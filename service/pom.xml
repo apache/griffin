@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.griffin</groupId>
-    <artifactId>core</artifactId>
+    <artifactId>service</artifactId>
     <packaging>war</packaging>
     <version>0.1.0-SNAPSHOT</version>
 
-    <name>Apache Griffin :: WebServer</name>
+    <name>Apache Griffin :: Web Service</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -43,6 +43,6 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>core</finalName>
+        <finalName>service</finalName>
     </build>
 </project>

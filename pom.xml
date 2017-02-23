@@ -16,7 +16,7 @@
     <name>Apache Griffin</name>
 
     <modules>
-        <module>core</module>
+        <module>service</module>
         <module>measure</module>
         <module>ui</module>
     </modules>
