@@ -19,7 +19,7 @@ public class PartitionItemsList implements Serializable {
     public List<String> generateString() {
         List<String> strs = new ArrayList<String>();
         for (PartitionItems items : getItemsList()) {
-            strs.add(items.generateString());
+            strs.add(items.toString());
         }
         return strs;
     }

@@ -1,22 +1,28 @@
 package org.apache.griffin.core.metastore;
 
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Service;
+
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.Partition;
+import org.apache.hadoop.hive.metastore.api.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
 
-@PropertySource("classpath:hive-conf.properties")
 @Service
 public class HiveMetastoreService {
 
-    @Value("${hive.conf.metastore.uris}")
+    private static final Logger log = LoggerFactory.getLogger(HiveMetastoreService.class);
+
+    @Value("${hive.metastore.uris}")
     private String uris;
 
-    @Value("${hive.default.dbname}")
+    @Value("${hive.metastore.dbname}")
     private String defaultDbName;
 
     @Override
@@ -38,26 +44,30 @@ public class HiveMetastoreService {
 
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
+        HiveMetaStoreClient client = null;
         try {
-            HiveMetaStoreClient client = getHiveMetastoreClient();
+            client = getHiveMetastoreClient();
             results = client.getAllDatabases();
+        } catch (MetaException e) {
+            log.error("Can not get databases",e.getMessage());
+        }finally {
             client.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return results;
     }
 
     public Iterable<String> getAllTables(String dbName) {
         Iterable<String> results = null;
+        HiveMetaStoreClient client = null;
         String useDbName = dbName;
-        if (useDbName == null || useDbName.equals("")) useDbName = defaultDbName;
+        if (!StringUtils.hasText(dbName)) useDbName = defaultDbName;
         try {
-            HiveMetaStoreClient client = getHiveMetastoreClient();
+            client = getHiveMetastoreClient();
             results = client.getAllTables(useDbName);
-            client.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception fetching tables info" + e.getMessage());
+        }finally {
+            client.close();
         }
         return results;
     }
@@ -65,13 +75,16 @@ public class HiveMetastoreService {
     public Table getTable(String dbName, String tableName) {
         Table result = null;
         String useDbName = dbName;
-        if (useDbName == null || useDbName.equals("")) useDbName = defaultDbName;
+        HiveMetaStoreClient client = null;
+        if (!StringUtils.hasText(dbName)) useDbName = defaultDbName;
         try {
-            HiveMetaStoreClient client = getHiveMetastoreClient();
+            client = getHiveMetastoreClient();
             result = client.getTable(useDbName, tableName);
-            client.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception fetching table info : " +tableName + " : " + e.getMessage());
+        }finally {
+            client.close();
+
         }
         return result;
     }
@@ -79,41 +92,34 @@ public class HiveMetastoreService {
     public Iterable<FieldSchema> getSchema(String dbName, String tableName) {
         Iterable<FieldSchema> results = null;
         String useDbName = dbName;
-        if (useDbName == null || useDbName.equals("")) useDbName = defaultDbName;
+        HiveMetaStoreClient client = null;
+        if (!StringUtils.hasText(useDbName)) useDbName = defaultDbName;
         try {
-            HiveMetaStoreClient client = getHiveMetastoreClient();
+            client = getHiveMetastoreClient();
             results = client.getSchema(useDbName, tableName);
-            client.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception fetching schema info : " +tableName + " : " + e.getMessage());
+        }finally {
+            client.close();
+
         }
         return results;
     }
 
-//    public Partition getPartition(String dbName, String tableName, String partName) {
-//        Partition result = null;
-//        String useDbName = dbName;
-//        if (useDbName == null || useDbName.equals("")) useDbName = defaultDbName;
-//        try {
-//            HiveMetaStoreClient client = getHiveMetastoreClient();
-//            result = client.getPartition(useDbName, tableName, partName);
-//            client.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return result;
-//    }
 
     public Partition getPartition(String dbName, String tableName, PartitionItems partitionItems) {
         Partition result = null;
         String useDbName = dbName;
-        if (useDbName == null || useDbName.equals("")) useDbName = defaultDbName;
+        HiveMetaStoreClient client = null;
+        if (!StringUtils.hasText(useDbName)) useDbName = defaultDbName;
         try {
-            HiveMetaStoreClient client = getHiveMetastoreClient();
-            result = client.getPartition(useDbName, tableName, partitionItems.generateString());
-            client.close();
+            client = getHiveMetastoreClient();
+            result = client.getPartition(useDbName, tableName, partitionItems.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception fetching partition info : " +tableName + " : " +partitionItems+" : "+ e.getMessage());
+        }finally {
+            client.close();
+
         }
         return result;
     }
@@ -121,13 +127,15 @@ public class HiveMetastoreService {
     public Iterable<Partition> getPartitions(String dbName, String tableName, PartitionItemsList partitionItemsList) {
         Iterable<Partition> results = null;
         String useDbName = dbName;
-        if (useDbName == null || useDbName.equals("")) useDbName = defaultDbName;
+        if (!StringUtils.hasText(useDbName)) useDbName = defaultDbName;
+        HiveMetaStoreClient client = null;
         try {
-            HiveMetaStoreClient client = getHiveMetastoreClient();
+            client = getHiveMetastoreClient();
             results = client.getPartitionsByNames(useDbName, tableName, partitionItemsList.generateString());
-            client.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception fetching partition info : " +tableName + " : " +partitionItemsList+" : "+ e.getMessage());
+        }finally {
+            client.close();
         }
         return results;
     }

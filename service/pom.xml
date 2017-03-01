@@ -16,9 +16,6 @@
         <scala.version>2.10</scala.version>
         <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
         <spring.version>4.3.2.RELEASE</spring.version>
-
-        <scala.compat.version>2.10</scala.compat.version>
-        <spark.version>1.6.0</spark.version>
     </properties>
 
 
@@ -47,28 +44,8 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>mysql</groupId>-->
-            <!--<artifactId>mysql-connector-java</artifactId>-->
-            <!--<scope>runtime</scope>-->
-        <!--</dependency>-->
 
-        <!--<dependency>-->
-            <!--<groupId>org.apache.spark</groupId>-->
-            <!--<artifactId>spark-core_${scala.compat.version}</artifactId>-->
-            <!--<version>${spark.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.spark</groupId>-->
-            <!--<artifactId>spark-hive_${scala.compat.version}</artifactId>-->
-            <!--<version>${spark.version}</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>org.apache.hadoop</groupId>-->
-            <!--<artifactId>hadoop-common</artifactId>-->
-            <!--<version>2.6.0</version>-->
-        <!--</dependency>-->
+        <!-- to access metastore from hive-->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>

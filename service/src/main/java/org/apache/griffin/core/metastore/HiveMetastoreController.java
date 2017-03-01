@@ -14,11 +14,6 @@ public class HiveMetastoreController {
     @Autowired
     HiveMetastoreService hiveMetastoreService;
 
-    @RequestMapping("/version")
-    public String greeting() {
-        return "0.1.0";
-    }
-
     @RequestMapping("/dbs")
     public Iterable<String> getAllDatabases() {
         return hiveMetastoreService.getAllDatabases();

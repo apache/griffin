@@ -24,7 +24,7 @@ public class PartitionItem implements Serializable {
 
     private String value;
 
-    public String generateString() {
+    public String toString() {
         return name + "=" + value;
     }
 }

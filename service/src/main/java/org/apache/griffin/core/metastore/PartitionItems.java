@@ -15,15 +15,15 @@ public class PartitionItems implements Serializable {
 
     private List<PartitionItem> items;
 
-    public String generateString() {
+    public String toString() {
         String s = "";
         int sz = items.size();
         for (int i = 0; i < sz; i++) {
             PartitionItem item = items.get(i);
             if (i < sz - 1) {
-                s += item.generateString() + "/";
+                s += item + "/";
             } else {
-                s += item.generateString();
+                s += item;
             }
         }
         return s;
