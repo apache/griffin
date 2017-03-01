@@ -26,7 +26,7 @@ public class GriffinWebApplication implements CommandLineRunner{
 
     public void run(String... strings) throws Exception {
         {
-            // save a couple of customers
+
             repository.save(new HiveDataAsset("table1","BE", "wenzhao"));
             repository.save(new HiveDataAsset("table2","BE", "wenzhao"));
             repository.save(new HiveDataAsset("table3","PDS", "wenzhao"));
@@ -36,7 +36,7 @@ public class GriffinWebApplication implements CommandLineRunner{
             repository.save(new HiveDataAsset("table7","GRIFFIN", "yueguo"));
 
 
-            // fetch all customers
+
             log.info("Customers found with findAll():");
             log.info("-------------------------------");
             for (HiveDataAsset hda : repository.findAll()) {
