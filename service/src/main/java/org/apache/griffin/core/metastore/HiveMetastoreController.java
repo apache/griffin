@@ -8,23 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/hive/metastore")
+@RequestMapping("/metastore/hive")
 public class HiveMetastoreController {
 
     @Autowired
     HiveMetastoreService hiveMetastoreService;
 
-    @RequestMapping("/dbs")
+    @RequestMapping("/db")
     public Iterable<String> getAllDatabases() {
         return hiveMetastoreService.getAllDatabases();
     }
 
-    @RequestMapping("/tables")
+    @RequestMapping("/table")
     public Iterable<String> getDefAllTables() {
         return hiveMetastoreService.getAllTables("");
     }
 
-    @RequestMapping("/tables/{db}")
+    @RequestMapping("/{db}/table")
     public Iterable<String> getAllTables(@PathVariable("db") String dbName) {
         return hiveMetastoreService.getAllTables(dbName);
     }
@@ -34,38 +34,10 @@ public class HiveMetastoreController {
         return hiveMetastoreService.getTable("", tableName);
     }
 
-    @RequestMapping("/table/{db}/{table}")
+    @RequestMapping("/{db}/table/{table}")
     public Table getTable(@PathVariable("db") String dbName, @PathVariable("table") String tableName) {
         return hiveMetastoreService.getTable(dbName, tableName);
     }
 
-    @RequestMapping("/schema/{table}")
-    public Iterable<FieldSchema> getDefSchema(@PathVariable("table") String tableName) {
-        return hiveMetastoreService.getSchema("", tableName);
-    }
 
-    @RequestMapping("/schema/{db}/{table}")
-    public Iterable<FieldSchema> getSchema(@PathVariable("db") String dbName, @PathVariable("table") String tableName) {
-        return hiveMetastoreService.getSchema(dbName, tableName);
-    }
-
-    @RequestMapping(value="/partition/{table}", method= RequestMethod.POST)
-    public Partition getDefPartition(@PathVariable("table") String tableName, @RequestBody PartitionItems partitionItems) {
-        return hiveMetastoreService.getPartition("", tableName, partitionItems);
-    }
-
-    @RequestMapping(value="/partition/{db}/{table}", method= RequestMethod.POST)
-    public Partition getPartition(@PathVariable("db") String dbName, @PathVariable("table") String tableName, @RequestBody PartitionItems partitionItems) {
-        return hiveMetastoreService.getPartition(dbName, tableName, partitionItems);
-    }
-
-    @RequestMapping(value="/partitions/{table}", method= RequestMethod.POST)
-    public Iterable<Partition> getDefPartitions(@PathVariable("table") String tableName, @RequestBody PartitionItemsList partitionItemsList) {
-        return hiveMetastoreService.getPartitions("", tableName, partitionItemsList);
-    }
-
-    @RequestMapping(value="/partitions/{db}/{table}", method= RequestMethod.POST)
-    public Iterable<Partition> getPartitions(@PathVariable("db") String dbName, @PathVariable("table") String tableName, @RequestBody PartitionItemsList partitionItemsList) {
-        return hiveMetastoreService.getPartitions(dbName, tableName, partitionItemsList);
-    }
 }

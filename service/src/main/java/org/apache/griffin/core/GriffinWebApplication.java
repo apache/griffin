@@ -35,9 +35,6 @@ public class GriffinWebApplication implements CommandLineRunner{
             repository.save(new HiveDataAsset("table6","IDS", "wenzhao"));
             repository.save(new HiveDataAsset("table7","GRIFFIN", "yueguo"));
 
-
-
-            log.info("Customers found with findAll():");
             log.info("-------------------------------");
             for (HiveDataAsset hda : repository.findAll()) {
                 log.info(hda.toString());
