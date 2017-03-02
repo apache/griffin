@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Inheritance(
         strategy = InheritanceType.SINGLE_TABLE
 )
-
 public class HiveDataAsset implements DataAsset {
     public String getName() {
         return name;
