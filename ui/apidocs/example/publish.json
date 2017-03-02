@@ -1,0 +1,17 @@
+{
+  "basic": {
+    "type": "3",
+    "system": "0",
+    "scheduleType": "1",
+    "owner": "aiye",
+    "name": "a_pub",
+    "desc": "publish",
+    "dataaset": "asset1",
+    "threshold": 800,
+    "email": "aa@bb.com",
+    "dataasetId": 72
+  },
+  "extra": {
+    "publishUrl": "http://localhost:3000"
+  }
+}
