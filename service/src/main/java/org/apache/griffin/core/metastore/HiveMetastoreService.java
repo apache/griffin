@@ -32,9 +32,7 @@ public class HiveMetastoreService {
         try {
             results = client.getAllDatabases();
         } catch (MetaException e) {
-            log.error("Can not get databases",e.getMessage());
-        }finally {
-//            client.close();
+            log.error("Can not get databases : ",e.getMessage());
         }
         return results;
     }
@@ -47,8 +45,6 @@ public class HiveMetastoreService {
             results = client.getAllTables(useDbName);
         } catch (Exception e) {
             log.warn("Exception fetching tables info" + e.getMessage());
-        }finally {
-//            client.close();
         }
         return results;
     }
@@ -61,9 +57,6 @@ public class HiveMetastoreService {
             result = client.getTable(useDbName, tableName);
         } catch (Exception e) {
             log.warn("Exception fetching table info : " +tableName + " : " + e.getMessage());
-        }finally {
-//            client.close();
-
         }
         return result;
     }
