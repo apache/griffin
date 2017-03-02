@@ -45,6 +45,7 @@
                     <exclude>src/**</exclude>
                     <exclude>target/**</exclude>
                     <exclude>pom.xml</exclude>
+                    <exclude>.DS_Store</exclude>
                   </excludes>
                   <filtering>true</filtering>
                 </resource>
