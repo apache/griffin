@@ -23,6 +23,10 @@ public class HiveMetastoreService {
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;
 
+    private String getUseDbName(String dbName) {
+        if (!StringUtils.hasText(dbName)) return defaultDbName;
+        else return dbName;
+    }
 
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
@@ -36,8 +40,7 @@ public class HiveMetastoreService {
 
     public Iterable<String> getAllTables(String dbName) {
         Iterable<String> results = null;
-        String useDbName = dbName;
-        if (!StringUtils.hasText(dbName)) useDbName = defaultDbName;
+        String useDbName = getUseDbName(dbName);
         try {
             results = client.getAllTables(useDbName);
         } catch (Exception e) {
@@ -48,8 +51,7 @@ public class HiveMetastoreService {
 
     public Table getTable(String dbName, String tableName) {
         Table result = null;
-        String useDbName = dbName;
-        if (!StringUtils.hasText(dbName)) useDbName = defaultDbName;
+        String useDbName = getUseDbName(dbName);
         try {
             result = client.getTable(useDbName, tableName);
         } catch (Exception e) {

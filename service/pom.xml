@@ -16,7 +16,15 @@
         <scala.version>2.10</scala.version>
         <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
         <spring.version>4.3.2.RELEASE</spring.version>
+        <confluent.version>3.2.0</confluent.version>
     </properties>
+
+    <!--<repositories>-->
+        <!--<repository>-->
+            <!--<id>confluent</id>-->
+            <!--<url>http://packages.confluent.io/maven/</url>-->
+        <!--</repository>-->
+    <!--</repositories>-->
 
 
     <dependencyManagement>
@@ -57,6 +65,12 @@
             <version>1.2.1</version>
         </dependency>
 
+        <!-- to access confluent schema registry -->
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-schema-registry-client</artifactId>
+            <version>${confluent.version}</version>
+        </dependency>
 
 
         <dependency>
