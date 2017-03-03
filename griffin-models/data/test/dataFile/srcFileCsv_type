@@ -1,0 +1,5 @@
+columnName,columnType
+id,long
+name,string
+age,int
+desc,string

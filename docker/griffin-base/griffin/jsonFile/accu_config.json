@@ -1,0 +1,63 @@
+{
+  "source": "users_info_src",
+  "target": "users_info_target",
+  "accuracyMapping": [
+    {
+      "sourceColId": 0,
+      "sourceColName": "user_id",
+      "targetColId": 0,
+      "targetColName": "user_id",
+      "matchFunction": "true",
+      "isPK": true
+    },
+    {
+      "sourceColId": 1,
+      "sourceColName": "first_name",
+      "targetColId": 1,
+      "targetColName": "first_name",
+      "matchFunction": "false",
+      "isPK": false
+    },
+    {
+      "sourceColId": 2,
+      "sourceColName": "last_name",
+      "targetColId": 2,
+      "targetColName": "last_name",
+      "matchFunction": "false",
+      "isPK": false
+    },
+    {
+      "sourceColId": 3,
+      "sourceColName": "address",
+      "targetColId": 3,
+      "targetColName": "address",
+      "matchFunction": "false",
+      "isPK": false
+    },
+    {
+      "sourceColId": 4,
+      "sourceColName": "email",
+      "targetColId": 4,
+      "targetColName": "email",
+      "matchFunction": "false",
+      "isPK": false
+    },
+    {
+      "sourceColId": 5,
+      "sourceColName": "phone",
+      "targetColId": 5,
+      "targetColName": "phone",
+      "matchFunction": "false",
+      "isPK": false
+    },
+    {
+      "sourceColId": 6,
+      "sourceColName": "post_code",
+      "targetColId": 6,
+      "targetColName": "post_code",
+      "matchFunction": "false",
+      "isPK": false
+    }
+  ]
+}
+

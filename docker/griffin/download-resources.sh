@@ -1,0 +1,63 @@
+#!/bin/bash
+
+
+URI=https://oss.sonatype.org/content/repositories/snapshots/com/ebay/oss
+
+#get xml line
+getval()
+{
+        RESULT=`sed -n 's/.*>\(.*\)<\/'$2'>/\1/p' $1`
+        echo $RESULT | cut -d ' ' -f 1
+}
+
+#get model version jar
+MODEL_DIR=griffin-models
+MODEL_MAVEN_XML=maven-metadata.xml
+wget $URI/$MODEL_DIR/$MODEL_MAVEN_XML
+MODEL_ARTIFACT_ID=`getval $MODEL_MAVEN_XML artifactId`
+MODEL_VERSION=`getval $MODEL_MAVEN_XML version`
+rm $MODEL_MAVEN_XML
+
+MODEL_MAVEN_METADATA_XML=maven-metadata.xml
+MODEL_PATH=$URI/$MODEL_DIR/$MODEL_VERSION
+wget $MODEL_PATH/$MODEL_MAVEN_METADATA_XML
+MODEL_VALUE=`getval $MODEL_MAVEN_METADATA_XML value`
+rm $MODEL_MAVEN_METADATA_XML
+
+MODEL_JAR=${MODEL_ARTIFACT_ID}-${MODEL_VALUE}.jar
+
+
+#get core version war
+CORE_DIR=griffin-core
+CORE_MAVEN_XML=maven-metadata.xml
+wget $URI/$CORE_DIR/$CORE_MAVEN_XML
+CORE_ARTIFACT_ID=`getval $CORE_MAVEN_XML artifactId`
+CORE_VERSION=`getval $CORE_MAVEN_XML version`
+rm $CORE_MAVEN_XML
+
+CORE_MAVEN_METADATA_XML=maven-metadata.xml
+CORE_PATH=$URI/$CORE_DIR/$CORE_VERSION
+wget $CORE_PATH/$CORE_MAVEN_METADATA_XML
+CORE_VALUE=`getval $CORE_MAVEN_METADATA_XML value`
+rm $MODEL_MAVEN_METADATA_XML
+
+CORE_WAR=${CORE_ARTIFACT_ID}-${CORE_VALUE}.war
+
+#download and move
+MODEL_FULL_PATH=$MODEL_PATH/$MODEL_JAR
+CORE_FULL_PATH=$CORE_PATH/$CORE_WAR
+
+MODEL_JAR_NEW=griffin-models.jar
+CORE_WAR_NEW=ROOT.war
+
+MODEL_JAR_NEW_PATH=$GRIFFIN_HOME/$MODEL_JAR_NEW
+CORE_WAR_NEW_PATH=$APACHE_HOME/webapps/$CORE_WAR_NEW
+
+wget $MODEL_FULL_PATH
+wget $CORE_FULL_PATH
+
+mv $MODEL_JAR $MODEL_JAR_NEW_PATH
+mv $CORE_WAR $CORE_WAR_NEW_PATH
+
+chmod 755 $MODEL_JAR_NEW_PATH
+chmod 755 $CORE_WAR_NEW_PATH
