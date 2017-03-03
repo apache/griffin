@@ -1,0 +1,4 @@
+models {
+  app.name = "BarkRealtimeApp"
+  batch.interval.seconds = 10
+}

@@ -1,0 +1,18 @@
+{
+  "type" : "record",
+  "name" : "tgt_data",
+  "namespace" : "org.apache.griffin",
+  "fields" : [ {
+		"name" : "id",
+		"type" : "long"
+	}, {
+		"name" : "name",
+		"type" : ["string", "null"]
+	}, {
+		"name" : "age",
+		"type" : "int"
+	}, {
+		"name" : "desc",
+		"type" : ["string", "null"]
+	} ]
+}
