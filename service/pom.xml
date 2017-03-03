@@ -19,12 +19,12 @@
         <confluent.version>3.2.0</confluent.version>
     </properties>
 
-    <!--<repositories>-->
-        <!--<repository>-->
-            <!--<id>confluent</id>-->
-            <!--<url>http://packages.confluent.io/maven/</url>-->
-        <!--</repository>-->
-    <!--</repositories>-->
+    <repositories>
+        <repository>
+            <id>confluent</id>
+            <url>http://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
 
 
     <dependencyManagement>

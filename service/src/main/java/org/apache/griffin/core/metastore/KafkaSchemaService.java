@@ -5,6 +5,7 @@ import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,12 @@ public class KafkaSchemaService {
     @Value("${kafka.schema.registry.url}")
     private String url;
 
+
     private String registryUrl(final String path) {
         if (StringUtils.hasText(path)) {
             String usePath = path;
             if (!path.startsWith("/")) usePath = "/" + path;
-            return url + usePath;
+            return this.url + usePath;
         }
         return "";
     }
