@@ -27,5 +27,23 @@
         <module>ui</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>prod</id>
+            <modules>
+                <module>service</module>
+                <module>measure</module>
+                <module>ui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <modules>
+                <module>service</module>
+                <module>measure</module>
+            </modules>
+        </profile>
+    </profiles>
+
 
 </project>
