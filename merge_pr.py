@@ -229,16 +229,16 @@ def fix_version_from_branch(branch, versions):
         return filter(lambda x: x.name.startswith(branch_ver), versions)[-1]
 
 
-def resolve_jira_issue(merge_branches, comment, default_jira_id=""):
+def resolve_jira_issue(merge_branches, comment, default_jira_id="5"):
     asf_jira = jira.client.JIRA({'server': JIRA_API_BASE},
                                 basic_auth=(JIRA_USERNAME, JIRA_PASSWORD))
 
-    jira_id = raw_input("Enter a JIRA id [%s]: " % default_jira_id)
+    jira_id = raw_input("Enter a Griffin JIRA number id [%s]: " % default_jira_id)
     if jira_id == "":
         jira_id = default_jira_id
 
     try:
-        issue = asf_jira.issue(jira_id)
+        issue = asf_jira.issue("GRIFFIN-%s" % (jira_id))
     except Exception as e:
         fail("ASF JIRA could not find %s\n%s" % (jira_id, e))
 
