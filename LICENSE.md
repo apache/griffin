@@ -9,9 +9,9 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 =======================================================================
 
-Griffin subcomponents:
+Apache Griffin subcomponents:
 
-The Griffin project contains subcomponents in the source code release with separate copyright notices and license terms. Your use of the source code for the these subcomponents is subject to the terms and
+The Apache Griffin project contains subcomponents in the source code release with separate copyright notices and license terms. Your use of the source code for the these subcomponents is subject to the terms and
 conditions of their respective licenses.
 
 
@@ -19,7 +19,7 @@ conditions of their respective licenses.
 The MIT License (http://opensource.org/licenses/mit-license.html)
 -----------------------------------------------------------------------
 
-The Griffin project bundles the following files under the MIT License:
+The Apache Griffin project bundles the following files under the MIT License:
 
 - Angular.JS v1.5.9 (http://angularjs.org) - Copyright (c) 2010-2015 Google, Inc.
 - Angular Smarttable 2.1.6 (https://github.com/lorenzofox3/Smart-Table)
@@ -40,7 +40,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ---------------------------------------------------------------------------
 FreeBSD License (https://opensource.org/licenses/BSD-2-Clause)
 ---------------------------------------------------------------------------
-The Griffin project bundles the following files under the FreeBSD License:
+The Apache Griffin project bundles the following files under the FreeBSD License:
 
 - echarts (http://echarts.baidu.com/) - Copyright (c) 2013, Baidu Inc.
 
@@ -72,7 +72,7 @@ either expressed or implied, of the FreeBSD Project.
 SIL Open Font License (https://opensource.org/licenses/OFL-1.1)
 ---------------------------------------------------------------------------
 
-The Griffin project bundles the following files under the SIL OFL 1.1 License:
+The Apache Griffin project bundles the following files under the SIL OFL 1.1 License:
 
 - Font Awesome (font files) (http://fontawesome.io) Copyright (c) Dave
     Gandy

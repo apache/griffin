@@ -2,7 +2,7 @@
 
 ## Goals
 
-Griffin is a open source Data Quality solution for distributed data systems at any scale in both streaming or batch data context. When people use open source products (e.g. Hadoop, Spark, Kafka, Storm), they always need a data quality service to build his/her confidence on data quality processed by those platforms. Griffin creates a unified process to define and construct data quality measurement pipeline across multiple data systems to provide:  
+Apache Griffin is a model driven open source Data Quality solution for distributed data systems at any scale in both streaming or batch data context. When people use open source products (e.g. Hadoop, Spark, Kafka, Storm), they always need a data quality service to build his/her confidence on data quality processed by those platforms. Apache Griffin creates a unified process to define and construct data quality measurement pipeline across multiple data systems to provide:  
 
 - Automatic quality validation of the data
 - Data profiling and anomaly detection
