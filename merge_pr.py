@@ -18,10 +18,10 @@
 #
 
 # Utility for creating well-formed pull request merges and pushing them to Apache.
-#   usage: ./apache-pr-merge.py    (see config env vars below)
+#   usage: ./merge_pr.py    (see config env vars below)
 #
-# This utility assumes you already have local a Eagle git folder and that you
-# have added remotes corresponding to both (i) the github apache Eagle
+# This utility assumes you already have local a Apache Griffin git folder and that you
+# have added remotes corresponding to both (i) the github Apache Griffin
 # mirror and (ii) the apache git repo.
 
 import json
@@ -38,7 +38,7 @@ try:
 except ImportError:
     JIRA_IMPORTED = False
 
-# Location of your EAGLE git development area
+# Location of your GRIFFIN git development area
 GRIFFIN_HOME = os.environ.get("GRIFFIN_HOME", os.getcwd())
 # Remote name which points to the Gihub site
 PR_REMOTE_NAME = os.environ.get("PR_REMOTE_NAME", "apache-github")
@@ -150,7 +150,7 @@ def merge_pr(pr_num, target_ref, title, body, pr_repo_desc):
     merge_message_flags += ["-m", title]
     if body is not None:
         # We remove @ symbols from the body to avoid triggering e-mails
-        # to people every time someone creates a public fork of EAGLE.
+        # to people every time someone creates a public fork of GRIFFIN.
         merge_message_flags += ["-m", body.replace("@", "")]
 
     authors = "\n".join(["Author: %s" % a for a in distinct_authors])
@@ -256,7 +256,7 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id=""):
     print ("summary\t\t%s\nassignee\t%s\nstatus\t\t%s\nurl\t\t%s/%s\n" % (
         cur_summary, cur_assignee, cur_status, JIRA_BASE, jira_id))
 
-    versions = asf_jira.project_versions("EAGLE")
+    versions = asf_jira.project_versions("GRIFFIN")
     versions = sorted(versions, key=lambda x: x.name, reverse=True)
     versions = filter(lambda x: x.raw['released'] is False, versions)
     # Consider only x.y.z versions
@@ -295,7 +295,7 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id=""):
 
 
 def resolve_jira_issues(title, merge_branches, comment):
-    jira_ids = re.findall("EAGLE-[0-9]{4,5}", title)
+    jira_ids = re.findall("GRIFFIN-[0-9]{4,5}", title)
 
     if len(jira_ids) == 0:
         resolve_jira_issue(merge_branches, comment)
@@ -308,17 +308,17 @@ def standardize_jira_ref(text):
     components = []
 
     # If the string is compliant, no need to process any further
-    if (re.search(r'^\[EAGLE-[0-9]{3,6}\](\[[A-Z0-9_\s,]+\] )+\S+', text)):
+    if (re.search(r'^\[GRIFFIN-[0-9]{3,6}\](\[[A-Z0-9_\s,]+\] )+\S+', text)):
         return text
 
     # Extract JIRA ref(s):
-    pattern = re.compile(r'(EAGLE[-\s]*[0-9]{3,6})+', re.IGNORECASE)
+    pattern = re.compile(r'(GRIFFIN[-\s]*[0-9]{3,6})+', re.IGNORECASE)
     for ref in pattern.findall(text):
         # Add brackets, replace spaces with a dash, & convert to uppercase
         jira_refs.append('[' + re.sub(r'\s+', '-', ref.upper()) + ']')
         text = text.replace(ref, '')
 
-    # Extract EAGLE component(s):
+    # Extract GRIFFIN component(s):
     # Look for alphanumeric chars, spaces, dashes, periods, and/or commas
     pattern = re.compile(r'(\[[\w\s,-\.]+\])', re.IGNORECASE)
     for component in pattern.findall(text):

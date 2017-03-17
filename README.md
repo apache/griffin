@@ -4,7 +4,7 @@ Apache Griffin is a model driven Data Quality solution for distributed data syst
 
 
 ### Contact us
-[Google Groups](mailto://dev@griffin.incubator.apache.org)
+[Dev List](mailto://dev@griffin.incubator.apache.org)
 
 
 ### CI
