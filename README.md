@@ -1,10 +1,10 @@
-## Griffin [![Travic-CI](https://api.travis-ci.org/eBay/griffin.svg)](https://travis-ci.org/eBay/griffin)
+## Apache Griffin [![Travic-CI](https://api.travis-ci.org/eBay/griffin.svg)](https://travis-ci.org/eBay/griffin)
 
-Griffin is a Data Quality solution for distributed data systems at any scale in both streaming and batch data context. It provides a framework process for defining data quality model, executing data quality measurement, automating data profiling and validation, as well as an unified data quality visualization across multiple data systems. You can access our home page [here](https://ebay.github.io/griffin/).
+Apache Griffin is a model driven Data Quality solution for distributed data systems at any scale in both streaming and batch data context. It provides a framework process for defining data quality model, executing data quality measurement, automating data profiling and validation, as well as an unified data quality visualization across multiple data systems. You can access our home page [here](https://ebay.github.io/griffin/).
 
 
 ### Contact us
-[Google Groups](mailto://ebay-griffin-devs@googlegroups.com)
+[Google Groups](mailto://dev@griffin.incubator.apache.org)
 
 
 ### CI
@@ -162,7 +162,7 @@ Release: https://oss.sonatype.org/service/local/staging/deploy/maven2
 13. You can also review the RESTful APIs through http://localhost:8080/api/v1/application.wadl
 
 ### How to develop
-In dev environment, you can run backend REST service and frontend UI seperately. The majority of the backend code logics are in the [griffin-core](https://github.com/eBay/griffin/tree/master/griffin-core) project. So, to start backend, please import maven project Griffin into eclipse, right click ***griffin-core->Run As->Run On Server***
+In dev environment, you can run backend REST service and frontend UI seperately. The majority of the backend code logics are in the [griffin-core](https://github.com/apache/incubator-griffin/tree/master/griffin-core) project. So, to start backend, please import maven project Griffin into eclipse, right click ***griffin-core->Run As->Run On Server***
 
 To start frontend, please follow up the below steps.
 
@@ -189,4 +189,3 @@ To start frontend, please follow up the below steps.
 ### Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute code, documentation, etc.
-

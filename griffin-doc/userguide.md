@@ -1,8 +1,8 @@
-# Griffin User Guide
+# Apache Griffin User Guide
 
 ## 1 Introduction & Access
 
-- Griffin is an open source Data Quality solution for distributed data systems at any scale in both streaming or batch data context.
+- Apache Griffin is an open source Data Quality solution for distributed data systems at any scale in both streaming or batch data context.
 - Users will primarily access this application from a PC.
 
 ## 2 Procedures
