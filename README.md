@@ -1,4 +1,4 @@
-## Apache Griffin [![Travic-CI](https://api.travis-ci.org/eBay/griffin.svg)](https://travis-ci.org/eBay/griffin)
+## Apache Griffin
 
 Apache Griffin is a model driven Data Quality solution for distributed data systems at any scale in both streaming and batch data context. It provides a framework process for defining data quality model, executing data quality measurement, automating data profiling and validation, as well as an unified data quality visualization across multiple data systems. You can access our home page [here](https://ebay.github.io/griffin/).
 
