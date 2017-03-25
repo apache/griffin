@@ -81,8 +81,8 @@ Select the target dataset and fields which will be used for comparision.
 - Step2:  Then, select whcih rule to match the source and the target. Here are 5 options to choose:
   1. Exactly match: each column in the two columns should be 100% matched.
   2. Length: only match whether the length of the two colums is the same.
-  3. Lower case: all the characters wiil be set in lower case, and then compare whether they are the same.
-  4. Upper case:all the characters wiil be set in upper case, and then compare whether they are the same.
+  3. Lower case: all the characters will be set in lower case, and then compare whether they are the same.
+  4. Upper case:all the characters will be set in upper case, and then compare whether they are the same.
   5. Trim: all the blank space will be removed, and then compare whether they are the same.
 - Step3:  Source fields:choose the which source that you want to compare with the target.
 
