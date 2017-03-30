@@ -1,0 +1,11 @@
+{
+  "spark": {
+    "app.name": "GriffinAccuStreamingApp",
+    "checkpoint.dir": "hdfs:///test/kafka/cp",
+    "config": {
+      "spark.task.maxFailures": 5,
+      "spark.streaming.kafka.maxRatePerPartition": 1000,
+      "spark.streaming.concurrentJobs": 4
+    }
+  }
+}
