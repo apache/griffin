@@ -81,8 +81,8 @@ Select the target dataset and fields which will be used for comparision.
 - Step2:  Then, select whcih rule to match the source and the target. Here are 5 options to choose:
   1. Exactly match: each column in the two columns should be 100% matched.
   2. Length: only match whether the length of the two colums is the same.
-  3. Lower case: all the characters wiil be set in lower case, and then compare whether they are the same.
-  4. Upper case:all the characters wiil be set in upper case, and then compare whether they are the same.
+  3. Lower case: all the characters will be set in lower case, and then compare whether they are the same.
+  4. Upper case:all the characters will be set in upper case, and then compare whether they are the same.
   5. Trim: all the blank space will be removed, and then compare whether they are the same.
 - Step3:  Source fields:choose the which source that you want to compare with the target.
 
@@ -102,7 +102,7 @@ After you create a new accuracy model,there are three status:
 
 1. **Testing:**This means the data is still in processing.
 2. **Need verify:**The data has already been processed, you can check the result by clicking the model's name.If you are satisified with the final result, you can click 'deploy' button to set the model into 'deployed' mode.
-3. **Deployed:**The model will be processed everyt time interval as you set in the schedule type.
+3. **Deployed:**The model will be processed every time interval as you set in the schedule type.
 
 **Example:**
 
@@ -284,7 +284,7 @@ Subscribe steps:
 a)      Can select on Org level, then all the assets under this Org will be selected    
 b)      Can select on Asset level    
 c)      Can multiple select     
-2. After the assets are selected, all the models under these assets shouldbe displayed, so that the end user will know which metrics he's selected
+2. After the assets are selected, all the models under these assets should be displayed, so that the end user will know which metrics he's selected
 3. Do subscription, then you may get the result as follow.
 
 <img src="img/userguide/subscriberesult.PNG">
