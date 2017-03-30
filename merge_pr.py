@@ -229,7 +229,7 @@ def fix_version_from_branch(branch, versions):
         return filter(lambda x: x.name.startswith(branch_ver), versions)[-1]
 
 
-def resolve_jira_issue(merge_branches, comment, default_jira_id="5"):
+def resolve_jira_issue(merge_branches, comment, default_jira_id="GRIFFIN-5"):
     asf_jira = jira.client.JIRA({'server': JIRA_API_BASE},
                                 basic_auth=(JIRA_USERNAME, JIRA_PASSWORD))
 
