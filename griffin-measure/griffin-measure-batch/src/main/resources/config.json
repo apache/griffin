@@ -6,18 +6,16 @@
     "connector": {
       "type": "hive",
       "version": "1.2",
-      "conf": ";;"
-    },
-    "deserializer": "json"
+      "conf": "table.name = users_info_source"
+    }
   },
 
   "target": {
     "connector": {
       "type": "hive",
       "version": "1.2",
-      "conf": ";;"
-    },
-    "deserializer": "json"
+      "conf": "table.name = users_info_target"
+    }
   },
 
   "evaluateRule": {
@@ -26,7 +24,26 @@
       "type": "DSL-xxx",
       "rules": [
         {
-
+          "isPK": true,
+          "rule": "${source}['user_id'] == ${target}['user_id']"
+        },
+        {
+          "rule": "${source}['first_name'] == ${target}['first_name']"
+        },
+        {
+          "rule": "${source}['last_name'] == ${target}['last_name']"
+        },
+        {
+          "rule": "${source}['address'] == ${target}['address']"
+        },
+        {
+          "rule": "${source}['email'] == ${target}['email']"
+        },
+        {
+          "rule": "${source}['phone'] == ${target}['phone']"
+        },
+        {
+          "rule": "${source}['post_code'] == ${target}['post_code']"
         }
       ]
     }
