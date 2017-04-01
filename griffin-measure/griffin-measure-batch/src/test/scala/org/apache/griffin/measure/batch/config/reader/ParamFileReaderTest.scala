@@ -6,9 +6,13 @@ import org.scalatest.junit.JUnitRunner
 import org.apache.griffin.measure.batch.config.params.user._
 import org.apache.griffin.measure.batch.config.params.env._
 
+import scala.util.{Success, Failure}
+
+import org.apache.griffin.measure.batch.log.Loggable
+
 
 @RunWith(classOf[JUnitRunner])
-class ParamFileReaderTest extends FunSuite with Matchers with BeforeAndAfter {
+class ParamFileReaderTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
 
   test("test file reader") {
     val userReader = ParamFileReader("src/test/resources/config.json")
@@ -17,8 +21,15 @@ class ParamFileReaderTest extends FunSuite with Matchers with BeforeAndAfter {
     val p1 = userReader.readConfig[UserParam]
     val p2 = envReader.readConfig[EnvParam]
 
-    println(p1)
-    println(p2)
+    p1 match {
+      case Success(v) => println(v)
+      case Failure(ex) => error(ex.getMessage)
+    }
+
+    p2 match {
+      case Success(v) => println(v)
+      case Failure(ex) => error(ex.getMessage)
+    }
   }
 
 }

@@ -10,4 +10,16 @@ trait Loggable {
     logger.info(msg)
   }
 
+  protected def debug(msg: String): Unit = {
+    logger.debug(msg)
+  }
+
+  protected def warn(msg: String): Unit = {
+    logger.warn(msg)
+  }
+
+  protected def error(msg: String): Unit = {
+    logger.error(msg)
+  }
+
 }
