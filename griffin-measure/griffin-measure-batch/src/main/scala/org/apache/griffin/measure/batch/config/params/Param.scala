@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.config.params
 
-trait ConfigParam extends Serializable {
+trait Param extends Serializable {
 
   def validate(): Boolean = true
   
