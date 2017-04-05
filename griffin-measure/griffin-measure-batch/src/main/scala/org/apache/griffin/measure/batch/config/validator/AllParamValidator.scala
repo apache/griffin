@@ -1,9 +1,15 @@
 package org.apache.griffin.measure.batch.config.validator
 
-import org.apache.log4j.LogManager
+import org.apache.griffin.measure.batch.config.params.Param
 
-class AllParamValidator extends ParamValidator {
+import scala.util.Try
 
-  @transient lazy val log = LogManager.getLogger("myLogger")
+case class AllParamValidator() extends ParamValidator {
+
+  def validate[T <: Param](param: Param): Try[Boolean] = {
+    Try {
+      true
+    }
+  }
 
 }

@@ -1,7 +1,6 @@
 package org.apache.griffin.measure.batch.config.reader
 
 import org.apache.griffin.measure.batch.config.params.Param
-import org.apache.griffin.measure.batch.log.Loggable
 import org.apache.griffin.measure.batch.utils.JsonUtil
 
 import scala.util.Try
