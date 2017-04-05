@@ -6,7 +6,9 @@
     "connector": {
       "type": "hive",
       "version": "1.2",
-      "config": "table.name = users_info_source"
+      "config": {
+        "table.name": "users_info_source"
+      }
     }
   },
 
@@ -14,7 +16,9 @@
     "connector": {
       "type": "hive",
       "version": "1.2",
-      "config": "table.name = users_info_target"
+      "config": {
+        "table.name": "users_info_target"
+      }
     }
   },
 

@@ -3,7 +3,7 @@ package org.apache.griffin.measure.batch.persist
 import org.apache.griffin.measure.batch.result._
 import org.apache.griffin.measure.batch.utils.{HttpUtil, JsonUtil}
 
-case class HttpPersist(url: String, method: String, metricName: String, timeStamp: Long) extends Persist {
+case class HttpPersist(api: String, method: String, metricName: String, timeStamp: Long) extends Persist {
 
   def start(): Unit = {}
   def finish(): Unit = {}
@@ -17,8 +17,8 @@ case class HttpPersist(url: String, method: String, metricName: String, timeStam
         // post
         val params = Map[String, Object]()
         val header = Map[String, Object](("content-type" -> "application/json"))
-        val status = HttpUtil.httpRequest(url, method, params, header, data)
-        info(s"${method} to ${url} response status: ${status}")
+        val status = HttpUtil.httpRequest(api, method, params, header, data)
+        info(s"${method} to ${api} response status: ${status}")
       }
       case _ => {
         info(s"result: ${result}")
