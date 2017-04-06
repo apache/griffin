@@ -5,7 +5,7 @@ import org.apache.griffin.measure.batch.utils.{HttpUtil, JsonUtil}
 
 case class HttpPersist(api: String, method: String, metricName: String, timeStamp: Long) extends Persist {
 
-  def start(): Unit = {}
+  def start(msg: String): Unit = {}
   def finish(): Unit = {}
 
   def result(rt: Long, result: Result): Unit = {

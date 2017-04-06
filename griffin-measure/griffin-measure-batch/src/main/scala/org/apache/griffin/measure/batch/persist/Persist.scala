@@ -7,7 +7,7 @@ import org.apache.griffin.measure.batch.result._
 trait Persist extends Loggable with Serializable {
   val timeStamp: Long
 
-  def start(): Unit
+  def start(msg: String): Unit
   def finish(): Unit
 
   def result(rt: Long, result: Result): Unit
