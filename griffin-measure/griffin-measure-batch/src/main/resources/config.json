@@ -28,13 +28,13 @@
       "type": "DSL-xxx",
       "rules": [
         {
-          "rule": "@Key ${source}['user_id'] == ${target}['user_id']"
+          "rule": "@Key ${source}['user_id'] === ${target}['user_id']"
         },
         {
-          "rule": "${source}['first_name'] == ${target}['first_name']; ${source}['last_name'] == ${target}['last_name']; ${source}['address'] == ${target}['address']"
+          "rule": "${source}['first_name'] === ${target}['first_name']; ${source}['last_name'] === ${target}['last_name']; ${source}['address'] === ${target}['address']"
         },
         {
-          "rule": "${source}['email'] == ${target}['email']; ${source}['phone'] == ${target}['phone']; ${source}['post_code'] == ${target}['post_code']"
+          "rule": "${source}['email'] === ${target}['email']; ${source}['phone'] === ${target}['phone']; ${source}['post_code'] === ${target}['post_code']"
         }
       ]
     }
