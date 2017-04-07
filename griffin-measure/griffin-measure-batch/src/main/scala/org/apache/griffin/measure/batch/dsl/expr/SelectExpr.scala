@@ -23,21 +23,14 @@ case class AnyPositionExpr(expression: String) extends SelectExpr {
 
 }
 
-case class FilterOprExpr(expression: String, left: Expr, right: Expr) extends SelectExpr {
+case class FilterOprExpr(expression: String, left: VariableExpr, right: ConstExpr) extends SelectExpr {
 
   val value: String = expression
 
 }
 
-case class FunctionExpr(expression: String, args: Iterable[Expr]) extends SelectExpr {
+case class FunctionExpr(expression: String, args: Iterable[ConstExpr]) extends SelectExpr {
 
-  val value: String = expression
-
-}
-
-case class SelectorsExpr(head: Expr, args: Iterable[Expr]) extends SelectExpr {
-
-  val expression: String = ""
   val value: String = expression
 
 }

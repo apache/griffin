@@ -7,7 +7,8 @@
       "type": "hive",
       "version": "1.2",
       "config": {
-        "table.name": "users_info_source"
+        "table.name": "users_info_source",
+        "partitions": ""
       }
     }
   },
@@ -17,7 +18,9 @@
       "type": "hive",
       "version": "1.2",
       "config": {
-        "table.name": "users_info_target"
+        "database": "default",
+        "table.name": "users_info_target",
+        "partitions": ""
       }
     }
   },
@@ -25,7 +28,7 @@
   "evaluateRule": {
     "sampleRatio": 1,
     "assertion": {
-      "type": "DSL-xxx",
+      "type": "DSL-griffin",
       "rules": [
         {
           "rule": "@Key ${source}['user_id'] === ${target}['user_id']"

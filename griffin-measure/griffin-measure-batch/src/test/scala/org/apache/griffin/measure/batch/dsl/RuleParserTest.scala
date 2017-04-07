@@ -15,8 +15,8 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
   test("test rule parser") {
     val ruleParser = RuleParser()
 
-//    val rules = "outTime = 24h; @Invalid ${source}['__time'] + ${outTime} > ${target}['__time']"
-    val rules = "@Key ${source}.json()['seeds'][*].json()['metadata'].json()['tracker']['crawlRequestCreateTS'] === ${target}.json()['groups'][0]['attrsList']['name'='CRAWLMETADATA']['values'][0].json()['tracker']['crawlRequestCreateTS']"
+    val rules = "outTime = 24h; @Invalid ${source}['__time'] + ${outTime} > ${target}['__time']"
+//    val rules = "@Key ${source}.json()['seeds'][*].json()['metadata'].json()['tracker']['crawlRequestCreateTS'] === ${target}.json()['groups'][0]['attrsList']['name'='CRAWLMETADATA']['values'][0].json()['tracker']['crawlRequestCreateTS']"
 //    val rules = "${source}['__time'] + ${outTime} > ${target}['__time']"
 //    val rules = "${source}['__time'] > ${target}['__time']"
 //    val rules = "432"

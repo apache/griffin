@@ -27,52 +27,54 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   val exprSep: Parser[String] = ";"
 
   // simple
-  def variableString: Parser[Expr] = "'" ~> anyString <~ "'" ^^ { VariableStringExpr(_) }
-  def constString: Parser[Expr] = "'" ~> anyString <~ "'" ^^ { ConstStringExpr(_) }
-  def constValue: Parser[Expr] = time ^^ { ConstTimeExpr(_) } | number ^^ { ConstNumberExpr(_)} | constString
-  def variableValue: Parser[Expr] = variable ^^ { VariableStringExpr(_) }
-  def quoteVariableValue: Parser[Expr] = "${" ~> variable <~ "}" ^^ { QuoteVariableStringExpr(_) }
-  def position: Parser[Expr] = anyPosition ^^ { AnyPositionExpr(_) } | """\d+""".r ^^ { NumPositionExpr(_) } | "'" ~> anyString <~ "'" ^^ { StringPositionExpr(_) }
-  def argument: Parser[Expr] = constValue
-  def annotationExpr: Parser[Expr] = "@" ~> variable ^^ { AnnotationExpr(_) }
+  def variableString: Parser[VariableExpr] = "'" ~> anyString <~ "'" ^^ { VariableStringExpr(_) }
+  def constString: Parser[ConstExpr] = "'" ~> anyString <~ "'" ^^ { ConstStringExpr(_) }
+  def constValue: Parser[ConstExpr] = time ^^ { ConstTimeExpr(_) } | number ^^ { ConstNumberExpr(_)} | constString
+  def variableValue: Parser[VariableExpr] = variable ^^ { VariableStringExpr(_) }
+  def quoteVariableValue: Parser[VariableExpr] = "${" ~> variable <~ "}" ^^ { QuoteVariableStringExpr(_) }
+  def position: Parser[SelectExpr] = anyPosition ^^ { AnyPositionExpr(_) } | """\d+""".r ^^ { NumPositionExpr(_) } | "'" ~> anyString <~ "'" ^^ { StringPositionExpr(_) }
+  def argument: Parser[ConstExpr] = constValue
+  def annotationExpr: Parser[AnnotationExpr] = "@" ~> variable ^^ { AnnotationExpr(_) }
 
   // selector
-  def filterOpration: Parser[Expr] = (variableString ~ filterOpr ~ constString) ^^ {
+  def filterOpration: Parser[SelectExpr] = (variableString ~ filterOpr ~ constString) ^^ {
     case v ~ opr ~ c => FilterOprExpr(opr, v, c)
   }
-  def positionExpr: Parser[Expr] = "[" ~> (filterOpration | position) <~ "]"
-  def functionExpr: Parser[Expr] = "." ~ variable ~ "(" ~ repsep(argument, ",") ~ ")" ^^ {
+  def positionExpr: Parser[SelectExpr] = "[" ~> (filterOpration | position) <~ "]"
+  def functionExpr: Parser[SelectExpr] = "." ~ variable ~ "(" ~ repsep(argument, ",") ~ ")" ^^ {
     case _ ~ v ~ _ ~ args ~ _ => FunctionExpr(v, args)
   }
-  def selectorExpr: Parser[Expr] = positionExpr | functionExpr
-  def selectorsExpr: Parser[Expr] = quoteVariableValue ~ rep(selectorExpr) ^^ {
-    case q ~ tails => SelectorsExpr(q, tails)
+  def selectorExpr: Parser[SelectExpr] = positionExpr | functionExpr
+
+  // data
+  def selectorsExpr: Parser[DataExpr] = quoteVariableValue ~ rep(selectorExpr) ^^ {
+    case q ~ tails => SelectionExpr(q, tails)
   }
 
   // calculation
-  def factor: Parser[Expr] = constValue | selectorsExpr | "(" ~> expr <~ ")"
-  def term: Parser[Expr] = factor ~ rep(opr1 ~ factor) ^^ {
+  def factor: Parser[CalcExpr] = (constValue | selectorsExpr | "(" ~> expr <~ ")") ^^ { FactorExpr(_) }
+  def term: Parser[CalcExpr] = factor ~ rep(opr1 ~ factor) ^^ {
     case a ~ Nil => a
-    case a ~ list => WholeExpr(a, list.map(c => (c._1, c._2)))
+    case a ~ list => CalculationExpr(a, list.map(c => (c._1, c._2)))
   }
-  def expr: Parser[Expr] = term ~ rep(opr2 ~ term) ^^ {
+  def expr: Parser[CalcExpr] = term ~ rep(opr2 ~ term) ^^ {
     case a ~ Nil => a
-    case a ~ list => WholeExpr(a, list.map(c => (c._1, c._2)))
+    case a ~ list => CalculationExpr(a, list.map(c => (c._1, c._2)))
   }
 
   // statement
-  def assignExpr: Parser[Expr] = variableValue ~ assignOpr ~ expr ^^ {
+  def assignExpr: Parser[StatementExpr] = variableValue ~ assignOpr ~ expr ^^ {
     case v ~ opr ~ c => AssignExpr(opr, v, c)
   }
-  def conditionExpr: Parser[Expr] = rep(annotationExpr) ~ expr ~ compareOpr ~ expr ^^ {
+  def conditionExpr: Parser[StatementExpr] = rep(annotationExpr) ~ expr ~ compareOpr ~ expr ^^ {
     case anos ~ le ~ opr ~ re => ConditionExpr(opr, le, re, anos)
   }
-  def mappingExpr: Parser[Expr] = rep(annotationExpr) ~ expr ~ mappingOpr ~ expr ^^ {
+  def mappingExpr: Parser[StatementExpr] = rep(annotationExpr) ~ expr ~ mappingOpr ~ expr ^^ {
     case anos ~ le ~ opr ~ re => MappingExpr(opr, le, re, anos)
   }
-  def statementExpr: Parser[Expr] = assignExpr | conditionExpr | mappingExpr
+  def statementExpr: Parser[StatementExpr] = assignExpr | conditionExpr | mappingExpr
 
   // statements
-  def statementsExpr: Parser[Expr] = repsep(statementExpr, exprSep) ^^ { StatementsExpr(_) }
+  def statementsExpr: Parser[StatementExpr] = repsep(statementExpr, exprSep) ^^ { StatementsExpr(_) }
 
 }
