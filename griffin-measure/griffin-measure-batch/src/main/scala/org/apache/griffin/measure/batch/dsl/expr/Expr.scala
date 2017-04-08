@@ -4,4 +4,6 @@ trait Expr extends Serializable {
 
   val expression: String
 
+  val value: Any
+
 }

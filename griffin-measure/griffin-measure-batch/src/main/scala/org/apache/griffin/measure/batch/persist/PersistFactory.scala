@@ -8,8 +8,8 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
   val HDFS_REGEX = """^(?i)hdfs$""".r
   val HTTP_REGEX = """^(?i)http$""".r
 
-  def getPersists(timeStamp: Long): Iterable[Persist] = {
-    persistParams.flatMap(param => getPersist(timeStamp, param))
+  def getPersists(timeStamp: Long): MultiPersists = {
+    MultiPersists(persistParams.flatMap(param => getPersist(timeStamp, param)))
   }
 
   private def getPersist(timeStamp: Long, persistParam: PersistParam): Option[Persist] = {

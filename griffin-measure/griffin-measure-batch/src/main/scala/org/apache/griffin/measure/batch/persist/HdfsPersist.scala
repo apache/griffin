@@ -45,8 +45,8 @@ case class HdfsPersist(path: String, metricName: String, timeStamp: Long) extend
     getFilePath(path, s"${metricName}/${timeStamp}/${file}")
   }
 
-  def start(): Unit = {
-    HdfsUtil.createEmptyFile(StartFile)
+  def start(msg: String): Unit = {
+    HdfsUtil.writeContent(StartFile, msg)
   }
   def finish(): Unit = {
     HdfsUtil.createEmptyFile(FinishFile)
