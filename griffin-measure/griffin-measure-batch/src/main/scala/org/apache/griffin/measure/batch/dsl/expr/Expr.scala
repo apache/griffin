@@ -4,6 +4,8 @@ trait Expr extends Serializable {
 
   val expression: String
 
-  val value: Any
+  val value: Option[Any]
+
+  def entity(values: Map[String, Any]): Expr
 
 }
