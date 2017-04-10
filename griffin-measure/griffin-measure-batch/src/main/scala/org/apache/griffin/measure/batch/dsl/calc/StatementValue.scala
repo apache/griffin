@@ -5,7 +5,7 @@ trait StatementValue extends CalcValue {
 
 }
 
-case class NullStatementValue() extends StatementValue {
+case class AssignValue(right: ElementValue) extends StatementValue {
 
   val value: Option[Any] = None
 

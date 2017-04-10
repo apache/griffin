@@ -2,11 +2,13 @@ package org.apache.griffin.measure.batch.algo
 
 import java.util.Date
 
+import org.apache.griffin.measure.batch.algo.core.AccuracyCore
 import org.apache.griffin.measure.batch.config.params.AllParam
 import org.apache.griffin.measure.batch.connector._
 import org.apache.griffin.measure.batch.dsl.RuleAnalyzer
 import org.apache.griffin.measure.batch.dsl.expr._
 import org.apache.griffin.measure.batch.persist._
+import org.apache.griffin.measure.batch.result._
 import org.apache.griffin.measure.batch.rule._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
@@ -82,9 +84,36 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         case _ => throw new Exception("target data error!")
       }
 
-      // fixme: accuracy algorithm
+      // accuracy algorithm
+      val (accuResult, missingRdd, matchingRdd) = accuracy(sourceData, targetData, ruleAnalyzer)
+
+      // fixme: persist result
+
+      // finish
+      persist.finish()
 
     }
+  }
+
+  def wrapInitData(data: Map[String, Any]): (Map[String, Any], Map[String, Any]) = {
+    (data, Map[String, Any]())
+  }
+
+  def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzer
+              ): (AccuracyResult, RDD[(Product, (Map[String, Any], Map[String, Any]))], RDD[(Product, (Map[String, Any], Map[String, Any]))]) = {
+    val t1 = new Date().getTime
+
+    // 1. wrap data
+    val sourceWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = sourceData.map(r => (r._1, wrapInitData(r._2)))
+    val targetWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = targetData.map(r => (r._1, wrapInitData(r._2)))
+
+    // 2. cogroup
+    val allKvs = sourceWrappedData.cogroup(targetWrappedData)
+
+    // 3. accuracy calculation
+    val (accuResult, missingRdd, matchingRdd) = AccuracyCore.accuracy(allKvs, ruleAnalyzer)
+
+    (accuResult, missingRdd, matchingRdd)
   }
 
 }

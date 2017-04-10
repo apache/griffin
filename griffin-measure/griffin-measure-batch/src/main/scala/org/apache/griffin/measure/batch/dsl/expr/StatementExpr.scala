@@ -10,11 +10,11 @@ trait StatementExpr extends Expr with StatementAnalyzable with ExprAnalyzable wi
 
 case class AssignExpr(expression: String, left: VariableExpr, right: ElementExpr) extends StatementExpr {
 
-  def genValue(values: Map[String, Any]): StatementValue = NullStatementValue()
+  def genValue(values: Map[String, Any]): AssignValue = AssignValue(right.genValue(values))
 
   def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = right.getDataRelatedExprs(dataSign)
 
-  override def getAssignVariables(): Iterable[VariableExpr] = left :: Nil
+  override def getAssigns(): Iterable[AssignExpr] = this :: Nil
 
 }
 
@@ -73,8 +73,8 @@ case class StatementsExpr(statements: Iterable[StatementExpr]) extends Statement
     statements.flatMap(_.getDataRelatedExprs(dataSign))
   }
 
-  override def getAssignVariables(): Iterable[VariableExpr] = {
-    statements.flatMap(_.getAssignVariables())
+  override def getAssigns(): Iterable[AssignExpr] = {
+    statements.flatMap(_.getAssigns())
   }
 
   override def getConditions(): Iterable[ConditionExpr] = {

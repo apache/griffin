@@ -91,8 +91,10 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
   }
 
   private def toTuple[A <: AnyRef](as: Seq[A]): Product = {
-    val tupleClass = Class.forName("scala.Tuple" + as.size)
-    tupleClass.getConstructors.apply(0).newInstance(as: _*).asInstanceOf[Product]
+    if (as.size > 0) {
+      val tupleClass = Class.forName("scala.Tuple" + as.size)
+      tupleClass.getConstructors.apply(0).newInstance(as: _*).asInstanceOf[Product]
+    } else None
   }
 
 }

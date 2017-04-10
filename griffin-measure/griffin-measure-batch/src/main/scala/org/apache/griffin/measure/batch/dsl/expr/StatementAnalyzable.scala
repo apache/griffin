@@ -3,7 +3,7 @@ package org.apache.griffin.measure.batch.dsl.expr
 
 trait StatementAnalyzable extends Serializable {
 
-  def getAssignVariables(): Iterable[VariableExpr] = Nil
+  def getAssigns(): Iterable[AssignExpr] = Nil
 
   def getConditions(): Iterable[ConditionExpr] = Nil
 

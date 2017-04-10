@@ -15,4 +15,8 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
   val sourceDataKeyExprs: Seq[DataExpr] = keyMappings.flatMap(_.getDataRelatedExprs(SourceData)).toSeq
   val targetDatakeyExprs: Seq[DataExpr] = keyMappings.flatMap(_.getDataRelatedExprs(TargetData)).toSeq
 
+  val assigns: Iterable[AssignExpr] = rule.getAssigns()
+  val conditions: Iterable[ConditionExpr] = rule.getConditions()
+  val mappings: Iterable[MappingExpr] = rule.getMappings()
+
 }
