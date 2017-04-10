@@ -1,18 +1,23 @@
 package org.apache.griffin.measure.batch.dsl.expr
 
-trait DataExpr extends Expr {
+import org.apache.griffin.measure.batch.dsl.calc._
 
-  def entity(values: Map[String, Any]): DataExpr
+trait DataExpr extends Expr with Calculatable {
+
+  def head: QuoteVariableExpr
+  def args: Iterable[SelectExpr]
+
+  def genValue(values: Map[String, Any]): DataValue
 
 }
 
 
-case class SelectionExpr(head: VariableExpr, args: Iterable[SelectExpr]) extends DataExpr {
+case class SelectionExpr(head: QuoteVariableExpr, args: Iterable[SelectExpr]) extends DataExpr {
 
   val expression: String = ""
-  val value: Option[Any] = Some(expression) // ??
+  val value: Option[Any] = Some(expression) // fixme: not done
 
-  def entity(values: Map[String, Any]): SelectionExpr = SelectionExpr(head.entity(values), args.map(_.entity(values)))
+  def genValue(values: Map[String, Any]): SelectionValue = SelectionValue(value)
 
 }
 

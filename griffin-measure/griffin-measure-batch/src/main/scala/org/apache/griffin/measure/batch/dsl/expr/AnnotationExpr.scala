@@ -1,8 +1,10 @@
 package org.apache.griffin.measure.batch.dsl.expr
 
-case class AnnotationExpr(expression: String) extends Expr {
+import org.apache.griffin.measure.batch.dsl.calc._
 
-  val value: Option[String] = Some(expression)
+case class AnnotationExpr(expression: String) extends Expr with Calculatable {
+
+//  val value: Option[String] = Some(expression)
 
   val Key = """^(?i)Key$""".r
   val Name = """^(?i)Name(\w+)$""".r
@@ -15,6 +17,6 @@ case class AnnotationExpr(expression: String) extends Expr {
     }
   }
 
-  def entity(values: Map[String, Any]): AnnotationExpr = AnnotationExpr(expression)
+  def genValue(values: Map[String, Any]): AnnotationValue = AnnotationValue(Some(expression))
 
 }

@@ -1,11 +1,14 @@
 package org.apache.griffin.measure.batch.connector
 
+import org.apache.griffin.measure.batch.dsl.expr._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 import scala.util.{Success, Try}
 
-case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any]) extends DataConnector {
+case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
+                             keyExprs: Seq[DataExpr], dataExprs: Iterable[DataExpr]
+                            ) extends DataConnector {
 
   val Database = "database"
   val TableName = "table.name"
@@ -42,14 +45,33 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any]) e
     }
   }
 
-//  def data(): Try[RDD[Map[String, Any]]] = {
-//    Try {
-//      val df: RDD[Row] = sqlContext.sql(dataSql).map(r=>r)
-//
-//      // fixme: get data
-//
-//    }
-//  }
+  def data(): Try[RDD[(Product, Map[String, Any])]] = {
+    Try {
+      sqlContext.sql(dataSql).map { row =>
+        val keys: Seq[AnyRef] = keyExprs.flatMap { expr =>
+          if (expr.args.size > 0) {
+            expr.args.head match {
+              case e: NumPositionExpr => Some(row.getAs[Any](e.index).asInstanceOf[AnyRef])
+              case e: StringPositionExpr => Some(row.getAs[Any](e.field).asInstanceOf[AnyRef])
+              case _ => None
+            }
+          } else None
+        }
+        val key = toTuple(keys)
+        val values: Iterable[(String, Any)] = dataExprs.flatMap { expr =>
+          if (expr.args.size > 0) {
+            expr.args.head match {
+              case e: NumPositionExpr => Some((e._id, row.getAs[Any](e.index)))
+              case e: StringPositionExpr => Some((e._id, row.getAs[Any](e.field)))
+              case _ => None
+            }
+          } else None
+        }
+        val value = values.toMap
+        (key, value)
+      }
+    }
+  }
 
   private def tableExistsSql(): String = {
     s"SHOW TABLES LIKE '${concreteTableName}'"
@@ -66,6 +88,11 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any]) e
       else s"SELECT * FROM ${concreteTableName} WHERE ${cls}"
     }
     clauses.mkString(" UNION ALL ")
+  }
+
+  private def toTuple[A <: AnyRef](as: Seq[A]): Product = {
+    val tupleClass = Class.forName("scala.Tuple" + as.size)
+    tupleClass.getConstructors.apply(0).newInstance(as: _*).asInstanceOf[Product]
   }
 
 }

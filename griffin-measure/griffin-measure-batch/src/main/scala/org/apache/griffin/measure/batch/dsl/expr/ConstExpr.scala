@@ -1,17 +1,22 @@
 package org.apache.griffin.measure.batch.dsl.expr
 
-trait ConstExpr extends Expr {
+import org.apache.griffin.measure.batch.dsl.calc._
 
-  def entity(values: Map[String, Any]): ConstExpr
+import scala.util.{Success, Try}
+
+trait ConstExpr extends Expr with Calculatable {
+
+  val value: Any
+
+  def genValue(values: Map[String, Any]): ConstValue
 
 }
 
 
 case class ConstStringExpr(expression: String) extends ConstExpr {
 
-  val value: Option[String] = Some(expression)
-
-  def entity(values: Map[String, Any]): ConstStringExpr = ConstStringExpr(expression)
+  val value: String = expression
+  def genValue(values: Map[String, Any]): ConstStringValue = ConstStringValue(Some(value))
 
 }
 
@@ -19,7 +24,7 @@ case class ConstTimeExpr(expression: String) extends ConstExpr {
 
   val TimeRegex = """(\d+)(y|M|w|d|h|m|s|ms)""".r
 
-  val value: Option[Long] = expression match {
+  val value: Long = expression match {
     case TimeRegex(time, unit) => {
       val t = time.toLong
       val r = unit match {
@@ -33,19 +38,26 @@ case class ConstTimeExpr(expression: String) extends ConstExpr {
         case "ms" => t
         case _ => t
       }
-      Some(r)
+      r
     }
-    case _ => None
+    case _ => 0L
   }
 
-  def entity(values: Map[String, Any]): ConstTimeExpr = ConstTimeExpr(expression)
+  def genValue(values: Map[String, Any]): ConstTimeValue = ConstTimeValue(Some(value))
 
 }
 
 case class ConstNumberExpr(expression: String) extends ConstExpr {
 
-  val value: Option[Long] = Some(expression.toLong)
+  val value: Long = {
+    Try {
+      expression.toLong
+    } match {
+      case Success(v) => v
+      case _ => 0L
+    }
+  }
 
-  def entity(values: Map[String, Any]): ConstNumberExpr = ConstNumberExpr(expression)
+  def genValue(values: Map[String, Any]): ConstNumberValue = ConstNumberValue(Some(value))
 
 }

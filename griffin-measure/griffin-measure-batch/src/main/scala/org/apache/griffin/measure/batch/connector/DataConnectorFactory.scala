@@ -1,20 +1,27 @@
 package org.apache.griffin.measure.batch.connector
 
 import org.apache.griffin.measure.batch.config.params.user.ConnectorParam
+import org.apache.griffin.measure.batch.dsl.expr._
 import org.apache.spark.sql.SQLContext
+
+import scala.util.Try
 
 object DataConnectorFactory {
 
   val HiveRegex = """^(?i)hive$""".r
 
-  def getDataConnector(sqlContext: SQLContext, connectorParam: ConnectorParam): Option[DataConnector] = {
+  def getDataConnector(sqlContext: SQLContext,
+                       connectorParam: ConnectorParam,
+                       keyExprs: Seq[DataExpr],
+                       dataExprs: Iterable[DataExpr]
+                      ): Try[DataConnector] = {
     val conType = connectorParam.conType
     val version = connectorParam.version
-    conType match {
-      case HiveRegex() => {
-        Some(HiveDataConnector(sqlContext, connectorParam.config))
+    Try {
+      conType match {
+        case HiveRegex() => HiveDataConnector(sqlContext, connectorParam.config, keyExprs, dataExprs)
+        case _ => throw new Exception("connector creation error!")
       }
-      case _ => None
     }
   }
 

@@ -4,8 +4,7 @@ trait Expr extends Serializable {
 
   val expression: String
 
-  val value: Option[Any]
-
-  def entity(values: Map[String, Any]): Expr
+  val _typeString = "expr"
+  val _id = ExprIdCounter.genId(_typeString)
 
 }

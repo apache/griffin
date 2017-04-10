@@ -20,13 +20,14 @@ case class RuleFactory(assertionParam: AssertionParam) {
     case _ => RuleParser()
   }
 
-  def generateRules(): Iterable[StatementExpr] = {
-    assertionParam.rules.flatMap { ruleParam =>
+  def generateRule(): StatementExpr = {
+    val statements = assertionParam.rules.flatMap { ruleParam =>
       parseExpr(ruleParam) match {
         case Success(se) => flatStatements(se)
         case _ => Nil
       }
     }
+    StatementsExpr(statements)
   }
 
   private def parseExpr(ruleParam: RuleParam): Try[StatementExpr] = {

@@ -11,6 +11,6 @@ trait DataConnector extends Serializable {
 
   def metaData(): Try[Iterable[(String, String)]]
 
-//  def data(): Try[RDD[Map[String, Any]]]
+  def data(): Try[RDD[(Product, Map[String, Any])]]
 
 }

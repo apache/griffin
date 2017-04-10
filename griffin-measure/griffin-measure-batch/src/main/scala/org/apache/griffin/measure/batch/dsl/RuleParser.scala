@@ -31,7 +31,7 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   def constString: Parser[ConstExpr] = "'" ~> anyString <~ "'" ^^ { ConstStringExpr(_) }
   def constValue: Parser[ConstExpr] = time ^^ { ConstTimeExpr(_) } | number ^^ { ConstNumberExpr(_)} | constString
   def variableValue: Parser[VariableExpr] = variable ^^ { VariableStringExpr(_) }
-  def quoteVariableValue: Parser[VariableExpr] = "${" ~> variable <~ "}" ^^ { QuoteVariableStringExpr(_) }
+  def quoteVariableValue: Parser[QuoteVariableExpr] = "${" ~> variable <~ "}" ^^ { QuoteVariableExpr(_) }
   def position: Parser[SelectExpr] = anyPosition ^^ { AnyPositionExpr(_) } | """\d+""".r ^^ { NumPositionExpr(_) } | "'" ~> anyString <~ "'" ^^ { StringPositionExpr(_) }
   def argument: Parser[ConstExpr] = constValue
   def annotationExpr: Parser[AnnotationExpr] = "@" ~> variable ^^ { AnnotationExpr(_) }
@@ -52,12 +52,12 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   }
 
   // calculation
-  def factor: Parser[CalcExpr] = (constValue | selectorsExpr | "(" ~> expr <~ ")") ^^ { FactorExpr(_) }
-  def term: Parser[CalcExpr] = factor ~ rep(opr1 ~ factor) ^^ {
+  def factor: Parser[ElementExpr] = (constValue | selectorsExpr | "(" ~> expr <~ ")") ^^ { FactorExpr(_) }
+  def term: Parser[ElementExpr] = factor ~ rep(opr1 ~ factor) ^^ {
     case a ~ Nil => a
     case a ~ list => CalculationExpr(a, list.map(c => (c._1, c._2)))
   }
-  def expr: Parser[CalcExpr] = term ~ rep(opr2 ~ term) ^^ {
+  def expr: Parser[ElementExpr] = term ~ rep(opr2 ~ term) ^^ {
     case a ~ Nil => a
     case a ~ list => CalculationExpr(a, list.map(c => (c._1, c._2)))
   }

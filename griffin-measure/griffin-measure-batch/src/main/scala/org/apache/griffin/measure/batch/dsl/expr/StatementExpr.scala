@@ -1,38 +1,36 @@
 package org.apache.griffin.measure.batch.dsl.expr
 
-import scala.util.Try
+import org.apache.griffin.measure.batch.dsl.calc._
 
-trait StatementExpr extends Expr {
+trait StatementExpr extends Expr with StatementAnalyzable with ExprAnalyzable with Calculatable {
 
-  def entity(values: Map[String, Any]): StatementExpr
-
-}
-
-case class AssignExpr(expression: String, left: VariableExpr, right: CalcExpr) extends StatementExpr {
-
-  val value: Option[Any] = None
-
-  def entity(values: Map[String, Any]): AssignExpr = AssignExpr(expression, left.entity(values), right.entity(values))
+  def genValue(values: Map[String, Any]): StatementValue
 
 }
 
-case class ConditionExpr(expression: String, left: CalcExpr, right: CalcExpr, annotations: Iterable[AnnotationExpr]) extends StatementExpr {
+case class AssignExpr(expression: String, left: VariableExpr, right: ElementExpr) extends StatementExpr {
 
-  val value: Option[Boolean] = Some(true) // fixme: need calculation
+  def genValue(values: Map[String, Any]): StatementValue = NullStatementValue()
 
-  def entity(values: Map[String, Any]): ConditionExpr = ConditionExpr(expression, left.entity(values), right.entity(values), annotations.map(_.entity(values)))
+  def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = right.getDataRelatedExprs(dataSign)
+
+  override def getAssignVariables(): Iterable[VariableExpr] = left :: Nil
 
 }
 
-case class MappingExpr(expression: String, left: CalcExpr, right: CalcExpr, annotations: Iterable[AnnotationExpr]) extends StatementExpr {
+case class ConditionExpr(expression: String, left: ElementExpr, right: ElementExpr, annotations: Iterable[AnnotationExpr]) extends StatementExpr {
 
-  val value: Option[Boolean] = {
-    (left.value, right.value) match {
-      case (Some(v1), Some(v2)) => Some(v1 == v2)
-      case (None, None) => Some(true)
-      case _ => Some(false)
-    }
+  def genValue(values: Map[String, Any]): ConditionValue = ConditionValue(expression, left.genValue(values), right.genValue(values), annotations.map(_.genValue(values)))
+
+  def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
+    left.getDataRelatedExprs(dataSign) ++ right.getDataRelatedExprs(dataSign)
   }
+
+  override def getConditions(): Iterable[ConditionExpr] = this :: Nil
+
+}
+
+case class MappingExpr(expression: String, left: ElementExpr, right: ElementExpr, annotations: Iterable[AnnotationExpr]) extends StatementExpr {
 
   def isKey: Boolean = {
     annotations.exists { e =>
@@ -54,15 +52,41 @@ case class MappingExpr(expression: String, left: CalcExpr, right: CalcExpr, anno
     }
   }
 
-  def entity(values: Map[String, Any]): MappingExpr = MappingExpr(expression, left.entity(values), right.entity(values), annotations.map(_.entity(values)))
+  def genValue(values: Map[String, Any]): MappingValue = MappingValue(expression, left.genValue(values), right.genValue(values), annotations.map(_.genValue(values)))
+
+  def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
+    left.getDataRelatedExprs(dataSign) ++ right.getDataRelatedExprs(dataSign)
+  }
+
+  override def getMappings(): Iterable[MappingExpr] = this :: Nil
+  override def getKeyMappings(): Iterable[MappingExpr] = if (isKey) this :: Nil else Nil
 
 }
 
 case class StatementsExpr(statements: Iterable[StatementExpr]) extends StatementExpr {
 
-  val expression: String = ""
-  val value: Option[Any] = None
+  val expression: String = statements.map(_.expression).mkString("\n")
 
-  def entity(values: Map[String, Any]): StatementsExpr = StatementsExpr(statements.map(_.entity(values)))
+  def genValue(values: Map[String, Any]): StatementsValue = StatementsValue(statements.map(_.genValue(values)))
+
+  def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
+    statements.flatMap(_.getDataRelatedExprs(dataSign))
+  }
+
+  override def getAssignVariables(): Iterable[VariableExpr] = {
+    statements.flatMap(_.getAssignVariables())
+  }
+
+  override def getConditions(): Iterable[ConditionExpr] = {
+    statements.flatMap(_.getConditions())
+  }
+
+  override def getMappings(): Iterable[MappingExpr] = {
+    statements.flatMap(_.getMappings())
+  }
+
+  override def getKeyMappings(): Iterable[MappingExpr] = {
+    statements.flatMap(_.getKeyMappings())
+  }
 
 }

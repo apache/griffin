@@ -8,7 +8,7 @@
       "version": "1.2",
       "config": {
         "table.name": "users_info_source",
-        "partitions": ""
+        "partitions": "dt=20170410, hour=14"
       }
     }
   },
@@ -20,7 +20,7 @@
       "config": {
         "database": "default",
         "table.name": "users_info_target",
-        "partitions": ""
+        "partitions": "dt=20170410, hour=14; dt=20170410, hour=15"
       }
     }
   },
