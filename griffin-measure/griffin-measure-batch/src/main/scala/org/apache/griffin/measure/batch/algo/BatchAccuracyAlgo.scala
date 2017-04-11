@@ -39,7 +39,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val applicationId = sc.applicationId
 
       // start
-//      persist.start(applicationId)
+      persist.start(applicationId)
 
       // rules
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam.assertionParam)
@@ -65,14 +65,14 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         }
 
       // get metadata
-      val sourceMetaData: Iterable[(String, String)] = sourceDataConnector.metaData() match {
-        case Success(md) => md
-        case _ => throw new Exception("source metadata error!")
-      }
-      val targetMetaData: Iterable[(String, String)] = targetDataConnector.metaData() match {
-        case Success(md) => md
-        case _ => throw new Exception("target metadata error!")
-      }
+//      val sourceMetaData: Iterable[(String, String)] = sourceDataConnector.metaData() match {
+//        case Success(md) => md
+//        case _ => throw new Exception("source metadata error!")
+//      }
+//      val targetMetaData: Iterable[(String, String)] = targetDataConnector.metaData() match {
+//        case Success(md) => md
+//        case _ => throw new Exception("target metadata error!")
+//      }
 
       // get data
       val sourceData: RDD[(Product, Map[String, Any])] = sourceDataConnector.data() match {
@@ -87,15 +87,17 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // accuracy algorithm
       val (accuResult, missingRdd, matchingRdd) = accuracy(sourceData, targetData, ruleAnalyzer)
 
-      // fixme: persist result
-      println(s"match percentage: ${accuResult.matchPercentage}")
-
       // end time
       val endTime = new Date().getTime
-//      persist.log(endTime, s"using time: ${endTime - startTime} ms")
+      persist.log(endTime, s"using time: ${endTime - startTime} ms")
+
+      // persist result
+      persist.result(endTime, accuResult)
+      val missingRecords = missingRdd.map(recordString(_)).collect
+      persist.missRecords(missingRecords)
 
       // finish
-//      persist.finish()
+      persist.finish()
 
     }
   }
@@ -111,8 +113,6 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     val sourceWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = sourceData.map(r => (r._1, wrapInitData(r._2)))
     val targetWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = targetData.map(r => (r._1, wrapInitData(r._2)))
 
-    sourceWrappedData.foreach(println)
-
     // 2. cogroup
     val allKvs = sourceWrappedData.cogroup(targetWrappedData)
 
@@ -120,6 +120,11 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     val (accuResult, missingRdd, matchingRdd) = AccuracyCore.accuracy(allKvs, ruleAnalyzer)
 
     (accuResult, missingRdd, matchingRdd)
+  }
+
+  def recordString(rec: (Product, (Map[String, Any], Map[String, Any]))): String = {
+    val (key, (data, info)) = rec
+    s"${data} [${info}]"
   }
 
 }

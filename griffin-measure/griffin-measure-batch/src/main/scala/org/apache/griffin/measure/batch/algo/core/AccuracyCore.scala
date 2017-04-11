@@ -16,11 +16,10 @@ object AccuracyCore {
               ): (AccuracyResult, RDD[(Product, (V, T))], RDD[(Product, (V, T))]) = {
     val result: RDD[(Long, Long, List[(Product, (V, T))], List[(Product, (V, T))])] = allKvs.map { kv =>
       val (key, (sourceDatas, targetDatas)) = kv
-      val targetSize = targetDatas.size
 
       // result: (missCount, matchCount, missDataList, matchDataList)
       val rslt = sourceDatas.foldLeft((0L, 0L, List[(Product, (V, T))](), List[(Product, (V, T))]())) { (sr, sourcePair) =>
-        val matchResult = if (targetSize <= 0) {
+        val matchResult = if (targetDatas.isEmpty) {
           (false, Map[String, Any]((MismatchInfo.key -> "no target")))
         } else {
           targetDatas.foldLeft((false, Map[String, Any]())) { (tr, targetPair) =>
