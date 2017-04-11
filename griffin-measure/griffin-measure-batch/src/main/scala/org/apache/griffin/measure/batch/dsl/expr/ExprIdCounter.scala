@@ -6,7 +6,6 @@ import scala.collection.mutable.{Set => MutableSet}
 object ExprIdCounter {
 
   private val idCounter: AtomicLong = new AtomicLong(0L)
-//  private var idCounter: Long = 0L
 
   private val existIdSet: MutableSet[String] = MutableSet.empty[String]
 
@@ -34,8 +33,6 @@ object ExprIdCounter {
   }
 
   private def increment(): Long = {
-//    idCounter += 1
-//    idCounter
     idCounter.incrementAndGet()
   }
 
