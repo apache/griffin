@@ -29,19 +29,17 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val sc = new SparkContext(conf)
       val sqlContext = new HiveContext(sc)
 
-      // current time
-      val curTime = new Date().getTime()
+      // start time
+      val startTime = new Date().getTime()
 
       // get persists
-      val persist: Persist = PersistFactory(envParam.persistParams, metricName).getPersists(curTime)
+      val persist: Persist = PersistFactory(envParam.persistParams, metricName).getPersists(startTime)
 
       // get spark application id
       val applicationId = sc.applicationId
 
       // start
 //      persist.start(applicationId)
-
-      val t1 = new Date().getTime
 
       // rules
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam.assertionParam)
@@ -92,9 +90,9 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // fixme: persist result
       println(s"match percentage: ${accuResult.matchPercentage}")
 
-      val t2 = new Date().getTime
-      // time log
-//      persist.log(t2, s"using time: ${t2 - t1} ms")
+      // end time
+      val endTime = new Date().getTime
+//      persist.log(endTime, s"using time: ${endTime - startTime} ms")
 
       // finish
 //      persist.finish()
@@ -112,6 +110,8 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     // 1. wrap data
     val sourceWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = sourceData.map(r => (r._1, wrapInitData(r._2)))
     val targetWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = targetData.map(r => (r._1, wrapInitData(r._2)))
+
+    sourceWrappedData.foreach(println)
 
     // 2. cogroup
     val allKvs = sourceWrappedData.cogroup(targetWrappedData)

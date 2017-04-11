@@ -4,50 +4,47 @@ import org.apache.griffin.measure.batch.dsl.expr._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
-import scala.util.{Success, Try}
+import com.databricks.spark.avro._
 
-case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
+import scala.util.{Success, Try}
+import java.nio.file.{Files, Paths}
+import java.io.File
+
+case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
                              keyExprs: Seq[DataExpr], dataExprs: Iterable[DataExpr]
                             ) extends DataConnector {
 
-  val Database = "database"
-  val TableName = "table.name"
-  val Partitions = "partitions"
+  val FilePath = "file.path"
+  val FileName = "file.name"
 
-  val database = config.getOrElse(Database, "").toString
-  val tableName = config.getOrElse(TableName, "").toString
-  val partitionsString = config.getOrElse(Partitions, "").toString
+  val filePath = config.getOrElse(FilePath, "").toString
+  val fileName = config.getOrElse(FileName, "").toString
 
-  val concreteTableName = if (dbPrefix) s"${database}.${tableName}" else tableName
-  val partitions = partitionsString.split(";").map(s => s.split(",").map(_.trim))
+  val concreteFileFullPath = if (pathPrefix) s"${filePath}${fileName}" else fileName
 
-  private def dbPrefix(): Boolean = {
-    !database.isEmpty && !database.equals("default")
+  private def pathPrefix(): Boolean = {
+    !filePath.isEmpty
+  }
+
+  private def fileExist(): Boolean = {
+    val path = Paths.get(concreteFileFullPath)
+    val exist = Files.exists(path)
+    exist
   }
 
   def available(): Boolean = {
-    (!tableName.isEmpty) && {
-      Try {
-        sqlContext.sql(tableExistsSql).collect.size
-      } match {
-        case Success(s) => s > 0
-        case _ => false
-      }
-    }
+    (!concreteFileFullPath.isEmpty) && fileExist
   }
 
   def metaData(): Try[Iterable[(String, String)]] = {
     Try {
-      val originRows = sqlContext.sql(metaDataSql).map(r => (r.getString(0), r.getString(1))).collect
-      val partitionPos: Int = originRows.indexWhere(pair => pair._1.startsWith("# "))
-      if (partitionPos < 0) originRows
-      else originRows.take(partitionPos)
+      List[(String, String)]()
     }
   }
 
   def data(): Try[RDD[(Product, Map[String, Any])]] = {
     Try {
-      sqlContext.sql(dataSql).map { row =>
+      loadDataFile.map { row =>
         val keys: Seq[AnyRef] = keyExprs.flatMap { expr =>
           if (expr.args.size > 0) {
             expr.args.head match {
@@ -73,21 +70,8 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     }
   }
 
-  private def tableExistsSql(): String = {
-    s"SHOW TABLES LIKE '${concreteTableName}'"
-  }
-
-  private def metaDataSql(): String = {
-    s"DESCRIBE ${concreteTableName}"
-  }
-
-  private def dataSql(): String = {
-    val clauses = partitions.map { prtn =>
-      val cls = prtn.mkString(" AND ")
-      if (cls.isEmpty) s"SELECT * FROM ${concreteTableName}"
-      else s"SELECT * FROM ${concreteTableName} WHERE ${cls}"
-    }
-    clauses.mkString(" UNION ALL ")
+  private def loadDataFile() = {
+    sqlContext.read.avro(concreteFileFullPath)
   }
 
   private def toTuple[A <: AnyRef](as: Seq[A]): Product = {

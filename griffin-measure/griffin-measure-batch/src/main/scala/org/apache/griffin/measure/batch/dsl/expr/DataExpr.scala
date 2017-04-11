@@ -2,7 +2,7 @@ package org.apache.griffin.measure.batch.dsl.expr
 
 import org.apache.griffin.measure.batch.dsl.calc._
 
-trait DataExpr extends Expr with Calculatable {
+trait DataExpr extends Expr with Calculatable with Recordable {
 
   def head: QuoteVariableExpr
   def args: Iterable[SelectExpr]
@@ -12,7 +12,16 @@ trait DataExpr extends Expr with Calculatable {
 }
 
 
-case class SelectionExpr(head: QuoteVariableExpr, args: Iterable[SelectExpr]) extends DataExpr {
+case class SelectionExpr(head: QuoteVariableExpr, args: Iterable[SelectExpr]) extends {
+
+  val recordName = {
+    val argsString = args.map(_.recordName).mkString("")
+    s"${head.recordName}${argsString}"
+  }
+
+  override protected val _defaultId = recordName
+
+} with DataExpr {
 
   val expression: String = ""
 

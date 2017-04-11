@@ -18,7 +18,7 @@ case class FactorExpr(self: Expr with Calculatable) extends ElementExpr {
 
   def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
     self match {
-      case expr: DataExpr => expr :: Nil
+      case expr: DataExpr => if (expr.head.name == dataSign) expr :: Nil else Nil
       case expr: CalculationExpr => expr.getDataRelatedExprs(dataSign)
       case _ => Nil
     }

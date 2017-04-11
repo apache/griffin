@@ -9,7 +9,12 @@ case class AnnotationExpr(expression: String) extends Expr with Calculatable {
   val Key = """^(?i)Key$""".r
   val Name = """^(?i)Name(\w+)$""".r
 
-  def isKey: Boolean = expression.equals(Key)
+  def isKey: Boolean = {
+    expression match {
+      case Key() => true
+      case _ => false
+    }
+  }
   def getName: Option[String] = {
     expression match {
       case Name(n) => Some(n)

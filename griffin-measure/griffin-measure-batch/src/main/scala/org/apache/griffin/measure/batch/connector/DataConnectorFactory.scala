@@ -9,6 +9,7 @@ import scala.util.Try
 object DataConnectorFactory {
 
   val HiveRegex = """^(?i)hive$""".r
+  val AvroRegex = """^(?i)avro$""".r
 
   def getDataConnector(sqlContext: SQLContext,
                        connectorParam: ConnectorParam,
@@ -20,6 +21,7 @@ object DataConnectorFactory {
     Try {
       conType match {
         case HiveRegex() => HiveDataConnector(sqlContext, connectorParam.config, keyExprs, dataExprs)
+        case AvroRegex() => AvroDataConnector(sqlContext, connectorParam.config, keyExprs, dataExprs)
         case _ => throw new Exception("connector creation error!")
       }
     }
