@@ -27,25 +27,25 @@ case class MappingValue(mappingOpr: String, left: ElementValue, right: ElementVa
     }
   }
 
-  def isKey: Boolean = {
-    annotations.exists { e =>
-      e match {
-        case a: AnnotationValue => a.isKey
-        case _ => false
-      }
-    }
-  }
-  def getName: String = {
-    val names = annotations.flatMap { e =>
-      e match {
-        case a: AnnotationValue => a.getName
-        case _ => None
-      }
-    }
-    if (names.size > 0) names.head else {
-      "???"   // fixme: need to try to get a name from left expr
-    }
-  }
+//  def isKey: Boolean = {
+//    annotations.exists { e =>
+//      e match {
+//        case a: AnnotationValue => a.isKey
+//        case _ => false
+//      }
+//    }
+//  }
+//  def getName: String = {
+//    val names = annotations.flatMap { e =>
+//      e match {
+//        case a: AnnotationValue => a.getName
+//        case _ => None
+//      }
+//    }
+//    if (names.size > 0) names.head else {
+//      "???"   // fixme: need to try to get a name from left expr
+//    }
+//  }
 
 }
 

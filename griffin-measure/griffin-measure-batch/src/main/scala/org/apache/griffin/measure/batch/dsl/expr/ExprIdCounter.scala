@@ -7,7 +7,7 @@ object ExprIdCounter {
 
   def genId(head: String): String = {
     curId += 1
-    s"${head}#${curId}"
+    s"${curId}#${head}"
   }
 
 }

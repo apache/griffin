@@ -39,7 +39,9 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val applicationId = sc.applicationId
 
       // start
-      persist.start(applicationId)
+//      persist.start(applicationId)
+
+      val t1 = new Date().getTime
 
       // rules
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam.assertionParam)
@@ -88,9 +90,14 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val (accuResult, missingRdd, matchingRdd) = accuracy(sourceData, targetData, ruleAnalyzer)
 
       // fixme: persist result
+      println(s"match percentage: ${accuResult.matchPercentage}")
+
+      val t2 = new Date().getTime
+      // time log
+//      persist.log(t2, s"using time: ${t2 - t1} ms")
 
       // finish
-      persist.finish()
+//      persist.finish()
 
     }
   }
@@ -101,7 +108,6 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
 
   def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzer
               ): (AccuracyResult, RDD[(Product, (Map[String, Any], Map[String, Any]))], RDD[(Product, (Map[String, Any], Map[String, Any]))]) = {
-    val t1 = new Date().getTime
 
     // 1. wrap data
     val sourceWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = sourceData.map(r => (r._1, wrapInitData(r._2)))

@@ -15,9 +15,11 @@ trait DataExpr extends Expr with Calculatable {
 case class SelectionExpr(head: QuoteVariableExpr, args: Iterable[SelectExpr]) extends DataExpr {
 
   val expression: String = ""
-  val value: Option[Any] = Some(expression) // fixme: not done
 
-  def genValue(values: Map[String, Any]): SelectionValue = SelectionValue(value)
+  def genValue(values: Map[String, Any]): SelectionValue = {
+    val value = values.get(_id)
+    SelectionValue(value)
+  }
 
 }
 
