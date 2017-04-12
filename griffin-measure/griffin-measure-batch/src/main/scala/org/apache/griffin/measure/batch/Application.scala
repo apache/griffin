@@ -38,7 +38,7 @@ object Application extends Loggable {
       }
     }
 
-    // choose algorithm
+    // choose algorithm   // fixme: not done, need to choose algorithm by param
     val dqType = allParam.userParam.dqType
     val algo: Algo = BatchAccuracyAlgo(allParam)
 

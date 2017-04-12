@@ -40,17 +40,6 @@ case class MappingExpr(expression: String, left: ElementExpr, right: ElementExpr
       }
     }
   }
-  def getName: String = {
-    val names = annotations.flatMap { e =>
-      e match {
-        case a: AnnotationExpr => a.getName
-        case _ => None
-      }
-    }
-    if (names.size > 0) names.head else {
-      "???"   // fixme: need to try to get a name from left expr
-    }
-  }
 
   def genValue(values: Map[String, Any]): MappingValue = MappingValue(expression, left.genValue(values), right.genValue(values), annotations.map(_.genValue(values)))
 

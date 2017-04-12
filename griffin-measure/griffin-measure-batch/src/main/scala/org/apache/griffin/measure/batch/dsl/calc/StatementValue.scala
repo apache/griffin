@@ -13,7 +13,7 @@ case class AssignValue(right: ElementValue) extends StatementValue {
 
 case class ConditionValue(compareOpr: String, left: ElementValue, right: ElementValue, annotations: Iterable[AnnotationValue]) extends StatementValue {
 
-  val value: Option[Boolean] = Some(true) // fixme: need calculation
+  val value: Option[Boolean] = Some(true) // fixme: not done, need calculation
 
 }
 
@@ -26,26 +26,6 @@ case class MappingValue(mappingOpr: String, left: ElementValue, right: ElementVa
       case _ => Some(false)
     }
   }
-
-//  def isKey: Boolean = {
-//    annotations.exists { e =>
-//      e match {
-//        case a: AnnotationValue => a.isKey
-//        case _ => false
-//      }
-//    }
-//  }
-//  def getName: String = {
-//    val names = annotations.flatMap { e =>
-//      e match {
-//        case a: AnnotationValue => a.getName
-//        case _ => None
-//      }
-//    }
-//    if (names.size > 0) names.head else {
-//      "???"   // fixme: need to try to get a name from left expr
-//    }
-//  }
 
 }
 

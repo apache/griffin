@@ -54,11 +54,10 @@ object Application extends Logging {
 //      case AccuracyType => {
 //        dataAssetTypeMap.get("source") match {
 //          case Some("kafka") => StreamingAccuracyAlgo(sparkParam, dataAssetParamMap.get("source").get, dataAssetParamMap.get("target").get)
-//          case _ => StreamingAccuracyAlgo(sparkParam, dataAssetParamMap.get("source").get, dataAssetParamMap.get("target").get) // fixme: it's wrong type here
+//          case _ => StreamingAccuracyAlgo(sparkParam, dataAssetParamMap.get("source").get, dataAssetParamMap.get("target").get)
 //        }
 //      }
 //      case _ => {
-//        // fixme: it's wrong type here
 //        StreamingAccuracyAlgo(sparkParam, dataAssetParamMap.get("source").get, dataAssetParamMap.get("target").get)
 //      }
 //    }
