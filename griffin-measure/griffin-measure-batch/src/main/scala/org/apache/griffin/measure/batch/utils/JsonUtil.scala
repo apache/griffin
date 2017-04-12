@@ -1,5 +1,7 @@
 package org.apache.griffin.measure.batch.utils
 
+import java.io.InputStream
+
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
@@ -22,5 +24,9 @@ object JsonUtil {
 
   def fromJson[T: ClassTag](json: String)(implicit m : Manifest[T]): T = {
     mapper.readValue[T](json, classTag[T].runtimeClass.asInstanceOf[Class[T]])
+  }
+
+  def fromJson[T: ClassTag](is: InputStream)(implicit m : Manifest[T]): T = {
+    mapper.readValue[T](is, classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
 }

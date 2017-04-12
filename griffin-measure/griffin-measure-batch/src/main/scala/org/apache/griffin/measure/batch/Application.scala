@@ -4,7 +4,7 @@ import org.apache.griffin.measure.batch.algo.{Algo, BatchAccuracyAlgo}
 import org.apache.griffin.measure.batch.config.params._
 import org.apache.griffin.measure.batch.config.params.env._
 import org.apache.griffin.measure.batch.config.params.user._
-import org.apache.griffin.measure.batch.config.reader.ParamFileReader
+import org.apache.griffin.measure.batch.config.reader._
 import org.apache.griffin.measure.batch.config.validator.AllParamValidator
 import org.apache.griffin.measure.batch.log.Loggable
 
@@ -14,12 +14,15 @@ object Application extends Loggable {
 
   def main(args: Array[String]): Unit = {
     if (args.length < 2) {
-      error("Usage: class <env-param-file> <user-param-file>")
+      error("Usage: class <env-param-file> <user-param-file> [file-system-type: local or hdfs(default)]")
       sys.exit(-1)
     }
 
+    val paramFiles: Array[String] = args.take(2)
+    val fsType = if (args.length > 2) args(2) else "hdfs"
+
     // read param files
-    val allParam: AllParam = readParamFiles(args) match {
+    val allParam: AllParam = readParamFiles(paramFiles, fsType) match {
       case Some(a) => a
       case _ => {
         error("param file read error!")
@@ -53,16 +56,16 @@ object Application extends Loggable {
     }
   }
 
-  private def readParamFiles(files: Array[String]): Option[AllParam] = {
+  private def readParamFiles(files: Array[String], fsType: String): Option[AllParam] = {
     val Array(envParamFile, userParamFile) = files
 
     // read config files
-    val envParamReader = ParamFileReader(envParamFile)
-    val envParamOpt = envParamReader.readConfig[EnvParam]
-    val userParamReader = ParamFileReader(userParamFile)
-    val userParamOpt = userParamReader.readConfig[UserParam]
+    val envParamReader = ParamReaderFactory.getParamReader(envParamFile, fsType)
+    val envParamTry = envParamReader.readConfig[EnvParam]
+    val userParamReader = ParamReaderFactory.getParamReader(userParamFile, fsType)
+    val userParamTry = userParamReader.readConfig[UserParam]
 
-    (envParamOpt, userParamOpt) match {
+    (envParamTry, userParamTry) match {
       case (Success(e), Success(u)) => Some(AllParam(e, u))
       case _ => None
     }

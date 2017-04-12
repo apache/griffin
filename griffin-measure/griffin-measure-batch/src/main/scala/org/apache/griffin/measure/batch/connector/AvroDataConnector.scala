@@ -3,12 +3,12 @@ package org.apache.griffin.measure.batch.connector
 import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
-
 import com.databricks.spark.avro._
 
 import scala.util.{Success, Try}
 import java.nio.file.{Files, Paths}
-import java.io.File
+
+import org.apache.griffin.measure.batch.utils.HdfsUtil
 
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
                              keyExprs: Seq[DataExpr], dataExprs: Iterable[DataExpr]
@@ -27,9 +27,7 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
   }
 
   private def fileExist(): Boolean = {
-    val path = Paths.get(concreteFileFullPath)
-    val exist = Files.exists(path)
-    exist
+    HdfsUtil.existPath(concreteFileFullPath)
   }
 
   def available(): Boolean = {
@@ -71,7 +69,8 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
   }
 
   private def loadDataFile() = {
-    sqlContext.read.avro(concreteFileFullPath)
+//    sqlContext.read.avro(concreteFileFullPath)
+    sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
   }
 
   private def toTuple[A <: AnyRef](as: Seq[A]): Product = {

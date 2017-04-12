@@ -36,7 +36,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
 
   before {
     // read param files
-    allParam = readParamFiles(args) match {
+    allParam = readParamFiles(args, "local") match {
       case Some(a) => a
       case _ => {
         error("param file read error!")
@@ -141,17 +141,16 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
     }
   }
 
-
-  private def readParamFiles(files: Array[String]): Option[AllParam] = {
+  private def readParamFiles(files: Array[String], fsType: String): Option[AllParam] = {
     val Array(envParamFile, userParamFile) = files
 
     // read config files
-    val envParamReader = ParamFileReader(envParamFile)
-    val envParamOpt = envParamReader.readConfig[EnvParam]
-    val userParamReader = ParamFileReader(userParamFile)
-    val userParamOpt = userParamReader.readConfig[UserParam]
+    val envParamReader = ParamReaderFactory.getParamReader(envParamFile, fsType)
+    val envParamTry = envParamReader.readConfig[EnvParam]
+    val userParamReader = ParamReaderFactory.getParamReader(userParamFile, fsType)
+    val userParamTry = userParamReader.readConfig[UserParam]
 
-    (envParamOpt, userParamOpt) match {
+    (envParamTry, userParamTry) match {
       case (Success(e), Success(u)) => Some(AllParam(e, u))
       case _ => None
     }

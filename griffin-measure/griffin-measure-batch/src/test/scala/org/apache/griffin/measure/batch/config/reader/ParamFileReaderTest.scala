@@ -30,19 +30,6 @@ class ParamFileReaderTest extends FunSuite with Matchers with BeforeAndAfter wit
       case Success(v) => println(v)
       case Failure(ex) => error(ex.getMessage)
     }
-
-    if (p2.isSuccess) {
-      val persist = PersistFactory(p2.get.persistParams, "test").getPersists(123456L)
-      for (elem <- persist.persists) {
-        elem match {
-          case ele: HdfsPersist => {
-            println(ele.maxPersistLines)
-            println(ele.maxLinesPerFile)
-          }
-          case _ => println("")
-        }
-      }
-    }
   }
 
 }

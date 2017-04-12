@@ -12,6 +12,11 @@ object HdfsUtil {
 
   private val dfs = FileSystem.get(conf)
 
+  def existPath(filePath: String): Boolean = {
+    val path = new Path(filePath)
+    dfs.exists(path)
+  }
+
   def createFile(filePath: String): FSDataOutputStream = {
     val path = new Path(filePath)
     if (dfs.exists(path)) dfs.delete(path, true)

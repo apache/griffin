@@ -77,15 +77,18 @@ object AccuracyCore {
 
     if (conditionPass) {
       // 4. mapping calculation by substituting from data map
-      val matched = ruleAnalyzer.mappings.foldLeft(true) { (res, mapping) =>
-        res && (mapping.genValue(dataMap).value match {
-          case Some(b) => b
-          case _ => false
-        })
+      ruleAnalyzer.mappings.foldLeft((true, Map[String, Any]())) { (res, mapping) =>
+        val (matched, info) = res
+        if (!matched) res
+        else {
+          ((mapping.genValue(dataMap).value match {
+            case Some(b) => b
+            case _ => false
+          }), info + (MismatchInfo.key -> s"not matched with ${target._1}"))
+        }
       }
-      (matched, Map[String, Any]())
     } else {
-      (false, Map[String, Any]())
+      (false, Map[String, Any]((MismatchInfo.key -> "condition fail")))
     }
 
   }

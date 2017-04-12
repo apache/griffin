@@ -52,7 +52,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
             if (cntr.available) cntr
             else throw new Exception("source data connection error!")
           }
-          case Failure(ex) => throw new Exception(ex)
+          case Failure(ex) => throw ex
         }
       val targetDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam.connector, ruleAnalyzer.targetDatakeyExprs, ruleAnalyzer.targetDataExprs) match {
@@ -60,7 +60,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
             if (cntr.available) cntr
             else throw new Exception("target data connection error!")
           }
-          case Failure(ex) => throw new Exception(ex)
+          case Failure(ex) => throw ex
         }
 
       // get metadata
@@ -76,11 +76,11 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // get data
       val sourceData: RDD[(Product, Map[String, Any])] = sourceDataConnector.data() match {
         case Success(dt) => dt
-        case _ => throw new Exception("source data error!")
+        case Failure(ex) => throw ex
       }
       val targetData: RDD[(Product, Map[String, Any])] = targetDataConnector.data() match {
         case Success(dt) => dt
-        case _ => throw new Exception("target data error!")
+        case Failure(ex) => throw ex
       }
 
       // accuracy algorithm
