@@ -70,10 +70,10 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   def result(rt: Long, result: Result): Unit = {
     val resStr = result match {
       case ar: AccuracyResult => {
-        s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}\n"
+        s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
       }
       case _ => {
-        s"result: ${result}\n"
+        s"result: ${result}"
       }
     }
     HdfsUtil.writeContent(ResultFile, timeHead(rt) + resStr)
@@ -112,7 +112,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
   def log(rt: Long, msg: String): Unit = {
-    val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n"
+    val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n\n"
     HdfsUtil.appendContent(LogFile, logStr)
   }
 
