@@ -23,7 +23,7 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
   val concreteFileFullPath = if (pathPrefix) s"${filePath}${fileName}" else fileName
 
   private def pathPrefix(): Boolean = {
-    !filePath.isEmpty
+    filePath.nonEmpty
   }
 
   private def fileExist(): Boolean = {

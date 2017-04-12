@@ -22,13 +22,28 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
   val partitions = partitionsString.split(";").map(s => s.split(",").map(_.trim))
 
   private def dbPrefix(): Boolean = {
-    !database.isEmpty && !database.equals("default")
+    database.nonEmpty && !database.equals("default")
   }
+
+//  def available(): Boolean = {
+//    (!tableName.isEmpty) && {
+//      Try {
+//        sqlContext.sql(tableExistsSql).collect.size
+//      } match {
+//        case Success(s) => s > 0
+//        case _ => false
+//      }
+//    }
+//  }
 
   def available(): Boolean = {
     (!tableName.isEmpty) && {
       Try {
-        sqlContext.sql(tableExistsSql).collect.size
+        if (dbPrefix) {
+          sqlContext.tables(database).filter(tableExistsSql).collect.size
+        } else {
+          sqlContext.tables().filter(tableExistsSql).collect.size
+        }
       } match {
         case Success(s) => s > 0
         case _ => false
@@ -74,7 +89,8 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
   }
 
   private def tableExistsSql(): String = {
-    s"SHOW TABLES LIKE '${concreteTableName}'"
+//    s"SHOW TABLES LIKE '${concreteTableName}'"    // this is hive sql, but not work for spark sql
+    s"tableName LIKE '${tableName}'"
   }
 
   private def metaDataSql(): String = {

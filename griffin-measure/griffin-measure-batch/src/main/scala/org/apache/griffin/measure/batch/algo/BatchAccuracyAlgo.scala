@@ -89,12 +89,16 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
 
       // end time
       val endTime = new Date().getTime
-      persist.log(endTime, s"using time: ${endTime - startTime} ms")
+      persist.log(endTime, s"calculation using time: ${endTime - startTime} ms")
 
       // persist result
       persist.result(endTime, accuResult)
-      val missingRecords = missingRdd.map(recordString(_)).collect
+      val missingRecords = missingRdd.map(record2String(_))
       persist.missRecords(missingRecords)
+
+      // persist end time
+      val persistEndTime = new Date().getTime
+      persist.log(persistEndTime, s"persist using time: ${persistEndTime - endTime} ms")
 
       // finish
       persist.finish()
@@ -122,7 +126,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     (accuResult, missingRdd, matchingRdd)
   }
 
-  def recordString(rec: (Product, (Map[String, Any], Map[String, Any]))): String = {
+  def record2String(rec: (Product, (Map[String, Any], Map[String, Any]))): String = {
     val (key, (data, info)) = rec
     s"${data} [${info}]"
   }

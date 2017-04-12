@@ -25,6 +25,8 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
     val result = ruleParser.parseAll(ruleParser.statementsExpr, rules)
 
     println(result)
+
+    println(1000.toString.toLong)
   }
 
 }

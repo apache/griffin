@@ -2,6 +2,8 @@ package org.apache.griffin.measure.batch.persist
 
 import org.apache.griffin.measure.batch.config.params.env._
 
+import scala.util.{Success, Try}
+
 
 case class PersistFactory(persistParams: Iterable[PersistParam], metricName: String) extends Serializable {
 
@@ -14,28 +16,15 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
 
   private def getPersist(timeStamp: Long, persistParam: PersistParam): Option[Persist] = {
     val persistConfig = persistParam.config
-    val persist = persistParam.persistType match {
-      case HDFS_REGEX() => {
-        persistConfig.get("path") match {
-          case Some(path: String) => Some(HdfsPersist(path, metricName, timeStamp))
-          case _ => None
-        }
-      }
-      case HTTP_REGEX() => {
-        persistConfig.get("api") match {
-          case Some(api: String) => {
-            val method = persistConfig.get("method") match {
-              case Some(m: String) => m
-              case _ => "GET"
-            }
-            Some(HttpPersist(api, method, metricName, timeStamp))
-          }
-          case _ => None
-        }
-      }
+    val persistTry = persistParam.persistType match {
+      case HDFS_REGEX() => Try(HdfsPersist(persistConfig, metricName, timeStamp))
+      case HTTP_REGEX() => Try(HttpPersist(persistConfig, metricName, timeStamp))
+      case _ => throw new Exception("not supported persist type")
+    }
+    persistTry match {
+      case Success(persist) if (persist.available) => Some(persist)
       case _ => None
     }
-    persist
   }
 
 }
