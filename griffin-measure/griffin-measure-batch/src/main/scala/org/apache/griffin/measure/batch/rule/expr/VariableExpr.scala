@@ -1,6 +1,6 @@
-package org.apache.griffin.measure.batch.dsl.expr
+package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.dsl.calc._
+import org.apache.griffin.measure.batch.rule.calc._
 
 trait VariableExpr extends Expr with Recordable {
 

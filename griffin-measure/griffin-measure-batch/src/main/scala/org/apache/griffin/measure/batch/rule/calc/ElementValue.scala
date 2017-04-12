@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.dsl.calc
+package org.apache.griffin.measure.batch.rule.calc
 
 import org.apache.griffin.measure.batch.utils.CalculationUtil._
 

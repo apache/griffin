@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.dsl.expr
+package org.apache.griffin.measure.batch.rule.expr
 
 trait SelectExpr extends Expr with Recordable {
 

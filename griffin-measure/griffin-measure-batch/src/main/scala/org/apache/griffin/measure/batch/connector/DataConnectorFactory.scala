@@ -1,7 +1,7 @@
 package org.apache.griffin.measure.batch.connector
 
 import org.apache.griffin.measure.batch.config.params.user.ConnectorParam
-import org.apache.griffin.measure.batch.dsl.expr._
+import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.spark.sql.SQLContext
 
 import scala.util.Try

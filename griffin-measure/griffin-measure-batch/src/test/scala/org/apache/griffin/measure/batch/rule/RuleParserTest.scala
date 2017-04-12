@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.dsl
+package org.apache.griffin.measure.batch.rule
 
 import org.junit.runner.RunWith
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
@@ -25,8 +25,6 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
     val result = ruleParser.parseAll(ruleParser.statementsExpr, rules)
 
     println(result)
-
-    println(1000.toString.toLong)
   }
 
 }

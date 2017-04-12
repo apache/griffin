@@ -1,8 +1,8 @@
 package org.apache.griffin.measure.batch.algo.core
 
-import org.apache.griffin.measure.batch.dsl.RuleAnalyzer
-import org.apache.griffin.measure.batch.dsl.expr._
-import org.apache.griffin.measure.batch.dsl.calc._
+import org.apache.griffin.measure.batch.rule.RuleAnalyzer
+import org.apache.griffin.measure.batch.rule.expr._
+import org.apache.griffin.measure.batch.rule.calc._
 import org.apache.griffin.measure.batch.result._
 import org.apache.spark.rdd.RDD
 

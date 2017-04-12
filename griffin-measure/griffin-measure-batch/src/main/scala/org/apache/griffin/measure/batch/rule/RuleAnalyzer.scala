@@ -1,6 +1,6 @@
-package org.apache.griffin.measure.batch.dsl
+package org.apache.griffin.measure.batch.rule
 
-import org.apache.griffin.measure.batch.dsl.expr._
+import org.apache.griffin.measure.batch.rule.expr._
 
 case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
 

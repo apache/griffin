@@ -1,8 +1,7 @@
 package org.apache.griffin.measure.batch.rule
 
 import org.apache.griffin.measure.batch.config.params.user._
-import org.apache.griffin.measure.batch.dsl.RuleParser
-import org.apache.griffin.measure.batch.dsl.expr._
+import org.apache.griffin.measure.batch.rule.expr._
 
 import scala.util.{Success, Try}
 

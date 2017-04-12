@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.dsl.expr
+package org.apache.griffin.measure.batch.rule.expr
 
 import java.util.concurrent.atomic.AtomicLong
 import scala.collection.mutable.{Set => MutableSet}

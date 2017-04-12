@@ -11,12 +11,11 @@ import org.apache.griffin.measure.batch.config.params._
 import org.apache.griffin.measure.batch.config.reader._
 import org.apache.griffin.measure.batch.config.validator._
 import org.apache.griffin.measure.batch.connector.{DataConnector, DataConnectorFactory}
-import org.apache.griffin.measure.batch.dsl.RuleAnalyzer
-import org.apache.griffin.measure.batch.dsl.expr.StatementExpr
+import org.apache.griffin.measure.batch.rule.{RuleAnalyzer, RuleFactory}
+import org.apache.griffin.measure.batch.rule.expr.StatementExpr
 
 import scala.util.{Failure, Success, Try}
 import org.apache.griffin.measure.batch.log.Loggable
-import org.apache.griffin.measure.batch.rule.RuleFactory
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}

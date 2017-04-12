@@ -5,11 +5,10 @@ import java.util.Date
 import org.apache.griffin.measure.batch.algo.core.AccuracyCore
 import org.apache.griffin.measure.batch.config.params.AllParam
 import org.apache.griffin.measure.batch.connector._
-import org.apache.griffin.measure.batch.dsl.RuleAnalyzer
-import org.apache.griffin.measure.batch.dsl.expr._
+import org.apache.griffin.measure.batch.rule._
+import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.griffin.measure.batch.persist._
 import org.apache.griffin.measure.batch.result._
-import org.apache.griffin.measure.batch.rule._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}

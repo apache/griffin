@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.dsl.calc
+package org.apache.griffin.measure.batch.rule.calc
 
 
 trait VariableValue extends CalcValue {
