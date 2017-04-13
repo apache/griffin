@@ -1,6 +1,6 @@
 package modelTest
 
-import org.apache.griffin._
+import org.apache.griffin.accuracy._
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.apache.spark.{SparkConf, SparkContext}
@@ -41,7 +41,7 @@ class AccuTest extends FunSuite with Matchers with BeforeAndAfter {
     mapper.registerModule(DefaultScalaModule)
 
     var cnt = 1;
-    val accTests = List("accuAvroTest.json")
+    val accTests = List("accuAvroTest.json", "accuUsersInfo.json")
     for (tf <- accTests) {
       val reqJson = reqJsonPath + tf
       val accuData = new AccuData()
