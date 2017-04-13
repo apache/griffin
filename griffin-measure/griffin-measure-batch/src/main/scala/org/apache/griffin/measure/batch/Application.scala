@@ -14,21 +14,30 @@ object Application extends Loggable {
 
   def main(args: Array[String]): Unit = {
     if (args.length < 2) {
-      error("Usage: class <env-param-file> <user-param-file> [file-system-type: local or hdfs(default)]")
+      error("Usage: class <env-param-file> <user-param-file> [file-system-of-param-file: local or hdfs(default)]")
       sys.exit(-1)
     }
 
-    val paramFiles: Array[String] = args.take(2)
+    val envParamFile = args(0)
+    val userParamFile = args(1)
     val fsType = if (args.length > 2) args(2) else "hdfs"
 
     // read param files
-    val allParam: AllParam = readParamFiles(paramFiles, fsType) match {
-      case Some(a) => a
-      case _ => {
-        error("param file read error!")
+    val envParam = readParamFile[EnvParam](envParamFile, fsType) match {
+      case Success(p) => p
+      case Failure(ex) => {
+        error(ex.getMessage)
         sys.exit(-2)
       }
     }
+    val userParam = readParamFile[UserParam](userParamFile, fsType) match {
+      case Success(p) => p
+      case Failure(ex) => {
+        error(ex.getMessage)
+        sys.exit(-2)
+      }
+    }
+    val allParam: AllParam = AllParam(envParam, userParam)
 
     // validate param files
     validateParams(allParam) match {
@@ -56,19 +65,9 @@ object Application extends Loggable {
     }
   }
 
-  private def readParamFiles(files: Array[String], fsType: String): Option[AllParam] = {
-    val Array(envParamFile, userParamFile) = files
-
-    // read config files
-    val envParamReader = ParamReaderFactory.getParamReader(envParamFile, fsType)
-    val envParamTry = envParamReader.readConfig[EnvParam]
-    val userParamReader = ParamReaderFactory.getParamReader(userParamFile, fsType)
-    val userParamTry = userParamReader.readConfig[UserParam]
-
-    (envParamTry, userParamTry) match {
-      case (Success(e), Success(u)) => Some(AllParam(e, u))
-      case _ => None
-    }
+  private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {
+    val paramReader = ParamReaderFactory.getParamReader(file, fsType)
+    paramReader.readConfig[T]
   }
 
   private def validateParams(allParam: AllParam): Try[Boolean] = {

@@ -26,6 +26,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
 
   val envFile = "src/test/resources/env.json"
   val confFile = "src/test/resources/config.json"
+  val fsType = "local"
 
   val args = Array(envFile, confFile)
 
@@ -36,13 +37,22 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
 
   before {
     // read param files
-    allParam = readParamFiles(args, "local") match {
-      case Some(a) => a
-      case _ => {
-        error("param file read error!")
+    val envParam = readParamFile[EnvParam](envFile, fsType) match {
+      case Success(p) => p
+      case Failure(ex) => {
+        error(ex.getMessage)
         sys.exit(-2)
       }
     }
+    val userParam = readParamFile[UserParam](confFile, fsType) match {
+      case Success(p) => p
+      case Failure(ex) => {
+        error(ex.getMessage)
+        sys.exit(-2)
+      }
+    }
+    allParam = AllParam(envParam, userParam)
+
     // validate param files
     validateParams(allParam) match {
       case Failure(ex) => {
@@ -53,9 +63,6 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
         info("params validation pass")
       }
     }
-
-    val envParam = allParam.envParam
-    val userParam = allParam.userParam
 
     val metricName = userParam.name
     val conf = new SparkConf().setMaster("local[*]").setAppName(metricName)
@@ -84,37 +91,37 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
         DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam.connector, ruleAnalyzer.sourceDataKeyExprs, ruleAnalyzer.sourceDataExprs) match {
           case Success(cntr) => {
             if (cntr.available) cntr
-            else throw new Exception("source data connection error!")
+            else throw new Exception("source data not available!")
           }
-          case Failure(ex) => throw new Exception(ex)
+          case Failure(ex) => throw ex
         }
       val targetDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam.connector, ruleAnalyzer.targetDatakeyExprs, ruleAnalyzer.targetDataExprs) match {
           case Success(cntr) => {
             if (cntr.available) cntr
-            else throw new Exception("target data connection error!")
+            else throw new Exception("target data not available!")
           }
-          case Failure(ex) => throw new Exception(ex)
+          case Failure(ex) => throw ex
         }
 
       // get metadata
-      val sourceMetaData: Iterable[(String, String)] = sourceDataConnector.metaData() match {
-        case Success(md) => md
-        case _ => throw new Exception("source metadata error!")
-      }
-      val targetMetaData: Iterable[(String, String)] = targetDataConnector.metaData() match {
-        case Success(md) => md
-        case _ => throw new Exception("target metadata error!")
-      }
+//      val sourceMetaData: Iterable[(String, String)] = sourceDataConnector.metaData() match {
+//        case Success(md) => md
+//        case Failure(ex) => throw ex
+//      }
+//      val targetMetaData: Iterable[(String, String)] = targetDataConnector.metaData() match {
+//        case Success(md) => md
+//        case Failure(ex) => throw ex
+//      }
 
       // get data
       val sourceData: RDD[(Product, Map[String, Any])] = sourceDataConnector.data() match {
         case Success(dt) => dt
-        case _ => throw new Exception("source data error!")
+        case Failure(ex) => throw ex
       }
       val targetData: RDD[(Product, Map[String, Any])] = targetDataConnector.data() match {
         case Success(dt) => dt
-        case _ => throw new Exception("target data error!")
+        case Failure(ex) => throw ex
       }
 
       // my algo
@@ -141,19 +148,9 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
     }
   }
 
-  private def readParamFiles(files: Array[String], fsType: String): Option[AllParam] = {
-    val Array(envParamFile, userParamFile) = files
-
-    // read config files
-    val envParamReader = ParamReaderFactory.getParamReader(envParamFile, fsType)
-    val envParamTry = envParamReader.readConfig[EnvParam]
-    val userParamReader = ParamReaderFactory.getParamReader(userParamFile, fsType)
-    val userParamTry = userParamReader.readConfig[UserParam]
-
-    (envParamTry, userParamTry) match {
-      case (Success(e), Success(u)) => Some(AllParam(e, u))
-      case _ => None
-    }
+  private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {
+    val paramReader = ParamReaderFactory.getParamReader(file, fsType)
+    paramReader.readConfig[T]
   }
 
   private def validateParams(allParam: AllParam): Try[Boolean] = {
