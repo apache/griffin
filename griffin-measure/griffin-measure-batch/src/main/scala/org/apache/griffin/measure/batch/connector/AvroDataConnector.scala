@@ -36,7 +36,8 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
 
   def metaData(): Try[Iterable[(String, String)]] = {
     Try {
-      List[(String, String)]()
+      val st = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath).schema
+      st.fields.map(f => (f.name, f.dataType.typeName))
     }
   }
 
@@ -69,7 +70,6 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
   }
 
   private def loadDataFile() = {
-//    sqlContext.read.avro(concreteFileFullPath)
     sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
   }
 

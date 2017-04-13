@@ -25,17 +25,6 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     database.nonEmpty && !database.equals("default")
   }
 
-//  def available(): Boolean = {
-//    (!tableName.isEmpty) && {
-//      Try {
-//        sqlContext.sql(tableExistsSql).collect.size
-//      } match {
-//        case Success(s) => s > 0
-//        case _ => false
-//      }
-//    }
-//  }
-
   def available(): Boolean = {
     (!tableName.isEmpty) && {
       Try {
