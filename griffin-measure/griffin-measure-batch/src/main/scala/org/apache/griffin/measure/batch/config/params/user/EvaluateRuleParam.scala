@@ -6,7 +6,7 @@ import org.apache.griffin.measure.batch.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
 case class EvaluateRuleParam( @JsonProperty("sampleRatio") sampleRatio: Double,
-                              @JsonProperty("assertion") assertionParam: AssertionParam
+                              @JsonProperty("rules") rules: String
                             ) extends Param {
 
 }

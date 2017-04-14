@@ -6,7 +6,7 @@ import org.apache.griffin.measure.batch.rule.expr._
 import scala.util.{Success, Try}
 
 
-case class RuleFactory(assertionParam: AssertionParam) {
+case class RuleFactory(evaluateRuleParam: EvaluateRuleParam) {
 
   object DSL {
     val DSL_Griffin = "DSL-griffin"
