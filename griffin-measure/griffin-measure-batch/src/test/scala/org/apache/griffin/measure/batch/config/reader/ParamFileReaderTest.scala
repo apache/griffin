@@ -15,8 +15,8 @@ import org.apache.griffin.measure.batch.persist.{HdfsPersist, PersistFactory}
 class ParamFileReaderTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
 
   test("test file reader") {
-    val userReader = ParamFileReader("src/test/resources/config1.json")
-    val envReader = ParamFileReader("src/test/resources/env1.json")
+    val userReader = ParamFileReader("src/test/resources/config.json")
+    val envReader = ParamFileReader("src/test/resources/env.json")
 
     val p1 = userReader.readConfig[UserParam]
     val p2 = envReader.readConfig[EnvParam]

@@ -3,23 +3,27 @@
   "type": "accuracy",
 
   "source": {
-    "type": "avro",
-    "version": "1.7",
+    "type": "hive",
+    "version": "1.2",
     "config": {
-      "file.name": "src/test/resources/users_info_src.avro"
+      "database": "default",
+      "table.name": "users_info_source",
+      "partitions": "dt=23123, hour=432; dt=35464, hour=4657"
     }
   },
 
   "target": {
-    "type": "avro",
-    "version": "1.7",
+    "type": "hive",
+    "version": "1.2",
     "config": {
-      "file.name": "src/test/resources/users_info_target.avro"
+      "database": "default",
+      "table.name": "users_info_target",
+      "partitions": "dt=23123, hour=432; dt=35464, hour=4657"
     }
   },
 
   "evaluateRule": {
-    "sampleRatio": 1,
+    "sampleRatio": 0.2,
     "rules": "@Key ${source}['user_id'] === ${target}['user_id';${source}['first_name'] === ${target}['first_name'];${source}['last_name'] === ${target}['last_name'];${source}['address'] === ${target}['address'];${source}['email'] === ${target}['email'];${source}['phone'] === ${target}['phone'];${source}['post_code'] === ${target}['post_code']"
   }
 }
