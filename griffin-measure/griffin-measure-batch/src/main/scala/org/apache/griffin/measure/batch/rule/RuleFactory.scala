@@ -8,30 +8,20 @@ import scala.util.{Success, Try}
 
 case class RuleFactory(evaluateRuleParam: EvaluateRuleParam) {
 
-  object DSL {
-    val DSL_Griffin = "DSL-griffin"
-  }
-
-  import DSL._
-
-  val ruleParser: RuleParser = assertionParam.dslType match {
-    case DSL_Griffin => RuleParser()
-    case _ => RuleParser()
-  }
+  val ruleParser: RuleParser = RuleParser()
 
   def generateRule(): StatementExpr = {
-    val statements = assertionParam.rules.flatMap { ruleParam =>
-      parseExpr(ruleParam) match {
-        case Success(se) => flatStatements(se)
-        case _ => Nil
-      }
+    val rules = evaluateRuleParam.rules
+    val statements = parseExpr(rules) match {
+      case Success(se) => flatStatements(se)
+      case _ => Nil
     }
     StatementsExpr(statements)
   }
 
-  private def parseExpr(ruleParam: RuleParam): Try[StatementExpr] = {
+  private def parseExpr(rules: String): Try[StatementExpr] = {
     Try {
-      val result = ruleParser.parseAll(ruleParser.statementsExpr, ruleParam.rule)
+      val result = ruleParser.parseAll(ruleParser.statementsExpr, rules)
       if (result.successful) result.get
       else throw new Exception("parse rule error!")
     }

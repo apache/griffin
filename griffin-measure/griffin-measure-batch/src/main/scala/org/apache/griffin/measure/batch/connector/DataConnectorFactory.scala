@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.connector
 
-import org.apache.griffin.measure.batch.config.params.user.ConnectorParam
+import org.apache.griffin.measure.batch.config.params.user._
 import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.spark.sql.SQLContext
 
@@ -12,16 +12,16 @@ object DataConnectorFactory {
   val AvroRegex = """^(?i)avro$""".r
 
   def getDataConnector(sqlContext: SQLContext,
-                       connectorParam: ConnectorParam,
+                       dataConnectorParam: DataConnectorParam,
                        keyExprs: Seq[DataExpr],
                        dataExprs: Iterable[DataExpr]
                       ): Try[DataConnector] = {
-    val conType = connectorParam.conType
-    val version = connectorParam.version
+    val conType = dataConnectorParam.conType
+    val version = dataConnectorParam.version
     Try {
       conType match {
-        case HiveRegex() => HiveDataConnector(sqlContext, connectorParam.config, keyExprs, dataExprs)
-        case AvroRegex() => AvroDataConnector(sqlContext, connectorParam.config, keyExprs, dataExprs)
+        case HiveRegex() => HiveDataConnector(sqlContext, dataConnectorParam.config, keyExprs, dataExprs)
+        case AvroRegex() => AvroDataConnector(sqlContext, dataConnectorParam.config, keyExprs, dataExprs)
         case _ => throw new Exception("connector creation error!")
       }
     }

@@ -41,13 +41,13 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       persist.start(applicationId)
 
       // rules
-      val ruleFactory = RuleFactory(userParam.evaluateRuleParam.assertionParam)
+      val ruleFactory = RuleFactory(userParam.evaluateRuleParam)
       val rule: StatementExpr = ruleFactory.generateRule()
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
       // data connector
       val sourceDataConnector: DataConnector =
-        DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam.connector, ruleAnalyzer.sourceDataKeyExprs, ruleAnalyzer.sourceDataExprs) match {
+        DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam, ruleAnalyzer.sourceDataKeyExprs, ruleAnalyzer.sourceDataExprs) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("source data connection error!")
@@ -55,7 +55,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
           case Failure(ex) => throw ex
         }
       val targetDataConnector: DataConnector =
-        DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam.connector, ruleAnalyzer.targetDatakeyExprs, ruleAnalyzer.targetDataExprs) match {
+        DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam, ruleAnalyzer.targetDatakeyExprs, ruleAnalyzer.targetDataExprs) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("target data connection error!")

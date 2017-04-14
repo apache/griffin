@@ -20,6 +20,6 @@
 
   "evaluateRule": {
     "sampleRatio": 1,
-    "rules": "@Key ${source}['user_id'] === ${target}['user_id';${source}['first_name'] === ${target}['first_name'];${source}['last_name'] === ${target}['last_name'];${source}['address'] === ${target}['address'];${source}['email'] === ${target}['email'];${source}['phone'] === ${target}['phone'];${source}['post_code'] === ${target}['post_code']"
+    "rules": "@Key ${source}['user_id'] === ${target}['user_id']; ${source}['first_name'] === ${target}['first_name']; ${source}['last_name'] === ${target}['last_name']; ${source}['address'] === ${target}['address']; ${source}['email'] === ${target}['email']; ${source}['phone'] === ${target}['phone']; ${source}['post_code'] === ${target}['post_code']"
   }
 }

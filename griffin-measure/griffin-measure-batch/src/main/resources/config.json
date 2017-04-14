@@ -3,43 +3,27 @@
   "type": "accuracy",
 
   "source": {
-    "connector": {
-      "type": "hive",
-      "version": "1.2",
-      "config": {
-        "table.name": "users_info_source",
-        "partitions": "dt=20170410, hour=14"
-      }
+    "type": "hive",
+    "version": "1.2",
+    "config": {
+      "database": "default",
+      "table.name": "users_info_source",
+      "partitions": "dt=23123, hour=432; dt=35464, hour=4657"
     }
   },
 
   "target": {
-    "connector": {
-      "type": "hive",
-      "version": "1.2",
-      "config": {
-        "database": "default",
-        "table.name": "users_info_target",
-        "partitions": "dt=20170410, hour=14; dt=20170410, hour=15"
-      }
+    "type": "hive",
+    "version": "1.2",
+    "config": {
+      "database": "default",
+      "table.name": "users_info_target",
+      "partitions": "dt=23123, hour=432; dt=35464, hour=4657"
     }
   },
 
   "evaluateRule": {
-    "sampleRatio": 1,
-    "assertion": {
-      "type": "DSL-griffin",
-      "rules": [
-        {
-          "rule": "@Key ${source}['user_id'] === ${target}['user_id']"
-        },
-        {
-          "rule": "${source}['first_name'] === ${target}['first_name']; ${source}['last_name'] === ${target}['last_name']; ${source}['address'] === ${target}['address']"
-        },
-        {
-          "rule": "${source}['email'] === ${target}['email']; ${source}['phone'] === ${target}['phone']; ${source}['post_code'] === ${target}['post_code']"
-        }
-      ]
-    }
+    "sampleRatio": 0.2,
+    "rules": "@Key ${source}['user_id'] === ${target}['user_id']; ${source}['first_name'] === ${target}['first_name']; ${source}['last_name'] === ${target}['last_name']; ${source}['address'] === ${target}['address']; ${source}['email'] === ${target}['email']; ${source}['phone'] === ${target}['phone']; ${source}['post_code'] === ${target}['post_code']"
   }
 }

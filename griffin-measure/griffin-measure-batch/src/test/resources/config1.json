@@ -3,39 +3,25 @@
   "type": "accuracy",
 
   "source": {
-    "connector": {
-      "type": "hive",
-      "version": "1.2",
-      "config": {
-        "table.name": "rheos_view_event",
-        "partitions": "dt=20170410, hour=15"
-      }
+    "type": "hive",
+    "version": "1.2",
+    "config": {
+      "table.name": "rheos_view_event",
+      "partitions": "dt=20170410, hour=15"
     }
   },
 
   "target": {
-    "connector": {
-      "type": "hive",
-      "version": "1.2",
-      "config": {
-        "table.name": "be_view_event_queue",
-        "partitions": "dt=20170410, hour=15; dt=20170410, hour=16"
-      }
+    "type": "hive",
+    "version": "1.2",
+    "config": {
+      "table.name": "be_view_event_queue",
+      "partitions": "dt=20170410, hour=15; dt=20170410, hour=16"
     }
   },
 
   "evaluateRule": {
     "sampleRatio": 1,
-    "assertion": {
-      "type": "DSL-griffin",
-      "rules": [
-        {
-          "rule": "@Key ${source}['uid'] === ${target}['uid']; @Key ${source}['eventtimestamp'] === ${target}['eventtimestamp']"
-        },
-        {
-          "rule": "${source}['page_id'] === ${target}['page_id']; ${source}['site_id'] === ${target}['site_id']; ${source}['itm'] === ${target}['itm']"
-        }
-      ]
-    }
+    "rules": "@Key ${source}['uid'] === ${target}['uid']; @Key ${source}['eventtimestamp'] === ${target}['eventtimestamp']; ${source}['page_id'] === ${target}['page_id']; ${source}['site_id'] === ${target}['site_id']; ${source}['itm'] === ${target}['itm']"
   }
 }
