@@ -1,16 +1,12 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.rule.calc._
-
 trait StatementExpr extends Expr with StatementAnalyzable with ExprAnalyzable with Calculatable {
-
-  def genValue(values: Map[String, Any]): StatementValue
 
 }
 
 case class AssignExpr(expression: String, left: VariableExpr, right: ElementExpr) extends StatementExpr {
 
-  def genValue(values: Map[String, Any]): AssignValue = AssignValue(right.genValue(values))
+  def genValue(values: Map[String, Any]): Option[Any] = right.genValue(values)
 
   def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = right.getDataRelatedExprs(dataSign)
 
@@ -20,7 +16,9 @@ case class AssignExpr(expression: String, left: VariableExpr, right: ElementExpr
 
 case class ConditionExpr(expression: String, left: ElementExpr, right: ElementExpr, annotations: Iterable[AnnotationExpr]) extends StatementExpr {
 
-  def genValue(values: Map[String, Any]): ConditionValue = ConditionValue(expression, left.genValue(values), right.genValue(values), annotations.map(_.genValue(values)))
+  def genValue(values: Map[String, Any]): Option[Boolean] = {
+    Some(true) // fixme: not done, need calculation
+  }
 
   def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
     left.getDataRelatedExprs(dataSign) ++ right.getDataRelatedExprs(dataSign)
@@ -41,7 +39,13 @@ case class MappingExpr(expression: String, left: ElementExpr, right: ElementExpr
     }
   }
 
-  def genValue(values: Map[String, Any]): MappingValue = MappingValue(expression, left.genValue(values), right.genValue(values), annotations.map(_.genValue(values)))
+  def genValue(values: Map[String, Any]): Option[Boolean] = {
+    (left.genValue(values), right.genValue(values)) match {
+      case (Some(v1), Some(v2)) => Some(v1 == v2)
+      case (None, None) => Some(true)
+      case _ => Some(false)
+    }
+  }
 
   def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
     left.getDataRelatedExprs(dataSign) ++ right.getDataRelatedExprs(dataSign)
@@ -56,7 +60,7 @@ case class StatementsExpr(statements: Iterable[StatementExpr]) extends Statement
 
   val expression: String = statements.map(_.expression).mkString("\n")
 
-  def genValue(values: Map[String, Any]): StatementsValue = StatementsValue(statements.map(_.genValue(values)))
+  def genValue(values: Map[String, Any]): Option[Any] = None
 
   def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
     statements.flatMap(_.getDataRelatedExprs(dataSign))

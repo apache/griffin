@@ -1,8 +1,6 @@
 package org.apache.griffin.measure.batch.algo.core
 
 import org.apache.griffin.measure.batch.rule.RuleAnalyzer
-import org.apache.griffin.measure.batch.rule.expr._
-import org.apache.griffin.measure.batch.rule.calc._
 import org.apache.griffin.measure.batch.result._
 import org.apache.spark.rdd.RDD
 
@@ -61,7 +59,7 @@ object AccuracyCore {
 
     // 2. get assign variables by substituting mergedData, and merge into data map
     val dataMap: Map[String, Any] = ruleAnalyzer.assigns.foldLeft(mergedData) { (dataMap, assign) =>
-      assign.right.genValue(dataMap).value match {
+      assign.right.genValue(dataMap) match {
         case Some(v) => dataMap + (assign.left.name -> v)
         case _ => dataMap
       }
@@ -69,7 +67,7 @@ object AccuracyCore {
 
     // 3. condition judgement by substituting from data map
     val conditionPass = ruleAnalyzer.conditions.foldLeft(true) { (pass, condition) =>
-      pass && (condition.genValue(dataMap).value match {
+      pass && (condition.genValue(dataMap) match {
         case Some(b) => b
         case _ => false
       })
@@ -81,7 +79,7 @@ object AccuracyCore {
         val (matched, info) = res
         if (!matched) res
         else {
-          ((mapping.genValue(dataMap).value match {
+          ((mapping.genValue(dataMap) match {
             case Some(b) => b
             case _ => false
           }), info + (MismatchInfo.key -> s"not matched with ${target._1}"))

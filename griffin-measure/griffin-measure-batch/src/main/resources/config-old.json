@@ -7,7 +7,7 @@
       "type": "hive",
       "version": "1.2",
       "config": {
-        "table.name": "users_info_source",
+        "table.name": "users_info_src",
         "partitions": "dt=20170410, hour=14"
       }
     }

@@ -1,7 +1,5 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.rule.calc._
-
 trait VariableExpr extends Expr with Recordable {
 
   val name: String
@@ -23,9 +21,6 @@ case class QuoteVariableExpr(expression: String) extends VariableExpr with Calcu
 
   val recordName = name
 
-  def genValue(values: Map[String, Any]): QuoteVariableValue = {
-    val value = values.get(name)
-    QuoteVariableValue(value)
-  }
+  def genValue(values: Map[String, Any]): Option[Any] = values.get(name)
 
 }

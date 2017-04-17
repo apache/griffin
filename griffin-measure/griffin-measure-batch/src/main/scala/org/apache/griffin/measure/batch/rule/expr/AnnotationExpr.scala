@@ -1,7 +1,5 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.rule.calc._
-
 case class AnnotationExpr(expression: String) extends Expr with Calculatable {
 
   val Key = """^(?i)Key$""".r
@@ -13,6 +11,6 @@ case class AnnotationExpr(expression: String) extends Expr with Calculatable {
     }
   }
 
-  def genValue(values: Map[String, Any]): AnnotationValue = AnnotationValue(Some(expression))
+  def genValue(values: Map[String, Any]): Option[String] = Some(expression)
 
 }

@@ -1,13 +1,9 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.rule.calc._
-
 trait DataExpr extends Expr with Calculatable with Recordable {
 
   def head: QuoteVariableExpr
   def args: Iterable[SelectExpr]
-
-  def genValue(values: Map[String, Any]): DataValue
 
 }
 
@@ -25,10 +21,7 @@ case class SelectionExpr(head: QuoteVariableExpr, args: Iterable[SelectExpr]) ex
 
   val expression: String = ""
 
-  def genValue(values: Map[String, Any]): SelectionValue = {
-    val value = values.get(_id)
-    SelectionValue(value)
-  }
+  def genValue(values: Map[String, Any]): Option[Any] = values.get(_id)
 
 }
 

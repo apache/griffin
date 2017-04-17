@@ -1,10 +1,8 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.rule.calc._
+import org.apache.griffin.measure.batch.utils.CalculationUtil._
 
 trait ElementExpr extends Expr with ExprAnalyzable with Calculatable {
-
-  def genValue(values: Map[String, Any]): ElementValue
 
 }
 
@@ -14,7 +12,7 @@ case class FactorExpr(self: Expr with Calculatable) extends ElementExpr {
 
   val expression: String = self.expression
 
-  def genValue(values: Map[String, Any]): FactorValue = FactorValue(self.genValue(values))
+  def genValue(values: Map[String, Any]): Option[Any] = self.genValue(values)
 
   def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
     self match {
@@ -30,7 +28,20 @@ case class CalculationExpr(first: ElementExpr, others: Iterable[(String, Element
 
   val expression: String = others.foldLeft(first.expression) { (ex, next) => s"${ex} ${next._1} ${next._2}" }
 
-  def genValue(values: Map[String, Any]): CalculationValue = CalculationValue(first.genValue(values), others.map(n => (n._1, n._2.genValue(values))))
+  def genValue(values: Map[String, Any]): Option[Any] = {
+    others.foldLeft(first.genValue(values)) { (v, next) =>
+      val (opr, ele) = next
+      val eleValue = ele.genValue(values)
+      opr match {
+        case "+" => v + eleValue
+        case "-" => v - eleValue
+        case "*" => v * eleValue
+        case "/" => v / eleValue
+        case "%" => v % eleValue
+        case _ => v
+      }
+    }
+  }
 
   def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = {
     others.foldLeft(first.getDataRelatedExprs(dataSign)) { (origin, next) =>

@@ -1,14 +1,10 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.rule.calc._
-
 import scala.util.{Success, Try}
 
 trait ConstExpr extends Expr with Calculatable {
 
   val value: Any
-
-  def genValue(values: Map[String, Any]): ConstValue
 
 }
 
@@ -16,7 +12,7 @@ trait ConstExpr extends Expr with Calculatable {
 case class ConstStringExpr(expression: String) extends ConstExpr {
 
   val value: String = expression
-  def genValue(values: Map[String, Any]): ConstStringValue = ConstStringValue(Some(value))
+  def genValue(values: Map[String, Any]): Option[String] = Some(value)
 
 }
 
@@ -43,7 +39,7 @@ case class ConstTimeExpr(expression: String) extends ConstExpr {
     case _ => 0L
   }
 
-  def genValue(values: Map[String, Any]): ConstTimeValue = ConstTimeValue(Some(value))
+  def genValue(values: Map[String, Any]): Option[Long] = Some(value)
 
 }
 
@@ -58,6 +54,6 @@ case class ConstNumberExpr(expression: String) extends ConstExpr {
     }
   }
 
-  def genValue(values: Map[String, Any]): ConstNumberValue = ConstNumberValue(Some(value))
+  def genValue(values: Map[String, Any]): Option[Long] = Some(value)
 
 }
