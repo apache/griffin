@@ -102,6 +102,9 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // finish
       persist.finish()
 
+      // context stop
+      sc.stop
+
     }
   }
 
