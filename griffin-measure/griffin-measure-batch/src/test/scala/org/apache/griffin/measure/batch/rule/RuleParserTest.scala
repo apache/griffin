@@ -27,12 +27,12 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
     println(result)
   }
 
-  test("treat escape") {
-    val es = """Hello\tworld\nmy name is \"ABC\""""
-    val un = StringContext treatEscapes es
-
-    println(es)
-    println(un)
-  }
+//  test("treat escape") {
+//    val es = """Hello\tworld\nmy name is \"ABC\""""
+//    val un = StringContext treatEscapes es
+//
+//    println(es)
+//    println(un)
+//  }
 
 }

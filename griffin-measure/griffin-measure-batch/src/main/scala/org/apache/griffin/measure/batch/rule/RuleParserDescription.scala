@@ -44,6 +44,7 @@
   * index: 0 ~ n means position from start, -1 ~ -n means position from end
   *
   * <filter-sel> ::= "[" <field-quote> <filter-compare-opr> <math-expr> "]"
+  * <field-quote> ::= ' <field-string> ' | " <field-string> "
   * <filter-compare-opr> ::= "=" | "!=" | "<" | ">" | "<=" | ">="
   * filter-sel example: ['name' = 'URL'], $source.man['age' > $source.graduate_age + 5 ]
   *
