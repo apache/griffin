@@ -48,11 +48,11 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
     * <index-field-range-sel> ::= "[" <index-field-range> [, <index-field-range>]+ "]"
     * <index-field-range> ::= <index-field> | (<index-field>, <index-field>) | "*"
     * index-field-range: 2 means the 3rd item, (0, 3) means first 4 items, * means all items, 'age' means item 'age'
-    * <index-field> ::= <math-expr>
+    * <index-field> ::= <index> | <field-quote> | <all-selection>
     * index: 0 ~ n means position from start, -1 ~ -n means position from end
+    * <field-quote> ::= ' <field-string> ' | " <field-string> "
     *
     * <filter-sel> ::= "[" <field-quote> <filter-compare-opr> <math-expr> "]"
-    * <field-quote> ::= ' <field-string> ' | " <field-string> "
     * <filter-compare-opr> ::= "=" | "!=" | "<" | ">" | "<=" | ">="
     * filter-sel example: ['name' = 'URL'], $source.man['age' > $source.graduate_age + 5 ]
     *
@@ -60,6 +60,7 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
     * $source.tags[1+2]             valid
     * $source.tags[$source.first]   valid
     * $source.tags[$target.first]   invalid
+    * -- Such job is for validation, not for parser
     *
     *
     * <literal> ::= <literal-string> | <literal-number> | <literal-time> | <literal-boolean>
@@ -90,13 +91,13 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
 
     def FilterCompareOpr: Parser[String] = "=" | "!=" | "<" | ">" | "<=" | ">="
 
-    def SelectOprPair: (Parser[String], Parser[String]) = ("[", "]")
-    def BracketOprPair: (Parser[String], Parser[String]) = ("(", ")")
-    def DotOpr: Parser[String] = "."
-    def AllSelectionOpr: Parser[String] = "*"
-    def SingleQuoteOpr: Parser[String] = "'"
-    def DoubleQuoteOpr: Parser[String] = "\""
-    def CommaOpr: Parser[String] = ","
+    def SqBracketPair: (Parser[String], Parser[String]) = ("[", "]")
+    def BracketPair: (Parser[String], Parser[String]) = ("(", ")")
+    def Dot: Parser[String] = "."
+    def AllSelection: Parser[String] = "*"
+    def SQuote: Parser[String] = "'"
+    def DQuote: Parser[String] = "\""
+    def Comma: Parser[String] = ","
   }
   import Operator._
 
@@ -108,12 +109,54 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   import SomeString._
 
   object SomeNumber {
-    def IntegerNumber: Parser[String] = "\d+".r
+    def IntegerNumber: Parser[String] = """[+\-]?\d+""".r
+    def DoubleNumber: Parser[String] = """[+\-]?(\.\d+|\d+\.\d*)""".r
+    def IndexNumber: Parser[String] = IntegerNumber
   }
   import SomeNumber._
 
-  def LiterialString: Parser[String] = AnyString
-  def LiterialNumber: Parser[String] = AnyString
+  // -- literal --
+  def literal: Parser[String] = literialString | literialNumber | literialTime | literialBoolean
+  def literialString: Parser[String] = (SQuote ~> AnyString <~ SQuote) | (DQuote ~> AnyString <~ DQuote)
+  def literialNumber: Parser[String] = IntegerNumber | DoubleNumber
+  def literialTime: Parser[String] = """(\d+(d|h|m|s|ms))+""".r
+  def literialBoolean: Parser[String] = """(?i)true""".r | """(?i)false""".r
+
+  // -- selection --
+  // <selection> ::= <selection-head> [ <field-sel> | <function-operation> | <index-field-range-sel> | <filter-sel> ]+
+  def selection: Parser[String] = selectionHead ~ rep(selector) ^^ {
+    case head ~ tails => head + tails.mkString("")
+  }
+  def selector: Parser[String] = (fieldSelect | functionOperation | indexFieldRangeSelect | filterSelect)
+
+  def selectionHead: Parser[String] = DataSourceKeywords
+  // <field-sel> ::= "." <field-string>
+  def fieldSelect: Parser[String] = Dot ~> FieldString
+  // <function-operation> ::= "." <function-name> "(" <arg> [, <arg>]+ ")"
+  def functionOperation: Parser[String] = Dot ~ NameString ~ BracketPair._1 ~ repsep(argument, Comma) ~ BracketPair._2 ^^ {
+    case _ ~ func ~ _ ~ args ~ _ => s".${func}(${args.mkString("")})"
+  }
+  def argument: Parser[String] = mathExpr
+  // <index-field-range-sel> ::= "[" <index-field-range> [, <index-field-range>]+ "]"
+  def indexFieldRangeSelect: Parser[String] = SqBracketPair._1 ~> rep1sep(indexFieldRange, Comma) <~ SqBracketPair._2 ^^ {
+    case ifrs => s"[${ifrs.mkString("")}]"
+  }
+  // <index-field-range> ::= <index-field> | (<index-field>, <index-field>) | "*"
+  def indexFieldRange: Parser[String] = indexField | BracketPair._1 ~ indexField ~ Comma ~ indexField ~ BracketPair._2 ^^ {
+    case _ ~ if1 ~ _ ~ if2 ~ _ => s"(${if1},${if2})"
+  }
+  // <index-field> ::= <index> | <field-quote> | <all-selection>
+  def indexField: Parser[String] = IndexNumber | fieldQuote | AllSelection
+  // <field-quote> ::= ' <field-string> ' | " <field-string> "
+  def fieldQuote: Parser[String] = (SQuote ~> FieldString <~ SQuote) | (DQuote ~> FieldString <~ DQuote)
+  // <filter-sel> ::= "[" <field-quote> <filter-compare-opr> <math-expr> "]"
+  def filterSelect: Parser[String] = SqBracketPair._1 ~> fieldQuote ~ FilterCompareOpr ~ mathExpr <~ SqBracketPair._2 ^^ {
+    case field ~ compare ~ value => s"${field} ${compare} ${value}"
+  }
+
+  // -- math --
+  def mathFactor: Parser[String] = "aaa"
+  def mathExpr: Parser[String] = "aaa"
 
 
 //
