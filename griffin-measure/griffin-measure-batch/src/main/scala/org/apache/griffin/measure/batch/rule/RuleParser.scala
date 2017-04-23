@@ -74,22 +74,24 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   object Keyword {
     def UnaryLogicalKeywords: Parser[String] = """(?i)not""".r
     def BinaryLogicalKeywords: Parser[String] = """(?i)and|or""".r
-    def RangeKeywords: Parser[String] = """(?i)(not)?\s+(in|between)""".r
+    def RangeKeywords: Parser[String] = """(?i)(not\s+)?(in|between)""".r
     def DataSourceKeywords: Parser[String] = """(?i)\$(source|target)""".r
     def Keywords: Parser[String] = UnaryLogicalKeywords | BinaryLogicalKeywords | RangeKeywords | DataSourceKeywords
   }
   import Keyword._
 
   object Operator {
-    def UnaryLogicalOpr: Parser[String] = UnaryLogicalKeywords | "!"
-    def BinaryLogicalOpr: Parser[String] = BinaryLogicalKeywords | "&&" | "||"
-    def CompareOpr: Parser[String] = "=" | "!=" | "<" | ">" | "<=" | ">="
+    def NotLogicalOpr: Parser[String] = """(?i)not""".r | "!"
+    def AndLogicalOpr: Parser[String] = """(?i)and""".r | "&&"
+    def OrLogicalOpr: Parser[String] = """(?i)or""".r | "||"
+    def CompareOpr: Parser[String] = """!?==?""".r | """<=?""".r | """>=?""".r
     def RangeOpr: Parser[String] = RangeKeywords
 
     def UnaryMathOpr: Parser[String] = "+" | "-"
-    def BinaryMathOpr: Parser[String] = "+" | "-" | "*" | "/" | "%"
+    def BinaryMathOpr1: Parser[String] = "*" | "/" | "%"
+    def BinaryMathOpr2: Parser[String] = "+" | "-"
 
-    def FilterCompareOpr: Parser[String] = "=" | "!=" | "<" | ">" | "<=" | ">="
+    def FilterCompareOpr: Parser[String] = """!?==?""".r | """<=?""".r | """>=?""".r
 
     def SqBracketPair: (Parser[String], Parser[String]) = ("[", "]")
     def BracketPair: (Parser[String], Parser[String]) = ("(", ")")
@@ -103,7 +105,8 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
 
   object SomeString {
     def AnyString: Parser[String] = """.*""".r
-    def FieldString: Parser[String] = """(\w|\s)+""".r
+    def SimpleFieldString: Parser[String] = """\w+""".r
+    def FieldString: Parser[String] = """[\w\s]+""".r
     def NameString: Parser[String] = """[a-zA-Z_]\w*""".r
   }
   import SomeString._
@@ -125,13 +128,13 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   // -- selection --
   // <selection> ::= <selection-head> [ <field-sel> | <function-operation> | <index-field-range-sel> | <filter-sel> ]+
   def selection: Parser[String] = selectionHead ~ rep(selector) ^^ {
-    case head ~ tails => head + tails.mkString("")
+    case head ~ tails => head + "[" + tails.mkString("") + "]"
   }
   def selector: Parser[String] = (fieldSelect | functionOperation | indexFieldRangeSelect | filterSelect)
 
   def selectionHead: Parser[String] = DataSourceKeywords
   // <field-sel> ::= "." <field-string>
-  def fieldSelect: Parser[String] = Dot ~> FieldString
+  def fieldSelect: Parser[String] = Dot ~> SimpleFieldString
   // <function-operation> ::= "." <function-name> "(" <arg> [, <arg>]+ ")"
   def functionOperation: Parser[String] = Dot ~ NameString ~ BracketPair._1 ~ repsep(argument, Comma) ~ BracketPair._2 ^^ {
     case _ ~ func ~ _ ~ args ~ _ => s".${func}(${args.mkString("")})"
@@ -139,7 +142,7 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   def argument: Parser[String] = mathExpr
   // <index-field-range-sel> ::= "[" <index-field-range> [, <index-field-range>]+ "]"
   def indexFieldRangeSelect: Parser[String] = SqBracketPair._1 ~> rep1sep(indexFieldRange, Comma) <~ SqBracketPair._2 ^^ {
-    case ifrs => s"[${ifrs.mkString("")}]"
+    case ifrs => s"${ifrs.mkString("")}"
   }
   // <index-field-range> ::= <index-field> | (<index-field>, <index-field>) | "*"
   def indexFieldRange: Parser[String] = indexField | BracketPair._1 ~ indexField ~ Comma ~ indexField ~ BracketPair._2 ^^ {
@@ -155,8 +158,60 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   }
 
   // -- math --
-  def mathFactor: Parser[String] = "aaa"
-  def mathExpr: Parser[String] = "aaa"
+  // <math-factor> ::= <literal> | <selection> | "(" <math-expr> ")"
+  def mathFactor: Parser[String] = literal | selection | BracketPair._1 ~> mathExpr <~ BracketPair._2 ^^ {
+    case a => s"(${a})"
+  }
+  // <math-expr> ::= [<unary-opr>] <math-factor> [<binary-opr> <math-factor>]+
+  // <unary-opr> ::= "+" | "-"
+  def unaryMathExpr: Parser[String] = opt(UnaryMathOpr) ~ mathFactor ^^ {
+    case Some(unary) ~ factor => s"${unary}${factor}"
+    case _ ~ factor => factor
+  }
+  // <binary-opr> ::= "+" | "-" | "*" | "/" | "%"
+  def binaryMathExpr1: Parser[String] = unaryMathExpr ~ rep(BinaryMathOpr1 ~ unaryMathExpr) ^^ {
+    case a ~ Nil => a
+    case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
+  }
+  def binaryMathExpr2: Parser[String] = binaryMathExpr1 ~ rep(BinaryMathOpr2 ~ binaryMathExpr1) ^^ {
+    case a ~ Nil => a
+    case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
+  }
+  def mathExpr: Parser[String] = binaryMathExpr2
+
+  // -- logical expression --
+  // <range-expr> ::= "(" [<math-expr>] [, <math-expr>]+ ")"
+  def rangeExpr: Parser[String] = BracketPair._1 ~> rep1sep(mathExpr, Comma) <~ BracketPair._2 ^^ {
+    case list => s"(${list.mkString(", ")})"
+  }
+  // <logical-expression> ::= <math-expr> (<compare-opr> <math-expr> | <range-opr> <range-expr>)
+  def logicalExpr: Parser[String] = mathExpr ~ CompareOpr ~ mathExpr ^^ {
+    case expr1 ~ opr ~ expr2 => s"${expr1} ${opr} ${expr2}"
+  } | mathExpr ~ RangeOpr ~ rangeExpr ^^ {
+    case expr ~ opr ~ range => s"${expr} ${opr} ${range}"
+  }
+
+  // -- logical statement --
+  def logicalFactor: Parser[String] = logicalExpr | BracketPair._1 ~> logicalStatement <~ BracketPair._2 ^^ {
+    case a => s"(${a})"
+  }
+  def NotLogicalStatement: Parser[String] = opt(NotLogicalOpr) ~ logicalFactor ^^ {
+    case Some(unary) ~ expr => s"${unary} ${expr}"
+    case _ ~ expr => expr
+  }
+  def andLogicalStatement: Parser[String] = NotLogicalStatement ~ rep(AndLogicalOpr ~ NotLogicalStatement) ^^ {
+    case 
+  }
+  // <logical-statement> ::= [NOT] <logical-expression> [(AND | OR) <logical-expression>]+ | "(" <logical-statement> ")"
+  def logicalStatement: Parser[String] = UnaryLogicalOpr
+
+
+  // for complie only
+  case class NullStatementExpr(expression: String) extends StatementExpr {
+    def genValue(values: Map[String, Any]): Option[Any] = None
+    def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = Nil
+  }
+  def statementsExpr = mathExpr ^^ { NullStatementExpr(_) }
 
 
 //
