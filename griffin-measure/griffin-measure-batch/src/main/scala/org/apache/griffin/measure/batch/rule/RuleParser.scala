@@ -141,27 +141,24 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   // <function-operation> ::= "." <function-name> "(" <arg> [, <arg>]+ ")"
   def functionOperation: Parser[FunctionOperationExpr] = Dot ~ NameString ~ BracketPair._1 ~ repsep(argument, Comma) ~ BracketPair._2 ^^ {
     case _ ~ func ~ _ ~ args ~ _ => FunctionOperationExpr(func, args)
-//    case _ ~ func ~ _ ~ args ~ _ => s".${func}(${args.mkString("")})"
   }
   def argument: Parser[MathExpr] = mathExpr
   // <index-field-range-sel> ::= "[" <index-field-range> [, <index-field-range>]+ "]"
   def indexFieldRangeSelect: Parser[IndexFieldRangeSelectExpr] = SqBracketPair._1 ~> rep1sep(indexFieldRange, Comma) <~ SqBracketPair._2 ^^ {
     case ifrs => IndexFieldRangeSelectExpr(ifrs)
-//    case ifrs => s"${ifrs.mkString("")}"
   }
   // <index-field-range> ::= <index-field> | (<index-field>, <index-field>) | "*"
   def indexFieldRange: Parser[FieldDescOnly] = indexField | BracketPair._1 ~ indexField ~ Comma ~ indexField ~ BracketPair._2 ^^ {
     case _ ~ if1 ~ _ ~ if2 ~ _ => FieldRangeDesc(if1, if2)
-//    case _ ~ if1 ~ _ ~ if2 ~ _ => s"(${if1},${if2})"
   }
   // <index-field> ::= <index> | <field-quote> | <all-selection>
+  // *here it can parse <math-expr>, but for simple situation, not supported now*
   def indexField: Parser[FieldDescOnly] = IndexNumber ^^ { IndexDesc(_) } | fieldQuote | AllSelection ^^ { AllFieldsDesc(_) }
   // <field-quote> ::= ' <field-string> ' | " <field-string> "
   def fieldQuote: Parser[FieldDesc] = (SQuote ~> FieldString <~ SQuote | DQuote ~> FieldString <~ DQuote) ^^ { FieldDesc(_) }
   // <filter-sel> ::= "[" <field-quote> <filter-compare-opr> <math-expr> "]"
   def filterSelect: Parser[FilterSelectExpr] = SqBracketPair._1 ~> fieldQuote ~ FilterCompareOpr ~ mathExpr <~ SqBracketPair._2 ^^ {
     case field ~ compare ~ value => FilterSelectExpr(field, compare, value)
-//    case field ~ compare ~ value => s"${field} ${compare} ${value}"
   }
 
   // -- math --

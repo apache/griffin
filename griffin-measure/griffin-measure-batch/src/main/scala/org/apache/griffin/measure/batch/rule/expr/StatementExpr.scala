@@ -8,6 +8,7 @@ trait StatementExpr extends Expr with Calculatable {
 case class SimpleStatementExpr(expr: LogicalExpr) extends StatementExpr {
   def calculate(values: Map[String, Any]): Option[Any] = expr.calculate(values)
   val desc: String = expr.desc
+  val dataSources: Set[String] = expr.dataSources
 }
 
 case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) extends StatementExpr {
@@ -20,4 +21,6 @@ case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) ext
       case _ => false
     }
   }
+
+  val dataSources: Set[String] = expr.dataSources ++ whenExpr.dataSources
 }

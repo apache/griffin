@@ -6,6 +6,7 @@ trait LiteralExpr extends Expr with Calculatable {
   val value: Option[Any]
   def calculate(values: Map[String, Any]): Option[Any] = value
   val desc: String = ""
+  val dataSources: Set[String] = Set.empty[String]
 }
 
 case class LiteralStringExpr(expr: String) extends LiteralExpr {

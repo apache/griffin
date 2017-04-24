@@ -2,7 +2,7 @@ package org.apache.griffin.measure.batch.rule.expr
 
 import scala.util.{Success, Try}
 
-trait FieldDescOnly extends Describable {
+trait FieldDescOnly extends Describable with DataSourceable {
 
 }
 
@@ -14,16 +14,19 @@ case class IndexDesc(expr: String) extends FieldDescOnly {
     }
   }
   val desc: String = describe(index)
+  val dataSources: Set[String] = Set.empty[String]
 }
 
 case class FieldDesc(expr: String) extends FieldDescOnly {
   val field: String = expr
   val desc: String = describe(field)
+  val dataSources: Set[String] = Set.empty[String]
 }
 
 case class AllFieldsDesc(expr: String) extends FieldDescOnly {
   val allFields: String = expr
   val desc: String = allFields
+  val dataSources: Set[String] = Set.empty[String]
 }
 
 case class FieldRangeDesc(startField: FieldDescOnly, endField: FieldDescOnly) extends FieldDescOnly {
@@ -33,4 +36,5 @@ case class FieldRangeDesc(startField: FieldDescOnly, endField: FieldDescOnly) ex
       case _ => throw new Exception("invalid field range description")
     }
   }
+  val dataSources: Set[String] = Set.empty[String]
 }

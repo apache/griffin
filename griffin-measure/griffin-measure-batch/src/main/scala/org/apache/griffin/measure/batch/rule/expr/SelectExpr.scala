@@ -6,14 +6,17 @@ trait SelectExpr extends Expr {
 
 case class IndexFieldRangeSelectExpr(fields: Iterable[FieldDescOnly]) extends SelectExpr {
   val desc: String = s"[${fields.mkString(",")}]"
+  val dataSources: Set[String] = Set.empty[String]
 }
 
 case class FunctionOperationExpr(func: String, args: Iterable[MathExpr]) extends SelectExpr {
   val desc: String = s".${func}(${args.map(_.desc).mkString(",")})"
+  val dataSources: Set[String] = args.flatMap(_.dataSources).toSet
 }
 
 case class FilterSelectExpr(field: FieldDesc, compare: String, value: MathExpr) extends SelectExpr {
   val desc: String = s"[${field.desc}${compare}${value.desc}]"
+  val dataSources: Set[String] = value.dataSources
 }
 
 // -- selection --
@@ -22,5 +25,9 @@ case class SelectionExpr(head: String, selectors: Iterable[SelectExpr]) extends 
   val desc: String = {
     val argsString = selectors.map(_.desc).mkString("")
     s"${head}${argsString}"
+  }
+  val dataSources: Set[String] = {
+    val selectorDataSources = selectors.flatMap(_.dataSources).toSet
+    selectorDataSources + head
   }
 }

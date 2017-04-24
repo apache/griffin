@@ -12,9 +12,11 @@ object ExprIdCounter {
 
   private val invalidIdRegex = """^\d+$""".r
 
+  val emptyId: String = ""
+
   def genId(defaultId: String): String = {
     defaultId match {
-      case "" => increment.toString
+      case emptyId => increment.toString
       case invalidIdRegex() => increment.toString
 //      case defId if (exist(defId)) => s"${increment}#${defId}"
       case defId if (exist(defId)) => s"${defId}"

@@ -11,6 +11,7 @@ case class LogicalCompareExpr(left: MathExpr, compare: String, right: MathExpr) 
     None
   }
   val desc: String = s"${left.desc} ${compare} ${right.desc}"
+  val dataSources: Set[String] = left.dataSources ++ right.dataSources
 }
 
 case class LogicalRangeExpr(left: MathExpr, rangeOpr: String, range: RangeDesc) extends LogicalExpr {
@@ -19,6 +20,7 @@ case class LogicalRangeExpr(left: MathExpr, rangeOpr: String, range: RangeDesc) 
     None
   }
   val desc: String = s"${left.desc} ${rangeOpr} ${range.desc}"
+  val dataSources: Set[String] = left.dataSources ++ range.dataSources
 }
 
 // -- logical statement --
@@ -33,6 +35,7 @@ case class UnaryLogicalExpr(oprList: Iterable[String], factor: LogicalExpr) exte
     None
   }
   val desc: String = oprList.foldRight(factor.desc) { (prev, ex) => s"${prev}${ex}" }
+  val dataSources: Set[String] = factor.dataSources
 }
 
 case class BinaryLogicalExpr(first: LogicalExpr, others: Iterable[(String, LogicalExpr)]) extends LogicalExpr {
@@ -41,4 +44,5 @@ case class BinaryLogicalExpr(first: LogicalExpr, others: Iterable[(String, Logic
     None
   }
   val desc: String = others.foldLeft(first.desc) { (ex, next) => s"${ex} ${next._1} ${next._2.desc}" }
+  val dataSources: Set[String] = first.dataSources ++ others.flatMap(_._2.dataSources).toSet
 }
