@@ -20,7 +20,7 @@ case class FilterSelectExpr(field: FieldDesc, compare: String, value: MathExpr) 
 }
 
 // -- selection --
-case class SelectionExpr(head: String, selectors: Iterable[SelectExpr]) extends Expr with Calculatable {
+case class SelectionExpr(head: SelectionHead, selectors: Iterable[SelectExpr]) extends Expr with Calculatable {
   def calculate(values: Map[String, Any]): Option[Any] = values.get(_id)
   val desc: String = {
     val argsString = selectors.map(_.desc).mkString("")
@@ -28,6 +28,6 @@ case class SelectionExpr(head: String, selectors: Iterable[SelectExpr]) extends 
   }
   val dataSources: Set[String] = {
     val selectorDataSources = selectors.flatMap(_.dataSources).toSet
-    selectorDataSources + head
+    head.dataSources ++ selectorDataSources
   }
 }

@@ -133,7 +133,7 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   }
   def selector: Parser[SelectExpr] = (fieldSelect | functionOperation | indexFieldRangeSelect | filterSelect)
 
-  def selectionHead: Parser[String] = DataSourceKeywords
+  def selectionHead: Parser[SelectionHead] = DataSourceKeywords ^^ { SelectionHead(_) }
   // <field-sel> ::= "." <field-string>
   def fieldSelect: Parser[IndexFieldRangeSelectExpr] = Dot ~> SimpleFieldString ^^ {
     case field => IndexFieldRangeSelectExpr(FieldDesc(field) :: Nil)
