@@ -1,7 +1,7 @@
 package org.apache.griffin.measure.batch.rule
 
 import org.apache.griffin.measure.batch.config.params.user._
-import org.apache.griffin.measure.batch.rule.expr._
+import org.apache.griffin.measure.batch.rule.expr_old._
 
 import scala.util.{Success, Try}
 

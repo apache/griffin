@@ -38,9 +38,9 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
   test("test rule parser") {
     val ruleParser = RuleParser()
 
-    val rules = "$source['tgt' < $source['age you' !== 1] - 1] between ( -$target['32a'] + 9, 100, 1000 )"
+    val rules = "$source['tgt' < $source['age you' !== 1] - 1] between ( -$target['32a'] + 9, 100, 1000 ) and (45 > 9 or $target.type + 8 == 9 and $source['a'] >= 0) when $source._time + 24h < $target._time"
 
-    val result = ruleParser.parseAll(ruleParser.logicalExpr, rules)
+    val result = ruleParser.parseAll(ruleParser.rule, rules)
 
     println(result)
   }

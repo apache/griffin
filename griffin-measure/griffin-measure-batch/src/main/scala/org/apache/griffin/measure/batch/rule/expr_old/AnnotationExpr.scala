@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.rule.expr
+package org.apache.griffin.measure.batch.rule.expr_old
 
 case class AnnotationExpr(expression: String) extends Expr with Calculatable {
 

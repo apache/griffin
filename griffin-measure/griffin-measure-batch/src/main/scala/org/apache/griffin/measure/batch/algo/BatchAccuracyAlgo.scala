@@ -6,7 +6,7 @@ import org.apache.griffin.measure.batch.algo.core.AccuracyCore
 import org.apache.griffin.measure.batch.config.params.AllParam
 import org.apache.griffin.measure.batch.connector._
 import org.apache.griffin.measure.batch.rule._
-import org.apache.griffin.measure.batch.rule.expr._
+import org.apache.griffin.measure.batch.rule.expr_old._
 import org.apache.griffin.measure.batch.persist._
 import org.apache.griffin.measure.batch.result._
 import org.apache.spark.rdd.RDD

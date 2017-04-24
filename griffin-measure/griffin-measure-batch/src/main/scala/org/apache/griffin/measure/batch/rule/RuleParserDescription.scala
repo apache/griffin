@@ -22,7 +22,7 @@
   * math-expr example: $source.price * $target.count, "hello" + " " + "world" + 123
   *
   * <binary-opr> ::= "+" | "-" | "*" | "/" | "%"
-  * <unary-opr> ::= "-" | "+"
+  * <unary-opr> ::= "+" | "-"
   *
   * <math-factor> ::= <literal> | <selection> | "(" <math-expr> ")"
   *
@@ -31,7 +31,7 @@
   *
   * <selection-head> ::= $source | $target
   *
-  * <field-sel> ::= "." <any-string>
+  * <field-sel> ::= "." <field-string>
   *
   * <function-operation> ::= "." <function-name> "(" <arg> [, <arg>]+ ")"
   * <function-name> ::= <name-string>
@@ -40,11 +40,11 @@
   * <index-field-range-sel> ::= "[" <index-field-range> [, <index-field-range>]+ "]"
   * <index-field-range> ::= <index-field> | (<index-field>, <index-field>) | "*"
   * index-field-range: 2 means the 3rd item, (0, 3) means first 4 items, * means all items, 'age' means item 'age'
-  * <index-field> ::= <math-expr>
+  * <index-field> ::= <index> | <field-quote> | <all-selection>
   * index: 0 ~ n means position from start, -1 ~ -n means position from end
+  * <field-quote> ::= ' <field-string> ' | " <field-string> "
   *
   * <filter-sel> ::= "[" <field-quote> <filter-compare-opr> <math-expr> "]"
-  * <field-quote> ::= ' <field-string> ' | " <field-string> "
   * <filter-compare-opr> ::= "=" | "!=" | "<" | ">" | "<=" | ">="
   * filter-sel example: ['name' = 'URL'], $source.man['age' > $source.graduate_age + 5 ]
   *
@@ -52,6 +52,7 @@
   * $source.tags[1+2]             valid
   * $source.tags[$source.first]   valid
   * $source.tags[$target.first]   invalid
+  * -- Such job is for validation, not for parser
   *
   *
   * <literal> ::= <literal-string> | <literal-number> | <literal-time> | <literal-boolean>

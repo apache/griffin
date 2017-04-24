@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.rule.expr
+package org.apache.griffin.measure.batch.rule.expr_old
 
 
 trait StatementAnalyzable extends Serializable {

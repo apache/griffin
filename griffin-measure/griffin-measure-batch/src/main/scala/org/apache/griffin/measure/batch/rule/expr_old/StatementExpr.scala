@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.rule.expr
+package org.apache.griffin.measure.batch.rule.expr_old
 
 trait StatementExpr extends Expr with StatementAnalyzable with ExprAnalyzable with Calculatable {
 

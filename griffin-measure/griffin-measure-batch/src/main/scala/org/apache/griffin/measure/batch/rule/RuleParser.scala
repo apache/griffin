@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.rule
 
-import org.apache.griffin.measure.batch.rule.expr._
+import org.apache.griffin.measure.batch.rule.expr_old._
 
 import scala.util.parsing.combinator._
 
@@ -72,11 +72,12 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
     */
 
   object Keyword {
+    def WhenKeywords: Parser[String] = """(?i)when""".r
     def UnaryLogicalKeywords: Parser[String] = """(?i)not""".r
     def BinaryLogicalKeywords: Parser[String] = """(?i)and|or""".r
     def RangeKeywords: Parser[String] = """(?i)(not\s+)?(in|between)""".r
     def DataSourceKeywords: Parser[String] = """(?i)\$(source|target)""".r
-    def Keywords: Parser[String] = UnaryLogicalKeywords | BinaryLogicalKeywords | RangeKeywords | DataSourceKeywords
+    def Keywords: Parser[String] = WhenKeywords | UnaryLogicalKeywords | BinaryLogicalKeywords | RangeKeywords | DataSourceKeywords
   }
   import Keyword._
 
@@ -119,7 +120,7 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   import SomeNumber._
 
   // -- literal --
-  def literal: Parser[String] = literialString | literialNumber | literialTime | literialBoolean
+  def literal: Parser[String] = literialString | literialTime | literialNumber | literialBoolean
   def literialString: Parser[String] = (SQuote ~> AnyString <~ SQuote) | (DQuote ~> AnyString <~ DQuote)
   def literialNumber: Parser[String] = IntegerNumber | DoubleNumber
   def literialTime: Parser[String] = """(\d+(d|h|m|s|ms))+""".r
@@ -181,7 +182,7 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
 
   // -- logical expression --
   // <range-expr> ::= "(" [<math-expr>] [, <math-expr>]+ ")"
-  def rangeExpr: Parser[String] = BracketPair._1 ~> rep1sep(mathExpr, Comma) <~ BracketPair._2 ^^ {
+  def rangeExpr: Parser[String] = BracketPair._1 ~> repsep(mathExpr, Comma) <~ BracketPair._2 ^^ {
     case list => s"(${list.mkString(", ")})"
   }
   // <logical-expression> ::= <math-expr> (<compare-opr> <math-expr> | <range-opr> <range-expr>)
@@ -200,11 +201,22 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
     case _ ~ expr => expr
   }
   def andLogicalStatement: Parser[String] = NotLogicalStatement ~ rep(AndLogicalOpr ~ NotLogicalStatement) ^^ {
-    case 
+    case a ~ Nil => a
+    case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
+  }
+  def orLogicalStatement: Parser[String] = andLogicalStatement ~ rep(OrLogicalOpr ~ andLogicalStatement) ^^ {
+    case a ~ Nil => a
+    case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
   }
   // <logical-statement> ::= [NOT] <logical-expression> [(AND | OR) <logical-expression>]+ | "(" <logical-statement> ")"
-  def logicalStatement: Parser[String] = UnaryLogicalOpr
+  def logicalStatement: Parser[String] = orLogicalStatement
 
+  // -- rule --
+  // <rule> ::= <logical-statement> [WHEN <logical-statement>]
+  def rule: Parser[String] = logicalStatement ~ opt(WhenKeywords ~> logicalStatement) ^^ {
+    case ls ~ Some(ws) => s"${ls} when ${ws}"
+    case ls ~ _ => ls
+  }
 
   // for complie only
   case class NullStatementExpr(expression: String) extends StatementExpr {
