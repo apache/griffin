@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.rule
 
-import org.apache.griffin.measure.batch.rule.expr_old._
+import org.apache.griffin.measure.batch.rule.expr._
 
 import scala.util.parsing.combinator._
 
@@ -120,110 +120,110 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   import SomeNumber._
 
   // -- literal --
-  def literal: Parser[String] = literialString | literialTime | literialNumber | literialBoolean
-  def literialString: Parser[String] = (SQuote ~> AnyString <~ SQuote) | (DQuote ~> AnyString <~ DQuote)
-  def literialNumber: Parser[String] = IntegerNumber | DoubleNumber
-  def literialTime: Parser[String] = """(\d+(d|h|m|s|ms))+""".r
-  def literialBoolean: Parser[String] = """(?i)true""".r | """(?i)false""".r
+  def literal: Parser[LiteralExpr] = literialString | literialTime | literialNumber | literialBoolean
+  def literialString: Parser[LiteralStringExpr] = (SQuote ~> AnyString <~ SQuote | DQuote ~> AnyString <~ DQuote) ^^ { LiteralStringExpr(_) }
+  def literialNumber: Parser[LiteralNumberExpr] = (IntegerNumber | DoubleNumber) ^^ { LiteralNumberExpr(_) }
+  def literialTime: Parser[LiteralTimeExpr] = """(\d+(d|h|m|s|ms))+""".r ^^ { LiteralTimeExpr(_) }
+  def literialBoolean: Parser[LiteralBooleanExpr] = ("""(?i)true""".r | """(?i)false""".r) ^^ { LiteralBooleanExpr(_) }
 
   // -- selection --
   // <selection> ::= <selection-head> [ <field-sel> | <function-operation> | <index-field-range-sel> | <filter-sel> ]+
-  def selection: Parser[String] = selectionHead ~ rep(selector) ^^ {
-    case head ~ tails => head + "[" + tails.mkString("") + "]"
+  def selection: Parser[SelectionExpr] = selectionHead ~ rep(selector) ^^ {
+    case head ~ selectors => SelectionExpr(head, selectors)
   }
-  def selector: Parser[String] = (fieldSelect | functionOperation | indexFieldRangeSelect | filterSelect)
+  def selector: Parser[SelectExpr] = (fieldSelect | functionOperation | indexFieldRangeSelect | filterSelect)
 
   def selectionHead: Parser[String] = DataSourceKeywords
   // <field-sel> ::= "." <field-string>
-  def fieldSelect: Parser[String] = Dot ~> SimpleFieldString
-  // <function-operation> ::= "." <function-name> "(" <arg> [, <arg>]+ ")"
-  def functionOperation: Parser[String] = Dot ~ NameString ~ BracketPair._1 ~ repsep(argument, Comma) ~ BracketPair._2 ^^ {
-    case _ ~ func ~ _ ~ args ~ _ => s".${func}(${args.mkString("")})"
+  def fieldSelect: Parser[IndexFieldRangeSelectExpr] = Dot ~> SimpleFieldString ^^ {
+    case field => IndexFieldRangeSelectExpr(FieldDesc(field) :: Nil)
   }
-  def argument: Parser[String] = mathExpr
+  // <function-operation> ::= "." <function-name> "(" <arg> [, <arg>]+ ")"
+  def functionOperation: Parser[FunctionOperationExpr] = Dot ~ NameString ~ BracketPair._1 ~ repsep(argument, Comma) ~ BracketPair._2 ^^ {
+    case _ ~ func ~ _ ~ args ~ _ => FunctionOperationExpr(func, args)
+//    case _ ~ func ~ _ ~ args ~ _ => s".${func}(${args.mkString("")})"
+  }
+  def argument: Parser[MathExpr] = mathExpr
   // <index-field-range-sel> ::= "[" <index-field-range> [, <index-field-range>]+ "]"
-  def indexFieldRangeSelect: Parser[String] = SqBracketPair._1 ~> rep1sep(indexFieldRange, Comma) <~ SqBracketPair._2 ^^ {
-    case ifrs => s"${ifrs.mkString("")}"
+  def indexFieldRangeSelect: Parser[IndexFieldRangeSelectExpr] = SqBracketPair._1 ~> rep1sep(indexFieldRange, Comma) <~ SqBracketPair._2 ^^ {
+    case ifrs => IndexFieldRangeSelectExpr(ifrs)
+//    case ifrs => s"${ifrs.mkString("")}"
   }
   // <index-field-range> ::= <index-field> | (<index-field>, <index-field>) | "*"
-  def indexFieldRange: Parser[String] = indexField | BracketPair._1 ~ indexField ~ Comma ~ indexField ~ BracketPair._2 ^^ {
-    case _ ~ if1 ~ _ ~ if2 ~ _ => s"(${if1},${if2})"
+  def indexFieldRange: Parser[FieldDescOnly] = indexField | BracketPair._1 ~ indexField ~ Comma ~ indexField ~ BracketPair._2 ^^ {
+    case _ ~ if1 ~ _ ~ if2 ~ _ => FieldRangeDesc(if1, if2)
+//    case _ ~ if1 ~ _ ~ if2 ~ _ => s"(${if1},${if2})"
   }
   // <index-field> ::= <index> | <field-quote> | <all-selection>
-  def indexField: Parser[String] = IndexNumber | fieldQuote | AllSelection
+  def indexField: Parser[FieldDescOnly] = IndexNumber ^^ { IndexDesc(_) } | fieldQuote | AllSelection ^^ { AllFieldsDesc(_) }
   // <field-quote> ::= ' <field-string> ' | " <field-string> "
-  def fieldQuote: Parser[String] = (SQuote ~> FieldString <~ SQuote) | (DQuote ~> FieldString <~ DQuote)
+  def fieldQuote: Parser[FieldDesc] = (SQuote ~> FieldString <~ SQuote | DQuote ~> FieldString <~ DQuote) ^^ { FieldDesc(_) }
   // <filter-sel> ::= "[" <field-quote> <filter-compare-opr> <math-expr> "]"
-  def filterSelect: Parser[String] = SqBracketPair._1 ~> fieldQuote ~ FilterCompareOpr ~ mathExpr <~ SqBracketPair._2 ^^ {
-    case field ~ compare ~ value => s"${field} ${compare} ${value}"
+  def filterSelect: Parser[FilterSelectExpr] = SqBracketPair._1 ~> fieldQuote ~ FilterCompareOpr ~ mathExpr <~ SqBracketPair._2 ^^ {
+    case field ~ compare ~ value => FilterSelectExpr(field, compare, value)
+//    case field ~ compare ~ value => s"${field} ${compare} ${value}"
   }
 
   // -- math --
   // <math-factor> ::= <literal> | <selection> | "(" <math-expr> ")"
-  def mathFactor: Parser[String] = literal | selection | BracketPair._1 ~> mathExpr <~ BracketPair._2 ^^ {
-    case a => s"(${a})"
-  }
+  def mathFactor: Parser[MathExpr] = (literal | selection | BracketPair._1 ~> mathExpr <~ BracketPair._2) ^^ { MathFactorExpr(_) }
   // <math-expr> ::= [<unary-opr>] <math-factor> [<binary-opr> <math-factor>]+
   // <unary-opr> ::= "+" | "-"
-  def unaryMathExpr: Parser[String] = rep(UnaryMathOpr) ~ mathFactor ^^ {
+  def unaryMathExpr: Parser[MathExpr] = rep(UnaryMathOpr) ~ mathFactor ^^ {
     case Nil ~ a => a
-    case list ~ a => s"${list.mkString("")}${a}"
+    case list ~ a => UnaryMathExpr(list, a)
   }
   // <binary-opr> ::= "+" | "-" | "*" | "/" | "%"
-  def binaryMathExpr1: Parser[String] = unaryMathExpr ~ rep(BinaryMathOpr1 ~ unaryMathExpr) ^^ {
+  def binaryMathExpr1: Parser[MathExpr] = unaryMathExpr ~ rep(BinaryMathOpr1 ~ unaryMathExpr) ^^ {
     case a ~ Nil => a
-    case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
+    case a ~ list => BinaryMathExpr(a, list.map(c => (c._1, c._2)))
   }
-  def binaryMathExpr2: Parser[String] = binaryMathExpr1 ~ rep(BinaryMathOpr2 ~ binaryMathExpr1) ^^ {
+  def binaryMathExpr2: Parser[MathExpr] = binaryMathExpr1 ~ rep(BinaryMathOpr2 ~ binaryMathExpr1) ^^ {
     case a ~ Nil => a
-    case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
+    case a ~ list => BinaryMathExpr(a, list.map(c => (c._1, c._2)))
   }
-  def mathExpr: Parser[String] = binaryMathExpr2
+  def mathExpr: Parser[MathExpr] = binaryMathExpr2
 
   // -- logical expression --
   // <range-expr> ::= "(" [<math-expr>] [, <math-expr>]+ ")"
-  def rangeExpr: Parser[String] = BracketPair._1 ~> repsep(mathExpr, Comma) <~ BracketPair._2 ^^ {
-    case list => s"(${list.mkString(", ")})"
-  }
+  def rangeExpr: Parser[RangeDesc] = BracketPair._1 ~> repsep(mathExpr, Comma) <~ BracketPair._2 ^^ { RangeDesc(_) }
   // <logical-expression> ::= <math-expr> (<compare-opr> <math-expr> | <range-opr> <range-expr>)
-  def logicalExpr: Parser[String] = mathExpr ~ CompareOpr ~ mathExpr ^^ {
-    case expr1 ~ opr ~ expr2 => s"${expr1} ${opr} ${expr2}"
+  def logicalExpr: Parser[LogicalExpr] = mathExpr ~ CompareOpr ~ mathExpr ^^ {
+    case left ~ opr ~ right => LogicalCompareExpr(left, opr, right)
   } | mathExpr ~ RangeOpr ~ rangeExpr ^^ {
-    case expr ~ opr ~ range => s"${expr} ${opr} ${range}"
+    case left ~ opr ~ range => LogicalRangeExpr(left, opr, range)
   }
 
   // -- logical statement --
-  def logicalFactor: Parser[String] = logicalExpr | BracketPair._1 ~> logicalStatement <~ BracketPair._2 ^^ {
-    case a => s"(${a})"
-  }
-  def notLogicalStatement: Parser[String] = rep(NotLogicalOpr) ~ logicalFactor ^^ {
+  def logicalFactor: Parser[LogicalExpr] = logicalExpr | BracketPair._1 ~> logicalStatement <~ BracketPair._2
+  def notLogicalStatement: Parser[LogicalExpr] = rep(NotLogicalOpr) ~ logicalFactor ^^ {
     case Nil ~ a => a
-    case list ~ a => s"${list.mkString(" ")} ${a}"
+    case list ~ a => UnaryLogicalExpr(list, a)
   }
-  def andLogicalStatement: Parser[String] = notLogicalStatement ~ rep(AndLogicalOpr ~ notLogicalStatement) ^^ {
+  def andLogicalStatement: Parser[LogicalExpr] = notLogicalStatement ~ rep(AndLogicalOpr ~ notLogicalStatement) ^^ {
     case a ~ Nil => a
-    case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
+    case a ~ list => BinaryLogicalExpr(a, list.map(c => (c._1, c._2)))
   }
-  def orLogicalStatement: Parser[String] = andLogicalStatement ~ rep(OrLogicalOpr ~ andLogicalStatement) ^^ {
+  def orLogicalStatement: Parser[LogicalExpr] = andLogicalStatement ~ rep(OrLogicalOpr ~ andLogicalStatement) ^^ {
     case a ~ Nil => a
-    case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
+    case a ~ list => BinaryLogicalExpr(a, list.map(c => (c._1, c._2)))
   }
   // <logical-statement> ::= [NOT] <logical-expression> [(AND | OR) <logical-expression>]+ | "(" <logical-statement> ")"
-  def logicalStatement: Parser[String] = orLogicalStatement
+  def logicalStatement: Parser[LogicalExpr] = orLogicalStatement
 
   // -- rule --
   // <rule> ::= <logical-statement> [WHEN <logical-statement>]
-  def rule: Parser[String] = logicalStatement ~ opt(WhenKeywords ~> logicalStatement) ^^ {
-    case ls ~ Some(ws) => s"${ls} when ${ws}"
-    case ls ~ _ => ls
+  def rule: Parser[StatementExpr] = logicalStatement ~ opt(WhenKeywords ~> logicalStatement) ^^ {
+    case ls ~ Some(ws) => WhenClauseStatementExpr(ls, ws)
+    case ls ~ _ => SimpleStatementExpr(ls)
   }
 
   // for complie only
-  case class NullStatementExpr(expression: String) extends StatementExpr {
-    def genValue(values: Map[String, Any]): Option[Any] = None
-    def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = Nil
-  }
-  def statementsExpr = mathExpr ^^ { NullStatementExpr(_) }
+//  case class NullStatementExpr(expression: String) extends StatementExpr {
+//    def genValue(values: Map[String, Any]): Option[Any] = None
+//    def getDataRelatedExprs(dataSign: String): Iterable[DataExpr] = Nil
+//  }
+//  def statementsExpr = mathExpr ^^ { NullStatementExpr(_) }
 
 
 //

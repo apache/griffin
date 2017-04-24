@@ -4,7 +4,7 @@ trait SelectExpr extends Expr {
 
 }
 
-case class IndexFieldRangeSelectExpr(fields: Iterable[DescOnly]) extends SelectExpr {
+case class IndexFieldRangeSelectExpr(fields: Iterable[FieldDescOnly]) extends SelectExpr {
   val desc: String = s"[${fields.mkString(",")}]"
 }
 
@@ -16,8 +16,8 @@ case class FilterSelectExpr(field: FieldDesc, compare: String, value: MathExpr) 
   val desc: String = s"[${field.desc}${compare}${value.desc}]"
 }
 
-
-case class SelectionExpr(head: String, selectors: Iterable[SelectExpr]) extends SelectExpr with Calculatable {
+// -- selection --
+case class SelectionExpr(head: String, selectors: Iterable[SelectExpr]) extends Expr with Calculatable {
   def calculate(values: Map[String, Any]): Option[Any] = values.get(_id)
   val desc: String = {
     val argsString = selectors.map(_.desc).mkString("")

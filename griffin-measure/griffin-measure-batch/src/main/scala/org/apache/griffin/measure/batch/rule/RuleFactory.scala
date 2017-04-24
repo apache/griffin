@@ -21,9 +21,10 @@ case class RuleFactory(evaluateRuleParam: EvaluateRuleParam) {
 
   private def parseExpr(rules: String): Try[StatementExpr] = {
     Try {
-      val result = ruleParser.parseAll(ruleParser.statementsExpr, rules)
-      if (result.successful) result.get
-      else throw new Exception("parse rule error!")
+//      val result = ruleParser.parseAll(ruleParser.statementsExpr, rules)
+//      if (result.successful) result.get
+//      else throw new Exception("parse rule error!")
+      throw new Exception("parse rule error!")
     }
   }
 

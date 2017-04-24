@@ -2,11 +2,11 @@ package org.apache.griffin.measure.batch.rule.expr
 
 import scala.util.{Success, Try}
 
-trait DescOnly extends Describable {
+trait FieldDescOnly extends Describable {
 
 }
 
-case class IndexDesc(expr: String) extends DescOnly {
+case class IndexDesc(expr: String) extends FieldDescOnly {
   val index: Int = {
     Try(expr.toInt) match {
       case Success(v) => v
@@ -16,28 +16,21 @@ case class IndexDesc(expr: String) extends DescOnly {
   val desc: String = describe(index)
 }
 
-case class FieldDesc(expr: String) extends DescOnly {
+case class FieldDesc(expr: String) extends FieldDescOnly {
   val field: String = expr
   val desc: String = describe(field)
 }
 
-case class AllFieldsDesc(expr: String) extends DescOnly {
+case class AllFieldsDesc(expr: String) extends FieldDescOnly {
   val allFields: String = expr
   val desc: String = allFields
 }
 
-case class FieldRangeDesc(startField: DescOnly, endField: DescOnly) extends DescOnly {
+case class FieldRangeDesc(startField: FieldDescOnly, endField: FieldDescOnly) extends FieldDescOnly {
   val desc: String = {
     (startField, endField) match {
       case (f1: IndexDesc, f2: IndexDesc) => s"(${f1.desc}, ${f2.desc})"
       case _ => throw new Exception("invalid field range description")
     }
-  }
-}
-
-case class RangeDesc(elements: Iterable[Describable]) extends DescOnly {
-  val desc: String = {
-    val rangeDesc = elements.map(_.desc).mkString(", ")
-    s"(${rangeDesc})"
   }
 }
