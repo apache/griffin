@@ -43,7 +43,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // rules
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam)
       val rule: StatementExpr = ruleFactory.generateRule()
-      val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
+      val ruleAnalyzer: RuleAnalyzerOld = RuleAnalyzerOld(rule)
 
       // data connector
       val sourceDataConnector: DataConnector =
@@ -112,7 +112,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     (data, Map[String, Any]())
   }
 
-  def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzer
+  def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzerOld
               ): (AccuracyResult, RDD[(Product, (Map[String, Any], Map[String, Any]))], RDD[(Product, (Map[String, Any], Map[String, Any]))]) = {
 
     // 1. wrap data

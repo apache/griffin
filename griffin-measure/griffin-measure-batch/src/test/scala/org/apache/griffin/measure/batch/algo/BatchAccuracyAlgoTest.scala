@@ -11,7 +11,7 @@ import org.apache.griffin.measure.batch.config.params._
 import org.apache.griffin.measure.batch.config.reader._
 import org.apache.griffin.measure.batch.config.validator._
 import org.apache.griffin.measure.batch.connector.{DataConnector, DataConnectorFactory}
-import org.apache.griffin.measure.batch.rule.{RuleAnalyzer, RuleFactory}
+import org.apache.griffin.measure.batch.rule.{RuleAnalyzerOld, RuleFactory}
 import org.apache.griffin.measure.batch.rule.expr_old.StatementExpr
 
 import scala.util.{Failure, Success, Try}
@@ -84,7 +84,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       // rules
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam)
       val rule: StatementExpr = ruleFactory.generateRule()
-      val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
+      val ruleAnalyzer: RuleAnalyzerOld = RuleAnalyzerOld(rule)
 
       // data connector
       val sourceDataConnector: DataConnector =

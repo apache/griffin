@@ -38,11 +38,33 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
   test("test rule parser") {
     val ruleParser = RuleParser()
 
-    val rules = "$source['tgt' < $source['tag' != 2] - -+-++---1] between ( -$target['32a'] + 9, 100, ----1000 ) and (45 > 9 or $target.type + 8 == 9 and $source['a'] >= 0) when not not not not $source._time + 24h < $target._time"
+    val rules = "$SOUrce['tgt' < $source['tag' != 2] - -+-++---1] between ( -$target['32a'] + 9, 100, ----1000 ) and (45 > 9 or $target.type + 8 == 9 and $source['a'] >= 0) when not not not not $source._time + 24h < $target._time"
 
     val result = ruleParser.parseAll(ruleParser.rule, rules)
 
     println(result)
+  }
+
+  test("test rule analyzer") {
+    val ruleParser = RuleParser()
+
+    val rules = "$source.tag == $target['take' >= 5] and $source.price + $source.price1 > $target['kk' < $target.age] when $target.ggg = 1"
+    val result = ruleParser.parseAll(ruleParser.rule, rules)
+    println(result)
+
+    if (result.successful) {
+      val ruleAnalyzer = RuleAnalyzer(result.get)
+
+      println("source")
+      ruleAnalyzer.sourcePersistExprs.foreach(a => println(a.desc))
+      ruleAnalyzer.sourcePersistExprs.foreach(println)
+      println("target")
+      ruleAnalyzer.targetPersistExprs.foreach(a => println(a.desc))
+      ruleAnalyzer.targetPersistExprs.foreach(println)
+    }
+
+
+
   }
 
 }

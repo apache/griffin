@@ -9,6 +9,12 @@ case class SimpleStatementExpr(expr: LogicalExpr) extends StatementExpr {
   def calculate(values: Map[String, Any]): Option[Any] = expr.calculate(values)
   val desc: String = expr.desc
   val dataSources: Set[String] = expr.dataSources
+  override def getSubCacheExprs(ds: String): Iterable[Expr] = {
+    expr.getCacheExprs(ds)
+  }
+  override def getSubPersistExprs(ds: String): Iterable[Expr] = {
+    expr.getPersistExprs(ds)
+  }
 }
 
 case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) extends StatementExpr {
@@ -23,4 +29,11 @@ case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) ext
   }
 
   val dataSources: Set[String] = expr.dataSources ++ whenExpr.dataSources
+  override def cacheUnit: Boolean = true
+  override def getSubCacheExprs(ds: String): Iterable[Expr] = {
+    expr.getCacheExprs(ds) ++ whenExpr.getCacheExprs(ds)
+  }
+  override def getSubPersistExprs(ds: String): Iterable[Expr] = {
+    expr.getPersistExprs(ds) ++ whenExpr.getPersistExprs(ds)
+  }
 }
