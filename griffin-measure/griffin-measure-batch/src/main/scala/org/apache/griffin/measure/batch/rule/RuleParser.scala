@@ -165,9 +165,9 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   }
   // <math-expr> ::= [<unary-opr>] <math-factor> [<binary-opr> <math-factor>]+
   // <unary-opr> ::= "+" | "-"
-  def unaryMathExpr: Parser[String] = opt(UnaryMathOpr) ~ mathFactor ^^ {
-    case Some(unary) ~ factor => s"${unary}${factor}"
-    case _ ~ factor => factor
+  def unaryMathExpr: Parser[String] = rep(UnaryMathOpr) ~ mathFactor ^^ {
+    case Nil ~ a => a
+    case list ~ a => s"${list.mkString("")}${a}"
   }
   // <binary-opr> ::= "+" | "-" | "*" | "/" | "%"
   def binaryMathExpr1: Parser[String] = unaryMathExpr ~ rep(BinaryMathOpr1 ~ unaryMathExpr) ^^ {
@@ -196,11 +196,11 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   def logicalFactor: Parser[String] = logicalExpr | BracketPair._1 ~> logicalStatement <~ BracketPair._2 ^^ {
     case a => s"(${a})"
   }
-  def NotLogicalStatement: Parser[String] = opt(NotLogicalOpr) ~ logicalFactor ^^ {
-    case Some(unary) ~ expr => s"${unary} ${expr}"
-    case _ ~ expr => expr
+  def notLogicalStatement: Parser[String] = rep(NotLogicalOpr) ~ logicalFactor ^^ {
+    case Nil ~ a => a
+    case list ~ a => s"${list.mkString(" ")} ${a}"
   }
-  def andLogicalStatement: Parser[String] = NotLogicalStatement ~ rep(AndLogicalOpr ~ NotLogicalStatement) ^^ {
+  def andLogicalStatement: Parser[String] = notLogicalStatement ~ rep(AndLogicalOpr ~ notLogicalStatement) ^^ {
     case a ~ Nil => a
     case a ~ list => s"${a} ${list.map(c => s"${c._1} ${c._2}").mkString(" ")}"
   }
