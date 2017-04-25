@@ -1,7 +1,7 @@
 package org.apache.griffin.measure.batch.rule.expr
 
 
-trait LogicalExpr extends Expr with Calculatable with GroupbyableExpr {
+trait LogicalExpr extends Expr with Calculatable with AnalyzableExpr {
   override def cacheUnit: Boolean = true
 }
 

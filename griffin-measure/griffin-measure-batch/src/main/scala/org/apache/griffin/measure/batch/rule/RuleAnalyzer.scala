@@ -17,4 +17,6 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
   val sourceGroupbyExprs: Iterable[MathExpr] = groupbyExprPairs.map(_._1)
   val targetGroupbyExprs: Iterable[MathExpr] = groupbyExprPairs.map(_._2)
 
+  val whenClauseExpr: Option[LogicalExpr] = rule.getWhenClauseExpr
+
 }
