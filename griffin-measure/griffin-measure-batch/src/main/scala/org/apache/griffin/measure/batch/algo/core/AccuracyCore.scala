@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.algo.core
 
-import org.apache.griffin.measure.batch.rule.RuleAnalyzerOld
+import org.apache.griffin.measure.batch.rule.RuleAnalyzer
 import org.apache.griffin.measure.batch.result._
 import org.apache.spark.rdd.RDD
 
@@ -10,7 +10,7 @@ object AccuracyCore {
   type V = Map[String, Any]
   type T = Map[String, Any]
 
-  def accuracy(allKvs: RDD[(Product, (Iterable[(V, T)], Iterable[(V, T)]))], ruleAnalyzer: RuleAnalyzerOld
+  def accuracy(allKvs: RDD[(Product, (Iterable[(V, T)], Iterable[(V, T)]))], ruleAnalyzer: RuleAnalyzer
               ): (AccuracyResult, RDD[(Product, (V, T))], RDD[(Product, (V, T))]) = {
     val result: RDD[(Long, Long, List[(Product, (V, T))], List[(Product, (V, T))])] = allKvs.map { kv =>
       val (key, (sourceDatas, targetDatas)) = kv
@@ -52,7 +52,9 @@ object AccuracyCore {
     (AccuracyResult(countPair._1, (countPair._1 + countPair._2)), missRdd, matchRdd)
   }
 
-  private def matchData(source: (V, T), target: (V, T), ruleAnalyzer: RuleAnalyzerOld): (Boolean, T) = {
+  private def matchData(source: (V, T), target: (V, T), ruleAnalyzer: RuleAnalyzer): (Boolean, T) = {
+
+    // fixme: need to modify the steps
 
     // 1. merge source and target data
     val mergedData: Map[String, Any] = mergeData(source, target)

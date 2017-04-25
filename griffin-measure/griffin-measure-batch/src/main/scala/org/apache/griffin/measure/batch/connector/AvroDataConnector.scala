@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.connector
 
-import org.apache.griffin.measure.batch.rule.expr_old._
+import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import com.databricks.spark.avro._
@@ -11,7 +11,7 @@ import java.nio.file.{Files, Paths}
 import org.apache.griffin.measure.batch.utils.HdfsUtil
 
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                             keyExprs: Seq[DataExpr], dataExprs: Iterable[DataExpr]
+                             groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr]
                             ) extends DataConnector {
 
   val FilePath = "file.path"
@@ -44,27 +44,25 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
   def data(): Try[RDD[(Product, Map[String, Any])]] = {
     Try {
       loadDataFile.map { row =>
-        val keys: Seq[AnyRef] = keyExprs.flatMap { expr =>
-          if (expr.args.size > 0) {
-            expr.args.head match {
-              case e: NumPositionExpr => Some(row.getAs[Any](e.index).asInstanceOf[AnyRef])
-              case e: StringPositionExpr => Some(row.getAs[Any](e.field).asInstanceOf[AnyRef])
-              case _ => None
-            }
-          } else None
+        // generate cache data
+        val cacheData: Map[String, Any] = cacheExprs.foldLeft(Map[String, Any]()) { (cachedMap, expr) =>
+          val valueOpt = SelectDataUtil.getSelectData(Some(row), expr, cachedMap)
+          cachedMap + (expr._id -> valueOpt.getOrElse(null))
+          if (valueOpt.nonEmpty) {
+            cachedMap + (expr._id -> valueOpt.get)
+          } else cachedMap
         }
-        val key = toTuple(keys)
-        val values: Iterable[(String, Any)] = dataExprs.flatMap { expr =>
-          if (expr.args.size > 0) {
-            expr.args.head match {
-              case e: NumPositionExpr => Some((expr._id, row.getAs[Any](e.index)))
-              case e: StringPositionExpr => Some((expr._id, row.getAs[Any](e.field)))
-              case _ => None
-            }
-          } else None
+
+        // get groupby data
+        val groupbyData: Seq[AnyRef] = groupbyExprs.flatMap { expr =>
+          expr.calculate(cacheData) match {
+            case Some(v) => Some(v.asInstanceOf[AnyRef])
+            case _ => None
+          }
         }
-        val value = values.toMap
-        (key, value)
+        val key = toTuple(groupbyData)
+
+        (key, cacheData)
       }
     }
   }

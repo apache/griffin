@@ -49,74 +49,28 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     }
   }
 
-  // for now, one expr only get one value, not supporting one expr get multiple values
-  private def getSelectData(data: Option[Any], expr: Expr, cachedMap: Map[String, Any]): Option[Any] = {
-    Try {
-      expr match {
-        case selection: SelectionExpr => {
-          selection.selectors.foldLeft(data) { (dt, selector) =>
-            getSelectData(dt, selector, cachedMap)
-          }
-        }
-        case selector: IndexFieldRangeSelectExpr => {
-          data match {
-            case Some(row: Row) => {
-              if (selector.fields.size == 1) {
-                selector.fields.head match {
-                  case i: IndexDesc => Some(row.getAs[Any](i.index))
-                  case f: FieldDesc => Some(row.getAs[Any](f.field))
-                  case _ => None
-                }
-              } else None
-            }
-            case _ => None
-          }
-        }
-        case _ => None
-      }
-    } match {
-      case Success(v) => v
-      case _ => None
-    }
-  }
-
   def data(): Try[RDD[(Product, Map[String, Any])]] = {
     Try {
       sqlContext.sql(dataSql).map { row =>
         // generate cache data
         val cacheData: Map[String, Any] = cacheExprs.foldLeft(Map[String, Any]()) { (cachedMap, expr) =>
-          val valueOpt = getSelectData(Some(row), expr, cachedMap)
+          val valueOpt = SelectDataUtil.getSelectData(Some(row), expr, cachedMap)
           cachedMap + (expr._id -> valueOpt.getOrElse(null))
           if (valueOpt.nonEmpty) {
             cachedMap + (expr._id -> valueOpt.get)
           } else cachedMap
         }
-        // fixme: ...
 
         // get groupby data
-        groupbyExprs.flatMap()
+        val groupbyData: Seq[AnyRef] = groupbyExprs.flatMap { expr =>
+          expr.calculate(cacheData) match {
+            case Some(v) => Some(v.asInstanceOf[AnyRef])
+            case _ => None
+          }
+        }
+        val key = toTuple(groupbyData)
 
-        val keys: Seq[AnyRef] = groupbyExprs.flatMap { expr =>
-          if (expr.args.size > 0) {
-            expr.args.head match {
-              case e: NumPositionExpr => Some(row.getAs[Any](e.index).asInstanceOf[AnyRef])
-              case e: StringPositionExpr => Some(row.getAs[Any](e.field).asInstanceOf[AnyRef])
-              case _ => None
-            }
-          } else None
-        }
-        val key = toTuple(keys)
-        val values: Iterable[(String, Any)] = dataExprs.flatMap { expr =>
-          if (expr.args.size > 0) {
-            expr.args.head match {
-              case e: NumPositionExpr => Some((expr._id, row.getAs[Any](e.index)))
-              case e: StringPositionExpr => Some((expr._id, row.getAs[Any](e.field)))
-              case _ => None
-            }
-          } else None
-        }
-        val value = values.toMap
-        (key, value)
+        (key, cacheData)
       }
     }
   }

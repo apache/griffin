@@ -112,7 +112,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     (data, Map[String, Any]())
   }
 
-  def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzerOld
+  def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzer
               ): (AccuracyResult, RDD[(Product, (Map[String, Any], Map[String, Any]))], RDD[(Product, (Map[String, Any], Map[String, Any]))]) = {
 
     // 1. wrap data
