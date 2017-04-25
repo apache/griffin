@@ -13,6 +13,8 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
   val sourcePersistExprs: Iterable[Expr] = rule.getPersistExprs(SourceData)
   val targetPersistExprs: Iterable[Expr] = rule.getPersistExprs(TargetData)
 
-//  def
+  val groupbyExprPairs: Iterable[(MathExpr, MathExpr)] = rule.getGroupbyExprPairs((SourceData, TargetData))
+  val sourceGroupbyExprs: Iterable[MathExpr] = groupbyExprPairs.map(_._1)
+  val targetGroupbyExprs: Iterable[MathExpr] = groupbyExprPairs.map(_._2)
 
 }

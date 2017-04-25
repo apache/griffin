@@ -48,7 +48,7 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
   test("test rule analyzer") {
     val ruleParser = RuleParser()
 
-    val rules = "$source.tag == $target['take' >= 5] and $source.price + $source.price1 > $target['kk' < $target.age] when $target.ggg = 1"
+    val rules = "$source.tag == $target['take' >= 5] and $source.price + $source.price1 > $target['kk' < $target.age] and $source.ee = $target.fe + $target.a when $target.ggg = 1"
     val result = ruleParser.parseAll(ruleParser.rule, rules)
     println(result)
 
@@ -61,6 +61,9 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
       println("target")
       ruleAnalyzer.targetPersistExprs.foreach(a => println(a.desc))
       ruleAnalyzer.targetPersistExprs.foreach(println)
+      println("groupby")
+      ruleAnalyzer.sourceGroupbyExprs.foreach(println)
+      ruleAnalyzer.targetGroupbyExprs.foreach(println)
     }
 
 
