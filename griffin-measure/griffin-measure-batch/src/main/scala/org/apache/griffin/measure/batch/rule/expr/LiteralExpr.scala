@@ -2,7 +2,7 @@ package org.apache.griffin.measure.batch.rule.expr
 
 import scala.util.{Failure, Success, Try}
 
-trait LiteralExpr extends Expr with Calculatable {
+trait LiteralExpr extends Expr {
   val value: Option[Any]
   def calculate(values: Map[String, Any]): Option[Any] = value
   val dataSources: Set[String] = Set.empty[String]

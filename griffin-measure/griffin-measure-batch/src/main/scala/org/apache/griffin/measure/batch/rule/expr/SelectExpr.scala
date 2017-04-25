@@ -1,7 +1,7 @@
 package org.apache.griffin.measure.batch.rule.expr
 
 trait SelectExpr extends Expr {
-
+  def calculate(values: Map[String, Any]): Option[Any] = None
 }
 
 case class IndexFieldRangeSelectExpr(fields: Iterable[FieldDescOnly]) extends SelectExpr {

@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-trait MathExpr extends Expr with Calculatable {
+trait MathExpr extends Expr {
 
 }
 

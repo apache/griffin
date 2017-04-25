@@ -1,7 +1,7 @@
 package org.apache.griffin.measure.batch.connector
 
 import org.apache.griffin.measure.batch.config.params.user._
-import org.apache.griffin.measure.batch.rule.expr_old._
+import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.spark.sql.SQLContext
 
 import scala.util.Try
@@ -13,15 +13,15 @@ object DataConnectorFactory {
 
   def getDataConnector(sqlContext: SQLContext,
                        dataConnectorParam: DataConnectorParam,
-                       keyExprs: Seq[DataExpr],
-                       dataExprs: Iterable[DataExpr]
+                       groupbyExprs: Seq[MathExpr],
+                       cacheExprs: Iterable[Expr]
                       ): Try[DataConnector] = {
     val conType = dataConnectorParam.conType
     val version = dataConnectorParam.version
     Try {
       conType match {
-        case HiveRegex() => HiveDataConnector(sqlContext, dataConnectorParam.config, keyExprs, dataExprs)
-        case AvroRegex() => AvroDataConnector(sqlContext, dataConnectorParam.config, keyExprs, dataExprs)
+        case HiveRegex() => HiveDataConnector(sqlContext, dataConnectorParam.config, groupbyExprs, cacheExprs)
+        case AvroRegex() => AvroDataConnector(sqlContext, dataConnectorParam.config, groupbyExprs, cacheExprs)
         case _ => throw new Exception("connector creation error!")
       }
     }

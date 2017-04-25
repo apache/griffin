@@ -1,7 +1,7 @@
 package org.apache.griffin.measure.batch.rule.expr
 
 
-trait StatementExpr extends Expr with Calculatable with AnalyzableExpr {
+trait StatementExpr extends Expr with AnalyzableExpr {
   def valid(values: Map[String, Any]): Boolean = true
 }
 
@@ -16,7 +16,7 @@ case class SimpleStatementExpr(expr: LogicalExpr) extends StatementExpr {
     expr.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Iterable[(MathExpr, MathExpr)] = expr.getGroupbyExprPairs(dsPair)
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = expr.getGroupbyExprPairs(dsPair)
 }
 
 case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) extends StatementExpr {
@@ -39,6 +39,6 @@ case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) ext
     expr.getPersistExprs(ds) ++ whenExpr.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Iterable[(MathExpr, MathExpr)] = expr.getGroupbyExprPairs(dsPair)
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = expr.getGroupbyExprPairs(dsPair)
   override def getWhenClauseExpr(): Option[LogicalExpr] = Some(whenExpr)
 }

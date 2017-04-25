@@ -6,7 +6,7 @@ import org.apache.griffin.measure.batch.algo.core.AccuracyCore
 import org.apache.griffin.measure.batch.config.params.AllParam
 import org.apache.griffin.measure.batch.connector._
 import org.apache.griffin.measure.batch.rule._
-import org.apache.griffin.measure.batch.rule.expr_old._
+import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.griffin.measure.batch.persist._
 import org.apache.griffin.measure.batch.result._
 import org.apache.spark.rdd.RDD
@@ -43,11 +43,11 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // rules
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam)
       val rule: StatementExpr = ruleFactory.generateRule()
-      val ruleAnalyzer: RuleAnalyzerOld = RuleAnalyzerOld(rule)
+      val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
       // data connector
       val sourceDataConnector: DataConnector =
-        DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam, ruleAnalyzer.sourceDataKeyExprs, ruleAnalyzer.sourceDataExprs) match {
+        DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam, ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourcePersistExprs) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("source data connection error!")
@@ -55,7 +55,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
           case Failure(ex) => throw ex
         }
       val targetDataConnector: DataConnector =
-        DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam, ruleAnalyzer.targetDatakeyExprs, ruleAnalyzer.targetDataExprs) match {
+        DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam, ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetPersistExprs) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("target data connection error!")

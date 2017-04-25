@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-trait Expr extends Serializable with Describable with Cacheable {
+trait Expr extends Serializable with Describable with Cacheable with Calculatable {
 
   protected val _defaultId: String = ExprIdCounter.emptyId
 

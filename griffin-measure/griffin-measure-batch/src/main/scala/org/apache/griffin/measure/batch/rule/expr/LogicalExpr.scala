@@ -1,7 +1,7 @@
 package org.apache.griffin.measure.batch.rule.expr
 
 
-trait LogicalExpr extends Expr with Calculatable with AnalyzableExpr {
+trait LogicalExpr extends Expr with AnalyzableExpr {
   override def cacheUnit: Boolean = true
 }
 
@@ -19,7 +19,7 @@ case class LogicalCompareExpr(left: MathExpr, compare: String, right: MathExpr) 
     left.getPersistExprs(ds) ++ right.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Iterable[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
     if (compare == "=" || compare == "==") {
       (left.dataSourceOpt, right.dataSourceOpt) match {
         case (Some(dsPair._1), Some(dsPair._2)) => (left, right) :: Nil
@@ -66,7 +66,7 @@ case class UnaryLogicalExpr(oprList: Iterable[String], factor: LogicalExpr) exte
     factor.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Iterable[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
     val notOprList = oprList.filter { opr =>
       opr match {
         case notRegex() => true
@@ -93,7 +93,7 @@ case class BinaryLogicalExpr(first: LogicalExpr, others: Iterable[(String, Logic
     first.getPersistExprs(ds) ++ others.flatMap(_._2.getPersistExprs(ds))
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Iterable[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
     if (others.isEmpty) first.getGroupbyExprPairs(dsPair)
     else {
       val isAnd = others.exists(_._1 match {
