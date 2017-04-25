@@ -5,24 +5,29 @@ import scala.util.{Failure, Success, Try}
 trait LiteralExpr extends Expr with Calculatable {
   val value: Option[Any]
   def calculate(values: Map[String, Any]): Option[Any] = value
-  val desc: String = ""
   val dataSources: Set[String] = Set.empty[String]
 }
 
 case class LiteralStringExpr(expr: String) extends LiteralExpr {
   val value: Option[String] = Some(expr)
+  val desc: String = value.getOrElse("")
 }
 
 case class LiteralNumberExpr(expr: String) extends LiteralExpr {
   val value: Option[Any] = {
-    Try {
-      if (expr.contains(".")) expr.toDouble
-      else expr.toLong
-    } match {
-      case Success(v) => Some(v)
-      case _ => throw new Exception(s"${expr} is invalid number")
+    if (expr.contains(".")) {
+      Try (expr.toDouble) match {
+        case Success(v) => Some(v)
+        case _ => throw new Exception(s"${expr} is invalid number")
+      }
+    } else {
+      Try (expr.toLong) match {
+        case Success(v) => Some(v)
+        case _ => throw new Exception(s"${expr} is invalid number")
+      }
     }
   }
+  val desc: String = value.getOrElse("").toString
 }
 
 case class LiteralTimeExpr(expr: String) extends LiteralExpr {
@@ -48,6 +53,7 @@ case class LiteralTimeExpr(expr: String) extends LiteralExpr {
       case Failure(ex) => throw ex
     }
   }
+  val desc: String = expr
 }
 
 case class LiteralBooleanExpr(expr: String) extends LiteralExpr {
@@ -58,4 +64,5 @@ case class LiteralBooleanExpr(expr: String) extends LiteralExpr {
     case FalseRegex() => Some(false)
     case _ => throw new Exception(s"${expr} is invalid boolean")
   }
+  val desc: String = value.getOrElse("").toString
 }
