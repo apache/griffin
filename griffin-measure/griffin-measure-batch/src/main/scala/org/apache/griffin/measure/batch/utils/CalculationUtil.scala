@@ -12,9 +12,13 @@ object CalculationUtil {
     def + (other: Option[_]): Option[_] = {
       Try {
         (value, other) match {
-          case (Some(s1: String), Some(v2)) => Some(s1 + v2.toString)
-          case (Some(n1: Long), Some(v2)) => Some(n1 + v2.toString.toLong)
-          case (Some(d1: Double), Some(v2)) => Some(d1 + v2.toString.toDouble)
+          case (Some(v1: String), Some(v2)) => Some(v1 + v2.toString)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 + v2.toString.toByte)
+          case (Some(v1: Short), Some(v2)) => Some(v1 + v2.toString.toShort)
+          case (Some(v1: Int), Some(v2)) => Some(v1 + v2.toString.toInt)
+          case (Some(v1: Long), Some(v2)) => Some(v1 + v2.toString.toLong)
+          case (Some(v1: Float), Some(v2)) => Some(v1 + v2.toString.toFloat)
+          case (Some(v1: Double), Some(v2)) => Some(v1 + v2.toString.toDouble)
           case (None, Some(v2)) => other
           case _ => value
         }
@@ -27,10 +31,12 @@ object CalculationUtil {
     def - (other: Option[_]): Option[_] = {
       Try {
         (value, other) match {
-          case (Some(n1: Long), Some(v2)) => Some(n1 - v2.toString.toLong)
-          case (Some(d1: Double), Some(v2)) => Some(d1 - v2.toString.toDouble)
-          case (None, Some(n2: Long)) => Some(- n2)
-          case (None, Some(d2: Double)) => Some(- d2)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 - v2.toString.toByte)
+          case (Some(v1: Short), Some(v2)) => Some(v1 - v2.toString.toShort)
+          case (Some(v1: Int), Some(v2)) => Some(v1 - v2.toString.toInt)
+          case (Some(v1: Long), Some(v2)) => Some(v1 - v2.toString.toLong)
+          case (Some(v1: Float), Some(v2)) => Some(v1 - v2.toString.toFloat)
+          case (Some(v1: Double), Some(v2)) => Some(v1 - v2.toString.toDouble)
           case _ => value
         }
       } match {
@@ -44,8 +50,12 @@ object CalculationUtil {
         (value, other) match {
           case (Some(s1: String), Some(n2: Int)) => Some(s1 * n2)
           case (Some(s1: String), Some(n2: Long)) => Some(s1 * n2.toInt)
-          case (Some(n1: Long), Some(v2)) => Some(n1 * v2.toString.toLong)
-          case (Some(d1: Double), Some(v2)) => Some(d1 * v2.toString.toDouble)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 * v2.toString.toByte)
+          case (Some(v1: Short), Some(v2)) => Some(v1 * v2.toString.toShort)
+          case (Some(v1: Int), Some(v2)) => Some(v1 * v2.toString.toInt)
+          case (Some(v1: Long), Some(v2)) => Some(v1 * v2.toString.toLong)
+          case (Some(v1: Float), Some(v2)) => Some(v1 * v2.toString.toFloat)
+          case (Some(v1: Double), Some(v2)) => Some(v1 * v2.toString.toDouble)
           case _ => value
         }
       } match {
@@ -57,8 +67,12 @@ object CalculationUtil {
     def / (other: Option[_]): Option[_] = {
       Try {
         (value, other) match {
-          case (Some(n1: Long), Some(v2)) => Some(n1 / v2.toString.toLong)
-          case (Some(d1: Double), Some(v2)) => Some(d1 / v2.toString.toDouble)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 / v2.toString.toByte)
+          case (Some(v1: Short), Some(v2)) => Some(v1 / v2.toString.toShort)
+          case (Some(v1: Int), Some(v2)) => Some(v1 / v2.toString.toInt)
+          case (Some(v1: Long), Some(v2)) => Some(v1 / v2.toString.toLong)
+          case (Some(v1: Float), Some(v2)) => Some(v1 / v2.toString.toFloat)
+          case (Some(v1: Double), Some(v2)) => Some(v1 / v2.toString.toDouble)
           case _ => value
         }
       } match {
@@ -70,8 +84,12 @@ object CalculationUtil {
     def % (other: Option[_]): Option[_] = {
       Try {
         (value, other) match {
-          case (Some(n1: Long), Some(v2)) => Some(n1 % v2.toString.toLong)
-          case (Some(d1: Double), Some(v2)) => Some(d1 % v2.toString.toDouble)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 % v2.toString.toByte)
+          case (Some(v1: Short), Some(v2)) => Some(v1 % v2.toString.toShort)
+          case (Some(v1: Int), Some(v2)) => Some(v1 % v2.toString.toInt)
+          case (Some(v1: Long), Some(v2)) => Some(v1 % v2.toString.toLong)
+          case (Some(v1: Float), Some(v2)) => Some(v1 % v2.toString.toFloat)
+          case (Some(v1: Double), Some(v2)) => Some(v1 % v2.toString.toDouble)
           case _ => value
         }
       } match {
@@ -82,9 +100,14 @@ object CalculationUtil {
 
     def unary_- (): Option[_] = {
       value match {
-        case Some(s: String) => Some(s.reverse.toString)
-        case Some(n: Long) => Some(-n)
-        case Some(d: Double) => Some(-d)
+        case Some(v: String) => Some(v.reverse.toString)
+        case Some(v: Boolean) => Some(!v)
+        case Some(v: Byte) => Some(-v)
+        case Some(v: Short) => Some(-v)
+        case Some(v: Int) => Some(-v)
+        case Some(v: Long) => Some(-v)
+        case Some(v: Float) => Some(-v)
+        case Some(v: Double) => Some(-v)
         case Some(v) => Some(v)
         case _ => None
       }
@@ -109,9 +132,13 @@ object CalculationUtil {
       Try {
         (value, other) match {
           case (Some(v1: String), Some(v2: String)) => Some(v1 > v2)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 > v2.toString.toDouble)
+          case (Some(v1: Short), Some(v2)) => Some(v1 > v2.toString.toDouble)
+          case (Some(v1: Int), Some(v2)) => Some(v1 > v2.toString.toDouble)
           case (Some(v1: Long), Some(v2)) => Some(v1 > v2.toString.toDouble)
+          case (Some(v1: Float), Some(v2)) => Some(v1 > v2.toString.toDouble)
           case (Some(v1: Double), Some(v2)) => Some(v1 > v2.toString.toDouble)
-          case _ => Some(true)
+          case _ => Some(false)
         }
       } match {
         case Success(opt) => opt
@@ -123,9 +150,13 @@ object CalculationUtil {
       Try {
         (value, other) match {
           case (Some(v1: String), Some(v2: String)) => Some(v1 >= v2)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 >= v2.toString.toDouble)
+          case (Some(v1: Short), Some(v2)) => Some(v1 >= v2.toString.toDouble)
+          case (Some(v1: Int), Some(v2)) => Some(v1 >= v2.toString.toDouble)
           case (Some(v1: Long), Some(v2)) => Some(v1 >= v2.toString.toDouble)
+          case (Some(v1: Float), Some(v2)) => Some(v1 >= v2.toString.toDouble)
           case (Some(v1: Double), Some(v2)) => Some(v1 >= v2.toString.toDouble)
-          case _ => Some(true)
+          case _ => Some(false)
         }
       } match {
         case Success(opt) => opt
@@ -137,9 +168,13 @@ object CalculationUtil {
       Try {
         (value, other) match {
           case (Some(v1: String), Some(v2: String)) => Some(v1 < v2)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 < v2.toString.toDouble)
+          case (Some(v1: Short), Some(v2)) => Some(v1 < v2.toString.toDouble)
+          case (Some(v1: Int), Some(v2)) => Some(v1 < v2.toString.toDouble)
           case (Some(v1: Long), Some(v2)) => Some(v1 < v2.toString.toDouble)
+          case (Some(v1: Float), Some(v2)) => Some(v1 < v2.toString.toDouble)
           case (Some(v1: Double), Some(v2)) => Some(v1 < v2.toString.toDouble)
-          case _ => Some(true)
+          case _ => Some(false)
         }
       } match {
         case Success(opt) => opt
@@ -151,9 +186,13 @@ object CalculationUtil {
       Try {
         (value, other) match {
           case (Some(v1: String), Some(v2: String)) => Some(v1 <= v2)
+          case (Some(v1: Byte), Some(v2)) => Some(v1 <= v2.toString.toDouble)
+          case (Some(v1: Short), Some(v2)) => Some(v1 <= v2.toString.toDouble)
+          case (Some(v1: Int), Some(v2)) => Some(v1 <= v2.toString.toDouble)
           case (Some(v1: Long), Some(v2)) => Some(v1 <= v2.toString.toDouble)
+          case (Some(v1: Float), Some(v2)) => Some(v1 <= v2.toString.toDouble)
           case (Some(v1: Double), Some(v2)) => Some(v1 <= v2.toString.toDouble)
-          case _ => Some(true)
+          case _ => Some(false)
         }
       } match {
         case Success(opt) => opt
@@ -193,7 +232,6 @@ object CalculationUtil {
         }
       }
     }
-
 
     def unary_! (): Option[Boolean] = {
       value match {

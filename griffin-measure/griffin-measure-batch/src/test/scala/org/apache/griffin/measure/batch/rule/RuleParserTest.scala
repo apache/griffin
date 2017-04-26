@@ -38,9 +38,10 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
   test("test rule parser") {
     val ruleParser = RuleParser()
 
-    val rules = "$SOUrce['tgt' < $source['tag' != 2] - -+-++---1] between ( -$target['32a'] + 9, 100, ----1000 ) and (45 > 9 or $target.type + 8 == 9 and $source['a'] >= 0) when not not not not $source._time + 24h < $target._time"
+//    val rules = "$SOUrce['tgt' < $source['tag' != 2] - -+-++---1] between ( -$target['32a'] + 9, 100, ----1000 ) and (45 > 9 or $target.type + 8 == 9 and $source['a'] >= 0) when not not not not $source._time + 24h < $target._time"
+    val rules = "$source['aaaf fd', (21, 43), '12']"
 
-    val result = ruleParser.parseAll(ruleParser.rule, rules)
+    val result = ruleParser.parseAll(ruleParser.selection, rules)
 
     println(result)
   }
@@ -48,7 +49,8 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
   test("test rule analyzer") {
     val ruleParser = RuleParser()
 
-    val rules = "$source.tag == $target['take' >= 5] and $source.price + $source.price1 > $target['kk' < $target.age] and $source.ee = $target.fe + $target.a when $target.ggg = 1"
+//    val rules = "$source.tag == $target['take' >= 5] and $source.price + $source.price1 > $target['kk' < $target.age] and $source.ee = $target.fe + $target.a when $target.ggg = 1"
+    val rules = "$source."
     val result = ruleParser.parseAll(ruleParser.rule, rules)
     println(result)
 
