@@ -14,23 +14,28 @@ object Application extends Loggable {
 
   def main(args: Array[String]): Unit = {
     if (args.length < 2) {
-      error("Usage: class <env-param-file> <user-param-file> [file-system-of-param-file: local or hdfs(default)]")
+      error("Usage: class <env-param> <user-param> [List of String split by comma: raw | local | hdfs(default)]")
       sys.exit(-1)
     }
 
     val envParamFile = args(0)
     val userParamFile = args(1)
-    val fsType = if (args.length > 2) args(2) else "hdfs"
+    val (envFsType, userFsType) = if (args.length > 2) {
+      val fsTypes = args(2).split(",")
+      if (fsTypes.length == 1) (fsTypes(0), fsTypes(0))
+      else if (fsTypes.length >= 2) (fsTypes(0), fsTypes(1))
+      else ("hdfs", "hdfs")
+    } else ("hdfs", "hdfs")
 
     // read param files
-    val envParam = readParamFile[EnvParam](envParamFile, fsType) match {
+    val envParam = readParamFile[EnvParam](envParamFile, envFsType) match {
       case Success(p) => p
       case Failure(ex) => {
         error(ex.getMessage)
         sys.exit(-2)
       }
     }
-    val userParam = readParamFile[UserParam](userParamFile, fsType) match {
+    val userParam = readParamFile[UserParam](userParamFile, userFsType) match {
       case Success(p) => p
       case Failure(ex) => {
         error(ex.getMessage)
