@@ -4,7 +4,7 @@ import scala.util.{Failure, Success, Try}
 
 trait LiteralExpr extends Expr {
   val value: Option[Any]
-  def calculate(values: Map[String, Any]): Option[Any] = value
+  def calculateOnly(values: Map[String, Any]): Option[Any] = value
   val dataSources: Set[String] = Set.empty[String]
 }
 

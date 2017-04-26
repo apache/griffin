@@ -95,7 +95,7 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
     def FilterCompareOpr: Parser[String] = """!?==?""".r | """<=?""".r | """>=?""".r
 
     def SqBracketPair: (Parser[String], Parser[String]) = ("[", "]")
-    def BracketPair: (Parser[String], Parser  [String]) = ("(", ")")
+    def BracketPair: (Parser[String], Parser[String]) = ("(", ")")
     def Dot: Parser[String] = "."
     def AllSelection: Parser[String] = "*"
     def SQuote: Parser[String] = "'"

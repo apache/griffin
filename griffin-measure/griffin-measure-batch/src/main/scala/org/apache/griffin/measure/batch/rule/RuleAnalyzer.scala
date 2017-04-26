@@ -4,9 +4,11 @@ import org.apache.griffin.measure.batch.rule.expr._
 
 case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
 
+  val GlobalData = ""
   val SourceData = "source"
   val TargetData = "target"
 
+  val globalCacheExprs: Iterable[Expr] = rule.getCacheExprs(GlobalData)
   val sourceCacheExprs: Iterable[Expr] = rule.getCacheExprs(SourceData)
   val targetCacheExprs: Iterable[Expr] = rule.getCacheExprs(TargetData)
 

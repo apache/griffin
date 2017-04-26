@@ -3,10 +3,11 @@ package org.apache.griffin.measure.batch.rule.expr
 
 trait StatementExpr extends Expr with AnalyzableExpr {
   def valid(values: Map[String, Any]): Boolean = true
+  override def cacheUnit: Boolean = true
 }
 
 case class SimpleStatementExpr(expr: LogicalExpr) extends StatementExpr {
-  def calculate(values: Map[String, Any]): Option[Any] = expr.calculate(values)
+  def calculateOnly(values: Map[String, Any]): Option[Any] = expr.calculate(values)
   val desc: String = expr.desc
   val dataSources: Set[String] = expr.dataSources
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
@@ -20,7 +21,7 @@ case class SimpleStatementExpr(expr: LogicalExpr) extends StatementExpr {
 }
 
 case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) extends StatementExpr {
-  def calculate(values: Map[String, Any]): Option[Any] = expr.calculate(values)
+  def calculateOnly(values: Map[String, Any]): Option[Any] = expr.calculate(values)
   val desc: String = s"${expr.desc} when ${whenExpr.desc}"
 
   override def valid(values: Map[String, Any]): Boolean = {
@@ -31,7 +32,6 @@ case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) ext
   }
 
   val dataSources: Set[String] = expr.dataSources ++ whenExpr.dataSources
-  override def cacheUnit: Boolean = true
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     expr.getCacheExprs(ds) ++ whenExpr.getCacheExprs(ds)
   }

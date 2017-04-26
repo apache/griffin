@@ -14,14 +14,15 @@ object DataConnectorFactory {
   def getDataConnector(sqlContext: SQLContext,
                        dataConnectorParam: DataConnectorParam,
                        groupbyExprs: Seq[MathExpr],
-                       cacheExprs: Iterable[Expr]
+                       cacheExprs: Iterable[Expr],
+                       globalCacheMap: Map[String, Any]
                       ): Try[DataConnector] = {
     val conType = dataConnectorParam.conType
     val version = dataConnectorParam.version
     Try {
       conType match {
-        case HiveRegex() => HiveDataConnector(sqlContext, dataConnectorParam.config, groupbyExprs, cacheExprs)
-        case AvroRegex() => AvroDataConnector(sqlContext, dataConnectorParam.config, groupbyExprs, cacheExprs)
+        case HiveRegex() => HiveDataConnector(sqlContext, dataConnectorParam.config, groupbyExprs, cacheExprs, globalCacheMap)
+        case AvroRegex() => AvroDataConnector(sqlContext, dataConnectorParam.config, groupbyExprs, cacheExprs, globalCacheMap)
         case _ => throw new Exception("connector creation error!")
       }
     }

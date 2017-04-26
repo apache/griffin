@@ -11,7 +11,8 @@ import java.nio.file.{Files, Paths}
 import org.apache.griffin.measure.batch.utils.HdfsUtil
 
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                             groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr]
+                             groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr],
+                             globalCacheMap: Map[String, Any]
                             ) extends DataConnector {
 
   val FilePath = "file.path"
@@ -45,12 +46,8 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     Try {
       loadDataFile.map { row =>
         // generate cache data
-        val cacheData: Map[String, Any] = cacheExprs.foldLeft(Map[String, Any]()) { (cachedMap, expr) =>
-          val valueOpt = SelectDataUtil.getSelectData(Some(row), expr, cachedMap)
-          cachedMap + (expr._id -> valueOpt.getOrElse(null))
-          if (valueOpt.nonEmpty) {
-            cachedMap + (expr._id -> valueOpt.get)
-          } else cachedMap
+        val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalCacheMap) { (cachedMap, expr) =>
+          SelectDataUtil.genCachedMap(Some(row), expr, cachedMap)
         }
 
         // get groupby data

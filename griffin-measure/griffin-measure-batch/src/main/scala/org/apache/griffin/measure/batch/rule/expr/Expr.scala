@@ -16,5 +16,13 @@ trait Expr extends Serializable with Describable with Cacheable with Calculatabl
   }
   protected def getSubPersistExprs(ds: String): Iterable[Expr] = Nil
 
+  final def calculate(values: Map[String, Any]): Option[Any] = {
+    values.get(_id) match {
+      case Some(v) => Some(v)
+      case _ => calculateOnly(values)
+    }
+  }
+  protected def calculateOnly(values: Map[String, Any]): Option[Any]
+
 }
 

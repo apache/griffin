@@ -7,7 +7,8 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import scala.util.{Success, Try}
 
 case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                             groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr]
+                             groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr],
+                             globalCacheMap: Map[String, Any]
                             ) extends DataConnector {
 
   val Database = "database"
@@ -53,12 +54,8 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     Try {
       sqlContext.sql(dataSql).map { row =>
         // generate cache data
-        val cacheData: Map[String, Any] = cacheExprs.foldLeft(Map[String, Any]()) { (cachedMap, expr) =>
-          val valueOpt = SelectDataUtil.getSelectData(Some(row), expr, cachedMap)
-          cachedMap + (expr._id -> valueOpt.getOrElse(null))
-          if (valueOpt.nonEmpty) {
-            cachedMap + (expr._id -> valueOpt.get)
-          } else cachedMap
+        val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalCacheMap) { (cachedMap, expr) =>
+          SelectDataUtil.genCachedMap(Some(row), expr, cachedMap)
         }
 
         // get groupby data

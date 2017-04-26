@@ -57,12 +57,17 @@ object AccuracyCore {
     // 1. merge source and target cached data
     val mergedData: Map[String, Any] = mergeData(source, target)
 
-    // 2. substitute the cached data into statement, get the statement value
-    // currently we can not get the mismatch reason, we need to add such information to figure out how it mismatches
-    ((ruleAnalyzer.rule.calculate(mergedData) match {
-      case Some(b: Boolean) => b
-      case _ => false
-    }), Map[String, Any]((MismatchInfo.key -> s"not matched with ${target._1}")))
+    // 2. check valid
+    if (ruleAnalyzer.rule.valid(mergedData)) {
+      // 3. substitute the cached data into statement, get the statement value
+      // currently we can not get the mismatch reason, we need to add such information to figure out how it mismatches
+      ((ruleAnalyzer.rule.calculate(mergedData) match {
+        case Some(b: Boolean) => b
+        case _ => false
+      }), Map[String, Any]((MismatchInfo.key -> s"not matched with ${target._1}")))
+    } else {
+      (false, Map[String, Any]((MismatchInfo.key -> s"not valid to compare with ${target._1}")))
+    }
 
   }
 
