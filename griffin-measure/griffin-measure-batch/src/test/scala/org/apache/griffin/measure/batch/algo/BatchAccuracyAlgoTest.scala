@@ -11,8 +11,8 @@ import org.apache.griffin.measure.batch.config.params._
 import org.apache.griffin.measure.batch.config.reader._
 import org.apache.griffin.measure.batch.config.validator._
 import org.apache.griffin.measure.batch.connector.{DataConnector, DataConnectorFactory}
-import org.apache.griffin.measure.batch.rule.{RuleAnalyzerOld, RuleFactory}
-import org.apache.griffin.measure.batch.rule.expr_old.StatementExpr
+import org.apache.griffin.measure.batch.rule.{RuleAnalyzer, RuleFactory}
+import org.apache.griffin.measure.batch.rule.expr._
 
 import scala.util.{Failure, Success, Try}
 import org.apache.griffin.measure.batch.log.Loggable
@@ -84,11 +84,11 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       // rules
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam)
       val rule: StatementExpr = ruleFactory.generateRule()
-      val ruleAnalyzer: RuleAnalyzerOld = RuleAnalyzerOld(rule)
+      val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
       // data connector
       val sourceDataConnector: DataConnector =
-        DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam, ruleAnalyzer.sourceDataKeyExprs, ruleAnalyzer.sourceDataExprs) match {
+        DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam, ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourcePersistExprs) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("source data not available!")
@@ -96,7 +96,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
           case Failure(ex) => throw ex
         }
       val targetDataConnector: DataConnector =
-        DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam, ruleAnalyzer.targetDatakeyExprs, ruleAnalyzer.targetDataExprs) match {
+        DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam, ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetPersistExprs) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("target data not available!")

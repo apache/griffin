@@ -54,42 +54,15 @@ object AccuracyCore {
 
   private def matchData(source: (V, T), target: (V, T), ruleAnalyzer: RuleAnalyzer): (Boolean, T) = {
 
-    // fixme: need to modify the steps
-
-    // 1. merge source and target data
+    // 1. merge source and target cached data
     val mergedData: Map[String, Any] = mergeData(source, target)
 
-    // 2. get assign variables by substituting mergedData, and merge into data map
-    val dataMap: Map[String, Any] = ruleAnalyzer.assigns.foldLeft(mergedData) { (dataMap, assign) =>
-      assign.right.genValue(dataMap) match {
-        case Some(v) => dataMap + (assign.left.name -> v)
-        case _ => dataMap
-      }
-    }
-
-    // 3. condition judgement by substituting from data map
-    val conditionPass = ruleAnalyzer.conditions.foldLeft(true) { (pass, condition) =>
-      pass && (condition.genValue(dataMap) match {
-        case Some(b) => b
-        case _ => false
-      })
-    }
-
-    if (conditionPass) {
-      // 4. mapping calculation by substituting from data map
-      ruleAnalyzer.mappings.foldLeft((true, Map[String, Any]())) { (res, mapping) =>
-        val (matched, info) = res
-        if (!matched) res
-        else {
-          ((mapping.genValue(dataMap) match {
-            case Some(b) => b
-            case _ => false
-          }), info + (MismatchInfo.key -> s"not matched with ${target._1}"))
-        }
-      }
-    } else {
-      (false, Map[String, Any]((MismatchInfo.key -> "condition fail")))
-    }
+    // 2. substitute the cached data into statement, get the statement value
+    // currently we can not get the mismatch reason, we need to add such information to figure out how it mismatches
+    ((ruleAnalyzer.rule.calculate(mergedData) match {
+      case Some(b: Boolean) => b
+      case _ => false
+    }), Map[String, Any]((MismatchInfo.key -> s"not matched with ${target._1}")))
 
   }
 
