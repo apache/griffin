@@ -10,7 +10,7 @@ import org.apache.griffin.measure.batch.config.params.env._
 import org.apache.griffin.measure.batch.config.params._
 import org.apache.griffin.measure.batch.config.reader._
 import org.apache.griffin.measure.batch.config.validator._
-import org.apache.griffin.measure.batch.connector.{DataConnector, DataConnectorFactory, SelectDataUtil}
+import org.apache.griffin.measure.batch.connector.{DataConnector, DataConnectorFactory, CacheDataUtil}
 import org.apache.griffin.measure.batch.rule.{RuleAnalyzer, RuleFactory}
 import org.apache.griffin.measure.batch.rule.expr._
 
@@ -86,13 +86,18 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       val rule: StatementExpr = ruleFactory.generateRule()
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
+      ruleAnalyzer.globalCacheExprs.foreach(println)
+      ruleAnalyzer.globalFinalCacheExprs.foreach(println)
+
       // global cache data
-      val globalCachedData = SelectDataUtil.genCachedMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
+      val globalCachedData = CacheDataUtil.genCachedMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
+      val globalFinalCachedData = CacheDataUtil.filterCachedMap(ruleAnalyzer.globalFinalCacheExprs, globalCachedData)
 
       // data connector
       val sourceDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam,
-          ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs, globalCachedData) match {
+          ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs,
+          ruleAnalyzer.sourceFinalCacheExprs, globalFinalCachedData) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("source data not available!")
@@ -101,7 +106,8 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
         }
       val targetDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam,
-          ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs, globalCachedData) match {
+          ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs,
+          ruleAnalyzer.targetFinalCacheExprs, globalFinalCachedData) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("target data not available!")
@@ -129,37 +135,39 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
         case Failure(ex) => throw ex
       }
 
-      println("-- global cache exprs --")
-      ruleAnalyzer.globalCacheExprs.foreach(a => println(s"${a._id} ${a.desc}"))
-      println("-- global cache data --")
-      globalCachedData.foreach(println)
-
-      println("-- source persist exprs --")
-      ruleAnalyzer.sourcePersistExprs.foreach(a => println(s"${a._id} ${a.desc}"))
-      println("-- source cache exprs --")
-      ruleAnalyzer.sourceCacheExprs.foreach(a => println(s"${a._id} ${a.desc}"))
-
-      println("-- source --")
-      sourceData.foreach { a =>
-        val printMap = ruleAnalyzer.sourcePersistExprs.flatMap { expr =>
-          a._2.get(expr._id) match {
-            case Some(v) => Some((expr._id + expr.desc, v))
-            case _ => None
-          }
-        }.toMap
-        println(printMap)
-
-        val cacheMap = ruleAnalyzer.sourceCacheExprs.flatMap { expr =>
-          a._2.get(expr._id) match {
-            case Some(v) => Some((expr._id + expr.desc, v))
-            case _ => None
-          }
-        }.toMap
-        println(cacheMap)
-
-        println(a)
-        println(a._2.size)
-      }
+//      println("-- global cache exprs --")
+//      ruleAnalyzer.globalCacheExprs.foreach(a => println(s"${a._id} ${a.desc}"))
+//      println("-- global cache data --")
+//      globalCachedData.foreach(println)
+//      println("-- global final cache data --")
+//      globalFinalCachedData.foreach(println)
+//
+//      println("-- source persist exprs --")
+//      ruleAnalyzer.sourcePersistExprs.foreach(a => println(s"${a._id} ${a.desc}"))
+//      println("-- source cache exprs --")
+//      ruleAnalyzer.sourceCacheExprs.foreach(a => println(s"${a._id} ${a.desc}"))
+//
+//      println("-- source --")
+//      sourceData.foreach { a =>
+//        val printMap = ruleAnalyzer.sourcePersistExprs.flatMap { expr =>
+//          a._2.get(expr._id) match {
+//            case Some(v) => Some((expr._id + expr.desc, v))
+//            case _ => None
+//          }
+//        }.toMap
+//        println(printMap)
+//
+//        val cacheMap = ruleAnalyzer.sourceCacheExprs.flatMap { expr =>
+//          a._2.get(expr._id) match {
+//            case Some(v) => Some((expr._id + expr.desc, v))
+//            case _ => None
+//          }
+//        }.toMap
+//        println(cacheMap)
+//
+//        println(a)
+//        println(a._2.size)
+//      }
 
 //      println("-- target --")
 //      targetData.foreach { a =>

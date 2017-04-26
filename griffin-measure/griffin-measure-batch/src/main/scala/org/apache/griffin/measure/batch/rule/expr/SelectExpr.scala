@@ -13,6 +13,7 @@ case class FunctionOperationExpr(func: String, args: Iterable[MathExpr]) extends
   val desc: String = s".${func}(${args.map(_.desc).mkString(",")})"
   val dataSources: Set[String] = args.flatMap(_.dataSources).toSet
   override def getSubCacheExprs(ds: String): Iterable[Expr] = args.flatMap(_.getCacheExprs(ds))
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = args.flatMap(_.getFinalCacheExprs(ds))
   override def getSubPersistExprs(ds: String): Iterable[Expr] = args.flatMap(_.getPersistExprs(ds))
 }
 
@@ -20,6 +21,7 @@ case class FilterSelectExpr(field: FieldDesc, compare: String, value: MathExpr) 
   val desc: String = s"[${field.desc}${compare}${value.desc}]"
   val dataSources: Set[String] = value.dataSources
   override def getSubCacheExprs(ds: String): Iterable[Expr] = value.getCacheExprs(ds)
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = value.getFinalCacheExprs(ds)
   override def getSubPersistExprs(ds: String): Iterable[Expr] = value.getPersistExprs(ds)
 }
 
@@ -39,6 +41,9 @@ case class SelectionExpr(head: SelectionHead, selectors: Iterable[SelectExpr]) e
   override def cacheUnit: Boolean = true
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     selectors.flatMap(_.getCacheExprs(ds))
+  }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    selectors.flatMap(_.getFinalCacheExprs(ds))
   }
 
   override def persistUnit: Boolean = true

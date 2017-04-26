@@ -25,6 +25,9 @@ case class LogicalCompareExpr(left: MathExpr, compare: String, right: MathExpr) 
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     left.getCacheExprs(ds) ++ right.getCacheExprs(ds)
   }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    left.getFinalCacheExprs(ds) ++ right.getFinalCacheExprs(ds)
+  }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     left.getPersistExprs(ds) ++ right.getPersistExprs(ds)
   }
@@ -57,6 +60,9 @@ case class LogicalRangeExpr(left: MathExpr, rangeOpr: String, range: RangeDesc) 
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     left.getCacheExprs(ds) ++ range.elements.flatMap(_.getCacheExprs(ds))
   }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    left.getFinalCacheExprs(ds) ++ range.elements.flatMap(_.getFinalCacheExprs(ds))
+  }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     left.getPersistExprs(ds) ++ range.elements.flatMap(_.getPersistExprs(ds))
   }
@@ -83,6 +89,9 @@ case class UnaryLogicalExpr(oprList: Iterable[String], factor: LogicalExpr) exte
   val dataSources: Set[String] = factor.dataSources
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     factor.getCacheExprs(ds)
+  }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    factor.getFinalCacheExprs(ds)
   }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     factor.getPersistExprs(ds)
@@ -117,6 +126,9 @@ case class BinaryLogicalExpr(first: LogicalExpr, others: Iterable[(String, Logic
   val dataSources: Set[String] = first.dataSources ++ others.flatMap(_._2.dataSources).toSet
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     first.getCacheExprs(ds) ++ others.flatMap(_._2.getCacheExprs(ds))
+  }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    first.getFinalCacheExprs(ds) ++ others.flatMap(_._2.getFinalCacheExprs(ds))
   }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     first.getPersistExprs(ds) ++ others.flatMap(_._2.getPersistExprs(ds))

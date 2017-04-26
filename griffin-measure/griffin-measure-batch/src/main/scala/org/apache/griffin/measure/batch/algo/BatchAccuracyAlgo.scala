@@ -46,12 +46,14 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
       // global cache data
-      val globalCachedData = SelectDataUtil.genCachedMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
+      val globalCachedData = CacheDataUtil.genCachedMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
+      val globalFinalCachedData = CacheDataUtil.filterCachedMap(ruleAnalyzer.globalFinalCacheExprs, globalCachedData)
 
       // data connector
       val sourceDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam,
-          ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs, globalCachedData) match {
+          ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs,
+          ruleAnalyzer.sourceFinalCacheExprs, globalFinalCachedData) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("source data connection error!")
@@ -60,7 +62,8 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         }
       val targetDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam,
-          ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs, globalCachedData) match {
+          ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs,
+          ruleAnalyzer.targetFinalCacheExprs, globalFinalCachedData) match {
           case Success(cntr) => {
             if (cntr.available) cntr
             else throw new Exception("target data connection error!")

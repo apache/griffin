@@ -5,15 +5,15 @@ import org.apache.spark.sql.Row
 
 import scala.util.{Success, Try}
 
-object SelectDataUtil {
+object CacheDataUtil {
 
   // for now, one expr only get one value, not supporting one expr get multiple values
-  private def getSelectData(data: Option[Any], expr: Expr, cachedMap: Map[String, Any]): Option[Any] = {
+  private def getCacheData(data: Option[Any], expr: Expr, cachedMap: Map[String, Any]): Option[Any] = {
     Try {
       expr match {
         case selection: SelectionExpr => {
           selection.selectors.foldLeft(data) { (dt, selector) =>
-            getSelectData(dt, selector, cachedMap)
+            getCacheData(dt, selector, cachedMap)
           }
         }
         case selector: IndexFieldRangeSelectExpr => {
@@ -39,7 +39,7 @@ object SelectDataUtil {
   }
 
   def genCachedMap(data: Option[Any], expr: Expr, initialCachedMap: Map[String, Any]): Map[String, Any] = {
-    val valueOpt = getSelectData(data, expr, initialCachedMap)
+    val valueOpt = getCacheData(data, expr, initialCachedMap)
     if (valueOpt.nonEmpty) {
       initialCachedMap + (expr._id -> valueOpt.get)
     } else initialCachedMap
@@ -47,7 +47,16 @@ object SelectDataUtil {
 
   def genCachedMap(data: Option[Any], exprs: Iterable[Expr], initialCachedMap: Map[String, Any]): Map[String, Any] = {
     exprs.foldLeft(initialCachedMap) { (cachedMap, expr) =>
-      SelectDataUtil.genCachedMap(None, expr, cachedMap)
+      CacheDataUtil.genCachedMap(None, expr, cachedMap)
+    }
+  }
+
+  def filterCachedMap(exprs: Iterable[Expr], cachedMap: Map[String, Any]): Map[String, Any] = {
+    exprs.foldLeft(Map[String, Any]()) { (newMap, expr) =>
+      val valueOpt = expr.calculate(cachedMap)
+      if (valueOpt.nonEmpty) {
+        newMap + (expr._id -> valueOpt.get)
+      } else newMap
     }
   }
 

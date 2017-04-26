@@ -3,7 +3,7 @@ package org.apache.griffin.measure.batch.rule.expr
 import org.apache.griffin.measure.batch.utils.CalculationUtil._
 
 trait MathExpr extends Expr {
-  override def cacheUnit: Boolean = true
+
 }
 
 case class MathFactorExpr(self: Expr) extends MathExpr {
@@ -13,12 +13,15 @@ case class MathFactorExpr(self: Expr) extends MathExpr {
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     self.getCacheExprs(ds)
   }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    self.getFinalCacheExprs(ds)
+  }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     self.getPersistExprs(ds)
   }
 }
 
-case class UnaryMathExpr(oprList: Iterable[String], factor: MathExpr) extends MathExpr {
+case class UnaryMathExpr(oprList: Iterable[String], factor: Expr) extends MathExpr {
   private val (posOpr, negOpr) = ("+", "-")
   def calculateOnly(values: Map[String, Any]): Option[Any] = {
     val fv = factor.calculate(values)
@@ -35,6 +38,9 @@ case class UnaryMathExpr(oprList: Iterable[String], factor: MathExpr) extends Ma
   override def cacheUnit: Boolean = true
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     factor.getCacheExprs(ds)
+  }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    factor.getFinalCacheExprs(ds)
   }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     factor.getPersistExprs(ds)
@@ -63,6 +69,9 @@ case class BinaryMathExpr(first: MathExpr, others: Iterable[(String, MathExpr)])
   override def cacheUnit: Boolean = true
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     first.getCacheExprs(ds) ++ others.flatMap(_._2.getCacheExprs(ds))
+  }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    first.getFinalCacheExprs(ds) ++ others.flatMap(_._2.getFinalCacheExprs(ds))
   }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     first.getPersistExprs(ds) ++ others.flatMap(_._2.getPersistExprs(ds))

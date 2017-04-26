@@ -13,6 +13,9 @@ case class SimpleStatementExpr(expr: LogicalExpr) extends StatementExpr {
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     expr.getCacheExprs(ds)
   }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    expr.getFinalCacheExprs(ds)
+  }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     expr.getPersistExprs(ds)
   }
@@ -34,6 +37,9 @@ case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) ext
   val dataSources: Set[String] = expr.dataSources ++ whenExpr.dataSources
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     expr.getCacheExprs(ds) ++ whenExpr.getCacheExprs(ds)
+  }
+  override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = {
+    expr.getFinalCacheExprs(ds) ++ whenExpr.getFinalCacheExprs(ds)
   }
   override def getSubPersistExprs(ds: String): Iterable[Expr] = {
     expr.getPersistExprs(ds) ++ whenExpr.getPersistExprs(ds)

@@ -8,7 +8,7 @@ import scala.util.{Success, Try}
 
 case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
                              groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr],
-                             globalCacheMap: Map[String, Any]
+                             finalCacheExprs: Iterable[Expr], globalFinalCacheMap: Map[String, Any]
                             ) extends DataConnector {
 
   val Database = "database"
@@ -54,20 +54,21 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     Try {
       sqlContext.sql(dataSql).map { row =>
         // generate cache data
-        val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalCacheMap) { (cachedMap, expr) =>
-          SelectDataUtil.genCachedMap(Some(row), expr, cachedMap)
+        val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalFinalCacheMap) { (cachedMap, expr) =>
+          CacheDataUtil.genCachedMap(Some(row), expr, cachedMap)
         }
+        val finalCacheData = CacheDataUtil.filterCachedMap(finalCacheExprs, cacheData)
 
         // get groupby data
         val groupbyData: Seq[AnyRef] = groupbyExprs.flatMap { expr =>
-          expr.calculate(cacheData) match {
+          expr.calculate(finalCacheData) match {
             case Some(v) => Some(v.asInstanceOf[AnyRef])
             case _ => None
           }
         }
         val key = toTuple(groupbyData)
 
-        (key, cacheData)
+        (key, finalCacheData)
       }
     }
   }
