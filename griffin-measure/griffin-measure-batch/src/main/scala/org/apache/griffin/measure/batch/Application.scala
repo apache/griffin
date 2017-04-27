@@ -13,6 +13,7 @@ import scala.util.{Failure, Success, Try}
 object Application extends Loggable {
 
   def main(args: Array[String]): Unit = {
+    info(args.toString)
     if (args.length < 2) {
       error("Usage: class <env-param> <user-param> [List of String split by comma: raw | local | hdfs(default)]")
       sys.exit(-1)
@@ -21,11 +22,14 @@ object Application extends Loggable {
     val envParamFile = args(0)
     val userParamFile = args(1)
     val (envFsType, userFsType) = if (args.length > 2) {
-      val fsTypes = args(2).split(",")
-      if (fsTypes.length == 1) (fsTypes(0), fsTypes(0))
-      else if (fsTypes.length >= 2) (fsTypes(0), fsTypes(1))
+      val fsTypes = args(2).trim.split(",")
+      if (fsTypes.length == 1) (fsTypes(0).trim, fsTypes(0).trim)
+      else if (fsTypes.length >= 2) (fsTypes(0).trim, fsTypes(1).trim)
       else ("hdfs", "hdfs")
     } else ("hdfs", "hdfs")
+
+    info(envParamFile)
+    info(userParamFile)
 
     // read param files
     val envParam = readParamFile[EnvParam](envParamFile, envFsType) match {
