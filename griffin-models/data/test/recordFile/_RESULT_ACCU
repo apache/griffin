@@ -1,5 +1,0 @@
-//========== 1. Test Accuracy model result with request file: data\test\reqJson\accuAvroTest.json ==========
-match percentage: 80.0 %
-
-Map(id -> 44444, name -> Snoooooopy, age -> 16, desc -> dooooog)
-
