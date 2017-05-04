@@ -16,7 +16,7 @@ Snapshot: https://oss.sonatype.org/content/repositories/snapshots
 Release: https://oss.sonatype.org/service/local/staging/deploy/maven2
 
 ### How to build
-1. git clone the repository of https://github.com/eBay/griffin
+1. git clone the repository of https://github.com/apache/incubator-griffin
 2. run "mvn install"
 
 ### How to run in docker
