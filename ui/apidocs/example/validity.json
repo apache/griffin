@@ -1,0 +1,20 @@
+{
+  "basic": {
+    "type": "1",
+    "scheduleType": "3",
+    "owner": "aiye",
+    "system": "0",
+    "name": "uni_id",
+    "desc": "unique count for user id",
+    "threshold": 1000,
+    "email": "aa@bb.com",
+    "dataaset": "asset1",
+    "dataasetId": 72
+  },
+  "extra": {
+    "srcDb": "Apollo",
+    "srcDataSet": "Bullseye",
+    "vaType": "3",
+    "column": "user_id"
+  }
+}
