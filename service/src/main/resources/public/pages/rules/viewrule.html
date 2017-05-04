@@ -13,226 +13,187 @@
 	limitations under the License.
  -->
 <div class="container-fluid" id="viewruleContent">
-  <div class="row">
-    <h5 class="over-title margin-bottom-15">View Model</h5>
-  </div><!--//row-->
-  <div class="row">
+    <div class="row">
+        <h5 class="over-title margin-bottom-15">View Model</h5>
+    </div><!--//row-->
+    <div class="row">
 
-    <div  class="col-sm-6 col-xs-12">
-        <div id="viewruleDefinition" class="viewrule-content">
-          <div class="row">
-            <label class="col-xs-4">
-              Model Name:
-            </label>
+        <div  class="col-sm-6 col-xs-12">
+            <div id="viewruleDefinition" class="viewrule-content">
+                <div class="row">
+                    <label class="col-xs-4">
+                        Model Name:
+                    </label>
 
-            <div class="col-xs-8 " style="color: #fff">
-              {{ruleData.name}}
-            </div>
-          </div>
+                    <div class="col-xs-8 " style="color: #fff">
+                        {{ruleData.name}}
+                    </div>
+                </div>
 
-          <div class="row">
-            <label class="col-xs-4">
-              Model Description:
-            </label>
+                <div class="row">
+                    <label class="col-xs-4">
+                        Model Description:
+                    </label>
 
-            <div class="col-xs-8 " style="color: #fff">
-              {{ruleData.description}}
-            </div>
-          </div>
+                    <div class="col-xs-8 " style="color: #fff">
+                        {{ruleData.description}}
+                    </div>
+                </div>
 
-          <div class="row">
-            <label class="col-xs-4">
-              Model Type:
-            </label>
+                <div class="row">
+                    <label class="col-xs-4">
+                        Model Type:
+                    </label>
 
-            <div class="col-xs-8 " style="color: #fff">
-              {{ruleData.type|strmap:'modeltype'}}
-            </div>
-          </div>
+                    <div class="col-xs-8 " style="color: #fff">
+                        {{ruleData.type|strmap:'modeltype'}}
+                    </div>
+                </div>
 
-          <div class="row">
-            <label for="systemSelector" class="col-xs-4">
-              Organization:
-            </label>
+                <div class="row">
+                    <label for="systemSelector" class="col-xs-4">
+                        Organization:
+                    </label>
 
-            <div class="col-xs-8 " style="color: #fff">
-              {{ruleData.organization|strmap:'modelsystem'}}
-            </div>
-          </div>
+                    <div class="col-xs-8 " style="color: #fff">
+                        {{ruleData.organization|strmap:'modelsystem'}}
+                    </div>
+                </div>
 
-          <div class="row">
-            <label class="col-xs-4">
-              DataAsset:
-            </label>
+                <div class="row">
+                    <label class="col-xs-4">
+                        DataAsset:
+                    </label>
 
-            <div class="col-xs-8" style="color: #fff">
-              {{ruleData.source.config.tableName}}&nbsp;&nbsp;{{ruleData.target.config.tableName}}
-            </div>
-          </div>
+                    <div class="col-xs-8" style="color: #fff">
+                        {{ruleData.source.config.tableName}}&nbsp;&nbsp;{{ruleData.target.config.tableName}}
+                    </div>
+                </div>
 
-          <div class="row">
-            <label class="col-xs-4">
-              Owner:
-            </label>
+                <div class="row">
+                    <label class="col-xs-4">
+                        Owner:
+                    </label>
 
-            <div class="col-xs-8" style="color: #fff">
-              {{ruleData.owner}}
+                    <div class="col-xs-8" style="color: #fff">
+                        {{ruleData.owner}}
+                    </div>
+                </div>
             </div>
         </div>
-      </div>
+    </div><!--//row-->
+    <div class="container-fluid" ng-show="ruleData.basic.status==1" >
+        <br/>
+        <label style="color:#B2C831">This model is ready to deploy now, if you are the owner, please click the deploy button after you verify all the information.</label>
+        <button ng-click="confirmDeploy()" ng-disabled="(ntAccount!=ruleData.basic.owner && !adminAccess)" class="btn btn-primary pull-right"> Deploy</button>
+        </p>
     </div>
-  </div><!--//row-->
-  <div class="container-fluid" ng-show="ruleData.basic.status==1" >
     <br/>
-     <label style="color:#B2C831">This model is ready to deploy now, if you are the owner, please click the deploy button after you verify all the information.</label>
-     <button ng-click="confirmDeploy()" ng-disabled="(ntAccount!=ruleData.basic.owner && !adminAccess)" class="btn btn-primary pull-right"> Deploy</button>
-  </p>
-  </div>
-  <br/>
-  <div ng-if="ruleData.type=='accuracy'"><!--Accuracy-->
-	  <h5 class="row">Target and source fields mapping</h5>
-	  <div class="">
-	    <table class="table table-striped">
-	      <thead style="">
-	        <tr style="background-color:#7D95CC;font-size:16px">
-	          <!--<th style="width:5%">PK?</th>-->
-	          <th style="width:40%;">Target Fields</th>
-	          <!--<th style="width:10%;text-align:center">Map To</th>-->
-	          <th style="width:45%;">Source Fields</th>
+    <div ng-if="ruleData.type=='accuracy'"><!--Accuracy-->
+        <h5 class="row">Mapping rules</h5>
+        <div class="">
+            <p>{{ruleData.evaluateRule.rules}}</p>
+            <p>
+                <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
+            </p>
 
+            <div class="col-md-12 col-lg-12 col-sm-12" style="color:#fff;font-size:16px;display: flex;align-items: center">
 
-	        </tr>
-	      </thead>
-	      <tbody>
-	      	<tr ng-repeat="i in getNumber(sourceLength) track by $index">
-		    		<!--<td><span ng-show="onerow.isPk">Yes</span></td>-->
-		    		<td>{{ruleData.source.config.tableName}}</td>
-		    		<!--<td style="text-align:center;">{{}}</td>-->
-		        <td>{{ruleData.target.config.tableName}}</td>
-		    	</tr>
+                <div class="" style="text-align:right;display:block;float:left;width:20%;">
+                    Accuracy Rate(%) =
+                </div>
+                <div class="" style="text-align:center;display:block;float:left;margin:0 10px 0 10px">
+                    <div class="formula-text-up" style="border-bottom:1px solid;">
+                        Total Count of Matched records between <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{ruleData.target.config.database}}</span>  and <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{ruleData.source.config.database}}</span>  fields
+                    </div>
+                    <div class="">
+                        Total Count of records in <span style="color:green;font-weight:bold;">{{ruleData.target.config.database}}&nbsp;&nbsp;{{ruleData.target.config.tableName}}</span>
+                    </div>
+                </div>
+                <div class="" style="text-align:left;display:block;float:left;width:10%;">
+                    x 100%
+                </div>
 
-	      </tbody>
-	    </table>
-	    <p>
-	      <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
-	    </p>
-
-	    <!-- <div class="col-md-12 col-lg-12 col-sm-12" style="color:#fff;font-size:16px;height:3em;">
-
-	      <div class="" style="text-align:right;line-height:3em;float:left">
-	        Accuracy Rate(%) =&nbsp;
-	      </div>
-	      <div class="" style="text-align:center;float:left">
-	        <div class=" formula-text-up" style="border-bottom:1px solid;">
-	          Total Count of Matched records between <span class="badge">{{ruleData.mappings.length}}</span> <span style="color:green;">{{ruleData.extra.srcDataSet}}</span>  and <span class="badge">{{ruleData.mappings.length}}</span> <span style="color:green;">{{ruleData.extra.targetDataSet}}</span>  fields
-	        </div>
-	        <div class="">
-	          Total Count of records in <span style="color:green;font-weight:bold;">{{ruleData.extra.targetDataSet}}</span>
-	        </div>
-	      </div>
-	      <div class="" style="text-align:left;line-height:3em;float:left">
-	        &nbsp;x 100%
-	      </div>
-
-	    </div> -->
-
-      <div class="col-md-12 col-lg-12 col-sm-12" style="color:#fff;font-size:16px;display: flex;align-items: center">
-
-        <div class="" style="text-align:right;display:block;float:left;width:20%;">
-          Accuracy Rate(%) =
-        </div>
-        <div class="" style="text-align:center;display:block;float:left;margin:0 10px 0 10px">
-          <div class="formula-text-up" style="border-bottom:1px solid;">
-            Total Count of Matched records between <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{ruleData.target.config.database}}</span>  and <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{ruleData.source.config.database}}</span>  fields
-          </div>
-          <div class="">
-            Total Count of records in <span style="color:green;font-weight:bold;">{{ruleData.target.config.database}}&nbsp;&nbsp;{{ruleData.target.config.tableName}}</span>
-          </div>
-        </div>
-        <div class="" style="text-align:left;display:block;float:left;width:10%;">
-          x 100%
-        </div>
-
-      </div>
-
-
-	  </div>
-	</div>
-
-	<div ng-if="ruleData.basic.type==1"><!--Validity-->
-	  <h5 class="row">Validity metrics</h5>
-	  <div  class="">
-        <div id="viewrule-definition" class="viewrule-content">
-          <div class="row">
-            <label class="col-xs-4">
-              Validity type:
-            </label>
-
-            <div class="col-xs-8 " style="color: #fff">
-              {{ruleData.extra.vaType|strmap:'vatype'}}
             </div>
-          </div>
 
-          <div class="row">
-            <label class="col-xs-4">
-              Selected column:
-            </label>
 
-            <div class="col-xs-8 " style="color: #fff">
-              {{ruleData.extra.column}}
-            </div>
-          </div>
         </div>
     </div>
-	</div>
 
-	<div ng-if="ruleData.basic.type==2"><!--Anomaly Detection-->
-	  <h5 class="row">Key information</h5>
-		  <div class="row">
-		    <div  class="col-lg-12 col-md-12 col-sm-12">
-		        <div id="viewrule-definition" class="viewrule-content">
-		          <div class="row">
-		            <label class="col-xs-4">
-		              Detection type:
-		            </label>
+    <div ng-if="ruleData.basic.type==1"><!--Validity-->
+        <h5 class="row">Validity metrics</h5>
+        <div  class="">
+            <div id="viewrule-definition" class="viewrule-content">
+                <div class="row">
+                    <label class="col-xs-4">
+                        Validity type:
+                    </label>
 
-		            <div class="col-xs-8 " style="color: #fff">
-                  {{ruleData.extra.anType|strmap:'antype'}}
-		            </div>
-		          </div>
-		          <div class="row-fluid">
-		            <img ng-if="ruleData.extra.anType==1" src="/img/yoy.png" style="max-height: 300px;width:100%"/>
-		            <img ng-if="ruleData.extra.anType==2" src="/img/bollinger.png" style="max-height: 400px;width:100%"/>
-                <img ng-if="ruleData.extra.anType==3" src="/img/mad.png" style="max-height: 300px;width:100%"/>
-		          </div>
+                    <div class="col-xs-8 " style="color: #fff">
+                        {{ruleData.extra.vaType|strmap:'vatype'}}
+                    </div>
+                </div>
 
+                <div class="row">
+                    <label class="col-xs-4">
+                        Selected column:
+                    </label>
 
-		        </div>
-		    </div>
-
-		  </div>
-	</div>
-
-  <div ng-if="ruleData.basic.type==3"><!--Publish Metrics-->
-	  <h5 class="row">Publish Metrics URL</h5>
-	  <div id="viewrule-definition" class="viewrule-content">
-
-          <div class="row">
-            <label class="col-xs-4">
-              Publish URL:
-            </label>
-
-            <div class="col-xs-8" style="color: #fff">
-              {{ruleData.extra.publishUrl}}
+                    <div class="col-xs-8 " style="color: #fff">
+                        {{ruleData.extra.column}}
+                    </div>
+                </div>
             </div>
-          </div>
+        </div>
+    </div>
 
-          <div class="row">
-            <label class="col-xs-4">
-              Publish data format:
-            </label>
+    <div ng-if="ruleData.basic.type==2"><!--Anomaly Detection-->
+        <h5 class="row">Key information</h5>
+        <div class="row">
+            <div  class="col-lg-12 col-md-12 col-sm-12">
+                <div id="viewrule-definition" class="viewrule-content">
+                    <div class="row">
+                        <label class="col-xs-4">
+                            Detection type:
+                        </label>
 
-            <div class="col-xs-8" style="color: #fff">
+                        <div class="col-xs-8 " style="color: #fff">
+                            {{ruleData.extra.anType|strmap:'antype'}}
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <img ng-if="ruleData.extra.anType==1" src="/img/yoy.png" style="max-height: 300px;width:100%"/>
+                        <img ng-if="ruleData.extra.anType==2" src="/img/bollinger.png" style="max-height: 400px;width:100%"/>
+                        <img ng-if="ruleData.extra.anType==3" src="/img/mad.png" style="max-height: 300px;width:100%"/>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div ng-if="ruleData.basic.type==3"><!--Publish Metrics-->
+        <h5 class="row">Publish Metrics URL</h5>
+        <div id="viewrule-definition" class="viewrule-content">
+
+            <div class="row">
+                <label class="col-xs-4">
+                    Publish URL:
+                </label>
+
+                <div class="col-xs-8" style="color: #fff">
+                    {{ruleData.extra.publishUrl}}
+                </div>
+            </div>
+
+            <div class="row">
+                <label class="col-xs-4">
+                    Publish data format:
+                </label>
+
+                <div class="col-xs-8" style="color: #fff">
               <pre style="background-color:transparent;color:inherit;border:none">Method: POST
 Endpoint: {{ruleData.extra.publishUrl}}
 Body:
@@ -241,9 +202,9 @@ Body:
 "timestamp": 1463373496583,
 "value": 99.9
 }</pre>
+                </div>
             </div>
-          </div>
         </div>
-	</div>
+    </div>
 
 </div>

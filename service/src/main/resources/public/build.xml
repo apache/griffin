@@ -5,7 +5,7 @@
 	</formats>
 	<fileSets>
 		<fileSet>
-			<directory>/Users/yueguo/repo.java/griffin/ui</directory><!--
+			<directory>/Users/yueguo/repo.ebay/incubator-griffin/ui</directory><!--
 			<includes>
 
 				<include>apidocs/**</include>

@@ -298,7 +298,7 @@ define(['./module'], function(controllers) {
         $scope.ruleTypes = $filter('strarr')('modeltype');//['Accuracy', 'Validity', 'Anomaly Detection', 'Publish Metrics'];
         $scope.scheduleTypes = $filter('strarr')('scheduletype');//['Daily', 'Weekly', 'Monthly', 'Hourly'];
         $scope.ruleSystems = $filter('strarr')('modelsystem');//['Bullseye', 'GPS', 'Hadoop', 'PDS', 'IDLS', 'Pulsar', 'Kafka'];
-        $scope.matchFunctions = ['LENGTH', 'LOWER', 'UPPER', 'TRIM'];
+        $scope.matchFunctions = ['==', '!==', '>', '>=','<',"<="];
 
         // $scope.ruleType = function(index){
         //   var types = ['', 'Accuracy', 'Validity', 'Anomaly Detection', 'Publish Metrics'];
@@ -414,17 +414,16 @@ define(['./module'], function(controllers) {
                     };
 
                     $scope.dataAsset = $scope.currentNodeTarget.name + ',' + $scope.currentNode.name;
-                    for(var i = 0;i<$scope.selection.length;i++){
+                    for(var i = 0;i<$scope.selectionTarget.length;i++){
                          console.log($scope.selection[i]);
                          var s =$scope.selection[i].split('.');
-                         rule += "${source}['" + s[1] + "'] === ${target}['" + s[1] + "'];" ;
+                         var t = $scope.selectionTarget[i].split('.');
+
+                         console.log( $scope.matches[i]);
+                         rule += "${source}['" + s[1] + "'] "+ $scope.matches[i]+" ${target}['" + t[1] + "'];" ;
                     }
 
-                    for(var i = 0;i<$scope.selectionTarget.length;i++){
-                         console.log($scope.selectionTarget[i]);
-                         var s =$scope.selectionTarget[i].split('.');
-                         rule += "${source}['" + s[1] + "'] === ${target}['" + s[1] + "'];" ;
-                    }
+
                     $scope.rules = rule;
                     this.data.evaluateRule.rules = rule;
                     for(var i =0; i < $scope.selectionTarget.length; i ++){

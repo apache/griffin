@@ -19,66 +19,66 @@
   <div class="row">
 
     <div  class="col-lg-12 col-md-12 col-sm-12">
-        <div id="viewrule-definition" class="viewrule-content">
-          <div class="row">
-            <label class="col-md-4 col-lg-4 col-sm-4">
-              Model Name:
-            </label>
+      <div id="viewrule-definition" class="viewrule-content">
+        <div class="row">
+          <label class="col-md-4 col-lg-4 col-sm-4">
+            Model Name:
+          </label>
 
-            <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-              {{deletedRow.name}}
-            </div>
+          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+            {{deletedRow.name}}
           </div>
+        </div>
 
-          <div class="row">
-            <label class="col-md-4 col-lg-4 col-sm-4">
-              Model Definition:
-            </label>
+        <div class="row">
+          <label class="col-md-4 col-lg-4 col-sm-4">
+            Model Definition:
+          </label>
 
-            <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-              {{deletedRow.description}}
-            </div>
+          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+            {{deletedRow.description}}
           </div>
+        </div>
 
-          <div class="row">
-            <label class="col-md-4 col-lg-4 col-sm-4">
-              Model Type:
-            </label>
+        <div class="row">
+          <label class="col-md-4 col-lg-4 col-sm-4">
+            Model Type:
+          </label>
 
-            <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-              {{deletedRow.type|strmap:'modeltype'}}
-            </div>
+          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+            {{deletedRow.type|strmap:'modeltype'}}
           </div>
+        </div>
 
-          <div class="row">
-            <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-              Organization:
-            </label>
+        <div class="row">
+          <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
+            Organization:
+          </label>
 
-            <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-              {{deletedRow.organization|strmap:'modelsystem'}}
-            </div>
+          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+            {{deletedRow.organization|strmap:'modelsystem'}}
           </div>
+        </div>
 
-          <div class="row">
-            <label class="col-md-4 col-lg-4 col-sm-4">
-              DataAsset:
-            </label>
+        <div class="row">
+          <label class="col-md-4 col-lg-4 col-sm-4">
+            DataAsset:
+          </label>
 
-            <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff">
-              {{deletedRow.source.config.tableName}}&nbsp;&nbsp;{{deletedRow.target.config.tableName}}
-            </div>
+          <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff">
+            {{deletedRow.source.config.tableName}}&nbsp;&nbsp;{{deletedRow.target.config.tableName}}
           </div>
+        </div>
 
-          <div class="row">
-            <label class="col-md-4 col-lg-4 col-sm-4">
-              Owner:
-            </label>
+        <div class="row">
+          <label class="col-md-4 col-lg-4 col-sm-4">
+            Owner:
+          </label>
 
-            <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff">
-              {{deletedRow.owner}}
-            </div>
+          <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff">
+            {{deletedRow.owner}}
           </div>
+        </div>
 
 
       </div>

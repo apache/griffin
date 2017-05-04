@@ -21,7 +21,10 @@ define(['./module'], function (services) {
 
 
       var BACKEND_SERVER = 'http://localhost:8080';
+    //   var BACKEND_SERVER = 'http://localhost:8080'; //dev env
 
+
+//    var BACKEND_SERVER = 'http://10.249.74.51';
 
 
       var API_ROOT_PATH = '/api/v1';

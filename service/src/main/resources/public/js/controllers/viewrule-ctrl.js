@@ -26,7 +26,7 @@ define(['./module'], function (controllers) {
         var getModelUrl = $config.uri.getModel+"/"+$routeParams.modelname;
         $http.get(getModelUrl).success(function(data){
           $scope.ruleData = data;
-          $scope.sourceLength = $scope.ruleData.evaluateRule.rules.split(';').length;
+          $scope.sourceLength = $scope.ruleData.evaluateRule.rules.split(';').length-1;
           console.log($scope.ruleData.evaluateRule.rules.split(';'));
 //          $scope.targetLength = $scope.ruleData.evaluateRule.rules.split(';').length;
 
@@ -40,19 +40,19 @@ define(['./module'], function (controllers) {
 
         var url= $config.uri.rulemetric+"/"+$routeParams.modelname;
 
-        $http.get(url).success(function(res){
-            $scope.modelresultData = res;
-            if (res.details) {
-              $('#viewrule-chart').height(200);
-              $scope.ruleChart = echarts.init(document.getElementById('viewrule-chart'), 'dark');
-              $scope.ruleChart.setOption($barkChart.getOptionSide(res));
-
-            }
-            resizeWindow();
-        }).error(function(data) {
-          resizeWindow();
-          toaster.pop('error', data.message);
-        });
+//        $http.get(url).success(function(res){
+//            $scope.modelresultData = res;
+//            if (res.details) {
+//              $('#viewrule-chart').height(200);
+//              $scope.ruleChart = echarts.init(document.getElementById('viewrule-chart'), 'dark');
+//              $scope.ruleChart.setOption($barkChart.getOptionSide(res));
+//
+//            }
+//            resizeWindow();
+//        }).error(function(data) {
+//          resizeWindow();
+//          toaster.pop('error', data.message);
+//        });
       }
 
       $scope.confirmDeploy = function(){

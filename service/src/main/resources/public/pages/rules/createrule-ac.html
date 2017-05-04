@@ -148,7 +148,6 @@
                      label-select="selectNodeLabelTarget"
                      l1-icon="fa fa-database"
                      l2-icon="fa fa-table"
-
                      class="y-scrollable">
                 </div>
 
@@ -230,29 +229,17 @@
                     <table class="table table-striped">
                       <thead style="">
                       <tr style="background-color:#7D95CC;font-size:20px">
-                        <th style="width:10%">
-                          <!--<input type="checkbox" ng-click="toggleAllPK()" ng-model="selectedAllPK"/>&nbsp;PK?-->
-                        </th>
-                        <th style="width:40%;text-align:center">Target Fields</th>
+                        <th style="width:40%;">Target Fields</th>
                         <th style="width:10%;text-align:center">Map To</th>
                         <th style="width:40%;text-align:center">Source Fields</th>
                       </tr>
                       </thead>
                       <tbody>
                       <tr ng-repeat="item in selectionTarget" >
-                        <td>
-                          <!--<input type="checkbox"-->
-                                 <!--value="{{item}}"-->
-                                 <!--ng-checked="selectionPK.indexOf(item) > -1"-->
-                                 <!--ng-click="toggleSelectionPK($event)"-->
-                          <!--/>-->
-                        </td>
                         <td>{{currentNodeTarget.parent[0].dbName}}.{{item}}</td>
-                        <!-- <td style="text-align:center;"><i class="fa fa-long-arrow-right" style="font-weight:bold;color:#0f0"></i></td> -->
                         <td style="text-align:center;">
-                          <select ng-model="matches[$index]" class="form-control" ng-init="matches[$index]='EXACT'" style="background:#00FFFF;font-weight:bold">
-                            <option value="EXACT">Exactly Match</option>
-                            <option ng-repeat="func in matchFunctions" value="{{func}}">{{func}}()</option>
+                          <select ng-model="matches[$index]" class="form-control" ng-init="matches[$index]='=='" style="background:#00FFFF;font-weight:bold" id="mapRule">
+                            <option ng-repeat="func in matchFunctions" value="{{func}}">{{func}}</option>
                           </select>
                         </td>
                         <td>
@@ -272,25 +259,6 @@
                       <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
                     </p>
 
-                    <!-- <div class="col-md-12 col-lg-12 col-sm-12" style="color:#fff;font-size:16px">
-
-                      <div class="col-md-3 col-lg-3 col-sm-3 formula-text-mid" style="text-align:right">
-                        Accuracy Rate(%) =
-                      </div>
-                      <div class="col-md-7 col-lg-7 col-sm-7 formula-text-3lines" style="text-align:center">
-                        <div class="row formula-text-up" style="border-bottom:1px solid;">
-                          Total Count of Matched records between <span class="badge">{{selectionTarget.length}}</span> <span style="color:green;">{{currentNodeTarget.parent.name}}</span>  and <span class="badge">{{mappings.length}}</span> <span style="color:green;">{{currentNode.parent.name}}</span>  fields
-                        </div>
-                        <div class="row">
-                          Total Count of records in <span style="color:green;font-weight:bold;">{{currentNode.parent.name}}.{{currentNode.name}}</span>
-                        </div>
-                      </div>
-                      <div class="col-md-2 col-lg-2 col-sm-2 formula-text-mid" style="text-align:left">
-                        x 100%
-                      </div>
-
-                    </div> -->
-
                     <div class="col-md-12 col-lg-12 col-sm-12" style="color:#fff;font-size:16px;display: flex;align-items: center">
 
                       <div class="" style="text-align:right;display:block;float:left;width:20%;">
@@ -298,7 +266,7 @@
                       </div>
                       <div class="" style="text-align:center;display:block;float:left;margin:0 10px 0 10px">
                         <div class="formula-text-up" style="border-bottom:1px solid;">
-                          Total Count of Matched records between <span class="badge">{{selectionTarget.length}}</span> <span style="color:green;">{{currentNodeTarget.parent[0].dbName}}</span>  and <span class="badge">{{mappings.length}}</span> <span style="color:green;">{{currentNode.parent[0].dbName}}</span>  fields
+                          Total Count of Matched records between <span class="badge">{{selectionTarget.length}}</span> <span style="color:green;">{{currentNodeTarget.name}}</span>  and <span class="badge">{{mappings.length}}</span> <span style="color:green;">{{currentNode.name}}</span>  fields
                         </div>
                         <div class="">
                           Total Count of records in <span style="color:green;font-weight:bold;">{{currentNode.parent[0].dbName}}.{{currentNode.name}}</span>
