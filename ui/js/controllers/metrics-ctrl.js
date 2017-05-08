@@ -25,54 +25,62 @@ define(['./module'], function(controllers) {
           $scope.$emit('initReq');
 
           var url_dashboard = $config.uri.dashboard + ($routeParams.sysName?('/'+$routeParams.sysName):'');
+          //          var url_organization = $config.uri.organization;
+          //          $http.get(url_organization).success(function(res){
+          //              $scope.orgs = [];
+          //              var orgNode = null;
+          //              angular.forEach(res, function(sys) {
+          //              orgNode = new Object();
+          //              $scope.orgs.push(orgNode);
+          //              orgNode.name = sys;
+          //              });
+          //          });
 
-          $http.get(url_dashboard, {cache:true}).success(function(res) {
+          $http.get(url_dashboard, {  "query": {
+                                      "bool":{
+                                      "filter":[
+                                              {"term" : {"name": "bevssoj" }}
+                                      ]
+                                      }
+                                      },cache:true}).success(function(res) {
             $scope.dashboard = res;
             // console.log(res);
-            $scope.orgs = [];
+            console.log(res);
+            console.log(res.hits);
 
-            var orgNode = null;
-            angular.forEach(res, function(sys) {
-              orgNode = new Object();
-              $scope.orgs.push(orgNode);
-              orgNode.name = sys.name;
-              orgNode.dq = sys.dq;
-
-              orgNode.assetMap = {};
-
-              angular.forEach(sys.metrics, function(metric) {
-                if(!metric.assetName){
-                  metric.assetName = 'unknown';
+            angular.forEach(res.hits.hits, function(sys) {
+//              orgNode.assetMap = {};
+                console.log(sys);
+//                angular.forEach(sys, function(metric) {
+//                if(!metric.assetName){
+//                  metric.assetName = 'unknown';
+//                }
+//                if(Object.getOwnPropertyNames(orgNode.assetMap).indexOf(metric.assetName) == -1){//not existed
+//                  orgNode.assetMap[metric.assetName] = {};
+//
+//                }
+                var chartData = sys._source;
+                chartData.sortData = function(a,b){
+                    return a.tmst - b.tmst;
                 }
-                if(Object.getOwnPropertyNames(orgNode.assetMap).indexOf(metric.assetName) == -1){//not existed
-                  orgNode.assetMap[metric.assetName] = {};
+//                orgNode.assetMap[metric.assetName].details = chartData;
+//              });
 
-                }
-                var chartData = metric.details;
-                chartData.sort(function(a, b){
-                  return a.timestamp - b.timestamp;
-                });
-
-                orgNode.assetMap[metric.assetName].details = chartData;
-
-
-              });
-
-                $scope.orgs.push(orgNode);
+//                $scope.orgs.push(orgNode);
             });
             $scope.originalData = angular.copy(res);
             // console.log($scope.originalData);
-            if($routeParams.sysName && $scope.originalData && $scope.originalData.length > 0){
-              for(var i = 0; i < $scope.originalData.length; i ++){
-                if($scope.originalData[i].name == $routeParams.sysName){
-                  $scope.selectedOrgIndex = i;
-                  $scope.changeOrg();
-                  $scope.orgSelectDisabled = true;
-                  break;
-                }
-
-              }
-            }
+//            if($routeParams.sysName && $scope.originalData && $scope.originalData.length > 0){
+//              for(var i = 0; i < $scope.originalData.length; i ++){
+//                if($scope.originalData[i].name == $routeParams.sysName){
+//                  $scope.selectedOrgIndex = i;
+//                  $scope.changeOrg();
+//                  $scope.orgSelectDisabled = true;
+//                  break;
+//                }
+//
+//              }
+//            }
 
             $timeout(function() {
               redraw($scope.dashboard);
@@ -87,22 +95,32 @@ define(['./module'], function(controllers) {
         });
 
         var redraw = function(data) {
-          // console.log(data);
+           console.log(data);
 
           $scope.chartHeight = $('.chartItem:eq(0)').width()*0.8+'px';
+                var tmp = document.getElementById('abc-bevssoj');
+                tmp.style.width = $('#abc-bevssoj').parent().width()+'px';
+                tmp.style.height = $scope.chartHeight;
+                var abcChart = echarts.init(tmp, 'dark');
+                abcChart.setOption($barkChart.getOptionThum(data));
 
-            angular.forEach(data, function(sys, parentIndex) {
-                var parentIndex = parentIndex
-                angular.forEach(sys.metrics, function(metric, index) {
+//            angular.forEach(data, function(sys, parentIndex) {
+//                var parentIndex = parentIndex
+//                angular.forEach(data.hits.hits, function(metric, index) {
+//                console.log(sys);
+//                console.log($('#abc'+parentIndex));
 
-                    $('#thumbnail'+parentIndex+'-'+index).get(0).style.width = $('#thumbnail'+parentIndex+'-'+index).parent().width()+'px';
-                    $('#thumbnail'+parentIndex+'-'+index).get(0).style.height = $scope.chartHeight;
+//                $('#abc-'+index).style.width = $('#abc-'+index).parent().width()+'px';
 
-                    var thumbnailChart = echarts.init($('#thumbnail'+parentIndex+'-'+index).get(0), 'dark');
-                    thumbnailChart.setOption($barkChart.getOptionThum(metric));
+//                $( '#abc-'+index ).css( "width", $('#abc-'+index).parent().width()+'px' );
+//                $( '#abc-'+index ).css( "height", $scope.chartHeight );
+//                angular.element("#abc-"+index).css( "width", $('#abc-'+index).parent().width()+'px' );
+//                angular.element("#abc-"+index).css( "height", $scope.chartHeight );
+//                $('#abc-'+index).style.height = $scope.chartHeight;
 
-                });
-            });
+
+//                });
+
         }
 
         $scope.assetOptions = [];

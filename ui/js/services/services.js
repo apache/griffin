@@ -34,24 +34,8 @@ define(['./module'], function (services) {
           uri: {
               base: BACKEND_SERVER + API_ROOT_PATH,
 
-              //mock data
-              // statistics:'/js/mock_data/statistics.json',
-              //briefmetrics:'/js/mock_data/briefmetrics.json',
-              //heatmap: '/js/mock_data/briefmetrics.json',
-              // dbtree: '/js/mock_data/dbtree1.json',
-              // schemadefinition: '/js/mock_data/schemadefinition.json',
-              // rulemetric: '/js/mock_data/rulemetric.json',
-              // dashboard: '/js/mock_data/briefmetrics.json' ,
-              // allModels: "http://localhost:8080/" + API_ROOT_PATH + '/model/allModels',
-              // newModel: "http://localhost:8080/" + API_ROOT_PATH + '/model/newModel' ,
-              // deleteModel: "http://localhost:8080" + API_ROOT_PATH + '/model/deleteModel' ,
-
-              //real data
-              //data asset
-//              dbtree: BACKEND_SERVER + API_ROOT_PATH + '/dataassets/metadata',
               dbtree:BACKEND_SERVER + '/metadata/hive/alltables',
-                schemadefinition: BACKEND_SERVER + '/metadata/hive',
-//              dataassetlist: BACKEND_SERVER + API_ROOT_PATH + '/dataassets',
+              schemadefinition: BACKEND_SERVER + '/metadata/hive',
               dataassetlist: BACKEND_SERVER + '/metadata/hive/default/alltables',
 
               adddataasset: BACKEND_SERVER + API_ROOT_PATH + '/dataassets',
@@ -70,16 +54,15 @@ define(['./module'], function (services) {
               heatmap: BACKEND_SERVER + API_ROOT_PATH + '/metrics/heatmap' ,
               metricdetail: BACKEND_SERVER + API_ROOT_PATH + '/metrics/complete',
               rulemetric: BACKEND_SERVER + API_ROOT_PATH + '/metrics/brief',
-              dashboard: BACKEND_SERVER + API_ROOT_PATH + '/metrics/dashboard' ,
-
+//              dashboard: BACKEND_SERVER + API_ROOT_PATH + '/metrics/dashboard' ,
+              organization:'http://10.249.75.250:8080/metrics/organization',
+              dashboard:'http://10.64.199.198:9200/griffin/accuracy/_search?pretty',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',
 
               //Models
-//              allModels: BACKEND_SERVER + API_ROOT_PATH + '/models' ,
               allModels: BACKEND_SERVER + '/measures',
               deleteModel:BACKEND_SERVER + '/measures/deleteByName',
-//              deleteModel: BACKEND_SERVER + API_ROOT_PATH + '/models',
               getModel: BACKEND_SERVER + '/measures/findByName',
               enableModel: BACKEND_SERVER + API_ROOT_PATH + '/models/enableModel',
 

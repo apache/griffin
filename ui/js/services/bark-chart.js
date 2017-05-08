@@ -71,7 +71,7 @@ define(['./module'], function (services) {
     var data = getMetricData(metric);
     var option = {
       title: {
-        text:  metric.name,
+        text:  'bbb',
         left: 'center',
         textStyle: {
             fontWeight: 'normal',
@@ -85,15 +85,15 @@ define(['./module'], function (services) {
         bottom: '5%',
         containLabel: true
       },
-      tooltip : {
-          trigger: 'axis',
-          formatter : function(params) {
-            return getTooltip(params, metric.metricType);
-          },
-          position: function(point, params, dom) {
-              return getTooltipPosition(point, params, dom);
-          }
-      },
+//      tooltip : {
+//          trigger: 'axis',
+//          formatter : function(params) {
+//            return getTooltip(params, metric.metricType);
+//          },
+//          position: function(point, params, dom) {
+//              return getTooltipPosition(point, params, dom);
+//          }
+//      },
       xAxis : {
               type : 'time',
               splitLine: {
@@ -104,9 +104,9 @@ define(['./module'], function (services) {
       yAxis : {
               type : 'value',
               scale : true,
-              name: formatter_yaxis_name(metric),
+//              name: formatter_yaxis_name(metric),
               axisLabel: {
-                  formatter: formatter_value
+//                  formatter: formatter_value
               },
               splitNumber: 2
       }
@@ -219,6 +219,7 @@ define(['./module'], function (services) {
     }else if(metric.metricType == 'Count' || metric.metricType == ''){
       series = getSeriesCount(metric);
     }
+    series = getSeriesCount(metric);
     return series;
   }
 
@@ -336,14 +337,12 @@ define(['./module'], function (services) {
 
   function getMetricData(metric) {
     var data = [];
-    var chartData = metric.details;
+    var chartData = metric.hits.hits;
     for(var i = 0; i < chartData.length; i++){
-        data.push([formatTimeStamp(chartData[i].timestamp), parseFloat(chartData[i].value.toFixed(2))]);
+        data.push([formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.matched/chartData[i]._source.total).toFixed(2))]);
     }
 
-    data.sort(function(a, b){
-      return a[0] - b[0];
-    });
+
     return data;
   }
 
