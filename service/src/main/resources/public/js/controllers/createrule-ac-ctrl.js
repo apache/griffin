@@ -414,14 +414,25 @@ define(['./module'], function(controllers) {
                     };
 
                     $scope.dataAsset = $scope.currentNodeTarget.name + ',' + $scope.currentNode.name;
-                    for(var i = 0;i<$scope.selectionTarget.length;i++){
-                         console.log($scope.selection[i]);
-                         var s =$scope.selection[i].split('.');
-                         var t = $scope.selectionTarget[i].split('.');
 
-                         console.log( $scope.matches[i]);
-                         rule += "${source}['" + s[1] + "'] "+ $scope.matches[i]+" ${target}['" + t[1] + "'];" ;
+                    var mappingRule = function(src, tgt, matches) {
+                        var s = src.split('.');
+                        var t = tgt.split('.');
+                        return "$source['" + s[1] + "'] " + matches + " $target['" + t[1] + "']";
                     }
+                    var rules = $scope.selectionTarget.map(function(item, i) {
+                        return mappingRule($scope.selection[i], item, $scope.matches[i]);
+                    });
+                    rule = rules.join(" AND ");
+
+//                    for(var i = 0;i<$scope.selectionTarget.length;i++){
+//                         console.log($scope.selection[i]);
+//                         var s =$scope.selection[i].split('.');
+//                         var t = $scope.selectionTarget[i].split('.');
+//
+//                         console.log( $scope.matches[i]);
+//                         rule += "${source}['" + s[1] + "'] "+ $scope.matches[i]+" ${target}['" + t[1] + "'];" ;
+//                    }
 
 
                     $scope.rules = rule;
@@ -444,7 +455,8 @@ define(['./module'], function(controllers) {
                 console.log(JSON.stringify($scope.form.data));
 
 //                var newModel = $config.uri.newAccuracyModel;
-                var newModel = 'http://localhost:8080/measures/add';
+                var BACKEND_SERVER = '';
+                var newModel = BACKEND_SERVER + '/measures/add';
                 $http.post(newModel, this.data).success(function(data) {
                 	// if(data.status=='0')
                 	// {

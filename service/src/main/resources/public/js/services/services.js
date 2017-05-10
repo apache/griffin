@@ -20,7 +20,8 @@ define(['./module'], function (services) {
     services.factory('$config', function(){
 
 
-      var BACKEND_SERVER = 'http://localhost:8080';
+    var BACKEND_SERVER = '';
+//      var BACKEND_SERVER = 'http://localhost:8080';
     //   var BACKEND_SERVER = 'http://localhost:8080'; //dev env
 
 
