@@ -55,7 +55,8 @@ define(['./module'], function (services) {
               metricdetail: BACKEND_SERVER + API_ROOT_PATH + '/metrics/complete',
               rulemetric: BACKEND_SERVER + API_ROOT_PATH + '/metrics/brief',
 //              dashboard: BACKEND_SERVER + API_ROOT_PATH + '/metrics/dashboard' ,
-              organization:'http://10.249.75.250:8080/metrics/organization',
+              organization:'http://10.249.75.250:8080/org',
+
               dashboard:'http://10.64.199.198:9200/griffin/accuracy/_search?pretty',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',

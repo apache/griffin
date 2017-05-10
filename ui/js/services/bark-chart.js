@@ -71,7 +71,7 @@ define(['./module'], function (services) {
     var data = getMetricData(metric);
     var option = {
       title: {
-        text:  'bbb',
+        text:  metric[0]._source.name,
         left: 'center',
         textStyle: {
             fontWeight: 'normal',
@@ -85,15 +85,15 @@ define(['./module'], function (services) {
         bottom: '5%',
         containLabel: true
       },
-//      tooltip : {
-//          trigger: 'axis',
-//          formatter : function(params) {
-//            return getTooltip(params, metric.metricType);
-//          },
-//          position: function(point, params, dom) {
-//              return getTooltipPosition(point, params, dom);
-//          }
-//      },
+      tooltip : {
+          trigger: 'axis',
+          formatter : function(params) {
+            return getTooltip(params);
+          },
+          position: function(point, params, dom) {
+              return getTooltipPosition(point, params, dom);
+          }
+      },
       xAxis : {
               type : 'time',
               splitLine: {
@@ -104,9 +104,9 @@ define(['./module'], function (services) {
       yAxis : {
               type : 'value',
               scale : true,
-//              name: formatter_yaxis_name(metric),
+              name: formatter_yaxis_name(metric),
               axisLabel: {
-//                  formatter: formatter_value
+                  formatter: formatter_value
               },
               splitNumber: 2
       }
@@ -128,36 +128,19 @@ define(['./module'], function (services) {
   }
 
   function formatter_yaxis_name(metric) {
-      if (metric.dq <= 100) {
-          return 'dq (%)';
-      } else {
-          return 'dq (k)';
-      }
+//      if (metric.hits.hits <= 100) {
+          return 'accuracy (%)';
+//      } else {
+//          return 'dq (k)';
+//      }
   }
 
-  function getTooltip(params, metricType) {
+  function getTooltip(params) {
     var result = '';
     if (params.length > 0) {
-
-        if(metricType == 'Bollinger'){
-          result = new Date(getUTCTimeStamp(params[0].data[0])).toUTCString().replace('GMT', '')+
-                      '<br /> Value : ' + params[2].data[1] +
-                      '<br /> Average : ' + params[3].data[1] +
-                      '<br /> Bands : ' + params[0].data[1] + '--' + params[1].data[1];
-        }else if(metricType == 'Trend'){
-          result = new Date(getUTCTimeStamp(params[0].data[0])).toUTCString().replace('GMT', '')+
-                      '<br /> Value : ' + params[0].data[1] +
-                      '<br /> -7 days : ' + params[1].data[1];
-        }else if(metricType == 'MAD'){
-          result = new Date(getUTCTimeStamp(params[0].data[0])).toUTCString().replace('GMT', '')+
-                      '<br /> Value : ' + params[2].data[1] +
-                      '<br /> Bands : ' + params[0].data[1] + '--' + params[1].data[1];
-        }else if(metricType == 'Count' || metricType == ''){
           result = new Date(getUTCTimeStamp(params[0].data[0])).toUTCString().replace('GMT', '')+
                       '<br /> Value : ' + params[0].data[1];
-        }
     }
-
     return result;
   }
 
@@ -184,7 +167,7 @@ define(['./module'], function (services) {
       tooltip : {
           trigger: 'axis',
           formatter : function(params) {
-            return getTooltip(params, metric.metricType);
+            return getTooltip(params);
           }
       },
       xAxis : {
@@ -210,15 +193,6 @@ define(['./module'], function (services) {
 
   function getSeries(metric) {
     var series = {};
-    if(metric.metricType == 'Bollinger'){
-      series = getSeriesBollinger(metric);
-    }else if(metric.metricType == 'Trend'){
-      series = getSeriesTrend(metric);
-    }else if(metric.metricType == 'MAD'){
-      series = getSeriesMAD(metric);
-    }else if(metric.metricType == 'Count' || metric.metricType == ''){
-      series = getSeriesCount(metric);
-    }
     series = getSeriesCount(metric);
     return series;
   }
@@ -227,9 +201,9 @@ define(['./module'], function (services) {
     var data = getMetricData(metric);
     var option = {
       title: {
-        text:  metric.name,
-        link: '/#/viewrule/' + metric.name,
-        target: 'self',
+        text:  metric[0]._source.name,
+//        link: '/#/viewrule/' + metric.name,
+//        target: 'self',
         left: 'center',
         textStyle: {
             fontSize: 25
@@ -242,16 +216,16 @@ define(['./module'], function (services) {
       },
       dataZoom: [{
         type: 'inside',
-        start: 75,
+        start: 0,
         throttle: 50
       },{
         show: true,
-        start: 75
+        start: 0
       }],
       tooltip : {
           trigger: 'axis',
           formatter : function(params) {
-            return getTooltip(params, metric.metricType);
+            return getTooltip(params);
           }
       },
       xAxis : {
@@ -271,150 +245,20 @@ define(['./module'], function (services) {
       animation: true
     };
     option.series = getSeries(metric);
-    if (metric.metricType == 'MAD') {
-        option.series = getMADBigSeries(option.series);
-    } else if (metric.metricType == 'Bollinger') {
-        option.series = getBollingerBigSeries(option.series);
-    }
     return option;
-  }
-
-  function getBollingerBigSeries(series) {
-      var dataLow = series[0].data;
-      var data = series[2].data;
-      var result = [];
-      for (var i = 0; i < data.length; i++) {
-          if (data[i][1] < dataLow[i][1]) {
-              var item = {};
-              item.coord = data[i];
-              var diff = Number(dataLow[i][1])-Number(data[i][1]);
-              item.label = {
-                  normal: {
-                      formatter: 'low '+diff
-                  }
-              };
-              item.itemStyle = {
-                  normal: {
-                      color: '#c23531'
-                  }
-              };
-              result.push(item);
-          }
-      }
-      series[2].markPoint = {};
-      series[2].markPoint.data = result;
-      console.log(series);
-      return series;
-  }
-
-  function getMADBigSeries(series) {
-      var dataLow = series[0].data;
-      var data = series[2].data;
-      var result = [];
-      for (var i = 0; i < data.length; i++) {
-          if (data[i][1] < dataLow[i][1]) {
-              var item = {};
-              item.coord = data[i];
-              var diff = Number(dataLow[i][1])-Number(data[i][1]);
-              item.label = {
-                  normal: {
-                      formatter: Math.round(diff/1000) + 'K below lower band'
-                  }
-              };
-              item.itemStyle = {
-                  normal: {
-                      color: '#c23531'
-                  }
-              };
-              result.push(item);
-          }
-      }
-      series[2].markPoint = {};
-      series[2].markPoint.data = result;
-      console.log(series);
-      return series;
   }
 
   function getMetricData(metric) {
     var data = [];
-    var chartData = metric.hits.hits;
+    var chartData = metric;
     for(var i = 0; i < chartData.length; i++){
         data.push([formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.matched/chartData[i]._source.total).toFixed(2))]);
     }
 
-
-    return data;
-  }
-
-  function getSeriesMADLow(metric) {
-    var data = [];
-    var chartData = metric.details;
-    for (var i = 0; i < chartData.length; i++) {
-      data.push([formatTimeStamp(chartData[i].timestamp), Number(chartData[i].mad.lower)]);
-    }
     data.sort(function(a, b){
       return a[0] - b[0];
     });
-    return data;
-  }
 
-  function getSeriesMADUp(metric) {
-    var data = [];
-    var chartData = metric.details;
-    for (var i = 0; i < chartData.length; i++) {
-      data.push([formatTimeStamp(chartData[i].timestamp), Number(chartData[i].mad.upper-chartData[i].mad.lower)]);
-    }
-    data.sort(function(a, b){
-      return a[0] - b[0];
-    });
-    return data;
-  }
-
-  function getSeriesBollingerLow(metric) {
-    var data = [];
-    var chartData = metric.details;
-    for (var i = 0; i < chartData.length; i++) {
-      data.push([formatTimeStamp(chartData[i].timestamp), Number(chartData[i].bolling.lower)]);
-    }
-    data.sort(function(a, b){
-      return a[0] - b[0];
-    });
-    return data;
-  }
-
-  function getSeriesBollingerUp(metric) {
-    var data = [];
-    var chartData = metric.details;
-    for (var i = 0; i < chartData.length; i++) {
-      data.push([formatTimeStamp(chartData[i].timestamp), Number(chartData[i].bolling.upper-chartData[i].bolling.lower)]);
-    }
-    data.sort(function(a, b){
-      return a[0] - b[0];
-    });
-    return data;
-  }
-
-  function getSeriesBollingerMean(metric) {
-    var data = [];
-    var chartData = metric.details;
-    for (var i = 0; i < chartData.length; i++) {
-      data.push([formatTimeStamp(chartData[i].timestamp), Number(chartData[i].bolling.mean)]);
-    }
-    data.sort(function(a, b){
-      return a[0] - b[0];
-    });
-    return data;
-  }
-
-  function getSeriesTrendComparision(metric) {
-    var data = [];
-    var chartData = metric.details;
-    for (var i = 0; i < chartData.length; i++) {
-      data.push([formatTimeStamp(chartData[i].timestamp), Number(chartData[i].comparisionValue)]);
-    }
-    data.sort(function(a, b){
-      return a[0] - b[0];
-    });
     return data;
   }
 
@@ -444,169 +288,5 @@ define(['./module'], function (services) {
       return series;
   }
 
-  function getSeriesTrend(metric) {
-    var series = [];
-    var data = getMetricData(metric);
-    var dataComparision = getSeriesTrendComparision(metric);
-    series.push({
-          type: 'line',
-          smooth:true,
-          data: data,
-          lineStyle: {
-            normal: {
-                color: '#d48265'
-            }
-          },
-          itemStyle: {
-              normal: {
-                  color: '#d48265'
-              }
-          }
-      });
-      series.push({
-          type: 'line',
-          smooth:true,
-          data: dataComparision,
-          lineStyle: {
-            normal: {
-                color: '#f15c80',
-                type: 'dashed'
-            }
-          },
-          itemStyle: {
-              normal: {
-                  color: '#f15c80'
-              }
-          }
-      });
-      return series;
-  }
-
-  function getSeriesBollinger(metric) {
-    var series = [];
-      var dataLow = getSeriesBollingerLow(metric);
-      var dataUp = getSeriesBollingerUp(metric);
-      var dataMean = getSeriesBollingerMean(metric);
-      var data = getMetricData(metric);
-      series.push({
-          name: 'L',
-          type: 'line',
-          smooth:true,
-          data: dataLow,
-          lineStyle: {
-              normal: {
-                  opacity: 0
-              }
-          },
-          stack: 'MAD-area',
-          symbol: 'none'
-      });
-      series.push({
-          name: 'U',
-          type: 'line',
-          smooth:true,
-          data: dataUp,
-          lineStyle: {
-              normal: {
-                  opacity: 0
-              }
-          },
-          areaStyle: {
-              normal: {
-                  color: '#eee',
-                  opacity: 0.2
-              }
-          },
-          stack: 'MAD-area',
-          symbol: 'none'
-      });
-      series.push({
-          type: 'line',
-          smooth:true,
-          data: data,
-          lineStyle: {
-            normal: {
-                color: '#d48265'
-            }
-          },
-          itemStyle: {
-              normal: {
-                  color: '#d48265'
-              }
-          }
-      });
-      series.push({
-          type: 'line',
-          smooth:true,
-          data: dataMean,
-          lineStyle: {
-            normal: {
-                color: '#f15c80',
-                type: 'dashed'
-            }
-          },
-          itemStyle: {
-              normal: {
-                  color: '#f15c80'
-              }
-          }
-      });
-      return series;
-  }
-
-  function getSeriesMAD(metric) {
-      var series = [];
-      var dataLow = getSeriesMADLow(metric);
-      var dataUp = getSeriesMADUp(metric);
-      var data = getMetricData(metric);
-      series.push({
-          name: 'L',
-          type: 'line',
-          smooth:true,
-          data: dataLow,
-          lineStyle: {
-              normal: {
-                  opacity: 0
-              }
-          },
-          stack: 'MAD-area',
-          symbol: 'none'
-      });
-      series.push({
-          name: 'U',
-          type: 'line',
-          smooth:true,
-          data: dataUp,
-          lineStyle: {
-              normal: {
-                  opacity: 0
-              }
-          },
-          areaStyle: {
-              normal: {
-                  color: '#eee',
-                  opacity: 0.2
-              }
-          },
-          stack: 'MAD-area',
-          symbol: 'none'
-      });
-      series.push({
-          type: 'line',
-          smooth:true,
-          data: data,
-          lineStyle: {
-            normal: {
-                color: '#d48265'
-            }
-          },
-          itemStyle: {
-              normal: {
-                  color: '#d48265'
-              }
-          }
-      });
-      return series;
-  }
 
 });
