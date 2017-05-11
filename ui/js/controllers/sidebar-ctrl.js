@@ -20,26 +20,29 @@ define(['./module'], function(controllers) {
 
         pageInit();
 
-
-        function pageInit() {
-          var url = $config.uri.statistics;
-
-          $http.get(url).success(function(res) {
-              $scope.datasets = res.assets;
-              $scope.metrics = res.metrics;
-              renderDataAssetPie(res.status);
-
-              sideBarList();
-          });
-
-
-        }
-
-        var renderDataAssetPie = function(status) {
+        function renderDataAssetPie(status){
             resizePieChart();
             $scope.dataAssetPieChart = echarts.init($('#data-asset-pie')[0], 'dark');
             $scope.dataAssetPieChart.setOption($barkChart.getOptionPie(status));
         }
+
+        function pageInit() {
+//          var url = $config.uri.statistics;
+
+//          $http.get(url).success(function(res) {
+//              $scope.datasets = res.assets;
+//              $scope.metrics = res.metrics;
+              $scope.status = new Object();
+              $scope.status.health = '100';
+              $scope.status.invalid = '6';
+
+              renderDataAssetPie($scope.status);
+              sideBarList();
+//          });
+
+
+        }
+
 
         $scope.$watch(function(){return $routeParams.sysName;}, function(value){
           console.log('Watched value: ' + value);
