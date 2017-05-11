@@ -22,12 +22,13 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
   def result(rt: Long, result: Result): Unit = {
     result match {
       case ar: AccuracyResult => {
-        val dataMap = Map[String, Any](("metricName" -> metricName), ("timestamp" -> timeStamp), ("value" -> ar.matchPercentage))
+        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
         val data = JsonUtil.toJson(dataMap)
 
         // post
         val params = Map[String, Object]()
-        val header = Map[String, Object](("content-type" -> "application/json"))
+//        val header = Map[String, Object](("content-type" -> "application/json"))
+        val header = Map[String, Object]()
         val status = HttpUtil.httpRequest(api, method, params, header, data)
         info(s"${method} to ${api} response status: ${status}")
       }
