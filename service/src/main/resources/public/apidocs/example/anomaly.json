@@ -1,0 +1,19 @@
+{
+  "basic": {
+    "type": "2",
+    "scheduleType": "1",
+    "owner": "aiye",
+    "system": "0",
+    "name": "ano_history",
+    "desc": "anomaly",
+    "threshold": 800,
+    "email": "aa@bb.com",
+    "dataaset": "asset1",
+    "dataasetId": 72
+  },
+  "extra": {
+    "srcDb": "Apollo",
+    "srcDataSet": "Bullseye",
+    "anType": 1
+  }
+}

@@ -1,0 +1,737 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Griffin API",
+        "description": "Move your app forward with the Griffin API",
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "schemes": [
+        "http"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/api/v1/dq/metrics/heatmap": {
+            "get": {
+                "summary": "User Profile",
+                "description": "heatmap",
+                "tags": [
+                    "health"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/js/mock_data/statistics.json": {
+            "get": {
+                "summary": "User Profile",
+                "description": "statistics",
+                "tags": [
+                    "health"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/js/mock_data/rulemetric.json": {
+            "get": {
+                "summary": "User Profile",
+                "description": "rulemetric",
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/dq/metrics/briefmetrics": {
+            "get": {
+                "summary": "User Profile",
+                "description": "Metrics on side bar",
+                "tags": [
+                    "health"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/dataassets/srctree": {
+            "get": {
+                "summary": "User Profile",
+                "description": "Metrics on side bar",
+                "tags": [
+                    "createrule-ac"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/dataassets/{id}": {
+            "get": {
+                "summary": "User Profile",
+                "description": "Get specfied data in datasets",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID like 1,2,3...",
+                        "type": "integer"
+                    }
+                ],
+                "tags": [
+                    "createrule-ac"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/dq/metrics/complete/{id}": {
+            "get": {
+                "summary": "User Profile",
+                "description": "metrics/complete",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID like accuracy_viewitem_queue, accuracy_bid_new_queue,...",
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "metrics/Bullseye"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/dq/metrics/dashboard/Bullseye": {
+            "get": {
+                "summary": "User Profile",
+                "description": "dashboard",
+                "tags": [
+                    "metrics/Bullseye"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/dq/metrics/dashboard": {
+            "get": {
+                "summary": "User Profile",
+                "description": "dashboard",
+                "tags": [
+                    "metrics"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/allModels": {
+            "get": {
+                "summary": "User Profile",
+                "description": "allModels",
+                "tags": [
+                    "rules"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/getAnomalyModel/{id}": {
+            "get": {
+                "summary": "User Profile",
+                "description": "GetAnomalyModel by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID like vad1, ...",
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/getPublishModel/{id}": {
+            "get": {
+                "summary": "User Profile",
+                "description": "GetPublishModel by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID like vad1, ...",
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/getAccuracyModel/{id}": {
+            "get": {
+                "summary": "User Profile",
+                "description": "GetAccuracyModel by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID like test_accuracy, ...",
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/getValidityModel/{id}": {
+            "get": {
+                "summary": "User Profile",
+                "description": "GetValidityModel by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID like vad1, ...",
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/newAccuracyModel": {
+            "post": {
+                "summary": "User Profile",
+                "description": "newAccuracyModel",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "description": "Please only change the name! ",
+                        "schema": {
+                            "$ref": "#/definitions/newAccuracyModel"
+                        }
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile information for a user"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/newValidityModel": {
+            "post": {
+                "summary": "User Profile",
+                "description": "newValidityModel",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "description": "Please only change the name! ",
+                        "schema": {
+                            "$ref": "#/definitions/newValidityModel"
+                        }
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile information for a user"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/newAnomalyModel": {
+            "post": {
+                "summary": "User Profile",
+                "description": "newAnomalyModel",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "description": "Please only change the name! ",
+                        "schema": {
+                            "$ref": "#/definitions/newAnomalyModel"
+                        }
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile information for a user"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/newPublishModel": {
+            "post": {
+                "summary": "User Profile",
+                "description": "newPublishModel",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "description": "Please only change the name! ",
+                        "schema": {
+                            "$ref": "#/definitions/newPublishModel"
+                        }
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile information for a user"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/api/v1/model/deleteModel/{id}": {
+            "delete": {
+                "summary": "User Profile",
+                "description": "Get specfied data in datasets",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID like wx_publish, ...",
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "viewrule"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "default": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "mappingsItem":{
+            "type": "object",
+            "properties": {
+                "target": {
+                    "type": "string",
+                    "enum": ["sitespeed.key"]
+                },
+                "src": {
+                    "type": "string",
+                    "enum": ["dw_bid.uid"]
+                },
+                "matchMethod": {
+                    "type": "string",
+                    "enum": ["EXACT"]
+                },
+                "isPk": {
+                    "type": "boolean",
+                    "enum": [true]
+                }
+            }
+        },
+        "newAccuracyModel": {
+            "type": "object",
+            "properties": {
+                "basic": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": ["0"]
+                        },
+                        "system": {
+                            "type": "string",
+                            "enum": ["2"]
+                        },
+                        "threshold": {
+                            "type": "integer",
+                            "enum": [90]
+                        },
+                        "scheduleType": {
+                            "type": "string",
+                            "enum": ["0"]
+                        },
+                        "owner": {
+                            "type": "string",
+                            "enum": ["xwang21"]
+                        },
+                        "name": {
+                            "type": "string",
+                            "enum": ["wx_ac"]
+                        },
+                        "desc": {
+                            "type": "string",
+                            "enum": ["ggggg"]
+                        },
+                        "email": {
+                            "type": "string",
+                            "enum": ["g@g"]
+                        },
+                        "dataaset": {
+                            "type": "string",
+                            "enum": ["sitespeed"]
+                        },
+                        "dataasetId": {
+                            "type": "integer",
+                            "enum": [21]
+                        }
+                    }
+                },
+                "extra": {
+                    "type": "object",
+                    "properties": {
+                        "srcDb": {
+                            "type": "string",
+                            "enum": ["Apollo"]
+                        },
+                        "srcDataSet": {
+                            "type": "string",
+                            "enum": ["Bullseye"]
+                        },
+                        "targetDb": {
+                            "type": "string",
+                            "enum": ["Apollo"]
+                        },
+                        "targetDataSet": {
+                            "type": "string",
+                            "enum": ["SiteSpeed"]
+                        }
+                    }
+                },
+                "mappings": {
+                    "type": "array",
+                    "items":{
+                        "$ref": "mappingsItem"
+                    }
+                }
+            }
+        },
+        "newValidityModel": {
+            "type": "object",
+            "properties": {
+                "basic": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": ["1"]
+                        },
+                        "system": {
+                            "type": "string",
+                            "enum": ["3"]
+                        },
+                        "scheduleType": {
+                            "type": "string",
+                            "enum": ["1"]
+                        },
+                        "owner": {
+                            "type": "string",
+                            "enum": ["xwang21"]
+                        },
+                        "name": {
+                            "type": "string",
+                            "enum": ["wx_valid"]
+                        },
+                        "desc": {
+                            "type": "string",
+                            "enum": ["wwwwww"]
+                        },
+                        "threshold": {
+                            "type": "integer",
+                            "enum": [60]
+                        },
+                        "email": {
+                            "type": "string",
+                            "enum": ["w@f"]
+                        },
+                        "dataaset": {
+                            "type": "string",
+                            "enum": ["ubi_event"]
+                        },
+                        "dataasetId": {
+                            "type": "integer",
+                            "enum": [22]
+                        }
+                    }
+                },
+                "extra": {
+                    "type": "object",
+                    "properties": {
+                        "srcDb": {
+                            "type": "string",
+                            "enum": ["Apollo"]
+                        },
+                        "srcDataSet": {
+                            "type": "string",
+                            "enum": ["Sojourner"]
+                        }
+                    }
+                },
+                "vaType": {
+                    "type": "string",
+                    "enum": ["5"]
+                },
+                "column": {
+                    "type": "string",
+                    "enum": ["guid"]
+                }
+            }
+        },
+        "newAnomalyModel": {
+            "type": "object",
+            "properties": {
+                "basic": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": ["2"]
+                        },
+                        "system": {
+                            "type": "string",
+                            "enum": ["4"]
+                        },
+                        "scheduleType": {
+                            "type": "string",
+                            "enum": ["0"]
+                        },
+                        "owner": {
+                            "type": "string",
+                            "enum": ["xwang21"]
+                        },
+                        "name": {
+                            "type": "string",
+                            "enum": ["wx_detec"]
+                        },
+                        "desc": {
+                            "type": "string",
+                            "enum": ["wwwwww"]
+                        },
+                        "threshold": {
+                            "type": "integer",
+                            "enum": [30]
+                        },
+                        "email": {
+                            "type": "string",
+                            "enum": ["w@f"]
+                        },
+                        "dataaset": {
+                            "type": "string",
+                            "enum": ["ubi_event"]
+                        },
+                        "dataasetId": {
+                            "type": "integer",
+                            "enum": [22]
+                        }
+                    }
+                },
+                "extra": {
+                    "type": "object",
+                    "properties": {
+                        "srcDb": {
+                            "type": "string",
+                            "enum": ["Apollo"]
+                        },
+                        "srcDataSet": {
+                            "type": "string",
+                            "enum": ["Sojourner"]
+                        }
+                    }
+                },
+                "anType": {
+                    "type": "string",
+                    "enum": ["3"]
+                }
+            }
+        },
+        "newPublishModel": {
+            "type": "object",
+            "properties": {
+                "basic": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": ["3"]
+                        },
+                        "system": {
+                            "type": "string",
+                            "enum": ["3"]
+                        },
+                        "scheduleType": {
+                            "type": "string",
+                            "enum": ["0"]
+                        },
+                        "owner": {
+                            "type": "string",
+                            "enum": ["xwang21"]
+                        },
+                        "name": {
+                            "type": "string",
+                            "enum": ["wx_publish"]
+                        },
+                        "desc": {
+                            "type": "string",
+                            "enum": ["wwwwww"]
+                        },
+                        "dataaset": {
+                            "type": "string",
+                            "enum": ["sssss"]
+                        },
+                        "threshold": {
+                            "type": "integer",
+                            "enum": [80]
+                        },
+                        "email": {
+                            "type": "string",
+                            "enum": ["w@f"]
+                        }
+                    }
+                },
+                "extra": {
+                    "type": "object",
+                    "properties": {
+                        "publishUrl": {
+                            "type": "string",
+                            "enum": ["http://dq.vip.ebay.com/api/v1/publishmetric/wx_publish"]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

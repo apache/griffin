@@ -1,0 +1,83 @@
+// accuracy
+{
+	"basic":{
+		"type":"0",
+		"system":"1",
+		"threshold":90,
+		"scheduleType":"1",
+		"owner":"xwang21",
+		"name":"wx_accu1",
+		"desc":"aa",
+		"email":"wx@f",
+		"dataaset":"dw_bid",
+		"dataasetId":108
+	},
+	"extra":{
+		"srcDb":"Teradata",
+		"srcDataSet":"gdw_tables",
+		"targetDb":"Teradata",
+		"targetDataSet":"gdw_tables"
+	},
+	"mappings":[
+		{
+			"target":"dw_bid.uid",
+			"src":"dw_bid.uid",
+			"matchMethod":"EXACT",
+			"isPk":true,
+			"$$hashKey":"object:988"
+		}
+	]
+}
+// validity
+{
+	"basic":{
+		"type": "1",
+		"system": "3",
+		"scheduleType": "3",
+		"owner": "xwang21",
+		"name": "wx_valid",
+		"desc": "wwwwww",
+		"threshold": 60,
+		"email": "w@w",
+		"dataaset": "ubi_event",
+		"dataasetId": 22
+	},
+	"extra":{
+		"srcDb": "Apollo",
+		"srcDataSet": "Sojourner"
+	},
+	"vaType": "5",
+	"column": "guid"
+}
+//new accuracy
+{
+	"basic":{
+		"type":"0",
+		"system":"1",
+		"threshold":90,
+		"scheduleType":"1",
+		"owner":"xwang21",
+		"name":"wx_accuracy",
+		"desc":"11111",
+		"email":"w@w",
+		"dataaset":"dw_bid",
+		"dataasetId":108
+	},
+	"extra":{
+		"srcDb":"Teradata",
+		"srcDataSet":"gdw_tables",
+		"targetDb":"Teradata",
+		"targetDataSet":"gdw_tables"
+	},
+	"mappings":[
+		{
+			"target":"dw_bid.js_ev_mak",
+			"src":"dw_trans.site_id",
+			"matchMethod":"EXACT",
+			"isPk":true,
+			"$$hashKey":"object:1044"
+		}
+	]
+}
+{"basic":{"type":"0","system":"1","threshold":90,"scheduleType":"1","owner":"xwang21","name":"wx_accuracy","desc":"11111","email":"w@w","dataaset":"dw_bid","dataasetId":108},"extra":{"srcDb":"Teradata","srcDataSet":"gdw_tables","targetDb":"Teradata","targetDataSet":"gdw_tables"},"mappings":[{"target":"dw_bid.js_ev_mak","src":"dw_trans.site_id","matchMethod":"EXACT","isPk":true,"$$hashKey":"object:1044"}]}
+
