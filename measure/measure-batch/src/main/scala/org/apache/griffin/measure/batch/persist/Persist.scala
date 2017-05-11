@@ -4,6 +4,8 @@ import org.apache.griffin.measure.batch.log.Loggable
 import org.apache.griffin.measure.batch.result._
 import org.apache.spark.rdd.RDD
 
+import scala.util.Try
+
 
 trait Persist extends Loggable with Serializable {
   val timeStamp: Long
@@ -12,12 +14,12 @@ trait Persist extends Loggable with Serializable {
 
   def available(): Boolean
 
-  def start(msg: String): Unit
-  def finish(): Unit
+  def start(msg: String): Try[Unit]
+  def finish(): Try[Unit]
 
-  def result(rt: Long, result: Result): Unit
+  def result(rt: Long, result: Result): Try[Unit]
 
-  def missRecords(records: RDD[String]): Unit
+  def missRecords(records: RDD[String]): Try[Unit]
 
-  def log(rt: Long, msg: String): Unit
+  def log(rt: Long, msg: String): Try[Unit]
 }

@@ -6,6 +6,8 @@ import org.apache.griffin.measure.batch.result._
 import org.apache.griffin.measure.batch.utils.HdfsUtil
 import org.apache.spark.rdd.RDD
 
+import scala.util.Try
+
 
 case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
@@ -60,14 +62,14 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     s"${path}.${suffix}"
   }
 
-  def start(msg: String): Unit = {
+  def start(msg: String): Try[Unit] = Try {
     HdfsUtil.writeContent(StartFile, msg)
   }
-  def finish(): Unit = {
+  def finish(): Try[Unit] = Try {
     HdfsUtil.createEmptyFile(FinishFile)
   }
 
-  def result(rt: Long, result: Result): Unit = {
+  def result(rt: Long, result: Result): Try[Unit] = Try {
     val resStr = result match {
       case ar: AccuracyResult => {
         s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
@@ -83,7 +85,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
   // need to avoid string too long
-  def missRecords(records: RDD[String]): Unit = {
+  def missRecords(records: RDD[String]): Try[Unit] = Try {
     val recordCount = records.count
     val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
     if (count > 0) {
@@ -111,7 +113,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     HdfsUtil.appendContent(hdfsPath, recStr)
   }
 
-  def log(rt: Long, msg: String): Unit = {
+  def log(rt: Long, msg: String): Try[Unit] = Try {
     val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n\n"
     HdfsUtil.appendContent(LogFile, logStr)
   }

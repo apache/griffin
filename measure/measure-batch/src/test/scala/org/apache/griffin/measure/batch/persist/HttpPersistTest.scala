@@ -7,6 +7,8 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
+import scala.util.Try
+
 
 @RunWith(classOf[JUnitRunner])
 class HttpPersistTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
@@ -16,6 +18,13 @@ class HttpPersistTest extends FunSuite with Matchers with BeforeAndAfter with Lo
     val dataMap = Map[String, Any](("name" -> "metric"), ("tmst" -> System.currentTimeMillis), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
     val data = JsonUtil.toJson(dataMap)
     println(data)
+  }
+
+  test("test try") {
+    Try {
+      ;
+    }
+
   }
 
 }

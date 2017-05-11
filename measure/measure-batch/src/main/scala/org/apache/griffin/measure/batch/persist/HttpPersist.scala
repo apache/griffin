@@ -4,6 +4,8 @@ import org.apache.griffin.measure.batch.result._
 import org.apache.griffin.measure.batch.utils.{HttpUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
 
+import scala.util.Try
+
 case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
   val Api = "api"
@@ -16,10 +18,10 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
     api.nonEmpty
   }
 
-  def start(msg: String): Unit = {}
-  def finish(): Unit = {}
+  def start(msg: String): Try[Unit] = Try {}
+  def finish(): Try[Unit] = Try {}
 
-  def result(rt: Long, result: Result): Unit = {
+  def result(rt: Long, result: Result): Try[Unit] = Try {
     result match {
       case ar: AccuracyResult => {
         val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
@@ -38,8 +40,8 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
     }
   }
 
-  def missRecords(records: RDD[String]): Unit = {}
+  def missRecords(records: RDD[String]): Try[Unit] = Try {}
 
-  def log(rt: Long, msg: String): Unit = {}
+  def log(rt: Long, msg: String): Try[Unit] = Try {}
 
 }
