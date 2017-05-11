@@ -43,6 +43,15 @@
             </goals>
             <configuration>
               <outputDirectory>${basedir}/../service/src/main/resources/public</outputDirectory>
+              <nonFilteredFileExtensions>
+                <nonFilteredFileExtension>otf</nonFilteredFileExtension>
+                <nonFilteredFileExtension>eot</nonFilteredFileExtension>
+                <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                <nonFilteredFileExtension>woff.bak</nonFilteredFileExtension>
+                <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+              </nonFilteredFileExtensions>
               <resources>
                 <resource>
                   <directory>${basedir}</directory>
