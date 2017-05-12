@@ -252,7 +252,7 @@ define(['./module'], function (services) {
     var data = [];
     var chartData = metric;
     for(var i = 0; i < chartData.length; i++){
-        data.push([formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.matched/chartData[i]._source.total).toFixed(2))]);
+        data.push([formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.matched/chartData[i]._source.total*100).toFixed(2))]);
     }
 
     data.sort(function(a, b){
