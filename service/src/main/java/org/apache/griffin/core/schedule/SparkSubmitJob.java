@@ -191,7 +191,7 @@ public class SparkSubmitJob implements Job {
         sparkJobDO.setJars(jars);
 
         List<String> files = new ArrayList<>();
-        files.add(props.getProperty("sparkJob.files_1"));
+//        files.add(props.getProperty("sparkJob.files_1"));
         sparkJobDO.setFiles(files);
     }
 

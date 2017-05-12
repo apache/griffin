@@ -1,0 +1,101 @@
+<!--
+	Copyright (c) 2016 eBay Software Foundation.
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+	    http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+ -->
+<div >
+    <p>
+        <a class="btn btn-primary btn-o btn-wide" href="#/createrule0"><i class="fa fa-plus"></i> Create DQ Model</a>
+    </p>
+
+    <div id="modelContainer">
+        <table st-table="displayed" st-pipe="paging" class="table table-striped">
+            <thead>
+            <!-- <tr>
+
+                    <th colspan="7">
+                        <input st-search placeholder="Search..." type="search" style="color:#000000"/>
+                    </th>
+                </tr> -->
+            <tr style="background-color:#7D95CC">
+                <th st-ratio="15">Model Name</th>
+                <!--<th st-ratio="15">Organization</th>-->
+                <th st-ratio="15">Model Type</th>
+                <th st-ratio="20">Description</th>
+                <!--<th st-ratio="15">Create Date</th>-->
+                <!--<th st-ratio="10">Model Stage</th>-->
+                <th st-ratio="5">Organization</th>
+                <th st-ratio="5">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-if="!rowCollection || rowCollection.length == 0">
+                <td colspan="7" style="text-align:center">No content!</td>
+            </tr>
+            <tr ng-repeat="row in displayed">
+                <td><a href="#/viewrule/{{row.name}}">{{row.name}}</a></td>
+                <!--<td>{{row.system|strmap:'modelsystem'}}</td>-->
+                <td>{{row.type|strmap:'modeltype'}}</td>
+                <td>{{row.description}}</td>
+                <!--<td>{{row.createDate | date:'short':'-0700'}}</td>-->
+                <!--<td><label class="label" ng-class="row.status==0?'label-default':row.status==1?'label-info':'label-success'" >{{row.status|strmap:'modelstatus'}}</label></td>-->
+                <td>{{row.organization}}</td>
+                <td>
+                    &nbsp;
+                    <a ng-class="" href="" ng-click="remove(row)" title="delete">
+                        <i class="fa fa-trash-o"></i>
+                    </a>
+                    &nbsp;
+                    <a href="#/viewrule/{{row.name}}" title="subscribe">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                </td>
+                <!-- <td>
+                    <button class="btn btn-sm" popover-placement="top" popover="{{row.email}}" type="button">
+                        <i class="glyphicon glyphicon-eye-open"></i>
+                    </button>
+                    <a ng-href="mailto:{{row.email}}">email</a></td>
+                <td>
+                    <button type="button" ng-click="removeRow(row)" class="btn btn-sm btn-danger">
+                        <i class="glyphicon glyphicon-remove-circle">
+                        </i>
+                    </button>
+                </td> -->
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="8" class="text-right">
+                    <div  st-items-by-page="10" st-pagination="" st-displayed-pages="10"></div>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="modal fade" id="deleteConfirmation" role="dialog">
+        <div class="modal-dialog modal-xg modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Delete the model with the below information?</h4>
+                </div>
+                <div class="modal-body">
+                    <ng-include src="'/pages/rules/delete-confirm.html'"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" ng-click="confirmDelete()">Yes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
