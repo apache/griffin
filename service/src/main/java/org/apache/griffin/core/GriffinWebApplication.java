@@ -40,24 +40,36 @@ public class GriffinWebApplication implements CommandLineRunner{
 
 
     public void run(String... strings) throws Exception {
-            HashMap<String,String> configMap1=new HashMap<>();
-            configMap1.put("database","default");
-            configMap1.put("table.name","test_data_src");
-            HashMap<String,String> configMap2=new HashMap<>();
-            configMap2.put("database","default");
-            configMap2.put("table.name","test_data_tgt");
-            String configJson1 = new ObjectMapper().writeValueAsString(configMap1);
-            String configJson2 = new ObjectMapper().writeValueAsString(configMap2);
+        HashMap<String,String> configMap1=new HashMap<>();
+        configMap1.put("database","default");
+        configMap1.put("table.name","src_data");
+        HashMap<String,String> configMap2=new HashMap<>();
+        configMap2.put("database","default");
+        configMap2.put("table.name","tgt_data");
+        String configJson1 = new ObjectMapper().writeValueAsString(configMap1);
+        String configJson2 = new ObjectMapper().writeValueAsString(configMap2);
 
-            DataConnector source = new DataConnector(ConnectorType.HIVE, "1.2", configJson1);
-            DataConnector target = new DataConnector(ConnectorType.HIVE, "1.2", configJson2);
+        DataConnector source = new DataConnector(ConnectorType.HIVE, "1.2", configJson1);
+        DataConnector target = new DataConnector(ConnectorType.HIVE, "1.2", configJson2);
 
-            String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
+        String rules = "$source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
 
-            EvaluateRule eRule = new EvaluateRule(1,rules);
+        EvaluateRule eRule = new EvaluateRule(1,rules);
 
-            Measure measure = new Measure("accu1","accu1 description", Measure.MearuseType.accuracy, "bullyeye", source, target, eRule,"test1");
-            measureRepo.save(measure);
+        Measure measure1 = new Measure("viewitem_hourly","viewitem hourly accuracy measure", Measure.MearuseType.accuracy, "demo", source, target, eRule,"test");
+        measureRepo.save(measure1);
+
+        DataConnector source2 = new DataConnector(ConnectorType.HIVE, "1.2", configJson1);
+        DataConnector target2 = new DataConnector(ConnectorType.HIVE, "1.2", configJson2);
+        EvaluateRule eRule2 = new EvaluateRule(1,rules);
+        Measure measure2 = new Measure("search_hourly","search hourly accuracy measure", Measure.MearuseType.accuracy, "demo", source2, target2, eRule2,"test");
+        measureRepo.save(measure2);
+
+        DataConnector source3 = new DataConnector(ConnectorType.HIVE, "1.2", configJson1);
+        DataConnector target3 = new DataConnector(ConnectorType.HIVE, "1.2", configJson2);
+        EvaluateRule eRule3 = new EvaluateRule(1,rules);
+        Measure measure3 = new Measure("buy_hourly","buy hourly accuracy measure", Measure.MearuseType.accuracy, "demo", source3, target3, eRule3,"test");
+        measureRepo.save(measure3);
     }
 
     @Bean

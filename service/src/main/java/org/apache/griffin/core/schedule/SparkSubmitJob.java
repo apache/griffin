@@ -85,16 +85,14 @@ public class SparkSubmitJob implements Job {
 
         if (sourcePattern != null && !sourcePattern.isEmpty()) {
             sourcePatternItemSet = sourcePattern.split("-");
-            sourcePatternPartitionSizeMin = Math.min(partitionItemSet.length, sourcePatternItemSet.length);
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
-            setDataConnectorPartitions(measure.getSource(), sourcePatternItemSet, partitionItemSet, currentTimstamp, sourcePatternPartitionSizeMin);
+            setDataConnectorPartitions(measure.getSource(), sourcePatternItemSet, partitionItemSet, currentTimstamp);
             jd.getJobDataMap().put("lastTime", currentTimstamp + "");
         }
         if (targetPattern != null && !targetPattern.equals("")) {
             targetPatternItemSet = targetPattern.split("-");
-            targetPatternPartitionSizeMin = Math.min(partitionItemSet.length, targetPatternItemSet.length);
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
-            setDataConnectorPartitions(measure.getTarget(), targetPatternItemSet, partitionItemSet, currentTimstamp, targetPatternPartitionSizeMin);
+            setDataConnectorPartitions(measure.getTarget(), targetPatternItemSet, partitionItemSet, currentTimstamp);
             jd.getJobDataMap().put("lastTime", currentTimstamp + "");
         }
         //final String uri = "http://10.9.246.187:8998/batches";
@@ -106,13 +104,14 @@ public class SparkSubmitJob implements Job {
         //	{"file": "/exe/griffin-measure-batch-0.0.1-SNAPSHOT.jar", "className": "org.apache.griffin.measure.batch.Application", "args": ["/benchmark/test/env.json", "/benchmark/test/config-rdm.json"], "name": "griffin-livy", "queue": "default", "numExecutors": 2, "executorCores": 4, "driverMemory": "2g", "executorMemory": "2g", "conf": {"spark.jars.packages": "com.databricks:spark-avro_2.10:2.0.1"}, "jars": ["/livy/datanucleus-api-jdo-3.2.6.jar", "/livy/datanucleus-core-3.2.10.jar", "/livy/datanucleus-rdbms-3.2.9.jar"], "files": ["/livy/hive-site.xml"]}' -H "Content-Type: application/json"
     }
 
-    public Map<String, String> genPartitions(String[] PatternItemSet, String[] partitionItemSet, long timestamp, int comparableSizeMin) {
+    public Map<String, String> genPartitions(String[] patternItemSet, String[] partitionItemSet, long timestamp) {
+        int comparableSizeMin=Math.min(patternItemSet.length,partitionItemSet.length);
         Map<String, String> res = new HashMap<>();
         for (int i = 0; i < comparableSizeMin; i++) {
             /**
              * in order to get a standard date like 20170427 01
              */
-            String pattrn = PatternItemSet[i].replace("mm", "MM");
+            String pattrn = patternItemSet[i].replace("mm", "MM");
             pattrn = pattrn.replace("DD", "dd");
             pattrn = pattrn.replace("hh", "HH");
             SimpleDateFormat sdf = new SimpleDateFormat(pattrn);
@@ -128,11 +127,10 @@ public class SparkSubmitJob implements Job {
      * @param patternItemSet
      * @param partitionItemSet
      * @param timestamp
-     * @param patternPartitionSizeMin
      * @return
      */
-    private void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItemSet, long timestamp, int patternPartitionSizeMin) {
-        Map<String, String> partitionItemMap = genPartitions(patternItemSet, partitionItemSet, timestamp, patternPartitionSizeMin);
+    public void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItemSet, long timestamp) {
+        Map<String, String> partitionItemMap = genPartitions(patternItemSet, partitionItemSet, timestamp);
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
 
         Map<String, String> configMap = dc.getConfig();
