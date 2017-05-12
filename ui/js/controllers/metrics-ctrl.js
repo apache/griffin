@@ -14,15 +14,15 @@
 */
 define(['./module'], function(controllers) {
     'use strict';
-    controllers.controller('MetricsCtrl', ['$scope', '$http', '$config', '$location', '$routeParams', '$timeout', '$compile', '$route', '$barkChart', '$rootScope', "$q",function($scope, $http, $config, $location, $routeParams, $timeout, $compile, $route, $barkChart, $rootScope,$q) {
+    controllers.controller('MetricsCtrl', ['$scope', '$http', '$config', '$location', '$routeParams', '$timeout', '$compile', '$route', '$barkChart', '$rootScope',function($scope, $http, $config, $location, $routeParams, $timeout, $compile, $route, $barkChart, $rootScope) {
         console.log('Route parameter: ' + $routeParams.sysName);
 
         var echarts = require('echarts');
 
         pageInit();
 
-        var defer = $q.defer();
-        var promise1 = defer.promise1;
+//        var defer = $q.defer();
+//        var promise1 = defer.promise1;
 
         function pageInit() {
           $scope.$emit('initReq');
@@ -41,10 +41,6 @@ define(['./module'], function(controllers) {
                    $scope.orgs.push(orgNode);
                    orgNode.name = sys;
                    orgNode.assetMap = [];
-                   $http.get(url_organization+'/'+orgNode.name).success(function(res){
-                         console.log(res);
-                         orgNode.assetMap = res;
-                       });
                    });
                }
            });
@@ -61,6 +57,8 @@ define(['./module'], function(controllers) {
                   });
 
           });
+
+          $scope.originalOrgs = angular.copy($scope.orgs);
 
           $http.post(url_dashboard, {"query": {"match_all":{}},"size":1000}).success(function(res) {
             $scope.dashboard = res;
@@ -94,24 +92,12 @@ define(['./module'], function(controllers) {
                 }
             }
             $scope.original = angular.copy($scope.dataData);
-//            angular.forEach($scope.dataData,function(data){
-//
-//            })
-//            if($routeParams.sysName && $scope.originalData && $scope.originalData.length > 0){
-//              for(var i = 0; i < $scope.originalData.length; i ++){
-//                if($scope.originalData[i].name == $routeParams.sysName){
-//                  $scope.selectedOrgIndex = i;
-//                  $scope.changeOrg();
-//                  $scope.orgSelectDisabled = true;
-//                  break;
-//                }
-//
-//              }
-//            }
-
             $timeout(function() {
+              console.log($scope.dataData);
               redraw($scope.dataData);
+              console.log("paint over");
             });
+//            setTimeout(redraw($scope.dataData));
 
           });
         }
@@ -120,21 +106,26 @@ define(['./module'], function(controllers) {
         });
 
         var redraw = function(data) {
-           $scope.chartHeight = $('.chartItem:eq(0)').width()*0.8+'px';
-             angular.forEach(data, function(sys, parentIndex) {
-                 var tmp = document.getElementById('thumbnail'+parentIndex);
-                 var org = $('#thumbnail'+parentIndex).parent().parent().parent().prev().text();
-                 console.log(org.trim());
-                 var nowOrg;
-                 for(var i = 0;i<$scope.orgs.length;i++){
-                     if($scope.orgs[i].name==org.trim() && $scope.orgs[i].assetMap.indexOf(sys[0]._source.name)!== -1){
-                         tmp.style.width = $('#thumbnail'+parentIndex).parent().width()+'px';
-                         tmp.style.height = $scope.chartHeight;
-                         var abcChart = echarts.init(tmp, 'dark');
-                         abcChart.setOption($barkChart.getOptionThum(sys));
-                     }
-                     else $('#thumbnail'+parentIndex).parent().parent().hide();
-                 }
+            if($scope.selectedOrgIndex==='' || $scope.selectedOrgIndex == undefined)
+                $scope.orgs = angular.copy($scope.originalOrgs);
+            else
+                $scope.orgs = $scope.originalOrgs[$scope.selectedOrgIndex];
+
+            $scope.chartHeight = $('.chartItem:eq(0)').width()*0.8+'px';
+
+            angular.forEach(data, function(sys, parentIndex) {
+                var tmp = document.getElementById('thumbnail'+parentIndex);
+                var org = $('#thumbnail'+parentIndex).parent().parent().parent().prev().text();
+
+                for(var i = 0;i<$scope.orgs.length;i++){
+                    if($scope.orgs[i].name==org.trim() && $scope.orgs[i].assetMap.indexOf(sys[0]._source.name)!== -1){
+                        tmp.style.width = $('#thumbnail'+parentIndex).parent().width()+'px';
+                        tmp.style.height = $scope.chartHeight;
+                        var abcChart = echarts.init(tmp, 'dark');
+                        abcChart.setOption($barkChart.getOptionThum(sys));
+                    }
+//                    else $('#thumbnail'+parentIndex).parent().parent().hide();
+                }
              });
         }
 
@@ -147,12 +138,14 @@ define(['./module'], function(controllers) {
           $scope.assetOptions = [];
           $scope.dataData = [];
           if($scope.selectedOrgIndex === ""){
+            $scope.orgs = angular.copy($scope.originalOrgs);
             $scope.dataData = angular.copy($scope.original);
             $timeout(function() {
                redraw($scope.dataData);
             }, 0);
           } else {
-            $http.get(url_organization+'/'+$scope.orgs[data].name).success(function(res){
+            $scope.orgs = $scope.originalOrgs[data];
+            $http.get(url_organization+'/'+$scope.orgs.name).success(function(res){
                 $scope.assetOptions = res;
                 angular.forEach($scope.original,function(data){
                     if(res.indexOf(data[0]._source.name)!= -1){
