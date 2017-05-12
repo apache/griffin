@@ -33,7 +33,7 @@
                 <th st-ratio="20">Description</th>
                 <!--<th st-ratio="15">Create Date</th>-->
                 <!--<th st-ratio="10">Model Stage</th>-->
-                <!--<th st-ratio="5">Owner</th>-->
+                <th st-ratio="5">Organization</th>
                 <th st-ratio="5">Action</th>
             </tr>
             </thead>
@@ -48,7 +48,7 @@
                 <td>{{row.description}}</td>
                 <!--<td>{{row.createDate | date:'short':'-0700'}}</td>-->
                 <!--<td><label class="label" ng-class="row.status==0?'label-default':row.status==1?'label-info':'label-success'" >{{row.status|strmap:'modelstatus'}}</label></td>-->
-                <!--<td>{{row.owner}}</td>-->
+                <td>{{row.organization}}</td>
                 <td>
                     &nbsp;
                     <a ng-class="" href="" ng-click="remove(row)" title="delete">
