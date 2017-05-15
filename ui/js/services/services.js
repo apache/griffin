@@ -51,10 +51,12 @@ define(['./module'], function (services) {
               heatmap: BACKEND_SERVER + API_ROOT_PATH + '/metrics/heatmap' ,
               metricdetail: BACKEND_SERVER + API_ROOT_PATH + '/metrics/complete',
               rulemetric: BACKEND_SERVER + API_ROOT_PATH + '/metrics/brief',
-              organization:BACKEND_SERVER+'/org',
+//              organization:BACKEND_SERVER+'/org',
               orgmap: BACKEND_SERVER+'/metrics/org',
 
-              dashboard:ES_SERVER+'/griffin/accuracy/_search?pretty',
+              //dashboard:ES_SERVER+'/griffin/accuracy/_search?pretty',
+              organization:'/org.json',
+              dashboard:'/dashboard.json',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',
 
