@@ -62,49 +62,65 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     s"${path}.${suffix}"
   }
 
-  def start(msg: String): Try[Unit] = Try {
-    HdfsUtil.writeContent(StartFile, msg)
-  }
-  def finish(): Try[Unit] = Try {
-    HdfsUtil.createEmptyFile(FinishFile)
-  }
-
-  def result(rt: Long, result: Result): Try[Unit] = Try {
-    val resStr = result match {
-      case ar: AccuracyResult => {
-        s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
-      }
-      case _ => {
-        s"result: ${result}"
-      }
+  def start(msg: String): Unit = {
+    try {
+      HdfsUtil.writeContent(StartFile, msg)
+    } catch {
+      case e => error(e.getMessage)
     }
-    HdfsUtil.writeContent(ResultFile, timeHead(rt) + resStr)
-    log(rt, resStr)
+  }
+  def finish(): Unit = {
+    try {
+      HdfsUtil.createEmptyFile(FinishFile)
+    } catch {
+      case e => error(e.getMessage)
+    }
+  }
 
-    info(resStr)
+  def result(rt: Long, result: Result): Unit = {
+    try {
+      val resStr = result match {
+        case ar: AccuracyResult => {
+          s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
+        }
+        case _ => {
+          s"result: ${result}"
+        }
+      }
+      HdfsUtil.writeContent(ResultFile, timeHead(rt) + resStr)
+      log(rt, resStr)
+
+      info(resStr)
+    } catch {
+      case e => error(e.getMessage)
+    }
   }
 
   // need to avoid string too long
-  def missRecords(records: RDD[String]): Try[Unit] = Try {
-    val recordCount = records.count
-    val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
-    if (count > 0) {
-      val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
-      if (groupCount <= 1) {
-        val recs = records.take(count.toInt)
-        persistRecords(MissRecFile, recs)
-      } else {
-        val groupedRecords: RDD[(Long, Iterable[String])] =
-          records.zipWithIndex.flatMap { r =>
-            val gid = r._2 / maxLinesPerFile
-            if (gid < groupCount) Some((gid, r._1)) else None
-          }.groupByKey()
-        groupedRecords.foreach { group =>
-          val (gid, recs) = group
-          val hdfsPath = if (gid == 0) MissRecFile else withSuffix(MissRecFile, gid.toString)
-          persistRecords(hdfsPath, recs)
+  def missRecords(records: RDD[String]): Unit = {
+    try {
+      val recordCount = records.count
+      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+      if (count > 0) {
+        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
+        if (groupCount <= 1) {
+          val recs = records.take(count.toInt)
+          persistRecords(MissRecFile, recs)
+        } else {
+          val groupedRecords: RDD[(Long, Iterable[String])] =
+            records.zipWithIndex.flatMap { r =>
+              val gid = r._2 / maxLinesPerFile
+              if (gid < groupCount) Some((gid, r._1)) else None
+            }.groupByKey()
+          groupedRecords.foreach { group =>
+            val (gid, recs) = group
+            val hdfsPath = if (gid == 0) MissRecFile else withSuffix(MissRecFile, gid.toString)
+            persistRecords(hdfsPath, recs)
+          }
         }
       }
+    } catch {
+      case e => error(e.getMessage)
     }
   }
 
@@ -113,9 +129,13 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     HdfsUtil.appendContent(hdfsPath, recStr)
   }
 
-  def log(rt: Long, msg: String): Try[Unit] = Try {
-    val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n\n"
-    HdfsUtil.appendContent(LogFile, logStr)
+  def log(rt: Long, msg: String): Unit = {
+    try {
+      val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n\n"
+      HdfsUtil.appendContent(LogFile, logStr)
+    } catch {
+      case e => error(e.getMessage)
+    }
   }
 
 }

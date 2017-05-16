@@ -18,30 +18,34 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
     api.nonEmpty
   }
 
-  def start(msg: String): Try[Unit] = Try {}
-  def finish(): Try[Unit] = Try {}
+  def start(msg: String): Unit = {}
+  def finish(): Unit = {}
 
-  def result(rt: Long, result: Result): Try[Unit] = Try {
-    result match {
-      case ar: AccuracyResult => {
-        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
-        val data = JsonUtil.toJson(dataMap)
+  def result(rt: Long, result: Result): Unit = {
+    try {
+      result match {
+        case ar: AccuracyResult => {
+          val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
+          val data = JsonUtil.toJson(dataMap)
 
-        // post
-        val params = Map[String, Object]()
-//        val header = Map[String, Object](("content-type" -> "application/json"))
-        val header = Map[String, Object]()
-        val status = HttpUtil.httpRequest(api, method, params, header, data)
-        info(s"${method} to ${api} response status: ${status}")
+          // post
+          val params = Map[String, Object]()
+//          val header = Map[String, Object](("content-type" -> "application/json"))
+          val header = Map[String, Object]()
+          val status = HttpUtil.httpRequest(api, method, params, header, data)
+          info(s"${method} to ${api} response status: ${status}")
+        }
+        case _ => {
+          info(s"result: ${result}")
+        }
       }
-      case _ => {
-        info(s"result: ${result}")
-      }
+    } catch {
+      case e => error(e.getMessage)
     }
   }
 
-  def missRecords(records: RDD[String]): Try[Unit] = Try {}
+  def missRecords(records: RDD[String]): Unit = {}
 
-  def log(rt: Long, msg: String): Try[Unit] = Try {}
+  def log(rt: Long, msg: String): Unit = {}
 
 }

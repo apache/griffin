@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
-import scala.util.Try
+import scala.util.{Try, Failure}
 
 @RunWith(classOf[JUnitRunner])
 class HttpPersistTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
@@ -21,7 +21,15 @@ class HttpPersistTest extends FunSuite with Matchers with BeforeAndAfter with Lo
 
   test("test try") {
     Try {
-      ;
+      Try {
+        throw new Exception("test")
+      } match {
+        case Failure(ex) => throw new Exception(ex.getMessage)
+        case _ => println("success inner")
+      }
+    } match {
+      case Failure(ex) => println(ex.getMessage)
+      case _ => println("success")
     }
 
   }
