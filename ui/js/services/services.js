@@ -54,7 +54,8 @@ define(['./module'], function (services) {
 //              organization:BACKEND_SERVER+'/org',
               orgmap: BACKEND_SERVER+'/metrics/org',
 
-              //dashboard:ES_SERVER+'/griffin/accuracy/_search?pretty',
+
+              metricsByOrg:'',
               organization:'/org.json',
               dashboard:'/dashboard.json',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',

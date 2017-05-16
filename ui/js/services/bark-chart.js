@@ -71,7 +71,7 @@ define(['./module'], function (services) {
     var data = getMetricData(metric);
     var option = {
       title: {
-        text:  metric[0]._source.name,
+        text:  metric.name,
         left: 'center',
         textStyle: {
             fontWeight: 'normal',
@@ -201,7 +201,7 @@ define(['./module'], function (services) {
     var data = getMetricData(metric);
     var option = {
       title: {
-        text:  metric[0]._source.name,
+        text:  metric.name,
 //        link: '/#/viewrule/' + metric.name,
 //        target: 'self',
         left: 'center',
@@ -250,7 +250,7 @@ define(['./module'], function (services) {
 
   function getMetricData(metric) {
     var data = [];
-    var chartData = metric;
+    var chartData = metric.details;
     for(var i = 0; i < chartData.length; i++){
         data.push([formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.matched/chartData[i]._source.total*100).toFixed(2))]);
     }

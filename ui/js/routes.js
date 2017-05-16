@@ -200,22 +200,22 @@ define(['./app'], function(app) {
 
 function isSpinnerRequired(Config, url){
     var names = [
-        "dbtree",
-        "getdataasset",
+//        "dbtree",
+//        "getdataasset",
         "allModels",
-        "getModel",
-        "heatmap",
-        "metricdetail",
-        "dashboard",
-        "getmydashboard",
-        "getsubscribe"
+//        "getModel",
+//        "heatmap",
+//        "metricdetail",
+        "dashboard"
+//        "getmydashboard",
+//        "getsubscribe"
     ];
 
-    var uriArray = Config.uri;
-    for(var i = 0; i < names.length; i ++){
-        if(url.indexOf(uriArray[names[i]])>=0)
-            return true;
-    }
+//    var uriArray = Config.uri;
+//    for(var i = 0; i < names.length; i ++){
+//        if(url.indexOf(uriArray[names[i]])>=0)
+//            return true;
+//    }
 
     return false;
 }

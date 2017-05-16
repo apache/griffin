@@ -24,12 +24,12 @@
 
                 <div class="sidebar-stat-center">
                     <img src="/img/sidebar1.png" >
-                    <span><a class="bark-link" href="#/dataassets">&nbsp;Data Assets</a></span>
+                    <span><a class="bark-link" href="#/dataassets">{{datasets}}&nbsp;Data Assets</a></span>
                 </div>
 
                 <div class="sidebar-stat-center">
                     <img src="/img/sidebar2.png">
-                    <span><a class="bark-link" href="#/metrics">&nbsp;DQ Metrics</a></span>
+                    <span><a class="bark-link" href="#/metrics">{{metrics}}&nbsp;DQ Metrics</a></span>
                 </div>
 
             </div>
@@ -43,39 +43,39 @@
 
 
     <div id="side-bar-metrics" class="row" style="margin-top:20px;overflow-y:auto;overflow-x:hidden;margin-left:0;margin-right:0;height:1px;">
-        <div ng-repeat="org in orgs">
+        <div ng-repeat="outerItems in finalData">
             <div class="well" style="padding:0px;background:transparent;border:0px;position:relative; ">
                 <!-- <img class="bullseye" src="/img/bullseye.png" title="image1" > -->
-                <div class="col-sm-4 col-lg-4 col-md-4 "><h4 ><a href="#/metrics/{{org.name}}"> {{org.name}}</a></h4></div>
-                <div class="col-sm-3 col-lg-3 col-md-3 " style="display: flex;justify-content: center;height:46px;"><div ng-class="led-green" style="align-self: center;"></div></div>
+                <div class="col-sm-4 col-lg-4 col-md-4 "><h4 ><a href="#/metrics/{{outerItems.name}}"> {{outerItems.name}}</a></h4></div>
+                <div class="col-sm-3 col-lg-3 col-md-3 " style="display: flex;justify-content: center;height:46px;"><div ng-class="outerItems.dq >=90 ? 'led-green':'led-yellow'" style="align-self: center;"></div></div>
                 <div class="col-sm-5 col-lg-5 col-md-5 " style="display: flex;justify-content: center;height:46px;"><a style="align-self: center;" class="btn btn-primary" href="https://github.com/eBay/DQSolution/issues" target="_blank">Report&nbsp;issue</a></div>
             </div>
             <br/>
             <div class="well side-bar-scroll">
-                <div class="panel-group" ng-repeat="outerItems in dataData" style="margin-bottom:0px;background:transparent;">
-                    <div ng-repeat="items in outerItems" >
+                <div class="panel-group" ng-repeat="items in outerItems.metrics" style="margin-bottom:0px;background:transparent;">
                     <div class="panel panel-default" style="position:relative;background:transparent;">
                         <div class="panel-heading" style="background:transparent;">
                             <h4 class="panel-title side-metrics">
-                                <a data-toggle="collapse" href={{"#"+items.name+$index}} ng-init="items.tag=true" ng-click="items.tag=!items.tag;draw(items, $parent.$index, $index);" >
+                                <a data-toggle="collapse" href={{"#"+outerItems.name+$index}} ng-init="items.tag=true" ng-click="items.tag=!items.tag;draw(items, $parent.$index, $index);" >
                                     <i class="faChevron" ng-class="items.tag ? 'fa fa-caret-right':'fa fa-caret-down'" style="width:10px"></i>
 
                                     <i class="fa fa-line-chart faArrows"></i>
-                                    <span class="side-date">{{items._source.tmst | date:'MM/dd HH:mm':'-0700'}}</span>
+                                    <span class="side-date">{{items.timestamp | date:'MM/dd HH:mm':'-0700'}}</span>
                                     &nbsp;&nbsp;
-                                    <span class="side-name" title="{{items.name}}">{{items._source.name |strShorten}}</span>
-                                    <span class="pull-right" ng-class="items.dqfail?'side-percent-red':'side-percent'">{{items.value | number:2}}%</span>
-                                    <!--<span class="pull-right" ng-class="items.dqfail?'side-percent-red':''">{{items.dq/1000 | number:0}}K</span>-->
+                                    <span class="side-name" title="{{items.name}}">{{items.name |strShorten}}</span>
+                                    <span ng-if="items.dq <= 100" class="pull-right" ng-class="items.dqfail?'side-percent-red':'side-percent'">{{items.dq | number:2}}%</span>
+                                    <span ng-if="items.dq > 100" class="pull-right" ng-class="items.dqfail?'side-percent-red':''">{{items.dq/1000 | number:0}}K</span>
                                 </a>
                             </h4>
                         </div>
-                        <div id={{$parent.$index}} class="panel-collapse collapse">
+                        <div id={{outerItems.name+$index}} class="panel-collapse collapse">
+                            <!-- <div class="panel-body">
+                              <highchart config="items.chartId">
+                            </div> -->
                             <div class="panel-body" style="cursor:pointer;padding:0px 15px;">
                                 <div id={{'chart'+$parent.$index+'-'+$index}} class="side-chart"></div>
                             </div>
                         </div>
-
-                    </div>
                     </div>
                 </div>
             </div>

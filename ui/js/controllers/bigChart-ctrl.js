@@ -33,7 +33,7 @@ define(['./module'], function(controllers) {
       $scope.closeBigChart = function(){
         console.log('close big chart!');
         $('#bigChartContainer').hide();
-        // $('#mainWindow').show();
+//        $('#mainWindow').show();
       }
 
       $scope.downloadSample = function() {
