@@ -22,7 +22,7 @@ define(['./module'], function(controllers) {
 
         $scope.orgs = [];
         $scope.finalData = [];
-        $scope.dataData = [];
+        $scope.metricData = [];
 
         var renderDataAssetPie = function(status) {
             resizePieChart();
@@ -39,11 +39,6 @@ define(['./module'], function(controllers) {
 
         $scope.$watch(function(){return $routeParams.sysName;}, function(value){
           console.log('Watched value: ' + value);
-          if(value){
-            sideBarList(value);
-          }else{
-            $scope.briefmetrics = $scope.backup_metrics;
-          }
         });
 
         $scope.draw = function(metric, parentIndex, index) {
@@ -77,14 +72,13 @@ define(['./module'], function(controllers) {
                });
                $scope.originalOrg = angular.copy($scope.orgs);
                var url_briefmetrics = $config.uri.dashboard;
-               $http.get(url_briefmetrics, {cache:true}).success(function(data) {
-                   $scope.briefmetrics = data;
+               $http.post(url_briefmetrics, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}]}).success(function(data) {
                    angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
                         return a.tmst - b.tmst;
                         }
-                });
+                   });
                $scope.originalData = angular.copy(data);
                $scope.myData = angular.copy($scope.originalData.hits.hits);
                $scope.metricName = [];
@@ -94,7 +88,7 @@ define(['./module'], function(controllers) {
                $scope.metricNameUnique = [];
                angular.forEach($scope.metricName,function(name){
                    if($scope.metricNameUnique.indexOf(name) === -1){
-                        $scope.dataData[$scope.metricNameUnique.length] = new Array();
+                        $scope.metricData[$scope.metricNameUnique.length] = new Array();
                         $scope.metricNameUnique.push(name);
                  }
                });
@@ -103,7 +97,7 @@ define(['./module'], function(controllers) {
             //push every point to its metric
                     for(var j = 0 ;j<$scope.metricNameUnique.length;j++){
                         if($scope.myData[i]._source.name==$scope.metricNameUnique[j]){
-                            $scope.dataData[j].push($scope.myData[i]);
+                            $scope.metricData[j].push($scope.myData[i]);
                         }
                     }
                 }
@@ -113,26 +107,27 @@ define(['./module'], function(controllers) {
                    node.name = sys.name;
                    node.dq = 0;
                    node.metrics = new Array();
-                   angular.forEach($scope.dataData,function(metric,index){
-                        if(sys.assetMap.indexOf(metric[0]._source.name)!= -1){
+                   angular.forEach($scope.metricData,function(metric,index){
+                        if(sys.assetMap.indexOf(metric[metric.length-1]._source.name)!= -1){
                             var metricNode = new Object();
-                            metricNode.name = metric[0]._source.name;
-                            metricNode.timestamp = metric[0]._source.tmst;
-                            metricNode.dq = metric[0]._source.matched/metric[0]._source.total*100;
+                            metricNode.name = metric[metric.length-1]._source.name;
+                            metricNode.timestamp = metric[metric.length-1]._source.tmst;
+                            metricNode.dq = metric[metric.length-1]._source.matched/metric[metric.length-1]._source.total*100;
                             metricNode.details = angular.copy(metric);
                             node.metrics.push(metricNode);
                         }
                    });
                    $scope.finalData.push(node);
-                })
-//            if(!sysName){
-//              $scope.backup_metrics = angular.copy(res);
-//            }
-                    $timeout(function() {
-                        resizeSideChart();
-                    }, 0);
                 });
-            });
+
+            if(!sysName){
+              $scope.backup_metrics = angular.copy($scope.finalData);
+            }
+            $timeout(function() {
+                resizeSideChart();
+            }, 0);
+           });
+          });
         }
 
         $(window).resize(function() {

@@ -22,9 +22,9 @@ define(['./module'], function (services) {
 
     var BACKEND_SERVER = 'http://10.149.247.156:38080';
 //      var BACKEND_SERVER = 'http://localhost:8080';
-
+//      var BACKEND_SERVER = '';
       var API_ROOT_PATH = '/api/v1';
-      var ES_SERVER = 'http://10.149.247.156:39200'
+      var ES_SERVER = 'http://10.149.247.156:39200';
 
       var config = {
           // URI paths, always have a trailing /
@@ -51,13 +51,12 @@ define(['./module'], function (services) {
               heatmap: BACKEND_SERVER + API_ROOT_PATH + '/metrics/heatmap' ,
               metricdetail: BACKEND_SERVER + API_ROOT_PATH + '/metrics/complete',
               rulemetric: BACKEND_SERVER + API_ROOT_PATH + '/metrics/brief',
-//              organization:BACKEND_SERVER+'/org',
               orgmap: BACKEND_SERVER+'/metrics/org',
 
-
-              metricsByOrg:'',
               organization:'/org.json',
-              dashboard:'/dashboard.json',
+//              dashboard:'/dashboard.json',
+//              organization:BACKEND_SERVER + '/orgWithMetrics',
+              dashboard:ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',
 
