@@ -37,8 +37,6 @@ public class GriffinWebApplication implements CommandLineRunner{
     @Autowired
     DataConnectorRepo connectorRepo;
 
-
-
     public void run(String... strings) throws Exception {
         HashMap<String,String> configMap1=new HashMap<>();
         configMap1.put("database","default");
@@ -62,7 +60,7 @@ public class GriffinWebApplication implements CommandLineRunner{
         DataConnector source2 = new DataConnector(ConnectorType.HIVE, "1.2", configJson1);
         DataConnector target2 = new DataConnector(ConnectorType.HIVE, "1.2", configJson2);
         EvaluateRule eRule2 = new EvaluateRule(1,rules);
-        Measure measure2 = new Measure("search_houly","test description", Measure.MearuseType.accuracy, "bullyeye", source2, target2, eRule2,"test1");
+        Measure measure2 = new Measure("search_hourly","test description", Measure.MearuseType.accuracy, "bullyeye", source2, target2, eRule2,"test1");
         measureRepo.save(measure2);
 
         DataConnector source3 = new DataConnector(ConnectorType.HIVE, "1.2", configJson1);

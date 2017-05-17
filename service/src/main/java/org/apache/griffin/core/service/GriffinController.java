@@ -1,8 +1,8 @@
 package org.apache.griffin.core.service;
 
 
+import org.apache.griffin.core.measure.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.util.OrgWithMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 @RestController
@@ -35,18 +34,46 @@ public class GriffinController {
     public List<String> getMetricNameListByOrg(@PathVariable("org") String org){
         return measureRepo.findNameByOrganization(org);
     }
+
     @RequestMapping("/orgWithMetrics")
-    public List<OrgWithMetrics> getOrgsWithMetrics(){
-        List<OrgWithMetrics> orgWithMetricsList=new ArrayList<OrgWithMetrics>();
+    public Map<String,List<String>> getOrgsWithMetrics(){
+        Map<String,List<String>> orgWithMetricsMap=new HashMap<>();
         List<String> orgList=measureRepo.findOrganizations();
         for (String org:orgList){
-            OrgWithMetrics orgWithMetrics=new OrgWithMetrics();
-            orgWithMetrics.setOrg(org);
-            orgWithMetrics.setMeasureName(measureRepo.findNameByOrganization(org));
-            orgWithMetricsList.add(orgWithMetrics);
+            if(org!=null){
+                orgWithMetricsMap.put(org,measureRepo.findNameByOrganization(org));
+            }
         }
-        return orgWithMetricsList;
-
+        return orgWithMetricsMap;
     }
+
+    @RequestMapping("/dataAssetsWithMetrics")
+    public Map<String,List<String>> getDataAssetsWithMetrics(){
+        Map<String,List<String>> daWithMetricsMap=new HashMap<>();
+        Iterable<Measure> measureList=measureRepo.findAll();
+        for (Measure m:measureList){
+            switch (m.getType()){
+                case accuracy:
+                    String[] tableNames={m.getSource().getConfig().get("table.name"),m.getTarget().getConfig().get("table.name")};
+                    for (String taName:tableNames){
+                        if(taName!=null) {
+                            if(daWithMetricsMap.get(taName)==null){
+                                daWithMetricsMap.put(taName, new ArrayList<>(Arrays.asList(m.getName())));
+                            }else{
+                                List<String> measureNameList=daWithMetricsMap.get(taName);
+                                measureNameList.add(m.getName());
+                                daWithMetricsMap.put(taName, measureNameList);
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    log.info("invalid measure type!");
+            }
+
+        }
+        return daWithMetricsMap;
+    }
+
 }
 
