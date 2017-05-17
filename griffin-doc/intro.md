@@ -4,7 +4,7 @@ Apache Griffin is a Data Quality Service platform built on Apache Hadoop and Apa
 
 
 ## Overview of Apache Griffin  
-At eBay, when people use big data (Hadoop or other streaming systems), measurement of data quality is a big challenge. Different teams have built customized tools to detect and analyze data quality issues within their own domains. As a platform organization, we think of taking a platform approach to commonly occurring patterns. As such, we are building a platform to provide shared Infrastructure and generic features to solve common data quality pain points. This would enable us to build trusted data assets.
+When people use big data (Hadoop or other streaming systems), measurement of data quality is a big challenge. Different teams have built customized tools to detect and analyze data quality issues within their own domains. As a platform organization, we think of taking a platform approach to commonly occurring patterns. As such, we are building a platform to provide shared Infrastructure and generic features to solve common data quality pain points. This would enable us to build trusted data assets.
 
 Currently it is very difficult and costly to do data quality validation when we have large volumes of related data flowing across multi-platforms (streaming and batch). Take eBay's Real-time Personalization Platform as a sample; Everyday we have to validate the data quality for ~600M records. Data quality often becomes one big challenge in this complex environment and massive scale.
 
@@ -43,15 +43,22 @@ For near real time analysis, we consume data from messaging system, then our dat
 
 **Apache Griffin Service**:
 
-We have RESTful web services to accomplish all the functionalities of Apache Griffin, such as register data-set, create data quality model, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web serivces.
+We have RESTful web services to accomplish all the functionalities of Apache Griffin, such as exploring data-sets, create data quality measures, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web serivces.
 
 ## Main business process
-Here's the business process diagram
 
 ![Business_Process_image](img/Business_Process.png)
 
+## Main architecture diagram
+
+![Business_Process_image](img/arch.png)
+
+## Main tech stack diagram
+
+![Business_Process_image](img/techstack.png)
+
 ## Rationale
-The challenge we face at eBay is that our data volume is becoming bigger and bigger, systems process become more complex, while we do not have a unified data quality solution to ensure the trusted data sets which provide confidences on data quality to our data consumers.  The key challenges on data quality includes:
+The challenge we face at big data ecosystem is that our data volume is becoming bigger and bigger, systems process become more complex, while we do not have a unified data quality solution to ensure the trusted data sets which provide confidences on data quality to our data consumers.  The key challenges on data quality includes:
 
 1. Existing commercial data quality solution cannot address data quality lineage among systems, cannot scale out to support fast growing data at eBay
 2. Existing eBay's domain specific tools take a long time to identify and fix poor data quality when data flowed through multiple systems
