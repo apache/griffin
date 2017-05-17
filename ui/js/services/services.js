@@ -20,9 +20,18 @@ define(['./module'], function (services) {
     services.factory('$config', function(){
 
 
+//    var BACKEND_SERVER = '';
+      var BACKEND_SERVER = 'http://localhost:8080';
+    //   var BACKEND_SERVER = 'http://localhost:8080'; //dev env
+
+
+//    var BACKEND_SERVER = 'http://10.249.74.51';
+
+
 //    var BACKEND_SERVER = 'http://10.149.247.156:38080';
 //      var BACKEND_SERVER = 'http://localhost:8080';
-      var BACKEND_SERVER = '';
+//      var BACKEND_SERVER = '';
+
       var API_ROOT_PATH = '/api/v1';
       var ES_SERVER = 'http://10.149.247.156:39200';
 
@@ -51,6 +60,8 @@ define(['./module'], function (services) {
               heatmap: BACKEND_SERVER + API_ROOT_PATH + '/metrics/heatmap' ,
               metricdetail: BACKEND_SERVER + API_ROOT_PATH + '/metrics/complete',
               rulemetric: BACKEND_SERVER + API_ROOT_PATH + '/metrics/brief',
+//              dashboard: BACKEND_SERVER + API_ROOT_PATH + '/metrics/dashboard' ,
+              organization:'http://10.249.75.109:8080/org',
 //              organization:BACKEND_SERVER+'/org',
               orgmap: BACKEND_SERVER+'/metrics/org',
 

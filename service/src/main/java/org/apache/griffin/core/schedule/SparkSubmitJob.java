@@ -74,6 +74,10 @@ public class SparkSubmitJob implements Job {
         JobDetail jd = context.getJobDetail();
         String measureName = jd.getJobDataMap().getString("measure");
         measure = measureRepo.findByName(measureName);
+        if (measure==null) {
+            logger.info(measureName + " is not find!");
+            return;
+        }
         sourcePattern = jd.getJobDataMap().getString("sourcePat");
         targetPattern = jd.getJobDataMap().getString("targetPat");
         dataStartTimestamp = jd.getJobDataMap().getString("dataStartTimestamp");
@@ -191,7 +195,7 @@ public class SparkSubmitJob implements Job {
         sparkJobDO.setJars(jars);
 
         List<String> files = new ArrayList<>();
-        files.add(props.getProperty("sparkJob.files_1"));
+//        files.add(props.getProperty("sparkJob.files_1"));
         sparkJobDO.setFiles(files);
     }
 
