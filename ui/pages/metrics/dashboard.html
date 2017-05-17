@@ -18,9 +18,9 @@
 			<div class="form-group">
 	      	<span>
 	            <label>Organization: </label>
-	            <select ng-disabled="orgSelectDisabled" class="form-control" style="padding: 4px 6px;height: 30px;width: 230px;background-color: #d1d3d2;display: inline-block;margin-left: 10px;" ng-model="selectedOrgIndex" ng-change="changeOrg(selectedOrgIndex)">
+	            <select ng-disabled="orgSelectDisabled" class="form-control" style="padding: 4px 6px;height: 30px;width: 230px;background-color: #d1d3d2;display: inline-block;margin-left: 10px;" ng-model="selectedOrgIndex" ng-change="changeOrg()">
                    <option value="">-- All --</option>
-                   <option ng-repeat="opt in orgs" value="{{$index}}" ng-selected="selectedOrgIndex==$index">{{opt.name}}</option>
+                   <option ng-repeat="opt in originalOrgs" value="{{$index}}" ng-selected="selectedOrgIndex==$index">{{opt.name}}</option>
 	            </select>
 	      	</span>
 				<span style="padding-left:30px;">
@@ -32,16 +32,18 @@
 	      	</span>
 			</div>
 		</div>
-		<div ng-repeat="opt in orgs" value="{{$index}}">
+		<div ng-repeat="outerItems in finalData">
 			<div class="row" >
 				<div class="col-sm-12 col-md-12 col-lg-12">
-					<h4>{{opt.name}}</h4>
+					<h4>{{outerItems.name}}</h4>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-6 col-md-4 col-xs-12 col-lg-3 chartItem" style="margin-bottom:30px;" ng-repeat="outerItems in dataData " >
+
+				<div class="col-sm-6 col-md-4 col-xs-12 col-lg-3 chartItem"  ng-repeat="items in outerItems.metrics" style="margin-bottom:30px;">
+
 					<div class="row-fluid" style="cursor: pointer;">
-						<div id={{'thumbnail'+$index}}  ng-click="showBig(outerItems)"  class="thumb-chart" style="border: 2px solid;"></div>
+						<div id={{'thumbnail'+$parent.$index+'-'+$index}} ng-click="showBig(items)" class="thumb-chart" style="border: 2px solid;"></div>
 						<p class="text-right">
 							<a href ng-click="getSample(items)" style="font-size: 11px;">
 								<u>Download&nbsp;Sample</u>
@@ -50,6 +52,8 @@
 					</div>
 				</div>
 			</div>
+
 		</div>
 	</div>
+
 </div>
