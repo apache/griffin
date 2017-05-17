@@ -4,6 +4,8 @@ import org.apache.griffin.measure.batch.log.Loggable
 import org.apache.griffin.measure.batch.result._
 import org.apache.spark.rdd.RDD
 
+import scala.util.Try
+
 
 trait Persist extends Loggable with Serializable {
   val timeStamp: Long

@@ -6,6 +6,8 @@ import org.apache.griffin.measure.batch.result._
 import org.apache.griffin.measure.batch.utils.HdfsUtil
 import org.apache.spark.rdd.RDD
 
+import scala.util.Try
+
 
 case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
@@ -61,48 +63,64 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
   def start(msg: String): Unit = {
-    HdfsUtil.writeContent(StartFile, msg)
+    try {
+      HdfsUtil.writeContent(StartFile, msg)
+    } catch {
+      case e => error(e.getMessage)
+    }
   }
   def finish(): Unit = {
-    HdfsUtil.createEmptyFile(FinishFile)
+    try {
+      HdfsUtil.createEmptyFile(FinishFile)
+    } catch {
+      case e => error(e.getMessage)
+    }
   }
 
   def result(rt: Long, result: Result): Unit = {
-    val resStr = result match {
-      case ar: AccuracyResult => {
-        s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
+    try {
+      val resStr = result match {
+        case ar: AccuracyResult => {
+          s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
+        }
+        case _ => {
+          s"result: ${result}"
+        }
       }
-      case _ => {
-        s"result: ${result}"
-      }
-    }
-    HdfsUtil.writeContent(ResultFile, timeHead(rt) + resStr)
-    log(rt, resStr)
+      HdfsUtil.writeContent(ResultFile, timeHead(rt) + resStr)
+      log(rt, resStr)
 
-    info(resStr)
+      info(resStr)
+    } catch {
+      case e => error(e.getMessage)
+    }
   }
 
   // need to avoid string too long
   def missRecords(records: RDD[String]): Unit = {
-    val recordCount = records.count
-    val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
-    if (count > 0) {
-      val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
-      if (groupCount <= 1) {
-        val recs = records.take(count.toInt)
-        persistRecords(MissRecFile, recs)
-      } else {
-        val groupedRecords: RDD[(Long, Iterable[String])] =
-          records.zipWithIndex.flatMap { r =>
-            val gid = r._2 / maxLinesPerFile
-            if (gid < groupCount) Some((gid, r._1)) else None
-          }.groupByKey()
-        groupedRecords.foreach { group =>
-          val (gid, recs) = group
-          val hdfsPath = if (gid == 0) MissRecFile else withSuffix(MissRecFile, gid.toString)
-          persistRecords(hdfsPath, recs)
+    try {
+      val recordCount = records.count
+      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+      if (count > 0) {
+        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
+        if (groupCount <= 1) {
+          val recs = records.take(count.toInt)
+          persistRecords(MissRecFile, recs)
+        } else {
+          val groupedRecords: RDD[(Long, Iterable[String])] =
+            records.zipWithIndex.flatMap { r =>
+              val gid = r._2 / maxLinesPerFile
+              if (gid < groupCount) Some((gid, r._1)) else None
+            }.groupByKey()
+          groupedRecords.foreach { group =>
+            val (gid, recs) = group
+            val hdfsPath = if (gid == 0) MissRecFile else withSuffix(MissRecFile, gid.toString)
+            persistRecords(hdfsPath, recs)
+          }
         }
       }
+    } catch {
+      case e => error(e.getMessage)
     }
   }
 
@@ -112,8 +130,12 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
   def log(rt: Long, msg: String): Unit = {
-    val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n\n"
-    HdfsUtil.appendContent(LogFile, logStr)
+    try {
+      val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n\n"
+      HdfsUtil.appendContent(LogFile, logStr)
+    } catch {
+      case e => error(e.getMessage)
+    }
   }
 
 }
