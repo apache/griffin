@@ -1,0 +1,20 @@
+{
+  "name": "angular-cookies",
+  "version": "1.6.4",
+  "license": "MIT",
+  "main": "./angular-cookies.js",
+  "ignore": [],
+  "dependencies": {
+    "angular": "1.6.4"
+  },
+  "homepage": "https://github.com/angular/bower-angular-cookies",
+  "_release": "1.6.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.6.4",
+    "commit": "62006f295af81a066be66f98408d0e5fcfb645ce"
+  },
+  "_source": "https://github.com/angular/bower-angular-cookies.git",
+  "_target": "1.6.4",
+  "_originalSource": "angular-cookies"
+}
