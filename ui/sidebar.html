@@ -24,12 +24,12 @@
 
                 <div class="sidebar-stat-center">
                     <img src="/img/sidebar1.png" >
-                    <span><a class="bark-link" href="#/dataassets">&nbsp;Data Assets</a></span>
+                    <span><a class="bark-link" href="#/dataassets">{{datasets}}&nbsp;Data Assets</a></span>
                 </div>
 
                 <div class="sidebar-stat-center">
                     <img src="/img/sidebar2.png">
-                    <span><a class="bark-link" href="#/metrics">&nbsp;DQ Metrics</a></span>
+                    <span><a class="bark-link" href="#/metrics">{{metrics}}&nbsp;DQ Metrics</a></span>
                 </div>
 
             </div>
@@ -43,7 +43,7 @@
 
 
     <div id="side-bar-metrics" class="row" style="margin-top:20px;overflow-y:auto;overflow-x:hidden;margin-left:0;margin-right:0;height:1px;">
-        <div ng-repeat="outerItems in briefmetrics">
+        <div ng-repeat="outerItems in finalData">
             <div class="well" style="padding:0px;background:transparent;border:0px;position:relative; ">
                 <!-- <img class="bullseye" src="/img/bullseye.png" title="image1" > -->
                 <div class="col-sm-4 col-lg-4 col-md-4 "><h4 ><a href="#/metrics/{{outerItems.name}}"> {{outerItems.name}}</a></h4></div>

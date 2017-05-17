@@ -56,6 +56,10 @@ public class GriffinWebApplication implements CommandLineRunner{
 
         EvaluateRule eRule = new EvaluateRule(1,rules);
 
+<<<<<<< HEAD
+//            Measure measure = new Measure("accu1","accu1 description", Measure.MearuseType.accuracy, "bullyeye", source, target, eRule,"test1");
+//            measureRepo.save(measure);
+=======
         Measure measure = new Measure("bevssoj","bevssoj description", Measure.MearuseType.accuracy, "bullyeye", source, target, eRule,"test1");
         measureRepo.save(measure);
 
@@ -70,6 +74,7 @@ public class GriffinWebApplication implements CommandLineRunner{
         EvaluateRule eRule3 = new EvaluateRule(1,rules);
         Measure measure3 = new Measure("just_inthere","test_just_inthere description", Measure.MearuseType.accuracy, "hadoop", source3, target3, eRule3,"test1");
         measureRepo.save(measure3);
+>>>>>>> b5fce52475bf275d6ff3fd97a1e0eee7b4a4d3fc
     }
 
     @Bean

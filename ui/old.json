@@ -1,0 +1,4536 @@
+[
+  {
+    name: "Bullseye",
+    dq: 0,
+    metrics: [
+      {
+        name: "test_accuracy_2",
+        dq: 99.123,
+        dqfail: 0,
+        timestamp: 1469494000000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1469494000000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467439200000,
+            value: 99.103,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467435600000,
+            value: 98.895,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467432000000,
+            value: 98.931,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467428400000,
+            value: 98.98,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467424800000,
+            value: 98.989,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467421200000,
+            value: 99.028,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467417600000,
+            value: 99.076,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467414000000,
+            value: 99.173,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467410400000,
+            value: 99.371,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467406800000,
+            value: 99.416,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467403200000,
+            value: 99.34,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467399600000,
+            value: 99.272,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467396000000,
+            value: 99.242,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467392400000,
+            value: 99.202,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467388800000,
+            value: 99.17,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467385200000,
+            value: 99.187,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467381600000,
+            value: 99.203,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467378000000,
+            value: 99.155,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467374400000,
+            value: 99.163,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467370800000,
+            value: 99.099,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467367200000,
+            value: 99.061,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467363600000,
+            value: 99.107,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467360000000,
+            value: 99.213,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "TotalCount_asset1",
+        dq: 5056215,
+        dqfail: 0,
+        timestamp: 1467439200000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1467439200000,
+            value: 5056215,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467435600000,
+            value: 6437413,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467432000000,
+            value: 6657130,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467428400000,
+            value: 7266645,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467424800000,
+            value: 7833544,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467421200000,
+            value: 7885072,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467417600000,
+            value: 8004150,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467414000000,
+            value: 9063605,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467410400000,
+            value: 11188490,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467406800000,
+            value: 13427397,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467403200000,
+            value: 14251196,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467399600000,
+            value: 14372429,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467396000000,
+            value: 13455800,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467392400000,
+            value: 12370392,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467388800000,
+            value: 11791789,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467385200000,
+            value: 11449207,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467381600000,
+            value: 10809003,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467378000000,
+            value: 10335987,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467374400000,
+            value: 9847269,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467370800000,
+            value: 9121418,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467367200000,
+            value: 8367134,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467363600000,
+            value: 7765755,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467360000000,
+            value: 7100276,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467356400000,
+            value: 5243035,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "TotalCount_asset2",
+        dq: 12297030,
+        dqfail: 0,
+        timestamp: 1467356400000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1467356400000,
+            value: 12297030,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467270000000,
+            value: 46597864,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467183600000,
+            value: 12579047,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467097200000,
+            value: 36170520,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467010800000,
+            value: 70259528,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466924400000,
+            value: 11254925,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466838000000,
+            value: 11453518,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466751600000,
+            value: 11727027,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466665200000,
+            value: 12394837,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466578800000,
+            value: 12848200,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466492400000,
+            value: 21483476,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466406000000,
+            value: 26826696,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466233200000,
+            value: 16013923,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466146800000,
+            value: 12088567,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466060400000,
+            value: 12295672,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465974000000,
+            value: 46614216,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465887600000,
+            value: 12721729,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465714800000,
+            value: 41937744,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465628400000,
+            value: 11526935,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465542000000,
+            value: 12245913,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465455600000,
+            value: 12215787,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465369200000,
+            value: 12919600,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465282800000,
+            value: 12690849,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465110000000,
+            value: 22765728,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "test_accuracy_1",
+        dq: 98.951,
+        dqfail: 1,
+        timestamp: 1467449200000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1467449200000,
+            value: 98.951,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467439200000,
+            value: 98.952,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467435600000,
+            value: 98.179,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467432000000,
+            value: 99.022,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467428400000,
+            value: 99.016,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467424800000,
+            value: 98.895,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467421200000,
+            value: 99.068,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467417600000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467414000000,
+            value: 99.296,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467410400000,
+            value: 98.905,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467406800000,
+            value: 98.201,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467403200000,
+            value: 98.52,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467399600000,
+            value: 98.557,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467396000000,
+            value: 98.64,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467392400000,
+            value: 98.77,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467388800000,
+            value: 98.825,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467385200000,
+            value: 98.656,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467381600000,
+            value: 98.424,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467378000000,
+            value: 98.613,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467374400000,
+            value: 98.685,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467370800000,
+            value: 99.005,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467367200000,
+            value: 98.236,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467363600000,
+            value: 98.39,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467360000000,
+            value: 97.982,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "as-qa-betest",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1482101702393,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1482101702393,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482101616171,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482101529031,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482101100469,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100929678,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100880628,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100814374,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100533169,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100480752,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100358283,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100245304,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100152261,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100093986,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100033672,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099984329,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099638304,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099482860,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099401961,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099282713,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099107869,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099025396,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482098959286,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482098848572,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482098755405,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "as-qa-betest1",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1482101723107,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1482101723107,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482101636879,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482101550236,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482101121287,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100950793,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100901355,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100835557,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100553892,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100502583,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100379490,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100266065,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100172971,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100114693,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100054382,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482100005581,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099659492,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099503562,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099422766,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099303922,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099128618,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482099046124,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482098979982,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482098869754,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1482098776146,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "bepersist_user_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1487967024732,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1487967024732,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487966901778,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487966763966,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487966505767,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487805302140,
+            value: 68,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487805202539,
+            value: 68,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487797241560,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796686942,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796645908,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796447015,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796178283,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796129549,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796058011,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796027451,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487795971882,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487795782695,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487795729665,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487741321093,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487741256467,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487741213306,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487712293615,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487712209945,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487711541019,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487711033695,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "bepersist_dict_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1487966706765,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1487966706765,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487966574013,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796391631,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796234207,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796198847,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796175959,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796127282,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796055727,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487796025173,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487795969570,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487795780413,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487795726934,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487711485816,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487711177741,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708974760,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708928033,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708620091,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708537267,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708488495,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708392951,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708323733,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708277065,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487708176244,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487706046030,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "as_pds2be_vi",
+        dq: 95.454544,
+        dqfail: 0,
+        timestamp: 1486954007862,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1486954007862,
+            value: 95.454544,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1486953937064,
+            value: 95.454544,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "pds_be_search_dq",
+        dq: 0,
+        dqfail: 0,
+        timestamp: 1489704738300,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1489704738300,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489704512601,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489698452765,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489535108798,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533424277,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489532737365,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489193796151,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489190021299,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489185541389,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489185344982,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489181746978,
+            value: 60,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489178469632,
+            value: 60,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489016987978,
+            value: 60,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489015382105,
+            value: 80,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489014926696,
+            value: 60,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489014244751,
+            value: 50,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489013734116,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489013084404,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489010822084,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488932239733,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488842376073,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488841996546,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488836785375,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488836426655,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "pds_be_vi_dq",
+        dq: 11.527377,
+        dqfail: 0,
+        timestamp: 1489704741560,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1489704741560,
+            value: 11.527377,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489704515555,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489698843128,
+            value: 10.714286,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489535109428,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533585792,
+            value: 10,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489532737697,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489193798762,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489190022830,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489189827801,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489185636749,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489178471420,
+            value: 11.25,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489016988121,
+            value: 11.25,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489016192359,
+            value: 9.210526,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489015568817,
+            value: 8.450705,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488835496580,
+            value: 12.941176,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488832111562,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488831676662,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488831304136,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488831161163,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488830983657,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488830980087,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488830975271,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1488830794470,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1486963552816,
+            value: 95.454544,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "pds_be_purchase_dq",
+        dq: 39.130436,
+        dqfail: 0,
+        timestamp: 1489704745024,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1489704745024,
+            value: 39.130436,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489704518456,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489699818013,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489699224974,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489690116287,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489690034734,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489690004112,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489689909764,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489689825652,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489689742517,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489687539888,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489686805146,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489602090951,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489602076976,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489535109675,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489534184786,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489534115557,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533780646,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533779627,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533778510,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533777407,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533776273,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533775186,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489533773954,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "be_pds_search_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1490923150343,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490923150343,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490923087615,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487984314018,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487979173588,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487979111244,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978835267,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978816224,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978745062,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978644063,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487977951925,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487977885672,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "be_pds_vi_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1490923172054,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490923172054,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490923137700,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490923087735,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490923077257,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487984314689,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487979174118,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487979112198,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978835583,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978816597,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978745456,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978644906,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978239966,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487977952159,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487977886330,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "be_pds_purchase_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1490923318889,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490923318889,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490923275682,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490923160100,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487984314948,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487979174431,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487979112577,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978904207,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978904207,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978745812,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487978478662,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487977952362,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1487977886538,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "pds_be_basic_search_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1490995728966,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490995728966,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490922418786,
+            value: 80,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490908074040,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490907923962,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490821335199,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490821316621,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820256091,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820238441,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820232532,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820226468,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820109752,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654754742,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654750533,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654740565,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654729564,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654721148,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489532562842,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "pds_be_basic_vi_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1490995729526,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490995729526,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490922419365,
+            value: 80,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490908074201,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490907924616,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490821335289,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490821317152,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820256191,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820238544,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820232620,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820226602,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820110345,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654754842,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654750640,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654740703,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654638440,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489532563599,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "pds_be_basic_puchase_dq",
+        dq: 80,
+        dqfail: 0,
+        timestamp: 1490922419464,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490922419464,
+            value: 80,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490908074343,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490907924768,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490821335381,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490821317237,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820256286,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820238634,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820232723,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820226737,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490820110612,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490655000025,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654750745,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490654740805,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1489532563884,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "be_pds_basic_search_dq",
+        dq: 90,
+        dqfail: 0,
+        timestamp: 1490922491578,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490922491578,
+            value: 90,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "be_pds_basic_vi_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1490923036902,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490923036902,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1490922808647,
+            value: 90,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "be_pds_basic_purchase_dq",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1490922916703,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1490922916703,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "test_accuracy_3",
+        dq: 99.123,
+        dqfail: 0,
+        timestamp: 1470294000000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1470294000000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470194000000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469994000000,
+            value: 98.951,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469894000000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469594000000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469494000000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "test_accuracy_5",
+        dq: 99.122,
+        dqfail: 0,
+        timestamp: 1470394000000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1470394000000,
+            value: 99.122,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470294000000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470194000000,
+            value: 99.123,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "aw",
+        dq: 5056215,
+        dqfail: 0,
+        timestamp: 1467439200000,
+        metricType: "Bollinger",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1467439200000,
+            value: 5056215,
+            bolling: {
+              upper: 13791890,
+              lower: 4637676,
+              mean: 9214783
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467435600000,
+            value: 6437413,
+            bolling: {
+              upper: 13784834,
+              lower: 4819394,
+              mean: 9302114
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467432000000,
+            value: 6657130,
+            bolling: {
+              upper: 13896162,
+              lower: 5018983,
+              mean: 9457573
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467428400000,
+            value: 7266645,
+            bolling: {
+              upper: 14326270,
+              lower: 5054647,
+              mean: 9690459
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467424800000,
+            value: 7833544,
+            bolling: {
+              upper: 15063168,
+              lower: 4895109,
+              mean: 9979139
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467421200000,
+            value: 7885072,
+            bolling: {
+              upper: 15665854,
+              lower: 4845082,
+              mean: 10255468
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467417600000,
+            value: 8004150,
+            bolling: {
+              upper: 16036012,
+              lower: 4930936,
+              mean: 10483474
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467414000000,
+            value: 9063605,
+            bolling: {
+              upper: 16218947,
+              lower: 5022663,
+              mean: 10620805
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467410400000,
+            value: 11188490,
+            bolling: {
+              upper: 16262516,
+              lower: 5034883,
+              mean: 10648700
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467406800000,
+            value: 13427397,
+            bolling: {
+              upper: 16125488,
+              lower: 5038308,
+              mean: 10581898
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467403200000,
+            value: 14251196,
+            bolling: {
+              upper: 15871496,
+              lower: 5057600,
+              mean: 10464548
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467399600000,
+            value: 14372429,
+            bolling: {
+              upper: 15577064,
+              lower: 5083467,
+              mean: 10330266
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467396000000,
+            value: 13455800,
+            bolling: {
+              upper: 15354815,
+              lower: 5069363,
+              mean: 10212089
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467392400000,
+            value: 12370392,
+            bolling: {
+              upper: 15210048,
+              lower: 5014326,
+              mean: 10112187
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467388800000,
+            value: 11791789,
+            bolling: {
+              upper: 15094774,
+              lower: 4922665,
+              mean: 10008720
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467385200000,
+            value: 11449207,
+            bolling: {
+              upper: 14996324,
+              lower: 4791662,
+              mean: 9893993
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467381600000,
+            value: 10809003,
+            bolling: {
+              upper: 14938048,
+              lower: 4612467,
+              mean: 9775258
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467378000000,
+            value: 10335987,
+            bolling: {
+              upper: 14962031,
+              lower: 4255095,
+              mean: 9608563
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467374400000,
+            value: 9847269,
+            bolling: {
+              upper: 14991406,
+              lower: 3916880,
+              mean: 9454143
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467370800000,
+            value: 9121418,
+            bolling: {
+              upper: 15029185,
+              lower: 3616743,
+              mean: 9322964
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467367200000,
+            value: 8367134,
+            bolling: {
+              upper: 15060310,
+              lower: 3392602,
+              mean: 9226456
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467363600000,
+            value: 7765755,
+            bolling: {
+              upper: 15074700,
+              lower: 3265836,
+              mean: 9170268
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467360000000,
+            value: 7100276,
+            bolling: {
+              upper: 15078302,
+              lower: 3233308,
+              mean: 9155805
+            },
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467356400000,
+            value: 5243035,
+            bolling: {
+              upper: 15041397,
+              lower: 3365341,
+              mean: 9203369
+            },
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "ano_history",
+        dq: 5056215,
+        dqfail: 0,
+        timestamp: 1467439200000,
+        metricType: "Trend",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1467439200000,
+            value: 5056215,
+            bolling: null,
+            comparisionValue: 9063605,
+            mad: null
+          },
+          {
+            timestamp: 1467435600000,
+            value: 6437413,
+            bolling: null,
+            comparisionValue: 11188490,
+            mad: null
+          },
+          {
+            timestamp: 1467432000000,
+            value: 6657130,
+            bolling: null,
+            comparisionValue: 13427397,
+            mad: null
+          },
+          {
+            timestamp: 1467428400000,
+            value: 7266645,
+            bolling: null,
+            comparisionValue: 14251196,
+            mad: null
+          },
+          {
+            timestamp: 1467424800000,
+            value: 7833544,
+            bolling: null,
+            comparisionValue: 14372429,
+            mad: null
+          },
+          {
+            timestamp: 1467421200000,
+            value: 7885072,
+            bolling: null,
+            comparisionValue: 13455800,
+            mad: null
+          },
+          {
+            timestamp: 1467417600000,
+            value: 8004150,
+            bolling: null,
+            comparisionValue: 12370392,
+            mad: null
+          },
+          {
+            timestamp: 1467414000000,
+            value: 9063605,
+            bolling: null,
+            comparisionValue: 11791789,
+            mad: null
+          },
+          {
+            timestamp: 1467410400000,
+            value: 11188490,
+            bolling: null,
+            comparisionValue: 11449207,
+            mad: null
+          },
+          {
+            timestamp: 1467406800000,
+            value: 13427397,
+            bolling: null,
+            comparisionValue: 10809003,
+            mad: null
+          },
+          {
+            timestamp: 1467403200000,
+            value: 14251196,
+            bolling: null,
+            comparisionValue: 10335987,
+            mad: null
+          },
+          {
+            timestamp: 1467399600000,
+            value: 14372429,
+            bolling: null,
+            comparisionValue: 9847269,
+            mad: null
+          },
+          {
+            timestamp: 1467396000000,
+            value: 13455800,
+            bolling: null,
+            comparisionValue: 9121418,
+            mad: null
+          },
+          {
+            timestamp: 1467392400000,
+            value: 12370392,
+            bolling: null,
+            comparisionValue: 8367134,
+            mad: null
+          },
+          {
+            timestamp: 1467388800000,
+            value: 11791789,
+            bolling: null,
+            comparisionValue: 7765755,
+            mad: null
+          },
+          {
+            timestamp: 1467385200000,
+            value: 11449207,
+            bolling: null,
+            comparisionValue: 7100276,
+            mad: null
+          },
+          {
+            timestamp: 1467381600000,
+            value: 10809003,
+            bolling: null,
+            comparisionValue: 5243035,
+            mad: null
+          },
+          {
+            timestamp: 1467378000000,
+            value: 10335987,
+            bolling: null,
+            comparisionValue: 5110670,
+            mad: null
+          },
+          {
+            timestamp: 1467374400000,
+            value: 9847269,
+            bolling: null,
+            comparisionValue: 6828642,
+            mad: null
+          },
+          {
+            timestamp: 1467370800000,
+            value: 9121418,
+            bolling: null,
+            comparisionValue: 7153604,
+            mad: null
+          },
+          {
+            timestamp: 1467367200000,
+            value: 8367134,
+            bolling: null,
+            comparisionValue: 7840681,
+            mad: null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: "Hadoop",
+    dq: 0,
+    metrics: [
+      {
+        name: "hadoop_accuracy_1",
+        dq: 99.053,
+        dqfail: 0,
+        timestamp: 1467356400000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1467356400000,
+            value: 99.053,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467270000000,
+            value: 99.042,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467183600000,
+            value: 99.092,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467097200000,
+            value: 99.758,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467010800000,
+            value: 99.723,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466924400000,
+            value: 99.767,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466838000000,
+            value: 98.444,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466751600000,
+            value: 99.632,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466665200000,
+            value: 98.275,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466578800000,
+            value: 99.111,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466492400000,
+            value: 98.999,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466406000000,
+            value: 99.189,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466319600000,
+            value: 99.865,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466233200000,
+            value: 98.763,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466146800000,
+            value: 98.719,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1466060400000,
+            value: 99.11,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465974000000,
+            value: 99.277,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465887600000,
+            value: 99.323,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465801200000,
+            value: 99.758,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465714800000,
+            value: 99.286,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465628400000,
+            value: 98.987,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465542000000,
+            value: 99.703,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465455600000,
+            value: 99.208,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465369200000,
+            value: 99.752,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "movie_acc",
+        dq: 97,
+        dqfail: 0,
+        timestamp: 1470009600000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1470009600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470002400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469998800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469991600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469984400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469980800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469973600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469970000000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469962800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469955600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469948400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469944800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469941200000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469934000000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469930400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469919600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469912400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469869200000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469862000000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469854800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469847600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469844000000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469833200000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469829600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "movie_acc_test2",
+        dq: 97,
+        dqfail: 0,
+        timestamp: 1470009600000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1470009600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470002400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469998800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469991600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469984400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469980800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469973600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469970000000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469962800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469955600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469948400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469944800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469941200000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469934000000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469930400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469919600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469912400000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469869200000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469862000000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469854800000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469847600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469844000000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469833200000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469829600000,
+            value: 97,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "test_movie_publish",
+        dq: 95.8,
+        dqfail: 1,
+        timestamp: 1466006897925,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1466006897925,
+            value: 95.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1465006897925,
+            value: 94.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1464006897925,
+            value: 92.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1463996897925,
+            value: 99.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1463996896925,
+            value: 99.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1463995896925,
+            value: 99.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1463994896925,
+            value: 99.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1463994796925,
+            value: 99.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1463994766925,
+            value: 99.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: "unknown",
+    dq: 0,
+    metrics: [
+      {
+        name: "test1001",
+        dq: 1638.6,
+        dqfail: 0,
+        timestamp: 1470387312289,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1470387312289,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470385941849,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470361409942,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470199553140,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470191003565,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470124800701,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470104303318,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470104180421,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470100618243,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470099994751,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470041484755,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470035989582,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470028871378,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470019588224,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470012688854,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469761294945,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469761275402,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469761132542,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469760693465,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469759841200,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469759729921,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469759194248,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469759172173,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469758999063,
+            value: 1638.6,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "mean",
+        dq: 2356.4,
+        dqfail: 0,
+        timestamp: 1472723699303,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1472723699303,
+            value: 2356.4,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1471256871630,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1471243618213,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1471243509495,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470893305354,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470840309391,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470839911376,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470839782454,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470838097665,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470837962944,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470831679682,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470831530178,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470738888469,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470738445391,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470738325686,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470732461346,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470387389994,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470386349348,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470361458653,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470199587633,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470191055715,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470124847788,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470104305546,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1470104182800,
+            value: 4835.3,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "test_publish",
+        dq: 99.8,
+        dqfail: 0,
+        timestamp: 1463994766925,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1463994766925,
+            value: 99.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "v",
+        dq: 99.8,
+        dqfail: 0,
+        timestamp: 1463994766925,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1463994766925,
+            value: 99.8,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "TotalCount_p13nquality.dmg_target",
+        dq: 11294432,
+        dqfail: 0,
+        timestamp: 1469948400000,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1469948400000,
+            value: 11294432,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469862000000,
+            value: 1505414,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469775600000,
+            value: 1699624,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469689200000,
+            value: 1551895,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469602800000,
+            value: 1657599,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469516400000,
+            value: 1653445,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469430000000,
+            value: 1506860,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469343600000,
+            value: 10051637,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469257200000,
+            value: 1476875,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469170800000,
+            value: 1694004,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1469084400000,
+            value: 1564524,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468998000000,
+            value: 1665597,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468911600000,
+            value: 1649144,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468825200000,
+            value: 1505494,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468738800000,
+            value: 42200368,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468652400000,
+            value: 471517,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468566000000,
+            value: 481181,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468479600000,
+            value: 1577835,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468393200000,
+            value: 1670640,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468306800000,
+            value: 1660122,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468220400000,
+            value: 1795038,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468134000000,
+            value: 20359676,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1468047600000,
+            value: 1473026,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1467961200000,
+            value: 1675778,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "as-dict-test",
+        dq: 29.9,
+        dqfail: 0,
+        timestamp: 1463373496583,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1463373496583,
+            value: 29.9,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      },
+      {
+        name: "as-qa-betestuser",
+        dq: 100,
+        dqfail: 0,
+        timestamp: 1481149843010,
+        metricType: "",
+        assetName: null,
+        details: [
+          {
+            timestamp: 1481149843010,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481149397644,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481148749000,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481148688643,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481072954442,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481072911870,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481067942219,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481066490412,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481065926336,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1481065907869,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1480981283030,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1480981227086,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1480981159894,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1480981143996,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1480977294325,
+            value: 100,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          },
+          {
+            timestamp: 1480976971146,
+            value: 0,
+            bolling: null,
+            comparisionValue: 0,
+            mad: null
+          }
+        ]
+      }
+    ]
+  }
+]

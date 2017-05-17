@@ -46,10 +46,10 @@ define(['./module'], function (controllers) {
 
       function retrieveNotifications(){
         var notificationUrl = $config.uri.getnotifications;
-        $http.get(notificationUrl).success(function(data) {
-          // $scope.allNotifications = data.slice(0, 15);
-          $scope.notifications = data.slice(0, 3);
-        });
+//        $http.get(notificationUrl).success(function(data) {
+//          // $scope.allNotifications = data.slice(0, 15);
+//          $scope.notifications = data.slice(0, 3);
+//        });
       }
 
     }]);

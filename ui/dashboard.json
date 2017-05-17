@@ -1,0 +1,255 @@
+{
+  "took": 103,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 4,
+    "failed": 0
+  },
+  "hits": {
+    "total": 934,
+    "max_score": 1,
+    "hits": [
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6F4e9gnRYXmkUy6",
+        "_score": 1,
+        "_source": {
+          "name": "search_hourly",
+          "tmst": 1493984223461,
+          "total": 1056905,
+          "matched": 1048087
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6H2e9gnRYXmkUzC",
+        "_score": 1,
+        "_source": {
+          "name": "search_hourly",
+          "tmst": 1494013023461,
+          "total": 1063349,
+          "matched": 1055783
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6IZe9gnRYXmkUzF",
+        "_score": 1,
+        "_source": {
+          "name": "search_hourly",
+          "tmst": 1493951823461,
+          "total": 23224,
+          "matched": 23028
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6JNe9gnRYXmkUzJ",
+        "_score": 1,
+        "_source": {
+          "name": "search_hourly",
+          "tmst": 1493966223461,
+          "total": 22713,
+          "matched": 22623
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6Jne9gnRYXmkUzL",
+        "_score": 1,
+        "_source": {
+          "name": "search_hourly",
+          "tmst": 1493973423461,
+          "total": 22017,
+          "matched": 21818
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6J8e9gnRYXmkUzN",
+        "_score": 1,
+        "_source": {
+          "name": "search_hourly",
+          "tmst": 1493980623461,
+          "total": 25149,
+          "matched": 25033
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6LIe9gnRYXmkUzU",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1494005823461,
+          "total": 23782,
+          "matched": 23551
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6L9e9gnRYXmkUzY",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1494020223461,
+          "total": 22951,
+          "matched": 22934
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X54de9gnRYXmkUye",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1493955423461,
+          "total": 9757306,
+          "matched": 9753493
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X56Se9gnRYXmkUyh",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1493966223461,
+          "total": 9360576,
+          "matched": 9288744
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6F4e9gnRYXmkUy6",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1493984223461,
+          "total": 1056905,
+          "matched": 1048087
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6H2e9gnRYXmkUzC",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1494013023461,
+          "total": 1063349,
+          "matched": 1055783
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6IZe9gnRYXmkUzF",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1493951823461,
+          "total": 23224,
+          "matched": 23028
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6JNe9gnRYXmkUzJ",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1493966223461,
+          "total": 22713,
+          "matched": 22623
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6Jne9gnRYXmkUzL",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1493973423461,
+          "total": 22017,
+          "matched": 21818
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6J8e9gnRYXmkUzN",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1493980623461,
+          "total": 25149,
+          "matched": 25033
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6LIe9gnRYXmkUzU",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1494005823461,
+          "total": 23782,
+          "matched": 23551
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X6L9e9gnRYXmkUzY",
+        "_score": 1,
+        "_source": {
+          "name": "buy_hourly",
+          "tmst": 1494020223461,
+          "total": 22951,
+          "matched": 22934
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X54de9gnRYXmkUye",
+        "_score": 1,
+        "_source": {
+          "name": "viewitem_hourly",
+          "tmst": 1493955423461,
+          "total": 9757306,
+          "matched": 9753493
+        }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "AVv6X56Se9gnRYXmkUyh",
+        "_score": 1,
+        "_source": {
+          "name": "viewitem_hourly",
+          "tmst": 1493966223461,
+          "total": 9360576,
+          "matched": 9288744
+        }
+      }
+    ]
+  }
+}

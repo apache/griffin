@@ -1,0 +1,19 @@
+{
+  "name": "Griffin",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "jquery": "2.1.4",
+    "bootswatch": "3.3.6",
+    "font-awesome": "4.7.0",
+    "angular": "1.6.4",
+    "angular-route": "1.6.4",
+    "angular-smart-table": "2.1.7",
+    "angular-cookies": "1.6.4",
+    "AngularJS-Toaster": "1.2.0",
+    "requirejs": "2.1.22",
+    "domReady": "2.0.1",
+    "angular-spinner": "0.8.0",
+    "echarts": "3.2.2"
+  }
+}
