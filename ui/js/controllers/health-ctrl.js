@@ -23,18 +23,82 @@ define(['./module'], function (controllers) {
 
         pageInit();
 
+        $scope.orgs = [];
+        $scope.dataData = [];
+        $scope.finalData = [];
         function pageInit() {
             $scope.$emit('initReq');
 
-            var url = $config.uri.heatmap;
-            $http.get(url).success(function(res) {
-                renderTreeMap(res);
+//            var url = $config.uri.heatmap;
+            var url_dashboard = $config.uri.dashboard ;
+            var url_organization = $config.uri.organization;
+            $http.get(url_organization).success(function(res){
+               var orgNode = null;
+               angular.forEach(res, function(value,key) {
+                    orgNode = new Object();
+                    $scope.orgs.push(orgNode);
+                    orgNode.name = key;
+                    orgNode.assetMap = value;
+               });
+               $scope.originalOrgs = angular.copy($scope.orgs);
+               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
+                    angular.forEach(data.hits.hits, function(sys) {
+                        var chartData = sys._source;
+                        chartData.sort = function(a,b){
+                            return a.tmst - b.tmst;
+                        }
+                    });
+                    $scope.originalData = angular.copy(data);
+
+                    $scope.myData = angular.copy($scope.originalData.hits.hits);
+                    $scope.metricName = [];
+                    for(var i = 0;i<$scope.myData.length;i++){
+                        $scope.metricName.push($scope.myData[i]._source.name);
+                    }
+                    $scope.metricNameUnique = [];
+                    angular.forEach($scope.metricName,function(name){
+                        if($scope.metricNameUnique.indexOf(name) === -1){
+                            $scope.dataData[$scope.metricNameUnique.length] = new Array();
+                            $scope.metricNameUnique.push(name);
+                        }
+                    });
+
+                    for(var i = 0;i<$scope.myData.length;i++){
+                        for(var j = 0 ;j<$scope.metricNameUnique.length;j++){
+                            if($scope.myData[i]._source.name==$scope.metricNameUnique[j]){
+                                $scope.dataData[j].push($scope.myData[i]);
+                            }
+                        }
+                    }
+                    angular.forEach($scope.originalOrgs,function(sys,parentIndex){
+                        var node = null;
+                        node = new Object();
+                        node.name = sys.name;
+                        node.dq = 0;
+                        node.metrics = new Array();
+                        angular.forEach($scope.dataData,function(metric,index){
+                            if(sys.assetMap.indexOf(metric[metric.length-1]._source.name)!= -1){
+                                var metricNode = new Object();
+                                metricNode.name = metric[metric.length-1]._source.name;
+                                metricNode.timestamp = metric[metric.length-1]._source.tmst;
+                                metricNode.dq = metric[metric.length-1]._source.matched/metric[metric.length-1]._source.total*100;
+                                metricNode.details = new Array();
+                                node.metrics.push(metricNode);
+                            }
+                        })
+                        $scope.finalData.push(node);
+                    })
+                    $scope.originalData = angular.copy($scope.finalData);
+                    renderTreeMap($scope.finalData);
+                });
+
             });
+//            $http.get(url).success(function(res) {
+//                renderTreeMap(res);
+//            });
         }
 
         function renderTreeMap(res) {
-
-
                 function parseData(data) {
                     var sysId = 0;
                     var metricId = 0;
@@ -169,9 +233,17 @@ define(['./module'], function (controllers) {
         }
 
         var showBig = function(metricName){
-          var metricDetailUrl = $config.uri.metricdetail + '/' + metricName;
-          $http.get(metricDetailUrl).success(function (data){
-            $rootScope.showBigChart($barkChart.getOptionBig(data));
+          var metricDetailUrl = $config.uri.dashboard;
+          $http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name": metricName }}]}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
+            var metric = new Object();
+            metric.name = data.hits.hits[0]._source.name;
+            metric.timestamp = data.hits.hits[data.hits.hits.length-1]._source.tmst;
+            metric.dq = data.hits.hits[data.hits.hits.length-1]._source.matched/data.hits.hits[data.hits.hits.length-1]._source.matched*100;
+            metric.details = new Array();
+            angular.forEach(data.hits.hits,function(point){
+                metric.details.push(point);
+            })
+            $rootScope.showBigChart($barkChart.getOptionBig(metric));
           });
         }
 

@@ -72,7 +72,7 @@ define(['./module'], function(controllers) {
                });
                $scope.originalOrg = angular.copy($scope.orgs);
                var url_briefmetrics = $config.uri.dashboard;
-               $http.post(url_briefmetrics, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}]}).success(function(data) {
+               $http.post(url_briefmetrics, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
                    angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){

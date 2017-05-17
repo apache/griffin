@@ -37,7 +37,7 @@ define(['./module'], function(controllers) {
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}]}).success(function(data) {
+               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
                     angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
@@ -103,8 +103,7 @@ define(['./module'], function(controllers) {
                         redraw($scope.finalData);
                     });
                 });
-            });
-//          $http.post(url_dashboard, {"query": {"match_all":{}},"size":1000}).success(function(res) {
+            });//          $http.post(url_dashboard, {"query": {"match_all":{}},"size":1000}).success(function(res) {
         }
 
         $scope.$watch('selectedOrgIndex', function(newValue){
