@@ -58,7 +58,7 @@ define(['./module'], function (services) {
               metricsByOrg:'',
 //              organization:'/org.json',
 //              dashboard:'/dashboard.json',
-              organization:'/orgWithMetrics',
+              organization:BACKEND_SERVER + '/orgWithMetrics',
               dashboard:ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',
