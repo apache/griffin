@@ -1,0 +1,15 @@
+{
+  "name": "domReady",
+  "version": "2.0.1",
+  "main": "domReady.js",
+  "homepage": "https://github.com/requirejs/domReady",
+  "_release": "2.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.0.1",
+    "commit": "c74caaa6dac64f2f47093f4952b991390406adfb"
+  },
+  "_source": "https://github.com/requirejs/domReady.git",
+  "_target": "2.0.1",
+  "_originalSource": "domReady"
+}

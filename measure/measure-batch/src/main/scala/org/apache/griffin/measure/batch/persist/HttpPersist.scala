@@ -4,6 +4,8 @@ import org.apache.griffin.measure.batch.result._
 import org.apache.griffin.measure.batch.utils.{HttpUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
 
+import scala.util.Try
+
 case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
   val Api = "api"
@@ -20,21 +22,25 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
   def finish(): Unit = {}
 
   def result(rt: Long, result: Result): Unit = {
-    result match {
-      case ar: AccuracyResult => {
-        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
-        val data = JsonUtil.toJson(dataMap)
+    try {
+      result match {
+        case ar: AccuracyResult => {
+          val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
+          val data = JsonUtil.toJson(dataMap)
 
-        // post
-        val params = Map[String, Object]()
-//        val header = Map[String, Object](("content-type" -> "application/json"))
-        val header = Map[String, Object]()
-        val status = HttpUtil.httpRequest(api, method, params, header, data)
-        info(s"${method} to ${api} response status: ${status}")
+          // post
+          val params = Map[String, Object]()
+//          val header = Map[String, Object](("content-type" -> "application/json"))
+          val header = Map[String, Object]()
+          val status = HttpUtil.httpRequest(api, method, params, header, data)
+          info(s"${method} to ${api} response status: ${status}")
+        }
+        case _ => {
+          info(s"result: ${result}")
+        }
       }
-      case _ => {
-        info(s"result: ${result}")
-      }
+    } catch {
+      case e: Throwable => error(e.getMessage)
     }
   }
 

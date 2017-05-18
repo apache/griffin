@@ -54,19 +54,19 @@ public class GriffinWebApplication implements CommandLineRunner{
 
         EvaluateRule eRule = new EvaluateRule(1,rules);
 
-        Measure measure = new Measure("viewitem_hourly","bevssoj description", Measure.MearuseType.accuracy, "bullyeye", source, target, eRule,"test1");
+        Measure measure = new Measure("viewitem_hourly","bevssoj description", Measure.MearuseType.accuracy, "bullseye", source, target, eRule,"test1");
         measureRepo.save(measure);
 
         DataConnector source2 = new DataConnector(ConnectorType.HIVE, "1.2", configJson1);
         DataConnector target2 = new DataConnector(ConnectorType.HIVE, "1.2", configJson2);
         EvaluateRule eRule2 = new EvaluateRule(1,rules);
-        Measure measure2 = new Measure("search_hourly","test description", Measure.MearuseType.accuracy, "bullyeye", source2, target2, eRule2,"test1");
+        Measure measure2 = new Measure("search_hourly","test description", Measure.MearuseType.accuracy, "bullseye", source2, target2, eRule2,"test1");
         measureRepo.save(measure2);
 
         DataConnector source3 = new DataConnector(ConnectorType.HIVE, "1.2", configJson1);
         DataConnector target3 = new DataConnector(ConnectorType.HIVE, "1.2", configJson2);
         EvaluateRule eRule3 = new EvaluateRule(1,rules);
-        Measure measure3 = new Measure("buy_hourly","test_just_inthere description", Measure.MearuseType.accuracy, "hadoop", source3, target3, eRule3,"test1");
+        Measure measure3 = new Measure("buy_hourly","test_just_inthere description", Measure.MearuseType.accuracy, "bullseye", source3, target3, eRule3,"test1");
         measureRepo.save(measure3);
     }
 

@@ -38,7 +38,7 @@ define(['./module'], function(controllers) {
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
                var url_briefmetrics = $config.uri.dashboard;
-               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}]}).success(function(data) {
+               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}], "size": 1000}).success(function(data) {
                     $scope.briefmetrics = data;
                     angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
@@ -80,7 +80,9 @@ define(['./module'], function(controllers) {
                                 var metricNode = new Object();
                                 metricNode.name = metric[0]._source.name;
                                 metricNode.timestamp = metric[0]._source.tmst;
-                                metricNode.dq = metric[0]._source.matched/metric[0]._source.total*100;
+                                var dq = 0.0;
+                                if (metric[0]._source.total > 0) dq = metric[0]._source.matched/metric[0]._source.total*100;
+                                metricNode.dq = dq;
                                 metricNode.details = angular.copy(metric);
                                 node.metrics.push(metricNode);
                             }

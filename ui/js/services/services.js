@@ -3,9 +3,7 @@
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-
       http://www.apache.org/licenses/LICENSE-2.0
-
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,20 +18,13 @@ define(['./module'], function (services) {
     services.factory('$config', function(){
 
 
-//    var BACKEND_SERVER = '';
-      var BACKEND_SERVER = 'http://localhost:8080';
-    //   var BACKEND_SERVER = 'http://localhost:8080'; //dev env
-
-
-//    var BACKEND_SERVER = 'http://10.249.74.51';
-
-
 //    var BACKEND_SERVER = 'http://10.149.247.156:38080';
 //      var BACKEND_SERVER = 'http://localhost:8080';
-//      var BACKEND_SERVER = '';
-
+      var BACKEND_SERVER = '';
       var API_ROOT_PATH = '/api/v1';
-      var ES_SERVER = 'http://10.149.247.156:39200';
+//      var ES_SERVER = 'http://10.149.247.156:59200';
+//      var ES_SERVER = "http://" + location.host + ":59200"
+      var ES_SERVER = "http://" + location.host.replace("8080", "9200");
 
       var config = {
           // URI paths, always have a trailing /
@@ -60,8 +51,6 @@ define(['./module'], function (services) {
               heatmap: BACKEND_SERVER + API_ROOT_PATH + '/metrics/heatmap' ,
               metricdetail: BACKEND_SERVER + API_ROOT_PATH + '/metrics/complete',
               rulemetric: BACKEND_SERVER + API_ROOT_PATH + '/metrics/brief',
-//              dashboard: BACKEND_SERVER + API_ROOT_PATH + '/metrics/dashboard' ,
-              organization:'http://10.249.75.109:8080/org',
 //              organization:BACKEND_SERVER+'/org',
               orgmap: BACKEND_SERVER+'/metrics/org',
 
@@ -69,7 +58,7 @@ define(['./module'], function (services) {
               metricsByOrg:'',
 //              organization:'/org.json',
 //              dashboard:'/dashboard.json',
-              organization:'/orgWithMetrics',
+              organization: BACKEND_SERVER + '/orgWithMetrics',
               dashboard:ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',
