@@ -4,6 +4,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
+
       http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
@@ -24,7 +25,10 @@ define(['./module'], function (services) {
 //      var BACKEND_SERVER = 'http://localhost:8080';
       var BACKEND_SERVER = '';
       var API_ROOT_PATH = '/api/v1';
-      var ES_SERVER = 'http://10.149.247.156:39200';
+
+//      var ES_SERVER = 'http://10.149.247.156:59200';
+//      var ES_SERVER = "http://" + location.host + ":59200"
+      var ES_SERVER = "http://" + location.host.replace("8080", "9200");
 
       var config = {
           // URI paths, always have a trailing /
@@ -58,6 +62,7 @@ define(['./module'], function (services) {
               metricsByOrg:'',
 //              organization:'/org.json',
 //              dashboard:'/dashboard.json',
+
               organization:BACKEND_SERVER + '/orgWithMetrics',
               dashboard:ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',

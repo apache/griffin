@@ -16710,7 +16710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            this._hovered = hovered;
 
-	            proxy.setCursor && proxy.setCursor(hovered ? hovered.cursor : 'pointer');
+	            proxy.setCursor && proxy.setCursor(hovered ? hovered.cursor : 'default');
 
 	            // Mouse out on previous hovered element
 	            if (lastHovered && hovered !== lastHovered && lastHovered.__zr) {
@@ -52285,16 +52285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (link) {
 	                textEl.on('click', function () {
 	                    window.open(link, '_' + titleModel.get('target'));
-						$('#bigChartContainer').hide();
 	                });
-					textEl.on('mouseover', function() {
-						console.log('title mouseover');
-						textEl.style.fill = "#d48265";
-					});
-					textEl.on('mouseout', function() {
-						console.log('title mouseout');
-						textEl.style.fill = textStyleModel.getTextColor();
-					});
 	            }
 	            if (sublink) {
 	                subTextEl.on('click', function () {

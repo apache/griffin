@@ -12,7 +12,7 @@ target/**
 *.war
 *.ear
 target
-service/src/main/resource/public/**
+service/src/main/resources/public/
 
 .project
 .settings/

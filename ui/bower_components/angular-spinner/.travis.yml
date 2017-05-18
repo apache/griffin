@@ -1,0 +1,9 @@
+language: node_js
+sudo: false
+node_js:
+  - 0.12
+before_script:
+  - npm install -g bower@1.5.x grunt-cli@~0.1.9
+  - bower install
+after_success:
+  - cat ./coverage/*/lcov.info | ./node_modules/coveralls/bin/coveralls.js

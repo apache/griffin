@@ -1,7 +1,5 @@
 package org.apache.griffin.core.metastore;
 
-
-import org.apache.avro.generic.GenericData;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;

@@ -20,9 +20,11 @@ public class MetricController {
 private static final Logger log = LoggerFactory.getLogger(MetricController.class);
     @Autowired
     MeasureRepo measureRepo;
-    @RequestMapping("/org/{measureName}")
+    @RequestMapping("/{measureName}/org")
     public String getOrgByMeasureName(@PathVariable("measureName") String measureName){
         return measureRepo.findOrgByName(measureName);
     }
+
+
 
 }

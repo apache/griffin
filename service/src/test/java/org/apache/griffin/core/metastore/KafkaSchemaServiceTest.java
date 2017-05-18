@@ -2,11 +2,13 @@ package org.apache.griffin.core.metastore;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Field;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
@@ -15,20 +17,23 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({HiveMetastoreService.class})
 public class KafkaSchemaServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(KafkaSchemaServiceTest.class);
-//    @Value("${kafka.schema.registry.url}")
-//    private String url;
 
+    @InjectMocks
     private KafkaSchemaService kafkaSchemaService;
 
     @Before
     public void setup() throws NoSuchFieldException, IllegalAccessException {
-        Field url = KafkaSchemaService.class.getDeclaredField("url");
-        url.setAccessible(true);
-        kafkaSchemaService=new KafkaSchemaService();
-        url.set(kafkaSchemaService, "http://localhost:8080");
+//        Field url = KafkaSchemaService.class.getDeclaredField("url");
+//        url.setAccessible(true);
+//        kafkaSchemaService=new KafkaSchemaService();
+//        url.set(kafkaSchemaService, "http://localhost:8080");
+        Whitebox.setInternalState(kafkaSchemaService,"url","http://localhost:8080");
+//        kafkaSchemaService.client=mock(HiveMetaStoreClient.class);
     }
 
     @Test
@@ -44,6 +49,10 @@ public class KafkaSchemaServiceTest {
         path="";
         result = Whitebox.invokeMethod(kafkaSchemaService, "registryUrl", path);
         assertEquals("success",result,path);
+    }
+    @Test
+    public void test_getSchemaString(){
+
     }
 
 //    @Test
