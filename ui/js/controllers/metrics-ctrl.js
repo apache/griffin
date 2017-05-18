@@ -37,9 +37,7 @@ define(['./module'], function(controllers) {
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-               var url_briefmetrics = $config.uri.dashboard;
-               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}], "size": 1000}).success(function(data) {
-                    $scope.briefmetrics = data;
+               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
                     angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
@@ -76,30 +74,39 @@ define(['./module'], function(controllers) {
                         node.dq = 0;
                         node.metrics = new Array();
                         angular.forEach($scope.dataData,function(metric,index){
-                            if(sys.assetMap.indexOf(metric[0]._source.name)!= -1){
+                            if(sys.assetMap.indexOf(metric[metric.length-1]._source.name)!= -1){
                                 var metricNode = new Object();
-                                metricNode.name = metric[0]._source.name;
-                                metricNode.timestamp = metric[0]._source.tmst;
                                 var dq = 0.0;
-                                if (metric[0]._source.total > 0) dq = metric[0]._source.matched/metric[0]._source.total*100;
+                                if (metric[metric.length-1]._source.total > 0)
+                                    dq = metric[metric.length-1]._source.matched/metric[metric.length-1]._source.total*100;
                                 metricNode.dq = dq;
+                                metricNode.name = metric[metric.length-1]._source.name;
+                                metricNode.timestamp = metric[metric.length-1]._source.tmst;
                                 metricNode.details = angular.copy(metric);
                                 node.metrics.push(metricNode);
                             }
                         })
                         $scope.finalData.push(node);
                     })
-//            if(!sysName){
-//              $scope.backup_metrics = angular.copy(res);
-//            }
 
+                    $scope.originalData = angular.copy($scope.finalData);
+
+                    if($routeParams.sysName && $scope.originalData && $scope.originalData.length > 0){
+                      for(var i = 0; i < $scope.originalData.length; i ++){
+                        if($scope.originalData[i].name == $routeParams.sysName){
+                          $scope.selectedOrgIndex = i;
+                          $scope.changeOrg();
+                          $scope.orgSelectDisabled = true;
+                          break;
+                        }
+
+                      }
+                    }
                     $timeout(function() {
                         redraw($scope.finalData);
                     });
-                    $scope.originalData = angular.copy($scope.finalData);
                 });
-            });
-//          $http.post(url_dashboard, {"query": {"match_all":{}},"size":1000}).success(function(res) {
+            });//          $http.post(url_dashboard, {"query": {"match_all":{}},"size":1000}).success(function(res) {
         }
 
         $scope.$watch('selectedOrgIndex', function(newValue){
@@ -142,7 +149,7 @@ define(['./module'], function(controllers) {
 
         $scope.changeAsset = function() {
             $scope.finalData = [];
-            if($scope.selectedOrgIndex == ""){
+            if($scope.selectedOrgIndex === ""){
               $scope.finalData = angular.copy($scope.originalData);
             } else {
               var org = angular.copy($scope.originalData[$scope.selectedOrgIndex]);
