@@ -15,7 +15,7 @@ Snapshot:
 
 Release: 
 
-### How to build
+### How to build docker
 1. git clone the repository of https://github.com/apache/incubator-griffin
 2. run "mvn install"
 
