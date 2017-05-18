@@ -66,14 +66,14 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     try {
       HdfsUtil.writeContent(StartFile, msg)
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
   def finish(): Unit = {
     try {
       HdfsUtil.createEmptyFile(FinishFile)
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 
@@ -92,7 +92,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
       info(resStr)
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 
@@ -120,7 +120,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
         }
       }
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 
@@ -134,7 +134,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
       val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n\n"
       HdfsUtil.appendContent(LogFile, logStr)
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 

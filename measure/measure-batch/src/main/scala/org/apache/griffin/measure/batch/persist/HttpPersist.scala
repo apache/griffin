@@ -40,7 +40,7 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
         }
       }
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 
