@@ -1,6 +1,6 @@
 ## Apache Griffin
 
-Apache Griffin is a model driven Data Quality solution for distributed data systems at any scale in both streaming and batch data context. It provides a framework process for defining data quality model, executing data quality measurement, automating data profiling and validation, as well as an unified data quality visualization across multiple data systems. You can access our home page [here](https://ebay.github.io/griffin/).
+Apache Griffin is a model driven Data Quality solution for distributed data systems at any scale in both streaming and batch data context. It provides a framework process for defining data quality model, executing data quality measurement, automating data profiling and validation, as well as an unified data quality visualization across multiple data systems. You can access our home page [here](http://griffin.incubator.apache.org/).
 
 
 ### Contact us
@@ -8,15 +8,15 @@ Apache Griffin is a model driven Data Quality solution for distributed data syst
 
 
 ### CI
-https://travis-ci.org/eBay/griffin
+
 
 ### Repository
-Snapshot: https://oss.sonatype.org/content/repositories/snapshots
+Snapshot: 
 
-Release: https://oss.sonatype.org/service/local/staging/deploy/maven2
+Release: 
 
-### How to build
-1. git clone the repository of https://github.com/eBay/griffin
+### How to build docker
+1. git clone the repository of https://github.com/apache/incubator-griffin
 2. run "mvn install"
 
 ### How to run in docker
@@ -162,26 +162,53 @@ Release: https://oss.sonatype.org/service/local/staging/deploy/maven2
 13. You can also review the RESTful APIs through http://localhost:8080/api/v1/application.wadl
 
 ### How to develop
-In dev environment, you can run backend REST service and frontend UI seperately. The majority of the backend code logics are in the [griffin-core](https://github.com/apache/incubator-griffin/tree/master/griffin-core) project. So, to start backend, please import maven project Griffin into eclipse, right click ***griffin-core->Run As->Run On Server***
+In dev environment, you can run backend REST service and frontend UI seperately. The majority of the backend code logics are in the [service](https://github.com/apache/incubator-griffin/tree/master/service) project. So, to start backend, please import maven project Griffin into eclipse, ***GriffinWebApplication as Spring Boot App***
 
 To start frontend, please follow up the below steps.
 
-1. Open **griffin-ui/js/services/services.js** file
+1. Open **ui/js/services/services.js** file
 
 2. Specify **BACKEND_SERVER** to your real backend server address, below is an example
 
     ```
     var BACKEND_SERVER = 'http://localhost:8080'; //dev env
-    //var BACKEND_SERVER = 'http://localhost:8080/ROOT'; //dev env
+    ```
+3. Specify some variables like mysql, hive and kafka connectors in your properies file under service/src/main/resources/application.properties
+
+    ```
+    spring.datasource.url= jdbc:mysql://localhost:3306/metastore
+    spring.datasource.username =griffin
+    spring.datasource.password =123456
+    
+    spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+    
+    ## Hibernate ddl auto (validate,create, create-drop, update)
+    
+    spring.jpa.hibernate.ddl-auto = create-drop
+    spring.jpa.show-sql=true
+    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+    #
+    #
+    ## Naming strategy
+    spring.jpa.hibernate.naming-strategy = org.hibernate.cfg.ImprovedNamingStrategy
+    
+    # hive metastore 
+    hive.metastore.uris = thrift://localhost:9083
+    hive.metastore.dbname = default
+    
+    # kafka schema registry
+    kafka.schema.registry.url = http://localhost:8081
     ```
 
-3. Open a command line, run the below commands in root directory of **griffin-ui**
+4. Open a command line, run the below commands in root directory
 
-   - npm install
-   - bower install
-   - npm start
+   - mvn clean install
 
-4. Then the UI will be opened in browser automatically, please follow the [User Guide](https://github.com/eBay/griffin/tree/master/griffin-doc/userguide.md), enjoy your journey!
+5. Find the GriffinWebApplication,
+
+   - run as spring boot application
+   
+6. In your browser, open http://localhost:8080 ,enjoy your journey!
 
 **Note**: The front-end UI is still under development, you can only access some basic features currently.
 

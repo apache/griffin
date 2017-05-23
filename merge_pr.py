@@ -238,7 +238,7 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id="5"):
         jira_id = default_jira_id
 
     try:
-        issue = asf_jira.issue("GRIFFIN-%s" % (jira_id))
+        issue = asf_jira.issue("%s" % (jira_id))
     except Exception as e:
         fail("ASF JIRA could not find %s\n%s" % (jira_id, e))
 
@@ -295,7 +295,7 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id="5"):
 
 
 def resolve_jira_issues(title, merge_branches, comment):
-    jira_ids = re.findall("GRIFFIN-[0-9]{4,5}", title)
+    jira_ids = re.findall("GRIFFIN-[0-9]{1,5}", title)
 
     if len(jira_ids) == 0:
         resolve_jira_issue(merge_branches, comment)

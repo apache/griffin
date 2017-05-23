@@ -1,0 +1,45 @@
+{
+  "name": "accu1",
+  "type": "accuracy",
+
+  "source": {
+    "connector": {
+      "type": "hive",
+      "version": "1.2",
+      "config": {
+        "table.name": "users_info_src",
+        "partitions": "dt=20170410, hour=14"
+      }
+    }
+  },
+
+  "target": {
+    "connector": {
+      "type": "hive",
+      "version": "1.2",
+      "config": {
+        "database": "default",
+        "table.name": "users_info_target",
+        "partitions": "dt=20170410, hour=14; dt=20170410, hour=15"
+      }
+    }
+  },
+
+  "evaluateRule": {
+    "sampleRatio": 1,
+    "assertion": {
+      "type": "DSL-griffin",
+      "rules": [
+        {
+          "rule": "@Key ${source}['user_id'] === ${target}['user_id']"
+        },
+        {
+          "rule": "${source}['first_name'] === ${target}['first_name']; ${source}['last_name'] === ${target}['last_name']; ${source}['address'] === ${target}['address']"
+        },
+        {
+          "rule": "${source}['email'] === ${target}['email']; ${source}['phone'] === ${target}['phone']; ${source}['post_code'] === ${target}['post_code']"
+        }
+      ]
+    }
+  }
+}
