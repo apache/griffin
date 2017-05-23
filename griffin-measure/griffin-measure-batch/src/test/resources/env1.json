@@ -1,0 +1,21 @@
+{
+  "spark": {
+    "log.level": "INFO",
+    "checkpoint.dir": "hdfs:///griffin/batch/cp",
+    "config": {}
+  },
+
+  "persist": [
+    {
+      "type": "hdfs",
+      "config": {
+        "path": "hdfs:///user/b_des/bark/griffin-batch/test",
+        "max.lines.per.file": 10000
+      }
+    }
+  ],
+
+  "cleaner": {
+
+  }
+}
