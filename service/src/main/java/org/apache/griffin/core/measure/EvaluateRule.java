@@ -7,8 +7,8 @@ import javax.persistence.Entity;
 public class EvaluateRule  extends AuditableEntity {
     
     private static final long serialVersionUID = -3589222812544556642L;
-    public int sampleRatio;
-    public String rules;
+    private int sampleRatio;
+    private String rules;
     
     public EvaluateRule() {
     }

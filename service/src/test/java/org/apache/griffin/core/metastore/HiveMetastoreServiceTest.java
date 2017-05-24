@@ -19,9 +19,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-/**
- * Created by xiangrchen on 5/10/17.
- */
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({HiveMetastoreService.class})
 public class HiveMetastoreServiceTest {

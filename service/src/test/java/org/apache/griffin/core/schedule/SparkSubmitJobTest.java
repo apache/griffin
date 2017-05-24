@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
  * Created by xiangrchen on 5/8/17.
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(locations = {"classpath:context.xml"})
 public class SparkSubmitJobTest {
 
     private SparkSubmitJob ssj;
