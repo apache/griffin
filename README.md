@@ -11,7 +11,7 @@ Apache Griffin is a model driven Data Quality solution for distributed data syst
 
 
 ### Repository
-Snapshot: 
+Snapshot:
 
 Release:
 
