@@ -54,7 +54,7 @@ public class GriffinController {
         for (Measure m:measureList){
             switch (m.getType()){
                 case accuracy:
-                    String[] tableNames={m.getSource().getConfig().get("table.name"),m.getTarget().getConfig().get("table.name")};
+                    String[] tableNames={m.getSource().getConfigInMaps().get("table.name"),m.getTarget().getConfigInMaps().get("table.name")};
                     for (String taName:tableNames){
                         if(taName!=null) {
                             if(daWithMetricsMap.get(taName)==null){
