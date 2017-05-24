@@ -13,7 +13,7 @@ Apache Griffin is a model driven Data Quality solution for distributed data syst
 ### Repository
 Snapshot: 
 
-Release: 
+Release:
 
 ### How to run in docker
 1. Install [docker](https://www.docker.com/).
