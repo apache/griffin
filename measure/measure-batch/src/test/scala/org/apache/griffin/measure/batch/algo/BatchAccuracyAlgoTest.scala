@@ -7,10 +7,11 @@ import org.apache.griffin.measure.batch.config.params.env._
 import org.apache.griffin.measure.batch.config.params.user._
 import org.apache.griffin.measure.batch.config.reader._
 import org.apache.griffin.measure.batch.config.validator._
-import org.apache.griffin.measure.batch.connector.{CacheDataUtil, DataConnector, DataConnectorFactory}
+import org.apache.griffin.measure.batch.connector.{DataConnector, DataConnectorFactory}
 import org.apache.griffin.measure.batch.log.Loggable
 import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.griffin.measure.batch.rule.{RuleAnalyzer, RuleFactory}
+import org.apache.griffin.measure.batch.utils.ExprValueUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
@@ -92,8 +93,8 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       ruleAnalyzer.globalFinalCacheExprs.foreach(println)
 
       // global cache data
-      val globalCachedData = CacheDataUtil.genCachedMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
-      val globalFinalCachedData = CacheDataUtil.filterCachedMap(ruleAnalyzer.globalFinalCacheExprs, globalCachedData)
+      val globalCachedData = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
+      val globalFinalCachedData = ExprValueUtil.updateExprValueMap(ruleAnalyzer.globalFinalCacheExprs, globalCachedData)
 
       // data connector
       val sourceDataConnector: DataConnector =

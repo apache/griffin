@@ -8,7 +8,7 @@ import com.databricks.spark.avro._
 import scala.util.{Success, Try}
 import java.nio.file.{Files, Paths}
 
-import org.apache.griffin.measure.batch.utils.HdfsUtil
+import org.apache.griffin.measure.batch.utils.{ExprValueUtil, HdfsUtil}
 
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
                              groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr],
@@ -48,9 +48,9 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
       loadDataFile.flatMap { row =>
         // generate cache data
         val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalFinalCacheMap) { (cachedMap, expr) =>
-          CacheDataUtil.genCachedMap(Some(row), expr, cachedMap)
+          ExprValueUtil.genExprValueMap(Some(row), expr, cachedMap)
         }
-        val finalCacheData = CacheDataUtil.filterCachedMap(finalCacheExprs, cacheData)
+        val finalCacheData = ExprValueUtil.updateExprValueMap(finalCacheExprs, cacheData)
 
         // when clause filter data source
         val whenResult = whenClauseOpt match {

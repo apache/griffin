@@ -1,6 +1,7 @@
 package org.apache.griffin.measure.batch.connector
 
 import org.apache.griffin.measure.batch.rule.expr._
+import org.apache.griffin.measure.batch.utils.ExprValueUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
@@ -56,9 +57,9 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
       sqlContext.sql(dataSql).flatMap { row =>
         // generate cache data
         val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalFinalCacheMap) { (cachedMap, expr) =>
-          CacheDataUtil.genCachedMap(Some(row), expr, cachedMap)
+          ExprValueUtil.genExprValueMap(Some(row), expr, cachedMap)
         }
-        val finalCacheData = CacheDataUtil.filterCachedMap(finalCacheExprs, cacheData)
+        val finalCacheData = ExprValueUtil.updateExprValueMap(finalCacheExprs, cacheData)
 
         // when clause filter data source
         val whenResult = whenClauseOpt match {

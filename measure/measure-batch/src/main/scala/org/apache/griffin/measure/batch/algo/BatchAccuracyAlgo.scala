@@ -9,6 +9,7 @@ import org.apache.griffin.measure.batch.rule._
 import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.griffin.measure.batch.persist._
 import org.apache.griffin.measure.batch.result._
+import org.apache.griffin.measure.batch.utils.ExprValueUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}
@@ -46,8 +47,8 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
       // global cache data
-      val globalCachedData = CacheDataUtil.genCachedMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
-      val globalFinalCachedData = CacheDataUtil.filterCachedMap(ruleAnalyzer.globalFinalCacheExprs, globalCachedData)
+      val globalCachedData = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
+      val globalFinalCachedData = ExprValueUtil.updateExprValueMap(ruleAnalyzer.globalFinalCacheExprs, globalCachedData)
 
       // data connector
       val sourceDataConnector: DataConnector =
