@@ -47,14 +47,14 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
       // global cache data
-      val globalCachedData = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
-      val globalFinalCachedData = ExprValueUtil.updateExprValueMap(ruleAnalyzer.globalFinalCacheExprs, globalCachedData)
+      val constExprValueMap = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
+      val finalConstExprValueMap = ExprValueUtil.updateExprValueMap(ruleAnalyzer.globalFinalCacheExprs, constExprValueMap)
 
       // data connector
       val sourceDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam,
           ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs,
-          ruleAnalyzer.sourceFinalCacheExprs, globalFinalCachedData,
+          ruleAnalyzer.sourceFinalCacheExprs, finalConstExprValueMap,
           ruleAnalyzer.whenClauseExpr
         ) match {
           case Success(cntr) => {
@@ -66,7 +66,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val targetDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam,
           ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs,
-          ruleAnalyzer.targetFinalCacheExprs, globalFinalCachedData,
+          ruleAnalyzer.targetFinalCacheExprs, finalConstExprValueMap,
           ruleAnalyzer.whenClauseExpr
         ) match {
           case Success(cntr) => {

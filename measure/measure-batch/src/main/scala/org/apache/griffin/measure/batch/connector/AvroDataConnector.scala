@@ -50,11 +50,11 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
         val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalFinalCacheMap) { (cachedMap, expr) =>
           ExprValueUtil.genExprValueMap(Some(row), expr, cachedMap)
         }
-        val finalCacheData = ExprValueUtil.updateExprValueMap(finalCacheExprs, cacheData)
+        val finalExprValueMap = ExprValueUtil.updateExprValueMap(finalCacheExprs, cacheData)
 
         // when clause filter data source
         val whenResult = whenClauseOpt match {
-          case Some(whenClause) => whenClause.calculate(finalCacheData)
+          case Some(whenClause) => whenClause.calculate(finalExprValueMap)
           case _ => None
         }
 
@@ -63,14 +63,14 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
           case Some(false) => None
           case _ => {
             val groupbyData: Seq[AnyRef] = groupbyExprs.flatMap { expr =>
-              expr.calculate(finalCacheData) match {
+              expr.calculate(finalExprValueMap) match {
                 case Some(v) => Some(v.asInstanceOf[AnyRef])
                 case _ => None
               }
             }
             val key = toTuple(groupbyData)
 
-            Some((key, finalCacheData))
+            Some((key, finalExprValueMap))
           }
         }
       }
