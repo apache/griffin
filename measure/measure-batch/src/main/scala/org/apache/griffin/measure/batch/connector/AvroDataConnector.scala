@@ -8,12 +8,11 @@ import com.databricks.spark.avro._
 import scala.util.{Success, Try}
 import java.nio.file.{Files, Paths}
 
+import org.apache.griffin.measure.batch.rule.RuleExprs
 import org.apache.griffin.measure.batch.utils.{ExprValueUtil, HdfsUtil}
 
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                             groupbyExprs: Seq[Expr], cacheExprs: Iterable[Expr],
-                             finalCacheExprs: Iterable[Expr], constFinalCacheMap: Map[String, Any],
-                             whenClauseOpt: Option[LogicalExpr]
+                             ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
                             ) extends DataConnector {
 
   val FilePath = "file.path"
@@ -47,13 +46,13 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     Try {
       loadDataFile.flatMap { row =>
         // generate cache data
-        val cacheExprValueMap: Map[String, Any] = cacheExprs.foldLeft(constFinalCacheMap) { (cachedMap, expr) =>
+        val cacheExprValueMap: Map[String, Any] = ruleExprs.cacheExprs.foldLeft(constFinalExprValueMap) { (cachedMap, expr) =>
           ExprValueUtil.genExprValueMap(Some(row), expr, cachedMap)
         }
-        val finalExprValueMap = ExprValueUtil.updateExprValueMap(finalCacheExprs, cacheExprValueMap)
+        val finalExprValueMap = ExprValueUtil.updateExprValueMap(ruleExprs.finalCacheExprs, cacheExprValueMap)
 
         // when clause filter data source
-        val whenResult = whenClauseOpt match {
+        val whenResult = ruleExprs.whenClauseExprOpt match {
           case Some(whenClause) => whenClause.calculate(finalExprValueMap)
           case _ => None
         }
@@ -62,7 +61,7 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
         whenResult match {
           case Some(false) => None
           case _ => {
-            val groupbyData: Seq[AnyRef] = groupbyExprs.flatMap { expr =>
+            val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
               expr.calculate(finalExprValueMap) match {
                 case Some(v) => Some(v.asInstanceOf[AnyRef])
                 case _ => None

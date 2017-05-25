@@ -53,9 +53,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // data connector
       val sourceDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam,
-          ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs,
-          ruleAnalyzer.sourceFinalCacheExprs, finalConstExprValueMap,
-          ruleAnalyzer.whenClauseExprOpt
+          ruleAnalyzer.sourceRuleExprs, finalConstExprValueMap
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -65,9 +63,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         }
       val targetDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam,
-          ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs,
-          ruleAnalyzer.targetFinalCacheExprs, finalConstExprValueMap,
-          ruleAnalyzer.whenClauseExprOpt
+          ruleAnalyzer.targetRuleExprs, finalConstExprValueMap
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -105,7 +101,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
 
       // persist result
       persist.result(endTime, accuResult)
-      val missingRecords = missingRdd.map(record2String(_, ruleAnalyzer.sourcePersistExprs, ruleAnalyzer.targetPersistExprs))
+      val missingRecords = missingRdd.map(record2String(_, ruleAnalyzer.sourceRuleExprs.persistExprs, ruleAnalyzer.targetRuleExprs.persistExprs))
       persist.missRecords(missingRecords)
 
       // persist end time

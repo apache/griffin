@@ -99,9 +99,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       // data connector
       val sourceDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam,
-          ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs,
-          ruleAnalyzer.sourceFinalCacheExprs, finalConstExprValueMap,
-          ruleAnalyzer.whenClauseExprOpt
+          ruleAnalyzer.sourceRuleExprs, finalConstExprValueMap
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -111,9 +109,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
         }
       val targetDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam,
-          ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs,
-          ruleAnalyzer.targetFinalCacheExprs, finalConstExprValueMap,
-          ruleAnalyzer.whenClauseExprOpt
+          ruleAnalyzer.targetRuleExprs, finalConstExprValueMap
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -195,7 +191,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
 
       println(s"match percentage: ${accuResult.matchPercentage}, total count: ${accuResult.total}")
 
-      missingRdd.map(rec => algo.record2String(rec, ruleAnalyzer.sourcePersistExprs, ruleAnalyzer.targetPersistExprs)).foreach(println)
+      missingRdd.map(rec => algo.record2String(rec, ruleAnalyzer.sourceRuleExprs.persistExprs, ruleAnalyzer.targetRuleExprs.persistExprs)).foreach(println)
 
       // end time
       val endTime = new Date().getTime

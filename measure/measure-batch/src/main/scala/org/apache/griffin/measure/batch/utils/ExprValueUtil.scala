@@ -45,7 +45,7 @@ object ExprValueUtil {
   }
 
   // try to calculate expr from data and initExprValueMap, generate a new expression value map
-  // depends on origin data
+  // depends on origin data and existed expr value map
   def genExprValueMap(data: Option[Any], expr: Expr, initExprValueMap: Map[String, Any]): Map[String, Any] = {
     val valueOpt = calcExprValue(data, expr, initExprValueMap)
     if (valueOpt.nonEmpty) {
@@ -54,7 +54,7 @@ object ExprValueUtil {
   }
 
   // try to calculate some exprs from data and initExprValueMap, generate a new expression value map
-  // depends on origin data
+  // depends on origin data and existed expr value map
   def genExprValueMap(data: Option[Any], exprs: Iterable[Expr], initExprValueMap: Map[String, Any]): Map[String, Any] = {
     exprs.foldLeft(initExprValueMap) { (evMap, expr) =>
       ExprValueUtil.genExprValueMap(None, expr, evMap)
@@ -62,7 +62,7 @@ object ExprValueUtil {
   }
 
   // with exprValueMap, calculate expressions, update the expression value map
-  // depends on existed expr value map, only calculation, not need origin data
+  // only depends on existed expr value map, only calculation, not need origin data
   def updateExprValueMap(exprs: Iterable[Expr], exprValueMap: Map[String, Any]): Map[String, Any] = {
     exprs.foldLeft(Map[String, Any]()) { (evMap, expr) =>
       val valueOpt = expr.calculate(exprValueMap)

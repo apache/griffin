@@ -55,16 +55,9 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Log
       val ruleAnalyzer = RuleAnalyzer(result.get)
 
       println("source")
-      ruleAnalyzer.sourceCacheExprs.foreach(a => println(a.desc))
-      println("source final")
-      ruleAnalyzer.sourceFinalCacheExprs.foreach(a => println(a.desc))
-      println("target")
-      ruleAnalyzer.targetCacheExprs.foreach(a => println(a.desc))
-      println("target final")
-      ruleAnalyzer.targetFinalCacheExprs.foreach(a => println(a.desc))
-      println("groupby")
-      ruleAnalyzer.sourceGroupbyExprs.foreach(println)
-      ruleAnalyzer.targetGroupbyExprs.foreach(println)
+      println(ruleAnalyzer.sourceRuleExprs)
+      println("source")
+      println(ruleAnalyzer.targetRuleExprs)
     }
 
 
