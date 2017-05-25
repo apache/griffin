@@ -20,6 +20,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertTrue;
 
+
 @RunWith(SpringRunner.class)
 @TestPropertySource(properties = {"hive.metastore.uris=thrift://10.9.246.187:9083"})
 public class HiveMetastoreServiceTests {
@@ -110,5 +111,4 @@ public class HiveMetastoreServiceTests {
             fail("Cannot get xxx table in default db");
         }
     }
-
 }
