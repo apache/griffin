@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.utils
+package org.apache.griffin.measure.batch.rule
 
 import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.spark.sql.Row

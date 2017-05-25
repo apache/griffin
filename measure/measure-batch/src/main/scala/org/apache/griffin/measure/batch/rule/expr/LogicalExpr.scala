@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.utils.CalculationUtil._
+import org.apache.griffin.measure.batch.rule.CalculationUtil._
 
 trait LogicalExpr extends Expr with AnalyzableExpr {
   override def cacheUnit: Boolean = true

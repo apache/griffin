@@ -8,8 +8,8 @@ import com.databricks.spark.avro._
 import scala.util.{Success, Try}
 import java.nio.file.{Files, Paths}
 
-import org.apache.griffin.measure.batch.rule.RuleExprs
-import org.apache.griffin.measure.batch.utils.{ExprValueUtil, HdfsUtil}
+import org.apache.griffin.measure.batch.rule.{ExprValueUtil, RuleExprs}
+import org.apache.griffin.measure.batch.utils.HdfsUtil
 
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
                              ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]

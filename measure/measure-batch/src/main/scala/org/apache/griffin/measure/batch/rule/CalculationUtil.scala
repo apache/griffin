@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.utils
+package org.apache.griffin.measure.batch.rule
 
 import scala.util.{Success, Try}
 

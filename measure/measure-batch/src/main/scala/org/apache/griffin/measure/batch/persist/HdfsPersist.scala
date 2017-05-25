@@ -16,8 +16,8 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val MaxLinesPerFile = "max.lines.per.file"
 
   val path = config.getOrElse(Path, "").toString
-  val maxPersistLines = config.getOrElse(MaxPersistLines, -1).toString.toLong
-  val maxLinesPerFile = config.getOrElse(MaxLinesPerFile, 10000).toString.toLong
+  val maxPersistLines = try { config.getOrElse(MaxPersistLines, -1).toString.toInt } catch { case _ => -1 }
+  val maxLinesPerFile = try { config.getOrElse(MaxLinesPerFile, 10000).toString.toLong } catch { case _ => 10000 }
 
   val separator = "/"
 

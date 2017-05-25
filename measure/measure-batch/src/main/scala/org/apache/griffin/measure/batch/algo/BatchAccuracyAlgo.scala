@@ -9,7 +9,6 @@ import org.apache.griffin.measure.batch.rule._
 import org.apache.griffin.measure.batch.rule.expr._
 import org.apache.griffin.measure.batch.persist._
 import org.apache.griffin.measure.batch.result._
-import org.apache.griffin.measure.batch.utils.ExprValueUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}
@@ -93,7 +92,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       }
 
       // accuracy algorithm
-      val (accuResult, missingRdd, matchingRdd) = accuracy(sourceData, targetData, ruleAnalyzer)
+      val (accuResult, missingRdd, matchedRdd) = accuracy(sourceData, targetData, ruleAnalyzer)
 
       // end time
       val endTime = new Date().getTime
@@ -132,9 +131,9 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     val allKvs = sourceWrappedData.cogroup(targetWrappedData)
 
     // 3. accuracy calculation
-    val (accuResult, missingRdd, matchingRdd) = AccuracyCore.accuracy(allKvs, ruleAnalyzer)
+    val (accuResult, missingRdd, matchedRdd) = AccuracyCore.accuracy(allKvs, ruleAnalyzer)
 
-    (accuResult, missingRdd, matchingRdd)
+    (accuResult, missingRdd, matchedRdd)
   }
 
   def record2String(rec: (Product, (Map[String, Any], Map[String, Any])), sourcePersist: Iterable[Expr], targetPersist: Iterable[Expr]): String = {

@@ -1,8 +1,7 @@
 package org.apache.griffin.measure.batch.connector
 
-import org.apache.griffin.measure.batch.rule.RuleExprs
+import org.apache.griffin.measure.batch.rule.{ExprValueUtil, RuleExprs}
 import org.apache.griffin.measure.batch.rule.expr._
-import org.apache.griffin.measure.batch.utils.ExprValueUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 

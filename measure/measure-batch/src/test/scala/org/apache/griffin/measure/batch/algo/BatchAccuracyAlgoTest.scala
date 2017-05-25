@@ -10,8 +10,7 @@ import org.apache.griffin.measure.batch.config.validator._
 import org.apache.griffin.measure.batch.connector.{DataConnector, DataConnectorFactory}
 import org.apache.griffin.measure.batch.log.Loggable
 import org.apache.griffin.measure.batch.rule.expr._
-import org.apache.griffin.measure.batch.rule.{RuleAnalyzer, RuleFactory}
-import org.apache.griffin.measure.batch.utils.ExprValueUtil
+import org.apache.griffin.measure.batch.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
@@ -187,7 +186,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       val algo = BatchAccuracyAlgo(allParam)
 
       // accuracy algorithm
-      val (accuResult, missingRdd, matchingRdd) = algo.accuracy(sourceData, targetData, ruleAnalyzer)
+      val (accuResult, missingRdd, matchedRdd) = algo.accuracy(sourceData, targetData, ruleAnalyzer)
 
       println(s"match percentage: ${accuResult.matchPercentage}, total count: ${accuResult.total}")
 
