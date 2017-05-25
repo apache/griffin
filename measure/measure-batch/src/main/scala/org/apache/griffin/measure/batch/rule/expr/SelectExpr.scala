@@ -5,12 +5,12 @@ trait SelectExpr extends Expr {
 }
 
 case class IndexFieldRangeSelectExpr(fields: Iterable[FieldDescOnly]) extends SelectExpr {
-  val desc: String = s"[${fields.map(_.desc).mkString(",")}]"
+  val desc: String = s"[${fields.map(_.desc).mkString(", ")}]"
   val dataSources: Set[String] = Set.empty[String]
 }
 
 case class FunctionOperationExpr(func: String, args: Iterable[MathExpr]) extends SelectExpr {
-  val desc: String = s".${func}(${args.map(_.desc).mkString(",")})"
+  val desc: String = s".${func}(${args.map(_.desc).mkString(", ")})"
   val dataSources: Set[String] = args.flatMap(_.dataSources).toSet
   override def getSubCacheExprs(ds: String): Iterable[Expr] = args.flatMap(_.getCacheExprs(ds))
   override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = args.flatMap(_.getFinalCacheExprs(ds))
@@ -18,7 +18,7 @@ case class FunctionOperationExpr(func: String, args: Iterable[MathExpr]) extends
 }
 
 case class FilterSelectExpr(field: FieldDesc, compare: String, value: MathExpr) extends SelectExpr {
-  val desc: String = s"[${field.desc}${compare}${value.desc}]"
+  val desc: String = s"[${field.desc} ${compare} ${value.desc}]"
   val dataSources: Set[String] = value.dataSources
   override def getSubCacheExprs(ds: String): Iterable[Expr] = value.getCacheExprs(ds)
   override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = value.getFinalCacheExprs(ds)
