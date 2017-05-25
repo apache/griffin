@@ -42,7 +42,7 @@ case class LogicalCompareExpr(left: MathExpr, compare: String, right: MathExpr) 
     left.getPersistExprs(ds) ++ right.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(Expr, Expr)] = {
     if (compare == "=" || compare == "==") {
       (left.dataSourceOpt, right.dataSourceOpt) match {
         case (Some(dsPair._1), Some(dsPair._2)) => (left, right) :: Nil
@@ -107,7 +107,7 @@ case class UnaryLogicalExpr(oprList: Iterable[String], factor: LogicalExpr) exte
     factor.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(Expr, Expr)] = {
     val notOprList = oprList.filter { opr =>
       opr match {
         case this.notOpr() => true
@@ -144,7 +144,7 @@ case class BinaryLogicalExpr(first: LogicalExpr, others: Iterable[(String, Logic
     first.getPersistExprs(ds) ++ others.flatMap(_._2.getPersistExprs(ds))
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(Expr, Expr)] = {
     if (others.isEmpty) first.getGroupbyExprPairs(dsPair)
     else {
       val isAnd = others.exists(_._1 match {

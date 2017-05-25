@@ -101,7 +101,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
         DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam,
           ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs,
           ruleAnalyzer.sourceFinalCacheExprs, finalConstExprValueMap,
-          ruleAnalyzer.whenClauseExpr
+          ruleAnalyzer.whenClauseExprOpt
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -113,7 +113,7 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam,
           ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs,
           ruleAnalyzer.targetFinalCacheExprs, finalConstExprValueMap,
-          ruleAnalyzer.whenClauseExpr
+          ruleAnalyzer.whenClauseExprOpt
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr

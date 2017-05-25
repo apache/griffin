@@ -9,7 +9,7 @@ import scala.util.{Success, Try}
 
 case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
                              groupbyExprs: Seq[Expr], cacheExprs: Iterable[Expr],
-                             finalCacheExprs: Iterable[Expr], globalFinalCacheMap: Map[String, Any],
+                             finalCacheExprs: Iterable[Expr], constFinalCacheMap: Map[String, Any],
                              whenClauseOpt: Option[LogicalExpr]
                             ) extends DataConnector {
 
@@ -56,10 +56,10 @@ case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     Try {
       sqlContext.sql(dataSql).flatMap { row =>
         // generate cache data
-        val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalFinalCacheMap) { (cachedMap, expr) =>
+        val cacheExprValueMap: Map[String, Any] = cacheExprs.foldLeft(constFinalCacheMap) { (cachedMap, expr) =>
           ExprValueUtil.genExprValueMap(Some(row), expr, cachedMap)
         }
-        val finalExprValueMap = ExprValueUtil.updateExprValueMap(finalCacheExprs, cacheData)
+        val finalExprValueMap = ExprValueUtil.updateExprValueMap(finalCacheExprs, cacheExprValueMap)
 
         // when clause filter data source
         val whenResult = whenClauseOpt match {

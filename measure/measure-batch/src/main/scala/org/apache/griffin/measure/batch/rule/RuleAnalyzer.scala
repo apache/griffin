@@ -19,10 +19,24 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
   val sourceFinalCacheExprs: Iterable[Expr] = rule.getFinalCacheExprs(SourceData).toSet ++ sourcePersistExprs.toSet
   val targetFinalCacheExprs: Iterable[Expr] = rule.getFinalCacheExprs(TargetData).toSet ++ targetPersistExprs.toSet
 
-  val groupbyExprPairs: Seq[(MathExpr, MathExpr)] = rule.getGroupbyExprPairs((SourceData, TargetData))
-  val sourceGroupbyExprs: Seq[MathExpr] = groupbyExprPairs.map(_._1)
-  val targetGroupbyExprs: Seq[MathExpr] = groupbyExprPairs.map(_._2)
+  val groupbyExprPairs: Seq[(Expr, Expr)] = rule.getGroupbyExprPairs((SourceData, TargetData))
+  val sourceGroupbyExprs: Seq[Expr] = groupbyExprPairs.map(_._1)
+  val targetGroupbyExprs: Seq[Expr] = groupbyExprPairs.map(_._2)
 
-  val whenClauseExpr: Option[LogicalExpr] = rule.getWhenClauseExpr
+  val whenClauseExprOpt: Option[LogicalExpr] = rule.getWhenClauseExpr
+
+  val sourceRuleExprs: RuleExprs = RuleExprs(sourceGroupbyExprs, sourceCacheExprs,
+    sourceFinalCacheExprs, sourcePersistExprs, whenClauseExprOpt)
+  val targetRuleExprs: RuleExprs = RuleExprs(targetGroupbyExprs, targetCacheExprs,
+    targetFinalCacheExprs, targetPersistExprs, whenClauseExprOpt)
+
+}
+
+case class RuleExprs(groupbyExprs: Seq[Expr],
+                     cacheExprs: Iterable[Expr],
+                     finalCacheExprs: Iterable[Expr],
+                     persistExprs: Iterable[Expr],
+                     whenClauseExprOpt: Option[LogicalExpr]
+                    ) {
 
 }

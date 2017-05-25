@@ -20,7 +20,7 @@ case class SimpleStatementExpr(expr: LogicalExpr) extends StatementExpr {
     expr.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = expr.getGroupbyExprPairs(dsPair)
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(Expr, Expr)] = expr.getGroupbyExprPairs(dsPair)
 }
 
 case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) extends StatementExpr {
@@ -45,7 +45,7 @@ case class WhenClauseStatementExpr(expr: LogicalExpr, whenExpr: LogicalExpr) ext
     expr.getPersistExprs(ds) ++ whenExpr.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(Expr, Expr)] = {
     expr.getGroupbyExprPairs(dsPair) ++ whenExpr.getGroupbyExprPairs(dsPair)
   }
   override def getWhenClauseExpr(): Option[LogicalExpr] = Some(whenExpr)
