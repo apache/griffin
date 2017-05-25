@@ -13,7 +13,7 @@ object DataConnectorFactory {
 
   def getDataConnector(sqlContext: SQLContext,
                        dataConnectorParam: DataConnectorParam,
-                       groupbyExprs: Seq[MathExpr],
+                       groupbyExprs: Seq[Expr],
                        cacheExprs: Iterable[Expr],
                        finalCacheExprs: Iterable[Expr],
                        globalFinalCacheMap: Map[String, Any],

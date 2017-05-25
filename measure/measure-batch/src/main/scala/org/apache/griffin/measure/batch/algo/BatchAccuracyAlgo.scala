@@ -32,23 +32,23 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // start time
       val startTime = new Date().getTime()
 
-      // get persists
+      // get persists to persist measure result
       val persist: Persist = PersistFactory(envParam.persistParams, metricName).getPersists(startTime)
 
       // get spark application id
       val applicationId = sc.applicationId
 
-      // start
+      // persist start id
       persist.start(applicationId)
 
-      // rules
+      // generate rule from rule param, generate rule analyzer
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam)
       val rule: StatementExpr = ruleFactory.generateRule()
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
-      // global cache data
-      val constExprValueMap = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
-      val finalConstExprValueMap = ExprValueUtil.updateExprValueMap(ruleAnalyzer.globalFinalCacheExprs, constExprValueMap)
+      // const expr value map
+      val constExprValueMap = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.constCacheExprs, Map[String, Any]())
+      val finalConstExprValueMap = ExprValueUtil.updateExprValueMap(ruleAnalyzer.constFinalCacheExprs, constExprValueMap)
 
       // data connector
       val sourceDataConnector: DataConnector =

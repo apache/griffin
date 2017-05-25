@@ -11,7 +11,7 @@ import java.nio.file.{Files, Paths}
 import org.apache.griffin.measure.batch.utils.{ExprValueUtil, HdfsUtil}
 
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                             groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr],
+                             groupbyExprs: Seq[Expr], cacheExprs: Iterable[Expr],
                              finalCacheExprs: Iterable[Expr], globalFinalCacheMap: Map[String, Any],
                              whenClauseOpt: Option[LogicalExpr]
                             ) extends DataConnector {

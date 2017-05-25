@@ -8,7 +8,7 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import scala.util.{Success, Try}
 
 case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                             groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr],
+                             groupbyExprs: Seq[Expr], cacheExprs: Iterable[Expr],
                              finalCacheExprs: Iterable[Expr], globalFinalCacheMap: Map[String, Any],
                              whenClauseOpt: Option[LogicalExpr]
                             ) extends DataConnector {

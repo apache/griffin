@@ -89,12 +89,12 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       val rule: StatementExpr = ruleFactory.generateRule()
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
-      ruleAnalyzer.globalCacheExprs.foreach(println)
-      ruleAnalyzer.globalFinalCacheExprs.foreach(println)
+      ruleAnalyzer.constCacheExprs.foreach(println)
+      ruleAnalyzer.constFinalCacheExprs.foreach(println)
 
       // global cache data
-      val constExprValueMap = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
-      val finalConstExprValueMap = ExprValueUtil.updateExprValueMap(ruleAnalyzer.globalFinalCacheExprs, constExprValueMap)
+      val constExprValueMap = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.constCacheExprs, Map[String, Any]())
+      val finalConstExprValueMap = ExprValueUtil.updateExprValueMap(ruleAnalyzer.constFinalCacheExprs, constExprValueMap)
 
       // data connector
       val sourceDataConnector: DataConnector =
