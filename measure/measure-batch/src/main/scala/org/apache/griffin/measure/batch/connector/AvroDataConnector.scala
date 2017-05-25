@@ -11,6 +11,7 @@ import java.nio.file.{Files, Paths}
 import org.apache.griffin.measure.batch.rule.{ExprValueUtil, RuleExprs}
 import org.apache.griffin.measure.batch.utils.HdfsUtil
 
+// data connector for avro file
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
                              ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
                             ) extends DataConnector {

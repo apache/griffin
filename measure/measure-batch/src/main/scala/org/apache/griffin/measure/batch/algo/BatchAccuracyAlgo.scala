@@ -15,7 +15,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.util.{Failure, Success, Try}
 
-
+// accuracy algorithm for batch mode
 case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
   val envParam = allParam.envParam
   val userParam = allParam.userParam
@@ -120,6 +120,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     (data, Map[String, Any]())
   }
 
+  // calculate accuracy between source data and target data
   def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzer
               ): (AccuracyResult, RDD[(Product, (Map[String, Any], Map[String, Any]))], RDD[(Product, (Map[String, Any], Map[String, Any]))]) = {
 
@@ -136,6 +137,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     (accuResult, missingRdd, matchedRdd)
   }
 
+  // convert data into a string
   def record2String(rec: (Product, (Map[String, Any], Map[String, Any])), sourcePersist: Iterable[Expr], targetPersist: Iterable[Expr]): String = {
     val (key, (data, info)) = rec
     val persistData = getPersistMap(data, sourcePersist)
@@ -148,6 +150,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     s"${persistData} [${persistInfo}]"
   }
 
+  // get the expr value map of the persist expressions
   private def getPersistMap(data: Map[String, Any], persist: Iterable[Expr]): Map[String, Any] = {
     val persistMap = persist.map(e => (e._id, e.desc)).toMap
     data.flatMap { pair =>

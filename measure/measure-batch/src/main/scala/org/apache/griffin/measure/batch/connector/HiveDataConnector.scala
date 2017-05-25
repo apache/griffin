@@ -7,6 +7,7 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 import scala.util.{Success, Try}
 
+// data connector for hive
 case class HiveDataConnector(sqlContext: SQLContext, config: Map[String, Any],
                              ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
                             ) extends DataConnector {

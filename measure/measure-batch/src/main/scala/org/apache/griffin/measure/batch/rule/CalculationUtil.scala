@@ -7,6 +7,7 @@ object CalculationUtil {
 
   implicit def option2CalculationValue(v: Option[_]): CalculationValue = CalculationValue(v)
 
+  // redefine the calculation method of operators in DSL
   case class CalculationValue(value: Option[_]) extends Serializable {
 
     def + (other: Option[_]): Option[_] = {

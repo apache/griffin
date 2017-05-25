@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.result
 
-
+// result for accuracy: miss count, total count
 case class AccuracyResult(miss: Long, total: Long) extends Result {
 
   type T = AccuracyResult

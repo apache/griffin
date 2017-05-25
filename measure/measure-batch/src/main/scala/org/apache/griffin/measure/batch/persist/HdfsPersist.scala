@@ -8,7 +8,7 @@ import org.apache.spark.rdd.RDD
 
 import scala.util.Try
 
-
+// persist result and data to hdfs
 case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
   val Path = "path"
