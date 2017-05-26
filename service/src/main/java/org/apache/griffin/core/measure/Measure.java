@@ -9,31 +9,31 @@ public class Measure extends AuditableEntity   {
     private static final long serialVersionUID = -4748881017029815794L;
 
     @Column(unique=true)
-    public String name;
+    private String name;
 
-    public String description;
+    private String description;
 
     public static enum MearuseType {
         accuracy,
     }
 
-    public String organization;
+    private String organization;
     @Enumerated(EnumType.STRING)
-    public MearuseType type;
+    private MearuseType type;
 
     @ManyToOne(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "source_id")
-    public DataConnector source;
+    private DataConnector source;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "target_id")
-    public DataConnector target;
+    private DataConnector target;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "evaluateRule_id")
-    public EvaluateRule evaluateRule;
+    private EvaluateRule evaluateRule;
 
-    public String owner;
+    private String owner;
 
     public String getName() {
         return name;
