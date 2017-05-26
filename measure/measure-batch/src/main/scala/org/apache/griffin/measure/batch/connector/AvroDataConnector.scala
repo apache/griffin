@@ -8,12 +8,12 @@ import com.databricks.spark.avro._
 import scala.util.{Success, Try}
 import java.nio.file.{Files, Paths}
 
+import org.apache.griffin.measure.batch.rule.{ExprValueUtil, RuleExprs}
 import org.apache.griffin.measure.batch.utils.HdfsUtil
 
+// data connector for avro file
 case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                             groupbyExprs: Seq[MathExpr], cacheExprs: Iterable[Expr],
-                             finalCacheExprs: Iterable[Expr], globalFinalCacheMap: Map[String, Any],
-                             whenClauseOpt: Option[LogicalExpr]
+                             ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
                             ) extends DataConnector {
 
   val FilePath = "file.path"
@@ -47,14 +47,14 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     Try {
       loadDataFile.flatMap { row =>
         // generate cache data
-        val cacheData: Map[String, Any] = cacheExprs.foldLeft(globalFinalCacheMap) { (cachedMap, expr) =>
-          CacheDataUtil.genCachedMap(Some(row), expr, cachedMap)
+        val cacheExprValueMap: Map[String, Any] = ruleExprs.cacheExprs.foldLeft(constFinalExprValueMap) { (cachedMap, expr) =>
+          ExprValueUtil.genExprValueMap(Some(row), expr, cachedMap)
         }
-        val finalCacheData = CacheDataUtil.filterCachedMap(finalCacheExprs, cacheData)
+        val finalExprValueMap = ExprValueUtil.updateExprValueMap(ruleExprs.finalCacheExprs, cacheExprValueMap)
 
         // when clause filter data source
-        val whenResult = whenClauseOpt match {
-          case Some(whenClause) => whenClause.calculate(finalCacheData)
+        val whenResult = ruleExprs.whenClauseExprOpt match {
+          case Some(whenClause) => whenClause.calculate(finalExprValueMap)
           case _ => None
         }
 
@@ -62,15 +62,15 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
         whenResult match {
           case Some(false) => None
           case _ => {
-            val groupbyData: Seq[AnyRef] = groupbyExprs.flatMap { expr =>
-              expr.calculate(finalCacheData) match {
+            val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
+              expr.calculate(finalExprValueMap) match {
                 case Some(v) => Some(v.asInstanceOf[AnyRef])
                 case _ => None
               }
             }
             val key = toTuple(groupbyData)
 
-            Some((key, finalCacheData))
+            Some((key, finalExprValueMap))
           }
         }
       }

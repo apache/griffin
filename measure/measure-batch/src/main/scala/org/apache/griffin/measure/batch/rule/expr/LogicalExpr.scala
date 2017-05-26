@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch.rule.expr
 
-import org.apache.griffin.measure.batch.utils.CalculationUtil._
+import org.apache.griffin.measure.batch.rule.CalculationUtil._
 
 trait LogicalExpr extends Expr with AnalyzableExpr {
   override def cacheUnit: Boolean = true
@@ -42,7 +42,7 @@ case class LogicalCompareExpr(left: MathExpr, compare: String, right: MathExpr) 
     left.getPersistExprs(ds) ++ right.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(Expr, Expr)] = {
     if (compare == "=" || compare == "==") {
       (left.dataSourceOpt, right.dataSourceOpt) match {
         case (Some(dsPair._1), Some(dsPair._2)) => (left, right) :: Nil
@@ -95,7 +95,7 @@ case class UnaryLogicalExpr(oprList: Iterable[String], factor: LogicalExpr) exte
       }
     }
   }
-  val desc: String = oprList.foldRight(factor.desc) { (prev, ex) => s"${prev}${ex}" }
+  val desc: String = oprList.foldRight(factor.desc) { (prev, ex) => s"${prev} ${ex}" }
   val dataSources: Set[String] = factor.dataSources
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     factor.getCacheExprs(ds)
@@ -107,7 +107,7 @@ case class UnaryLogicalExpr(oprList: Iterable[String], factor: LogicalExpr) exte
     factor.getPersistExprs(ds)
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(Expr, Expr)] = {
     val notOprList = oprList.filter { opr =>
       opr match {
         case this.notOpr() => true
@@ -144,7 +144,7 @@ case class BinaryLogicalExpr(first: LogicalExpr, others: Iterable[(String, Logic
     first.getPersistExprs(ds) ++ others.flatMap(_._2.getPersistExprs(ds))
   }
 
-  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(MathExpr, MathExpr)] = {
+  override def getGroupbyExprPairs(dsPair: (String, String)): Seq[(Expr, Expr)] = {
     if (others.isEmpty) first.getGroupbyExprPairs(dsPair)
     else {
       val isAnd = others.exists(_._1 match {

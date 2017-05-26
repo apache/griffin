@@ -10,6 +10,8 @@ object AccuracyCore {
   type V = Map[String, Any]
   type T = Map[String, Any]
 
+  // allKvs: rdd of (key, (List[(sourceData, sourceInfo)], List[(targetData, targetInfo)]))
+  // output: accuracy result, missing source data rdd, matched source data rdd
   def accuracy(allKvs: RDD[(Product, (Iterable[(V, T)], Iterable[(V, T)]))], ruleAnalyzer: RuleAnalyzer
               ): (AccuracyResult, RDD[(Product, (V, T))], RDD[(Product, (V, T))]) = {
     val result: RDD[(Long, Long, List[(Product, (V, T))], List[(Product, (V, T))])] = allKvs.map { kv =>
@@ -52,26 +54,29 @@ object AccuracyCore {
     (AccuracyResult(countPair._1, (countPair._1 + countPair._2)), missRdd, matchRdd)
   }
 
+  // try to match source and target data, return true if matched, false if unmatched, also with some matching info
   private def matchData(source: (V, T), target: (V, T), ruleAnalyzer: RuleAnalyzer): (Boolean, T) = {
 
     // 1. merge source and target cached data
-    val mergedData: Map[String, Any] = mergeData(source, target)
+    val mergedExprValueMap: Map[String, Any] = mergeExprValueMap(source, target)
 
     // 2. check valid
-    if (ruleAnalyzer.rule.valid(mergedData)) {
+    if (ruleAnalyzer.rule.valid(mergedExprValueMap)) {
       // 3. substitute the cached data into statement, get the statement value
-      // currently we can not get the mismatch reason, we need to add such information to figure out how it mismatches
-      ((ruleAnalyzer.rule.calculate(mergedData) match {
+      val matched = ruleAnalyzer.rule.calculate(mergedExprValueMap) match {
         case Some(b: Boolean) => b
         case _ => false
-      }), Map[String, Any](MismatchInfo.wrap("not matched"), TargetInfo.wrap(target._1)))
+      }
+      // currently we can not get the mismatch reason, we need to add such information to figure out how it mismatches
+      if (matched) (matched, Map[String, Any]())
+      else (matched, Map[String, Any](MismatchInfo.wrap("not matched"), TargetInfo.wrap(target._1)))
     } else {
       (false, Map[String, Any](MismatchInfo.wrap("invalid to compare"), TargetInfo.wrap(target._1)))
     }
 
   }
 
-  private def mergeData(source: (V, T), target: (V, T)): Map[String, Any] = {
+  private def mergeExprValueMap(source: (V, T), target: (V, T)): Map[String, Any] = {
     source._1 ++ target._1
   }
 

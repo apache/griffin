@@ -1,4 +1,4 @@
-package org.apache.griffin.measure.batch.utils
+package org.apache.griffin.measure.batch.rule
 
 import scala.util.{Success, Try}
 
@@ -7,6 +7,7 @@ object CalculationUtil {
 
   implicit def option2CalculationValue(v: Option[_]): CalculationValue = CalculationValue(v)
 
+  // redefine the calculation method of operators in DSL
   case class CalculationValue(value: Option[_]) extends Serializable {
 
     def + (other: Option[_]): Option[_] = {
@@ -117,14 +118,16 @@ object CalculationUtil {
     def === (other: Option[_]): Option[Boolean] = {
       (value, other) match {
         case (Some(v1), Some(v2)) => Some(v1 == v2)
-        case _ => None
+        case (None, None) => Some(true)
+        case _ => Some(false)
       }
     }
 
     def =!= (other: Option[_]): Option[Boolean] = {
       (value, other) match {
         case (Some(v1), Some(v2)) => Some(v1 != v2)
-        case _ => None
+        case (None, None) => Some(false)
+        case _ => Some(true)
       }
     }
 
@@ -149,6 +152,7 @@ object CalculationUtil {
     def >= (other: Option[_]): Option[Boolean] = {
       Try {
         (value, other) match {
+          case (None, None) => Some(true)
           case (Some(v1: String), Some(v2: String)) => Some(v1 >= v2)
           case (Some(v1: Byte), Some(v2)) => Some(v1 >= v2.toString.toDouble)
           case (Some(v1: Short), Some(v2)) => Some(v1 >= v2.toString.toDouble)
@@ -185,6 +189,7 @@ object CalculationUtil {
     def <= (other: Option[_]): Option[Boolean] = {
       Try {
         (value, other) match {
+          case (None, None) => Some(true)
           case (Some(v1: String), Some(v2: String)) => Some(v1 <= v2)
           case (Some(v1: Byte), Some(v2)) => Some(v1 <= v2.toString.toDouble)
           case (Some(v1: Short), Some(v2)) => Some(v1 <= v2.toString.toDouble)
@@ -216,14 +221,16 @@ object CalculationUtil {
     def between (other: Iterable[Option[_]]): Option[Boolean] = {
       if (other.size < 2) None else {
         val (begin, end) = (other.head, other.tail.head)
-        optAnd(>=(begin), <=(end))
+        if (begin.isEmpty && end.isEmpty) Some(value.isEmpty)
+        else optAnd(>=(begin), <=(end))
       }
     }
 
     def not_between (other: Iterable[Option[_]]): Option[Boolean] = {
       if (other.size < 2) None else {
         val (begin, end) = (other.head, other.tail.head)
-        optOr(<(begin), >(end))
+        if (begin.isEmpty && end.isEmpty) Some(value.nonEmpty)
+        else optOr(<(begin), >(end))
       }
     }
 
