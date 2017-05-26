@@ -1,0 +1,11 @@
+network.host: 0.0.0.0
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+node.name: "griffin"
+cluster.name: griffin-elas
+path.data: /data/elasticsearch
+
+indices.fielddata.cache.size: 40%
+indices.breaker.fielddata.limit: 60%
+indices.breaker.request.limit: 40%
+indices.breaker.total.limit: 70%

@@ -6,6 +6,7 @@ import org.apache.spark.rdd.RDD
 
 import scala.util.Try
 
+// persist result and data by multiple persists
 case class MultiPersists(persists: Iterable[Persist]) extends Persist {
 
   val timeStamp: Long = persists match {

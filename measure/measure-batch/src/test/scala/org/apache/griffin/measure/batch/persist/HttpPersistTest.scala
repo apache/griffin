@@ -1,36 +1,24 @@
 package org.apache.griffin.measure.batch.persist
 
-import org.apache.griffin.measure.batch.log.Loggable
-import org.apache.griffin.measure.batch.result.AccuracyResult
-import org.apache.griffin.measure.batch.utils.JsonUtil
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
-import scala.util.{Try, Failure}
-
 @RunWith(classOf[JUnitRunner])
-class HttpPersistTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
+class HttpPersistTest extends FunSuite with Matchers with BeforeAndAfter {
 
-  test("test result json") {
-    val ar = AccuracyResult(10, 1000)
-    val dataMap = Map[String, Any](("name" -> "metric"), ("tmst" -> System.currentTimeMillis), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
-    val data = JsonUtil.toJson(dataMap)
-    println(data)
+  val config: Map[String, Any] = Map[String, Any](("api" -> "url/api"), ("method" -> "post"))
+  val metricName: String = "metric"
+  val timeStamp: Long = 123456789L
+
+  val httpPersist = HttpPersist(config, metricName, timeStamp)
+
+  test ("constructor") {
+    httpPersist.api should be ("url/api")
+    httpPersist.method should be ("post")
   }
 
-  test("test try") {
-    Try {
-      Try {
-        throw new Exception("test")
-      } match {
-        case Failure(ex) => throw new Exception(ex.getMessage)
-        case _ => println("success inner")
-      }
-    } match {
-      case Failure(ex) => println(ex.getMessage)
-      case _ => println("success")
-    }
-
+  test("available") {
+    httpPersist.available should be (true)
   }
 }
