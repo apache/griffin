@@ -95,7 +95,7 @@ case class UnaryLogicalExpr(oprList: Iterable[String], factor: LogicalExpr) exte
       }
     }
   }
-  val desc: String = oprList.foldRight(factor.desc) { (prev, ex) => s"${prev}${ex}" }
+  val desc: String = oprList.foldRight(factor.desc) { (prev, ex) => s"${prev} ${ex}" }
   val dataSources: Set[String] = factor.dataSources
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
     factor.getCacheExprs(ds)

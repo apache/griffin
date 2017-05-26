@@ -63,11 +63,13 @@ object AccuracyCore {
     // 2. check valid
     if (ruleAnalyzer.rule.valid(mergedExprValueMap)) {
       // 3. substitute the cached data into statement, get the statement value
-      // currently we can not get the mismatch reason, we need to add such information to figure out how it mismatches
-      ((ruleAnalyzer.rule.calculate(mergedExprValueMap) match {
+      val matched = ruleAnalyzer.rule.calculate(mergedExprValueMap) match {
         case Some(b: Boolean) => b
         case _ => false
-      }), Map[String, Any](MismatchInfo.wrap("not matched"), TargetInfo.wrap(target._1)))
+      }
+      // currently we can not get the mismatch reason, we need to add such information to figure out how it mismatches
+      if (matched) (matched, Map[String, Any]())
+      else (matched, Map[String, Any](MismatchInfo.wrap("not matched"), TargetInfo.wrap(target._1)))
     } else {
       (false, Map[String, Any](MismatchInfo.wrap("invalid to compare"), TargetInfo.wrap(target._1)))
     }

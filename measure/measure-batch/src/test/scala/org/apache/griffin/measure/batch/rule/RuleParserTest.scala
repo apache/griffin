@@ -1,72 +1,5 @@
 package org.apache.griffin.measure.batch.rule
 
-//import org.apache.griffin.measure.batch.log.Loggable
-//import org.junit.runner.RunWith
-//import org.scalatest.junit.JUnitRunner
-//import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
-//
-//
-//@RunWith(classOf[JUnitRunner])
-//class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
-//
-////  test("test rule parser") {
-////    val ruleParser = RuleParser()
-////
-//////    val rules = "outTime = 24h; @Invalid ${source}['__time'] + ${outTime} > ${target}['__time']"
-////    val rules = "@Key ${source}.json()['seeds'][*].json()['metadata'].json()['tracker']['crawlRequestCreateTS'] === ${target}.json()['groups'][0][\"attrsList\"]['name'=\"CRAWLMETADATA\"]['values'][0].json()['tracker']['crawlRequestCreateTS']"
-//////    val rules = "${source}['__time'] + ${outTime} > ${target}['__time']"
-//////    val rules = "${source}['__time'] > ${target}['__time']"
-//////    val rules = "432"
-//////    val rules = "${target}.json()['groups'][0]['attrsList']['name'='URL']['values'][0]"
-////
-////    val result = ruleParser.parseAll(ruleParser.statementsExpr, rules)
-////
-////    println(result)
-////  }
-//
-////  test("treat escape") {
-////    val es = """Hello\tworld\nmy name is \"ABC\""""
-////    val un = StringContext treatEscapes es
-////
-////    println(es)
-////    println(un)
-////  }
-//
-//  test("test rule parser") {
-//    val ruleParser = RuleParser()
-//
-////    val rules = "$SOUrce['tgt' < $source['tag' != 2] - -+-++---1] between ( -$target['32a'] + 9, 100, ----1000 ) and (45 > 9 or $target.type + 8 == 9 and $source['a'] >= 0) when not not not not $source._time + 24h < $target._time"
-//    val rules = "$source['aaaf fd', (21, 43), '12']"
-//
-//    val result = ruleParser.parseAll(ruleParser.selection, rules)
-//
-//    println(result)
-//  }
-//
-//  test("test rule analyzer") {
-//    val ruleParser = RuleParser()
-//
-////    val rules = "$source.tag == $target['take' >= 5] and $source.price + $source.price1 > $target['kk' < $target.age] and $source.ee = $target.fe + $target.a when $target.ggg = 1"
-//    val rules = "$source.tag = $target.tag WHEN true"
-//    val result = ruleParser.parseAll(ruleParser.rule, rules)
-//    println(result)
-//
-//    if (result.successful) {
-//      val ruleAnalyzer = RuleAnalyzer(result.get)
-//
-//      println("source")
-//      println(ruleAnalyzer.sourceRuleExprs)
-//      println("source")
-//      println(ruleAnalyzer.targetRuleExprs)
-//    }
-//
-//
-//
-//  }
-//
-//}
-
-import org.apache.griffin.measure.batch.rule.expr._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
@@ -206,4 +139,39 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter {
     result.get.desc should be ("($source['age'] + 1, $target['age'] + 3, 40)")
   }
 
+  test ("logical expr") {
+    val rule1 = "$source.age + 1 = $target.age"
+    val result1 = ruleParser.parseAll(ruleParser.logicalExpr, rule1)
+    result1.successful should be (true)
+    result1.get.desc should be ("$source['age'] + 1 = $target['age']")
+
+    val rule2 = "$source.age in (3, 5, 6, 10)"
+    val result2 = ruleParser.parseAll(ruleParser.logicalExpr, rule2)
+    result2.successful should be (true)
+    result2.get.desc should be ("$source['age'] in (3, 5, 6, 10)")
+  }
+
+  test ("logical statement") {
+    val rule1 = "$source.descs[0] = $target.desc AND $source.name = $target.name"
+    val result1 = ruleParser.parseAll(ruleParser.logicalStatement, rule1)
+    result1.successful should be (true)
+    result1.get.desc should be ("$source['descs'][0] = $target['desc'] AND $source['name'] = $target['name']")
+
+    val rule2 = "NOT $source.age = $target.age"
+    val result2 = ruleParser.parseAll(ruleParser.logicalStatement, rule2)
+    result2.successful should be (true)
+    result2.get.desc should be ("NOT $source['age'] = $target['age']")
+  }
+
+  test ("whole rule") {
+    val rule1 = "$source.name = $target.name AND $source.age = $target.age"
+    val result1 = ruleParser.parseAll(ruleParser.rule, rule1)
+    result1.successful should be (true)
+    result1.get.desc should be ("$source['name'] = $target['name'] AND $source['age'] = $target['age']")
+
+    val rule2 = "$source.name = $target.name AND $source.age = $target.age WHEN $source.id > 1000"
+    val result2 = ruleParser.parseAll(ruleParser.rule, rule2)
+    result2.successful should be (true)
+    result2.get.desc should be ("$source['name'] = $target['name'] AND $source['age'] = $target['age'] when $source['id'] > 1000")
+  }
 }
