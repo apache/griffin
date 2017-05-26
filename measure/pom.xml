@@ -144,18 +144,6 @@
       <version>${scalamock.version}</version>
       <scope>test</scope>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.scalamock</groupId>-->
-      <!--<artifactId>scalamock-specs2-support_${scala.binary.version}</artifactId>-->
-      <!--<version>${scalamock.version}</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.scalamock</groupId>-->
-      <!--<artifactId>scalamock-core_${scala.binary.version}</artifactId>-->
-      <!--<version>${scalamock.version}</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
 
   </dependencies>
 
