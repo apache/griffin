@@ -8,7 +8,7 @@ import org.apache.spark.rdd.RDD
 
 import scala.util.Try
 
-
+// persist result and data to hdfs
 case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
   val Path = "path"
@@ -16,8 +16,8 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val MaxLinesPerFile = "max.lines.per.file"
 
   val path = config.getOrElse(Path, "").toString
-  val maxPersistLines = config.getOrElse(MaxPersistLines, -1).toString.toLong
-  val maxLinesPerFile = config.getOrElse(MaxLinesPerFile, 10000).toString.toLong
+  val maxPersistLines = try { config.getOrElse(MaxPersistLines, -1).toString.toInt } catch { case _ => -1 }
+  val maxLinesPerFile = try { config.getOrElse(MaxLinesPerFile, 10000).toString.toLong } catch { case _ => 10000 }
 
   val separator = "/"
 
@@ -66,14 +66,14 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     try {
       HdfsUtil.writeContent(StartFile, msg)
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
   def finish(): Unit = {
     try {
       HdfsUtil.createEmptyFile(FinishFile)
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 
@@ -92,7 +92,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
       info(resStr)
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 
@@ -120,7 +120,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
         }
       }
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 
@@ -134,7 +134,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
       val logStr = (if (isInit) persistHead else "") + timeHead(rt) + s"${msg}\n\n"
       HdfsUtil.appendContent(LogFile, logStr)
     } catch {
-      case e => error(e.getMessage)
+      case e: Throwable => error(e.getMessage)
     }
   }
 

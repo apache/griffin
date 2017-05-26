@@ -1,18 +1,25 @@
 package org.apache.griffin.core.measure;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Transient;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 @Entity
 public class DataConnector extends AuditableEntity  {
+    private final static Logger log = LoggerFactory.getLogger(DataConnector.class);
 
     private static final long serialVersionUID = -4748881017029815794L;
     
@@ -21,38 +28,61 @@ public class DataConnector extends AuditableEntity  {
     }
     
     @Enumerated(EnumType.STRING)
-    public ConnectorType type;
+    private ConnectorType type;
     
-    public String version;
+    private String version;
 
     private String config;
 
-    public Map<String,String> getConfig() {
-        Map<String, String> map = new HashMap<String, String>();
-        ObjectMapper mapper = new ObjectMapper();
+    @JsonIgnore
+    @Transient
+    private Map<String,String> configInMaps;
 
-        try {
-            //convert JSON string to Map
-            map = mapper.readValue(config, new TypeReference<HashMap<String, String>>() {});
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static Map<String,String> convertJonsToMap(String jsonString){
+        if(StringUtils.isEmpty(jsonString)) return Collections.EMPTY_MAP;
+        else{
+            Map<String, String> map = new HashMap<String, String>();
+            ObjectMapper mapper = new ObjectMapper();
+
+            try {
+                map = mapper.readValue(jsonString, new TypeReference<HashMap<String, String>>() {});
+            } catch (Exception e) {
+                log.error("Error in converting json to map",e);
+            }
+            return map;
+
         }
-        return map;
     }
 
-    public void setConfig(Map<String,String> config) throws JsonProcessingException {
-        String configJson = new ObjectMapper().writeValueAsString(config);
+    public Map<String,String> getConfigInMaps() {
+        return configInMaps;
+    }
+
+    public void setConfig(Map<String,String> configInMaps) throws JsonProcessingException {
+        String configJson = new ObjectMapper().writeValueAsString(configInMaps);
         this.config = configJson;
     }
 
     public DataConnector() {
     }
 
+    public DataConnector(ConnectorType type,String version, Map<String,String> config){
+        this.type = type;
+        this.version = version;
+        this.configInMaps = config;
+        try {
+            this.config = new ObjectMapper().writeValueAsString(configInMaps);
+        } catch (JsonProcessingException e) {
+            log.error("cannot convert map to josn in DataConnector",e);
+            this.config = "";
+        }
+    }
+
     public DataConnector(ConnectorType type, String version, String config) {
-        super();
         this.type = type;
         this.version = version;
         this.config = config;
+        this.configInMaps = convertJonsToMap(config);
     }
 
     @Override

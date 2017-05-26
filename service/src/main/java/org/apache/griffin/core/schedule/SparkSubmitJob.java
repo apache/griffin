@@ -74,6 +74,10 @@ public class SparkSubmitJob implements Job {
         JobDetail jd = context.getJobDetail();
         String measureName = jd.getJobDataMap().getString("measure");
         measure = measureRepo.findByName(measureName);
+        if (measure==null) {
+            logger.info(measureName + " is not find!");
+            return;
+        }
         sourcePattern = jd.getJobDataMap().getString("sourcePat");
         targetPattern = jd.getJobDataMap().getString("targetPat");
         dataStartTimestamp = jd.getJobDataMap().getString("dataStartTimestamp");
@@ -133,7 +137,7 @@ public class SparkSubmitJob implements Job {
         Map<String, String> partitionItemMap = genPartitions(patternItemSet, partitionItemSet, timestamp);
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
 
-        Map<String, String> configMap = dc.getConfig();
+        Map<String, String> configMap = dc.getConfigInMaps();
         configMap.put("partitions", partitions);
         try {
             dc.setConfig(configMap);

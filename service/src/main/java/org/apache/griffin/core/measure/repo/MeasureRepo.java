@@ -4,9 +4,11 @@ package org.apache.griffin.core.measure.repo;
 import org.apache.griffin.core.measure.Measure;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface MeasureRepo extends CrudRepository<Measure, Long> {
     Measure findByName(String name);
 

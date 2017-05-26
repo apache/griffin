@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
  * Created by xiangrchen on 5/8/17.
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(locations = {"classpath:context.xml"})
 public class SparkSubmitJobTest {
 
     private SparkSubmitJob ssj;
@@ -67,14 +66,13 @@ public class SparkSubmitJobTest {
         DataConnector target = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
         String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
         EvaluateRule eRule = new EvaluateRule(1,rules);
-        Measure measure = new Measure("bevssoj","bevssoj description", Measure.MearuseType.accuracy, "bullyeye", source, target, eRule,"test1");
+        Measure measure = new Measure("viewitem_hourly","bevssoj description", Measure.MearuseType.accuracy, "bullyeye", source, target, eRule,"test1");
 
         when(ssj.measureRepo.findByName("bevssoj")).thenReturn(measure);
-//        ssj.execute(context);
+        ssj.execute(context);
 
         RestTemplate restTemplate =mock(RestTemplate.class);
-//        String uri="http://10.9.246.187:8998/batches";
-        String uri="";
+        String uri="http://10.9.246.187:8998/batches";
         SparkJobDO sparkJobDO=mock(SparkJobDO.class);
         when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(null);
 
@@ -82,8 +80,8 @@ public class SparkSubmitJobTest {
         long currentSystemTimestamp=System.currentTimeMillis();
         long currentTimstamp = ssj.setCurrentTimestamp(currentSystemTimestamp);
 
-//        verify(ssj.measureRepo).findByName("bevssoj");
-//        verify(jdmap,atLeast(2)).put("lastTime",currentTimstamp+"");
+        verify(ssj.measureRepo).findByName("bevssoj");
+        verify(jdmap,atLeast(2)).put("lastTime",currentTimstamp+"");
     }
 
     @Test
@@ -98,22 +96,22 @@ public class SparkSubmitJobTest {
         assertEquals(verifyMap,par);
     }
 
-   @Test
-   public void test_setDataConnectorPartitions(){
-       DataConnector dc=mock(DataConnector.class);
-       String[] patternItemSet={"YYYYMMDD","HH"};
-       String[] partitionItemSet={"date","hour"};
-       long timestamp=1460174400000l;
-       ssj.setDataConnectorPartitions(dc,patternItemSet,partitionItemSet,timestamp);
+    @Test
+    public void test_setDataConnectorPartitions(){
+        DataConnector dc=mock(DataConnector.class);
+        String[] patternItemSet={"YYYYMMDD","HH"};
+        String[] partitionItemSet={"date","hour"};
+        long timestamp=1460174400000l;
+        ssj.setDataConnectorPartitions(dc,patternItemSet,partitionItemSet,timestamp);
 //       doNothing().when(ssj).setDataConnectorPartitions(dataConnector,patternItemSet,partitionItemSet,timestamp);
-       Map<String,String> map=new HashMap<>();
-       map.put("partitions","date=20160409, hour=12");
-       try {
-           verify(dc).setConfig(map);
-       } catch (JsonProcessingException e) {
-           e.printStackTrace();
-       }
-   }
+        Map<String,String> map=new HashMap<>();
+        map.put("partitions","date=20160409, hour=12");
+        try {
+            verify(dc).setConfig(map);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void test_setCurrentTimestamp(){

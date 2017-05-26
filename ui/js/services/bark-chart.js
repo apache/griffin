@@ -1,16 +1,16 @@
 /*
-	Copyright (c) 2016 eBay Software Foundation.
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+  Copyright (c) 2016 eBay Software Foundation.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-	    http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 */
 define(['./module'], function (services) {
   services.factory('$barkChart', function(){
@@ -71,7 +71,7 @@ define(['./module'], function (services) {
     var data = getMetricData(metric);
     var option = {
       title: {
-        text:  metric[0]._source.name,
+        text:  metric.name,
         left: 'center',
         textStyle: {
             fontWeight: 'normal',
@@ -201,7 +201,7 @@ define(['./module'], function (services) {
     var data = getMetricData(metric);
     var option = {
       title: {
-        text:  metric[0]._source.name,
+        text:  metric.name,
 //        link: '/#/viewrule/' + metric.name,
 //        target: 'self',
         left: 'center',
@@ -250,13 +250,9 @@ define(['./module'], function (services) {
 
   function getMetricData(metric) {
     var data = [];
-    var chartData = metric;
+    var chartData = metric.details;
     for(var i = 0; i < chartData.length; i++){
-        var value = 0;
-        if (chartData[i]._source.total > 0) {
-            value = (chartData[i]._source.matched / chartData[i]._source.total * 100).toFixed(2)
-        }
-        data.push([formatTimeStamp(chartData[i]._source.tmst), parseFloat(value)]);
+        data.push([formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.matched/chartData[i]._source.total*100).toFixed(2))]);
     }
 
     data.sort(function(a, b){

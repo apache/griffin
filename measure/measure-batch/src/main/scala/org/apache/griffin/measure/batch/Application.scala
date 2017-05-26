@@ -59,14 +59,21 @@ object Application extends Loggable {
       }
     }
 
-    // choose algorithm   // fixme: not done, need to choose algorithm by param
+    // choose algorithm
     val dqType = allParam.userParam.dqType
-    val algo: Algo = BatchAccuracyAlgo(allParam)
+    val algo: Algo = dqType match {
+      case "accuracy" => BatchAccuracyAlgo(allParam)
+      case _ => {
+        error(s"${dqType} is unsupported dq type!")
+        sys.exit(-4)
+      }
+    }
 
+    // algorithm run
     algo.run match {
       case Failure(ex) => {
         error(ex.getMessage)
-        sys.exit(-4)
+        sys.exit(-5)
       }
       case _ => {
         info("calculation finished")
