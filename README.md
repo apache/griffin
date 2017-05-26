@@ -32,7 +32,7 @@ Release:
     ```
     http://<your local IP address>:38080/
     ```
-    You can also follow the steps using UI [here]()
+    You can also follow the steps using UI [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/dockerUIguide.md#webui-test-case-guide).
 
 ### How to deploy and run at local
 1. Install jdk (1.8 or later versions).
@@ -92,7 +92,7 @@ Release:
     ```
     http://<your IP>:8080
     ```
-9. Follow the steps using UI [here]().
+9. Follow the steps using UI [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/dockerUIguide.md#webui-test-case-guide).
 
 
 **Note**: The front-end UI is still under development, you can only access some basic features currently.
