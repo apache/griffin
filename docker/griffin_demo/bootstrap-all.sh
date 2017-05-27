@@ -41,7 +41,7 @@ service elasticsearch start
 #griffin prepare
 cd /root/data
 nohup ./gen-hive-data.sh > hive-data.log &
-#nohup ./gen-es-data.sh > es-data.log &
+nohup ./init-demo-data.sh > init-data.log &
 cd /root
 
 sed s/HOSTNAME/$HOSTNAME/ /root/service/config/application.properties.template > /root/service/config/application.properties
