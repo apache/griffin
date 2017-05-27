@@ -10,7 +10,7 @@ trait LiteralExpr extends Expr {
 
 case class LiteralStringExpr(expr: String) extends LiteralExpr {
   val value: Option[String] = Some(expr)
-  val desc: String = value.getOrElse("")
+  val desc: String = s"'${value.getOrElse("")}'"
 }
 
 case class LiteralNumberExpr(expr: String) extends LiteralExpr {
@@ -65,4 +65,9 @@ case class LiteralBooleanExpr(expr: String) extends LiteralExpr {
     case _ => throw new Exception(s"${expr} is invalid boolean")
   }
   val desc: String = value.getOrElse("").toString
+}
+
+case class LiteralNullExpr(expr: String) extends LiteralExpr {
+  val value: Option[Any] = None
+  val desc: String = "null"
 }

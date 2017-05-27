@@ -15,7 +15,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.util.{Failure, Success, Try}
 
-
+// accuracy algorithm for batch mode
 case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
   val envParam = allParam.envParam
   val userParam = allParam.userParam
@@ -31,30 +31,28 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // start time
       val startTime = new Date().getTime()
 
-      // get persists
+      // get persists to persist measure result
       val persist: Persist = PersistFactory(envParam.persistParams, metricName).getPersists(startTime)
 
       // get spark application id
       val applicationId = sc.applicationId
 
-      // start
+      // persist start id
       persist.start(applicationId)
 
-      // rules
+      // generate rule from rule param, generate rule analyzer
       val ruleFactory = RuleFactory(userParam.evaluateRuleParam)
       val rule: StatementExpr = ruleFactory.generateRule()
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
-      // global cache data
-      val globalCachedData = CacheDataUtil.genCachedMap(None, ruleAnalyzer.globalCacheExprs, Map[String, Any]())
-      val globalFinalCachedData = CacheDataUtil.filterCachedMap(ruleAnalyzer.globalFinalCacheExprs, globalCachedData)
+      // const expr value map
+      val constExprValueMap = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.constCacheExprs, Map[String, Any]())
+      val finalConstExprValueMap = ExprValueUtil.updateExprValueMap(ruleAnalyzer.constFinalCacheExprs, constExprValueMap)
 
       // data connector
       val sourceDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam,
-          ruleAnalyzer.sourceGroupbyExprs, ruleAnalyzer.sourceCacheExprs,
-          ruleAnalyzer.sourceFinalCacheExprs, globalFinalCachedData,
-          ruleAnalyzer.whenClauseExpr
+          ruleAnalyzer.sourceRuleExprs, finalConstExprValueMap
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -64,9 +62,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         }
       val targetDataConnector: DataConnector =
         DataConnectorFactory.getDataConnector(sqlContext, userParam.targetParam,
-          ruleAnalyzer.targetGroupbyExprs, ruleAnalyzer.targetCacheExprs,
-          ruleAnalyzer.targetFinalCacheExprs, globalFinalCachedData,
-          ruleAnalyzer.whenClauseExpr
+          ruleAnalyzer.targetRuleExprs, finalConstExprValueMap
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -96,7 +92,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       }
 
       // accuracy algorithm
-      val (accuResult, missingRdd, matchingRdd) = accuracy(sourceData, targetData, ruleAnalyzer)
+      val (accuResult, missingRdd, matchedRdd) = accuracy(sourceData, targetData, ruleAnalyzer)
 
       // end time
       val endTime = new Date().getTime
@@ -104,7 +100,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
 
       // persist result
       persist.result(endTime, accuResult)
-      val missingRecords = missingRdd.map(record2String(_, ruleAnalyzer.sourcePersistExprs, ruleAnalyzer.targetPersistExprs))
+      val missingRecords = missingRdd.map(record2String(_, ruleAnalyzer.sourceRuleExprs.persistExprs, ruleAnalyzer.targetRuleExprs.persistExprs))
       persist.missRecords(missingRecords)
 
       // persist end time
@@ -124,6 +120,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     (data, Map[String, Any]())
   }
 
+  // calculate accuracy between source data and target data
   def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzer
               ): (AccuracyResult, RDD[(Product, (Map[String, Any], Map[String, Any]))], RDD[(Product, (Map[String, Any], Map[String, Any]))]) = {
 
@@ -135,11 +132,12 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     val allKvs = sourceWrappedData.cogroup(targetWrappedData)
 
     // 3. accuracy calculation
-    val (accuResult, missingRdd, matchingRdd) = AccuracyCore.accuracy(allKvs, ruleAnalyzer)
+    val (accuResult, missingRdd, matchedRdd) = AccuracyCore.accuracy(allKvs, ruleAnalyzer)
 
-    (accuResult, missingRdd, matchingRdd)
+    (accuResult, missingRdd, matchedRdd)
   }
 
+  // convert data into a string
   def record2String(rec: (Product, (Map[String, Any], Map[String, Any])), sourcePersist: Iterable[Expr], targetPersist: Iterable[Expr]): String = {
     val (key, (data, info)) = rec
     val persistData = getPersistMap(data, sourcePersist)
@@ -152,6 +150,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     s"${persistData} [${persistInfo}]"
   }
 
+  // get the expr value map of the persist expressions
   private def getPersistMap(data: Map[String, Any], persist: Iterable[Expr]): Map[String, Any] = {
     val persistMap = persist.map(e => (e._id, e.desc)).toMap
     data.flatMap { pair =>

@@ -137,7 +137,7 @@ public class SparkSubmitJob implements Job {
         Map<String, String> partitionItemMap = genPartitions(patternItemSet, partitionItemSet, timestamp);
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
 
-        Map<String, String> configMap = dc.getConfig();
+        Map<String, String> configMap = dc.getConfigInMaps();
         configMap.put("partitions", partitions);
         try {
             dc.setConfig(configMap);
