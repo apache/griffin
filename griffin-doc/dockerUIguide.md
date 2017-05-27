@@ -22,7 +22,7 @@ Follow the steps [here](https://github.com/apache/incubator-griffin#how-to-run-i
     Our default schedule UI is not implemented at current, so you can call the rest api we provide, to schedule this measurement.
     Assume that your measure name is "demo_accu", and you want to start the job immediately, run the job every 5 minutes.  
     ```
-    curl -X POST -d '{
+    curl -X POST -H "Content-Type: application/json" -d '{
       "sourcePat":"YYYYMMdd-HH",
       "targetPat":"YYYYMMdd-HH",
       "jobStartTime":"0",
