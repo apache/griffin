@@ -14,6 +14,7 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
     MultiPersists(persistParams.flatMap(param => getPersist(timeStamp, param)))
   }
 
+  // get the persists configured
   private def getPersist(timeStamp: Long, persistParam: PersistParam): Option[Persist] = {
     val persistConfig = persistParam.config
     val persistTry = persistParam.persistType match {

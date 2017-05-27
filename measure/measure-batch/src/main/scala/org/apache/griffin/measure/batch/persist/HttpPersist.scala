@@ -6,6 +6,7 @@ import org.apache.spark.rdd.RDD
 
 import scala.util.Try
 
+// persist result by http way
 case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
   val Api = "api"
