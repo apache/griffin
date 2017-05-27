@@ -19,14 +19,14 @@ Release:
 1. Install [docker](https://www.docker.com/).
 2. Pull our built docker image.
     ```
-    docker pull bhlx3lyx7/griffin_demo:0.1.0
+    docker pull bhlx3lyx7/griffin_demo:0.0.1
     ```
 3. Run this docker image, then griffin is ready.
     ```
     docker run -it -h sandbox --name griffin_demo -m 8G --memory-swap -1 \
     -p 32122:2122 -p 37077:7077 -p 36066:6066 -p 38088:8088 -p 38040:8040 \
     -p 33306:3306 -p 39000:9000 -p 38042:8042 -p 38080:8080 -p 37017:27017 \
-    -p 39083:9083 -p 38998:8998 -p 39200:9200 bhlx3lyx7/griffin_demo:0.1.0
+    -p 39083:9083 -p 38998:8998 -p 39200:9200 bhlx3lyx7/griffin_demo:0.0.1
     ```
 4. Now you can visit UI through your browser, login with account "test" and password "test" if required.
     ```
