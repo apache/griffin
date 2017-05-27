@@ -20,14 +20,14 @@ Follow the steps [here](https://github.com/apache/incubator-griffin#how-to-run-i
 
 3.  Now you've created a new DQ measurement, the measurement needs to be scheduled to run in the docker container.  
     Our default schedule UI is not implemented at current, so you can call the rest api we provide, to schedule this measurement.
-    Assume that your measure name is "demo_accu", and you want to start the job immediately, run the job every 5 minutes.  
+    Assume that you want to start the job immediately, run the job every 5 minutes.  
     ```
     curl -X POST -H "Content-Type: application/json" -d '{
       "sourcePat":"YYYYMMdd-HH",
       "targetPat":"YYYYMMdd-HH",
       "jobStartTime":"0",
       "periodTime":"300"
-    }' "http://<you local ip>:38080/jobs/add/BA/<job id>/demo_accu"
+    }' "http://<you local ip>:38080/jobs/add/BA/<job id>/<measure-name>"
     ```  
     The port 38080 is mapping to docker container 8080, the port of griffin service, and each time you submit a new schedule, you need to submit a new <job id>.  
     Wait for about 1 minute, after the calculation, results would be published to web UI, then you can watch the dashboard by clicking "DQ Metrics" at the top right corner.
