@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class MeasureController {
     private static final Logger log = LoggerFactory.getLogger(MeasureController.class);
@@ -43,6 +45,10 @@ public class MeasureController {
         return measureService.updateMeasure(measure);
     }
 
+    @RequestMapping("/measures/owner/{owner}")
+    public List<String> getAllMeasureNameOfOwner(@PathVariable("owner") String owner){
+        return measureService.getAllMeasureNameByOwner(owner);
+    }
 
     @RequestMapping(value = "/measures/add", method = RequestMethod.POST)
     @ResponseBody

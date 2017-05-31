@@ -1,5 +1,6 @@
 package org.apache.griffin.core.schedule;
 
+import org.apache.griffin.core.schedule.Repo.ScheduleStateRepo;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
@@ -27,7 +28,8 @@ public class SchedulerController {
 
     @Autowired
     private SchedulerFactoryBean factory;
-
+    @Autowired
+    private ScheduleStateRepo scheduleStateRepo;
 
     public static final String ACCURACY_BATCH_GROUP = "BA";
 
@@ -52,12 +54,24 @@ public class SchedulerController {
                 if (triggers.size() > 0) {
                     //always get next run
                     Date nextFireTime = triggers.get(0).getNextFireTime();
+                    Date previousFireTime=triggers.get(0).getPreviousFireTime();
+//                    triggers.get(0).getScheduleBuilder()
+
+                    Trigger.TriggerState triggerState=scheduler.getTriggerState(triggers.get(0).getKey());
 
                     map.put("jobName", jobName);
                     map.put("groupName", jobGroup);
-                    map.put("nextFireTime", nextFireTime.toString());
+                    map.put("nextFireTime", nextFireTime.getTime());
+                    map.put("previousFireTime",previousFireTime.getTime());
+                    map.put("triggerState",triggerState);
 
                     map.put("measure", (String) jd.getJobDataMap().get("measure"));
+                    map.put("sourcePat",jd.getJobDataMap().getString("sourcePat"));
+                    map.put("targetPat",jd.getJobDataMap().getString("targetPat"));
+
+                    map.put("dataStartTimestamp",Long.parseLong(jd.getJobDataMap().getString("dataStartTimestamp")));
+                    map.put("jobStartTime",jd.getJobDataMap().getString("jobStartTime"));
+                    map.put("periodTime",jd.getJobDataMap().getString("periodTime"));
                     list.add(map);
                 }
 
@@ -112,6 +126,8 @@ public class SchedulerController {
                 jobDetail.getJobDataMap().put("jobStartTime", schedulerRequestBody.getJobStartTime());
                 jobDetail.getJobDataMap().put("periodTime", schedulerRequestBody.getPeriodTime());
                 jobDetail.getJobDataMap().put("lastTime", "");
+                jobDetail.getJobDataMap().put("groupName",groupName);
+                jobDetail.getJobDataMap().put("jobName",jobName);
 
                 jobStartTime = Integer.parseInt(schedulerRequestBody.getJobStartTime());
                 periodTime = Integer.parseInt(schedulerRequestBody.getPeriodTime());
@@ -150,6 +166,11 @@ public class SchedulerController {
             LOGGER.error(e.getMessage());
             return false;
         }
+    }
+
+    @RequestMapping("/instances/groups/{group}/jobs/{name}")
+    public Iterable<ScheduleState> findInstancesOfJob(@PathVariable String group,@PathVariable String name){
+        return scheduleStateRepo.findAllByGroupNameAndJobName(group,name);
     }
 }
 
