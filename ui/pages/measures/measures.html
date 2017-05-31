@@ -1,4 +1,25 @@
 <!--
+  #%L
+  Apache Griffin
+$Id:$
+$HeadURL:$
+  %%
+  Copyright (C) 2017 Apache
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  #L%
+  -->
+<!--
 	Copyright (c) 2016 eBay Software Foundation.
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -14,7 +35,7 @@
  -->
 <div >
     <p>
-        <a class="btn btn-primary btn-o btn-wide" href="#/createrule0"><i class="fa fa-plus"></i> Create DQ Model</a>
+        <a class="btn btn-primary btn-o btn-wide" href="#/createrule0"><i class="fa fa-plus"></i> Create Measure</a>
     </p>
 
     <div id="modelContainer">
@@ -51,7 +72,7 @@
                 <td>{{row.organization}}</td>
                 <td>
                     &nbsp;
-                    <a ng-class="" href="" ng-click="remove(row)" title="delete">
+                    <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
                         <i class="fa fa-trash-o"></i>
                     </a>
                     &nbsp;
@@ -89,7 +110,7 @@
                     <h4 class="modal-title">Delete the model with the below information?</h4>
                 </div>
                 <div class="modal-body">
-                    <ng-include src="'/pages/rules/delete-confirm.html'"/>
+                    <ng-include src="'/pages/measures/delete-confirm.html'"/>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" ng-click="confirmDelete()">Yes</button>

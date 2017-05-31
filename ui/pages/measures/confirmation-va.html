@@ -1,4 +1,25 @@
 <!--
+  #%L
+  Apache Griffin
+$Id:$
+$HeadURL:$
+  %%
+  Copyright (C) 2017 Apache
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  #L%
+  -->
+<!--
 	Copyright (c) 2016 eBay Software Foundation.
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -70,6 +91,16 @@
             </div>
           </div>
 
+          <div class="row" ng-show="form.data.extra.vaType=='9'">
+            <label class="col-md-4 col-lg-4 col-sm-4">
+              Regular Expression:
+            </label>
+
+            <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff">
+              {{form.data.basic.regex}}
+            </div>
+          </div>
+
           <div class="row">
             <label class="col-md-4 col-lg-4 col-sm-4">
               Threshold:
@@ -122,19 +153,23 @@
         <div id="viewrule-definition" class="viewrule-content">
           <div class="row">
             <label class="col-md-4 col-lg-4 col-sm-4">
-              Detection type:
+              Validity type:
             </label>
 
             <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-              {{form.anType|strmap:anTypes}}
+              {{form.vaType|strmap:vaTypes}}
             </div>
           </div>
-          <div class="row-fluid">
-            <img ng-if="form.anType == 1" src="/img/yoy.png" style="max-height: 300px;width:100%"/>
-            <img ng-if="form.anType == 2" src="/img/bollinger.png" style="max-height: 400px;width:100%"/>
+
+          <div class="row">
+            <label class="col-md-4 col-lg-4 col-sm-4">
+              Selected column:
+            </label>
+
+            <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+              {{currentNode.parent.name}}.{{currentNode.name}}.{{form.selection}}
+            </div>
           </div>
-
-
         </div>
     </div>
 

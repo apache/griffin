@@ -1,0 +1,67 @@
+<div class="container-fluid" id="viewJobContent" style="overflow:auto;">
+    <div class="row">
+        <h5 class="over-title margin-bottom-15">Basic information</h5>
+    </div><!--//row-->
+    <div class="row">
+
+        <div  class="col-lg-12 col-md-12 col-sm-12">
+            <div id="viewrule-definition" class="viewrule-content">
+                <div class="row">
+                    <label class="col-md-4 col-lg-4 col-sm-4">
+                        Source Partition:
+                    </label>
+
+                    <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                        {{sourcePat}}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="col-md-4 col-lg-4 col-sm-4">
+                        Target Partition:
+                    </label>
+
+                    <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                        {{targetPat}}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="col-md-4 col-lg-4 col-sm-4">
+                        Measure Name:
+                    </label>
+
+                    <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                        {{Measures[measure]}}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
+                        Start after:
+                    </label>
+
+                    <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                        {{jobStartTime}}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="col-md-4 col-lg-4 col-sm-4">
+                        Interval:
+                    </label>
+
+                    <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff"  >{{periodTime}}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div><!--//row-->
+
+    <br/>
+
+
+</div>

@@ -1,0 +1,66 @@
+<div >
+    <p>
+        <a class="btn btn-primary btn-o btn-wide" href="#/createjob-ac"><i class="fa fa-plus"></i> Create Job</a>
+    </p>
+
+    <div id="modelContainer">
+        <table st-table="displayed" st-pipe="paging" class="table table-striped">
+            <thead>
+            <tr style="background-color:#7D95CC">
+                <th st-ratio="15">Job Name</th>
+                <th st-ratio="15">Source Partition</th>
+                <th st-ratio="15">Target Partition</th>
+                <th st-ratio="20">Next Fire Time</th>
+                <th st-ratio="5">Interval</th>
+                <th st-ratio="5">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-if="!rowCollection || rowCollection.length == 0">
+                <td colspan="7" style="text-align:center">No content!</td>
+            </tr>
+            <tr ng-repeat="row in displayed">
+                <td>{{row.jobName}}</a></td>
+                <td>{{row.sourcePat}}</a></td>
+                <td>{{row.targetPat|strmap:'modeltype'}}</td>
+                <td>{{(row.nextFireTime | date: 'short':'-0700') || 'N/A' }}</td>
+                <td>{{row.periodTime}}</td>
+                <td>
+                    &nbsp;
+                    <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
+                        <i class="fa fa-trash-o"></i>
+                    </a>
+                    &nbsp;
+                    <!--<a href="#/viewrule/{{row.name}}" title="subscribe">-->
+                        <!--<i class="fa fa-eye"></i>-->
+                    <!--</a>-->
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="8" class="text-right">
+                    <div  st-items-by-page="10" st-pagination="" st-displayed-pages="10"></div>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="modal fade" id="deleteJobConfirmation" role="dialog">
+        <div class="modal-dialog modal-xg modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Delete the model with the below information?</h4>
+                </div>
+                <div class="modal-body">
+                    <ng-include src="'/pages/jobs/delete-confirm.html'"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" ng-click="confirmDelete()">Yes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

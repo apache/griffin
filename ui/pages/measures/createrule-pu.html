@@ -1,4 +1,25 @@
 <!--
+  #%L
+  Apache Griffin
+$Id:$
+$HeadURL:$
+  %%
+  Copyright (C) 2017 Apache
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  #L%
+  -->
+<!--
 	Copyright (c) 2016 eBay Software Foundation.
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -47,7 +68,7 @@
                       </label>
 
                       <div class="col-md-10 col-lg-10 col-sm-10 ">
-                        <input type="text" class="form-control" ng-model="form.basic.name" name="ruleName" placeholder="Please input the rule name" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'">
+                        <input type="text" class="form-control" ng-model="form.basic.name" name="ruleName" placeholder="Please input the measure name" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'">
                         <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.required">Model Name is required</span>
                         <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Only letter, number, "-" and "_" are allowed</span>
                       </div>
@@ -192,7 +213,9 @@
 
                 <div class="createrule-hint">
                   <p>
-                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href='#/rules'>Models</a>" to check the model status
+                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href='#/measures
+
+'>Models</a>" to check the model status
                   </p>
                 </div>
 
@@ -217,7 +240,7 @@
                 <h4 class="modal-title">Save the model with the below information?</h4>
               </div>
               <div class="modal-body">
-                <ng-include src="'/pages/rules/confirmation-pu.html'"/>
+                <ng-include src="'/pages/measures/confirmation-pu.html'"/>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
