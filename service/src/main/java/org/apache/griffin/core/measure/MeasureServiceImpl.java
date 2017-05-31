@@ -7,7 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MeasureServiceImpl implements MeasureService{
@@ -55,6 +59,16 @@ public class MeasureServiceImpl implements MeasureService{
             log.info("Failed to create new measure "+name+", it already exists");
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
+    }
+
+    public List<String> getAllMeasureNameByOwner(String owner){
+        List<String> res=new ArrayList<String>();
+        for (Measure measure:measureRepo.findAll()){
+            if(measure.getOwner().equals(owner)){
+                res.add(measure.getName());
+            }
+        }
+        return res;
     }
 
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
