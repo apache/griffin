@@ -1,6 +1,6 @@
 package org.apache.griffin.measure.batch
 
-import org.apache.griffin.measure.batch.algo.{Algo, BatchAccuracyAlgo}
+import org.apache.griffin.measure.batch.algo._
 import org.apache.griffin.measure.batch.config.params._
 import org.apache.griffin.measure.batch.config.params.env._
 import org.apache.griffin.measure.batch.config.params.user._
@@ -62,7 +62,8 @@ object Application extends Loggable {
     // choose algorithm
     val dqType = allParam.userParam.dqType
     val algo: Algo = dqType match {
-      case "accuracy" => BatchAccuracyAlgo(allParam)
+      case MeasureType.accuracy() => BatchAccuracyAlgo(allParam)
+      case MeasureType.profile() => BatchProfileAlgo(allParam)
       case _ => {
         error(s"${dqType} is unsupported dq type!")
         sys.exit(-4)
