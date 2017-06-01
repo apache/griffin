@@ -28,7 +28,7 @@ define(['./module'], function (services) {
 
 //      var ES_SERVER = 'http://10.149.247.156:59200';
 //      var ES_SERVER = "http://" + location.host + ":59200"
-      var ES_SERVER = "search-griffin-h5xiny6xvzre2davsa4s4si4g4.ap-northeast-1.es.amazonaws.com";
+      var ES_SERVER = "http://" + location.host.replace("8080", "9200");
 
       var config = {
           // URI paths, always have a trailing /
