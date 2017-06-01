@@ -6,6 +6,9 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.bind.annotation.*;
 
@@ -168,9 +171,10 @@ public class SchedulerController {
         }
     }
 
-    @RequestMapping("/instances/groups/{group}/jobs/{name}")
-    public Iterable<ScheduleState> findInstancesOfJob(@PathVariable String group,@PathVariable String name){
-        return scheduleStateRepo.findAllByGroupNameAndJobName(group,name);
+    @RequestMapping("/instances/groups/{group}/jobs/{name}/{page}/{size}")
+    public List<ScheduleState> findInstancesOfJob(@PathVariable String group,@PathVariable String name,@PathVariable int page,@PathVariable int size){
+        Pageable pageRequest=new PageRequest(page,size, Sort.Direction.DESC,"timestamp");
+        return scheduleStateRepo.findByGroupNameAndJobName(group,name,pageRequest);
     }
 }
 
