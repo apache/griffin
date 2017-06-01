@@ -191,6 +191,29 @@ public class SchedulerController {
         Pageable pageRequest=new PageRequest(page,size, Sort.Direction.DESC,"timestamp");
         return scheduleStateRepo.findByGroupNameAndJobName(group,name,pageRequest);
     }
+
+    @RequestMapping("/statics")
+    public JobHealth getHealthInfo() throws SchedulerException {
+        Scheduler scheduler=factory.getObject();
+        int jobCount=scheduler.getJobGroupNames().size();
+        int health=0;
+        int invalid=0;
+        for (String groupName : scheduler.getJobGroupNames()){
+            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))){
+                String jobName=jobKey.getName();
+                String jobGroup=jobKey.getGroup();
+                Pageable pageRequest=new PageRequest(0,1, Sort.Direction.DESC,"timestamp");
+                ScheduleState scheduleState=scheduleStateRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
+                if(scheduleState.getState().equals("starting")){
+                    health++;
+                }else{
+                    invalid++;
+                }
+            }
+        }
+        JobHealth jobHealth=new JobHealth(health,invalid,jobCount);
+        return jobHealth;
+    }
 }
 
 
