@@ -106,7 +106,7 @@ define(['./module'], function(controllers) {
 
             // $scope.schemaCollection = null;
             if (newValue) {
-                $http.get(schemaDefinitionUrl + '/table/' + newValue.name).success(function(data) {
+                $http.get(schemaDefinitionUrl+ '/' + newValue.parent[0].dbName+'/table/'+newValue.name).success(function(data) {
                 console.log(data);
                 $scope.schemaCollection = data.sd.cols;
                 console.log($scope.schemaCollection);
