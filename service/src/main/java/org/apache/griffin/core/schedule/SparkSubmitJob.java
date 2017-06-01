@@ -109,7 +109,6 @@ public class SparkSubmitJob implements Job {
         //final String uri = "http://10.9.246.187:8998/batches";
         RestTemplate restTemplate = new RestTemplate();
         setSparkJobDO();
-//        String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         logger.info(result);
         ScheduleResult scheduleResult=new ScheduleResult();
