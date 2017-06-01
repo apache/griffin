@@ -1,15 +1,18 @@
-/*
-  Copyright (c) 2016 eBay Software Foundation.
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-      http://www.apache.org/licenses/LICENSE-2.0
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-*/
+/*-
+ * Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+ */
+
 define(['./module'], function (services) {
     'use strict';
     //version
@@ -59,7 +62,8 @@ define(['./module'], function (services) {
               metricsByOrg:'',
 //              organization:'/org.json',
 //              dashboard:'/dashboard.json',
-              organization: BACKEND_SERVER + '/orgWithMetrics',
+
+              organization:BACKEND_SERVER + '/orgWithMetrics',
               dashboard:ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
               metricsample: BACKEND_SERVER + API_ROOT_PATH + '/metrics/sample',
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',
@@ -70,6 +74,12 @@ define(['./module'], function (services) {
               getModel: BACKEND_SERVER + '/measures/findByName',
               enableModel: BACKEND_SERVER + API_ROOT_PATH + '/models/enableModel',
 
+              //Jobs
+              allJobs:BACKEND_SERVER + '/jobs/',
+              addJobs:BACKEND_SERVER+'/jobs/add/',
+              getMeasuresByOwner:BACKEND_SERVER+'/measures/owner/',
+              deleteJob:BACKEND_SERVER + '/jobs/groups/',
+//              allJobs:'/jobs.json',
               newAccuracyModel: BACKEND_SERVER + API_ROOT_PATH + '/models' ,
               newValidityModel: BACKEND_SERVER + API_ROOT_PATH + '/models' ,
               newAnomalyModel: BACKEND_SERVER + API_ROOT_PATH + '/models' ,

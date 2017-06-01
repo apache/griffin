@@ -1,17 +1,18 @@
 <!--
-	Copyright (c) 2016 eBay Software Foundation.
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
 
-	    http://www.apache.org/licenses/LICENSE-2.0
+  Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
- -->
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+-->
 <div class="container-fluid">
   <div class="row">
     <h5 class="over-title margin-bottom-15">Create DQ Model</h5>
@@ -48,8 +49,7 @@
 					</ul>
 
         <div id="step-1" ng-show="currentStep == 1" class="formStep" >
-          <label class="stepDesc">This step let you choose the target for data quality model, Apollo datasets are enabled, other platofrms are coming soon. </label>
-
+          <label class="stepDesc">This step let you choose the target for data quality comparision with target, Apollo datasets are enabled, other platofrms are coming soon. Currently you can only select the attributes from one schema</label>
 					<div class="container-fluid">
             <!-- select db tree -->
 						<div class="col-md-4 col-lg-4 col-sm-4">
@@ -58,7 +58,6 @@
                 <div class="add-dataset" style="color:#b2c831">
                     <a class="bark-link" href="#/createdataasset">Cannot find your DataAsset? Click here to add</a>
                 </div>
-
                 <div angular-treeview="true"
                       tree-model="dbList"
                       node-id="id"
@@ -77,23 +76,21 @@
 						<div class="col-md-8 col-lg-8 col-sm-8">
 							<fieldset>
 								<legend>
-									<!-- Select one attribute -->
-                  Schema definition
+									Select one attribute
 								</legend>
 
 								<div class="y-scrollable">
                   <div>
                    <label>View schema:</label> <i ng-show="currentNode.parent" style="color:#fff;font-weight: bold;">{{currentNode.parent.name}}.{{currentNode.name}}</i>
                   </div>
-                  <!-- <div>
+                  <div>
                    <label>Selected Column:</label> <i style="color:#fff;font-weight: bold;">{{form.selection}}</i>
-                  </div> -->
-
+                  </div>
                  <div>
                    <table st-table="schemaCollection" class="table table-striped">
                    	<thead>
                      	<tr style="background-color:#7D95CC">
-                        <!-- <th></th> -->
+                        <th></th>
                      		<th>Column Name</th>
                      		<th>Description</th>
                      		<th>Data Type</th>
@@ -106,12 +103,12 @@
                          <td colspan="5" style="text-align:center" ><span class="highlight">Please select a schema from the left tree first</span></td>
                        </tr>
                      	<tr ng-repeat="row in schemaCollection">
-                        <!-- <td><input type="radio"
+                        <td><input type="radio"
                               name="selAttr"
                               value="{{row.name}}"
                               ng-model="form.selection"
                             />
-                        </td> -->
+                        </td>
                         <td>{{row.name}}</td>
                      		<td>{{row.desc}}</td>
                         <td>{{row.type}}</td>
@@ -119,12 +116,6 @@
                      	</tr>
                    	</tbody>
                    </table>
-                 </div>
-
-                 <div style="color:#b2c831">
-                   <p ng-show="currentNode.parent">
-                     <i class="fa fa-info-circle"></i> Total Count of this schema will be applied to the machine learning algorithm
-                   </p>
                  </div>
                 </div>
               </fieldset>
@@ -144,84 +135,63 @@
 
 
       <div id="step-2" ng-show="currentStep == 2" class="formStep" >
-        <label class="stepDesc">Please choose one of the statistical techniques provided below for automatically detecting anomalies:</label>
+        <label class="stepDesc">Please choose one of the validity models provided below:</label>
         <div class="container-fluid">
-
-
           <div class="col-md-12 col-lg-12 col-sm-12">
             <fieldset>
-              <!-- <legend>
-                Map the fields
-              </legend> -->
-
               <div class="y-scrollable">
-
                 <div class="container col-md-12 col-lg-12 col-sm-12">
                   <div class="row">
-
-                    <div class="col-md-6 col-lg-6 col-sm-6">
-
-                      <h5>
-                        <input name="anType" type="radio" ng-model="form.anType" value="1" ng-init="form.anType=1" style="width:1em;height:1em;"/>
-                        <span>History Trend Detection</span>
-                      </h5>
-
-                        <label style="color:#fff;">This is a method of evaluating two or more measured events to comparison the results at one time period with those from another time period (or series of time periods), on an yearly, monthly, weekly, daily or hourly basis. Currently weekly comparision is supported.</label>
-
-                    </div>
-                    <div class="col-md-6 col-lg-6 col-sm-6">
+                    <div class="col-md-3 col-lg-3 col-sm-3">
+                      <h5>Simple Statistics</h5>
                       <div class="container-fluid">
-                        <!-- <p>Here's an example for Year over Year difference calculation</p> -->
-                        <img src="/img/yoy.png" style="max-height: 200px;width:100%"/>
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                          <input name="vaType" type="radio" ng-model="form.vaType" value="2" ng-init="form.vaType=2" /> <label>Null Count</label>
+                        </div>
+                      </div>
+                      <div class="container-fluid">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                          <input name="vaType" type="radio" ng-model="form.vaType"   value="3"/> <label>Unique Count</label>
+                        </div>
+                      </div>
+                      <div class="container-fluid">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                          <input name="vaType" type="radio" ng-model="form.vaType" value="4"/> <label>Duplicate Count</label>
+                        </div>
+                      </div>
+                      <h5>Summary Statistics</h5>
+                      <div class="container-fluid">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                          <input name="vaType" type="radio" ng-model="form.vaType"  value="5"/> <label>Maximum</label>
+                        </div>
+                      </div>
+                      <div class="container-fluid">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                          <input name="vaType" type="radio" ng-model="form.vaType" value="6"/> <label>Minimum</label>
+                        </div>
+                      </div>
+                      <div class="container-fluid">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                          <input name="vaType" type="radio" ng-model="form.vaType" value="7"/> <label>Mean</label>
+                        </div>
+                      </div>
+                      <div class="container-fluid">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                          <input name="vaType" type="radio" ng-model="form.vaType" value="8"/> <label>Median</label>
+                        </div>
+                      </div>
+                      <h5>Advanced Statistics</h5>
+                      <div class="container-fluid">
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                          <input name="vaType" type="radio" ng-model="form.vaType" value="9" disabled/> <label>Regular Expression Match</label>
+                        </div>
                       </div>
                     </div>
-
+                    <div class="col-md-9 col-lg-9 col-sm-9" ng-include="'/pages/measures/va-explaination.html'">
+                      <!-- <ng-include src="'/models.html'"/> -->
+                    </div>
                   </div>
-                  <br/>
-                  <div class="row">
-
-                    <div class="col-md-6 col-lg-6 col-sm-6">
-                      <h5>
-                        <input name="anType" type="radio" ng-model="form.anType" value="3" style="width:1em;height:1em;"/>
-                        <span>Deviation Detection(Based on MAD)</span>
-                      </h5>
-
-                        <label style="color:#fff;">Deviation detection algorithm usually look at a given time window of a metric time series and establish an upper and lower band for accepted deviations and assume any data point out of those band as a deviation.
-                          <a href="https://en.wikipedia.org/wiki/Median_absolute_deviation" target="_blank">MAD(Median absolute deviation)</a> is a robust measure of the variability of a univariate sample of quantitative data
-                        </label>
-
-                    </div>
-                    <div class="col-md-6 col-lg-6 col-sm-6">
-                      <div class="container-fluid">
-                        <!-- <p>Here's an example for Year over Year difference calculation</p> -->
-                        <img src="/img/mad.png" style="max-height: 200px;width:100%"/>
-                      </div>
-                    </div>
-
-                  </div>
-                  <br/>
-                  <div class="row">
-                    <div class="col-md-6 col-lg-6 col-sm-6">
-                      <h5>
-                        <input name="anType" type="radio" ng-model="form.anType" value="2" style="width:1em;height:1em;"/>
-                        Bollinger Bands Detection
-                      </h5>
-
-                      <label style="color:#fff">
-                        <a href="https://en.wikipedia.org/wiki/Bollinger_Bands" target="_blank">Bollinger Bands</a> are volatility bands placed above and below a moving average. Volatility is based on the standard deviation, which changes as volatility increases and decreases. The bands automatically widen when volatility increases and narrow when volatility decreases.
-                      </label>
-                    </div>
-                    <div class="col-md-6 col-lg-6 col-sm-6">
-                      <div class="container-fluid">
-                        <!-- <p>Here's an example for Bollinger Bands</p> -->
-                        <img src="/img/bollinger.png" style="max-height: 200px;width:100%"/>
-                      </div>
-                    </div>
-
-                  </div>
-
                 </div>
-
               </div>
             </fieldset>
           </div>
@@ -255,10 +225,11 @@
                     </label>
 
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" ng-model="form.basic.name" name="ruleName" placeholder="Please input the rule name" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'">
+                      <input type="text" class="form-control" ng-model="form.basic.name" name="ruleName" placeholder="Please input the measure name" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'">
                       <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.required">Model Name is required</span>
                       <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Only letter, number, "-" and "_" are allowed</span>
                     </div>
+
                   </div>
                 </div>
                 <div class="col-md-12 col-lg-12 col-sm-12">
@@ -279,7 +250,7 @@
                     </label>
 
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select id="typeSelector" class="form-control" ng-model="form.basic.type" ng-init="form.basic.type='2'" disabled required>
+                      <select id="typeSelector" class="form-control" ng-model="form.basic.type" ng-init="form.basic.type='1'" disabled required>
                         <option ng-repeat="row in ruleTypes" value="{{$index}}" >{{row}}</option>
                       </select>
                     </div>
@@ -306,6 +277,33 @@
 
                     <div class="col-md-10 col-lg-10 col-sm-10">
                       <input type="text" class="form-control" ng-model="currentNode.name" disabled>
+                    </div>
+                  </div>
+                </div>
+                <div ng-show="form.vaType==9" class="col-md-12 col-lg-12 col-sm-12" ng-class="{'has-error':Form.regex.$dirty && Form.regex.$invalid, 'has-success':Form.regex.$valid}">
+                  <div class="form-group">
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Regular Expression<span class="symbol required"></span>:
+                    </label>
+
+                    <div class="col-md-10 col-lg-10 col-sm-10">
+                      <div class="row">
+                        <div class="col-md-10 col-lg-10 col-sm-10">
+                          <input type="text"  class="form-control" ng-model="form.basic.regex" name="regex" placeholder="Some expression like ^[A-Za-z]+$" ng-required="form.vaType==9" ng-change="form.testRegex(Form)">
+                          <span class="error text-small block" ng-if="Form.regex.$dirty && Form.regex.$invalid">Please input valid regular expression.</span>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-sm-2">
+                          <button type="button" class="btn btn-primary btn-o next-step" style="width:100%;" ng-click="needTestRegex=!needTestRegex" ng-init="needTestRegex=false;"><i class="faChevron" ng-class="needTestRegex ?'fa fa-angle-down':'fa fa-angle-right'" style="width:10px"></i>&nbsp;Test Regex</button>
+                        </div>
+                      </div>
+                      <div class="row" ng-show="needTestRegex">
+                        <div class="col-md-10 col-lg-10 col-sm-10">
+                          <input type="text"  class="form-control" ng-model="form.basic.regexTestStr" name="regexTestStr" placeholder="Please input the test string here" ng-change="form.testRegex(Form)">
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-sm-2" style="padding-top:8px;">
+                          <span class="test-result" ng-class="{'bg-success': regexTestResult=='Matched', 'bg-danger': regexTestResult=='Unmatched'}">{{regexTestResult}}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -365,7 +363,7 @@
 
               <div style="color:#b2c831">
                 <p>
-                  <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href="#/rules">Models</a>" to check the model status
+                  <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href="#/measures">Models</a>" to check the model status
                 </p>
               </div>
 
@@ -384,7 +382,7 @@
         </div>
       </div>
 
-      <div class="modal fade" id="confirm-an" role="dialog">
+      <div class="modal fade" id="confirm-va" role="dialog">
         <div class="modal-dialog modal-xg modal-lg">
           <div class="modal-content">
             <div class="modal-header">
@@ -392,7 +390,7 @@
               <h4 class="modal-title">Save the model with the below information?</h4>
             </div>
             <div class="modal-body">
-              <ng-include src="'/pages/rules/confirmation-an.html'"/>
+              <ng-include src="'/pages/measures/confirmation-va.html'"/>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

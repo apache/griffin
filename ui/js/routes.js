@@ -1,17 +1,18 @@
-/*
-	Copyright (c) 2016 eBay Software Foundation.
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+/*-
+ * Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-	    http://www.apache.org/licenses/LICENSE-2.0
+     http://www.apache.org/licenses/LICENSE-2.0
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
-*/
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+ */
+
 define(['./app'], function(app) {
     'use strict';
 
@@ -26,44 +27,54 @@ define(['./app'], function(app) {
             controller: 'HealthCtrl'
         });
 
-        $routeProvider.when('/rules', {
-            templateUrl: '/pages/rules/rules.html',
+        $routeProvider.when('/measures', {
+            templateUrl: '/pages/measures/measures.html',
             controller: 'RuleCtrl'
         });
 
         $routeProvider.when('/createrule0', {
-            templateUrl: '/pages/rules/createrule0.html',
+            templateUrl: '/pages/measures/createrule0.html',
             controller: 'CreateRule0Ctrl'
         });
 
         $routeProvider.when('/createrule-ac', {
-            templateUrl: '/pages/rules/createrule-ac.html',
+            templateUrl: '/pages/measures/createrule-ac.html',
             controller: 'CreateRuleACCtrl'
         });
 
         $routeProvider.when('/createrule-va', {
-            templateUrl: '/pages/rules/createrule-va.html',
+            templateUrl: '/pages/measures/createrule-va.html',
             controller: 'CreateRuleVACtrl'
         });
 
         $routeProvider.when('/createrule-an', {
-            templateUrl: '/pages/rules/createrule-an.html',
+            templateUrl: '/pages/measures/createrule-an.html',
             controller: 'CreateRuleANCtrl'
         });
 
         $routeProvider.when('/createrule-pu', {
-            templateUrl: '/pages/rules/createrule-pu.html',
+            templateUrl: '/pages/measures/createrule-pu.html',
             controller: 'CreateRulePUCtrl'
         });
 
         $routeProvider.when('/viewrule/:modelname/:modeltype', {
-            templateUrl: '/pages/rules/viewrule.html',
+            templateUrl: '/pages/measures/viewrule.html',
             controller: 'ViewRuleCtrl'
         });
 
         $routeProvider.when('/viewrule/:modelname', {
-            templateUrl: '/pages/rules/viewrule.html',
+            templateUrl: '/pages/measures/viewrule.html',
             controller: 'ViewRuleCtrl'
+        });
+
+        $routeProvider.when('/jobs',{
+            templateUrl:'pages/jobs/jobs.html',
+            controller:'JobCtrl'
+        });
+
+        $routeProvider.when('/createjob-ac', {
+            templateUrl: '/pages/jobs/createjob-ac.html',
+            controller: 'CreateJobACCtrl'
         });
 
         $routeProvider.when('/metrics', {
