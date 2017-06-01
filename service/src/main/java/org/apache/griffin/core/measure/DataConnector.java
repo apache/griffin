@@ -44,7 +44,15 @@ public class DataConnector extends AuditableEntity  {
     
     @Enumerated(EnumType.STRING)
     private ConnectorType type;
-    
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     private String version;
 
     private String config;
@@ -70,6 +78,7 @@ public class DataConnector extends AuditableEntity  {
     }
 
     public Map<String,String> getConfigInMaps() {
+        if (this.configInMaps == null) this.configInMaps = convertJonsToMap(config);
         return configInMaps;
     }
 
@@ -79,6 +88,7 @@ public class DataConnector extends AuditableEntity  {
     }
 
     public DataConnector() {
+        System.out.println();
     }
 
     public DataConnector(ConnectorType type,String version, Map<String,String> config){
