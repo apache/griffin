@@ -1,10 +1,29 @@
+/*-
+ * Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+ */
+
 package org.apache.griffin.core.schedule;
 
+import org.apache.griffin.core.schedule.Repo.ScheduleStateRepo;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +46,8 @@ public class SchedulerController {
 
     @Autowired
     private SchedulerFactoryBean factory;
-
+    @Autowired
+    private ScheduleStateRepo scheduleStateRepo;
 
     public static final String ACCURACY_BATCH_GROUP = "BA";
 
@@ -52,12 +72,24 @@ public class SchedulerController {
                 if (triggers.size() > 0) {
                     //always get next run
                     Date nextFireTime = triggers.get(0).getNextFireTime();
+                    Date previousFireTime=triggers.get(0).getPreviousFireTime();
+//                    triggers.get(0).getScheduleBuilder()
+
+                    Trigger.TriggerState triggerState=scheduler.getTriggerState(triggers.get(0).getKey());
 
                     map.put("jobName", jobName);
                     map.put("groupName", jobGroup);
-                    map.put("nextFireTime", nextFireTime.toString());
+                    map.put("nextFireTime", nextFireTime.getTime());
+                    map.put("previousFireTime",previousFireTime.getTime());
+                    map.put("triggerState",triggerState);
 
                     map.put("measure", (String) jd.getJobDataMap().get("measure"));
+                    map.put("sourcePat",jd.getJobDataMap().getString("sourcePat"));
+                    map.put("targetPat",jd.getJobDataMap().getString("targetPat"));
+
+                    map.put("dataStartTimestamp",Long.parseLong(jd.getJobDataMap().getString("dataStartTimestamp")));
+                    map.put("jobStartTime",jd.getJobDataMap().getString("jobStartTime"));
+                    map.put("periodTime",jd.getJobDataMap().getString("periodTime"));
                     list.add(map);
                 }
 
@@ -112,6 +144,8 @@ public class SchedulerController {
                 jobDetail.getJobDataMap().put("jobStartTime", schedulerRequestBody.getJobStartTime());
                 jobDetail.getJobDataMap().put("periodTime", schedulerRequestBody.getPeriodTime());
                 jobDetail.getJobDataMap().put("lastTime", "");
+                jobDetail.getJobDataMap().put("groupName",groupName);
+                jobDetail.getJobDataMap().put("jobName",jobName);
 
                 jobStartTime = Integer.parseInt(schedulerRequestBody.getJobStartTime());
                 periodTime = Integer.parseInt(schedulerRequestBody.getPeriodTime());
@@ -150,6 +184,12 @@ public class SchedulerController {
             LOGGER.error(e.getMessage());
             return false;
         }
+    }
+
+    @RequestMapping("/instances/groups/{group}/jobs/{name}/{page}/{size}")
+    public List<ScheduleState> findInstancesOfJob(@PathVariable String group,@PathVariable String name,@PathVariable int page,@PathVariable int size){
+        Pageable pageRequest=new PageRequest(page,size, Sort.Direction.DESC,"timestamp");
+        return scheduleStateRepo.findByGroupNameAndJobName(group,name,pageRequest);
     }
 }
 

@@ -1,11 +1,28 @@
+/*-
+ * Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+ */
+
 package org.apache.griffin.core.schedule;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.Gson;
 import org.apache.griffin.core.measure.DataConnector;
 import org.apache.griffin.core.measure.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.schedule.Repo.ScheduleStateRepo;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +42,9 @@ public class SparkSubmitJob implements Job {
 
     @Autowired
     MeasureRepo measureRepo;
+
+    @Autowired
+    ScheduleStateRepo scheduleStateRepo;
 
     Properties props;
 
@@ -72,6 +92,8 @@ public class SparkSubmitJob implements Job {
     @Override
     public void execute(JobExecutionContext context) {
         JobDetail jd = context.getJobDetail();
+        String groupName=jd.getJobDataMap().getString("groupName");
+        String jobName=jd.getJobDataMap().getString("jobName");
         String measureName = jd.getJobDataMap().getString("measure");
         measure = measureRepo.findByName(measureName);
         if (measure==null) {
@@ -102,9 +124,18 @@ public class SparkSubmitJob implements Job {
         //final String uri = "http://10.9.246.187:8998/batches";
         RestTemplate restTemplate = new RestTemplate();
         setSparkJobDO();
-
+//        String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         logger.info(result);
+        ScheduleResult scheduleResult=new ScheduleResult();
+        Gson gson=new Gson();
+        try {
+            scheduleResult=gson.fromJson(result,ScheduleResult.class);
+        }catch (Exception e){
+            logger.info("scheduleResult covert error!"+e);
+        }
+        ScheduleState scheduleState=new ScheduleState(groupName,jobName,scheduleResult.getId(),scheduleResult.getState(),scheduleResult.getAppId(),System.currentTimeMillis());
+        scheduleStateRepo.save(scheduleState);
         //	{"file": "/exe/griffin-measure-batch-0.0.1-SNAPSHOT.jar", "className": "org.apache.griffin.measure.batch.Application", "args": ["/benchmark/test/env.json", "/benchmark/test/config-rdm.json"], "name": "griffin-livy", "queue": "default", "numExecutors": 2, "executorCores": 4, "driverMemory": "2g", "executorMemory": "2g", "conf": {"spark.jars.packages": "com.databricks:spark-avro_2.10:2.0.1"}, "jars": ["/livy/datanucleus-api-jdo-3.2.6.jar", "/livy/datanucleus-core-3.2.10.jar", "/livy/datanucleus-rdbms-3.2.9.jar"], "files": ["/livy/hive-site.xml"]}' -H "Content-Type: application/json"
     }
 
@@ -196,6 +227,7 @@ public class SparkSubmitJob implements Job {
 
         List<String> files = new ArrayList<>();
 //        files.add(props.getProperty("sparkJob.files_1"));
+
         sparkJobDO.setFiles(files);
     }
 
