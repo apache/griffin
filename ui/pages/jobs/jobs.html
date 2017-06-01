@@ -26,7 +26,11 @@ limitations under the License.
                 <th st-ratio="15">Job Name</th>
                 <th st-ratio="15">Source Partition</th>
                 <th st-ratio="15">Target Partition</th>
+                <th st-ratio="15">Previous Fire Time</th>
+
                 <th st-ratio="20">Next Fire Time</th>
+                <th st-ratio="15">Trigger State</th>
+
                 <th st-ratio="5">Interval</th>
                 <th st-ratio="5">Action</th>
             </tr>
@@ -39,7 +43,11 @@ limitations under the License.
                 <td>{{row.jobName}}</a></td>
                 <td>{{row.sourcePat}}</a></td>
                 <td>{{row.targetPat|strmap:'modeltype'}}</td>
+                <td>{{(row.previousFireTime | date: 'short':'-0700') || 'N/A' }}</td>
+
                 <td>{{(row.nextFireTime | date: 'short':'-0700') || 'N/A' }}</td>
+                <td>{{row.triggerState}}</td>
+
                 <td>{{row.periodTime}}</td>
                 <td>
                     &nbsp;
