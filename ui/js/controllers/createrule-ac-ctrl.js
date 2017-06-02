@@ -409,7 +409,8 @@ define(['./module'], function(controllers) {
                       "evaluateRule":{
                           "rules":'',
                       },
-                      "owner":$scope.currentNode.parent[0].owner,
+//                      "owner":$scope.currentNode.parent[0].owner,
+                      "owner":$scope.basic.owner,
                       mappings:[],
 
                     };
