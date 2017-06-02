@@ -63,11 +63,13 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
     * -- Such job is for validation, not for parser
     *
     *
-    * <literal> ::= <literal-string> | <literal-number> | <literal-time> | <literal-boolean>
+    * <literal> ::= <literal-string> | <literal-number> | <literal-time> | <literal-boolean> | <literal-null> | <literal-none>
     * <literal-string> ::= <any-string>
     * <literal-number> ::= <integer> | <double>
     * <literal-time> ::= <integer> ("d"|"h"|"m"|"s"|"ms")
     * <literal-boolean> ::= true | false
+    * <literal-null> ::= null | undefined
+    * <literal-none> ::= none
     *
     */
 

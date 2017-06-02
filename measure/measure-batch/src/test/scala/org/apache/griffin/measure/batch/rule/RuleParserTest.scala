@@ -53,6 +53,13 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val rule = "null"
     val result = ruleParser.parseAll(ruleParser.literal, rule)
     result.successful should be (true)
+    result.get.value should be (Some(null))
+  }
+
+  test ("literial none") {
+    val rule = "none"
+    val result = ruleParser.parseAll(ruleParser.literal, rule)
+    result.successful should be (true)
     result.get.value should be (None)
   }
 

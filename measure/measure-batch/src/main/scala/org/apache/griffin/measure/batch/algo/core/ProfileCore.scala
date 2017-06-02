@@ -10,14 +10,14 @@ object ProfileCore {
   type V = Map[String, Any]
   type T = Map[String, Any]
 
-  // allKvs: rdd of (key, (List[(sourceData, sourceInfo)], List[(targetData, targetInfo)]))
+  // dataRdd: rdd of (key, (sourceData, sourceInfo))
   // output: accuracy result, missing source data rdd, matched source data rdd
   def profile(dataRdd: RDD[(Product, (V, T))], ruleAnalyzer: RuleAnalyzer
               ): (ProfileResult, RDD[(Product, (V, T))], RDD[(Product, (V, T))]) = {
 
     val resultRdd: RDD[((Product, (V, T)), Boolean)] = dataRdd.map { kv =>
       val (key, (data, info)) = kv
-      val (matched, missInfo) = matchData(data, ruleAnalyzer)
+      val (matched, missInfo) = matchData((data, info), ruleAnalyzer)
       ((key, (data, info ++ missInfo)), matched)
     }
 
@@ -32,7 +32,9 @@ object ProfileCore {
   }
 
   // try to match data as rule, return true if matched, false if unmatched
-  private def matchData(data: V, ruleAnalyzer: RuleAnalyzer): (Boolean, T) = {
+  private def matchData(dataPair: (V, T), ruleAnalyzer: RuleAnalyzer): (Boolean, T) = {
+
+    val data: Map[String, Any] = dataPair._1
 
     // 1. check valid
     if (ruleAnalyzer.rule.valid(data)) {
