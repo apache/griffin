@@ -20,6 +20,7 @@ trait Persist extends Loggable with Serializable {
   def result(rt: Long, result: Result): Unit
 
   def missRecords(records: RDD[String]): Unit
+  def matchRecords(records: RDD[String]): Unit
 
   def log(rt: Long, msg: String): Unit
 }

@@ -24,6 +24,7 @@ case class MultiPersists(persists: Iterable[Persist]) extends Persist {
   def result(rt: Long, result: Result): Unit = { persists.foreach(_.result(rt, result)) }
 
   def missRecords(records: RDD[String]): Unit = { persists.foreach(_.missRecords(records)) }
+  def matchRecords(records: RDD[String]): Unit = { persists.foreach(_.matchRecords(records)) }
 
   def log(rt: Long, msg: String): Unit = { persists.foreach(_.log(rt, msg)) }
 

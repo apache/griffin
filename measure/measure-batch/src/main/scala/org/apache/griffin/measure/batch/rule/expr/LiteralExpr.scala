@@ -68,6 +68,11 @@ case class LiteralBooleanExpr(expr: String) extends LiteralExpr {
 }
 
 case class LiteralNullExpr(expr: String) extends LiteralExpr {
-  val value: Option[Any] = None
+  val value: Option[Any] = Some(null)
   val desc: String = "null"
+}
+
+case class LiteralNoneExpr(expr: String) extends LiteralExpr {
+  val value: Option[Any] = None
+  val desc: String = "none"
 }
