@@ -9,7 +9,7 @@ hadoop fs -mkdir /griffin/data
 hadoop fs -mkdir /griffin/data/batch
 
 #jar file
-hadoop fs -put jar/griffin-measure-batch.jar /griffin/
+hadoop fs -put jar/griffin-measure.jar /griffin/
 
 #data
 

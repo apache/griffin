@@ -5,11 +5,7 @@
   <groupId>org.apache.griffin</groupId>
   <artifactId>measure</artifactId>
   <version>0.1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-
-  <modules>
-    <module>measure-batch</module>
-  </modules>
+  <packaging>jar</packaging>
 
   <name>Apache Griffin :: Measures</name>
   <url>http://maven.apache.org</url>
@@ -149,15 +145,6 @@
 
   <build>
     <plugins>
-      <!--<plugin>-->
-        <!--<groupId>org.apache.maven.plugins</groupId>-->
-        <!--<artifactId>maven-compiler-plugin</artifactId>-->
-        <!--<configuration>-->
-          <!--&lt;!&ndash; or whatever version you use &ndash;&gt;-->
-          <!--<source>1.8</source>-->
-          <!--<target>1.8</target>-->
-        <!--</configuration>-->
-      <!--</plugin>-->
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
@@ -186,7 +173,7 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <finalName>griffin-measure-batch</finalName>
+          <finalName>griffin-measure</finalName>
           <appendAssemblyId>false</appendAssemblyId>
         </configuration>
         <executions>
