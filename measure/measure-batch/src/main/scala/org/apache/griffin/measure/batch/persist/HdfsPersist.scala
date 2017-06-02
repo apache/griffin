@@ -26,6 +26,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val ResultFile = filePath("_RESULT")
 
   val MissRecFile = filePath("_MISSREC")      // optional
+  val MatchRecFile = filePath("_MATCHREC")    // optional
 
   val LogFile = filePath("_LOG")
 
@@ -83,6 +84,9 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
         case ar: AccuracyResult => {
           s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
         }
+        case pr: ProfileResult => {
+          s"match percentage: ${pr.matchPercentage}\ntotal count: ${pr.getTotal}\nmiss count: ${pr.getMiss}, match count: ${pr.getMatch}"
+        }
         case _ => {
           s"result: ${result}"
         }
@@ -97,7 +101,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
   // need to avoid string too long
-  def missRecords(records: RDD[String]): Unit = {
+  private def rddRecords(records: RDD[String], path: String): Unit = {
     try {
       val recordCount = records.count
       val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
@@ -105,7 +109,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
         val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
         if (groupCount <= 1) {
           val recs = records.take(count.toInt)
-          persistRecords(MissRecFile, recs)
+          persistRecords(path, recs)
         } else {
           val groupedRecords: RDD[(Long, Iterable[String])] =
             records.zipWithIndex.flatMap { r =>
@@ -114,7 +118,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
             }.groupByKey()
           groupedRecords.foreach { group =>
             val (gid, recs) = group
-            val hdfsPath = if (gid == 0) MissRecFile else withSuffix(MissRecFile, gid.toString)
+            val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
             persistRecords(hdfsPath, recs)
           }
         }
@@ -122,6 +126,14 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     } catch {
       case e: Throwable => error(e.getMessage)
     }
+  }
+
+  def missRecords(records: RDD[String]): Unit = {
+    rddRecords(records, MissRecFile)
+  }
+
+  def matchRecords(records: RDD[String]): Unit = {
+    rddRecords(records, MatchRecFile)
   }
 
   private def persistRecords(hdfsPath: String, records: Iterable[String]): Unit = {
