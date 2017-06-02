@@ -136,7 +136,6 @@ public class SparkSubmitJob implements Job {
         }
         ScheduleState scheduleState=new ScheduleState(groupName,jobName,scheduleResult.getId(),scheduleResult.getState(),scheduleResult.getAppId(),System.currentTimeMillis());
         scheduleStateRepo.save(scheduleState);
-        //	{"file": "/exe/griffin-measure-batch-0.0.1-SNAPSHOT.jar", "className": "org.apache.griffin.measure.batch.Application", "args": ["/benchmark/test/env.json", "/benchmark/test/config-rdm.json"], "name": "griffin-livy", "queue": "default", "numExecutors": 2, "executorCores": 4, "driverMemory": "2g", "executorMemory": "2g", "conf": {"spark.jars.packages": "com.databricks:spark-avro_2.10:2.0.1"}, "jars": ["/livy/datanucleus-api-jdo-3.2.6.jar", "/livy/datanucleus-core-3.2.10.jar", "/livy/datanucleus-rdbms-3.2.9.jar"], "files": ["/livy/hive-site.xml"]}' -H "Content-Type: application/json"
     }
 
     public Map<String, String> genPartitions(String[] patternItemSet, String[] partitionItemSet, long timestamp) {

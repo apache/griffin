@@ -80,7 +80,10 @@ public class SchedulerController {
                     map.put("jobName", jobName);
                     map.put("groupName", jobGroup);
                     map.put("nextFireTime", nextFireTime.getTime());
-                    map.put("previousFireTime",previousFireTime.getTime());
+                    if (previousFireTime!=null)
+                        map.put("previousFireTime",previousFireTime.getTime());
+                    else
+                        map.put("previousFireTime",-1);
                     map.put("triggerState",triggerState);
 
                     map.put("measure", (String) jd.getJobDataMap().get("measure"));
