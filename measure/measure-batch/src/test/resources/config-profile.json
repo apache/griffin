@@ -12,6 +12,6 @@
 
   "evaluateRule": {
     "sampleRatio": 1,
-    "rules": "$source.user_id > 10020"
+    "rules": "$source.post_code == null"
   }
 }
