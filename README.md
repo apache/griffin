@@ -68,7 +68,7 @@ Release:
     ```
     service/src/main/resources/sparkJob.properties
     ```
-    sparkJob.file = hdfs://<griffin measure path>/griffin-measure-batch.jar
+    sparkJob.file = hdfs://<griffin measure path>/griffin-measure.jar
     sparkJob.args_1 = hdfs://<griffin env path>/env.json
     sparkJob.jars_1 = hdfs://<datanucleus path>/datanucleus-api-jdo-3.2.6.jar
     sparkJob.jars_2 = hdfs://<datanucleus path>/datanucleus-core-3.2.10.jar
@@ -86,7 +86,7 @@ Release:
     ```
     Create a directory in Hdfs, and put our measure package into it.
     ```
-    hdfs dfs -put /measure/measure-batch/target/griffin-measure-batch.jar <griffin measure path>/
+    hdfs dfs -put /measure/target/griffin-measure.jar <griffin measure path>/
     ```
     After all our environment services startup, we can start our server.
     ```

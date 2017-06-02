@@ -182,19 +182,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.maven.doxia</groupId>
-                                <artifactId>doxia-core</artifactId>
-                                <version>1.7</version>
-                                <exclusions>
-                                    <exclusion>
-                                        <groupId>xerces</groupId>
-                                        <artifactId>xercesImpl</artifactId>
-                                    </exclusion>
-                                </exclusions>
-                            </dependency>
-                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
