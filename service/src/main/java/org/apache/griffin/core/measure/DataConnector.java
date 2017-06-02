@@ -87,6 +87,20 @@ public class DataConnector extends AuditableEntity  {
         this.config = configJson;
     }
 
+    public ConnectorType getType() {
+        return type;
+    }
+
+    public void setType(ConnectorType type) {
+        this.type = type;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+
+
     public DataConnector() {
         System.out.println();
     }
