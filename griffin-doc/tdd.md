@@ -62,4 +62,4 @@ For data processing, griffin provides several measure libraries for various data
 
 After appending business rules into those measures, griffin will deploy related jobs in spark cluster.
 
-For more details of the design, please refer to https://github.com/eBay/DQSolution/blob/master/griffin-doc/models.md
+For more details of the design, please refer to https://github.com/eBay/DQSolution/blob/master/griffin-doc/measures.md
