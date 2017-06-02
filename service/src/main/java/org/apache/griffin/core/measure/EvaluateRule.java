@@ -22,6 +22,23 @@ import javax.persistence.Entity;
 public class EvaluateRule  extends AuditableEntity {
     
     private static final long serialVersionUID = -3589222812544556642L;
+
+    public int getSampleRatio() {
+        return sampleRatio;
+    }
+
+    public void setSampleRatio(int sampleRatio) {
+        this.sampleRatio = sampleRatio;
+    }
+
+    public String getRules() {
+        return rules;
+    }
+
+    public void setRules(String rules) {
+        this.rules = rules;
+    }
+
     private int sampleRatio;
     private String rules;
     
