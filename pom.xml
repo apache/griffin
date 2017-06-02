@@ -6,20 +6,74 @@
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>17</version>
+        <relativePath/>
     </parent>
 
     <groupId>com.apache.griffin</groupId>
     <artifactId>griffin</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <name>Apache Griffin ${project.version}</name>
+    <url>http://griffin.incubator.apache.org</url>
 
+    <prerequisites>
+        <maven>3.2.5</maven>
+    </prerequisites>
 
     <properties>
         <java.version>1.8</java.version>
+        <maven-apache-rat.version>0.11</maven-apache-rat.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-    <name>Apache Griffin</name>
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://www.apache.org</url>
+    </organization>
+
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://issues.apache.org/jira/browse/GRIFFIN</url>
+    </issueManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>griffin-dev</name>
+            <subscribe>dev-subscribe@griffin.incubator.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@griffin.incubator.apache.org</unsubscribe>
+            <post>dev@griffin.incubator.apache.org</post>
+            <!--<archive>http://mail-archives.apache.org/mod_mbox/griffin-dev/</archive>-->
+        </mailingList>
+    </mailingLists>
+
+    <pluginRepositories>
+    </pluginRepositories>
+
+    <scm>
+        <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</connection>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</developerConnection>
+        <url>https://git-wip-us.apache.org/repos/asf?p=incubator-griffin.git;a=summary</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <site>
+            <id>apache.website</id>
+            <name>Apache Griffin Website</name>
+            <url>scpexe://people.apache.org/www/incubator.apache.org/griffin</url>
+        </site>
+    </distributionManagement>
+
 
     <modules>
         <module>ui</module>
@@ -27,36 +81,123 @@
         <module>measure</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>prod</id>
-            <modules>
-                <module>service</module>
-                <module>measure</module>
-                <module>ui</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>dev</id>
-            <modules>
-                <module>service</module>
-                <module>measure</module>
-            </modules>
-        </profile>
-    </profiles>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.6.1</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                    </configuration>
+
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>apache-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.rat</groupId>
+                        <artifactId>apache-rat-plugin</artifactId>
+                        <configuration>
+                            <!-- Exclude files/folders for apache release -->
+                            <excludes>
+                                <!-- Git specific files -->
+                                <exclude>.git/</exclude>
+                                <exclude>.java-version</exclude>
+                                <exclude>.gitignore</exclude>
+                                <!-- IDE specific files-->
+                                <exclude>**/.idea/</exclude>
+                                <exclude>**/.cache-main</exclude>
+                                <exclude>**/.scalastyle/</exclude>
+                                <exclude>**/*.iml</exclude>
+                                <exclude>**/.classpath</exclude>
+                                <exclude>**/.settings/**</exclude>
+                                <exclude>**/.project</exclude>
+                                <!-- Maven working directory -->
+                                <exclude>**/target/**</exclude>
+                                <!-- Patch files which can be lying around -->
+                                <exclude>**/*.patch</exclude>
+                                <exclude>**/*.rej</exclude>
+                                <!-- Exclude generated files -->
+                                <exclude>**/gen/**</exclude>
+                                <!-- README and test data with exact format -->
+                                <exclude>README*</exclude>
+                                <exclude>**/*.log</exclude>
+                                <exclude>**/*.out</exclude>
+                                <exclude>**/*.db</exclude>
+                                <exclude>**/velocity.log*</exclude>
+                                <!-- all json files should be excluded -->
+                                <exclude>**/*.json</exclude>
+                                <exclude>**/ui/bower_components/**</exclude>
+                                <!-- Fonts and Images -->
+                                <exclude>**/fonts/**</exclude>
+                                <exclude>**/images/**</exclude>
+                                <exclude>**/lib/js/**</exclude>
+                                <exclude>**/lib/css/**</exclude>
+                                <exclude>**/*.min.js</exclude>
+                                <exclude>**/jquery-*.js</exclude>
+                                <exclude>**/MANIFEST.MF</exclude>
+                                <!-- External dependency script -->
+                                <exclude>**/.json</exclude>
+                                <exclude>**/*.md</exclude>
+                                <exclude>**/*.asc</exclude>
+                                <exclude>**/webapp/**</exclude>
+                                <exclude>**/*.pid</exclude>
+                                <exclude>**/buildNumber.properties</exclude>
+                                <exclude>addServer.py</exclude>
+
+                                <!-- Docs related -->
+                                <exclude>griffin-doc/**</exclude>
+                                <exclude>docker/**</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.maven.doxia</groupId>
+                                <artifactId>doxia-core</artifactId>
+                                <version>1.7</version>
+                                <exclusions>
+                                    <exclusion>
+                                        <groupId>xerces</groupId>
+                                        <artifactId>xercesImpl</artifactId>
+                                    </exclusion>
+                                </exclusions>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
