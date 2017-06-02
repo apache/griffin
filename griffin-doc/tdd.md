@@ -2,7 +2,7 @@
 
 
 ## System Architecture
-There are 3 main parts of the system: Web UI, Backend Services, and Model engine on Hadoop. Please refer to the below high level architecture diagram
+There are 3 main parts of the system: Web UI, Backend Services, and Measure engine on Hadoop. Please refer to the below high level architecture diagram
 
 ![Technical Architecture Design](img/tdd/arch_design.png)
 
@@ -12,7 +12,7 @@ There are 3 main parts of the system: Web UI, Backend Services, and Model engine
 - Bootstrap 3.3.6 - http://getbootstrap.com
 
 ## Backend Service Layer
-There are several key componets hosted on the web server, such as RESTful web service, Job scheduler, Core Service. We provides RESTful APIs to support all kinds of clients(web browser, mobile app, applications on PC, etc.). The Job scheduler is responsible for triggering the execution of the models and persist the metrics values. The Metadata engine is to provide most of the management features such as model management, data asset management, notification management, user settings, etc.
+There are several key componets hosted on the web server, such as RESTful web service, Job scheduler, Core Service. We provides RESTful APIs to support all kinds of clients(web browser, mobile app, applications on PC, etc.). The Job scheduler is responsible for triggering the execution of the measures and persist the metrics values. The Metadata engine is to provide most of the management features such as measure management, data asset management, notification management, user settings, etc.
 
 ### RESTful Service
 #### Concepts
@@ -40,7 +40,7 @@ May leverage QUARTZ: http://www.quartz-scheduler.org/
 ### Core Service
 Here are the key components in Core Service:
 - data asset management
-- model management
+- measure management
 - metrics subscription
 - notification component
 - user settings
@@ -58,8 +58,8 @@ Here're the typical classes/interfaces for each component
 
 For data ingestion, griffin can consume real time data from streaming and also support batch data like sql or structured files.
 
-For data processing, griffin provides several model libraries for various data quality dimensions like accuracy, validity, etc.
+For data processing, griffin provides several measure libraries for various data quality dimensions like accuracy, validity, etc.
 
-After appending business rules into those models, griffin will deploy related jobs in spark cluster.
+After appending business rules into those measures, griffin will deploy related jobs in spark cluster.
 
 For more details of the design, please refer to https://github.com/eBay/DQSolution/blob/master/griffin-doc/models.md
