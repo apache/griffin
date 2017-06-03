@@ -177,12 +177,20 @@ public class SparkSubmitJob implements Job {
     }
 
     public long setCurrentTimestamp(long currentSystemTimestamp) {
-        long currentTimstamp;
+        long currentTimstamp=0;
         if (eachJoblastTimestamp != null && !eachJoblastTimestamp.equals("")) {
-            currentTimstamp = Long.parseLong(eachJoblastTimestamp) + Integer.parseInt(periodTime) * 1000;
+            try {
+                currentTimstamp = Long.parseLong(eachJoblastTimestamp) + Integer.parseInt(periodTime) * 1000;
+            }catch (Exception e){
+                logger.info("lasttime or periodTime format problem! "+e);
+            }
         } else {
             if (dataStartTimestamp != null && !dataStartTimestamp.equals("")) {
-                currentTimstamp = Long.parseLong(dataStartTimestamp);
+                try{
+                    currentTimstamp = Long.parseLong(dataStartTimestamp);
+                }catch (Exception e){
+                    logger.info("dataStartTimestamp format problem! "+e);
+                }
             } else {
                 currentTimstamp = currentSystemTimestamp;
             }
