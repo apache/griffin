@@ -15,7 +15,7 @@ limitations under the License.
 -->
 <div class="container-fluid" id="viewruleContent">
     <div class="row">
-        <h5 class="over-title margin-bottom-15">View Model</h5>
+        <h5 class="over-title margin-bottom-15">View Measure</h5>
     </div><!--//row-->
     <div class="row">
 
@@ -23,7 +23,7 @@ limitations under the License.
             <div id="viewruleDefinition" class="viewrule-content">
                 <div class="row">
                     <label class="col-xs-4">
-                        Model Name:
+                        Measure Name:
                     </label>
 
                     <div class="col-xs-8 " style="color: #fff">
@@ -33,7 +33,7 @@ limitations under the License.
 
                 <div class="row">
                     <label class="col-xs-4">
-                        Model Description:
+                        Measure Description:
                     </label>
 
                     <div class="col-xs-8 " style="color: #fff">
@@ -43,7 +43,7 @@ limitations under the License.
 
                 <div class="row">
                     <label class="col-xs-4">
-                        Model Type:
+                        Measure Type:
                     </label>
 
                     <div class="col-xs-8 " style="color: #fff">
@@ -67,7 +67,7 @@ limitations under the License.
                     </label>
 
                     <div class="col-xs-8" style="color: #fff">
-                        {{ruleData.source.config.tableName}}&nbsp;&nbsp;{{ruleData.target.config.tableName}}
+                        {{sourceTable}}&nbsp;&nbsp;{{targetTable}}
                     </div>
                 </div>
 
@@ -85,7 +85,7 @@ limitations under the License.
     </div><!--//row-->
     <div class="container-fluid" ng-show="ruleData.basic.status==1" >
         <br/>
-        <label style="color:#B2C831">This model is ready to deploy now, if you are the owner, please click the deploy button after you verify all the information.</label>
+        <label style="color:#B2C831">This measure is ready to deploy now, if you are the owner, please click the deploy button after you verify all the information.</label>
         <button ng-click="confirmDeploy()" ng-disabled="(ntAccount!=ruleData.basic.owner && !adminAccess)" class="btn btn-primary pull-right"> Deploy</button>
         </p>
     </div>
@@ -105,10 +105,10 @@ limitations under the License.
                 </div>
                 <div class="" style="text-align:center;display:block;float:left;margin:0 10px 0 10px">
                     <div class="formula-text-up" style="border-bottom:1px solid;">
-                        Total Count of Matched records between <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{ruleData.target.config.database}}</span>  and <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{ruleData.source.config.database}}</span>  fields
+                        Total Count of Matched records between <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{targetTable}}</span>  and <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{sourceTable}}</span>  fields
                     </div>
                     <div class="">
-                        Total Count of records in <span style="color:green;font-weight:bold;">{{ruleData.target.config.database}}&nbsp;&nbsp;{{ruleData.target.config.tableName}}</span>
+                        Total Count of records in <span style="color:green;font-weight:bold;">{{targetDB}}&nbsp;&nbsp;{{targetTable}}</span>
                     </div>
                 </div>
                 <div class="" style="text-align:left;display:block;float:left;width:10%;">

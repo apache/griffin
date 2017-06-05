@@ -15,7 +15,7 @@ limitations under the License.
 -->
 <div class="container-fluid">
   <div class="row">
-    <h5 class="over-title margin-bottom-15">Create DQ Model</h5>
+    <h5 class="over-title margin-bottom-15">Create Measure</h5>
   </div><!--//row-->
   <div class="row">
     <form name="Form" id="form" novalidate>
@@ -57,15 +57,15 @@ limitations under the License.
       </div>
 
         <div id="step-1" ng-show="currentStep == 1" class="formStep" >
-          <label class="stepDesc">This step let you choose the single source of truth for data quality comparision with target, Apollo datasets are enabled, other platofrms are coming soon. Currently you can only select the attributes from one schema</label>
+          <label class="stepDesc">This step let you choose the single source of truth for data quality comparision with target. Currently you can only select the attributes from one schema</label>
           <div class="container-fluid">
             <!-- select db tree -->
             <div class="col-md-4 col-lg-4 col-sm-4">
               <fieldset>
                 <legend>Please select schema</legend>
-                <div class="add-dataset" style="color:#b2c831">
-                  <a class="bark-link" href="#/createdataasset">Cannot find your DataAsset? Click here to add</a>
-                </div>
+                <!--<div class="add-dataset" style="color:#b2c831">-->
+                  <!--<a class="bark-link" href="#/createdataasset">Cannot find your DataAsset? Click here to add</a>-->
+                <!--</div>-->
                 <div angular-treeview="true"
                      tree-model="dbList"
                      node-id="id"
@@ -136,7 +136,7 @@ limitations under the License.
 
 
         <div id="step-2" ng-show="currentStep == 2" class="formStep" >
-          <label class="stepDesc">This step let you choose the target for data quality comparision with source, Apollo datasets are enabled, other platforms are coming soon</label>
+          <label class="stepDesc">This step let you choose the target for data quality comparision with source</label>
           <div class="container-fluid">
             <!-- select db tree -->
             <div class="col-md-4 col-lg-4 col-sm-4">
@@ -225,9 +225,6 @@ limitations under the License.
                 <div class="y-scrollable">
 
                   <div class="container col-md-12 col-lg-12 col-sm-12">
-                    <div style="color:#b2c831">
-                      <i class="fa fa-info-circle"></i> Please make sure to select a primary key in "PK?" column
-                    </div>
                     <table class="table table-striped">
                       <thead style="">
                       <tr style="background-color:#7D95CC;font-size:20px">
@@ -298,7 +295,7 @@ limitations under the License.
         </div>
 
         <div id="step-4" ng-show="currentStep == 4" class="formStep" >
-          <label class="stepDesc">Please setup the model required information</label>
+          <label class="stepDesc">Please setup the measure required information</label>
           <div class="container-fluid">
 
             <!-- schema definition list -->
@@ -316,7 +313,7 @@ limitations under the License.
 
                       <div class="col-md-10 col-lg-10 col-sm-10 ">
                         <input type="text" class="form-control" ng-model="basic.name" name="ruleName" placeholder="Please input the measure name" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'">
-                        <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.required">Model Name is required</span>
+                        <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.required">Measure Name is required</span>
                         <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Only letter, number, "-" and "_" are allowed</span>
                       </div>
                     </div>
@@ -328,7 +325,7 @@ limitations under the License.
                       </label>
 
                       <div class="col-md-10 col-lg-10 col-sm-10 ">
-                        <input type="text" class="form-control" ng-model="basic.desc" placeholder="Please input detail description of your model">
+                        <input type="text" class="form-control" ng-model="basic.desc" placeholder="Please input detail description of your measure">
                       </div>
                     </div>
                   </div>
@@ -395,7 +392,7 @@ limitations under the License.
 
                 <div style="color:#b2c831">
                   <p>
-                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href="#/measures">Models</a>" to check the model status
+                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href="#/measures">Measures</a>" to check the measure status
                   </p>
                 </div>
 
@@ -419,7 +416,7 @@ limitations under the License.
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Save the model with the below information?</h4>
+                <h4 class="modal-title">Save the measure with the below information?</h4>
               </div>
               <div class="modal-body">
                 <ng-include src="'/pages/measures/confirmation-ac.html'"/>
