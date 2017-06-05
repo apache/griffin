@@ -99,7 +99,8 @@ define(['./module'], function (controllers) {
         var getModelUrl = $config.uri.getModel + '/' +row.name;
         $http.get(getModelUrl).success(function(data){
   			  $scope.deletedRow = data;
-
+              $scope.sourceTable = JSON.parse($scope.deletedRow.source.config)["table.name"];
+              $scope.targetTable = JSON.parse($scope.deletedRow.target.config)["table.name"];
   		  });
         // $scope.deletedRow = row;
         $scope.deletedBriefRow = row;
