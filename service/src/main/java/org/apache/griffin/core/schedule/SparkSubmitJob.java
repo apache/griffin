@@ -109,7 +109,7 @@ public class SparkSubmitJob implements Job {
         //prepare current system timestamp
         long currentSystemTimestamp = System.currentTimeMillis();
 
-        if (sourcePattern != null && !sourcePattern.isEmpty()) {
+        if (sourcePattern != null && !sourcePattern.equals("")) {
             sourcePatternItemSet = sourcePattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getSource(), sourcePatternItemSet, partitionItemSet, currentTimstamp);
@@ -125,6 +125,7 @@ public class SparkSubmitJob implements Job {
         RestTemplate restTemplate = new RestTemplate();
         setSparkJobDO();
 //        String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
+        logger.info("measure: \n"+measure);
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         logger.info(result);
         ScheduleResult scheduleResult=new ScheduleResult();
