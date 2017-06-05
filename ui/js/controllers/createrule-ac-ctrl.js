@@ -289,7 +289,8 @@ define(['./module'], function(controllers) {
                     $(stepSelection).css({
                         height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
                     });
-                    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
+//                    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
+                    document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
                     $('.y-scrollable').css({
                         'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
                     });
@@ -409,7 +410,6 @@ define(['./module'], function(controllers) {
                       "evaluateRule":{
                           "rules":'',
                       },
-//                      "owner":$scope.currentNode.parent[0].owner,
                       "owner":$scope.basic.owner,
                       mappings:[],
 
@@ -464,7 +464,7 @@ define(['./module'], function(controllers) {
                 	// {
                 	  console.log(data);
                       if(data=='fail'){
-                          toaster.pop('error', 'Please modify the name of model, because there is already a same model in database ', data.message);
+                          toaster.pop('error', 'Please modify the name of measure, because there is already a same measure in database ', data.message);
                           return;
                       }
 
@@ -482,7 +482,7 @@ define(['./module'], function(controllers) {
 
                 }).error(function(data){
                   // errorMessage(0, 'Save model failed, please try again!');
-                  toaster.pop('error', 'Save model failed, please try again!', data.message);
+                  toaster.pop('error', 'Save measure failed, please try again!', data.message);
                 });
 
             },

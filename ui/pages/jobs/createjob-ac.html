@@ -20,117 +20,124 @@ limitations under the License.
     </div><!--//row-->
     <div class="row">
         <form name="Form" id="form" novalidate>
-                <div  class="formStep" >
-                    <label class="stepDesc">Please setup the job required information</label>
-                    <div class="container-fluid">
+            <div  class="formStep" >
+                <label class="stepDesc">Please setup the job required information</label>
+                <div class="container-fluid">
 
-                        <!-- schema definition list -->
-                        <div class="col-md-12 col-lg-12 col-sm-12">
-                            <fieldset>
-                                <legend>
-                                    Required Information
-                                </legend>
-                                <div class="y-scrollable">
-                                    <div class="col-md-12 col-lg-12 col-sm-12">
-                                        <div class="form-group" ng-class="{'has-error':Form.ruleName.$dirty&&Form.ruleName.$invalid, 'has-success':Form.ruleName.$valid}">
-                                            <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                                                Source Partition<span class="symbol required"></span>:
-                                            </label>
+                    <!-- schema definition list -->
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <fieldset>
+                            <legend>
+                                Required Information
+                            </legend>
+                            <div class="y-scrollable">
+                                <div class="col-md-12 col-lg-12 col-sm-12">
+                                    <div class="form-group" ng-class="{'has-error':Form.ruleName.$dirty&&Form.ruleName.$invalid, 'has-success':Form.ruleName.$valid}">
+                                        <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                                            Source Partition<span class="symbol required"></span>:
+                                        </label>
 
-                                            <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                                <input type="text" class="form-control" ng-model="sourcePat" name="ruleName" placeholder="Please input the source partition" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'">
-                                                <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.required">Model Name is required</span>
-                                                <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Only letter, number, "-" and "_" are allowed</span>
-                                            </div>
+                                        <div class="col-md-10 col-lg-10 col-sm-10 ">
+                                            <input type="text" class="form-control" ng-model="sourcePat" name="ruleName" placeholder="Please input the source partition, such as 'YYYYMMdd-HH'." required ng-pattern="'([0-9a-zA-Z\\_\\-])+'">
+                                            <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Only letter, number, "-" and "_" are allowed</span>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-lg-12 col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                                                Target Partition:
-                                            </label>
+                                </div>
+                                <div class="col-md-12 col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                                            Target Partition:
+                                        </label>
 
-                                            <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                                <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your model">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-12 col-lg-12 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                                                Measure Name:
-                                            </label>
-
-                                            <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                                <select id="measureSelector" class="form-control" ng-model="measure" ng-init="Measures[0]" required>
-                                                    <option ng-repeat="row in Measures" value="{{$index}}" >{{row}}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 col-lg-12 col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                                                 Start After(s):
-                                            </label>
-
-                                            <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                                <input type="text" class="form-control" ng-model="jobStartTime" >
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 col-lg-12 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                                                Interval:
-                                            </label>
-
-                                            <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                                <input type="text" id="systemSelector" class="form-control" ng-model="periodTime"  required >
-                                            </div>
+                                        <div class="col-md-10 col-lg-10 col-sm-10 ">
+                                            <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'.">
                                         </div>
                                     </div>
                                 </div>
 
-                                <div style="color:#b2c831">
-                                    <p>
-                                        <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href="#/jobs">Jobs</a>" to check the job status
-                                    </p>
+                                <div class="col-md-12 col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
+                                            Measure Name:
+                                        </label>
+
+                                        <div class="col-md-10 col-lg-10 col-sm-10 ">
+                                            <select id="measureSelector" class="form-control" ng-model="measure"  required>
+                                                <option ng-repeat="row in Measures" value="{{$index}}" >{{row}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
+                                <div class="col-md-12 col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                                            Start At:
+                                        </label>
 
-                            </fieldset>
+                                        <div class="col-md-10 col-lg-10 col-sm-10 ">
+                                            <input type="text" class="form-control" ng-model="jobStartTime" placeholder="The time of start. eg: 20170101 00:00:00">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-lg-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
+                                            Interval:
+                                        </label>
+
+                                        <div class="col-md-5 col-lg-5 col-sm-5 ">
+                                            <input type="text" id="systemSelector" class="form-control" ng-model="periodTime"  required placeholder="How often it works">
+                                        </div>
+                                        <div class="col-md-5 col-lg-5 col-sm-5 ">
+                                            <select id="timeSelector" class="form-control" ng-model="timeType" required>
+                                                <!--<option  value="hours" >hours</option>-->
+                                                <!--<option  value="minutes" >minutes</option>-->
+                                                <!--<option  value="seconds" >seconds</option>-->
+                                                <option ng-repeat="time in Times"  >{{time}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="color:#b2c831">
+                                <p>
+                                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href="#/jobs">Jobs</a>" to check the job status
+                                </p>
+                            </div>
+
+                        </fieldset>
+                    </div>
+
+                    <div class="form-group btn-container" >
+                        <button class="btn btn-primary btn-o back-step btn-wide pull-left" ng-click="form.prev(Form)">
+                            <i class="fa fa-arrow-circle-left"></i> Back
+                        </button>
+                        <button class="btn btn-primary btn-o next-step btn-wide pull-right" ng-click="form.submit(Form)">
+                            <!-- <button class="btn btn-primary btn-o next-step btn-wide pull-right" data-toggle="modal" data-target="#confirm"> -->
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="confirm-job" role="dialog">
+                <div class="modal-dialog modal-xg modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Save the job with the below information?</h4>
                         </div>
-
-                        <div class="form-group btn-container" >
-                            <button class="btn btn-primary btn-o back-step btn-wide pull-left" ng-click="form.prev(Form)">
-                                <i class="fa fa-arrow-circle-left"></i> Back
-                            </button>
-                            <button class="btn btn-primary btn-o next-step btn-wide pull-right" ng-click="form.submit(Form)">
-                                <!-- <button class="btn btn-primary btn-o next-step btn-wide pull-right" data-toggle="modal" data-target="#confirm"> -->
-                                Submit
-                            </button>
+                        <div class="modal-body">
+                            <ng-include src="'/pages/jobs/confirmation-ac.html'"/>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" ng-click="form.save()">Save</button>
                         </div>
                     </div>
                 </div>
-
-                <div class="modal fade" id="confirm-job" role="dialog">
-                    <div class="modal-dialog modal-xg modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">Save the job with the below information?</h4>
-                            </div>
-                            <div class="modal-body">
-                                <ng-include src="'/pages/jobs/confirmation-ac.html'"/>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary" ng-click="form.save()">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
         </form>
     </div><!--//row-->
 </div>
