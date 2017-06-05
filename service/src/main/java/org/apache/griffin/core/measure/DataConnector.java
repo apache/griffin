@@ -95,10 +95,13 @@ public class DataConnector extends AuditableEntity  {
         this.type = type;
     }
 
-    public String getConfig() {
-        return config;
-    }
+//    public String getConfig() {
+//        return config;
+//    }
 
+    public Map<String,String> getConfig() {
+        return getConfigInMaps();
+    }
 
 
     public DataConnector() {
