@@ -7,17 +7,17 @@ In the current version, we've implemented the below main DQ features
 
   User can register, delete, edit data assets, currently only Hadoop data-sets are supported
 
-- **Model Management**
+- **Measure Management**
 
-  User can create, delete, edit models for 4 types: Accuracy, Profiling, Anomaly Detection, Publish Metrics
+  User can create, delete, edit measures for 4 types: Accuracy, Profiling, Anomaly Detection, Publish Metrics
 
 - **Job Scheduler**
 
-  After the models are created, the Job Scheduler component can create the jobs and schedule them to calculate the metrics values
+  After the measures are created, the Job Scheduler component can create the jobs and schedule them to calculate the metrics values
 
-- **Model Execution on Spark**
+- **Measure Execution on Spark**
 
-  The Job Scheduler will trigger the model execution on Spark to generate the metrics values
+  The Job Scheduler will trigger the measure execution on Spark to generate the metrics values
 
 - **Metrics Visualization**
 
@@ -38,6 +38,6 @@ In the current version, we've implemented the below main DQ features
 
   Besides accuracy, there are some other data quality dimensions(Completeness, Uniqueness, Timeliness, Validity, Consistency), we should support more dimensions
 
-- **More ML algorithms for Anomaly Detection model**
+- **More ML algorithms for Anomaly Detection measure**
 
   Currently only [MAD(Median absolute deviation)](https://en.wikipedia.org/wiki/Median_absolute_deviation) and [Bollinger Bands](https://en.wikipedia.org/wiki/Bollinger_Bands) are supported, we are considering to support more Machine Learning algorithms

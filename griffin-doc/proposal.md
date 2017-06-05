@@ -1,7 +1,7 @@
 
 
 ## Abstract
-Apache Griffin is a Data Quality Service platform built on Apache Hadoop and Apache Spark. It provides a framework process for defining data quality model, executing data quality measurement, automating data profiling and validation, as well as a unified data quality visualization across multiple data systems.  It tries to address the data quality challenges in big data and streaming context.
+Apache Griffin is a Data Quality Service platform built on Apache Hadoop and Apache Spark. It provides a framework process for defining data quality measure, executing data quality measurement, automating data profiling and validation, as well as a unified data quality visualization across multiple data systems.  It tries to address the data quality challenges in big data and streaming context.
 
 ## Proposal
 Apache Griffin is a open source Data Quality solution for distributed data systems at any scale in both streaming or batch data context. When people use open source products (e.g. Apache Hadoop, Apache Spark, Apache Kafka, Apache Storm), they always need a data quality service to build his/her confidence on data quality processed by those platforms. Apache Griffin creates a unified process to define and construct data quality measurement pipeline across multiple data systems to provide:
@@ -13,11 +13,11 @@ Apache Griffin is a open source Data Quality solution for distributed data syste
  - Shared infrastructure resource management
 
 ## Overview of Apache Griffin  
-Apache Griffin has been deployed in production at eBay serving major data systems, it takes a platform approach to provide generic features to solve common data quality validation pain points. Firstly, user can register the data-set which user wants to do data quality check. The data-set can be batch data in RDBMS (e.g.Teradata), Apache Hadoop system or near real-time streaming data from Apache Kafka, Apache Storm and other real time data platforms. Secondly, user can create data quality model to define the data quality rule and metadata. Thirdly, the model or rule will be executed automatically(by the model engine) to get the sample data quality validation results in a few seconds for streaming data.  Finally, user can analyze the data quality results through built-in visualization tool to take actions.
+Apache Griffin has been deployed in production at eBay serving major data systems, it takes a platform approach to provide generic features to solve common data quality validation pain points. Firstly, user can register the data-set which user wants to do data quality check. The data-set can be batch data in RDBMS (e.g.Teradata), Apache Hadoop system or near real-time streaming data from Apache Kafka, Apache Storm and other real time data platforms. Secondly, user can create data quality measure to define the data quality rule and metadata. Thirdly, the measure or rule will be executed automatically(by the measure engine) to get the sample data quality validation results in a few seconds for streaming data.  Finally, user can analyze the data quality results through built-in visualization tool to take actions.
 
 Apache Griffin includes:
 
-**Data Quality Model Engine**: Apache Griffin is model driven solution, user can choose various data quality dimension to execute his/her data quality validation based on selected target data-set or source data-set ( as the golden reference data). It has corresponding library supporting it in back-end for the following measurement:
+**Data Quality Measure Engine**: Apache Griffin is model driven solution, user can choose various data quality dimension to execute his/her data quality validation based on selected target data-set or source data-set ( as the golden reference data). It has corresponding library supporting it in back-end for the following measurement:
 
  - Accuracy - Does data reflect the real-world objects or a verifiable source
  - Completeness - Is all necessary data present
@@ -36,13 +36,13 @@ For real time mode, we can connect with messaging system like Kafka to near real
 
 **Data Process and Storage Layer**:
 
-For batch analysis, our data quality model will compute data quality metrics in our spark cluster based on data source in hadoop.
+For batch analysis, our data quality measure will compute data quality metrics in our spark cluster based on data source in hadoop.
 
-For near real time analysis, we consume data from messaging system, then our data quality model will compute our real time data quality metrics in our spark cluster. for data storage, we use time series database in our back end to fulfill front end request.
+For near real time analysis, we consume data from messaging system, then our data quality measure will compute our real time data quality metrics in our spark cluster. for data storage, we use time series database in our back end to fulfill front end request.
 
 **Apache Griffin Service**:
 
-We have RESTful web services to accomplish all the functionalities of Apache Griffin, such as register data-set, create data quality model, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web serivces.
+We have RESTful web services to accomplish all the functionalities of Apache Griffin, such as register data-set, create data quality measure, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web serivces.
 
 ## Background
 At eBay, when people play with big data in Apache Hadoop (or other streaming data), data quality often becomes one big challenge. Different teams have built customized data quality tools to detect and analyze data quality issues within their own domain. We are thinking to take a platform approach to provide shared Infrastructure and generic features to solve common data quality pain points. This would enable us to build trusted data assets.
@@ -52,7 +52,7 @@ Currently it’s very difficult and costly to do data quality validation when we
 So we conclude 3 data quality problems at eBay:
 
 1. Lack of end2end unified view of data quality measurement from multiple data sources to target applications, it usually takes a long time to identify and fix poor data quality.
-2. How to get data quality measured in streaming mode, we need to have a process and tool to visualize data quality insights through registering dataset which you want to check data quality, creating data quality measurement model,  executing the data quality validation job and getting metrics insights for action taking.
+2. How to get data quality measured in streaming mode, we need to have a process and tool to visualize data quality insights through registering dataset which you want to check data quality, creating data quality measurement,  executing the data quality validation job and getting metrics insights for action taking.
 3. No Shared platform and API Service, have to apply and manage own hardware and software infrastructure.
 
 ## Rationale
@@ -68,7 +68,7 @@ The idea of  Apache Griffin is to provide Data Quality validation as a Service, 
 
  - Near real-time understanding of the data quality health of your data pipelines with end-to-end monitoring, all in one place.
  - Profiling, detecting and correlating issues and providing recommendations that drive rapid and focused troubleshooting
- - A centralized data quality model management system including rule, metadata, scheduler etc.  
+ - A centralized data quality measure management system including rule, metadata, scheduler etc.  
  - Native code generation to run everywhere, including Hadoop, Kafka, Spark, etc.
  - One set of tools to build data quality pipelines across all eBay data platforms.
 
@@ -87,7 +87,7 @@ The ASF is a natural host for Apache Griffin given that it is already the home o
 
 ##Known Risks  
 ###Orphaned Products
-The core developers of Apache Griffin team work full time on this project. There is no risk of Apache Griffin getting orphaned since at least one large company (eBay) is extensively using it in their production Hadoop and Spark clusters for multiple data systems.  For example, currently there are 4 data systems at eBay (real time personalization platform, eBay real time ID linking platform, Hadoop, Site speed analytics platform) are leveraging Apache Griffin, with more than  ~600M records for data quality status validation every day, 35 data sets being monitored, 50+ data quality models have been created.
+The core developers of Apache Griffin team work full time on this project. There is no risk of Apache Griffin getting orphaned since at least one large company (eBay) is extensively using it in their production Hadoop and Spark clusters for multiple data systems.  For example, currently there are 4 data systems at eBay (real time personalization platform, eBay real time ID linking platform, Hadoop, Site speed analytics platform) are leveraging Apache Griffin, with more than  ~600M records for data quality status validation every day, 35 data sets being monitored, 50+ data quality measures have been created.
 
 As Apache Griffin is designed to connect many types of data sources,  we are very confident that they will use Apache Griffin as a service for ensuring the data quality in open source data ecosystems. We plan to extend and diversify this community further through Apache.
 
@@ -107,7 +107,7 @@ Apache Griffin has a strong relationship and dependency with Apache Hadoop, Apac
 Information about Apache Griffin can be found at https://github.com/apache/incubator-griffin.  
 
 ##Initial Source
-Apache Griffin has been under development since early 2016 by a team of engineers at eBay Inc. It is currently hosted on Github.com under an Apache license 2.0 at https://github.com/apache/incubator-griffin. 
+Apache Griffin has been under development since early 2016 by a team of engineers at eBay Inc. It is currently hosted on Github.com under an Apache license 2.0 at https://github.com/apache/incubator-griffin.
 
 Once in incubation we will be moving the code base to Apache git repository.  
 

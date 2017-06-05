@@ -25,7 +25,7 @@ Release:
     ```
     sysctl -w vm.max_map_count=262144
     ```  
-4. Run this docker image, then griffin is ready.
+4. Run this docker image, wait for about one minute, then griffin is ready.
     ```
     docker run -it -h sandbox --name griffin_demo -m 8G --memory-swap -1 \
     -p 32122:2122 -p 37077:7077 -p 36066:6066 -p 38088:8088 -p 38040:8040 \

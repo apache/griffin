@@ -1,8 +1,8 @@
-# Models
-models to calculate data quality metrics.
+# Measures
+measures to calculate data quality metrics.
 
-### Accuracy model
-accuracy model is to compare source and target content, given corresponding mapping relationship.
+### Accuracy measure
+accuracy measure is to compare source and target content, given corresponding mapping relationship.
 
 #### Introduction
 How to measure accuracy dimension of one target dataset T, given source of truth as golden dataset S.
@@ -24,7 +24,7 @@ Traditional way is to use SQL based join to calculate this, like scripts in hive
 
 But this SQL based solution can be improved since it has not considered unique natures of source dataset and target dataset in this context.
 
-Our approach is to provide a generic accuracy model, after taking into consideration of special natures of source dataset and target dataset.
+Our approach is to provide a generic accuracy measure, after taking into consideration of special natures of source dataset and target dataset.
 
 Our implementation is in scala, leveraging scala's declarative capability to cater for various requirements, and running in spark cluster.
 
@@ -91,7 +91,7 @@ and schema for target is below as
 ```
 
 
-#### Accuracy Model In Deep
+#### Accuracy Measure In Deep
 
 ##### Pre-Process phase (transform raw data)
 For efficient, we will convert our raw record to some key-value pair , after that, we just need to compare values which have the same key.

@@ -100,7 +100,6 @@ public class DataConnector extends AuditableEntity  {
     }
 
 
-
     public DataConnector() {
         System.out.println();
     }
