@@ -134,29 +134,9 @@ After the processing work has done, here are 3 ways to show the data diagram.
 
    <img src="img/userguide/dashboard big.png" >
 
-3. The metrics is shown on the right side of the page. By clicking on the number, you can get the diagram and details about the data.   
+3. The metrics is shown on the right side of the page. By clicking on the measure, you can get the diagram and details about the measure result.   
 
-   <img src="img/userguide/side.PNG" >
-
-## 6 My Dashboard
-
-<img src="img/userguide/my dashboard.PNG">
-
-User can subscribe a metrics so that it can be displayed on "my dashboard".  
-
-<img src="img/userguide/subscribe.PNG">
-
-Subscribe steps:    
-1. Select Org->Asset    
-a)      Can select on Org level, then all the assets under this Org will be selected    
-b)      Can select on Asset level    
-c)      Can multiple select     
-2. After the assets are selected, all the models under these assets should be displayed, so that the end user will know which metrics he's selected
-3. Do subscription, then you may get the result as follow.
-
-<img src="img/userguide/subscriberesult.PNG">
-
-All the diagrams that you want to keep tracking are shown on 'my dashboard' page.
+   <img src="img/userguide/right bar.png" >
 
 ## References
 ###Six core data quality dimensions
