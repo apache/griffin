@@ -20,6 +20,9 @@ define(['./module'], function(controllers) {
         console.log('Create job controller');
         $scope.currentStep = 1;
 
+        $scope.Times = ['seconds','minutes','hours'];
+        $scope.timeType = 'seconds';
+
         $scope.Measures = [];
         $scope.$on('$viewContentLoaded', function() {
             // console.log($('#footerwrap').css('height'));
@@ -41,6 +44,7 @@ define(['./module'], function(controllers) {
                 $scope.Measures.push(measure);
             })
             console.log($scope.Measures);
+            $scope.measure = 0;
         })
 
 
@@ -87,12 +91,18 @@ define(['./module'], function(controllers) {
                 } else {
                     //  $location.path('/rules');
                     form.$setPristine();
+                    var period;
+                    if($scope.timeType=='minutes')
+                        period = $scope.periodTime *60;
+                    else if($scope.timeType=='hours')
+                        period = $scope.periodTime * 3600;
+                    else period = $scope.periodTime;
                     var rule = '';
                     this.data={
                       "sourcePat":$scope.sourcePat,
                       "targetPat":$scope.targetPat,
                       "jobStartTime":$scope.jobStartTime,
-                      "periodTime":$scope.periodTime,
+                      "periodTime":period,
                       "groupName":'BA',
                     };
                     $('#confirm-job').modal('show');
@@ -111,7 +121,10 @@ define(['./module'], function(controllers) {
                 var month = date.getMonth()+1;
                 var timestamp = Date.parse(date);
                 timestamp = timestamp / 1000;
-                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + date.getFullYear() + '-'+ month + '-'+date.getDate();
+                var time = date.toDateString()+' '+date.toLocaleTimeString();
+//                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + date.getFullYear() + '-'+ month + '-'+date.getDate();
+                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + time;
+
                 var newJob = $config.uri.addJobs + this.data.groupName + '/' + jobName + '/' + $scope.Measures[$scope.measure];
                 console.log(newJob);
                 console.log(this.data);

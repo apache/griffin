@@ -27,8 +27,18 @@ define(['./module'], function (controllers) {
         var getModelUrl = $config.uri.getModel+"/"+$routeParams.modelname;
         $http.get(getModelUrl).success(function(data){
           $scope.ruleData = data;
-          $scope.sourceLength = $scope.ruleData.evaluateRule.rules.split(';').length-1;
-          console.log($scope.ruleData.evaluateRule.rules.split(';'));
+          $scope.sourceLength = $scope.ruleData.evaluateRule.rules.split('AND').length;
+          console.log($scope.sourceLength);
+
+          console.log(JSON.parse($scope.ruleData.source.config));
+          $scope.sourceDB = JSON.parse($scope.ruleData.source.config).database;
+          console.log($scope.sourceDB);
+          $scope.targetDB = JSON.parse($scope.ruleData.target.config).database;
+          $scope.sourceTable = JSON.parse($scope.ruleData.source.config)["table.name"];
+          $scope.targetTable = JSON.parse($scope.ruleData.target.config)["table.name"];
+          console.log($scope.targetTable);
+          console.log($scope.targetDB);
+          console.log($scope.ruleData.evaluateRule.rules.split('AND'));
 //          $scope.targetLength = $scope.ruleData.evaluateRule.rules.split(';').length;
 
           $scope.getNumber = function(n){return new Array(n);}
