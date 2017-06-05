@@ -122,22 +122,17 @@ After the processing work has done, here are 3 ways to show the data diagram.
 
    <img src="img/userguide/heatmap.png" >
 
-2. Clcik on "DQ Metrics"  
+2. Click on "DQ Metrics".
 
-   <img src="img/userguide/data asset.PNG">  
+   <img src="img/userguide/dq metrics.png">  
 
-   - You can see all the metrics diagrams are shown on the page.
+   You can see the diagrams of metrics.
 
-   <img src="img/userguide/bullseye.PNG" >
+   <img src="img/userguide/metrics dashboard.png" >
 
-   - For the type accuracy and validity, you can also download the model sample.By clicking 'Download sample',you may get a list of 20 recently added models, choose the one you want to download.
+   By clicking on the diagram, you can get the zoom-in picture of it, and know the metrics at the selected time window.  
 
-   <img src="img/userguide/download.PNG">
-
-   - By clicking on the diagram, you can get the zoom-in picture of it, and know the DQ metrics at the selected time window.  
-
-   <img src="img/userguide/DQ metirics.PNG" >
-
+   <img src="img/userguide/dashboard big.png" >
 
 3. The metrics is shown on the right side of the page. By clicking on the number, you can get the diagram and details about the data.   
 
