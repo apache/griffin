@@ -18,16 +18,15 @@ Follow the steps [here](https://github.com/apache/incubator-griffin#how-to-run-i
     5) Fill out the required table as required, "Organization" is the group of this measurement.  
     Submit and save, you can see your new DQ measurement created in the measures list.  
 
-3.  Now you've created a new DQ measurement, the measurement needs to be scheduled to run in the docker container.  
-    Our default schedule UI is not implemented at current, so you can call the rest api we provide, to schedule this measurement.
-    Assume that you want to start the job immediately, run the job every 5 minutes.  
+3.  Now you've created a new DQ measurement, the measurement needs to be scheduled to run in the docker container. Click "Jobs" button to watch all the jobs here, at current there is no job, you need to create a new one.
+    Click "Create Job" button at the top left corner, fill out all the blocks as below.
     ```
-    curl -X POST -H "Content-Type: application/json" -d '{
-      "sourcePat":"YYYYMMdd-HH",
-      "targetPat":"YYYYMMdd-HH",
-      "jobStartTime":"0",
-      "periodTime":"300"
-    }' "http://<you local ip>:38080/jobs/add/BA/<job id>/<measure-name>"
-    ```  
-    The port 38080 is mapping to docker container 8080, the port of griffin service, and each time you submit a new schedule, you need to submit a new <job id>.  
+    "Source Partition": YYYYMMdd-HH
+    "Target Partition": YYYYMMdd-HH
+    "Measure Name": <choose the measure you just created>
+    "Start After(s)": 0
+    "Interval": 300
+    ```
+    The source and target partition means the partition pattern of the demo data, which is based on timestamp, "Start After(s)" means the job will start after n seconds, "Interval" is the interval of job, the unit is second. In the example above, the job will run every 5 minutes.
+
     Wait for about 1 minute, after the calculation, results would be published to web UI, then you can watch the dashboard by clicking "DQ Metrics" at the top right corner.
