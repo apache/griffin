@@ -19,7 +19,7 @@ After you log into the system, you may follow the steps:
 
 You can check the data assets by clicking "DataAssets" on the top right corner.
 
-<img src="img/userguide/data asset.png" >
+<img src="img/userguide/data asset new.png" >
 
 Then you can see all the data assets listed here.
 
@@ -53,7 +53,7 @@ Measured by how the values agree with an identified source of truth.
 
 Select the source dataset and fields which will be used for comparision.
 
-<img src="img/userguide/source.png">
+<img src="img/userguide/source new.png">
 
 For example, we choose 2 columns here.
 
@@ -61,7 +61,7 @@ For example, we choose 2 columns here.
 
 Select the target dataset and fields which will be used for comparision.
 
-<img src="img/userguide/target.png">
+<img src="img/userguide/target new.png">
 
 3) Mapping source and target
 
@@ -82,7 +82,7 @@ Set up the measure required information.
 
 The organization means the group of your measure, you can manage your measurement dashboard by group later.
 
-<img src="img/userguide/confirm.png">
+<img src="img/userguide/confirm new.png">
 
 5) Measure information
 
