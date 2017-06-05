@@ -29,6 +29,8 @@ import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,11 +104,15 @@ public class SparkSubmitJobTest {
     public void test_genPartitions(){
         String[] patternItemSet={"YYYYMMDD","HH"};
         String[] partitionItemSet={"date","hour"};
-        long timestamp=1460174400000l;
+//        long timestamp=1460174400000l;
+        long timestamp=System.currentTimeMillis();
         Map<String,String> par=ssj.genPartitions(patternItemSet,partitionItemSet,timestamp);
         Map<String,String> verifyMap=new HashMap<>();
-        verifyMap.put("date","20160409");
-        verifyMap.put("hour","12");
+//        verifyMap.put("date","20160409");
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
+        verifyMap.put("date",sdf.format(new Date(timestamp)));
+        SimpleDateFormat sdf1 = new SimpleDateFormat("HH");
+        verifyMap.put("hour",sdf1.format(new Date(timestamp)));
         assertEquals(verifyMap,par);
     }
 
