@@ -95,8 +95,9 @@ public class DataConnector extends AuditableEntity  {
         this.type = type;
     }
 
-    public String getConfig() {
-        return config;
+    public Map<String,String> getConfig() {
+        if (this.configInMaps == null) this.configInMaps = convertJonsToMap(config);
+        return configInMaps;
     }
 
 
