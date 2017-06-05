@@ -23,7 +23,7 @@ You can check the data assets by clicking "DataAssets" on the top right corner.
 
 Then you can see all the data assets listed here.
 
-<img src="img/userguide/asset.png">
+<img src="img/userguide/asset list.png">
 
 ### 2.2 Create measure
 
@@ -41,7 +41,7 @@ There are mainly four kinds of measures for you to choose, which are:
 At current we only support accuracy measure creation from UI.
 
 #### **2.2.1 Accuracy** [[1]](#accuracy)
-<img src="img/userguide/accurancy.png" >
+<img src="img/userguide/accuracy.png" >
 
 **Definition:**
 
@@ -49,22 +49,21 @@ Measured by how the values agree with an identified source of truth.
 
 **Steps:**
 
-1)      Choose source
+1) Choose source
 
 Select the source dataset and fields which will be used for comparision.
 
-<img src="img/userguide/source.PNG">
+<img src="img/userguide/source.png">
 
 For example, we choose 2 columns here.
 
-2)      Choose target:
+2) Choose target:
 
 Select the target dataset and fields which will be used for comparision.
 
-<img src="img/userguide/target.PNG">
+<img src="img/userguide/target.png">
 
-
-3)      Mapping source and target
+3) Mapping source and target
 
 - Step1: "Map To": Select which rule to match the source and the target. Here are 6 options to choose:
   1. == : data of the two columns should be exactly matched.
@@ -75,9 +74,9 @@ Select the target dataset and fields which will be used for comparision.
   3. <= : the target column data should be smaller than or equal to the source one.
 - Step2: "Source fields": choose the source column that you want to compare with the target column.
 
-<img src="img/userguide/mapping.PNG">
+<img src="img/userguide/mapping.png">
 
-4)      Configuration
+4) Configuration
 
 Set up the measure required information.
 
@@ -85,7 +84,7 @@ The organization means the group of your measure, you can manage your measuremen
 
 <img src="img/userguide/confirm.png">
 
-5)      Measure information
+5) Measure information
 
 After you create a new accuracy measure, you can check the measure you've created by selecting it in the listed measurements' page.
 
