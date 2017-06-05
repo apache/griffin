@@ -108,7 +108,7 @@ public class SparkSubmitJob implements Job {
         periodTime = jd.getJobDataMap().getString("periodTime");
         //prepare current system timestamp
         long currentSystemTimestamp = System.currentTimeMillis();
-
+        logger.info("currentSystemTimestamp: "+currentSystemTimestamp);
         if (sourcePattern != null && !sourcePattern.equals("")) {
             sourcePatternItemSet = sourcePattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
@@ -254,7 +254,7 @@ public class SparkSubmitJob implements Job {
                 throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.info("Exception: " + e);
         } finally {
             inputStream.close();
         }
