@@ -31,9 +31,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.quartz.DateBuilder.futureDate;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -121,8 +121,17 @@ public class SchedulerController {
                            @RequestBody SchedulerRequestBody schedulerRequestBody) {
         //@RequestParam(value = "sourcePat", required = false) String sourcePat,
         //@RequestParam(value = "targetPat", required = false) String targetPat
-        int jobStartTime = 0;
+//        int jobStartTime = 0;
+        Date jobStartTime=null;
         int periodTime = 0;
+        SimpleDateFormat format=new SimpleDateFormat("YYYYMMdd HH:mm:ss");
+        try{
+            periodTime = Integer.parseInt(schedulerRequestBody.getPeriodTime());
+            jobStartTime=format.parse(schedulerRequestBody.getJobStartTime());
+        }catch (Exception e){
+            LOGGER.info("jobStartTime or periodTime format error! "+e);
+            return false;
+        }
         try {
             Scheduler scheduler = factory.getObject();
             TriggerKey triggerKey = triggerKey(jobName, groupName);
@@ -134,6 +143,7 @@ public class SchedulerController {
             JobDetail jobDetail;
             if (scheduler.checkExists(jobKey)) {
                 jobDetail = scheduler.getJobDetail(jobKey);
+                setJobDetail(jobDetail,schedulerRequestBody,measureName,groupName,jobName);
                 scheduler.addJob(jobDetail, true);
             } else {
                 jobDetail = newJob(SparkSubmitJob.class)
@@ -141,18 +151,7 @@ public class SchedulerController {
                         .withIdentity(jobKey)
                         .build();
 
-                jobDetail.getJobDataMap().put("measure", measureName);
-                jobDetail.getJobDataMap().put("sourcePat", schedulerRequestBody.getSourcePat());
-                jobDetail.getJobDataMap().put("targetPat", schedulerRequestBody.getTargetPat());
-                jobDetail.getJobDataMap().put("dataStartTimestamp", schedulerRequestBody.getDataStartTimestamp());
-                jobDetail.getJobDataMap().put("jobStartTime", schedulerRequestBody.getJobStartTime());
-                jobDetail.getJobDataMap().put("periodTime", schedulerRequestBody.getPeriodTime());
-                jobDetail.getJobDataMap().put("lastTime", "");
-                jobDetail.getJobDataMap().put("groupName",groupName);
-                jobDetail.getJobDataMap().put("jobName",jobName);
-
-                jobStartTime = Integer.parseInt(schedulerRequestBody.getJobStartTime());
-                periodTime = Integer.parseInt(schedulerRequestBody.getPeriodTime());
+                setJobDetail(jobDetail,schedulerRequestBody,measureName,groupName,jobName);
                 scheduler.addJob(jobDetail, false);
             }
 
@@ -164,9 +163,8 @@ public class SchedulerController {
                     .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                             .withIntervalInSeconds(periodTime)
                             .repeatForever())
-                    .startAt(futureDate(jobStartTime, DateBuilder.IntervalUnit.SECOND))
+                    .startAt(jobStartTime)
                     .build();
-
             scheduler.scheduleJob(trigger);
 
             return true;
@@ -177,6 +175,17 @@ public class SchedulerController {
         }
     }
 
+    private void setJobDetail(JobDetail jobDetail,SchedulerRequestBody schedulerRequestBody,String measureName,String groupName,String jobName){
+        jobDetail.getJobDataMap().put("measure", measureName);
+        jobDetail.getJobDataMap().put("sourcePat", schedulerRequestBody.getSourcePat());
+        jobDetail.getJobDataMap().put("targetPat", schedulerRequestBody.getTargetPat());
+        jobDetail.getJobDataMap().put("dataStartTimestamp", schedulerRequestBody.getDataStartTimestamp());
+        jobDetail.getJobDataMap().put("jobStartTime", schedulerRequestBody.getJobStartTime());
+        jobDetail.getJobDataMap().put("periodTime", schedulerRequestBody.getPeriodTime());
+        jobDetail.getJobDataMap().put("lastTime", "");
+        jobDetail.getJobDataMap().put("groupName",groupName);
+        jobDetail.getJobDataMap().put("jobName",jobName);
+    }
 
     @RequestMapping(value = "/groups/{group}/jobs/{name}", method = RequestMethod.DELETE)
     public boolean deleteJob(@PathVariable String group, @PathVariable String name) {
