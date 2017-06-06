@@ -89,7 +89,6 @@ public class SchedulerController {
                     map.put("measure", (String) jd.getJobDataMap().get("measure"));
                     map.put("sourcePat",jd.getJobDataMap().getString("sourcePat"));
                     map.put("targetPat",jd.getJobDataMap().getString("targetPat"));
-                    System.out.print("dataStartTimestamp:"+jd.getJobDataMap().getString("dataStartTimestamp"));
                     if(jd.getJobDataMap().getString("dataStartTimestamp")!=null && !jd.getJobDataMap().getString("dataStartTimestamp").equals(""))
                         map.put("dataStartTimestamp",jd.getJobDataMap().getString("dataStartTimestamp"));
                     map.put("jobStartTime",jd.getJobDataMap().getString("jobStartTime"));

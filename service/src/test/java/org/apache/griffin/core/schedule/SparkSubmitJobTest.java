@@ -23,10 +23,12 @@ import org.apache.griffin.core.measure.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -86,11 +88,15 @@ public class SparkSubmitJobTest {
 
         when(ssj.measureRepo.findByName("bevssoj")).thenReturn(measure);
 //        ssj.execute(context);
-//
-//        RestTemplate restTemplate =mock(RestTemplate.class);
+        RestTemplate restTemplate =spy(RestTemplate.class);
+        Mockito.when(new RestTemplate()).thenReturn(restTemplate);
+//        PowerMockito.whenNew(RestTemplate.class).withNoArguments().thenReturn(restTemplate);
+
+//        RestTemplate restTemplate =spy(RestTemplate.class);
 //        String uri="http://10.9.246.187:8998/batches";
-//        SparkJobDO sparkJobDO=mock(SparkJobDO.class);
-//        when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(null);
+        String uri="http://localhost:8998/batches";
+        SparkJobDO sparkJobDO=mock(SparkJobDO.class);
+        when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(null);
 //
 //
 //        long currentSystemTimestamp=System.currentTimeMillis();
@@ -98,6 +104,7 @@ public class SparkSubmitJobTest {
 //
 //        verify(ssj.measureRepo).findByName("bevssoj");
 //        verify(jdmap,atLeast(2)).put("lastTime",currentTimstamp+"");
+
     }
 
     @Test
