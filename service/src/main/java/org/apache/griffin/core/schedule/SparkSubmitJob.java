@@ -109,13 +109,13 @@ public class SparkSubmitJob implements Job {
         //prepare current system timestamp
         long currentSystemTimestamp = System.currentTimeMillis();
         logger.info("currentSystemTimestamp: "+currentSystemTimestamp);
-        if (sourcePattern != null && !sourcePattern.equals("")) {
+        if (sourcePattern != null && !sourcePattern.isEmpty()) {
             sourcePatternItemSet = sourcePattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getSource(), sourcePatternItemSet, partitionItemSet, currentTimstamp);
             jd.getJobDataMap().put("lastTime", currentTimstamp + "");
         }
-        if (targetPattern != null && !targetPattern.equals("")) {
+        if (targetPattern != null && !targetPattern.isEmpty()) {
             targetPatternItemSet = targetPattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getTarget(), targetPatternItemSet, partitionItemSet, currentTimstamp);
@@ -125,7 +125,6 @@ public class SparkSubmitJob implements Job {
         RestTemplate restTemplate = new RestTemplate();
         setSparkJobDO();
 //        String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
-        logger.info("measure: \n"+measure);
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         logger.info(result);
         ScheduleResult scheduleResult=new ScheduleResult();
@@ -179,14 +178,14 @@ public class SparkSubmitJob implements Job {
 
     public long setCurrentTimestamp(long currentSystemTimestamp) {
         long currentTimstamp=0;
-        if (eachJoblastTimestamp != null && !eachJoblastTimestamp.equals("")) {
+        if (eachJoblastTimestamp != null && !eachJoblastTimestamp.isEmpty()) {
             try {
                 currentTimstamp = Long.parseLong(eachJoblastTimestamp) + Integer.parseInt(periodTime) * 1000;
             }catch (Exception e){
                 logger.info("lasttime or periodTime format problem! "+e);
             }
         } else {
-            if (dataStartTimestamp != null && !dataStartTimestamp.equals("")) {
+            if (dataStartTimestamp != null && !dataStartTimestamp.isEmpty()) {
                 try{
                     currentTimstamp = Long.parseLong(dataStartTimestamp);
                 }catch (Exception e){
