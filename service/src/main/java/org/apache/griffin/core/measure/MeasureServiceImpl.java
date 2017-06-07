@@ -87,7 +87,14 @@ public class MeasureServiceImpl implements MeasureService{
     }
 
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
-
+//        Long measureId=measure.getId();
+//        if (measureRepo.findOne(measureId)==null){
+//            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
+//        }else{
+//            measureRepo.updateMeasure(measureId,measure.getDescription(),measure.getOrganization(),measure.getSource(),measure.getTarget(),measure.getEvaluateRule());
+////            System.out.print(res);
+//            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
+//        }
         String name=measure.getName();
         Measure temp_mesaure=measureRepo.findByName(name);
         if (temp_mesaure==null){

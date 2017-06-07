@@ -124,9 +124,9 @@ public class SparkSubmitJob implements Job {
         //final String uri = "http://10.9.246.187:8998/batches";
         RestTemplate restTemplate = new RestTemplate();
         setSparkJobDO();
-//        String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         logger.info(result);
+        //save result info into DataBase
         ScheduleResult scheduleResult=new ScheduleResult();
         Gson gson=new Gson();
         try {
@@ -134,8 +134,10 @@ public class SparkSubmitJob implements Job {
         }catch (Exception e){
             logger.info("scheduleResult covert error!"+e);
         }
-        ScheduleState scheduleState=new ScheduleState(groupName,jobName,scheduleResult.getId(),scheduleResult.getState(),scheduleResult.getAppId(),System.currentTimeMillis());
-        scheduleStateRepo.save(scheduleState);
+        if(scheduleResult!=null) {
+            ScheduleState scheduleState = new ScheduleState(groupName, jobName, scheduleResult.getId(), scheduleResult.getState(), scheduleResult.getAppId(), System.currentTimeMillis());
+            scheduleStateRepo.save(scheduleState);
+        }
     }
 
     public Map<String, String> genPartitions(String[] patternItemSet, String[] partitionItemSet, long timestamp) {
