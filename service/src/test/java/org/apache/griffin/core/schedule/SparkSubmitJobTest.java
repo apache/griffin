@@ -16,17 +16,22 @@ limitations under the License.
 package org.apache.griffin.core.schedule;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.griffin.core.measure.DataConnector;
 import org.apache.griffin.core.measure.EvaluateRule;
 import org.apache.griffin.core.measure.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -40,8 +45,10 @@ import static org.mockito.Mockito.*;
 /**
  * Created by xiangrchen on 5/8/17.
  */
-//@RunWith(SpringJUnit4ClassRunner.class)
-public class SparkSubmitJobTest {
+//@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SparkSubmitJob.class)
+public class SparkSubmitJobTest{
 
     private SparkSubmitJob ssj;
 
@@ -55,7 +62,7 @@ public class SparkSubmitJobTest {
     }
 
     @Test
-    public void test_execute() throws JsonProcessingException {
+    public void test_execute() throws Exception {
         JobExecutionContext context=mock(JobExecutionContext.class);
         JobDetail jd = mock(JobDetail.class);
         when(context.getJobDetail()).thenReturn(jd);
@@ -69,35 +76,44 @@ public class SparkSubmitJobTest {
         when(jdmap.getString("dataStartTimestamp")).thenReturn("1460174400000");
         when(jdmap.getString("lastTime")).thenReturn("");
         when(jdmap.getString("periodTime")).thenReturn("10");
+        Measure measure = createATestMeasure("viewitem_hourly","bullseye");
+        when(ssj.measureRepo.findByName("bevssoj")).thenReturn(measure);
 
+        RestTemplate restTemplate =Mockito.mock(RestTemplate.class);
+        PowerMockito.whenNew(RestTemplate.class).withAnyArguments().thenReturn(restTemplate);
+        String uri="";
+        SparkJobDO sparkJobDO= Mockito.mock(SparkJobDO.class);
+        PowerMockito.when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(null);
+        ssj.execute(context);
+
+        long currentSystemTimestamp=System.currentTimeMillis();
+        long currentTimstamp = ssj.setCurrentTimestamp(currentSystemTimestamp);
+//
+        verify(ssj.measureRepo).findByName("bevssoj");
+        verify(jdmap,atLeast(2)).put("lastTime",currentTimstamp+"");
+
+    }
+
+    private Measure createATestMeasure(String name,String org)throws IOException,Exception{
         HashMap<String,String> configMap1=new HashMap<>();
         configMap1.put("database","default");
         configMap1.put("table.name","test_data_src");
         HashMap<String,String> configMap2=new HashMap<>();
         configMap2.put("database","default");
         configMap2.put("table.name","test_data_tgt");
-        String configJson1 = new ObjectMapper().writeValueAsString(configMap1);
-        String configJson2 = new ObjectMapper().writeValueAsString(configMap2);
+        String configJson1 = new org.codehaus.jackson.map.ObjectMapper().writeValueAsString(configMap1);
+        String configJson2 = new org.codehaus.jackson.map.ObjectMapper().writeValueAsString(configMap2);
+
         DataConnector source = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
         DataConnector target = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-        String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
-        EvaluateRule eRule = new EvaluateRule(1,rules);
-        Measure measure = new Measure("viewitem_hourly","bevssoj description", Measure.MearuseType.accuracy, "bullyeye", source, target, eRule,"test1");
 
-        when(ssj.measureRepo.findByName("bevssoj")).thenReturn(measure);
-//        ssj.execute(context);
-//
-//        RestTemplate restTemplate =mock(RestTemplate.class);
-//        String uri="http://10.9.246.187:8998/batches";
-//        SparkJobDO sparkJobDO=mock(SparkJobDO.class);
-//        when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(null);
-//
-//
-//        long currentSystemTimestamp=System.currentTimeMillis();
-//        long currentTimstamp = ssj.setCurrentTimestamp(currentSystemTimestamp);
-//
-//        verify(ssj.measureRepo).findByName("bevssoj");
-//        verify(jdmap,atLeast(2)).put("lastTime",currentTimstamp+"");
+        String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
+
+        EvaluateRule eRule = new EvaluateRule(1,rules);
+
+        Measure measure = new Measure(name,"bevssoj description", Measure.MearuseType.accuracy, org, source, target, eRule,"test1");
+
+        return measure;
     }
 
     @Test
