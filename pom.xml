@@ -24,9 +24,9 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.apache.griffin</groupId>
+    <groupId>org.apache.griffin</groupId>
     <artifactId>griffin</artifactId>
-    <version>0.0.1-incubating-SNAPSHOT</version>
+    <version>0.1.1-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
     <url>http://griffin.incubator.apache.org</url>
