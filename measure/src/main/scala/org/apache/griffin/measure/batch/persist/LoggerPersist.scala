@@ -49,7 +49,7 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
           s"result: ${result}"
         }
       }
-      info(s"${metricName} result: ${resStr}")
+      info(s"${metricName} result: \n${resStr}")
     } catch {
       case e: Throwable => error(e.getMessage)
     }
