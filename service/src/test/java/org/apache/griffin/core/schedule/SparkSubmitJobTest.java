@@ -42,10 +42,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-/**
- * Created by xiangrchen on 5/8/17.
- */
-//@RunWith(MockitoJUnitRunner.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SparkSubmitJob.class)
 public class SparkSubmitJobTest{

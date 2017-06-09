@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.DataConnector;
 import org.apache.griffin.core.measure.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -109,13 +110,13 @@ public class SparkSubmitJob implements Job {
         //prepare current system timestamp
         long currentSystemTimestamp = System.currentTimeMillis();
         logger.info("currentSystemTimestamp: "+currentSystemTimestamp);
-        if (sourcePattern != null && !sourcePattern.isEmpty()) {
+        if (StringUtils.isNotEmpty(sourcePattern)) {
             sourcePatternItemSet = sourcePattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getSource(), sourcePatternItemSet, partitionItemSet, currentTimstamp);
             jd.getJobDataMap().put("lastTime", currentTimstamp + "");
         }
-        if (targetPattern != null && !targetPattern.isEmpty()) {
+        if (StringUtils.isNotEmpty(targetPattern)) {
             targetPatternItemSet = targetPattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getTarget(), targetPatternItemSet, partitionItemSet, currentTimstamp);
@@ -180,14 +181,14 @@ public class SparkSubmitJob implements Job {
 
     public long setCurrentTimestamp(long currentSystemTimestamp) {
         long currentTimstamp=0;
-        if (eachJoblastTimestamp != null && !eachJoblastTimestamp.isEmpty()) {
+        if (StringUtils.isNotEmpty(eachJoblastTimestamp)) {
             try {
                 currentTimstamp = Long.parseLong(eachJoblastTimestamp) + Integer.parseInt(periodTime) * 1000;
             }catch (Exception e){
                 logger.info("lasttime or periodTime format problem! "+e);
             }
         } else {
-            if (dataStartTimestamp != null && !dataStartTimestamp.isEmpty()) {
+            if (StringUtils.isNotEmpty(dataStartTimestamp)) {
                 try{
                     currentTimstamp = Long.parseLong(dataStartTimestamp);
                 }catch (Exception e){
@@ -235,8 +236,6 @@ public class SparkSubmitJob implements Job {
         sparkJobDO.setJars(jars);
 
         List<String> files = new ArrayList<>();
-//        files.add(props.getProperty("sparkJob.files_1"));
-
         sparkJobDO.setFiles(files);
     }
 

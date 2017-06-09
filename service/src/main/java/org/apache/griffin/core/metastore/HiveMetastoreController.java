@@ -30,7 +30,7 @@ import java.util.Map;
 public class HiveMetastoreController {
 
     @Autowired
-    HiveMetastoreService hiveMetastoreService;
+    HiveMetastoreServiceImpl hiveMetastoreService;
 
     @RequestMapping("/db")
     public Iterable<String> getAllDatabases() {

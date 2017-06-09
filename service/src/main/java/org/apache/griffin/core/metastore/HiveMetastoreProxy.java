@@ -37,19 +37,19 @@ public class HiveMetastoreProxy
 
     @Bean
     public HiveMetaStoreClient initHiveMetastoreClient(){
-    HiveConf hiveConf = new HiveConf();
-    hiveConf.set("hive.metastore.local", "false");
-    hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
-    hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
-    try {
-        client= new HiveMetaStoreClient(hiveConf);
-    } catch (MetaException e) {
-        log.error("Failed to connect hive metastore",e.getMessage());
-        client = null;
-    }
+        HiveConf hiveConf = new HiveConf();
+        hiveConf.set("hive.metastore.local", "false");
+        hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
+        hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
+        try {
+            client= new HiveMetaStoreClient(hiveConf);
+        } catch (MetaException e) {
+            log.error("Failed to connect hive metastore",e.getMessage());
+            client = null;
+        }
 
-    return client;
-}
+        return client;
+    }
 
     public void destroy() throws Exception {
         if(null!=client) client.close();

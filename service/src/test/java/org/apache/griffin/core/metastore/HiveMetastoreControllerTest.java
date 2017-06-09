@@ -35,7 +35,7 @@ public class HiveMetastoreControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    HiveMetastoreService hiveMetastoreService;
+    HiveMetastoreServiceImpl hiveMetastoreService;
 
     @InjectMocks
     private HiveMetastoreController hiveMetastoreController;

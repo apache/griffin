@@ -38,13 +38,13 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(properties = {"hive.metastore.uris=thrift://10.9.246.187:9083"})
-public class HiveMetastoreServiceTests {
+public class HiveMetastoreServiceImplTest {
 
     @TestConfiguration
     public static class HiveMetastoreServiceConfiguration{
         @Bean
-        public HiveMetastoreService service(){
-            return new HiveMetastoreService();
+        public HiveMetastoreServiceImpl service(){
+            return new HiveMetastoreServiceImpl();
         }
 
         @Value("${hive.metastore.uris}")
@@ -67,7 +67,7 @@ public class HiveMetastoreServiceTests {
 
         }
     }
-    @Autowired private HiveMetastoreService service;
+    @Autowired private HiveMetastoreServiceImpl service;
 
 
     @Before
