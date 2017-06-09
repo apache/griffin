@@ -157,15 +157,6 @@ public class SparkSubmitJob implements Job {
         return res;
     }
 
-    /**
-     * putDataConnectorPartitions
-     *
-     * @param dc
-     * @param patternItemSet
-     * @param partitionItemSet
-     * @param timestamp
-     * @return
-     */
     public void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItemSet, long timestamp) {
         Map<String, String> partitionItemMap = genPartitions(patternItemSet, partitionItemSet, timestamp);
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);

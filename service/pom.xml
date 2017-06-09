@@ -13,14 +13,13 @@
   or implied. See the License for the specific language governing permissions and limitations under
   the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.apache.griffin</groupId>
+        <groupId>org.apache.griffin</groupId>
         <artifactId>griffin</artifactId>
-        <version>0.0.1-incubating-SNAPSHOT</version>
+        <version>0.1.3-incubating-SNAPSHOT</version>
     </parent>
 
     <artifactId>service</artifactId>
@@ -41,6 +40,7 @@
         <start-class>org.apache.griffin.core.GriffinWebApplication</start-class>
         <powermock.version>1.6.6</powermock.version>
         <mockito.version>1.10.19</mockito.version>
+        <spring-boot-maven-plugin.version>1.5.1.RELEASE</spring-boot-maven-plugin.version>
     </properties>
 
     <repositories>
@@ -170,11 +170,11 @@
     <profiles>
     </profiles>
     <build>
-        <finalName>service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
