@@ -155,7 +155,6 @@
     <profiles>
     </profiles>
     <build>
-        <finalName>service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
