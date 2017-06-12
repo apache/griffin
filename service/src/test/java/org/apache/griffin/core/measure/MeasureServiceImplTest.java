@@ -180,16 +180,12 @@ public class MeasureServiceImplTest {
         configMap2.put("table.name","test_data_tgt");
         String configJson1 = new ObjectMapper().writeValueAsString(configMap1);
         String configJson2 = new ObjectMapper().writeValueAsString(configMap2);
-
         DataConnector source = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
         DataConnector target = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
 
         String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
-
         EvaluateRule eRule = new EvaluateRule(1,rules);
-
         Measure measure = new Measure(name,"bevssoj description", Measure.MearuseType.accuracy, org, source, target, eRule,"test1");
-
         return measure;
     }
 

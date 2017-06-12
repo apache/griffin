@@ -21,18 +21,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
@@ -162,10 +164,19 @@ public class SchedulerServiceImplTest {
         try {
             Scheduler scheduler=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler);
+            given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("BA"));
+            JobKey jobKey= new JobKey("TEST");
+            Set<JobKey> jobKeySet=new HashSet<JobKey>();
+            jobKeySet.add(jobKey);
+            given(scheduler.getJobKeys(GroupMatcher.jobGroupEquals("BA"))).willReturn((jobKeySet));
+
+            Pageable pageRequest=new PageRequest(0,1, Sort.Direction.DESC,"timestamp");
+            List<ScheduleState> scheduleStateList=new ArrayList<ScheduleState>();
+            given(scheduleStateRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
             JobHealth tmp = service.getHealthInfo();
             assertTrue(true);
         }catch (Throwable t){
-            fail("Cannot find instances of Job");
+            fail("Cannot get Health info "+t);
         }
     }
 

@@ -38,7 +38,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
 
 @Service
-public class SchedulerServiceImpl implements SchedulerService {
+public class SchedulerServiceImpl implements SchedulerService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 

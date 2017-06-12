@@ -15,21 +15,23 @@ limitations under the License.
 
 package org.apache.griffin.core.metastore;
 
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.thrift.TException;
 
 import java.util.List;
 import java.util.Map;
 
 public interface HiveMetastoreService {
 
-    public Iterable<String> getAllDatabases();
+    public Iterable<String> getAllDatabases() throws MetaException;
 
-    public Iterable<String> getAllTableNames(String dbName);
+    public Iterable<String> getAllTableNames(String dbName) throws MetaException;
 
-    public List<Table> getAllTable(String db);
+    public List<Table> getAllTable(String db) throws TException;
 
-    public Map<String,List<Table>> getAllTable();
+    public Map<String,List<Table>> getAllTable() throws TException;
 
-    public Table getTable(String dbName, String tableName);
+    public Table getTable(String dbName, String tableName) throws TException;
 
 }

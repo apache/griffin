@@ -36,6 +36,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
     @Value("${kafka.schema.registry.url}")
     private String url;
 
+    RestTemplate restTemplate = new RestTemplate();
 
     private String registryUrl(final String path) {
         if (StringUtils.hasText(path)) {
@@ -52,7 +53,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
         String regUrl = registryUrl(path);
         SchemaString result = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
+//            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<SchemaString> res = restTemplate.getForEntity(regUrl, SchemaString.class);
             result = res.getBody();
         } catch (Exception e) {
@@ -67,7 +68,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
         String regUrl = registryUrl(path);
         Iterable<String> result = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
+//            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String[]> res = restTemplate.getForEntity(regUrl, String[].class);
             result = Arrays.asList(res.getBody());
         } catch (Exception e) {
@@ -82,7 +83,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
         String regUrl = registryUrl(path);
         Iterable<Integer> result = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
+//            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Integer[]> res = restTemplate.getForEntity(regUrl, Integer[].class);
             result = Arrays.asList(res.getBody());
         } catch (Exception e) {
@@ -97,7 +98,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
         String regUrl = registryUrl(path);
         Schema result = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
+//            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Schema> res = restTemplate.getForEntity(regUrl, Schema.class);
             result = res.getBody();
         } catch (Exception e) {
@@ -112,7 +113,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
         String regUrl = registryUrl(path);
         Config result = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
+//            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Config> res = restTemplate.getForEntity(regUrl, Config.class);
 
             result = res.getBody();
@@ -128,7 +129,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
         String regUrl = registryUrl(path);
         Config result = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
+//            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Config> res = restTemplate.getForEntity(regUrl, Config.class);
             result = res.getBody();
         } catch (Exception e) {

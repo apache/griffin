@@ -15,18 +15,23 @@ limitations under the License.
 
 package org.apache.griffin.core.metastore;
 
+import io.confluent.kafka.schemaregistry.client.rest.entities.Config;
+import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
+import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
+
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(properties = {"kafka.schema.registry.url = http://10.65.159.119:8081"})
 public class KafkaSchemaServiceImplTest {
     @TestConfiguration
     public static class KafkaSchemaServiceConfiguration {
@@ -34,9 +39,6 @@ public class KafkaSchemaServiceImplTest {
         public KafkaSchemaServiceImpl service() {
             return new KafkaSchemaServiceImpl();
         }
-
-        @Value("${kafka.schema.registry.url}")
-        String urls;
     }
 
     @Autowired
@@ -44,18 +46,66 @@ public class KafkaSchemaServiceImplTest {
 
     @Before
     public void setup(){
-
+        service.restTemplate= Mockito.mock(RestTemplate.class);
     }
 
     @Test
     public void testGetSchemaString(){
-//        try {
-//            SchemaString tmp = service.getSchemaString(1);
-//            assertTrue(true);
-//        }catch (Throwable t){
-//            fail("Cannot get all tables from all dbs");
-//        }
+        try {
+            SchemaString tmp = service.getSchemaString(1);
+            assertTrue(true);
+        }catch (Throwable t){
+            fail("Cannot get all tables from all dbs");
+        }
     }
 
+    @Test
+    public void testGetSubjects(){
+        try {
+            Iterable<String> tmp = service.getSubjects();
+            assertTrue(true);
+        }catch (Throwable t){
+            fail("Cannot get all tables from all dbs");
+        }
+    }
 
+    @Test
+    public void testGetSubjectVersions(){
+        try {
+            Iterable<Integer> tmp = service.getSubjectVersions("");
+            assertTrue(true);
+        }catch (Throwable t){
+            fail("Cannot get all tables from all dbs");
+        }
+    }
+
+    @Test
+    public void testGetSubjectSchema(){
+        try {
+            Schema tmp = service.getSubjectSchema("","");
+            assertTrue(true);
+        }catch (Throwable t){
+            fail("Cannot get all tables from all dbs");
+        }
+    }
+
+    @Test
+    public void testGetTopLevelConfig(){
+        try {
+            Config tmp = service.getTopLevelConfig();
+            assertTrue(true);
+        }catch (Throwable t){
+            fail("Cannot get all tables from all dbs");
+        }
+    }
+
+    @Test
+    public void testGetSubjectLevelConfig(){
+        try {
+            Config tmp = service.getSubjectLevelConfig("");
+            assertTrue(true);
+        }catch (Throwable t){
+            fail("Cannot get all tables from all dbs");
+        }
+    }
 }

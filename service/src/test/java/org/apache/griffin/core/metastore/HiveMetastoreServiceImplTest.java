@@ -15,18 +15,15 @@ limitations under the License.
 
 package org.apache.griffin.core.metastore;
 
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -37,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(properties = {"hive.metastore.uris=thrift://10.9.246.187:9083"})
+//@TestPropertySource(properties = {"hive.metastore.uris=thrift://10.9.246.187:9083"})
 public class HiveMetastoreServiceImplTest {
 
     @TestConfiguration
@@ -46,29 +43,13 @@ public class HiveMetastoreServiceImplTest {
         public HiveMetastoreServiceImpl service(){
             return new HiveMetastoreServiceImpl();
         }
-
-        @Value("${hive.metastore.uris}")
-        String urls;
-        @Bean
-        public HiveMetaStoreClient client(){
-
-                HiveMetaStoreClient client = null;
-                HiveConf hiveConf = new HiveConf();
-                hiveConf.set("hive.metastore.local", "false");
-                hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
-                hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, urls);
-                try {
-                    client= new HiveMetaStoreClient(hiveConf);
-                } catch (MetaException e) {
-                    client = null;
-                }
-
-                return client;
-
-        }
     }
-    @Autowired private HiveMetastoreServiceImpl service;
 
+    @MockBean
+    private HiveMetaStoreClient client;
+
+    @Autowired
+    private HiveMetastoreServiceImpl service;
 
     @Before
     public void setup(){
@@ -76,8 +57,7 @@ public class HiveMetastoreServiceImplTest {
     }
 
     @Test
-    public void testGetAllTables(){
-
+    public void testGetAllDatabases(){
         try {
             Iterable<String> tmp = service.getAllDatabases();
             assertTrue(true);
