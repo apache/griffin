@@ -33,13 +33,19 @@ define(['./module'], function (controllers) {
         if(start == 0 && !$scope.rowCollection){
           $http.get(allModels).success(function(data) {
             if(data){
-              data.sort(function(a,b){
-                return -(a.timestamp - b.timestamp);
-              });
+              // data.sort(function(a,b){
+              //   return -(a.timestamp - b.timestamp);
+              // });
             }
+            originalRowCollection = new Array();
+            angular.forEach(data,function(db){
+              angular.forEach(db,function(table){
+                originalRowCollection.push(table);
+              });
+            });
 
-            originalRowCollection = angular.copy(data);
-            $scope.rowCollection = angular.copy(data);
+            // originalRowCollection = angular.copy(data);
+            $scope.rowCollection = angular.copy(originalRowCollection);
             // $scope.rowCollection.sort(function(a,b){
             //   return (a.assetName<b.assetName?-1:(a.assetName>b.assetName?1:0));
             // });

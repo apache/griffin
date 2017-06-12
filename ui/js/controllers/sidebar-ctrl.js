@@ -15,7 +15,7 @@ limitations under the License.
 
 define(['./module'], function(controllers) {
     'use strict';
-    controllers.controller('SideBarCtrl', ['$scope', '$http', '$config', '$filter', '$timeout', '$compile', '$routeParams', '$barkChart', '$rootScope', function($scope, $http, $config, $filter, $timeout, $compile, $routeParams, $barkChart, $rootScope) {
+    controllers.controller('SideBarCtrl', ['$scope', '$http', '$config', '$filter', '$timeout', '$compile', '$routeParams', '$barkChart', '$rootScope','$location', function($scope, $http, $config, $filter, $timeout, $compile, $routeParams, $barkChart, $rootScope,$location) {
 
         var echarts = require('echarts');
 
@@ -51,8 +51,8 @@ define(['./module'], function(controllers) {
             myChart.setOption(metric.myOption);
 
             $('#'+chartId).unbind('click');
-            $('#'+chartId).click(function() {
-              showBig($scope.finalData[parentIndex].metrics[index]);
+            $('#'+chartId).click(function(e) {
+              window.location.href = '/#/detailed/'+$scope.finalData[parentIndex].metrics[index].name;
             });
 
         };
@@ -63,6 +63,7 @@ define(['./module'], function(controllers) {
 
         function sideBarList(sysName){
             var url_organization = $config.uri.organization;
+            // var url_organization = 'org.json';
             $http.get(url_organization).success(function(res){
                var orgNode = null;
                angular.forEach(res, function(value,key) {
@@ -74,6 +75,7 @@ define(['./module'], function(controllers) {
                $scope.originalOrg = angular.copy($scope.orgs);
                var url_briefmetrics = $config.uri.dashboard;
                $http.post(url_briefmetrics, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
+               // $http.get('data.json').success(function(data){
                    angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){

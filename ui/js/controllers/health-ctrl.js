@@ -32,7 +32,9 @@ define(['./module'], function (controllers) {
 
 //            var url = $config.uri.heatmap;
             var url_dashboard = $config.uri.dashboard ;
+            // var url_dashboard = 'data.json';
             var url_organization = $config.uri.organization;
+            // var url_organization = 'org.json';
             $http.get(url_organization).success(function(res){
                var orgNode = null;
                angular.forEach(res, function(value,key) {
@@ -42,7 +44,8 @@ define(['./module'], function (controllers) {
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
+                $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
+//                  $http.get(url_dashboard).success(function(data){
                     angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
@@ -125,7 +128,9 @@ define(['./module'], function (controllers) {
                                         normal: {
                                             color: '#4c8c6f'
                                         }
-                                    }
+                                    },
+                                    // link:'/#/detailed/'+metric.name,
+                                    // target:'self',
                                 };
                                 if (metric.dqfail == 1) {
                                     itemChild.itemStyle.normal.color = '#ae5732';
@@ -204,7 +209,7 @@ define(['./module'], function (controllers) {
                                 show: false
                             },
                             roam: false,
-                            nodeClick: false,
+                            nodeClick: 'link',
                             data: data,
                             // leafDepth: 1,
                             width: '95%',
@@ -225,27 +230,11 @@ define(['./module'], function (controllers) {
                     // }
                     // param.event.event.preventDefault();
                     if (param.data.name) {
-
-                        showBig(param.data.name);
-                        // return false;
+                        // $location.path('/detailed/'+param.data.name);
+                        window.location.href = '/#/detailed/'+param.data.name;
                     }
                 });
 
-        }
-
-        var showBig = function(metricName){
-          var metricDetailUrl = $config.uri.dashboard;
-          $http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name": metricName }}]}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
-            var metric = new Object();
-            metric.name = data.hits.hits[0]._source.name;
-            metric.timestamp = data.hits.hits[data.hits.hits.length-1]._source.tmst;
-            metric.dq = data.hits.hits[data.hits.hits.length-1]._source.matched/data.hits.hits[data.hits.hits.length-1]._source.matched*100;
-            metric.details = new Array();
-            angular.forEach(data.hits.hits,function(point){
-                metric.details.push(point);
-            })
-            $rootScope.showBigChart($barkChart.getOptionBig(metric));
-          });
         }
 
         $scope.$on('resizeHandler', function(e) {
