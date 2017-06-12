@@ -44,8 +44,8 @@ define(['./module'], function (controllers) {
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-               // $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
-                  $http.get(url_dashboard).success(function(data){
+                $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
+//                  $http.get(url_dashboard).success(function(data){
                     angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
@@ -232,10 +232,6 @@ define(['./module'], function (controllers) {
                     if (param.data.name) {
                         // $location.path('/detailed/'+param.data.name);
                         window.location.href = '/#/detailed/'+param.data.name;
-                        var curUrl = $location.absUrl();
-                        console.log(curUrl);
-                        // showBig(param.data.name);
-                        // return false;
                     }
                 });
 

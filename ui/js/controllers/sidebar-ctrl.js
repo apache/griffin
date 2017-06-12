@@ -52,12 +52,7 @@ define(['./module'], function(controllers) {
 
             $('#'+chartId).unbind('click');
             $('#'+chartId).click(function(e) {
-              // e.preventDefault();
-              // $location.path('/detailed/'+$scope.finalData[parentIndex].metrics[index].name);
               window.location.href = '/#/detailed/'+$scope.finalData[parentIndex].metrics[index].name;
-              // e.preventDefault();
-
-              // showBig($scope.finalData[parentIndex].metrics[index]);
             });
 
         };
