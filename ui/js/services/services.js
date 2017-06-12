@@ -37,7 +37,7 @@ define(['./module'], function (services) {
 
               dbtree:BACKEND_SERVER + '/metadata/hive/alltables',
               schemadefinition: BACKEND_SERVER + '/metadata/hive',
-              dataassetlist: BACKEND_SERVER + '/metadata/hive/default/alltables',
+              dataassetlist: BACKEND_SERVER + '/metadata/hive/alltables',
 
               adddataasset: BACKEND_SERVER + API_ROOT_PATH + '/dataassets',
               updatedataasset: BACKEND_SERVER + API_ROOT_PATH + '/dataassets',
