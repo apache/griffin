@@ -203,8 +203,8 @@ define(['./module'], function (services) {
     var option = {
       title: {
         text:  metric.name,
-//        link: '/#/viewrule/' + metric.name,
-//        target: 'self',
+        link: '/#/viewrule/' + metric.name,
+        target: 'self',
         left: 'center',
         textStyle: {
             fontSize: 25

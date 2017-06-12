@@ -46,8 +46,8 @@ define(['./module'], function(controllers) {
                         dbList.push(dbNode);
                         if (db) {
                                angular.forEach(db,function(table){
-                                   console.log(table);
-                                   console.log(typeof(table));
+                                   // console.log(table);
+                                   // console.log(typeof(table));
                                    var dsNode = {
                                        name: table.tableName,
                                        l2: true,
@@ -150,7 +150,8 @@ define(['./module'], function(controllers) {
                 console.log($scope.schemaCollectionTarget);
                 });
             }
-            $scope.dataAsset = $scope.currentNodeTarget.name + ',' + $scope.currentNode.name;
+            if($scope.currentNodeTarget)
+                $scope.dataAsset = $scope.currentNodeTarget.name + ',' + $scope.currentNode.name;
             console.log($scope.dataAsset);
         });
 

@@ -22,8 +22,8 @@ define(['./module'], function (services) {
 
 
 //    var BACKEND_SERVER = 'http://10.149.247.156:38080';
-//      var BACKEND_SERVER = 'http://localhost:8080';
-      var BACKEND_SERVER = '';
+      var BACKEND_SERVER = 'http://localhost:8080';
+//      var BACKEND_SERVER = '';
       var API_ROOT_PATH = '/api/v1';
 
 //      var ES_SERVER = 'http://10.149.247.156:59200';
@@ -37,7 +37,7 @@ define(['./module'], function (services) {
 
               dbtree:BACKEND_SERVER + '/metadata/hive/alltables',
               schemadefinition: BACKEND_SERVER + '/metadata/hive',
-              dataassetlist: BACKEND_SERVER + '/metadata/hive/default/alltables',
+              dataassetlist: BACKEND_SERVER + '/metadata/hive/alltables',
 
               adddataasset: BACKEND_SERVER + API_ROOT_PATH + '/dataassets',
               updatedataasset: BACKEND_SERVER + API_ROOT_PATH + '/dataassets',
