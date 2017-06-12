@@ -36,7 +36,8 @@ define([
     './subscribemodel-ctrl',
     './bigChart-ctrl',
     './main-ctrl',
-    './downloadSample-ctrl'
+    './downloadSample-ctrl',
+    './detail-ctrl'
     // './my-ctrl-2'
 ], function () {
   // console.log('my controller 1');
