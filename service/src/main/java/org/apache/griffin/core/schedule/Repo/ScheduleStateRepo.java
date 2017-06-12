@@ -10,9 +10,9 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
  */
 package org.apache.griffin.core.schedule.Repo;
+
 
 import org.apache.griffin.core.schedule.ScheduleState;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +22,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Created by xiangrchen on 5/31/17.
- */
+
 @Repository
 public interface ScheduleStateRepo extends CrudRepository<ScheduleState,Long>{
     @Query("select s from ScheduleState s " +

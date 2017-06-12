@@ -65,4 +65,39 @@ public class SchedulerRequestBody {
         this.periodTime = periodTime;
     }
 
+    public SchedulerRequestBody(String sourcePat, String targetPat, String dataStartTimestamp, String jobStartTime, String periodTime) {
+        this.sourcePat = sourcePat;
+        this.targetPat = targetPat;
+        this.dataStartTimestamp = dataStartTimestamp;
+        this.jobStartTime = jobStartTime;
+        this.periodTime = periodTime;
+    }
+
+    public SchedulerRequestBody() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SchedulerRequestBody that = (SchedulerRequestBody) o;
+
+        if (sourcePat != null ? !sourcePat.equals(that.sourcePat) : that.sourcePat != null) return false;
+        if (targetPat != null ? !targetPat.equals(that.targetPat) : that.targetPat != null) return false;
+        if (dataStartTimestamp != null ? !dataStartTimestamp.equals(that.dataStartTimestamp) : that.dataStartTimestamp != null)
+            return false;
+        if (jobStartTime != null ? !jobStartTime.equals(that.jobStartTime) : that.jobStartTime != null) return false;
+        return periodTime != null ? periodTime.equals(that.periodTime) : that.periodTime == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = sourcePat != null ? sourcePat.hashCode() : 0;
+        result = 31 * result + (targetPat != null ? targetPat.hashCode() : 0);
+        result = 31 * result + (dataStartTimestamp != null ? dataStartTimestamp.hashCode() : 0);
+        result = 31 * result + (jobStartTime != null ? jobStartTime.hashCode() : 0);
+        result = 31 * result + (periodTime != null ? periodTime.hashCode() : 0);
+        return result;
+    }
 }
