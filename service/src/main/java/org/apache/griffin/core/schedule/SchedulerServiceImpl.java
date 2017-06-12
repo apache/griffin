@@ -196,11 +196,15 @@ public class SchedulerServiceImpl implements SchedulerService{
                 String jobName=jobKey.getName();
                 String jobGroup=jobKey.getGroup();
                 Pageable pageRequest=new PageRequest(0,1, Sort.Direction.DESC,"timestamp");
-                ScheduleState scheduleState=scheduleStateRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
-                if(scheduleState.getState().equals("starting")){
-                    health++;
-                }else{
-                    invalid++;
+                ScheduleState scheduleState=new ScheduleState();
+                if (scheduleStateRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest)!=null
+                        &&scheduleStateRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).size()>0){
+                    scheduleState=scheduleStateRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
+                    if(scheduleState.getState().equals("starting")){
+                        health++;
+                    }else{
+                        invalid++;
+                    }
                 }
             }
         }

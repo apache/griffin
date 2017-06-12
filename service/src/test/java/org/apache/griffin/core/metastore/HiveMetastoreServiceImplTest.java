@@ -26,11 +26,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 
 
 @RunWith(SpringRunner.class)
@@ -80,7 +83,9 @@ public class HiveMetastoreServiceImplTest {
     @Test
     public void testGetAllTableByDBName(){
         try {
-            List<Table> tmp = service.getAllTable("default");
+            String useDbName="default";
+            given(client.getAllTables(useDbName)).willReturn(Arrays.asList("cout","cout1"));
+            List<Table> tmp = service.getAllTable(useDbName);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all tables in default db");
@@ -90,6 +95,10 @@ public class HiveMetastoreServiceImplTest {
     @Test
     public void testGetAllTable(){
         try {
+            Iterable<String> dbs=new ArrayList<>();
+            given(service.getAllDatabases()).willReturn(Arrays.asList("default","griffin"));
+            String useDbName="default";
+            given(client.getAllTables(useDbName)).willReturn(Arrays.asList("cout","cout1"));
             Map<String, List<Table>> tmp = service.getAllTable();
             assertTrue(true);
         }catch (Throwable t){

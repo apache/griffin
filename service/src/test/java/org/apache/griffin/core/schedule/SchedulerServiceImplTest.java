@@ -45,7 +45,6 @@ import static org.mockito.BDDMockito.given;
 public class SchedulerServiceImplTest {
 
     @TestConfiguration
-//    @ComponentScan("org.apache.griffin.core.schedule")
     public static class SchedulerServiceConfiguration{
         @Bean
         public SchedulerServiceImpl service(){
@@ -55,10 +54,6 @@ public class SchedulerServiceImplTest {
         public SchedulerFactoryBean factoryBean(){
             return new SchedulerFactoryBean();
         }
-//        @Bean
-//        public SchedulerConfig schedulerConfig(){
-//            return new SchedulerConfig();
-//        }
     }
 
     @MockBean
