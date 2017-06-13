@@ -37,7 +37,7 @@ public class KafkaSchemaControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    KafkaSchemaService kafkaSchemaService;
+    KafkaSchemaServiceImpl kafkaSchemaService;
 
     @InjectMocks
     private KafkaSchemaController kafkaSchemaController;

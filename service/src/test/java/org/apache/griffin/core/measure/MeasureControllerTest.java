@@ -13,13 +13,14 @@ limitations under the License.
 
  */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.core.measure;
 
-import org.apache.griffin.core.measure.*;
+import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,11 +29,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,9 +51,22 @@ public class MeasureControllerTest {
     public void setup(){
     }
 
-
     @Test
     public void testGetAllMeasures() throws IOException,Exception{
+        Measure measure = createATestMeasure("viewitem_hourly","bullseye");
+
+        given(service.getAllMeasures()).willReturn(Arrays.asList(measure));
+
+        mvc.perform(get("/measures").contentType(MediaType.APPLICATION_JSON))
+//                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].name",is("viewitem_hourly")))
+        ;
+    }
+
+
+    @Test
+    public void testGetMeasuresById() throws IOException,Exception{
         Measure measure = createATestMeasure("viewitem_hourly","bullseye");
 
         given(service.getMeasuresById(1L)).willReturn(measure);
@@ -65,15 +80,74 @@ public class MeasureControllerTest {
 
     @Test
     public void testGetMeasureByName() throws IOException,Exception{
-
         Measure measure = createATestMeasure("viewitem_hourly","bullseye");
 
         given(service.getMeasuresByName("viewitem_hourly")).willReturn(measure);
 
         mvc.perform(get("/measures/findByName/viewitem_hourly").contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name",is("viewitem_hourly")))
+        ;
+    }
+    @Test
+    public void testDeleteMeasuresById() throws Exception{
+        Mockito.doNothing().when(service).deleteMeasuresById(1L);
+
+        mvc.perform(delete("/measures/deleteById/1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+        ;
+    }
+
+    @Test
+    public void testDeleteMeasuresByName() throws Exception{
+        String measureName="viewitem_hourly";
+        given(service.deleteMeasuresByName(measureName)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS);
+
+        mvc.perform(delete("/measures/deleteByName/"+measureName).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",is("DELETE_MEASURE_BY_NAME_SUCCESS")))
+        ;
+    }
+
+    @Test
+    public void testUpdateMeasure() throws Exception{
+        String measureName="viewitem_hourly";
+        String org="bullseye";
+        Measure measure=createATestMeasure(measureName,org);
+        ObjectMapper mapper=new ObjectMapper();
+        String measureJson=mapper.writeValueAsString(measure);
+        given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
+
+        mvc.perform(post("/measures/update").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",is("UPDATE_MEASURE_SUCCESS")))
+        ;
+    }
+
+    @Test
+    public void testGetAllMeasureNameOfOwner() throws Exception{
+        String Owner="test1";
+        String measureName="viewitem_hourly";
+        given(service.getAllMeasureNameByOwner(Owner)).willReturn(Arrays.asList(measureName));
+
+        mvc.perform(get("/measures/owner/"+Owner).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0]",is("viewitem_hourly")))
+        ;
+    }
+
+    @Test
+    public void testCreateNewMeasure() throws Exception{
+        String measureName="viewitem_hourly";
+        String org="bullseye";
+        Measure measure=createATestMeasure(measureName,org);
+        ObjectMapper mapper=new ObjectMapper();
+        String measureJson=mapper.writeValueAsString(measure);
+        given(service.createNewMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
+
+        mvc.perform(post("/measures/add").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",is("CREATE_MEASURE_SUCCESS")))
         ;
     }
 
@@ -98,4 +172,6 @@ public class MeasureControllerTest {
 
         return measure;
     }
+
+
 }
