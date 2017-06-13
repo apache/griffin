@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class KafkaSchemaController {
 
     @Autowired
-    KafkaSchemaService kafkaSchemaService;
+    KafkaSchemaServiceImpl kafkaSchemaService;
 
     @RequestMapping("/schema/{id}")
     public SchemaString getSchemaString(@PathVariable("id") Integer id) {

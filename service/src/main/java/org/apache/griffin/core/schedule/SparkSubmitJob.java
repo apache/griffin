@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.DataConnector;
 import org.apache.griffin.core.measure.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -108,14 +109,14 @@ public class SparkSubmitJob implements Job {
         periodTime = jd.getJobDataMap().getString("periodTime");
         //prepare current system timestamp
         long currentSystemTimestamp = System.currentTimeMillis();
-
-        if (sourcePattern != null && !sourcePattern.equals("")) {
+        logger.info("currentSystemTimestamp: "+currentSystemTimestamp);
+        if (StringUtils.isNotEmpty(sourcePattern)) {
             sourcePatternItemSet = sourcePattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getSource(), sourcePatternItemSet, partitionItemSet, currentTimstamp);
             jd.getJobDataMap().put("lastTime", currentTimstamp + "");
         }
-        if (targetPattern != null && !targetPattern.equals("")) {
+        if (StringUtils.isNotEmpty(targetPattern)) {
             targetPatternItemSet = targetPattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getTarget(), targetPatternItemSet, partitionItemSet, currentTimstamp);
@@ -124,10 +125,9 @@ public class SparkSubmitJob implements Job {
         //final String uri = "http://10.9.246.187:8998/batches";
         RestTemplate restTemplate = new RestTemplate();
         setSparkJobDO();
-//        String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
-        logger.info("measure: \n"+measure);
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         logger.info(result);
+        //save result info into DataBase
         ScheduleResult scheduleResult=new ScheduleResult();
         Gson gson=new Gson();
         try {
@@ -135,8 +135,10 @@ public class SparkSubmitJob implements Job {
         }catch (Exception e){
             logger.info("scheduleResult covert error!"+e);
         }
-        ScheduleState scheduleState=new ScheduleState(groupName,jobName,scheduleResult.getId(),scheduleResult.getState(),scheduleResult.getAppId(),System.currentTimeMillis());
-        scheduleStateRepo.save(scheduleState);
+        if(scheduleResult!=null) {
+            ScheduleState scheduleState = new ScheduleState(groupName, jobName, scheduleResult.getId(), scheduleResult.getState(), scheduleResult.getAppId(), System.currentTimeMillis());
+            scheduleStateRepo.save(scheduleState);
+        }
     }
 
     public Map<String, String> genPartitions(String[] patternItemSet, String[] partitionItemSet, long timestamp) {
@@ -170,14 +172,14 @@ public class SparkSubmitJob implements Job {
 
     public long setCurrentTimestamp(long currentSystemTimestamp) {
         long currentTimstamp=0;
-        if (eachJoblastTimestamp != null && !eachJoblastTimestamp.equals("")) {
+        if (StringUtils.isNotEmpty(eachJoblastTimestamp)) {
             try {
                 currentTimstamp = Long.parseLong(eachJoblastTimestamp) + Integer.parseInt(periodTime) * 1000;
             }catch (Exception e){
                 logger.info("lasttime or periodTime format problem! "+e);
             }
         } else {
-            if (dataStartTimestamp != null && !dataStartTimestamp.equals("")) {
+            if (StringUtils.isNotEmpty(dataStartTimestamp)) {
                 try{
                     currentTimstamp = Long.parseLong(dataStartTimestamp);
                 }catch (Exception e){
@@ -225,8 +227,6 @@ public class SparkSubmitJob implements Job {
         sparkJobDO.setJars(jars);
 
         List<String> files = new ArrayList<>();
-//        files.add(props.getProperty("sparkJob.files_1"));
-
         sparkJobDO.setFiles(files);
     }
 
@@ -245,7 +245,7 @@ public class SparkSubmitJob implements Job {
                 throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.info("Exception: " + e);
         } finally {
             inputStream.close();
         }
