@@ -101,7 +101,6 @@ public class DataConnector extends AuditableEntity  {
 
 
     public DataConnector() {
-        System.out.println();
     }
 
     public DataConnector(ConnectorType type,String version, Map<String,String> config){
