@@ -86,6 +86,7 @@ Release:
     ```
     Create a directory in Hdfs, and put our measure package into it.
     ```
+    cp /measure/target/measure-0.1.3-incubating-SNAPSHOT.jar /measure/target/griffin-measure.jar
     hdfs dfs -put /measure/target/griffin-measure.jar <griffin measure path>/
     ```
     After all our environment services startup, we can start our server.
