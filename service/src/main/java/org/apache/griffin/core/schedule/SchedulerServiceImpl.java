@@ -108,12 +108,13 @@ public class SchedulerServiceImpl implements SchedulerService{
 
     @Override
     public Boolean addJob(String groupName, String jobName, String measureName, SchedulerRequestBody schedulerRequestBody) {
-        Date jobStartTime=null;
         int periodTime = 0;
-        SimpleDateFormat format=new SimpleDateFormat("YYYYMMdd HH:mm:ss");
+        Date jobStartTime=null;
+        SimpleDateFormat format=new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         try{
             periodTime = Integer.parseInt(schedulerRequestBody.getPeriodTime());
             jobStartTime=format.parse(schedulerRequestBody.getJobStartTime());
+            setJobStartTime(jobStartTime,periodTime);
         }catch (Exception e){
             LOGGER.info("jobStartTime or periodTime format error! "+e);
             return false;
@@ -135,6 +136,7 @@ public class SchedulerServiceImpl implements SchedulerService{
                         .storeDurably()
                         .withIdentity(jobKey)
                         .build();
+                //set JobDetail
                 setJobDetail(jobDetail,schedulerRequestBody,measureName,groupName,jobName);
                 scheduler.addJob(jobDetail, false);
             }
@@ -152,6 +154,17 @@ public class SchedulerServiceImpl implements SchedulerService{
         } catch (SchedulerException e) {
             LOGGER.error("", e);
             return false;
+        }
+    }
+
+    public void setJobStartTime(Date jobStartTime,int periodTime){
+        long currentTimestamp=System.currentTimeMillis();
+        long jobstartTimestamp=jobStartTime.getTime();
+        //if jobStartTime is before currentTimestamp, set it as the latest trigger time in the future
+        if(jobStartTime.before(new Date(currentTimestamp))){
+            long n=(currentTimestamp-jobstartTimestamp)/(long)(periodTime*1000);
+            jobstartTimestamp=jobstartTimestamp+(n+1)*(long)(periodTime*1000);
+            jobStartTime.setTime(jobstartTimestamp);
         }
     }
 
