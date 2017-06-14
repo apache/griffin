@@ -29,7 +29,6 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.quartz.JobBuilder.newJob;
@@ -110,10 +109,11 @@ public class SchedulerServiceImpl implements SchedulerService{
     public Boolean addJob(String groupName, String jobName, String measureName, SchedulerRequestBody schedulerRequestBody) {
         int periodTime = 0;
         Date jobStartTime=null;
-        SimpleDateFormat format=new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+//        SimpleDateFormat format=new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         try{
             periodTime = Integer.parseInt(schedulerRequestBody.getPeriodTime());
-            jobStartTime=format.parse(schedulerRequestBody.getJobStartTime());
+//            jobStartTime=format.parse(schedulerRequestBody.getJobStartTime());
+            jobStartTime=new Date(Long.parseLong(schedulerRequestBody.getJobStartTime()));
             setJobStartTime(jobStartTime,periodTime);
         }catch (Exception e){
             LOGGER.info("jobStartTime or periodTime format error! "+e);
