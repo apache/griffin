@@ -102,7 +102,7 @@ define(['./module'], function(controllers) {
                     var year = $scope.jobStartTime.substr(0,4);
                     var month = $scope.jobStartTime.substr(4,2);
                     var day = $scope.jobStartTime.substr(6,2);
-                    startTime = year +'-'+ month + '-'+ day + ' '+ $scope.jobStartTime.split(' ')[0];
+                    startTime = year +'-'+ month + '-'+ day + ' '+ $scope.jobStartTime.split(' ')[1];
                     startTime = Date.parse(startTime);
                     this.data={
                       "sourcePat":$scope.sourcePat,
