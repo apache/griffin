@@ -70,6 +70,7 @@ define(['./module'], function (services) {
 
               //Models
               allModels: BACKEND_SERVER + '/measures',
+              addModels: BACKEND_SERVER + '/measures/add',
               deleteModel:BACKEND_SERVER + '/measures/deleteByName',
               getModel: BACKEND_SERVER + '/measures/findByName',
               enableModel: BACKEND_SERVER + API_ROOT_PATH + '/models/enableModel',

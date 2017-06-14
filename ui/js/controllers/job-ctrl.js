@@ -51,27 +51,6 @@ define(['./module'], function (controllers) {
         }
       };
 
-      // $scope.pagingInstance = function(tableState){
-      //   console.log(tableState);
-      //   ts = tableState;
-
-      //   // tableState.pagination.numberOfPages = $scope.rowCollection.length/10 + 1;
-      //   start = tableState.pagination.start || 0;
-      //   number = tableState.pagination.number || 10;
-
-      //   if(start == 0 && !$scope.rowCollection){
-      //    // $http.get(allJobs).success(function(data) {
-      //      originalRowCollection = angular.copy($scope.currentInstance);
-      //      $scope.rowCollection = angular.copy($scope.currentInstance);
-
-      //      $scope.instances = $scope.rowCollection.slice(start, start+number);
-      //      tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
-      //    // });
-      //   }else{
-      //    $scope.instances = $scope.rowCollection.slice(start, start+number);
-      //   }
-      // };
-
       $scope.showInstances = function showInstances(row,number){
           var p_index = $scope.displayed.indexOf(row);
           $('#'+p_index+'-'+number).addClass('page-active');
@@ -116,7 +95,7 @@ define(['./module'], function (controllers) {
       }
 
       $scope.confirmDelete = function(){
-        var row =  $scope.deletedBriefRow;
+        var row = $scope.deletedBriefRow;
         var deleteModelUrl = $config.uri.deleteJob + row.groupName+'/jobs/'+row.jobName;
         $http.delete(deleteModelUrl).success(function(){
 
