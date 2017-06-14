@@ -98,10 +98,16 @@ define(['./module'], function(controllers) {
                         period = $scope.periodTime * 3600;
                     else period = $scope.periodTime;
                     var rule = '';
+                    var startTime = '';
+                    var year = $scope.jobStartTime.substr(0,4);
+                    var month = $scope.jobStartTime.substr(4,2);
+                    var day = $scope.jobStartTime.substr(6,2);
+                    startTime = year +'-'+ month + '-'+ day + ' '+ $scope.jobStartTime.split(' ')[0];
+                    startTime = Date.parse(startTime);
                     this.data={
                       "sourcePat":$scope.sourcePat,
                       "targetPat":$scope.targetPat,
-                      "jobStartTime":$scope.jobStartTime,
+                      "jobStartTime":startTime,
                       "periodTime":period,
                       "groupName":'BA',
                     };
@@ -132,10 +138,10 @@ define(['./module'], function(controllers) {
                 	// if(data.status=='0')
                 	// {
                 	  console.log(data);
-                      if(data=='fail'){
-                          toaster.pop('error', 'Please modify the name of job, because there is already a same model in database ', data.message);
-                          return;
-                      }
+                      // if(data=='fail'){
+                      //     toaster.pop('error', 'Please modify the name of job, because there is already a same model in database ', data.message);
+                      //     return;
+                      // }
 
 	                  $('#confirm-job').on('hidden.bs.modal', function(e) {
 	                      $('#confirm-job').off('hidden.bs.modal');
@@ -151,7 +157,7 @@ define(['./module'], function(controllers) {
 
                 }).error(function(data){
                   // errorMessage(0, 'Save model failed, please try again!');
-                  toaster.pop('error', 'Save model failed, please try again!', data.message);
+                  toaster.pop('error', 'Save job failed, please try again!', data.message);
                 });
 
             },
@@ -159,7 +165,7 @@ define(['./module'], function(controllers) {
         }
 
         var errorMessage = function(i, msg) {
-            var errorMsgs = ['Please select at least one attribute!', 'Please select at least one attribute in target, make sure target is different from source!', 'Please make sure to map each target to a unique source.', 'please complete the form in this step before proceeding'];
+            var errorMsgs = ['Please select at least one measure!', 'please complete the form in this step before proceeding'];
             if (!msg) {
                 toaster.pop('error', 'Error', errorMsgs[i - 1], 0);
             } else {

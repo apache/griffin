@@ -56,7 +56,7 @@ define(['./module'], function (controllers) {
           $('#'+p_index+'-'+number).addClass('page-active');
           $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           $scope.currentJob = row;
-          var allInstances = $config.uri.getInstances + 'BA/jobs/' + row.jobName +'/0/100';
+          var allInstances = $config.uri.getInstances + 'BA/' + row.jobName +'/0/100';
           $http.get(allInstances).success(function(data){
             row.instances = data;
             row.pageCount = new Array();
@@ -66,10 +66,10 @@ define(['./module'], function (controllers) {
             $('#'+p_index+'-'+number).addClass('page-active');
             $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           });
-          var url = $config.uri.getInstances + 'BA/jobs/' + row.jobName + '/'+number+'/10';
+          var url = $config.uri.getInstances + 'BA/' + row.jobName + '/'+number+'/10';
           $http.get(url).success(function(data){
               // row.instances = data;
-              row.currentInstances = data; 
+              row.currentInstances = data;
               $('#'+p_index+'-'+number).addClass('page-active');
               $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           });
@@ -96,7 +96,7 @@ define(['./module'], function (controllers) {
 
       $scope.confirmDelete = function(){
         var row = $scope.deletedBriefRow;
-        var deleteModelUrl = $config.uri.deleteJob + row.groupName+'/jobs/'+row.jobName;
+        var deleteModelUrl = $config.uri.deleteJob + row.groupName+'/'+row.jobName;
         $http.delete(deleteModelUrl).success(function(){
 
           var index = $scope.rowCollection.indexOf(row);
