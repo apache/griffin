@@ -25,7 +25,7 @@ define(['./module'], function (controllers) {
       var number = 10;
       var originalRowCollection = undefined;
 
-      $scope.paging = function(tableState){
+      $scope.pagingJob = function(tableState){
         console.log(tableState);
         ts = tableState;
 
@@ -35,6 +35,11 @@ define(['./module'], function (controllers) {
 
         if(start == 0 && !$scope.rowCollection){
          $http.get(allJobs).success(function(data) {
+           data.sort(function(a,b){
+            var dateA = Date.parse(new Date(a.jobName.split('-')[3]))/1000;
+            var dateB = Date.parse(new Date(b.jobName.split('-')[3]))/1000;
+                return -(dateA-dateB);
+              });
            originalRowCollection = angular.copy(data);
            $scope.rowCollection = angular.copy(data);
 
@@ -46,6 +51,35 @@ define(['./module'], function (controllers) {
         }
       };
 
+      $scope.showInstances = function showInstances(row,number){
+          var p_index = $scope.displayed.indexOf(row);
+          $('#'+p_index+'-'+number).addClass('page-active');
+          $('#'+p_index+'-'+number).siblings().removeClass('page-active');
+          $scope.currentJob = row;
+          var allInstances = $config.uri.getInstances + 'BA/' + row.jobName +'/0/100';
+          $http.get(allInstances).success(function(data){
+            row.instances = data;
+            row.pageCount = new Array();
+            for(var i = 0;i<Math.ceil(row.instances.length/10);i++){
+                row.pageCount.push(i);
+              }
+            $('#'+p_index+'-'+number).addClass('page-active');
+            $('#'+p_index+'-'+number).siblings().removeClass('page-active');
+          });
+          var url = $config.uri.getInstances + 'BA/' + row.jobName + '/'+number+'/10';
+          $http.get(url).success(function(data){
+              // row.instances = data;
+              row.currentInstances = data;
+              $('#'+p_index+'-'+number).addClass('page-active');
+              $('#'+p_index+'-'+number).siblings().removeClass('page-active');
+          });
+          $('#'+p_index+'-'+number).addClass('page-active');
+          $('#'+p_index+'-'+number).siblings().removeClass('page-active');
+          $timeout(function(){
+            $('#'+p_index+'-'+number).addClass('page-active');
+            $('#'+p_index+'-'+number).siblings().removeClass('page-active');
+          },200);
+      }
 
 
 
@@ -61,8 +95,8 @@ define(['./module'], function (controllers) {
       }
 
       $scope.confirmDelete = function(){
-        var row =   $scope.deletedBriefRow;
-        var deleteModelUrl = $config.uri.deleteJob + row.groupName+'/jobs/'+row.jobName;
+        var row = $scope.deletedBriefRow;
+        var deleteModelUrl = $config.uri.deleteJob + row.groupName+'/'+row.jobName;
         $http.delete(deleteModelUrl).success(function(){
 
           var index = $scope.rowCollection.indexOf(row);
