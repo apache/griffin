@@ -43,9 +43,9 @@ limitations under the License.
                 <td>{{row.jobName}}</a></td>
                 <td>{{row.sourcePat}}</a></td>
                 <td>{{row.targetPat|strmap:'modeltype'}}</td>
-                <td>{{(row.previousFireTime | date: 'short':'-0700') || 'N/A' }}</td>
+                <td>{{(row.previousFireTime | date: 'short') || 'N/A' }}</td>
 
-                <td>{{(row.nextFireTime | date: 'short':'-0700') || 'N/A' }}</td>
+                <td>{{(row.nextFireTime | date: 'short') || 'N/A' }}</td>
                 <td>{{row.triggerState}}</td>
 
                 <td>{{row.periodTime}}</td>

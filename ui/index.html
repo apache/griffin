@@ -134,9 +134,9 @@ limitations under the License.
         <!-- <footer class="clearfix"></footer> -->
         <div class="container-fluid">
             <div class="row ">
-                <p ng-show="!notifications">{{timestamp|date:'short':'-0700'}} - Welcome <label>{{fullName}}</label>!</p>
+                <p ng-show="!notifications">{{timestamp|date:'short'}} - Welcome <label>{{fullName}}</label>!</p>
                 <p ng-repeat="r in notifications">
-                    {{r.timestamp|date:'short':'-0700'}} - <label>{{r.owner}}</label> {{r.operation}}d a {{r.target}} named
+                    {{r.timestamp|date:'short'}} - <label>{{r.owner}}</label> {{r.operation}}d a {{r.target}} named
                     <a ng-if="r.target=='model'" href="#/viewrule/{{r.name}}">{{r.name}}</a>
                     <label ng-if="r.target=='dataasset'">"{{r.name}}"</label>
                 </p>
