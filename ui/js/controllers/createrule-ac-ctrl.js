@@ -144,7 +144,7 @@ define(['./module'], function(controllers) {
 //
 //            }
             if (newValue) {
-                $http.get(schemaDefinitionUrl + '/table/' + newValue.name).success(function(data) {
+                $http.get(schemaDefinitionUrl + '/' + newValue.parent[0].dbName+'/table/'+newValue.name).success(function(data) {
                 console.log(data);
                 $scope.schemaCollectionTarget = data.sd.cols;
                 console.log($scope.schemaCollectionTarget);
@@ -457,9 +457,7 @@ define(['./module'], function(controllers) {
                 //::TODO: Need to save the data to backend with POST/PUT method
                 console.log(JSON.stringify($scope.form.data));
 
-//                var newModel = $config.uri.newAccuracyModel;
-                var BACKEND_SERVER = '';
-                var newModel = BACKEND_SERVER + '/measures/add';
+                var newModel = $config.uri.addModels;
                 $http.post(newModel, this.data).success(function(data) {
                 	// if(data.status=='0')
                 	// {
