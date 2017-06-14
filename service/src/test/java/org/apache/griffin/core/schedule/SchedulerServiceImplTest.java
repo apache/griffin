@@ -116,7 +116,7 @@ public class SchedulerServiceImplTest {
             assertTrue(true);
 
             SchedulerRequestBody schedulerRequestBody1=new SchedulerRequestBody("YYYYMMdd-HH","YYYYMMdd-HH",
-                    System.currentTimeMillis()+"","20170605 15:29:30","1000");
+                    System.currentTimeMillis()+"",System.currentTimeMillis()+"","1000");
             Scheduler scheduler1=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler1);
             Boolean tmp1 = service.addJob(groupName,jobName,measureName,schedulerRequestBody1);
