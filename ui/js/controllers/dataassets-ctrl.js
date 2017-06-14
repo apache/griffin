@@ -70,7 +70,7 @@ define(['./module'], function (controllers) {
       };
 
       var findValue = function(keyword, assetItem) {
-        var date = $filter('date')(assetItem.timestamp, 'M/d/yy h:mm a')
+        var date = $filter('date')(assetItem.timestamp, 'M/d/yy h:mm a', '-0700')
         return include(keyword, assetItem.assetName)
           || include(keyword, assetItem.assetType)
           || include(keyword, assetItem.owner)

@@ -23,7 +23,7 @@ limitations under the License.
           <div ng-if="sample.length==0">No data</div>
           <div ng-if="sample.length>0" ng-repeat="item in sample">
             <span style="color: #fff">
-              {{item.date | date: 'MM/dd/yy HH:mm'}}
+              {{item.date | date: 'MM/dd/yy HH:mm':'-0700'}}
             </span>
             &nbsp;&nbsp;
             <span>

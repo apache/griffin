@@ -61,7 +61,7 @@ limitations under the License.
                                     <i class="faChevron" ng-class="items.tag ? 'fa fa-caret-right':'fa fa-caret-down'" style="width:10px"></i>
 
                                     <i class="fa fa-line-chart faArrows"></i>
-                                    <span class="side-date">{{items.timestamp | date:'MM/dd HH:mm'}}</span>
+                                    <span class="side-date">{{items.timestamp | date:'MM/dd HH:mm':'-0700'}}</span>
                                     &nbsp;&nbsp;
                                     <span class="side-name" title="{{items.name}}">{{items.name |strShorten}}</span>
                                     <span ng-if="items.dq <= 100" class="pull-right" ng-class="items.dqfail?'side-percent-red':'side-percent'">{{items.dq | number:2}}%</span>
