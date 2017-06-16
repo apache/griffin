@@ -149,8 +149,8 @@ public class SparkSubmitJobTest{
         long timestamp=System.currentTimeMillis();
         ssj.eachJoblastTimestamp="";
         System.out.println(ssj.setCurrentTimestamp(timestamp));
-        ssj.eachJoblastTimestamp="1494297256667";
-        ssj.periodTime="10";
+        ssj.eachJoblastTimestamp=(timestamp-1000)+"";
+        ssj.periodTime="1000";
         System.out.println(ssj.setCurrentTimestamp(timestamp));
     }
 
