@@ -36,67 +36,66 @@ limitations under the License.
             </tr>
             </thead>
             <tbody>
-                <tr ng-if="!rowCollection || rowCollection.length == 0">
-                    <td colspan="7" style="text-align:center">No content!</td>
-                </tr>
+            <tr ng-if="!rowCollection || rowCollection.length == 0">
+                <td colspan="7" style="text-align:center">No content!</td>
+            </tr>
             </tbody>
             <tbody ng-repeat="row in displayed" ng-init="p_index=$index">
-                <tr ng-click = "showInstances(row,0)">
-                    <td ng-class="{accordion:true}" ng-click="row.showDetail=!(row.showDetail)" style="cursor: pointer;">
-                        <i ng-show="!row.showDetail" class="fa fa-chevron-circle-right blue"></i>
-                        <i ng-show="row.showDetail" class="fa fa-chevron-circle-down blue"></i>
+            <tr ng-click = "showInstances(row,0)">
+                <td ng-class="{accordion:true}" ng-click="row.showDetail=!(row.showDetail)" style="cursor: pointer;">
+                    <i ng-show="!row.showDetail" class="fa fa-chevron-circle-right blue"></i>
+                    <i ng-show="row.showDetail" class="fa fa-chevron-circle-down blue"></i>
                     {{row.jobName}}</td>
-                    <td>{{row.sourcePat}}</td>
-                    <td>{{row.targetPat|strmap:'modeltype'}}</td>
-                    <td ng-show="row.previousFireTime==-1">--/--/-- &nbsp;&nbsp;--:--</td>
-                    <td ng-show="row.previousFireTime!=-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
-                    <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
-                    <td>{{row.triggerState}}</td>
-                    <td>{{row.periodTime}}</td>
-                    <td>
+                <td>{{row.sourcePat}}</td>
+                <td>{{row.targetPat|strmap:'modeltype'}}</td>
+                <td ng-show="row.previousFireTime==-1">--/--/-- &nbsp;&nbsp;--:--</td>
+                <td ng-show="row.previousFireTime!=-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
+                <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
+                <td>{{row.triggerState}}</td>
+                <td>{{row.periodTime}}s</td>
+                <td>
                     &nbsp;
-                        <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
-                            <i class="fa fa-trash-o"></i>
-                        </a>
+                    <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
+                        <i class="fa fa-trash-o"></i>
+                    </a>
                     &nbsp;
-                    </td>
-                </tr>
-                <tr ng-show="row.showDetail">
-                    <td colspan="7" style="padding:20px 30px 10px 30px;">
-                        <table st-table="row.currentInstances"
-                        class="table table-striped" style="word-wrap: break-word;" >
-                            <thead>
-                                <tr style="background-color:#7D95CC">
-                                    <th style="width:25%" >ID</th>
-                                    <th style="width:35%" >Time</th>
-                                    <th style="width:30%" >Group Name</th>
-                                    <th style="width:25%" >State</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-if="!row.currentInstances || row.currentInstances.length == 0">
-                                    <td colspan="7" style="text-align:center">No content.</td>
-                                </tr>
-                                <tr ng-repeat="item in row.currentInstances" >
-                                    <td>{{item.id}}</td>
-                                    <td>{{item.timestamp | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
-                                    <td>{{item.groupName}}</td>
-                                    <td>{{item.state}}</td>
-                                </tr>
-                                <br>
-                                
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="2" class="text-right">
-                                    <td ng-repeat="item in row.pageCount" ng-click="showInstances(row,item)" ng-init="c_index=$index" class="page" id={{p_index}}-{{c_index}}>{{item+1}}</td>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </td>
-                </tr>
-            </tbody> 
+                </td>
+            </tr>
+            <tr ng-show="row.showDetail">
+                <td colspan="7" style="padding:20px 30px 10px 30px;">
+                    <table st-table="row.currentInstances"
+                           class="table table-striped" style="word-wrap: break-word;" >
+                        <thead>
+                        <tr style="background-color:#7D95CC">
+                            <th style="width:25%" >ID</th>
+                            <th style="width:25%" >Time</th>
+                            <th style="width:25%" >Group Name</th>
+                            <th style="width:36%" >State</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-if="!row.currentInstances || row.currentInstances.length == 0">
+                            <td colspan="7" style="text-align:center">No content.</td>
+                        </tr>
+                        <tr ng-repeat="item in row.currentInstances" >
+                            <td>{{item.id}}</td>
+                            <td>{{item.timestamp | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
+                            <td>{{item.groupName}}</td>
+                            <td>{{item.state}}</td>
+                        </tr>
+                        <br>
+
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-right"></td>
+                            <td ng-repeat="item in row.pageCount" ng-click="showInstances(row,item)" ng-init="c_index=$index" class="page" id={{p_index}}-{{c_index}}>{{item+1}}</td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
             <tfoot>
             <tr>
                 <td colspan="8" class="text-right">

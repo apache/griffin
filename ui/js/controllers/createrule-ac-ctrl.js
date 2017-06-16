@@ -462,7 +462,7 @@ define(['./module'], function(controllers) {
                 	// if(data.status=='0')
                 	// {
                 	  console.log(data);
-                      if(data=='fail'){
+                      if(data=='CREATE_MEASURE_FAIL_DUPLICATE'){
                           toaster.pop('error', 'Please modify the name of measure, because there is already a same measure in database ', data.message);
                           return;
                       }
