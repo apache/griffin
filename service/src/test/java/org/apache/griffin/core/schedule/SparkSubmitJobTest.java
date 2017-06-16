@@ -116,11 +116,9 @@ public class SparkSubmitJobTest{
     public void test_genPartitions(){
         String[] patternItemSet={"YYYYMMDD","HH"};
         String[] partitionItemSet={"date","hour"};
-//        long timestamp=1460174400000l;
         long timestamp=System.currentTimeMillis();
         Map<String,String> par=ssj.genPartitions(patternItemSet,partitionItemSet,timestamp);
         Map<String,String> verifyMap=new HashMap<>();
-//        verifyMap.put("date","20160409");
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
         verifyMap.put("date",sdf.format(new Date(timestamp)));
         SimpleDateFormat sdf1 = new SimpleDateFormat("HH");
@@ -133,11 +131,12 @@ public class SparkSubmitJobTest{
         DataConnector dc=mock(DataConnector.class);
         String[] patternItemSet={"YYYYMMDD","HH"};
         String[] partitionItemSet={"date","hour"};
-        long timestamp=1460174400000l;
+        long timestamp=System.currentTimeMillis();
         ssj.setDataConnectorPartitions(dc,patternItemSet,partitionItemSet,timestamp);
-//       doNothing().when(ssj).setDataConnectorPartitions(dataConnector,patternItemSet,partitionItemSet,timestamp);
         Map<String,String> map=new HashMap<>();
-        map.put("partitions","date=20160409, hour=12");
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
+        SimpleDateFormat sdf1 = new SimpleDateFormat("HH");
+        map.put("partitions","date="+sdf.format(new Date(timestamp))+", hour="+sdf1.format(new Date(timestamp)));
         try {
             verify(dc).setConfig(map);
         } catch (JsonProcessingException e) {
@@ -150,8 +149,8 @@ public class SparkSubmitJobTest{
         long timestamp=System.currentTimeMillis();
         ssj.eachJoblastTimestamp="";
         System.out.println(ssj.setCurrentTimestamp(timestamp));
-        ssj.eachJoblastTimestamp="1494297256667";
-        ssj.periodTime="10";
+        ssj.eachJoblastTimestamp=(timestamp-1000)+"";
+        ssj.periodTime="1000";
         System.out.println(ssj.setCurrentTimestamp(timestamp));
     }
 
