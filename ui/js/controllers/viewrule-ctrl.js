@@ -30,12 +30,12 @@ define(['./module'], function (controllers) {
           $scope.sourceLength = $scope.ruleData.evaluateRule.rules.split('AND').length;
           console.log($scope.sourceLength);
 
-          console.log(JSON.parse($scope.ruleData.source.config));
-          $scope.sourceDB = JSON.parse($scope.ruleData.source.config).database;
+          // console.log(JSON.parse($scope.ruleData.source.config));
+          $scope.sourceDB = $scope.ruleData.source.config.database;
           console.log($scope.sourceDB);
-          $scope.targetDB = JSON.parse($scope.ruleData.target.config).database;
-          $scope.sourceTable = JSON.parse($scope.ruleData.source.config)["table.name"];
-          $scope.targetTable = JSON.parse($scope.ruleData.target.config)["table.name"];
+          $scope.targetDB = $scope.ruleData.target.config.database;
+          $scope.sourceTable = $scope.ruleData.source.config["table.name"];
+          $scope.targetTable = $scope.ruleData.target.config["table.name"];
           console.log($scope.targetTable);
           console.log($scope.targetDB);
           console.log($scope.ruleData.evaluateRule.rules.split('AND'));

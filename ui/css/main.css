@@ -1052,3 +1052,20 @@ a:hover {
 tbody {
   word-break:break-all;
 }
+
+
+/*style of job*/
+.page{
+  cursor: pointer;
+  float: left;
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  color: #fff;
+  text-decoration: underline;
+}
+
+.page-active{
+  background-color: #2a9fd6;
+  border-color: transparent;
+  cursor: default;
+}

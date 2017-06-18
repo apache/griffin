@@ -14,7 +14,7 @@ limitations under the License.
  */
 define(['./module'], function(controllers) {
     'use strict';
-    controllers.controller('BigChartCtrl', ['$scope', '$http', '$config', '$filter', '$timeout', '$compile', '$routeParams', '$barkChart', '$rootScope', function($scope, $http, $config, $filter, $timeout, $compile, $routeParams, $barkChart, $rootScope) {
+    controllers.controller('BigChartCtrl', ['$scope', '$http', '$config', '$filter', '$timeout', '$compile', '$routeParams', '$barkChart', '$rootScope', '$location',function($scope, $http, $config, $filter, $timeout, $compile, $routeParams, $barkChart, $rootScope,$location) {
 
       var echarts = require('echarts');
 
@@ -32,7 +32,9 @@ define(['./module'], function(controllers) {
 
       $scope.closeBigChart = function(){
         console.log('close big chart!');
-        $('#bigChartContainer').hide();
+        // $('#bigChartContainer').hide();
+        history.back();
+        // $location.path('/health');
         // $('#mainWindow').show();
       }
 

@@ -42,9 +42,9 @@ limitations under the License.
                     <i ng-show="row.showDetail" class="fa fa-chevron-circle-down blue"></i>
                     {{row.tableName}}</td>
 	    		<td>{{row.dbName || 'N/A'}}</td>
-	        <td>{{row.owner || 'N/A'}}</td>
-	    		<td>{{(row.createTime | date: 'short':'-0700') ||  'N/A'}}</td>
-	    		<td>{{(row.lastAccessTime | date: 'short':'-0700') || 'N/A' }}</td>
+	        	<td>{{row.owner || 'N/A'}}</td>
+	    		<td>{{(row.createTime | date: 'short') ||  'N/A'}}</td>
+	    		<td>{{(row.lastAccessTime | date: 'short') || 'N/A' }}</td>
 	    		<td>{{row.sd.location || 'N/A'}}</td>
 	    	</tr>
 	    	<tr ng-show="row.showDetail">

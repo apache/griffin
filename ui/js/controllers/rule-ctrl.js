@@ -64,7 +64,7 @@ define(['./module'], function (controllers) {
       };
 
       var findValue = function(keyword, assetItem) {
-        var date = $filter('date')(assetItem.createDate, 'M/d/yy h:mm a', '-0700')
+        var date = $filter('date')(assetItem.createDate, 'M/d/yy h:mm a')
         return include(keyword, assetItem.name)
           || include(keyword, assetItem.description)
           || include(keyword, assetItem.owner)
@@ -99,8 +99,8 @@ define(['./module'], function (controllers) {
         var getModelUrl = $config.uri.getModel + '/' +row.name;
         $http.get(getModelUrl).success(function(data){
   			  $scope.deletedRow = data;
-              $scope.sourceTable = JSON.parse($scope.deletedRow.source.config)["table.name"];
-              $scope.targetTable = JSON.parse($scope.deletedRow.target.config)["table.name"];
+              $scope.sourceTable = $scope.deletedRow.source.config["table.name"];
+              $scope.targetTable = $scope.deletedRow.target.config["table.name"];
   		  });
         // $scope.deletedRow = row;
         $scope.deletedBriefRow = row;

@@ -46,8 +46,8 @@ define(['./module'], function(controllers) {
                         dbList.push(dbNode);
                         if (db) {
                                angular.forEach(db,function(table){
-                                   console.log(table);
-                                   console.log(typeof(table));
+                                   // console.log(table);
+                                   // console.log(typeof(table));
                                    var dsNode = {
                                        name: table.tableName,
                                        l2: true,
@@ -144,13 +144,14 @@ define(['./module'], function(controllers) {
 //
 //            }
             if (newValue) {
-                $http.get(schemaDefinitionUrl + '/table/' + newValue.name).success(function(data) {
+                $http.get(schemaDefinitionUrl + '/' + newValue.parent[0].dbName+'/table/'+newValue.name).success(function(data) {
                 console.log(data);
                 $scope.schemaCollectionTarget = data.sd.cols;
                 console.log($scope.schemaCollectionTarget);
                 });
             }
-            $scope.dataAsset = $scope.currentNodeTarget.name + ',' + $scope.currentNode.name;
+            if($scope.currentNodeTarget)
+                $scope.dataAsset = $scope.currentNodeTarget.name + ',' + $scope.currentNode.name;
             console.log($scope.dataAsset);
         });
 
@@ -456,14 +457,12 @@ define(['./module'], function(controllers) {
                 //::TODO: Need to save the data to backend with POST/PUT method
                 console.log(JSON.stringify($scope.form.data));
 
-//                var newModel = $config.uri.newAccuracyModel;
-                var BACKEND_SERVER = '';
-                var newModel = BACKEND_SERVER + '/measures/add';
+                var newModel = $config.uri.addModels;
                 $http.post(newModel, this.data).success(function(data) {
                 	// if(data.status=='0')
                 	// {
                 	  console.log(data);
-                      if(data=='fail'){
+                      if(data=='CREATE_MEASURE_FAIL_DUPLICATE'){
                           toaster.pop('error', 'Please modify the name of measure, because there is already a same measure in database ', data.message);
                           return;
                       }

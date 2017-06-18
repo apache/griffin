@@ -69,7 +69,8 @@ define(['./module'], function (directives) {
           //tree template
           var template =
             '<ul>' +
-              '<li ng-repeat="node in ' + treeModel + '">' +
+              '<li ng-repeat="node in ' + treeModel + '" >' +
+                '<span ng-show=!node.' + nodeChildren + '.length>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>'+
                 '<i class="collapsed fa fa-caret-right" ng-show="node.' + nodeChildren + '.length && node.collapsed" ng-click="selectNodeHead(node)"></i>' +
                 '<i class="expanded fa fa-caret-down" ng-show="node.' + nodeChildren + '.length && !node.collapsed" ng-click="selectNodeHead(node)"></i>' +
                 '<i class="' + l1Icon + '" ng-show="node.l1"></i>'  +

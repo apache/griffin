@@ -37,7 +37,7 @@ define(['./module'], function (services) {
 
               dbtree:BACKEND_SERVER + '/metadata/hive/alltables',
               schemadefinition: BACKEND_SERVER + '/metadata/hive',
-              dataassetlist: BACKEND_SERVER + '/metadata/hive/default/alltables',
+              dataassetlist: BACKEND_SERVER + '/metadata/hive/alltables',
 
               adddataasset: BACKEND_SERVER + API_ROOT_PATH + '/dataassets',
               updatedataasset: BACKEND_SERVER + API_ROOT_PATH + '/dataassets',
@@ -70,6 +70,7 @@ define(['./module'], function (services) {
 
               //Models
               allModels: BACKEND_SERVER + '/measures',
+              addModels: BACKEND_SERVER + '/measures/add',
               deleteModel:BACKEND_SERVER + '/measures/deleteByName',
               getModel: BACKEND_SERVER + '/measures/findByName',
               enableModel: BACKEND_SERVER + API_ROOT_PATH + '/models/enableModel',
@@ -78,7 +79,8 @@ define(['./module'], function (services) {
               allJobs:BACKEND_SERVER + '/jobs/',
               addJobs:BACKEND_SERVER+'/jobs/add/',
               getMeasuresByOwner:BACKEND_SERVER+'/measures/owner/',
-              deleteJob:BACKEND_SERVER + '/jobs/groups/',
+              deleteJob:BACKEND_SERVER + '/jobs/del/',
+              getInstances:BACKEND_SERVER + '/jobs/instances/',
 //              allJobs:'/jobs.json',
               newAccuracyModel: BACKEND_SERVER + API_ROOT_PATH + '/models' ,
               newValidityModel: BACKEND_SERVER + API_ROOT_PATH + '/models' ,

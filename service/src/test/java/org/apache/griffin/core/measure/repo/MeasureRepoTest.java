@@ -15,8 +15,6 @@ limitations under the License.
 
 package org.apache.griffin.core.measure.repo;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.griffin.core.measure.DataConnector;
 import org.apache.griffin.core.measure.EvaluateRule;
 import org.apache.griffin.core.measure.Measure;
@@ -44,97 +42,21 @@ public class MeasureRepoTest {
     private MeasureRepo measureRepo;
 
     @Before
-    public void setup(){
+    public void setup() throws Exception {
         entityManager.clear();
         entityManager.flush();
+        setEntityManager();
     }
 
     @Test
-    public void testFindAllOrganizations(){
-        HashMap<String,String> configMap1=new HashMap<>();
-        configMap1.put("database","default");
-        configMap1.put("table.name","test_data_src");
-        HashMap<String,String> configMap2=new HashMap<>();
-        configMap2.put("database","default");
-        configMap2.put("table.name","test_data_tgt");
-        String configJson1 = null;
-        String configJson2 = null;
-        try {
-            configJson1 = new ObjectMapper().writeValueAsString(configMap1);
-            configJson2 = new ObjectMapper().writeValueAsString(configMap2);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        DataConnector source = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-
-        String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
-
-        EvaluateRule eRule = new EvaluateRule(1,rules);
-
-        Measure measure = new Measure("m1","bevssoj description", Measure.MearuseType.accuracy, "bullseye", source, target, eRule,"owner1");
-        entityManager.persistAndFlush(measure);
-
-        DataConnector source2 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target2 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-        EvaluateRule eRule2 = new EvaluateRule(1,rules);
-        Measure measure2 = new Measure("m2","test description", Measure.MearuseType.accuracy, "org1", source2, target2, eRule2,"owner1");
-        entityManager.persistAndFlush(measure2);
-
-        DataConnector source3 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target3 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-        EvaluateRule eRule3 = new EvaluateRule(1,rules);
-        Measure measure3 = new Measure("m3","test_just_inthere description", Measure.MearuseType.accuracy, "org2", source3, target3, eRule3,"owner1");
-        entityManager.persistAndFlush(measure3);
-
-
+    public void testFindAllOrganizations() throws Exception {
         List<String> orgs = measureRepo.findOrganizations();
         assertThat(orgs.size()).isEqualTo(3);
-
     }
 
 
     @Test
-    public void testFindNameByOrganization(){
-        HashMap<String,String> configMap1=new HashMap<>();
-        configMap1.put("database","default");
-        configMap1.put("table.name","test_data_src");
-        HashMap<String,String> configMap2=new HashMap<>();
-        configMap2.put("database","default");
-        configMap2.put("table.name","test_data_tgt");
-        String configJson1 = null;
-        String configJson2 = null;
-        try {
-            configJson1 = new ObjectMapper().writeValueAsString(configMap1);
-            configJson2 = new ObjectMapper().writeValueAsString(configMap2);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        DataConnector source = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-
-        String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
-
-        EvaluateRule eRule = new EvaluateRule(1,rules);
-
-        Measure measure = new Measure("m1","bevssoj description", Measure.MearuseType.accuracy, "bullseye", source, target, eRule,"owner1");
-        entityManager.persistAndFlush(measure);
-
-        DataConnector source2 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target2 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-        EvaluateRule eRule2 = new EvaluateRule(1,rules);
-        Measure measure2 = new Measure("m2","test description", Measure.MearuseType.accuracy, "org1", source2, target2, eRule2,"owner1");
-        entityManager.persistAndFlush(measure2);
-
-        DataConnector source3 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target3 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-        EvaluateRule eRule3 = new EvaluateRule(1,rules);
-        Measure measure3 = new Measure("m3","test_just_inthere description", Measure.MearuseType.accuracy, "org2", source3, target3, eRule3,"owner1");
-        entityManager.persistAndFlush(measure3);
-
-
+    public void testFindNameByOrganization() throws Exception {
         List<String> orgs = measureRepo.findNameByOrganization("org1");
         assertThat(orgs.size()).isEqualTo(1);
         assertThat(orgs.get(0)).isEqualToIgnoringCase("m2");
@@ -142,21 +64,20 @@ public class MeasureRepoTest {
     }
 
     @Test
-    public void testFindOrgByName(){
+    public void testFindOrgByName() throws Exception {
+        String org = measureRepo.findOrgByName("m3");
+        assertThat(org).isEqualTo("org2");
+    }
+
+    private Measure createATestMeasure(String name,String org)throws Exception{
         HashMap<String,String> configMap1=new HashMap<>();
         configMap1.put("database","default");
         configMap1.put("table.name","test_data_src");
         HashMap<String,String> configMap2=new HashMap<>();
         configMap2.put("database","default");
         configMap2.put("table.name","test_data_tgt");
-        String configJson1 = null;
-        String configJson2 = null;
-        try {
-            configJson1 = new ObjectMapper().writeValueAsString(configMap1);
-            configJson2 = new ObjectMapper().writeValueAsString(configMap2);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        String configJson1 = new org.codehaus.jackson.map.ObjectMapper().writeValueAsString(configMap1);
+        String configJson2 = new org.codehaus.jackson.map.ObjectMapper().writeValueAsString(configMap2);
 
         DataConnector source = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
         DataConnector target = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
@@ -165,24 +86,19 @@ public class MeasureRepoTest {
 
         EvaluateRule eRule = new EvaluateRule(1,rules);
 
-        Measure measure = new Measure("m1","bevssoj description", Measure.MearuseType.accuracy, "bullseye", source, target, eRule,"owner1");
+        Measure measure = new Measure(name,"bevssoj description", Measure.MearuseType.accuracy, org, source, target, eRule,"test1");
+
+        return measure;
+    }
+
+    public void setEntityManager() throws Exception {
+        Measure measure=createATestMeasure("m1","bullseye");
         entityManager.persistAndFlush(measure);
 
-        DataConnector source2 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target2 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-        EvaluateRule eRule2 = new EvaluateRule(1,rules);
-        Measure measure2 = new Measure("m2","test description", Measure.MearuseType.accuracy, "org1", source2, target2, eRule2,"owner1");
+        Measure measure2=createATestMeasure("m2","org1");
         entityManager.persistAndFlush(measure2);
 
-        DataConnector source3 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target3 = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
-        EvaluateRule eRule3 = new EvaluateRule(1,rules);
-        Measure measure3 = new Measure("m3","test_just_inthere description", Measure.MearuseType.accuracy, "org2", source3, target3, eRule3,"owner1");
+        Measure measure3=createATestMeasure("m3","org2");
         entityManager.persistAndFlush(measure3);
-
-
-        String org = measureRepo.findOrgByName("m3");
-        assertThat(org).isEqualTo("org2");
-
     }
 }

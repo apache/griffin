@@ -13,25 +13,24 @@ limitations under the License.
 
  */
 
-package org.apache.griffin.core.metastore;
+package org.apache.griffin.core.schedule;
 
-import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.thrift.TException;
+import org.quartz.SchedulerException;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public interface HiveMetastoreService {
+public interface SchedulerService {
+    public List<Map<String, Serializable>> getJobs() throws SchedulerException;
 
-    public Iterable<String> getAllDatabases() throws MetaException;
+    public Boolean addJob(String groupName,String jobName,String measureName,SchedulerRequestBody schedulerRequestBody);
 
-    public Iterable<String> getAllTableNames(String dbName) throws MetaException;
+    public Boolean deleteJob(String groupName,String jobName);
 
-    public List<Table> getAllTable(String db) throws TException;
+    public List<ScheduleState> findInstancesOfJob(String group,String name,int page,int size);
 
-    public Map<String,List<Table>> getAllTable() throws TException;
+    public JobHealth getHealthInfo() throws SchedulerException;
 
-    public Table getTable(String dbName, String tableName) throws TException;
 
 }
