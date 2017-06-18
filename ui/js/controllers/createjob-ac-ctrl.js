@@ -71,6 +71,9 @@ define(['./module'], function(controllers) {
 
         // Initial Value
         $scope.form = {
+            prev:function(form){
+                history.back();
+            },
             submit: function(form) {
                 if (!form.$valid) {
                     var field = null
@@ -104,6 +107,10 @@ define(['./module'], function(controllers) {
                     var day = $scope.jobStartTime.substr(6,2);
                     startTime = year +'-'+ month + '-'+ day + ' '+ $scope.jobStartTime.split(' ')[1];
                     startTime = Date.parse(startTime);
+                    if(isNaN(startTime)){
+                        toaster.pop('error','Please input the right format of start time');
+                        return;
+                    }
                     this.data={
                       "sourcePat":$scope.sourcePat,
                       "targetPat":$scope.targetPat,
@@ -165,7 +172,7 @@ define(['./module'], function(controllers) {
         }
 
         var errorMessage = function(i, msg) {
-            var errorMsgs = ['Please select at least one measure!', 'please complete the form in this step before proceeding'];
+            var errorMsgs = ['Please complete the form!', 'please complete the form in this step before proceeding'];
             if (!msg) {
                 toaster.pop('error', 'Error', errorMsgs[i - 1], 0);
             } else {
