@@ -1,7 +1,10 @@
 ## Apache Griffin
 
-Apache Griffin is a model driven Data Quality solution for distributed data systems at any scale in both streaming and batch data context. It provides a framework process for defining data quality model, executing data quality measurement, automating data profiling and validation, as well as an unified data quality visualization across multiple data systems. You can access our home page [here](http://griffin.incubator.apache.org/).
-
+Apache Griffin is a model driven data quality solution for modern data systems. 
+It provides a standard process to define data quality measures, execute, report, as well as an unified dashboard across multiple data systems. 
+You can access our home page [here](http://griffin.incubator.apache.org/).
+You can access our wiki page [here](https://cwiki.apache.org/confluence/display/GRIFFIN/Apache+Griffin).
+You can access our issues jira page [here](https://issues.apache.org/jira/secure/Dashboard.jspa?selectPageId=12330914).
 
 ### Contact us
 [Dev List](mailto://dev@griffin.incubator.apache.org)
