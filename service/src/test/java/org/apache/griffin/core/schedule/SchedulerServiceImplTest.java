@@ -23,6 +23,8 @@ import org.mockito.Mockito;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.CronTriggerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -43,6 +45,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 public class SchedulerServiceImplTest {
+    private static final Logger log = LoggerFactory.getLogger(SchedulerServiceImplTest.class);
 
     @TestConfiguration
     public static class SchedulerServiceConfiguration{
@@ -128,15 +131,21 @@ public class SchedulerServiceImplTest {
 
     @Test
     public void testDeleteJob(){
+        String groupName="BA";
+        String jobName="job1";
         try {
-            String groupName="BA";
-            String jobName="job1";
             Scheduler scheduler=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler);
             Boolean tmp = service.deleteJob(groupName,jobName);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot delete job");
+        }
+        try {
+            given(factory.getObject()).willThrow(SchedulerException.class);
+            Boolean tmp = service.deleteJob(groupName,jobName);
+        } catch (Exception e) {
+            log.info("testGetAllTable: test catch "+e);
         }
     }
 
@@ -167,9 +176,23 @@ public class SchedulerServiceImplTest {
 
             Pageable pageRequest=new PageRequest(0,1, Sort.Direction.DESC,"timestamp");
             List<ScheduleState> scheduleStateList=new ArrayList<ScheduleState>();
+            ScheduleState scheduleState1=new ScheduleState();
+            scheduleState1.setGroupName("BA");
+            scheduleState1.setJobName("job1");
+            scheduleState1.setScheduleid(1);
+            scheduleState1.setState("starting");
+            scheduleState1.setAppId("ttt");
+            scheduleState1.setTimestamp(System.currentTimeMillis());
+            scheduleStateList.add(scheduleState1);
             given(scheduleStateRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
             JobHealth tmp = service.getHealthInfo();
             assertTrue(true);
+
+            scheduleStateList.remove(0);
+            scheduleState1.setState("down");
+            scheduleStateList.add(scheduleState1);
+            given(scheduleStateRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
+            JobHealth tmp1 = service.getHealthInfo();
         }catch (Throwable t){
             fail("Cannot get Health info "+t);
         }
