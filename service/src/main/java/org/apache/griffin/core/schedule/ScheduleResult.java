@@ -74,11 +74,11 @@ public class ScheduleResult {
     public ScheduleResult() {
     }
 
-    public ScheduleResult(long id, String state, String appId, JsonObject appInfo, ArrayList<JsonObject> log) {
-        this.id = id;
-        this.state = state;
-        this.appId = appId;
-        this.appInfo = appInfo;
-        this.log = log;
-    }
+//    public ScheduleResult(long id, String state, String appId, JsonObject appInfo, ArrayList<JsonObject> log) {
+//        this.id = id;
+//        this.state = state;
+//        this.appId = appId;
+//        this.appInfo = appInfo;
+//        this.log = log;
+//    }
 }
