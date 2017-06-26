@@ -16,10 +16,13 @@ limitations under the License.
 package org.apache.griffin.core.metastore;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,11 +37,12 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 
 
 @RunWith(SpringRunner.class)
-//@TestPropertySource(properties = {"hive.metastore.uris=thrift://10.9.246.187:9083"})
 public class HiveMetastoreServiceImplTest {
+    private static final Logger log = LoggerFactory.getLogger(HiveMetastoreServiceImplTest.class);
 
     @TestConfiguration
     public static class HiveMetastoreServiceConfiguration{
@@ -67,6 +71,13 @@ public class HiveMetastoreServiceImplTest {
         }catch (Throwable t){
             fail("Cannot get all tables from all dbs");
         }
+        try {
+            given(client.getAllDatabases()).willThrow(MetaException.class);
+            doNothing().when(client).reconnect();
+            service.getAllDatabases();
+        } catch (MetaException e) {
+            log.info("testGetAllDatabases: test catch "+e);
+        }
     }
 
 
@@ -75,8 +86,16 @@ public class HiveMetastoreServiceImplTest {
         try {
             Iterable<String> tmp = service.getAllTableNames("default");
             assertTrue(true);
+
         }catch (Throwable t){
             fail("Cannot get all tables in db default");
+        }
+        try {
+            given(client.getAllTables("default")).willThrow(MetaException.class);
+            doNothing().when(client).reconnect();
+            service.getAllTableNames("default");
+        } catch (MetaException e) {
+            log.info("testGetAllTableNames: test catch "+e);
         }
     }
 
@@ -89,6 +108,13 @@ public class HiveMetastoreServiceImplTest {
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all tables in default db");
+        }
+        try {
+            given(client.getAllTables("default")).willThrow(MetaException.class);
+            doNothing().when(client).reconnect();
+            service.getAllTable("default");
+        } catch (Exception e) {
+            log.info("testGetAllTableByDBName: test catch "+e);
         }
     }
 
@@ -104,6 +130,13 @@ public class HiveMetastoreServiceImplTest {
         }catch (Throwable t){
             fail("Cannot get all table in map format");
         }
+        try {
+            given(client.getAllTables("default")).willThrow(MetaException.class);
+            doNothing().when(client).reconnect();
+            service.getAllTable();
+        } catch (Exception e) {
+            log.info("testGetAllTable: test catch "+e);
+        }
     }
 
     @Test
@@ -113,6 +146,13 @@ public class HiveMetastoreServiceImplTest {
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get xxx table in default db");
+        }
+        try {
+            given(client.getTable("default","xxx")).willThrow(MetaException.class);
+            doNothing().when(client).reconnect();
+            service.getTable("default","xxx");
+        } catch (Exception e) {
+            log.info("testGetDesignatedTable: test catch "+e);
         }
     }
 }
