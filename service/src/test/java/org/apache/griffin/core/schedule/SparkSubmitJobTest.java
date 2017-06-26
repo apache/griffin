@@ -24,13 +24,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -42,19 +40,22 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(SparkSubmitJob.class)
+//@RunWith(PowerMockRunner.class)
+//@PrepareForTest(SparkSubmitJob.class)
+@RunWith(SpringRunner.class)
 public class SparkSubmitJobTest{
 
     private SparkSubmitJob ssj;
 
-    @Autowired
+//    @Autowired
+    @MockBean
     MeasureRepo measureRepo;
 
     @Before
     public void setUp() throws IOException {
         ssj=new SparkSubmitJob();
         ssj.measureRepo=mock(MeasureRepo.class);
+        ssj.restTemplate= mock(RestTemplate.class);
     }
 
     @Test
@@ -76,18 +77,26 @@ public class SparkSubmitJobTest{
         when(ssj.measureRepo.findByName("bevssoj")).thenReturn(measure);
 
         RestTemplate restTemplate =Mockito.mock(RestTemplate.class);
-        PowerMockito.whenNew(RestTemplate.class).withAnyArguments().thenReturn(restTemplate);
-        String uri="";
+//        PowerMockito.whenNew(RestTemplate.class).withAnyArguments().thenReturn(restTemplate);
+        String uri=ssj.uri;
         SparkJobDO sparkJobDO= Mockito.mock(SparkJobDO.class);
-        PowerMockito.when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(null);
+//        PowerMockito.when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(null);
+        when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(null);
         ssj.execute(context);
 
         long currentSystemTimestamp=System.currentTimeMillis();
         long currentTimstamp = ssj.setCurrentTimestamp(currentSystemTimestamp);
-//
+
         verify(ssj.measureRepo).findByName("bevssoj");
         verify(jdmap,atLeast(2)).put("lastTime",currentTimstamp+"");
 
+        when(ssj.measureRepo.findByName("bevssoj")).thenReturn(null);
+        ssj.execute(context);
+
+        when(ssj.measureRepo.findByName("bevssoj")).thenReturn(measure);
+        String result="{\"id\":8718,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+        when(restTemplate.postForObject(uri, sparkJobDO, String.class)).thenReturn(result);
+        ssj.execute(context);
     }
 
     private Measure createATestMeasure(String name,String org)throws IOException,Exception{
