@@ -1,13 +1,3 @@
-## Apache Griffin
-
-Apache Griffin is a model driven data quality solution for modern data systems. 
-It provides a standard process to define data quality measures, execute, report, as well as an unified dashboard across multiple data systems. 
-You can access our home page [here](http://griffin.incubator.apache.org/).
-You can access our wiki page [here](https://cwiki.apache.org/confluence/display/GRIFFIN/Apache+Griffin).
-You can access our issues jira page [here](https://issues.apache.org/jira/secure/Dashboard.jspa?selectPageId=12330914).
-
-### Contact us
-[Dev List](mailto://dev@griffin.incubator.apache.org)
 <!--
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor license agreements.  See the NOTICE file distributed with
@@ -24,6 +14,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
+
+## Apache Griffin
+
+Apache Griffin is a model driven data quality solution for modern data systems. 
+It provides a standard process to define data quality measures, execute, report, as well as an unified dashboard across multiple data systems. 
+You can access our home page [here](http://griffin.incubator.apache.org/).
+You can access our wiki page [here](https://cwiki.apache.org/confluence/display/GRIFFIN/Apache+Griffin).
+You can access our issues jira page [here](https://issues.apache.org/jira/secure/Dashboard.jspa?selectPageId=12330914).
+
+### Contact us
+[Dev List](mailto://dev@griffin.incubator.apache.org)
+
 
 ### CI
 
@@ -59,11 +62,12 @@ Release:
 ### How to deploy and run at local
 1. Install jdk (1.8 or later versions).
 2. Install mysql.
-2. Install [Hadoop](http://apache.claz.org/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz) (2.6.0 or later), you can get some help [here](https://hadoop.apache.org/docs/r2.7.2/hadoop-project-dist/hadoop-common/SingleCluster.html).
-3. Install [Spark](http://spark.apache.org/downloads.html) (version 1.6.x, griffin does not support 2.0.x at current), if you want to install Pseudo Distributed/Single Node Cluster, you can get some help [here](http://why-not-learn-something.blogspot.com/2015/06/spark-installation-pseudo.html).
-4. Install [Hive](http://apache.claz.org/hive/hive-1.2.1/apache-hive-1.2.1-bin.tar.gz) (version 1.2.1 or later), you can get some help [here](https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHive).
+3. Install npm (version 6.0.0+).
+4. Install [Hadoop](http://apache.claz.org/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz) (2.6.0 or later), you can get some help [here](https://hadoop.apache.org/docs/r2.7.2/hadoop-project-dist/hadoop-common/SingleCluster.html).
+5. Install [Spark](http://spark.apache.org/downloads.html) (version 1.6.x, griffin does not support 2.0.x at current), if you want to install Pseudo Distributed/Single Node Cluster, you can get some help [here](http://why-not-learn-something.blogspot.com/2015/06/spark-installation-pseudo.html).
+6. Install [Hive](http://apache.claz.org/hive/hive-1.2.1/apache-hive-1.2.1-bin.tar.gz) (version 1.2.1 or later), you can get some help [here](https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHive).
     You need to make sure that your spark cluster could access your HiveContext.
-5. Install [Livy](http://archive.cloudera.com/beta/livy/livy-server-0.3.0.zip), you can get some help [here](http://livy.io/quickstart.html).
+7. Install [Livy](http://archive.cloudera.com/beta/livy/livy-server-0.3.0.zip), you can get some help [here](http://livy.io/quickstart.html).
     Griffin need to schedule spark jobs by server, we use livy to submit our jobs.
     For some issues of Livy for HiveContext, we need to download 3 files, and put them into Hdfs.
     ```
@@ -71,9 +75,9 @@ Release:
     datanucleus-core-3.2.10.jar
     datanucleus-rdbms-3.2.9.jar
     ```
-6. Install [ElasticSearch]().
+8. Install [ElasticSearch]().
     ElasticSearch works as a metrics collector, Griffin produces metrics to it, and our default UI get metrics from it, you can use your own way as well.
-7. Modify configuration for your environment.
+9. Modify configuration for your environment.
     You need to modify the configuration part of code, to make Griffin works well in you environment.
     service/src/main/resources/application.properties
     ```
@@ -98,7 +102,7 @@ Release:
     ES_SERVER = "http://<your IP>:9200"
     ```
     Configure measure/measure-batch/src/main/resources/env.json for your environment, and put it into Hdfs <griffin env path>/
-8. Build the whole project and deploy.
+10. Build the whole project and deploy.(NPM should be installed , on mac you can try 'brew install node')
     ```
     mvn install
     ```
@@ -115,7 +119,7 @@ Release:
     ```
     http://<your IP>:8080
     ```
-9. Follow the steps using UI [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/dockerUIguide.md#webui-test-case-guide).
+11. Follow the steps using UI [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/dockerUIguide.md#webui-test-case-guide).
 
 
 **Note**: The front-end UI is still under development, you can only access some basic features currently.
