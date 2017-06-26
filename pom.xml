@@ -26,7 +26,7 @@
 
     <groupId>org.apache.griffin</groupId>
     <artifactId>griffin</artifactId>
-    <version>0.1.3-incubating-SNAPSHOT</version>
+    <version>0.1.4-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
     <url>http://griffin.incubator.apache.org</url>
@@ -149,27 +149,7 @@
                                 <exclude>**/*.out</exclude>
                                 <exclude>**/*.db</exclude>
                                 <exclude>**/velocity.log*</exclude>
-                                <!-- all json files should be excluded -->
                                 <exclude>**/*.json</exclude>
-                                <exclude>**/bower_components/**</exclude>
-                                <exclude>**/apidocs/**</exclude>
-                                <!-- Fonts and Images -->
-                                <exclude>**/fonts/**</exclude>
-                                <exclude>**/images/**</exclude>
-                                <exclude>**/*.min.js</exclude>
-                                <exclude>**/MANIFEST.MF</exclude>
-                                <exclude>**/.json</exclude>
-                                <exclude>**/*.md</exclude>
-                                <exclude>**/*.asc</exclude>
-                                <exclude>**/resources/public/**</exclude>
-                                <exclude>**/*.pid</exclude>
-                                <exclude>addServer.py</exclude>
-                                <exclude>travis-settings.xml</exclude>
-                                <exclude>**/griffin-doc/**</exclude>
-                                <exclude>**/docker/**</exclude>
-                                <exclude>**/pom.xml.tag</exclude>
-                                <exclude>**/build.xml</exclude>
-                                <exclude>**/*.properties</exclude>
                             </excludes>
                         </configuration>
                         <executions>

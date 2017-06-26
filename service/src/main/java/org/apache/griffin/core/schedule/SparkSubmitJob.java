@@ -76,6 +76,9 @@ public class SparkSubmitJob implements Job {
     String eachJoblastTimestamp;
     String periodTime;
 
+    RestTemplate restTemplate = new RestTemplate();
+
+
     String uri;
     SparkJobDO sparkJobDO = new SparkJobDO();
 
@@ -123,7 +126,7 @@ public class SparkSubmitJob implements Job {
             jd.getJobDataMap().put("lastTime", currentTimstamp + "");
         }
         //final String uri = "http://10.9.246.187:8998/batches";
-        RestTemplate restTemplate = new RestTemplate();
+//        RestTemplate restTemplate = new RestTemplate();
         setSparkJobDO();
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         logger.info(result);
@@ -236,9 +239,7 @@ public class SparkSubmitJob implements Job {
         ;
         try {
             String propFileName = "sparkJob.properties";
-
             inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-
             if (inputStream != null) {
                 prop.load(inputStream);
             } else {
