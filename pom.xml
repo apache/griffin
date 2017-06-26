@@ -150,6 +150,7 @@
                                 <exclude>**/*.db</exclude>
                                 <exclude>**/velocity.log*</exclude>
                                 <exclude>**/*.json</exclude>
+                                <exclude>**/bower_components/**</exclude>
                             </excludes>
                         </configuration>
                         <executions>
