@@ -25,7 +25,7 @@
     </parent>
 
     <groupId>org.apache.griffin</groupId>
-    <artifactId>griffin</artifactId>
+    <artifactId>griffin-parent</artifactId>
     <version>0.1.4-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
