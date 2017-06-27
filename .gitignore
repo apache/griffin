@@ -23,7 +23,7 @@ bin
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-
+# don't need binary 
 ui/bower_components/*
 
 
