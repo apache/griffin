@@ -151,7 +151,7 @@
                                 <exclude>**/velocity.log*</exclude>
                                 <exclude>**/*.json</exclude>
                                 <exclude>**/bower_components/**</exclude>
-
+                                <exclude>**/.bowerrc</exclude>
                                 <exclude>**/src/main/resources/public/**</exclude>
                                 <exclude>**/pom.xml.releaseBackup</exclude>
                                 <exclude>**/pom.xml.tag</exclude>
