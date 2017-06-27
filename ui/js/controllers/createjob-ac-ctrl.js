@@ -39,8 +39,8 @@ define(['./module'], function(controllers) {
             // $('.formStep').css({height: 800});
         });
         var getMeasureUrl = $config.uri.getMeasuresByOwner+$scope.ntAccount;
-        $http.get(getMeasureUrl).success(function(res){
-            angular.forEach(res,function(measure){
+        $http.get(getMeasureUrl).then(function successCallback(res){
+            angular.forEach(res.data,function(measure){
                 $scope.Measures.push(measure);
             })
             console.log($scope.Measures);
@@ -141,7 +141,7 @@ define(['./module'], function(controllers) {
                 var newJob = $config.uri.addJobs + this.data.groupName + '/' + jobName + '/' + $scope.Measures[$scope.measure];
                 console.log(newJob);
                 console.log(this.data);
-                $http.post(newJob, this.data).success(function(data) {
+                $http.post(newJob, this.data).then(function successCallback(data) {
                 	// if(data.status=='0')
                 	// {
                 	  console.log(data);
@@ -162,10 +162,13 @@ define(['./module'], function(controllers) {
                 	// 	errorMessage(0, data.result);
                 	// }
 
-                }).error(function(data){
-                  // errorMessage(0, 'Save model failed, please try again!');
-                  toaster.pop('error', 'Save job failed, please try again!', data.message);
-                });
+                // }).error(function(data){
+                //   // errorMessage(0, 'Save model failed, please try again!');
+                //   toaster.pop('error', 'Save job failed, please try again!', data.message);
+                // });
+                      },function errorCallback(response) {
+                        toaster.pop('error', 'Error when creating job', data);
+                        });
 
             },
 

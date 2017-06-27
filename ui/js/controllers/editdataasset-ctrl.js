@@ -57,7 +57,8 @@ define(['./module'], function (controllers) {
 
         var assetUri = $config.uri.getdataasset + '/' + $scope.assetId;
         $scope.getDataAsset = function(){
-            $http.get(assetUri).success(function(data) {
+            $http.get(assetUri).then(function successCallback(data) {
+                data = data.data;
                 $scope.form.basic.assetName = data.assetName;
                 $scope.form.basic.path = data.assetHDFSPath;
                 $scope.form.basic.type = $scope.assetTypeOptions.indexOf(data.assetType).toString();
@@ -187,14 +188,14 @@ define(['./module'], function (controllers) {
                     'partitions' : $scope.form.basic.partitions
                 }
 
-                $http.put($config.uri.updatedataasset, msg).success(function(data) {
-                	if(data.result=='success')
+                $http.put($config.uri.updatedataasset, msg).then(function successCallback(data) {
+                	if(data.data.result=='success')
                 	{
                       	$('#confirm-pu').modal('hide');
                     }
                 	else
                 	{
-                		errorMessage(0, data.result);
+                		errorMessage(0, data.data.result);
                 	}
                 });
             },

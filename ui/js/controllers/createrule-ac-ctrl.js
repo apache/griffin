@@ -33,10 +33,10 @@ define(['./module'], function(controllers) {
         var dbtreeUrl = $config.uri.dbtree;
         var schemaDefinitionUrl = $config.uri.schemadefinition;
 
-        $http.get(dbtreeUrl).success(function(data) {
+        $http.get(dbtreeUrl).then(function successCallback(data) {
                     var dbList = [];
-                    if (data) {
-                        angular.forEach(data,function(db,key){
+                    if (data.data) {
+                        angular.forEach(data.data,function(db,key){
                         console.log(db);
                         var dbNode = {
                             name: key,
@@ -88,9 +88,9 @@ define(['./module'], function(controllers) {
 
             // $scope.schemaCollection = null;
             if (newValue) {
-                $http.get(schemaDefinitionUrl+ '/' + newValue.parent[0].dbName+'/table/'+newValue.name).success(function(data) {
+                $http.get(schemaDefinitionUrl+ '/' + newValue.parent[0].dbName+'/table/'+newValue.name).then(function successCallback(data) {
                 console.log(data);
-                $scope.schemaCollection = data.sd.cols;
+                $scope.schemaCollection = data.data.sd.cols;
                 console.log($scope.schemaCollection);
                 });
             }
@@ -144,9 +144,9 @@ define(['./module'], function(controllers) {
 //
 //            }
             if (newValue) {
-                $http.get(schemaDefinitionUrl + '/' + newValue.parent[0].dbName+'/table/'+newValue.name).success(function(data) {
+                $http.get(schemaDefinitionUrl + '/' + newValue.parent[0].dbName+'/table/'+newValue.name).then(function successCallback(data) {
                 console.log(data);
-                $scope.schemaCollectionTarget = data.sd.cols;
+                $scope.schemaCollectionTarget = data.data.sd.cols;
                 console.log($scope.schemaCollectionTarget);
                 });
             }
@@ -458,11 +458,11 @@ define(['./module'], function(controllers) {
                 console.log(JSON.stringify($scope.form.data));
 
                 var newModel = $config.uri.addModels;
-                $http.post(newModel, this.data).success(function(data) {
+                $http.post(newModel, this.data).then(function successCallback(data) {
                 	// if(data.status=='0')
                 	// {
                 	  console.log(data);
-                      if(data=='CREATE_MEASURE_FAIL_DUPLICATE'){
+                      if(data.data=='CREATE_MEASURE_FAIL_DUPLICATE'){
                           toaster.pop('error', 'Please modify the name of measure, because there is already a same measure in database ', data.message);
                           return;
                       }
@@ -479,10 +479,13 @@ define(['./module'], function(controllers) {
                 	// 	errorMessage(0, data.result);
                 	// }
 
-                }).error(function(data){
-                  // errorMessage(0, 'Save model failed, please try again!');
-                  toaster.pop('error', 'Save measure failed, please try again!', data.message);
-                });
+                // }).error(function(data){
+                //   // errorMessage(0, 'Save model failed, please try again!');
+                //   toaster.pop('error', 'Save measure failed, please try again!', data.message);
+                // });
+                      },function errorCallback(response) {
+                            toaster.pop('error', 'Save measure failed, please try again!', data.message);
+                    });
 
             },
 

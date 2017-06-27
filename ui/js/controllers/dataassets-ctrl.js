@@ -31,14 +31,14 @@ define(['./module'], function (controllers) {
         number = tableState.pagination.number || 10;
 
         if(start == 0 && !$scope.rowCollection){
-          $http.get(allModels).success(function(data) {
-            if(data){
+          $http.get(allModels).then(function successCallback(data) {
+            if(data.data){
               // data.sort(function(a,b){
               //   return -(a.timestamp - b.timestamp);
               // });
             }
             originalRowCollection = new Array();
-            angular.forEach(data,function(db){
+            angular.forEach(data.data,function(db){
               angular.forEach(db,function(table){
                 originalRowCollection.push(table);
               });
@@ -106,7 +106,7 @@ define(['./module'], function (controllers) {
 		};
 
 		$scope.sendDeleteRequest = function() {
-			$http.delete($config.uri.deletedataasset+'/'+$scope.selectedRow._id).success(function(data){
+			$http.delete($config.uri.deletedataasset+'/'+$scope.selectedRow._id).then(function successCallback(data){
 
 					$('#confirm-delete').modal('hide');
           var index = $scope.rowCollection.indexOf($scope.selectedRow);
@@ -115,9 +115,13 @@ define(['./module'], function (controllers) {
           index = $scope.displayed.indexOf($scope.selectedRow);
           $scope.displayed.splice(index, 1);
 
-			}).error(function(data, status){
-        toaster.pop('error', 'Error when deleting record', data);
-      });
+			// }).error(function(data, status){
+   //      toaster.pop('error', 'Error when deleting record', data);
+   //    });
+            },function errorCallback(response) {
+               toaster.pop('error', 'Error when deleting record', data.message);
+       });
+
 
 		}
 

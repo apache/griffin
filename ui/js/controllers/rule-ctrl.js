@@ -37,12 +37,12 @@ define(['./module'], function (controllers) {
         number = tableState.pagination.number || 10;
 
         if(start == 0 && !$scope.rowCollection){
-         $http.get(allModels).success(function(data) {
-           data.sort(function(a,b){
+         $http.get(allModels).then(function successCallback(data) {
+           data.data.sort(function(a,b){
              return -(a.createDate - b.createDate);
            });
-           originalRowCollection = angular.copy(data);
-           $scope.rowCollection = angular.copy(data);
+           originalRowCollection = angular.copy(data.data);
+           $scope.rowCollection = angular.copy(data.data);
 
            $scope.displayed = $scope.rowCollection.slice(start, start+number);
            tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
@@ -97,8 +97,8 @@ define(['./module'], function (controllers) {
 
       $scope.remove = function remove(row) {
         var getModelUrl = $config.uri.getModel + '/' +row.name;
-        $http.get(getModelUrl).success(function(data){
-  			  $scope.deletedRow = data;
+        $http.get(getModelUrl).then(function successCallback(data){
+  			  $scope.deletedRow = data.data;
               $scope.sourceTable = $scope.deletedRow.source.config["table.name"];
               $scope.targetTable = $scope.deletedRow.target.config["table.name"];
   		  });
@@ -110,18 +110,20 @@ define(['./module'], function (controllers) {
       $scope.confirmDelete = function(){
         var row =   $scope.deletedBriefRow;
         var deleteModelUrl = $config.uri.deleteModel + '/' + row.name;
-        $http.delete(deleteModelUrl).success(function(){
-
-          var index = $scope.rowCollection.indexOf(row);
-          $scope.rowCollection.splice(index, 1);
-
-          index = $scope.displayed.indexOf(row);
-          $scope.displayed.splice(index, 1);
-
+        $http.delete(deleteModelUrl).then(function successCallback(data){
+          if(data.data=="DELETE_MEASURE_BY_NAME_SUCCESS"){
+              var index = $scope.rowCollection.indexOf(row);
+              $scope.rowCollection.splice(index, 1);
+              index = $scope.displayed.indexOf(row);
+              $scope.displayed.splice(index, 1);
+          }
+          else {
+              toaster.pop('error', 'Error when deleting measure', data);
+          }
           $('#deleteConfirmation').modal('hide');
 
-        }).error(function(data, status){
-          toaster.pop('error', 'Error when deleting record', data);
+          },function errorCallback(response) {
+          toaster.pop('error', 'Error when deleting measure', data);
         });
       }
 
