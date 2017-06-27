@@ -29,8 +29,9 @@ define(['./module'], function(controllers) {
           var url_dashboard = $config.uri.dashboard ;
           var url_organization = $config.uri.organization;
 
-          $http.get(url_organization).success(function(res){
+          $http.get(url_organization).then(function successCallback(res){
                var orgNode = null;
+               res = res.data;
                angular.forEach(res, function(value,key) {
                     orgNode = new Object();
                     $scope.orgs.push(orgNode);
@@ -38,7 +39,9 @@ define(['./module'], function(controllers) {
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-               $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
+//               $http.get(url_dashboard).then(function successCallback(data){
+                $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
+                    data = data.data;
                     angular.forEach(data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
@@ -189,7 +192,8 @@ define(['./module'], function(controllers) {
 
         /*click the chart to be bigger*/
         $scope.showBig = function(t){
-            $rootScope.showBigChart($barkChart.getOptionBig(t));
+            // $rootScope.showBigChart($barkChart.getOptionBig(t));
+             window.location.href = '/#!/detailed/'+t.name;
         }
 
         $scope.getSample = function(item) {
