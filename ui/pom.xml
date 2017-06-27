@@ -18,8 +18,8 @@
 
     <parent>
         <groupId>org.apache.griffin</groupId>
-        <artifactId>griffin</artifactId>
-        <version>0.1.4-incubating-SNAPSHOT</version>
+        <artifactId>griffin-parent</artifactId>
+        <version>0.1.5-incubating-SNAPSHOT</version>
     </parent>
   <artifactId>ui</artifactId>
   <packaging>pom</packaging>
