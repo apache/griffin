@@ -37,7 +37,7 @@ limitations under the License.
 		</tbody>
 	  	<tbody ng-repeat="row in displayed" style="word-break:break-all;">
 	    	<tr>
-	    		<td ng-class="{accordion:true}" ng-click="row.showDetail=!(row.showDetail)">
+	    		<td ng-class="{accordion:true}" ng-click="row.showDetail=!(row.showDetail)" style="cursor: pointer;">
                     <i ng-show="!row.showDetail" class="fa fa-chevron-circle-right blue"></i>
                     <i ng-show="row.showDetail" class="fa fa-chevron-circle-down blue"></i>
                     {{row.tableName}}</td>

@@ -52,7 +52,7 @@ define(['./module'], function(controllers) {
 
             $('#'+chartId).unbind('click');
             $('#'+chartId).click(function(e) {
-              window.location.href = '/#/detailed/'+$scope.finalData[parentIndex].metrics[index].name;
+              window.location.href = '/#!/detailed/'+$scope.finalData[parentIndex].metrics[index].name;
             });
 
         };
@@ -62,11 +62,11 @@ define(['./module'], function(controllers) {
         }
 
         function sideBarList(sysName){
-            var url_organization = $config.uri.organization;
-            // var url_organization = 'org.json';
-            $http.get(url_organization).success(function(res){
+             var url_organization = $config.uri.organization;
+//            var url_organization = 'org.json';
+            $http.get(url_organization).then(function successCallback(res){
                var orgNode = null;
-               angular.forEach(res, function(value,key) {
+               angular.forEach(res.data, function(value,key) {
                orgNode = new Object();
                $scope.orgs.push(orgNode);
                orgNode.name = key;
@@ -74,15 +74,15 @@ define(['./module'], function(controllers) {
                });
                $scope.originalOrg = angular.copy($scope.orgs);
                var url_briefmetrics = $config.uri.dashboard;
-               $http.post(url_briefmetrics, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
-               // $http.get('data.json').success(function(data){
-                   angular.forEach(data.hits.hits, function(sys) {
+                $http.post(url_briefmetrics, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
+//               $http.get('data.json').then(function successCallback(data){
+                   angular.forEach(data.data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
                         return a.tmst - b.tmst;
                         }
                    });
-               $scope.originalData = angular.copy(data);
+               $scope.originalData = angular.copy(data.data);
                $scope.myData = angular.copy($scope.originalData.hits.hits);
                $scope.metricName = [];
                for(var i = 0;i<$scope.myData.length;i++){
