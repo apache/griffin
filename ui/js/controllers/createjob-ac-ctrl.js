@@ -167,7 +167,7 @@ define(['./module'], function(controllers) {
                 //   toaster.pop('error', 'Save job failed, please try again!', data.message);
                 // });
                       },function errorCallback(response) {
-                        toaster.pop('error', 'Error when creating job', data);
+                        toaster.pop('error', 'Error when creating job', response.message);
                         });
 
             },

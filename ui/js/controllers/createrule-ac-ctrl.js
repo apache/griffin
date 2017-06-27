@@ -484,7 +484,7 @@ define(['./module'], function(controllers) {
                 //   toaster.pop('error', 'Save measure failed, please try again!', data.message);
                 // });
                       },function errorCallback(response) {
-                            toaster.pop('error', 'Save measure failed, please try again!', data.message);
+                            toaster.pop('error', 'Save measure failed, please try again!', response.message);
                     });
 
             },

@@ -162,7 +162,7 @@ define(['./module'], function (controllers) {
 	                  $('#confirm-pu').modal('hide');
 
                  },function errorCallback(response) {
-                    toaster.pop('error', 'Error when creating dataasset', data);
+                    toaster.pop('error', 'Error when creating dataasset', response.message);
                 });
             },
 

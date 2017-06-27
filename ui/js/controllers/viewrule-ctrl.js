@@ -48,7 +48,7 @@ define(['./module'], function (controllers) {
         //   toaster.pop('error', data.message);
         // });
          },function errorCallback(response) {
-          toaster.pop('error', 'Error when deleting record', response);
+          toaster.pop('error', 'Error when deleting record', response.message);
         });
 
         $scope.anTypes = ['', 'History Trend Detection', 'Bollinger Bands Detection', 'Deviation Detection'];

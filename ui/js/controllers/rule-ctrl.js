@@ -118,12 +118,12 @@ define(['./module'], function (controllers) {
               $scope.displayed.splice(index, 1);
           }
           else {
-              toaster.pop('error', 'Error when deleting measure', data);
+              toaster.pop('error', 'Error when deleting measure', data.data);
           }
           $('#deleteConfirmation').modal('hide');
 
           },function errorCallback(response) {
-          toaster.pop('error', 'Error when deleting measure', data);
+          toaster.pop('error', 'Error when deleting measure', response.message);
         });
       }
 

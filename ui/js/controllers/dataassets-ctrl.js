@@ -119,7 +119,7 @@ define(['./module'], function (controllers) {
    //      toaster.pop('error', 'Error when deleting record', data);
    //    });
             },function errorCallback(response) {
-               toaster.pop('error', 'Error when deleting record', data.message);
+               toaster.pop('error', 'Error when deleting record', response.message);
        });
 
 
