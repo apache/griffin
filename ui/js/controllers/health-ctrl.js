@@ -31,28 +31,28 @@ define(['./module'], function (controllers) {
             $scope.$emit('initReq');
 
 //            var url = $config.uri.heatmap;
-            var url_dashboard = $config.uri.dashboard ;
-            // var url_dashboard = 'data.json';
-            var url_organization = $config.uri.organization;
-            // var url_organization = 'org.json';
-            $http.get(url_organization).success(function(res){
+             var url_dashboard = $config.uri.dashboard ;
+//            var url_dashboard = 'data.json';
+             var url_organization = $config.uri.organization;
+//            var url_organization = 'org.json';
+            $http.get(url_organization).then(function successCallback(res){
                var orgNode = null;
-               angular.forEach(res, function(value,key) {
+               angular.forEach(res.data, function(value,key) {
                     orgNode = new Object();
                     $scope.orgs.push(orgNode);
                     orgNode.name = key;
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-                $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
-//                  $http.get(url_dashboard).success(function(data){
-                    angular.forEach(data.hits.hits, function(sys) {
+                 $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
+//                 $http.get(url_dashboard).then(function successCallback(data){
+                    angular.forEach(data.data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
                             return a.tmst - b.tmst;
                         }
                     });
-                    $scope.originalData = angular.copy(data);
+                    $scope.originalData = angular.copy(data.data);
 
                     $scope.myData = angular.copy($scope.originalData.hits.hits);
                     $scope.metricName = [];
@@ -231,7 +231,7 @@ define(['./module'], function (controllers) {
                     // param.event.event.preventDefault();
                     if (param.data.name) {
                         // $location.path('/detailed/'+param.data.name);
-                        window.location.href = '/#/detailed/'+param.data.name;
+                        window.location.href = '/#!/detailed/'+param.data.name;
                     }
                 });
 

@@ -22,20 +22,30 @@ define(['./module'], function (controllers) {
         var echarts = require('echarts');
         var formatUtil = echarts.format;
 
+       if($rootScope.showBigChart==undefined)
+        {
+            $rootScope.showBigChart = function(option) {
+                $scope.selectedModel = option.title.text;
+                $('#bigChartContainer').show();
+                // $('#mainWindow').hide();
+                $rootScope.bigChart.clear();
+                $rootScope.bigChart.setOption(option);
+            }
+        }
 
         var showBig = function(metricName){
           var metricDetailUrl = $config.uri.dashboard;
-          // var metricDetailUrl = 'data.json';
-          $http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name": metricName }}]}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).success(function(data) {
-            // $http.get(metricDetailUrl).success(function (data) {
+//          var metricDetailUrl = 'data.json';
+           $http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name": metricName }}]}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
+//            $http.get(metricDetailUrl).then(function successCallback(data) {
                 // body...
             
             var metric = new Object();
-            metric.name = data.hits.hits[0]._source.name;
-            metric.timestamp = data.hits.hits[data.hits.hits.length-1]._source.tmst;
-            metric.dq = data.hits.hits[data.hits.hits.length-1]._source.matched/data.hits.hits[data.hits.hits.length-1]._source.matched*100;
+            metric.name = data.data.hits.hits[0]._source.name;
+            metric.timestamp = data.data.hits.hits[data.data.hits.hits.length-1]._source.tmst;
+            metric.dq = data.data.hits.hits[data.data.hits.hits.length-1]._source.matched/data.data.hits.hits[data.data.hits.hits.length-1]._source.matched*100;
             metric.details = new Array();
-            angular.forEach(data.hits.hits,function(point){
+            angular.forEach(data.data.hits.hits,function(point){
                 metric.details.push(point);
             })
             $rootScope.showBigChart($barkChart.getOptionBig(metric));
