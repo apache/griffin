@@ -6,11 +6,14 @@
     "type": "kafka",
     "version": "0.8",
     "config": {
-      "bootstrap.servers": "a.b.c.d:9092",
-      "group.id": "group1",
-      "auto.offset.reset": "smallest",
-      "auto.commit.enable": "false",
-      "topics": "src"
+      "kafka.config": {
+        "bootstrap.servers": "a.b.c.d:9092",
+        "group.id": "group1",
+        "auto.offset.reset": "smallest",
+        "auto.commit.enable": "false",
+      },
+      "topics": "src",
+      "decoder": "kafka.serializer.StringDecoder"
     }
   },
 
@@ -18,11 +21,14 @@
     "type": "kafka",
     "version": "0.8",
     "config": {
-      "bootstrap.servers": "a.b.c.d:9092",
-      "group.id": "group1",
-      "auto.offset.reset": "smallest",
-      "auto.commit.enable": "false",
-      "topics": "tgt"
+      "kafka.config": {
+        "bootstrap.servers": "a.b.c.d:9092",
+        "group.id": "group1",
+        "auto.offset.reset": "smallest",
+        "auto.commit.enable": "false",
+      },
+      "topics": "tgt",
+      "decoder": "kafka.serializer.StringDecoder"
     }
   },
 

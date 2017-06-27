@@ -14,9 +14,16 @@ limitations under the License.
  */
 package org.apache.griffin.measure.connector
 
+import org.apache.spark.streaming.dstream.InputDStream
 
-trait DataConnector extends Serializable {
+import scala.util.Try
 
-  def available(): Boolean
+
+trait StreamingDataConnector extends DataConnector {
+
+  type K
+  type V
+
+  def stream(): Try[InputDStream[(K, V)]]
 
 }

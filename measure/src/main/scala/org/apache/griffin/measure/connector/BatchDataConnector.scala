@@ -14,9 +14,15 @@ limitations under the License.
  */
 package org.apache.griffin.measure.connector
 
+import org.apache.spark.rdd.RDD
 
-trait DataConnector extends Serializable {
+import scala.util.Try
 
-  def available(): Boolean
+
+trait BatchDataConnector extends DataConnector {
+
+  def metaData(): Try[Iterable[(String, String)]]
+
+  def data(): Try[RDD[(Product, Map[String, Any])]]
 
 }

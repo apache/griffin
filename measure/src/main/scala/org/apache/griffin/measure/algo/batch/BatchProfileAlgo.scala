@@ -19,7 +19,7 @@ import java.util.Date
 import org.apache.griffin.measure.algo.ProfileAlgo
 import org.apache.griffin.measure.algo.core.ProfileCore
 import org.apache.griffin.measure.config.params._
-import org.apache.griffin.measure.connector.{DataConnector, DataConnectorFactory}
+import org.apache.griffin.measure.connector._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.expr.{Expr, StatementExpr}
@@ -65,8 +65,8 @@ case class BatchProfileAlgo(allParam: AllParam) extends ProfileAlgo {
       val finalConstExprValueMap = ExprValueUtil.updateExprValueMap(ruleAnalyzer.constFinalCacheExprs, constExprValueMap)
 
       // data connector
-      val sourceDataConnector: DataConnector =
-      DataConnectorFactory.getDataConnector(sqlContext, userParam.sourceParam,
+      val sourceDataConnector: BatchDataConnector =
+      DataConnectorFactory.getBatchDataConnector(sqlContext, userParam.sourceParam,
         ruleAnalyzer.sourceRuleExprs, finalConstExprValueMap
       ) match {
         case Success(cntr) => {

@@ -14,52 +14,60 @@ limitations under the License.
  */
 package org.apache.griffin.measure.connector
 
+import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
 import org.apache.griffin.measure.rule.expr._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
-import com.databricks.spark.avro._
 
 import scala.util.{Success, Try}
-import java.nio.file.{Files, Paths}
 
-import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
-import org.apache.griffin.measure.utils.HdfsUtil
+// data connector for hive
+case class HiveBatchDataConnector(sqlContext: SQLContext, config: Map[String, Any],
+                                  ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
+                                 ) extends BatchDataConnector {
 
-// data connector for avro file
-case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                             ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
-                            ) extends DataConnector {
+  val Database = "database"
+  val TableName = "table.name"
+  val Partitions = "partitions"
 
-  val FilePath = "file.path"
-  val FileName = "file.name"
+  val database = config.getOrElse(Database, "").toString
+  val tableName = config.getOrElse(TableName, "").toString
+  val partitionsString = config.getOrElse(Partitions, "").toString
 
-  val filePath = config.getOrElse(FilePath, "").toString
-  val fileName = config.getOrElse(FileName, "").toString
+  val concreteTableName = if (dbPrefix) s"${database}.${tableName}" else tableName
+  val partitions = partitionsString.split(";").map(s => s.split(",").map(_.trim))
 
-  val concreteFileFullPath = if (pathPrefix) s"${filePath}${fileName}" else fileName
-
-  private def pathPrefix(): Boolean = {
-    filePath.nonEmpty
-  }
-
-  private def fileExist(): Boolean = {
-    HdfsUtil.existPath(concreteFileFullPath)
+  private def dbPrefix(): Boolean = {
+    database.nonEmpty && !database.equals("default")
   }
 
   def available(): Boolean = {
-    (!concreteFileFullPath.isEmpty) && fileExist
+    (!tableName.isEmpty) && {
+      Try {
+        if (dbPrefix) {
+          sqlContext.tables(database).filter(tableExistsSql).collect.size
+        } else {
+          sqlContext.tables().filter(tableExistsSql).collect.size
+        }
+      } match {
+        case Success(s) => s > 0
+        case _ => false
+      }
+    }
   }
 
   def metaData(): Try[Iterable[(String, String)]] = {
     Try {
-      val st = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath).schema
-      st.fields.map(f => (f.name, f.dataType.typeName))
+      val originRows = sqlContext.sql(metaDataSql).map(r => (r.getString(0), r.getString(1))).collect
+      val partitionPos: Int = originRows.indexWhere(pair => pair._1.startsWith("# "))
+      if (partitionPos < 0) originRows
+      else originRows.take(partitionPos)
     }
   }
 
   def data(): Try[RDD[(Product, Map[String, Any])]] = {
     Try {
-      loadDataFile.flatMap { row =>
+      sqlContext.sql(dataSql).flatMap { row =>
         // generate cache data
         val cacheExprValueMap: Map[String, Any] = ruleExprs.cacheExprs.foldLeft(constFinalExprValueMap) { (cachedMap, expr) =>
           ExprValueUtil.genExprValueMap(Some(row), expr, cachedMap)
@@ -91,8 +99,22 @@ case class AvroDataConnector(sqlContext: SQLContext, config: Map[String, Any],
     }
   }
 
-  private def loadDataFile() = {
-    sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
+  private def tableExistsSql(): String = {
+//    s"SHOW TABLES LIKE '${concreteTableName}'"    // this is hive sql, but not work for spark sql
+    s"tableName LIKE '${tableName}'"
+  }
+
+  private def metaDataSql(): String = {
+    s"DESCRIBE ${concreteTableName}"
+  }
+
+  private def dataSql(): String = {
+    val clauses = partitions.map { prtn =>
+      val cls = prtn.mkString(" AND ")
+      if (cls.isEmpty) s"SELECT * FROM ${concreteTableName}"
+      else s"SELECT * FROM ${concreteTableName} WHERE ${cls}"
+    }
+    clauses.mkString(" UNION ALL ")
   }
 
   private def toTuple[A <: AnyRef](as: Seq[A]): Product = {
