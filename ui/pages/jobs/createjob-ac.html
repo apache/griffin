@@ -38,8 +38,10 @@ limitations under the License.
                                         </label>
 
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                            <input type="text" class="form-control" ng-model="sourcePat" name="ruleName" placeholder="Please input the source partition, such as 'YYYYMMdd-HH'." required ng-pattern="'([0-9a-zA-Z\\_\\-])+'">
-                                            <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Only letter, number, "-" and "_" are allowed</span>
+                                            <input type="text" class="form-control" ng-model="sourcePat" name="ruleName" placeholder="Please input the source partition, such as 'YYYYMMdd-HH'." required 
+                                            ng-pattern="/YYYYMMdd-HH/i"
+                                            ng-maxlength='11'>
+                                            <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Please input partition like 'YYYYMMdd-HH'</span>
                                         </div>
                                     </div>
                                 </div>
@@ -50,7 +52,7 @@ limitations under the License.
                                         </label>
 
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                            <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'.">
+                                            <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'." ng-pattern="/YYYYMMdd-HH/i" ng-maxlength='11'>
                                         </div>
                                     </div>
                                 </div>
@@ -86,7 +88,9 @@ limitations under the License.
                                         </label>
 
                                         <div class="col-md-5 col-lg-5 col-sm-5 ">
-                                            <input type="text" id="systemSelector" class="form-control" ng-model="periodTime"  required placeholder="How often it works">
+                                            <input type="text" id="systemSelector" class="form-control" ng-model="periodTime"  required placeholder="How often it works"  
+                                            onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" 
+                                            onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
                                         </div>
                                         <div class="col-md-5 col-lg-5 col-sm-5 ">
                                             <select id="timeSelector" class="form-control" ng-model="timeType" required>
@@ -102,7 +106,7 @@ limitations under the License.
 
                             <div style="color:#b2c831">
                                 <p>
-                                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href="#/jobs">Jobs</a>" to check the job status
+                                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" href="#!/jobs">Jobs</a>" to check the job status
                                 </p>
                             </div>
 

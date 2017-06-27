@@ -30,8 +30,8 @@ define(['./module'], function (controllers) {
         // $scope.regex = new RegExp('^\\/(?:[0-9a-zA-Z\\_\\-\\.]+\\/?)+');
 
         var allModels = $config.uri.dbtree;
-        $http.get(allModels).success(function(data) {
-            $scope.platformOptions = data;
+        $http.get(allModels).then(function successCallback(data) {
+            $scope.platformOptions = data.data;
         });
 
         //$scope.platformOptions = [{"id":null,"platform":"Teradata","systems":[{"id":null,"name":"gdw_tables","assets":[{"id":108,"name":"dw_bid"},{"id":109,"name":"dw_trans"}]}]},{"id":null,"platform":"Apollo","systems":[{"id":null,"name":"Sojourner","assets":[{"id":22,"name":"ubi_event"}]},{"id":null,"name":"SiteSpeed","assets":[{"id":21,"name":"sitespeed"}]},{"id":null,"name":"PDS","assets":[{"id":20,"name":"last_categories_accessed"}]},{"id":null,"name":"Bullseye","assets":[{"id":1,"name":"be_view_event_queue"},{"id":2,"name":"be_search_event_queue"},{"id":3,"name":"be_item_watch_event_queue"},{"id":4,"name":"be_bid_event_queue"},{"id":5,"name":"be_transaction_event_queue"},{"id":6,"name":"dmg"},{"id":7,"name":"loyaltysgmnt"},{"id":8,"name":"cust_dna_cat_score"},{"id":9,"name":"badge_interest"},{"id":10,"name":"cust_dna_vq_feed"},{"id":11,"name":"user_dna"},{"id":12,"name":"adchoice_user_pref"},{"id":13,"name":"cust_dna_vq_cat_feed"},{"id":14,"name":"cpcp_dealsv17"},{"id":15,"name":"bbe_tbl_trx"},{"id":17,"name":"bbe_tbl_neg"},{"id":16,"name":"bbe_tbl_neu"},{"id":19,"name":"rtm_segment_dict"},{"id":18,"name":"bbe_tbl_pos"}]}]}];
@@ -152,7 +152,7 @@ define(['./module'], function (controllers) {
                   'owner' : $scope.form.basic.owner
                 }
 
-                $http.post($config.uri.adddataasset, msg).success(function() {
+                $http.post($config.uri.adddataasset, msg).then(function successCallback() {
                     $('#confirm-pu').on('hidden.bs.modal', function(e) {
                         $('#confirm-pu').off('hidden.bs.modal');
                         $location.path('/dataassets');
@@ -161,8 +161,8 @@ define(['./module'], function (controllers) {
 
 	                  $('#confirm-pu').modal('hide');
 
-                }).error(function(data){
-                  toaster.pop('error', 'Save data asset failed, please try again!', data.message);
+                 },function errorCallback(response) {
+                    toaster.pop('error', 'Error when creating dataasset', response.message);
                 });
             },
 

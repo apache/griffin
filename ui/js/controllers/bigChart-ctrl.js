@@ -22,7 +22,8 @@ define(['./module'], function(controllers) {
 
       function pageInit() {
         resizeBigChart();
-        $scope.bigChart = echarts.init($('#bigChartDiv').get(0), 'dark');
+        // $scope.bigChart = echarts.init($('#bigChartDiv').get(0), 'dark');
+        $rootScope.bigChart = echarts.init($('#bigChartDiv').get(0), 'dark');
       }
 
       function resizeBigChart() {
@@ -33,8 +34,8 @@ define(['./module'], function(controllers) {
       $scope.closeBigChart = function(){
         console.log('close big chart!');
         // $('#bigChartContainer').hide();
-        history.back();
-        // $location.path('/health');
+        // history.back();
+        $location.path('/health');
         // $('#mainWindow').show();
       }
 
@@ -45,16 +46,25 @@ define(['./module'], function(controllers) {
       $(window).resize(function() {
         console.log('big chart resize');
           resizeBigChart();
-          $scope.bigChart.resize();
+          $rootScope.bigChart.resize();
       });
 
-      $rootScope.showBigChart = function(option) {
-        $scope.selectedModel = option.title.text;
-        $('#bigChartContainer').show();
-        // $('#mainWindow').hide();
-        $scope.bigChart.clear();
-        $scope.bigChart.setOption(option);
-      }
+      // $rootScope.showBigChart = function(option) {
+      //   $scope.selectedModel = option.title.text;
+      //   $('#bigChartContainer').show();
+      //   // $('#mainWindow').hide();
+      //   $scope.bigChart.clear();
+      //   $scope.bigChart.setOption(option);
+      // }
+         if($rootScope.showBigChart==undefined){
+              $rootScope.showBigChart = function(option) {
+              $scope.selectedModel = option.title.text;
+              $('#bigChartContainer').show();
+              // $('#mainWindow').hide();
+              $rootScope.bigChart.clear();
+              $rootScope.bigChart.setOption(option);
+            }
+          }
 
     }]);
 });

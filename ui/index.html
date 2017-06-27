@@ -66,26 +66,26 @@ limitations under the License.
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="#/" class="navbar-brand" style="padding-top:5px;padding-bottom:0;"><img src="/img/logo.gif" title="Data Quality Service" style="max-height:40px;"/></a>
+            <a href="#!/" class="navbar-brand" style="padding-top:5px;padding-bottom:0;"><img src="/img/logo.gif" title="Data Quality Service" style="max-height:40px;"/></a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <ul class="nav navbar-nav">
-                <li ng-class="{active:isActive('/health')}"><a href="#/health"><i class="icon-home icon-white"></i> Health</a></li>
-                <li ng-class="{active:isActive('/measures') || isActive('/createrule')}"><a href="#/measures"><i class="icon-folder-open icon-white"></i> Measures</a></li>
+                <li ng-class="{active:isActive('/health')}"><a href="#!/health"><i class="icon-home icon-white"></i> Health</a></li>
+                <li ng-class="{active:isActive('/measures') || isActive('/createrule')}"><a href="#!/measures"><i class="icon-folder-open icon-white"></i> Measures</a></li>
                 <!-- <li><a href="#/undercons"><i class="icon-calendar icon-white"></i> Data Profiling</a></li> -->
-                <li ng-class="{active:isActive('/jobs') || isActive('/jobs')}"><a href="#/jobs"><i class="icon-calendar icon-white"></i> Jobs</a></li>
+                <li ng-class="{active:isActive('/jobs') || isActive('/jobs')}"><a href="#!/jobs"><i class="icon-calendar icon-white"></i> Jobs</a></li>
 
-                <li ng-class="{active:isActive('/mydashboard') || isActive('/subscribemodel')}"><a href="#/mydashboard"><i class="icon-calendar icon-white"></i> My Dashboard</a></li>
+                <li ng-class="{active:isActive('/mydashboard') || isActive('/subscribemodel')}"><a href="#!/mydashboard"><i class="icon-calendar icon-white"></i> My Dashboard</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{fullName}} <i class="fa fa-user fa-fw"></i><span class="caret"></span></a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#/undercons"><i class="fa fa-user fa-fw"></i> User Profile</a></li>
-                        <li><a href="#/undercons"><i class="fa fa-gear fa-fw"></i> Settings</a></li>
+                        <li><a href="#!/undercons"><i class="fa fa-user fa-fw"></i> User Profile</a></li>
+                        <li><a href="#!/undercons"><i class="fa fa-gear fa-fw"></i> Settings</a></li>
                         <li class="divider"></li>
                         <li><a href="/apidocs/index.html" target="_blank"><i class="fa fa-book fa-fw"></i> API DOCs</a></li>
                         <li><a href="https://github.com/eBay/griffin/blob/master/griffin-doc/userguide.md" target="_blank"><i class="fa fa-question-circle fa-fw"></i> User Guide</a></li>
@@ -137,7 +137,7 @@ limitations under the License.
                 <p ng-show="!notifications">{{timestamp|date:'short'}} - Welcome <label>{{fullName}}</label>!</p>
                 <p ng-repeat="r in notifications">
                     {{r.timestamp|date:'short'}} - <label>{{r.owner}}</label> {{r.operation}}d a {{r.target}} named
-                    <a ng-if="r.target=='model'" href="#/viewrule/{{r.name}}">{{r.name}}</a>
+                    <a ng-if="r.target=='model'" href="#!/viewrule/{{r.name}}">{{r.name}}</a>
                     <label ng-if="r.target=='dataasset'">"{{r.name}}"</label>
                 </p>
             </div><!-- /row -->
