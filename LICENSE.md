@@ -194,6 +194,7 @@ Contents:
 
 (2) Notices for bundled software
 
+```
 This project includes the software: angular
   Available at: https://github.com/angular/angular.js/blob/v1.6.4/LICENSE
   Version used: 1.6.4
@@ -268,6 +269,7 @@ This project includes the software: requirejs
   Used under the following license: The BSD 3-Clause (New BSD) License (http://opensource.org/licenses/BSD-3-Clause)
   Copyright (c) 2010-2015, The Dojo Foundation
 
+```
 ---------------------------------------------------
 
 (3) Licenses for bundled software
