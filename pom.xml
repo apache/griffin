@@ -26,7 +26,7 @@
 
     <groupId>org.apache.griffin</groupId>
     <artifactId>griffin-parent</artifactId>
-    <version>0.1.5-incubating-SNAPSHOT</version>
+    <version>0.1.5-incubating</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
     <url>http://griffin.incubator.apache.org</url>
@@ -78,7 +78,7 @@
         <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</connection>
         <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</developerConnection>
         <url>https://git-wip-us.apache.org/repos/asf?p=incubator-griffin.git;a=summary</url>
-        <tag>HEAD</tag>
+        <tag>griffin-parent-0.1.5-incubating</tag>
     </scm>
 
     <distributionManagement>
