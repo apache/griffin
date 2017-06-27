@@ -13,7 +13,8 @@
         "auto.commit.enable": "false",
       },
       "topics": "src",
-      "decoder": "kafka.serializer.StringDecoder"
+      "key.type": "java.lang.String",
+      "value.type": "java.lang.String"
     }
   },
 
@@ -28,7 +29,8 @@
         "auto.commit.enable": "false",
       },
       "topics": "tgt",
-      "decoder": "kafka.serializer.StringDecoder"
+      "key.type": "java.lang.String",
+      "value.type": "java.lang.String"
     }
   },
 

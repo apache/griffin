@@ -17,7 +17,6 @@ package org.apache.griffin.measure.connector
 import kafka.serializer.StringDecoder
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.rule.RuleExprs
-import org.apache.griffin.measure.rule.expr._
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
@@ -30,6 +29,8 @@ object DataConnectorFactory {
 
   val HiveRegex = """^(?i)hive$""".r
   val AvroRegex = """^(?i)avro$""".r
+
+  val KafkaRegex = """^(?i)kafka$""".r
 
   def getBatchDataConnector(sqlContext: SQLContext,
                             dataConnectorParam: DataConnectorParam,
@@ -58,32 +59,39 @@ object DataConnectorFactory {
     val config = dataConnectorParam.config
     Try {
       conType match {
-        case HiveRegex() => {
-          val KeyType = "key.type"
-          val ValueType = "value.type"
-          val keyType = dataConnectorParam.config.getOrElse(KeyType, "java.lang.String").toString
-          val valueType = dataConnectorParam.config.getOrElse(ValueType, "java.lang.String").toString
-          (getClassTag(keyType), getClassTag(valueType)) match {
-            case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
-              new KafkaDataConnector(ssc, config) {
-                type K = String
-                type KD = StringDecoder
-                type V = String
-                type VD = StringDecoder
-
-                def stream(): Try[InputDStream[(K, V)]] = Try {
-                  val topicSet = topics.split(",").toSet
-                  KafkaUtils.createDirectStream[K, V, KD, VD](
-                    ssc,
-                    kafkaConfig,
-                    topicSet
-                  )
-                }
-              }
-            }
-          }
+        case KafkaRegex() => {
+          genKafkaDataConnector(ssc, config)
         }
         case _ => throw new Exception("connector creation error!")
+      }
+    }
+  }
+
+  protected def genKafkaDataConnector(ssc: StreamingContext, config: Map[String, Any]) = {
+    val KeyType = "key.type"
+    val ValueType = "value.type"
+    val keyType = config.getOrElse(KeyType, "java.lang.String").toString
+    val valueType = config.getOrElse(ValueType, "java.lang.String").toString
+    (getClassTag(keyType), getClassTag(valueType)) match {
+      case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
+        new KafkaDataConnector(ssc, config) {
+          type K = String
+          type KD = StringDecoder
+          type V = String
+          type VD = StringDecoder
+
+          def stream(): Try[InputDStream[(K, V)]] = Try {
+            val topicSet = topics.split(",").toSet
+            KafkaUtils.createDirectStream[K, V, KD, VD](
+              ssc,
+              kafkaConfig,
+              topicSet
+            )
+          }
+        }
+      }
+      case _ => {
+        throw new Exception("not supported type kafka data connector")
       }
     }
   }

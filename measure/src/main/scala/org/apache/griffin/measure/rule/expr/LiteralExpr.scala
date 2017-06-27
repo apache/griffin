@@ -14,6 +14,8 @@ limitations under the License.
  */
 package org.apache.griffin.measure.rule.expr
 
+import org.apache.griffin.measure.utils.TimeUtil
+
 import scala.util.{Failure, Success, Try}
 
 trait LiteralExpr extends Expr {
@@ -46,27 +48,7 @@ case class LiteralNumberExpr(expr: String) extends LiteralExpr {
 
 case class LiteralTimeExpr(expr: String) extends LiteralExpr {
   final val TimeRegex = """(\d+)(d|h|m|s|ms)""".r
-  val value: Option[Long] = {
-    Try {
-      expr match {
-        case TimeRegex(time, unit) => {
-          val t = time.toLong
-          unit match {
-            case "d" => t * 24 * 60 * 60 * 1000
-            case "h" => t * 60 * 60 * 1000
-            case "m" => t * 60 * 1000
-            case "s" => t * 1000
-            case "ms" => t
-            case _ => throw new Exception(s"${expr} is invalid time format")
-          }
-        }
-        case _ => throw new Exception(s"${expr} is invalid time format")
-      }
-    } match {
-      case Success(v) => Some(v)
-      case Failure(ex) => throw ex
-    }
-  }
+  val value: Option[Long] = TimeUtil.milliseconds(expr)
   val desc: String = expr
 }
 
