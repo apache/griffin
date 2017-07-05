@@ -14,7 +14,8 @@
     "requirejs": "2.1.22",
     "domReady": "2.0.1",
     "angular-spinner": "0.8.0",
-    "echarts": "3.2.2"
+    "echarts": "3.2.2",
+    "angular-animate": "1.6.4"
   },
   "resolutions": {
     "angular": "1.6.4"
