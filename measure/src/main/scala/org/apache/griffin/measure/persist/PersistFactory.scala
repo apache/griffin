@@ -31,11 +31,11 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
 
   // get the persists configured
   private def getPersist(timeStamp: Long, persistParam: PersistParam): Option[Persist] = {
-    val persistConfig = persistParam.config
+    val config = persistParam.config
     val persistTry = persistParam.persistType match {
-      case HDFS_REGEX() => Try(HdfsPersist(persistConfig, metricName, timeStamp))
-      case HTTP_REGEX() => Try(HttpPersist(persistConfig, metricName, timeStamp))
-      case LOG_REGEX() => Try(LoggerPersist(persistConfig, metricName, timeStamp))
+      case HDFS_REGEX() => Try(HdfsPersist(config, metricName, timeStamp))
+      case HTTP_REGEX() => Try(HttpPersist(config, metricName, timeStamp))
+      case LOG_REGEX() => Try(LoggerPersist(config, metricName, timeStamp))
       case _ => throw new Exception("not supported persist type")
     }
     persistTry match {

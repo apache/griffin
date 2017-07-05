@@ -15,6 +15,7 @@ limitations under the License.
 package org.apache.griffin.measure.rule.expr
 
 import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.spark.sql.types._
 
 import scala.util.{Failure, Success, Try}
 
@@ -27,6 +28,7 @@ trait LiteralExpr extends Expr {
 case class LiteralStringExpr(expr: String) extends LiteralExpr {
   val value: Option[String] = Some(expr)
   val desc: String = s"'${value.getOrElse("")}'"
+  def dataType: DataType = StringType
 }
 
 case class LiteralNumberExpr(expr: String) extends LiteralExpr {
@@ -44,12 +46,14 @@ case class LiteralNumberExpr(expr: String) extends LiteralExpr {
     }
   }
   val desc: String = value.getOrElse("").toString
+  def dataType: DataType = DoubleType
 }
 
 case class LiteralTimeExpr(expr: String) extends LiteralExpr {
   final val TimeRegex = """(\d+)(d|h|m|s|ms)""".r
   val value: Option[Long] = TimeUtil.milliseconds(expr)
   val desc: String = expr
+  def dataType: DataType = LongType
 }
 
 case class LiteralBooleanExpr(expr: String) extends LiteralExpr {
@@ -61,14 +65,17 @@ case class LiteralBooleanExpr(expr: String) extends LiteralExpr {
     case _ => throw new Exception(s"${expr} is invalid boolean")
   }
   val desc: String = value.getOrElse("").toString
+  def dataType: DataType = BooleanType
 }
 
 case class LiteralNullExpr(expr: String) extends LiteralExpr {
   val value: Option[Any] = Some(null)
   val desc: String = "null"
+  def dataType: DataType = NullType
 }
 
 case class LiteralNoneExpr(expr: String) extends LiteralExpr {
   val value: Option[Any] = None
   val desc: String = "none"
+  def dataType: DataType = NullType
 }

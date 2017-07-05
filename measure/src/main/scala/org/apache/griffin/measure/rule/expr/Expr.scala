@@ -14,11 +14,15 @@ limitations under the License.
  */
 package org.apache.griffin.measure.rule.expr
 
+import org.apache.spark.sql.types.DataType
+
 trait Expr extends Serializable with Describable with Cacheable with Calculatable {
 
   protected val _defaultId: String = ExprIdCounter.emptyId
 
   val _id = ExprIdCounter.genId(_defaultId)
+
+  def dataType: DataType
 
   protected def getSubCacheExprs(ds: String): Iterable[Expr] = Nil
   final def getCacheExprs(ds: String): Iterable[Expr] = {

@@ -12,15 +12,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
  */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.rule.func
 
-import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.utils.JsonUtil
 
+class DefaultFunctionDefine extends FunctionDefine {
 
-trait DataConnector extends Loggable with Serializable {
-
-  def available(): Boolean
-
-  def init(): Unit = {}
+  def json(str: String): Map[String, Any] = {
+    try {
+      JsonUtil.toAnyMap(str)
+    } catch {
+      case e: Throwable => throw e
+    }
+  }
 
 }

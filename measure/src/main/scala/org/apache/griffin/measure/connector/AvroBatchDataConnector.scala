@@ -22,6 +22,7 @@ import com.databricks.spark.avro._
 import scala.util.{Success, Try}
 import java.nio.file.{Files, Paths}
 
+import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
 import org.apache.griffin.measure.utils.HdfsUtil
 
@@ -57,36 +58,60 @@ case class AvroBatchDataConnector(sqlContext: SQLContext, config: Map[String, An
     }
   }
 
-  def data(): Try[RDD[(Product, Map[String, Any])]] = {
+  def data(): Try[RDD[(Product, (Map[String, Any], Map[String, Any]))]] = {
     Try {
       loadDataFile.flatMap { row =>
         // generate cache data
-        val cacheExprValueMap: Map[String, Any] = ruleExprs.cacheExprs.foldLeft(constFinalExprValueMap) { (cachedMap, expr) =>
-          ExprValueUtil.genExprValueMap(Some(row), expr, cachedMap)
+        val cacheExprValueMaps = ExprValueUtil.genExprValueMaps(Some(row), ruleExprs.cacheExprs, constFinalExprValueMap)
+        val finalExprValueMaps = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMaps)
+
+        // data info
+        val dataInfoMap: Map[String, Any] = DataInfo.cacheInfoList.map { info =>
+          try {
+            (info.key -> row.getAs[info.T](info.key))
+          } catch {
+            case e: Throwable => info.defWrap
+          }
+        }.toMap
+
+        finalExprValueMaps.flatMap { finalExprValueMap =>
+          val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
+            expr.calculate(finalExprValueMap) match {
+              case Some(v) => Some(v.asInstanceOf[AnyRef])
+              case _ => None
+            }
+          }
+          val key = toTuple(groupbyData)
+
+          Some((key, (finalExprValueMap, dataInfoMap)))
         }
-        val finalExprValueMap = ExprValueUtil.updateExprValueMap(ruleExprs.finalCacheExprs, cacheExprValueMap)
+
+//        val cacheExprValueMap: Map[String, Any] = ruleExprs.cacheExprs.foldLeft(constFinalExprValueMap) { (cachedMap, expr) =>
+//          ExprValueUtil.genExprValueMaps(Some(row), expr, cachedMap)
+//        }
+//        val finalExprValueMap = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMap)
 
         // when clause filter data source
-        val whenResult = ruleExprs.whenClauseExprOpt match {
-          case Some(whenClause) => whenClause.calculate(finalExprValueMap)
-          case _ => None
-        }
-
-        // get groupby data
-        whenResult match {
-          case Some(false) => None
-          case _ => {
-            val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
-              expr.calculate(finalExprValueMap) match {
-                case Some(v) => Some(v.asInstanceOf[AnyRef])
-                case _ => None
-              }
-            }
-            val key = toTuple(groupbyData)
-
-            Some((key, finalExprValueMap))
-          }
-        }
+//        val whenResult = ruleExprs.whenClauseExprOpt match {
+//          case Some(whenClause) => whenClause.calculate(finalExprValueMap)
+//          case _ => None
+//        }
+//
+//        // get groupby data
+//        whenResult match {
+//          case Some(false) => None
+//          case _ => {
+//            val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
+//              expr.calculate(finalExprValueMap) match {
+//                case Some(v) => Some(v.asInstanceOf[AnyRef])
+//                case _ => None
+//              }
+//            }
+//            val key = toTuple(groupbyData)
+//
+//            Some((key, finalExprValueMap))
+//          }
+//        }
       }
     }
   }

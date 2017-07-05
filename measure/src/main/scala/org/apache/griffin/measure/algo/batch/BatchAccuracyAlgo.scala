@@ -39,8 +39,11 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
     Try {
       val metricName = userParam.name
 
+      val sparkParam = envParam.sparkParam
+
       val conf = new SparkConf().setAppName(metricName)
       val sc = new SparkContext(conf)
+      sc.setLogLevel(sparkParam.logLevel)
       val sqlContext = new HiveContext(sc)
 
       // start time
@@ -61,8 +64,8 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val ruleAnalyzer: RuleAnalyzer = RuleAnalyzer(rule)
 
       // const expr value map
-      val constExprValueMap = ExprValueUtil.genExprValueMap(None, ruleAnalyzer.constCacheExprs, Map[String, Any]())
-      val finalConstExprValueMap = ExprValueUtil.updateExprValueMap(ruleAnalyzer.constFinalCacheExprs, constExprValueMap)
+      val constExprValueMap = ExprValueUtil.genExprValueMaps(None, ruleAnalyzer.constCacheExprs, Map[String, Any]())
+      val finalConstExprValueMap = ExprValueUtil.updateExprValueMaps(ruleAnalyzer.constFinalCacheExprs, constExprValueMap)
 
       // data connector
       val sourceDataConnector: BatchDataConnector =

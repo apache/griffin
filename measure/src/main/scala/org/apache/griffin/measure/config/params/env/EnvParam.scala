@@ -21,6 +21,7 @@ import org.apache.griffin.measure.config.params.Param
 @JsonInclude(Include.NON_NULL)
 case class EnvParam( @JsonProperty("spark") sparkParam: SparkParam,
                      @JsonProperty("persist") persistParams: List[PersistParam],
+                     @JsonProperty("info.cache") infoCacheParams: List[InfoCacheParam],
                      @JsonProperty("cleaner") cleanerParam: CleanerParam
                    ) extends Param {
 

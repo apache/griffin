@@ -83,9 +83,9 @@ object AccuracyCore {
       }
       // currently we can not get the mismatch reason, we need to add such information to figure out how it mismatches
       if (matched) (matched, Map[String, Any]())
-      else (matched, Map[String, Any](MismatchInfo.wrap("not matched"), TargetInfo.wrap(target._1)))
+      else (matched, Map[String, Any](MismatchInfo.wrap("not matched")))
     } else {
-      (false, Map[String, Any](MismatchInfo.wrap("invalid to compare"), TargetInfo.wrap(target._1)))
+      (false, Map[String, Any](MismatchInfo.wrap("invalid to compare")))
     }
 
   }

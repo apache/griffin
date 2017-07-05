@@ -15,6 +15,8 @@ limitations under the License.
 package org.apache.griffin.measure.rule.expr
 
 import org.apache.griffin.measure.rule.CalculationUtil._
+import org.apache.griffin.measure.rule.DataTypeCalculationUtil._
+import org.apache.spark.sql.types.DataType
 
 trait MathExpr extends Expr {
 
@@ -22,6 +24,7 @@ trait MathExpr extends Expr {
 
 case class MathFactorExpr(self: Expr) extends MathExpr {
   def calculateOnly(values: Map[String, Any]): Option[Any] = self.calculate(values)
+  def dataType: DataType = self.dataType
   val desc: String = self.desc
   val dataSources: Set[String] = self.dataSources
   override def getSubCacheExprs(ds: String): Iterable[Expr] = {
@@ -45,6 +48,11 @@ case class UnaryMathExpr(oprList: Iterable[String], factor: Expr) extends MathEx
         case this.negOpr => -v
         case _ => None
       }
+    }
+  }
+  def dataType: DataType = {
+    oprList.foldRight(factor.dataType unaryOpr) { (opr, tp) =>
+      tp unaryOpr
     }
   }
   val desc: String = oprList.foldRight(factor.desc) { (prev, ex) => s"${prev}${ex}" }
@@ -76,6 +84,13 @@ case class BinaryMathExpr(first: MathExpr, others: Iterable[(String, MathExpr)])
         case this.modOpr => v % nv
         case _ => None
       }
+    }
+  }
+  def dataType: DataType = {
+    others.foldLeft(first.dataType) { (tp, pair) =>
+      val (opr, next) = pair
+      val ntp = next.dataType
+      tp binaryOpr ntp
     }
   }
   val desc: String = others.foldLeft(first.desc) { (ex, next) => s"${ex} ${next._1} ${next._2.desc}" }

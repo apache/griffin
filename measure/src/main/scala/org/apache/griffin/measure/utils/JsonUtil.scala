@@ -43,4 +43,8 @@ object JsonUtil {
   def fromJson[T: ClassTag](is: InputStream)(implicit m : Manifest[T]): T = {
     mapper.readValue[T](is, classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
+
+  def toAnyMap(json: String) = {
+    mapper.readValue(json, classOf[Map[String, Any]])
+  }
 }

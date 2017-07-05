@@ -25,3 +25,13 @@ case class DataConnectorParam( @JsonProperty("type") conType: String,
                              ) extends Param {
 
 }
+
+object DataConnectorParam {
+  def apply(map: Map[String, Any]): DataConnectorParam = {
+    DataConnectorParam(
+      map.getOrElse("type", "").toString,
+      map.getOrElse("version", "").toString,
+      map.getOrElse("config", Map[String, Any]()).asInstanceOf[Map[String, Any]]
+    )
+  }
+}

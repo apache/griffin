@@ -12,15 +12,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
  */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.cache
 
 import org.apache.griffin.measure.log.Loggable
 
+trait InfoCache extends Loggable with Serializable {
 
-trait DataConnector extends Loggable with Serializable {
-
+  def init(): Unit
   def available(): Boolean
+  def close(): Unit
 
-  def init(): Unit = {}
+  def cacheInfo(info: Map[String, String]): Boolean
+  def readInfo(keys: Iterable[String]): Map[String, String]
+  def deleteInfo(keys: Iterable[String]): Unit
+  def clearInfo(): Unit
+
+  def genLock(): CacheLock
 
 }

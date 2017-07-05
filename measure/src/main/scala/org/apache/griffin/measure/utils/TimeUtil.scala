@@ -42,6 +42,29 @@ object TimeUtil {
         case Failure(ex) => throw ex
       }
     }
+    value
+  }
+
+  def timeToUnit(ms: Long, unit: String): Long = {
+    unit match {
+      case "ms" => ms
+      case "sec" => ms / 1000
+      case "min" => ms / (60 * 1000)
+      case "hour" => ms / (60 * 60 * 1000)
+      case "day" => ms / (24 * 60 * 60 * 1000)
+      case _ => ms / (60 * 1000)
+    }
+  }
+
+  def timeFromUnit(t: Long, unit: String): Long = {
+    unit match {
+      case "ms" => t
+      case "sec" => t * 1000
+      case "min" => t * 60 * 1000
+      case "hour" => t * 60 * 60 * 1000
+      case "day" => t * 24 * 60 * 60 * 1000
+      case _ => t * 60 * 1000
+    }
   }
 
 }

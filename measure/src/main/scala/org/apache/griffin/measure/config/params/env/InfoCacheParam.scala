@@ -12,15 +12,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
  */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.config.params.env
 
-import org.apache.griffin.measure.log.Loggable
+import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
+import com.fasterxml.jackson.annotation.JsonInclude.Include
+import org.apache.griffin.measure.config.params.Param
 
-
-trait DataConnector extends Loggable with Serializable {
-
-  def available(): Boolean
-
-  def init(): Unit = {}
+@JsonInclude(Include.NON_NULL)
+case class InfoCacheParam( @JsonProperty("type") persistType: String,
+                           @JsonProperty("config") config: Map[String, Any]
+                         ) extends Param {
 
 }

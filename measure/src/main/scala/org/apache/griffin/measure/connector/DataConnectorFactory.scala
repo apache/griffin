@@ -32,6 +32,25 @@ object DataConnectorFactory {
 
   val KafkaRegex = """^(?i)kafka$""".r
 
+  def getDataConnector(sqlContext: SQLContext,
+                       ssc: StreamingContext,
+                       dataConnectorParam: DataConnectorParam,
+                       ruleExprs: RuleExprs,
+                       globalFinalCacheMap: Map[String, Any]
+                      ): Try[BatchDataConnector] = {
+    val conType = dataConnectorParam.conType
+    val version = dataConnectorParam.version
+    val config = dataConnectorParam.config
+    Try {
+      conType match {
+        case HiveRegex() => HiveBatchDataConnector(sqlContext, config, ruleExprs, globalFinalCacheMap)
+        case AvroRegex() => AvroBatchDataConnector(sqlContext, config, ruleExprs, globalFinalCacheMap)
+        case KafkaRegex() => KafkaDataConnector(sqlContext, ssc, dataConnectorParam, ruleExprs, globalFinalCacheMap)
+        case _ => throw new Exception("connector creation error!")
+      }
+    }
+  }
+
   def getBatchDataConnector(sqlContext: SQLContext,
                             dataConnectorParam: DataConnectorParam,
                             ruleExprs: RuleExprs,
@@ -44,15 +63,13 @@ object DataConnectorFactory {
       conType match {
         case HiveRegex() => HiveBatchDataConnector(sqlContext, config, ruleExprs, globalFinalCacheMap)
         case AvroRegex() => AvroBatchDataConnector(sqlContext, config, ruleExprs, globalFinalCacheMap)
-        case _ => throw new Exception("connector creation error!")
+        case _ => throw new Exception("batch connector creation error!")
       }
     }
   }
 
   def getStreamingDataConnector(ssc: StreamingContext,
-                                dataConnectorParam: DataConnectorParam,
-                                ruleExprs: RuleExprs,
-                                globalFinalCacheMap: Map[String, Any]
+                                dataConnectorParam: DataConnectorParam
                                ): Try[StreamingDataConnector] = {
     val conType = dataConnectorParam.conType
     val version = dataConnectorParam.version
@@ -62,7 +79,23 @@ object DataConnectorFactory {
         case KafkaRegex() => {
           genKafkaDataConnector(ssc, config)
         }
-        case _ => throw new Exception("connector creation error!")
+        case _ => throw new Exception("streaming connector creation error!")
+      }
+    }
+  }
+
+  def getCacheDataConnector(sqlContext: SQLContext,
+                            dataConnectorParam: DataConnectorParam
+                           ): Try[CacheDataConnector] = {
+    val conType = dataConnectorParam.conType
+    val version = dataConnectorParam.version
+    val config = dataConnectorParam.config
+    Try {
+      conType match {
+        case KafkaRegex() => {
+          TempCacheDataConnector(sqlContext, config)
+        }
+        case _ => throw new Exception("cache connector creation error!")
       }
     }
   }
@@ -74,19 +107,13 @@ object DataConnectorFactory {
     val valueType = config.getOrElse(ValueType, "java.lang.String").toString
     (getClassTag(keyType), getClassTag(valueType)) match {
       case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
-        new KafkaDataConnector(ssc, config) {
+        new KafkaStreamingDataConnector(ssc, config) {
           type K = String
           type KD = StringDecoder
           type V = String
           type VD = StringDecoder
-
-          def stream(): Try[InputDStream[(K, V)]] = Try {
-            val topicSet = topics.split(",").toSet
-            KafkaUtils.createDirectStream[K, V, KD, VD](
-              ssc,
-              kafkaConfig,
-              topicSet
-            )
+          def createDStream(topicSet: Set[String]): InputDStream[(K, V)] = {
+            KafkaUtils.createDirectStream[K, V, KD, VD](ssc, kafkaConfig, topicSet)
           }
         }
       }

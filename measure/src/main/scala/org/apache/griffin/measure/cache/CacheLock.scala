@@ -12,15 +12,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
  */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.cache
+
+import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.log.Loggable
 
+trait CacheLock extends Loggable with Serializable {
 
-trait DataConnector extends Loggable with Serializable {
+  def lock(outtime: Long, unit: TimeUnit): Boolean
 
-  def available(): Boolean
-
-  def init(): Unit = {}
+  def unlock(): Unit
 
 }

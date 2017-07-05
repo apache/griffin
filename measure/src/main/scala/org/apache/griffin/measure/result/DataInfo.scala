@@ -15,39 +15,32 @@ limitations under the License.
 package org.apache.griffin.measure.result
 
 
-sealed trait ResultInfo {
+sealed trait DataInfo {
   type T
   val key: String
-  val tp: String
   def wrap(value: T) = (key -> value)
+  def defWrap() = wrap(dfv)
+  val dfv: T
 }
 
-final case object TimeGroupInfo extends ResultInfo {
+final case object TimeStampInfo extends DataInfo {
   type T = Long
-  val key = "__time__"
-  val tp = "bigint"
+  val key = "_tmst_"
+  val dfv = 0L
 }
 
-final case object NextFireTimeInfo extends ResultInfo {
-  type T = Long
-  val key = "__next_fire_time__"
-  val tp = "bigint"
-}
-
-final case object MismatchInfo extends ResultInfo {
+final case object MismatchInfo extends DataInfo {
   type T = String
-  val key = "__mismatch__"
-  val tp = "string"
+  val key = "_mismatch_"
+  val dfv = ""
 }
 
-final case object TargetInfo extends ResultInfo {
-  type T = Map[String, Any]
-  val key = "__target__"
-  val tp = "map"
-}
-
-final case object ErrorInfo extends ResultInfo {
+final case object ErrorInfo extends DataInfo {
   type T = String
-  val key = "__error__"
-  val tp = "string"
+  val key = "_error_"
+  val dfv = ""
+}
+
+object DataInfo {
+  val cacheInfoList = List(TimeStampInfo, MismatchInfo, ErrorInfo)
 }

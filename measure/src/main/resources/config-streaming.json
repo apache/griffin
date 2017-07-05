@@ -14,7 +14,14 @@
       },
       "topics": "src",
       "key.type": "java.lang.String",
-      "value.type": "java.lang.String"
+      "value.type": "java.lang.String",
+      "cache": {
+        "type": "temp",
+        "config": {
+          "table.name": "source",
+          "info.path": "src"
+        }
+      }
     }
   },
 
@@ -30,7 +37,16 @@
       },
       "topics": "tgt",
       "key.type": "java.lang.String",
-      "value.type": "java.lang.String"
+      "value.type": "java.lang.String",
+      "cache": {
+        "type": "hive",
+        "version": 1.2,
+        "config": {
+          "database": "default",
+          "table.name": "target_table",
+          "info.path": "tgt"
+        }
+      }
     }
   },
 
