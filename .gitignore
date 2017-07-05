@@ -13,7 +13,6 @@ target/**
 *.ear
 target
 service/src/main/resources/public/
-service/src/main/resources/application-dev.properties
 
 
 .project

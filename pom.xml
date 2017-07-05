@@ -25,8 +25,8 @@
     </parent>
 
     <groupId>org.apache.griffin</groupId>
-    <artifactId>griffin</artifactId>
-    <version>0.1.4-incubating-SNAPSHOT</version>
+    <artifactId>griffin-parent</artifactId>
+    <version>0.1.5-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
     <url>http://griffin.incubator.apache.org</url>
@@ -151,7 +151,7 @@
                                 <exclude>**/velocity.log*</exclude>
                                 <exclude>**/*.json</exclude>
                                 <exclude>**/bower_components/**</exclude>
-
+                                <exclude>**/.bowerrc</exclude>
                                 <exclude>**/src/main/resources/public/**</exclude>
                                 <exclude>**/pom.xml.releaseBackup</exclude>
                                 <exclude>**/pom.xml.tag</exclude>
