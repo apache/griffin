@@ -66,11 +66,15 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // const expr value map
       val constExprValueMap = ExprValueUtil.genExprValueMaps(None, ruleAnalyzer.constCacheExprs, Map[String, Any]())
       val finalConstExprValueMap = ExprValueUtil.updateExprValueMaps(ruleAnalyzer.constFinalCacheExprs, constExprValueMap)
+      val finalConstMap = finalConstExprValueMap.headOption match {
+        case Some(m) => m
+        case _ => Map[String, Any]()
+      }
 
       // data connector
       val sourceDataConnector: BatchDataConnector =
         DataConnectorFactory.getBatchDataConnector(sqlContext, userParam.sourceParam,
-          ruleAnalyzer.sourceRuleExprs, finalConstExprValueMap
+          ruleAnalyzer.sourceRuleExprs, finalConstMap
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -80,7 +84,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         }
       val targetDataConnector: BatchDataConnector =
         DataConnectorFactory.getBatchDataConnector(sqlContext, userParam.targetParam,
-          ruleAnalyzer.targetRuleExprs, finalConstExprValueMap
+          ruleAnalyzer.targetRuleExprs, finalConstMap
         ) match {
           case Success(cntr) => {
             if (cntr.available) cntr
@@ -100,11 +104,11 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
 //      }
 
       // get data
-      val sourceData: RDD[(Product, Map[String, Any])] = sourceDataConnector.data() match {
+      val sourceData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = sourceDataConnector.data() match {
         case Success(dt) => dt
         case Failure(ex) => throw ex
       }
-      val targetData: RDD[(Product, Map[String, Any])] = targetDataConnector.data() match {
+      val targetData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = targetDataConnector.data() match {
         case Success(dt) => dt
         case Failure(ex) => throw ex
       }
@@ -139,17 +143,13 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
   }
 
   // calculate accuracy between source data and target data
-  def accuracy(sourceData: RDD[(Product, Map[String, Any])], targetData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzer
-              ): (AccuracyResult, RDD[(Product, (Map[String, Any], Map[String, Any]))], RDD[(Product, (Map[String, Any], Map[String, Any]))]) = {
+  def accuracy(sourceData: RDD[(Product, (Map[String, Any], Map[String, Any]))],
+               targetData: RDD[(Product, (Map[String, Any], Map[String, Any]))],
+               ruleAnalyzer: RuleAnalyzer) = {
+    // 1. cogroup
+    val allKvs = sourceData.cogroup(targetData)
 
-    // 1. wrap data
-    val sourceWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = sourceData.map(r => (r._1, wrapInitData(r._2)))
-    val targetWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = targetData.map(r => (r._1, wrapInitData(r._2)))
-
-    // 2. cogroup
-    val allKvs = sourceWrappedData.cogroup(targetWrappedData)
-
-    // 3. accuracy calculation
+    // 2. accuracy calculation
     val (accuResult, missingRdd, matchedRdd) = AccuracyCore.accuracy(allKvs, ruleAnalyzer)
 
     (accuResult, missingRdd, matchedRdd)

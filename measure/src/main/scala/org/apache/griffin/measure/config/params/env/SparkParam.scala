@@ -22,6 +22,7 @@ import org.apache.griffin.measure.config.params.Param
 case class SparkParam( @JsonProperty("log.level") logLevel: String,
                        @JsonProperty("checkpoint.dir") cpDir: String,
                        @JsonProperty("batch.interval") batchInterval: String,
+                       @JsonProperty("process.interval") processInterval: String,
                        @JsonProperty("config") config: Map[String, Any]
                      ) extends Param {
 

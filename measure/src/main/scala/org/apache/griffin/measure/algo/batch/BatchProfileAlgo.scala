@@ -66,11 +66,15 @@ case class BatchProfileAlgo(allParam: AllParam) extends ProfileAlgo {
       // const expr value map
       val constExprValueMap = ExprValueUtil.genExprValueMaps(None, ruleAnalyzer.constCacheExprs, Map[String, Any]())
       val finalConstExprValueMap = ExprValueUtil.updateExprValueMaps(ruleAnalyzer.constFinalCacheExprs, constExprValueMap)
+      val finalConstMap = finalConstExprValueMap.headOption match {
+        case Some(m) => m
+        case _ => Map[String, Any]()
+      }
 
       // data connector
       val sourceDataConnector: BatchDataConnector =
       DataConnectorFactory.getBatchDataConnector(sqlContext, userParam.sourceParam,
-        ruleAnalyzer.sourceRuleExprs, finalConstExprValueMap
+        ruleAnalyzer.sourceRuleExprs, finalConstMap
       ) match {
         case Success(cntr) => {
           if (cntr.available) cntr
@@ -86,7 +90,7 @@ case class BatchProfileAlgo(allParam: AllParam) extends ProfileAlgo {
       //      }
 
       // get data
-      val sourceData: RDD[(Product, Map[String, Any])] = sourceDataConnector.data() match {
+      val sourceData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = sourceDataConnector.data() match {
         case Success(dt) => dt
         case Failure(ex) => throw ex
       }
@@ -120,14 +124,10 @@ case class BatchProfileAlgo(allParam: AllParam) extends ProfileAlgo {
   }
 
   // calculate profile from source data
-  def profile(sourceData: RDD[(Product, Map[String, Any])], ruleAnalyzer: RuleAnalyzer
-              ): (ProfileResult, RDD[(Product, (Map[String, Any], Map[String, Any]))], RDD[(Product, (Map[String, Any], Map[String, Any]))]) = {
-
-    // 1. wrap data
-    val sourceWrappedData: RDD[(Product, (Map[String, Any], Map[String, Any]))] = sourceData.map(r => (r._1, wrapInitData(r._2)))
-
-    // 2. profile calculation
-    val (profileResult, missingRdd, matchedRdd) = ProfileCore.profile(sourceWrappedData, ruleAnalyzer)
+  def profile(sourceData: RDD[(Product, (Map[String, Any], Map[String, Any]))], ruleAnalyzer: RuleAnalyzer
+              ) = {
+    // 1. profile calculation
+    val (profileResult, missingRdd, matchedRdd) = ProfileCore.profile(sourceData, ruleAnalyzer)
 
     (profileResult, missingRdd, matchedRdd)
   }

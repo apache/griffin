@@ -14,6 +14,8 @@ limitations under the License.
  */
 package org.apache.griffin.measure.rule.expr
 
+import org.apache.spark.sql.types.DataType
+
 trait SelectExpr extends Expr {
   def calculateOnly(values: Map[String, Any]): Option[Any] = None
 }

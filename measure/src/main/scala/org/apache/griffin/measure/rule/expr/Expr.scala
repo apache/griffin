@@ -22,8 +22,6 @@ trait Expr extends Serializable with Describable with Cacheable with Calculatabl
 
   val _id = ExprIdCounter.genId(_defaultId)
 
-  def dataType: DataType
-
   protected def getSubCacheExprs(ds: String): Iterable[Expr] = Nil
   final def getCacheExprs(ds: String): Iterable[Expr] = {
     if (cacheable(ds)) getSubCacheExprs(ds).toList :+ this else getSubCacheExprs(ds)

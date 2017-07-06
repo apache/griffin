@@ -19,7 +19,6 @@ import org.apache.spark.sql.types.{BooleanType, DataType}
 
 trait LogicalExpr extends Expr with AnalyzableExpr {
   override def cacheUnit: Boolean = true
-  def dataType: DataType = BooleanType
 }
 
 case class LogicalSimpleExpr(expr: MathExpr) extends LogicalExpr {

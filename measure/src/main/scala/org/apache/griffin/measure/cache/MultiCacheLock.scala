@@ -14,19 +14,22 @@ limitations under the License.
  */
 package org.apache.griffin.measure.cache
 
-import org.apache.griffin.measure.log.Loggable
+import java.util.concurrent.TimeUnit
 
-trait InfoCache extends Loggable with Serializable {
+case class MultiCacheLock(cacheLocks: List[CacheLock]) extends CacheLock {
 
-  def init(): Unit
-  def available(): Boolean
-  def close(): Unit
+  def lock(outtime: Long, unit: TimeUnit): Boolean = {
+    cacheLocks.headOption match {
+      case Some(cl) => cl.lock(outtime, unit)
+      case None => true
+    }
+  }
 
-  def cacheInfo(info: Map[String, String]): Boolean
-  def readInfo(keys: Iterable[String]): Map[String, String]
-  def deleteInfo(keys: Iterable[String]): Unit
-  def clearInfo(): Unit
-
-  def genLock(s: String): CacheLock
+  def unlock(): Unit = {
+    cacheLocks.headOption match {
+      case Some(cl) => cl.unlock
+      case None => {}
+    }
+  }
 
 }
