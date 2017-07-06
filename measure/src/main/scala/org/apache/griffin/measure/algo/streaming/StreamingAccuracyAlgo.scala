@@ -108,8 +108,8 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       InfoCacheInstance.init
 
       // process thread
-      case class Process(name: String) extends Runnable {
-        val lock = InfoCacheInstance.genLock(name)
+      case class Process() extends Runnable {
+        val lock = InfoCacheInstance.genLock("process")
         def run(): Unit = {
           val locked = lock.lock(5, TimeUnit.SECONDS)
           if (locked) {
@@ -153,7 +153,7 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         case Some(interval) => interval
         case _ => throw new Exception("invalid batch interval")
       }
-      val process = StreamingProcess(processInterval, Process(metricName))
+      val process = StreamingProcess(processInterval, Process())
 
       process.startup()
 

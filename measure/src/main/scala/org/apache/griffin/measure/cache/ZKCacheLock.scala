@@ -34,7 +34,7 @@ case class ZKCacheLock(@transient mutex: InterProcessMutex) extends CacheLock {
 
   def unlock(): Unit = {
     try {
-      mutex.release
+      if (mutex.isAcquiredInThisProcess) mutex.release
     } catch {
       case e: Throwable => {
         error(s"unlock error: ${e.getMessage}")

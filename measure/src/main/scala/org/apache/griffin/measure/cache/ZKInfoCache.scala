@@ -23,7 +23,7 @@ import org.apache.zookeeper.CreateMode
 case class ZKInfoCache(config: Map[String, Any], metricName: String) extends InfoCache {
 
   val Hosts = "hosts"
-  val ParentPath = "parent.path"
+  val Namespace = "namespace"
   val Mode = "mode"
   val InitClear = "init.clear"
   val CloseClear = "close.clear"
@@ -35,7 +35,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
   final val separator = "/"
 
   val hosts = config.getOrElse(Hosts, "").toString
-  val parentPath = config.getOrElse(ParentPath, separator).toString
+  val namespace = config.getOrElse(Namespace, "").toString
   val mode: CreateMode = config.get(Mode) match {
     case Some(s: String) => s match {
       case PersistRegex() => CreateMode.PERSISTENT
@@ -54,11 +54,16 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
   }
   val lockPath = config.getOrElse(LockPath, "lock").toString
 
-  private val client: CuratorFramework = CuratorFrameworkFactory.newClient(
-    Hosts, new ExponentialBackoffRetry(1000, 3)).usingNamespace(cacheParentPath)
+  private val cacheNamespace: String = if (namespace.isEmpty) metricName else namespace + separator + metricName
+  private val builder = CuratorFrameworkFactory.builder()
+    .connectString("localhost:2181")
+    .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+    .namespace(cacheNamespace)
+  private val client: CuratorFramework = builder.build
 
   def init(): Unit = {
     client.start()
+    client.usingNamespace(cacheNamespace)
     if (initClear) {
       clearInfo
     }
@@ -87,7 +92,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
 
   def readInfo(keys: Iterable[String]): Map[String, String] = {
     keys.flatMap { key =>
-      read(key) match {
+      read(path(key)) match {
         case Some(v) => Some((key, v))
         case _ => None
       }
@@ -103,21 +108,12 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
   }
 
   def genLock(s: String): ZKCacheLock = {
-    val lpt = if (s.isEmpty) path(lockPath) else validHeadPath(lockPath) + s
+    val lpt = if (s.isEmpty) path(lockPath) else path(lockPath) + separator + s
     ZKCacheLock(new InterProcessMutex(client, lpt))
   }
 
   private def path(k: String): String = {
     if (k.startsWith(separator)) k else separator + k
-  }
-
-  private def validHeadPath(head: String): String = {
-    val hd = if (head.startsWith(separator)) head else separator + head
-    if (hd.endsWith(separator)) hd else hd + separator
-  }
-
-  private def cacheParentPath: String = {
-    validHeadPath(parentPath) + metricName
   }
 
   private def createOrUpdate(path: String, content: String): Boolean = {
