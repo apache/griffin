@@ -39,11 +39,16 @@ define(['./module'], function (controllers) {
 
         if(start == 0 && !$scope.rowCollection){
          $http.get(allJobs).then(function successCallback(data) {
+
+           angular.forEach(data.data,function(job){
+              job.name = job.jobName.split('-')[0] + '-' + job.jobName.split('-')[1] + '-' + job.jobName.split('-')[2];
+              job.createTime = job.jobName.split('-')[3];
+           });
            data.data.sort(function(a,b){
-            var dateA = Date.parse(new Date(a.jobName.split('-')[3]))/1000;
-            var dateB = Date.parse(new Date(b.jobName.split('-')[3]))/1000;
+            var dateA = a.createTime;
+            var dateB = b.createTime;
                 return -(dateA-dateB);
-              });
+            });
            originalRowCollection = angular.copy(data.data);
            $scope.rowCollection = angular.copy(data.data);
 
