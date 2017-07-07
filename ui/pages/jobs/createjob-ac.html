@@ -49,17 +49,17 @@ under the License.
                                     </div>
                                 </div>
                                 <div class="col-md-12 col-lg-12 col-sm-12">
-                                    <div class="form-group">
+                                    <div class="form-group" ng-class="{'has-error':Form.targetPat.$dirty&&Form.targetPat.$invalid, 'has-success':Form.targetPat.$valid}">
                                         <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                                            Target Partition:
+                                            Target Partition<span class="symbol required"></span>:
                                         </label>
-
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                            <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'." ng-pattern="/YYYYMMdd-HH/i" ng-maxlength='11'>
+                                            <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'." 
+                                            required ng-pattern="/YYYYMMdd-HH/i" ng-maxlength='11' name="targetPat">
+                                            <span class="error text-small block " ng-if="Form.targetPat.$dirty && Form.targetPat.$error.pattern">Please input partition like 'YYYYMMdd-HH'</span>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="col-md-12 col-lg-12 col-sm-12">
                                     <div class="form-group">
                                         <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
