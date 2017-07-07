@@ -37,12 +37,10 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
   private val sourceGroupbyExprs: Seq[Expr] = groupbyExprPairs.map(_._1)
   private val targetGroupbyExprs: Seq[Expr] = groupbyExprPairs.map(_._2)
 
-  private val whenClauseExprOpt: Option[LogicalExpr] = rule.getWhenClauseExpr
-
   val sourceRuleExprs: RuleExprs = RuleExprs(sourceGroupbyExprs, sourceCacheExprs,
-    sourceFinalCacheExprs, sourcePersistExprs, whenClauseExprOpt)
+    sourceFinalCacheExprs, sourcePersistExprs)
   val targetRuleExprs: RuleExprs = RuleExprs(targetGroupbyExprs, targetCacheExprs,
-    targetFinalCacheExprs, targetPersistExprs, whenClauseExprOpt)
+    targetFinalCacheExprs, targetPersistExprs)
 
 }
 
@@ -61,8 +59,7 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
 case class RuleExprs(groupbyExprs: Seq[Expr],
                      cacheExprs: Iterable[Expr],
                      finalCacheExprs: Iterable[Expr],
-                     persistExprs: Iterable[Expr],
-                     whenClauseExprOpt: Option[LogicalExpr]
+                     persistExprs: Iterable[Expr]
                     ) {
   // for example: for a rule "$source.name = $target.name AND $source.age < $target.age + (3 * 4)"
   // in this rule, for the target data source, the targetRuleExprs looks like below

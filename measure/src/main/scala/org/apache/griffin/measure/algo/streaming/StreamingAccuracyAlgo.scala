@@ -25,7 +25,7 @@ import org.apache.griffin.measure.connector._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.result.AccuracyResult
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
-import org.apache.griffin.measure.rule.expr.{Expr, StatementExpr}
+import org.apache.griffin.measure.rule.expr._
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext

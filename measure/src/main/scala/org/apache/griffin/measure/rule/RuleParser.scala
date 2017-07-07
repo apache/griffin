@@ -226,11 +226,14 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   // <logical-statement> ::= [NOT] <logical-expression> [(AND | OR) <logical-expression>]+ | "(" <logical-statement> ")"
   def logicalStatement: Parser[LogicalExpr] = orLogicalStatement
 
+  // -- clause statement --
+  def whereClause: Parser[WhereClauseExpr] = logicalStatement ^^ { WhereClauseExpr(_) }
+  def whenClause: Parser[WhenClauseExpr] = WhenKeywords ~> logicalStatement ^^ { WhenClauseExpr(_) }
+
   // -- rule --
   // <rule> ::= <logical-statement> [WHEN <logical-statement>]
-  def rule: Parser[StatementExpr] = logicalStatement ~ opt(WhenKeywords ~> logicalStatement) ^^ {
-    case ls ~ Some(ws) => WhenClauseStatementExpr(ls, ws)
-    case ls ~ _ => SimpleStatementExpr(ls)
+  def rule: Parser[StatementExpr] = whereClause ~ opt(whenClause) ^^ {
+    case a ~ b => StatementExpr(a, b)
   }
 
 }

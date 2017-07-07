@@ -41,8 +41,6 @@ class RuleAnalyzerTest extends FunSuite with BeforeAndAfter with Matchers {
       "$source['name']", "$source['age']", "$source['born']", "$source['born'] > 6 - 2 * 2"))
     ruleAnalyzer.sourceRuleExprs.persistExprs.map(_.desc) should be (List[String](
       "$source['name']", "$source['age']", "$source['born']"))
-    ruleAnalyzer.sourceRuleExprs.whenClauseExprOpt.map(_.desc) should be (Some(
-      "$source['born'] > 6 - 2 * 2"))
 
     ruleAnalyzer.targetRuleExprs.groupbyExprs.map(_.desc) should be (List[String](
       "$target['name']", "$target['age'] + 2 * 5"))
@@ -52,8 +50,6 @@ class RuleAnalyzerTest extends FunSuite with BeforeAndAfter with Matchers {
       "$target['name']", "$target['age']", "$target['age'] + 2 * 5"))
     ruleAnalyzer.targetRuleExprs.persistExprs.map(_.desc) should be (List[String](
       "$target['name']", "$target['age']"))
-    ruleAnalyzer.targetRuleExprs.whenClauseExprOpt.map(_.desc) should be (Some(
-      "$source['born'] > 6 - 2 * 2"))
 
   }
 

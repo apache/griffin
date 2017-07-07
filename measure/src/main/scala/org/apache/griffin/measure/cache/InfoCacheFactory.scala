@@ -15,7 +15,7 @@ case class InfoCacheFactory(infoCacheParams: Iterable[InfoCacheParam], metricNam
       case _ => throw new Exception("not supported info cache type")
     }
     infoCacheTry match {
-      case Success(infoCache) if (infoCache.available) => Some(infoCache)
+      case Success(infoCache) => Some(infoCache)
       case _ => None
     }
   }
