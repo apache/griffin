@@ -39,6 +39,7 @@ define(['./module'], function (controllers) {
 
         if(start == 0 && !$scope.rowCollection){
          $http.get(allJobs).then(function successCallback(data) {
+
            angular.forEach(data.data,function(job){
               job.name = job.jobName.split('-')[0] + '-' + job.jobName.split('-')[1] + '-' + job.jobName.split('-')[2];
               job.createTime = job.jobName.split('-')[3];
