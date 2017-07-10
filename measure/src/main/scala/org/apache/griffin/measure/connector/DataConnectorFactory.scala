@@ -109,6 +109,13 @@ object DataConnectorFactory {
     val ValueType = "value.type"
     val keyType = config.getOrElse(KeyType, "java.lang.String").toString
     val valueType = config.getOrElse(ValueType, "java.lang.String").toString
+    val KafkaConfig = "kafka.config"
+    val Topics = "topics"
+    val kafkaConfig = config.get(KafkaConfig) match {
+      case Some(map: Map[String, Any]) => map.mapValues(_.toString)
+      case _ => Map[String, String]()
+    }
+    val topics = config.getOrElse(Topics, "").toString
     (getClassTag(keyType), getClassTag(valueType)) match {
       case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
         new KafkaStreamingDataConnector(ssc, config) {

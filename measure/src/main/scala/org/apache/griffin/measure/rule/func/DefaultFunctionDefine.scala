@@ -22,9 +22,12 @@ import org.apache.griffin.measure.utils.JsonUtil
 
 class DefaultFunctionDefine extends FunctionDefine {
 
-  def json(str: String): Map[String, Any] = {
+  def json(strOpt: Option[_]): Map[String, Any] = {
     try {
-      JsonUtil.toAnyMap(str)
+      strOpt match {
+        case Some(str: String) => JsonUtil.toAnyMap(str)
+        case _ => throw new Exception("json function param should be string")
+      }
     } catch {
       case e: Throwable => throw e
     }

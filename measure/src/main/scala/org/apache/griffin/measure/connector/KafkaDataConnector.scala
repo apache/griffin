@@ -78,7 +78,8 @@ case class KafkaDataConnector(sqlContext: SQLContext, ssc: StreamingContext, dat
 //  }
 
   def available(): Boolean = {
-    kafkaStreamingDataConnector.available && cacheDataConnector.available
+//    kafkaStreamingDataConnector.available && cacheDataConnector.available
+    cacheDataConnector.available
   }
 
   override def init(): Unit = {

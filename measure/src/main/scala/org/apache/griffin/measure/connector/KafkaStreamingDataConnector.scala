@@ -35,7 +35,7 @@ abstract class KafkaStreamingDataConnector(ssc: StreamingContext, config: Map[St
   val Topics = "topics"
 
   val kafkaConfig = config.get(KafkaConfig) match {
-    case map: Map[String, Any] => map.mapValues(_.toString)
+    case Some(map: Map[String, Any]) => map.mapValues(_.toString).map(identity)
     case _ => Map[String, String]()
   }
   val topics = config.getOrElse(Topics, "").toString

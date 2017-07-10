@@ -7,12 +7,12 @@
     "version": "0.8",
     "config": {
       "kafka.config": {
-        "bootstrap.servers": "a.b.c.d:9092",
+        "bootstrap.servers": "localhost:9092",
         "group.id": "group1",
         "auto.offset.reset": "smallest",
         "auto.commit.enable": "false",
       },
-      "topics": "src",
+      "topics": "sss",
       "key.type": "java.lang.String",
       "value.type": "java.lang.String",
       "cache": {
@@ -30,12 +30,12 @@
     "version": "0.8",
     "config": {
       "kafka.config": {
-        "bootstrap.servers": "a.b.c.d:9092",
+        "bootstrap.servers": "localhost:9092",
         "group.id": "group1",
         "auto.offset.reset": "smallest",
         "auto.commit.enable": "false",
       },
-      "topics": "tgt",
+      "topics": "ttt",
       "key.type": "java.lang.String",
       "value.type": "java.lang.String",
       "cache": {

@@ -26,79 +26,6 @@ import scala.util.{Success, Try}
 
 object ExprValueUtil {
 
-//  private def calcExprValue(originDatas: Seq[Option[Any]], expr: Expr, existExprValueMap: Map[String, Any]): Seq[Option[Any]] = {
-//    originDatas.flatMap { originData =>
-//      calcExprValue(originData, expr, existExprValueMap)
-//    }
-//  }
-
-  // from origin data such as a Row of DataFrame, with existed expr value map, calculate related expression, get the expression value
-  // for now, one expr only get one value, not supporting one expr get multiple values
-  // params:
-  // - originData: the origin data such as a Row of DataFrame
-  // - expr: the expression to be calculated
-  // - existExprValueMap: existed expression value map, which might be used to get some existed expression value during calculation
-  // output: the calculated expression values
-//  private def calcExprValue(originData: Option[Any], expr: Expr, existExprValueMap: Map[String, Any]): Seq[Option[Any]] = {
-//    Try {
-//      expr match {
-//        case selection: SelectionExpr => {
-//          selection.selectors.foldLeft(Seq(originData)) { (datas, selector) =>
-//            calcExprValue(datas, selector, existExprValueMap)
-//          }
-//        }
-//        case selector: IndexFieldRangeSelectExpr => {
-//          originData match {
-//            case Some(row: Row) => {
-//              if (selector.fields.size == 1) {
-//                selector.fields.head match {
-//                  case i: IndexDesc => Seq(Some(row.getAs[Any](i.index)))
-//                  case f: FieldDesc => Seq(Some(row.getAs[Any](f.field)))
-//                  case _ => Nil
-//                }
-//              } else Nil
-//            }
-//            case Some(d: Map[String, Any]) => {
-//              selector.fields.foldLeft(Seq[Option[Any]]()) { (results, field) =>
-//                results ++ (field match {
-//                  case f: FieldDesc => opt2Seq(d.get(f.field))
-//                  case a: AllFieldsDesc => d.values.map(Some(_)).toSeq
-//                  case _ => Nil
-//                })
-//              }
-//            }
-//            case Some(d: Seq[Any]) => {
-//              selector.fields.foldLeft(Seq[Option[Any]]()) { (results, field) =>
-//                results ++ (field match {
-//                  case i: IndexDesc => opt2Seq(try { Some(d(i.index)) } catch { case _ => None })
-//                  case a: AllFieldsDesc => d.map(Some(_))
-//                  case r: FieldRangeDesc => Nil   // not done
-//                  case _ => Nil
-//                })
-//              }
-//            }
-//            case _ => Nil
-//          }
-//        }
-//        case selector: FunctionOperationExpr => {
-//          val args: Array[Option[Any]] = selector.args.map { arg =>
-//            arg.calculate(existExprValueMap)
-//          }.toArray
-//          originData match {
-//            case Some(d: String) => {
-//              FunctionUtil.invoke(selector.func, Some(d) +: args)
-//            }
-//            case _ => Nil
-//          }
-//        }
-//        case _ => Seq(expr.calculate(existExprValueMap))
-//      }
-//    } match {
-//      case Success(v) => v
-//      case _ => Nil
-//    }
-//  }
-
   private def append(path: List[String], step: String): List[String] = {
     path :+ step
   }
@@ -204,7 +131,7 @@ object ExprValueUtil {
   }
 
   private def calcExprsValues(data: Option[Any], exprs: Iterable[Expr], existExprValueMap: Map[String, Any]): List[Map[String, Any]] = {
-    val schemaValues: Map[String, List[(List[String], Any)]] = exprs.map { expr =>
+    val selectionValues: Map[String, List[(List[String], Any)]] = exprs.map { expr =>
       (expr._id, calcExprValues((Nil, data) :: Nil, expr, existExprValueMap).flatMap { pair =>
         pair._2 match {
           case Some(v) => Some((pair._1, v))
@@ -212,43 +139,28 @@ object ExprValueUtil {
         }
       })
     }.toMap
-    SchemaValueCombineUtil.cartesian(schemaValues)
+    SchemaValueCombineUtil.cartesian(selectionValues)
   }
-
-  // try to calculate expr from data and initExprValueMap, generate new expression value maps
-  // depends on origin data and existed expr value map
-//  def genExprValueMap(data: Option[Any], expr: Expr, initExprValueMap: Map[String, Any]): Seq[Map[String, Any]] = {
-//    val valueOpts = calcExprValues(data, expr, initExprValueMap)
-//    valueOpts.map { valueOpt =>
-//      if (valueOpt.nonEmpty) {
-//        initExprValueMap + (expr._id -> valueOpt.get)
-//      } else initExprValueMap
-//    }
-//  }
 
   // try to calculate some exprs from data and initExprValueMap, generate a new expression value map
   // depends on origin data and existed expr value map
   def genExprValueMaps(data: Option[Any], exprs: Iterable[Expr], initExprValueMap: Map[String, Any]): List[Map[String, Any]] = {
-    val valueMaps = calcExprsValues(data, exprs, initExprValueMap)
-
-    valueMaps.map { valueMap =>
-      initExprValueMap ++ valueMap
-    }
+    val (selections, nonSelections) = exprs.partition(_.isInstanceOf[SelectionExpr])
+    val valueMaps = calcExprsValues(data, selections, initExprValueMap)
+    updateExprValueMaps(nonSelections, valueMaps)
   }
 
   // with exprValueMap, calculate expressions, update the expression value map
   // only depends on existed expr value map, only calculation, not need origin data
   def updateExprValueMaps(exprs: Iterable[Expr], exprValueMaps: List[Map[String, Any]]): List[Map[String, Any]] = {
-    exprValueMaps.flatMap { exprValueMap =>
-      genExprValueMaps(None, exprs, exprValueMap)
+    exprValueMaps.map { valueMap =>
+      exprs.foldLeft(valueMap) { (em, expr) =>
+        expr.calculate(em) match {
+          case Some(v) => em + (expr._id -> v)
+          case _ => em
+        }
+      }
     }
   }
-
-//  private def opt2Seq(opt: Option[Any]): Seq[Option[Any]] = {
-//    opt match {
-//      case Some(v) => Seq(opt)
-//      case _ => Nil
-//    }
-//  }
 
 }

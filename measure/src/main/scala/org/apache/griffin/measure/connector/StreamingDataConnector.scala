@@ -23,7 +23,7 @@ import org.apache.spark.streaming.dstream.InputDStream
 import scala.util.Try
 
 
-trait StreamingDataConnector extends DataConnector {
+trait StreamingDataConnector {
 
   type K
   type V

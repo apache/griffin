@@ -34,7 +34,7 @@ object FunctionUtil extends Loggable {
     for (cls <- classes) {
       try {
         val clz: Class[_] = Class.forName(cls)
-        if (clz.isAssignableFrom(classOf[FunctionDefine])) {
+        if (classOf[FunctionDefine].isAssignableFrom(clz)) {
           functionDefines += (cls -> clz.newInstance.asInstanceOf[FunctionDefine])
         } else {
           warn(s"${cls} register fails: ${cls} is not sub class of ${classOf[FunctionDefine].getCanonicalName}")
@@ -46,16 +46,17 @@ object FunctionUtil extends Loggable {
   }
 
   def invoke(methodName: String, params: Array[Option[Any]]): Seq[Option[Any]] = {
-    val paramTypes = params.map { param =>
-      try {
-        param match {
-          case Some(v) => v.getClass
-          case _ => classOf[UnKnown]
-        }
-      } catch {
-        case e: Throwable => classOf[UnKnown]
-      }
-    }
+//    val paramTypes = params.map { param =>
+//      try {
+//        param match {
+//          case Some(v) => v.getClass
+//          case _ => classOf[UnKnown]
+//        }
+//      } catch {
+//        case e: Throwable => classOf[UnKnown]
+//      }
+//    }
+    val paramTypes = params.map(a => classOf[Option[_]])
 
     functionDefines.values.foldLeft(Nil: Seq[Option[Any]]) { (res, funcDef) =>
       if (res.isEmpty) {
