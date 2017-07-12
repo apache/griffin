@@ -24,18 +24,6 @@ object SchemaValueCombineUtil {
   def cartesian[T](valuesMap: Map[String, List[(List[String], T)]]): List[Map[String, T]] = {
     val fieldsList: List[(String, List[(List[String], T)])] = valuesMap.toList
 
-    // wrong algorithm: assume the lists have same size
-//    val minSize = fieldsList.map(_._2.size).min
-//    val idxes = (0 to (minSize - 1)).toList
-//    idxes.map { idx =>
-//      fieldsList.foldLeft(Map[String, T]()) { (map, pair) =>
-//        val (key, value) = pair
-//        map + (key -> value(idx)._2)
-//      }
-//    }
-
-    // following is correct algorithm
-
     // List[key, List[(path, value)]] to List[(path, (key, value))]
     val valueList: List[(List[String], (String, T))] = fieldsList.flatMap { fields =>
       val (key, list) = fields
@@ -52,36 +40,16 @@ object SchemaValueCombineUtil {
     val valueMapList: List[Map[String, _]] = TreeUtil.mergeDatasIntoMap(root, Nil)
 
     // 3. simple change
-    valueMapList.map { mp =>
+    val result = valueMapList.map { mp =>
       mp.map { kv =>
         val (k, v) = kv
         (k, v.asInstanceOf[T])
       }
     }
 
-  }
+    result
 
-//  def cartesianTest[T](valuesMap: Map[String, List[(List[String], T)]]): Unit = {
-//    val fieldsList: List[(String, List[(List[String], T)])] = valuesMap.toList
-//
-//    // List[key, List[(path, value)]] to List[(path, (key, value))]
-//    val valueList: List[(List[String], (String, T))] = fieldsList.flatMap { fields =>
-//      val (key, list) = fields
-//      list.map { pv =>
-//        val (path, value) = pv
-//        (path, (key, value))
-//      }
-//    }
-//
-//    // 1. generate tree from value list, and return root node
-//    val root = TreeUtil.genRootTree(valueList)
-//
-//    // 2. deep first visit tree from root, merge datas into value map list
-//    val valueMapList: List[Map[String, _]] = TreeUtil.mergeDatasIntoMap(root, Nil)
-//
-//    valueMapList.foreach(println)
-//
-//  }
+  }
 
 
   case class TreeNode(key: String, var datas: List[(String, _)]) {
@@ -94,7 +62,6 @@ object SchemaValueCombineUtil {
     private def genTree(path: List[String], datas: List[(String, _)]): Option[TreeNode] = {
       path match {
         case Nil => None
-//        case head :: Nil => Some(TreeNode(datas))
         case head :: tail => {
           genTree(tail, datas) match {
             case Some(child) => {
@@ -161,12 +128,17 @@ object SchemaValueCombineUtil {
     def mergeDatasIntoMap(root: TreeNode, mapDatas: List[Map[String, _]]): List[Map[String, _]] = {
       val childrenKeysMapDatas = root.children.foldLeft(Map[List[String], List[Map[String, _]]]()) { (keysMap, child) =>
         val childMdts = mergeDatasIntoMap(child, List[Map[String, _]]())
-        val keys = keysList(childMdts)
-        val afterList = keysMap.get(keys) match {
-          case Some(list) => add(list, childMdts)
-          case _ => childMdts
+        childMdts match {
+          case Nil => keysMap
+          case _ => {
+            val keys = keysList(childMdts)
+            val afterList = keysMap.get(keys) match {
+              case Some(list) => add(list, childMdts)
+              case _ => childMdts
+            }
+            keysMap + (keys -> afterList)
+          }
         }
-        keysMap + (keys -> afterList)
       }
       val childrenMergeMaps = childrenKeysMapDatas.values.foldLeft(List[Map[String, _]]()) { (originList, list) =>
         originList match {
@@ -174,7 +146,8 @@ object SchemaValueCombineUtil {
           case _ => multiply(originList, list)
         }
       }
-      mergeNodeChildrenDatasIntoMap(root, childrenMergeMaps)
+      val result = mergeNodeChildrenDatasIntoMap(root, childrenMergeMaps)
+      result
     }
 
     private def mergeNodeChildrenDatasIntoMap(node: TreeNode, mapDatas: List[Map[String, _]]): List[Map[String, _]] = {

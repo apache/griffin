@@ -201,8 +201,9 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
   }
 
   test ("rule calculation") {
-    val rules = "$source.json().name = 's2' AND $source.json().age = 32"
-//    val rules = "$source.json() = 'aaa'"
+//    val rules = "$source.json().name = 's2' and $source.json().age[*] = 32"
+    val rules = "$source.json().items[*] = 202 AND $source.json().age[*] = 32 AND $source.json().df['a' = 1].b = 3"
+//    val rules = "$source.json().df[0].a = 1"
     val ep = EvaluateRuleParam(1, rules)
 
     val ruleFactory = RuleFactory(ep)
@@ -213,9 +214,9 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
     val constFinalExprValueMap = Map[String, Any]()
 
     val data = List[String](
-      ("""{"name": "s1", "age": 22}"""),
-      ("""{"name": "s2", "age": 32}"""),
-      ("""{"name": "s3", "age": 42}""")
+      ("""{"name": "s1", "age": [22, 23], "items": [102, 104, 106], "df": [{"a": 1, "b": 3}, {"b": 2}]}"""),
+      ("""{"name": "s2", "age": [32, 33], "items": [202, 204, 206], "df": [{"a": 1, "b": 4}, {"b": 2}]}"""),
+      ("""{"name": "s3", "age": [42, 43], "items": [302, 304, 306], "df": [{"a": 1, "b": 5}, {"b": 2}]}""")
     )
 
     def str(expr: Expr) = {
@@ -242,15 +243,15 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
     println(finalConstMap)
 
     println("====")
-    data.foreach { msg =>
+    val valueMaps = data.flatMap { msg =>
       val cacheExprValueMaps = ExprValueUtil.genExprValueMaps(Some(msg), ruleExprs.cacheExprs, finalConstMap)
       val finalExprValueMaps = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMaps)
 
-//      finalExprValueMaps.map { vm =>
-//        vm ++ dataInfoMap
-//      }
-      println(finalExprValueMaps)
+      finalExprValueMaps
     }
+
+    valueMaps.foreach(println)
+    println(valueMaps.size)
 
   }
 

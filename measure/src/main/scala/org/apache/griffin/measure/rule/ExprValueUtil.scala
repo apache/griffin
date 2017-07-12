@@ -120,6 +120,17 @@ object ExprValueUtil {
             }
           }
         }
+//        case selector: FilterSelectExpr => {
+//          val field = selector.field
+//          pathDatas.flatMap { pathData =>
+//            val (path, data) = pathData
+//            data match {
+//              case Some(row: Row) => {
+//                ;
+//              }
+//            }
+//          }
+//        }
         case _ => {
           (expr.desc :: Nil, expr.calculate(existExprValueMap)) :: Nil
         }
