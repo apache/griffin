@@ -30,6 +30,30 @@ object ExprValueUtil {
     path :+ step
   }
 
+  private def getSingleValue(data: Option[Any], desc: FieldDescOnly): Option[Any] = {
+    data match {
+      case Some(row: Row) => {
+        desc match {
+          case i: IndexDesc => try { Some(row.getAs[Any](i.index)) } catch { case _ => None }
+          case f: FieldDesc => try { Some(row.getAs[Any](f.field)) } catch { case _ => None }
+          case _ => None
+        }
+      }
+      case Some(d: Map[String, Any]) => {
+        desc match {
+          case f: FieldDesc => d.get(f.field)
+          case _ => None
+        }
+      }
+      case Some(d: Seq[Any]) => {
+        desc match {
+          case i: IndexDesc => if (i.index >= 0 && i.index < d.size) Some(d(i.index)) else None
+          case _ => None
+        }
+      }
+    }
+  }
+
   private def calcExprValues(pathDatas: List[(List[String], Option[Any])], expr: Expr, existExprValueMap: Map[String, Any]): List[(List[String], Option[Any])] = {
     Try {
       expr match {
@@ -45,20 +69,44 @@ object ExprValueUtil {
               case Some(row: Row) => {
                 selector.fields.flatMap { field =>
                   field match {
-                    case i: IndexDesc => Some((append(path, i.desc), Some(row.getAs[Any](i.index))))
-                    case f: FieldDesc => Some((append(path, f.desc), Some(row.getAs[Any](f.field))))
-                    case _ => None
+                    case (_: IndexDesc) | (_: FieldDesc) => {
+                      getSingleValue(data, field).map { v => (append(path, field.desc), Some(v)) }
+                    }
+                    case a: AllFieldsDesc => {
+                      (0 until row.size).flatMap { i =>
+                        getSingleValue(data, IndexDesc(i.toString)).map { v =>
+                          (append(path, s"${a.desc}_${i}"), Some(v))
+                        }
+                      }.toList
+                    }
+                    case r: FieldRangeDesc => {
+                      (r.startField, r.endField) match {
+                        case (si: IndexDesc, ei: IndexDesc) => {
+                          (si.index to ei.index).flatMap { i =>
+                            (append(path, s"${r.desc}_${i}"), getSingleValue(data, IndexDesc(i.toString)))
+                            getSingleValue(data, IndexDesc(i.toString)).map { v =>
+                              (append(path, s"${r.desc}_${i}"), Some(v))
+                            }
+                          }.toList
+                        }
+                        case _ => Nil
+                      }
+                    }
+                    case _ => Nil
                   }
                 }
               }
               case Some(d: Map[String, Any]) => {
                 selector.fields.flatMap { field =>
                   field match {
-                    case f: FieldDesc => Some((append(path, f.desc), d.get(f.field)))
+                    case (_: IndexDesc) | (_: FieldDesc) => {
+                      getSingleValue(data, field).map { v => (append(path, field.desc), Some(v)) }
+                    }
                     case a: AllFieldsDesc => {
-                      d.map { kv =>
-                        val (k, v) = kv
-                        (append(path, s"${a.desc}_${k}"), Some(v))
+                      d.keySet.flatMap { k =>
+                        getSingleValue(data, FieldDesc(k)).map { v =>
+                          (append(path, s"${a.desc}_${k}"), Some(v))
+                        }
                       }
                     }
                     case _ => None
@@ -68,29 +116,28 @@ object ExprValueUtil {
               case Some(d: Seq[Any]) => {
                 selector.fields.flatMap { field =>
                   field match {
-                    case i: IndexDesc => {
-                      if (i.index >= 0 && i.index < d.size) {
-                        Some((append(path, i.desc), Some(d(i.index))))
-                      } else None
+                    case (_: IndexDesc) | (_: FieldDesc) => {
+                      getSingleValue(data, field).map { v => (append(path, field.desc), Some(v)) }
                     }
                     case a: AllFieldsDesc => {
-                      val dt = d.zipWithIndex
-                      dt.map { kv =>
-                        val (v, i) = kv
-                        (append(path, s"${a.desc}_${i}"), Some(v))
-                      }
+                      (0 until d.size).flatMap { i =>
+                        (append(path, s"${a.desc}_${i}"), getSingleValue(data, IndexDesc(i.toString)))
+                        getSingleValue(data, IndexDesc(i.toString)).map { v =>
+                          (append(path, s"${a.desc}_${i}"), Some(v))
+                        }
+                      }.toList
                     }
                     case r: FieldRangeDesc => {
                       (r.startField, r.endField) match {
                         case (si: IndexDesc, ei: IndexDesc) => {
-                          if (si.index >= 0 && ei.index < d.size && si.index <= ei.index) {
-                            val dt = d.zipWithIndex
-                            dt.filter(kv => (kv._2 >= si.index && kv._2 <= ei.index)).map { kv =>
-                              val (v, i) = kv
+                          (si.index to ei.index).flatMap { i =>
+                            (append(path, s"${r.desc}_${i}"), getSingleValue(data, IndexDesc(i.toString)))
+                            getSingleValue(data, IndexDesc(i.toString)).map { v =>
                               (append(path, s"${r.desc}_${i}"), Some(v))
                             }
-                          } else None
+                          }.toList
                         }
+                        case _ => None
                       }
                     }
                     case _ => None
@@ -121,11 +168,14 @@ object ExprValueUtil {
           }
         }
 //        case selector: FilterSelectExpr => {
-//          val field = selector.field
 //          pathDatas.flatMap { pathData =>
 //            val (path, data) = pathData
 //            data match {
 //              case Some(row: Row) => {
+//                val f = selector.field
+//                row.getAs[Any](f.field)
+//              }
+//              case Some(d: Map[String, Any]) => {
 //                ;
 //              }
 //            }

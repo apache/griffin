@@ -202,7 +202,8 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
 
   test ("rule calculation") {
 //    val rules = "$source.json().name = 's2' and $source.json().age[*] = 32"
-    val rules = "$source.json().items[*] = 202 AND $source.json().age[*] = 32 AND $source.json().df['a' = 1].b = 3"
+//    val rules = "$source.json().items[*] = 202 AND $source.json().age[*] = 32 AND $source.json().df[*].a = 1"
+    val rules = "$source.json().items[*] = 202 AND $source.json().age[*] = 32 AND $source.json().df['a' = 1].b = 4"
 //    val rules = "$source.json().df[0].a = 1"
     val ep = EvaluateRuleParam(1, rules)
 
