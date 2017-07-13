@@ -37,7 +37,7 @@ case class LogicalSimpleExpr(expr: MathExpr) extends LogicalExpr {
 
 case class LogicalCompareExpr(left: MathExpr, compare: String, right: MathExpr) extends LogicalExpr {
   private val (eqOpr, neqOpr, btOpr, bteOpr, ltOpr, lteOpr) = ("""==?""".r, """!==?""".r, ">", ">=", "<", "<=")
-  def calculateOnly(values: Map[String, Any]): Option[Any] = {
+  def calculateOnly(values: Map[String, Any]): Option[Boolean] = {
     val (lv, rv) = (left.calculate(values), right.calculate(values))
     compare match {
       case this.eqOpr() => lv === rv

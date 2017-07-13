@@ -30,6 +30,10 @@ object ExprValueUtil {
     path :+ step
   }
 
+  private def value2Map(key: String, value: Option[Any]): Map[String, Any] = {
+    value.flatMap(v => Some((key -> v))).toMap
+  }
+
   private def getSingleValue(data: Option[Any], desc: FieldDescOnly): Option[Any] = {
     data match {
       case Some(row: Row) => {
@@ -167,20 +171,50 @@ object ExprValueUtil {
             }
           }
         }
-//        case selector: FilterSelectExpr => {
-//          pathDatas.flatMap { pathData =>
-//            val (path, data) = pathData
-//            data match {
-//              case Some(row: Row) => {
-//                val f = selector.field
-//                row.getAs[Any](f.field)
-//              }
-//              case Some(d: Map[String, Any]) => {
-//                ;
-//              }
-//            }
-//          }
-//        }
+        case selector: FilterSelectExpr => {  // fileter means select the items fit the condition
+          pathDatas.flatMap { pathData =>
+            val (path, data) = pathData
+            data match {
+              case Some(row: Row) => {
+                // right value could not be selection
+                val rmap = value2Map(selector.value._id, selector.value.calculate(existExprValueMap))
+                (0 until row.size).flatMap { i =>
+                  val dt = getSingleValue(data, IndexDesc(i.toString))
+                  val lmap = value2Map(selector.fieldKey, getSingleValue(dt, selector.field))
+                  val partValueMap = lmap ++ rmap
+                  selector.calculate(partValueMap) match {
+                    case Some(true) => Some((append(path, s"${selector.desc}_${i}"), dt))
+                    case _ => None
+                  }
+                }
+              }
+              case Some(d: Map[String, Any]) => {
+                val rmap = value2Map(selector.value._id, selector.value.calculate(existExprValueMap))
+                d.keySet.flatMap { k =>
+                  val dt = getSingleValue(data, FieldDesc(k))
+                  val lmap = value2Map(selector.fieldKey, getSingleValue(dt, selector.field))
+                  val partValueMap = lmap ++ rmap
+                  selector.calculate(partValueMap) match {
+                    case Some(true) => Some((append(path, s"${selector.desc}_${k}"), dt))
+                    case _ => None
+                  }
+                }
+              }
+              case Some(d: Seq[Any]) => {
+                val rmap = value2Map(selector.value._id, selector.value.calculate(existExprValueMap))
+                (0 until d.size).flatMap { i =>
+                  val dt = getSingleValue(data, IndexDesc(i.toString))
+                  val lmap = value2Map(selector.fieldKey, getSingleValue(dt, selector.field))
+                  val partValueMap = lmap ++ rmap
+                  selector.calculate(partValueMap) match {
+                    case Some(true) => Some((append(path, s"${selector.desc}_${i}"), dt))
+                    case _ => None
+                  }
+                }
+              }
+            }
+          }
+        }
         case _ => {
           (expr.desc :: Nil, expr.calculate(existExprValueMap)) :: Nil
         }
@@ -201,6 +235,16 @@ object ExprValueUtil {
       })
     }.toMap
     SchemaValueCombineUtil.cartesian(selectionValues)
+//    val exprValues: Map[String, List[(List[String], Any)]] =
+//      exprs.foldLeft(Map[String, List[(List[String], Any)]]()) { (existExprValues, expr) =>
+//        existExprValues + (expr._id -> calcExprValues((Nil, data) :: Nil, expr, existExprValueMap).flatMap { pair =>
+//          pair._2 match {
+//            case Some(v) => Some((pair._1, v))
+//            case _ => None
+//          }
+//        })
+//      }
+//    SchemaValueCombineUtil.cartesian(exprValues)
   }
 
   // try to calculate some exprs from data and initExprValueMap, generate a new expression value map

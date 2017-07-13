@@ -19,6 +19,7 @@ under the License.
 package org.apache.griffin.measure.rule.expr
 
 import org.apache.spark.sql.types.DataType
+import org.apache.griffin.measure.rule.CalculationUtil._
 
 trait SelectExpr extends Expr {
   def calculateOnly(values: Map[String, Any]): Option[Any] = None
@@ -43,6 +44,20 @@ case class FilterSelectExpr(field: FieldDesc, compare: String, value: MathExpr) 
   override def getSubCacheExprs(ds: String): Iterable[Expr] = value.getCacheExprs(ds)
   override def getSubFinalCacheExprs(ds: String): Iterable[Expr] = value.getFinalCacheExprs(ds)
   override def getSubPersistExprs(ds: String): Iterable[Expr] = value.getPersistExprs(ds)
+  private val (eqOpr, neqOpr, btOpr, bteOpr, ltOpr, lteOpr) = ("""==?""".r, """!==?""".r, ">", ">=", "<", "<=")
+  override def calculateOnly(values: Map[String, Any]): Option[Any] = {
+    val (lv, rv) = (values.get(fieldKey), value.calculate(values))
+    compare match {
+      case this.eqOpr() => lv === rv
+      case this.neqOpr() => lv =!= rv
+      case this.btOpr => lv > rv
+      case this.bteOpr => lv >= rv
+      case this.ltOpr => lv < rv
+      case this.lteOpr => lv <= rv
+      case _ => None
+    }
+  }
+  def fieldKey: String = s"__${field.field}"
 }
 
 // -- selection --

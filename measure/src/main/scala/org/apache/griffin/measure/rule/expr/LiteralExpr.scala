@@ -29,6 +29,10 @@ trait LiteralExpr extends Expr {
   val dataSources: Set[String] = Set.empty[String]
 }
 
+case class LiteralValueExpr(value: Option[Any]) extends LiteralExpr {
+  val desc: String = value.getOrElse("").toString
+}
+
 case class LiteralStringExpr(expr: String) extends LiteralExpr {
   val value: Option[String] = Some(expr)
   val desc: String = s"'${value.getOrElse("")}'"
