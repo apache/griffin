@@ -19,28 +19,46 @@ under the License.
 package org.apache.griffin.measure.connector
 
 import org.apache.griffin.measure.cache.{InfoCacheInstance, ZKInfoCache}
+import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.sql.DataFrame
+
+import scala.util.Try
 
 trait CacheDataConnector extends DataConnector {
 
   def saveData(df: DataFrame, ms: Long): Unit
 
-  def readData(): DataFrame
+  def readData(): Try[DataFrame]
 
-  val cacheTimeKey: String
+  val cacheInfoPath: String
+  val readyTimeInterval: Long
+  val readyTimeDelay: Long
 
-  val LastProcTime = "last.proc.time"
-  val CurReadyTime = "cur.ready.time"
+  def CacheTime = s"${cacheInfoPath}/cache.time"
+  def LastProcTime = s"${cacheInfoPath}/last.proc.time"
+  def ReadyTime = s"${cacheInfoPath}/ready.time"
 
   protected def submitCacheTime(ms: Long): Unit = {
-    val map = Map[String, String]() + (cacheTimeKey -> ms.toString)
+    val map = Map[String, String]((CacheTime -> ms.toString))
+    InfoCacheInstance.cacheInfo(map)
+  }
+
+  protected def submitReadyTime(ms: Long): Unit = {
+    if (ms % readyTimeInterval == 0) {
+      val map = Map[String, String]((ReadyTime -> ms.toString))
+      InfoCacheInstance.cacheInfo(map)
+    }
+  }
+
+  def submitLastProcTime(ms: Long): Unit = {
+    val map = Map[String, String]((LastProcTime -> ms.toString))
     InfoCacheInstance.cacheInfo(map)
   }
 
   protected def readTimeRange(): (Long, Long) = {
-    val map = InfoCacheInstance.readInfo(List(LastProcTime, CurReadyTime))
+    val map = InfoCacheInstance.readInfo(List(LastProcTime, ReadyTime))
     val lastProcTime = getLong(map, LastProcTime)
-    val curReadyTime = getLong(map, CurReadyTime)
+    val curReadyTime = getLong(map, ReadyTime)
     (lastProcTime + 1, curReadyTime)
   }
 

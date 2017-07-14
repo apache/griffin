@@ -60,7 +60,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
 
   private val cacheNamespace: String = if (namespace.isEmpty) metricName else namespace + separator + metricName
   private val builder = CuratorFrameworkFactory.builder()
-    .connectString("localhost:2181")
+    .connectString(hosts)
     .retryPolicy(new ExponentialBackoffRetry(1000, 3))
     .namespace(cacheNamespace)
   private val client: CuratorFramework = builder.build

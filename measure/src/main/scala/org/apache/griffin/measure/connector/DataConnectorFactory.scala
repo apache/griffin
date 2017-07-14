@@ -36,6 +36,8 @@ object DataConnectorFactory {
 
   val KafkaRegex = """^(?i)kafka$""".r
 
+  val TempRegex = """^(?i)temp|temporary$""".r
+
   def getDataConnector(sqlContext: SQLContext,
                        ssc: StreamingContext,
                        dataConnectorParam: DataConnectorParam,
@@ -96,8 +98,8 @@ object DataConnectorFactory {
     val config = dataConnectorParam.config
     Try {
       conType match {
-        case KafkaRegex() => {
-          TempCacheDataConnector(sqlContext, config)
+        case TempRegex() => {
+          DfCacheDataConnector(sqlContext, config)
         }
         case _ => throw new Exception("cache connector creation error!")
       }

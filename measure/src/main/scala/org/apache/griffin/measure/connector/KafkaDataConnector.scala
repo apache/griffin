@@ -148,31 +148,36 @@ case class KafkaDataConnector(sqlContext: SQLContext, ssc: StreamingContext, dat
   }
 
   def data(): Try[RDD[(Product, (Map[String, Any], Map[String, Any]))]] = Try {
-    cacheDataConnector.readData.flatMap { row =>
-      // generate cache data
-      val cacheExprValueMaps = ExprValueUtil.genExprValueMaps(Some(row), ruleExprs.cacheExprs, constFinalExprValueMap)
-      val finalExprValueMaps = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMaps)
+    cacheDataConnector.readData match {
+      case Success(df) => {
+        df.flatMap { row =>
+          // generate cache data
+          val cacheExprValueMaps = ExprValueUtil.genExprValueMaps(Some(row), ruleExprs.cacheExprs, constFinalExprValueMap)
+          val finalExprValueMaps = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMaps)
 
-      // data info
-      val dataInfoMap: Map[String, Any] = DataInfo.cacheInfoList.map { info =>
-        try {
-          (info.key -> row.getAs[info.T](info.key))
-        } catch {
-          case e: Throwable => info.defWrap
-        }
-      }.toMap
+          // data info
+          val dataInfoMap: Map[String, Any] = DataInfo.cacheInfoList.map { info =>
+            try {
+              (info.key -> row.getAs[info.T](info.key))
+            } catch {
+              case e: Throwable => info.defWrap
+            }
+          }.toMap
 
-      finalExprValueMaps.flatMap { finalExprValueMap =>
-        val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
-          expr.calculate(finalExprValueMap) match {
-            case Some(v) => Some(v.asInstanceOf[AnyRef])
-            case _ => None
+          finalExprValueMaps.flatMap { finalExprValueMap =>
+            val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
+              expr.calculate(finalExprValueMap) match {
+                case Some(v) => Some(v.asInstanceOf[AnyRef])
+                case _ => None
+              }
+            }
+            val key = toTuple(groupbyData)
+
+            Some((key, (finalExprValueMap, dataInfoMap)))
           }
         }
-        val key = toTuple(groupbyData)
-
-        Some((key, (finalExprValueMap, dataInfoMap)))
       }
+      case Failure(ex) => throw ex
     }
   }
 

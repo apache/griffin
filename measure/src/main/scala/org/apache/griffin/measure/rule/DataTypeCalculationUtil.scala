@@ -43,11 +43,11 @@ object DataTypeCalculationUtil {
       case v: String => StringType
       case v: Boolean => BooleanType
       case v: Long => LongType
-      case v: Int => LongType
-      case v: Short => LongType
-      case v: Byte => LongType
+      case v: Int => IntegerType
+      case v: Short => ShortType
+      case v: Byte => ByteType
       case v: Double => DoubleType
-      case v: Float => DoubleType
+      case v: Float => FloatType
       case v: Map[_, _] => MapType(getSameDataType(v.keys), getSameDataType(v.values))
       case v: Iterable[_] => ArrayType(getSameDataType(v))
       case _ => NullType
@@ -62,26 +62,53 @@ object DataTypeCalculationUtil {
     if (dt1 == dt2) dt1 else {
       dt1 match {
         case NullType => dt2
-        case StringType => StringType
+        case StringType => dt1
         case DoubleType => {
           dt2 match {
-            case StringType => StringType
-            case DoubleType | LongType => DoubleType
+            case StringType => dt2
+            case DoubleType | FloatType | LongType | IntegerType | ShortType | ByteType => dt1
+            case _ => throw DataTypeException()
+          }
+        }
+        case FloatType => {
+          dt2 match {
+            case StringType | DoubleType => dt2
+            case FloatType | LongType | IntegerType | ShortType | ByteType => dt1
             case _ => throw DataTypeException()
           }
         }
         case LongType => {
           dt2 match {
-            case StringType => StringType
-            case DoubleType => DoubleType
-            case LongType => LongType
+            case StringType | DoubleType | FloatType => dt2
+            case LongType | IntegerType | ShortType | ByteType => dt1
+            case _ => throw DataTypeException()
+          }
+        }
+        case IntegerType => {
+          dt2 match {
+            case StringType | DoubleType | FloatType | LongType => dt2
+            case IntegerType | ShortType | ByteType => dt1
+            case _ => throw DataTypeException()
+          }
+        }
+        case ShortType => {
+          dt2 match {
+            case StringType | DoubleType | FloatType | LongType | IntegerType => dt2
+            case ShortType | ByteType => dt1
+            case _ => throw DataTypeException()
+          }
+        }
+        case ByteType => {
+          dt2 match {
+            case StringType | DoubleType | FloatType | LongType | IntegerType | ShortType => dt2
+            case ByteType => dt1
             case _ => throw DataTypeException()
           }
         }
         case BooleanType => {
           dt2 match {
-            case StringType => StringType
-            case BooleanType => BooleanType
+            case StringType => dt2
+            case BooleanType => dt1
             case _ => throw DataTypeException()
           }
         }

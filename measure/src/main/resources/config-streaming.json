@@ -16,10 +16,12 @@
       "key.type": "java.lang.String",
       "value.type": "java.lang.String",
       "cache": {
-        "type": "temp",
+        "type": "df",
         "config": {
           "table.name": "source",
-          "info.path": "src"
+          "info.path": "src",
+          "ready.time.interval": "1m",
+          "ready.time.delay": "1m"
         }
       }
     }

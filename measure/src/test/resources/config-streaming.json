@@ -16,9 +16,9 @@
       "key.type": "java.lang.String",
       "value.type": "java.lang.String",
       "cache": {
-        "type": "temp",
+        "type": "df",
         "config": {
-          "table.name": "source",
+          "cache.level": "MEMORY_AND_DISK",
           "info.path": "src"
         }
       }

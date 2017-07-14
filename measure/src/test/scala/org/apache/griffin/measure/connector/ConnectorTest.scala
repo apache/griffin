@@ -19,15 +19,18 @@ under the License.
 package org.apache.griffin.measure.connector
 
 import kafka.serializer.StringDecoder
+import org.apache.griffin.measure.cache.InfoCacheInstance
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user.{DataConnectorParam, EvaluateRuleParam}
 import org.apache.griffin.measure.config.reader.ParamRawStringReader
 import org.apache.griffin.measure.result.{DataInfo, TimeStampInfo}
 import org.apache.griffin.measure.rule.expr.{Expr, StatementExpr}
-import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory, RuleParser}
+import org.apache.griffin.measure.rule._
 import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.griffin.measure.rule.{DataTypeCalculationUtil, ExprValueUtil, RuleExprs}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.types.{DataType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
@@ -112,6 +115,23 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
       ("cache" -> cacheParam)
     )
 
+    val infoCacheConfig = Map[String, Any](
+      ("hosts" -> "localhost:2181"),
+      ("namespace" -> "griffin/infocache"),
+      ("lock.path" -> "lock"),
+      ("mode" -> "persist"),
+      ("init.clear" -> true),
+      ("close.clear" -> false)
+    )
+    val name = "ttt"
+
+    val icp = InfoCacheParam("zk", infoCacheConfig)
+    val icps = icp :: Nil
+
+    InfoCacheInstance.initInstance(icps, name)
+    InfoCacheInstance.init
+
+
     val connectorParam = DataConnectorParam("kafka", "0.8", config)
 
     val conf = new SparkConf().setMaster("local[*]").setAppName("ConnectorTest")
@@ -132,7 +152,35 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
       case _ => fail
     }
 
+    val cacheDataConnectorParam = connectorParam.config.get("cache") match {
+      case Some(map: Map[String, Any]) => DataConnectorParam(map)
+      case _ => throw new Exception("invalid cache parameter!")
+    }
+    val cacheDataConnector = DataConnectorFactory.getCacheDataConnector(sqlContext, cacheDataConnectorParam) match {
+      case Success(cntr) => cntr
+      case Failure(ex) => throw ex
+    }
+
     ///
+
+    def genDataFrame(rdd: RDD[Map[String, Any]]): DataFrame = {
+      val fields = rdd.aggregate(Map[String, DataType]())(
+        DataTypeCalculationUtil.sequenceDataTypeMap, DataTypeCalculationUtil.combineDataTypeMap
+      ).toList.map(f => StructField(f._1, f._2))
+      val schema = StructType(fields)
+      val datas: RDD[Row] = rdd.map { d =>
+        val values = fields.map { field =>
+          val StructField(k, dt, _, _) = field
+          d.get(k) match {
+            case Some(v) => v
+            case _ => null
+          }
+        }
+        Row(values: _*)
+      }
+      val df = sqlContext.createDataFrame(datas, schema)
+      df
+    }
 
     val rules = "$source.json().name = 's2' AND $source.json().age = 32"
     val ep = EvaluateRuleParam(1, rules)
@@ -181,13 +229,22 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
       val valueMaps = valueMapRdd.collect()
       val valuestr = valueMaps.mkString("\n")
 
-      println(s"count: ${cnt}\n ${valuestr}")
+      println(s"count: ${cnt}\n${valuestr}")
 
       // generate DataFrame
-//      val df = genDataFrame(valueMapRdd)
-//
-//      // save data frame
-//      cacheDataConnector.saveData(df, ms)
+      val df = genDataFrame(valueMapRdd)
+      df.show(10)
+
+      // save data frame
+      cacheDataConnector.saveData(df, ms)
+
+      // show data
+      cacheDataConnector.readData() match {
+        case Success(rdf) => rdf.show(10)
+        case Failure(ex) => println(s"cache data error: ${ex.getMessage}")
+      }
+
+      cacheDataConnector.submitLastProcTime(ms)
     })
 
 
@@ -197,6 +254,8 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
 
     // context stop
     sc.stop
+
+    InfoCacheInstance.close()
 
   }
 
