@@ -7,10 +7,10 @@
     "version": "0.8",
     "config": {
       "kafka.config": {
-        "bootstrap.servers": "localhost:9092",
+        "bootstrap.servers": "10.149.247.156:9092",
         "group.id": "group1",
         "auto.offset.reset": "smallest",
-        "auto.commit.enable": "false",
+        "auto.commit.enable": "false"
       },
       "topics": "sss",
       "key.type": "java.lang.String",
@@ -30,20 +30,18 @@
     "version": "0.8",
     "config": {
       "kafka.config": {
-        "bootstrap.servers": "localhost:9092",
+        "bootstrap.servers": "10.149.247.156:9092",
         "group.id": "group1",
         "auto.offset.reset": "smallest",
-        "auto.commit.enable": "false",
+        "auto.commit.enable": "false"
       },
       "topics": "ttt",
       "key.type": "java.lang.String",
       "value.type": "java.lang.String",
       "cache": {
-        "type": "hive",
-        "version": 1.2,
+        "type": "df",
         "config": {
-          "database": "default",
-          "table.name": "target_table",
+          "cache.level": "MEMORY_AND_DISK",
           "info.path": "tgt"
         }
       }
@@ -52,6 +50,6 @@
 
   "evaluateRule": {
     "sampleRatio": 0.2,
-    "rules": "$source.json().seeds[*].json().url = $target.json().groups[0].attrsList['name' = 'URL'].values[0] AND $source.json().seeds[*].json().metadata.json().tracker.crawlRequestCreateTS = $target.json().groups[0].attrsList['name' = 'CRAWLMETADATA'].values[0].json().tracker.crawlRequestCreateTS WHEN $source._timestamp_ + 24h < $target._timestamp_"
+    "rules": "$source.name = $target.name AND $source.age = $target.age WHEN $source._tmst_ < $target._tmst_ + 2m"
   }
 }

@@ -34,7 +34,7 @@ case class StreamingProcess(interval: Long, runnable: Runnable) {
   }
 
   def startup(): Unit = {
-    timer.schedule(timerTask, 0, interval)
+    timer.schedule(timerTask, interval, interval)
   }
 
   def shutdown(): Unit = {

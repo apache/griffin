@@ -69,6 +69,8 @@ case class DfCacheDataConnector(sqlContext: SQLContext, config: Map[String, Any]
   def readData(): Try[DataFrame] = Try {
     if (initialed) {
       val timeRange = readTimeRange
+      println(timeRange)
+      submitLastProcTime(timeRange._2)
       dataFrame.filter(s"${timeStampColumn} BETWEEN ${timeRange._1} AND ${timeRange._2}")
     } else {
       throw new Exception("data not cached")

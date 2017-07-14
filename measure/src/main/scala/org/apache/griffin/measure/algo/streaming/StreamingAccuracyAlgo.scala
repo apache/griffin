@@ -198,7 +198,7 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         case vd: Map[String, Any] => getPersistMap(vd, targetPersist)
         case v => v
       }
-    }
+    }.map(identity)
     s"${persistData} [${persistInfo}]"
   }
 

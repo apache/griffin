@@ -36,7 +36,7 @@ object DataConnectorFactory {
 
   val KafkaRegex = """^(?i)kafka$""".r
 
-  val TempRegex = """^(?i)temp|temporary$""".r
+  val DfRegex = """^(?i)df|dataframe$""".r
 
   def getDataConnector(sqlContext: SQLContext,
                        ssc: StreamingContext,
@@ -98,7 +98,7 @@ object DataConnectorFactory {
     val config = dataConnectorParam.config
     Try {
       conType match {
-        case TempRegex() => {
+        case DfRegex() => {
           DfCacheDataConnector(sqlContext, config)
         }
         case _ => throw new Exception("cache connector creation error!")
@@ -111,13 +111,13 @@ object DataConnectorFactory {
     val ValueType = "value.type"
     val keyType = config.getOrElse(KeyType, "java.lang.String").toString
     val valueType = config.getOrElse(ValueType, "java.lang.String").toString
-    val KafkaConfig = "kafka.config"
-    val Topics = "topics"
-    val kafkaConfig = config.get(KafkaConfig) match {
-      case Some(map: Map[String, Any]) => map.mapValues(_.toString)
-      case _ => Map[String, String]()
-    }
-    val topics = config.getOrElse(Topics, "").toString
+//    val KafkaConfig = "kafka.config"
+//    val Topics = "topics"
+//    val kafkaConfig = config.get(KafkaConfig) match {
+//      case Some(map: Map[String, Any]) => map.mapValues(_.toString).map(identity)
+//      case _ => Map[String, String]()
+//    }
+//    val topics = config.getOrElse(Topics, "").toString
     (getClassTag(keyType), getClassTag(valueType)) match {
       case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
         new KafkaStreamingDataConnector(ssc, config) {

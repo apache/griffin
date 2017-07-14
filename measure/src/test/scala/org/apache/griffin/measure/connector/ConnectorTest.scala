@@ -18,7 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.connector
 
+import java.util.Date
+import java.util.concurrent.TimeUnit
+
 import kafka.serializer.StringDecoder
+import org.apache.griffin.measure.algo.streaming.StreamingProcess
 import org.apache.griffin.measure.cache.InfoCacheInstance
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user.{DataConnectorParam, EvaluateRuleParam}
@@ -103,7 +107,7 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
     )
 
     val cacheParam = Map[String, Any](
-      ("type" -> "temp"),
+      ("type" -> "df"),
       ("config" -> cacheConfig)
     )
 
@@ -136,6 +140,7 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
 
     val conf = new SparkConf().setMaster("local[*]").setAppName("ConnectorTest")
     val sc = new SparkContext(conf)
+    sc.setLogLevel("WARN")
     val sqlContext = new SQLContext(sc)
 
     val batchInterval = TimeUtil.milliseconds("2s") match {
@@ -229,23 +234,74 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
       val valueMaps = valueMapRdd.collect()
       val valuestr = valueMaps.mkString("\n")
 
-      println(s"count: ${cnt}\n${valuestr}")
+//      println(s"count: ${cnt}\n${valuestr}")
 
       // generate DataFrame
       val df = genDataFrame(valueMapRdd)
-      df.show(10)
+//      df.show(10)
 
       // save data frame
       cacheDataConnector.saveData(df, ms)
 
       // show data
-      cacheDataConnector.readData() match {
-        case Success(rdf) => rdf.show(10)
-        case Failure(ex) => println(s"cache data error: ${ex.getMessage}")
-      }
-
-      cacheDataConnector.submitLastProcTime(ms)
+//      cacheDataConnector.readData() match {
+//        case Success(rdf) => rdf.show(10)
+//        case Failure(ex) => println(s"cache data error: ${ex.getMessage}")
+//      }
+//
+//      cacheDataConnector.submitLastProcTime(ms)
     })
+
+    // process thread
+    case class Process() extends Runnable {
+      val lock = InfoCacheInstance.genLock("process")
+      def run(): Unit = {
+        val locked = lock.lock(5, TimeUnit.SECONDS)
+        if (locked) {
+          try {
+            // show data
+            cacheDataConnector.readData() match {
+              case Success(rdf) => {
+                rdf.show(10)
+                println(s"count: ${rdf.count}")
+              }
+              case Failure(ex) => println(s"cache data error: ${ex.getMessage}")
+            }
+
+//            val st = new Date().getTime
+            // get data
+//            val sourceData = sourceDataConnector.data match {
+//              case Success(dt) => dt
+//              case Failure(ex) => throw ex
+//            }
+//            val targetData = targetDataConnector.data match {
+//              case Success(dt) => dt
+//              case Failure(ex) => throw ex
+//            }
+//
+//            // accuracy algorithm
+//            val (accuResult, missingRdd, matchedRdd) = accuracy(sourceData, targetData, ruleAnalyzer)
+//
+//            println(accuResult)
+//
+//            val et = new Date().getTime
+//
+//            val missingRecords = missingRdd.map(record2String(_, ruleAnalyzer.sourceRuleExprs.persistExprs, ruleAnalyzer.targetRuleExprs.persistExprs))
+
+          } finally {
+            lock.unlock()
+          }
+        }
+      }
+    }
+
+    val processInterval = TimeUtil.milliseconds("10s") match {
+      case Some(interval) => interval
+      case _ => throw new Exception("invalid batch interval")
+    }
+    val process = StreamingProcess(processInterval, Process())
+
+    process.startup()
 
 
     ssc.start()
@@ -256,6 +312,8 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
     sc.stop
 
     InfoCacheInstance.close()
+
+    process.shutdown()
 
   }
 

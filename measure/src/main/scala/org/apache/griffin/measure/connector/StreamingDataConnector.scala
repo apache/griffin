@@ -18,12 +18,13 @@ under the License.
 */
 package org.apache.griffin.measure.connector
 
+import org.apache.griffin.measure.log.Loggable
 import org.apache.spark.streaming.dstream.InputDStream
 
 import scala.util.Try
 
 
-trait StreamingDataConnector {
+trait StreamingDataConnector extends Loggable with Serializable {
 
   type K
   type V
