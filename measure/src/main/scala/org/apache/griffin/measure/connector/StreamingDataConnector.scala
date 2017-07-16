@@ -24,7 +24,7 @@ import org.apache.spark.streaming.dstream.InputDStream
 import scala.util.Try
 
 
-trait StreamingDataConnector extends Loggable with Serializable {
+trait StreamingDataConnector extends Loggable {
 
   type K
   type V

@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.connector
 
+import org.apache.griffin.measure.result.TimeStampInfo
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
@@ -26,12 +27,12 @@ import org.apache.spark.storage.StorageLevel
 import scala.util.{Success, Try}
 
 case class DfCacheDataConnector(sqlContext: SQLContext, config: Map[String, Any]
-                                 ) extends CacheDataConnector {
+                               ) extends CacheDataConnector {
 
   val CacheLevel = "cache.level"
   val cacheLevel: String = config.getOrElse(CacheLevel, "MEMORY_ONLY").toString
 
-  val timeStampColumn = "_tmst_"
+  val timeStampColumn = TimeStampInfo.key
 
   var initialed: Boolean = false
   var dataFrame: DataFrame = _
@@ -69,7 +70,6 @@ case class DfCacheDataConnector(sqlContext: SQLContext, config: Map[String, Any]
   def readData(): Try[DataFrame] = Try {
     if (initialed) {
       val timeRange = readTimeRange
-      println(timeRange)
       submitLastProcTime(timeRange._2)
       dataFrame.filter(s"${timeStampColumn} BETWEEN ${timeRange._1} AND ${timeRange._2}")
     } else {

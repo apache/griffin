@@ -50,6 +50,6 @@
 
   "evaluateRule": {
     "sampleRatio": 0.2,
-    "rules": "$source.name = $target.name AND $source.age = $target.age WHEN $source._tmst_ < $target._tmst_ + 2m"
+    "rules": "$source.json().name = $target.json().name AND $source.json().age = $target.json().age WHEN $source._tmst_ < $target._tmst_ + 2m"
   }
 }

@@ -18,9 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.connector
 
-import org.apache.griffin.measure.config.params.user.DataConnectorParam
+import java.util.Date
+
+import org.apache.griffin.measure.config.params.user.{DataConnectorParam, EvaluateRuleParam}
 import org.apache.griffin.measure.result._
-import org.apache.griffin.measure.rule.{DataTypeCalculationUtil, ExprValueUtil, RuleExprs}
+import org.apache.griffin.measure.rule.expr.StatementExpr
+import org.apache.griffin.measure.rule._
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{DataType, StructField, StructType}
@@ -29,11 +32,11 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 import scala.util.{Failure, Success, Try}
 
-case class KafkaDataConnector(sqlContext: SQLContext, ssc: StreamingContext, dataConnectorParam: DataConnectorParam,
+case class KafkaDataConnector(sqlContext: SQLContext, @transient ssc: StreamingContext, dataConnectorParam: DataConnectorParam,
                               ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
                              ) extends BatchDataConnector {
 
-  val kafkaStreamingDataConnector = DataConnectorFactory.getStreamingDataConnector(ssc, dataConnectorParam) match {
+  @transient val kafkaStreamingDataConnector = DataConnectorFactory.getStreamingDataConnector(ssc, dataConnectorParam) match {
     case Success(cntr) => cntr
     case Failure(ex) => throw ex
   }
@@ -87,14 +90,9 @@ case class KafkaDataConnector(sqlContext: SQLContext, ssc: StreamingContext, dat
       case Success(dstream) => dstream
       case Failure(ex) => throw ex
     }
+
     ds.foreachRDD((rdd, time) => {
       val ms = time.milliseconds
-//      val min = TimeUtil.timeToUnit(ms, "min")
-//      val hour = TimeUtil.timeToUnit(ms, "hour")
-//      val partitions = List[(String, Any)](("hr", hour), ("min", min))
-
-//      val partitionPath = genPartitionHdfsPath(partitions)
-//      val path = s"${targetDumpDir}/${partitionPath}/${ms}"
 
       val dataInfoMap = DataInfo.cacheInfoList.map(_.defWrap).toMap + TimeStampInfo.wrap(ms)
 
@@ -104,9 +102,6 @@ case class KafkaDataConnector(sqlContext: SQLContext, ssc: StreamingContext, dat
 
         val cacheExprValueMaps = ExprValueUtil.genExprValueMaps(Some(msg), ruleExprs.cacheExprs, constFinalExprValueMap)
         val finalExprValueMaps = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMaps)
-
-//        val sf = StructField("name", DataType.fromJson("string"))
-//        val schema: StructType = new StructType()
 
         finalExprValueMaps.map { vm =>
           vm ++ dataInfoMap
@@ -152,8 +147,11 @@ case class KafkaDataConnector(sqlContext: SQLContext, ssc: StreamingContext, dat
       case Success(df) => {
         df.flatMap { row =>
           // generate cache data
-          val cacheExprValueMaps = ExprValueUtil.genExprValueMaps(Some(row), ruleExprs.cacheExprs, constFinalExprValueMap)
-          val finalExprValueMaps = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMaps)
+//          val cacheExprValueMaps = ExprValueUtil.genExprValueMaps(Some(row), ruleExprs.cacheExprs, constFinalExprValueMap)
+//          val finalExprValueMaps = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMaps)
+          val finalExprValueMap = ruleExprs.finalCacheExprs.foldLeft(Map[String, Any]()) { (mp, expr) =>
+            mp + (expr._id -> row.getAs[Any](expr._id))
+          }
 
           // data info
           val dataInfoMap: Map[String, Any] = DataInfo.cacheInfoList.map { info =>
@@ -164,17 +162,15 @@ case class KafkaDataConnector(sqlContext: SQLContext, ssc: StreamingContext, dat
             }
           }.toMap
 
-          finalExprValueMaps.flatMap { finalExprValueMap =>
-            val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
-              expr.calculate(finalExprValueMap) match {
-                case Some(v) => Some(v.asInstanceOf[AnyRef])
-                case _ => None
-              }
+          val groupbyData: Seq[AnyRef] = ruleExprs.groupbyExprs.flatMap { expr =>
+            expr.calculate(finalExprValueMap) match {
+              case Some(v) => Some(v.asInstanceOf[AnyRef])
+              case _ => None
             }
-            val key = toTuple(groupbyData)
-
-            Some((key, (finalExprValueMap, dataInfoMap)))
           }
+          val key = toTuple(groupbyData)
+
+          Some((key, (finalExprValueMap, dataInfoMap)))
         }
       }
       case Failure(ex) => throw ex

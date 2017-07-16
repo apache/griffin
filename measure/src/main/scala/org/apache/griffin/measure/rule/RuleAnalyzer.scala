@@ -64,7 +64,7 @@ case class RuleExprs(groupbyExprs: Seq[Expr],
                      cacheExprs: Iterable[Expr],
                      finalCacheExprs: Iterable[Expr],
                      persistExprs: Iterable[Expr]
-                    ) {
+                    ) extends Serializable {
   // for example: for a rule "$source.name = $target.name AND $source.age < $target.age + (3 * 4)"
   // in this rule, for the target data source, the targetRuleExprs looks like below
   // groupbyExprs: $target.name
