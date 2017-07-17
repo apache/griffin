@@ -19,7 +19,9 @@ under the License.
 
 package org.apache.griffin.core.schedule;
 
-import org.apache.griffin.core.schedule.Repo.ScheduleStateRepo;
+import org.apache.griffin.core.schedule.repo.ScheduleStateRepo;
+import org.apache.griffin.core.schedule.entity.JobHealth;
+import org.apache.griffin.core.schedule.entity.ScheduleState;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

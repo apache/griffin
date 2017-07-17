@@ -16,41 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.core.schedule;
 
+package org.apache.griffin.core.schedule.quartzConfig;
 
-public class JobHealth {
-    private int health;
-    private int invalid;
-    private int jobCount;
+/**
+ * Created by xiangrchen on 4/26/17.
+ */
+public class Conf {
+    String spark_jars_packages;
 
-    public int getHealth() {
-        return health;
+    public String getSpark_jars_packages() {
+        return spark_jars_packages;
     }
 
-    public void setHealth(int health) {
-        this.health = health;
-    }
-
-    public int getInvalid() {
-        return invalid;
-    }
-
-    public void setInvalid(int invalid) {
-        this.invalid = invalid;
-    }
-
-    public int getJobCount() {
-        return jobCount;
-    }
-
-    public void setJobCount(int jobCount) {
-        this.jobCount = jobCount;
-    }
-
-    public JobHealth(int health, int invalid, int jobCount) {
-        this.health = health;
-        this.invalid = invalid;
-        this.jobCount = jobCount;
+    public void setSpark_jars_packages(String spark_jars_packages) {
+        this.spark_jars_packages = spark_jars_packages;
     }
 }

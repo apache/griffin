@@ -19,8 +19,13 @@ under the License.
 
 package org.apache.griffin.core.schedule;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.schedule.Repo.ScheduleStateRepo;
+import org.apache.griffin.core.common.JsonConvert;
+import org.apache.griffin.core.common.PropertiesOperate;
+import org.apache.griffin.core.schedule.entity.JobHealth;
+import org.apache.griffin.core.schedule.entity.ScheduleState;
+import org.apache.griffin.core.schedule.repo.ScheduleStateRepo;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
@@ -31,10 +36,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import static java.lang.Thread.sleep;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -52,14 +60,22 @@ public class SchedulerServiceImpl implements SchedulerService{
 
     public static final String ACCURACY_BATCH_GROUP = "BA";
 
+    Properties sparkJobProps=null;
+
+    public SchedulerServiceImpl(){
+        try {
+            sparkJobProps= PropertiesOperate.getProperties("sparkJob.properties");
+        } catch (IOException e) {
+            LOGGER.warn("get sparkJob.properties failed! "+e);
+        }
+    }
 
     @Override
     public List<Map<String, Serializable>> getJobs() throws SchedulerException {
         Scheduler scheduler = factory.getObject();
         List<Map<String, Serializable>> list = new ArrayList<>();
         for (String groupName : scheduler.getJobGroupNames()) {
-            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher
-                    .jobGroupEquals(groupName))) {
+            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                 setJobsByKey(list,scheduler, jobKey);
             }
         }
@@ -116,7 +132,6 @@ public class SchedulerServiceImpl implements SchedulerService{
 //        SimpleDateFormat format=new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         try{
             periodTime = Integer.parseInt(schedulerRequestBody.getPeriodTime());
-//            jobStartTime=format.parse(schedulerRequestBody.getJobStartTime());
             jobStartTime=new Date(Long.parseLong(schedulerRequestBody.getJobStartTime()));
             setJobStartTime(jobStartTime,periodTime);
         }catch (Exception e){
@@ -189,6 +204,7 @@ public class SchedulerServiceImpl implements SchedulerService{
         try {
             Scheduler scheduler = factory.getObject();
             scheduler.deleteJob(new JobKey(name, group));
+            scheduleStateRepo.deleteInGroupAndjobName(group,name);
             return true;
         } catch (SchedulerException e) {
             LOGGER.error(e.getMessage());
@@ -197,9 +213,79 @@ public class SchedulerServiceImpl implements SchedulerService{
     }
 
     @Override
-    public List<ScheduleState> findInstancesOfJob(String group, String name, int page, int size) {
+    public List<ScheduleState> findInstancesOfJob(String group, String jobName, int page, int size) throws IOException {
+        //update job instances
+        updateInstances(group,jobName);
+        //query and return instances
         Pageable pageRequest=new PageRequest(page,size, Sort.Direction.DESC,"timestamp");
-        return scheduleStateRepo.findByGroupNameAndJobName(group,name,pageRequest);
+        return scheduleStateRepo.findByGroupNameAndJobName(group,jobName,pageRequest);
+    }
+
+    public synchronized void updateInstances(String group, String jobName) throws IOException {
+        //update all schedule instance state belongs to this group and job.
+        List<ScheduleState> scheduleStateList=scheduleStateRepo.findByGroupNameAndJobName(group,jobName);
+        for (ScheduleState scheduleState:scheduleStateList){
+            if (scheduleState.getState().equals("success") || scheduleState.getState().equals("unknown")){
+                continue;
+            }
+            String uri=sparkJobProps.getProperty("sparkJob.uri")+"/"+scheduleState.getScheduleid();
+            RestTemplate restTemplate=new RestTemplate();
+            String resultStr=null;
+            try{
+                resultStr=restTemplate.getForObject(uri,String.class);
+            }catch (Exception e){
+                LOGGER.error("spark session "+scheduleState.getScheduleid()+" has overdue, set state as unknown!\n"+e);
+                scheduleState.setState("unknown");
+            }
+            TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
+            HashMap<String,Object> resultMap= JsonConvert.toEntity(resultStr,type);
+            try{
+                if (resultMap!=null && resultMap.size()!=0){
+                    scheduleState.setState(resultMap.get("state").toString());
+                    scheduleState.setAppId(resultMap.get("appId").toString());
+                }
+            }catch (Exception e){
+                LOGGER.warn("schedule Instance has some null field (state or appId). "+e);
+                continue;
+            }
+            scheduleStateRepo.setFixedStateAndappIdFor(scheduleState.getId(),scheduleState.getState(),scheduleState.getAppId());
+        }
+    }
+
+    @Override
+    public void startUpdateInstances(){
+        List<Object> groupJobList=scheduleStateRepo.findGroupWithJobName();
+        for (Object groupJobObj : groupJobList){
+            try{
+                Object[] groupJob=(Object[])groupJobObj;
+                if (groupJob!=null && groupJob.length==2){
+                    updateInstancesThread(groupJob[0].toString(),groupJob[1].toString());
+                }
+            }catch (Exception e){
+                LOGGER.error(""+e);
+            }
+        }
+    }
+
+    public void updateInstancesThread(String group, String jobName){
+        Thread thread=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true){
+                    try {
+                        sleep(60*1000);
+                        updateInstances(group,jobName);
+                        LOGGER.info("thread execute, update schedule instances!");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        });
+        thread.start();
     }
 
     @Override

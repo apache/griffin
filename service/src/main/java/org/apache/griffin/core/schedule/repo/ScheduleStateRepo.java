@@ -16,14 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.core.schedule.Repo;
+package org.apache.griffin.core.schedule.repo;
 
 
-import org.apache.griffin.core.schedule.ScheduleState;
+import org.apache.griffin.core.schedule.entity.ScheduleState;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,4 +36,25 @@ public interface ScheduleStateRepo extends CrudRepository<ScheduleState,Long>{
             "where s.groupName= ?1 and s.jobName=?2 "/*+
             "order by s.timestamp desc"*/)
     List<ScheduleState> findByGroupNameAndJobName(String group, String name, Pageable pageable);
+
+    @Query("select s from ScheduleState s " +
+            "where s.groupName= ?1 and s.jobName=?2 ")
+    List<ScheduleState> findByGroupNameAndJobName(String group, String name);
+
+    @Query("select DISTINCT s.groupName, s.jobName from ScheduleState s")
+    List<Object> findGroupWithJobName();
+
+    @Transactional
+    @Modifying
+    @Query("update ScheduleState s "+
+            "set s.state= ?2, s.appId= ?3 where s.id= ?1")
+    void setFixedStateAndappIdFor(Long Id, String state, String appId);
+
+    @Transactional
+    @Modifying
+    @Query("delete from ScheduleState s " +
+            "where s.groupName= ?1 and s.jobName=?2 ")
+    void deleteInGroupAndjobName(String groupName, String jobName);
+
+
 }

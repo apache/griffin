@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.schedule;
 
+import org.apache.griffin.core.schedule.entity.JobHealth;
+import org.apache.griffin.core.schedule.entity.ScheduleState;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.List;
@@ -37,8 +40,16 @@ import java.util.Map;
 public class SchedulerController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerController.class);
 
-    @Autowired
+//    @Autowired
     SchedulerService schedulerService;
+
+    @Autowired
+    public SchedulerController(SchedulerService schedulerService){
+        this.schedulerService=schedulerService;
+        // when SpringApplication begin, start a thread to update instances of every job
+        schedulerService.startUpdateInstances();
+    }
+
 
     @RequestMapping("/")
     public List<Map<String, Serializable>> getJobs() throws SchedulerException,
@@ -62,8 +73,8 @@ public class SchedulerController {
     }
 
     @RequestMapping("/instances/{group}/{jobName}/{page}/{size}")
-    public List<ScheduleState> findInstancesOfJob(@PathVariable String group,@PathVariable String jobName,
-                                                  @PathVariable int page,@PathVariable int size){
+    public List<ScheduleState> findInstancesOfJob(@PathVariable String group, @PathVariable String jobName,
+                                                  @PathVariable int page, @PathVariable int size) throws IOException {
         return schedulerService.findInstancesOfJob(group,jobName,page,size);
     }
 

@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.schedule;
 
+import org.apache.griffin.core.schedule.entity.JobHealth;
+import org.apache.griffin.core.schedule.entity.ScheduleState;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
