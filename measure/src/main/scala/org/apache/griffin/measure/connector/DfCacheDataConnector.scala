@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.connector
 
+import org.apache.griffin.measure.config.params.user.DataCacheParam
 import org.apache.griffin.measure.result.TimeStampInfo
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.rdd.RDD
@@ -26,8 +27,10 @@ import org.apache.spark.storage.StorageLevel
 
 import scala.util.{Success, Try}
 
-case class DfCacheDataConnector(sqlContext: SQLContext, config: Map[String, Any]
+case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCacheParam
                                ) extends CacheDataConnector {
+
+  val config = dataCacheParam.config
 
   val CacheLevel = "cache.level"
   val cacheLevel: String = config.getOrElse(CacheLevel, "MEMORY_ONLY").toString

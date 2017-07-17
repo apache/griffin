@@ -41,13 +41,8 @@ case class KafkaDataConnector(sqlContext: SQLContext, @transient ssc: StreamingC
     case Failure(ex) => throw ex
   }
 
-  val Cache = "cache"
-
-  val cacheDataConnectorParam = dataConnectorParam.config.get(Cache) match {
-    case Some(map: Map[String, Any]) => DataConnectorParam(map)
-    case _ => throw new Exception("invalid cache parameter!")
-  }
-  val cacheDataConnector = DataConnectorFactory.getCacheDataConnector(sqlContext, cacheDataConnectorParam) match {
+  val dataCacheParam = dataConnectorParam.cache
+  val cacheDataConnector = DataConnectorFactory.getCacheDataConnector(sqlContext, dataCacheParam) match {
     case Success(cntr) => cntr
     case Failure(ex) => throw ex
   }

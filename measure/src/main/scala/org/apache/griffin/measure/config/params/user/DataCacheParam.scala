@@ -23,10 +23,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.griffin.measure.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
-case class DataConnectorParam( @JsonProperty("type") conType: String,
-                               @JsonProperty("version") version: String,
-                               @JsonProperty("config") config: Map[String, Any],
-                               @JsonProperty("cache") cache: DataCacheParam
-                             ) extends Param {
+case class DataCacheParam( @JsonProperty("type") cacheType: String,
+                           @JsonProperty("config") config: Map[String, Any],
+                           @JsonProperty("time.range") timeRange: List[String]
+                         ) extends Param {
 
 }

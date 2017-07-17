@@ -91,15 +91,16 @@ object DataConnectorFactory {
   }
 
   def getCacheDataConnector(sqlContext: SQLContext,
-                            dataConnectorParam: DataConnectorParam
+                            dataCacheParam: DataCacheParam
                            ): Try[CacheDataConnector] = {
-    val conType = dataConnectorParam.conType
-    val version = dataConnectorParam.version
-    val config = dataConnectorParam.config
+    if (dataCacheParam == null) {
+      throw new Exception("invalid data cache param!")
+    }
+    val cacheType = dataCacheParam.cacheType
     Try {
-      conType match {
+      cacheType match {
         case DfRegex() => {
-          DfCacheDataConnector(sqlContext, config)
+          DfCacheDataConnector(sqlContext, dataCacheParam)
         }
         case _ => throw new Exception("cache connector creation error!")
       }

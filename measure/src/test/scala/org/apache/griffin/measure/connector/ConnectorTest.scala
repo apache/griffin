@@ -25,7 +25,7 @@ import kafka.serializer.StringDecoder
 import org.apache.griffin.measure.algo.streaming.StreamingProcess
 import org.apache.griffin.measure.cache.info.InfoCacheInstance
 import org.apache.griffin.measure.config.params.env._
-import org.apache.griffin.measure.config.params.user.{DataConnectorParam, EvaluateRuleParam}
+import org.apache.griffin.measure.config.params.user.{DataCacheParam, DataConnectorParam, EvaluateRuleParam}
 import org.apache.griffin.measure.config.reader.ParamRawStringReader
 import org.apache.griffin.measure.result.{DataInfo, TimeStampInfo}
 import org.apache.griffin.measure.rule.expr.{Expr, StatementExpr}
@@ -106,17 +106,13 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
       ("info.path" -> "src")
     )
 
-    val cacheParam = Map[String, Any](
-      ("type" -> "df"),
-      ("config" -> cacheConfig)
-    )
+    val cacheParam = DataCacheParam("df", cacheConfig, Nil)
 
     val config = Map[String, Any](
       ("kafka.config" -> kafkaConfig),
       ("topics" -> "sss"),
       ("key.type" -> "java.lang.String"),
-      ("value.type" -> "java.lang.String"),
-      ("cache" -> cacheParam)
+      ("value.type" -> "java.lang.String")
     )
 
     val infoCacheConfig = Map[String, Any](
@@ -136,7 +132,7 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
     InfoCacheInstance.init
 
 
-    val connectorParam = DataConnectorParam("kafka", "0.8", config)
+    val connectorParam = DataConnectorParam("kafka", "0.8", config, cacheParam)
 
     val conf = new SparkConf().setMaster("local[*]").setAppName("ConnectorTest")
     val sc = new SparkContext(conf)
@@ -157,11 +153,8 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
       case _ => fail
     }
 
-    val cacheDataConnectorParam = connectorParam.config.get("cache") match {
-      case Some(map: Map[String, Any]) => DataConnectorParam(map)
-      case _ => throw new Exception("invalid cache parameter!")
-    }
-    val cacheDataConnector = DataConnectorFactory.getCacheDataConnector(sqlContext, cacheDataConnectorParam) match {
+    val dataCacheParam = connectorParam.cache
+    val cacheDataConnector = DataConnectorFactory.getCacheDataConnector(sqlContext, dataCacheParam) match {
       case Success(cntr) => cntr
       case Failure(ex) => throw ex
     }

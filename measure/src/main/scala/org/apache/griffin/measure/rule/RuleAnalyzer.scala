@@ -46,8 +46,6 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
   val targetRuleExprs: RuleExprs = RuleExprs(targetGroupbyExprs, targetCacheExprs,
     targetFinalCacheExprs, targetPersistExprs)
 
-  val whenClauseExprOpt: Option[WhenClauseExpr] = rule.whenClauseOpt
-
 }
 
 

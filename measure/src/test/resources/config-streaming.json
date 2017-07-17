@@ -14,14 +14,15 @@
       },
       "topics": "sss",
       "key.type": "java.lang.String",
-      "value.type": "java.lang.String",
-      "cache": {
-        "type": "df",
-        "config": {
-          "cache.level": "MEMORY_AND_DISK",
-          "info.path": "src"
-        }
-      }
+      "value.type": "java.lang.String"
+    },
+    "cache": {
+      "type": "df",
+      "config": {
+        "cache.level": "MEMORY_AND_DISK",
+        "info.path": "src"
+      },
+      "time.range": ["-2m", "0"]
     }
   },
 
@@ -37,19 +38,20 @@
       },
       "topics": "ttt",
       "key.type": "java.lang.String",
-      "value.type": "java.lang.String",
-      "cache": {
-        "type": "df",
-        "config": {
-          "cache.level": "MEMORY_AND_DISK",
-          "info.path": "tgt"
-        }
-      }
+      "value.type": "java.lang.String"
+    },
+    "cache": {
+      "type": "df",
+      "config": {
+        "cache.level": "MEMORY_AND_DISK",
+        "info.path": "tgt"
+      },
+      "time.range": []
     }
   },
 
   "evaluateRule": {
     "sampleRatio": 0.2,
-    "rules": "$source.json().name = $target.json().name AND $source.json().age = $target.json().age WHEN $source._tmst_ < $target._tmst_ + 2m"
+    "rules": "$source.json().name = $target.json().name AND $source.json().age = $target.json().age"
   }
 }
