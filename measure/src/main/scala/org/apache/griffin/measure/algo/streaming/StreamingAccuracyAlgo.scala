@@ -23,11 +23,11 @@ import java.util.concurrent.{Executors, ThreadPoolExecutor, TimeUnit}
 
 import org.apache.griffin.measure.algo.AccuracyAlgo
 import org.apache.griffin.measure.algo.core.AccuracyCore
-import org.apache.griffin.measure.cache.InfoCacheInstance
+import org.apache.griffin.measure.cache.info.InfoCacheInstance
 import org.apache.griffin.measure.config.params.AllParam
 import org.apache.griffin.measure.connector._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.result.AccuracyResult
+import org.apache.griffin.measure.result.{AccuracyResult, TimeStampInfo}
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
 import org.apache.griffin.measure.rule.expr._
 import org.apache.griffin.measure.utils.TimeUtil
@@ -211,6 +211,18 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         case Some(d) => Some((d -> v))
         case _ => None
       }
+    }
+  }
+
+  def reorgByTimeGroup(rdd: RDD[(Product, (Map[String, Any], Map[String, Any]))]
+                      ): RDD[(Long, (Product, (Map[String, Any], Map[String, Any])))] = {
+    rdd.flatMap { row =>
+      val (key, (value, info)) = row
+      val b: Option[(Long, (Product, (Map[String, Any], Map[String, Any])))] = info.get(TimeStampInfo.key) match {
+        case Some(t: Long) => Some((t, row))
+        case _ => None
+      }
+      b
     }
   }
 

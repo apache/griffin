@@ -24,6 +24,7 @@ import java.util.concurrent.{Executors, ThreadPoolExecutor, TimeUnit}
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
+import org.apache.griffin.measure.cache.info.ZKInfoCache
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}

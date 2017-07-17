@@ -16,16 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.cache
+package org.apache.griffin.measure.cache.result
 
-import java.util.concurrent.TimeUnit
+import org.apache.griffin.measure.result.Result
 
-import org.apache.griffin.measure.log.Loggable
+case class CacheResult(timeGroup: Long, updateTime: Long, result: Result) {
 
-trait CacheLock extends Loggable with Serializable {
-
-  def lock(outtime: Long, unit: TimeUnit): Boolean
-
-  def unlock(): Unit
+  def olderThan(ut: Long): Boolean = {
+    updateTime < ut
+  }
 
 }

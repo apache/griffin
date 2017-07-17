@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import kafka.serializer.StringDecoder
 import org.apache.griffin.measure.algo.streaming.StreamingProcess
-import org.apache.griffin.measure.cache.InfoCacheInstance
+import org.apache.griffin.measure.cache.info.InfoCacheInstance
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user.{DataConnectorParam, EvaluateRuleParam}
 import org.apache.griffin.measure.config.reader.ParamRawStringReader

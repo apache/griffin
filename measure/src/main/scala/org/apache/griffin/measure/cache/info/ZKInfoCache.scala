@@ -16,12 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.cache
+package org.apache.griffin.measure.cache.info
 
 import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
+import org.apache.griffin.measure.cache.lock.ZKCacheLock
 import org.apache.zookeeper.CreateMode
 
 case class ZKInfoCache(config: Map[String, Any], metricName: String) extends InfoCache {

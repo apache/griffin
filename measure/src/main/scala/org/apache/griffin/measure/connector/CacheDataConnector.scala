@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.connector
 
-import org.apache.griffin.measure.cache.{InfoCacheInstance, ZKInfoCache}
+import org.apache.griffin.measure.cache.info.{InfoCacheInstance, ZKInfoCache}
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.sql.DataFrame
 

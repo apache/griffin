@@ -22,7 +22,8 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.algo.batch.BatchAccuracyAlgo
-import org.apache.griffin.measure.cache.InfoCacheInstance
+import org.apache.griffin.measure.cache.info.InfoCacheInstance
+import org.apache.griffin.measure.cache.result._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
@@ -31,6 +32,7 @@ import org.apache.griffin.measure.config.validator._
 import org.apache.griffin.measure.connector.{BatchDataConnector, DataConnector, DataConnectorFactory}
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.expr._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
 import org.apache.griffin.measure.utils.TimeUtil
@@ -164,6 +166,8 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     InfoCacheInstance.initInstance(envParam.infoCacheParams, metricName)
     InfoCacheInstance.init
 
+    val cacheResultProcesser = CacheResultProcesser()
+
     // init data stream
     sourceDataConnector.init()
     targetDataConnector.init()
@@ -175,6 +179,7 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     case class Process() extends Runnable {
       val lock = InfoCacheInstance.genLock("process")
       def run(): Unit = {
+        val updateTime = new Date().getTime
         val locked = lock.lock(5, TimeUnit.SECONDS)
         if (locked) {
           try {
@@ -196,8 +201,72 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
             val (accuResult, missingRdd, matchedRdd) = algo.accuracy(sourceData, targetData, ruleAnalyzer)
             println(accuResult)
 
-            val et = new Date().getTime
-            println(s"process time: ${et - st} ms")
+            // result of every group
+            val matchedGroups = algo.reorgByTimeGroup(matchedRdd)
+            val matchedGroupCount = matchedGroups.count
+            println(s"===== matchedGroupCount: ${matchedGroupCount} =====")
+
+            // get missing results
+            val missingGroups = algo.reorgByTimeGroup(missingRdd)
+            val missingGroupCount = missingGroups.count
+            println(s"===== missingGroupCount: ${missingGroupCount} =====")
+
+            val groups = matchedGroups.cogroup(missingGroups)
+            val groupCount = groups.count
+            println(s"===== groupCount: ${groupCount} =====")
+
+            val updateResults = groups.flatMap { group =>
+              val (t, (matchData, missData)) = group
+
+              val matchSize = matchData.size
+              val missSize = missData.size
+              val res = AccuracyResult(missSize, matchSize + missSize)
+
+              val updatedCacheResulOpt = cacheResultProcesser.genUpdateCacheResult(t, updateTime, res)
+
+              // updated result
+              if (updatedCacheResulOpt.nonEmpty) {
+                val missStrings = missData.map { row =>
+                  val (key, (value, info)) = row
+                  s"${value} [${info.getOrElse(MismatchInfo.key, "unknown")}]"
+                }
+                // persist missing data
+                missStrings.foreach(println)
+                // record missing records
+//                try {
+//                  persist.accuracyMissingRecords(missStrings)
+//                } catch {
+//                  case e: Throwable => println("missing record error: " + e.getMessage)
+//                }
+              }
+
+              updatedCacheResulOpt
+            }.collect()
+
+            // persist update results
+            updateResults.foreach { updateResult =>
+              // cache
+              cacheResultProcesser.update(updateResult)
+
+              // persist
+              // fixme:
+              println(updateResult)
+            }
+
+            // dump missing rdd
+//            ruleAnalyzer.whenClauseExprOpt
+//            val savingRdd: RDD[(Product, (Map[String, Any], Map[String, Any]))] = missingRdd.filter { row =>
+//              val (key, (value, info)) = row
+//              info.get(TimeGroupInfo.key) match {
+//                case Some(t: Long) => {
+//                  cacheProcesser.getCache(t) match {
+//                    case Some(cache) => true
+//                    case _ => false
+//                  }
+//                }
+//                case _ => false
+//              }
+//            }
 
             // persist time
             //              persist.log(et, s"calculation using time: ${et - st} ms")
@@ -209,6 +278,8 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
 
             //              val pet = new Date().getTime
             //              persist.log(pet, s"persist using time: ${pet - et} ms")
+            val et = new Date().getTime
+            println(s"process time: ${et - st} ms")
           } finally {
             lock.unlock()
           }

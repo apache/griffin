@@ -46,6 +46,8 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
   val targetRuleExprs: RuleExprs = RuleExprs(targetGroupbyExprs, targetCacheExprs,
     targetFinalCacheExprs, targetPersistExprs)
 
+  val whenClauseExprOpt: Option[WhenClauseExpr] = rule.whenClauseOpt
+
 }
 
 
@@ -58,8 +60,6 @@ case class RuleAnalyzer(rule: StatementExpr) extends Serializable {
 //                  Cached for the calculation usage, and can be saved for the re-calculation in streaming mode
 // persistExprs: the expr values should be persisted, only the direct selection exprs are persistable
 //                  Persisted for record usage, to record the missing data, need be readable as raw data
-// whenClauseExprOpt: when clause of rule, to determine if the row of data source is filtered
-//                  Can be prep-calculated to filter some data in data connector
 case class RuleExprs(groupbyExprs: Seq[Expr],
                      cacheExprs: Iterable[Expr],
                      finalCacheExprs: Iterable[Expr],
@@ -71,5 +71,4 @@ case class RuleExprs(groupbyExprs: Seq[Expr],
   // cacheExprs: $target.name, $target.age, $target.age + (3 * 4)
   // finalCacheExprs: $target.name, $target.age + (3 * 4), $target.age
   // persistExprs: $target.name, $target.age
-  // whenClauseExprOpt: None
 }
