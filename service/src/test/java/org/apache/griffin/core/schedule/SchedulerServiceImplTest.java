@@ -19,9 +19,9 @@ under the License.
 
 package org.apache.griffin.core.schedule;
 
-import org.apache.griffin.core.schedule.repo.ScheduleStateRepo;
 import org.apache.griffin.core.schedule.entity.JobHealth;
-import org.apache.griffin.core.schedule.entity.ScheduleState;
+import org.apache.griffin.core.schedule.entity.JobInstance;
+import org.apache.griffin.core.schedule.repo.JobInstanceRepo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,7 +66,7 @@ public class SchedulerServiceImplTest {
     }
 
     @MockBean
-    private ScheduleStateRepo scheduleStateRepo;
+    private JobInstanceRepo jobInstanceRepo;
 
 
     @MockBean
@@ -162,7 +162,7 @@ public class SchedulerServiceImplTest {
             String jobName="job1";
             int page=0;
             int size=2;
-            List<ScheduleState> tmp = service.findInstancesOfJob(groupName,jobName,page,size);
+            List<JobInstance> tmp = service.findInstancesOfJob(groupName,jobName,page,size);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot find instances of Job");
@@ -181,23 +181,23 @@ public class SchedulerServiceImplTest {
             given(scheduler.getJobKeys(GroupMatcher.jobGroupEquals("BA"))).willReturn((jobKeySet));
 
             Pageable pageRequest=new PageRequest(0,1, Sort.Direction.DESC,"timestamp");
-            List<ScheduleState> scheduleStateList=new ArrayList<ScheduleState>();
-            ScheduleState scheduleState1=new ScheduleState();
-            scheduleState1.setGroupName("BA");
-            scheduleState1.setJobName("job1");
-            scheduleState1.setScheduleid(1);
-            scheduleState1.setState("starting");
-            scheduleState1.setAppId("ttt");
-            scheduleState1.setTimestamp(System.currentTimeMillis());
-            scheduleStateList.add(scheduleState1);
-            given(scheduleStateRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
+            List<JobInstance> scheduleStateList=new ArrayList<JobInstance>();
+            JobInstance jobInstance=new JobInstance();
+            jobInstance.setGroupName("BA");
+            jobInstance.setJobName("job1");
+            jobInstance.setSessionId(1);
+            jobInstance.setState("starting");
+            jobInstance.setAppId("ttt");
+            jobInstance.setTimestamp(System.currentTimeMillis());
+            scheduleStateList.add(jobInstance);
+            given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
             JobHealth tmp = service.getHealthInfo();
             assertTrue(true);
 
             scheduleStateList.remove(0);
-            scheduleState1.setState("down");
-            scheduleStateList.add(scheduleState1);
-            given(scheduleStateRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
+            jobInstance.setState("down");
+            scheduleStateList.add(jobInstance);
+            given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
             JobHealth tmp1 = service.getHealthInfo();
         }catch (Throwable t){
             fail("Cannot get Health info "+t);

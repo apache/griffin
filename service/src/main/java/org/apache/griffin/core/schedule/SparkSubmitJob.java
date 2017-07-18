@@ -29,10 +29,10 @@ import org.apache.griffin.core.common.PropertiesOperate;
 import org.apache.griffin.core.measure.DataConnector;
 import org.apache.griffin.core.measure.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.schedule.repo.ScheduleStateRepo;
-import org.apache.griffin.core.schedule.entity.ScheduleState;
+import org.apache.griffin.core.schedule.entity.JobInstance;
 import org.apache.griffin.core.schedule.entity.SparkJobDO;
 import org.apache.griffin.core.schedule.quartzConfig.Conf;
+import org.apache.griffin.core.schedule.repo.JobInstanceRepo;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public class SparkSubmitJob implements Job {
     MeasureRepo measureRepo;
 
     @Autowired
-    ScheduleStateRepo scheduleStateRepo;
+    JobInstanceRepo jobInstanceRepo;
 
     Properties props;
 
@@ -91,7 +91,6 @@ public class SparkSubmitJob implements Job {
 
     public SparkSubmitJob() throws IOException {
         try {
-//            props = getsparkJobProperties();
             props= PropertiesOperate.getProperties("sparkJob.properties");
             patItem = props.getProperty("sparkJob.dateAndHour");
             partitionItemSet = patItem.split(",");
@@ -137,31 +136,31 @@ public class SparkSubmitJob implements Job {
         setSparkJobDO();
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         LOGGER.info(result);
-        saveScheduleState(groupName,jobName,result);
+        saveJobInstance(groupName,jobName,result);
     }
 
-    public void saveScheduleState(String groupName,String jobName,String result){
-        //save scheduleState info into DataBase
+    public void saveJobInstance(String groupName,String jobName,String result){
+        //save JobInstance info into DataBase
         Map<String,Object> resultMap=new HashMap<String,Object>();
         try {
             TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
             resultMap= JsonConvert.toEntity(result,type);
         }catch (Exception e){
-            LOGGER.error("scheduleResult covert error!"+e);
+            LOGGER.error("jobInstance convert error!"+e);
         }
-        ScheduleState scheduleState=new ScheduleState();
+        JobInstance jobInstance=new JobInstance();
         if(resultMap!=null) {
-            scheduleState.setGroupName(groupName);
-            scheduleState.setJobName(jobName);
+            jobInstance.setGroupName(groupName);
+            jobInstance.setJobName(jobName);
             try {
-                scheduleState.setScheduleid(Long.parseLong(resultMap.get("id").toString()));
-                scheduleState.setState(resultMap.get("state").toString());
-                scheduleState.setAppId(resultMap.get("appId").toString());
+                jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
+                jobInstance.setState(resultMap.get("state").toString());
+                jobInstance.setAppId(resultMap.get("appId").toString());
             }catch (Exception e){
-                LOGGER.warn("scheduleState has null field. \n"+e);
+                LOGGER.warn("jobInstance has null field. \n"+e);
             }
-            scheduleState.setTimestamp(System.currentTimeMillis());
-            scheduleStateRepo.save(scheduleState);
+            jobInstance.setTimestamp(System.currentTimeMillis());
+            jobInstanceRepo.save(jobInstance);
         }
     }
 
@@ -186,11 +185,12 @@ public class SparkSubmitJob implements Job {
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
 
         Map<String, String> configMap = dc.getConfigInMaps();
+        //config should not be null
         configMap.put("partitions", partitions);
         try {
             dc.setConfig(configMap);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOGGER.error(""+e);
         }
     }
 
@@ -253,24 +253,4 @@ public class SparkSubmitJob implements Job {
         List<String> files = new ArrayList<>();
         sparkJobDO.setFiles(files);
     }
-
-//    public Properties getsparkJobProperties() throws IOException {
-//        InputStream inputStream = null;
-//        Properties prop = new Properties();
-//        ;
-//        try {
-//            String propFileName = "sparkJob.properties";
-//            inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-//            if (inputStream != null) {
-//                prop.load(inputStream);
-//            } else {
-//                throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
-//            }
-//        } catch (Exception e) {
-//            logger.info("Exception: " + e);
-//        } finally {
-//            inputStream.close();
-//        }
-//        return prop;
-//    }
 }

@@ -24,8 +24,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.common.JsonConvert;
 import org.apache.griffin.core.common.PropertiesOperate;
 import org.apache.griffin.core.schedule.entity.JobHealth;
-import org.apache.griffin.core.schedule.entity.ScheduleState;
-import org.apache.griffin.core.schedule.repo.ScheduleStateRepo;
+import org.apache.griffin.core.schedule.entity.JobInstance;
+import org.apache.griffin.core.schedule.repo.JobInstanceRepo;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -42,7 +43,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import static java.lang.Thread.sleep;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -56,7 +56,7 @@ public class SchedulerServiceImpl implements SchedulerService{
     @Autowired
     private SchedulerFactoryBean factory;
     @Autowired
-    private ScheduleStateRepo scheduleStateRepo;
+    private JobInstanceRepo jobInstanceRepo;
 
     public static final String ACCURACY_BATCH_GROUP = "BA";
 
@@ -204,7 +204,7 @@ public class SchedulerServiceImpl implements SchedulerService{
         try {
             Scheduler scheduler = factory.getObject();
             scheduler.deleteJob(new JobKey(name, group));
-            scheduleStateRepo.deleteInGroupAndjobName(group,name);
+            jobInstanceRepo.deleteInGroupAndjobName(group,name);
             return true;
         } catch (SchedulerException e) {
             LOGGER.error(e.getMessage());
@@ -213,79 +213,64 @@ public class SchedulerServiceImpl implements SchedulerService{
     }
 
     @Override
-    public List<ScheduleState> findInstancesOfJob(String group, String jobName, int page, int size) throws IOException {
-        //update job instances
-        updateInstances(group,jobName);
+    public List<JobInstance> findInstancesOfJob(String group, String jobName, int page, int size) {
+        //update job instances, if updating is failed, it shouldn't block search database
+        try{
+            updateInstances(group,jobName);
+        }catch (IOException e) {
+            LOGGER.error("update instances of job "+jobName+" failed. "+e);
+        }
         //query and return instances
         Pageable pageRequest=new PageRequest(page,size, Sort.Direction.DESC,"timestamp");
-        return scheduleStateRepo.findByGroupNameAndJobName(group,jobName,pageRequest);
+        return jobInstanceRepo.findByGroupNameAndJobName(group,jobName,pageRequest);
     }
 
     public synchronized void updateInstances(String group, String jobName) throws IOException {
-        //update all schedule instance state belongs to this group and job.
-        List<ScheduleState> scheduleStateList=scheduleStateRepo.findByGroupNameAndJobName(group,jobName);
-        for (ScheduleState scheduleState:scheduleStateList){
-            if (scheduleState.getState().equals("success") || scheduleState.getState().equals("unknown")){
+        //update all instance info belongs to this group and job.
+        List<JobInstance> jobInstanceList=jobInstanceRepo.findByGroupNameAndJobName(group,jobName);
+        for (JobInstance jobInstance:jobInstanceList){
+            if (jobInstance.getState().equals("success") || jobInstance.getState().equals("unknown")){
                 continue;
             }
-            String uri=sparkJobProps.getProperty("sparkJob.uri")+"/"+scheduleState.getScheduleid();
+            String uri=sparkJobProps.getProperty("sparkJob.uri")+"/"+jobInstance.getSessionId();
             RestTemplate restTemplate=new RestTemplate();
             String resultStr=null;
             try{
                 resultStr=restTemplate.getForObject(uri,String.class);
             }catch (Exception e){
-                LOGGER.error("spark session "+scheduleState.getScheduleid()+" has overdue, set state as unknown!\n"+e);
-                scheduleState.setState("unknown");
+                LOGGER.error("spark session "+jobInstance.getSessionId()+" has overdue, set state as unknown!\n"+e);
+                jobInstance.setState("unknown");
             }
             TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
             HashMap<String,Object> resultMap= JsonConvert.toEntity(resultStr,type);
             try{
                 if (resultMap!=null && resultMap.size()!=0){
-                    scheduleState.setState(resultMap.get("state").toString());
-                    scheduleState.setAppId(resultMap.get("appId").toString());
+                    jobInstance.setState(resultMap.get("state").toString());
+                    jobInstance.setAppId(resultMap.get("appId").toString());
                 }
             }catch (Exception e){
-                LOGGER.warn("schedule Instance has some null field (state or appId). "+e);
+                LOGGER.warn(group+","+jobName+"job Instance has some null field (state or appId). "+e);
                 continue;
             }
-            scheduleStateRepo.setFixedStateAndappIdFor(scheduleState.getId(),scheduleState.getState(),scheduleState.getAppId());
+            jobInstanceRepo.setFixedStateAndappIdFor(jobInstance.getId(),jobInstance.getState(),jobInstance.getAppId());
         }
     }
 
     @Override
+    @Scheduled(fixedDelay = 60*1000)
     public void startUpdateInstances(){
-        List<Object> groupJobList=scheduleStateRepo.findGroupWithJobName();
+        List<Object> groupJobList=jobInstanceRepo.findGroupWithJobName();
         for (Object groupJobObj : groupJobList){
             try{
                 Object[] groupJob=(Object[])groupJobObj;
                 if (groupJob!=null && groupJob.length==2){
-                    updateInstancesThread(groupJob[0].toString(),groupJob[1].toString());
+//                    updateInstancesThread(groupJob[0].toString(),groupJob[1].toString());
+                    updateInstances(groupJob[0].toString(),groupJob[1].toString());
                 }
             }catch (Exception e){
                 LOGGER.error(""+e);
             }
         }
-    }
-
-    public void updateInstancesThread(String group, String jobName){
-        Thread thread=new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true){
-                    try {
-                        sleep(60*1000);
-                        updateInstances(group,jobName);
-                        LOGGER.info("thread execute, update schedule instances!");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }
-        });
-        thread.start();
     }
 
     @Override
@@ -299,11 +284,11 @@ public class SchedulerServiceImpl implements SchedulerService{
                 String jobName=jobKey.getName();
                 String jobGroup=jobKey.getGroup();
                 Pageable pageRequest=new PageRequest(0,1, Sort.Direction.DESC,"timestamp");
-                ScheduleState scheduleState=new ScheduleState();
-                if (scheduleStateRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest)!=null
-                        &&scheduleStateRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).size()>0){
-                    scheduleState=scheduleStateRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
-                    if(scheduleState.getState().equals("starting")){
+                JobInstance jobInstance=new JobInstance();
+                if (jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest)!=null
+                        &&jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).size()>0){
+                    jobInstance=jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
+                    if(jobInstance.getState().equals("starting")){
                         health++;
                     }else{
                         invalid++;

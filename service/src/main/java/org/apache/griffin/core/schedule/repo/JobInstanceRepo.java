@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.core.schedule.repo;
 
 
-import org.apache.griffin.core.schedule.entity.ScheduleState;
+import org.apache.griffin.core.schedule.entity.JobInstance;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -31,28 +31,28 @@ import java.util.List;
 
 
 @Repository
-public interface ScheduleStateRepo extends CrudRepository<ScheduleState,Long>{
-    @Query("select s from ScheduleState s " +
+public interface JobInstanceRepo extends CrudRepository<JobInstance,Long>{
+    @Query("select s from JobInstance s " +
             "where s.groupName= ?1 and s.jobName=?2 "/*+
             "order by s.timestamp desc"*/)
-    List<ScheduleState> findByGroupNameAndJobName(String group, String name, Pageable pageable);
+    List<JobInstance> findByGroupNameAndJobName(String group, String name, Pageable pageable);
 
-    @Query("select s from ScheduleState s " +
+    @Query("select s from JobInstance s " +
             "where s.groupName= ?1 and s.jobName=?2 ")
-    List<ScheduleState> findByGroupNameAndJobName(String group, String name);
+    List<JobInstance> findByGroupNameAndJobName(String group, String name);
 
-    @Query("select DISTINCT s.groupName, s.jobName from ScheduleState s")
+    @Query("select DISTINCT s.groupName, s.jobName from JobInstance s")
     List<Object> findGroupWithJobName();
 
     @Transactional
     @Modifying
-    @Query("update ScheduleState s "+
+    @Query("update JobInstance s "+
             "set s.state= ?2, s.appId= ?3 where s.id= ?1")
     void setFixedStateAndappIdFor(Long Id, String state, String appId);
 
     @Transactional
     @Modifying
-    @Query("delete from ScheduleState s " +
+    @Query("delete from JobInstance s " +
             "where s.groupName= ?1 and s.jobName=?2 ")
     void deleteInGroupAndjobName(String groupName, String jobName);
 

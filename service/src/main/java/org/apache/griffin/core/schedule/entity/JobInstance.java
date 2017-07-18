@@ -27,13 +27,13 @@ import javax.persistence.Entity;
  * Created by xiangrchen on 5/31/17.
  */
 @Entity
-public class ScheduleState extends AuditableEntity {
+public class JobInstance extends AuditableEntity {
 
     private static final long serialVersionUID = -4748881017029815874L;
 
     String groupName;
     String jobName;
-    long scheduleid;
+    int sessionId;
     String state;
     String appId;
     long timestamp;
@@ -54,12 +54,12 @@ public class ScheduleState extends AuditableEntity {
         this.jobName = jobName;
     }
 
-    public long getScheduleid() {
-        return scheduleid;
+    public int getSessionId() {
+        return sessionId;
     }
 
-    public void setScheduleid(long scheduleid) {
-        this.scheduleid = scheduleid;
+    public void setSessionId(int sessionId) {
+        this.sessionId = sessionId;
     }
 
     public String getState() {
@@ -86,13 +86,13 @@ public class ScheduleState extends AuditableEntity {
         this.timestamp = timestamp;
     }
 
-    public ScheduleState() {
+    public JobInstance() {
     }
 
-    public ScheduleState(String groupName, String jobName, long scheduleid, String state, String appId, long timestamp) {
+    public JobInstance(String groupName, String jobName, int sessionId, String state, String appId, long timestamp) {
         this.groupName = groupName;
         this.jobName = jobName;
-        this.scheduleid = scheduleid;
+        this.sessionId = sessionId;
         this.state = state;
         this.appId = appId;
         this.timestamp = timestamp;
