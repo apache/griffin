@@ -26,7 +26,11 @@ case class ZKCacheLock(@transient mutex: InterProcessMutex) extends CacheLock {
 
   def lock(outtime: Long, unit: TimeUnit): Boolean = {
     try {
-      mutex.acquire(outtime, unit)
+      if (outtime >= 0) {
+        mutex.acquire(outtime, unit)
+      } else {
+        mutex.acquire(-1, null)
+      }
     } catch {
       case e: Throwable => {
         error(s"lock error: ${e.getMessage}")

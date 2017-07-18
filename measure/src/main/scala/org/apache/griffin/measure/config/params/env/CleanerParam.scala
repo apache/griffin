@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.griffin.measure.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
-case class CleanerParam() extends Param {
+case class CleanerParam( @JsonProperty("clean.interval") cleanInterval: String
+                       ) extends Param {
 
 }

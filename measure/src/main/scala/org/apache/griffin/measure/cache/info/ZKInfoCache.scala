@@ -25,6 +25,8 @@ import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.griffin.measure.cache.lock.ZKCacheLock
 import org.apache.zookeeper.CreateMode
 
+import scala.collection.JavaConverters._
+
 case class ZKInfoCache(config: Map[String, Any], metricName: String) extends InfoCache {
 
   val Hosts = "hosts"
@@ -110,6 +112,10 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
 
   def clearInfo(): Unit = {
     delete("/")
+  }
+
+  def listKeys(p: String): List[String] = {
+    client.getChildren().forPath(path(p)).asScala.toList
   }
 
   def genLock(s: String): ZKCacheLock = {

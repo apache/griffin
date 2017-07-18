@@ -157,7 +157,7 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         case Some(interval) => interval
         case _ => throw new Exception("invalid batch interval")
       }
-      val process = StreamingProcess(processInterval, Process())
+      val process = TimingProcess(processInterval, Process())
 
       process.startup()
 

@@ -22,7 +22,7 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 import kafka.serializer.StringDecoder
-import org.apache.griffin.measure.algo.streaming.StreamingProcess
+import org.apache.griffin.measure.algo.streaming.TimingProcess
 import org.apache.griffin.measure.cache.info.InfoCacheInstance
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user.{DataCacheParam, DataConnectorParam, EvaluateRuleParam}
@@ -132,7 +132,7 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
     InfoCacheInstance.init
 
 
-    val connectorParam = DataConnectorParam("kafka", "0.8", config, cacheParam)
+    val connectorParam = DataConnectorParam("kafka", "0.8", config, cacheParam, false)
 
     val conf = new SparkConf().setMaster("local[*]").setAppName("ConnectorTest")
     val sc = new SparkContext(conf)
@@ -292,7 +292,7 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
       case Some(interval) => interval
       case _ => throw new Exception("invalid batch interval")
     }
-    val process = StreamingProcess(processInterval, Process())
+    val process = TimingProcess(processInterval, Process())
 
     process.startup()
 

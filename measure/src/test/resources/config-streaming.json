@@ -20,10 +20,13 @@
       "type": "df",
       "config": {
         "cache.level": "MEMORY_AND_DISK",
-        "info.path": "src"
+        "info.path": "src",
+        "ready.time.interval": "10s",
+        "ready.time.delay": "0"
       },
       "time.range": ["-2m", "0"]
-    }
+    },
+    "match.once": true
   },
 
   "target": {
@@ -44,10 +47,13 @@
       "type": "df",
       "config": {
         "cache.level": "MEMORY_AND_DISK",
-        "info.path": "tgt"
+        "info.path": "tgt",
+        "ready.time.interval": "10s",
+        "ready.time.delay": "0"
       },
-      "time.range": []
-    }
+      "time.range": ["-2m", "0"]
+    },
+    "match.once": false
   },
 
   "evaluateRule": {

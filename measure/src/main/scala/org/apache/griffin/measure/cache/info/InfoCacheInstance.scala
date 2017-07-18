@@ -43,5 +43,11 @@ object InfoCacheInstance extends InfoCache {
   def deleteInfo(keys: Iterable[String]): Unit = infoCaches.foreach(_.deleteInfo(keys))
   def clearInfo(): Unit = infoCaches.foreach(_.clearInfo)
 
+  def listKeys(path: String): List[String] = {
+    infoCaches.foldLeft(Nil: List[String]) { (res, infoCache) =>
+      if (res.size > 0) res else infoCache.listKeys(path)
+    }
+  }
+
   def genLock(s: String): CacheLock = MultiCacheLock(infoCaches.map(_.genLock(s)))
 }

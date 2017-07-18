@@ -45,14 +45,12 @@ case class CacheResultProcesser() extends Loggable {
   }
 
   def update(cr: CacheResult): Unit = {
-    if (!cr.result.eventual) {
-      val t = cr.timeGroup
-      cacheGroup.get(t) match {
-        case Some(c) => {
-          if (c.olderThan(t)) cacheGroup += (t -> cr)
-        }
-        case _ => cacheGroup += (t -> cr)
+    val t = cr.timeGroup
+    cacheGroup.get(t) match {
+      case Some(c) => {
+        if (c.olderThan(cr.updateTime)) cacheGroup += (t -> cr)
       }
+      case _ => cacheGroup += (t -> cr)
     }
   }
 

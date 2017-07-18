@@ -172,6 +172,16 @@ case class KafkaDataConnector(sqlContext: SQLContext, @transient ssc: StreamingC
     }
   }
 
+  override def cleanOldData(): Unit = {
+    cacheDataConnector.cleanOldData
+  }
+
+  override def updateOldData(oldRdd: RDD[Map[String, Any]]): Unit = {
+    if (dataConnectorParam.getMatchOnce) {
+      cacheDataConnector.updateOldData(genDataFrame(oldRdd))
+    }
+  }
+
 //  private def dbPrefix(): Boolean = {
 //    if (useTempTable) false else dumpDatabase.nonEmpty && !dumpDatabase.equals("default")
 //  }

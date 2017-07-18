@@ -40,6 +40,6 @@
   ],
 
   "cleaner": {
-
+    "clean.interval": "2m"
   }
 }

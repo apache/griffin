@@ -21,7 +21,7 @@ package org.apache.griffin.measure.algo.streaming
 import java.util.concurrent.{Executors, ThreadPoolExecutor, TimeUnit}
 import java.util.{Timer, TimerTask}
 
-case class StreamingProcess(interval: Long, runnable: Runnable) {
+case class TimingProcess(interval: Long, runnable: Runnable) {
 
   val pool: ThreadPoolExecutor = Executors.newFixedThreadPool(5).asInstanceOf[ThreadPoolExecutor]
 

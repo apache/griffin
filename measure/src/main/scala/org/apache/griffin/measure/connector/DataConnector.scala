@@ -19,6 +19,8 @@ under the License.
 package org.apache.griffin.measure.connector
 
 import org.apache.griffin.measure.log.Loggable
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 
 trait DataConnector extends Loggable with Serializable {
@@ -26,5 +28,10 @@ trait DataConnector extends Loggable with Serializable {
   def available(): Boolean
 
   def init(): Unit = {}
+
+  def cleanOldData(): Unit = {}
+
+  def updateOldData(oldDf: DataFrame): Unit = {}
+  def updateOldData(oldRdd: RDD[Map[String, Any]]): Unit = {}
 
 }

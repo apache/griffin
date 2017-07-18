@@ -22,7 +22,8 @@ import scala.util.{Failure, Success, Try}
 
 object TimeUtil {
 
-  final val TimeRegex = """(\d+)(d|h|m|s|ms)""".r
+  final val TimeRegex = """([+\-]?\d+)(d|h|m|s|ms)""".r
+  final val PureTimeRegex = """([+\-]?\d+)""".r
 
   def milliseconds(timeString: String): Option[Long] = {
     val value: Option[Long] = {
@@ -38,6 +39,10 @@ object TimeUtil {
               case "ms" => t
               case _ => throw new Exception(s"${timeString} is invalid time format")
             }
+          }
+          case PureTimeRegex(time) => {
+            val t = time.toLong
+            t
           }
           case _ => throw new Exception(s"${timeString} is invalid time format")
         }

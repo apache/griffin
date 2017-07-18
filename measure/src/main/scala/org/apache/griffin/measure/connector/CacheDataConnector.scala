@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.connector
 
-import org.apache.griffin.measure.cache.info.{InfoCacheInstance, ZKInfoCache}
+import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache, ZKInfoCache}
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.sql.DataFrame
 
@@ -34,43 +34,28 @@ trait CacheDataConnector extends DataConnector {
   val readyTimeInterval: Long
   val readyTimeDelay: Long
 
-  def CacheTime = s"${cacheInfoPath}/cache.time"
-  def LastProcTime = s"${cacheInfoPath}/last.proc.time"
-  def ReadyTime = s"${cacheInfoPath}/ready.time"
+  def selfCacheInfoPath = s"${TimeInfoCache.infoPath}/${cacheInfoPath}"
+
+  def selfCacheTime = TimeInfoCache.cacheTime(selfCacheInfoPath)
+  def selfLastProcTime = TimeInfoCache.lastProcTime(selfCacheInfoPath)
+  def selfReadyTime = TimeInfoCache.readyTime(selfCacheInfoPath)
 
   protected def submitCacheTime(ms: Long): Unit = {
-    val map = Map[String, String]((CacheTime -> ms.toString))
+    val map = Map[String, String]((selfCacheTime -> ms.toString))
     InfoCacheInstance.cacheInfo(map)
   }
 
   protected def submitReadyTime(ms: Long): Unit = {
-    if (ms % readyTimeInterval == 0) {
-      val map = Map[String, String]((ReadyTime -> ms.toString))
+    val curReadyTime = ms - readyTimeDelay
+    if (curReadyTime % readyTimeInterval == 0) {
+      val map = Map[String, String]((selfReadyTime -> curReadyTime.toString))
       InfoCacheInstance.cacheInfo(map)
     }
   }
 
-  def submitLastProcTime(ms: Long): Unit = {
-    val map = Map[String, String]((LastProcTime -> ms.toString))
+  protected def submitLastProcTime(ms: Long): Unit = {
+    val map = Map[String, String]((selfLastProcTime -> ms.toString))
     InfoCacheInstance.cacheInfo(map)
-  }
-
-  protected def readTimeRange(): (Long, Long) = {
-    val map = InfoCacheInstance.readInfo(List(LastProcTime, ReadyTime))
-    val lastProcTime = getLong(map, LastProcTime)
-    val curReadyTime = getLong(map, ReadyTime)
-    (lastProcTime + 1, curReadyTime)
-  }
-
-  private def getLong(map: Map[String, String], key: String): Long = {
-    try {
-      map.get(key) match {
-        case Some(v) => v.toLong
-        case _ => -1
-      }
-    } catch {
-      case _ => -1
-    }
   }
 
 }

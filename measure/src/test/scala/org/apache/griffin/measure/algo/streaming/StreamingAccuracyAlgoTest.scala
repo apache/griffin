@@ -22,7 +22,7 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.algo.batch.BatchAccuracyAlgo
-import org.apache.griffin.measure.cache.info.InfoCacheInstance
+import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 import org.apache.griffin.measure.cache.result._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
@@ -104,6 +104,7 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     val userParam = allParam.userParam
     val metricName = userParam.name
     val sparkParam = envParam.sparkParam
+    val cleanerParam = envParam.cleanerParam
 
     val batchInterval = TimeUtil.milliseconds(sparkParam.batchInterval) match {
       case Some(interval) => Milliseconds(interval)
@@ -127,6 +128,9 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
 
     // persist start id
 //    persist.start(applicationId)
+
+    InfoCacheInstance.initInstance(envParam.infoCacheParams, metricName)
+    InfoCacheInstance.init
 
     // generate rule from rule param, generate rule analyzer
     val ruleFactory = RuleFactory(userParam.evaluateRuleParam)
@@ -163,9 +167,6 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
         case Failure(ex) => throw ex
       }
 
-    InfoCacheInstance.initInstance(envParam.infoCacheParams, metricName)
-    InfoCacheInstance.init
-
     val cacheResultProcesser = CacheResultProcesser()
 
     // init data stream
@@ -184,6 +185,9 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
         if (locked) {
           try {
             val st = new Date().getTime
+
+            TimeInfoCache.startTimeInfoCache
+
             // get data
             val sourceData = sourceDataConnector.data match {
               case Success(dt) => dt
@@ -254,19 +258,12 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
             }
 
             // dump missing rdd
-//            ruleAnalyzer.whenClauseExprOpt
-//            val savingRdd: RDD[(Product, (Map[String, Any], Map[String, Any]))] = missingRdd.filter { row =>
-//              val (key, (value, info)) = row
-//              info.get(TimeGroupInfo.key) match {
-//                case Some(t: Long) => {
-//                  cacheProcesser.getCache(t) match {
-//                    case Some(cache) => true
-//                    case _ => false
-//                  }
-//                }
-//                case _ => false
-//              }
-//            }
+            val dumpRdd: RDD[Map[String, Any]] = missingRdd.map { row =>
+              val (key, (value, info)) = row
+              value ++ info
+            }
+            sourceDataConnector.updateOldData(dumpRdd)
+            targetDataConnector.updateOldData(dumpRdd)
 
             // persist time
             //              persist.log(et, s"calculation using time: ${et - st} ms")
@@ -278,6 +275,9 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
 
             //              val pet = new Date().getTime
             //              persist.log(pet, s"persist using time: ${pet - et} ms")
+
+            TimeInfoCache.endTimeInfoCache
+
             val et = new Date().getTime
             println(s"process time: ${et - st} ms")
           } finally {
@@ -291,9 +291,31 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
       case Some(interval) => interval
       case _ => throw new Exception("invalid batch interval")
     }
-    val process = StreamingProcess(processInterval, Process())
+    val process = TimingProcess(processInterval, Process())
+
+    // clean thread
+//    case class Clean() extends Runnable {
+//      val lock = InfoCacheInstance.genLock("clean")
+//      def run(): Unit = {
+//        val locked = lock.lock(5, TimeUnit.SECONDS)
+//        if (locked) {
+//          try {
+//            sourceDataConnector.cleanData
+//            targetDataConnector.cleanData
+//          } finally {
+//            lock.unlock()
+//          }
+//        }
+//      }
+//    }
+//    val cleanInterval = TimeUtil.milliseconds(cleanerParam.cleanInterval) match {
+//      case Some(interval) => interval
+//      case _ => throw new Exception("invalid batch interval")
+//    }
+//    val clean = TimingProcess(cleanInterval, Clean())
 
     process.startup()
+//    clean.startup()
 
     ssc.start()
     ssc.awaitTermination()
@@ -307,6 +329,7 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
 //    persist.finish()
 
     process.shutdown()
+//    clean.shutdown()
   }
 
   private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {

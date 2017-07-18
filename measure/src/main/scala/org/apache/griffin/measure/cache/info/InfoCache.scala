@@ -32,6 +32,8 @@ trait InfoCache extends Loggable with Serializable {
   def deleteInfo(keys: Iterable[String]): Unit
   def clearInfo(): Unit
 
+  def listKeys(path: String): List[String]
+
   def genLock(s: String): CacheLock
 
 }
