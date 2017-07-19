@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.connector
 
+import java.util.concurrent.atomic.AtomicLong
+
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache, ZKInfoCache}
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.sql.DataFrame
@@ -25,6 +27,8 @@ import org.apache.spark.sql.DataFrame
 import scala.util.Try
 
 trait CacheDataConnector extends DataConnector {
+
+  protected val defCacheInfoPath = PathCounter.genPath
 
   def saveData(df: DataFrame, ms: Long): Unit
 
@@ -58,4 +62,12 @@ trait CacheDataConnector extends DataConnector {
     InfoCacheInstance.cacheInfo(map)
   }
 
+}
+
+object PathCounter {
+  private val counter: AtomicLong = new AtomicLong(0L)
+  def genPath(): String = s"path_${increment}"
+  private def increment(): Long = {
+    counter.incrementAndGet()
+  }
 }

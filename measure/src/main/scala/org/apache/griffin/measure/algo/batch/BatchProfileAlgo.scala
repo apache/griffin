@@ -24,7 +24,7 @@ import org.apache.griffin.measure.algo.ProfileAlgo
 import org.apache.griffin.measure.algo.core.ProfileCore
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.connector._
-import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.persist.{Persist, PersistFactory, PersistType}
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.expr._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
@@ -109,7 +109,8 @@ case class BatchProfileAlgo(allParam: AllParam) extends ProfileAlgo {
       // persist result
       persist.result(endTime, profileResult)
       val matchedRecords = matchedRdd.map(record2String(_, ruleAnalyzer.sourceRuleExprs.persistExprs))
-      persist.matchRecords(matchedRecords)
+//      persist.matchRecords(matchedRecords)
+      persist.records(matchedRecords, PersistType.MATCH)
 
       // persist end time
       val persistEndTime = new Date().getTime

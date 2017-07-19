@@ -70,8 +70,11 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   }
 
-  def missRecords(records: RDD[String]): Unit = {}
-  def matchRecords(records: RDD[String]): Unit = {}
+  def records(recs: RDD[String], tp: String): Unit = {}
+  def records(recs: Iterable[String], tp: String): Unit = {}
+
+//  def missRecords(records: RDD[String]): Unit = {}
+//  def matchRecords(records: RDD[String]): Unit = {}
 
   def log(rt: Long, msg: String): Unit = {}
 

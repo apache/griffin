@@ -127,7 +127,8 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       // persist result
       persist.result(endTime, accuResult)
       val missingRecords = missingRdd.map(record2String(_, ruleAnalyzer.sourceRuleExprs.persistExprs, ruleAnalyzer.targetRuleExprs.persistExprs))
-      persist.missRecords(missingRecords)
+//      persist.missRecords(missingRecords)
+      persist.records(missingRecords, PersistType.MISS)
 
       // persist end time
       val persistEndTime = new Date().getTime

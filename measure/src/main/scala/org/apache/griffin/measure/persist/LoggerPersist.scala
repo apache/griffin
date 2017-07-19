@@ -34,10 +34,10 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
   def available(): Boolean = true
 
   def start(msg: String): Unit = {
-    info(s"${metricName} start")
+    println(s"[${timeStamp}] ${metricName} start")
   }
   def finish(): Unit = {
-    info(s"${metricName} finish")
+    println(s"[${timeStamp}] ${metricName} finish")
   }
 
   def result(rt: Long, result: Result): Unit = {
@@ -53,7 +53,7 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
           s"result: ${result}"
         }
       }
-      info(s"${metricName} result: \n${resStr}")
+      println(s"[${timeStamp}] ${metricName} result: \n${resStr}")
     } catch {
       case e: Throwable => error(e.getMessage)
     }
@@ -73,17 +73,46 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
     }
   }
 
-  def missRecords(records: RDD[String]): Unit = {
-    info(s"${metricName} miss records: ")
-    rddRecords(records)
-  }
-  def matchRecords(records: RDD[String]): Unit = {
-    info(s"${metricName} match records: ")
-    rddRecords(records)
+  private def iterableRecords(records: Iterable[String]): Unit = {
+    try {
+      val recordCount = records.size
+      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+      if (count > 0) {
+        val recordsArray = records.take(count)
+        recordsArray.foreach(println)
+      }
+    } catch {
+      case e: Throwable => error(e.getMessage)
+    }
   }
 
+  def records(recs: RDD[String], tp: String): Unit = {
+    tp match {
+      case PersistType.MISS => rddRecords(recs)
+      case PersistType.MATCH => rddRecords(recs)
+      case _ => {}
+    }
+  }
+
+  def records(recs: Iterable[String], tp: String): Unit = {
+    tp match {
+      case PersistType.MISS => iterableRecords(recs)
+      case PersistType.MATCH => iterableRecords(recs)
+      case _ => {}
+    }
+  }
+
+//  def missRecords(records: RDD[String]): Unit = {
+//    warn(s"[${timeStamp}] ${metricName} miss records: ")
+//    rddRecords(records)
+//  }
+//  def matchRecords(records: RDD[String]): Unit = {
+//    warn(s"[${timeStamp}] ${metricName} match records: ")
+//    rddRecords(records)
+//  }
+
   def log(rt: Long, msg: String): Unit = {
-    info(s"${rt}: ${msg}")
+    println(s"[${timeStamp}] ${rt}: ${msg}")
   }
 
 }

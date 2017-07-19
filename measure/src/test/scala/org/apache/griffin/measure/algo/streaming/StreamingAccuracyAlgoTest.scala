@@ -31,7 +31,7 @@ import org.apache.griffin.measure.config.reader._
 import org.apache.griffin.measure.config.validator._
 import org.apache.griffin.measure.connector.{BatchDataConnector, DataConnector, DataConnectorFactory}
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.persist.{Persist, PersistFactory, PersistType}
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.expr._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
@@ -120,14 +120,16 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     // start time
     val startTime = new Date().getTime()
 
+    val persistFactory = PersistFactory(envParam.persistParams, metricName)
+
     // get persists to persist measure result
-//    val persist: Persist = PersistFactory(envParam.persistParams, metricName).getPersists(startTime)
+    val appPersist: Persist = persistFactory.getPersists(startTime)
 
     // get spark application id
     val applicationId = sc.applicationId
 
     // persist start id
-//    persist.start(applicationId)
+    appPersist.start(applicationId)
 
     InfoCacheInstance.initInstance(envParam.infoCacheParams, metricName)
     InfoCacheInstance.init
@@ -205,6 +207,9 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
             val (accuResult, missingRdd, matchedRdd) = algo.accuracy(sourceData, targetData, ruleAnalyzer)
             println(accuResult)
 
+            val ct = new Date().getTime
+            appPersist.log(ct, s"calculation using time: ${ct - st} ms")
+
             // result of every group
             val matchedGroups = algo.reorgByTimeGroup(matchedRdd)
             val matchedGroupCount = matchedGroups.count
@@ -226,35 +231,33 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
               val missSize = missData.size
               val res = AccuracyResult(missSize, matchSize + missSize)
 
-              val updatedCacheResulOpt = cacheResultProcesser.genUpdateCacheResult(t, updateTime, res)
+              val updatedCacheResultOpt = cacheResultProcesser.genUpdateCacheResult(t, updateTime, res)
 
-              // updated result
-              if (updatedCacheResulOpt.nonEmpty) {
-                val missStrings = missData.map { row =>
-                  val (key, (value, info)) = row
-                  s"${value} [${info.getOrElse(MismatchInfo.key, "unknown")}]"
+              updatedCacheResultOpt match {
+                case Some(updatedCacheResult) => {
+                  val persist: Persist = persistFactory.getPersists(t)
+
+                  // persist result
+                  persist.result(updateTime, accuResult)
+
+                  // persist missing data
+                  val missStrings = missData.map { row =>
+                    val (key, (value, info)) = row
+                    s"${value} [${info.getOrElse(MismatchInfo.key, "unknown")}]"
+                  }
+                  persist.records(missStrings, PersistType.MISS)
                 }
-                // persist missing data
-                missStrings.foreach(println)
-                // record missing records
-//                try {
-//                  persist.accuracyMissingRecords(missStrings)
-//                } catch {
-//                  case e: Throwable => println("missing record error: " + e.getMessage)
-//                }
+                case _ => {
+                  // do nothing
+                }
               }
 
-              updatedCacheResulOpt
+              updatedCacheResultOpt
             }.collect()
 
-            // persist update results
+            // update results cache together
             updateResults.foreach { updateResult =>
-              // cache
               cacheResultProcesser.update(updateResult)
-
-              // persist
-              // fixme:
-              println(updateResult)
             }
 
             // dump missing rdd
@@ -263,23 +266,18 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
               value ++ info
             }
             sourceDataConnector.updateOldData(dumpRdd)
-            targetDataConnector.updateOldData(dumpRdd)
+            targetDataConnector.updateOldData(dumpRdd)    // not correct
 
-            // persist time
-            //              persist.log(et, s"calculation using time: ${et - st} ms")
+            // fixme: 2. implement the hive cahe data connector
 
-            // persist result
-            //              persist.result(et, accuResult)
-//            val missingRecords = missingRdd.map(algo.record2String(_, ruleAnalyzer.sourceRuleExprs.persistExprs, ruleAnalyzer.targetRuleExprs.persistExprs))
-            //              persist.missRecords(missingRecords)
+            // fixme: 3. refactor data connector module
 
-            //              val pet = new Date().getTime
-            //              persist.log(pet, s"persist using time: ${pet - et} ms")
 
             TimeInfoCache.endTimeInfoCache
 
             val et = new Date().getTime
-            println(s"process time: ${et - st} ms")
+            appPersist.log(et, s"persist using time: ${et - ct} ms")
+
           } finally {
             lock.unlock()
           }
@@ -326,7 +324,7 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
 
     InfoCacheInstance.close
 
-//    persist.finish()
+    appPersist.finish()
 
     process.shutdown()
 //    clean.shutdown()

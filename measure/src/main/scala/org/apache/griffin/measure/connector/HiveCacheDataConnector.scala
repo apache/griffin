@@ -16,37 +16,17 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.persist
+package org.apache.griffin.measure.connector
 
-import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.result._
-import org.apache.spark.rdd.RDD
+import org.apache.griffin.measure.config.params.user.DataCacheParam
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.hive.HiveContext
 
-import scala.util.Try
+case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCacheParam
+                                 ) extends CacheDataConnector {
 
+  if (!sqlContext.isInstanceOf[HiveContext]) {
+    throw new Exception("hive context not prepared!")
+  }
 
-trait Persist extends Loggable with Serializable {
-  val timeStamp: Long
-
-  val config: Map[String, Any]
-
-  def available(): Boolean
-
-  def start(msg: String): Unit
-  def finish(): Unit
-
-  def result(rt: Long, result: Result): Unit
-
-  def records(recs: RDD[String], tp: String): Unit
-  def records(recs: Iterable[String], tp: String): Unit
-
-//  def missRecords(records: RDD[String]): Unit
-//  def matchRecords(records: RDD[String]): Unit
-
-  def log(rt: Long, msg: String): Unit
-}
-
-object PersistType {
-  final val MISS = "miss"
-  final val MATCH = "match"
 }

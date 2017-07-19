@@ -19,7 +19,6 @@ under the License.
 package org.apache.griffin.measure.connector
 
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 import org.apache.griffin.measure.cache.lock.CacheLock
@@ -37,7 +36,7 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
 
   val config = dataCacheParam.config
   val InfoPath = "info.path"
-  val cacheInfoPath: String = config.getOrElse(InfoPath, PathCounter.genPath).toString
+  val cacheInfoPath: String = config.getOrElse(InfoPath, defCacheInfoPath).toString
 
   val newCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.new")
   val oldCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.old")
@@ -223,12 +222,4 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
     }
   }
 
-}
-
-object PathCounter {
-  private val counter: AtomicLong = new AtomicLong(0L)
-  def genPath(): String = s"path${increment}"
-  private def increment(): Long = {
-    counter.incrementAndGet()
-  }
 }
