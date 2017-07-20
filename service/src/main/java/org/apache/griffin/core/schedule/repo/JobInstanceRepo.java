@@ -18,7 +18,6 @@ under the License.
 */
 package org.apache.griffin.core.schedule.repo;
 
-
 import org.apache.griffin.core.schedule.entity.JobInstance;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
