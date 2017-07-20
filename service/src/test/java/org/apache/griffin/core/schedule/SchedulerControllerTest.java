@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.schedule;
 
+import org.apache.griffin.core.schedule.entity.JobHealth;
+import org.apache.griffin.core.schedule.entity.JobInstance;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,8 +102,8 @@ public class SchedulerControllerTest {
         String job="job1";
         int page=0;
         int size=2;
-        ScheduleState scheduleState=new ScheduleState(group, job, 1, "NORMAL", "", System.currentTimeMillis());
-        given(service.findInstancesOfJob(group,job,page,size)).willReturn(Arrays.asList(scheduleState));
+        JobInstance jobInstance=new JobInstance(group, job, 1, "NORMAL", "", System.currentTimeMillis());
+        given(service.findInstancesOfJob(group,job,page,size)).willReturn(Arrays.asList(jobInstance));
         mvc.perform(get("/jobs/instances/BA/job1/0/2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].groupName",is("BA")))

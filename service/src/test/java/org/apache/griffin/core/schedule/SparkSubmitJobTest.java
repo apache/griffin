@@ -24,6 +24,7 @@ import org.apache.griffin.core.measure.DataConnector;
 import org.apache.griffin.core.measure.EvaluateRule;
 import org.apache.griffin.core.measure.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.schedule.entity.SparkJobDO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -173,14 +174,14 @@ public class SparkSubmitJobTest{
         doNothing().when(ssj).setSparkJobDO();
     }
 
-    @Test
-    public void test_getsparkJobProperties(){
-        ssj=mock(SparkSubmitJob.class);
-        try {
-            when(ssj.getsparkJobProperties()).thenReturn(null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    @Test
+//    public void test_getsparkJobProperties(){
+//        ssj=mock(SparkSubmitJob.class);
+//        try {
+//            when(ssj.getsparkJobProperties()).thenReturn(null);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }

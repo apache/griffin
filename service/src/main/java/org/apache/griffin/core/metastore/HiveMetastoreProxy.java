@@ -59,6 +59,8 @@ public class HiveMetastoreProxy
 
     @PreDestroy
     public void destroy() throws Exception {
-        if(null!=client) client.close();
+        if(null!=client) {
+            client.close();
+        }
     }
 }
