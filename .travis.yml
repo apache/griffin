@@ -11,6 +11,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 
+
 language: java scala node_js
 
 jdk:
@@ -22,4 +23,5 @@ node_js:
 
 before_script:
   - 'npm install -g bower'
+
 script: mvn clean verify
