@@ -1,7 +1,7 @@
 {
   "spark": {
     "log.level": "WARN",
-    "checkpoint.dir": "/test/griffin/cp",
+    "checkpoint.dir": "hdfs://localhost/test/griffin/cp",
     "batch.interval": "2s",
     "process.interval": "10s",
     "config": {}

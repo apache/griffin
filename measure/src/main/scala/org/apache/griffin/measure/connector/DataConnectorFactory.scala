@@ -99,9 +99,8 @@ object DataConnectorFactory {
     val cacheType = dataCacheParam.cacheType
     Try {
       cacheType match {
-        case DfRegex() => {
-          DfCacheDataConnector(sqlContext, dataCacheParam)
-        }
+        case DfRegex() => DfCacheDataConnector(sqlContext, dataCacheParam)
+        case HiveRegex() => HiveCacheDataConnector(sqlContext, dataCacheParam)
         case _ => throw new Exception("cache connector creation error!")
       }
     }

@@ -38,6 +38,7 @@ import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
@@ -51,7 +52,7 @@ import scala.util.{Failure, Success, Try}
 class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
 
   val envFile = "src/test/resources/env-streaming.json"
-  val confFile = "src/test/resources/config-streaming.json"
+  val confFile = "src/test/resources/config-streaming1.json"
   val envFsType = "local"
   val userFsType = "local"
 
@@ -96,7 +97,12 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     val conf = new SparkConf().setMaster("local[*]").setAppName(metricName)
     sc = new SparkContext(conf)
     sc.setLogLevel(envParam.sparkParam.logLevel)
-    sqlContext = new SQLContext(sc)
+//    sqlContext = new SQLContext(sc)
+    sqlContext = new HiveContext(sc)
+
+    val a = sqlContext.sql("select * from test limit 10")
+    //    val a = sqlContext.sql("show tables")
+    a.show(10)
   }
 
   test("algorithm") {
@@ -278,6 +284,8 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
             val et = new Date().getTime
             appPersist.log(et, s"persist using time: ${et - ct} ms")
 
+          } catch {
+            case e: Throwable => error(s"process error: ${e.getMessage}")
           } finally {
             lock.unlock()
           }

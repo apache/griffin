@@ -161,24 +161,24 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
 
     ///
 
-    def genDataFrame(rdd: RDD[Map[String, Any]]): DataFrame = {
-      val fields = rdd.aggregate(Map[String, DataType]())(
-        DataTypeCalculationUtil.sequenceDataTypeMap, DataTypeCalculationUtil.combineDataTypeMap
-      ).toList.map(f => StructField(f._1, f._2))
-      val schema = StructType(fields)
-      val datas: RDD[Row] = rdd.map { d =>
-        val values = fields.map { field =>
-          val StructField(k, dt, _, _) = field
-          d.get(k) match {
-            case Some(v) => v
-            case _ => null
-          }
-        }
-        Row(values: _*)
-      }
-      val df = sqlContext.createDataFrame(datas, schema)
-      df
-    }
+//    def genDataFrame(rdd: RDD[Map[String, Any]]): DataFrame = {
+//      val fields = rdd.aggregate(Map[String, DataType]())(
+//        DataTypeCalculationUtil.sequenceDataTypeMap, DataTypeCalculationUtil.combineDataTypeMap
+//      ).toList.map(f => StructField(f._1, f._2))
+//      val schema = StructType(fields)
+//      val datas: RDD[Row] = rdd.map { d =>
+//        val values = fields.map { field =>
+//          val StructField(k, dt, _, _) = field
+//          d.get(k) match {
+//            case Some(v) => v
+//            case _ => null
+//          }
+//        }
+//        Row(values: _*)
+//      }
+//      val df = sqlContext.createDataFrame(datas, schema)
+//      df
+//    }
 
     val rules = "$source.json().name = 's2' AND $source.json().age = 32"
     val ep = EvaluateRuleParam(1, rules)
@@ -230,11 +230,11 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
 //      println(s"count: ${cnt}\n${valuestr}")
 
       // generate DataFrame
-      val df = genDataFrame(valueMapRdd)
+//      val df = genDataFrame(valueMapRdd)
 //      df.show(10)
 
       // save data frame
-      cacheDataConnector.saveData(df, ms)
+      cacheDataConnector.saveData(valueMapRdd, ms)
 
       // show data
 //      cacheDataConnector.readData() match {
@@ -254,9 +254,9 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
           try {
             // show data
             cacheDataConnector.readData() match {
-              case Success(rdf) => {
-                rdf.show(10)
-                println(s"count: ${rdf.count}")
+              case Success(rdd) => {
+                rdd.take(10).foreach(println)
+                println(s"count: ${rdd.count}")
               }
               case Failure(ex) => println(s"cache data error: ${ex.getMessage}")
             }

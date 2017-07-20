@@ -81,6 +81,8 @@ case class KafkaDataConnector(sqlContext: SQLContext, @transient ssc: StreamingC
   }
 
   override def init(): Unit = {
+    cacheDataConnector.init
+
     val ds = kafkaStreamingDataConnector.stream match {
       case Success(dstream) => dstream
       case Failure(ex) => throw ex
@@ -104,34 +106,34 @@ case class KafkaDataConnector(sqlContext: SQLContext, @transient ssc: StreamingC
       }
 
       // generate DataFrame
-      val df = genDataFrame(valueMapRdd)
+//      val df = genDataFrame(valueMapRdd)
 
       // save data frame
-      cacheDataConnector.saveData(df, ms)
+      cacheDataConnector.saveData(valueMapRdd, ms)
     })
   }
 
-  // generate DataFrame
-  // maybe we can directly use def createDataFrame[A <: Product : TypeTag](rdd: RDD[A]): DataFrame
-  // to avoid generate data type by myself, just translate each value into Product
-  private def genDataFrame(rdd: RDD[Map[String, Any]]): DataFrame = {
-    val fields = rdd.aggregate(Map[String, DataType]())(
-      DataTypeCalculationUtil.sequenceDataTypeMap, DataTypeCalculationUtil.combineDataTypeMap
-    ).toList.map(f => StructField(f._1, f._2))
-    val schema = StructType(fields)
-    val datas: RDD[Row] = rdd.map { d =>
-      val values = fields.map { field =>
-        val StructField(k, dt, _, _) = field
-        d.get(k) match {
-          case Some(v) => v
-          case _ => null
-        }
-      }
-      Row(values: _*)
-    }
-    val df = sqlContext.createDataFrame(datas, schema)
-    df
-  }
+//  // generate DataFrame
+//  // maybe we can directly use def createDataFrame[A <: Product : TypeTag](rdd: RDD[A]): DataFrame
+//  // to avoid generate data type by myself, just translate each value into Product
+//  private def genDataFrame(rdd: RDD[Map[String, Any]]): DataFrame = {
+//    val fields = rdd.aggregate(Map[String, DataType]())(
+//      DataTypeCalculationUtil.sequenceDataTypeMap, DataTypeCalculationUtil.combineDataTypeMap
+//    ).toList.map(f => StructField(f._1, f._2))
+//    val schema = StructType(fields)
+//    val datas: RDD[Row] = rdd.map { d =>
+//      val values = fields.map { field =>
+//        val StructField(k, dt, _, _) = field
+//        d.get(k) match {
+//          case Some(v) => v
+//          case _ => null
+//        }
+//      }
+//      Row(values: _*)
+//    }
+//    val df = sqlContext.createDataFrame(datas, schema)
+//    df
+//  }
 
   def metaData(): Try[Iterable[(String, String)]] = Try {
     Map.empty[String, String]
@@ -139,21 +141,32 @@ case class KafkaDataConnector(sqlContext: SQLContext, @transient ssc: StreamingC
 
   def data(): Try[RDD[(Product, (Map[String, Any], Map[String, Any]))]] = Try {
     cacheDataConnector.readData match {
-      case Success(df) => {
-        df.flatMap { row =>
+      case Success(rdd) => {
+        rdd.flatMap { row =>
           // generate cache data
 //          val cacheExprValueMaps = ExprValueUtil.genExprValueMaps(Some(row), ruleExprs.cacheExprs, constFinalExprValueMap)
 //          val finalExprValueMaps = ExprValueUtil.updateExprValueMaps(ruleExprs.finalCacheExprs, cacheExprValueMaps)
-          val finalExprValueMap = ruleExprs.finalCacheExprs.foldLeft(Map[String, Any]()) { (mp, expr) =>
-            mp + (expr._id -> row.getAs[Any](expr._id))
-          }
+//          val finalExprValueMap = ruleExprs.finalCacheExprs.foldLeft(Map[String, Any]()) { (mp, expr) =>
+//            mp + (expr._id -> row.get(expr._id))
+//          }
+          val finalExprValueMap = ruleExprs.finalCacheExprs.flatMap { expr =>
+            row.get(expr._id).flatMap { d =>
+              Some((expr._id, d))
+            }
+          }.toMap
 
           // data info
+//          val dataInfoMap: Map[String, Any] = DataInfo.cacheInfoList.map { info =>
+//            try {
+//              (info.key -> row.getAs[info.T](info.key))
+//            } catch {
+//              case e: Throwable => info.defWrap
+//            }
+//          }.toMap
           val dataInfoMap: Map[String, Any] = DataInfo.cacheInfoList.map { info =>
-            try {
-              (info.key -> row.getAs[info.T](info.key))
-            } catch {
-              case e: Throwable => info.defWrap
+            row.get(info.key) match {
+              case Some(d) => (info.key -> d)
+              case _ => info.defWrap
             }
           }.toMap
 
@@ -178,7 +191,7 @@ case class KafkaDataConnector(sqlContext: SQLContext, @transient ssc: StreamingC
 
   override def updateOldData(oldRdd: RDD[Map[String, Any]]): Unit = {
     if (dataConnectorParam.getMatchOnce) {
-      cacheDataConnector.updateOldData(genDataFrame(oldRdd))
+      cacheDataConnector.updateOldData(oldRdd)
     }
   }
 

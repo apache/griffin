@@ -31,7 +31,6 @@ trait DataConnector extends Loggable with Serializable {
 
   def cleanOldData(): Unit = {}
 
-  def updateOldData(oldDf: DataFrame): Unit = {}
   def updateOldData(oldRdd: RDD[Map[String, Any]]): Unit = {}
 
 }

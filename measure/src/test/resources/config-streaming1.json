@@ -17,10 +17,9 @@
       "value.type": "java.lang.String"
     },
     "cache": {
-      "type": "hive",
+      "type": "df",
       "config": {
-        "table.name": "src",
-        "parent.path": "hdfs://localhost/griffin/streaming/dump",
+        "cache.level": "MEMORY_AND_DISK",
         "info.path": "src",
         "ready.time.interval": "10s",
         "ready.time.delay": "0"
@@ -45,10 +44,9 @@
       "value.type": "java.lang.String"
     },
     "cache": {
-      "type": "hive",
+      "type": "df",
       "config": {
-        "table.name": "tgt",
-        "parent.path": "hdfs://localhost/griffin/streaming/dump",
+        "cache.level": "MEMORY_AND_DISK",
         "info.path": "tgt",
         "ready.time.interval": "10s",
         "ready.time.delay": "0"

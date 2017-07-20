@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache, ZKInfoCache}
 import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 import scala.util.Try
@@ -30,9 +31,9 @@ trait CacheDataConnector extends DataConnector {
 
   protected val defCacheInfoPath = PathCounter.genPath
 
-  def saveData(df: DataFrame, ms: Long): Unit
+  def saveData(rdd: RDD[Map[String, Any]], ms: Long): Unit
 
-  def readData(): Try[DataFrame]
+  def readData(): Try[RDD[Map[String, Any]]]
 
   val cacheInfoPath: String
   val readyTimeInterval: Long
