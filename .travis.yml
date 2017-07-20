@@ -11,10 +11,15 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 
-language: java scala
+language: java scala node_js
+
 jdk:
   - oraclejdk8
 scala:
   - 2.10.6
+node_js:
+  - "6"
 
+before_script:
+  - 'npm install -g bower'
 script: mvn clean verify
