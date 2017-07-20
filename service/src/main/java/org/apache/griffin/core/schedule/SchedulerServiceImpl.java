@@ -62,6 +62,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 
     Properties sparkJobProps=null;
 
+
     public SchedulerServiceImpl(){
         try {
             sparkJobProps= PropertiesOperate.getProperties("sparkJob.properties");
@@ -257,14 +258,13 @@ public class SchedulerServiceImpl implements SchedulerService{
     }
 
     @Override
-    @Scheduled(fixedDelay = 60*1000)
+    @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void startUpdateInstances(){
         List<Object> groupJobList=jobInstanceRepo.findGroupWithJobName();
         for (Object groupJobObj : groupJobList){
             try{
                 Object[] groupJob=(Object[])groupJobObj;
                 if (groupJob!=null && groupJob.length==2){
-//                    updateInstancesThread(groupJob[0].toString(),groupJob[1].toString());
                     updateInstances(groupJob[0].toString(),groupJob[1].toString());
                 }
             }catch (Exception e){
