@@ -16,22 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.core.schedule.Repo;
 
+package org.apache.griffin.core.schedule.quartzConfig;
 
-import org.apache.griffin.core.schedule.ScheduleState;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+/**
+ * Created by xiangrchen on 4/26/17.
+ */
+public class Conf {
+    String spark_jars_packages;
 
-import java.util.List;
+    public String getSpark_jars_packages() {
+        return spark_jars_packages;
+    }
 
-
-@Repository
-public interface ScheduleStateRepo extends CrudRepository<ScheduleState,Long>{
-    @Query("select s from ScheduleState s " +
-            "where s.groupName= ?1 and s.jobName=?2 "/*+
-            "order by s.timestamp desc"*/)
-    List<ScheduleState> findByGroupNameAndJobName(String group, String name, Pageable pageable);
+    public void setSpark_jars_packages(String spark_jars_packages) {
+        this.spark_jars_packages = spark_jars_packages;
+    }
 }

@@ -25,10 +25,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 //import org.apache.griffin.core.measure.repo.ConnectorConfigRepo;
 
 @SpringBootApplication
+@EnableScheduling
 public class GriffinWebApplication/* implements CommandLineRunner*/{
     private static final Logger log = LoggerFactory.getLogger(GriffinWebApplication.class);
     public static void main(String[] args) {
