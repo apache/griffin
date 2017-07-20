@@ -21,7 +21,7 @@ scala:
 node_js:
   - "6"
 
-before_script:
-  - 'npm install -g bower'
+install:
+  - npm install -g bower
 
 script: mvn clean verify
