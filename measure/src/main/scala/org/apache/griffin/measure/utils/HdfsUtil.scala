@@ -27,6 +27,7 @@ object HdfsUtil {
 
   private val conf = new Configuration()
   conf.set("dfs.support.append", "true")
+  conf.set("fs.defaultFS", "hdfs://localhost")    // fixme
 
   private val dfs = FileSystem.get(conf)
 
@@ -76,5 +77,17 @@ object HdfsUtil {
   def deleteHdfsPath(dirPath: String): Unit = {
     val path = new Path(dirPath)
     if (dfs.exists(path)) dfs.delete(path, true)
+  }
+
+  def listPathFiles(dirPath: String): Iterable[String] = {
+    val path = new Path(dirPath)
+    try {
+      val fileStatusArray = dfs.listStatus(path)
+      fileStatusArray.flatMap { fileStatus =>
+        if (fileStatus.isFile) {
+          Some(fileStatus.getPath.getName)
+        } else None
+      }
+    }
   }
 }

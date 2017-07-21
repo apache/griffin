@@ -69,12 +69,8 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     s"--- ${dt} ---\n"
   }
 
-  protected def getFilePath(parentPath: String, fileName: String): String = {
-    if (parentPath.endsWith(separator)) parentPath + fileName else parentPath + separator + fileName
-  }
-
   protected def filePath(file: String): String = {
-    getFilePath(path, s"${metricName}/${timeStamp}/${file}")
+    HdfsUtil.getHdfsFilePath(path, s"${metricName}/${timeStamp}/${file}")
   }
 
   protected def withSuffix(path: String, suffix: String): String = {

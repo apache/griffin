@@ -27,10 +27,17 @@ object HdfsFileDumpUtil {
   private def suffix(i: Long): String = {
     if (i == 0) "" else s".${i}"
   }
+  private def samePattern(fileName: String, patternFileName: String): Boolean = {
+    fileName.startsWith(patternFileName)
+  }
 
   def splitRdd[T](rdd: RDD[T])(implicit m: Manifest[T]): RDD[(Long, Iterable[T])] = {
     val indexRdd = rdd.zipWithIndex
     indexRdd.map(p => ((p._2 / sepCount), p._1)).groupByKey()
+  }
+  def splitIterable[T](datas: Iterable[T])(implicit m: Manifest[T]): Iterator[(Int, Iterable[T])] = {
+    val groupedData = datas.grouped(sepCount).zipWithIndex
+    groupedData.map(v => (v._2, v._1))
   }
 
   private def directDump(path: String, list: Iterable[String], lineSep: String): Unit = {
@@ -48,6 +55,29 @@ object HdfsFileDumpUtil {
       directDump(filePath, list, lineSep)
       true
     }, _ && _)
+  }
+  def dump(path: String, records: Iterable[String], lineSep: String): Boolean = {
+    val groupedRecords = splitIterable(records)
+    groupedRecords.aggregate(true)({ (res, pair) =>
+      val (idx, list) = pair
+      val filePath = path + suffix(idx)
+      directDump(filePath, list, lineSep)
+      true
+    }, _ && _)
+  }
+
+  def remove(path: String, filename: String, withSuffix: Boolean): Unit = {
+    if (withSuffix) {
+      val files = HdfsUtil.listPathFiles(path)
+      val patternFiles = files.filter(samePattern(_, filename))
+      patternFiles.foreach { f =>
+        val rmPath = HdfsUtil.getHdfsFilePath(path, f)
+        HdfsUtil.deleteHdfsPath(rmPath)
+      }
+    } else {
+      val rmPath = HdfsUtil.getHdfsFilePath(path, filename)
+      HdfsUtil.deleteHdfsPath(rmPath)
+    }
   }
 
 }

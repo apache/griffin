@@ -95,6 +95,8 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
         // submit ms
         submitCacheTime(ms)
         submitReadyTime(ms)
+      } catch {
+        case e: Throwable => error(s"save data error: ${e.getMessage}")
       } finally {
         newCacheLock.unlock()
       }
@@ -167,6 +169,8 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
         oldDataFrame.unpersist()
         oldDataFrame = oldDataFrame.filter(s"${timeStampColumn} >= ${reviseTimeRange._1}")
         oldDataFrame.persist(StorageLevel.fromString(cacheLevel))
+      } catch {
+        case e: Throwable => error(s"clean old data error: ${e.getMessage}")
       } finally {
         oldCacheLock.unlock()
       }
@@ -187,7 +191,7 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
 //    }
   }
 
-  override def updateOldData(oldRdd: RDD[Map[String, Any]]): Unit = {
+  override def updateAllOldData(oldRdd: RDD[Map[String, Any]]): Unit = {
     val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
     if (oldCacheLocked) {
       try {
@@ -206,6 +210,8 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
             oldDataFrame = null
           }
         }
+      } catch {
+        case e: Throwable => error(s"update all old data error: ${e.getMessage}")
       } finally {
         oldCacheLock.unlock()
       }

@@ -189,9 +189,15 @@ case class KafkaDataConnector(sqlContext: SQLContext, @transient ssc: StreamingC
     cacheDataConnector.cleanOldData
   }
 
-  override def updateOldData(oldRdd: RDD[Map[String, Any]]): Unit = {
+  override def updateOldData(t: Long, oldData: Iterable[Map[String, Any]]): Unit = {
     if (dataConnectorParam.getMatchOnce) {
-      cacheDataConnector.updateOldData(oldRdd)
+      cacheDataConnector.updateOldData(t, oldData)
+    }
+  }
+
+  override def updateAllOldData(oldRdd: RDD[Map[String, Any]]): Unit = {
+    if (dataConnectorParam.getMatchOnce) {
+      cacheDataConnector.updateAllOldData(oldRdd)
     }
   }
 

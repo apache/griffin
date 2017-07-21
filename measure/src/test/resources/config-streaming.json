@@ -19,6 +19,7 @@
     "cache": {
       "type": "hive",
       "config": {
+        "database": "griffin_cache",
         "table.name": "src",
         "parent.path": "hdfs://localhost/griffin/streaming/dump",
         "info.path": "src",
@@ -47,6 +48,7 @@
     "cache": {
       "type": "hive",
       "config": {
+        "database": "griffin_cache",
         "table.name": "tgt",
         "parent.path": "hdfs://localhost/griffin/streaming/dump",
         "info.path": "tgt",

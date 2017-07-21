@@ -44,6 +44,7 @@ trait CacheDataConnector extends DataConnector {
   def selfCacheTime = TimeInfoCache.cacheTime(selfCacheInfoPath)
   def selfLastProcTime = TimeInfoCache.lastProcTime(selfCacheInfoPath)
   def selfReadyTime = TimeInfoCache.readyTime(selfCacheInfoPath)
+  def selfCleanTime = TimeInfoCache.cleanTime(selfCacheInfoPath)
 
   protected def submitCacheTime(ms: Long): Unit = {
     val map = Map[String, String]((selfCacheTime -> ms.toString))
@@ -61,6 +62,23 @@ trait CacheDataConnector extends DataConnector {
   protected def submitLastProcTime(ms: Long): Unit = {
     val map = Map[String, String]((selfLastProcTime -> ms.toString))
     InfoCacheInstance.cacheInfo(map)
+  }
+
+  protected def submitCleanTime(ms: Long): Unit = {
+    val map = Map[String, String]((selfCleanTime -> ms.toString))
+    InfoCacheInstance.cacheInfo(map)
+  }
+
+  protected def readCleanTime(): Option[Long] = {
+    val key = selfCleanTime
+    val keys = key :: Nil
+    InfoCacheInstance.readInfo(keys).get(key).flatMap { v =>
+      try {
+        Some(v.toLong)
+      } catch {
+        case _ => None
+      }
+    }
   }
 
 }

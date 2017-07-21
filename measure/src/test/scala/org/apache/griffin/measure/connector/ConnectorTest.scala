@@ -30,7 +30,7 @@ import org.apache.griffin.measure.config.reader.ParamRawStringReader
 import org.apache.griffin.measure.result.{DataInfo, TimeStampInfo}
 import org.apache.griffin.measure.rule.expr.{Expr, StatementExpr}
 import org.apache.griffin.measure.rule._
-import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.griffin.measure.utils.{HdfsFileDumpUtil, HdfsUtil, TimeUtil}
 import org.apache.griffin.measure.rule.{DataTypeCalculationUtil, ExprValueUtil, RuleExprs}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{DataType, StructField, StructType}
@@ -309,8 +309,5 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
     process.shutdown()
 
   }
-
-
-
 }
 

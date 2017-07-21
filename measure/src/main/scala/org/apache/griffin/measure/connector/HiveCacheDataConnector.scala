@@ -23,13 +23,13 @@ import java.util.concurrent.TimeUnit
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 import org.apache.griffin.measure.config.params.user.DataCacheParam
 import org.apache.griffin.measure.result.TimeStampInfo
-import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.griffin.measure.utils.{HdfsFileDumpUtil, HdfsUtil, JsonUtil, TimeUtil}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.storage.StorageLevel
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCacheParam
                                  ) extends CacheDataConnector {
@@ -61,9 +61,11 @@ case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCa
     case _ => (0, 0)
   }
 
+  val Database = "database"
+  val database: String = config.getOrElse(Database, "").toString
   val TableName = "table.name"
   val tableName: String = config.get(TableName) match {
-    case Some(s: String) => s
+    case Some(s: String) if (s.nonEmpty) => s
     case _ => throw new Exception("invalid table.name!")
   }
   val ParentPath = "parent.path"
@@ -71,71 +73,118 @@ case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCa
     case Some(s: String) => s
     case _ => throw new Exception("invalid parent.path!")
   }
-  val tablePath = getFilePath(parentPath, tableName)
+  val tablePath = HdfsUtil.getHdfsFilePath(parentPath, tableName)
 
-  val timeStampColumn = TimeStampInfo.key
+  val concreteTableName = if (dbPrefix) s"${database}.${tableName}" else tableName
 
   val ReadyTimeInterval = "ready.time.interval"
   val ReadyTimeDelay = "ready.time.delay"
   val readyTimeInterval: Long = TimeUtil.milliseconds(config.getOrElse(ReadyTimeInterval, "1m").toString).getOrElse(60000L)
   val readyTimeDelay: Long = TimeUtil.milliseconds(config.getOrElse(ReadyTimeDelay, "1m").toString).getOrElse(60000L)
 
-  type Schema = (Long, String)
+  val TimeStampColumn: String = TimeStampInfo.key
+  val PayloadColumn: String = "payload"
+
+//  type Schema = (Long, String)
   val schema: List[(String, String)] = List(
-    ("tmst", "bigint"),
-    ("payload", "string")
+    (TimeStampColumn, "bigint"),
+    (PayloadColumn, "string")
   )
-  type Partition = (Long, Long)
+  val schemaName = schema.map(_._1)
+
+//  type Partition = (Long, Long)
   val partition: List[(String, String, String)] = List(
     ("hr", "bigint", "hour"),
     ("min", "bigint", "min")
   )
+  val partitionName = partition.map(_._1)
 
-  private val fieldSep = ""","""
+  private val fieldSep = """|"""
   private val rowSep = """\n"""
+  private val rowSepLiteral = "\n"
 
-  protected def getFilePath(parentPath: String, fileName: String): String = {
-    if (parentPath.endsWith("/")) parentPath + fileName else parentPath + "/" + fileName
+  private def dbPrefix(): Boolean = {
+    database.nonEmpty && !database.equals("default")
+  }
+
+  private def tableExists(): Boolean = {
+    Try {
+      if (dbPrefix) {
+        sqlContext.tables(database).filter(tableExistsSql).collect.size
+      } else {
+        sqlContext.tables().filter(tableExistsSql).collect.size
+      }
+    } match {
+      case Success(s) => s > 0
+      case _ => false
+    }
   }
 
   override def init(): Unit = {
-    val colsSql = schema.map { field =>
-      s"`${field._1}` ${field._2}"
-    }.mkString(", ")
-    val partitionsSql = partition.map { partition =>
-      s"`${partition._1}` ${partition._2}"
+    try {
+      if (tableExists) {
+        // drop exist table
+        val dropSql = s"""DROP TABLE ${concreteTableName}"""
+        sqlContext.sql(dropSql)
+      }
+
+      val colsSql = schema.map { field =>
+        s"`${field._1}` ${field._2}"
+      }.mkString(", ")
+      val partitionsSql = partition.map { partition =>
+        s"`${partition._1}` ${partition._2}"
+      }.mkString(", ")
+      val sql = s"""CREATE EXTERNAL TABLE IF NOT EXISTS ${concreteTableName}
+                    |(${colsSql}) PARTITIONED BY (${partitionsSql})
+                    |ROW FORMAT DELIMITED
+                    |FIELDS TERMINATED BY '${fieldSep}'
+                    |LINES TERMINATED BY '${rowSep}'
+                    |STORED AS TEXTFILE
+                    |LOCATION '${tablePath}'""".stripMargin
+      sqlContext.sql(sql)
+    } catch {
+      case e: Throwable => throw e
     }
-    val sql = s"""CREATE EXTERNAL TABLE IF NOT EXISTS `${tableName}`
-                  |(${colsSql}) PARTITIONED BY (${partitionsSql})
-                  |ROW FORMAT DELIMITED
-                  |FIELDS TERMINATED BY '${fieldSep}'
-                  |LINES TERMINATED BY '${rowSep}'
-                  |STORED AS TEXTFILE
-                  |LOCATION '${tablePath}'""".stripMargin
-    sqlContext.sql(sql)
   }
 
   def available(): Boolean = {
     true
   }
 
-  private def encode(data: Map[String, Any]): Schema = {
-    ;
-  }
-
-  private def decode(data: Schema): Map[String, Any] = {
-    ;
-  }
-
-  private def getPartition(ms: Long): List[(String, Any)] = {
-    partition.map { p =>
-      val (name, _, unit) = p
-      val t = TimeUtil.timeToUnit(ms, unit)
-      (name, t)
+  private def encode(data: Map[String, Any], ms: Long): Option[List[Any]] = {
+    try {
+      Some(schema.map { field =>
+        val (name, _) = field
+        name match {
+          case TimeStampColumn => ms
+          case PayloadColumn => JsonUtil.toJson(data)
+          case _ => null
+        }
+      })
+    } catch {
+      case _ => None
     }
   }
-  private def genPartitionHdfsPath(partitions: List[(String, Any)]): String = {
-    partitions.map(prtn => s"${prtn._1}=${prtn._2}").mkString("/")
+
+  private def decode(data: List[Any], updateTimeStamp: Boolean): Option[Map[String, Any]] = {
+    val dataMap = schemaName.zip(data).toMap
+    dataMap.get(PayloadColumn) match {
+      case Some(v: String) => {
+        try {
+          val map = JsonUtil.toAnyMap(v)
+          val resMap = if (updateTimeStamp) {
+            dataMap.get(TimeStampColumn) match {
+              case Some(t) => map + (TimeStampColumn -> t)
+              case _ => map
+            }
+          } else map
+          Some(resMap)
+        } catch {
+          case _ => None
+        }
+      }
+      case _ => None
+    }
   }
 
   def saveData(rdd: RDD[Map[String, Any]], ms: Long): Unit = {
@@ -143,97 +192,59 @@ case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCa
     if (newCacheLocked) {
       try {
         val ptns = getPartition(ms)
-        val ptnsSql = ptns.map(ptn => (s"`${ptn._1}`=${ptn._2}")).mkString(", ")
         val ptnsPath = genPartitionHdfsPath(ptns)
-        val filePath = s"${tablePath}/${ptnsPath}/${ms}"
+        val dirPath = s"${tablePath}/${ptnsPath}"
+        val fileName = s"${ms}"
+        val filePath = HdfsUtil.getHdfsFilePath(dirPath, fileName)
 
         // encode data
-        val dataRdd = rdd.map(encode(_))
+        val dataRdd: RDD[List[Any]] = rdd.flatMap(encode(_, ms))
 
-        // save data to hdfs
-        // fixme: waiting...
+        // save data
+        val recordRdd: RDD[String] = dataRdd.map { dt =>
+          dt.map(_.toString).mkString(fieldSep)
+        }
 
-        // add partition info
+        val dumped = if (!recordRdd.isEmpty) {
+          HdfsFileDumpUtil.dump(filePath, recordRdd, rowSepLiteral)
+        } else false
+
+        // add partition
+        if (dumped) {
+          val sql = addPartitionSql(concreteTableName, ptns)
+          sqlContext.sql(sql)
+        }
 
         // submit ms
         submitCacheTime(ms)
         submitReadyTime(ms)
+      } catch {
+        case e: Throwable => error(s"save data error: ${e.getMessage}")
       } finally {
         newCacheLock.unlock()
       }
     }
-    //    if (newDataFrame == null) {
-    //      newDataFrame = df
-    //      newDataFrame.persist(StorageLevel.fromString(cacheLevel))
-    //    } else {
-    //      if (!df.rdd.isEmpty) {
-    //        newDataFrame.unpersist()
-    //        newDataFrame = newDataFrame.unionAll(df)
-    //        newDataFrame.persist(StorageLevel.fromString(cacheLevel))
-    //      }
-    //    }
-    //    // submit ms
-    //    submitCacheTime(ms)
-    //    submitReadyTime(ms)
   }
 
   def readData(): Try[RDD[Map[String, Any]]] = Try {
-    //    if (initialed) {
-    //      val timeRange = TimeInfoCache.getTimeRange
-    //      println(s"timeRange: ${timeRange}")
-    //      submitLastProcTime(timeRange._2)
-    //
-    //      val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-    //      println(s"reviseTimeRange: ${reviseTimeRange}")
-    //      dataFrame.filter(s"${timeStampColumn} BETWEEN ${reviseTimeRange._1} AND ${reviseTimeRange._2}")
-    //    } else {
-    //      throw new Exception("data not cached")
-    //    }
-
     val timeRange = TimeInfoCache.getTimeRange
     println(s"timeRange: ${timeRange}")
     submitLastProcTime(timeRange._2)
+
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
     println(s"reviseTimeRange: ${reviseTimeRange}")
 
-    // move new data frame to temp data frame
-    val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
-    val newTempDataFrame = if (newCacheLocked) {
-      try {
-        val tmp = newDataFrame.filter(s"${timeStampColumn} BETWEEN ${reviseTimeRange._1} AND ${reviseTimeRange._2}")
-        newDataFrame.unpersist()
-        newDataFrame = newDataFrame.filter(s"${timeStampColumn} > ${reviseTimeRange._2}")
-        tmp
-      } finally {
-        newCacheLock.unlock()
-      }
-    } else null
+    // read directly through partition info
+    val partitionRange = getPartitionRange(reviseTimeRange._1, reviseTimeRange._2)
+    val sql = selectSql(concreteTableName, partitionRange)
+    val df = sqlContext.sql(sql)
 
-    // add temp data frame to old data frame
-    val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
-    val oldTempDataFrame = if (oldCacheLocked) {
-      try {
-        if (oldDataFrame != null) {
-          oldDataFrame.filter(s"${timeStampColumn} BETWEEN ${reviseTimeRange._1} AND ${reviseTimeRange._2}")
-        } else null
-      } finally {
-        oldCacheLock.unlock()
+    // decode data
+    df.flatMap { row =>
+      val dt = schemaName.map { sn =>
+        row.getAs[Any](sn)
       }
-    } else {
-      throw new Exception("old cache lock unavailable")
-    }
-
-    if (oldTempDataFrame == null && newTempDataFrame == null) {
-      throw new Exception("data not cached")
-    } else {
-      val finalDataFrame = if (newTempDataFrame == null) {
-        oldTempDataFrame
-      } else if (oldTempDataFrame == null) {
-        newTempDataFrame
-      } else {
-        oldTempDataFrame.unionAll(newTempDataFrame)
-      }
-      finalDataFrame
+      decode(dt, true)
     }
   }
 
@@ -245,47 +256,96 @@ case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCa
         val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
         println(s"clean reviseTimeRange: ${reviseTimeRange}")
 
-        oldDataFrame.unpersist()
-        oldDataFrame = oldDataFrame.filter(s"${timeStampColumn} >= ${reviseTimeRange._1}")
-        oldDataFrame.persist(StorageLevel.fromString(cacheLevel))
+        // drop partition
+        val lowerBound = getPartition(reviseTimeRange._1)
+        val sql = dropPartitionSql(concreteTableName, lowerBound)
+        sqlContext.sql(sql)
+
+        // fixme: remove data
+//        readCleanTime match {
+//          case Some(ct) => {
+//            ;
+//          }
+//          case _ => {
+//            ;
+//          }
+//        }
+      } catch {
+        case e: Throwable => error(s"clean old data error: ${e.getMessage}")
       } finally {
         oldCacheLock.unlock()
       }
     }
-
-    //    if (initialed) {
-    //      val timeRange = TimeInfoCache.getTimeRange
-    //      val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-    //      println(s"clean reviseTimeRange: ${reviseTimeRange}")
-    //
-    //      dataFrame.show(10)
-    //
-    //      dataFrame.unpersist()
-    //      dataFrame = dataFrame.filter(s"${timeStampColumn} >= ${reviseTimeRange._1}")
-    //      dataFrame.persist(StorageLevel.fromString(cacheLevel))
-    //
-    //      dataFrame.show(10)
-    //    }
   }
 
-  override def updateOldData(oldRdd: RDD[Map[String, Any]]): Unit = {
-    val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
-    if (oldCacheLocked) {
-      try {
-        if (oldDataFrame == null) {
-          oldDataFrame = oldDf
-          oldDataFrame.persist(StorageLevel.fromString(cacheLevel))
-        } else {
-          if (!oldDf.rdd.isEmpty) {
-            oldDataFrame.unpersist()
-            oldDataFrame = oldDf
-            oldDataFrame.persist(StorageLevel.fromString(cacheLevel))
-          }
+  override def updateOldData(t: Long, oldData: Iterable[Map[String, Any]]): Unit = {
+    // parallel process different time groups, lock is unnecessary
+    val ptns = getPartition(t)
+    val ptnsPath = genPartitionHdfsPath(ptns)
+    val dirPath = s"${tablePath}/${ptnsPath}"
+    val fileName = s"${t}"
+    val filePath = HdfsUtil.getHdfsFilePath(dirPath, fileName)
+
+    try {
+      // remove out time old data
+      HdfsFileDumpUtil.remove(dirPath, fileName, true)
+
+      // save updated old data
+      if (oldData.size > 0) {
+        val recordDatas = oldData.flatMap { dt =>
+          encode(dt, t)
         }
-      } finally {
-        oldCacheLock.unlock()
+        val records: Iterable[String] = recordDatas.map { dt =>
+          dt.map(_.toString).mkString(fieldSep)
+        }
+        val dumped = HdfsFileDumpUtil.dump(filePath, records, rowSepLiteral)
       }
+    } catch {
+      case e: Throwable => error(s"update old data error: ${e.getMessage}")
     }
+  }
+
+  private def getPartition(ms: Long): List[(String, Any)] = {
+    partition.map { p =>
+      val (name, _, unit) = p
+      val t = TimeUtil.timeToUnit(ms, unit)
+      (name, t)
+    }
+  }
+  private def getPartitionRange(ms1: Long, ms2: Long): List[(String, (Any, Any))] = {
+    partition.map { p =>
+      val (name, _, unit) = p
+      val t1 = TimeUtil.timeToUnit(ms1, unit)
+      val t2 = TimeUtil.timeToUnit(ms2, unit)
+      (name, (t1, t2))
+    }
+  }
+
+  private def genPartitionHdfsPath(partition: List[(String, Any)]): String = {
+    partition.map(prtn => s"${prtn._1}=${prtn._2}").mkString("/")
+  }
+  private def addPartitionSql(tbn: String, partition: List[(String, Any)]): String = {
+    val partitionSql = partition.map(ptn => (s"`${ptn._1}` = ${ptn._2}")).mkString(", ")
+    val sql = s"""ALTER TABLE ${tbn} ADD IF NOT EXISTS PARTITION (${partitionSql})"""
+    sql
+  }
+  private def selectSql(tbn: String, partitionRange: List[(String, (Any, Any))]): String = {
+    val clause = partitionRange.map { pr =>
+      val (name, (r1, r2)) = pr
+      s"""`${name}` BETWEEN '${r1}' and '${r2}'"""
+    }.mkString(" AND ")
+    val whereClause = if (clause.nonEmpty) s"WHERE ${clause}" else ""
+    val sql = s"""SELECT * FROM ${tbn} ${whereClause}"""
+    sql
+  }
+  private def dropPartitionSql(tbn: String, partition: List[(String, Any)]): String = {
+    val partitionSql = partition.map(ptn => (s"PARTITION ( `${ptn._1}` < ${ptn._2} ) ")).mkString(", ")
+    val sql = s"""ALTER TABLE ${tbn} DROP ${partitionSql}"""
+    sql
+  }
+
+  private def tableExistsSql(): String = {
+    s"tableName LIKE '${tableName}'"
   }
 
 }

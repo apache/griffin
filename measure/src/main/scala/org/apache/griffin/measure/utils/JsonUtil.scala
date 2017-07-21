@@ -48,7 +48,7 @@ object JsonUtil {
     mapper.readValue[T](is, classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
 
-  def toAnyMap(json: String) = {
+  def toAnyMap(json: String): Map[String, Any] = {
     mapper.readValue(json, classOf[Map[String, Any]])
   }
 }

@@ -35,7 +35,7 @@ import org.apache.griffin.measure.persist.{Persist, PersistFactory, PersistType}
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.expr._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
-import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
@@ -52,7 +52,7 @@ import scala.util.{Failure, Success, Try}
 class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
 
   val envFile = "src/test/resources/env-streaming.json"
-  val confFile = "src/test/resources/config-streaming1.json"
+  val confFile = "src/test/resources/config-streaming.json"
   val envFsType = "local"
   val userFsType = "local"
 
@@ -100,9 +100,12 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
 //    sqlContext = new SQLContext(sc)
     sqlContext = new HiveContext(sc)
 
-    val a = sqlContext.sql("select * from test limit 10")
+    val a = sqlContext.sql("select * from s1 limit 10")
     //    val a = sqlContext.sql("show tables")
     a.show(10)
+
+    val b = HdfsUtil.existPath("/griffin/streaming")
+    println(b)
   }
 
   test("algorithm") {
@@ -239,42 +242,60 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
 
               val updatedCacheResultOpt = cacheResultProcesser.genUpdateCacheResult(t, updateTime, res)
 
-              updatedCacheResultOpt match {
-                case Some(updatedCacheResult) => {
-                  val persist: Persist = persistFactory.getPersists(t)
+              updatedCacheResultOpt.flatMap { updatedCacheResult =>
+                Some((updatedCacheResult, (t, missData)))
+              }
+            }
 
-                  // persist result
-                  persist.result(updateTime, accuResult)
+            updateResults.cache
 
-                  // persist missing data
-                  val missStrings = missData.map { row =>
-                    val (key, (value, info)) = row
-                    s"${value} [${info.getOrElse(MismatchInfo.key, "unknown")}]"
-                  }
-                  persist.records(missStrings, PersistType.MISS)
-                }
-                case _ => {
-                  // do nothing
-                }
+            val updateResultsPart =  updateResults.map(_._1)
+            val updateDataPart =  updateResults.map(_._2)
+
+            val updateResultsArray = updateResultsPart.collect()
+
+            // update results cache (in driver)
+            // collect action is traversable once action, it will make rdd updateResults empty
+            updateResultsArray.foreach { updateResult =>
+              println(s"update result: ${updateResult}")
+              cacheResultProcesser.update(updateResult)
+              // persist result
+              val persist: Persist = persistFactory.getPersists(updateResult.timeGroup)
+              persist.result(updateTime, updateResult.result)
+            }
+
+            // record missing data and update old data (in executor)
+            updateDataPart.foreach { grp =>
+              val (t, datas) = grp
+              val persist: Persist = persistFactory.getPersists(t)
+              // persist missing data
+              val missStrings = datas.map { row =>
+                val (_, (value, info)) = row
+                s"${value} [${info.getOrElse(MismatchInfo.key, "unknown")}]"
+              }
+              persist.records(missStrings, PersistType.MISS)
+              // data connector update old data
+              val dumpDatas = datas.map { r =>
+                val (_, (v, i)) = r
+                v ++ i
               }
 
-              updatedCacheResultOpt
-            }.collect()
+              println(t)
+              dumpDatas.foreach(println)
 
-            // update results cache together
-            updateResults.foreach { updateResult =>
-              cacheResultProcesser.update(updateResult)
+              sourceDataConnector.updateOldData(t, dumpDatas)
+              targetDataConnector.updateOldData(t, dumpDatas)    // not correct
             }
 
-            // dump missing rdd
-            val dumpRdd: RDD[Map[String, Any]] = missingRdd.map { row =>
-              val (key, (value, info)) = row
-              value ++ info
-            }
-            sourceDataConnector.updateOldData(dumpRdd)
-            targetDataConnector.updateOldData(dumpRdd)    // not correct
+            updateResults.unpersist()
 
-            // fixme: 2. implement the hive cahe data connector
+            // dump missing rdd   (this part not need for future version, only for current df cache data version)
+            val dumpRdd: RDD[Map[String, Any]] = missingRdd.map { r =>
+              val (_, (v, i)) = r
+              v ++ i
+            }
+            sourceDataConnector.updateAllOldData(dumpRdd)
+            targetDataConnector.updateAllOldData(dumpRdd)    // not correct
 
             // fixme: 3. refactor data connector module
 

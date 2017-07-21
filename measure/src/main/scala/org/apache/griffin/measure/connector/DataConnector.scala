@@ -31,6 +31,7 @@ trait DataConnector extends Loggable with Serializable {
 
   def cleanOldData(): Unit = {}
 
-  def updateOldData(oldRdd: RDD[Map[String, Any]]): Unit = {}
+  def updateOldData(t: Long, oldData: Iterable[Map[String, Any]]): Unit = {}
+  def updateAllOldData(oldRdd: RDD[Map[String, Any]]): Unit = {}
 
 }
