@@ -16,17 +16,19 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.streaming
 
-import org.apache.griffin.measure.log.Loggable
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.griffin.measure.connector.DataConnector
+import org.apache.spark.streaming.dstream.InputDStream
+
+import scala.util.Try
 
 
-trait DataConnector extends Loggable with Serializable {
+trait StreamingDataConnector extends DataConnector {
 
-  def available(): Boolean
+  type K
+  type V
 
-  def init(): Unit
+  def stream(): Try[InputDStream[(K, V)]]
 
 }

@@ -16,12 +16,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.cache
 
 import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
-import org.apache.griffin.measure.cache.lock.CacheLock
 import org.apache.griffin.measure.config.params.user.DataCacheParam
 import org.apache.griffin.measure.result.TimeStampInfo
 import org.apache.griffin.measure.rule.DataTypeCalculationUtil
@@ -31,7 +30,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.spark.storage.StorageLevel
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCacheParam
                                ) extends CacheDataConnector {
@@ -75,6 +74,8 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
   def available(): Boolean = {
     true
   }
+
+  def init(): Unit = {}
 
   def saveData(rdd: RDD[Map[String, Any]], ms: Long): Unit = {
     val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
@@ -242,7 +243,7 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
 
 }
 
-import scala.collection.mutable.{ArrayBuffer}
+import scala.collection.mutable.ArrayBuffer
 
 object SparkRowFormatter {
 

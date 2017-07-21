@@ -16,24 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
-
-import org.apache.griffin.measure.rule.expr._
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row, SQLContext}
-import com.databricks.spark.avro._
-
-import scala.util.{Success, Try}
-import java.nio.file.{Files, Paths}
+package org.apache.griffin.measure.connector.direct
 
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
 import org.apache.griffin.measure.utils.HdfsUtil
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SQLContext
+
+import scala.util.Try
 
 // data connector for avro file
-case class AvroBatchDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                                  ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
-                                 ) extends BatchDataConnector {
+case class AvroDirectDataConnector(sqlContext: SQLContext, config: Map[String, Any],
+                                   ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
+                                 ) extends DirectDataConnector {
 
   val FilePath = "file.path"
   val FileName = "file.name"
@@ -54,6 +50,8 @@ case class AvroBatchDataConnector(sqlContext: SQLContext, config: Map[String, An
   def available(): Boolean = {
     (!concreteFileFullPath.isEmpty) && fileExist
   }
+
+  def init(): Unit = {}
 
   def metaData(): Try[Iterable[(String, String)]] = {
     Try {

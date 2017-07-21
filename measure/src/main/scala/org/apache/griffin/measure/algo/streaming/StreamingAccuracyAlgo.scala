@@ -26,6 +26,7 @@ import org.apache.griffin.measure.algo.core.AccuracyCore
 import org.apache.griffin.measure.cache.info.InfoCacheInstance
 import org.apache.griffin.measure.config.params.AllParam
 import org.apache.griffin.measure.connector._
+import org.apache.griffin.measure.connector.direct.DirectDataConnector
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.result.{AccuracyResult, TimeStampInfo}
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
@@ -87,8 +88,8 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       }
 
       // data connector
-      val sourceDataConnector: BatchDataConnector =
-      DataConnectorFactory.getDataConnector(sqlContext, ssc, userParam.sourceParam,
+      val sourceDataConnector: DirectDataConnector =
+      DataConnectorFactory.getDirectDataConnector(sqlContext, ssc, userParam.sourceParam,
         ruleAnalyzer.sourceRuleExprs, finalConstMap
       ) match {
         case Success(cntr) => {
@@ -97,8 +98,8 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
         }
         case Failure(ex) => throw ex
       }
-      val targetDataConnector: BatchDataConnector =
-        DataConnectorFactory.getDataConnector(sqlContext, ssc, userParam.targetParam,
+      val targetDataConnector: DirectDataConnector =
+        DataConnectorFactory.getDirectDataConnector(sqlContext, ssc, userParam.targetParam,
           ruleAnalyzer.targetRuleExprs, finalConstMap
         ) match {
           case Success(cntr) => {

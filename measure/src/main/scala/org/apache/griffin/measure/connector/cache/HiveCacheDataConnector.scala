@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.cache
 
 import java.util.concurrent.TimeUnit
 
@@ -25,9 +25,8 @@ import org.apache.griffin.measure.config.params.user.DataCacheParam
 import org.apache.griffin.measure.result.TimeStampInfo
 import org.apache.griffin.measure.utils.{HdfsFileDumpUtil, HdfsUtil, JsonUtil, TimeUtil}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.storage.StorageLevel
 
 import scala.util.{Success, Try}
 

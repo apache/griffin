@@ -29,7 +29,8 @@ import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.config.reader._
 import org.apache.griffin.measure.config.validator._
-import org.apache.griffin.measure.connector.{BatchDataConnector, DataConnector, DataConnectorFactory}
+import org.apache.griffin.measure.connector.direct.DirectDataConnector
+import org.apache.griffin.measure.connector.{DataConnector, DataConnectorFactory}
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory, PersistType}
 import org.apache.griffin.measure.result._
@@ -157,8 +158,8 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     }
 
     // data connector
-    val sourceDataConnector: BatchDataConnector =
-      DataConnectorFactory.getDataConnector(sqlContext, ssc, userParam.sourceParam,
+    val sourceDataConnector: DirectDataConnector =
+      DataConnectorFactory.getDirectDataConnector(sqlContext, ssc, userParam.sourceParam,
         ruleAnalyzer.sourceRuleExprs, finalConstMap
       ) match {
         case Success(cntr) => {
@@ -167,8 +168,8 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
         }
         case Failure(ex) => throw ex
       }
-    val targetDataConnector: BatchDataConnector =
-      DataConnectorFactory.getDataConnector(sqlContext, ssc, userParam.targetParam,
+    val targetDataConnector: DirectDataConnector =
+      DataConnectorFactory.getDirectDataConnector(sqlContext, ssc, userParam.targetParam,
         ruleAnalyzer.targetRuleExprs, finalConstMap
       ) match {
         case Success(cntr) => {

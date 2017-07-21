@@ -16,20 +16,19 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.direct
 
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
-import org.apache.griffin.measure.rule.expr._
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.apache.spark.sql.SQLContext
 
 import scala.util.{Success, Try}
 
 // data connector for hive
-case class HiveBatchDataConnector(sqlContext: SQLContext, config: Map[String, Any],
-                                  ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
-                                 ) extends BatchDataConnector {
+case class HiveDirectDataConnector(sqlContext: SQLContext, config: Map[String, Any],
+                                   ruleExprs: RuleExprs, constFinalExprValueMap: Map[String, Any]
+                                 ) extends DirectDataConnector {
 
   val Database = "database"
   val TableName = "table.name"
@@ -60,6 +59,8 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, config: Map[String, An
       }
     }
   }
+
+  def init(): Unit = {}
 
   def metaData(): Try[Iterable[(String, String)]] = {
     Try {

@@ -24,6 +24,7 @@ import org.apache.griffin.measure.algo.AccuracyAlgo
 import org.apache.griffin.measure.algo.core.AccuracyCore
 import org.apache.griffin.measure.config.params.AllParam
 import org.apache.griffin.measure.connector._
+import org.apache.griffin.measure.connector.direct.DirectDataConnector
 import org.apache.griffin.measure.persist._
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule._
@@ -76,8 +77,8 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       }
 
       // data connector
-      val sourceDataConnector: BatchDataConnector =
-        DataConnectorFactory.getBatchDataConnector(sqlContext, userParam.sourceParam,
+      val sourceDataConnector: DirectDataConnector =
+        DataConnectorFactory.getDirectDataConnector(sqlContext, null, userParam.sourceParam,
           ruleAnalyzer.sourceRuleExprs, finalConstMap
         ) match {
           case Success(cntr) => {
@@ -86,8 +87,8 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
           }
           case Failure(ex) => throw ex
         }
-      val targetDataConnector: BatchDataConnector =
-        DataConnectorFactory.getBatchDataConnector(sqlContext, userParam.targetParam,
+      val targetDataConnector: DirectDataConnector =
+        DataConnectorFactory.getDirectDataConnector(sqlContext, null, userParam.targetParam,
           ruleAnalyzer.targetRuleExprs, finalConstMap
         ) match {
           case Success(cntr) => {

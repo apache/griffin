@@ -16,17 +16,19 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.direct
 
-import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.connector.DataConnector
+import org.apache.griffin.measure.connector.cache.DataUpdatable
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+
+import scala.util.Try
 
 
-trait DataConnector extends Loggable with Serializable {
+trait DirectDataConnector extends DataConnector with DataUpdatable {
 
-  def available(): Boolean
+  def metaData(): Try[Iterable[(String, String)]]
 
-  def init(): Unit
+  def data(): Try[RDD[(Product, (Map[String, Any], Map[String, Any]))]]
 
 }

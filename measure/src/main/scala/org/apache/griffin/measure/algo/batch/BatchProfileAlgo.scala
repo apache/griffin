@@ -24,6 +24,7 @@ import org.apache.griffin.measure.algo.ProfileAlgo
 import org.apache.griffin.measure.algo.core.ProfileCore
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.connector._
+import org.apache.griffin.measure.connector.direct.DirectDataConnector
 import org.apache.griffin.measure.persist.{Persist, PersistFactory, PersistType}
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.expr._
@@ -76,8 +77,8 @@ case class BatchProfileAlgo(allParam: AllParam) extends ProfileAlgo {
       }
 
       // data connector
-      val sourceDataConnector: BatchDataConnector =
-      DataConnectorFactory.getBatchDataConnector(sqlContext, userParam.sourceParam,
+      val sourceDataConnector: DirectDataConnector =
+      DataConnectorFactory.getDirectDataConnector(sqlContext, null, userParam.sourceParam,
         ruleAnalyzer.sourceRuleExprs, finalConstMap
       ) match {
         case Success(cntr) => {

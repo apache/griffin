@@ -16,17 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.cache
 
 import org.apache.spark.rdd.RDD
 
-import scala.util.Try
+trait DataUpdatable {
 
+  def cleanOldData(): Unit = {}
 
-trait BatchDataConnector extends DataConnector {
-
-  def metaData(): Try[Iterable[(String, String)]]
-
-  def data(): Try[RDD[(Product, (Map[String, Any], Map[String, Any]))]]
+  def updateOldData(t: Long, oldData: Iterable[Map[String, Any]]): Unit = {}
+  def updateAllOldData(oldRdd: RDD[Map[String, Any]]): Unit = {}
 
 }

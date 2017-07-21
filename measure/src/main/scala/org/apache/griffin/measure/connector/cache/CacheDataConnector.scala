@@ -16,19 +16,18 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.cache
 
-import org.apache.griffin.measure.log.Loggable
-import org.apache.spark.streaming.dstream.InputDStream
+import org.apache.griffin.measure.connector.DataConnector
+import org.apache.spark.rdd.RDD
 
 import scala.util.Try
 
+trait CacheDataConnector extends DataConnector with DataCacheable with DataUpdatable {
 
-trait StreamingDataConnector extends Loggable {
+  def saveData(rdd: RDD[Map[String, Any]], ms: Long): Unit
 
-  type K
-  type V
-
-  def stream(): Try[InputDStream[(K, V)]]
+  def readData(): Try[RDD[Map[String, Any]]]
 
 }
+

@@ -16,17 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.streaming
 
 import kafka.serializer.Decoder
+import org.apache.griffin.measure.connector.cache.{CacheDataConnector, DataCacheable}
+import org.apache.griffin.measure.result.{DataInfo, TimeStampInfo}
+import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
+import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
-import org.apache.spark.streaming.kafka.KafkaUtils
 
-import scala.reflect.ClassTag
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
-abstract class KafkaStreamingDataConnector(ssc: StreamingContext, config: Map[String, Any]
+abstract class KafkaStreamingDataConnector(@transient ssc: StreamingContext,
+                                           config: Map[String, Any]
                                           ) extends StreamingDataConnector {
   type KD <: Decoder[K]
   type VD <: Decoder[V]
@@ -43,6 +46,8 @@ abstract class KafkaStreamingDataConnector(ssc: StreamingContext, config: Map[St
   def available(): Boolean = {
     true
   }
+
+  def init(): Unit = {}
 
   def stream(): Try[InputDStream[(K, V)]] = Try {
     val topicSet = topics.split(",").toSet

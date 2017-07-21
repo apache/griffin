@@ -16,24 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.connector
+package org.apache.griffin.measure.connector.cache
 
 import java.util.concurrent.atomic.AtomicLong
 
-import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache, ZKInfoCache}
-import org.apache.griffin.measure.utils.TimeUtil
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 
-import scala.util.Try
-
-trait CacheDataConnector extends DataConnector {
+trait DataCacheable {
 
   protected val defCacheInfoPath = PathCounter.genPath
-
-  def saveData(rdd: RDD[Map[String, Any]], ms: Long): Unit
-
-  def readData(): Try[RDD[Map[String, Any]]]
 
   val cacheInfoPath: String
   val readyTimeInterval: Long

@@ -26,7 +26,8 @@ import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.config.reader._
 import org.apache.griffin.measure.config.validator._
-import org.apache.griffin.measure.connector.{BatchDataConnector, DataConnector, DataConnectorFactory}
+import org.apache.griffin.measure.connector.direct.DirectDataConnector
+import org.apache.griffin.measure.connector.{DataConnector, DataConnectorFactory}
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.rule.expr._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}
@@ -118,8 +119,8 @@ class BatchProfileAlgoTest extends FunSuite with Matchers with BeforeAndAfter wi
       }
 
       // data connector
-      val sourceDataConnector: BatchDataConnector =
-        DataConnectorFactory.getBatchDataConnector(sqlContext, userParam.sourceParam,
+      val sourceDataConnector: DirectDataConnector =
+        DataConnectorFactory.getDirectDataConnector(sqlContext, null, userParam.sourceParam,
           ruleAnalyzer.sourceRuleExprs, finalConstMap
         ) match {
           case Success(cntr) => {
