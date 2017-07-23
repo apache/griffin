@@ -2,6 +2,8 @@
   "name": "accu2",
   "type": "accuracy",
 
+  "process.type": "streaming",
+
   "source": {
     "type": "kafka",
     "version": "0.8",

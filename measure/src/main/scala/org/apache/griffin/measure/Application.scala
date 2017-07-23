@@ -19,7 +19,8 @@ under the License.
 package org.apache.griffin.measure
 
 import org.apache.griffin.measure.algo._
-import org.apache.griffin.measure.algo.batch.{BatchAccuracyAlgo, BatchProfileAlgo}
+import org.apache.griffin.measure.algo.batch._
+import org.apache.griffin.measure.algo.streaming._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
@@ -80,11 +81,14 @@ object Application extends Loggable {
 
     // choose algorithm
     val dqType = allParam.userParam.dqType
-    val algo: Algo = dqType match {
-      case MeasureType.accuracy() => BatchAccuracyAlgo(allParam)
-      case MeasureType.profile() => BatchProfileAlgo(allParam)
+    val procType = allParam.userParam.procType
+    val algo: Algo = (dqType, procType) match {
+      case (MeasureType.accuracy(), ProcessType.batch()) => BatchAccuracyAlgo(allParam)
+      case (MeasureType.profile(), ProcessType.batch()) => BatchProfileAlgo(allParam)
+      case (MeasureType.accuracy(), ProcessType.streaming()) => StreamingAccuracyAlgo(allParam)
+//      case (MeasureType.profile(), ProcessType.streaming()) => StreamingProfileAlgo(allParam)
       case _ => {
-        error(s"${dqType} is unsupported dq type!")
+        error(s"${dqType} with ${procType} is unsupported dq type!")
         sys.exit(-4)
       }
     }

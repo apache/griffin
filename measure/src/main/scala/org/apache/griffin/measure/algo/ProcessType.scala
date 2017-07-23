@@ -18,9 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure.algo
 
-object MeasureType {
+object ProcessType {
 
-  val accuracy = """^(?i)accuracy$""".r
-  val profile = """^(?i)profile$""".r
+  val batch = """^(?i)batch$""".r
+  val streaming = """^(?i)streaming$""".r
 
 }

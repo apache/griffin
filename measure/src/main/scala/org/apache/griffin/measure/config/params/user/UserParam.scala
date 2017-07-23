@@ -25,6 +25,7 @@ import org.apache.griffin.measure.config.params.Param
 @JsonInclude(Include.NON_NULL)
 case class UserParam(@JsonProperty("name") name: String,
                      @JsonProperty("type") dqType: String,
+                     @JsonProperty("process.type") procType: String,
                      @JsonProperty("source") sourceParam: DataConnectorParam,
                      @JsonProperty("target") targetParam: DataConnectorParam,
                      @JsonProperty("evaluateRule") evaluateRuleParam: EvaluateRuleParam
