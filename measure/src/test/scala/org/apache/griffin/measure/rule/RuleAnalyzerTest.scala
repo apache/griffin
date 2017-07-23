@@ -27,7 +27,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 class RuleAnalyzerTest extends FunSuite with BeforeAndAfter with Matchers {
 
   test ("rule analyze") {
-    val rule = "$source.name = $target.name AND $source.age = $target.age + (2 * 5) WHEN $source.born > (6 - 2 * 2)"
+    val rule = "$source.name = $target.name AND $source.age = $target.age + (2 * 5) AND $source.born > (6 - 2 * 2)"
     val evaluateRuleParam = EvaluateRuleParam(1.0, rule)
     val ruleFactory = RuleFactory(evaluateRuleParam)
     val statement = ruleFactory.generateRule

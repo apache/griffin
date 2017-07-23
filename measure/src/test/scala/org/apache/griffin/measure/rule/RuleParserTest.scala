@@ -194,9 +194,9 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter {
     result1.successful should be (true)
     result1.get.desc should be ("$source['name'] = $target['name'] AND $source['age'] = $target['age']")
 
-    val rule2 = "$source.name = $target.name AND $source.age = $target.age WHEN $source.id > 1000"
+    val rule2 = "$source.name = $target.name AND $source.age = $target.age AND $source.id > 1000"
     val result2 = ruleParser.parseAll(ruleParser.rule, rule2)
     result2.successful should be (true)
-    result2.get.desc should be ("$source['name'] = $target['name'] AND $source['age'] = $target['age'] when $source['id'] > 1000")
+    result2.get.desc should be ("$source['name'] = $target['name'] AND $source['age'] = $target['age'] AND $source['id'] > 1000")
   }
 }
