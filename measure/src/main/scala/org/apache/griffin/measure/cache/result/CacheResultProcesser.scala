@@ -25,7 +25,7 @@ import scala.collection.mutable.{Map => MutableMap}
 
 case class CacheResultProcesser() extends Loggable {
 
-  private val cacheGroup: MutableMap[Long, CacheResult] = MutableMap()
+  val cacheGroup: MutableMap[Long, CacheResult] = MutableMap()
 
   def genUpdateCacheResult(timeGroup: Long, updateTime: Long, result: Result): Option[CacheResult] = {
     cacheGroup.get(timeGroup) match {
@@ -62,7 +62,7 @@ case class CacheResultProcesser() extends Loggable {
     val curCacheGroup = cacheGroup.toMap
     val deadCache = curCacheGroup.filter { pr =>
       val (_, cr) = pr
-      cr.timeGroup <= overtime || cr.result.eventual()
+      cr.timeGroup < overtime || cr.result.eventual()
     }
     info(s"=== dead cache group count: ${deadCache.size} ===")
     deadCache.keySet.foreach(cacheGroup -= _)

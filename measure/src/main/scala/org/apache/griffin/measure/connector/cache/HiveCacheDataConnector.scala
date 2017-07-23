@@ -227,11 +227,10 @@ case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCa
 
   def readData(): Try[RDD[Map[String, Any]]] = Try {
     val timeRange = TimeInfoCache.getTimeRange
-    println(s"timeRange: ${timeRange}")
     submitLastProcTime(timeRange._2)
 
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-    println(s"reviseTimeRange: ${reviseTimeRange}")
+    submitCleanTime(reviseTimeRange._1)
 
     // read directly through partition info
     val partitionRange = getPartitionRange(reviseTimeRange._1, reviseTimeRange._2)
@@ -251,24 +250,18 @@ case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCa
     val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
     if (oldCacheLocked) {
       try {
-        val timeRange = TimeInfoCache.getTimeRange
-        val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-        println(s"clean reviseTimeRange: ${reviseTimeRange}")
-
-        // drop partition
-        val lowerBound = getPartition(reviseTimeRange._1)
-        val sql = dropPartitionSql(concreteTableName, lowerBound)
-        sqlContext.sql(sql)
-
-        // fixme: remove data
-//        readCleanTime match {
-//          case Some(ct) => {
-//            ;
-//          }
-//          case _ => {
-//            ;
-//          }
-//        }
+        val cleanTime = readCleanTime()
+        cleanTime match {
+          case Some(ct) => {
+            // drop partition
+            val bound = getPartition(ct)
+            val sql = dropPartitionSql(concreteTableName, bound)
+            sqlContext.sql(sql)
+          }
+          case _ => {
+            // do nothing
+          }
+        }
       } catch {
         case e: Throwable => error(s"clean old data error: ${e.getMessage}")
       } finally {
@@ -302,6 +295,13 @@ case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCa
     } catch {
       case e: Throwable => error(s"update old data error: ${e.getMessage}")
     }
+  }
+
+  override protected def genCleanTime(ms: Long): Long = {
+    val minPartition = partition.last
+    val t1 = TimeUtil.timeToUnit(ms, minPartition._3)
+    val t2 = TimeUtil.timeFromUnit(t1, minPartition._3)
+    t2
   }
 
   private def getPartition(ms: Long): List[(String, Any)] = {
@@ -338,8 +338,9 @@ case class HiveCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCa
     sql
   }
   private def dropPartitionSql(tbn: String, partition: List[(String, Any)]): String = {
-    val partitionSql = partition.map(ptn => (s"PARTITION ( `${ptn._1}` < ${ptn._2} ) ")).mkString(", ")
+    val partitionSql = partition.map(ptn => (s"PARTITION ( `${ptn._1}` < '${ptn._2}' ) ")).mkString(", ")
     val sql = s"""ALTER TABLE ${tbn} DROP ${partitionSql}"""
+    println(sql)
     sql
   }
 

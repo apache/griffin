@@ -106,10 +106,8 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
 
   def readData(): Try[RDD[Map[String, Any]]] = Try {
     val timeRange = TimeInfoCache.getTimeRange
-    println(s"timeRange: ${timeRange}")
     submitLastProcTime(timeRange._2)
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-    println(s"reviseTimeRange: ${reviseTimeRange}")
 
     // move new data frame to temp data frame
     val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
@@ -165,7 +163,6 @@ case class DfCacheDataConnector(sqlContext: SQLContext, dataCacheParam: DataCach
       try {
         val timeRange = TimeInfoCache.getTimeRange
         val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-        println(s"clean reviseTimeRange: ${reviseTimeRange}")
 
         oldDataFrame.unpersist()
         oldDataFrame = oldDataFrame.filter(s"${timeStampColumn} >= ${reviseTimeRange._1}")

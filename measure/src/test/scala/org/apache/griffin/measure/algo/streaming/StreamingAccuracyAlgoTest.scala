@@ -101,12 +101,12 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
 //    sqlContext = new SQLContext(sc)
     sqlContext = new HiveContext(sc)
 
-    val a = sqlContext.sql("select * from s1 limit 10")
-    //    val a = sqlContext.sql("show tables")
-    a.show(10)
-
-    val b = HdfsUtil.existPath("/griffin/streaming")
-    println(b)
+//    val a = sqlContext.sql("select * from s1 limit 10")
+//    //    val a = sqlContext.sql("show tables")
+//    a.show(10)
+//
+//    val b = HdfsUtil.existPath("/griffin/streaming")
+//    println(b)
   }
 
   test("algorithm") {
@@ -188,138 +188,15 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     // my algo
     val algo = StreamingAccuracyAlgo(allParam)
 
-    // process thread
-    case class Process() extends Runnable {
-      val lock = InfoCacheInstance.genLock("process")
-      def run(): Unit = {
-        val updateTime = new Date().getTime
-        val locked = lock.lock(5, TimeUnit.SECONDS)
-        if (locked) {
-          try {
-            val st = new Date().getTime
-
-            TimeInfoCache.startTimeInfoCache
-
-            // get data
-            val sourceData = sourceDataConnector.data match {
-              case Success(dt) => dt
-              case Failure(ex) => throw ex
-            }
-            val targetData = targetDataConnector.data match {
-              case Success(dt) => dt
-              case Failure(ex) => throw ex
-            }
-
-            println(s"sourceData.count: ${sourceData.count}")
-            println(s"targetData.count: ${targetData.count}")
-
-            // accuracy algorithm
-            val (accuResult, missingRdd, matchedRdd) = algo.accuracy(sourceData, targetData, ruleAnalyzer)
-            println(accuResult)
-
-            val ct = new Date().getTime
-            appPersist.log(ct, s"calculation using time: ${ct - st} ms")
-
-            // result of every group
-            val matchedGroups = algo.reorgByTimeGroup(matchedRdd)
-            val matchedGroupCount = matchedGroups.count
-            println(s"===== matchedGroupCount: ${matchedGroupCount} =====")
-
-            // get missing results
-            val missingGroups = algo.reorgByTimeGroup(missingRdd)
-            val missingGroupCount = missingGroups.count
-            println(s"===== missingGroupCount: ${missingGroupCount} =====")
-
-            val groups = matchedGroups.cogroup(missingGroups)
-            val groupCount = groups.count
-            println(s"===== groupCount: ${groupCount} =====")
-
-            val updateResults = groups.flatMap { group =>
-              val (t, (matchData, missData)) = group
-
-              val matchSize = matchData.size
-              val missSize = missData.size
-              val res = AccuracyResult(missSize, matchSize + missSize)
-
-              val updatedCacheResultOpt = cacheResultProcesser.genUpdateCacheResult(t, updateTime, res)
-
-              updatedCacheResultOpt.flatMap { updatedCacheResult =>
-                Some((updatedCacheResult, (t, missData)))
-              }
-            }
-
-            updateResults.cache
-
-            val updateResultsPart =  updateResults.map(_._1)
-            val updateDataPart =  updateResults.map(_._2)
-
-            val updateResultsArray = updateResultsPart.collect()
-
-            // update results cache (in driver)
-            // collect action is traversable once action, it will make rdd updateResults empty
-            updateResultsArray.foreach { updateResult =>
-              println(s"update result: ${updateResult}")
-              cacheResultProcesser.update(updateResult)
-              // persist result
-              val persist: Persist = persistFactory.getPersists(updateResult.timeGroup)
-              persist.result(updateTime, updateResult.result)
-            }
-
-            // record missing data and update old data (in executor)
-            updateDataPart.foreach { grp =>
-              val (t, datas) = grp
-              val persist: Persist = persistFactory.getPersists(t)
-              // persist missing data
-              val missStrings = datas.map { row =>
-                val (_, (value, info)) = row
-                s"${value} [${info.getOrElse(MismatchInfo.key, "unknown")}]"
-              }
-              persist.records(missStrings, PersistType.MISS)
-              // data connector update old data
-              val dumpDatas = datas.map { r =>
-                val (_, (v, i)) = r
-                v ++ i
-              }
-
-              println(t)
-              dumpDatas.foreach(println)
-
-              sourceDataConnector.updateOldData(t, dumpDatas)
-              targetDataConnector.updateOldData(t, dumpDatas)    // not correct
-            }
-
-            updateResults.unpersist()
-
-            // dump missing rdd   (this part not need for future version, only for current df cache data version)
-            val dumpRdd: RDD[Map[String, Any]] = missingRdd.map { r =>
-              val (_, (v, i)) = r
-              v ++ i
-            }
-            sourceDataConnector.updateAllOldData(dumpRdd)
-            targetDataConnector.updateAllOldData(dumpRdd)    // not correct
-
-            // fixme: 3. refactor data connector module
-
-
-            TimeInfoCache.endTimeInfoCache
-
-            val et = new Date().getTime
-            appPersist.log(et, s"persist using time: ${et - ct} ms")
-
-          } catch {
-            case e: Throwable => error(s"process error: ${e.getMessage}")
-          } finally {
-            lock.unlock()
-          }
-        }
-      }
-    }
+    val streamingAccuracyProcess = StreamingAccuracyProcess(
+      sourceDataConnector, targetDataConnector,
+      ruleAnalyzer, cacheResultProcesser, persistFactory, appPersist)
 
     val processInterval = TimeUtil.milliseconds(sparkParam.processInterval) match {
       case Some(interval) => interval
       case _ => throw new Exception("invalid batch interval")
     }
-    val process = TimingProcess(processInterval, Process())
+    val process = TimingProcess(processInterval, streamingAccuracyProcess)
 
     // clean thread
 //    case class Clean() extends Runnable {

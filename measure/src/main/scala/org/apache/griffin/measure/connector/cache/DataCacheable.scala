@@ -56,9 +56,12 @@ trait DataCacheable {
   }
 
   protected def submitCleanTime(ms: Long): Unit = {
-    val map = Map[String, String]((selfCleanTime -> ms.toString))
+    val cleanTime = genCleanTime(ms)
+    val map = Map[String, String]((selfCleanTime -> cleanTime.toString))
     InfoCacheInstance.cacheInfo(map)
   }
+
+  protected def genCleanTime(ms: Long): Long = ms
 
   protected def readCleanTime(): Option[Long] = {
     val key = selfCleanTime

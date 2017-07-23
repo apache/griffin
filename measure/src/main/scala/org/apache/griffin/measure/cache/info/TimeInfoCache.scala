@@ -37,6 +37,7 @@ object TimeInfoCache extends Loggable with Serializable {
   val finalCacheInfoPath = "info.final"
   val finalReadyTime = s"${finalCacheInfoPath}/${ReadyTime}"
   val finalLastProcTime = s"${finalCacheInfoPath}/${LastProcTime}"
+  val finalCleanTime = s"${finalCacheInfoPath}/${CleanTime}"
 
   def startTimeInfoCache(): Unit = {
     genFinalReadyTime
@@ -46,8 +47,13 @@ object TimeInfoCache extends Loggable with Serializable {
     readTimeRange
   }
 
+  def getCleanTime(): Long = {
+    readCleanTime
+  }
+
   def endTimeInfoCache: Unit = {
     genFinalLastProcTime
+    genFinalCleanTime
   }
 
   private def genFinalReadyTime(): Unit = {
@@ -72,11 +78,28 @@ object TimeInfoCache extends Loggable with Serializable {
     InfoCacheInstance.cacheInfo(map)
   }
 
+  private def genFinalCleanTime(): Unit = {
+    val subPath = InfoCacheInstance.listKeys(infoPath)
+    val keys = subPath.map { p => s"${infoPath}/${p}/${CleanTime}" }
+    val result = InfoCacheInstance.readInfo(keys)
+    val time = keys.map { k =>
+      getLong(result, k)
+    }.min
+    val map = Map[String, String]((finalCleanTime -> time.toString))
+    InfoCacheInstance.cacheInfo(map)
+  }
+
   private def readTimeRange(): (Long, Long) = {
     val map = InfoCacheInstance.readInfo(List(finalLastProcTime, finalReadyTime))
     val lastProcTime = getLong(map, finalLastProcTime)
     val curReadyTime = getLong(map, finalReadyTime)
     (lastProcTime + 1, curReadyTime)
+  }
+
+  private def readCleanTime(): Long = {
+    val map = InfoCacheInstance.readInfo(List(finalCleanTime))
+    val cleanTime = getLong(map, finalCleanTime)
+    cleanTime
   }
 
   private def getLong(map: Map[String, String], key: String): Long = {
