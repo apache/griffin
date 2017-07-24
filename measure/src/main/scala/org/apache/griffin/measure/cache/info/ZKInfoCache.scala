@@ -22,6 +22,7 @@ import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
+import org.apache.curator.utils.ZKPaths
 import org.apache.griffin.measure.cache.lock.ZKCacheLock
 import org.apache.zookeeper.CreateMode
 
@@ -39,7 +40,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
   val PersistRegex = """^(?i)persist$""".r
   val EphemeralRegex = """^(?i)ephemeral$""".r
 
-  final val separator = "/"
+  final val separator = ZKPaths.PATH_SEPARATOR
 
   val hosts = config.getOrElse(Hosts, "").toString
   val namespace = config.getOrElse(Namespace, "").toString
@@ -70,7 +71,10 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
 
   def init(): Unit = {
     client.start()
+    info("start zk info cache")
     client.usingNamespace(cacheNamespace)
+    info(s"init with namespace: ${cacheNamespace}")
+    deleteInfo(lockPath :: Nil)
     if (initClear) {
       clearInfo
     }
@@ -87,6 +91,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
     if (closeClear) {
       clearInfo
     }
+    info("close zk info cache")
     client.close()
   }
 
@@ -111,11 +116,12 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
   }
 
   def clearInfo(): Unit = {
-    delete("/")
+//    delete("/")
+    info("clear info")
   }
 
   def listKeys(p: String): List[String] = {
-    client.getChildren().forPath(path(p)).asScala.toList
+    children(path(p))
   }
 
   def genLock(s: String): ZKCacheLock = {
@@ -125,6 +131,17 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
 
   private def path(k: String): String = {
     if (k.startsWith(separator)) k else separator + k
+  }
+
+  private def children(path: String): List[String] = {
+    try {
+      client.getChildren().forPath(path).asScala.toList
+    } catch {
+      case e: Throwable => {
+        error(s"list ${path} error: ${e.getMessage}")
+        Nil
+      }
+    }
   }
 
   private def createOrUpdate(path: String, content: String): Boolean = {

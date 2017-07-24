@@ -191,7 +191,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   private def persistRecords(hdfsPath: String, records: Iterable[String]): Unit = {
     val recStr = records.mkString("\n")
-    HdfsUtil.appendContent(hdfsPath, recStr)
+    HdfsUtil.writeContent(hdfsPath, recStr)
   }
 
   def log(rt: Long, msg: String): Unit = {
