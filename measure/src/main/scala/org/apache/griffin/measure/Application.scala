@@ -27,6 +27,7 @@ import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.config.reader._
 import org.apache.griffin.measure.config.validator.AllParamValidator
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.persist.PersistThreadPool
 
 import scala.util.{Failure, Success, Try}
 
@@ -103,6 +104,9 @@ object Application extends Loggable {
         info("calculation finished")
       }
     }
+
+    // shut down
+    shutdown
   }
 
   private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {
@@ -113,6 +117,10 @@ object Application extends Loggable {
   private def validateParams(allParam: AllParam): Try[Boolean] = {
     val allParamValidator = AllParamValidator()
     allParamValidator.validate(allParam)
+  }
+
+  private def shutdown(): Unit = {
+    PersistThreadPool.shutdown
   }
 
 }

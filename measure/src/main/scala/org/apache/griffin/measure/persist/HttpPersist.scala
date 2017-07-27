@@ -62,8 +62,15 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
       // post
       val params = Map[String, Object]()
       val header = Map[String, Object]()
-      val status = HttpUtil.httpRequest(api, method, params, header, data)
-      info(s"${method} to ${api} response status: ${status}")
+
+      def func(): Boolean = {
+        HttpUtil.httpRequest(api, method, params, header, data)
+      }
+
+      PersistThreadPool.addTask(func _, 10)
+
+//      val status = HttpUtil.httpRequest(api, method, params, header, data)
+//      info(s"${method} to ${api} response status: ${status}")
     } catch {
       case e: Throwable => error(e.getMessage)
     }
