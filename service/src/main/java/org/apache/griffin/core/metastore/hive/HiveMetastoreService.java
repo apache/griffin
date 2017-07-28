@@ -17,15 +17,24 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.core.metastore.hive;
 
+import org.apache.griffin.core.error.Exception.HiveConnectionException;
+import org.apache.hadoop.hive.metastore.api.Table;
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Map;
 
-@Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
+public interface HiveMetastoreService {
 
+    public Iterable<String> getAllDatabases() throws HiveConnectionException;
+
+    public Iterable<String> getAllTableNames(String dbName) throws HiveConnectionException;
+
+    public List<Table> getAllTable(String db) throws HiveConnectionException;
+
+    public Map<String,List<Table>> getAllTable() throws HiveConnectionException;
+
+    public Table getTable(String dbName, String tableName) throws HiveConnectionException;
 
 }

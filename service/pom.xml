@@ -143,6 +143,27 @@ under the License.
             <version>2.2.2</version>
         </dependency>
 
+        <!-- livy api -->
+        <dependency>
+            <groupId>com.cloudera.livy</groupId>
+            <artifactId>livy-api</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <!-- livy core -->
+        <dependency>
+            <groupId>com.cloudera.livy</groupId>
+            <artifactId>livy-core_2.10</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <!-- livy-server -->
+        <dependency>
+            <groupId>com.cloudera.livy</groupId>
+            <artifactId>livy-server</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+
+
+
         <!-- test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

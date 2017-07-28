@@ -24,8 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * In griffin, metricName usually equals to measureName, and we only save measureName in server.
+ */
 
 @RestController
 @RequestMapping("/metrics")
@@ -37,7 +41,8 @@ public class MetricController {
     public String getOrgByMeasureName(@PathVariable("measureName") String measureName){
         return metricService.getOrgByMeasureName(measureName);
     }
-
-
-
+    @RequestMapping("/org")
+    public String getOrgByMeasureName_(@RequestParam("measureName") String measureName) {
+        return metricService.getOrgByMeasureName(measureName);
+    }
 }

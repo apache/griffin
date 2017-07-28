@@ -20,9 +20,9 @@ under the License.
 package org.apache.griffin.core.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.griffin.core.measure.DataConnector;
-import org.apache.griffin.core.measure.EvaluateRule;
-import org.apache.griffin.core.measure.Measure;
+import org.apache.griffin.core.measure.entity.DataConnector;
+import org.apache.griffin.core.measure.entity.EvaluateRule;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.junit.Before;
 import org.junit.Test;

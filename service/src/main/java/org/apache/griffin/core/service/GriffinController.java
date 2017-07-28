@@ -20,7 +20,7 @@ under the License.
 package org.apache.griffin.core.service;
 
 
-import org.apache.griffin.core.measure.Measure;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +54,9 @@ public class GriffinController {
         return measureRepo.findNameByOrganization(org);
     }
 
-    @RequestMapping("/orgWithMetrics")
-    public Map<String,List<String>> getOrgsWithMetrics(){
+//    @RequestMapping("/orgWithMetrics")
+    @RequestMapping("/orgWithMetricsName")
+    public Map<String,List<String>> getOrgsWithMetricsName(){
         Map<String,List<String>> orgWithMetricsMap=new HashMap<>();
         List<String> orgList=measureRepo.findOrganizations();
         for (String org:orgList){
@@ -66,8 +67,9 @@ public class GriffinController {
         return orgWithMetricsMap;
     }
 
-    @RequestMapping("/dataAssetsWithMetrics")
-    public Map<String,List<String>> getDataAssetsWithMetrics(){
+//    @RequestMapping("/dataAssetsWithMetrics")
+    @RequestMapping("/dataAssetsNameWithMetricsName")
+    public Map<String,List<String>> getDataAssetsNameWithMetricsName(){
         Map<String,List<String>> daWithMetricsMap=new HashMap<>();
         Iterable<Measure> measureList=measureRepo.findAll();
         for (Measure m:measureList){
@@ -89,7 +91,6 @@ public class GriffinController {
                 default:
                     log.info("invalid measure type!");
             }
-
         }
         return daWithMetricsMap;
     }

@@ -17,15 +17,40 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
 
+package org.apache.griffin.core.measure.entity;
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import javax.persistence.Entity;
 
-@Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
+@Entity
+public class EvaluateRule  extends AuditableEntity {
+    
+    private static final long serialVersionUID = -3589222812544556642L;
 
+    public int getSampleRatio() {
+        return sampleRatio;
+    }
 
+    public void setSampleRatio(int sampleRatio) {
+        this.sampleRatio = sampleRatio;
+    }
+
+    public String getRules() {
+        return rules;
+    }
+
+    public void setRules(String rules) {
+        this.rules = rules;
+    }
+
+    private int sampleRatio;
+    private String rules;
+    
+    public EvaluateRule() {
+    }
+
+    public EvaluateRule(int sampleRatio, String rules) {
+        this.sampleRatio = sampleRatio;
+        this.rules = rules;
+    }
 }

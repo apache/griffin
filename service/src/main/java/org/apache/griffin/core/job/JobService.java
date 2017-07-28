@@ -17,15 +17,28 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.core.job;
 
+import org.apache.griffin.core.job.entity.JobHealth;
+import org.apache.griffin.core.job.entity.JobInstance;
+import org.apache.griffin.core.job.entity.JobRequestBody;
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
-@Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
+public interface JobService {
 
+    public List<Map<String, Serializable>> getJobs();
+
+    public String addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody);
+
+    public String deleteJob(String groupName,String jobName);
+
+    public List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
+
+    public JobHealth getHealthInfo();
+
+    public  void updateInstancesOfJob(String group, String jobName);
 
 }

@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
@@ -51,32 +52,40 @@ public class MeasureServiceImpl implements MeasureService{
         return measureRepo.findByName(measureName);
     }
 
-    public void deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId) { measureRepo.delete(MeasureId);}
-
-
-    public GriffinOperationMessage deleteMeasuresByName(@PathVariable("measureName") String measureName) {
-        Measure temp_mesaure=measureRepo.findByName(measureName);
-        if(temp_mesaure==null){
-            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        }
-        else{
-            measureRepo.delete(temp_mesaure.getId());
-            return GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS;
+    public String deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId) {
+        Measure temp_mesaure=measureRepo.findOne(MeasureId);
+        if (temp_mesaure==null){
+            return GriffinOperationMessage.RESOURCE_NOT_FOUND.toString();
+        }else {
+            measureRepo.delete(MeasureId);
+            return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS.toString();
         }
     }
 
-    public GriffinOperationMessage createNewMeasure(@RequestBody Measure measure) {
+
+    public String deleteMeasuresByName(@PathVariable("measureName") String measureName) {
+        Measure temp_mesaure=measureRepo.findByName(measureName);
+        if(temp_mesaure==null){
+            return GriffinOperationMessage.RESOURCE_NOT_FOUND.toString();
+        }
+        else{
+            measureRepo.delete(temp_mesaure.getId());
+            return GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS.toString();
+        }
+    }
+
+    public String createNewMeasure(@RequestBody Measure measure) {
         String name=measure.getName();
         Measure temp_mesaure=measureRepo.findByName(name);
         if (temp_mesaure==null){
             if (measureRepo.save(measure)!=null)
-                return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
+                return GriffinOperationMessage.CREATE_MEASURE_SUCCESS.toString();
             else{
-                return GriffinOperationMessage.CREATE_MEASURE_FAIL;
+                return GriffinOperationMessage.CREATE_MEASURE_FAIL.toString();
             }
         } else{
             log.info("Failed to create new measure "+name+", it already exists");
-            return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
+            return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE.toString();
         }
     }
 
@@ -90,7 +99,7 @@ public class MeasureServiceImpl implements MeasureService{
         return res;
     }
 
-    public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
+    public String updateMeasure(@RequestBody Measure measure) {
 //        Long measureId=measure.getId();
 //        if (measureRepo.findOne(measureId)==null){
 //            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
@@ -102,13 +111,13 @@ public class MeasureServiceImpl implements MeasureService{
         String name=measure.getName();
         Measure temp_mesaure=measureRepo.findByName(name);
         if (temp_mesaure==null){
-            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
+            return GriffinOperationMessage.RESOURCE_NOT_FOUND.toString();
         }else{
             //in this way, id will changed
             //TODO, FRONTEND ID?
             measureRepo.delete(temp_mesaure.getId());
             measureRepo.save(measure);
-            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
+            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS.toString();
         }
     }
 }

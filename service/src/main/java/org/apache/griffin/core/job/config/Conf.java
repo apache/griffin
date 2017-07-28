@@ -17,15 +17,19 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.core.job.config;
 
+/**
+ * Created by xiangrchen on 4/26/17.
+ */
+public class Conf {
+    String spark_jars_packages;
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+    public String getSpark_jars_packages() {
+        return spark_jars_packages;
+    }
 
-@Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
-
-
+    public void setSpark_jars_packages(String spark_jars_packages) {
+        this.spark_jars_packages = spark_jars_packages;
+    }
 }

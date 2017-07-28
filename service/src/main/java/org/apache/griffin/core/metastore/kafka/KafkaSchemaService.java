@@ -17,15 +17,23 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.core.metastore.kafka;
 
+import io.confluent.kafka.schemaregistry.client.rest.entities.Config;
+import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
+import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+public interface KafkaSchemaService {
+    public SchemaString getSchemaString(Integer id);
 
-@Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
+    public Iterable<String> getSubjects();
 
+    public Iterable<Integer> getSubjectVersions(String subject);
+
+    public Schema getSubjectSchema(String subject, String version);
+
+    public Config getTopLevelConfig();
+
+    public Config getSubjectLevelConfig(String subject);
 
 }
