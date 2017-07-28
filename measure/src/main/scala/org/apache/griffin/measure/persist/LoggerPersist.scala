@@ -66,7 +66,7 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
       val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
       if (count > 0) {
         val recordsArray = records.take(count)
-        recordsArray.foreach(println)
+//        recordsArray.foreach(println)
       }
     } catch {
       case e: Throwable => error(e.getMessage)
@@ -79,7 +79,7 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
       val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
       if (count > 0) {
         val recordsArray = records.take(count)
-        recordsArray.foreach(println)
+//        recordsArray.foreach(println)
       }
     } catch {
       case e: Throwable => error(e.getMessage)

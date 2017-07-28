@@ -40,6 +40,7 @@ object DataConnectorFactory {
   val KafkaRegex = """^(?i)kafka$""".r
 
   val DfRegex = """^(?i)df|dataframe$""".r
+  val ParquetRegex = """^(?i)parquet$""".r
 
   def getDirectDataConnector(sqlContext: SQLContext,
                              ssc: StreamingContext,
@@ -91,6 +92,7 @@ object DataConnectorFactory {
       cacheType match {
         case DfRegex() => DfCacheDataConnector(sqlContext, dataCacheParam)
         case HiveRegex() => HiveCacheDataConnector(sqlContext, dataCacheParam)
+        case ParquetRegex() => ParquetCacheDataConnector(sqlContext, dataCacheParam)
         case _ => throw new Exception("cache connector creation error!")
       }
     }

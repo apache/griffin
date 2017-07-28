@@ -34,6 +34,7 @@ import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory
 import org.apache.griffin.measure.rule.expr._
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.streaming.{Milliseconds, Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -55,6 +56,7 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val sc = new SparkContext(conf)
       sc.setLogLevel(sparkParam.logLevel)
       val sqlContext = new HiveContext(sc)
+//      val sqlContext = new SQLContext(sc)
 
       val batchInterval = TimeUtil.milliseconds(sparkParam.batchInterval) match {
         case Some(interval) => Milliseconds(interval)

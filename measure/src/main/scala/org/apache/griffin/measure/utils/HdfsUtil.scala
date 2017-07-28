@@ -27,7 +27,7 @@ object HdfsUtil {
 
   private val conf = new Configuration()
   conf.set("dfs.support.append", "true")
-  conf.set("fs.defaultFS", "hdfs://localhost")    // debug @localhost
+//  conf.set("fs.defaultFS", "hdfs://localhost")    // debug @localhost
 
   private val dfs = FileSystem.get(conf)
 
@@ -79,14 +79,41 @@ object HdfsUtil {
     if (dfs.exists(path)) dfs.delete(path, true)
   }
 
-  def listPathFiles(dirPath: String): Iterable[String] = {
+//  def listPathFiles(dirPath: String): Iterable[String] = {
+//    val path = new Path(dirPath)
+//    try {
+//      val fileStatusArray = dfs.listStatus(path)
+//      fileStatusArray.flatMap { fileStatus =>
+//        if (fileStatus.isFile) {
+//          Some(fileStatus.getPath.getName)
+//        } else None
+//      }
+//    } catch {
+//      case e: Throwable => {
+//        println(s"list path files error: ${e.getMessage}")
+//        Nil
+//      }
+//    }
+//  }
+
+  def listSubPaths(dirPath: String, subType: String, fullPath: Boolean = false): Iterable[String] = {
     val path = new Path(dirPath)
     try {
       val fileStatusArray = dfs.listStatus(path)
-      fileStatusArray.flatMap { fileStatus =>
-        if (fileStatus.isFile) {
-          Some(fileStatus.getPath.getName)
-        } else None
+      fileStatusArray.filter { fileStatus =>
+        subType match {
+          case "dir" => fileStatus.isDirectory
+          case "file" => fileStatus.isFile
+          case _ => true
+        }
+      }.map { fileStatus =>
+        val fname = fileStatus.getPath.getName
+        if (fullPath) getHdfsFilePath(dirPath, fname) else fname
+      }
+    } catch {
+      case e: Throwable => {
+        println(s"list path files error: ${e.getMessage}")
+        Nil
       }
     }
   }

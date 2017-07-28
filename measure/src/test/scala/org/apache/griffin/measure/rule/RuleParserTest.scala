@@ -51,6 +51,11 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val result2 = ruleParser.parseAll(ruleParser.literal, rule1)
     result2.successful should be (true)
     result2.get.value should be (Some("123"))
+
+    val rule3 = "'1+2-3'"
+    val result3 = ruleParser.parseAll(ruleParser.literal, rule3)
+    result3.successful should be (true)
+    result3.get.value should be (Some("1+2-3"))
   }
 
   test ("literial time") {
@@ -155,6 +160,12 @@ class RuleParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val result = ruleParser.parseAll(ruleParser.mathExpr, rule)
     result.successful should be (true)
     result.get.desc should be ("$source['age'] * 6 + 4 / 2")
+
+    val rule2 = "'age + 1' / 'vv'"
+    val result2 = ruleParser.parseAll(ruleParser.mathExpr, rule2)
+    result2.successful should be (true)
+    result2.get.desc should be ("'age + 1' / 'vv'")
+    println(result2)
   }
 
   test ("range expr") {

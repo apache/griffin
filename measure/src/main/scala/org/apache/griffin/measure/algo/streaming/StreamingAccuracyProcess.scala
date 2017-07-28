@@ -115,6 +115,7 @@ case class StreamingAccuracyProcess(sourceDataConnector: DirectDataConnector,
         val updateDataPart =  updateResults.map(_._2)
 
         val updateResultsArray = updateResultsPart.collect()
+        val updateDataArray = updateDataPart.collect()
 
         // update results cache (in driver)
         // collect action is traversable once action, it will make rdd updateResults empty
@@ -126,7 +127,20 @@ case class StreamingAccuracyProcess(sourceDataConnector: DirectDataConnector,
           persist.result(updateTime, updateResult.result)
         }
 
-        // record missing data and update old data (in executor)
+        // dump old data (in driver)
+        updateDataArray.foreach { grp =>
+          val (t, datas) = grp
+          // data connector update old data
+          val dumpDatas = datas.map { r =>
+            val (_, (v, i)) = r
+            v ++ i
+          }
+
+          sourceDataConnector.updateOldData(t, dumpDatas)
+//          targetDataConnector.updateOldData(t, dumpDatas)    // not correct
+        }
+
+        // record missing data (in executor)
         updateDataPart.foreach { grp =>
           val (t, datas) = grp
           val persist: Persist = persistFactory.getPersists(t)
@@ -135,17 +149,6 @@ case class StreamingAccuracyProcess(sourceDataConnector: DirectDataConnector,
             record2String(row, ruleAnalyzer.sourceRuleExprs.persistExprs, ruleAnalyzer.targetRuleExprs.persistExprs)
           }
           persist.records(missStrings, PersistType.MISS)
-          // data connector update old data
-          val dumpDatas = datas.map { r =>
-            val (_, (v, i)) = r
-            v ++ i
-          }
-
-//          println(t)
-//          dumpDatas.foreach(println)
-
-          sourceDataConnector.updateOldData(t, dumpDatas)
-          targetDataConnector.updateOldData(t, dumpDatas)    // not correct
         }
 
         updateResults.unpersist()

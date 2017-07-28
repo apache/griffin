@@ -53,7 +53,7 @@ import scala.util.{Failure, Success, Try}
 class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
 
   val envFile = "src/test/resources/env-streaming.json"
-  val confFile = "src/test/resources/config-streaming.json"
+  val confFile = "src/test/resources/config-streaming2.json"
   val envFsType = "local"
   val userFsType = "local"
 

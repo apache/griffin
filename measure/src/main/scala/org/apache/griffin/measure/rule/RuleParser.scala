@@ -125,7 +125,8 @@ case class RuleParser() extends JavaTokenParsers with Serializable {
   import Operator._
 
   object SomeString {
-    def AnyString: Parser[String] = """[^'\"{}\[\]()=<>.$@,;+\-*/\\]*""".r
+//    def AnyString: Parser[String] = """[^'\"{}\[\]()=<>.$@,;+\-*/\\]*""".r
+    def AnyString: Parser[String] = """[^'\"]*""".r
     def SimpleFieldString: Parser[String] = """\w+""".r
     def FieldString: Parser[String] = """[\w\s]+""".r
     def NameString: Parser[String] = """[a-zA-Z_]\w*""".r
