@@ -252,40 +252,40 @@ case class ParquetCacheDataConnector(sqlContext: SQLContext, dataCacheParam: Dat
     }
   }
 
-  override def updateOldData(t: Long, oldData: Iterable[Map[String, Any]]): Unit = {
-    // parallel process different time groups, lock is unnecessary
-    val ptns = getPartition(t)
-    val ptnsPath = genPartitionHdfsPath(ptns)
-    val dirPath = s"${filePath}/${ptnsPath}"
-    val dataFileName = s"${t}"
-    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
-
-    try {
-      // remove old data path
-      HdfsUtil.deleteHdfsPath(dataFilePath)
-
-      // save updated old data
-      if (oldData.size > 0) {
-        // encode data
-        val recordDatas = oldData.flatMap { dt =>
-          encode(dt, t)
-        }.toList
-
-//        val rdd = sqlContext.sparkContext.parallelize(recordDatas)
-
-        // generate data frame
-        val df = sqlContext.createDataFrame(recordDatas, schema)
-
-        // save data frame
-        df.write.parquet(dataFilePath)
-      }
-    } catch {
-      case e: Throwable => {
-        error(s"update old data error: ${e.getMessage}")
-        e.printStackTrace()
-      }
-    }
-  }
+//  override def updateOldData(t: Long, oldData: Iterable[Map[String, Any]]): Unit = {
+//    // parallel process different time groups, lock is unnecessary
+//    val ptns = getPartition(t)
+//    val ptnsPath = genPartitionHdfsPath(ptns)
+//    val dirPath = s"${filePath}/${ptnsPath}"
+//    val dataFileName = s"${t}"
+//    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+//
+//    try {
+//      // remove old data path
+//      HdfsUtil.deleteHdfsPath(dataFilePath)
+//
+//      // save updated old data
+//      if (oldData.size > 0) {
+//        // encode data
+//        val recordDatas = oldData.flatMap { dt =>
+//          encode(dt, t)
+//        }.toList
+//
+////        val rdd = sqlContext.sparkContext.parallelize(recordDatas)
+//
+//        // generate data frame
+//        val df = sqlContext.createDataFrame(recordDatas, schema)
+//
+//        // save data frame
+//        df.write.parquet(dataFilePath)
+//      }
+//    } catch {
+//      case e: Throwable => {
+//        error(s"update old data error: ${e.getMessage}")
+//        e.printStackTrace()
+//      }
+//    }
+//  }
 
   override protected def genCleanTime(ms: Long): Long = {
     val minPartitionUnit = partitionUnits.last
