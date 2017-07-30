@@ -53,7 +53,7 @@ import scala.util.{Failure, Success, Try}
 class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
 
   val envFile = "src/test/resources/env-streaming.json"
-  val confFile = "src/test/resources/config-streaming2.json"
+  val confFile = "src/test/resources/config-streaming3.json"
   val envFsType = "local"
   val userFsType = "local"
 
@@ -98,8 +98,8 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     val conf = new SparkConf().setMaster("local[*]").setAppName(metricName)
     sc = new SparkContext(conf)
     sc.setLogLevel(envParam.sparkParam.logLevel)
-//    sqlContext = new SQLContext(sc)
-    sqlContext = new HiveContext(sc)
+    sqlContext = new SQLContext(sc)
+//    sqlContext = new HiveContext(sc)
 
 //    val a = sqlContext.sql("select * from s1 limit 10")
 //    //    val a = sqlContext.sql("show tables")

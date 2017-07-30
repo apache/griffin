@@ -41,6 +41,7 @@ object DataConnectorFactory {
 
   val DfRegex = """^(?i)df|dataframe$""".r
   val ParquetRegex = """^(?i)parquet$""".r
+  val TextRegex = """^(?i)text$""".r
 
   def getDirectDataConnector(sqlContext: SQLContext,
                              ssc: StreamingContext,
@@ -93,6 +94,7 @@ object DataConnectorFactory {
         case DfRegex() => DfCacheDataConnector(sqlContext, dataCacheParam)
         case HiveRegex() => HiveCacheDataConnector(sqlContext, dataCacheParam)
         case ParquetRegex() => ParquetCacheDataConnector(sqlContext, dataCacheParam)
+        case TextRegex() => TextCacheDataConnector(sqlContext, dataCacheParam)
         case _ => throw new Exception("cache connector creation error!")
       }
     }

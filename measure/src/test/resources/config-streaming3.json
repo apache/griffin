@@ -19,7 +19,7 @@
       "value.type": "java.lang.String"
     },
     "cache": {
-      "type": "parquet",
+      "type": "text",
       "config": {
         "file.path": "hdfs://localhost/griffin/streaming/dump/source",
         "info.path": "source",
@@ -46,7 +46,7 @@
       "value.type": "java.lang.String"
     },
     "cache": {
-      "type": "parquet",
+      "type": "text",
       "config": {
         "file.path": "hdfs://localhost/griffin/streaming/dump/target",
         "info.path": "target",

@@ -46,8 +46,9 @@ case class StreamingAccuracyProcess(sourceDataConnector: DirectDataConnector,
 
   def run(): Unit = {
 //    println(s"cache count: ${cacheResultProcesser.cacheGroup.size}")
-    val updateTime = new Date().getTime
-    println(s"===== [${updateTime}] process begins =====")
+    val updateTimeDate = new Date()
+    val updateTime = updateTimeDate.getTime
+    println(s"===== [${updateTimeDate}] process begins =====")
     val locked = lock.lock(5, TimeUnit.SECONDS)
     if (locked) {
       try {
@@ -168,9 +169,11 @@ case class StreamingAccuracyProcess(sourceDataConnector: DirectDataConnector,
       } finally {
         lock.unlock()
       }
+    } else {
+      println(s"===== [${updateTimeDate}] process ignores =====")
     }
     val endTime = new Date().getTime
-    println(s"===== [${updateTime}] process ends, using ${endTime - updateTime} ms =====")
+    println(s"===== [${updateTimeDate}] process ends, using ${endTime - updateTime} ms =====")
   }
 
   // clean old data and old result cache
