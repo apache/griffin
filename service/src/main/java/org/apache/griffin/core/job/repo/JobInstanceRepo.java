@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.core.job.repo;
 
+import org.apache.griffin.core.job.entity.LivySessionStateMap;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -47,7 +48,7 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance,Long>{
     @Modifying
     @Query("update JobInstance s "+
             "set s.state= ?2, s.appId= ?3 where s.id= ?1")
-    void setFixedStateAndappIdFor(Long Id, JobInstance.State state, String appId);
+    void setFixedStateAndappIdFor(Long Id, LivySessionStateMap.State state, String appId);
 
     @Transactional
     @Modifying

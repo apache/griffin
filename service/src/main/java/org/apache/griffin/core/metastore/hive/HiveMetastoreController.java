@@ -62,12 +62,12 @@ public class HiveMetastoreController {
         return hiveMetastoreService.getAllTable(dbName);
     }
 
-    @RequestMapping("/allTables")
+    @RequestMapping("/db/allTables")
     public List<Table> getAllTables_(@RequestParam("db") String dbName) throws HiveConnectionException {
         return hiveMetastoreService.getAllTable(dbName);
     }
 
-    @RequestMapping("/alltables")
+    @RequestMapping("/allTables")
     public Map<String,List<Table>> getAllTables() throws HiveConnectionException {
         return hiveMetastoreService.getAllTable();
     }

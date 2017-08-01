@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,36 +61,36 @@ public class MeasureController {
     }
 
     @RequestMapping(value = "/measures/deleteById/{MeasureId}",method = RequestMethod.DELETE)
-    public String deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId) {
+    public GriffinOperationMessage deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId) {
         return measureService.deleteMeasuresById(MeasureId);
     }
 
     @RequestMapping(value = "/measure/{MeasureId}",method = RequestMethod.DELETE)
-    public String deleteMeasuresById_(@PathVariable("MeasureId") Long MeasureId) {
+    public GriffinOperationMessage deleteMeasuresById_(@PathVariable("MeasureId") Long MeasureId) {
         return measureService.deleteMeasuresById(MeasureId);
     }
 
     @RequestMapping(value = "/measures/deleteByName/{measureName}",method = RequestMethod.DELETE)
-    public String deleteMeasuresByName(@PathVariable("measureName") String measureName) {
+    public GriffinOperationMessage deleteMeasuresByName(@PathVariable("measureName") String measureName) {
         return measureService.deleteMeasuresByName(measureName);
     }
 
     @RequestMapping(value = "/measure",method = RequestMethod.DELETE)
-    public String deleteMeasuresByName_(@RequestParam("measureName") String measureName) {
+    public GriffinOperationMessage deleteMeasuresByName_(@RequestParam("measureName") String measureName) {
         return measureService.deleteMeasuresByName(measureName);
     }
 
     @RequestMapping(value = "/measures/update",method = RequestMethod.POST)
     @ResponseBody
     @Transactional
-    public String updateMeasure(@RequestBody Measure measure) {
+    public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         return measureService.updateMeasure(measure);
     }
 
     @RequestMapping(value = "/measure",method = RequestMethod.PUT)
     @ResponseBody
     @Transactional
-    public String updateMeasure_(@RequestBody Measure measure) {
+    public GriffinOperationMessage updateMeasure_(@RequestBody Measure measure) {
         return measureService.updateMeasure(measure);
     }
 
@@ -100,13 +101,13 @@ public class MeasureController {
 
     @RequestMapping(value = "/measures/add", method = RequestMethod.POST)
     @ResponseBody
-    public String createNewMeasure(@RequestBody Measure measure) {
+    public GriffinOperationMessage createNewMeasure(@RequestBody Measure measure) {
         return measureService.createNewMeasure(measure);
     }
 
     @RequestMapping(value = "/measure", method = RequestMethod.POST)
     @ResponseBody
-    public String createNewMeasure_(@RequestBody Measure measure) {
+    public GriffinOperationMessage createNewMeasure_(@RequestBody Measure measure) {
         return measureService.createNewMeasure(measure);
     }
 }

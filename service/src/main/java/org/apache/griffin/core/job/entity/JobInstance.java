@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import org.apache.griffin.core.job.entity.LivySessionStateMap.State;
 import org.apache.griffin.core.measure.entity.AuditableEntity;
 
 import javax.persistence.Entity;
@@ -37,19 +38,18 @@ public class JobInstance extends AuditableEntity {
     private String jobName;
     private int sessionId;
 
-    public static enum State {
-        starting,
-        running,
-        success,
-        unknown,
-        error,
-    }
+//    public static enum State {
+//        starting,
+//        running,
+//        success,
+//        unknown,
+//        error,
+//    }
 
     @Enumerated(EnumType.STRING)
-    private State state;
-
-    private String appId;
-    private long timestamp;
+    State state;
+    String appId;
+    long timestamp;
 
     public String getGroupName() {
         return groupName;

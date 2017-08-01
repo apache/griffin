@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.LivySessionStateMap;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.GriffinUtil;
@@ -128,7 +129,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public String addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody) {
+    public GriffinOperationMessage addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody) {
         int periodTime = 0;
         Date jobStartTime=null;
 //        SimpleDateFormat format=new SimpleDateFormat("yyyyMMdd HH:mm:ss");
@@ -138,7 +139,7 @@ public class JobServiceImpl implements JobService {
             setJobStartTime(jobStartTime,periodTime);
         }catch (Exception e){
             LOGGER.info("jobStartTime or periodTime format error! "+e);
-            return GriffinOperationMessage.CREATE_JOB_FAIL.toString();
+            return GriffinOperationMessage.CREATE_JOB_FAIL;
         }
         try {
             Scheduler scheduler = factory.getObject();
@@ -171,10 +172,10 @@ public class JobServiceImpl implements JobService {
                     .startAt(jobStartTime)
                     .build();
             scheduler.scheduleJob(trigger);
-            return GriffinOperationMessage.CREATE_JOB_SUCCESS.toString();
+            return GriffinOperationMessage.CREATE_JOB_SUCCESS;
         } catch (SchedulerException e) {
             LOGGER.error("", e);
-            return GriffinOperationMessage.CREATE_JOB_FAIL.toString();
+            return GriffinOperationMessage.CREATE_JOB_FAIL;
         }
     }
 
@@ -202,15 +203,15 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public String deleteJob(String group, String name) {
+    public GriffinOperationMessage deleteJob(String group, String name) {
         try {
             Scheduler scheduler = factory.getObject();
             scheduler.deleteJob(new JobKey(name, group));
             jobInstanceRepo.deleteInGroupAndjobName(group,name);
-            return GriffinOperationMessage.DELETE_JOB_SUCCESS.toString();
+            return GriffinOperationMessage.DELETE_JOB_SUCCESS;
         } catch (SchedulerException e) {
             LOGGER.error(GriffinOperationMessage.DELETE_JOB_FAIL+""+e);
-            return GriffinOperationMessage.DELETE_JOB_FAIL.toString();
+            return GriffinOperationMessage.DELETE_JOB_FAIL;
         }
     }
 
@@ -226,7 +227,7 @@ public class JobServiceImpl implements JobService {
         //update all instance info belongs to this group and job.
         List<JobInstance> jobInstanceList=jobInstanceRepo.findByGroupNameAndJobName(group,jobName);
         for (JobInstance jobInstance:jobInstanceList){
-            if (jobInstance.getState().equals(JobInstance.State.success) || jobInstance.getState().equals(JobInstance.State.unknown)){
+            if (!LivySessionStateMap.isActive(jobInstance.getState().toString())){
                 continue;
             }
             String uri=sparkJobProps.getProperty("sparkJob.uri")+"/"+jobInstance.getSessionId();
@@ -236,7 +237,8 @@ public class JobServiceImpl implements JobService {
                 resultStr=restTemplate.getForObject(uri,String.class);
             }catch (Exception e){
                 LOGGER.error("spark session "+jobInstance.getSessionId()+" has overdue, set state as unknown!\n"+e);
-                jobInstance.setState(JobInstance.State.unknown);
+                //if server cannot get session from Livy, set State as unknown.
+                jobInstance.setState(LivySessionStateMap.State.unknown);
             }
             TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
             HashMap<String,Object> resultMap= null;
@@ -248,7 +250,7 @@ public class JobServiceImpl implements JobService {
             }
             try{
                 if (resultMap!=null && resultMap.size()!=0){
-                    jobInstance.setState(JobInstance.State.valueOf(resultMap.get("state").toString()));
+                    jobInstance.setState(LivySessionStateMap.State.valueOf(resultMap.get("state").toString()));
                     jobInstance.setAppId(resultMap.get("appId").toString());
                 }
             }catch (Exception e){
