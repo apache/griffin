@@ -22,7 +22,6 @@ package org.apache.griffin.core.metric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,12 +36,9 @@ public class MetricController {
     private static final Logger log = LoggerFactory.getLogger(MetricController.class);
     @Autowired
     MetricService metricService;
-    @RequestMapping("/{measureName}/org")
-    public String getOrgByMeasureName(@PathVariable("measureName") String measureName){
-        return metricService.getOrgByMeasureName(measureName);
-    }
+
     @RequestMapping("/org")
-    public String getOrgByMeasureName_(@RequestParam("measureName") String measureName) {
+    public String getOrgByMeasureName(@RequestParam("measureName") String measureName) {
         return metricService.getOrgByMeasureName(measureName);
     }
 }

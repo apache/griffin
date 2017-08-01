@@ -19,12 +19,11 @@ under the License.
 
 package org.apache.griffin.core.job.config;
 
+import org.apache.griffin.core.util.GriffinUtil;
 import org.quartz.spi.JobFactory;
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import javax.sql.DataSource;
@@ -55,9 +54,6 @@ public class SchedulerConfig {
 
 	@Bean
 	public Properties quartzProperties() throws IOException {
-		PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
-		propertiesFactoryBean.setLocation(new ClassPathResource("/quartz.properties"));
-		propertiesFactoryBean.afterPropertiesSet();
-		return propertiesFactoryBean.getObject();
+		return GriffinUtil.getProperties("/quartz.properties");
 	}
 }

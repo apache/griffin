@@ -47,23 +47,13 @@ public class HiveMetastoreController {
         return hiveMetastoreService.getAllTableNames("");
     }
 
-    @RequestMapping("/{db}/table")
-    public Iterable<String> getAllTableNames(@PathVariable("db") String dbName) throws HiveConnectionException {
-        return hiveMetastoreService.getAllTableNames(dbName);
-    }
-
     @RequestMapping("/allTableNames")
-    public Iterable<String> getAllTableNames_(@RequestParam("db") String dbName) throws HiveConnectionException {
+    public Iterable<String> getAllTableNames(@RequestParam("db") String dbName) throws HiveConnectionException {
         return hiveMetastoreService.getAllTableNames(dbName);
-    }
-
-    @RequestMapping("/{db}/alltables")
-    public List<Table> getAllTables(@PathVariable("db") String dbName) throws HiveConnectionException {
-        return hiveMetastoreService.getAllTable(dbName);
     }
 
     @RequestMapping("/db/allTables")
-    public List<Table> getAllTables_(@RequestParam("db") String dbName) throws HiveConnectionException {
+    public List<Table> getAllTables(@RequestParam("db") String dbName) throws HiveConnectionException {
         return hiveMetastoreService.getAllTable(dbName);
     }
 
@@ -77,13 +67,8 @@ public class HiveMetastoreController {
         return hiveMetastoreService.getTable("", tableName);
     }
 
-    @RequestMapping("/{db}/table/{table}")
-    public Table getTable(@PathVariable("db") String dbName, @PathVariable("table") String tableName) throws HiveConnectionException {
-        return hiveMetastoreService.getTable(dbName, tableName);
-    }
-
     @RequestMapping("")
-    public Table getTable_(@RequestParam("db") String dbName, @RequestParam("table") String tableName) throws HiveConnectionException {
+    public Table getTable(@RequestParam("db") String dbName, @RequestParam("table") String tableName) throws HiveConnectionException {
         return hiveMetastoreService.getTable(dbName, tableName);
     }
 }

@@ -27,7 +27,7 @@ import com.cloudera.livy.sessions.SessionState;
 public class LivySessionStateMap {
 
     /**
-     * unknown is used to represent the state that server cannot get from Livy.
+     * unknown is used to represent the state that server get null from Livy.
      * the other state is just same as com.cloudera.livy.sessions.SessionState.
      */
     public static enum State {

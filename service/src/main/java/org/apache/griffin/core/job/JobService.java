@@ -39,7 +39,4 @@ public interface JobService {
     public List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
 
     public JobHealth getHealthInfo();
-
-    public  void updateInstancesOfJob(String group, String jobName);
-
 }

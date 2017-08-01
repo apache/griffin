@@ -19,14 +19,12 @@ under the License.
 
 package org.apache.griffin.core.job.config;
 
+import org.apache.griffin.core.util.GriffinUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -37,16 +35,7 @@ public class SparkJobConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparkJobConfig.class);
 
     @Bean(name = "sparkJobProps")
-    public Properties getProperties() {
-        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
-        propertiesFactoryBean.setLocation(new ClassPathResource("/sparkJob.properties"));
-        Properties properties=null;
-        try {
-            propertiesFactoryBean.afterPropertiesSet();
-            properties=propertiesFactoryBean.getObject();
-        } catch (IOException e) {
-            LOGGER.error("get properties from /sparkJob.properties failed. "+e);
-        }
-        return properties;
+    public Properties sparkJobProperties() {
+        return GriffinUtil.getProperties("/sparkJob.properties");
     }
 }

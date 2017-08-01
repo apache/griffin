@@ -54,7 +54,6 @@ public class GriffinController {
         return measureRepo.findNameByOrganization(org);
     }
 
-//    @RequestMapping("/orgWithMetrics")
     @RequestMapping("/orgWithMetricsName")
     public Map<String,List<String>> getOrgsWithMetricsName(){
         Map<String,List<String>> orgWithMetricsMap=new HashMap<>();
@@ -67,7 +66,6 @@ public class GriffinController {
         return orgWithMetricsMap;
     }
 
-//    @RequestMapping("/dataAssetsWithMetrics")
     @RequestMapping("/dataAssetsNameWithMetricsName")
     public Map<String,List<String>> getDataAssetsNameWithMetricsName(){
         Map<String,List<String>> daWithMetricsMap=new HashMap<>();

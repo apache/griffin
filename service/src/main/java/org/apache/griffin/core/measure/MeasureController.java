@@ -40,74 +40,41 @@ public class MeasureController {
         return measureService.getAllMeasures();
     }
 
-    @RequestMapping("/measures/{id}")
+    @RequestMapping("/measure/{id}")
     public Measure getMeasuresById(@PathVariable("id") long id) {
         return measureService.getMeasuresById(id);
     }
 
-    @RequestMapping("/measure/{id}")
-    public Measure getMeasuresById_(@PathVariable("id") long id) {
-        return measureService.getMeasuresById(id);
-    }
-
-    @RequestMapping("/measures/findByName/{measureName}")
-    public Measure getMeasuresByName(@PathVariable("measureName") String measureName) {
-        return measureService.getMeasuresByName(measureName);
-    }
-
     @RequestMapping("/measure")
-    public Measure getMeasuresByName_(@RequestParam("measureName") String measureName) {
+    public Measure getMeasureByName(@RequestParam("measureName") String measureName) {
         return measureService.getMeasuresByName(measureName);
-    }
-
-    @RequestMapping(value = "/measures/deleteById/{MeasureId}",method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId) {
-        return measureService.deleteMeasuresById(MeasureId);
     }
 
     @RequestMapping(value = "/measure/{MeasureId}",method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteMeasuresById_(@PathVariable("MeasureId") Long MeasureId) {
+    public GriffinOperationMessage deleteMeasureById(@PathVariable("MeasureId") Long MeasureId) {
         return measureService.deleteMeasuresById(MeasureId);
     }
 
-    @RequestMapping(value = "/measures/deleteByName/{measureName}",method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteMeasuresByName(@PathVariable("measureName") String measureName) {
-        return measureService.deleteMeasuresByName(measureName);
-    }
-
     @RequestMapping(value = "/measure",method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteMeasuresByName_(@RequestParam("measureName") String measureName) {
+    public GriffinOperationMessage deleteMeasureByName(@RequestParam("measureName") String measureName) {
         return measureService.deleteMeasuresByName(measureName);
     }
 
-    @RequestMapping(value = "/measures/update",method = RequestMethod.POST)
+    @RequestMapping(value = "/measure",method = RequestMethod.PUT)
     @ResponseBody
     @Transactional
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         return measureService.updateMeasure(measure);
     }
 
-    @RequestMapping(value = "/measure",method = RequestMethod.PUT)
-    @ResponseBody
-    @Transactional
-    public GriffinOperationMessage updateMeasure_(@RequestBody Measure measure) {
-        return measureService.updateMeasure(measure);
-    }
-
     @RequestMapping("/measures/owner/{owner}")
-    public List<String> getAllMeasureNameOfOwner(@PathVariable("owner") String owner){
+    public List<String> getAllMeasureNameByOwner(@PathVariable("owner") String owner){
         return measureService.getAllMeasureNameByOwner(owner);
-    }
-
-    @RequestMapping(value = "/measures/add", method = RequestMethod.POST)
-    @ResponseBody
-    public GriffinOperationMessage createNewMeasure(@RequestBody Measure measure) {
-        return measureService.createNewMeasure(measure);
     }
 
     @RequestMapping(value = "/measure", method = RequestMethod.POST)
     @ResponseBody
-    public GriffinOperationMessage createNewMeasure_(@RequestBody Measure measure) {
+    public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
         return measureService.createNewMeasure(measure);
     }
 }

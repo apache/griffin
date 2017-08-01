@@ -24,8 +24,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Created by xiangrchen on 7/21/17.
@@ -60,5 +63,18 @@ public class GriffinUtil {
         }
         ObjectMapper mapper=new ObjectMapper();
         return mapper.readValue(jsonStr,type);
+    }
+
+    public static Properties getProperties(String propertiesPath) {
+        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
+        propertiesFactoryBean.setLocation(new ClassPathResource(propertiesPath));
+        Properties properties=null;
+        try {
+            propertiesFactoryBean.afterPropertiesSet();
+            properties=propertiesFactoryBean.getObject();
+        } catch (IOException e) {
+            LOGGER.error("get properties from "+propertiesPath+" failed. "+e);
+        }
+        return properties;
     }
 }

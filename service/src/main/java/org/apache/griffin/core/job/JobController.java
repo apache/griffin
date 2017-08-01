@@ -47,54 +47,23 @@ public class JobController {
         return jobService.getJobs();
     }
 
-    @RequestMapping(value = "/add/{groupName}/{jobName}/{measureName}", method = RequestMethod.POST)
-    @ResponseBody
-    @Produces(MediaType.APPLICATION_JSON)
-    public GriffinOperationMessage addJob(@PathVariable String groupName,
-                           @PathVariable String jobName,
-                           @PathVariable String measureName,
-                           @RequestBody JobRequestBody jobRequestBody) {
-        return jobService.addJob(groupName,jobName,measureName, jobRequestBody);
-    }
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ResponseBody
     @Produces(MediaType.APPLICATION_JSON)
-    public GriffinOperationMessage addJob1(@RequestParam("group") String groupName,
+    public GriffinOperationMessage addJob(@RequestParam("group") String groupName,
                                            @RequestParam("jobName") String jobName,
                                            @RequestParam("measureName") String measureName,
                                            @RequestBody JobRequestBody jobRequestBody) {
         return jobService.addJob(groupName,jobName,measureName, jobRequestBody);
     }
 
-
-    @RequestMapping(value = "/del/{group}/{name}", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteJob(@PathVariable String group, @PathVariable String name) {
-        return jobService.deleteJob(group,name);
-    }
-
     @RequestMapping(value = "", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteJob1(@RequestParam("group") String group, @RequestParam("jobName") String jobName) {
+    public GriffinOperationMessage deleteJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName) {
         return jobService.deleteJob(group,jobName);
     }
 
-    @RequestMapping("/instances/{group}/{jobName}")
-    public void updateInstancesInfoOfJob(@PathVariable String group, @PathVariable String jobName) {
-        jobService.updateInstancesOfJob(group,jobName);
-    }
-
-    @RequestMapping(value = "/instances",method = RequestMethod.PUT)
-    public void updateInstancesOfJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName) {
-        jobService.updateInstancesOfJob(group,jobName);
-    }
-
-    @RequestMapping("/instances/{group}/{jobName}/{page}/{size}")
-    public List<JobInstance> findInstancesOfJob(@PathVariable String group, @PathVariable String jobName,
-                                                @PathVariable int page, @PathVariable int size) {
-        return jobService.findInstancesOfJob(group,jobName,page,size);
-    }
-
     @RequestMapping(value = "/instances",method = RequestMethod.GET)
-    public List<JobInstance> findInstancesOfJob1(@RequestParam("group") String group, @RequestParam("jobName") String jobName,
+    public List<JobInstance> findInstancesOfJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName,
                                                 @RequestParam("page") int page, @RequestParam("size") int size) {
         return jobService.findInstancesOfJob(group,jobName,page,size);
     }

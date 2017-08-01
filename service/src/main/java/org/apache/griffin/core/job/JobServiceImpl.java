@@ -132,7 +132,6 @@ public class JobServiceImpl implements JobService {
     public GriffinOperationMessage addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody) {
         int periodTime = 0;
         Date jobStartTime=null;
-//        SimpleDateFormat format=new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         try{
             periodTime = Integer.parseInt(jobRequestBody.getPeriodTime());
             jobStartTime=new Date(Long.parseLong(jobRequestBody.getJobStartTime()));
@@ -222,8 +221,7 @@ public class JobServiceImpl implements JobService {
         return jobInstanceRepo.findByGroupNameAndJobName(group,jobName,pageRequest);
     }
 
-    @Override
-    public  void updateInstancesOfJob(String group, String jobName) {
+    public void syncInstancesOfJob(String group, String jobName) {
         //update all instance info belongs to this group and job.
         List<JobInstance> jobInstanceList=jobInstanceRepo.findByGroupNameAndJobName(group,jobName);
         for (JobInstance jobInstance:jobInstanceList){
@@ -262,13 +260,13 @@ public class JobServiceImpl implements JobService {
     }
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
-    public void scheduleUpdateInstancesOfAllJobs(){
+    public void syncInstancesOfAllJobs(){
         List<Object> groupJobList=jobInstanceRepo.findGroupWithJobName();
         for (Object groupJobObj : groupJobList){
             try{
                 Object[] groupJob=(Object[])groupJobObj;
                 if (groupJob!=null && groupJob.length==2){
-                    updateInstancesOfJob(groupJob[0].toString(),groupJob[1].toString());
+                    syncInstancesOfJob(groupJob[0].toString(),groupJob[1].toString());
                 }
             }catch (Exception e){
                 LOGGER.error("schedule update instances of all jobs failed. "+e);
