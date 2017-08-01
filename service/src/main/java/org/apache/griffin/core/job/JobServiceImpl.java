@@ -278,22 +278,23 @@ public class JobServiceImpl implements JobService {
     public JobHealth getHealthInfo()  {
         Scheduler scheduler=factory.getObject();
         int jobCount= 0;
-        int healthyJobCount=0;
+        int notHealthyCount=0;
         try {
-            jobCount = scheduler.getJobGroupNames().size();
             for (String groupName : scheduler.getJobGroupNames()){
                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))){
+                    jobCount++;
                     String jobName=jobKey.getName();
                     String jobGroup=jobKey.getGroup();
                     Pageable pageRequest=new PageRequest(0,1, Sort.Direction.DESC,"timestamp");
-                    JobInstance jobInstance=new JobInstance();
+                    JobInstance latestJobInstance=new JobInstance();
                     if (jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest)!=null
                             &&jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).size()>0){
-                        jobInstance=jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
-                        if(jobInstance.getState().equals("starting")){
-                            healthyJobCount++;
-                        }else{
-                            healthyJobCount++;
+                        latestJobInstance=jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
+                        if(LivySessionStateMap.State.error.toString().equals(latestJobInstance.getState()) ||
+                                LivySessionStateMap.State.dead.toString().equals(latestJobInstance.getState()) ||
+                                LivySessionStateMap.State.shutting_down.equals(latestJobInstance.getState())
+                                ){
+                            notHealthyCount++;
                         }
                     }
                 }
@@ -301,7 +302,7 @@ public class JobServiceImpl implements JobService {
         } catch (SchedulerException e) {
             LOGGER.error(""+e);
         }
-        JobHealth jobHealth=new JobHealth(healthyJobCount,jobCount);
+        JobHealth jobHealth=new JobHealth(jobCount-notHealthyCount,jobCount);
         return jobHealth;
     }
 }
