@@ -1049,3 +1049,15 @@ tbody {
   border-color: transparent;
   cursor: default;
 }
+
+.normal{
+  background-color: #00C853;
+  border-radius: 5px; 
+  padding:3px 4px;
+}
+
+.unnormal{
+  background-color: #EF5350;
+  border-radius: 5px; 
+  padding:3px 4px;
+}

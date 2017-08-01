@@ -141,7 +141,7 @@ define(['./module'], function(controllers) {
                 // var time = date.toDateString()+' '+date.toLocaleTimeString();
                 var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + timestamp;
 
-                var newJob = $config.uri.addJobs + this.data.groupName + '/' + jobName + '/' + $scope.Measures[$scope.measure];
+                var newJob = $config.uri.addJobs + '?group=' + this.data.groupName + '&jobName=' + jobName + '&measureName=' + $scope.Measures[$scope.measure];
                 console.log(newJob);
                 console.log(this.data);
                 $http.post(newJob, this.data).then(function successCallback(data) {

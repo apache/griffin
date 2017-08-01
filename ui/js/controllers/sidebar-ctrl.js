@@ -22,24 +22,31 @@ define(['./module'], function(controllers) {
     controllers.controller('SideBarCtrl', ['$scope', '$http', '$config', '$filter', '$timeout', '$compile', '$routeParams', '$barkChart', '$rootScope','$location', function($scope, $http, $config, $filter, $timeout, $compile, $routeParams, $barkChart, $rootScope,$location) {
 
         var echarts = require('echarts');
-
+        var renderDataAssetPie = function(status) {
+            resizePieChart();
+            $scope.dataAssetPieChart = echarts.init($('#data-asset-pie')[0], 'dark');
+            $scope.dataAssetPieChart.setOption($barkChart.getOptionPie(status));
+        }
         pageInit();
 
         $scope.orgs = [];
         $scope.finalData = [];
         $scope.metricData = [];
 
-        var renderDataAssetPie = function(status) {
-            resizePieChart();
-            $scope.dataAssetPieChart = echarts.init($('#data-asset-pie')[0], 'dark');
-            $scope.dataAssetPieChart.setOption($barkChart.getOptionPie(status));
-        }
+
         function pageInit() {
+              var health_url = $config.uri.statistics;
               $scope.status = new Object();
-              $scope.status.health = '100';
-              $scope.status.invalid = '6';
-//              renderDataAssetPie($scope.status);
-              sideBarList();
+              $http.get(health_url).then(function successCallback(response){
+                  response = response.data;
+                  $scope.status.health = response.healthyJobCount;
+                  $scope.status.invalid = response.jobCount - response.healthyJobCount;
+                  renderDataAssetPie($scope.status);
+                  sideBarList();
+              },function errorCallback(response){
+
+              });
+              
         }
 
         $scope.$watch(function(){return $routeParams.sysName;}, function(value){

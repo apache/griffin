@@ -66,7 +66,7 @@ define(['./module'], function (controllers) {
           $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           $scope.currentJob = row;
 
-          var allInstances = $config.uri.getInstances + 'BA/' + row.jobName +'/0/100';
+          var allInstances = $config.uri.getInstances + '?group=' + 'BA/' + '&jobName=' + row.jobName +'&page='+'/0/'+'&size='+'100';
           $http.get(allInstances).then(function successCallback(data){
             row.instances = data.data;
             row.pageCount = new Array();
@@ -106,7 +106,7 @@ define(['./module'], function (controllers) {
 
       $scope.confirmDelete = function(){
         var row = $scope.deletedBriefRow;
-        var deleteModelUrl = $config.uri.deleteJob + row.groupName+'/'+row.jobName;
+        var deleteModelUrl = $config.uri.deleteJob + '/?group=' + row.groupName+'&jobName='+row.jobName;
         $http.delete(deleteModelUrl).then(function successCallback(){
 
           var index = $scope.rowCollection.indexOf(row);

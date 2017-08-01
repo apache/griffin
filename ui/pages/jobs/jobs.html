@@ -56,7 +56,11 @@ under the License.
                 <td ng-show="row.previousFireTime==-1">--/--/-- &nbsp;&nbsp;--:--</td>
                 <td ng-show="row.previousFireTime!=-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
                 <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
-                <td>{{row.triggerState}}</td>
+                <td>
+                    <span ng-if='row.triggerState == "NORMAL"' class="normal">{{row.triggerState}}
+                    </span>
+                    <span ng-if='row.triggerState != "NORMAL"' class = 'unnormal'>{{row.triggerState}}</span>
+                </td>
                 <td>{{row.periodTime}}s</td>
                 <td>
                     &nbsp;
@@ -72,9 +76,9 @@ under the License.
                            class="table table-striped" style="word-wrap: break-word;" >
                         <thead>
                         <tr style="background-color:#7D95CC">
-                            <th style="width:25%" >ID</th>
+                            <th style="width:30%" >AppID</th>
+                            <th style="width:20%" >SessionID</th>
                             <th style="width:25%" >Time</th>
-                            <th style="width:25%" >Group Name</th>
                             <th style="width:36%" >State</th>
                         </tr>
                         </thead>
@@ -83,10 +87,11 @@ under the License.
                             <td colspan="7" style="text-align:center">No content.</td>
                         </tr>
                         <tr ng-repeat="item in row.currentInstances" >
-                            <td>{{item.id}}</td>
+                            <td>{{item.appId}}</td>
+                            <td>{{item.sessionId}}</td>
                             <td>{{item.timestamp | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
-                            <td>{{item.groupName}}</td>
                             <td>{{item.state}}</td>
+
                         </tr>
                         <br>
 

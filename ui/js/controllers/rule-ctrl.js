@@ -99,7 +99,7 @@ define(['./module'], function (controllers) {
 
 
       $scope.remove = function remove(row) {
-        var getModelUrl = $config.uri.getModel + '/' +row.name;
+        var getModelUrl = $config.uri.getModel + '/' +row.id;
         $http.get(getModelUrl).then(function successCallback(data){
   			  $scope.deletedRow = data.data;
               $scope.sourceTable = $scope.deletedRow.source.config["table.name"];
@@ -112,7 +112,7 @@ define(['./module'], function (controllers) {
 
       $scope.confirmDelete = function(){
         var row =   $scope.deletedBriefRow;
-        var deleteModelUrl = $config.uri.deleteModel + '/' + row.name;
+        var deleteModelUrl = $config.uri.deleteModel + '/' + row.id;
         $http.delete(deleteModelUrl).then(function successCallback(data){
           if(data.data=="DELETE_MEASURE_BY_NAME_SUCCESS"){
               var index = $scope.rowCollection.indexOf(row);
@@ -130,16 +130,12 @@ define(['./module'], function (controllers) {
         });
       }
 
-
-
       $scope.edit = function edit() {
       }
-
 
       $scope.$on('$viewContentLoaded', function() {
         $scope.$emit('initReq');
       });
-
 
 /*
        function createRowCollection(){

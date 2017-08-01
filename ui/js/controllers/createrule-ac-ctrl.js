@@ -92,7 +92,7 @@ define(['./module'], function(controllers) {
 
             // $scope.schemaCollection = null;
             if (newValue) {
-                $http.get(schemaDefinitionUrl+ '/' + newValue.parent[0].dbName+'/table/'+newValue.name).then(function successCallback(data) {
+                $http.get(schemaDefinitionUrl+ '?db=' + newValue.parent[0].dbName+'&table='+newValue.name).then(function successCallback(data) {
                 console.log(data);
                 $scope.schemaCollection = data.data.sd.cols;
                 console.log($scope.schemaCollection);
@@ -148,7 +148,7 @@ define(['./module'], function(controllers) {
 //
 //            }
             if (newValue) {
-                $http.get(schemaDefinitionUrl + '/' + newValue.parent[0].dbName+'/table/'+newValue.name).then(function successCallback(data) {
+                $http.get(schemaDefinitionUrl + '?db=' + newValue.parent[0].dbName+'&table='+newValue.name).then(function successCallback(data) {
                 console.log(data);
                 $scope.schemaCollectionTarget = data.data.sd.cols;
                 console.log($scope.schemaCollectionTarget);
@@ -456,38 +456,24 @@ define(['./module'], function(controllers) {
             },
 
             save: function() {
-
-
                 //::TODO: Need to save the data to backend with POST/PUT method
                 console.log(JSON.stringify($scope.form.data));
-
                 var newModel = $config.uri.addModels;
                 $http.post(newModel, this.data).then(function successCallback(data) {
-                	// if(data.status=='0')
-                	// {
-                	  console.log(data);
-                      if(data.data=='CREATE_MEASURE_FAIL_DUPLICATE'){
-                          toaster.pop('error', 'Please modify the name of measure, because there is already a same measure in database ', data.message);
-                          return;
-                      }
+                      // console.log(data);
+                      // if(data.data=='CREATE_MEASURE_FAIL_DUPLICATE'){
+                      //     toaster.pop('error', 'Please modify the name of measure, because there is already a same measure in database ', data.message);
+                      //     return;
+                      // }
 
-	                  $('#confirm').on('hidden.bs.modal', function(e) {
-	                      $('#confirm').off('hidden.bs.modal');
-	                      $location.path('/rules').replace();
-	                      $scope.$apply();
-	                  });
-	                	$('#confirm').modal('hide');
-	                // }
-                	// else
-                	// {
-                	// 	errorMessage(0, data.result);
-                	// }
-
-                // }).error(function(data){
-                //   // errorMessage(0, 'Save model failed, please try again!');
-                //   toaster.pop('error', 'Save measure failed, please try again!', data.message);
-                // });
+                      // $('#confirm').on('hidden.bs.modal', function(e) {
+                      //     $('#confirm').off('hidden.bs.modal');
+                      //     $location.path('/rules').replace();
+                      //     $scope.$apply();
+                      // });
+                      // $('#confirm').modal('hide');
                       },function errorCallback(response) {
+                        console.log(response);
                             toaster.pop('error', 'Save measure failed, please try again!', response.message);
                     });
 

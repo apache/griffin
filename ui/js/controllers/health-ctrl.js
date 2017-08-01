@@ -41,6 +41,7 @@ define(['./module'], function (controllers) {
 //            var url_organization = 'org.json';
             $http.get(url_organization).then(function successCallback(res){
                var orgNode = null;
+               console.log(res);
                angular.forEach(res.data, function(value,key) {
                     orgNode = new Object();
                     $scope.orgs.push(orgNode);
@@ -48,8 +49,8 @@ define(['./module'], function (controllers) {
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-                 $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
-//                 $http.get(url_dashboard).then(function successCallback(data){
+                 // $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
+                $http.get(url_dashboard).then(function successCallback(data){
                     angular.forEach(data.data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
