@@ -110,15 +110,15 @@ public class MeasureServiceImplTest {
         try {
             String measureName="viewitem_hourly";
             given(measureRepo.findByName(measureName)).willReturn(null);
-            String message=service.deleteMeasuresByName("viewitem_hourly");
-            assertEquals(message,GriffinOperationMessage.RESOURCE_NOT_FOUND.toString());
+            GriffinOperationMessage message=service.deleteMeasuresByName("viewitem_hourly");
+            assertEquals(message,GriffinOperationMessage.RESOURCE_NOT_FOUND);
             assertTrue(true);
 
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
             given(measureRepo.findByName(measureName)).willReturn(measure);
-            String message1=service.deleteMeasuresByName("viewitem_hourly");
-            assertEquals(message1,GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS.toString());
+            GriffinOperationMessage message1=service.deleteMeasuresByName("viewitem_hourly");
+            assertEquals(message1,GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS);
         }catch (Throwable t){
             fail("Cannot delete Measure in db By name: viewitem_hourly");
         }
@@ -131,19 +131,19 @@ public class MeasureServiceImplTest {
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
             given(measureRepo.findByName(measureName)).willReturn(null);
-            String message=service.createNewMeasure(measure);
-            assertEquals(message,GriffinOperationMessage.CREATE_MEASURE_FAIL.toString());
+            GriffinOperationMessage message=service.createNewMeasure(measure);
+            assertEquals(message,GriffinOperationMessage.CREATE_MEASURE_FAIL);
             assertTrue(true);
 
             Measure measure1=createATestMeasure(measureName,"bullseye1");
             given(measureRepo.findByName(measureName)).willReturn(measure1);
-            String message1=service.createNewMeasure(measure);
-            assertEquals(message1,GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE.toString());
+            GriffinOperationMessage message1=service.createNewMeasure(measure);
+            assertEquals(message1,GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
 
             given(measureRepo.findByName(measureName)).willReturn(null);
             given(measureRepo.save(measure)).willReturn(measure);
-            String message2=service.createNewMeasure(measure);
-            assertEquals(message2,GriffinOperationMessage.CREATE_MEASURE_SUCCESS.toString());
+            GriffinOperationMessage message2=service.createNewMeasure(measure);
+            assertEquals(message2,GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
         }catch (Throwable t){
             fail("Cannot create new measure viewitem_hourly");
         }
@@ -170,7 +170,7 @@ public class MeasureServiceImplTest {
             String measureName="viewitem_hourly";
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
-            String message=service.updateMeasure(measure);
+            GriffinOperationMessage message=service.updateMeasure(measure);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot create new measure viewitem_hourly");

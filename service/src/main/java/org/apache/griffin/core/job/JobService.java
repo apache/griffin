@@ -22,6 +22,7 @@ package org.apache.griffin.core.job;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.util.GriffinOperationMessage;
 
 import java.io.Serializable;
 import java.util.List;
@@ -31,9 +32,9 @@ public interface JobService {
 
     public List<Map<String, Serializable>> getJobs();
 
-    public String addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody);
+    public GriffinOperationMessage addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody);
 
-    public String deleteJob(String groupName,String jobName);
+    public GriffinOperationMessage deleteJob(String groupName,String jobName);
 
     public List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
 

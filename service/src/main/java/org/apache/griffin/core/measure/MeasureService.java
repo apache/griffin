@@ -21,6 +21,7 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
@@ -34,14 +35,14 @@ public interface MeasureService {
     public Measure getMeasuresByName(String measureName);
 
 
-    public String deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId);
+    public GriffinOperationMessage deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId);
 
 
-    public String deleteMeasuresByName(String measureName) ;
+    public GriffinOperationMessage deleteMeasuresByName(String measureName) ;
 
-    public String updateMeasure(Measure measure);
+    public GriffinOperationMessage updateMeasure(Measure measure);
 
     public List<String> getAllMeasureNameByOwner(String owner);
 
-    public String createNewMeasure(Measure measure);
+    public GriffinOperationMessage createNewMeasure(Measure measure);
 }

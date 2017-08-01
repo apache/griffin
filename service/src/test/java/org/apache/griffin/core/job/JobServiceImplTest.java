@@ -22,6 +22,7 @@ package org.apache.griffin.core.job;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.LivySessionStateMap;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.junit.Before;
@@ -122,16 +123,16 @@ public class JobServiceImplTest {
             JobRequestBody jobRequestBody =new JobRequestBody();
             Scheduler scheduler=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler);
-            String tmp = service.addJob(groupName,jobName,measureName, jobRequestBody);
-            assertEquals(tmp,GriffinOperationMessage.CREATE_JOB_FAIL.toString());
+            GriffinOperationMessage tmp = service.addJob(groupName,jobName,measureName, jobRequestBody);
+            assertEquals(tmp,GriffinOperationMessage.CREATE_JOB_FAIL);
             assertTrue(true);
 
             JobRequestBody jobRequestBody1 =new JobRequestBody("YYYYMMdd-HH","YYYYMMdd-HH",
                     System.currentTimeMillis()+"",System.currentTimeMillis()+"","1000");
             Scheduler scheduler1=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler1);
-            String tmp1 = service.addJob(groupName,jobName,measureName, jobRequestBody1);
-            assertEquals(tmp1,GriffinOperationMessage.CREATE_JOB_SUCCESS.toString());
+            GriffinOperationMessage tmp1 = service.addJob(groupName,jobName,measureName, jobRequestBody1);
+            assertEquals(tmp1,GriffinOperationMessage.CREATE_JOB_SUCCESS);
         }catch (Throwable t){
             fail("Cannot add job ");
         }
@@ -144,14 +145,14 @@ public class JobServiceImplTest {
         try {
             Scheduler scheduler=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler);
-            String tmp = service.deleteJob(groupName,jobName);
+            GriffinOperationMessage tmp = service.deleteJob(groupName,jobName);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot delete job");
         }
         try {
             given(factory.getObject()).willThrow(SchedulerException.class);
-            String tmp = service.deleteJob(groupName,jobName);
+            GriffinOperationMessage tmp = service.deleteJob(groupName,jobName);
         } catch (Exception e) {
             log.info("testGetAllTable: test catch "+e);
         }
@@ -188,7 +189,7 @@ public class JobServiceImplTest {
             jobInstance.setGroupName("BA");
             jobInstance.setJobName("job1");
             jobInstance.setSessionId(1);
-            jobInstance.setState(JobInstance.State.starting);
+            jobInstance.setState(LivySessionStateMap.State.starting);
             jobInstance.setAppId("ttt");
             jobInstance.setTimestamp(System.currentTimeMillis());
             scheduleStateList.add(jobInstance);
@@ -197,7 +198,7 @@ public class JobServiceImplTest {
             assertTrue(true);
 
             scheduleStateList.remove(0);
-            jobInstance.setState(JobInstance.State.success);
+            jobInstance.setState(LivySessionStateMap.State.success);
             scheduleStateList.add(jobInstance);
             given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
             JobHealth tmp1 = service.getHealthInfo();

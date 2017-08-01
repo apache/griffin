@@ -20,6 +20,9 @@ under the License.
 package org.apache.griffin.core.util;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum GriffinOperationMessage {
     //success
     CREATE_MEASURE_SUCCESS(201, "Create Measure Succeed"),

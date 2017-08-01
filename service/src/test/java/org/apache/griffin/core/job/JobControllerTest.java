@@ -22,6 +22,7 @@ package org.apache.griffin.core.job;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.LivySessionStateMap;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
@@ -79,11 +80,11 @@ public class JobControllerTest {
         JobRequestBody jobRequestBody =new JobRequestBody("YYYYMMdd-HH","YYYYMMdd-HH","111","20170607","100");
         ObjectMapper mapper=new ObjectMapper();
         String schedulerRequestBodyJson=mapper.writeValueAsString(jobRequestBody);
-        given(service.addJob(groupName,jobName,measureName, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS.toString());
+        given(service.addJob(groupName,jobName,measureName, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS);
 
         mvc.perform(post("/jobs/add/BA/job1/viewitem_hourly").contentType(MediaType.APPLICATION_JSON).content(schedulerRequestBodyJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",is(GriffinOperationMessage.CREATE_JOB_SUCCESS.toString())))
+                .andExpect(jsonPath("$",is(GriffinOperationMessage.CREATE_JOB_SUCCESS)))
         ;
     }
 
@@ -91,10 +92,10 @@ public class JobControllerTest {
     public void testDeleteJob() throws Exception {
         String groupName="BA";
         String jobName="job1";
-        given(service.deleteJob(groupName,jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_SUCCESS.toString());
+        given(service.deleteJob(groupName,jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_SUCCESS);
         mvc.perform(delete("/jobs/del/BA/job1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",is(GriffinOperationMessage.DELETE_JOB_SUCCESS.toString())))
+                .andExpect(jsonPath("$",is(GriffinOperationMessage.DELETE_JOB_SUCCESS)))
         ;
     }
 
@@ -104,7 +105,7 @@ public class JobControllerTest {
         String job="job1";
         int page=0;
         int size=2;
-        JobInstance jobInstance=new JobInstance(group, job, 1, JobInstance.State.running, "", System.currentTimeMillis());
+        JobInstance jobInstance=new JobInstance(group, job, 1, LivySessionStateMap.State.running, "", System.currentTimeMillis());
         given(service.findInstancesOfJob(group,job,page,size)).willReturn(Arrays.asList(jobInstance));
         mvc.perform(get("/jobs/instances/BA/job1/0/2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

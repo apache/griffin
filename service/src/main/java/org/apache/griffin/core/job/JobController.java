@@ -22,6 +22,7 @@ package org.apache.griffin.core.job;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class JobController {
     @RequestMapping(value = "/add/{groupName}/{jobName}/{measureName}", method = RequestMethod.POST)
     @ResponseBody
     @Produces(MediaType.APPLICATION_JSON)
-    public String addJob(@PathVariable String groupName,
+    public GriffinOperationMessage addJob(@PathVariable String groupName,
                            @PathVariable String jobName,
                            @PathVariable String measureName,
                            @RequestBody JobRequestBody jobRequestBody) {
@@ -58,7 +59,7 @@ public class JobController {
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ResponseBody
     @Produces(MediaType.APPLICATION_JSON)
-    public String addJob1(@RequestParam("group") String groupName,
+    public GriffinOperationMessage addJob1(@RequestParam("group") String groupName,
                                            @RequestParam("jobName") String jobName,
                                            @RequestParam("measureName") String measureName,
                                            @RequestBody JobRequestBody jobRequestBody) {
@@ -67,12 +68,12 @@ public class JobController {
 
 
     @RequestMapping(value = "/del/{group}/{name}", method = RequestMethod.DELETE)
-    public String deleteJob(@PathVariable String group, @PathVariable String name) {
+    public GriffinOperationMessage deleteJob(@PathVariable String group, @PathVariable String name) {
         return jobService.deleteJob(group,name);
     }
 
     @RequestMapping(value = "", method = RequestMethod.DELETE)
-    public String deleteJob1(@RequestParam("group") String group, @RequestParam("jobName") String jobName) {
+    public GriffinOperationMessage deleteJob1(@RequestParam("group") String group, @RequestParam("jobName") String jobName) {
         return jobService.deleteJob(group,jobName);
     }
 

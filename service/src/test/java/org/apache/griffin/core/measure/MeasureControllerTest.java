@@ -108,7 +108,7 @@ public class MeasureControllerTest {
     @Test
     public void testDeleteMeasuresByName() throws Exception{
         String measureName="viewitem_hourly";
-        given(service.deleteMeasuresByName(measureName)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS.toString());
+        given(service.deleteMeasuresByName(measureName)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS);
 
         mvc.perform(delete("/measures/deleteByName/"+measureName).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -123,7 +123,7 @@ public class MeasureControllerTest {
         Measure measure=createATestMeasure(measureName,org);
         ObjectMapper mapper=new ObjectMapper();
         String measureJson=mapper.writeValueAsString(measure);
-        given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS.toString());
+        given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
 
         mvc.perform(post("/measures/update").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
@@ -150,7 +150,7 @@ public class MeasureControllerTest {
         Measure measure=createATestMeasure(measureName,org);
         ObjectMapper mapper=new ObjectMapper();
         String measureJson=mapper.writeValueAsString(measure);
-        given(service.createNewMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS.toString());
+        given(service.createNewMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
 
         mvc.perform(post("/measures/add").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
