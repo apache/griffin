@@ -71,4 +71,6 @@ public class HiveMetastoreController {
     public Table getTable(@RequestParam("db") String dbName, @RequestParam("table") String tableName) throws HiveConnectionException {
         return hiveMetastoreService.getTable(dbName, tableName);
     }
+
+
 }
