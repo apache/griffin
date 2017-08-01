@@ -73,7 +73,6 @@ define(['./module'], function (services) {
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',
 
               //Models
-              
               allModels: BACKEND_SERVER + '/measures',
               addModels: BACKEND_SERVER + '/measure',
               deleteModel:BACKEND_SERVER + '/measure',

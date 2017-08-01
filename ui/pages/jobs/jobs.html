@@ -61,7 +61,10 @@ under the License.
                     </span>
                     <span ng-if='row.triggerState != "NORMAL"' class = 'unnormal'>{{row.triggerState}}</span>
                 </td>
-                <td>{{row.periodTime}}s</td>
+                <td>{{row.interval}}</td>
+                <!--                 <td ng-if='row.periodTime<60'>{{row.periodTime}}s</td>
+                                <td ng-if='row.periodTime>=60 && row.periodTime<3600'>{{row.periodTime/60}}min</td>
+                                <td ng-if='row.periodTime>=3600 && row.periodTime<86400'>{{row.periodTime/3600}}h</td> -->
                 <td>
                     &nbsp;
                     <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">

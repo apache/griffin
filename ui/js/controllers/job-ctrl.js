@@ -41,8 +41,29 @@ define(['./module'], function (controllers) {
          $http.get(allJobs).then(function successCallback(data) {
 
            angular.forEach(data.data,function(job){
-              job.name = job.jobName.split('-')[0] + '-' + job.jobName.split('-')[1] + '-' + job.jobName.split('-')[2];
-              job.createTime = job.jobName.split('-')[3];
+              job.interval = job.periodTime;
+              if(job.interval<60)
+                job.interval = job.periodTime + 's';
+              else if(job.interval<3600)
+              {
+                if(job.interval%60==0)
+                  job.interval = job.periodTime/60 + 'min';
+                else
+                  job.interval = (job.periodTime - job.periodTime%60)/60 + 'min'+job.periodTime%60 + 's';
+              }
+              else
+              {
+                if(job.interval%3600==0)
+                  job.interval = job.periodTime/3600 + 'h';
+                else{
+                  job.interval = (job.periodTime - job.periodTime%3600)/3600 + 'h';
+                  var s = job.periodTime%3600;
+                  job.interval = job.interval + (s-s%60)/60+'min'+s%60+'s';
+                }
+
+              }
+              var length = job.jobName.split('-').length;
+              job.createTime = job.jobName.split('-')[length-1];
            });
            data.data.sort(function(a,b){
             var dateA = a.createTime;
@@ -66,7 +87,7 @@ define(['./module'], function (controllers) {
           $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           $scope.currentJob = row;
 
-          var allInstances = $config.uri.getInstances + '?group=' + 'BA/' + '&jobName=' + row.jobName +'&page='+'/0/'+'&size='+'100';
+          var allInstances = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+'0'+'&size='+'100';
           $http.get(allInstances).then(function successCallback(data){
             row.instances = data.data;
             row.pageCount = new Array();
@@ -76,7 +97,7 @@ define(['./module'], function (controllers) {
             $('#'+p_index+'-'+number).addClass('page-active');
             $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           });
-          var url = $config.uri.getInstances + 'BA/' + row.jobName + '/'+number+'/10';
+          var url = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+number+'&size='+'10';
           $http.get(url).then(function successCallback(data){
               // row.instances = data;
               row.currentInstances = data.data;

@@ -41,9 +41,7 @@ define(['./module'], function (controllers) {
 
         if(start == 0 && !$scope.rowCollection){
          $http.get(allModels).then(function successCallback(data) {
-           data.data.sort(function(a,b){
-             return -(a.createDate - b.createDate);
-           });
+           data.data.reverse();
            originalRowCollection = angular.copy(data.data);
            $scope.rowCollection = angular.copy(data.data);
 
@@ -114,14 +112,14 @@ define(['./module'], function (controllers) {
         var row =   $scope.deletedBriefRow;
         var deleteModelUrl = $config.uri.deleteModel + '/' + row.id;
         $http.delete(deleteModelUrl).then(function successCallback(data){
-          if(data.data=="DELETE_MEASURE_BY_NAME_SUCCESS"){
+          if(data.data.description=="Delete Measures By Name Succeed"){
               var index = $scope.rowCollection.indexOf(row);
               $scope.rowCollection.splice(index, 1);
               index = $scope.displayed.indexOf(row);
               $scope.displayed.splice(index, 1);
           }
           else {
-              toaster.pop('error', 'Error when deleting measure', data.data);
+              toaster.pop('error', 'Error when deleting measure', data.data.description);
           }
           $('#deleteConfirmation').modal('hide');
 
