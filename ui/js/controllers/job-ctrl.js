@@ -48,10 +48,10 @@ define(['./module'], function (controllers) {
               {
                 if(job.interval%60==0)
                   job.interval = job.periodTime/60 + 'min';
-                else
+                else 
                   job.interval = (job.periodTime - job.periodTime%60)/60 + 'min'+job.periodTime%60 + 's';
               }
-              else
+              else 
               {
                 if(job.interval%3600==0)
                   job.interval = job.periodTime/3600 + 'h';
@@ -127,7 +127,7 @@ define(['./module'], function (controllers) {
 
       $scope.confirmDelete = function(){
         var row = $scope.deletedBriefRow;
-        var deleteModelUrl = $config.uri.deleteJob + '/?group=' + row.groupName+'&jobName='+row.jobName;
+        var deleteModelUrl = $config.uri.deleteJob + '?group=' + row.groupName+'&jobName='+row.jobName;
         $http.delete(deleteModelUrl).then(function successCallback(){
 
           var index = $scope.rowCollection.indexOf(row);
@@ -146,16 +146,12 @@ define(['./module'], function (controllers) {
         });
       }
 
-
-
       $scope.edit = function edit() {
       }
-
 
       $scope.$on('$viewContentLoaded', function() {
         $scope.$emit('initReq');
       });
-
 
 /*
        function createRowCollection(){

@@ -41,6 +41,9 @@ define(['./module'], function (controllers) {
 
         if(start == 0 && !$scope.rowCollection){
          $http.get(allModels).then(function successCallback(data) {
+           // data.data.sort(function(a,b){
+           //   return -(a.createDate - b.createDate);
+           // });
            data.data.reverse();
            originalRowCollection = angular.copy(data.data);
            $scope.rowCollection = angular.copy(data.data);
