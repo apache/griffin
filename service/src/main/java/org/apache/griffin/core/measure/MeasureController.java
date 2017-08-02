@@ -24,7 +24,6 @@ import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,24 +34,24 @@ public class MeasureController {
 
     @Autowired
     MeasureService measureService;
-    @RequestMapping("/measures")
+    @RequestMapping(value = "/measures",method = RequestMethod.GET)
     public Iterable<Measure> getAllMeasures() {
         return measureService.getAllMeasures();
     }
 
-    @RequestMapping("/measure/{id}")
+    @RequestMapping(value = "/measure/{id}",method = RequestMethod.GET)
     public Measure getMeasuresById(@PathVariable("id") long id) {
         return measureService.getMeasuresById(id);
     }
 
-    @RequestMapping("/measure")
+    @RequestMapping(value = "/measure",method = RequestMethod.GET)
     public Measure getMeasureByName(@RequestParam("measureName") String measureName) {
         return measureService.getMeasuresByName(measureName);
     }
 
-    @RequestMapping(value = "/measure/{MeasureId}",method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteMeasureById(@PathVariable("MeasureId") Long MeasureId) {
-        return measureService.deleteMeasuresById(MeasureId);
+    @RequestMapping(value = "/measure/{id}",method = RequestMethod.DELETE)
+    public GriffinOperationMessage deleteMeasureById(@PathVariable("id") Long id) {
+        return measureService.deleteMeasuresById(id);
     }
 
     @RequestMapping(value = "/measure",method = RequestMethod.DELETE)
@@ -61,19 +60,16 @@ public class MeasureController {
     }
 
     @RequestMapping(value = "/measure",method = RequestMethod.PUT)
-    @ResponseBody
-    @Transactional
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         return measureService.updateMeasure(measure);
     }
 
-    @RequestMapping("/measures/owner/{owner}")
+    @RequestMapping(value = "/measures/owner/{owner}",method = RequestMethod.GET)
     public List<String> getAllMeasureNameByOwner(@PathVariable("owner") String owner){
         return measureService.getAllMeasureNameByOwner(owner);
     }
 
     @RequestMapping(value = "/measure", method = RequestMethod.POST)
-    @ResponseBody
     public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
         return measureService.createNewMeasure(measure);
     }

@@ -457,33 +457,23 @@ define(['./module'], function(controllers) {
 
             save: function() {
                 //::TODO: Need to save the data to backend with POST/PUT method
-                console.log(JSON.stringify($scope.form.data));
                 var newModel = $config.uri.addModels;
                 $http.post(newModel, this.data).then(function successCallback(data) {
-                      // console.log(data);
-                      // if(data.data=='CREATE_MEASURE_FAIL_DUPLICATE'){
-                      //     toaster.pop('error', 'Please modify the name of measure, because there is already a same measure in database ', data.message);
-                      //     return;
-                      // }
-
-                      // $('#confirm').on('hidden.bs.modal', function(e) {
-                      //     $('#confirm').off('hidden.bs.modal');
-                      //     $location.path('/rules').replace();
-                      //     $scope.$apply();
-                      // });
+                      console.log(data);
                       // $('#confirm').modal('hide');
-                      },function errorCallback(response) {
-                        console.log(response);
-                            toaster.pop('error', 'Save measure failed, please try again!', response.message);
-                    });
-
+                      // $location.path('/measures');
+                      $('#confirm').on('hidden.bs.modal', function(e) {
+                          $('#confirm').off('hidden.bs.modal');
+                          $location.path('/measures').replace();
+                          $scope.$apply();
+                      });
+                        $('#confirm').modal('hide');
+                      }
+                      // ,function errorCallback(response) {
+                        // toaster.pop('error', 'Error when creating measure', response.message);
+                // }
+                );
             },
-
-            // reset: function() {
-            //
-            // },
-            //
-            // ruleType: 1
         }
 
 

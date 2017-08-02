@@ -21,10 +21,7 @@ package org.apache.griffin.core.metastore.hive;
 
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -36,38 +33,41 @@ public class HiveMetastoreController {
     @Autowired
     HiveMetastoreServiceImpl hiveMetastoreService;
 
-    @RequestMapping("/db")
+
+    @RequestMapping(value = "/db",method = RequestMethod.GET)
     public Iterable<String> getAllDatabases()  {
         return hiveMetastoreService.getAllDatabases();
     }
 
-    @RequestMapping("/table")
+    @RequestMapping(value = "/table",method = RequestMethod.GET)
     public Iterable<String> getDefAllTables()  {
         return hiveMetastoreService.getAllTableNames("");
     }
 
-    @RequestMapping("/allTableNames")
+    @RequestMapping(value = "/allTableNames",method = RequestMethod.GET)
     public Iterable<String> getAllTableNames(@RequestParam("db") String dbName)  {
         return hiveMetastoreService.getAllTableNames(dbName);
     }
 
-    @RequestMapping("/db/allTables")
+    @RequestMapping(value = "/db/allTables",method = RequestMethod.GET)
     public List<Table> getAllTables(@RequestParam("db") String dbName)  {
         return hiveMetastoreService.getAllTable(dbName);
     }
 
-    @RequestMapping("/allTables")
+    @RequestMapping(value = "/allTables",method = RequestMethod.GET)
     public Map<String,List<Table>> getAllTables()  {
         return hiveMetastoreService.getAllTable();
     }
 
-    @RequestMapping("/default/{table}")
+    @RequestMapping(value = "/default/{table}",method = RequestMethod.GET)
     public Table getDefTable(@PathVariable("table") String tableName)  {
         return hiveMetastoreService.getTable("", tableName);
     }
 
-    @RequestMapping("")
+    @RequestMapping(value = "",method = RequestMethod.GET)
     public Table getTable(@RequestParam("db") String dbName, @RequestParam("table") String tableName)  {
         return hiveMetastoreService.getTable(dbName, tableName);
     }
+
+
 }

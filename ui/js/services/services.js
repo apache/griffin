@@ -30,9 +30,9 @@ define(['./module'], function (services) {
        // var BACKEND_SERVER = '';
       var API_ROOT_PATH = '/api/v1';
 
-     var ES_SERVER = 'http://10.149.247.156:49200';
+     // var ES_SERVER = 'http://10.149.247.156:39200';
 //      var ES_SERVER = "http://" + location.host + ":59200"
-      // var ES_SERVER = "http://" + location.host.replace("8080", "9200");
+      var ES_SERVER = "http://" + location.host.replace("8080", "9200");
 
       var config = {
           // URI paths, always have a trailing /
@@ -73,7 +73,6 @@ define(['./module'], function (services) {
               metricdownload: BACKEND_SERVER + API_ROOT_PATH + '/metrics/download',
 
               //Models
-              
               allModels: BACKEND_SERVER + '/measures',
               addModels: BACKEND_SERVER + '/measure',
               deleteModel:BACKEND_SERVER + '/measure',

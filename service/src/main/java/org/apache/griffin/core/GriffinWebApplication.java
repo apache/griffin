@@ -31,6 +31,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
+//@EnableSwagger2
 public class GriffinWebApplication/* implements CommandLineRunner*/{
     private static final Logger log = LoggerFactory.getLogger(GriffinWebApplication.class);
     public static void main(String[] args) {

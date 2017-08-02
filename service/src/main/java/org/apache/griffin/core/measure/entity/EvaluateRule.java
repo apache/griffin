@@ -20,7 +20,9 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 
 @Entity
 public class EvaluateRule  extends AuditableEntity {
@@ -44,6 +46,9 @@ public class EvaluateRule  extends AuditableEntity {
     }
 
     private int sampleRatio;
+
+    @Lob
+    @Column(length=1000000)
     private String rules;
     
     public EvaluateRule() {
