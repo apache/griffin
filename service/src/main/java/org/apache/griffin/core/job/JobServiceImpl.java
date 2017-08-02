@@ -21,6 +21,8 @@ package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.error.Exception.GriffinException.GetHealthInfoFailureException;
+import org.apache.griffin.core.error.Exception.GriffinException.GetJobsFailureException;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
@@ -81,6 +83,7 @@ public class JobServiceImpl implements JobService {
             }
         } catch (SchedulerException e) {
             LOGGER.error("failed to get jobs."+e);
+            throw new GetJobsFailureException();
         }
         return list;
     }
@@ -300,6 +303,7 @@ public class JobServiceImpl implements JobService {
             }
         } catch (SchedulerException e) {
             LOGGER.error(""+e);
+            throw new GetHealthInfoFailureException();
         }
         JobHealth jobHealth=new JobHealth(healthyJobCount,jobCount);
         return jobHealth;

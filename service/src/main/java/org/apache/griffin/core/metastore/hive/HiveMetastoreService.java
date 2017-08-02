@@ -27,14 +27,14 @@ import java.util.Map;
 
 public interface HiveMetastoreService {
 
-    public Iterable<String> getAllDatabases() throws HiveConnectionException;
+    public Iterable<String> getAllDatabases() ;
 
-    public Iterable<String> getAllTableNames(String dbName) throws HiveConnectionException;
+    public Iterable<String> getAllTableNames(String dbName) ;
 
-    public List<Table> getAllTable(String db) throws HiveConnectionException;
+    public List<Table> getAllTable(String db) ;
 
-    public Map<String,List<Table>> getAllTable() throws HiveConnectionException;
+    public Map<String,List<Table>> getAllTable() ;
 
-    public Table getTable(String dbName, String tableName) throws HiveConnectionException;
+    public Table getTable(String dbName, String tableName) ;
 
 }

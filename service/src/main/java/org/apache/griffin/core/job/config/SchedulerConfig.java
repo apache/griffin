@@ -41,7 +41,7 @@ public class SchedulerConfig {
 	}
 
 	@Bean
-	public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource, JobFactory jobFactory) throws IOException {
+	public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource, JobFactory jobFactory) {
 		SchedulerFactoryBean factory = new SchedulerFactoryBean();
 		factory.setOverwriteExistingJobs(true);
 		factory.setDataSource(dataSource);
@@ -53,7 +53,7 @@ public class SchedulerConfig {
 	}
 
 	@Bean
-	public Properties quartzProperties() throws IOException {
+	public Properties quartzProperties() {
 		return GriffinUtil.getProperties("/quartz.properties");
 	}
 }

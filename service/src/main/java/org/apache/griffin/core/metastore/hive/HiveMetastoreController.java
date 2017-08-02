@@ -19,7 +19,6 @@ under the License.
 package org.apache.griffin.core.metastore.hive;
 
 
-import org.apache.griffin.core.error.Exception.HiveConnectionException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,37 +37,37 @@ public class HiveMetastoreController {
     HiveMetastoreServiceImpl hiveMetastoreService;
 
     @RequestMapping("/db")
-    public Iterable<String> getAllDatabases() throws HiveConnectionException {
+    public Iterable<String> getAllDatabases()  {
         return hiveMetastoreService.getAllDatabases();
     }
 
     @RequestMapping("/table")
-    public Iterable<String> getDefAllTables() throws HiveConnectionException {
+    public Iterable<String> getDefAllTables()  {
         return hiveMetastoreService.getAllTableNames("");
     }
 
     @RequestMapping("/allTableNames")
-    public Iterable<String> getAllTableNames(@RequestParam("db") String dbName) throws HiveConnectionException {
+    public Iterable<String> getAllTableNames(@RequestParam("db") String dbName)  {
         return hiveMetastoreService.getAllTableNames(dbName);
     }
 
     @RequestMapping("/db/allTables")
-    public List<Table> getAllTables(@RequestParam("db") String dbName) throws HiveConnectionException {
+    public List<Table> getAllTables(@RequestParam("db") String dbName)  {
         return hiveMetastoreService.getAllTable(dbName);
     }
 
     @RequestMapping("/allTables")
-    public Map<String,List<Table>> getAllTables() throws HiveConnectionException {
+    public Map<String,List<Table>> getAllTables()  {
         return hiveMetastoreService.getAllTable();
     }
 
     @RequestMapping("/default/{table}")
-    public Table getDefTable(@PathVariable("table") String tableName) throws HiveConnectionException {
+    public Table getDefTable(@PathVariable("table") String tableName)  {
         return hiveMetastoreService.getTable("", tableName);
     }
 
     @RequestMapping("")
-    public Table getTable(@RequestParam("db") String dbName, @RequestParam("table") String tableName) throws HiveConnectionException {
+    public Table getTable(@RequestParam("db") String dbName, @RequestParam("table") String tableName)  {
         return hiveMetastoreService.getTable(dbName, tableName);
     }
 }
