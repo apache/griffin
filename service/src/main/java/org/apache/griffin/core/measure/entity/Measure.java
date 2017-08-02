@@ -52,6 +52,9 @@ public class Measure extends AuditableEntity   {
     @JoinColumn(name = "evaluateRule_id")
     private EvaluateRule evaluateRule;
 
+    /**
+     * owner means owner name
+     */
     private String owner;
 
     public String getName() {
