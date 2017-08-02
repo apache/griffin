@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "jquery": "2.1.4",
+    "jquery-ui":"1.12.1",
     "bootswatch": "3.3.6",
     "font-awesome": "4.7.0",
     "angular": "1.6.4",

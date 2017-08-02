@@ -20,7 +20,7 @@ under the License.
 
 define(['./module'], function (controllers) {
     'use strict';
-    controllers.controller('JobCtrl', ['$scope', '$http', '$config', '$location', '$timeout', '$route', 'toaster', '$filter', function ($scope, $http, $config, $location, $timeout, $route, toaster, $filter) {
+    controllers.controller('JobCtrl', ['$scope', '$http', '$config', '$location', '$timeout', '$route', 'toaster', '$filter','$interval', function ($scope, $http, $config, $location, $timeout, $route, toaster, $filter,$interval) {
       console.log('job controller');
       console.log($scope.ntAccount);
       var allJobs = $config.uri.allJobs;
@@ -29,17 +29,56 @@ define(['./module'], function (controllers) {
       var number = 10;
       var originalRowCollection = undefined;
 
+      var getJobs = function(start,number){
+        //  $http.get(allJobs).then(function successCallback(data) {
+        //    angular.forEach(data.data,function(job){
+        //       job.interval = job.periodTime;
+        //       if(job.interval<60)
+        //         job.interval = job.periodTime + 's';
+        //       else if(job.interval<3600)
+        //       {
+        //         if(job.interval%60==0)
+        //           job.interval = job.periodTime/60 + 'min';
+        //         else 
+        //           job.interval = (job.periodTime - job.periodTime%60)/60 + 'min'+job.periodTime%60 + 's';
+        //       }
+        //       else 
+        //       {
+        //         if(job.interval%3600==0)
+        //           job.interval = job.periodTime/3600 + 'h';
+        //         else{
+        //           job.interval = (job.periodTime - job.periodTime%3600)/3600 + 'h';
+        //           var s = job.periodTime%3600;
+        //           job.interval = job.interval + (s-s%60)/60+'min'+s%60+'s';
+        //         }
+
+        //       }
+        //       var length = job.jobName.split('-').length;
+        //       job.createTime = job.jobName.split('-')[length-1];
+        //    });
+        //    data.data.sort(function(a,b){
+        //     var dateA = a.createTime;
+        //     var dateB = b.createTime;
+        //         return -(dateA-dateB);
+        //   });
+        //   if(start == 0 && $scope.rowCollection!=null){
+        //   $scope.displayed = $scope.rowCollection.slice(start, start+number);
+        //   tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
+        //   }else{
+        //   originalRowCollection = angular.copy(data.data);
+        //    $scope.rowCollection = angular.copy(data.data);
+        //    $scope.displayed = $scope.rowCollection.slice(start, start+number);
+        //   }  
+        // });
+      }
+    
       $scope.pagingJob = function(tableState){
         console.log(tableState);
         ts = tableState;
-
         // tableState.pagination.numberOfPages = $scope.rowCollection.length/10 + 1;
         start = tableState.pagination.start || 0;
         number = tableState.pagination.number || 10;
-
-        if(start == 0 && !$scope.rowCollection){
-         $http.get(allJobs).then(function successCallback(data) {
-
+        $http.get(allJobs).then(function successCallback(data) {
            angular.forEach(data.data,function(job){
               job.interval = job.periodTime;
               if(job.interval<60)
@@ -69,16 +108,61 @@ define(['./module'], function (controllers) {
             var dateA = a.createTime;
             var dateB = b.createTime;
                 return -(dateA-dateB);
-            });
+          });
            originalRowCollection = angular.copy(data.data);
            $scope.rowCollection = angular.copy(data.data);
-
            $scope.displayed = $scope.rowCollection.slice(start, start+number);
-           tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
-         });
-        }else{
-         $scope.displayed = $scope.rowCollection.slice(start, start+number);
-        }
+          if(start == 0 && $scope.rowCollection!=null){
+          
+          tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
+          }else{
+           
+          }  
+        });
+        $interval(function(){
+          $http.get(allJobs).then(function successCallback(data) {
+           angular.forEach(data.data,function(job){
+              job.interval = job.periodTime;
+              if(job.interval<60)
+                job.interval = job.periodTime + 's';
+              else if(job.interval<3600)
+              {
+                if(job.interval%60==0)
+                  job.interval = job.periodTime/60 + 'min';
+                else 
+                  job.interval = (job.periodTime - job.periodTime%60)/60 + 'min'+job.periodTime%60 + 's';
+              }
+              else 
+              {
+                if(job.interval%3600==0)
+                  job.interval = job.periodTime/3600 + 'h';
+                else{
+                  job.interval = (job.periodTime - job.periodTime%3600)/3600 + 'h';
+                  var s = job.periodTime%3600;
+                  job.interval = job.interval + (s-s%60)/60+'min'+s%60+'s';
+                }
+
+              }
+              var length = job.jobName.split('-').length;
+              job.createTime = job.jobName.split('-')[length-1];
+            });
+            data.data.sort(function(a,b){
+              var dateA = a.createTime;
+              var dateB = b.createTime;
+                return -(dateA-dateB);
+            });
+            originalRowCollection = angular.copy(data.data);
+            $scope.rowCollection = angular.copy(data.data);
+            $scope.displayed = $scope.rowCollection.slice(start, start+number);
+
+            if(start == 0 && $scope.rowCollection!=null){
+              tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
+            }else{
+              // $scope.rowCollection = angular.copy(data.data);
+            }  
+            console.log($scope.displayed);
+          });
+        },60000);
       };
 
       $scope.showInstances = function showInstances(row,number){
@@ -99,7 +183,6 @@ define(['./module'], function (controllers) {
           });
           var url = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+number+'&size='+'10';
           $http.get(url).then(function successCallback(data){
-              // row.instances = data;
               row.currentInstances = data.data;
               $('#'+p_index+'-'+number).addClass('page-active');
               $('#'+p_index+'-'+number).siblings().removeClass('page-active');
@@ -112,14 +195,7 @@ define(['./module'], function (controllers) {
           },200);
       }
 
-
-
       $scope.remove = function remove(row) {
-//        var getJobUrl = $config.uri.getJob + '/' +row.name;
-//        $http.get(getJobUrl).success(function(data){
-//  			  $scope.deletedRow = data;
-//
-//  		  });
         $scope.deletedRow = row;
         $scope.deletedBriefRow = row;
         $('#deleteJobConfirmation').modal('show');
@@ -137,10 +213,6 @@ define(['./module'], function (controllers) {
           $scope.displayed.splice(index, 1);
 
           $('#deleteJobConfirmation').modal('hide');
-
-        // }).error(function(data, status){
-        //   toaster.pop('error', 'Error when deleting record', data);
-        // });
       },function errorCallback(response) {
           toaster.pop('error', 'Error when deleting record', response.message);
         });
@@ -152,40 +224,5 @@ define(['./module'], function (controllers) {
       $scope.$on('$viewContentLoaded', function() {
         $scope.$emit('initReq');
       });
-
-/*
-       function createRowCollection(){
-         var data = [];
-         for (var j = 0; j < 22; j++) {
-              data.push(createRandomItem());
-          }
-
-          return data;
-       }
-
-       function createRandomItem() {
-         var nameList = ['ViewItem', 'Search', 'BidEvent', 'user_dna', 'LAST_ITEMS_VIEWED'],
-             systemList = ['Bullseye', 'PDS', 'GPS', 'IDLS', 'Hadoop'],
-             dateList = ['2016-03-10', '2016-03-12', '2016-03-15', '2016-03-19', '2016-03-20'],
-             statusList = [0, 1, 2];
-
-           var
-               name = nameList[Math.floor(Math.random() * 5)],
-               system = Math.floor(Math.random() * 7),
-               type = Math.floor(Math.random() * 4),
-               description = 'Only for demo purpose',
-               createDate = dateList[Math.floor(Math.random() * 5)],
-               status = Math.floor(Math.random() * 3);
-
-           return{
-               name: name,
-               system: system,
-               type: type,
-               description: description,
-               createDate: createDate,
-               status:status
-           };
-       }
-*/
     }]);
 });

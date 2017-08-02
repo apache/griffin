@@ -24,6 +24,8 @@ define(['./module'], function(controllers) {
         console.log('Create job controller');
         $scope.currentStep = 1;
 
+        $( "#datepicker" ).datepicker();
+
         $scope.Times = ['seconds','minutes','hours'];
         $scope.timeType = 'seconds';
 
@@ -47,7 +49,6 @@ define(['./module'], function(controllers) {
             angular.forEach(res.data,function(measure){
                 $scope.Measures.push(measure);
             })
-            console.log($scope.Measures);
             $scope.measure = 0;
         })
 
@@ -62,14 +63,14 @@ define(['./module'], function(controllers) {
 
 
         function resizeWindow() {
-                    var stepSelection = '.formStep[id=step-' + $scope.currentStep + ']';
-                    $(stepSelection).css({
-                        height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
-                    });
-                    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
-                    $('.y-scrollable').css({
-                        'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
-                    });
+            var stepSelection = '.formStep';
+            $(stepSelection).css({
+                height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
+            });
+            $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
+            $('.y-scrollable').css({
+                'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+            });
 
         }
 
@@ -105,11 +106,12 @@ define(['./module'], function(controllers) {
                         period = $scope.periodTime * 3600;
                     else period = $scope.periodTime;
                     var rule = '';
-                    var startTime = '';
-                    var year = $scope.jobStartTime.substr(0,4);
-                    var month = $scope.jobStartTime.substr(4,2);
-                    var day = $scope.jobStartTime.substr(6,2);
-                    startTime = year +'-'+ month + '-'+ day + ' '+ $scope.jobStartTime.split(' ')[1];
+                    var startTime = $scope.jobStartTime;
+                    console.log(startTime);
+                    var year = $scope.jobStartTime.split('/')[2];
+                    var month = $scope.jobStartTime.split('/')[0];
+                    var day = $scope.jobStartTime.split('/')[1];
+                    startTime = year +'-'+ month + '-'+ day + ' '+ $scope.time;
                     startTime = Date.parse(startTime);
                     if(isNaN(startTime)){
                         toaster.pop('error','Please input the right format of start time');
