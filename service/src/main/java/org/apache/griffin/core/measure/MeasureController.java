@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import io.swagger.annotations.*;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
@@ -29,11 +30,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+//@Api("MeasureController")
+
 public class MeasureController {
     private static final Logger log = LoggerFactory.getLogger(MeasureController.class);
 
     @Autowired
     MeasureService measureService;
+
+    @ApiOperation("获取用户信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="header",name="username",dataType="String",required=true,value="用户的姓名",defaultValue="zhaojigang"),
+            @ApiImplicitParam(paramType="query",name="password",dataType="String",required=true,value="用户的密码",defaultValue="wangna")
+    })
+    @ApiResponses({
+            @ApiResponse(code=400,message="请求参数没填好"),
+            @ApiResponse(code=404,message="请求路径没有或页面跳转路径不对")
+    })
+    @RequestMapping(value="/getUser",method=RequestMethod.GET)
+    public String getUser(@RequestHeader("username") String username, @RequestParam("password") String password) {
+//        return userService.getUser(username,password);
+        return "aaa";
+    }
+
     @RequestMapping(value = "/measures",method = RequestMethod.GET)
     public Iterable<Measure> getAllMeasures() {
         return measureService.getAllMeasures();
