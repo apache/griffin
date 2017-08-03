@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.metastore.hive;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.slf4j.Logger;
@@ -38,6 +39,11 @@ public class HiveMetastoreProxy
     @Value("${hive.metastore.uris}")
     private String uris;
 
+    @Value("${hive.hmshandler.retry.attempts}")
+    private int attempts;
+
+    @Value("${hive.hmshandler.retry.interval}")
+    private String interval;
 
     private HiveMetaStoreClient client = null;
 
@@ -47,6 +53,8 @@ public class HiveMetastoreProxy
         hiveConf.set("hive.metastore.local", "false");
         hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
         hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
+        hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
+        hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);
         try {
             client= new HiveMetaStoreClient(hiveConf);
         } catch (MetaException e) {

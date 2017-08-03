@@ -23,13 +23,10 @@ import org.apache.griffin.core.error.Exception.GriffinException.HiveConnectionEx
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -55,9 +52,6 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         else return dbName;
     }
 
-    @Retryable(value = { MetaException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
     @Override
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
@@ -70,9 +64,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return results;
     }
 
-    @Retryable(value = { MetaException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
+
     @Override
     public Iterable<String> getAllTableNames(String dbName) {
         Iterable<String> results = null;
@@ -86,9 +78,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return results;
     }
 
-    @Retryable(value = { TException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
+
     @Override
     public List<Table> getAllTable(String db) {
         List<Table> results = new ArrayList<Table>();
@@ -106,9 +96,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return results;
     }
 
-    @Retryable(value = { TException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
+
     @Override
     public Map<String,List<Table>> getAllTable() {
         Map<String,List<Table>> results = new HashMap<String, List<Table>>();
@@ -131,9 +119,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return results;
     }
 
-    @Retryable(value = { TException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
+
     @Override
     public Table getTable(String dbName, String tableName) {
         Table result = null;
