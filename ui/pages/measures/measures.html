@@ -55,7 +55,7 @@ under the License.
                 <td>{{row.organization}}</td>
                 <td>
                     &nbsp;
-                    <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
+                    <a ng-class="(!adminAccess && ntAccount!=row.owner)?'disabled':''" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
                         <i class="fa fa-trash-o"></i>
                     </a>
                     &nbsp;

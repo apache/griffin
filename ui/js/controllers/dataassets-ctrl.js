@@ -21,7 +21,7 @@ define(['./module'], function (controllers) {
     'use strict';
     controllers.controller('DataAssetsCtrl', ['$scope', '$http', '$config', '$location', 'toaster', '$timeout', '$route', '$filter', function ($scope, $http, $config, $location, toaster, $timeout, $route, $filter) {
 
-      var allModels = $config.uri.dataassetlist;
+      var allDataassets = $config.uri.dataassetlist;
       var ts = null;
       var start = 0;
       var number = 10;
@@ -35,12 +35,7 @@ define(['./module'], function (controllers) {
         number = tableState.pagination.number || 10;
 
         if(start == 0 && !$scope.rowCollection){
-          $http.get(allModels).then(function successCallback(data) {
-            if(data.data){
-              // data.sort(function(a,b){
-              //   return -(a.timestamp - b.timestamp);
-              // });
-            }
+          $http.get(allDataassets).then(function successCallback(data) {
             originalRowCollection = new Array();
             angular.forEach(data.data,function(db){
               angular.forEach(db,function(table){

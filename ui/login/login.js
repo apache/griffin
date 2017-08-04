@@ -37,16 +37,9 @@ $(document).ready(function() {
     });
 
     $('#login-btn').click(function() {
-
-
-
         var name = $('input:eq(0)').val();
         var password = $('input:eq(1)').val();
-
        var loginUrl = '/api/v1/login/authenticate';
-
-
-
         loginBtnWait();
         $.ajax({
             type: 'POST',
@@ -82,7 +75,6 @@ $(document).ready(function() {
                 window.location.replace('/');
                 //::TODO ignore login for test purpose done
             }
-
         });
     });
 

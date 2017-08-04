@@ -62,9 +62,6 @@ under the License.
                     <span ng-if='row.triggerState != "NORMAL"' class = 'unnormal'>{{row.triggerState}}</span>
                 </td>
                 <td>{{row.interval}}</td>
-<!--                 <td ng-if='row.periodTime<60'>{{row.periodTime}}s</td>
-                <td ng-if='row.periodTime>=60 && row.periodTime<3600'>{{row.periodTime/60}}min</td>
-                <td ng-if='row.periodTime>=3600 && row.periodTime<86400'>{{row.periodTime/3600}}h</td> -->
                 <td>
                     &nbsp;
                     <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
@@ -94,7 +91,6 @@ under the License.
                             <td>{{item.sessionId}}</td>
                             <td>{{item.timestamp | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
                             <td>{{item.state}}</td>
-
                         </tr>
                         <br>
 
@@ -112,7 +108,8 @@ under the License.
             <tfoot>
             <tr>
                 <td colspan="8" class="text-right">
-                    <div  st-items-by-page="10" st-pagination="" st-displayed-pages="10"></div>
+                    <div  st-items-by-page="10" st-pagination="" st-displayed-pages="10">
+                    </div>
                 </td>
             </tr>
             </tfoot>

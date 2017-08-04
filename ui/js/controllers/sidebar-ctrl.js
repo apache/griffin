@@ -33,8 +33,8 @@ define(['./module'], function(controllers) {
         $scope.finalData = [];
         $scope.metricData = [];
 
-
         function pageInit() {
+          var allDataassets = $config.uri.dataassetlist;
               var health_url = $config.uri.statistics;
               $scope.status = new Object();
               $http.get(health_url).then(function successCallback(response){
@@ -46,7 +46,16 @@ define(['./module'], function(controllers) {
               },function errorCallback(response){
 
               });
-              
+              var dataasset = 0;
+              $http.get(allDataassets).then(function successCallback(data) {
+                angular.forEach(data.data,function(db){
+                  angular.forEach(db,function(table){
+                    dataasset = dataasset + 1;
+                  });
+                });
+                $scope.dataasset = dataasset;
+              });
+
         }
 
         $scope.$watch(function(){return $routeParams.sysName;}, function(value){
@@ -106,6 +115,7 @@ define(['./module'], function(controllers) {
                         $scope.metricNameUnique.push(name);
                  }
                });
+               $scope.metricsCount = $scope.metricNameUnique.length;
 
                for(var i = 0;i<$scope.myData.length;i++){
             //push every point to its metric

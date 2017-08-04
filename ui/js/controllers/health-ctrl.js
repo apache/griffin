@@ -33,12 +33,8 @@ define(['./module'], function (controllers) {
         $scope.finalData = [];
         function pageInit() {
             $scope.$emit('initReq');
-
-//            var url = $config.uri.heatmap;
-             var url_dashboard = $config.uri.dashboard ;
-//            var url_dashboard = 'data.json';
-             var url_organization = $config.uri.organization;
-//            var url_organization = 'org.json';
+            var url_dashboard = $config.uri.dashboard ;
+            var url_organization = $config.uri.organization;
             $http.get(url_organization).then(function successCallback(res){
                var orgNode = null;
                console.log(res);
