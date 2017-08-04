@@ -19,17 +19,14 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import org.apache.griffin.core.error.Exception.HiveConnectionException;
+import org.apache.griffin.core.error.Exception.GriffinException.HiveConnectionException;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -55,11 +52,8 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         else return dbName;
     }
 
-    @Retryable(value = { MetaException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
     @Override
-    public Iterable<String> getAllDatabases() throws HiveConnectionException {
+    public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
             results = client.getAllDatabases();
@@ -70,11 +64,9 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return results;
     }
 
-    @Retryable(value = { MetaException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
+
     @Override
-    public Iterable<String> getAllTableNames(String dbName) throws HiveConnectionException {
+    public Iterable<String> getAllTableNames(String dbName) {
         Iterable<String> results = null;
         String useDbName = getUseDbName(dbName);
         try {
@@ -86,11 +78,9 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return results;
     }
 
-    @Retryable(value = { TException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
+
     @Override
-    public List<Table> getAllTable(String db) throws HiveConnectionException {
+    public List<Table> getAllTable(String db) {
         List<Table> results = new ArrayList<Table>();
         String useDbName = getUseDbName(db);
         try {
@@ -106,11 +96,9 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return results;
     }
 
-    @Retryable(value = { TException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
+
     @Override
-    public Map<String,List<Table>> getAllTable() throws HiveConnectionException {
+    public Map<String,List<Table>> getAllTable() {
         Map<String,List<Table>> results = new HashMap<String, List<Table>>();
         Iterable<String> dbs = getAllDatabases();
         for(String db: dbs){
@@ -131,11 +119,9 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return results;
     }
 
-    @Retryable(value = { TException.class },
-            maxAttempts = 2,
-            backoff = @Backoff(delay = 5000))
+
     @Override
-    public Table getTable(String dbName, String tableName) throws HiveConnectionException {
+    public Table getTable(String dbName, String tableName) {
         Table result = null;
         String useDbName = getUseDbName(dbName);
         try {
@@ -147,7 +133,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         return result;
     }
 
-    private void reconnect() throws HiveConnectionException {
+    private void reconnect() {
         try {
             client.reconnect();
         } catch (MetaException e) {

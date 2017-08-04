@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -42,14 +40,12 @@ public class JobController {
     @Autowired
     private JobService jobService;
 
-    @RequestMapping("/")
+    @RequestMapping(value = "/",method = RequestMethod.GET)
     public List<Map<String, Serializable>> getJobs() {
         return jobService.getJobs();
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    @ResponseBody
-    @Produces(MediaType.APPLICATION_JSON)
     public GriffinOperationMessage addJob(@RequestParam("group") String groupName,
                                            @RequestParam("jobName") String jobName,
                                            @RequestParam("measureName") String measureName,

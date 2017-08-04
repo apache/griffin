@@ -22,6 +22,7 @@ package org.apache.griffin.core.metastore.kafka;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Config;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
+import org.apache.griffin.core.error.Exception.GriffinException.KafkaConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +62,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
             result = res.getBody();
         } catch (Exception e) {
             log.error("Exception getting schema of id " + id + " : ", e.getMessage());
+            throw new KafkaConnectionException();
         }
         return result;
     }
@@ -75,6 +77,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
             result = Arrays.asList(res.getBody());
         } catch (Exception e) {
             log.error("Exception getting subjects : ", e.getMessage());
+            throw new KafkaConnectionException();
         }
         return result;
     }
@@ -89,6 +92,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
             result = Arrays.asList(res.getBody());
         } catch (Exception e) {
             log.error("Exception getting subject " + subject + " versions : ", e.getMessage());
+            throw new KafkaConnectionException();
         }
         return result;
     }
@@ -103,6 +107,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
             result = res.getBody();
         } catch (Exception e) {
             log.error("Exception getting subject " + subject + " with version " + version + " : ", e.getMessage());
+            throw new KafkaConnectionException();
         }
         return result;
     }
@@ -117,6 +122,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
             result = res.getBody();
         } catch (Exception e) {
             log.error("Exception getting top level config : ", e.getMessage());
+            throw new KafkaConnectionException();
         }
         return result;
     }
@@ -131,6 +137,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
             result = res.getBody();
         } catch (Exception e) {
             log.error("Exception getting subject " + subject + " level config : ", e.getMessage());
+            throw new KafkaConnectionException();
         }
         return result;
     }

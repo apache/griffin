@@ -45,6 +45,8 @@ public enum GriffinOperationMessage {
     CREATE_MEASURE_FAIL_DUPLICATE(408, "Create Measure Failed, duplicate records"),
     HIVE_CONNECT_FAILED(409,"Hive Connect Failed"),
     KAFKA_CONNECT_FAILED(410,"Kafka Connect Failed"),
+    GET_HEALTHINFO_FAIL(411, "Get HealthInfo Failed"),
+    Get_JOBS_FAIL(412, "Get Jobs Failed")
     ;
 
     private final int code;
