@@ -76,7 +76,7 @@ public class MeasureControllerTest {
     public void testGetMeasuresById() throws IOException,Exception{
         Measure measure = createATestMeasure("viewitem_hourly","bullseye");
 
-        given(service.getMeasuresById(1L)).willReturn(measure);
+        given(service.getMeasureById(1L)).willReturn(measure);
 
         mvc.perform(get("/measures/1").contentType(MediaType.APPLICATION_JSON))
 //                .andDo(print())
@@ -89,7 +89,7 @@ public class MeasureControllerTest {
     public void testGetMeasureByName() throws IOException,Exception{
         Measure measure = createATestMeasure("viewitem_hourly","bullseye");
 
-        given(service.getMeasuresByName("viewitem_hourly")).willReturn(measure);
+        given(service.getMeasureByName("viewitem_hourly")).willReturn(measure);
 
         mvc.perform(get("/measures/findByName/viewitem_hourly").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -98,7 +98,7 @@ public class MeasureControllerTest {
     }
     @Test
     public void testDeleteMeasuresById() throws Exception{
-        Mockito.doNothing().when(service).deleteMeasuresById(1L);
+        Mockito.doNothing().when(service).deleteMeasureById(1L);
 
         mvc.perform(delete("/measures/deleteById/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -108,7 +108,7 @@ public class MeasureControllerTest {
     @Test
     public void testDeleteMeasuresByName() throws Exception{
         String measureName="viewitem_hourly";
-        given(service.deleteMeasuresByName(measureName)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS);
+        given(service.deleteMeasureByName(measureName)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS);
 
         mvc.perform(delete("/measures/deleteByName/"+measureName).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -150,7 +150,7 @@ public class MeasureControllerTest {
         Measure measure=createATestMeasure(measureName,org);
         ObjectMapper mapper=new ObjectMapper();
         String measureJson=mapper.writeValueAsString(measure);
-        given(service.createNewMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
+        given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
 
         mvc.perform(post("/measures/add").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())

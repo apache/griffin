@@ -37,8 +37,7 @@ under the License.
         <hadoop.version>2.6.0</hadoop.version>
         <hive.version>1.2.1</hive.version>
         <scala.version>2.10</scala.version>
-        <spring.boot.version>1.5.2.RELEASE</spring.boot.version>
-        <spring.version>4.3.2.RELEASE</spring.version>
+        <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
         <confluent.version>3.2.0</confluent.version>
         <quartz.version>2.2.1</quartz.version>
         <start-class>org.apache.griffin.core.GriffinWebApplication</start-class>

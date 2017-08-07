@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.job.config.Conf;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.LivySessionStateMap;
 import org.apache.griffin.core.job.entity.SparkJobDO;
@@ -50,11 +49,8 @@ public class SparkSubmitJob implements Job {
 
     @Autowired
     private MeasureRepo measureRepo;
-
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
-
-
     @Autowired
     private Properties sparkJobProps;
 
@@ -82,18 +78,20 @@ public class SparkSubmitJob implements Job {
     private String sourcePattern;
     private String targetPattern;
     private String dataStartTimestamp;
-    private String eachJoblastTimestamp;
+    private String lastDataStartTimestamp;
     private String periodTime;
 
     private RestTemplate restTemplate = new RestTemplate();
-
-
     private String uri;
     private SparkJobDO sparkJobDO = new SparkJobDO();
 
     public SparkSubmitJob() {
     }
 
+    /**
+     * execute method is used to submit sparkJobDO to Livy.
+     * @param context
+     */
     @Override
     public void execute(JobExecutionContext context) {
         patItem = sparkJobProps.getProperty("sparkJob.dateAndHour");
@@ -103,17 +101,17 @@ public class SparkSubmitJob implements Job {
         JobDetail jd = context.getJobDetail();
         String groupName=jd.getJobDataMap().getString("groupName");
         String jobName=jd.getJobDataMap().getString("jobName");
-        String measureName = jd.getJobDataMap().getString("measure");
+        String measureName = jd.getJobDataMap().getString("measureName");
         measure = measureRepo.findByName(measureName);
         if (measure==null) {
             LOGGER.error(measureName + " is not find!");
             return;
         }
-        sourcePattern = jd.getJobDataMap().getString("sourcePat");
-        targetPattern = jd.getJobDataMap().getString("targetPat");
+        sourcePattern = jd.getJobDataMap().getString("sourcePattern");
+        targetPattern = jd.getJobDataMap().getString("targetPattern");
         dataStartTimestamp = jd.getJobDataMap().getString("dataStartTimestamp");
-        eachJoblastTimestamp = jd.getJobDataMap().getString("lastTime");
-        LOGGER.info(eachJoblastTimestamp);
+        lastDataStartTimestamp = jd.getJobDataMap().getString("lastDataStartTimestamp");
+        LOGGER.info("lastDataStartTimestamp:"+lastDataStartTimestamp);
         periodTime = jd.getJobDataMap().getString("periodTime");
         //prepare current system timestamp
         long currentSystemTimestamp = System.currentTimeMillis();
@@ -122,13 +120,13 @@ public class SparkSubmitJob implements Job {
             sourcePatternItemSet = sourcePattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getSource(), sourcePatternItemSet, partitionItemSet, currentTimstamp);
-            jd.getJobDataMap().put("lastTime", currentTimstamp + "");
+            jd.getJobDataMap().put("lastDataStartTimestamp", currentTimstamp + "");
         }
         if (StringUtils.isNotEmpty(targetPattern)) {
             targetPatternItemSet = targetPattern.split("-");
             long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
             setDataConnectorPartitions(measure.getTarget(), targetPatternItemSet, partitionItemSet, currentTimstamp);
-            jd.getJobDataMap().put("lastTime", currentTimstamp + "");
+            jd.getJobDataMap().put("lastDataStartTimestamp", currentTimstamp + "");
         }
         //final String uri = "http://10.9.246.187:8998/batches";
         setSparkJobDO();
@@ -162,12 +160,17 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    public Map<String, String> genPartitions(String[] patternItemSet, String[] partitionItemSet, long timestamp) {
+    public Map<String, String> genPartitionMap(String[] patternItemSet, String[] partitionItemSet, long timestamp) {
+        /**
+         * patternItemSet:{YYYYMMdd,HH}
+         * partitionItemSet:{dt,hour}
+         * res:{dt=20170804,hour=09}
+         */
         int comparableSizeMin=Math.min(patternItemSet.length,partitionItemSet.length);
         Map<String, String> res = new HashMap<>();
         for (int i = 0; i < comparableSizeMin; i++) {
             /**
-             * in order to get a standard date like 20170427 01
+             * in order to get a standard date like 20170427 01 (YYYYMMdd-HH)
              */
             String pattrn = patternItemSet[i].replace("mm", "MM");
             pattrn = pattrn.replace("DD", "dd");
@@ -179,7 +182,11 @@ public class SparkSubmitJob implements Job {
     }
 
     public void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItemSet, long timestamp) {
-        Map<String, String> partitionItemMap = genPartitions(patternItemSet, partitionItemSet, timestamp);
+        Map<String, String> partitionItemMap = genPartitionMap(patternItemSet, partitionItemSet, timestamp);
+        /**
+         * partitions must be a string like: "dt=20170301, hour=12"
+         * partitionItemMap.toString() is like "{dt=20170301, hour=12}"
+         */
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
 
         Map<String, String> configMap = dc.getConfigInMaps();
@@ -194,11 +201,11 @@ public class SparkSubmitJob implements Job {
 
     public long setCurrentTimestamp(long currentSystemTimestamp) {
         long currentTimstamp=0;
-        if (StringUtils.isNotEmpty(eachJoblastTimestamp)) {
+        if (StringUtils.isNotEmpty(lastDataStartTimestamp)) {
             try {
-                currentTimstamp = Long.parseLong(eachJoblastTimestamp) + Integer.parseInt(periodTime) * 1000;
+                currentTimstamp = Long.parseLong(lastDataStartTimestamp) + Integer.parseInt(periodTime) * 1000;
             }catch (Exception e){
-                LOGGER.info("lasttime or periodTime format problem! "+e);
+                LOGGER.info("lastDataStartTimestamp or periodTime format problem! "+e);
             }
         } else {
             if (StringUtils.isNotEmpty(dataStartTimestamp)) {
@@ -218,7 +225,7 @@ public class SparkSubmitJob implements Job {
         sparkJobDO.setFile(sparkJobProps.getProperty("sparkJob.file"));
         sparkJobDO.setClassName(sparkJobProps.getProperty("sparkJob.className"));
 
-        List<String> args = new ArrayList<>();
+        List<String> args = new ArrayList<String>();
         args.add(sparkJobProps.getProperty("sparkJob.args_1"));
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String measureJson = "";
@@ -238,8 +245,8 @@ public class SparkSubmitJob implements Job {
         sparkJobDO.setDriverMemory(sparkJobProps.getProperty("sparkJob.driverMemory"));
         sparkJobDO.setExecutorMemory(sparkJobProps.getProperty("sparkJob.executorMemory"));
 
-        Conf conf = new Conf();
-        conf.setSpark_jars_packages(sparkJobProps.getProperty("sparkJob.spark.jars.packages"));
+        Map<String,String> conf=new HashMap<String,String>();
+        conf.put("spark.jars.packages",sparkJobProps.getProperty("sparkJob.spark.jars.packages"));
         sparkJobDO.setConf(conf);
 
         List<String> jars = new ArrayList<>();

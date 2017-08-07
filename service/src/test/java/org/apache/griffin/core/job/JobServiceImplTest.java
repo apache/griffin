@@ -110,7 +110,7 @@ public class JobServiceImplTest {
         JobDataMap jobDataMap=Mockito.mock(JobDataMap.class);
         given(jd.getJobDataMap()).willReturn(jobDataMap);
 
-        service.setJobsByKey(list,scheduler,jobKey);
+//        service.setJobsByKey(list,scheduler,jobKey);
 
     }
 

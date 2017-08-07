@@ -40,19 +40,22 @@ public class MeasureServiceImpl implements MeasureService{
     @Autowired
     MeasureRepo measureRepo;
 
+    @Override
     public Iterable<Measure> getAllMeasures() {
         return measureRepo.findAll();
     }
 
-    public Measure getMeasuresById(@PathVariable("id") long id) {
+    @Override
+    public Measure getMeasureById(@PathVariable("id") long id) {
         return measureRepo.findOne(id);
     }
 
-    public Measure getMeasuresByName(@PathVariable("measureName") String measureName) {
+    @Override
+    public Measure getMeasureByName(@PathVariable("measureName") String measureName) {
         return measureRepo.findByName(measureName);
     }
-
-    public GriffinOperationMessage deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId) {
+    @Override
+    public GriffinOperationMessage deleteMeasureById(@PathVariable("MeasureId") Long MeasureId) {
         Measure temp_mesaure=measureRepo.findOne(MeasureId);
         if (temp_mesaure==null){
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
@@ -62,8 +65,8 @@ public class MeasureServiceImpl implements MeasureService{
         }
     }
 
-
-    public GriffinOperationMessage deleteMeasuresByName(@PathVariable("measureName") String measureName) {
+    @Override
+    public GriffinOperationMessage deleteMeasureByName(@PathVariable("measureName") String measureName) {
         Measure temp_mesaure=measureRepo.findByName(measureName);
         if(temp_mesaure==null){
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
@@ -74,7 +77,8 @@ public class MeasureServiceImpl implements MeasureService{
         }
     }
 
-    public GriffinOperationMessage createNewMeasure(@RequestBody Measure measure) {
+    @Override
+    public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
         String name=measure.getName();
         Measure temp_mesaure=measureRepo.findByName(name);
         if (temp_mesaure==null){
@@ -89,6 +93,7 @@ public class MeasureServiceImpl implements MeasureService{
         }
     }
 
+    @Override
     public List<String> getAllMeasureNameByOwner(String owner){
         List<String> res=new ArrayList<String>();
         for (Measure measure:measureRepo.findAll()){
