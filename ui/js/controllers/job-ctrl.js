@@ -34,22 +34,22 @@ define(['./module'], function (controllers) {
                 angular.forEach(data.data,function(job){
                     job.Interval = job.interval;
                     if(job.Interval<60)
-                        job.Interval = job.periodTime + 's';
+                        job.Interval = job.interval + 's';
                     else if(job.Interval<3600)
                     {
                         if(job.Interval%60==0)
-                            job.Interval = job.periodTime/60 + 'min';
+                            job.Interval = job.interval/60 + 'min';
                         else 
-                            job.Interval = (job.periodTime - job.periodTime%60)/60 + 'min'+job.periodTime%60 + 's';
+                            job.Interval = (job.interval - job.interval%60)/60 + 'min'+job.interval%60 + 's';
                     }
                     else 
                     {
                         if(job.Interval%3600==0)
-                            job.Interval = job.periodTime/3600 + 'h';
+                            job.Interval = job.interval/3600 + 'h';
                         else
                         {
-                            job.Interval = (job.periodTime - job.periodTime%3600)/3600 + 'h';
-                            var s = job.periodTime%3600;
+                            job.Interval = (job.interval - job.interval%3600)/3600 + 'h';
+                            var s = job.interval%3600;
                             job.Interval = job.Interval + (s-s%60)/60+'min'+s%60+'s';
                         }
                     }
