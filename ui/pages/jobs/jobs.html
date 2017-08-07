@@ -51,8 +51,8 @@ under the License.
                     {{row.jobName}}
                     <!-- -{{(row.createTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }} -->
                 </td>
-                <td>{{row.sourcePat}}</td>
-                <td>{{row.targetPat|strmap:'modeltype'}}</td>
+                <td>{{row.sourcePattern}}</td>
+                <td>{{row.targetPattern|strmap:'modeltype'}}</td>
                 <td ng-show="row.previousFireTime==-1">--/--/-- &nbsp;&nbsp;--:--</td>
                 <td ng-show="row.previousFireTime!=-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
                 <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
@@ -61,7 +61,7 @@ under the License.
                     </span>
                     <span ng-if='row.triggerState != "NORMAL"' class = 'unnormal'>{{row.triggerState}}</span>
                 </td>
-                <td>{{row.interval}}</td>
+                <td>{{row.Interval}}</td>
                 <td>
                     &nbsp;
                     <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">

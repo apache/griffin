@@ -108,10 +108,10 @@ define(['./module'], function(controllers) {
                         return;
                     }
                     this.data={
-                        "sourcePat":$scope.sourcePat,
-                        "targetPat":$scope.targetPat,
+                        "sourcePattern":$scope.sourcePat,
+                        "targetPattern":$scope.targetPat,
                         "jobStartTime":startTime,
-                        "periodTime":period,
+                        "interval":period,
                         "groupName":'BA',
                     };
                     $('#confirm-job').modal('show');

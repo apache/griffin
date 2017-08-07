@@ -32,25 +32,25 @@ define(['./module'], function (controllers) {
         function getJobs(start,number,tableState){
             $http.get(allJobs).then(function successCallback(data) {
                 angular.forEach(data.data,function(job){
-                    job.interval = job.periodTime;
-                    if(job.interval<60)
-                        job.interval = job.periodTime + 's';
-                    else if(job.interval<3600)
+                    job.Interval = job.interval;
+                    if(job.Interval<60)
+                        job.Interval = job.periodTime + 's';
+                    else if(job.Interval<3600)
                     {
-                        if(job.interval%60==0)
-                            job.interval = job.periodTime/60 + 'min';
+                        if(job.Interval%60==0)
+                            job.Interval = job.periodTime/60 + 'min';
                         else 
-                            job.interval = (job.periodTime - job.periodTime%60)/60 + 'min'+job.periodTime%60 + 's';
+                            job.Interval = (job.periodTime - job.periodTime%60)/60 + 'min'+job.periodTime%60 + 's';
                     }
                     else 
                     {
-                        if(job.interval%3600==0)
-                            job.interval = job.periodTime/3600 + 'h';
+                        if(job.Interval%3600==0)
+                            job.Interval = job.periodTime/3600 + 'h';
                         else
                         {
-                            job.interval = (job.periodTime - job.periodTime%3600)/3600 + 'h';
+                            job.Interval = (job.periodTime - job.periodTime%3600)/3600 + 'h';
                             var s = job.periodTime%3600;
-                            job.interval = job.interval + (s-s%60)/60+'min'+s%60+'s';
+                            job.Interval = job.Interval + (s-s%60)/60+'min'+s%60+'s';
                         }
                     }
                     var length = job.jobName.split('-').length;
