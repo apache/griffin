@@ -95,7 +95,9 @@ class StreamingAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAft
     }
 
     val metricName = userParam.name
+    val sparkParam = envParam.sparkParam
     val conf = new SparkConf().setMaster("local[*]").setAppName(metricName)
+    conf.setAll(sparkParam.config)
     sc = new SparkContext(conf)
     sc.setLogLevel(envParam.sparkParam.logLevel)
     sqlContext = new SQLContext(sc)

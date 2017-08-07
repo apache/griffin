@@ -4,7 +4,16 @@
     "checkpoint.dir": "hdfs://localhost/test/griffin/cp",
     "batch.interval": "2s",
     "process.interval": "10s",
-    "config": {}
+    "config": {
+      "spark.task.maxFailures": 5,
+      "spark.streaming.kafkaMaxRatePerPartition": 1000,
+      "spark.streaming.concurrentJobs": 4,
+      "spark.yarn.maxAppAttempts": 5,
+      "spark.yarn.am.attemptFailuresValidityInterval": "1h",
+      "spark.yarn.max.executor.failures": 120,
+      "spark.yarn.executor.failuresValidityInterval": "1h",
+      "spark.hadoop.fs.hdfs.impl.disable.cache": true
+    }
   },
 
   "persist": [

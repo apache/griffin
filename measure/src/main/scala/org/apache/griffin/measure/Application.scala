@@ -97,16 +97,23 @@ object Application extends Loggable {
     // algorithm run
     algo.run match {
       case Failure(ex) => {
-        error(ex.getMessage)
-        sys.exit(-5)
+        error(s"app error: ${ex.getMessage}")
+
+        procType match {
+          case ProcessType.streaming() => {
+            // streaming need to attempt more times by spark streaming itself
+            throw ex
+          }
+          case _ => {
+            shutdown
+            sys.exit(-5)
+          }
+        }
       }
       case _ => {
-        info("calculation finished")
+        info("app finished and success")
       }
     }
-
-    // shut down
-    shutdown
   }
 
   private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {
