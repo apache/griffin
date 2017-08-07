@@ -54,19 +54,14 @@ import static org.quartz.TriggerKey.triggerKey;
 
 @Service
 public class JobServiceImpl implements JobService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
 
     @Autowired
     SchedulerFactoryBean factory;
     @Autowired
     JobInstanceRepo jobInstanceRepo;
-
-    public static final String ACCURACY_BATCH_GROUP = "BA";
-
     @Autowired
     Properties sparkJobProps;
-
 
     public JobServiceImpl(){
     }
@@ -78,7 +73,7 @@ public class JobServiceImpl implements JobService {
         try {
             for (String groupName : scheduler.getJobGroupNames()) {
                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
-                    setJobsByKey(list,scheduler, jobKey);
+                    list.add(genJobInfoMap(scheduler,jobKey));
                 }
             }
         } catch (SchedulerException e) {
@@ -88,47 +83,41 @@ public class JobServiceImpl implements JobService {
         return list;
     }
 
-    public void setJobsByKey(List<Map<String, Serializable>> list,Scheduler scheduler, JobKey jobKey) throws SchedulerException {
+    public Map genJobInfoMap(Scheduler scheduler,JobKey jobKey) throws SchedulerException {
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
-        if (triggers.size() > 0) {
-            //always get next run
-            Map<String, Serializable> map = new HashMap<>();
-            setMap(map,scheduler,jobKey);
-            list.add(map);
+        Map<String, Serializable> jobInfoMap = new HashMap<>();
+        if (triggers==null || triggers.size() == 0){
+            return jobInfoMap;
         }
-    }
-
-
-    public void setMap(Map<String, Serializable> map,Scheduler scheduler,JobKey jobKey) throws SchedulerException {
-        List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         JobDetail jd = scheduler.getJobDetail(jobKey);
         Date nextFireTime = triggers.get(0).getNextFireTime();
         Date previousFireTime=triggers.get(0).getPreviousFireTime();
         Trigger.TriggerState triggerState=scheduler.getTriggerState(triggers.get(0).getKey());
 
-        map.put("jobName", jobKey.getName());
-        map.put("groupName", jobKey.getGroup());
+        jobInfoMap.put("jobName", jobKey.getName());
+        jobInfoMap.put("groupName", jobKey.getGroup());
         if (nextFireTime!=null){
-            map.put("nextFireTime", nextFireTime.getTime());
+            jobInfoMap.put("nextFireTime", nextFireTime.getTime());
         }
         else {
-            map.put("nextFireTime", -1);
+            jobInfoMap.put("nextFireTime", -1);
         }
         if (previousFireTime!=null) {
-            map.put("previousFireTime", previousFireTime.getTime());
+            jobInfoMap.put("previousFireTime", previousFireTime.getTime());
         }
         else {
-            map.put("previousFireTime", -1);
+            jobInfoMap.put("previousFireTime", -1);
         }
-        map.put("triggerState",triggerState);
-        map.put("measure", jd.getJobDataMap().getString("measure"));
-        map.put("sourcePat",jd.getJobDataMap().getString("sourcePat"));
-        map.put("targetPat",jd.getJobDataMap().getString("targetPat"));
+        jobInfoMap.put("triggerState",triggerState);
+        jobInfoMap.put("measureName", jd.getJobDataMap().getString("measureName"));
+        jobInfoMap.put("sourcePat",jd.getJobDataMap().getString("sourcePattern"));
+        jobInfoMap.put("targetPat",jd.getJobDataMap().getString("targetPattern"));
         if(StringUtils.isNotEmpty(jd.getJobDataMap().getString("dataStartTimestamp"))) {
-            map.put("dataStartTimestamp", jd.getJobDataMap().getString("dataStartTimestamp"));
+            jobInfoMap.put("dataStartTimestamp", jd.getJobDataMap().getString("dataStartTimestamp"));
         }
-        map.put("jobStartTime",jd.getJobDataMap().getString("jobStartTime"));
-        map.put("periodTime",jd.getJobDataMap().getString("periodTime"));
+        jobInfoMap.put("jobStartTime",jd.getJobDataMap().getString("jobStartTime"));
+        jobInfoMap.put("periodTime",jd.getJobDataMap().getString("periodTime"));
+        return jobInfoMap;
     }
 
     @Override
@@ -153,15 +142,15 @@ public class JobServiceImpl implements JobService {
             JobDetail jobDetail;
             if (scheduler.checkExists(jobKey)) {
                 jobDetail = scheduler.getJobDetail(jobKey);
-                setJobDetail(jobDetail, jobRequestBody,measureName,groupName,jobName);
+                setJobData(jobDetail, jobRequestBody,measureName,groupName,jobName);
                 scheduler.addJob(jobDetail, true);
             } else {
                 jobDetail = newJob(SparkSubmitJob.class)
                         .storeDurably()
                         .withIdentity(jobKey)
                         .build();
-                //set JobDetail
-                setJobDetail(jobDetail, jobRequestBody,measureName,groupName,jobName);
+                //set JobData
+                setJobData(jobDetail, jobRequestBody,measureName,groupName,jobName);
                 scheduler.addJob(jobDetail, false);
             }
             Trigger trigger = newTrigger()
@@ -192,14 +181,14 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    public void setJobDetail(JobDetail jobDetail, JobRequestBody jobRequestBody, String measureName, String groupName, String jobName){
-        jobDetail.getJobDataMap().put("measure", measureName);
-        jobDetail.getJobDataMap().put("sourcePat", jobRequestBody.getSourcePat());
-        jobDetail.getJobDataMap().put("targetPat", jobRequestBody.getTargetPat());
+    public void setJobData(JobDetail jobDetail, JobRequestBody jobRequestBody, String measureName, String groupName, String jobName){
+        jobDetail.getJobDataMap().put("measureName", measureName);
+        jobDetail.getJobDataMap().put("sourcePattern", jobRequestBody.getSourcePat());
+        jobDetail.getJobDataMap().put("targetPattern", jobRequestBody.getTargetPat());
         jobDetail.getJobDataMap().put("dataStartTimestamp", jobRequestBody.getDataStartTimestamp());
         jobDetail.getJobDataMap().put("jobStartTime", jobRequestBody.getJobStartTime());
         jobDetail.getJobDataMap().put("periodTime", jobRequestBody.getPeriodTime());
-        jobDetail.getJobDataMap().put("lastTime", "");
+        jobDetail.getJobDataMap().put("lastDataStartTimestamp", "");
         jobDetail.getJobDataMap().put("groupName",groupName);
         jobDetail.getJobDataMap().put("jobName",jobName);
     }
@@ -222,6 +211,21 @@ public class JobServiceImpl implements JobService {
         //query and return instances
         Pageable pageRequest=new PageRequest(page,size, Sort.Direction.DESC,"timestamp");
         return jobInstanceRepo.findByGroupNameAndJobName(group,jobName,pageRequest);
+    }
+
+    @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
+    public void syncInstancesOfAllJobs(){
+        List<Object> groupJobList=jobInstanceRepo.findGroupWithJobName();
+        for (Object groupJobObj : groupJobList){
+            try{
+                Object[] groupJob=(Object[])groupJobObj;
+                if (groupJob!=null && groupJob.length==2){
+                    syncInstancesOfJob(groupJob[0].toString(),groupJob[1].toString());
+                }
+            }catch (Exception e){
+                LOGGER.error("schedule update instances of all jobs failed. "+e);
+            }
+        }
     }
 
     public void syncInstancesOfJob(String group, String jobName) {
@@ -259,21 +263,6 @@ public class JobServiceImpl implements JobService {
                 continue;
             }
             jobInstanceRepo.setFixedStateAndappIdFor(jobInstance.getId(),jobInstance.getState(),jobInstance.getAppId());
-        }
-    }
-
-    @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
-    public void syncInstancesOfAllJobs(){
-        List<Object> groupJobList=jobInstanceRepo.findGroupWithJobName();
-        for (Object groupJobObj : groupJobList){
-            try{
-                Object[] groupJob=(Object[])groupJobObj;
-                if (groupJob!=null && groupJob.length==2){
-                    syncInstancesOfJob(groupJob[0].toString(),groupJob[1].toString());
-                }
-            }catch (Exception e){
-                LOGGER.error("schedule update instances of all jobs failed. "+e);
-            }
         }
     }
 

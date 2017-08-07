@@ -19,10 +19,9 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import org.apache.griffin.core.job.config.Conf;
-
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by xiangrchen on 4/26/17.
@@ -77,7 +76,7 @@ public class SparkJobDO implements Serializable{
 
     private String executorMemory;
 
-    private Conf conf;
+    private Map<String,String> conf;
 
     private List<String> jars;
 
@@ -155,11 +154,11 @@ public class SparkJobDO implements Serializable{
         this.executorMemory = executorMemory;
     }
 
-    public Conf getConf() {
+    public Map<String, String> getConf() {
         return conf;
     }
 
-    public void setConf(Conf conf) {
+    public void setConf(Map<String, String> conf) {
         this.conf = conf;
     }
 

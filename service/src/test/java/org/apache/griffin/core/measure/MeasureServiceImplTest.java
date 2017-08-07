@@ -78,7 +78,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testGetMeasuresById(){
         try {
-            Measure tmp = service.getMeasuresById(1);
+            Measure tmp = service.getMeasureById(1);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get Measure in db By Id: 1");
@@ -88,7 +88,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testGetMeasuresByName(){
         try {
-            Measure tmp = service.getMeasuresByName("viewitem_hourly");
+            Measure tmp = service.getMeasureByName("viewitem_hourly");
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get Measure in db By name: viewitem_hourly");
@@ -98,7 +98,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testDeleteMeasuresById(){
         try {
-            service.deleteMeasuresById(1L);
+            service.deleteMeasureById(1L);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot delete Measure in db By Id: 1");
@@ -110,14 +110,14 @@ public class MeasureServiceImplTest {
         try {
             String measureName="viewitem_hourly";
             given(measureRepo.findByName(measureName)).willReturn(null);
-            GriffinOperationMessage message=service.deleteMeasuresByName("viewitem_hourly");
+            GriffinOperationMessage message=service.deleteMeasureByName("viewitem_hourly");
             assertEquals(message,GriffinOperationMessage.RESOURCE_NOT_FOUND);
             assertTrue(true);
 
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
             given(measureRepo.findByName(measureName)).willReturn(measure);
-            GriffinOperationMessage message1=service.deleteMeasuresByName("viewitem_hourly");
+            GriffinOperationMessage message1=service.deleteMeasureByName("viewitem_hourly");
             assertEquals(message1,GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS);
         }catch (Throwable t){
             fail("Cannot delete Measure in db By name: viewitem_hourly");
@@ -131,18 +131,18 @@ public class MeasureServiceImplTest {
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
             given(measureRepo.findByName(measureName)).willReturn(null);
-            GriffinOperationMessage message=service.createNewMeasure(measure);
+            GriffinOperationMessage message=service.createMeasure(measure);
             assertEquals(message,GriffinOperationMessage.CREATE_MEASURE_FAIL);
             assertTrue(true);
 
             Measure measure1=createATestMeasure(measureName,"bullseye1");
             given(measureRepo.findByName(measureName)).willReturn(measure1);
-            GriffinOperationMessage message1=service.createNewMeasure(measure);
+            GriffinOperationMessage message1=service.createMeasure(measure);
             assertEquals(message1,GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
 
             given(measureRepo.findByName(measureName)).willReturn(null);
             given(measureRepo.save(measure)).willReturn(measure);
-            GriffinOperationMessage message2=service.createNewMeasure(measure);
+            GriffinOperationMessage message2=service.createMeasure(measure);
             assertEquals(message2,GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
         }catch (Throwable t){
             fail("Cannot create new measure viewitem_hourly");

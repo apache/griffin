@@ -29,19 +29,19 @@ public interface MeasureService {
 
     public Iterable<Measure> getAllMeasures();
 
-    public Measure getMeasuresById(long id);
+    public Measure getMeasureById(long id);
 
-    public Measure getMeasuresByName(String measureName);
-
-
-    public GriffinOperationMessage deleteMeasuresById(Long id);
+    public Measure getMeasureByName(String measureName);
 
 
-    public GriffinOperationMessage deleteMeasuresByName(String measureName) ;
+    public GriffinOperationMessage deleteMeasureById(Long id);
+
+
+    public GriffinOperationMessage deleteMeasureByName(String measureName) ;
 
     public GriffinOperationMessage updateMeasure(Measure measure);
 
     public List<String> getAllMeasureNameByOwner(String owner);
 
-    public GriffinOperationMessage createNewMeasure(Measure measure);
+    public GriffinOperationMessage createMeasure(Measure measure);
 }

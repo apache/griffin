@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import io.swagger.annotations.*;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
@@ -29,34 +30,53 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+//@Api("MeasureController")
+
 public class MeasureController {
     private static final Logger log = LoggerFactory.getLogger(MeasureController.class);
 
     @Autowired
     MeasureService measureService;
+
+    @ApiOperation("get all measures")
+    @ApiResponses({
+            @ApiResponse(code=200,message="Successfully get all measures"),
+            @ApiResponse(code=401,message="You are not authorized to view the resource"),
+            @ApiResponse(code=404,message="The resource you were trying to reach is not found")
+    })
     @RequestMapping(value = "/measures",method = RequestMethod.GET)
     public Iterable<Measure> getAllMeasures() {
         return measureService.getAllMeasures();
     }
 
+
+    @ApiOperation("get measure by id")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query",name="id",dataType="Long",required=true,value="measureId",defaultValue="1")
+    })
+    @ApiResponses({
+            @ApiResponse(code=200,message="Successfully get measure by id"),
+            @ApiResponse(code=400,message="You are not authorized to view the resource"),
+            @ApiResponse(code=404,message="The resource you were trying to reach is not found")
+    })
     @RequestMapping(value = "/measure/{id}",method = RequestMethod.GET)
-    public Measure getMeasuresById(@PathVariable("id") long id) {
-        return measureService.getMeasuresById(id);
+    public Measure getMeasureById(@PathVariable("id") long id) {
+        return measureService.getMeasureById(id);
     }
 
     @RequestMapping(value = "/measure",method = RequestMethod.GET)
     public Measure getMeasureByName(@RequestParam("measureName") String measureName) {
-        return measureService.getMeasuresByName(measureName);
+        return measureService.getMeasureByName(measureName);
     }
 
     @RequestMapping(value = "/measure/{id}",method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteMeasureById(@PathVariable("id") Long id) {
-        return measureService.deleteMeasuresById(id);
+        return measureService.deleteMeasureById(id);
     }
 
     @RequestMapping(value = "/measure",method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteMeasureByName(@RequestParam("measureName") String measureName) {
-        return measureService.deleteMeasuresByName(measureName);
+        return measureService.deleteMeasureByName(measureName);
     }
 
     @RequestMapping(value = "/measure",method = RequestMethod.PUT)
@@ -71,6 +91,6 @@ public class MeasureController {
 
     @RequestMapping(value = "/measure", method = RequestMethod.POST)
     public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
-        return measureService.createNewMeasure(measure);
+        return measureService.createMeasure(measure);
     }
 }
