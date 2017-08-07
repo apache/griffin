@@ -47,6 +47,7 @@ case class BatchAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val sparkParam = envParam.sparkParam
 
       val conf = new SparkConf().setAppName(metricName)
+      conf.setAll(sparkParam.config)
       val sc = new SparkContext(conf)
       sc.setLogLevel(sparkParam.logLevel)
       val sqlContext = new HiveContext(sc)
