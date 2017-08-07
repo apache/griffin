@@ -79,7 +79,7 @@ public class SparkSubmitJob implements Job {
     private String targetPattern;
     private String dataStartTimestamp;
     private String lastDataStartTimestamp;
-    private String periodTime;
+    private String interval;
 
     private RestTemplate restTemplate = new RestTemplate();
     private String uri;
@@ -112,7 +112,7 @@ public class SparkSubmitJob implements Job {
         dataStartTimestamp = jd.getJobDataMap().getString("dataStartTimestamp");
         lastDataStartTimestamp = jd.getJobDataMap().getString("lastDataStartTimestamp");
         LOGGER.info("lastDataStartTimestamp:"+lastDataStartTimestamp);
-        periodTime = jd.getJobDataMap().getString("periodTime");
+        interval = jd.getJobDataMap().getString("interval");
         //prepare current system timestamp
         long currentSystemTimestamp = System.currentTimeMillis();
         LOGGER.info("currentSystemTimestamp: "+currentSystemTimestamp);
@@ -203,9 +203,9 @@ public class SparkSubmitJob implements Job {
         long currentTimstamp=0;
         if (StringUtils.isNotEmpty(lastDataStartTimestamp)) {
             try {
-                currentTimstamp = Long.parseLong(lastDataStartTimestamp) + Integer.parseInt(periodTime) * 1000;
+                currentTimstamp = Long.parseLong(lastDataStartTimestamp) + Integer.parseInt(interval) * 1000;
             }catch (Exception e){
-                LOGGER.info("lastDataStartTimestamp or periodTime format problem! "+e);
+                LOGGER.info("lastDataStartTimestamp or interval format problem! "+e);
             }
         } else {
             if (StringUtils.isNotEmpty(dataStartTimestamp)) {

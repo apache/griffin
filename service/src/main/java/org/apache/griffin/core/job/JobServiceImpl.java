@@ -110,26 +110,26 @@ public class JobServiceImpl implements JobService {
         }
         jobInfoMap.put("triggerState",triggerState);
         jobInfoMap.put("measureName", jd.getJobDataMap().getString("measureName"));
-        jobInfoMap.put("sourcePat",jd.getJobDataMap().getString("sourcePattern"));
-        jobInfoMap.put("targetPat",jd.getJobDataMap().getString("targetPattern"));
+        jobInfoMap.put("sourcePattern",jd.getJobDataMap().getString("sourcePattern"));
+        jobInfoMap.put("targetPattern",jd.getJobDataMap().getString("targetPattern"));
         if(StringUtils.isNotEmpty(jd.getJobDataMap().getString("dataStartTimestamp"))) {
             jobInfoMap.put("dataStartTimestamp", jd.getJobDataMap().getString("dataStartTimestamp"));
         }
         jobInfoMap.put("jobStartTime",jd.getJobDataMap().getString("jobStartTime"));
-        jobInfoMap.put("periodTime",jd.getJobDataMap().getString("periodTime"));
+        jobInfoMap.put("interval",jd.getJobDataMap().getString("interval"));
         return jobInfoMap;
     }
 
     @Override
     public GriffinOperationMessage addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody) {
-        int periodTime = 0;
+        int interval = 0;
         Date jobStartTime=null;
         try{
-            periodTime = Integer.parseInt(jobRequestBody.getPeriodTime());
+            interval = Integer.parseInt(jobRequestBody.getInterval());
             jobStartTime=new Date(Long.parseLong(jobRequestBody.getJobStartTime()));
-            setJobStartTime(jobStartTime,periodTime);
+            setJobStartTime(jobStartTime,interval);
         }catch (Exception e){
-            LOGGER.info("jobStartTime or periodTime format error! "+e);
+            LOGGER.info("jobStartTime or interval format error! "+e);
             return GriffinOperationMessage.CREATE_JOB_FAIL;
         }
         try {
@@ -158,7 +158,7 @@ public class JobServiceImpl implements JobService {
                     .forJob(jobDetail)
 //					.withSchedule(CronScheduleBuilder.cronSchedule("0 0/1 0 * * ?"))
                     .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInSeconds(periodTime)
+                            .withIntervalInSeconds(interval)
                             .repeatForever())
                     .startAt(jobStartTime)
                     .build();
@@ -170,27 +170,27 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    public void setJobStartTime(Date jobStartTime,int periodTime){
+    public void setJobStartTime(Date jobStartTime,int interval){
         long currentTimestamp=System.currentTimeMillis();
         long jobstartTimestamp=jobStartTime.getTime();
         //if jobStartTime is before currentTimestamp, set it as the latest trigger time in the future
         if(jobStartTime.before(new Date(currentTimestamp))){
-            long n=(currentTimestamp-jobstartTimestamp)/(long)(periodTime*1000);
-            jobstartTimestamp=jobstartTimestamp+(n+1)*(long)(periodTime*1000);
+            long n=(currentTimestamp-jobstartTimestamp)/(long)(interval*1000);
+            jobstartTimestamp=jobstartTimestamp+(n+1)*(long)(interval*1000);
             jobStartTime.setTime(jobstartTimestamp);
         }
     }
 
     public void setJobData(JobDetail jobDetail, JobRequestBody jobRequestBody, String measureName, String groupName, String jobName){
-        jobDetail.getJobDataMap().put("measureName", measureName);
-        jobDetail.getJobDataMap().put("sourcePattern", jobRequestBody.getSourcePat());
-        jobDetail.getJobDataMap().put("targetPattern", jobRequestBody.getTargetPat());
-        jobDetail.getJobDataMap().put("dataStartTimestamp", jobRequestBody.getDataStartTimestamp());
-        jobDetail.getJobDataMap().put("jobStartTime", jobRequestBody.getJobStartTime());
-        jobDetail.getJobDataMap().put("periodTime", jobRequestBody.getPeriodTime());
-        jobDetail.getJobDataMap().put("lastDataStartTimestamp", "");
         jobDetail.getJobDataMap().put("groupName",groupName);
         jobDetail.getJobDataMap().put("jobName",jobName);
+        jobDetail.getJobDataMap().put("measureName", measureName);
+        jobDetail.getJobDataMap().put("sourcePattern", jobRequestBody.getSourcePattern());
+        jobDetail.getJobDataMap().put("targetPattern", jobRequestBody.getTargetPattern());
+        jobDetail.getJobDataMap().put("dataStartTimestamp", jobRequestBody.getDataStartTimestamp());
+        jobDetail.getJobDataMap().put("jobStartTime", jobRequestBody.getJobStartTime());
+        jobDetail.getJobDataMap().put("interval", jobRequestBody.getInterval());
+        jobDetail.getJobDataMap().put("lastDataStartTimestamp", "");
     }
 
     @Override

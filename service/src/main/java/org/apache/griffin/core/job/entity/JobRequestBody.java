@@ -22,26 +22,26 @@ package org.apache.griffin.core.job.entity;
  * Created by xiangrchen on 4/27/17.
  */
 public class JobRequestBody {
-    private String sourcePat;
-    private String targetPat;
+    private String sourcePattern;
+    private String targetPattern;
     private String dataStartTimestamp;
     private String jobStartTime;
-    private String periodTime;
+    private String interval;
 
-    public String getSourcePat() {
-        return sourcePat;
+    public String getSourcePattern() {
+        return sourcePattern;
     }
 
-    public void setSourcePat(String sourcePat) {
-        this.sourcePat = sourcePat;
+    public void setSourcePattern(String sourcePattern) {
+        this.sourcePattern = sourcePattern;
     }
 
-    public String getTargetPat() {
-        return targetPat;
+    public String getTargetPattern() {
+        return targetPattern;
     }
 
-    public void setTargetPat(String targetPat) {
-        this.targetPat = targetPat;
+    public void setTargetPattern(String targetPattern) {
+        this.targetPattern = targetPattern;
     }
 
     public String getDataStartTimestamp() {
@@ -60,23 +60,23 @@ public class JobRequestBody {
         this.jobStartTime = jobStartTime;
     }
 
-    public String getPeriodTime() {
-        return periodTime;
+    public String getInterval() {
+        return interval;
     }
 
-    public void setPeriodTime(String periodTime) {
-        this.periodTime = periodTime;
-    }
-
-    public JobRequestBody(String sourcePat, String targetPat, String dataStartTimestamp, String jobStartTime, String periodTime) {
-        this.sourcePat = sourcePat;
-        this.targetPat = targetPat;
-        this.dataStartTimestamp = dataStartTimestamp;
-        this.jobStartTime = jobStartTime;
-        this.periodTime = periodTime;
+    public void setInterval(String interval) {
+        this.interval = interval;
     }
 
     public JobRequestBody() {
+    }
+
+    public JobRequestBody(String sourcePattern, String targetPattern, String dataStartTimestamp, String jobStartTime, String interval) {
+        this.sourcePattern = sourcePattern;
+        this.targetPattern = targetPattern;
+        this.dataStartTimestamp = dataStartTimestamp;
+        this.jobStartTime = jobStartTime;
+        this.interval = interval;
     }
 
     @Override
@@ -86,21 +86,23 @@ public class JobRequestBody {
 
         JobRequestBody that = (JobRequestBody) o;
 
-        if (sourcePat != null ? !sourcePat.equals(that.sourcePat) : that.sourcePat != null) return false;
-        if (targetPat != null ? !targetPat.equals(that.targetPat) : that.targetPat != null) return false;
+        if (sourcePattern != null ? !sourcePattern.equals(that.sourcePattern) : that.sourcePattern != null)
+            return false;
+        if (targetPattern != null ? !targetPattern.equals(that.targetPattern) : that.targetPattern != null)
+            return false;
         if (dataStartTimestamp != null ? !dataStartTimestamp.equals(that.dataStartTimestamp) : that.dataStartTimestamp != null)
             return false;
         if (jobStartTime != null ? !jobStartTime.equals(that.jobStartTime) : that.jobStartTime != null) return false;
-        return periodTime != null ? periodTime.equals(that.periodTime) : that.periodTime == null;
+        return interval != null ? interval.equals(that.interval) : that.interval == null;
     }
 
     @Override
     public int hashCode() {
-        int result = sourcePat != null ? sourcePat.hashCode() : 0;
-        result = 31 * result + (targetPat != null ? targetPat.hashCode() : 0);
+        int result = sourcePattern != null ? sourcePattern.hashCode() : 0;
+        result = 31 * result + (targetPattern != null ? targetPattern.hashCode() : 0);
         result = 31 * result + (dataStartTimestamp != null ? dataStartTimestamp.hashCode() : 0);
         result = 31 * result + (jobStartTime != null ? jobStartTime.hashCode() : 0);
-        result = 31 * result + (periodTime != null ? periodTime.hashCode() : 0);
+        result = 31 * result + (interval != null ? interval.hashCode() : 0);
         return result;
     }
 }
