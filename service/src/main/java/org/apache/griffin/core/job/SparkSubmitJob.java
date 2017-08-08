@@ -54,35 +54,25 @@ public class SparkSubmitJob implements Job {
     @Autowired
     private Properties sparkJobProps;
 
-    private String patItem;
     /**
-     * partitionItemSet
+     * partitionItems
      * for example
-     * partitionItemSet like "date","hour",...
+     * partitionItems like "date","hour",...
      */
-    private String[] partitionItemSet;
+    private String[] partitionItems;
     /**
-     * sourcePatternItemSet targetPatternItemSet
+     * sourcePatternItems targetPatternItems
      * for example
-     * sourcePatternItemSet like "YYYYMMDD","HH",...
+     * sourcePatternItems or targetPatternItems is like "YYYYMMDD","HH",...
      */
-    private String[] sourcePatternItemSet;
-    private String[] targetPatternItemSet;
-    /**
-     * sourcePatternPartitionSizeMin is the min between partitionItemSet.length and sourcePatternItemSet.length
-     */
-    private int sourcePatternPartitionSizeMin = 0;
-    private int targetPatternPartitionSizeMin = 0;
+    private String[] sourcePatternItems,targetPatternItems;
 
     private Measure measure;
-    private String sourcePattern;
-    private String targetPattern;
-    private String dataStartTimestamp;
-    private String lastDataStartTimestamp;
+    private String sourcePattern,targetPattern;
+    private String dataStartTimestamp,lastDataStartTimestamp;
     private String interval;
-
-    private RestTemplate restTemplate = new RestTemplate();
     private String uri;
+    private RestTemplate restTemplate = new RestTemplate();
     private SparkJobDO sparkJobDO = new SparkJobDO();
 
     public SparkSubmitJob() {
@@ -94,101 +84,53 @@ public class SparkSubmitJob implements Job {
      */
     @Override
     public void execute(JobExecutionContext context) {
-        patItem = sparkJobProps.getProperty("sparkJob.dateAndHour");
-        partitionItemSet = patItem.split(",");
-        uri = sparkJobProps.getProperty("sparkJob.uri");
-
         JobDetail jd = context.getJobDetail();
         String groupName=jd.getJobDataMap().getString("groupName");
         String jobName=jd.getJobDataMap().getString("jobName");
-        String measureName = jd.getJobDataMap().getString("measureName");
-        measure = measureRepo.findByName(measureName);
-        if (measure==null) {
-            LOGGER.error(measureName + " is not find!");
-            return;
-        }
-        sourcePattern = jd.getJobDataMap().getString("sourcePattern");
-        targetPattern = jd.getJobDataMap().getString("targetPattern");
-        dataStartTimestamp = jd.getJobDataMap().getString("dataStartTimestamp");
-        lastDataStartTimestamp = jd.getJobDataMap().getString("lastDataStartTimestamp");
-        LOGGER.info("lastDataStartTimestamp:"+lastDataStartTimestamp);
-        interval = jd.getJobDataMap().getString("interval");
+        init(jd);
         //prepare current system timestamp
-        long currentSystemTimestamp = System.currentTimeMillis();
-        LOGGER.info("currentSystemTimestamp: "+currentSystemTimestamp);
+        long currentDataStartTimestamp = setCurrentDataStartTimestamp(System.currentTimeMillis());
+        LOGGER.info("currentDataStartTimestamp: "+currentDataStartTimestamp);
         if (StringUtils.isNotEmpty(sourcePattern)) {
-            sourcePatternItemSet = sourcePattern.split("-");
-            long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
-            setDataConnectorPartitions(measure.getSource(), sourcePatternItemSet, partitionItemSet, currentTimstamp);
-            jd.getJobDataMap().put("lastDataStartTimestamp", currentTimstamp + "");
+            sourcePatternItems = sourcePattern.split("-");
+            setDataConnectorPartitions(measure.getSource(), sourcePatternItems, partitionItems, currentDataStartTimestamp);
         }
         if (StringUtils.isNotEmpty(targetPattern)) {
-            targetPatternItemSet = targetPattern.split("-");
-            long currentTimstamp = setCurrentTimestamp(currentSystemTimestamp);
-            setDataConnectorPartitions(measure.getTarget(), targetPatternItemSet, partitionItemSet, currentTimstamp);
-            jd.getJobDataMap().put("lastDataStartTimestamp", currentTimstamp + "");
+            targetPatternItems = targetPattern.split("-");
+            setDataConnectorPartitions(measure.getTarget(), targetPatternItems, partitionItems, currentDataStartTimestamp);
         }
-        //final String uri = "http://10.9.246.187:8998/batches";
+        jd.getJobDataMap().put("lastDataStartTimestamp", currentDataStartTimestamp + "");
         setSparkJobDO();
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         LOGGER.info(result);
         saveJobInstance(groupName,jobName,result);
     }
 
-    public void saveJobInstance(String groupName,String jobName,String result){
-        //save JobInstance info into DataBase
-        Map<String,Object> resultMap=new HashMap<String,Object>();
-        TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
-        try {
-            resultMap= GriffinUtil.toEntity(result,type);
-        } catch (IOException e) {
-            LOGGER.error("jobInstance jsonStr convert to map failed. "+e);
+    public void init(JobDetail jd){
+        String measureName = jd.getJobDataMap().getString("measureName");
+        measure = measureRepo.findByName(measureName);
+        if (measure==null) {
+            LOGGER.error(measureName + " is not find!");
+            return;
         }
-        JobInstance jobInstance=new JobInstance();
-        if(resultMap!=null) {
-            jobInstance.setGroupName(groupName);
-            jobInstance.setJobName(jobName);
-            try {
-                jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
-                jobInstance.setState(LivySessionStateMap.State.valueOf(resultMap.get("state").toString()));
-                jobInstance.setAppId(resultMap.get("appId").toString());
-            }catch (Exception e){
-                LOGGER.warn("jobInstance has null field. "+e);
-            }
-            jobInstance.setTimestamp(System.currentTimeMillis());
-            jobInstanceRepo.save(jobInstance);
-        }
+        String partitionItemstr = sparkJobProps.getProperty("sparkJob.dateAndHour");
+        partitionItems = partitionItemstr.split(",");
+        uri = sparkJobProps.getProperty("sparkJob.uri");
+        sourcePattern = jd.getJobDataMap().getString("sourcePattern");
+        targetPattern = jd.getJobDataMap().getString("targetPattern");
+        dataStartTimestamp = jd.getJobDataMap().getString("dataStartTimestamp");
+        lastDataStartTimestamp = jd.getJobDataMap().getString("lastDataStartTimestamp");
+        LOGGER.info("lastDataStartTimestamp:"+lastDataStartTimestamp);
+        interval = jd.getJobDataMap().getString("interval");
     }
 
-    public Map<String, String> genPartitionMap(String[] patternItemSet, String[] partitionItemSet, long timestamp) {
-        /**
-         * patternItemSet:{YYYYMMdd,HH}
-         * partitionItemSet:{dt,hour}
-         * res:{dt=20170804,hour=09}
-         */
-        int comparableSizeMin=Math.min(patternItemSet.length,partitionItemSet.length);
-        Map<String, String> res = new HashMap<>();
-        for (int i = 0; i < comparableSizeMin; i++) {
-            /**
-             * in order to get a standard date like 20170427 01 (YYYYMMdd-HH)
-             */
-            String pattrn = patternItemSet[i].replace("mm", "MM");
-            pattrn = pattrn.replace("DD", "dd");
-            pattrn = pattrn.replace("hh", "HH");
-            SimpleDateFormat sdf = new SimpleDateFormat(pattrn);
-            res.put(partitionItemSet[i], sdf.format(new Date(timestamp)));
-        }
-        return res;
-    }
-
-    public void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItemSet, long timestamp) {
-        Map<String, String> partitionItemMap = genPartitionMap(patternItemSet, partitionItemSet, timestamp);
+    public void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItems, long timestamp) {
+        Map<String, String> partitionItemMap = genPartitionMap(patternItemSet, partitionItems, timestamp);
         /**
          * partitions must be a string like: "dt=20170301, hour=12"
          * partitionItemMap.toString() is like "{dt=20170301, hour=12}"
          */
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
-
         Map<String, String> configMap = dc.getConfigInMaps();
         //config should not be null
         configMap.put("partitions", partitions);
@@ -199,26 +141,48 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    public long setCurrentTimestamp(long currentSystemTimestamp) {
-        long currentTimstamp=0;
+    public Map<String, String> genPartitionMap(String[] patternItemSet, String[] partitionItems, long timestamp) {
+        /**
+         * patternItemSet:{YYYYMMdd,HH}
+         * partitionItems:{dt,hour}
+         * partitionItemMap:{dt=20170804,hour=09}
+         */
+        int comparableSizeMin=Math.min(patternItemSet.length,partitionItems.length);
+        Map<String, String> partitionItemMap = new HashMap<>();
+        for (int i = 0; i < comparableSizeMin; i++) {
+            /**
+             * in order to get a standard date like 20170427 01 (YYYYMMdd-HH)
+             */
+            String pattrn = patternItemSet[i].replace("mm", "MM");
+            pattrn = pattrn.replace("DD", "dd");
+            pattrn = pattrn.replace("hh", "HH");
+            SimpleDateFormat sdf = new SimpleDateFormat(pattrn);
+            partitionItemMap.put(partitionItems[i], sdf.format(new Date(timestamp)));
+        }
+        return partitionItemMap;
+    }
+
+
+    public long setCurrentDataStartTimestamp(long currentSystemTimestamp) {
+        long currentDataStartTimestamp=0;
         if (StringUtils.isNotEmpty(lastDataStartTimestamp)) {
             try {
-                currentTimstamp = Long.parseLong(lastDataStartTimestamp) + Integer.parseInt(interval) * 1000;
+                currentDataStartTimestamp = Long.parseLong(lastDataStartTimestamp) + Integer.parseInt(interval) * 1000;
             }catch (Exception e){
                 LOGGER.info("lastDataStartTimestamp or interval format problem! "+e);
             }
         } else {
             if (StringUtils.isNotEmpty(dataStartTimestamp)) {
                 try{
-                    currentTimstamp = Long.parseLong(dataStartTimestamp);
+                    currentDataStartTimestamp = Long.parseLong(dataStartTimestamp);
                 }catch (Exception e){
                     LOGGER.info("dataStartTimestamp format problem! "+e);
                 }
             } else {
-                currentTimstamp = currentSystemTimestamp;
+                currentDataStartTimestamp = currentSystemTimestamp;
             }
         }
-        return currentTimstamp;
+        return currentDataStartTimestamp;
     }
 
     public void setSparkJobDO() {
@@ -264,5 +228,30 @@ public class SparkSubmitJob implements Job {
 //        createBatchRequest.args_$eq(args);
 //        scala.collection.immutable.List argss=new scala.collection.immutable.List<String>();
 //        createBatchRequest.name_$eq(new Some(sparkJobProps.getProperty("sparkJob.name")));
+    }
+
+    public void saveJobInstance(String groupName,String jobName,String result){
+        //save JobInstance info into DataBase
+        Map<String,Object> resultMap=new HashMap<String,Object>();
+        TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
+        try {
+            resultMap= GriffinUtil.toEntity(result,type);
+        } catch (IOException e) {
+            LOGGER.error("jobInstance jsonStr convert to map failed. "+e);
+        }
+        JobInstance jobInstance=new JobInstance();
+        if(resultMap!=null) {
+            jobInstance.setGroupName(groupName);
+            jobInstance.setJobName(jobName);
+            try {
+                jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
+                jobInstance.setState(LivySessionStateMap.State.valueOf(resultMap.get("state").toString()));
+                jobInstance.setAppId(resultMap.get("appId").toString());
+            }catch (Exception e){
+                LOGGER.warn("jobInstance has null field. "+e);
+            }
+            jobInstance.setTimestamp(System.currentTimeMillis());
+            jobInstanceRepo.save(jobInstance);
+        }
     }
 }

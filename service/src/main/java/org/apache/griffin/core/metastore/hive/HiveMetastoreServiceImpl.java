@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import org.apache.griffin.core.error.Exception.GriffinException.HiveConnectionException;
+import org.apache.griffin.core.error.exception.GriffinException.HiveConnectionException;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;

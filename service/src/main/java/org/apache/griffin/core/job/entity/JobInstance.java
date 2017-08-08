@@ -37,15 +37,6 @@ public class JobInstance extends AuditableEntity {
     private String groupName;
     private String jobName;
     private int sessionId;
-
-//    public static enum State {
-//        starting,
-//        running,
-//        success,
-//        unknown,
-//        error,
-//    }
-
     @Enumerated(EnumType.STRING)
     State state;
     String appId;
