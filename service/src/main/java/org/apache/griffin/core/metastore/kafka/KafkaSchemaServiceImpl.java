@@ -22,7 +22,7 @@ package org.apache.griffin.core.metastore.kafka;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Config;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
-import org.apache.griffin.core.error.Exception.GriffinException.KafkaConnectionException;
+import org.apache.griffin.core.error.exception.GriffinException.KafkaConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
