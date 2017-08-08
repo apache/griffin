@@ -21,8 +21,8 @@ package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.error.Exception.GriffinException.GetHealthInfoFailureException;
-import org.apache.griffin.core.error.Exception.GriffinException.GetJobsFailureException;
+import org.apache.griffin.core.error.exception.GriffinException.GetHealthInfoFailureException;
+import org.apache.griffin.core.error.exception.GriffinException.GetJobsFailureException;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
@@ -228,6 +228,11 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+    /**
+     * call livy to update jobInstance table in mysql.
+     * @param group
+     * @param jobName
+     */
     public void syncInstancesOfJob(String group, String jobName) {
         //update all instance info belongs to this group and job.
         List<JobInstance> jobInstanceList=jobInstanceRepo.findByGroupNameAndJobName(group,jobName);
@@ -266,6 +271,10 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+    /**
+     * a job is regard as healthy job when its latest instance is in healthy state.
+     * @return
+     */
     @Override
     public JobHealth getHealthInfo()  {
         Scheduler scheduler=factory.getObject();
@@ -282,10 +291,7 @@ public class JobServiceImpl implements JobService {
                     if (jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest)!=null
                             &&jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).size()>0){
                         latestJobInstance=jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
-                        if(LivySessionStateMap.State.error.toString().equals(latestJobInstance.getState()) ||
-                                LivySessionStateMap.State.dead.toString().equals(latestJobInstance.getState()) ||
-                                LivySessionStateMap.State.shutting_down.equals(latestJobInstance.getState())
-                                ){
+                        if(LivySessionStateMap.isHeathy(latestJobInstance.getState())){
                             notHealthyCount++;
                         }
                     }

@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.error.Exception;
+package org.apache.griffin.core.error.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -38,5 +38,4 @@ public abstract class GriffinException extends RuntimeException{
   @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT,reason="Fail to Get Jobs")
   public static class GetJobsFailureException extends GriffinException {
   }
-
 }

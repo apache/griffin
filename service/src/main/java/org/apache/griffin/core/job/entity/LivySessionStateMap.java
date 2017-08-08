@@ -83,4 +83,11 @@ public class LivySessionStateMap {
             return sessionState.isActive();
         }
     }
+
+    public static boolean isHeathy(State state){
+        if (State.error.equals(state) || State.dead.equals(state) || State.shutting_down.equals(state)){
+            return false;
+        }
+        return true;
+    }
 }
