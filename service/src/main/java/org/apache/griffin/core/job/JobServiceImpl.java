@@ -291,7 +291,7 @@ public class JobServiceImpl implements JobService {
                     if (jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest)!=null
                             &&jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).size()>0){
                         latestJobInstance=jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
-                        if(LivySessionStateMap.isHeathy(latestJobInstance.getState())){
+                        if(!LivySessionStateMap.isHeathy(latestJobInstance.getState())){
                             notHealthyCount++;
                         }
                     }
