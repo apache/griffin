@@ -40,7 +40,7 @@ public class HiveMetastoreProxy
     private String uris;
 
     /**
-     * Set attempts and interval for HiveMetastore to retry.
+     * Set attempts and interval for HiveMetastoreClient to retry.
      * @hive.hmshandler.retry.attempts: The number of times to retry a HMSHandler call if there were a connection error.
      * @hive.hmshandler.retry.interval: The time between HMSHandler retry attempts on failure.
      */
