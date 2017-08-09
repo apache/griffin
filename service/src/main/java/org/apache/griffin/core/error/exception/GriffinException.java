@@ -32,10 +32,10 @@ public abstract class GriffinException extends RuntimeException{
   @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT,reason="Fail to Connect Hive")
   public static class HiveConnectionException extends GriffinException{
   }
-  @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT,reason="Fail to Get HealthInfo")
+  @ResponseStatus(value = HttpStatus.NOT_FOUND,reason="Fail to Get HealthInfo")
   public static class GetHealthInfoFailureException extends GriffinException {
   }
-  @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT,reason="Fail to Get Jobs")
+  @ResponseStatus(value = HttpStatus.NOT_FOUND,reason="Fail to Get Jobs")
   public static class GetJobsFailureException extends GriffinException {
   }
 }
