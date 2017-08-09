@@ -234,17 +234,9 @@ object ExprValueUtil {
         }
       })
     }.toMap
-    SchemaValueCombineUtil.cartesian(selectionValues)
-//    val exprValues: Map[String, List[(List[String], Any)]] =
-//      exprs.foldLeft(Map[String, List[(List[String], Any)]]()) { (existExprValues, expr) =>
-//        existExprValues + (expr._id -> calcExprValues((Nil, data) :: Nil, expr, existExprValueMap).flatMap { pair =>
-//          pair._2 match {
-//            case Some(v) => Some((pair._1, v))
-//            case _ => None
-//          }
-//        })
-//      }
-//    SchemaValueCombineUtil.cartesian(exprValues)
+    // if exprs is empty, return an empty value map for each row
+    if (selectionValues.isEmpty) List(Map[String, Any]())
+    else SchemaValueCombineUtil.cartesian(selectionValues)
   }
 
   // try to calculate some exprs from data and initExprValueMap, generate a new expression value map
