@@ -47,8 +47,8 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance,Long>{
     @Transactional
     @Modifying
     @Query("update JobInstance s "+
-            "set s.state= ?2, s.appId= ?3 where s.id= ?1")
-    void setFixedStateAndappIdFor(Long Id, LivySessionStateMap.State state, String appId);
+            "set s.state= ?2, s.appId= ?3, s.appUri= ?4 where s.id= ?1")
+    void update(Long Id, LivySessionStateMap.State state, String appId, String appUri);
 
     @Transactional
     @Modifying

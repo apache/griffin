@@ -105,7 +105,7 @@ public class JobControllerTest {
         String job="job1";
         int page=0;
         int size=2;
-        JobInstance jobInstance=new JobInstance(group, job, 1, LivySessionStateMap.State.running, "", System.currentTimeMillis());
+        JobInstance jobInstance=new JobInstance(group, job, 1, LivySessionStateMap.State.running, "","", System.currentTimeMillis());
         given(service.findInstancesOfJob(group,job,page,size)).willReturn(Arrays.asList(jobInstance));
         mvc.perform(get("/jobs/instances/BA/job1/0/2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

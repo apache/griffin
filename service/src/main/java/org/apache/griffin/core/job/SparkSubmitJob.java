@@ -115,7 +115,7 @@ public class SparkSubmitJob implements Job {
         }
         String partitionItemstr = sparkJobProps.getProperty("sparkJob.dateAndHour");
         partitionItems = partitionItemstr.split(",");
-        uri = sparkJobProps.getProperty("sparkJob.uri");
+        uri = sparkJobProps.getProperty("livy.uri");
         sourcePattern = jd.getJobDataMap().getString("sourcePattern");
         targetPattern = jd.getJobDataMap().getString("targetPattern");
         dataStartTimestamp = jd.getJobDataMap().getString("dataStartTimestamp");

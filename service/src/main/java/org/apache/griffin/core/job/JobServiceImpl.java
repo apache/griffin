@@ -240,7 +240,7 @@ public class JobServiceImpl implements JobService {
             if (!LivySessionStateMap.isActive(jobInstance.getState().toString())){
                 continue;
             }
-            String uri=sparkJobProps.getProperty("sparkJob.uri")+"/"+jobInstance.getSessionId();
+            String uri=sparkJobProps.getProperty("livy.uri")+"/"+jobInstance.getSessionId();
             RestTemplate restTemplate=new RestTemplate();
             String resultStr=null;
             try{
@@ -249,6 +249,7 @@ public class JobServiceImpl implements JobService {
                 LOGGER.error("spark session "+jobInstance.getSessionId()+" has overdue, set state as unknown!\n"+e);
                 //if server cannot get session from Livy, set State as unknown.
                 jobInstance.setState(LivySessionStateMap.State.unknown);
+                continue;
             }
             TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
             HashMap<String,Object> resultMap= null;
@@ -262,12 +263,13 @@ public class JobServiceImpl implements JobService {
                 if (resultMap!=null && resultMap.size()!=0){
                     jobInstance.setState(LivySessionStateMap.State.valueOf(resultMap.get("state").toString()));
                     jobInstance.setAppId(resultMap.get("appId").toString());
+                    jobInstance.setAppUri(sparkJobProps.getProperty("spark.uri")+"/cluster/app/"+resultMap.get("appId").toString());
                 }
             }catch (Exception e){
                 LOGGER.warn(group+","+jobName+"job Instance has some null field (state or appId). "+e);
                 continue;
             }
-            jobInstanceRepo.setFixedStateAndappIdFor(jobInstance.getId(),jobInstance.getState(),jobInstance.getAppId());
+            jobInstanceRepo.update(jobInstance.getId(),jobInstance.getState(),jobInstance.getAppId(),jobInstance.getAppUri());
         }
     }
 

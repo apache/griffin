@@ -22,9 +22,7 @@ package org.apache.griffin.core.job.entity;
 import org.apache.griffin.core.job.entity.LivySessionStateMap.State;
 import org.apache.griffin.core.measure.entity.AuditableEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 /**
  * Created by xiangrchen on 5/31/17.
@@ -40,6 +38,9 @@ public class JobInstance extends AuditableEntity {
     @Enumerated(EnumType.STRING)
     State state;
     String appId;
+    @Lob
+    @Column(length=1048576) //2^20=1048576
+    private String appUri;
     long timestamp;
 
     public String getGroupName() {
@@ -82,6 +83,14 @@ public class JobInstance extends AuditableEntity {
         this.appId = appId;
     }
 
+    public String getAppUri() {
+        return appUri;
+    }
+
+    public void setAppUri(String appUri) {
+        this.appUri = appUri;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
@@ -93,12 +102,13 @@ public class JobInstance extends AuditableEntity {
     public JobInstance() {
     }
 
-    public JobInstance(String groupName, String jobName, int sessionId, State state, String appId, long timestamp) {
+    public JobInstance(String groupName, String jobName, int sessionId, State state, String appId, String appUri, long timestamp) {
         this.groupName = groupName;
         this.jobName = jobName;
         this.sessionId = sessionId;
         this.state = state;
         this.appId = appId;
+        this.appUri = appUri;
         this.timestamp = timestamp;
     }
 }

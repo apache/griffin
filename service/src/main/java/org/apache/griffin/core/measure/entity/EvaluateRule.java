@@ -48,7 +48,7 @@ public class EvaluateRule  extends AuditableEntity {
     private int sampleRatio;
 
     @Lob
-    @Column(length=1000000)
+    @Column(length=1048576) //2^20=1048576
     private String rules;
     
     public EvaluateRule() {
