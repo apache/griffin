@@ -43,6 +43,7 @@ public enum GriffinOperationMessage {
     DELETE_JOB_FAIL(406,"Delete Job Failed"),
     UPDATE_JOB_INSTANCE_FAIL(407,"Update Job Instance Failed"),
     CREATE_MEASURE_FAIL_DUPLICATE(408, "Create Measure Failed, duplicate records"),
+    UNEXPECTED_RUNTIME_EXCEPTION(409, "Unexpected RuntimeException"),
     ;
 
     private final int code;
