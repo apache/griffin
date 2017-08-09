@@ -39,6 +39,11 @@ public class HiveMetastoreProxy
     @Value("${hive.metastore.uris}")
     private String uris;
 
+    /**
+     * Set attempts and interval for HiveMetastore to retry.
+     * @hive.hmshandler.retry.attempts: The number of times to retry a HMSHandler call if there were a connection error.
+     * @hive.hmshandler.retry.interval: The time between HMSHandler retry attempts on failure.
+     */
     @Value("${hive.hmshandler.retry.attempts}")
     private int attempts;
 
