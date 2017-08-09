@@ -84,5 +84,5 @@ public class GriffinWebApplication/* implements CommandLineRunner*/{
     public SimpleCORSFilter simpleFilter() {
         return new SimpleCORSFilter();
     }
- 
+
 }
