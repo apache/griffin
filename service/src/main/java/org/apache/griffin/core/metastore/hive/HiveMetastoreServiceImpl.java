@@ -137,7 +137,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         try {
             client.reconnect();
         } catch (MetaException e) {
-            log.error("reconnect to hive failed. "+e);
+            log.error("reconnect to hive failed. ");
             throw new HiveConnectionException();
         }
     }
