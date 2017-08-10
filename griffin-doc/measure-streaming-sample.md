@@ -188,7 +188,7 @@ The "cache" field in data source configuration represents the temporary data cac
 ### Run
 Build the measure package.
 ```
-mvn install
+mvn clean install
 ```
 Get the measure package ```measure-<version>-incubating-SNAPSHOT.jar```, rename it to ```griffin-measure.jar```.  
 Put measure package together with env.json and config.json.
