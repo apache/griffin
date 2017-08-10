@@ -48,7 +48,9 @@ under the License.
                 <td ng-class="{accordion:true}" ng-click="row.showDetail=!(row.showDetail)" style="cursor: pointer;">
                     <i ng-show="!row.showDetail" class="fa fa-chevron-circle-right blue"></i>
                     <i ng-show="row.showDetail" class="fa fa-chevron-circle-down blue"></i>
-                    {{row.jobName}}</td>
+                    {{row.jobName}}
+                    <!-- -{{(row.createTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }} -->
+                </td>
                 <td>{{row.sourcePat}}</td>
                 <td>{{row.targetPat|strmap:'modeltype'}}</td>
                 <td ng-show="row.previousFireTime==-1">--/--/-- &nbsp;&nbsp;--:--</td>

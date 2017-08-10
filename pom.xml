@@ -30,7 +30,7 @@ under the License.
 
     <groupId>org.apache.griffin</groupId>
     <artifactId>griffin-parent</artifactId>
-    <version>0.1.5-incubating-SNAPSHOT</version>
+    <version>0.1.6-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
     <url>http://griffin.incubator.apache.org</url>

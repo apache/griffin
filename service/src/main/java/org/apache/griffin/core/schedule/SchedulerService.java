@@ -19,20 +19,26 @@ under the License.
 
 package org.apache.griffin.core.schedule;
 
+import org.apache.griffin.core.schedule.entity.JobHealth;
+import org.apache.griffin.core.schedule.entity.JobInstance;
 import org.quartz.SchedulerException;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 public interface SchedulerService {
+
+    public void startUpdateInstances();
+
     public List<Map<String, Serializable>> getJobs() throws SchedulerException;
 
     public Boolean addJob(String groupName,String jobName,String measureName,SchedulerRequestBody schedulerRequestBody);
 
     public Boolean deleteJob(String groupName,String jobName);
 
-    public List<ScheduleState> findInstancesOfJob(String group,String name,int page,int size);
+    public List<JobInstance> findInstancesOfJob(String group, String name, int page, int size) throws IOException;
 
     public JobHealth getHealthInfo() throws SchedulerException;
 

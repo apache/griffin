@@ -134,13 +134,12 @@ define(['./module'], function(controllers) {
 
 //                var newModel = $config.uri.newAccuracyModel;
 //                var BACKEND_SERVER = '';
-                var date = new Date();
+               var date = new Date();
                 var month = date.getMonth()+1;
                 var timestamp = Date.parse(date);
-                timestamp = timestamp / 1000;
-                var time = date.toDateString()+' '+date.toLocaleTimeString();
-//                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + date.getFullYear() + '-'+ month + '-'+date.getDate();
-                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + time;
+                // timestamp = timestamp / 1000;
+                // var time = date.toDateString()+' '+date.toLocaleTimeString();
+                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + timestamp;
 
                 var newJob = $config.uri.addJobs + this.data.groupName + '/' + jobName + '/' + $scope.Measures[$scope.measure];
                 console.log(newJob);
