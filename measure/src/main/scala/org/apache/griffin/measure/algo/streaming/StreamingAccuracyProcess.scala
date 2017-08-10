@@ -143,18 +143,10 @@ case class StreamingAccuracyProcess(sourceDataConnector: DirectDataConnector,
             v ++ i
           }
           sourceDataConnector.updateOldData(t, dumpDatas)
-          //          targetDataConnector.updateOldData(t, dumpDatas)    // not correct
+//          targetDataConnector.updateOldData(t, dumpDatas)    // not correct
         }
 
         updateResults.unpersist()
-
-        // dump missing rdd   (this part not need for future version, only for current df cache data version)
-        val dumpRdd: RDD[Map[String, Any]] = missingRdd.map { r =>
-          val (_, (v, i)) = r
-          v ++ i
-        }
-        sourceDataConnector.updateAllOldData(dumpRdd)
-        targetDataConnector.updateAllOldData(dumpRdd)    // not correct
 
         TimeInfoCache.endTimeInfoCache
 
