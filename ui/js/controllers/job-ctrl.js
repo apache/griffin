@@ -1,17 +1,21 @@
-/*-
- * Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
- */
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 
 define(['./module'], function (controllers) {
@@ -34,14 +38,19 @@ define(['./module'], function (controllers) {
         number = tableState.pagination.number || 10;
 
         if(start == 0 && !$scope.rowCollection){
-         $http.get(allJobs).success(function(data) {
-           data.sort(function(a,b){
-            var dateA = Date.parse(new Date(a.jobName.split('-')[3]))/1000;
-            var dateB = Date.parse(new Date(b.jobName.split('-')[3]))/1000;
+         $http.get(allJobs).then(function successCallback(data) {
+
+           angular.forEach(data.data,function(job){
+              job.name = job.jobName.split('-')[0] + '-' + job.jobName.split('-')[1] + '-' + job.jobName.split('-')[2];
+              job.createTime = job.jobName.split('-')[3];
+           });
+           data.data.sort(function(a,b){
+            var dateA = a.createTime;
+            var dateB = b.createTime;
                 return -(dateA-dateB);
-              });
-           originalRowCollection = angular.copy(data);
-           $scope.rowCollection = angular.copy(data);
+            });
+           originalRowCollection = angular.copy(data.data);
+           $scope.rowCollection = angular.copy(data.data);
 
            $scope.displayed = $scope.rowCollection.slice(start, start+number);
            tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
@@ -56,9 +65,10 @@ define(['./module'], function (controllers) {
           $('#'+p_index+'-'+number).addClass('page-active');
           $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           $scope.currentJob = row;
+
           var allInstances = $config.uri.getInstances + 'BA/' + row.jobName +'/0/100';
-          $http.get(allInstances).success(function(data){
-            row.instances = data;
+          $http.get(allInstances).then(function successCallback(data){
+            row.instances = data.data;
             row.pageCount = new Array();
             for(var i = 0;i<Math.ceil(row.instances.length/10);i++){
                 row.pageCount.push(i);
@@ -67,9 +77,9 @@ define(['./module'], function (controllers) {
             $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           });
           var url = $config.uri.getInstances + 'BA/' + row.jobName + '/'+number+'/10';
-          $http.get(url).success(function(data){
+          $http.get(url).then(function successCallback(data){
               // row.instances = data;
-              row.currentInstances = data;
+              row.currentInstances = data.data;
               $('#'+p_index+'-'+number).addClass('page-active');
               $('#'+p_index+'-'+number).siblings().removeClass('page-active');
           });
@@ -97,7 +107,7 @@ define(['./module'], function (controllers) {
       $scope.confirmDelete = function(){
         var row = $scope.deletedBriefRow;
         var deleteModelUrl = $config.uri.deleteJob + row.groupName+'/'+row.jobName;
-        $http.delete(deleteModelUrl).success(function(){
+        $http.delete(deleteModelUrl).then(function successCallback(){
 
           var index = $scope.rowCollection.indexOf(row);
           $scope.rowCollection.splice(index, 1);
@@ -107,8 +117,11 @@ define(['./module'], function (controllers) {
 
           $('#deleteJobConfirmation').modal('hide');
 
-        }).error(function(data, status){
-          toaster.pop('error', 'Error when deleting record', data);
+        // }).error(function(data, status){
+        //   toaster.pop('error', 'Error when deleting record', data);
+        // });
+      },function errorCallback(response) {
+          toaster.pop('error', 'Error when deleting record', response.message);
         });
       }
 

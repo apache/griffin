@@ -1,17 +1,20 @@
 <!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
 
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
 -->
 
 <div id="rightbar" ng-controller="SideBarCtrl" class="" style="background-color:#262626;">
@@ -25,12 +28,12 @@ limitations under the License.
 
                 <div class="sidebar-stat-center">
                     <img src="/img/sidebar1.png" >
-                    <span><a class="bark-link" href="#/dataassets">{{datasets}}&nbsp;Data Assets</a></span>
+                    <span><a class="bark-link" href="#!/dataassets">{{datasets}}&nbsp;Data Assets</a></span>
                 </div>
 
                 <div class="sidebar-stat-center">
                     <img src="/img/sidebar2.png">
-                    <span><a class="bark-link" href="#/metrics">{{metrics}}&nbsp;DQ Metrics</a></span>
+                    <span><a class="bark-link" href="#!/metrics">{{metrics}}&nbsp;DQ Metrics</a></span>
                 </div>
 
             </div>
@@ -47,9 +50,9 @@ limitations under the License.
         <div ng-repeat="outerItems in finalData">
             <div class="well" style="padding:0px;background:transparent;border:0px;position:relative; ">
                 <!-- <img class="bullseye" src="/img/bullseye.png" title="image1" > -->
-                <div class="col-sm-4 col-lg-4 col-md-4 "><h4 ><a href="#/metrics/{{outerItems.name}}"> {{outerItems.name}}</a></h4></div>
+                <div class="col-sm-4 col-lg-4 col-md-4 "><h4 ><a href="#!/metrics/{{outerItems.name}}"> {{outerItems.name}}</a></h4></div>
                 <div class="col-sm-3 col-lg-3 col-md-3 " style="display: flex;justify-content: center;height:46px;"><div ng-class="outerItems.dq >=90 ? 'led-green':'led-yellow'" style="align-self: center;"></div></div>
-                <div class="col-sm-5 col-lg-5 col-md-5 " style="display: flex;justify-content: center;height:46px;"><a style="align-self: center;" class="btn btn-primary" href="https://github.com/eBay/DQSolution/issues" target="_blank">Report&nbsp;issue</a></div>
+                <!-- <div class="col-sm-5 col-lg-5 col-md-5 " style="display: flex;justify-content: center;height:46px;"><a style="align-self: center;" class="btn btn-primary" href="https://github.com/eBay/DQSolution/issues" target="_blank">Report&nbsp;issue</a></div> -->
             </div>
             <br/>
             <div class="well side-bar-scroll">

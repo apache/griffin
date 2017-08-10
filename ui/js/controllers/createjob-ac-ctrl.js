@@ -1,17 +1,21 @@
-/*-
- * Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
- */
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 
 define(['./module'], function(controllers) {
@@ -39,8 +43,8 @@ define(['./module'], function(controllers) {
             // $('.formStep').css({height: 800});
         });
         var getMeasureUrl = $config.uri.getMeasuresByOwner+$scope.ntAccount;
-        $http.get(getMeasureUrl).success(function(res){
-            angular.forEach(res,function(measure){
+        $http.get(getMeasureUrl).then(function successCallback(res){
+            angular.forEach(res.data,function(measure){
                 $scope.Measures.push(measure);
             })
             console.log($scope.Measures);
@@ -130,18 +134,17 @@ define(['./module'], function(controllers) {
 
 //                var newModel = $config.uri.newAccuracyModel;
 //                var BACKEND_SERVER = '';
-                var date = new Date();
+               var date = new Date();
                 var month = date.getMonth()+1;
                 var timestamp = Date.parse(date);
-                timestamp = timestamp / 1000;
-                var time = date.toDateString()+' '+date.toLocaleTimeString();
-//                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + date.getFullYear() + '-'+ month + '-'+date.getDate();
-                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + time;
+                // timestamp = timestamp / 1000;
+                // var time = date.toDateString()+' '+date.toLocaleTimeString();
+                var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + timestamp;
 
                 var newJob = $config.uri.addJobs + this.data.groupName + '/' + jobName + '/' + $scope.Measures[$scope.measure];
                 console.log(newJob);
                 console.log(this.data);
-                $http.post(newJob, this.data).success(function(data) {
+                $http.post(newJob, this.data).then(function successCallback(data) {
                 	// if(data.status=='0')
                 	// {
                 	  console.log(data);
@@ -162,10 +165,13 @@ define(['./module'], function(controllers) {
                 	// 	errorMessage(0, data.result);
                 	// }
 
-                }).error(function(data){
-                  // errorMessage(0, 'Save model failed, please try again!');
-                  toaster.pop('error', 'Save job failed, please try again!', data.message);
-                });
+                // }).error(function(data){
+                //   // errorMessage(0, 'Save model failed, please try again!');
+                //   toaster.pop('error', 'Save job failed, please try again!', data.message);
+                // });
+                      },function errorCallback(response) {
+                        toaster.pop('error', 'Error when creating job', response.message);
+                        });
 
             },
 

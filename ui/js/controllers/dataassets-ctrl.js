@@ -1,17 +1,21 @@
-/*-
- * Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
- */
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 define(['./module'], function (controllers) {
     'use strict';
@@ -31,14 +35,14 @@ define(['./module'], function (controllers) {
         number = tableState.pagination.number || 10;
 
         if(start == 0 && !$scope.rowCollection){
-          $http.get(allModels).success(function(data) {
-            if(data){
+          $http.get(allModels).then(function successCallback(data) {
+            if(data.data){
               // data.sort(function(a,b){
               //   return -(a.timestamp - b.timestamp);
               // });
             }
             originalRowCollection = new Array();
-            angular.forEach(data,function(db){
+            angular.forEach(data.data,function(db){
               angular.forEach(db,function(table){
                 originalRowCollection.push(table);
               });
@@ -106,7 +110,7 @@ define(['./module'], function (controllers) {
 		};
 
 		$scope.sendDeleteRequest = function() {
-			$http.delete($config.uri.deletedataasset+'/'+$scope.selectedRow._id).success(function(data){
+			$http.delete($config.uri.deletedataasset+'/'+$scope.selectedRow._id).then(function successCallback(data){
 
 					$('#confirm-delete').modal('hide');
           var index = $scope.rowCollection.indexOf($scope.selectedRow);
@@ -115,9 +119,13 @@ define(['./module'], function (controllers) {
           index = $scope.displayed.indexOf($scope.selectedRow);
           $scope.displayed.splice(index, 1);
 
-			}).error(function(data, status){
-        toaster.pop('error', 'Error when deleting record', data);
-      });
+			// }).error(function(data, status){
+   //      toaster.pop('error', 'Error when deleting record', data);
+   //    });
+            },function errorCallback(response) {
+               toaster.pop('error', 'Error when deleting record', response.message);
+       });
+
 
 		}
 
