@@ -2,6 +2,8 @@
   "name": "prof1",
   "type": "profile",
 
+  "process.type": "batch",
+
   "source": {
     "type": "avro",
     "version": "1.7",
