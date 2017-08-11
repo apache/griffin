@@ -1061,3 +1061,41 @@ tbody {
   border-radius: 5px; 
   padding:3px 4px;
 }
+
+#timePopup{
+  position: absolute;
+  z-index:1;
+  height:100px;
+  background-color:white; 
+  /*width:80%;*/
+  text-align: center;
+  border: 5px solid #c5c5c5;
+  border-radius: 3px;
+}
+
+#hourSelector{
+  width: 30%;
+  height: 100%;
+  display: inline-block;
+}
+
+#minuteSelector{
+  width:30%;
+  height:100%;
+  display: inline-block;
+  
+}
+
+#pmam{
+  width:30%;
+  height:100%;
+  display: inline-block;
+}
+
+.division{
+  display: inline-block;
+  width:10%;
+  height:100%;
+  position:relative;
+  top: -30px;
+}

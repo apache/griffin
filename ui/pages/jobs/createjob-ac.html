@@ -82,21 +82,28 @@ under the License.
                                         <div class="col-md-5 col-lg-5 col-sm-5 ">
                                             <input type="text" id="datepicker" class="form-control" ng-model="jobStartTime">
                                         </div>
-                                        <!-- <div class="col-md-1 col-lg-1 col-sm-1 ">
-                                            <input type="text"  class="form-control" ng-model="hour">
-                                        </div>
-                                        <span>&nbsp;:</span>
-                                        <div class="col-md-1 col-lg-1 col-sm-1 ">
-                                            <input type="text"  class="form-control" ng-model="minute">                                    
-                                        </div>
-                                        <span>&nbsp;:</span>
-                                        <div class="col-md-1 col-lg-1 col-sm-1 ">
-                                            <input type="text"  class="form-control" ng-model="second">
-                                        </div> -->
-                                        <div class="col-md-5 col-lg-5 col-sm-5 ">
-                                            <input type="text"  class="form-control" ng-model="time">
-                                        </div>
 
+                                        <div class="col-md-5 col-lg-5 col-sm-5 ">
+                                            <input type="text" class="form-control" id="timeDetail" ng-click="showTime()" value="{{hourDetail}}:{{minuteDetail}} ">
+                                            <div id="timePopup" class="col-md-11 col-lg-11 col-sm-11" ng-if="isOpen">
+                                                <div id="hourSelector">
+                                                    <p ng-click="hourIncrease()"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p>{{hourDetail}}</p>
+                                                    <p ng-click="hourDecrease()"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                </div>
+                                                <div class="division">
+                                                <!-- <p></p> -->
+                                                <p>:</p>
+                                                <!-- <p></p> -->
+                                                <!-- <span>:</span> -->
+                                                </div>
+                                                <div id="minuteSelector">
+                                                    <p ng-click="minuteIncrease()"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p >{{minuteDetail}}</p>
+                                                    <p ng-click="minuteDecrease()"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-12 col-lg-12 col-sm-12">

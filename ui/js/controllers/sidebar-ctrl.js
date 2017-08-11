@@ -41,7 +41,7 @@ define(['./module'], function(controllers) {
                   response = response.data;
                   $scope.status.health = response.healthyJobCount;
                   $scope.status.invalid = response.jobCount - response.healthyJobCount;
-                  renderDataAssetPie($scope.status);
+                  // renderDataAssetPie($scope.status);
                   sideBarList();
               },function errorCallback(response){
 

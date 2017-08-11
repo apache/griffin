@@ -27,8 +27,8 @@ under the License.
             <thead>
             <tr style="background-color:#7D95CC">
                 <th st-ratio="15">Job Name</th>
-                <th st-ratio="15">Source Partition</th>
-                <th st-ratio="15">Target Partition</th>
+                <th st-ratio="15">Source Pattern</th>
+                <th st-ratio="15">Target Pattern</th>
                 <th st-ratio="15">Previous Fire Time</th>
 
                 <th st-ratio="20">Next Fire Time</th>
@@ -72,7 +72,7 @@ under the License.
             </tr>
             <tr ng-show="row.showDetail">
                 <td colspan="7" style="padding:20px 30px 10px 30px;">
-                    <table st-table="row.currentInstances"
+                    <table st-table="row.currentInstances" 
                            class="table table-striped" style="word-wrap: break-word;" >
                         <thead>
                         <tr style="background-color:#7D95CC">
@@ -82,7 +82,7 @@ under the License.
                             <th style="width:20%" >State</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody >
                         <tr ng-if="!row.currentInstances || row.currentInstances.length == 0">
                             <td colspan="7" style="text-align:center">No content.</td>
                         </tr>
@@ -97,7 +97,7 @@ under the License.
                         </tbody>
                         <tfoot>
                         <tr>
-                            <td colspan="3" class="text-right"></td>
+                            <!-- <td colspan="3" class="text-left"></td> -->
                             <td ng-repeat="item in row.pageCount" ng-click="showInstances(row,item)" ng-init="c_index=$index" class="page" id={{p_index}}-{{c_index}}>{{item+1}}</td>
                         </tr>
                         </tfoot>
