@@ -41,20 +41,20 @@ define(['./module'], function(controllers) {
                   response = response.data;
                   $scope.status.health = response.healthyJobCount;
                   $scope.status.invalid = response.jobCount - response.healthyJobCount;
-                  renderDataAssetPie($scope.status);
+                  // renderDataAssetPie($scope.status);
                   sideBarList();
               },function errorCallback(response){
 
               });
               var dataasset = 0;
-              $http.get(allDataassets).then(function successCallback(data) {
-                angular.forEach(data.data,function(db){
-                  angular.forEach(db,function(table){
-                    dataasset = dataasset + 1;
-                  });
-                });
-                $scope.dataasset = dataasset;
-              });
+              // $http.get(allDataassets).then(function successCallback(data) {
+              //   angular.forEach(data.data,function(db){
+              //     angular.forEach(db,function(table){
+              //       dataasset = dataasset + 1;
+              //     });
+              //   });
+              //   $scope.dataasset = dataasset;
+              // });
 
         }
 

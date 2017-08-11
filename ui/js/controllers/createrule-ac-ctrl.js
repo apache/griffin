@@ -37,7 +37,7 @@ define(['./module'], function(controllers) {
         var dbtreeUrl = $config.uri.dbtree;
         var schemaDefinitionUrl = $config.uri.schemadefinition;
 
-        $http.get(dbtreeUrl).then(function successCallback(data) {
+        $http.get(dbtreeUrl,{cache: true}).then(function successCallback(data) {
             var dbList = [];
             if (data.data) {
                 angular.forEach(data.data,function(db,key){

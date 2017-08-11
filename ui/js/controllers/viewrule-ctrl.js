@@ -28,7 +28,10 @@ define(['./module'], function (controllers) {
       function pageInit() {
         $scope.$emit('initReq');
         console.log($routeParams);
-        var getModelUrl = $config.uri.getModel+"/"+$routeParams.modelname;
+        var getModelUrl;
+        if(!isNaN($routeParams.modelname))
+            getModelUrl = $config.uri.getModel+"/"+$routeParams.modelname;
+        else getModelUrl = $config.uri.getModel+"?measureName="+$routeParams.modelname;
         console.log(getModelUrl);
         $http.get(getModelUrl).then(function successCallback(data){
           $scope.ruleData = data.data;
