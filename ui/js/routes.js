@@ -220,13 +220,13 @@ define(['./app'], function(app) {
 
 function isSpinnerRequired(Config, url){
     var names = [
-        "dbtree",
-        "getdataasset",
+        // "dbtree",
+        // "getdataasset",
         "allModels",
         "getModel",
-        "heatmap",
-        "metricdetail",
-        "dashboard",
+        //"heatmap",
+        //"metricdetail",
+        //"dashboard",
         "getmydashboard",
         "getsubscribe"
     ];

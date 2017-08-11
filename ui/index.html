@@ -137,10 +137,10 @@ under the License.
 
     <div id="footerwrap" class="navbar-fixed-bottom" ng-controller="FooterCtrl">
         <!-- <footer class="clearfix"></footer> -->
-        <div class="container-fluid">
-            <div class="row ">
-                <p ng-show="!notifications">{{timestamp|date:'short'}} - Welcome <label>{{fullName}}</label>!</p>
-                <p ng-repeat="r in notifications">
+        <div class="container-fluid" class="ng-cloak">
+            <div class="row" ng-show="timestamp|date:'short'">
+                <p ng-show="!notifications" class="ng-cloak">{{timestamp|date:'short'}} - Welcome <label>{{fullName}}</label>!</p>
+                <p ng-repeat="r in notifications" class="ng-cloak">
                     {{r.timestamp|date:'short'}} - <label>{{r.owner}}</label> {{r.operation}}d a {{r.target}} named
                     <a ng-if="r.target=='model'" href="#!/viewrule/{{r.name}}">{{r.name}}</a>
                     <label ng-if="r.target=='dataasset'">"{{r.name}}"</label>
