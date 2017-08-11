@@ -32,16 +32,25 @@ define(['./module'], function(controllers) {
         $scope.pmam = ['AM','PM'];
         $scope.timeType = 'seconds';
         $scope.isOpen = false;
+        $scope.maskOpen = false;
 
         $scope.hourDetail = parseInt('0');
         $scope.minuteDetail = $scope.Minutes[0];
         $scope.pmam = 'PM';
         $scope.time = '';
 
-        
+
         $scope.showTime = function(){
             console.log('open');
             $scope.isOpen = !$scope.isOpen;
+            $scope.maskOpen = !$scope.maskOpen;
+
+        }
+
+        $scope.close = function(){
+            $scope.isOpen = false;
+            $scope.maskOpen = false;
+
         }
 
         $scope.hourIncrease = function(){
