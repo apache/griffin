@@ -35,7 +35,7 @@ define(['./module'], function (controllers) {
         number = tableState.pagination.number || 10;
 
         if(start == 0 && !$scope.rowCollection){
-          $http.get(allDataassets,{cache: true}).then(function successCallback(data) {
+          $http.get(allDataassets).then(function successCallback(data) {
             originalRowCollection = new Array();
             angular.forEach(data.data,function(db){
               angular.forEach(db,function(table){
@@ -43,14 +43,13 @@ define(['./module'], function (controllers) {
               });
             });
 
-            // originalRowCollection = angular.copy(data);
             $scope.rowCollection = angular.copy(originalRowCollection);
-            // $scope.rowCollection.sort(function(a,b){
-            //   return (a.assetName<b.assetName?-1:(a.assetName>b.assetName?1:0));
-            // });
 
             $scope.displayed = $scope.rowCollection.slice(start, start+number);
             tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
+          },function errorCallback(data){
+            console.log(data);
+            toaster.pop('error','Hive connect failed',data.data.message);
           });
         }else{
           $scope.displayed = $scope.rowCollection.slice(start, start+number);

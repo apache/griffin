@@ -1075,22 +1075,24 @@ tbody {
 }
 
 #hourSelector{
-  width: 30%;
+  width: 20%;
   height: 100%;
   display: inline-block;
 }
 
 #minuteSelector{
-  width:30%;
+  width:20%;
   height:100%;
   display: inline-block;
-  
+
 }
 
-#pmam{
-  width:30%;
+
+#secondSelector{
+  width:20%;
   height:100%;
   display: inline-block;
+
 }
 
 .division{
@@ -1100,6 +1102,7 @@ tbody {
   position:relative;
   top: -30px;
 }
+
 
 /*Typing Loader*/
 .span{
