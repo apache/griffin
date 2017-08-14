@@ -39,7 +39,7 @@ public class JobInstance extends AuditableEntity {
     State state;
     String appId;
     @Lob
-    @Column(length=1048576) //2^20=1048576
+    @Column(length=1024) //2^10=1024
     private String appUri;
     long timestamp;
 

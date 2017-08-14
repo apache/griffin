@@ -24,7 +24,7 @@ package org.apache.griffin.core.job.entity;
 public class JobRequestBody {
     private String sourcePattern;
     private String targetPattern;
-    private String dataStartTimestamp;
+    private String blockStartTimestamp;
     private String jobStartTime;
     private String interval;
 
@@ -44,12 +44,12 @@ public class JobRequestBody {
         this.targetPattern = targetPattern;
     }
 
-    public String getDataStartTimestamp() {
-        return dataStartTimestamp;
+    public String getBlockStartTimestamp() {
+        return blockStartTimestamp;
     }
 
-    public void setDataStartTimestamp(String dataStartTimestamp) {
-        this.dataStartTimestamp = dataStartTimestamp;
+    public void setBlockStartTimestamp(String blockStartTimestamp) {
+        this.blockStartTimestamp = blockStartTimestamp;
     }
 
     public String getJobStartTime() {
@@ -71,10 +71,10 @@ public class JobRequestBody {
     public JobRequestBody() {
     }
 
-    public JobRequestBody(String sourcePattern, String targetPattern, String dataStartTimestamp, String jobStartTime, String interval) {
+    public JobRequestBody(String sourcePattern, String targetPattern, String blockStartTimestamp, String jobStartTime, String interval) {
         this.sourcePattern = sourcePattern;
         this.targetPattern = targetPattern;
-        this.dataStartTimestamp = dataStartTimestamp;
+        this.blockStartTimestamp = blockStartTimestamp;
         this.jobStartTime = jobStartTime;
         this.interval = interval;
     }
@@ -90,7 +90,7 @@ public class JobRequestBody {
             return false;
         if (targetPattern != null ? !targetPattern.equals(that.targetPattern) : that.targetPattern != null)
             return false;
-        if (dataStartTimestamp != null ? !dataStartTimestamp.equals(that.dataStartTimestamp) : that.dataStartTimestamp != null)
+        if (blockStartTimestamp != null ? !blockStartTimestamp.equals(that.blockStartTimestamp) : that.blockStartTimestamp != null)
             return false;
         if (jobStartTime != null ? !jobStartTime.equals(that.jobStartTime) : that.jobStartTime != null) return false;
         return interval != null ? interval.equals(that.interval) : that.interval == null;
@@ -100,7 +100,7 @@ public class JobRequestBody {
     public int hashCode() {
         int result = sourcePattern != null ? sourcePattern.hashCode() : 0;
         result = 31 * result + (targetPattern != null ? targetPattern.hashCode() : 0);
-        result = 31 * result + (dataStartTimestamp != null ? dataStartTimestamp.hashCode() : 0);
+        result = 31 * result + (blockStartTimestamp != null ? blockStartTimestamp.hashCode() : 0);
         result = 31 * result + (jobStartTime != null ? jobStartTime.hashCode() : 0);
         result = 31 * result + (interval != null ? interval.hashCode() : 0);
         return result;
