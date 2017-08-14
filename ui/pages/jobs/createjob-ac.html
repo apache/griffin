@@ -44,7 +44,7 @@ under the License.
 
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
                                             <input type="text" class="form-control" ng-model="sourcePat" name="ruleName" placeholder="Please input the source partition, such as 'YYYYMMdd-HH'." required
-                                                   ng-pattern="/YYYYMMdd-HH/i"
+
                                                    ng-maxlength='11'>
                                             <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Please input partition like 'YYYYMMdd-HH'</span>
                                         </div>
@@ -57,7 +57,7 @@ under the License.
                                         </label>
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
                                             <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'."
-                                                   required ng-pattern="/YYYYMMdd-HH/i" ng-maxlength='11' name="targetPat">
+                                                   required  ng-maxlength='11' name="targetPat">
                                             <span class="error text-small block " ng-if="Form.targetPat.$dirty && Form.targetPat.$error.pattern">Please input partition like 'YYYYMMdd-HH'</span>
                                         </div>
                                     </div>

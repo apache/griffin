@@ -35,7 +35,7 @@ define(['./module'], function (controllers) {
         number = tableState.pagination.number || 10;
 
         if(start == 0 && !$scope.rowCollection){
-          $http.get(allDataassets).then(function successCallback(data) {
+          $http.get(allDataassets,{cache: true}).then(function successCallback(data) {
             originalRowCollection = new Array();
             angular.forEach(data.data,function(db){
               angular.forEach(db,function(table){
