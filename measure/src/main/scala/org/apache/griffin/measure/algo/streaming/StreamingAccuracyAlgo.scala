@@ -59,12 +59,23 @@ case class StreamingAccuracyAlgo(allParam: AllParam) extends AccuracyAlgo {
       val sqlContext = new HiveContext(sc)
 //      val sqlContext = new SQLContext(sc)
 
-      val batchInterval = TimeUtil.milliseconds(sparkParam.batchInterval) match {
-        case Some(interval) => Milliseconds(interval)
-        case _ => throw new Exception("invalid batch interval")
+//      val batchInterval = TimeUtil.milliseconds(sparkParam.batchInterval) match {
+//        case Some(interval) => Milliseconds(interval)
+//        case _ => throw new Exception("invalid batch interval")
+//      }
+//      val ssc = new StreamingContext(sc, batchInterval)
+//      ssc.checkpoint(sparkParam.cpDir)
+
+      def createStreamingContext(): StreamingContext = {
+        val batchInterval = TimeUtil.milliseconds(sparkParam.batchInterval) match {
+          case Some(interval) => Milliseconds(interval)
+          case _ => throw new Exception("invalid batch interval")
+        }
+        val ssc = new StreamingContext(sc, batchInterval)
+        ssc.checkpoint(sparkParam.cpDir)
+        ssc
       }
-      val ssc = new StreamingContext(sc, batchInterval)
-      ssc.checkpoint(sparkParam.cpDir)
+      val ssc = StreamingContext.getOrCreate(sparkParam.cpDir, createStreamingContext)
 
       // init info cache instance
       InfoCacheInstance.initInstance(envParam.infoCacheParams, metricName)
