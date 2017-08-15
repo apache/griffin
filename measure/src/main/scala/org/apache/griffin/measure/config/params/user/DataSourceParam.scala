@@ -16,22 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.config.reader
+package org.apache.griffin.measure.config.params.user
 
-import org.apache.griffin.measure.config.params.env._
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
+import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
+import com.fasterxml.jackson.annotation.JsonInclude.Include
+import org.apache.griffin.measure.config.params.Param
 
-@RunWith(classOf[JUnitRunner])
-class ParamRawStringReaderTest extends FunSuite with Matchers with BeforeAndAfter {
+@JsonInclude(Include.NON_NULL)
+case class DataSourceParam( @JsonProperty("name") name: String,
+                            @JsonProperty("connectors") connectors: List[DataConnectorParam]
+                          ) extends Param {
 
-  test("read raw config") {
-    val rawString = """{"type": "hdfs", "config": {"path": "/path/to", "time": 1234567}}"""
-
-    val reader = ParamRawStringReader(rawString)
-    val paramTry = reader.readConfig[PersistParam]
-    paramTry.isSuccess should be (true)
-    paramTry.get should be (PersistParam("hdfs", Map[String, Any](("path" -> "/path/to"), ("time" -> 1234567))))
-  }
 }

@@ -9,6 +9,7 @@
       "connectors": [
         {
           "type": "hive",
+          "version": "1.2",
           "config": {
             "database": "default",
             "table.name": "users_info_src",
