@@ -26,14 +26,14 @@ import java.util.Map;
 
 public interface HiveMetastoreService {
 
-    public Iterable<String> getAllDatabases() ;
+    Iterable<String> getAllDatabases() ;
 
-    public Iterable<String> getAllTableNames(String dbName) ;
+    Iterable<String> getAllTableNames(String dbName) ;
 
-    public List<Table> getAllTable(String db) ;
+    List<Table> getAllTable(String db) ;
 
-    public Map<String,List<Table>> getAllTable() ;
+    Map<String,List<Table>> getAllTable() ;
 
-    public Table getTable(String dbName, String tableName) ;
+    Table getTable(String dbName, String tableName) ;
 
 }

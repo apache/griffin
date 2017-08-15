@@ -32,7 +32,7 @@ public class Measure extends AuditableEntity   {
 
     private String description;
 
-    public static enum MearuseType {
+    public enum MearuseType {
         accuracy,
     }
 
