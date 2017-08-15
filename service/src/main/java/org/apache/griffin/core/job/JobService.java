@@ -30,13 +30,13 @@ import java.util.Map;
 
 public interface JobService {
 
-    public List<Map<String, Serializable>> getJobs();
+    List<Map<String, Serializable>> getJobs();
 
-    public GriffinOperationMessage addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody);
+    GriffinOperationMessage addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody);
 
-    public GriffinOperationMessage deleteJob(String groupName,String jobName);
+    GriffinOperationMessage deleteJob(String groupName,String jobName);
 
-    public List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
+    List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
 
-    public JobHealth getHealthInfo();
+    JobHealth getHealthInfo();
 }

@@ -24,16 +24,16 @@ import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
 
 public interface KafkaSchemaService {
-    public SchemaString getSchemaString(Integer id);
+    SchemaString getSchemaString(Integer id);
 
-    public Iterable<String> getSubjects();
+    Iterable<String> getSubjects();
 
-    public Iterable<Integer> getSubjectVersions(String subject);
+    Iterable<Integer> getSubjectVersions(String subject);
 
-    public Schema getSubjectSchema(String subject, String version);
+    Schema getSubjectSchema(String subject, String version);
 
-    public Config getTopLevelConfig();
+    Config getTopLevelConfig();
 
-    public Config getSubjectLevelConfig(String subject);
+    Config getSubjectLevelConfig(String subject);
 
 }
