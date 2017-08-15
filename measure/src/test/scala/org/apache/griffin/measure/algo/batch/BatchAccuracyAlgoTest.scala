@@ -214,11 +214,11 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
 //      val sourceDF = sqlContext.read.format("com.databricks.spark.avro").load(sourceFilePath)
 //      val targetDF = sqlContext.read.format("com.databricks.spark.avro").load(targetFilePath)
 
-      val sourceTableName = "source"
-      val targetTableName = "target"
+      val sourceTableName = "source.table"
+      val targetTableName = "target.table"
 
-      val sourceDF = sqlContext.sql("SELECT * FROM default.data_rdm")
-      val targetDF = sqlContext.sql("SELECT * FROM default.data_rdm")
+      val sourceDF = sqlContext.sql("SELECT * FROM default.data_avr")
+      val targetDF = sqlContext.sql("SELECT * FROM default.data_only")
 
 //      sourceDF.show(100)
 //      targetDF.show(100)
@@ -226,30 +226,30 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       sourceDF.registerTempTable(sourceTableName)
       targetDF.registerTempTable(targetTableName)
 
-      val sql =
-        s"""
-          |SELECT COUNT(*) FROM ${sourceTableName} LEFT JOIN ${targetTableName}
-          |ON ${sourceTableName}.uid = ${targetTableName}.uid
-        """.stripMargin
+//        val sourceTableName = "data_avr"
+//        val targetTableName = "data_avr"
 
 //      val sql =
-//        """
-//          |SELECT COUNT(*) FROM source LEFT JOIN target
-//          |ON coalesce(source.user_id, 'null') = coalesce(target.user_id, 'null')
-//          |AND coalesce(source.first_name, 'null') = coalesce(target.first_name, 'null')
-//          |AND coalesce(source.last_name, 'null') = coalesce(target.last_name, 'null')
-//          |AND coalesce(source.address, 'null') = coalesce(target.address, 'null')
-//          |AND coalesce(source.email, 'null') = coalesce(target.email, 'null')
-//          |AND coalesce(source.phone, 'null') = coalesce(target.phone, 'null')
-//          |AND coalesce(source.post_code, 'null') = coalesce(target.post_code, 'null')
-//          |WHERE (target.user_id IS NULL
-//          |AND target.first_name IS NULL
-//          |AND target.last_name IS NULL
-//          |AND target.address IS NULL
-//          |AND target.email IS NULL
-//          |AND target.phone IS NULL
-//          |AND target.post_code IS NULL)
+//        s"""
+//          |SELECT COUNT(*) FROM `${sourceTableName}` LEFT JOIN `${targetTableName}`
+//          |ON `${sourceTableName}`.uid = `${targetTableName}`.uid
 //        """.stripMargin
+
+      val sql =
+        s"""
+          |SELECT `${sourceTableName}`.uid, `${sourceTableName}`.uage, `${sourceTableName}`.udes,
+          |`${targetTableName}`.uid, `${targetTableName}`.uage, `${targetTableName}`.udes
+          |FROM `${sourceTableName}` LEFT JOIN `${targetTableName}`
+          |ON coalesce(`${sourceTableName}`.uid, 'null') = coalesce(`${targetTableName}`.uid, 'null')
+          |AND coalesce(`${sourceTableName}`.uage, 'null') = coalesce(`${targetTableName}`.uage, 'null')
+          |AND coalesce(`${sourceTableName}`.udes, 'null') = coalesce(`${targetTableName}`.udes, 'null')
+          |WHERE (NOT (`${sourceTableName}`.uid IS NULL
+          |AND `${sourceTableName}`.uage IS NULL
+          |AND `${sourceTableName}`.udes IS NULL))
+          |AND ((`${targetTableName}`.uid IS NULL
+          |AND `${targetTableName}`.uage IS NULL
+          |AND `${targetTableName}`.udes IS NULL))
+        """.stripMargin
 
 //      val sql =
 //        """
@@ -271,6 +271,11 @@ class BatchAccuracyAlgoTest extends FunSuite with Matchers with BeforeAndAfter w
       val result = sqlContext.sql(sql)
 
       result.show(100)
+
+//      result.registerTempTable("result")
+//      val rsql = "SELECT COUNT(*) FROM result"
+//      val rr = sqlContext.sql(rsql)
+//      rr.show(100)
 
       // end time
       val endTime = new Date().getTime
