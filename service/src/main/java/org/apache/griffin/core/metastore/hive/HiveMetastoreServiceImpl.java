@@ -73,7 +73,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
             results = client.getAllTables(useDbName);
         } catch (Exception e) {
             reconnect();
-            log.error("Exception fetching tables info" + e.getMessage());
+            log.error("Exception fetching tables info: " + e.getMessage());
         }
         return results;
     }
@@ -91,7 +91,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
             }
         } catch (Exception e) {
             reconnect();
-            log.error("Exception fetching tables info" + e.getMessage());
+            log.error("Exception fetching tables info: " + e.getMessage());
         }
         return results;
     }
@@ -112,7 +112,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
                 }
             } catch (Exception e) {
                 reconnect();
-                log.error("Exception fetching tables info" + e.getMessage());
+                log.error("Exception fetching tables info: " + e.getMessage());
             }
             results.put(db,alltables);
         }

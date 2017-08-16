@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class MeasureServiceImpl implements MeasureService{
+public class MeasureServiceImpl implements MeasureService {
     private static final Logger log = LoggerFactory.getLogger(MeasureServiceImpl.class);
 
     @Autowired
@@ -54,12 +54,16 @@ public class MeasureServiceImpl implements MeasureService{
     public Measure getMeasureByName(@PathVariable("measureName") String measureName) {
         return measureRepo.findByName(measureName);
     }
+
+    /*
+        TODO: require to be fixed: deleting measure doesn't deal with job protocol related to it, leading quartz to throw error that measure cannot be found.
+     */
     @Override
     public GriffinOperationMessage deleteMeasureById(@PathVariable("MeasureId") Long MeasureId) {
-        Measure temp_mesaure=measureRepo.findOne(MeasureId);
-        if (temp_mesaure==null){
+        Measure temp_mesaure = measureRepo.findOne(MeasureId);
+        if (temp_mesaure == null) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        }else {
+        } else {
             measureRepo.delete(MeasureId);
             return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
         }
@@ -67,11 +71,10 @@ public class MeasureServiceImpl implements MeasureService{
 
     @Override
     public GriffinOperationMessage deleteMeasureByName(@PathVariable("measureName") String measureName) {
-        Measure temp_mesaure=measureRepo.findByName(measureName);
-        if(temp_mesaure==null){
+        Measure temp_mesaure = measureRepo.findByName(measureName);
+        if (temp_mesaure == null) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        }
-        else{
+        } else {
             measureRepo.delete(temp_mesaure.getId());
             return GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS;
         }
@@ -79,25 +82,25 @@ public class MeasureServiceImpl implements MeasureService{
 
     @Override
     public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
-        String name=measure.getName();
-        Measure temp_mesaure=measureRepo.findByName(name);
-        if (temp_mesaure==null){
-            if (measureRepo.save(measure)!=null)
+        String name = measure.getName();
+        Measure temp_mesaure = measureRepo.findByName(name);
+        if (temp_mesaure == null) {
+            if (measureRepo.save(measure) != null)
                 return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
-            else{
+            else {
                 return GriffinOperationMessage.CREATE_MEASURE_FAIL;
             }
-        } else{
-            log.info("Failed to create new measure "+name+", it already exists");
+        } else {
+            log.info("Failed to create new measure " + name + ", it already exists");
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
     }
 
     @Override
-    public List<String> getAllMeasureNameByOwner(String owner){
-        List<String> res=new ArrayList<String>();
-        for (Measure measure:measureRepo.findAll()){
-            if(measure.getOwner().equals(owner)){
+    public List<String> getAllMeasureNameByOwner(String owner) {
+        List<String> res = new ArrayList<String>();
+        for (Measure measure : measureRepo.findAll()) {
+            if (measure.getOwner().equals(owner)) {
                 res.add(measure.getName());
             }
         }
@@ -113,11 +116,11 @@ public class MeasureServiceImpl implements MeasureService{
 ////            System.out.print(res);
 //            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
 //        }
-        String name=measure.getName();
-        Measure temp_mesaure=measureRepo.findByName(name);
-        if (temp_mesaure==null){
+        String name = measure.getName();
+        Measure temp_mesaure = measureRepo.findByName(name);
+        if (temp_mesaure == null) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        }else{
+        } else {
             //in this way, id will changed
             //TODO, FRONTEND ID?
             measureRepo.delete(temp_mesaure.getId());

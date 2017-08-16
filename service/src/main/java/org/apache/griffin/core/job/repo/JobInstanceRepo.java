@@ -32,6 +32,14 @@ import java.util.List;
 
 @Repository
 public interface JobInstanceRepo extends CrudRepository<JobInstance,Long>{
+    /**
+     *
+     * @param group is group name
+     * @param name is job name
+     * @param pageable
+     * @return all job instances scheduled at different time using the same prototype job,
+     * the prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.
+     */
     @Query("select s from JobInstance s " +
             "where s.groupName= ?1 and s.jobName=?2 "/*+
             "order by s.timestamp desc"*/)
