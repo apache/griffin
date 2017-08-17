@@ -19,9 +19,5 @@ public class CacheEvictor {
         LOGGER.info("Evict hive cache");
     }
 
-    @Scheduled(fixedRateString = "${cache.evict.hive.fixedRate}")
-    @CacheEvict(cacheNames = "job", allEntries = true, beforeInvocation = true)
-    public void evictJobCache() {
-        LOGGER.info("Evict job cache");
-    }
+
 }
