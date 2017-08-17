@@ -35,6 +35,8 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -53,6 +55,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
 
 @Service
+@CacheConfig(cacheNames = "job")
 public class JobServiceImpl implements JobService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
 
@@ -207,6 +210,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Cacheable
     public List<JobInstance> findInstancesOfJob(String group, String jobName, int page, int size) {
         //query and return instances
         Pageable pageRequest=new PageRequest(page,size, Sort.Direction.DESC,"timestamp");
@@ -249,6 +253,7 @@ public class JobServiceImpl implements JobService {
                 LOGGER.error("spark session "+jobInstance.getSessionId()+" has overdue, set state as unknown!\n"+e);
                 //if server cannot get session from Livy, set State as unknown.
                 jobInstance.setState(LivySessionStateMap.State.unknown);
+                jobInstanceRepo.save(jobInstance);
                 continue;
             }
             TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};

@@ -30,4 +30,4 @@ ui/bower_components/*
 
 ui/node_modules/*
 
-
+ui/package-lock.json
