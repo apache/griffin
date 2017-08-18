@@ -72,7 +72,7 @@ under the License.
             </tr>
             <tr ng-show="row.showDetail">
                 <td colspan="7" style="padding:20px 30px 10px 30px;">
-                    <table st-table="row.currentInstances" 
+                    <table st-table="row.currentInstances"
                            class="table table-striped" style="word-wrap: break-word;" >
                         <thead>
                         <tr style="background-color:#7D95CC">
@@ -96,9 +96,14 @@ under the License.
 
                         </tbody>
                         <tfoot>
-                        <tr>
-                            <!-- <td colspan="3" class="text-left"></td> -->
-                            <td ng-repeat="item in row.pageCount" ng-click="showInstances(row,item)" ng-init="c_index=$index" class="page" id={{p_index}}-{{c_index}}>{{item+1}}</td>
+                        <tr class="text-center">
+                            <!-- <td colspan="1" class="text-left"></td> -->
+                            <td class="text-right page" colspan="1" ng-click="prevPage(row)"><<</td>
+                            <td colspan="10" ng-repeat="item in row.pageCount" ng-click="showInstances(row,item)" ng-init="c_index=$index" class="page" id={{p_index}}-{{item}}>
+                             {{item+1}}                           
+                            </td>
+                            <td class="text-left page" colspan="1" ng-click="nextPage(row)">>></td>
+                            
                         </tr>
                         </tfoot>
                     </table>

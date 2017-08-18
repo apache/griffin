@@ -60,7 +60,7 @@ define(['./module'], function (controllers) {
 
         function pageInit() {
             $scope.$emit('initReq');
-            showBig($routeParams.modelname);
+            showBig($routeParams.modelname);            
         }
 
         $scope.$on('resizeHandler', function(e) {
@@ -70,6 +70,8 @@ define(['./module'], function (controllers) {
                 $scope.myChart.resize();
             }
         });
+        
+
 
         function resizeTreeMap() {
             $('#chart1').height( $('#mainWindow').height() - $('.bs-component').outerHeight() );

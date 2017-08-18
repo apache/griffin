@@ -1102,10 +1102,6 @@ tbody {
 }
 
 /*Typing Loader*/
-.span{
-  text-align: center;
-    padding: 50px 0;
-}
 .typing_loader{
     width: 6px;
     height: 6px;
@@ -1186,6 +1182,18 @@ tbody {
       }
 }
 
+
+.dot {
+  background: #000;
+  float: left;
+  height: 5px;
+  margin-left: 4px;
+  width: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  opacity: 0;
+}
 
 
 .ng-cloak{display:none !important;}

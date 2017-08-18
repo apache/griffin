@@ -27,6 +27,17 @@ define(['./module'], function (controllers) {
       var number = 10;
       var originalRowCollection = undefined;
 
+      $scope.isIE = function() {
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf("MSIE ");
+            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)){
+               return true; 
+            }
+            else {
+               return false;
+            }
+        }
+
       $scope.paging = function(tableState){
         console.log(tableState);
         ts = tableState;

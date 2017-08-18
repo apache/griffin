@@ -28,6 +28,9 @@ define(['./module'], function (controllers) {
         var start = 0;
         var number = 10;    
         var originalRowCollection = undefined;
+        $scope.currentPage = 0;
+
+
 
         function getJobs(start,number,tableState){
             $http.get(allJobs).then(function successCallback(data) {
@@ -86,15 +89,29 @@ define(['./module'], function (controllers) {
         $scope.showInstances = function showInstances(row,number){
             var p_index = $scope.displayed.indexOf(row);
             $scope.currentJob = row;
-  
-            var allInstances = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+'0'+'&size='+'100';
+            $scope.currentPage = number;
+
+            
+
+            var allInstances = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+'0'+'&size='+'200';
             $http.get(allInstances).then(function successCallback(data){
-                row.instances = data.data;
-                row.pageCount = new Array();
-                for(var i = 0;i<Math.ceil(row.instances.length/10);i++){
-                    row.pageCount.push(i);
-                }
-                addCurrent(p_index,number);
+                 row.instances = data.data;                
+                 $scope.pageSize = 5;
+                 $scope.pages = Math.ceil(row.instances.length / $scope.pageSize);
+                 // $scope.newPages = $scope.pages > 5 ? 5 : $scope.pages;
+                 row.pageCount = new Array();
+                 var num = number+1;
+                 if (num > 2) {
+                   for(var i = (num - 3) ; i < ((num + 2) > $scope.pages ? $scope.pages : (num + 2)) ; i++){
+                     row.pageCount.push(i);
+                     //console.log(num);
+                   }
+                 }
+                 else{
+                    for(var i = 0 ; i < 5 ; i++){
+                     row.pageCount.push(i);
+                    }
+                 }
             });
             var url = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+number+'&size='+'10';
             $http.get(url).then(function successCallback(data){
@@ -104,6 +121,19 @@ define(['./module'], function (controllers) {
             $timeout(function(){
                 addCurrent(p_index,number);
             },200);
+        }
+
+
+        $scope.prevPage = function(row){
+            if($scope.currentPage > 0){
+            $scope.currentPage--;
+            $scope.showInstances(row,$scope.currentPage);
+            }   
+        }
+
+        $scope.nextPage = function(row,item){
+            $scope.currentPage++;
+            $scope.showInstances(row,$scope.currentPage);
         }
 
         $scope.remove = function remove(row) {
