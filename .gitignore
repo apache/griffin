@@ -29,5 +29,5 @@ ui/bower_components/*
 
 
 ui/node_modules/*
-
+ui/debug.log
 
