@@ -112,8 +112,8 @@ public class JobServiceImpl implements JobService {
         jobInfoMap.put("measureName", jd.getJobDataMap().getString("measureName"));
         jobInfoMap.put("sourcePattern",jd.getJobDataMap().getString("sourcePattern"));
         jobInfoMap.put("targetPattern",jd.getJobDataMap().getString("targetPattern"));
-        if(StringUtils.isNotEmpty(jd.getJobDataMap().getString("dataStartTimestamp"))) {
-            jobInfoMap.put("dataStartTimestamp", jd.getJobDataMap().getString("dataStartTimestamp"));
+        if(StringUtils.isNotEmpty(jd.getJobDataMap().getString("blockStartTimestamp"))) {
+            jobInfoMap.put("blockStartTimestamp", jd.getJobDataMap().getString("blockStartTimestamp"));
         }
         jobInfoMap.put("jobStartTime",jd.getJobDataMap().getString("jobStartTime"));
         jobInfoMap.put("interval",jd.getJobDataMap().getString("interval"));
@@ -187,10 +187,10 @@ public class JobServiceImpl implements JobService {
         jobDetail.getJobDataMap().put("measureName", measureName);
         jobDetail.getJobDataMap().put("sourcePattern", jobRequestBody.getSourcePattern());
         jobDetail.getJobDataMap().put("targetPattern", jobRequestBody.getTargetPattern());
-        jobDetail.getJobDataMap().put("dataStartTimestamp", jobRequestBody.getDataStartTimestamp());
+        jobDetail.getJobDataMap().put("blockStartTimestamp", jobRequestBody.getBlockStartTimestamp());
         jobDetail.getJobDataMap().put("jobStartTime", jobRequestBody.getJobStartTime());
         jobDetail.getJobDataMap().put("interval", jobRequestBody.getInterval());
-        jobDetail.getJobDataMap().put("lastDataStartTimestamp", "");
+        jobDetail.getJobDataMap().put("lastBlockStartTimestamp", "");
     }
 
     @Override
@@ -249,6 +249,7 @@ public class JobServiceImpl implements JobService {
                 LOGGER.error("spark session "+jobInstance.getSessionId()+" has overdue, set state as unknown!\n"+e);
                 //if server cannot get session from Livy, set State as unknown.
                 jobInstance.setState(LivySessionStateMap.State.unknown);
+                jobInstanceRepo.save(jobInstance);
                 continue;
             }
             TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};

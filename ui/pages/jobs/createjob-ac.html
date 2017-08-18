@@ -17,6 +17,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+<div class="mask" ng-if = 'maskOpen' ng-click="close()"></div>
+
 <div class="container-fluid">
     <div class="row">
         <h5 class="over-title margin-bottom-15">Create Job</h5>
@@ -42,7 +44,7 @@ under the License.
 
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
                                             <input type="text" class="form-control" ng-model="sourcePat" name="ruleName" placeholder="Please input the source partition, such as 'YYYYMMdd-HH'." required
-                                                  
+                                                   ng-pattern="/YYYYMMdd-HH/i"
                                                    ng-maxlength='11'>
                                             <span class="error text-small block " ng-if="Form.ruleName.$dirty && Form.ruleName.$error.pattern">Please input partition like 'YYYYMMdd-HH'</span>
                                         </div>
@@ -55,7 +57,7 @@ under the License.
                                         </label>
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
                                             <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'."
-                                                   required  ng-maxlength='11' name="targetPat">
+                                                   required ng-pattern="/YYYYMMdd-HH/i" ng-maxlength='11' name="targetPat">
                                             <span class="error text-small block " ng-if="Form.targetPat.$dirty && Form.targetPat.$error.pattern">Please input partition like 'YYYYMMdd-HH'</span>
                                         </div>
                                     </div>
@@ -74,17 +76,20 @@ under the License.
                                     </div>
                                 </div>
                                 <div class="col-md-12 col-lg-12 col-sm-12">
-                                    <div class="form-group">
+                                    <div class="form-group" >
                                         <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                                             Start At:
                                         </label>
 
                                         <div class="col-md-5 col-lg-5 col-sm-5 ">
-                                            <input type="text" id="datepicker" class="form-control" ng-model="jobStartTime">
+                                            <input type="text" id="datepicker" class="form-control" ng-model="jobStartTime" >
                                         </div>
 
-                                        <div class="col-md-5 col-lg-5 col-sm-5 ">
-                                            <input type="text" class="form-control" id="timeDetail" ng-click="showTime()" value="{{hourDetail}}:{{minuteDetail}} ">
+                                        <div class="col-md-5 col-lg-5 col-sm-5" ng-class="{'has-error':Form.timeDetail.$invalid, 'has-success':Form.timeDetail.$valid}">
+                                            <input type="text" class="form-control" id="timeDetail" ng-click="showTime()" value="{{hourDetail}}:{{minuteDetail}}:{{secondDetail}} "
+                                                   ng-model="timeDetail"
+
+                                            >
                                             <div id="timePopup" class="col-md-11 col-lg-11 col-sm-11" ng-if="isOpen">
                                                 <div id="hourSelector">
                                                     <p ng-click="hourIncrease()"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
@@ -92,15 +97,20 @@ under the License.
                                                     <p ng-click="hourDecrease()"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
                                                 </div>
                                                 <div class="division">
-                                                <!-- <p></p> -->
-                                                <p>:</p>
-                                                <!-- <p></p> -->
-                                                <!-- <span>:</span> -->
+                                                    <p>:</p>
                                                 </div>
                                                 <div id="minuteSelector">
                                                     <p ng-click="minuteIncrease()"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
                                                     <p >{{minuteDetail}}</p>
                                                     <p ng-click="minuteDecrease()"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                </div>
+                                                <div class="division">
+                                                    <p>:</p>
+                                                </div>
+                                                <div id="secondSelector">
+                                                    <p ng-click="secondIncrease()"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p >{{secondDetail}}</p>
+                                                    <p ng-click="secondDecrease()"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
                                                 </div>
                                             </div>
                                         </div>

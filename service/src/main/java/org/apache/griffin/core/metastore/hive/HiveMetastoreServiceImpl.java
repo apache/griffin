@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -37,6 +39,7 @@ import java.util.Map;
 
 
 @Service
+@CacheConfig(cacheNames = "hive")
 public class HiveMetastoreServiceImpl implements HiveMetastoreService{
 
     private static final Logger log = LoggerFactory.getLogger(HiveMetastoreServiceImpl.class);
@@ -53,6 +56,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
     }
 
     @Override
+    @Cacheable
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
@@ -66,6 +70,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
 
 
     @Override
+    @Cacheable
     public Iterable<String> getAllTableNames(String dbName) {
         Iterable<String> results = null;
         String useDbName = getUseDbName(dbName);
@@ -73,13 +78,14 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
             results = client.getAllTables(useDbName);
         } catch (Exception e) {
             reconnect();
-            log.error("Exception fetching tables info" + e.getMessage());
+            log.error("Exception fetching tables info: " + e.getMessage());
         }
         return results;
     }
 
 
     @Override
+    @Cacheable
     public List<Table> getAllTable(String db) {
         List<Table> results = new ArrayList<Table>();
         String useDbName = getUseDbName(db);
@@ -91,13 +97,14 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
             }
         } catch (Exception e) {
             reconnect();
-            log.error("Exception fetching tables info" + e.getMessage());
+            log.error("Exception fetching tables info: " + e.getMessage());
         }
         return results;
     }
 
 
     @Override
+    @Cacheable
     public Map<String,List<Table>> getAllTable() {
         Map<String,List<Table>> results = new HashMap<String, List<Table>>();
         Iterable<String> dbs = getAllDatabases();
@@ -112,7 +119,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
                 }
             } catch (Exception e) {
                 reconnect();
-                log.error("Exception fetching tables info" + e.getMessage());
+                log.error("Exception fetching tables info: " + e.getMessage());
             }
             results.put(db,alltables);
         }
@@ -121,6 +128,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
 
 
     @Override
+    @Cacheable
     public Table getTable(String dbName, String tableName) {
         Table result = null;
         String useDbName = getUseDbName(dbName);

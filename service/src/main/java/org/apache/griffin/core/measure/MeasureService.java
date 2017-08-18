@@ -27,21 +27,21 @@ import java.util.List;
 
 public interface MeasureService {
 
-    public Iterable<Measure> getAllMeasures();
+    Iterable<Measure> getAllMeasures();
 
-    public Measure getMeasureById(long id);
+    Measure getMeasureById(long id);
 
-    public Measure getMeasureByName(String measureName);
-
-
-    public GriffinOperationMessage deleteMeasureById(Long id);
+    Measure getMeasureByName(String measureName);
 
 
-    public GriffinOperationMessage deleteMeasureByName(String measureName) ;
+    GriffinOperationMessage deleteMeasureById(Long id);
 
-    public GriffinOperationMessage updateMeasure(Measure measure);
 
-    public List<String> getAllMeasureNameByOwner(String owner);
+    GriffinOperationMessage deleteMeasureByName(String measureName) ;
 
-    public GriffinOperationMessage createMeasure(Measure measure);
+    GriffinOperationMessage updateMeasure(Measure measure);
+
+    List<String> getAllMeasureNameByOwner(String owner);
+
+    GriffinOperationMessage createMeasure(Measure measure);
 }

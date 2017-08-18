@@ -54,14 +54,13 @@ define(['./module'], function (controllers) {
               });
             });
 
-            // originalRowCollection = angular.copy(data);
             $scope.rowCollection = angular.copy(originalRowCollection);
-            // $scope.rowCollection.sort(function(a,b){
-            //   return (a.assetName<b.assetName?-1:(a.assetName>b.assetName?1:0));
-            // });
 
             $scope.displayed = $scope.rowCollection.slice(start, start+number);
             tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
+          },function errorCallback(data){
+            console.log(data);
+            toaster.pop('error','Hive connect failed',data.data.message);
           });
         }else{
           $scope.displayed = $scope.rowCollection.slice(start, start+number);

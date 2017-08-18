@@ -69,7 +69,7 @@ public class SparkSubmitJob implements Job {
 
     private Measure measure;
     private String sourcePattern,targetPattern;
-    private String dataStartTimestamp,lastDataStartTimestamp;
+    private String blockStartTimestamp,lastBlockStartTimestamp;
     private String interval;
     private String uri;
     private RestTemplate restTemplate = new RestTemplate();
@@ -89,17 +89,17 @@ public class SparkSubmitJob implements Job {
         String jobName=jd.getJobDataMap().getString("jobName");
         init(jd);
         //prepare current system timestamp
-        long currentDataStartTimestamp = setCurrentDataStartTimestamp(System.currentTimeMillis());
-        LOGGER.info("currentDataStartTimestamp: "+currentDataStartTimestamp);
+        long currentblockStartTimestamp = setCurrentblockStartTimestamp(System.currentTimeMillis());
+        LOGGER.info("currentblockStartTimestamp: "+currentblockStartTimestamp);
         if (StringUtils.isNotEmpty(sourcePattern)) {
             sourcePatternItems = sourcePattern.split("-");
-            setDataConnectorPartitions(measure.getSource(), sourcePatternItems, partitionItems, currentDataStartTimestamp);
+            setDataConnectorPartitions(measure.getSource(), sourcePatternItems, partitionItems, currentblockStartTimestamp);
         }
         if (StringUtils.isNotEmpty(targetPattern)) {
             targetPatternItems = targetPattern.split("-");
-            setDataConnectorPartitions(measure.getTarget(), targetPatternItems, partitionItems, currentDataStartTimestamp);
+            setDataConnectorPartitions(measure.getTarget(), targetPatternItems, partitionItems, currentblockStartTimestamp);
         }
-        jd.getJobDataMap().put("lastDataStartTimestamp", currentDataStartTimestamp + "");
+        jd.getJobDataMap().put("lastBlockStartTimestamp", currentblockStartTimestamp + "");
         setSparkJobDO();
         String result = restTemplate.postForObject(uri, sparkJobDO, String.class);
         LOGGER.info(result);
@@ -118,9 +118,9 @@ public class SparkSubmitJob implements Job {
         uri = sparkJobProps.getProperty("livy.uri");
         sourcePattern = jd.getJobDataMap().getString("sourcePattern");
         targetPattern = jd.getJobDataMap().getString("targetPattern");
-        dataStartTimestamp = jd.getJobDataMap().getString("dataStartTimestamp");
-        lastDataStartTimestamp = jd.getJobDataMap().getString("lastDataStartTimestamp");
-        LOGGER.info("lastDataStartTimestamp:"+lastDataStartTimestamp);
+        blockStartTimestamp = jd.getJobDataMap().getString("blockStartTimestamp");
+        lastBlockStartTimestamp = jd.getJobDataMap().getString("lastBlockStartTimestamp");
+        LOGGER.info("lastBlockStartTimestamp:"+lastBlockStartTimestamp);
         interval = jd.getJobDataMap().getString("interval");
     }
 
@@ -163,26 +163,26 @@ public class SparkSubmitJob implements Job {
     }
 
 
-    public long setCurrentDataStartTimestamp(long currentSystemTimestamp) {
-        long currentDataStartTimestamp=0;
-        if (StringUtils.isNotEmpty(lastDataStartTimestamp)) {
+    public long setCurrentblockStartTimestamp(long currentSystemTimestamp) {
+        long currentblockStartTimestamp=0;
+        if (StringUtils.isNotEmpty(lastBlockStartTimestamp)) {
             try {
-                currentDataStartTimestamp = Long.parseLong(lastDataStartTimestamp) + Integer.parseInt(interval) * 1000;
+                currentblockStartTimestamp = Long.parseLong(lastBlockStartTimestamp) + Integer.parseInt(interval) * 1000;
             }catch (Exception e){
-                LOGGER.info("lastDataStartTimestamp or interval format problem! "+e);
+                LOGGER.info("lastBlockStartTimestamp or interval format problem! "+e);
             }
         } else {
-            if (StringUtils.isNotEmpty(dataStartTimestamp)) {
+            if (StringUtils.isNotEmpty(blockStartTimestamp)) {
                 try{
-                    currentDataStartTimestamp = Long.parseLong(dataStartTimestamp);
+                    currentblockStartTimestamp = Long.parseLong(blockStartTimestamp);
                 }catch (Exception e){
-                    LOGGER.info("dataStartTimestamp format problem! "+e);
+                    LOGGER.info("blockStartTimestamp format problem! "+e);
                 }
             } else {
-                currentDataStartTimestamp = currentSystemTimestamp;
+                currentblockStartTimestamp = currentSystemTimestamp;
             }
         }
-        return currentDataStartTimestamp;
+        return currentblockStartTimestamp;
     }
 
     public void setSparkJobDO() {

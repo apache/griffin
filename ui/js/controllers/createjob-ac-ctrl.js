@@ -27,54 +27,73 @@ define(['./module'], function(controllers) {
         $( "#datepicker" ).datepicker();
 
         $scope.Times = ['seconds','minutes','hours'];
-        $scope.Hours = ['00','01','02','03','04','05','06','07','08','09','10','11','12'];
-        $scope.Minutes = ['00','10','20','30','40','50'];
-        $scope.pmam = ['AM','PM'];
         $scope.timeType = 'seconds';
         $scope.isOpen = false;
+        $scope.maskOpen = false;
 
-        $scope.hourDetail = parseInt('0');
-        $scope.minuteDetail = $scope.Minutes[0];
-        $scope.pmam = 'PM';
-        $scope.time = '';
+        $scope.hourDetail = '00';
+        $scope.minuteDetail = '00';
+        $scope.secondDetail = '00';
+        $scope.timeDetail = '00:00:00';
 
-        
+        var changeTime = function(min,max,increase,time){
+            time = parseInt(time);
+            if(increase){
+                if(time==max)
+                    time = min;
+                else time = time + 1;
+            }
+            else{
+                if(time==min)
+                    time = max;
+                else time = time - 1;
+            }
+            console.log(typeof(time));
+            if(time < 10)
+                time = '0' + time;
+            console.log(typeof(time));
+            return time;
+        }
+
         $scope.showTime = function(){
-            console.log('open');
             $scope.isOpen = !$scope.isOpen;
+            $scope.maskOpen = !$scope.maskOpen;
+        }
+
+        $scope.close = function(){
+            $scope.isOpen = false;
+            $scope.maskOpen = false;
         }
 
         $scope.hourIncrease = function(){
-            console.log('++');
-            if($scope.hourDetail == 24)
-                $scope.hourDetail = 0;
-            else $scope.hourDetail = $scope.hourDetail+1;
+            $scope.hourDetail = changeTime(0,24,true,$scope.hourDetail);
+            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
         }
 
         $scope.hourDecrease = function(){
-            if($scope.hourDetail == 0)
-                $scope.hourDetail = 24;
-            else $scope.hourDetail = $scope.hourDetail-1;
+            $scope.hourDetail = changeTime(0,24,false,$scope.hourDetail);
+            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
         }
 
         $scope.minuteIncrease = function(){
-            if($scope.Minutes.indexOf($scope.minuteDetail)==5)
-                $scope.minuteDetail = $scope.Minutes[0];
-            else $scope.minuteDetail = $scope.Minutes[$scope.Minutes.indexOf($scope.minuteDetail)+1];
+            $scope.minuteDetail = changeTime(0,59,true,$scope.minuteDetail);
+            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
         }
 
         $scope.minuteDecrease =function(){
-            if($scope.Minutes.indexOf($scope.minuteDetail)==0)
-                $scope.minuteDetail = $scope.Minutes[5];
-            else $scope.minuteDetail = $scope.Minutes[$scope.Minutes.indexOf($scope.minuteDetail)-1];
+            $scope.minuteDetail = changeTime(0,59,false,$scope.minuteDetail);
+            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
         }
 
-        $scope.changepmam = function(){
-            if($scope.pmam == 'AM')
-                $scope.pmam = 'PM';
-            else $scope.pmam = 'AM';
+        $scope.secondIncrease = function(){
+            $scope.secondDetail = changeTime(0,59,true,$scope.secondDetail);
+            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
         }
 
+        $scope.secondDecrease =function(){
+            $scope.secondDetail = changeTime(0,59,false,$scope.secondDetail);
+            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
+        }
 
         $scope.Measures = [];
         $scope.$on('$viewContentLoaded', function() {
@@ -148,8 +167,7 @@ define(['./module'], function(controllers) {
                     var year = $scope.jobStartTime.split('/')[2];
                     var month = $scope.jobStartTime.split('/')[0];
                     var day = $scope.jobStartTime.split('/')[1];
-                    $scope.time = $scope.hourDetail + ':' + $scope.minuteDetail;
-                    startTime = year +'-'+ month + '-'+ day + ' '+ $scope.time;
+                    startTime = year +'-'+ month + '-'+ day + ' '+ $scope.timeDetail;
                     console.log(startTime);
                     startTime = Date.parse(startTime);
                     if(isNaN(startTime)){
