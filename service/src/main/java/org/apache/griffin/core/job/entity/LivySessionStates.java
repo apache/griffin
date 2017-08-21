@@ -24,7 +24,7 @@ import com.cloudera.livy.sessions.SessionState;
 /**
  * Created by xiangrchen on 7/31/17.
  */
-public class LivySessionStateMap {
+public class LivySessionStates {
 
     /**
      * unknown is used to represent the state that server get null from Livy.
@@ -44,8 +44,8 @@ public class LivySessionStateMap {
         unknown
     }
 
-    public static SessionState toSessionState(String stateStr){
-        switch (State.valueOf(stateStr)){
+    public static SessionState toSessionState(State state){
+        switch (state){
             case not_started:
                 return new SessionState.NotStarted();
             case starting:
@@ -71,12 +71,12 @@ public class LivySessionStateMap {
         }
     }
 
-    public static boolean isActive(String stateStr){
-        if (State.unknown.toString().equals(stateStr)){
+    public static boolean isActive(State state){
+        if (State.unknown.equals(state)){
             // set unknown isactive() as false.
             return false;
         }
-        SessionState sessionState=toSessionState(stateStr);
+        SessionState sessionState=toSessionState(state);
         if (sessionState==null){
             return false;
         }else {
