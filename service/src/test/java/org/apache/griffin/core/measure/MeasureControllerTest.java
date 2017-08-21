@@ -36,8 +36,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
@@ -132,10 +131,13 @@ public class MeasureControllerTest {
     }
 
     @Test
-    public void testGetAllMeasureNameOfOwner() throws Exception{
+    public void testGetAllMeasuresOfOwner() throws Exception{
         String Owner="test1";
-        String measureName="viewitem_hourly";
-        given(service.getAllMeasureNameByOwner(Owner)).willReturn(Arrays.asList(measureName));
+        List<Map<String, String>> measureList=new LinkedList<>();
+        HashMap<String, String> map = new HashMap<>();
+        map.put("name", "viewitem_hourly");
+        map.put("id", "0");
+        given(service.getAllMeasureByOwner(Owner)).willReturn(measureList);
 
         mvc.perform(get("/measures/owner/"+Owner).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

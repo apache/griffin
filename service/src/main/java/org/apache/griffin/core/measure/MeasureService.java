@@ -24,6 +24,7 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MeasureService {
 
@@ -41,7 +42,7 @@ public interface MeasureService {
 
     GriffinOperationMessage updateMeasure(Measure measure);
 
-    List<String> getAllMeasureNameByOwner(String owner);
+    List<Map<String, String>> getAllMeasureByOwner(String owner);
 
     GriffinOperationMessage createMeasure(Measure measure);
 }

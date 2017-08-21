@@ -32,7 +32,7 @@ public interface JobService {
 
     List<Map<String, Serializable>> getJobs();
 
-    GriffinOperationMessage addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody);
+    GriffinOperationMessage addJob(String groupName, String jobName, long measureId, JobRequestBody jobRequestBody);
 
     GriffinOperationMessage deleteJob(String groupName,String jobName);
 

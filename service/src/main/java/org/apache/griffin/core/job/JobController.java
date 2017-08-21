@@ -48,9 +48,9 @@ public class JobController {
     @RequestMapping(value = "", method = RequestMethod.POST)
     public GriffinOperationMessage addJob(@RequestParam("group") String groupName,
                                            @RequestParam("jobName") String jobName,
-                                           @RequestParam("measureName") String measureName,
+                                           @RequestParam("measureId") long measureId,
                                            @RequestBody JobRequestBody jobRequestBody) {
-        return jobService.addJob(groupName,jobName,measureName, jobRequestBody);
+        return jobService.addJob(groupName,jobName, measureId, jobRequestBody);
     }
 
     @RequestMapping(value = "", method = RequestMethod.DELETE)

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 //@Api("MeasureController")
@@ -85,8 +86,8 @@ public class MeasureController {
     }
 
     @RequestMapping(value = "/measures/owner/{owner}",method = RequestMethod.GET)
-    public List<String> getAllMeasureNameByOwner(@PathVariable("owner") String owner){
-        return measureService.getAllMeasureNameByOwner(owner);
+    public List<Map<String, String>> getAllMeasureByOwner(@PathVariable("owner") String owner){
+        return measureService.getAllMeasureByOwner(owner);
     }
 
     @RequestMapping(value = "/measure", method = RequestMethod.POST)

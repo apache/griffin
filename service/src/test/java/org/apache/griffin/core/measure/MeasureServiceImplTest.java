@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
@@ -150,14 +151,14 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testGetAllMeasureNameByOwner(){
+    public void testGetAllMeasureByOwner(){
         try {
             String measureName="viewitem_hourly";
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
             String owner="test1";
             given(measureRepo.findAll()).willReturn(Arrays.asList(measure));
-            List<String> namelist=service.getAllMeasureNameByOwner(owner);
+            List<Map<String, String>> namelist=service.getAllMeasureByOwner(owner);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all measure name by owner test1");

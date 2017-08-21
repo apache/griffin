@@ -107,6 +107,7 @@ public class SparkSubmitJob implements Job {
     }
 
     public void init(JobDetail jd){
+        //jd.getJobDataMap().getString()
         String measureName = jd.getJobDataMap().getString("measureName");
         measure = measureRepo.findByName(measureName);
         if (measure==null) {

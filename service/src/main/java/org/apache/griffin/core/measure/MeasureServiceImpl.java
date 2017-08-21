@@ -30,8 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.print.attribute.HashAttributeSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MeasureServiceImpl implements MeasureService {
@@ -97,11 +100,14 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public List<String> getAllMeasureNameByOwner(String owner) {
-        List<String> res = new ArrayList<String>();
+    public List<Map<String, String>> getAllMeasureByOwner(String owner) {
+        List<Map<String, String>> res = new ArrayList<>();
         for (Measure measure : measureRepo.findAll()) {
             if (measure.getOwner().equals(owner)) {
-                res.add(measure.getName());
+                HashMap<String, String> map = new HashMap<>();
+                map.put("name", measure.getName());
+                map.put("id", measure.getId().toString());
+                res.add(map);
             }
         }
         return res;

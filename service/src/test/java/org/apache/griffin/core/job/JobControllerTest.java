@@ -76,11 +76,11 @@ public class JobControllerTest {
     public void testAddJob() throws Exception {
         String groupName="BA";
         String jobName="job1";
-        String measureName="viewitem_hourly";
+        long measureId=0;
         JobRequestBody jobRequestBody =new JobRequestBody("YYYYMMdd-HH","YYYYMMdd-HH","111","20170607","100");
         ObjectMapper mapper=new ObjectMapper();
         String schedulerRequestBodyJson=mapper.writeValueAsString(jobRequestBody);
-        given(service.addJob(groupName,jobName,measureName, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS);
+        given(service.addJob(groupName, jobName, measureId, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS);
 
         mvc.perform(post("/jobs/add/BA/job1/viewitem_hourly").contentType(MediaType.APPLICATION_JSON).content(schedulerRequestBodyJson))
                 .andExpect(status().isOk())

@@ -119,11 +119,11 @@ public class JobServiceImplTest {
         try {
             String groupName="BA";
             String jobName="job1";
-            String measureName="m1";
+            long measureId=0;
             JobRequestBody jobRequestBody =new JobRequestBody();
             Scheduler scheduler=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler);
-            GriffinOperationMessage tmp = service.addJob(groupName,jobName,measureName, jobRequestBody);
+            GriffinOperationMessage tmp = service.addJob(groupName,jobName,measureId, jobRequestBody);
             assertEquals(tmp,GriffinOperationMessage.CREATE_JOB_FAIL);
             assertTrue(true);
 
@@ -131,7 +131,7 @@ public class JobServiceImplTest {
                     System.currentTimeMillis()+"",System.currentTimeMillis()+"","1000");
             Scheduler scheduler1=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler1);
-            GriffinOperationMessage tmp1 = service.addJob(groupName,jobName,measureName, jobRequestBody1);
+            GriffinOperationMessage tmp1 = service.addJob(groupName,jobName,measureId, jobRequestBody1);
             assertEquals(tmp1,GriffinOperationMessage.CREATE_JOB_SUCCESS);
         }catch (Throwable t){
             fail("Cannot add job ");

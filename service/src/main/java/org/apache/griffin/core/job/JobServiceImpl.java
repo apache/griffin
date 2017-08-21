@@ -121,7 +121,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public GriffinOperationMessage addJob(String groupName, String jobName, String measureName, JobRequestBody jobRequestBody) {
+    public GriffinOperationMessage addJob(String groupName, String jobName, long measureId, JobRequestBody jobRequestBody) {
         int interval = 0;
         Date jobStartTime=null;
         try{
@@ -142,7 +142,7 @@ public class JobServiceImpl implements JobService {
             JobDetail jobDetail;
             if (scheduler.checkExists(jobKey)) {
                 jobDetail = scheduler.getJobDetail(jobKey);
-                setJobData(jobDetail, jobRequestBody,measureName,groupName,jobName);
+                setJobData(jobDetail, jobRequestBody, measureId, groupName, jobName);
                 scheduler.addJob(jobDetail, true);
             } else {
                 jobDetail = newJob(SparkSubmitJob.class)
@@ -150,7 +150,7 @@ public class JobServiceImpl implements JobService {
                         .withIdentity(jobKey)
                         .build();
                 //set JobData
-                setJobData(jobDetail, jobRequestBody,measureName,groupName,jobName);
+                setJobData(jobDetail, jobRequestBody, measureId, groupName, jobName);
                 scheduler.addJob(jobDetail, false);
             }
             Trigger trigger = newTrigger()
@@ -181,10 +181,10 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    public void setJobData(JobDetail jobDetail, JobRequestBody jobRequestBody, String measureName, String groupName, String jobName){
+    public void setJobData(JobDetail jobDetail, JobRequestBody jobRequestBody, long measureId, String groupName, String jobName){
         jobDetail.getJobDataMap().put("groupName",groupName);
         jobDetail.getJobDataMap().put("jobName",jobName);
-        jobDetail.getJobDataMap().put("measureName", measureName);
+        jobDetail.getJobDataMap().put("measureId", measureId);
         jobDetail.getJobDataMap().put("sourcePattern", jobRequestBody.getSourcePattern());
         jobDetail.getJobDataMap().put("targetPattern", jobRequestBody.getTargetPattern());
         jobDetail.getJobDataMap().put("blockStartTimestamp", jobRequestBody.getBlockStartTimestamp());
