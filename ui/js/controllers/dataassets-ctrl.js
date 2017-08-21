@@ -60,7 +60,7 @@ define(['./module'], function (controllers) {
             tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
           },function errorCallback(data){
             console.log(data);
-            toaster.pop('error','Hive connect failed',data.data.message);
+            toaster.pop('error','Get data assets failed',data.data.message);
           });
         }else{
           $scope.displayed = $scope.rowCollection.slice(start, start+number);

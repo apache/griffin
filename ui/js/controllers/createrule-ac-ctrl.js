@@ -222,10 +222,10 @@ define(['./module'], function(controllers) {
                 height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
             });
 //            $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
-            document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
-            $('.y-scrollable').css({
-                'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
-            });
+//            document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
+//            $('.y-scrollable').css({
+//                'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+//            });
         }
 
         $scope.ruleTypes = $filter('strarr')('modeltype');//['Accuracy', 'Validity', 'Anomaly Detection', 'Publish Metrics'];

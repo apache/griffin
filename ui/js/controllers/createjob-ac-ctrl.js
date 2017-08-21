@@ -36,7 +36,7 @@ define(['./module'], function(controllers) {
         $scope.secondDetail = '00';
         $scope.timeDetail = '00:00:00';
 
-        var changeTime = function(min,max,increase,time){
+        $scope.changeTime = function(min,max,increase,time,type){
             time = parseInt(time);
             if(increase){
                 if(time==max)
@@ -48,11 +48,17 @@ define(['./module'], function(controllers) {
                     time = max;
                 else time = time - 1;
             }
-            console.log(typeof(time));
             if(time < 10)
                 time = '0' + time;
-            console.log(typeof(time));
-            return time;
+
+            if(type==1)
+                $scope.hourDetail = time;
+            else if(type==2)
+                $scope.minuteDetail = time;
+            else
+                $scope.secondDetail = time;
+            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
+
         }
 
         $scope.showTime = function(){
@@ -63,36 +69,6 @@ define(['./module'], function(controllers) {
         $scope.close = function(){
             $scope.isOpen = false;
             $scope.maskOpen = false;
-        }
-
-        $scope.hourIncrease = function(){
-            $scope.hourDetail = changeTime(0,24,true,$scope.hourDetail);
-            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
-        }
-
-        $scope.hourDecrease = function(){
-            $scope.hourDetail = changeTime(0,24,false,$scope.hourDetail);
-            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
-        }
-
-        $scope.minuteIncrease = function(){
-            $scope.minuteDetail = changeTime(0,59,true,$scope.minuteDetail);
-            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
-        }
-
-        $scope.minuteDecrease =function(){
-            $scope.minuteDetail = changeTime(0,59,false,$scope.minuteDetail);
-            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
-        }
-
-        $scope.secondIncrease = function(){
-            $scope.secondDetail = changeTime(0,59,true,$scope.secondDetail);
-            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
-        }
-
-        $scope.secondDecrease =function(){
-            $scope.secondDetail = changeTime(0,59,false,$scope.secondDetail);
-            $scope.timeDetail = $scope.hourDetail+':'+$scope.minuteDetail+':'+$scope.secondDetail;
         }
 
         $scope.Measures = [];
@@ -192,7 +168,7 @@ define(['./module'], function(controllers) {
                 var timestamp = Date.parse(date);
                 var jobName = $scope.Measures[$scope.measure] + '-BA-' + $scope.ntAccount + '-' + timestamp;
 
-                var newJob = $config.uri.addJobs + '?group=' + this.data.groupName + '&jobName=' + jobName + '&measureName=' + $scope.Measures[$scope.measure];
+                var newJob = $config.uri.addJobs + '?group=' + this.data.groupName + '&jobName=' + jobName + '&measureId=' + $scope.Measures[$scope.measure].id;
                 console.log(newJob);
                 console.log(this.data);
                 $http.post(newJob, this.data).then(function successCallback(data) {

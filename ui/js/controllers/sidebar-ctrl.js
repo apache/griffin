@@ -161,7 +161,7 @@ define(['./module'], function(controllers) {
             } else {
               $('#rightbar').css('display', 'block');
               resizePieChart();
-              $scope.dataAssetPieChart.resize();
+//              $scope.dataAssetPieChart.resize();
               resizeSideChart();
             }
         });
