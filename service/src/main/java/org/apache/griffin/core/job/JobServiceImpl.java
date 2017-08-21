@@ -26,7 +26,7 @@ import org.apache.griffin.core.error.exception.GriffinException.GetJobsFailureEx
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
-import org.apache.griffin.core.job.entity.LivySessionStateMap;
+import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.GriffinUtil;
@@ -237,7 +237,7 @@ public class JobServiceImpl implements JobService {
         //update all instance info belongs to this group and job.
         List<JobInstance> jobInstanceList=jobInstanceRepo.findByGroupNameAndJobName(group,jobName);
         for (JobInstance jobInstance:jobInstanceList){
-            if (!LivySessionStateMap.isActive(jobInstance.getState().toString())){
+            if (!LivySessionStates.isActive(jobInstance.getState())){
                 continue;
             }
             String uri=sparkJobProps.getProperty("livy.uri")+"/"+jobInstance.getSessionId();
@@ -248,12 +248,11 @@ public class JobServiceImpl implements JobService {
             }catch (Exception e){
                 LOGGER.error("spark session "+jobInstance.getSessionId()+" has overdue, set state as unknown!\n"+e);
                 //if server cannot get session from Livy, set State as unknown.
-                jobInstance.setState(LivySessionStateMap.State.unknown);
+                jobInstance.setState(LivySessionStates.State.unknown);
                 jobInstanceRepo.save(jobInstance);
-                continue;
             }
             TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
-            HashMap<String,Object> resultMap= null;
+            HashMap<String,Object> resultMap;
             try {
                 resultMap = GriffinUtil.toEntity(resultStr,type);
             } catch (IOException e) {
@@ -262,7 +261,7 @@ public class JobServiceImpl implements JobService {
             }
             try{
                 if (resultMap!=null && resultMap.size()!=0){
-                    jobInstance.setState(LivySessionStateMap.State.valueOf(resultMap.get("state").toString()));
+                    jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
                     jobInstance.setAppId(resultMap.get("appId").toString());
                     jobInstance.setAppUri(sparkJobProps.getProperty("spark.uri")+"/cluster/app/"+resultMap.get("appId").toString());
                 }
@@ -290,11 +289,11 @@ public class JobServiceImpl implements JobService {
                     String jobName=jobKey.getName();
                     String jobGroup=jobKey.getGroup();
                     Pageable pageRequest=new PageRequest(0,1, Sort.Direction.DESC,"timestamp");
-                    JobInstance latestJobInstance=new JobInstance();
+                    JobInstance latestJobInstance;
                     if (jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest)!=null
                             &&jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).size()>0){
                         latestJobInstance=jobInstanceRepo.findByGroupNameAndJobName(jobGroup,jobName,pageRequest).get(0);
-                        if(!LivySessionStateMap.isHeathy(latestJobInstance.getState())){
+                        if(!LivySessionStates.isHeathy(latestJobInstance.getState())){
                             notHealthyCount++;
                         }
                     }

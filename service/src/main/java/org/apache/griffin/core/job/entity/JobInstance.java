@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import org.apache.griffin.core.job.entity.LivySessionStateMap.State;
+import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AuditableEntity;
 
 import javax.persistence.*;
