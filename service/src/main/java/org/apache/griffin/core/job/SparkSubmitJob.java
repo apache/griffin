@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.LivySessionStateMap;
+import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.entity.SparkJobDO;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
@@ -245,7 +245,7 @@ public class SparkSubmitJob implements Job {
             jobInstance.setJobName(jobName);
             try {
                 jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
-                jobInstance.setState(LivySessionStateMap.State.valueOf(resultMap.get("state").toString()));
+                jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
                 jobInstance.setAppId(resultMap.get("appId").toString());
             }catch (Exception e){
                 LOGGER.warn("jobInstance has null field. "+e);

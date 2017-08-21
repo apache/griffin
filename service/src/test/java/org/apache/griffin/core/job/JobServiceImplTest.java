@@ -22,7 +22,7 @@ package org.apache.griffin.core.job;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
-import org.apache.griffin.core.job.entity.LivySessionStateMap;
+import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.junit.Before;
@@ -189,7 +189,7 @@ public class JobServiceImplTest {
             jobInstance.setGroupName("BA");
             jobInstance.setJobName("job1");
             jobInstance.setSessionId(1);
-            jobInstance.setState(LivySessionStateMap.State.starting);
+            jobInstance.setState(LivySessionStates.State.starting);
             jobInstance.setAppId("ttt");
             jobInstance.setTimestamp(System.currentTimeMillis());
             scheduleStateList.add(jobInstance);
@@ -198,7 +198,7 @@ public class JobServiceImplTest {
             assertTrue(true);
 
             scheduleStateList.remove(0);
-            jobInstance.setState(LivySessionStateMap.State.success);
+            jobInstance.setState(LivySessionStates.State.success);
             scheduleStateList.add(jobInstance);
             given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(),jobKey.getName(),pageRequest)).willReturn(scheduleStateList);
             JobHealth tmp1 = service.getHealthInfo();

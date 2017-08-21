@@ -22,7 +22,7 @@ package org.apache.griffin.core.job;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
-import org.apache.griffin.core.job.entity.LivySessionStateMap;
+import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
@@ -105,7 +105,7 @@ public class JobControllerTest {
         String job="job1";
         int page=0;
         int size=2;
-        JobInstance jobInstance=new JobInstance(group, job, 1, LivySessionStateMap.State.running, "","", System.currentTimeMillis());
+        JobInstance jobInstance=new JobInstance(group, job, 1, LivySessionStates.State.running, "","", System.currentTimeMillis());
         given(service.findInstancesOfJob(group,job,page,size)).willReturn(Arrays.asList(jobInstance));
         mvc.perform(get("/jobs/instances/BA/job1/0/2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
