@@ -359,6 +359,8 @@ define(['./module'], function(controllers) {
                 //::TODO: Need to save the data to backend with POST/PUT method
                 var newModel = $config.uri.addModels;
                 $http.post(newModel, this.data).then(function successCallback(data) {
+                    if(data.data.code=='408')
+                        toaster.pop('error','Create Measure Failed, duplicate records');
                     $('#confirm').on('hidden.bs.modal', function(e) {
                         $('#confirm').off('hidden.bs.modal');
                         $location.path('/measures').replace();
