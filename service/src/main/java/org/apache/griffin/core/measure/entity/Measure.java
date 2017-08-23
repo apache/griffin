@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import javax.persistence.*;
 

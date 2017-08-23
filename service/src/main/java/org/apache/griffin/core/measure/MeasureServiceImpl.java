@@ -83,7 +83,7 @@ public class MeasureServiceImpl implements MeasureService {
         try {
             for(JobKey jobKey: scheduler.getJobKeys(GroupMatcher.anyGroup())){//get all jobs
                 JobDataMap jobDataMap = scheduler.getJobDetail(jobKey).getJobDataMap();
-                if(jobDataMap.getString("measureId").equals(measureId.toString())){//select jobs related measureId
+                if(jobDataMap.getString("measureId").equals(measureId.toString())){//select jobs related to measureId
                     List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);//get all triggers of one job
                     for (Trigger trigger: triggers){//unschedule all triggers
                         scheduler.unscheduleJob(trigger.getKey());

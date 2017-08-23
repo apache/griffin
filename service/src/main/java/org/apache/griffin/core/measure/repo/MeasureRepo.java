@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.measure.repo;
 
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.EvaluateRule;
 import org.apache.griffin.core.measure.entity.Measure;

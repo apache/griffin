@@ -109,7 +109,7 @@ public class SparkSubmitJob implements Job {
     public void init(JobDetail jd){
         //jd.getJobDataMap().getString()
         /**
-         * the field measureId is from `setJobData` in `JobServiceImpl`
+         * the field measureId is generated from `setJobData` in `JobServiceImpl`
          */
         String measureId = jd.getJobDataMap().getString("measureId");
         measure = measureRepo.findOne(Long.valueOf(measureId));
