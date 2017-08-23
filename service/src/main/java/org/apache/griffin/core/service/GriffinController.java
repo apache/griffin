@@ -50,6 +50,12 @@ public class GriffinController {
         return measureRepo.findOrganizations();
     }
 
+    /**
+     *
+     * @param org
+     * @return list of the name of metric, and a metric is the result of executing the job sharing the same name with
+     * measure.
+     */
     @RequestMapping(value = "/org/{org}",method = RequestMethod.GET)
     public List<String> getMetricNameListByOrg(@PathVariable("org") String org){
         return measureRepo.findNameByOrganization(org);

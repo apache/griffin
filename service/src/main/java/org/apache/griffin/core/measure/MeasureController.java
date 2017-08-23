@@ -46,8 +46,8 @@ public class MeasureController {
             @ApiResponse(code=404,message="The resource you were trying to reach is not found")
     })
     @RequestMapping(value = "/measures",method = RequestMethod.GET)
-    public Iterable<Measure> getAllMeasures() {
-        return measureService.getAllMeasures();
+    public Iterable<Measure> getAllAliveMeasures() {
+        return measureService.getAllAliveMeasures();
     }
 
 
@@ -65,20 +65,20 @@ public class MeasureController {
         return measureService.getMeasureById(id);
     }
 
-    @RequestMapping(value = "/measure",method = RequestMethod.GET)
+   /* @RequestMapping(value = "/measure",method = RequestMethod.GET)
     public Measure getMeasureByName(@RequestParam("measureName") String measureName) {
         return measureService.getMeasureByName(measureName);
-    }
+    }*/
 
     @RequestMapping(value = "/measure/{id}",method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteMeasureById(@PathVariable("id") Long id) {
         return measureService.deleteMeasureById(id);
     }
 
-    @RequestMapping(value = "/measure",method = RequestMethod.DELETE)
+/*    @RequestMapping(value = "/measure",method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteMeasureByName(@RequestParam("measureName") String measureName) {
         return measureService.deleteMeasureByName(measureName);
-    }
+    }*/
 
     @RequestMapping(value = "/measure",method = RequestMethod.PUT)
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
@@ -86,8 +86,8 @@ public class MeasureController {
     }
 
     @RequestMapping(value = "/measures/owner/{owner}",method = RequestMethod.GET)
-    public List<Map<String, String>> getAllMeasureByOwner(@PathVariable("owner") String owner){
-        return measureService.getAllMeasureByOwner(owner);
+    public List<Map<String, String>> getAllAliveMeasureNameIdByOwner(@PathVariable("owner") String owner){
+        return measureService.getAllAliveMeasureNameIdByOwner(owner);
     }
 
     @RequestMapping(value = "/measure", method = RequestMethod.POST)

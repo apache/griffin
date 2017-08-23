@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import javax.persistence.*;
 
 
@@ -27,7 +29,6 @@ public class Measure extends AuditableEntity   {
 
     private static final long serialVersionUID = -4748881017029815794L;
 
-    @Column(unique=true)
     private String name;
 
     private String description;
@@ -56,7 +57,7 @@ public class Measure extends AuditableEntity   {
      * owner means owner name
      */
     private String owner;
-
+    private Boolean deleted = false;
     public String getName() {
         return name;
     }
@@ -122,6 +123,14 @@ public class Measure extends AuditableEntity   {
     }
 
     public Measure() {
+    }
+
+    public Boolean getDeleted() {
+        return this.deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Measure(String name, String description, MearuseType type, String organization, DataConnector source, DataConnector target, EvaluateRule evaluateRule, String owner) {

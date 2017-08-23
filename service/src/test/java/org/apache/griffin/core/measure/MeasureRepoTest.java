@@ -69,7 +69,7 @@ public class MeasureRepoTest {
         assertThat(measureRepo.findOrgByName("griffin_aver")).isEqualTo("eBay");
     }
 
-    @Test
+   /* @Test
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void testUpdateMeasure() {
         HashMap<String, String> sourceMap = new HashMap<>();
@@ -102,5 +102,5 @@ public class MeasureRepoTest {
             }
         }
 
-    }
+    }*/
 }

@@ -67,13 +67,16 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<Map<String, Serializable>> getJobs() {
+    public List<Map<String, Serializable>> getRunningJobs() {
         Scheduler scheduler = factory.getObject();
         List<Map<String, Serializable>> list = new ArrayList<>();
         try {
             for (String groupName : scheduler.getJobGroupNames()) {
                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
-                    list.add(genJobInfoMap(scheduler,jobKey));
+                    Map jobInfoMap = genJobInfoMap(scheduler, jobKey);
+                    if(jobInfoMap.size()!=0){
+                        list.add(jobInfoMap);
+                    }
                 }
             }
         } catch (SchedulerException e) {
@@ -109,7 +112,7 @@ public class JobServiceImpl implements JobService {
             jobInfoMap.put("previousFireTime", -1);
         }
         jobInfoMap.put("triggerState",triggerState);
-        jobInfoMap.put("measureName", jd.getJobDataMap().getString("measureName"));
+        jobInfoMap.put("measureId", jd.getJobDataMap().getString("measureId"));
         jobInfoMap.put("sourcePattern",jd.getJobDataMap().getString("sourcePattern"));
         jobInfoMap.put("targetPattern",jd.getJobDataMap().getString("targetPattern"));
         if(StringUtils.isNotEmpty(jd.getJobDataMap().getString("blockStartTimestamp"))) {
@@ -121,7 +124,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public GriffinOperationMessage addJob(String groupName, String jobName, long measureId, JobRequestBody jobRequestBody) {
+    public GriffinOperationMessage addJob(String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody) {
         int interval = 0;
         Date jobStartTime=null;
         try{
@@ -181,10 +184,10 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    public void setJobData(JobDetail jobDetail, JobRequestBody jobRequestBody, long measureId, String groupName, String jobName){
+    public void setJobData(JobDetail jobDetail, JobRequestBody jobRequestBody, Long measureId, String groupName, String jobName){
         jobDetail.getJobDataMap().put("groupName",groupName);
         jobDetail.getJobDataMap().put("jobName",jobName);
-        jobDetail.getJobDataMap().put("measureId", measureId);
+        jobDetail.getJobDataMap().put("measureId", measureId.toString());
         jobDetail.getJobDataMap().put("sourcePattern", jobRequestBody.getSourcePattern());
         jobDetail.getJobDataMap().put("targetPattern", jobRequestBody.getTargetPattern());
         jobDetail.getJobDataMap().put("blockStartTimestamp", jobRequestBody.getBlockStartTimestamp());
@@ -250,6 +253,7 @@ public class JobServiceImpl implements JobService {
                 //if server cannot get session from Livy, set State as unknown.
                 jobInstance.setState(LivySessionStates.State.unknown);
                 jobInstanceRepo.save(jobInstance);
+                continue;
             }
             TypeReference<HashMap<String,Object>> type=new TypeReference<HashMap<String,Object>>(){};
             HashMap<String,Object> resultMap;
@@ -269,7 +273,7 @@ public class JobServiceImpl implements JobService {
                 LOGGER.warn(group+","+jobName+"job Instance has some null field (state or appId). "+e);
                 continue;
             }
-            jobInstanceRepo.update(jobInstance.getId(),jobInstance.getState(),jobInstance.getAppId(),jobInstance.getAppUri());
+            jobInstanceRepo.save(jobInstance);
         }
     }
 

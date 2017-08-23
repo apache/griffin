@@ -108,11 +108,14 @@ public class SparkSubmitJob implements Job {
 
     public void init(JobDetail jd){
         //jd.getJobDataMap().getString()
-        String measureName = jd.getJobDataMap().getString("measureName");
-        measure = measureRepo.findByName(measureName);
+        /**
+         * the field measureId is from `setJobData` in `JobServiceImpl`
+         */
+        String measureId = jd.getJobDataMap().getString("measureId");
+        measure = measureRepo.findOne(Long.valueOf(measureId));
         if (measure==null) {
-            LOGGER.error(measureName + " is not find!");
-            return;
+            LOGGER.error("Measure with id " + measureId + " is not find!");
+            //if return here, livy uri won't be set, and will keep null for all measures even they are not null
         }
         String partitionItemstr = sparkJobProps.getProperty("sparkJob.dateAndHour");
         partitionItems = partitionItemstr.split(",");

@@ -64,7 +64,7 @@ public class JobControllerTest {
         Map<String, Serializable> map=new HashMap<String, Serializable>();
         map.put("jobName", "job1");
         map.put("groupName", "BA");
-        given(service.getJobs()).willReturn(Arrays.asList(map));
+        given(service.getRunningJobs()).willReturn(Arrays.asList(map));
 
         mvc.perform(get("/jobs/").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

@@ -87,7 +87,7 @@ public class JobServiceImplTest {
         try {
             Scheduler scheduler=Mockito.mock(Scheduler.class);
             given(factory.getObject()).willReturn(scheduler);
-            List<Map<String, Serializable>> tmp = service.getJobs();
+            List<Map<String, Serializable>> tmp = service.getRunningJobs();
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all jobs info from dbs");

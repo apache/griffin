@@ -42,13 +42,13 @@ public class JobController {
 
     @RequestMapping(value = "/",method = RequestMethod.GET)
     public List<Map<String, Serializable>> getJobs() {
-        return jobService.getJobs();
+        return jobService.getRunningJobs();
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public GriffinOperationMessage addJob(@RequestParam("group") String groupName,
                                            @RequestParam("jobName") String jobName,
-                                           @RequestParam("measureId") long measureId,
+                                           @RequestParam("measureId") Long measureId,
                                            @RequestBody JobRequestBody jobRequestBody) {
         return jobService.addJob(groupName,jobName, measureId, jobRequestBody);
     }

@@ -30,9 +30,9 @@ import java.util.Map;
 
 public interface JobService {
 
-    List<Map<String, Serializable>> getJobs();
+    List<Map<String, Serializable>> getRunningJobs();
 
-    GriffinOperationMessage addJob(String groupName, String jobName, long measureId, JobRequestBody jobRequestBody);
+    GriffinOperationMessage addJob(String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody);
 
     GriffinOperationMessage deleteJob(String groupName,String jobName);
 

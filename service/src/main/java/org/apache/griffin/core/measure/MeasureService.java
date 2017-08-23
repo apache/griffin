@@ -28,21 +28,25 @@ import java.util.Map;
 
 public interface MeasureService {
 
-    Iterable<Measure> getAllMeasures();
+    Iterable<Measure> getAllAliveMeasures();
 
     Measure getMeasureById(long id);
 
+/*
     Measure getMeasureByName(String measureName);
+*/
 
 
     GriffinOperationMessage deleteMeasureById(Long id);
 
 
+/*
     GriffinOperationMessage deleteMeasureByName(String measureName) ;
+*/
 
     GriffinOperationMessage updateMeasure(Measure measure);
 
-    List<Map<String, String>> getAllMeasureByOwner(String owner);
+    List<Map<String, String>> getAllAliveMeasureNameIdByOwner(String owner);
 
     GriffinOperationMessage createMeasure(Measure measure);
 }

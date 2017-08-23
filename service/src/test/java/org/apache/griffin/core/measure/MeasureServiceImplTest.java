@@ -69,7 +69,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testGetAllMeasures(){
         try {
-            Iterable<Measure> tmp = service.getAllMeasures();
+            Iterable<Measure> tmp = service.getAllAliveMeasures();
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all Measure from dbs");
@@ -86,7 +86,7 @@ public class MeasureServiceImplTest {
         }
     }
 
-    @Test
+  /*  @Test
     public void testGetMeasuresByName(){
         try {
             Measure tmp = service.getMeasureByName("viewitem_hourly");
@@ -94,7 +94,7 @@ public class MeasureServiceImplTest {
         }catch (Throwable t){
             fail("Cannot get Measure in db By name: viewitem_hourly");
         }
-    }
+    }*/
 
     @Test
     public void testDeleteMeasuresById(){
@@ -106,7 +106,7 @@ public class MeasureServiceImplTest {
         }
     }
 
-    @Test
+    /*@Test
     public void testDeleteMeasuresByName(){
         try {
             String measureName="viewitem_hourly";
@@ -123,7 +123,7 @@ public class MeasureServiceImplTest {
         }catch (Throwable t){
             fail("Cannot delete Measure in db By name: viewitem_hourly");
         }
-    }
+    }*/
 
     @Test
     public void testCreateNewMeasure(){
@@ -131,17 +131,17 @@ public class MeasureServiceImplTest {
             String measureName="viewitem_hourly";
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
-            given(measureRepo.findByName(measureName)).willReturn(null);
+            given(measureRepo.findOne(0L)).willReturn(null);
             GriffinOperationMessage message=service.createMeasure(measure);
             assertEquals(message,GriffinOperationMessage.CREATE_MEASURE_FAIL);
             assertTrue(true);
 
             Measure measure1=createATestMeasure(measureName,"bullseye1");
-            given(measureRepo.findByName(measureName)).willReturn(measure1);
+            given(measureRepo.findOne(0L)).willReturn(measure1);
             GriffinOperationMessage message1=service.createMeasure(measure);
             assertEquals(message1,GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
 
-            given(measureRepo.findByName(measureName)).willReturn(null);
+            given(measureRepo.findOne(0L)).willReturn(null);
             given(measureRepo.save(measure)).willReturn(measure);
             GriffinOperationMessage message2=service.createMeasure(measure);
             assertEquals(message2,GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
@@ -158,7 +158,7 @@ public class MeasureServiceImplTest {
             Measure measure=createATestMeasure(measureName,org);
             String owner="test1";
             given(measureRepo.findAll()).willReturn(Arrays.asList(measure));
-            List<Map<String, String>> namelist=service.getAllMeasureByOwner(owner);
+            List<Map<String, String>> namelist=service.getAllAliveMeasureNameIdByOwner(owner);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all measure name by owner test1");
@@ -194,6 +194,7 @@ public class MeasureServiceImplTest {
         String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
         EvaluateRule eRule = new EvaluateRule(1,rules);
         Measure measure = new Measure(name,"bevssoj description", Measure.MearuseType.accuracy, org, source, target, eRule,"test1");
+        measure.setId(0L);
         return measure;
     }
 

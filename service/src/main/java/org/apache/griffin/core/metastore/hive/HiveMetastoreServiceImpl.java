@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
+import org.apache.griffin.core.common.CacheEvictor;
 import org.apache.griffin.core.error.exception.GriffinException.HiveConnectionException;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -45,7 +46,10 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
     private static final Logger log = LoggerFactory.getLogger(HiveMetastoreServiceImpl.class);
 
     @Autowired
-    HiveMetaStoreClient client;
+    private HiveMetaStoreClient client;
+    //TODO: wrap HiveMetaStoreClient to manage hive connection, when hive connection fails, evict hive cache.
+    //Note that if the hive connection is down, the following methods won't throw exception because it isn't executed
+    //because of cache.
 
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;
