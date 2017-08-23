@@ -29,22 +29,22 @@ define(['./module'], function(controllers) {
           $scope.$emit('initReq');
 
           var url_dashboard = $config.uri.getmydashboard + $scope.ntAccount;
-          $http.get(url_dashboard).success(function(res) {
-              $scope.dashboard = res;
-              angular.forEach(res, function(sys) {
-                angular.forEach(sys.metrics, function(metric) {
-                  var chartData = metric.details;
-                  chartData.sort(function(a, b){
-                    return a.timestamp - b.timestamp;
-                  });
-
-                });
-              });
-              $scope.originalData = angular.copy(res);
-              $timeout(function() {
-                redraw($scope.dashboard);
-              }, 0);
-          });
+//          $http.get(url_dashboard).success(function(res) {
+//              $scope.dashboard = res;
+//              angular.forEach(res, function(sys) {
+//                angular.forEach(sys.metrics, function(metric) {
+//                  var chartData = metric.details;
+//                  chartData.sort(function(a, b){
+//                    return a.timestamp - b.timestamp;
+//                  });
+//
+//                });
+//              });
+//              $scope.originalData = angular.copy(res);
+//              $timeout(function() {
+//                redraw($scope.dashboard);
+//              }, 0);
+//          });
 
         }
 
@@ -75,9 +75,9 @@ define(['./module'], function(controllers) {
         $scope.showBig = function(t){
           var metricDetailUrl = $config.uri.metricdetail + '/' + t.name;
           // var metricDetailUrl = '/js/mock_data/anom.json';
-          $http.get(metricDetailUrl).success(function (data){
-            $rootScope.showBigChart($barkChart.getOptionBig(data));
-          });
+//          $http.get(metricDetailUrl).success(function (data){
+//            $rootScope.showBigChart($barkChart.getOptionBig(data));
+//          });
 
         }
 

@@ -222,10 +222,10 @@ define(['./module'], function(controllers) {
                 height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
             });
 //            $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
-            document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
-            $('.y-scrollable').css({
-                'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
-            });
+//            document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
+//            $('.y-scrollable').css({
+//                'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+//            });
         }
 
         $scope.ruleTypes = $filter('strarr')('modeltype');//['Accuracy', 'Validity', 'Anomaly Detection', 'Publish Metrics'];
@@ -359,6 +359,8 @@ define(['./module'], function(controllers) {
                 //::TODO: Need to save the data to backend with POST/PUT method
                 var newModel = $config.uri.addModels;
                 $http.post(newModel, this.data).then(function successCallback(data) {
+                    if(data.data.code=='408')
+                        toaster.pop('error','Create Measure Failed, duplicate records');
                     $('#confirm').on('hidden.bs.modal', function(e) {
                         $('#confirm').off('hidden.bs.modal');
                         $location.path('/measures').replace();

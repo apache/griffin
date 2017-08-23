@@ -92,25 +92,25 @@ under the License.
                                             >
                                             <div id="timePopup" class="col-md-11 col-lg-11 col-sm-11" ng-if="isOpen">
                                                 <div id="hourSelector">
-                                                    <p ng-click="hourIncrease()"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p ng-click="changeTime(0,24,true,hourDetail,1)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
                                                     <p>{{hourDetail}}</p>
-                                                    <p ng-click="hourDecrease()"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                    <p ng-click="changeTime(0,24,false,hourDetail,1)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
                                                 </div>
                                                 <div class="division">
                                                     <p>:</p>
                                                 </div>
                                                 <div id="minuteSelector">
-                                                    <p ng-click="minuteIncrease()"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p ng-click="changeTime(0,59,true,minuteDetail,2)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
                                                     <p >{{minuteDetail}}</p>
-                                                    <p ng-click="minuteDecrease()"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                    <p ng-click="changeTime(0,59,false,minuteDetail,2)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
                                                 </div>
                                                 <div class="division">
                                                     <p>:</p>
                                                 </div>
                                                 <div id="secondSelector">
-                                                    <p ng-click="secondIncrease()"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p ng-click="changeTime(0,59,true,secondDetail,3)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
                                                     <p >{{secondDetail}}</p>
-                                                    <p ng-click="secondDecrease()"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                    <p ng-click="changeTime(0,59,false,secondDetail,3)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
                                                 </div>
                                             </div>
                                         </div>
