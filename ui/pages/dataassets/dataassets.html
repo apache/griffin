@@ -38,10 +38,9 @@ under the License.
 		     <td ng-if="displayed.length == 0" colspan="7" style="text-align:center">
 		     No content.
 		     </td>
-		     <td>
-		        <img ng-if="isIE()" src="/img/spinner.gif" style="margin-left: 400px;max-height: 120px;"/> 
-             	<div ng-if="!isIE()" class="typing_loader"></div>	
-		     </td>            
+		     <td class="icon">
+				 <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
+			 </td>
 		    </tr>
 		</tbody>
 	  	<tbody ng-repeat="row in displayed" style="word-break:break-all;">
