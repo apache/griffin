@@ -65,30 +65,25 @@ public class MeasureServiceImpl implements MeasureService {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         } else {
             //stop all jobs related to the measure
-            stopJobs(measureId);
             Measure measure = measureRepo.findOne(measureId);
+            pauseJobs(measure);
             measure.setDeleted(true);
             measureRepo.save(measure);
             return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
         }
     }
 
-    private void stopJobs(Long measureId) {
+    private void pauseJobs(Measure measure) {
         Scheduler scheduler = factory.getObject();
         try {
             for(JobKey jobKey: scheduler.getJobKeys(GroupMatcher.anyGroup())){//get all jobs
                 JobDataMap jobDataMap = scheduler.getJobDetail(jobKey).getJobDataMap();
-                if(jobDataMap.getString("measureId").equals(measureId.toString())){//select jobs related to measureId
+                if(jobDataMap.getString("measureId").equals(measure.getId().toString())){//select jobs related to measureId
                     scheduler.pauseJob(jobKey);
-                    /*List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);//get all triggers of one job
-                    for (Trigger trigger: triggers){//unschedule all triggers
-
-                        scheduler.unscheduleJob(trigger.getKey());
-                    }*/
                 }
             }
         } catch (SchedulerException e) {
-            log.error("Fail to stop jobs related to measure " + measureId);
+            log.error("Fail to stop jobs related to measure id: " + measure.getId()+"name: "+measure.getName());
         }
     }
 

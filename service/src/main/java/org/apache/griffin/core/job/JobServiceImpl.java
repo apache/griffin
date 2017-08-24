@@ -75,13 +75,13 @@ public class JobServiceImpl implements JobService {
             for (String groupName : scheduler.getJobGroupNames()) {
                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                     Map jobInfoMap = genJobInfoMap(scheduler, jobKey);
-                    if(jobInfoMap.size()!=0 && jobInfoMap.get("triggerState").equals(Trigger.TriggerState.PAUSED) == false){
+                    if(jobInfoMap.size()!=0 && !jobInfoMap.get("triggerState").equals(Trigger.TriggerState.PAUSED)){
                         list.add(jobInfoMap);
                     }
                 }
             }
         } catch (SchedulerException e) {
-            LOGGER.error("failed to get jobs."+e);
+            LOGGER.error("failed to get running jobs."+e);
             throw new GetJobsFailureException();
         }
         return list;
