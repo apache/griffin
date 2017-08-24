@@ -166,7 +166,7 @@ define(['./module'], function(controllers) {
                 var date = new Date();
                 var month = date.getMonth()+1;
                 var timestamp = Date.parse(date);
-                var jobName = $scope.Measures[$scope.measure].id + '-BA-' + $scope.ntAccount + '-' + timestamp;
+                var jobName = $scope.Measures[$scope.measure].name + '-BA-' + $scope.ntAccount + '-' + timestamp;
 
                 var newJob = $config.uri.addJobs + '?group=' + this.data.groupName + '&jobName=' + jobName + '&measureId=' + $scope.Measures[$scope.measure].id;
                 console.log(newJob);

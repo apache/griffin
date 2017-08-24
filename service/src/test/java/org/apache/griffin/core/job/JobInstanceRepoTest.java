@@ -33,7 +33,10 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByGroupNameAndJobName3Args(){
-        //jobInstanceRepo.findByGroupNameAndJobName();
+/*
+        jobInstanceRepo.findByGroupNameAndJobName();
+*/
+
     }
 
 }

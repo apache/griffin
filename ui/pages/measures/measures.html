@@ -96,9 +96,9 @@ under the License.
                     <ng-include src="'/pages/measures/delete-confirm.html'"/>
                 </div>
                 <div class="modal-footer">
-                    <p style="text-align: left;color: white;font-size: 150%;">If you delete this measure, your jobs on this measure will also be deleted, please be careful</p>
-                    <button type="button" class="btn btn-primary" ng-click="confirmDelete()">Yes</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <p style="text-align: left;color: white;font-size: 150%;">If you delete this measure, your running jobs on this measure will also be paused, please be careful!</p>
+                    <button type="button" class="btn btn-default" ng-click="confirmDelete()">Yes</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
                 </div>
             </div>
         </div>

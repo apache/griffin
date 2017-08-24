@@ -74,7 +74,7 @@ public class JobServiceImpl implements JobService {
             for (String groupName : scheduler.getJobGroupNames()) {
                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                     Map jobInfoMap = genJobInfoMap(scheduler, jobKey);
-                    if(jobInfoMap.size()!=0){
+                    if(jobInfoMap.size()!=0 && jobInfoMap.get("triggerState").equals(Trigger.TriggerState.PAUSED) == false){
                         list.add(jobInfoMap);
                     }
                 }
