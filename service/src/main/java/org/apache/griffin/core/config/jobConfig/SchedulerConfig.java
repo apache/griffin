@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.job.config;
+package org.apache.griffin.core.config.jobConfig;
 
 import org.apache.griffin.core.util.GriffinUtil;
 import org.quartz.spi.JobFactory;
