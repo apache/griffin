@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import static org.apache.griffin.core.util.GriffinOperationMessage.CREATE_JOB_FAIL;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -133,13 +134,15 @@ public class JobServiceImpl implements JobService {
             setJobStartTime(jobStartTime,interval);
         }catch (Exception e){
             LOGGER.info("jobStartTime or interval format error! "+e);
-            return GriffinOperationMessage.CREATE_JOB_FAIL;
+            return CREATE_JOB_FAIL;
         }
         try {
             Scheduler scheduler = factory.getObject();
             TriggerKey triggerKey = triggerKey(jobName, groupName);
             if (scheduler.checkExists(triggerKey)) {
-                scheduler.unscheduleJob(triggerKey);
+                LOGGER.error("the triggerKey(jobName,groupName) "+jobName+" has been used.");
+                return CREATE_JOB_FAIL;
+                //scheduler.unscheduleJob(triggerKey);
             }
             JobKey jobKey = jobKey(jobName, groupName);
             JobDetail jobDetail;
@@ -169,7 +172,7 @@ public class JobServiceImpl implements JobService {
             return GriffinOperationMessage.CREATE_JOB_SUCCESS;
         } catch (SchedulerException e) {
             LOGGER.error("", e);
-            return GriffinOperationMessage.CREATE_JOB_FAIL;
+            return CREATE_JOB_FAIL;
         }
     }
 
@@ -201,7 +204,7 @@ public class JobServiceImpl implements JobService {
         try {
             Scheduler scheduler = factory.getObject();
             scheduler.deleteJob(new JobKey(name, group));
-            jobInstanceRepo.deleteInGroupAndjobName(group,name);
+            jobInstanceRepo.deleteByGroupAndjobName(group,name);
             return GriffinOperationMessage.DELETE_JOB_SUCCESS;
         } catch (SchedulerException e) {
             LOGGER.error(GriffinOperationMessage.DELETE_JOB_FAIL+""+e);
