@@ -56,11 +56,6 @@ public class MeasureServiceImpl implements MeasureService {
         return measureRepo.findOne(id);
     }
 
-    /*@Override
-    public Measure getMeasureByName(@PathVariable("measureName") String measureName) {
-        return measureRepo.findByName(measureName);
-    }*/
-
     /*
         TODO: require to be fixed: deleting measure doesn't deal with job protocol related to it, leading quartz to throw error that measure cannot be found.
      */
@@ -89,24 +84,11 @@ public class MeasureServiceImpl implements MeasureService {
                         scheduler.unscheduleJob(trigger.getKey());
                     }
                 }
-
-
             }
         } catch (SchedulerException e) {
             log.error("Fail to stop jobs related to measure " + measureId);
         }
     }
-
-  /*  @Override
-    public GriffinOperationMessage deleteMeasureByName(@PathVariable("measureName") String measureName) {
-        Measure temp_mesaure = measureRepo.findByName(measureName);
-        if (temp_mesaure == null) {
-            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        } else {
-            measureRepo.delete(temp_mesaure.getId());
-            return GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS;
-        }
-    }*/
 
     @Override
     public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
@@ -126,14 +108,6 @@ public class MeasureServiceImpl implements MeasureService {
     @Override
     public List<Map<String, String>> getAllAliveMeasureNameIdByOwner(String owner) {
         List<Map<String, String>> res = new ArrayList<>();
-        /*for (Measure measure : measureRepo.findAll()) {
-            if (measure.getOwner().equals(owner)) {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("name", measure.getName());
-                map.put("id", measure.getId().toString());
-                res.add(map);
-            }
-        }*/
         for(Measure measure: measureRepo.findByOwnerAndDeleted(owner, false)){
             HashMap<String, String> map = new HashMap<>();
             map.put("name", measure.getName());
@@ -144,15 +118,6 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
-//        Long measureId=measure.getId();
-//        if (measureRepo.findOne(measureId)==null){
-//            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-//        }else{
-//            measureRepo.updateMeasure(measureId,measure.getDescription(),measure.getOrganization(),measure.getSource(),measure.getTarget(),measure.getEvaluateRule());
-////            System.out.print(res);
-//            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
-//        }
-
         if (measureRepo.exists(measure.getId()) == false) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         } else {

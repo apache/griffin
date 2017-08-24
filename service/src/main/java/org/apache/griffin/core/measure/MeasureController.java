@@ -48,20 +48,10 @@ public class MeasureController {
         return measureService.getMeasureById(id);
     }
 
-   /* @RequestMapping(value = "/measure",method = RequestMethod.GET)
-    public Measure getMeasureByName(@RequestParam("measureName") String measureName) {
-        return measureService.getMeasureByName(measureName);
-    }*/
-
     @RequestMapping(value = "/measure/{id}",method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteMeasureById(@PathVariable("id") Long id) {
         return measureService.deleteMeasureById(id);
     }
-
-/*    @RequestMapping(value = "/measure",method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteMeasureByName(@RequestParam("measureName") String measureName) {
-        return measureService.deleteMeasureByName(measureName);
-    }*/
 
     @RequestMapping(value = "/measure",method = RequestMethod.PUT)
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
