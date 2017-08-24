@@ -1103,100 +1103,13 @@ tbody {
   top: -30px;
 }
 
-
-/*Typing Loader*/
-.typing_loader{
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    -webkit-animation: typing 1s linear infinite alternate;
-       -moz-animation: Typing 1s linear infinite alternate;
-       -ms-animation: Typing 1s linear infinite alternate;
-            animation: typing 1s linear infinite alternate;
-    margin-top: 150px;
-    margin-left: 500px;
-    position: absolute;
-}
-@-webkit-keyframes typing{
-    0%{
-        background-color: rgba(255,255,255, 1);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2),
-                    24px 0px 0px 0px rgba(255,255,255,0.2);
-      }
-    25%{
-        background-color: rgba(255,255,255, 0.4);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,2),
-                    24px 0px 0px 0px rgba(255,255,255,0.2);
-    }
-    75%{ background-color: rgba(255,255,255, 0.4);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2),
-                    24px 0px 0px 0px rgba(255,255,255,1);
-      }
+.icon{
+  color: #fff;
+  position: absolute;
+  left: 50%;
+  top:20%;
 }
 
-@-moz-keyframes typing{
-   0%{
-        background-color: rgba(255,255,255, 1);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2),
-                    24px 0px 0px 0px rgba(255,255,255,0.2);
-      }
-    25%{
-        background-color: rgba(255,255,255, 0.4);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,2),
-                    24px 0px 0px 0px rgba(255,255,255,0.2);
-    }
-    75%{ background-color: rgba(255,255,255, 0.4);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2),
-                    24px 0px 0px 0px rgba(255,255,255,1);
-      }
-}
-
-@-o-keyframes typing{
-   0%{
-        background-color: rgba(255,255,255, 1);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2),
-                    24px 0px 0px 0px rgba(255,255,255,0.2);
-      }
-    25%{
-        background-color: rgba(255,255,255, 0.4);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,2),
-                    24px 0px 0px 0px rgba(255,255,255,0.2);
-    }
-    75%{ background-color: rgba(255,255,255, 0.4);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2),
-                    24px 0px 0px 0px rgba(255,255,255,1);
-      }
-}
-
-@keyframes typing{
-   0%{
-        background-color: rgba(255,255,255, 1);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2),
-                    24px 0px 0px 0px rgba(255,255,255,0.2);
-      }
-    25%{
-        background-color: rgba(255,255,255, 0.4);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,2),
-                    24px 0px 0px 0px rgba(255,255,255,0.2);
-    }
-    75%{ background-color: rgba(255,255,255, 0.4);
-        box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2),
-                    24px 0px 0px 0px rgba(255,255,255,1);
-      }
-}
-
-
-.dot {
-  background: #000;
-  float: left;
-  height: 5px;
-  margin-left: 4px;
-  width: 5px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  opacity: 0;
-}
 
 
 .ng-cloak{display:none !important;}

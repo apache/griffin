@@ -32,8 +32,9 @@ under the License.
   <div class="tab-pane fade active in" id="heatmap" >
     <div ng-if="!finalData || finalData.length == 0">
       <span ng-if="finalData.length == 0" colspan="7" style="text-align:center">No content.</span>
-      <img ng-if="isIE()" src="/img/spinner.gif" style="margin-left:380px;max-height: 120px;position: absolute;"/>
-      <div ng-if="!isIE()" class="typing_loader"></div> 
+      <div class="icon">
+        <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
+      </div>
     </div>      
     <div id="chart1"></div>
   </div>
