@@ -30,7 +30,7 @@ import java.util.Map;
 
 public interface JobService {
 
-    List<Map<String, Serializable>> getRunningJobs();
+    List<Map<String, Serializable>> getAliveJobs();
 
     GriffinOperationMessage addJob(String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody);
 

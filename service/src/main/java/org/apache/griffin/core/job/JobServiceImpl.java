@@ -68,14 +68,14 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<Map<String, Serializable>> getRunningJobs() {
+    public List<Map<String, Serializable>> getAliveJobs() {
         Scheduler scheduler = factory.getObject();
         List<Map<String, Serializable>> list = new ArrayList<>();
         try {
             for (String groupName : scheduler.getJobGroupNames()) {
                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                     Map jobInfoMap = genJobInfoMap(scheduler, jobKey);
-                    if(jobInfoMap.size()!=0 && !jobInfoMap.get("triggerState").equals(Trigger.TriggerState.PAUSED)){
+                    if(jobInfoMap.size()!=0 && isJobDeleted(scheduler, jobKey) == false){
                         list.add(jobInfoMap);
                     }
                 }
@@ -85,6 +85,12 @@ public class JobServiceImpl implements JobService {
             throw new GetJobsFailureException();
         }
         return list;
+    }
+
+    private boolean isJobDeleted(Scheduler scheduler, JobKey jobKey) throws SchedulerException {
+        JobDataMap jobDataMap = scheduler.getJobDetail(jobKey).getJobDataMap();
+        boolean status= Boolean.parseBoolean((String) jobDataMap.get("deleted"));
+        return status;
     }
 
     public Map genJobInfoMap(Scheduler scheduler,JobKey jobKey) throws SchedulerException {
@@ -197,6 +203,7 @@ public class JobServiceImpl implements JobService {
         jobDetail.getJobDataMap().put("jobStartTime", jobRequestBody.getJobStartTime());
         jobDetail.getJobDataMap().put("interval", jobRequestBody.getInterval());
         jobDetail.getJobDataMap().put("lastBlockStartTimestamp", "");
+        jobDetail.getJobDataMap().putAsString("deleted", false);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class JobController {
 
     @RequestMapping(value = "/",method = RequestMethod.GET)
     public List<Map<String, Serializable>> getJobs() {
-        return jobService.getRunningJobs();
+        return jobService.getAliveJobs();
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)

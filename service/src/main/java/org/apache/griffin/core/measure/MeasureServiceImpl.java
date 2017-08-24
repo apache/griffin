@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import org.apache.griffin.core.job.SparkSubmitJob;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
@@ -64,7 +65,7 @@ public class MeasureServiceImpl implements MeasureService {
         if (measureRepo.exists(measureId) == false) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         } else {
-            //stop all jobs related to the measure
+            //pause all jobs related to the measure
             Measure measure = measureRepo.findOne(measureId);
             pauseJobs(measure);
             measure.setDeleted(true);
@@ -74,12 +75,17 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     private void pauseJobs(Measure measure) {
+
         Scheduler scheduler = factory.getObject();
         try {
             for(JobKey jobKey: scheduler.getJobKeys(GroupMatcher.anyGroup())){//get all jobs
-                JobDataMap jobDataMap = scheduler.getJobDetail(jobKey).getJobDataMap();
+                JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+                JobDataMap jobDataMap = jobDetail.getJobDataMap();
                 if(jobDataMap.getString("measureId").equals(measure.getId().toString())){//select jobs related to measureId
                     scheduler.pauseJob(jobKey);
+                    jobDataMap.putAsString("deleted", true);
+                    scheduler.addJob(jobDetail, true);
+                    log.info(jobKey.getGroup()+" "+jobKey.getName()+" is paused and logically deleted.");
                 }
             }
         } catch (SchedulerException e) {
