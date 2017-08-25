@@ -21,6 +21,7 @@ package org.apache.griffin.core.measure;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.EvaluateRule;
 import org.apache.griffin.core.measure.entity.Measure;
@@ -55,12 +56,19 @@ public class MeasureServiceImplTest {
         public MeasureServiceImpl service(){
             return new MeasureServiceImpl();
         }
+
+        @Bean
+        public JobServiceImpl JobService(){
+            return new JobServiceImpl();
+        }
+
     }
     @MockBean
     private MeasureRepo measureRepo;
 
     @Autowired
     private MeasureServiceImpl service;
+
 
     @Before
     public void setup(){
