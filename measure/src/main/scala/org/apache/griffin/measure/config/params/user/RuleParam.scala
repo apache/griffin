@@ -23,10 +23,12 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.griffin.measure.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
-case class RuleParam( @JsonProperty("name") name: String,
-                      @JsonProperty("type") ruleType: String,
-                      @JsonProperty("rule") procType: String,
-                      @JsonProperty("persist.type") persistType: String
+case class RuleParam(@JsonProperty("name") name: String,
+                     @JsonProperty("dsl.type") dslType: String,
+                     @JsonProperty("rule") rule: String,
+                     @JsonProperty("persist.type") persistType: String,
+                     @JsonProperty("dq.type") dqType: String,
+                     @JsonProperty("details") details: Map[String, Any]
                     ) extends Param {
 
 }

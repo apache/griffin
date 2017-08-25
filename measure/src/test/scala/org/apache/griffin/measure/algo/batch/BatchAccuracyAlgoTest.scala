@@ -26,8 +26,8 @@
 //import org.apache.griffin.measure.config.params.user._
 //import org.apache.griffin.measure.config.reader._
 //import org.apache.griffin.measure.config.validator._
-//import org.apache.griffin.measure.connector.direct.DirectDataConnector
-//import org.apache.griffin.measure.connector.{DataConnector, DataConnectorFactory}
+//import org.apache.griffin.measure.data.connector.direct.DirectDataConnector
+//import org.apache.griffin.measure.data.connector.{DataConnector, DataConnectorFactory}
 //import org.apache.griffin.measure.log.Loggable
 //import org.apache.griffin.measure.rule.expr._
 //import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}

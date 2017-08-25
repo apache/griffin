@@ -26,8 +26,8 @@
 //import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 //import org.apache.griffin.measure.cache.result.CacheResultProcesser
 //import org.apache.griffin.measure.config.params.AllParam
-//import org.apache.griffin.measure.connector._
-//import org.apache.griffin.measure.connector.direct.DirectDataConnector
+//import org.apache.griffin.measure.data.connector._
+//import org.apache.griffin.measure.data.connector.direct.DirectDataConnector
 //import org.apache.griffin.measure.persist.{Persist, PersistFactory, PersistType}
 //import org.apache.griffin.measure.result.{AccuracyResult, MismatchInfo, TimeStampInfo}
 //import org.apache.griffin.measure.rule.{ExprValueUtil, RuleAnalyzer, RuleFactory}

@@ -46,7 +46,7 @@ trait Persist extends Loggable with Serializable {
   def log(rt: Long, msg: String): Unit
 }
 
-object PersistType {
+object PersistDataType {
   final val MISS = "miss"
   final val MATCH = "match"
 }

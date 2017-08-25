@@ -29,7 +29,7 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
 
   val MaxLogLines = "max.log.lines"
 
-  val maxLogLines = try { config.getOrElse(MaxLogLines, 100).toString.toInt } catch { case _ => 100 }
+  val maxLogLines = try { config.getOrElse(MaxLogLines, 100).toString.toInt } catch { case _: Throwable => 100 }
 
   def available(): Boolean = true
 
@@ -88,16 +88,16 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
 
   def records(recs: RDD[String], tp: String): Unit = {
     tp match {
-      case PersistType.MISS => rddRecords(recs)
-      case PersistType.MATCH => rddRecords(recs)
+      case PersistDataType.MISS => rddRecords(recs)
+      case PersistDataType.MATCH => rddRecords(recs)
       case _ => {}
     }
   }
 
   def records(recs: Iterable[String], tp: String): Unit = {
     tp match {
-      case PersistType.MISS => iterableRecords(recs)
-      case PersistType.MATCH => iterableRecords(recs)
+      case PersistDataType.MISS => iterableRecords(recs)
+      case PersistDataType.MATCH => iterableRecords(recs)
       case _ => {}
     }
   }

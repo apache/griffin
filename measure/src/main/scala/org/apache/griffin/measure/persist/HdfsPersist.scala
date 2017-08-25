@@ -34,8 +34,8 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val MaxLinesPerFile = "max.lines.per.file"
 
   val path = config.getOrElse(Path, "").toString
-  val maxPersistLines = try { config.getOrElse(MaxPersistLines, -1).toString.toInt } catch { case _ => -1 }
-  val maxLinesPerFile = try { config.getOrElse(MaxLinesPerFile, 10000).toString.toLong } catch { case _ => 10000 }
+  val maxPersistLines = try { config.getOrElse(MaxPersistLines, -1).toString.toInt } catch { case _: Throwable => -1 }
+  val maxLinesPerFile = try { config.getOrElse(MaxLinesPerFile, 10000).toString.toLong } catch { case _: Throwable => 10000 }
 
   val separator = "/"
 
@@ -167,16 +167,16 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   def records(recs: RDD[String], tp: String): Unit = {
     tp match {
-      case PersistType.MISS => rddRecords(recs, MissRecFile)
-      case PersistType.MATCH => rddRecords(recs, MatchRecFile)
+      case PersistDataType.MISS => rddRecords(recs, MissRecFile)
+      case PersistDataType.MATCH => rddRecords(recs, MatchRecFile)
       case _ => {}
     }
   }
 
   def records(recs: Iterable[String], tp: String): Unit = {
     tp match {
-      case PersistType.MISS => iterableRecords(recs, MissRecFile)
-      case PersistType.MATCH => iterableRecords(recs, MatchRecFile)
+      case PersistDataType.MISS => iterableRecords(recs, MissRecFile)
+      case PersistDataType.MATCH => iterableRecords(recs, MatchRecFile)
       case _ => {}
     }
   }

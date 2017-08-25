@@ -23,8 +23,8 @@
 //import org.apache.griffin.measure.algo.ProfileAlgo
 //import org.apache.griffin.measure.algo.core.ProfileCore
 //import org.apache.griffin.measure.config.params._
-//import org.apache.griffin.measure.connector._
-//import org.apache.griffin.measure.connector.direct.DirectDataConnector
+//import org.apache.griffin.measure.data.connector._
+//import org.apache.griffin.measure.data.connector.direct.DirectDataConnector
 //import org.apache.griffin.measure.persist.{Persist, PersistFactory, PersistType}
 //import org.apache.griffin.measure.result._
 //import org.apache.griffin.measure.rule.expr._

@@ -24,7 +24,7 @@ import org.apache.griffin.measure.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
 case class EvaluateRuleParam( @JsonProperty("dsl.type") dslType: String,
-                              @JsonProperty("rules") rules: List[RuleParam]
+                              @JsonProperty("rules") rules: List[Map[String, Any]]
                             ) extends Param {
 
 }

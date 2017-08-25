@@ -23,8 +23,8 @@
 //import org.apache.griffin.measure.algo.AccuracyAlgo
 //import org.apache.griffin.measure.algo.core.AccuracyCore
 //import org.apache.griffin.measure.config.params.AllParam
-//import org.apache.griffin.measure.connector._
-//import org.apache.griffin.measure.connector.direct.DirectDataConnector
+//import org.apache.griffin.measure.data.connector._
+//import org.apache.griffin.measure.data.connector.direct.DirectDataConnector
 //import org.apache.griffin.measure.persist._
 //import org.apache.griffin.measure.result._
 //import org.apache.griffin.measure.rule._
