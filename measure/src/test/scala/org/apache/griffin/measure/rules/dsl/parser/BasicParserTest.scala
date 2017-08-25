@@ -80,7 +80,6 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val result1 = parser.parseAll(parser.selection, rule1)
     result1.successful should be (true)
     result1.get.desc should be ("source")
-    result1.get.alias should be (Some("source"))
 
     val rule2 = """source_not_registered"""
     val result2 = parser.parseAll(parser.selection, rule2)
@@ -132,9 +131,7 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     result2.get.desc should be ("source.age BETWEEN 12 + 3 AND 23")
 
     val rule3 = "source.age between (12 + 3)"
-    val result3 = parser.parseAll(parser.logicalExpression, rule3)
-    result3.successful should be (true)
-    assertThrows[Exception](result3.get.desc)
+    assertThrows[Exception](parser.parseAll(parser.logicalExpression, rule3))
 
     val rule4 = "source.name like '%tk'"
     val result4 = parser.parseAll(parser.logicalExpression, rule4)
@@ -195,15 +192,6 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val result3 = parser.parseAll(parser.expression, rule3)
     result3.successful should be (true)
     result3.get.desc should be ("source.age + 2 * 5 + target.offset * func('a', source.name)")
-    result3.get.alias should be (None)
-  }
-
-  test ("test alias") {
-    val rule1 = "(source.name as name)"
-    val result1 = parser.parseAll(parser.expression, rule1)
-    result1.successful should be (true)
-    result1.get.desc should be ("source.name")
-    result1.get.alias should be (Some("name"))
   }
 
 }

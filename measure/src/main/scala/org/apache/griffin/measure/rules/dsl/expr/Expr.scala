@@ -22,6 +22,4 @@ trait Expr extends TreeNode with Serializable {
 
   def desc: String
 
-  def alias: Option[String]
-
 }

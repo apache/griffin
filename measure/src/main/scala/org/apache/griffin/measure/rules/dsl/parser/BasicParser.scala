@@ -168,8 +168,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <arg> ::= <math-expr>
     */
 
-  def selection: Parser[SelectionExpr] = selectionHead ~ rep(selector) ^^ {
-    case head ~ sels => SelectionExpr(head, sels)
+  def selection: Parser[SelectionExpr] = selectionHead ~ rep(selector) ~ opt(asAlias) ^^ {
+    case head ~ sels ~ aliasOpt => SelectionExpr(head, sels, aliasOpt)
   }
   def selectionHead: Parser[HeadExpr] = DataSourceName ^^ { DataSourceHeadExpr(_) } | function ^^ { OtherHeadExpr(_) }
   def selector: Parser[SelectExpr] = functionSelect | fieldSelect | indexSelect
@@ -179,6 +179,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     case _ ~ name ~ _ ~ args ~ _ => FunctionSelectExpr(name, args)
   }
 
+  def asAlias: Parser[String] = AS ~> TableFieldName
+
   /**
     * -- math expr --
     * <math-factor> ::= <literal> | <alias-expr> | <function> | <selection> | "(" <math-expr> ")"
@@ -187,7 +189,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <math-expr> ::= <binary-math-expr>
     */
 
-  def mathFactor: Parser[MathExpr] = (literal | aliasExpr | function | selection) ^^ {
+  def mathFactor: Parser[MathExpr] = (literal | function | selection) ^^ {
     MathFactorExpr(_, false)
   } | LBR ~> mathExpression <~ RBR ^^ {
     MathFactorExpr(_, true)
@@ -278,14 +280,5 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     case name ~ _ ~ args ~ _ => FunctionExpr(name, args)
   }
   def argument: Parser[Expr] = expression
-
-  /**
-    * -- alias expr --
-    * <alias-expr> = <expr> <as> <name>
-    */
-
-  def aliasExpr: Parser[AliasExpr] = LBR ~> expression ~ AS ~ TableFieldName <~ RBR ^^ {
-    case expr ~ _ ~ aname => AliasExpr(expr, aname)
-  }
 
 }

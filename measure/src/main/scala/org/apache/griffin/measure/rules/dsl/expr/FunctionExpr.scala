@@ -25,5 +25,4 @@ case class FunctionExpr(functionName: String, args: Seq[Expr]) extends Expr {
   def desc: String = {
     s"${functionName}(${args.map(_.desc).mkString(", ")})"
   }
-  def alias: Option[String] = None
 }

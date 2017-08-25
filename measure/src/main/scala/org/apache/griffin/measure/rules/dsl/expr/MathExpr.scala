@@ -19,7 +19,6 @@ under the License.
 package org.apache.griffin.measure.rules.dsl.expr
 
 trait MathExpr extends Expr {
-  def alias: Option[String] = None
 }
 
 case class MathFactorExpr(factor: Expr, withBracket: Boolean) extends MathExpr {
@@ -29,7 +28,6 @@ case class MathFactorExpr(factor: Expr, withBracket: Boolean) extends MathExpr {
   def desc: String = {
     if (withBracket) s"(${factor.desc})" else factor.desc
   }
-  override def alias: Option[String] = factor.alias
 }
 
 case class UnaryMathExpr(oprs: Seq[String], factor: MathExpr) extends MathExpr {

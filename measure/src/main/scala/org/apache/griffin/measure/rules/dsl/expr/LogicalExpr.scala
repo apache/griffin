@@ -19,7 +19,6 @@ under the License.
 package org.apache.griffin.measure.rules.dsl.expr
 
 trait LogicalExpr extends Expr {
-  def alias: Option[String] = None
 }
 
 case class InExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends LogicalExpr {
@@ -88,7 +87,6 @@ case class LogicalFactorExpr(factor: Expr, withBracket: Boolean) extends Logical
   def desc: String = {
     if (withBracket) s"(${factor.desc})" else factor.desc
   }
-  override def alias: Option[String] = factor.alias
 }
 
 case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends LogicalExpr {

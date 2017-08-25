@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rules.dsl.analyzer
 
-import org.apache.griffin.measure.rules.dsl.expr.Expr
+import org.apache.griffin.measure.rules.dsl.expr._
 
 
 case class AccuracyAnalyzer(expr: Expr, sourceName: String, targetName: String) extends BasicAnalyzer {
@@ -27,11 +27,11 @@ case class AccuracyAnalyzer(expr: Expr, sourceName: String, targetName: String) 
 
   val sourceSelectionExprs = {
     val seq = seqSelectionExprs(sourceName)
-    expr.preOrderTraverseDepthFirst(Seq[Expr]())(seq, combSelectionExprs)
+    expr.preOrderTraverseDepthFirst(Seq[SelectionExpr]())(seq, combSelectionExprs)
   }
   val targetSelectionExprs = {
     val seq = seqSelectionExprs(targetName)
-    expr.preOrderTraverseDepthFirst(Seq[Expr]())(seq, combSelectionExprs)
+    expr.preOrderTraverseDepthFirst(Seq[SelectionExpr]())(seq, combSelectionExprs)
   }
 
 }

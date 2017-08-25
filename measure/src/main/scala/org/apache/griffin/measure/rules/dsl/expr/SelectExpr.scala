@@ -24,7 +24,6 @@ trait HeadExpr extends Expr {
 
 case class DataSourceHeadExpr(name: String) extends HeadExpr {
   def desc: String = name
-  def alias: Option[String] = Some(name)
 }
 
 case class OtherHeadExpr(expr: Expr) extends HeadExpr {
@@ -32,12 +31,13 @@ case class OtherHeadExpr(expr: Expr) extends HeadExpr {
   addChild(expr)
 
   def desc: String = expr.desc
-  def alias: Option[String] = expr.alias
 }
 
 // -------------
 
 trait SelectExpr extends Expr {
+
+  def alias: Option[String]
 
 }
 
@@ -51,7 +51,7 @@ case class IndexSelectExpr(index: Expr) extends SelectExpr {
   addChild(index)
 
   def desc: String = s"[${index.desc}]"
-  def alias: Option[String] = None
+  def alias: Option[String] = Some(desc)
 }
 
 case class FunctionSelectExpr(functionName: String, args: Seq[Expr]) extends SelectExpr {
@@ -64,7 +64,7 @@ case class FunctionSelectExpr(functionName: String, args: Seq[Expr]) extends Sel
 
 // -------------
 
-case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr]) extends Expr {
+case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: Option[String]) extends SelectExpr {
 
   addChildren(head +: selectors)
 
@@ -80,9 +80,11 @@ case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr]) extends Exp
     }
   }
   def alias: Option[String] = {
-    selectors.lastOption match {
-      case Some(last) => last.alias
-      case _ => head.alias
-    }
+    if (aliasOpt.isEmpty) {
+      selectors.lastOption match {
+        case Some(last) => last.alias
+        case _ => None
+      }
+    } else aliasOpt
   }
 }

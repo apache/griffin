@@ -33,17 +33,12 @@ trait BasicAnalyzer extends Serializable {
   }
   val combDataSourceNames = (a: Set[String], b: Set[String]) => a ++ b
 
-  val seqSelectionExprs = (dsName: String) => (expr: Expr, v: Seq[Expr]) => {
+  val seqSelectionExprs = (dsName: String) => (expr: Expr, v: Seq[SelectionExpr]) => {
     expr match {
-      case se @ SelectionExpr(head: DataSourceHeadExpr, _) => {
-        head.alias match {
-          case Some(a) if (a == dsName) => v :+ se
-          case _ => v
-        }
-      }
+      case se @ SelectionExpr(head: DataSourceHeadExpr, _, _) if (head.desc == dsName) => v :+ se
       case _ => v
     }
   }
-  val combSelectionExprs = (a: Seq[Expr], b: Seq[Expr]) => a ++ b
+  val combSelectionExprs = (a: Seq[SelectionExpr], b: Seq[SelectionExpr]) => a ++ b
 
 }
