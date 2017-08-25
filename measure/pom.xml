@@ -49,6 +49,7 @@ under the License.
     <scalatest.version>3.0.0</scalatest.version>
     <slf4j.version>1.7.21</slf4j.version>
     <log4j.version>1.2.16</log4j.version>
+    <curator.version>2.10.0</curator.version>
     <scalamock.version>3.6.0</scalamock.version>
   </properties>
 
@@ -137,6 +138,13 @@ under the License.
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>${log4j.version}</version>
+    </dependency>
+
+    <!--curator-->
+    <dependency>
+      <groupId>org.apache.curator</groupId>
+      <artifactId>curator-recipes</artifactId>
+      <version>${curator.version}</version>
     </dependency>
 
     <!--junit-->
