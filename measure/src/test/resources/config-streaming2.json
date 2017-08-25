@@ -1,0 +1,65 @@
+{
+  "name": "accu1",
+  "type": "accuracy",
+
+  "process.type": "streaming",
+
+  "source": {
+    "type": "kafka",
+    "version": "0.8",
+    "config": {
+      "kafka.config": {
+        "bootstrap.servers": "10.149.247.156:9092",
+        "group.id": "group1",
+        "auto.offset.reset": "smallest",
+        "auto.commit.enable": "false"
+      },
+      "topics": "sss",
+      "key.type": "java.lang.String",
+      "value.type": "java.lang.String"
+    },
+    "cache": {
+      "type": "parquet",
+      "config": {
+        "file.path": "hdfs://localhost/griffin/streaming/dump/source",
+        "info.path": "source",
+        "ready.time.interval": "10s",
+        "ready.time.delay": "0"
+      },
+      "time.range": ["-2m", "0"]
+    },
+    "match.once": true
+  },
+
+  "target": {
+    "type": "kafka",
+    "version": "0.8",
+    "config": {
+      "kafka.config": {
+        "bootstrap.servers": "10.149.247.156:9092",
+        "group.id": "group1",
+        "auto.offset.reset": "smallest",
+        "auto.commit.enable": "false"
+      },
+      "topics": "ttt",
+      "key.type": "java.lang.String",
+      "value.type": "java.lang.String"
+    },
+    "cache": {
+      "type": "parquet",
+      "config": {
+        "file.path": "hdfs://localhost/griffin/streaming/dump/target",
+        "info.path": "target",
+        "ready.time.interval": "10s",
+        "ready.time.delay": "0"
+      },
+      "time.range": ["-2m", "0"]
+    },
+    "match.once": false
+  },
+
+  "evaluateRule": {
+    "sampleRatio": 0.2,
+    "rules": "$source.json().name = $target.json().name AND $source.json().age = $target.json().age"
+  }
+}

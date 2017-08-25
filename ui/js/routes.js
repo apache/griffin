@@ -112,8 +112,12 @@ define(['./app'], function(app) {
         });
 
         $routeProvider.when('/mydashboard', {
-                    templateUrl: '/pages/metrics/dashboard.html',
-                    controller: 'MetricsCtrl'
+
+            // templateUrl: '/pages/mydashboard/mydashboard.html',
+            // controller: 'MyDashboardCtrl'
+            templateUrl: '/pages/metrics/dashboard.html',
+            controller: 'MetricsCtrl'
+
         });
 
         $routeProvider.when('/subscribemodel', {
