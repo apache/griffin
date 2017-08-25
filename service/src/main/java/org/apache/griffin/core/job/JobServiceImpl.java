@@ -28,6 +28,7 @@ import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.GriffinUtil;
 import org.quartz.*;
@@ -48,6 +49,8 @@ import java.io.Serializable;
 import java.util.*;
 
 import static org.apache.griffin.core.util.GriffinOperationMessage.CREATE_JOB_FAIL;
+import static org.apache.griffin.core.util.GriffinOperationMessage.PAUSE_JOB_SUCCESS;
+import static org.apache.griffin.core.util.GriffinOperationMessage.SET_JOB_DELETED_STATUS_SUCCESS;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -89,7 +92,7 @@ public class JobServiceImpl implements JobService {
 
     private boolean isJobDeleted(Scheduler scheduler, JobKey jobKey) throws SchedulerException {
         JobDataMap jobDataMap = scheduler.getJobDetail(jobKey).getJobDataMap();
-        boolean status= Boolean.parseBoolean((String) jobDataMap.get("deleted"));
+        boolean status=jobDataMap.getBooleanFromString("deleted");
         return status;
     }
 
@@ -132,8 +135,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public GriffinOperationMessage addJob(String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody) {
-        int interval = 0;
-        Date jobStartTime=null;
+        int interval;
+        Date jobStartTime;
         try{
             interval = Integer.parseInt(jobRequestBody.getInterval());
             jobStartTime=new Date(Long.parseLong(jobRequestBody.getJobStartTime()));
@@ -168,7 +171,6 @@ public class JobServiceImpl implements JobService {
             Trigger trigger = newTrigger()
                     .withIdentity(triggerKey)
                     .forJob(jobDetail)
-//					.withSchedule(CronScheduleBuilder.cronSchedule("0 0/1 0 * * ?"))
                     .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                             .withIntervalInSeconds(interval)
                             .repeatForever())
@@ -177,7 +179,7 @@ public class JobServiceImpl implements JobService {
             scheduler.scheduleJob(trigger);
             return GriffinOperationMessage.CREATE_JOB_SUCCESS;
         } catch (SchedulerException e) {
-            LOGGER.error("", e);
+            LOGGER.error("SchedulerException when add job.", e);
             return CREATE_JOB_FAIL;
         }
     }
@@ -185,7 +187,7 @@ public class JobServiceImpl implements JobService {
     public void setJobStartTime(Date jobStartTime,int interval){
         long currentTimestamp=System.currentTimeMillis();
         long jobstartTimestamp=jobStartTime.getTime();
-        //if jobStartTime is before currentTimestamp, set it as the latest trigger time in the future
+        //if jobStartTime is before currentTimestamp, reset it with a future time
         if(jobStartTime.before(new Date(currentTimestamp))){
             long n=(currentTimestamp-jobstartTimestamp)/(long)(interval*1000);
             jobstartTimestamp=jobstartTimestamp+(n+1)*(long)(interval*1000);
@@ -207,15 +209,68 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public GriffinOperationMessage deleteJob(String group, String name) {
+    public GriffinOperationMessage pauseJob(String group, String name){
         try {
             Scheduler scheduler = factory.getObject();
-            scheduler.deleteJob(new JobKey(name, group));
-            jobInstanceRepo.deleteByGroupAndjobName(group,name);
-            return GriffinOperationMessage.DELETE_JOB_SUCCESS;
+            scheduler.pauseJob(new JobKey(name, group));
+            return GriffinOperationMessage.PAUSE_JOB_SUCCESS;
         } catch (SchedulerException e) {
-            LOGGER.error(GriffinOperationMessage.DELETE_JOB_FAIL+""+e);
-            return GriffinOperationMessage.DELETE_JOB_FAIL;
+            LOGGER.error(GriffinOperationMessage.PAUSE_JOB_FAIL+""+e);
+            return GriffinOperationMessage.PAUSE_JOB_FAIL;
+        }
+    }
+
+    private GriffinOperationMessage setJobDeleted(String group, String name){
+        try {
+            Scheduler scheduler = factory.getObject();
+            JobDetail jobDetail=scheduler.getJobDetail(new JobKey(name, group));
+            jobDetail.getJobDataMap().putAsString("deleted", true);
+            scheduler.addJob(jobDetail, true);
+            return GriffinOperationMessage.SET_JOB_DELETED_STATUS_SUCCESS;
+        } catch (SchedulerException e) {
+            LOGGER.error(GriffinOperationMessage.PAUSE_JOB_FAIL+""+e);
+            return GriffinOperationMessage.SET_JOB_DELETED_STATUS_FAIL;
+        }
+    }
+
+    /**
+     * logically delete
+     * 1. pause these jobs
+     * 2. set these jobs as deleted status
+     * @param group
+     * @param name
+     * @return
+     */
+    @Override
+    public GriffinOperationMessage deleteJob(String group, String name) {
+        //logically delete
+        if (pauseJob(group,name).equals(PAUSE_JOB_SUCCESS) &&
+                setJobDeleted(group, name).equals(SET_JOB_DELETED_STATUS_SUCCESS)){
+            return GriffinOperationMessage.DELETE_JOB_SUCCESS;
+        }
+        return GriffinOperationMessage.DELETE_JOB_FAIL;
+    }
+
+    /**
+     * deleteJobsRelateToMeasure
+     * 1. search jobs related to measure
+     * 2. deleteJob
+     * @param measure
+     */
+    public void deleteJobsRelateToMeasure(Measure measure) {
+        Scheduler scheduler = factory.getObject();
+        try {
+            for(JobKey jobKey: scheduler.getJobKeys(GroupMatcher.anyGroup())){//get all jobs
+                JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+                JobDataMap jobDataMap = jobDetail.getJobDataMap();
+                if(jobDataMap.getString("measureId").equals(measure.getId().toString())){
+                    //select jobs related to measureId,
+                    deleteJob(jobKey.getGroup(),jobKey.getName());
+                    LOGGER.info(jobKey.getGroup()+" "+jobKey.getName()+" is paused and logically deleted.");
+                }
+            }
+        } catch (SchedulerException e) {
+            LOGGER.error("Fail to stop jobs related to measure id: " + measure.getId()+"name: "+measure.getName());
         }
     }
 

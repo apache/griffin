@@ -225,13 +225,6 @@ public class SparkSubmitJob implements Job {
 
         List<String> files = new ArrayList<>();
         sparkJobDO.setFiles(files);
-
-//        CreateBatchRequest createBatchRequest=new CreateBatchRequest;
-//        createBatchRequest.file_$eq(sparkJobProps.getProperty("sparkJob.file"));
-//        createBatchRequest.className_$eq(new Some(sparkJobProps.getProperty("sparkJob.className")));
-//        createBatchRequest.args_$eq(args);
-//        scala.collection.immutable.List argss=new scala.collection.immutable.List<String>();
-//        createBatchRequest.name_$eq(new Some(sparkJobProps.getProperty("sparkJob.name")));
     }
 
     public void saveJobInstance(String groupName,String jobName,String result){

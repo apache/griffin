@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.metastore.hive;
 
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ import javax.annotation.PreDestroy;
 @Component
 public class HiveMetastoreProxy
 {
-    private static final Logger log = LoggerFactory.getLogger(HiveMetastoreProxy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetastoreProxy.class);
 
     @Value("${hive.metastore.uris}")
     private String uris;
@@ -63,7 +62,7 @@ public class HiveMetastoreProxy
         try {
             client= new HiveMetaStoreClient(hiveConf);
         } catch (MetaException e) {
-            log.error("Failed to connect hive metastore",e.getMessage());
+            LOGGER.error("Failed to connect hive metastore",e.getMessage());
             client = null;
         }
 

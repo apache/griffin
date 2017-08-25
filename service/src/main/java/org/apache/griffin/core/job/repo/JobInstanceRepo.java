@@ -54,13 +54,14 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance,Long>{
 
     @Transactional
     @Modifying
+    @Query("delete from JobInstance s " +
+            "where s.groupName= ?1 and s.jobName=?2 ")
+    void deleteByGroupAndjobName(String groupName, String jobName);
+
+    @Transactional
+    @Modifying
     @Query("update JobInstance s "+
             "set s.state= ?2, s.appId= ?3, s.appUri= ?4 where s.id= ?1")
     void update(Long Id, LivySessionStates.State state, String appId, String appUri);
 
-    @Transactional
-    @Modifying
-    @Query("delete from JobInstance s " +
-            "where s.groupName= ?1 and s.jobName=?2 ")
-    void deleteByGroupAndjobName(String groupName, String jobName);
 }

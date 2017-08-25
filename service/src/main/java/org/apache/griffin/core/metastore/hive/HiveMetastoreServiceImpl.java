@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import org.apache.griffin.core.common.CacheEvictor;
 import org.apache.griffin.core.error.exception.GriffinException.HiveConnectionException;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -43,7 +42,7 @@ import java.util.Map;
 @CacheConfig(cacheNames = "hive")
 public class HiveMetastoreServiceImpl implements HiveMetastoreService{
 
-    private static final Logger log = LoggerFactory.getLogger(HiveMetastoreServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetastoreServiceImpl.class);
 
     @Autowired
     private HiveMetaStoreClient client;
@@ -67,7 +66,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
             results = client.getAllDatabases();
         } catch (MetaException e) {
             reconnect();
-            log.error("Can not get databases : ",e.getMessage());
+            LOGGER.error("Can not get databases : ",e.getMessage());
         }
         return results;
     }
@@ -82,7 +81,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
             results = client.getAllTables(useDbName);
         } catch (Exception e) {
             reconnect();
-            log.error("Exception fetching tables info: " + e.getMessage());
+            LOGGER.error("Exception fetching tables info: " + e.getMessage());
         }
         return results;
     }
@@ -101,7 +100,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
             }
         } catch (Exception e) {
             reconnect();
-            log.error("Exception fetching tables info: " + e.getMessage());
+            LOGGER.error("Exception fetching tables info: " + e.getMessage());
         }
         return results;
     }
@@ -123,7 +122,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
                 }
             } catch (Exception e) {
                 reconnect();
-                log.error("Exception fetching tables info: " + e.getMessage());
+                LOGGER.error("Exception fetching tables info: " + e.getMessage());
             }
             results.put(db,alltables);
         }
@@ -140,7 +139,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
             result = client.getTable(useDbName, tableName);
         } catch (Exception e) {
             reconnect();
-            log.error("Exception fetching table info : " +tableName + " : " + e.getMessage());
+            LOGGER.error("Exception fetching table info : " +tableName + " : " + e.getMessage());
         }
         return result;
     }
@@ -149,7 +148,7 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
         try {
             client.reconnect();
         } catch (MetaException e) {
-            log.error("reconnect to hive failed. ");
+            LOGGER.error("reconnect to hive failed. ");
             throw new HiveConnectionException();
         }
     }

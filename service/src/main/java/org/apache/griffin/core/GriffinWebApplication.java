@@ -26,16 +26,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 //import org.apache.griffin.core.measure.repo.ConnectorConfigRepo;
 
 @SpringBootApplication
 @EnableScheduling
 public class GriffinWebApplication/* implements CommandLineRunner*/{
-    private static final Logger log = LoggerFactory.getLogger(GriffinWebApplication.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GriffinWebApplication.class);
     public static void main(String[] args) {
-        log.info("application start");
+        LOGGER.info("application start");
         SpringApplication.run(GriffinWebApplication.class, args);
     }
 

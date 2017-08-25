@@ -19,8 +19,6 @@ specific language governing permissions and limitations
 under the License.
 */
 
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +28,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import org.springframework.web.context.request.ServletWebRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * Created by xiangrchen on 7/24/17.
@@ -39,11 +39,11 @@ import org.springframework.web.context.request.ServletWebRequest;
 @ControllerAdvice
 @ResponseBody
 public class RuntimeExceptionHandler {
-  private static final Logger log = LoggerFactory.getLogger(RuntimeExceptionHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RuntimeExceptionHandler.class);
 
   @ExceptionHandler(RuntimeException.class)
   public ResponseEntity<Map<String, Object>> handleUnexpectedRuntimeException(RuntimeException e, HttpServletRequest request){
-    log.error("Unexpected RuntimeException. "+e);
+    LOGGER.error("Unexpected RuntimeException. "+e);
     return setExceptionResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, GriffinOperationMessage.UNEXPECTED_RUNTIME_EXCEPTION);
   }
 

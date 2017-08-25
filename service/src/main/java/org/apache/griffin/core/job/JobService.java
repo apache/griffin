@@ -34,6 +34,8 @@ public interface JobService {
 
     GriffinOperationMessage addJob(String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody);
 
+    GriffinOperationMessage pauseJob(String group, String name);
+
     GriffinOperationMessage deleteJob(String groupName,String jobName);
 
     List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);

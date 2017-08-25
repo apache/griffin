@@ -35,7 +35,7 @@ import java.util.*;
 
 @RestController
 public class GriffinController {
-    private static final Logger log = LoggerFactory.getLogger(GriffinController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GriffinController.class);
 
     @Autowired
     MeasureRepo measureRepo;
@@ -94,7 +94,7 @@ public class GriffinController {
                     }
                     break;
                 default:
-                    log.info("invalid measure type!");
+                    LOGGER.info("invalid measure type!");
             }
         }
         return daWithMetricsMap;
