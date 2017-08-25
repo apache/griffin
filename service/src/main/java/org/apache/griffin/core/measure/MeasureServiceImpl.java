@@ -20,12 +20,10 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
-import org.apache.griffin.core.job.SparkSubmitJob;
+import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.quartz.*;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +39,10 @@ import java.util.Map;
 
 @Service
 public class MeasureServiceImpl implements MeasureService {
-    private static final Logger log = LoggerFactory.getLogger(MeasureServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeasureServiceImpl.class);
 
+    @Autowired
+    JobServiceImpl jobService;
     @Autowired
     private MeasureRepo measureRepo;
     @Autowired
@@ -61,40 +61,22 @@ public class MeasureServiceImpl implements MeasureService {
         TODO: require to be fixed: deleting measure doesn't deal with job protocol related to it, leading quartz to throw error that measure cannot be found.
      */
     @Override
-    public GriffinOperationMessage deleteMeasureById(@PathVariable("MeasureId") Long measureId) {
+    public GriffinOperationMessage deleteMeasureById(Long measureId) {
         if (measureRepo.exists(measureId) == false) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         } else {
             //pause all jobs related to the measure
             Measure measure = measureRepo.findOne(measureId);
-            pauseJobs(measure);
+            jobService.deleteJobsRelateToMeasure(measure);
             measure.setDeleted(true);
             measureRepo.save(measure);
             return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
         }
     }
 
-    private void pauseJobs(Measure measure) {
-
-        Scheduler scheduler = factory.getObject();
-        try {
-            for(JobKey jobKey: scheduler.getJobKeys(GroupMatcher.anyGroup())){//get all jobs
-                JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-                JobDataMap jobDataMap = jobDetail.getJobDataMap();
-                if(jobDataMap.getString("measureId").equals(measure.getId().toString())){//select jobs related to measureId
-                    scheduler.pauseJob(jobKey);
-                    jobDataMap.putAsString("deleted", true);
-                    scheduler.addJob(jobDetail, true);
-                    log.info(jobKey.getGroup()+" "+jobKey.getName()+" is paused and logically deleted.");
-                }
-            }
-        } catch (SchedulerException e) {
-            log.error("Fail to stop jobs related to measure id: " + measure.getId()+"name: "+measure.getName());
-        }
-    }
 
     @Override
-    public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
+    public GriffinOperationMessage createMeasure(Measure measure) {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
         if (aliveMeasureList.size() == 0) {
             if (measureRepo.save(measure) != null)
@@ -103,7 +85,7 @@ public class MeasureServiceImpl implements MeasureService {
                 return GriffinOperationMessage.CREATE_MEASURE_FAIL;
             }
         } else {
-            log.info("Failed to create new measure " + measure.getName() + ", it already exists");
+            LOGGER.info("Failed to create new measure " + measure.getName() + ", it already exists");
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
     }

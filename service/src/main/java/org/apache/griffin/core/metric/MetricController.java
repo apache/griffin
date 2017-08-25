@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/metrics")
 public class MetricController {
-    private static final Logger log = LoggerFactory.getLogger(MetricController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricController.class);
     @Autowired
     MetricService metricService;
 

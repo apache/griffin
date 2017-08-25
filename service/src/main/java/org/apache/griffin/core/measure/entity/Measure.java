@@ -121,15 +121,15 @@ public class Measure extends AuditableEntity   {
         this.evaluateRule = evaluateRule;
     }
 
-    public Measure() {
-    }
-
     public Boolean getDeleted() {
         return this.deleted;
     }
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Measure() {
     }
 
     public Measure(String name, String description, MearuseType type, String organization, DataConnector source, DataConnector target, EvaluateRule evaluateRule, String owner) {
