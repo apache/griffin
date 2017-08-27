@@ -26,7 +26,8 @@ import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.streaming.StreamingContext
 
-case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingContext) extends DqEngine {
+case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingContext
+                         ) extends DqEngine {
 
   def genDataSource(dataSourceParam: DataSourceParam): Option[DataSource] = {
     DataSourceFactory.genDataSource(sqlContext, ssc, dataSourceParam)
@@ -41,7 +42,7 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
           true
         } catch {
           case e: Throwable => {
-            error(s"run rule ${name} error: ${e.getMessage}")
+            error(s"run spark sql [ ${rule} ] error: ${e.getMessage}")
             false
           }
         }

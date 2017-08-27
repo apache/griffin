@@ -84,7 +84,6 @@ object RuleAdaptorGroup {
       }
       (preSteps ++ curSteps, curNames)
     }
-    steps.foreach(println)
     steps
   }
 

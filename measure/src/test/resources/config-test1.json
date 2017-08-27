@@ -34,9 +34,12 @@
   "evaluateRule": {
     "rules": [
       {
-        "dsl.type": "spark-opr",
+        "dsl.type": "df-opr",
         "name": "source",
-        "rule": "from_json(source.value)"
+        "rule": "from_json",
+        "details": {
+          "df.name": "source"
+        }
       },
       {
         "dsl.type": "spark-sql",
@@ -44,9 +47,13 @@
         "rule": "SELECT explode(seeds) as seed FROM source"
       },
       {
-        "dsl.type": "spark-opr",
+        "dsl.type": "df-opr",
         "name": "seeds",
-        "rule": "from_json(seeds.seed)"
+        "rule": "from_json",
+        "details": {
+          "df.name": "seeds",
+          "col.name": "seed"
+        }
       },
       {
         "dsl.type": "spark-sql",

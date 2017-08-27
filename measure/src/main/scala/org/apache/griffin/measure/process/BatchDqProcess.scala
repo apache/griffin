@@ -72,17 +72,17 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // generate rule steps
     val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam)
 
-    // get calculation engine
-    val engine = DqEngineFactory.genDqEngines(sqlContext, null)
+    // get dq engines
+    val dqEngines = DqEngineFactory.genDqEngines(sqlContext, null)
 
     // init data sources
-    engine.initDataSources(userParam.dataSources)
+    dqEngines.initDataSources(userParam.dataSources)
 
     // run rules
-    engine.runRuleSteps(ruleSteps)
+    dqEngines.runRuleSteps(ruleSteps)
 
     // persist results
-    engine.persistResults(ruleSteps, persist)
+    dqEngines.persistResults(ruleSteps, persist)
 
     // end time
     val endTime = new Date().getTime

@@ -27,6 +27,12 @@ case class SparkSqlAdaptor() extends RuleAdaptor {
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
     SparkSqlStep(getName(param), getRule(param), getPersistType(param)) :: Nil
   }
+  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
+    ruleStep match {
+      case rs @ SparkSqlStep(_, _, _) => rs :: Nil
+      case _ => Nil
+    }
+  }
 
   def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
     param.get(_name) match {

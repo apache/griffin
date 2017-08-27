@@ -25,9 +25,8 @@ case class MathFactorExpr(factor: Expr, withBracket: Boolean) extends MathExpr {
 
   addChild(factor)
 
-  def desc: String = {
-    if (withBracket) s"(${factor.desc})" else factor.desc
-  }
+  def desc: String = if (withBracket) s"(${factor.desc})" else factor.desc
+  def coalesceDesc: String = factor.coalesceDesc
 }
 
 case class UnaryMathExpr(oprs: Seq[String], factor: MathExpr) extends MathExpr {
@@ -36,6 +35,11 @@ case class UnaryMathExpr(oprs: Seq[String], factor: MathExpr) extends MathExpr {
 
   def desc: String = {
     oprs.foldRight(factor.desc) { (opr, fac) =>
+      s"(${opr}${fac})"
+    }
+  }
+  def coalesceDesc: String = {
+    oprs.foldRight(factor.coalesceDesc) { (opr, fac) =>
       s"(${opr}${fac})"
     }
   }
@@ -49,6 +53,13 @@ case class BinaryMathExpr(factor: MathExpr, tails: Seq[(String, MathExpr)]) exte
     val res = tails.foldLeft(factor.desc) { (fac, tail) =>
       val (opr, expr) = tail
       s"${fac} ${opr} ${expr.desc}"
+    }
+    if (tails.size <= 0) res else s"${res}"
+  }
+  def coalesceDesc: String = {
+    val res = tails.foldLeft(factor.coalesceDesc) { (fac, tail) =>
+      val (opr, expr) = tail
+      s"${fac} ${opr} ${expr.coalesceDesc}"
     }
     if (tails.size <= 0) res else s"${res}"
   }

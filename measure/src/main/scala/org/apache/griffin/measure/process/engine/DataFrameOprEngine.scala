@@ -22,10 +22,11 @@ import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source.{DataSource, DataSourceFactory}
 import org.apache.griffin.measure.persist.Persist
 import org.apache.griffin.measure.rules.step._
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.streaming.StreamingContext
 
-case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingContext) extends DqEngine {
+case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingContext
+                             ) extends DqEngine {
 
   def genDataSource(dataSourceParam: DataSourceParam): Option[DataSource] = {
     DataSourceFactory.genDataSource(sqlContext, ssc, dataSourceParam)
@@ -33,15 +34,21 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
-      case DfOprStep(name, rule, _) => {
+      case DfOprStep(name, rule, details) => {
         try {
-//          val rdf = sqlContext.sql(rule)
-//          rdf.registerTempTable(name)
-          // fixme
+          rule match {
+            case DataFrameOprs._fromJson => {
+              val df = DataFrameOprs.fromJson(sqlContext, name, details)
+              df.registerTempTable(name)
+            }
+            case _ => {
+              throw new Exception(s"df opr [ ${rule} ] not supported")
+            }
+          }
           true
         } catch {
           case e: Throwable => {
-            error(s"run rule ${name} error: ${e.getMessage}")
+            error(s"run df opr [ ${rule} ] error: ${e.getMessage}")
             false
           }
         }
@@ -69,6 +76,25 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
 
 }
 
+object DataFrameOprs {
+
+  final val _fromJson = "from_json"
+
+  def fromJson(sqlContext: SQLContext, name: String, details: Map[String, Any]): DataFrame = {
+    val _dfName = "df.name"
+    val _colName = "col.name"
+    val dfName = details.getOrElse(_dfName, name).toString
+    val colNameOpt = details.get(_colName).map(_.toString)
+
+    val df = sqlContext.table(dfName)
+    val rdd = colNameOpt match {
+      case Some(colName: String) => df.map(_.getAs[String](colName))
+      case _ => df.map(_.getAs[String](0))
+    }
+    sqlContext.read.json(rdd)
+  }
+
+}
 
 
 

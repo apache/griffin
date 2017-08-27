@@ -21,6 +21,7 @@ package org.apache.griffin.measure.rules.dsl.expr
 import org.apache.griffin.measure.utils.TimeUtil
 
 trait LiteralExpr extends Expr {
+  def coalesceDesc: String = desc
 }
 
 case class LiteralNullExpr(str: String) extends LiteralExpr {

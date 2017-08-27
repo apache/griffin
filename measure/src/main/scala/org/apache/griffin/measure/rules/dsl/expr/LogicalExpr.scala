@@ -29,6 +29,10 @@ case class InExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends LogicalExpr
     val notStr = if (is) "" else " NOT"
     s"${head.desc}${notStr} IN (${range.map(_.desc).mkString(", ")})"
   }
+  def coalesceDesc: String = {
+    val notStr = if (is) "" else " NOT"
+    s"${head.coalesceDesc}${notStr} IN (${range.map(_.coalesceDesc).mkString(", ")})"
+  }
 }
 
 case class BetweenExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends LogicalExpr {
@@ -46,6 +50,14 @@ case class BetweenExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends Logica
     }
     s"${head.desc}${notStr} BETWEEN ${rangeStr}"
   }
+  def coalesceDesc: String = {
+    val notStr = if (is) "" else " NOT"
+    val rangeStr = range match {
+      case first :: second :: _ => s"${first.coalesceDesc} AND ${second.coalesceDesc}"
+      case _ => throw new Exception("between expression exception: range less than 2")
+    }
+    s"${head.coalesceDesc}${notStr} BETWEEN ${rangeStr}"
+  }
 }
 
 case class LikeExpr(head: Expr, is: Boolean, value: Expr) extends LogicalExpr {
@@ -55,6 +67,10 @@ case class LikeExpr(head: Expr, is: Boolean, value: Expr) extends LogicalExpr {
   def desc: String = {
     val notStr = if (is) "" else " NOT"
     s"${head.desc}${notStr} LIKE ${value.desc}"
+  }
+  def coalesceDesc: String = {
+    val notStr = if (is) "" else " NOT"
+    s"${head.coalesceDesc}${notStr} LIKE ${value.coalesceDesc}"
   }
 }
 
@@ -66,6 +82,7 @@ case class IsNullExpr(head: Expr, is: Boolean) extends LogicalExpr {
     val notStr = if (is) "" else " NOT"
     s"${head.desc} IS${notStr} NULL"
   }
+  def coalesceDesc: String = desc
 }
 
 case class IsNanExpr(head: Expr, is: Boolean) extends LogicalExpr {
@@ -76,6 +93,7 @@ case class IsNanExpr(head: Expr, is: Boolean) extends LogicalExpr {
     val notStr = if (is) "" else "NOT "
     s"${notStr}isnan(${head.desc})"
   }
+  def coalesceDesc: String = desc
 }
 
 // -----------
@@ -84,9 +102,8 @@ case class LogicalFactorExpr(factor: Expr, withBracket: Boolean) extends Logical
 
   addChild(factor)
 
-  def desc: String = {
-    if (withBracket) s"(${factor.desc})" else factor.desc
-  }
+  def desc: String = if (withBracket) s"(${factor.desc})" else factor.desc
+  def coalesceDesc: String = factor.coalesceDesc
 }
 
 case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends LogicalExpr {
@@ -95,6 +112,11 @@ case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends Logi
 
   def desc: String = {
     oprs.foldRight(factor.desc) { (opr, fac) =>
+      s"(${trans(opr)} ${fac})"
+    }
+  }
+  def coalesceDesc: String = {
+    oprs.foldRight(factor.coalesceDesc) { (opr, fac) =>
       s"(${trans(opr)} ${fac})"
     }
   }
@@ -114,6 +136,13 @@ case class BinaryLogicalExpr(factor: LogicalExpr, tails: Seq[(String, LogicalExp
     val res = tails.foldLeft(factor.desc) { (fac, tail) =>
       val (opr, expr) = tail
       s"${fac} ${trans(opr)} ${expr.desc}"
+    }
+    if (tails.size <= 0) res else s"${res}"
+  }
+  def coalesceDesc: String = {
+    val res = tails.foldLeft(factor.coalesceDesc) { (fac, tail) =>
+      val (opr, expr) = tail
+      s"${fac} ${trans(opr)} ${expr.coalesceDesc}"
     }
     if (tails.size <= 0) res else s"${res}"
   }

@@ -31,23 +31,25 @@ trait RuleAdaptor extends Loggable with Serializable {
   val _name = "name"
   val _rule = "rule"
   val _persistType = "persist.type"
+  val _details = "details"
 
   protected def getName(param: Map[String, Any]) = param.getOrElse(_name, RuleStepNameGenerator.genName).toString
   protected def getRule(param: Map[String, Any]) = param.getOrElse(_rule, "").toString
   protected def getPersistType(param: Map[String, Any]) = PersistType(param.getOrElse(_persistType, "").toString)
+  protected def getDetails(param: Map[String, Any]) = param.get(_details) match {
+    case Some(dt: Map[String, Any]) => dt
+    case _ => Map[String, Any]()
+  }
 
   def getTempSourceNames(param: Map[String, Any]): Seq[String]
 
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep]
   def genConcreteRuleStep(param: Map[String, Any]): Seq[ConcreteRuleStep] = {
     genRuleStep(param).flatMap { rs =>
-      rs match {
-        case s: ConcreteRuleStep => Some(s)
-        case _ => adaptConcreteRuleStep(rs)
-      }
+      adaptConcreteRuleStep(rs)
     }
   }
-  protected def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = Nil
+  protected def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep]
 
 }
 

@@ -24,6 +24,7 @@ trait HeadExpr extends Expr {
 
 case class DataSourceHeadExpr(name: String) extends HeadExpr {
   def desc: String = name
+  def coalesceDesc: String = desc
 }
 
 case class OtherHeadExpr(expr: Expr) extends HeadExpr {
@@ -31,6 +32,7 @@ case class OtherHeadExpr(expr: Expr) extends HeadExpr {
   addChild(expr)
 
   def desc: String = expr.desc
+  def coalesceDesc: String = expr.coalesceDesc
 }
 
 // -------------
@@ -43,6 +45,7 @@ trait SelectExpr extends Expr {
 
 case class FieldSelectExpr(field: String) extends SelectExpr {
   def desc: String = s".${field}"
+  def coalesceDesc: String = desc
   def alias: Option[String] = Some(field)
 }
 
@@ -51,6 +54,7 @@ case class IndexSelectExpr(index: Expr) extends SelectExpr {
   addChild(index)
 
   def desc: String = s"[${index.desc}]"
+  def coalesceDesc: String = desc
   def alias: Option[String] = Some(desc)
 }
 
@@ -59,6 +63,7 @@ case class FunctionSelectExpr(functionName: String, args: Seq[Expr]) extends Sel
   addChildren(args)
 
   def desc: String = ""
+  def coalesceDesc: String = desc
   def alias: Option[String] = None
 }
 
@@ -77,6 +82,13 @@ case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: O
         }
         case _ => s"${hd}${sel.desc}"
       }
+    }
+  }
+  def coalesceDesc: String = {
+    selectors.lastOption match {
+      case None => desc
+      case Some(sel: FunctionSelectExpr) => desc
+      case _ => s"coalesce(${desc}, 'null')"
     }
   }
   def alias: Option[String] = {

@@ -20,8 +20,11 @@ package org.apache.griffin.measure.rules.step
 
 import org.apache.griffin.measure.rules.dsl._
 
-case class DfOprStep(name: String, rule: String, persistType: PersistType) extends ConcreteRuleStep {
+case class DfOprStep(name: String, rule: String, details: Map[String, Any]
+                    ) extends ConcreteRuleStep {
 
   val dslType: DslType = DfOprType
+
+  val persistType: PersistType = NonePersistType
 
 }

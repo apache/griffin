@@ -26,6 +26,7 @@ import org.apache.griffin.measure.config.reader.ParamReaderFactory
 import org.apache.griffin.measure.config.validator.AllParamValidator
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.PersistThreadPool
+import org.apache.griffin.measure.process.engine.DataFrameOprs
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.hadoop.hive.ql.exec.UDF
 import org.apache.spark.{SparkConf, SparkContext}
@@ -81,16 +82,20 @@ class JsonParseTest extends FunSuite with Matchers with BeforeAndAfter with Logg
 //    df2.registerTempTable("df2")
 
 
+
     // 1. read from json string to extracted json row
-    val readSql = "SELECT value FROM src"
-    val df = sqlContext.sql(readSql)
-    val rdd = df.map { row =>
-      row.getAs[String]("value")
-    }
-    val df1 = sqlContext.read.json(rdd)
-    df1.printSchema
-    df1.show(10)
-    df1.registerTempTable("df1")
+//    val readSql = "SELECT value FROM src"
+//    val df = sqlContext.sql(readSql)
+//    val df = sqlContext.table("src")
+//    val rdd = df.map { row =>
+//      row.getAs[String]("value")
+//    }
+//    val df1 = sqlContext.read.json(rdd)
+//    df1.printSchema
+//    df1.show(10)
+//    df1.registerTempTable("df1")
+    val details = Map[String, Any](("df.name" -> "src"))
+    DataFrameOprs.fromJson(sqlContext, "df1", details)
 
     // 2. extract json array into lines
 //    val rdd2 = df1.flatMap { row =>

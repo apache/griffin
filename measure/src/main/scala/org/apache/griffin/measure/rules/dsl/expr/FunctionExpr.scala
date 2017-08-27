@@ -22,7 +22,6 @@ case class FunctionExpr(functionName: String, args: Seq[Expr]) extends Expr {
 
   addChildren(args)
 
-  def desc: String = {
-    s"${functionName}(${args.map(_.desc).mkString(", ")})"
-  }
+  def desc: String = s"${functionName}(${args.map(_.desc).mkString(", ")})"
+  def coalesceDesc: String = desc
 }

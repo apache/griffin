@@ -47,29 +47,22 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
       }
       nameOpt.getOrElse(key)
     }
-    def resultPersistType(param: Map[String, Any], key: String): PersistType = {
+    def resultPersistType(param: Map[String, Any], key: String, defPersistType: PersistType): PersistType = {
       param.get(key) match {
         case Some(prm: Map[String, Any]) => StepInfo.getPersistType(prm)
-        case _ => NonePersistType
+        case _ => defPersistType
       }
     }
   }
 
   val _dqType = "dq.type"
-  val _details = "details"
+
+  protected def getDqType(param: Map[String, Any]) = DqType(param.getOrElse(_dqType, "").toString)
 
   val filteredFunctionNames = functionNames.filter { fn =>
     fn.matches("""^[a-zA-Z_]\w*$""")
   }
   val parser = GriffinDslParser(dataSourceNames, filteredFunctionNames)
-
-  protected def getDqType(param: Map[String, Any]) = DqType(param.getOrElse(_dqType, "").toString)
-  protected def getDetails(param: Map[String, Any]) = {
-    param.get(_details) match {
-      case Some(p: Map[String, Any]) => p
-      case _ => Map[String, Any]()
-    }
-  }
 
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
     GriffinDslStep(getName(param), getRule(param), getDqType(param), getDetails(param)) :: Nil
@@ -100,7 +93,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
     }
   }
 
-  override def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
+  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
     ruleStep match {
       case rs @ GriffinDslStep(_, rule, _, _) => {
         val exprOpt = try {
@@ -129,13 +122,14 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
   }
 
   private def transConcreteRuleSteps(ruleStep: GriffinDslStep, expr: Expr): Seq[ConcreteRuleStep] = {
+    val details = ruleStep.details
     ruleStep.dqType match {
       case AccuracyType => {
-        val sourceName = AccuracyInfo.getNameOpt(ruleStep.details, AccuracyInfo._Source) match {
+        val sourceName = AccuracyInfo.getNameOpt(details, AccuracyInfo._Source) match {
           case Some(name) => name
           case _ => dataSourceNames.head
         }
-        val targetName = AccuracyInfo.getNameOpt(ruleStep.details, AccuracyInfo._Target) match {
+        val targetName = AccuracyInfo.getNameOpt(details, AccuracyInfo._Target) match {
           case Some(name) => name
           case _ => dataSourceNames.tail.head
         }
@@ -151,21 +145,48 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
             s"${sel.desc}${alias}"
           }.mkString(", ")
 
-          s"SELECT ${selClause} FROM ${sourceName} LEFT JOIN ${targetName}"
+          val onClause = expr.coalesceDesc
+
+          val sourceIsNull = analyzer.sourceSelectionExprs.map { sel =>
+            s"${sel.desc} IS NULL"
+          }.mkString(" AND ")
+          val targetIsNull = analyzer.targetSelectionExprs.map { sel =>
+            s"${sel.desc} IS NULL"
+          }.mkString(" AND ")
+          val whereClause = s"(NOT (${sourceIsNull})) AND (${targetIsNull})"
+
+          s"SELECT ${selClause} FROM ${sourceName} LEFT JOIN ${targetName} ON ${onClause} WHERE ${whereClause}"
         }
-        println(missRecordSql)
+        val missRecordName = AccuracyInfo.resultName(details, AccuracyInfo._MissRecord)
+        val missRecordStep = SparkSqlStep(
+          missRecordName,
+          missRecordSql,
+          AccuracyInfo.resultPersistType(details, AccuracyInfo._MissRecord, RecordPersistType)
+        )
 
         // 2. miss count
         val missCountSql = {
-          ""
+          s"SELECT COUNT(*) AS `miss.count` FROM `${missRecordName}`"
         }
+        val missCountName = AccuracyInfo.resultName(details, AccuracyInfo._MissCount)
+        val missCountStep = SparkSqlStep(
+          missCountName,
+          missCountSql,
+          AccuracyInfo.resultPersistType(details, AccuracyInfo._MissCount, MetricPersistType)
+        )
 
         // 3. total count
         val totalCountSql = {
-          ""
+          s"SELECT COUNT(*) AS `total.count` FROM ${sourceName}"
         }
+        val totalCountName = AccuracyInfo.resultName(details, AccuracyInfo._TotalCount)
+        val totalCountStep = SparkSqlStep(
+          totalCountName,
+          totalCountSql,
+          AccuracyInfo.resultPersistType(details, AccuracyInfo._TotalCount, MetricPersistType)
+        )
 
-        Nil
+        missRecordStep :: missCountStep :: totalCountStep :: Nil
       }
       case ProfilingType => {
         Nil
