@@ -294,11 +294,12 @@ define(['./module'], function(controllers) {
                     $(stepSelection).css({
                         height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
                     });
+                    //to fix this bug later
 //                    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
-                    document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
-                    $('.y-scrollable').css({
-                        'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
-                    });
+//                    document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
+//                    $('.y-scrollable').css({
+//                        'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+//                    });
 
         }
 
