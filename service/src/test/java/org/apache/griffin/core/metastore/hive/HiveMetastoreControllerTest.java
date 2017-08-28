@@ -69,10 +69,10 @@ public class HiveMetastoreControllerTest {
     }
 
     @Test
-    public void test_getAllTableNamess() throws Exception {
+    public void test_getAllTableNames() throws Exception {
         String db="default";
         when(hiveMetastoreService.getAllTableNames(db)).thenReturn(null);
-        mockMvc.perform(get("/metadata/hive/{db}/table",db))
+        mockMvc.perform(get("/metadata/hive/allTableNames?db="+db))
                 .andExpect(status().isOk());
         verify(hiveMetastoreService).getAllTableNames(db);
     }
@@ -81,15 +81,17 @@ public class HiveMetastoreControllerTest {
     public void test_getAllTables() throws Exception {
         String db="default";
         when(hiveMetastoreService.getAllTable(db)).thenReturn(null);
-        mockMvc.perform(get("/metadata/hive/{db}/alltables",db))
+        mockMvc.perform(get("/metadata/hive/db/allTables?db={db}",db))
                 .andExpect(status().isOk());
         verify(hiveMetastoreService).getAllTable(db);
     }
 
+    /**
+     */
     @Test
     public void test_getAllTables2() throws Exception {
         when(hiveMetastoreService.getAllTable()).thenReturn(null);
-        mockMvc.perform(get("/metadata/hive/alltables"))
+        mockMvc.perform(get("/metadata/hive/allTables"))
                 .andExpect(status().isOk());
         verify(hiveMetastoreService).getAllTable();
     }
@@ -99,7 +101,7 @@ public class HiveMetastoreControllerTest {
         String dbName="";
         String tableName="cout";
         when(hiveMetastoreService.getTable(dbName,tableName)).thenReturn(null);
-        mockMvc.perform(get("/metadata/hive/table/{table}",tableName))
+        mockMvc.perform(get("/metadata/hive/default/{table}",tableName))
                 .andExpect(status().isOk());
         verify(hiveMetastoreService).getTable(dbName,tableName);
     }
@@ -109,7 +111,7 @@ public class HiveMetastoreControllerTest {
         String db="default";
         String table="cout";
         when(hiveMetastoreService.getTable(db,table)).thenReturn(null);
-        mockMvc.perform(get("/metadata/hive/{db}/table/{table}",db,table))
+        mockMvc.perform(get("/metadata/hive?db={db}&table={table}",db,table))
                 .andExpect(status().isOk());
         verify(hiveMetastoreService).getTable(db,table);
     }

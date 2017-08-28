@@ -47,10 +47,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.Serializable;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.quartz.JobBuilder.newJob;
 
 @RunWith(SpringRunner.class)
 public class JobServiceImplTest {
@@ -95,22 +97,26 @@ public class JobServiceImplTest {
     }
 
     @Test
-    public void testSetJobsByKey() throws SchedulerException {
-        List<Map<String, Serializable>> list=new ArrayList<Map<String, Serializable>>();
-        Scheduler scheduler=Mockito.mock(Scheduler.class);
-        JobKey jobKey= new JobKey("TEST");
-        List<Trigger> triggers=new ArrayList<Trigger>();
-        Trigger trigger=new CronTriggerImpl();
-        triggers.add(trigger);
-        given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
+    public void testSetJobsByKey(){
+        try {
+            List<Map<String, Serializable>> list = new ArrayList<Map<String, Serializable>>();
+            Scheduler scheduler = Mockito.mock(Scheduler.class);
+            JobKey jobKey = new JobKey("TEST");
+            List<Trigger> triggers = new ArrayList<Trigger>();
+            Trigger trigger = new CronTriggerImpl();
+            triggers.add(trigger);
+            given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
 
-        JobDetail jd=Mockito.mock(JobDetail.class);
-        given(scheduler.getJobDetail(jobKey)).willReturn(jd);
+            JobDetail jd = Mockito.mock(JobDetail.class);
+            given(scheduler.getJobDetail(jobKey)).willReturn(jd);
 
-        JobDataMap jobDataMap=Mockito.mock(JobDataMap.class);
-        given(jd.getJobDataMap()).willReturn(jobDataMap);
+            JobDataMap jobDataMap = Mockito.mock(JobDataMap.class);
+            given(jd.getJobDataMap()).willReturn(jobDataMap);
 
-//        service.setJobsByKey(list,scheduler,jobKey);
+            //        service.setJobsByKey(list,scheduler,jobKey);
+        } catch (SchedulerException e) {
+            fail("can't set jobs by key.");
+        }
 
     }
 
@@ -139,23 +145,29 @@ public class JobServiceImplTest {
     }
 
     @Test
-    public void testDeleteJob(){
+    public void testDeleteJob() {
         String groupName="BA";
         String jobName="job1";
+        JobKey jobKey=new JobKey(jobName, groupName);
+        JobDetail jobDetail = newJob(SparkSubmitJob.class)
+                .storeDurably()
+                .withIdentity(jobKey)
+                .build();
+        JobRequestBody jobRequestBody=new JobRequestBody("YYYYMMdd-HH", "YYYYMMdd-HH", null, "1503158400000", "50");
+        service.setJobData(jobDetail, jobRequestBody, 0L, groupName, jobName);
+        Scheduler scheduler=Mockito.mock(Scheduler.class);
+        given(factory.getObject()).willReturn(scheduler);
         try {
-            Scheduler scheduler=Mockito.mock(Scheduler.class);
-            given(factory.getObject()).willReturn(scheduler);
-            GriffinOperationMessage tmp = service.deleteJob(groupName,jobName);
-            assertTrue(true);
-        }catch (Throwable t){
-            fail("Cannot delete job");
+            given(scheduler.getJobDetail(jobKey)).willReturn(jobDetail);
+        } catch (SchedulerException e) {
+            fail("fail to return jobDetail for scheduler.getJobDetail(jobKey)");
         }
-        try {
-            given(factory.getObject()).willThrow(SchedulerException.class);
-            GriffinOperationMessage tmp = service.deleteJob(groupName,jobName);
-        } catch (Exception e) {
-            log.info("testGetAllTable: test catch "+e);
-        }
+
+        GriffinOperationMessage tmp = service.deleteJob(groupName,jobName);
+        assertThat(tmp).isEqualTo(GriffinOperationMessage.DELETE_JOB_SUCCESS);
+        given(factory.getObject()).willThrow(SchedulerException.class);
+        tmp = service.deleteJob(groupName,jobName);
+        assertThat(tmp).isEqualTo(GriffinOperationMessage.DELETE_JOB_FAIL);
     }
 
     @Test

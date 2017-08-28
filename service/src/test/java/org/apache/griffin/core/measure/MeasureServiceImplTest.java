@@ -30,6 +30,8 @@ import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,7 +52,7 @@ import static org.mockito.BDDMockito.given;
 @RunWith(SpringRunner.class)
 public class MeasureServiceImplTest {
 
-    @TestConfiguration
+    /*@TestConfiguration
     public static class MeasureServiceImplConfiguration{
         @Bean
         public MeasureServiceImpl service(){
@@ -62,13 +64,13 @@ public class MeasureServiceImplTest {
             return new JobServiceImpl();
         }
 
-    }
-    @MockBean
-    private MeasureRepo measureRepo;
+    }*/
 
-    @Autowired
+
+    @InjectMocks
     private MeasureServiceImpl service;
-
+    @Mock
+    private MeasureRepo measureRepo;
 
     @Before
     public void setup(){
@@ -134,8 +136,10 @@ public class MeasureServiceImplTest {
     }*/
 
     @Test
-    public void testCreateNewMeasure(){
+    public void testCreateNewMeasure() throws Exception {
+/*
         try {
+*/
             String measureName="viewitem_hourly";
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
@@ -147,15 +151,15 @@ public class MeasureServiceImplTest {
             Measure measure1=createATestMeasure(measureName,"bullseye1");
             given(measureRepo.findOne(0L)).willReturn(measure1);
             GriffinOperationMessage message1=service.createMeasure(measure);
-            assertEquals(message1,GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
+            assertEquals(message1,GriffinOperationMessage.CREATE_MEASURE_FAIL);
 
             given(measureRepo.findOne(0L)).willReturn(null);
             given(measureRepo.save(measure)).willReturn(measure);
             GriffinOperationMessage message2=service.createMeasure(measure);
             assertEquals(message2,GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
-        }catch (Throwable t){
+        /*}catch (Throwable t){
             fail("Cannot create new measure viewitem_hourly");
-        }
+        }*/
     }
 
     @Test

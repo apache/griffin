@@ -128,7 +128,7 @@ public class SparkSubmitJob implements Job {
         interval = jd.getJobDataMap().getString("interval");
     }
 
-    public void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItems, long timestamp) {
+    private void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItems, long timestamp) {
         Map<String, String> partitionItemMap = genPartitionMap(patternItemSet, partitionItems, timestamp);
         /**
          * partitions must be a string like: "dt=20170301, hour=12"

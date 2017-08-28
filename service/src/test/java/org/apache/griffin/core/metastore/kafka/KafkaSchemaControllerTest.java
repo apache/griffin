@@ -76,7 +76,7 @@ public class KafkaSchemaControllerTest {
     public void test_getSubjectVersions() throws Exception {
         String subject="sss";
         when(kafkaSchemaService.getSubjectVersions(subject)).thenReturn(null);
-        mockMvc.perform(get("/metadata/kafka/subject/{subject}/version",subject))
+        mockMvc.perform(get("/metadata/kafka/versions?subject={subject}", subject))
                 .andExpect(status().isOk());
         verify(kafkaSchemaService).getSubjectVersions(subject);
     }
@@ -86,7 +86,7 @@ public class KafkaSchemaControllerTest {
         String subject="ss.s";
         String version="ss";
         when(kafkaSchemaService.getSubjectSchema(subject, version)).thenReturn(null);
-        mockMvc.perform(get("/metadata/kafka/subject/{subject}/version/{version}",subject,version))
+        mockMvc.perform(get("/metadata/kafka/subjectSchema?subject={subject}&version={version}",subject,version))
                 .andExpect(status().isOk());
         verify(kafkaSchemaService).getSubjectSchema(subject, version);
     }

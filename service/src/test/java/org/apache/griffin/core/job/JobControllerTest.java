@@ -82,9 +82,10 @@ public class JobControllerTest {
         String schedulerRequestBodyJson=mapper.writeValueAsString(jobRequestBody);
         given(service.addJob(groupName, jobName, measureId, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS);
 
-        mvc.perform(post("/jobs/add/BA/job1/viewitem_hourly").contentType(MediaType.APPLICATION_JSON).content(schedulerRequestBodyJson))
+        mvc.perform(post("/jobs?group=BA&jobName=job1&measureId=0").contentType(MediaType.APPLICATION_JSON).content(schedulerRequestBodyJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",is(GriffinOperationMessage.CREATE_JOB_SUCCESS)))
+                .andExpect(jsonPath("$.code",is(GriffinOperationMessage.CREATE_JOB_SUCCESS.getCode())))
+                .andExpect(jsonPath("$.description", is(GriffinOperationMessage.CREATE_JOB_SUCCESS.getDescription())))
         ;
     }
 
@@ -93,9 +94,10 @@ public class JobControllerTest {
         String groupName="BA";
         String jobName="job1";
         given(service.deleteJob(groupName,jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_SUCCESS);
-        mvc.perform(delete("/jobs/del/BA/job1").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(delete("/jobs?group=BA&jobName=job1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",is(GriffinOperationMessage.DELETE_JOB_SUCCESS)))
+                .andExpect(jsonPath("$.code",is(GriffinOperationMessage.DELETE_JOB_SUCCESS.getCode())))
+                .andExpect(jsonPath("$.description", is(GriffinOperationMessage.DELETE_JOB_SUCCESS.getDescription())))
         ;
     }
 
@@ -107,7 +109,7 @@ public class JobControllerTest {
         int size=2;
         JobInstance jobInstance=new JobInstance(group, job, 1, LivySessionStates.State.running, "","", System.currentTimeMillis());
         given(service.findInstancesOfJob(group,job,page,size)).willReturn(Arrays.asList(jobInstance));
-        mvc.perform(get("/jobs/instances/BA/job1/0/2").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/jobs/instances?group=BA&jobName=job1&page=0&size=2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].groupName",is("BA")))
         ;
@@ -117,9 +119,10 @@ public class JobControllerTest {
     public void testGetHealthInfo() throws Exception {
         JobHealth jobHealth=new JobHealth(1,3);
         given(service.getHealthInfo()).willReturn(jobHealth);
-        mvc.perform(get("/jobs/statics").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/jobs/health").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.health",is(1)))
+                .andExpect(jsonPath("$.healthyJobCount",is(1)))
+                .andExpect(jsonPath("$.jobCount", is(3)))
         ;
     }
 }
