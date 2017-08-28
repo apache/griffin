@@ -47,6 +47,7 @@ public class Measure extends AuditableEntity   {
     @Enumerated(EnumType.STRING)
     private MearuseType type;
 
+    @Enumerated(EnumType.STRING)
     private ProcessType processType=ProcessType.batch;
 
     @ManyToOne(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
