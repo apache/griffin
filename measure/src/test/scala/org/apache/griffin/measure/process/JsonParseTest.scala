@@ -95,7 +95,8 @@ class JsonParseTest extends FunSuite with Matchers with BeforeAndAfter with Logg
 //    df1.show(10)
 //    df1.registerTempTable("df1")
     val details = Map[String, Any](("df.name" -> "src"))
-    DataFrameOprs.fromJson(sqlContext, "df1", details)
+    val df1 = DataFrameOprs.fromJson(sqlContext, details)
+    df1.registerTempTable("df1")
 
     // 2. extract json array into lines
 //    val rdd2 = df1.flatMap { row =>

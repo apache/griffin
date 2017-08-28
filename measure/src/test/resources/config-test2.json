@@ -1,5 +1,5 @@
 {
-  "name": "accu batch test",
+  "name": "accu_batch_test",
 
   "process.type": "batch",
 
@@ -38,18 +38,17 @@
         "details": {
           "source": "source",
           "target": "target",
-          "miss.record": {
-            "name": "miss.record",
+          "miss.records": {
+            "name": "miss.records",
             "persist.type": "record"
           },
-          "miss.count": {
-            "name": "miss.count",
+          "accuracy": {
+            "name": "accu",
             "persist.type": "metric"
           },
-          "total.count": {
-            "name": "total.count",
-            "persist.type": "metric"
-          }
+          "miss": "miss",
+          "total": "total",
+          "matched": "matched"
         }
       }
     ]

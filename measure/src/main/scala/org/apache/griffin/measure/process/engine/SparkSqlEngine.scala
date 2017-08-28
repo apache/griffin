@@ -61,22 +61,22 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
         try {
           persistType match {
             case RecordPersistType => {
-              val pdf = sqlContext.table(name)
-              val recordRdd = pdf.toJSON
+              val pdf = sqlContext.table(s"`${name}`")
+              val records = pdf.toJSON
 
-              persist.records(recordRdd, name)
+              persist.persistRecords(records, name)
 
               val recordLog = s"[ ${name} ] persist records"
               persist.log(curTime, recordLog)
             }
             case MetricPersistType => {
-              val pdf = sqlContext.table(name)
+              val pdf = sqlContext.table(s"`${name}`")
               val recordRdd = pdf.toJSON
 
-              val metric = recordRdd.collect
-              persist.records(metric, name)
+              val metrics = recordRdd.collect
+              persist.persistMetrics(metrics, name)
 
-              val metricLog = s"[ ${name} ] persist metric \n${metric.mkString("\n")}"
+              val metricLog = s"[ ${name} ] persist metric \n${metrics.mkString("\n")}"
               persist.log(curTime, metricLog)
             }
             case _ => {

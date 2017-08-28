@@ -40,21 +40,21 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
   def start(msg: String): Unit = {}
   def finish(): Unit = {}
 
-  def result(rt: Long, result: Result): Unit = {
-    result match {
-      case ar: AccuracyResult => {
-        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
-        httpResult(dataMap)
-      }
-      case pr: ProfileResult => {
-        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> pr.getTotal), ("matched" -> pr.getMatch))
-        httpResult(dataMap)
-      }
-      case _ => {
-        info(s"result: ${result}")
-      }
-    }
-  }
+//  def result(rt: Long, result: Result): Unit = {
+//    result match {
+//      case ar: AccuracyResult => {
+//        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
+//        httpResult(dataMap)
+//      }
+//      case pr: ProfileResult => {
+//        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> pr.getTotal), ("matched" -> pr.getMatch))
+//        httpResult(dataMap)
+//      }
+//      case _ => {
+//        info(s"result: ${result}")
+//      }
+//    }
+//  }
 
   private def httpResult(dataMap: Map[String, Any]) = {
     try {
@@ -77,12 +77,27 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   }
 
-  def records(recs: RDD[String], tp: String): Unit = {}
-  def records(recs: Iterable[String], tp: String): Unit = {}
+//  def records(recs: RDD[String], tp: String): Unit = {}
+//  def records(recs: Iterable[String], tp: String): Unit = {}
 
 //  def missRecords(records: RDD[String]): Unit = {}
 //  def matchRecords(records: RDD[String]): Unit = {}
 
   def log(rt: Long, msg: String): Unit = {}
+
+  def persistRecords(records: RDD[String], name: String): Unit = {}
+
+  def persistMetrics(metrics: Seq[String], name: String): Unit = {
+    val maps = metrics.flatMap { m =>
+      try {
+        Some(JsonUtil.toAnyMap(m) ++ Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp)))
+      } catch {
+        case e: Throwable => None
+      }
+    }
+    maps.foreach { map =>
+      httpResult(map)
+    }
+  }
 
 }

@@ -40,7 +40,7 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
         try {
           rule match {
             case DataFrameOprs._fromJson => {
-              val df = DataFrameOprs.fromJson(sqlContext, name, details)
+              val df = DataFrameOprs.fromJson(sqlContext, details)
               df.registerTempTable(name)
             }
             case _ => {
@@ -85,13 +85,13 @@ object DataFrameOprs {
 
   final val _fromJson = "from_json"
 
-  def fromJson(sqlContext: SQLContext, name: String, details: Map[String, Any]): DataFrame = {
+  def fromJson(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
     val _dfName = "df.name"
     val _colName = "col.name"
-    val dfName = details.getOrElse(_dfName, name).toString
+    val dfName = details.getOrElse(_dfName, "").toString
     val colNameOpt = details.get(_colName).map(_.toString)
 
-    val df = sqlContext.table(dfName)
+    val df = sqlContext.table(s"`${dfName}`")
     val rdd = colNameOpt match {
       case Some(colName: String) => df.map(_.getAs[String](colName))
       case _ => df.map(_.getAs[String](0))

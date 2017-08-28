@@ -35,18 +35,19 @@ trait Persist extends Loggable with Serializable {
   def start(msg: String): Unit
   def finish(): Unit
 
-  def result(rt: Long, result: Result): Unit
-
-  def records(recs: RDD[String], tp: String): Unit
-  def records(recs: Iterable[String], tp: String): Unit
-
-//  def missRecords(records: RDD[String]): Unit
-//  def matchRecords(records: RDD[String]): Unit
-
   def log(rt: Long, msg: String): Unit
+
+//  def result(rt: Long, result: Result): Unit
+//
+//  def records(recs: RDD[String], tp: String): Unit
+//  def records(recs: Iterable[String], tp: String): Unit
+
+  def persistRecords(records: RDD[String], name: String): Unit
+  def persistMetrics(metrics: Seq[String], name: String): Unit
+
 }
 
-object PersistDataType {
-  final val MISS = "miss"
-  final val MATCH = "match"
-}
+//object PersistDataType {
+//  final val MISS = "miss"
+//  final val MATCH = "match"
+//}

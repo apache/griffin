@@ -36,9 +36,11 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
   object AccuracyInfo {
     val _Source = "source"
     val _Target = "target"
-    val _MissRecord = "miss.record"
-    val _MissCount = "miss.count"
-    val _TotalCount = "total.count"
+    val _MissRecords = "miss.records"
+    val _Accuracy = "accuracy"
+    val _Miss = "miss"
+    val _Total = "total"
+    val _Matched = "matched"
     def getNameOpt(param: Map[String, Any], key: String): Option[String] = param.get(key).flatMap(a => Some(a.toString))
     def resultName(param: Map[String, Any], key: String): String = {
       val nameOpt = param.get(key) match {
@@ -75,9 +77,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
         dqType match {
           case AccuracyType => {
             Seq[String](
-              AccuracyInfo.resultName(param, AccuracyInfo._MissRecord),
-              AccuracyInfo.resultName(param, AccuracyInfo._MissCount),
-              AccuracyInfo.resultName(param, AccuracyInfo._TotalCount)
+              AccuracyInfo.resultName(param, AccuracyInfo._MissRecords),
+              AccuracyInfo.resultName(param, AccuracyInfo._Accuracy)
             )
           }
           case ProfilingType => {
@@ -136,7 +137,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
         val analyzer = AccuracyAnalyzer(expr, sourceName, targetName)
 
         // 1. miss record
-        val missRecordSql = {
+        val missRecordsSql = {
           val selClause = analyzer.sourceSelectionExprs.map { sel =>
             val alias = sel.alias match {
               case Some(a) => s" AS ${a}"
@@ -157,36 +158,55 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
 
           s"SELECT ${selClause} FROM ${sourceName} LEFT JOIN ${targetName} ON ${onClause} WHERE ${whereClause}"
         }
-        val missRecordName = AccuracyInfo.resultName(details, AccuracyInfo._MissRecord)
-        val missRecordStep = SparkSqlStep(
-          missRecordName,
-          missRecordSql,
-          AccuracyInfo.resultPersistType(details, AccuracyInfo._MissRecord, RecordPersistType)
+        val missRecordsName = AccuracyInfo.resultName(details, AccuracyInfo._MissRecords)
+        val missRecordsStep = SparkSqlStep(
+          missRecordsName,
+          missRecordsSql,
+          AccuracyInfo.resultPersistType(details, AccuracyInfo._MissRecords, RecordPersistType)
         )
 
         // 2. miss count
-        val missCountSql = {
-          s"SELECT COUNT(*) AS `miss.count` FROM `${missRecordName}`"
+        val missTableName = "_miss_"
+        val missColName = AccuracyInfo.getNameOpt(details, AccuracyInfo._Miss).getOrElse(AccuracyInfo._Miss)
+        val missSql = {
+          s"SELECT COUNT(*) AS `${missColName}` FROM `${missRecordsName}`"
         }
-        val missCountName = AccuracyInfo.resultName(details, AccuracyInfo._MissCount)
-        val missCountStep = SparkSqlStep(
-          missCountName,
-          missCountSql,
-          AccuracyInfo.resultPersistType(details, AccuracyInfo._MissCount, MetricPersistType)
+        val missStep = SparkSqlStep(
+          missTableName,
+          missSql,
+          NonePersistType
         )
 
         // 3. total count
-        val totalCountSql = {
-          s"SELECT COUNT(*) AS `total.count` FROM ${sourceName}"
+        val totalTableName = "_total_"
+        val totalColName = AccuracyInfo.getNameOpt(details, AccuracyInfo._Total).getOrElse(AccuracyInfo._Total)
+        val totalSql = {
+          s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
         }
-        val totalCountName = AccuracyInfo.resultName(details, AccuracyInfo._TotalCount)
-        val totalCountStep = SparkSqlStep(
-          totalCountName,
-          totalCountSql,
-          AccuracyInfo.resultPersistType(details, AccuracyInfo._TotalCount, MetricPersistType)
+        val totalStep = SparkSqlStep(
+          totalTableName,
+          totalSql,
+          NonePersistType
         )
 
-        missRecordStep :: missCountStep :: totalCountStep :: Nil
+        // 4. accuracy metric
+        val matchedColName = AccuracyInfo.getNameOpt(details, AccuracyInfo._Matched).getOrElse(AccuracyInfo._Matched)
+        val accuracyMetricSql = {
+          s"""
+             |SELECT `${totalTableName}`.`${totalColName}` AS `${totalColName}`,
+             |`${missTableName}`.`${missColName}` AS `${missColName}`,
+             |(`${totalColName}` - `${missColName}`) AS `${matchedColName}`
+             |FROM `${totalTableName}` JOIN `${missTableName}`
+           """.stripMargin
+        }
+        val accuracyMetricName = AccuracyInfo.resultName(details, AccuracyInfo._Accuracy)
+        val accuracyMetricStep = SparkSqlStep(
+          accuracyMetricName,
+          accuracyMetricSql,
+          AccuracyInfo.resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType)
+        )
+
+        missRecordsStep :: missStep :: totalStep :: accuracyMetricStep :: Nil
       }
       case ProfilingType => {
         Nil

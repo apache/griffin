@@ -40,67 +40,67 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
     println(s"[${timeStamp}] ${metricName} finish")
   }
 
-  def result(rt: Long, result: Result): Unit = {
-    try {
-      val resStr = result match {
-        case ar: AccuracyResult => {
-          s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
-        }
-        case pr: ProfileResult => {
-          s"match percentage: ${pr.matchPercentage}\ntotal count: ${pr.getTotal}\nmiss count: ${pr.getMiss}, match count: ${pr.getMatch}"
-        }
-        case _ => {
-          s"result: ${result}"
-        }
-      }
-      println(s"[${timeStamp}] ${metricName} result: \n${resStr}")
-    } catch {
-      case e: Throwable => error(e.getMessage)
-    }
-  }
+//  def result(rt: Long, result: Result): Unit = {
+//    try {
+//      val resStr = result match {
+//        case ar: AccuracyResult => {
+//          s"match percentage: ${ar.matchPercentage}\ntotal count: ${ar.getTotal}\nmiss count: ${ar.getMiss}, match count: ${ar.getMatch}"
+//        }
+//        case pr: ProfileResult => {
+//          s"match percentage: ${pr.matchPercentage}\ntotal count: ${pr.getTotal}\nmiss count: ${pr.getMiss}, match count: ${pr.getMatch}"
+//        }
+//        case _ => {
+//          s"result: ${result}"
+//        }
+//      }
+//      println(s"[${timeStamp}] ${metricName} result: \n${resStr}")
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
+//  }
+//
+//  // need to avoid string too long
+//  private def rddRecords(records: RDD[String]): Unit = {
+//    try {
+//      val recordCount = records.count.toInt
+//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+//      if (count > 0) {
+//        val recordsArray = records.take(count)
+////        recordsArray.foreach(println)
+//      }
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
+//  }
 
-  // need to avoid string too long
-  private def rddRecords(records: RDD[String]): Unit = {
-    try {
-      val recordCount = records.count.toInt
-      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-      if (count > 0) {
-        val recordsArray = records.take(count)
-//        recordsArray.foreach(println)
-      }
-    } catch {
-      case e: Throwable => error(e.getMessage)
-    }
-  }
+//  private def iterableRecords(records: Iterable[String]): Unit = {
+//    try {
+//      val recordCount = records.size
+//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+//      if (count > 0) {
+//        val recordsArray = records.take(count)
+////        recordsArray.foreach(println)
+//      }
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
+//  }
 
-  private def iterableRecords(records: Iterable[String]): Unit = {
-    try {
-      val recordCount = records.size
-      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-      if (count > 0) {
-        val recordsArray = records.take(count)
-//        recordsArray.foreach(println)
-      }
-    } catch {
-      case e: Throwable => error(e.getMessage)
-    }
-  }
-
-  def records(recs: RDD[String], tp: String): Unit = {
-    tp match {
-      case PersistDataType.MISS => rddRecords(recs)
-      case PersistDataType.MATCH => rddRecords(recs)
-      case _ => {}
-    }
-  }
-
-  def records(recs: Iterable[String], tp: String): Unit = {
-    tp match {
-      case PersistDataType.MISS => iterableRecords(recs)
-      case PersistDataType.MATCH => iterableRecords(recs)
-      case _ => {}
-    }
-  }
+//  def records(recs: RDD[String], tp: String): Unit = {
+//    tp match {
+//      case PersistDataType.MISS => rddRecords(recs)
+//      case PersistDataType.MATCH => rddRecords(recs)
+//      case _ => {}
+//    }
+//  }
+//
+//  def records(recs: Iterable[String], tp: String): Unit = {
+//    tp match {
+//      case PersistDataType.MISS => iterableRecords(recs)
+//      case PersistDataType.MATCH => iterableRecords(recs)
+//      case _ => {}
+//    }
+//  }
 
 //  def missRecords(records: RDD[String]): Unit = {
 //    warn(s"[${timeStamp}] ${metricName} miss records: ")
@@ -114,5 +114,32 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
   def log(rt: Long, msg: String): Unit = {
     println(s"[${timeStamp}] ${rt}: ${msg}")
   }
+
+  def persistRecords(records: RDD[String], name: String): Unit = {
+    try {
+      val recordCount = records.count.toInt
+      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+      if (count > 0) {
+        val recordsArray = records.take(count)
+        recordsArray.foreach(println)
+      }
+    } catch {
+      case e: Throwable => error(e.getMessage)
+    }
+  }
+
+  def persistMetrics(metrics: Seq[String], name: String): Unit = {
+    try {
+      val recordCount = metrics.size
+      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+      if (count > 0) {
+        val recordsArray = metrics.take(count)
+        recordsArray.foreach(println)
+      }
+    } catch {
+      case e: Throwable => error(e.getMessage)
+    }
+  }
+
 
 }
