@@ -24,13 +24,16 @@ define(['./module'], function (controllers) {
         console.log('job controller');
         console.log($scope.ntAccount);
         var allJobs = $config.uri.allJobs;
+
         var ts = null;
         var start = 0;
-        var number = 10;    
+        var number = 10;
         var originalRowCollection = undefined;
-        $scope.currentPage = 0;
-
-
+        var originalInstances = undefined;
+        $scope.n = 0;
+        $scope.currentJob = undefined;
+        $scope.tableState = [];
+        $scope.oldindex = undefined;
 
         function getJobs(start,number,tableState){
             $http.get(allJobs).then(function successCallback(data) {
@@ -42,10 +45,10 @@ define(['./module'], function (controllers) {
                     {
                         if(job.Interval%60==0)
                             job.Interval = job.interval/60 + 'min';
-                        else 
+                        else
                             job.Interval = (job.interval - job.interval%60)/60 + 'min'+job.interval%60 + 's';
                     }
-                    else 
+                    else
                     {
                         if(job.Interval%3600==0)
                             job.Interval = job.interval/3600 + 'h';
@@ -58,6 +61,7 @@ define(['./module'], function (controllers) {
                     }
                     var length = job.jobName.split('-').length;
                     job.createTime = job.jobName.split('-')[length-1];
+                    $scope.jobName = job.jobName;
                 });
                 data.data.sort(function(a,b){
                     var dateA = a.createTime;
@@ -70,8 +74,22 @@ define(['./module'], function (controllers) {
                 tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
             },function errorCallback(response){});
         }
-    
+
+
+        function getInstances(start,number,tableState){
+            var allInstances = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + $scope.currentJob.jobName +'&page='+'0'+'&size='+'200';
+            $http.get(allInstances).then(function successCallback(data) {
+                originalInstances = angular.copy(data.data);
+                $scope.row_currentInstances = angular.copy(data.data);
+                $scope.currentInstances = $scope.row_currentInstances.slice(start, start+number);
+                tableState.pagination.numberOfPages = Math.ceil($scope.row_currentInstances.length/number);
+            },function errorCallback(response){});
+        }
+
+
         $scope.pagingJob = function(tableState){
+            $scope.n = 0;
+            $scope.oldindex = undefined;
             ts = tableState;
             start = tableState.pagination.start || 0;
             number = tableState.pagination.number || 10;
@@ -81,59 +99,26 @@ define(['./module'], function (controllers) {
             },600000);
         };
 
-        function addCurrent(p_index,number){
-            $('#'+p_index+'-'+number).addClass('page-active');
-            $('#'+p_index+'-'+number).siblings().removeClass('page-active');
-        }
 
-        $scope.showInstances = function showInstances(row,number){
-            var p_index = $scope.displayed.indexOf(row);
+        $scope.pagingInstances = function(tableState){
+            $scope.tableState[$scope.n] = tableState;
+            $scope.n = $scope.n+1;
+            ts = tableState;
+            start = tableState.pagination.start || 0;
+            number = tableState.pagination.number || 10;
+             if($scope.currentJob!=undefined && $scope.currentJob.jobName!=undefined)
+                getInstances(start,number,tableState);
+        };
+
+        $scope.showInstances = function showInstances(row){
+            var index = $scope.displayed.indexOf(row);
+            if ($scope.oldindex!=undefined && $scope.oldindex != index)
+                $scope.displayed[$scope.oldindex].showDetail = false;
+            row.showDetail = !row.showDetail;
             $scope.currentJob = row;
-            $scope.currentPage = number;
-
-            
-
-            var allInstances = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+'0'+'&size='+'200';
-            $http.get(allInstances).then(function successCallback(data){
-                 row.instances = data.data;                
-                 $scope.pageSize = 5;
-                 $scope.pages = Math.ceil(row.instances.length / $scope.pageSize);
-                 // $scope.newPages = $scope.pages > 5 ? 5 : $scope.pages;
-                 row.pageCount = new Array();
-                 var num = number+1;
-                 if (num > 2) {
-                   for(var i = (num - 3) ; i < ((num + 2) > $scope.pages ? $scope.pages : (num + 2)) ; i++){
-                     row.pageCount.push(i);
-                     //console.log(num);
-                   }
-                 }
-                 else{
-                    for(var i = 0 ; i < 5 ; i++){
-                     row.pageCount.push(i);
-                    }
-                 }
-            });
-            var url = $config.uri.getInstances + '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+number+'&size='+'10';
-            $http.get(url).then(function successCallback(data){
-                row.currentInstances = data.data;
-                addCurrent(p_index,number);
-            });
-            $timeout(function(){
-                addCurrent(p_index,number);
-            },200);
-        }
-
-
-        $scope.prevPage = function(row){
-            if($scope.currentPage > 0){
-            $scope.currentPage--;
-            $scope.showInstances(row,$scope.currentPage);
-            }   
-        }
-
-        $scope.nextPage = function(row,item){
-            $scope.currentPage++;
-            $scope.showInstances(row,$scope.currentPage);
+            $scope.currentJob.tableState = $scope.tableState[index];
+            $scope.pagingInstances($scope.currentJob.tableState);
+            $scope.oldindex = index;
         }
 
         $scope.remove = function remove(row) {

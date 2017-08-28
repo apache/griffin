@@ -44,8 +44,8 @@ under the License.
             </tr>
             </tbody>
             <tbody ng-repeat="row in displayed" ng-init="p_index=$index">
-            <tr ng-click = "showInstances(row,0)">
-                <td ng-class="{accordion:true}" ng-click="row.showDetail=!(row.showDetail)" style="cursor: pointer;">
+            <tr ng-click = "showInstances(row)">
+                <td ng-class="{accordion:true}"  style="cursor: pointer;">
                     <i ng-show="!row.showDetail" class="fa fa-chevron-circle-right blue"></i>
                     <i ng-show="row.showDetail" class="fa fa-chevron-circle-down blue"></i>
                     {{row.jobName}}
@@ -72,8 +72,7 @@ under the License.
             </tr>
             <tr ng-show="row.showDetail">
                 <td colspan="7" style="padding:20px 30px 10px 30px;">
-                    <table st-table="row.currentInstances"
-                           class="table table-striped" style="word-wrap: break-word;" >
+                    <table st-table="currentInstances" st-pipe="pagingInstances" class="table table-striped">
                         <thead>
                         <tr style="background-color:#7D95CC">
                             <th style="width:30%" >AppID</th>
@@ -83,10 +82,10 @@ under the License.
                         </tr>
                         </thead>
                         <tbody >
-                        <tr ng-if="!row.currentInstances || row.currentInstances.length == 0">
+                        <tr ng-if="!row_currentInstances || row_currentInstances.length == 0">
                             <td colspan="7" style="text-align:center">No content.</td>
                         </tr>
-                        <tr ng-repeat="item in row.currentInstances" >
+                        <tr ng-repeat="item in currentInstances track by $index" >
                             <td><a href={{item.appUri}} target="_blank">{{item.appId}}</a></td>
                             <!-- <td>{{item.sessionId}}</td> -->
                             <td>{{item.timestamp | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
@@ -96,14 +95,10 @@ under the License.
 
                         </tbody>
                         <tfoot>
-                        <tr class="text-center">
-                            <!-- <td colspan="1" class="text-left"></td> -->
-                            <td class="text-right page" colspan="1" ng-click="prevPage(row)"><<</td>
-                            <td colspan="10" ng-repeat="item in row.pageCount" ng-click="showInstances(row,item)" ng-init="c_index=$index" class="page" id={{p_index}}-{{item}}>
-                             {{item+1}}                           
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <div st-pagination="" st-items-by-page="10" st-displayed-pages="5"></div>
                             </td>
-                            <td class="text-left page" colspan="1" ng-click="nextPage(row)">>></td>
-                            
                         </tr>
                         </tfoot>
                     </table>
