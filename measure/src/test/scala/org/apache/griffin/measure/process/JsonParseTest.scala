@@ -27,7 +27,7 @@ import org.apache.griffin.measure.config.validator.AllParamValidator
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.PersistThreadPool
 import org.apache.griffin.measure.process.engine.DataFrameOprs
-import org.apache.griffin.measure.utils.JsonUtil
+import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.hadoop.hive.ql.exec.UDF
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Column, DataFrame, Row, SQLContext}
@@ -218,6 +218,7 @@ class JsonParseTest extends FunSuite with Matchers with BeforeAndAfter with Logg
 //    desc.show(100)
 
     //
+
   }
 
   test ("json test 2") {

@@ -15,14 +15,6 @@
       "config": {
         "max.log.lines": 100
       }
-    },
-    {
-      "type": "hdfs",
-      "config": {
-        "path": "hdfs://localhost/griffin/test/persist",
-        "max.persist.lines": 10000,
-        "max.lines.per.file": 10000
-      }
     }
   ],
 
