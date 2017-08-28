@@ -43,7 +43,7 @@ define(['./module'], function(controllers) {
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-//               $http.get(url_dashboard).then(function successCallback(data){
+              // $http.get(url_dashboard).then(function successCallback(data){
                 $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
                     data = data.data;
                     angular.forEach(data.hits.hits, function(sys) {

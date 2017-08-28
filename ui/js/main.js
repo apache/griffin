@@ -34,6 +34,7 @@ require.config({
 			'ngCookies': '../bower_components/angular-cookies/angular-cookies',
 
 	    'jquery': '../bower_components/jquery/dist/jquery',
+	    'jquery-ui':'../bower_components/jquery-ui/jquery-ui',
 	    'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap',
 	    'spin': '../bower_components/spin.js/spin',
 	    'angularSpinner': '../bower_components/angular-spinner/angular-spinner',
@@ -69,6 +70,10 @@ require.config({
 	    'jquery': {
 				exports: 'jquery'
 			},
+		'jquery-ui':{
+			exports:'jquery-ui',
+			deps:['jquery']
+		},
 	    'bootstrap': {
 	      exports: 'bootstrap',
 	      deps: ['jquery']

@@ -25,22 +25,29 @@ define(['./module'], function (controllers) {
 
         var echarts = require('echarts');
         var formatUtil = echarts.format;
+        
+        $scope.isIE = function() {
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf("MSIE ");
+            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)){
+               return true; 
+            }
+            else {
+               return false;
+            }
+        }
 
         pageInit();
 
         $scope.orgs = [];
         $scope.dataData = [];
-        $scope.finalData = [];
         function pageInit() {
             $scope.$emit('initReq');
-
-//            var url = $config.uri.heatmap;
-             var url_dashboard = $config.uri.dashboard ;
-//            var url_dashboard = 'data.json';
-             var url_organization = $config.uri.organization;
-//            var url_organization = 'org.json';
+            var url_dashboard = $config.uri.dashboard ;
+            var url_organization = $config.uri.organization;
             $http.get(url_organization).then(function successCallback(res){
                var orgNode = null;
+               console.log(res);
                angular.forEach(res.data, function(value,key) {
                     orgNode = new Object();
                     $scope.orgs.push(orgNode);
@@ -48,8 +55,10 @@ define(['./module'], function (controllers) {
                     orgNode.assetMap = value;
                });
                $scope.originalOrgs = angular.copy($scope.orgs);
-                 $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
-//                 $http.get(url_dashboard).then(function successCallback(data){
+                  $http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).then(function successCallback(data) {
+//                $http.get(url_dashboard).then(function successCallback(data){
+                    $scope.finalData = [];
+
                     angular.forEach(data.data.hits.hits, function(sys) {
                         var chartData = sys._source;
                         chartData.sort = function(a,b){
