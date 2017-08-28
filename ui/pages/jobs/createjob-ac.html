@@ -17,6 +17,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+<div class="mask" ng-if = 'maskOpen' ng-click="close()"></div>
+
 <div class="container-fluid">
     <div class="row">
         <h5 class="over-title margin-bottom-15">Create Job</h5>
@@ -37,7 +39,7 @@ under the License.
                                 <div class="col-md-12 col-lg-12 col-sm-12">
                                     <div class="form-group" ng-class="{'has-error':Form.ruleName.$dirty&&Form.ruleName.$invalid, 'has-success':Form.ruleName.$valid}">
                                         <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                                            Source Partition<span class="symbol required"></span>:
+                                            Source Pattern<span class="symbol required"></span>:
                                         </label>
 
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
@@ -51,7 +53,7 @@ under the License.
                                 <div class="col-md-12 col-lg-12 col-sm-12">
                                     <div class="form-group" ng-class="{'has-error':Form.targetPat.$dirty&&Form.targetPat.$invalid, 'has-success':Form.targetPat.$valid}">
                                         <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                                            Target Partition<span class="symbol required"></span>:
+                                            Target Pattern<span class="symbol required"></span>:
                                         </label>
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
                                             <input type="text" class="form-control" ng-model="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'."
@@ -68,19 +70,49 @@ under the License.
 
                                         <div class="col-md-10 col-lg-10 col-sm-10 ">
                                             <select id="measureSelector" class="form-control" ng-model="measure"  required>
-                                                <option ng-repeat="row in Measures" value="{{$index}}" >{{row}}</option>
+                                                <option ng-repeat="row in Measures" value="{{$index}}" >{{row.name}}</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-12 col-lg-12 col-sm-12">
-                                    <div class="form-group">
+                                    <div class="form-group" >
                                         <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                                             Start At:
                                         </label>
 
-                                        <div class="col-md-10 col-lg-10 col-sm-10 ">
-                                            <input type="text" class="form-control" ng-model="jobStartTime" placeholder="The time of start. eg: 20170101 00:00:00">
+                                        <div class="col-md-5 col-lg-5 col-sm-5 ">
+                                            <input type="text" id="datepicker" class="form-control" ng-model="jobStartTime" >
+                                        </div>
+
+                                        <div class="col-md-5 col-lg-5 col-sm-5" ng-class="{'has-error':Form.timeDetail.$invalid, 'has-success':Form.timeDetail.$valid}">
+                                            <input type="text" class="form-control" id="timeDetail" ng-click="showTime()" value="{{hourDetail}}:{{minuteDetail}}:{{secondDetail}} "
+                                                   ng-model="timeDetail"
+
+                                            >
+                                            <div id="timePopup" class="col-md-11 col-lg-11 col-sm-11" ng-if="isOpen">
+                                                <div id="hourSelector">
+                                                    <p ng-click="changeTime(0,24,true,hourDetail,1)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p>{{hourDetail}}</p>
+                                                    <p ng-click="changeTime(0,24,false,hourDetail,1)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                </div>
+                                                <div class="division">
+                                                    <p>:</p>
+                                                </div>
+                                                <div id="minuteSelector">
+                                                    <p ng-click="changeTime(0,59,true,minuteDetail,2)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p >{{minuteDetail}}</p>
+                                                    <p ng-click="changeTime(0,59,false,minuteDetail,2)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                </div>
+                                                <div class="division">
+                                                    <p>:</p>
+                                                </div>
+                                                <div id="secondSelector">
+                                                    <p ng-click="changeTime(0,59,true,secondDetail,3)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
+                                                    <p >{{secondDetail}}</p>
+                                                    <p ng-click="changeTime(0,59,false,secondDetail,3)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -92,7 +124,7 @@ under the License.
 
                                         <div class="col-md-5 col-lg-5 col-sm-5 ">
                                             <input type="text" id="systemSelector" class="form-control" ng-model="periodTime"  required placeholder="How often it works"
-                                                   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                                                   onblur="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
                                                    onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
                                         </div>
                                         <div class="col-md-5 col-lg-5 col-sm-5 ">

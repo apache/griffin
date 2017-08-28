@@ -33,9 +33,14 @@ under the License.
 
 			</tr>
 	  	</thead>
-	  	<tbody ng-if="!displayed || displayed.length == 0">
-		    <tr>
-		        <td colspan="7" style="text-align:center">No content.</td>
+	  	<tbody>
+		    <tr ng-if="!displayed || displayed.length == 0">
+		     <td ng-if="displayed.length == 0" colspan="7" style="text-align:center">
+		     No content.
+		     </td>
+		     <td class="icon">
+				 <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
+			 </td>
 		    </tr>
 		</tbody>
 	  	<tbody ng-repeat="row in displayed" style="word-break:break-all;">
@@ -46,8 +51,8 @@ under the License.
                     {{row.tableName}}</td>
 	    		<td>{{row.dbName || 'N/A'}}</td>
 	        	<td>{{row.owner || 'N/A'}}</td>
-	    		<td>{{(row.createTime | date: 'short') ||  'N/A'}}</td>
-	    		<td>{{(row.lastAccessTime | date: 'short') || 'N/A' }}</td>
+	    		<td>{{(row.createTime * 1000 | date: 'short') ||  'N/A'}}</td>
+	    		<td>{{(row.lastAccessTime * 1000 | date: 'short') || 'N/A' }}</td>
 	    		<td>{{row.sd.location || 'N/A'}}</td>
 	    	</tr>
 	    	<tr ng-show="row.showDetail">

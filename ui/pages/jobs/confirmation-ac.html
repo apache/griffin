@@ -27,7 +27,7 @@ under the License.
             <div id="viewrule-definition" class="viewrule-content">
                 <div class="row">
                     <label class="col-md-4 col-lg-4 col-sm-4">
-                        Source Partition:
+                        Source Pattern:
                     </label>
 
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
@@ -37,7 +37,7 @@ under the License.
 
                 <div class="row">
                     <label class="col-md-4 col-lg-4 col-sm-4">
-                        Target Partition:
+                        Target Pattern:
                     </label>
 
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
@@ -51,17 +51,17 @@ under the License.
                     </label>
 
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                        {{Measures[measure]}}
+                        {{Measures[measure].name}}
                     </div>
                 </div>
 
                 <div class="row">
                     <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                        Start after:
+                        Start at:
                     </label>
 
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                        {{jobStartTime}}
+                        {{jobStartTime}}&nbsp; {{timeDetail}}
                     </div>
                 </div>
 
@@ -70,7 +70,7 @@ under the License.
                         Interval:
                     </label>
 
-                    <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff"  >{{periodTime}}
+                    <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff"  >{{periodTime}}&nbsp;{{timeType}}
 
                     </div>
                 </div>

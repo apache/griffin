@@ -22,22 +22,24 @@ package org.apache.griffin.core.metric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * In griffin, metricName usually equals to measureName, and we only save measureName in server.
+ */
 
 @RestController
 @RequestMapping("/metrics")
 public class MetricController {
-    private static final Logger log = LoggerFactory.getLogger(MetricController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricController.class);
     @Autowired
     MetricService metricService;
-    @RequestMapping("/{measureName}/org")
-    public String getOrgByMeasureName(@PathVariable("measureName") String measureName){
+
+    @RequestMapping(value = "/org",method = RequestMethod.GET)
+    public String getOrgByMeasureName(@RequestParam("measureName") String measureName) {
         return metricService.getOrgByMeasureName(measureName);
     }
-
-
-
 }

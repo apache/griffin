@@ -27,8 +27,8 @@ under the License.
             <thead>
             <tr style="background-color:#7D95CC">
                 <th st-ratio="15">Job Name</th>
-                <th st-ratio="15">Source Partition</th>
-                <th st-ratio="15">Target Partition</th>
+                <th st-ratio="15">Source Pattern</th>
+                <th st-ratio="15">Target Pattern</th>
                 <th st-ratio="15">Previous Fire Time</th>
 
                 <th st-ratio="20">Next Fire Time</th>
@@ -44,20 +44,24 @@ under the License.
             </tr>
             </tbody>
             <tbody ng-repeat="row in displayed" ng-init="p_index=$index">
-            <tr ng-click = "showInstances(row,0)">
-                <td ng-class="{accordion:true}" ng-click="row.showDetail=!(row.showDetail)" style="cursor: pointer;">
+            <tr ng-click = "showInstances(row)">
+                <td ng-class="{accordion:true}"  style="cursor: pointer;">
                     <i ng-show="!row.showDetail" class="fa fa-chevron-circle-right blue"></i>
                     <i ng-show="row.showDetail" class="fa fa-chevron-circle-down blue"></i>
                     {{row.jobName}}
                     <!-- -{{(row.createTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }} -->
                 </td>
-                <td>{{row.sourcePat}}</td>
-                <td>{{row.targetPat|strmap:'modeltype'}}</td>
+                <td>{{row.sourcePattern}}</td>
+                <td>{{row.targetPattern|strmap:'modeltype'}}</td>
                 <td ng-show="row.previousFireTime==-1">--/--/-- &nbsp;&nbsp;--:--</td>
                 <td ng-show="row.previousFireTime!=-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
                 <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
-                <td>{{row.triggerState}}</td>
-                <td>{{row.periodTime}}s</td>
+                <td>
+                    <span ng-if='row.triggerState == "NORMAL"' class="normal">{{row.triggerState}}
+                    </span>
+                    <span ng-if='row.triggerState != "NORMAL"' class = 'unnormal'>{{row.triggerState}}</span>
+                </td>
+                <td>{{row.Interval}}</td>
                 <td>
                     &nbsp;
                     <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
@@ -68,24 +72,23 @@ under the License.
             </tr>
             <tr ng-show="row.showDetail">
                 <td colspan="7" style="padding:20px 30px 10px 30px;">
-                    <table st-table="row.currentInstances"
-                           class="table table-striped" style="word-wrap: break-word;" >
+                    <table st-table="currentInstances" st-pipe="pagingInstances" class="table table-striped">
                         <thead>
                         <tr style="background-color:#7D95CC">
-                            <th style="width:25%" >ID</th>
+                            <th style="width:30%" >AppID</th>
+                            <!-- <th style="width:20%" >SessionID</th> -->
                             <th style="width:25%" >Time</th>
-                            <th style="width:25%" >Group Name</th>
-                            <th style="width:36%" >State</th>
+                            <th style="width:20%" >State</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr ng-if="!row.currentInstances || row.currentInstances.length == 0">
+                        <tbody >
+                        <tr ng-if="!row_currentInstances || row_currentInstances.length == 0">
                             <td colspan="7" style="text-align:center">No content.</td>
                         </tr>
-                        <tr ng-repeat="item in row.currentInstances" >
-                            <td>{{item.id}}</td>
+                        <tr ng-repeat="item in currentInstances track by $index" >
+                            <td><a href={{item.appUri}} target="_blank">{{item.appId}}</a></td>
+                            <!-- <td>{{item.sessionId}}</td> -->
                             <td>{{item.timestamp | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
-                            <td>{{item.groupName}}</td>
                             <td>{{item.state}}</td>
                         </tr>
                         <br>
@@ -93,8 +96,9 @@ under the License.
                         </tbody>
                         <tfoot>
                         <tr>
-                            <td colspan="3" class="text-right"></td>
-                            <td ng-repeat="item in row.pageCount" ng-click="showInstances(row,item)" ng-init="c_index=$index" class="page" id={{p_index}}-{{c_index}}>{{item+1}}</td>
+                            <td colspan="5" class="text-center">
+                                <div st-pagination="" st-items-by-page="10" st-displayed-pages="5"></div>
+                            </td>
                         </tr>
                         </tfoot>
                     </table>
@@ -104,7 +108,8 @@ under the License.
             <tfoot>
             <tr>
                 <td colspan="8" class="text-right">
-                    <div  st-items-by-page="10" st-pagination="" st-displayed-pages="10"></div>
+                    <div  st-items-by-page="10" st-pagination="" st-displayed-pages="10">
+                    </div>
                 </td>
             </tr>
             </tfoot>

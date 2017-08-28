@@ -21,11 +21,22 @@ define(['./module'], function (controllers) {
     'use strict';
     controllers.controller('DataAssetsCtrl', ['$scope', '$http', '$config', '$location', 'toaster', '$timeout', '$route', '$filter', function ($scope, $http, $config, $location, toaster, $timeout, $route, $filter) {
 
-      var allModels = $config.uri.dataassetlist;
+      var allDataassets = $config.uri.dataassetlist;
       var ts = null;
       var start = 0;
       var number = 10;
       var originalRowCollection = undefined;
+
+      $scope.isIE = function() {
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf("MSIE ");
+            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)){
+               return true; 
+            }
+            else {
+               return false;
+            }
+        }
 
       $scope.paging = function(tableState){
         console.log(tableState);
@@ -35,12 +46,7 @@ define(['./module'], function (controllers) {
         number = tableState.pagination.number || 10;
 
         if(start == 0 && !$scope.rowCollection){
-          $http.get(allModels).then(function successCallback(data) {
-            if(data.data){
-              // data.sort(function(a,b){
-              //   return -(a.timestamp - b.timestamp);
-              // });
-            }
+          $http.get(allDataassets,{cache: true}).then(function successCallback(data) {
             originalRowCollection = new Array();
             angular.forEach(data.data,function(db){
               angular.forEach(db,function(table){
@@ -48,14 +54,13 @@ define(['./module'], function (controllers) {
               });
             });
 
-            // originalRowCollection = angular.copy(data);
             $scope.rowCollection = angular.copy(originalRowCollection);
-            // $scope.rowCollection.sort(function(a,b){
-            //   return (a.assetName<b.assetName?-1:(a.assetName>b.assetName?1:0));
-            // });
 
             $scope.displayed = $scope.rowCollection.slice(start, start+number);
             tableState.pagination.numberOfPages = Math.ceil($scope.rowCollection.length/number);
+          },function errorCallback(data){
+            console.log(data);
+            toaster.pop('error','Get data assets failed',data.data.message);
           });
         }else{
           $scope.displayed = $scope.rowCollection.slice(start, start+number);

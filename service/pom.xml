@@ -38,7 +38,6 @@ under the License.
         <hive.version>1.2.1</hive.version>
         <scala.version>2.10</scala.version>
         <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
-        <spring.version>4.3.2.RELEASE</spring.version>
         <confluent.version>3.2.0</confluent.version>
         <quartz.version>2.2.1</quartz.version>
         <start-class>org.apache.griffin.core.GriffinWebApplication</start-class>
@@ -80,16 +79,7 @@ under the License.
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
-            <version>1.1.5.RELEASE</version>
         </dependency>
-
-        <!--dev db-->
-
-        <!--<dependency>-->
-            <!--<groupId>com.h2database</groupId>-->
-            <!--<artifactId>h2</artifactId>-->
-        <!--</dependency>-->
-
 
         <!--prod db-->
         <dependency>
@@ -112,12 +102,22 @@ under the License.
                     <artifactId>servlet-api</artifactId>
                     <groupId>javax.servlet</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-metastore</artifactId>
             <version>${hive.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- to access confluent schema registry -->
@@ -141,6 +141,13 @@ under the License.
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
             <version>2.2.2</version>
+        </dependency>
+
+        <!--livy-core-->
+        <dependency>
+            <groupId>com.cloudera.livy</groupId>
+            <artifactId>livy-core_2.10</artifactId>
+            <version>0.3.0</version>
         </dependency>
 
         <!-- test -->
@@ -169,7 +176,24 @@ under the License.
             <scope>test</scope>
         </dependency>
 
+        <!--swagger-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.6.1</version>
+        </dependency>
 
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.6.1</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
     </dependencies>
     <profiles>
     </profiles>
