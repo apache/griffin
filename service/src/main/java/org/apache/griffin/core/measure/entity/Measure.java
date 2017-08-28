@@ -20,6 +20,8 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 
 
@@ -36,9 +38,16 @@ public class Measure extends AuditableEntity   {
         accuracy,
     }
 
+    public enum ProcessType{
+        batch,
+        streaming
+    }
+
     private String organization;
     @Enumerated(EnumType.STRING)
     private MearuseType type;
+
+    private ProcessType processType=ProcessType.batch;
 
     @ManyToOne(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "source_id")
@@ -97,6 +106,16 @@ public class Measure extends AuditableEntity   {
         this.type = type;
     }
 
+    @JsonProperty("process.type")
+    public ProcessType getProcessType() {
+        return processType;
+    }
+
+    @JsonProperty("process.type")
+    public void setProcessType(ProcessType processType) {
+        this.processType = processType;
+    }
+
     public DataConnector getSource() {
         return source;
     }
@@ -142,6 +161,4 @@ public class Measure extends AuditableEntity   {
         this.evaluateRule = evaluateRule;
         this.owner = owner;
     }
-
-
 }
