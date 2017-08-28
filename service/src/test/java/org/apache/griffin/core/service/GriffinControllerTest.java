@@ -20,9 +20,9 @@ under the License.
 package org.apache.griffin.core.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.griffin.core.measure.DataConnector;
-import org.apache.griffin.core.measure.EvaluateRule;
-import org.apache.griffin.core.measure.Measure;
+import org.apache.griffin.core.measure.entity.DataConnector;
+import org.apache.griffin.core.measure.entity.EvaluateRule;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,7 +101,7 @@ public class GriffinControllerTest {
         when(measureRepo.findOrganizations()).thenReturn(orgList);
 
         when(measureRepo.findNameByOrganization(org)).thenReturn(Arrays.asList("viewitem_hourly"));
-        mockMvc.perform(get("/orgWithMetrics"))
+        mockMvc.perform(get("/orgWithMetricsName"))
                 .andExpect(status().isOk());
         verify(measureRepo).findOrganizations();
         verify(measureRepo).findNameByOrganization(org);
@@ -129,7 +129,7 @@ public class GriffinControllerTest {
         Measure measure2 = new Measure("search_hourly","test description", Measure.MearuseType.accuracy, "bullyeye", source2, target2, eRule2,"test1");
 
         when(measureRepo.findAll()).thenReturn(Arrays.asList(measure,measure2));
-        mockMvc.perform(get("/dataAssetsWithMetrics"))
+        mockMvc.perform(get("/dataAssetsNameWithMetricsName"))
                 .andExpect(status().isOk())
                 .andDo(print());
         verify(measureRepo).findAll();

@@ -20,28 +20,33 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MeasureService {
 
-    public Iterable<Measure> getAllMeasures();
+    Iterable<Measure> getAllAliveMeasures();
 
-    public Measure getMeasuresById(long id);
+    Measure getMeasureById(long id);
 
-    public Measure getMeasuresByName(String measureName);
+/*
+    Measure getMeasureByName(String measureName);
+*/
 
 
-    public void deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId);
+    GriffinOperationMessage deleteMeasureById(Long id);
 
 
-    public GriffinOperationMessage deleteMeasuresByName(String measureName) ;
+/*
+    GriffinOperationMessage deleteMeasureByName(String measureName) ;
+*/
 
-    public GriffinOperationMessage updateMeasure(Measure measure);
+    GriffinOperationMessage updateMeasure(Measure measure);
 
-    public List<String> getAllMeasureNameByOwner(String owner);
+    List<Map<String, String>> getAllAliveMeasureNameIdByOwner(String owner);
 
-    public GriffinOperationMessage createNewMeasure(Measure measure);
+    GriffinOperationMessage createMeasure(Measure measure);
 }

@@ -20,20 +20,22 @@ under the License.
 package org.apache.griffin.core.measure.repo;
 
 
-import org.apache.griffin.core.measure.DataConnector;
-import org.apache.griffin.core.measure.EvaluateRule;
-import org.apache.griffin.core.measure.Measure;
+import org.apache.griffin.core.measure.entity.DataConnector;
+import org.apache.griffin.core.measure.entity.EvaluateRule;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
 public interface MeasureRepo extends CrudRepository<Measure, Long> {
-    Measure findByName(String name);
-
+    List<Measure> findByNameAndDeleted(String name, Boolean deleted);
+    List<Measure> findByDeleted(Boolean deleted);
+    List<Measure> findByOwnerAndDeleted(String owner, Boolean deleted);
     @Query("select DISTINCT m.organization from Measure m")
     List<String> findOrganizations();
 
@@ -46,8 +48,8 @@ public interface MeasureRepo extends CrudRepository<Measure, Long> {
     String findOrgByName(String measureName);
 
     @Modifying
+    @Transactional
     @Query("update Measure m "+
             "set m.description= ?2,m.organization= ?3,m.source= ?4,m.target= ?5,m.evaluateRule= ?6 where m.id= ?1")
-    void updateMeasure(Long Id, String description, String organization, DataConnector source, DataConnector target, EvaluateRule evaluateRule);
-
+    void update(Long Id, String description, String organization, DataConnector source, DataConnector target, EvaluateRule evaluateRule);
 }

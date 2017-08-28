@@ -46,6 +46,8 @@ under the License.
     <link href="pages/measures/measure.css" rel="stylesheet">
     <link href="pages/metrics/metrics.css" rel="stylesheet">
     <link href="pages/template/bigchart.css" rel="stylesheet">
+    <link href="bower_components/jquery-ui/themes/base/jquery-ui.css" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -69,7 +71,7 @@ under the License.
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="#!/" class="navbar-brand" style="padding-top:5px;padding-bottom:0;"><img src="/img/logo.gif" title="Data Quality Service" style="max-height:40px;"/></a>
+            <a href="#!/" class="navbar-brand" style="padding-top:5px;padding-bottom:0;"><img src="/img/logo.png" title="Data Quality Service" style="max-height:40px;"/></a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -135,10 +137,10 @@ under the License.
 
     <div id="footerwrap" class="navbar-fixed-bottom" ng-controller="FooterCtrl">
         <!-- <footer class="clearfix"></footer> -->
-        <div class="container-fluid">
-            <div class="row ">
-                <p ng-show="!notifications">{{timestamp|date:'short'}} - Welcome <label>{{fullName}}</label>!</p>
-                <p ng-repeat="r in notifications">
+        <div class="container-fluid" class="ng-cloak">
+            <div class="row" ng-show="timestamp|date:'short'">
+                <p ng-show="!notifications" class="ng-cloak">{{timestamp|date:'short'}} - Welcome <label>{{fullName}}</label>!</p>
+                <p ng-repeat="r in notifications" class="ng-cloak">
                     {{r.timestamp|date:'short'}} - <label>{{r.owner}}</label> {{r.operation}}d a {{r.target}} named
                     <a ng-if="r.target=='model'" href="#!/viewrule/{{r.name}}">{{r.name}}</a>
                     <label ng-if="r.target=='dataasset'">"{{r.name}}"</label>

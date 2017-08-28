@@ -23,7 +23,8 @@ define([
     'bootstrap',
     'angular',
     'app',
-    'routes'
+    'routes',
+    'jquery-ui'
 ], function (require, $, bootstrap, angular) {
     'use strict';
 
