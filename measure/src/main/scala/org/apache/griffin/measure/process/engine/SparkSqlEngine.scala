@@ -18,9 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.process.engine
 
+import java.util.Date
+
 import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.persist.Persist
+import org.apache.griffin.measure.rules.dsl.{MetricPersistType, RecordPersistType}
 import org.apache.griffin.measure.rules.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -52,28 +55,46 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
   }
 
   def persistResult(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
+    val curTime = new Date().getTime
     ruleStep match {
-      case SparkSqlStep(_, _, _) => {
+      case SparkSqlStep(name, _, persistType) => {
         try {
-          val pdf = sqlContext.sql(getDfSql(ruleStep.name))
-          val records = pdf.toJSON.collect()
-          val persistType = ruleStep.persistType
-          // fixme
-          records.foreach(println)
+          persistType match {
+            case RecordPersistType => {
+              val pdf = sqlContext.table(name)
+              val recordRdd = pdf.toJSON
+
+              persist.records(recordRdd, name)
+
+              val recordLog = s"[ ${name} ] persist records"
+              persist.log(curTime, recordLog)
+            }
+            case MetricPersistType => {
+              val pdf = sqlContext.table(name)
+              val recordRdd = pdf.toJSON
+
+              val metric = recordRdd.collect
+              persist.records(metric, name)
+
+              val metricLog = s"[ ${name} ] persist metric \n${metric.mkString("\n")}"
+              persist.log(curTime, metricLog)
+            }
+            case _ => {
+              val nonLog = s"[ ${name} ] not persisted"
+              persist.log(curTime, nonLog)
+            }
+          }
+
           true
         } catch {
           case e: Throwable => {
-            error(s"persist result ${ruleStep.name} error: ${e.getMessage}")
+            error(s"persist result ${name} error: ${e.getMessage}")
             false
           }
         }
       }
       case _ => false
     }
-  }
-
-  private def getDfSql(name: String): String = {
-    s"SELECT * FROM `${name}`"
   }
 
 }

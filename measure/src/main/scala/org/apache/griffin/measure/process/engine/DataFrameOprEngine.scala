@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.process.engine
 
+import java.util.Date
+
 import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source.{DataSource, DataSourceFactory}
 import org.apache.griffin.measure.persist.Persist
@@ -58,10 +60,13 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
   }
 
   def persistResult(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
+    val curTime = new Date().getTime
     ruleStep match {
-      case SparkSqlStep(_, _, _) => {
+      case DfOprStep(name, _, _) => {
         try {
-          // fixme
+          val nonLog = s"[ ${name} ] not persisted"
+          persist.log(curTime, nonLog)
+
           true
         } catch {
           case e: Throwable => {

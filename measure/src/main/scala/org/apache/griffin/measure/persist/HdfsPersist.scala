@@ -56,7 +56,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
   def available(): Boolean = {
-    (path.nonEmpty) && (maxPersistLines < Int.MaxValue)
+    path.nonEmpty
   }
 
   private def persistHead: String = {
