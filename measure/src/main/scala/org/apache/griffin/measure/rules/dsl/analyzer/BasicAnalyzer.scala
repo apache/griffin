@@ -41,4 +41,13 @@ trait BasicAnalyzer extends Serializable {
   }
   val combSelectionExprs = (a: Seq[SelectionExpr], b: Seq[SelectionExpr]) => a ++ b
 
+  val seqWithAliasExprs = (expr: Expr, v: Seq[AliasableExpr]) => {
+    expr match {
+      case se: SelectExpr => v
+      case a: AliasableExpr if (a.alias.nonEmpty) => v :+ a
+      case _ => v
+    }
+  }
+  val combWithAliasExprs = (a: Seq[AliasableExpr], b: Seq[AliasableExpr]) => a ++ b
+
 }

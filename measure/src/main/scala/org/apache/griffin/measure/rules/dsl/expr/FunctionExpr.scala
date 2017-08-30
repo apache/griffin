@@ -18,10 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.rules.dsl.expr
 
-case class FunctionExpr(functionName: String, args: Seq[Expr]) extends Expr {
+case class FunctionExpr(functionName: String, args: Seq[Expr], aliasOpt: Option[String]
+                       ) extends Expr with AliasableExpr {
 
   addChildren(args)
 
   def desc: String = s"${functionName}(${args.map(_.desc).mkString(", ")})"
   def coalesceDesc: String = desc
+  def alias: Option[String] = if (aliasOpt.isEmpty) Some(functionName) else aliasOpt
 }

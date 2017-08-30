@@ -31,6 +31,7 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
   val parser = new BasicParser{
     val dataSourceNames: Seq[String] = "source" :: "target" :: Nil
     val functionNames: Seq[String] = "func" :: "get_json_object" :: Nil
+    def rootExpression: Parser[Expr] = expression
   }
 
   test("test literal") {

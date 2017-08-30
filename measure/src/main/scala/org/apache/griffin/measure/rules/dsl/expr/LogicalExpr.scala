@@ -98,12 +98,18 @@ case class IsNanExpr(head: Expr, is: Boolean) extends LogicalExpr {
 
 // -----------
 
-case class LogicalFactorExpr(factor: Expr, withBracket: Boolean) extends LogicalExpr {
+case class LogicalFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Option[String]
+                            ) extends LogicalExpr with AliasableExpr {
 
   addChild(factor)
 
   def desc: String = if (withBracket) s"(${factor.desc})" else factor.desc
   def coalesceDesc: String = factor.coalesceDesc
+  def alias: Option[String] = aliasOpt
+  override def extractSelf: Expr = {
+    if (aliasOpt.nonEmpty) this
+    else factor.extractSelf
+  }
 }
 
 case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends LogicalExpr {
@@ -125,6 +131,10 @@ case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends Logi
       case "!" => "NOT"
       case _ => s.toUpperCase
     }
+  }
+  override def extractSelf: Expr = {
+    if (oprs.nonEmpty) this
+    else factor.extractSelf
   }
 }
 
@@ -152,5 +162,9 @@ case class BinaryLogicalExpr(factor: LogicalExpr, tails: Seq[(String, LogicalExp
       case "||" => "OR"
       case _ => s.toUpperCase
     }
+  }
+  override def extractSelf: Expr = {
+    if (tails.nonEmpty) this
+    else factor.extractSelf
   }
 }

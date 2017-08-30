@@ -37,10 +37,7 @@ case class OtherHeadExpr(expr: Expr) extends HeadExpr {
 
 // -------------
 
-trait SelectExpr extends Expr {
-
-  def alias: Option[String]
-
+trait SelectExpr extends Expr with AliasableExpr {
 }
 
 case class FieldSelectExpr(field: String) extends SelectExpr {
@@ -64,7 +61,7 @@ case class FunctionSelectExpr(functionName: String, args: Seq[Expr]) extends Sel
 
   def desc: String = ""
   def coalesceDesc: String = desc
-  def alias: Option[String] = None
+  def alias: Option[String] = Some(functionName)
 }
 
 // -------------

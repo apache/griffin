@@ -18,12 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.rules.dsl.expr
 
-trait Expr extends TreeNode with Serializable {
+trait AliasableExpr extends Expr {
 
-  def desc: String
-
-  def coalesceDesc: String
-
-  def extractSelf: Expr = this
+  def alias: Option[String]
 
 }

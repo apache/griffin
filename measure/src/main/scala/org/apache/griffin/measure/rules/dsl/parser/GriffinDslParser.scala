@@ -18,6 +18,19 @@ under the License.
 */
 package org.apache.griffin.measure.rules.dsl.parser
 
-case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[String]) extends BasicParser {
+import org.apache.griffin.measure.rules.dsl._
+import org.apache.griffin.measure.rules.dsl.expr.Expr
+
+case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[String]
+                           ) extends BasicParser {
+
+  def parseRule(rule: String, dqType: DqType): ParseResult[Expr] = {
+    val rootExpr = dqType match {
+      case AccuracyType => logicalExpression
+      case ProfilingType => expressions
+      case _ => expression
+    }
+    parseAll(rootExpr, rule)
+  }
 
 }

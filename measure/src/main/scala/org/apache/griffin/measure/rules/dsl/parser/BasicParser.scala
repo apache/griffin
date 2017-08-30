@@ -24,7 +24,8 @@ import scala.util.parsing.combinator.JavaTokenParsers
 
 trait BasicParser extends JavaTokenParsers with Serializable {
 
-  def rootExpression = expression
+  val dataSourceNames: Seq[String]
+  val functionNames: Seq[String]
 
   /**
     * BNF for basic parser
@@ -76,9 +77,6 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * -- alias expr --
     * <alias-expr> = <expr> <as> <name>
     */
-
-  val dataSourceNames: Seq[String]
-  val functionNames: Seq[String]
 
   protected def genNamesParser(names: Seq[String]): Parser[String] = {
     names.map {
@@ -190,9 +188,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     */
 
   def mathFactor: Parser[MathExpr] = (literal | function | selection) ^^ {
-    MathFactorExpr(_, false)
-  } | LBR ~> mathExpression <~ RBR ^^ {
-    MathFactorExpr(_, true)
+    MathFactorExpr(_, false, None)
+  } | LBR ~ mathExpression ~ RBR ~ opt(asAlias) ^^ {
+    case _ ~ expr ~ _ ~ aliasOpt => MathFactorExpr(expr, true, aliasOpt)
   }
   def unaryMathExpression: Parser[MathExpr] = rep(MATH_UNARY) ~ mathFactor ^^ {
     case Nil ~ a => a
@@ -243,9 +241,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   }
 
   def logicalFactor: Parser[LogicalExpr] = (inExpr | betweenExpr | likeExpr | isNullExpr | isNanExpr | mathExpression) ^^ {
-    LogicalFactorExpr(_, false)
-  } | LBR ~> logicalExpression <~ RBR ^^ {
-    LogicalFactorExpr(_, true)
+    LogicalFactorExpr(_, false, None)
+  } | LBR ~ logicalExpression ~ RBR ~ opt(asAlias) ^^ {
+    case _ ~ expr ~ _ ~ aliasOpt => LogicalFactorExpr(expr, true, aliasOpt)
   }
   def unaryLogicalExpression: Parser[LogicalExpr] = rep(LOGICAL_UNARY) ~ logicalFactor ^^ {
     case Nil ~ a => a
@@ -276,9 +274,16 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <arg> ::= <expr>
     */
 
-  def function: Parser[FunctionExpr] = FunctionName ~ LBR ~ repsep(argument, COMMA) ~ RBR ^^ {
-    case name ~ _ ~ args ~ _ => FunctionExpr(name, args)
+  def function: Parser[FunctionExpr] = FunctionName ~ LBR ~ repsep(argument, COMMA) ~ RBR ~ opt(asAlias) ^^ {
+    case name ~ _ ~ args ~ _ ~ aliasOpt => FunctionExpr(name, args, aliasOpt)
   }
   def argument: Parser[Expr] = expression
+
+  /**
+    * -- exprs --
+    * <exprs> = <expr> [, <expr>]*
+    */
+
+  def expressions: Parser[Expressions] = rep1sep(expression, COMMA) ^^ { Expressions(_) }
 
 }

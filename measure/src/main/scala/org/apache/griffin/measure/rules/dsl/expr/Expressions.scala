@@ -18,12 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.rules.dsl.expr
 
-trait Expr extends TreeNode with Serializable {
+case class Expressions(exprs: Seq[Expr]) extends Expr {
 
-  def desc: String
+  addChildren(exprs)
 
-  def coalesceDesc: String
-
-  def extractSelf: Expr = this
-
+  def desc: String = s"${exprs.map(_.desc).mkString(", ")}"
+  def coalesceDesc: String = s"${exprs.map(_.coalesceDesc).mkString(", ")}"
 }
