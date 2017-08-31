@@ -23,7 +23,7 @@ import java.util.Date
 import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.persist.Persist
-import org.apache.griffin.measure.rules.dsl.{MetricPersistType, RecordPersistType}
+import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -38,7 +38,7 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
-      case SparkSqlStep(name, rule, _) => {
+      case SparkSqlStep(name, rule, _, _) => {
         try {
           val rdf = sqlContext.sql(rule)
           rdf.registerTempTable(name)
@@ -54,36 +54,18 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
     }
   }
 
-  def persistResult(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
+  def persistRecords(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
     val curTime = new Date().getTime
     ruleStep match {
-      case SparkSqlStep(name, _, persistType) => {
+      case SparkSqlStep(name, _, _, RecordPersistType) => {
         try {
-          persistType match {
-            case RecordPersistType => {
-              val pdf = sqlContext.table(s"`${name}`")
-              val records = pdf.toJSON
+          val pdf = sqlContext.table(s"`${name}`")
+          val records = pdf.toJSON
 
-              persist.persistRecords(records, name)
+          persist.persistRecords(records, name)
 
-              val recordLog = s"[ ${name} ] persist records"
-              persist.log(curTime, recordLog)
-            }
-            case MetricPersistType => {
-              val pdf = sqlContext.table(s"`${name}`")
-              val recordRdd = pdf.toJSON
-
-              val metrics = recordRdd.collect
-              persist.persistMetrics(metrics, name)
-
-              val metricLog = s"[ ${name} ] persist metric \n${metrics.mkString("\n")}"
-              persist.log(curTime, metricLog)
-            }
-            case _ => {
-              val nonLog = s"[ ${name} ] not persisted"
-              persist.log(curTime, nonLog)
-            }
-          }
+          val recordLog = s"[ ${name} ] persist records"
+          persist.log(curTime, recordLog)
 
           true
         } catch {
@@ -96,6 +78,96 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
       case _ => false
     }
   }
+
+  def collectMetrics(ruleStep: ConcreteRuleStep): Map[String, Any] = {
+    val emptyMap = Map[String, Any]()
+    ruleStep match {
+      case SparkSqlStep(name, _, _, MetricPersistType) => {
+        try {
+          val pdf = sqlContext.table(s"`${name}`")
+          val records = pdf.toJSON.collect()
+
+          if (ruleStep.isArray) {
+            val arr = records.flatMap { rec =>
+              try {
+                Some(JsonUtil.toAnyMap(rec))
+              } catch {
+                case e: Throwable => None
+              }
+            }
+            Map[String, Any]((name -> arr))
+          } else {
+            records.headOption match {
+              case Some(head) => {
+                try {
+                  JsonUtil.toAnyMap(head)
+                } catch {
+                  case e: Throwable => emptyMap
+                }
+              }
+              case _ => emptyMap
+            }
+          }
+        } catch {
+          case e: Throwable => {
+            error(s"persist result ${name} error: ${e.getMessage}")
+            emptyMap
+          }
+        }
+      }
+      case _ => emptyMap
+    }
+  }
+
+//  def persistResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist, persistType: PersistType): Boolean = {
+//    val curTime = new Date().getTime
+//    persistType match {
+//      case RecordPersistType => {
+//        ;
+//      }
+//    }
+//
+//
+//    ruleStep match {
+//      case SparkSqlStep(name, _, persistType) => {
+//        try {
+//          persistType match {
+//            case RecordPersistType => {
+//              val pdf = sqlContext.table(s"`${name}`")
+//              val records = pdf.toJSON
+//
+//              persist.persistRecords(records, name)
+//
+//              val recordLog = s"[ ${name} ] persist records"
+//              persist.log(curTime, recordLog)
+//            }
+//            case MetricPersistType => {
+//              val pdf = sqlContext.table(s"`${name}`")
+//              val recordRdd = pdf.toJSON
+//
+//              val metrics = recordRdd.collect
+//              persist.persistMetrics(metrics, name)
+//
+//              val metricLog = s"[ ${name} ] persist metric \n${metrics.mkString("\n")}"
+//              persist.log(curTime, metricLog)
+//            }
+//            case _ => {
+//              val nonLog = s"[ ${name} ] not persisted"
+//              persist.log(curTime, nonLog)
+//            }
+//          }
+//
+//          true
+//        } catch {
+//          case e: Throwable => {
+//            error(s"persist result ${name} error: ${e.getMessage}")
+//            false
+//          }
+//        }
+//      }
+//      case _ => false
+//    }
+//  }
 
 }
 

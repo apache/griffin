@@ -50,6 +50,7 @@ case class MultiPersists(persists: Iterable[Persist]) extends Persist {
   def log(rt: Long, msg: String): Unit = { persists.foreach(_.log(rt, msg)) }
 
   def persistRecords(records: RDD[String], name: String): Unit = { persists.foreach(_.persistRecords(records, name)) }
-  def persistMetrics(metrics: Seq[String], name: String): Unit = { persists.foreach(_.persistMetrics(metrics, name)) }
+//  def persistMetrics(metrics: Seq[String], name: String): Unit = { persists.foreach(_.persistMetrics(metrics, name)) }
+  def persistMetrics(metrics: Map[String, Any]): Unit = { persists.foreach(_.persistMetrics(metrics)) }
 
 }

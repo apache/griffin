@@ -25,11 +25,11 @@ import org.apache.griffin.measure.rules.step._
 case class SparkSqlAdaptor() extends RuleAdaptor {
 
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
-    SparkSqlStep(getName(param), getRule(param), getPersistType(param)) :: Nil
+    SparkSqlStep(getName(param), getRule(param), getDetails(param), getPersistType(param)) :: Nil
   }
   def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
     ruleStep match {
-      case rs @ SparkSqlStep(_, _, _) => rs :: Nil
+      case rs @ SparkSqlStep(_, _, _, _) => rs :: Nil
       case _ => Nil
     }
   }

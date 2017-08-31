@@ -26,5 +26,6 @@ trait RuleStep extends Serializable {
 
   val name: String
   val rule: String
+  val details: Map[String, Any]
 
 }

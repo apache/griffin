@@ -82,7 +82,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dqEngines.runRuleSteps(ruleSteps)
 
     // persist results
-    dqEngines.persistResults(ruleSteps, persist)
+    dqEngines.persistAllResults(ruleSteps, persist)
 
     // end time
     val endTime = new Date().getTime

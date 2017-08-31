@@ -30,7 +30,7 @@ import org.apache.griffin.measure.process.engine.DataFrameOprs
 import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.hadoop.hive.ql.exec.UDF
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.{Column, DataFrame, Row, SQLContext}
+import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.expressions.UserDefinedAggregateFunction
 import org.apache.spark.sql.hive.HiveContext

@@ -33,6 +33,8 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val api = config.getOrElse(Api, "").toString
   val method = config.getOrElse(Method, "post").toString
 
+  val _Value = "value"
+
   def available(): Boolean = {
     api.nonEmpty
   }
@@ -87,17 +89,23 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   def persistRecords(records: RDD[String], name: String): Unit = {}
 
-  def persistMetrics(metrics: Seq[String], name: String): Unit = {
-    val maps = metrics.flatMap { m =>
-      try {
-        Some(JsonUtil.toAnyMap(m) ++ Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp)))
-      } catch {
-        case e: Throwable => None
-      }
-    }
-    maps.foreach { map =>
-      httpResult(map)
-    }
+//  def persistMetrics(metrics: Seq[String], name: String): Unit = {
+//    val maps = metrics.flatMap { m =>
+//      try {
+//        Some(JsonUtil.toAnyMap(m) ++ Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp)))
+//      } catch {
+//        case e: Throwable => None
+//      }
+//    }
+//    maps.foreach { map =>
+//      httpResult(map)
+//    }
+//  }
+
+  def persistMetrics(metrics: Map[String, Any]): Unit = {
+    val head = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp))
+    val result = head + (_Value -> metrics)
+    httpResult(result)
   }
 
 }

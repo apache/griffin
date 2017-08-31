@@ -23,7 +23,9 @@ import java.util.Date
 import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source.{DataSource, DataSourceFactory}
 import org.apache.griffin.measure.persist.Persist
+import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
+import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.streaming.StreamingContext
 
@@ -36,7 +38,7 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
-      case DfOprStep(name, rule, details) => {
+      case DfOprStep(name, rule, details, _) => {
         try {
           rule match {
             case DataFrameOprs._fromJson => {
@@ -59,18 +61,23 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
     }
   }
 
-  def persistResult(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
+  def persistRecords(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
     val curTime = new Date().getTime
     ruleStep match {
-      case DfOprStep(name, _, _) => {
+      case DfOprStep(name, _, _, RecordPersistType) => {
         try {
-          val nonLog = s"[ ${name} ] not persisted"
-          persist.log(curTime, nonLog)
+          val pdf = sqlContext.table(s"`${name}`")
+          val records = pdf.toJSON
+
+          persist.persistRecords(records, name)
+
+          val recordLog = s"[ ${name} ] persist records"
+          persist.log(curTime, recordLog)
 
           true
         } catch {
           case e: Throwable => {
-            error(s"persist result ${ruleStep.name} error: ${e.getMessage}")
+            error(s"persist result ${name} error: ${e.getMessage}")
             false
           }
         }
@@ -78,6 +85,66 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
       case _ => false
     }
   }
+
+  def collectMetrics(ruleStep: ConcreteRuleStep): Map[String, Any] = {
+    val emptyMap = Map[String, Any]()
+    ruleStep match {
+      case DfOprStep(name, _, _, MetricPersistType) => {
+        try {
+          val pdf = sqlContext.table(s"`${name}`")
+          val records = pdf.toJSON.collect()
+
+          if (ruleStep.isArray) {
+            val arr = records.flatMap { rec =>
+              try {
+                Some(JsonUtil.toAnyMap(rec))
+              } catch {
+                case e: Throwable => None
+              }
+            }
+            Map[String, Any]((name -> arr))
+          } else {
+            records.headOption match {
+              case Some(head) => {
+                try {
+                  JsonUtil.toAnyMap(head)
+                } catch {
+                  case e: Throwable => emptyMap
+                }
+              }
+              case _ => emptyMap
+            }
+          }
+        } catch {
+          case e: Throwable => {
+            error(s"persist result ${name} error: ${e.getMessage}")
+            emptyMap
+          }
+        }
+      }
+      case _ => emptyMap
+    }
+  }
+
+//  def persistResults(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
+//    val curTime = new Date().getTime
+//    ruleStep match {
+//      case DfOprStep(name, _, _) => {
+//        try {
+//          val nonLog = s"[ ${name} ] not persisted"
+//          persist.log(curTime, nonLog)
+//
+//          true
+//        } catch {
+//          case e: Throwable => {
+//            error(s"persist result ${ruleStep.name} error: ${e.getMessage}")
+//            false
+//          }
+//        }
+//      }
+//      case _ => false
+//    }
+//  }
 
 }
 

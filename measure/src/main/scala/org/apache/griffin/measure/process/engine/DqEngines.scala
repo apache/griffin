@@ -22,9 +22,12 @@ import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.Persist
+import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 
 case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
+
+  val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
   def initDataSources(dataSourceParams: Seq[DataSourceParam]): Unit = {
     val dataSources = dataSourceParams.flatMap { param =>
@@ -41,9 +44,30 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     }
   }
 
-  def persistResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist): Unit = {
-    ruleSteps.foreach { ruleStep =>
-      persistResult(ruleStep, persist)
+  def persistAllResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist): Unit = {
+    // 1. group by same persist types
+    val groupedRuleSteps = ruleSteps.groupBy(_.persistType)
+
+    // 2. persist results in order [metric, record]
+    persistOrder.foreach { prstType =>
+      val steps = groupedRuleSteps.get(prstType) match {
+        case Some(a) => a
+        case _ => Nil
+      }
+      prstType match {
+        case MetricPersistType => {
+          val metrics = steps.foldLeft(Map[String, Any]())(_ ++ collectMetrics(_))
+          persist.persistMetrics(metrics)
+        }
+        case RecordPersistType => {
+          steps.foreach { ruleStep =>
+            persistRecords(ruleStep, persist)
+          }
+        }
+        case _ => {
+          warn(s"${prstType} is not persistable")
+        }
+      }
     }
   }
 
@@ -63,12 +87,27 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     ret
   }
 
-  def persistResult(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
+  def persistRecords(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
     val ret = engines.foldLeft(false) { (done, engine) =>
-      done || engine.persistResult(ruleStep, persist)
+      done || engine.persistRecords(ruleStep, persist)
     }
     if (!ret) error(s"persist result warn: no dq engine support ${ruleStep}")
     ret
   }
+  def collectMetrics(ruleStep: ConcreteRuleStep): Map[String, Any] = {
+    val ret = engines.foldLeft(Map[String, Any]()) { (ret, engine) =>
+      ret ++ engine.collectMetrics(ruleStep)
+    }
+    if (ret.isEmpty) error(s"collect metrics warn: no metrics collected for ${ruleStep}")
+    ret
+  }
+
+//  def persistResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist, persistType: PersistType): Boolean = {
+//    val ret = engines.foldLeft(false) { (done, engine) =>
+//      done || engine.persistResults(ruleSteps, persist, persistType)
+//    }
+//    if (!ret) error(s"persist result warn: no dq engine support ${ruleSteps}")
+//    ret
+//  }
 
 }

@@ -18,10 +18,18 @@ under the License.
 */
 package org.apache.griffin.measure.rules.step
 
-import org.apache.griffin.measure.rules.dsl.{DslType, PersistType}
+import org.apache.griffin.measure.rules.dsl._
 
 trait ConcreteRuleStep extends RuleStep {
 
   val persistType: PersistType
+
+  def isArray: Boolean = {
+    val _IsArray = "is.array"
+    details.get(_IsArray) match {
+      case Some(b: Boolean) => b
+      case _ => false
+    }
+  }
 
 }

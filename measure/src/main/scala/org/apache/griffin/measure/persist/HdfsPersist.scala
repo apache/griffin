@@ -21,7 +21,7 @@ package org.apache.griffin.measure.persist
 import java.util.Date
 
 import org.apache.griffin.measure.result._
-import org.apache.griffin.measure.utils.HdfsUtil
+import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
 
 import scala.util.Try
@@ -41,10 +41,10 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   val StartFile = filePath("_START")
   val FinishFile = filePath("_FINISH")
-  val ResultFile = filePath("_RESULT")
+  val MetricsFile = filePath("_METRICS")
 
-  val MissRecFile = filePath("_MISSREC")      // optional
-  val MatchRecFile = filePath("_MATCHREC")    // optional
+//  val MissRecFile = filePath("_MISSREC")      // optional
+//  val MatchRecFile = filePath("_MATCHREC")    // optional
 
   val LogFile = filePath("_LOG")
 
@@ -224,25 +224,34 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     }
   }
 
-  def persistMetrics(metrics: Seq[String], name: String): Unit = {
-    val path = filePath(name)
+//  def persistMetrics(metrics: Seq[String], name: String): Unit = {
+//    val path = filePath(name)
+//    try {
+//      val recordCount = metrics.size
+//      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+//      if (count > 0) {
+//        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
+//        if (groupCount <= 1) {
+//          val recs = metrics.take(count.toInt)
+//          persistRecords(path, recs)
+//        } else {
+//          val groupedRecords = metrics.grouped(groupCount).zipWithIndex
+//          groupedRecords.take(groupCount).foreach { group =>
+//            val (recs, gid) = group
+//            val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
+//            persistRecords(hdfsPath, recs)
+//          }
+//        }
+//      }
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
+//  }
+
+  def persistMetrics(metrics: Map[String, Any]): Unit = {
+    val json = JsonUtil.toJson(metrics)
     try {
-      val recordCount = metrics.size
-      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
-      if (count > 0) {
-        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
-        if (groupCount <= 1) {
-          val recs = metrics.take(count.toInt)
-          persistRecords(path, recs)
-        } else {
-          val groupedRecords = metrics.grouped(groupCount).zipWithIndex
-          groupedRecords.take(groupCount).foreach { group =>
-            val (recs, gid) = group
-            val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
-            persistRecords(hdfsPath, recs)
-          }
-        }
-      }
+      persistRecords(MetricsFile, json :: Nil)
     } catch {
       case e: Throwable => error(e.getMessage)
     }

@@ -128,16 +128,24 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
     }
   }
 
-  def persistMetrics(metrics: Seq[String], name: String): Unit = {
-    try {
-      val recordCount = metrics.size
-      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-      if (count > 0) {
-        val recordsArray = metrics.take(count)
-        recordsArray.foreach(println)
-      }
-    } catch {
-      case e: Throwable => error(e.getMessage)
+//  def persistMetrics(metrics: Seq[String], name: String): Unit = {
+//    try {
+//      val recordCount = metrics.size
+//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+//      if (count > 0) {
+//        val recordsArray = metrics.take(count)
+//        recordsArray.foreach(println)
+//      }
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
+//  }
+
+  def persistMetrics(metrics: Map[String, Any]): Unit = {
+    println(s"${metricName} [${timeStamp}] metrics: ")
+    metrics.foreach { metric =>
+      val (key, value) = metric
+      println(s"${key}: ${value}")
     }
   }
 

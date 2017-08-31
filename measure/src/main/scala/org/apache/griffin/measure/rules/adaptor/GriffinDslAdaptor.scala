@@ -177,6 +177,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
         val missRecordsStep = SparkSqlStep(
           missRecordsName,
           missRecordsSql,
+          Map[String, Any](),
           resultPersistType(details, AccuracyInfo._MissRecords, RecordPersistType)
         )
 
@@ -189,6 +190,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
         val missStep = SparkSqlStep(
           missTableName,
           missSql,
+          Map[String, Any](),
           NonePersistType
         )
 
@@ -201,6 +203,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
         val totalStep = SparkSqlStep(
           totalTableName,
           totalSql,
+          Map[String, Any](),
           NonePersistType
         )
 
@@ -218,6 +221,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
         val accuracyMetricStep = SparkSqlStep(
           accuracyMetricName,
           accuracyMetricSql,
+          Map[String, Any](),
           resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType)
         )
 
@@ -246,6 +250,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
         val profilingStep = SparkSqlStep(
           profilingMetricName,
           profilingSql,
+          Map[String, Any](),
           resultPersistType(details, ProfilingInfo._Profiling, RecordPersistType)
         )
 
