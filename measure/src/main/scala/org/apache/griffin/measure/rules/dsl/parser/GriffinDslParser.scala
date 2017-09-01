@@ -27,7 +27,7 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
   def parseRule(rule: String, dqType: DqType): ParseResult[Expr] = {
     val rootExpr = dqType match {
       case AccuracyType => logicalExpression
-      case ProfilingType => expressions
+      case ProfilingType => combinedClause
       case _ => expression
     }
     parseAll(rootExpr, rule)

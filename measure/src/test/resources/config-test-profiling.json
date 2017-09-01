@@ -23,13 +23,14 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "source.user_id.max(), source.first_name.count() as cnt",
+        "rule": "count(source.user_id), source.first_name group by source.first_name order by count(source.user_id) desc, source.first_name asc limit 3",
         "details": {
           "source": "source",
           "profiling": {
             "name": "prof",
             "persist.type": "metric"
-          }
+          },
+          "is.array": true
         }
       }
     ]

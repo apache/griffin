@@ -21,15 +21,18 @@ package org.apache.griffin.measure.rules.dsl.analyzer
 import org.apache.griffin.measure.rules.dsl.expr._
 
 
-case class ProfilingAnalyzer(expr: Expressions, sourceName: String) extends BasicAnalyzer {
+case class ProfilingAnalyzer(expr: CombinedClause, sourceName: String) extends BasicAnalyzer {
 
   val dataSourceNames = expr.preOrderTraverseDepthFirst(Set[String]())(seqDataSourceNames, combDataSourceNames)
 
   val sourceSelectionExprs = {
     val seq = seqSelectionExprs(sourceName)
-    expr.preOrderTraverseDepthFirst(Seq[SelectionExpr]())(seq, combSelectionExprs)
+    expr.selectClause.preOrderTraverseDepthFirst(Seq[SelectionExpr]())(seq, combSelectionExprs)
   }
 
-  val selectionExprs = expr.exprs.map(_.extractSelf)
+  val selectionExprs = {
+    expr.selectClause.exprs.map(_.extractSelf)
+  }
+  val tailsExprs = expr.tails.map(_.extractSelf)
 
 }

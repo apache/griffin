@@ -26,6 +26,7 @@ import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
 import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
+import org.apache.griffin.measure.rules.udf.GriffinUdfs
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
@@ -52,6 +53,9 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     sparkContext = new SparkContext(conf)
     sparkContext.setLogLevel(sparkParam.logLevel)
     sqlContext = new HiveContext(sparkContext)
+
+    // register udf
+    GriffinUdfs.register(sqlContext)
 
     // init adaptors
     val dataSourceNames = userParam.dataSources.map(_.name)

@@ -79,8 +79,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     */
 
   protected def genNamesParser(names: Seq[String]): Parser[String] = {
-    names.map {
-      fn => s"""${fn}""".r: Parser[String]
+    names.reverse.map {
+      fn => s"""${fn}""": Parser[String]
     }.reduce(_ | _)
   }
 
@@ -119,6 +119,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val COMMA: Parser[String] = ","
 
     val AS: Parser[String] = "(?i)as".r
+    val WHERE: Parser[String] = "(?i)where".r
+    val GROUP: Parser[String] = "(?i)group".r
+    val ORDER: Parser[String] = "(?i)order".r
+    val BY: Parser[String] = "(?i)by".r
+    val DESC: Parser[String] = "(?i)desc".r
+    val ASC: Parser[String] = "(?i)asc".r
+    val HAVING: Parser[String] = "(?i)having".r
+    val LIMIT: Parser[String] = "(?i)limit".r
   }
   import Operator._
 
@@ -280,10 +288,39 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   def argument: Parser[Expr] = expression
 
   /**
-    * -- exprs --
-    * <exprs> = <expr> [, <expr>]*
+    * -- clauses --
+    * <select-clause> = <expr> [, <expr>]*
+    * <where-clause> = <where> <expr>
+    * <having-clause> = <having> <expr>
+    * <groupby-clause> = <group> <by> <expr> [ <having-clause> ]?
+    * <orderby-item> = <expr> [ <DESC> ]?
+    * <orderby-clause> = <order> <by> <orderby-item> [ , <orderby-item> ]*
+    * <limit-clause> = <limit> <expr>
     */
 
-  def expressions: Parser[Expressions] = rep1sep(expression, COMMA) ^^ { Expressions(_) }
+  def selectClause: Parser[SelectClause] = rep1sep(expression, COMMA) ^^ { SelectClause(_) }
+  def whereClause: Parser[WhereClause] = WHERE ~> expression ^^ { WhereClause(_) }
+  def havingClause: Parser[Expr] = HAVING ~> expression
+  def groupbyClause: Parser[GroupbyClause] = GROUP ~ BY ~ rep1sep(expression, COMMA) ~ opt(havingClause) ^^ {
+    case _ ~ _ ~ cols ~ havingOpt => GroupbyClause(cols, havingOpt)
+  }
+  def orderbyItem: Parser[OrderbyItem] = expression ~ opt(DESC | ASC) ^^ {
+    case expr ~ orderOpt => OrderbyItem(expr, orderOpt)
+  }
+  def orderbyClause: Parser[OrderbyClause] = ORDER ~> BY ~> rep1sep(orderbyItem, COMMA) ^^ { OrderbyClause(_) }
+  def limitClause: Parser[LimitClause] = LIMIT ~> expression ^^ { LimitClause(_) }
+
+  /**
+    * -- combined clauses --
+    * <combined-clauses> = <select-clause> [ <where-clause> ]+ [ <groupby-clause> ]+ [ <orderby-clause> ]+ [ <limit-clause> ]+
+    */
+
+  def combinedClause: Parser[CombinedClause] = selectClause ~ opt(whereClause) ~
+    opt(groupbyClause) ~ opt(orderbyClause) ~ opt(limitClause) ^^ {
+    case sel ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
+      val tails = Seq(whereOpt, groupbyOpt,  orderbyOpt, limitOpt).flatMap(opt => opt)
+      CombinedClause(sel, tails)
+    }
+  }
 
 }

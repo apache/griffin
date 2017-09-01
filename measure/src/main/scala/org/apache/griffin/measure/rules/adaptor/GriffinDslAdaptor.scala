@@ -232,7 +232,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
           case Some(name) => name
           case _ => dataSourceNames.head
         }
-        val analyzer = ProfilingAnalyzer(expr.asInstanceOf[Expressions], sourceName)
+        val analyzer = ProfilingAnalyzer(expr.asInstanceOf[CombinedClause], sourceName)
 
         // 1. select statement
         val profilingSql = {
@@ -244,13 +244,15 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String], functionNames: Seq[St
             s"${sel.desc}${alias}"
           }.mkString(", ")
 
-          s"SELECT ${selClause} FROM ${sourceName}"
+          val tailClause = analyzer.tailsExprs.map(_.desc).mkString(" ")
+
+          s"SELECT ${selClause} FROM ${sourceName} ${tailClause}"
         }
         val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
         val profilingStep = SparkSqlStep(
           profilingMetricName,
           profilingSql,
-          Map[String, Any](),
+          details,
           resultPersistType(details, ProfilingInfo._Profiling, RecordPersistType)
         )
 

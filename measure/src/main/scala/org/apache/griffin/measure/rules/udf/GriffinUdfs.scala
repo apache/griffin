@@ -16,12 +16,18 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rules.dsl.expr
+package org.apache.griffin.measure.rules.udf
 
-case class Expressions(exprs: Seq[Expr]) extends Expr {
+import org.apache.spark.sql.SQLContext
 
-  addChildren(exprs)
+object GriffinUdfs {
 
-  def desc: String = s"${exprs.map(_.desc).mkString(", ")}"
-  def coalesceDesc: String = s"${exprs.map(_.coalesceDesc).mkString(", ")}"
+  def register(sqlContext: SQLContext): Unit = {
+    sqlContext.udf.register("index_of", indexOf)
+  }
+
+  private val indexOf = (arr: Seq[String], v: String) => {
+    arr.indexOf(v)
+  }
+
 }

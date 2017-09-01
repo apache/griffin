@@ -21,7 +21,7 @@ package org.apache.griffin.measure.persist
 import java.util.Date
 
 import org.apache.griffin.measure.result._
-import org.apache.griffin.measure.utils.HdfsUtil
+import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
 
 // persist result and data to hdfs
@@ -143,10 +143,12 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
 
   def persistMetrics(metrics: Map[String, Any]): Unit = {
     println(s"${metricName} [${timeStamp}] metrics: ")
-    metrics.foreach { metric =>
-      val (key, value) = metric
-      println(s"${key}: ${value}")
-    }
+    val json = JsonUtil.toJson(metrics)
+    println(json)
+//    metrics.foreach { metric =>
+//      val (key, value) = metric
+//      println(s"${key}: ${value}")
+//    }
   }
 
 
