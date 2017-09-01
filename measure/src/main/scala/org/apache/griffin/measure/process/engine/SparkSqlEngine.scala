@@ -87,7 +87,7 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
           val pdf = sqlContext.table(s"`${name}`")
           val records = pdf.toJSON.collect()
 
-          if (ruleStep.isArray) {
+          if (ruleStep.isGroupMetric) {
             val arr = records.flatMap { rec =>
               try {
                 Some(JsonUtil.toAnyMap(rec))

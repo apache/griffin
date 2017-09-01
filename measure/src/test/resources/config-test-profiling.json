@@ -30,7 +30,7 @@
             "name": "prof",
             "persist.type": "metric"
           },
-          "is.array": true
+          "group.metric": true
         }
       }
     ]

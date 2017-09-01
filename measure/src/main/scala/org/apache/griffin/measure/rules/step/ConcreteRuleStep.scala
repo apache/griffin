@@ -24,9 +24,9 @@ trait ConcreteRuleStep extends RuleStep {
 
   val persistType: PersistType
 
-  def isArray: Boolean = {
-    val _IsArray = "is.array"
-    details.get(_IsArray) match {
+  def isGroupMetric: Boolean = {
+    val _GroupMetric = "group.metric"
+    details.get(_GroupMetric) match {
       case Some(b: Boolean) => b
       case _ => false
     }
