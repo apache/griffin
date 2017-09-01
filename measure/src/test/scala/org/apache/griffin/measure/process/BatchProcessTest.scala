@@ -37,7 +37,7 @@ class BatchProcessTest extends FunSuite with Matchers with BeforeAndAfter with L
 
   val envFile = "src/test/resources/env-test.json"
   val confFile = "src/test/resources/config-test-profiling.json"
-//  val confFile = "src/test/resources/config-test2.json"
+//  val confFile = "src/test/resources/config-test-accuracy.json"
 
   val envFsType = "local"
   val userFsType = "local"
