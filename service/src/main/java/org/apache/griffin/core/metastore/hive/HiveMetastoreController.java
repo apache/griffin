@@ -33,15 +33,9 @@ public class HiveMetastoreController {
     @Autowired
     HiveMetastoreServiceImpl hiveMetastoreService;
 
-
     @RequestMapping(value = "/db",method = RequestMethod.GET)
     public Iterable<String> getAllDatabases()  {
         return hiveMetastoreService.getAllDatabases();
-    }
-
-    @RequestMapping(value = "/table",method = RequestMethod.GET)
-    public Iterable<String> getDefAllTables()  {
-        return hiveMetastoreService.getAllTableNames("");
     }
 
     @RequestMapping(value = "/allTableNames",method = RequestMethod.GET)
@@ -51,7 +45,7 @@ public class HiveMetastoreController {
 
     @RequestMapping(value = "/db/allTables",method = RequestMethod.GET)
     public List<Table> getAllTables(@RequestParam("db") String dbName)  {
-        return hiveMetastoreService.getAllTable(dbName);
+        return hiveMetastoreService.getAllTablesByDbName(dbName);
     }
 
     @RequestMapping(value = "/allTables",method = RequestMethod.GET)
@@ -59,15 +53,8 @@ public class HiveMetastoreController {
         return hiveMetastoreService.getAllTable();
     }
 
-    @RequestMapping(value = "/default/{table}",method = RequestMethod.GET)
-    public Table getDefTable(@PathVariable("table") String tableName)  {
-        return hiveMetastoreService.getTable("", tableName);
-    }
-
-    @RequestMapping(value = "",method = RequestMethod.GET)
+    @RequestMapping(value = "table",method = RequestMethod.GET)
     public Table getTable(@RequestParam("db") String dbName, @RequestParam("table") String tableName)  {
         return hiveMetastoreService.getTable(dbName, tableName);
     }
-
-
 }

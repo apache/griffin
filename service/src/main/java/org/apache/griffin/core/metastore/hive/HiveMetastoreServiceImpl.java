@@ -87,9 +87,8 @@ public class HiveMetastoreServiceImpl implements HiveMetastoreService{
     }
 
 
-    @Override
     @Cacheable
-    public List<Table> getAllTable(String db) {
+    public List<Table> getAllTablesByDbName(String db) {
         List<Table> results = new ArrayList<Table>();
         String useDbName = getUseDbName(db);
         try {
