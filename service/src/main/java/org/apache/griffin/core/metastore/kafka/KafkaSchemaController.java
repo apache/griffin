@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/metadata/kafka")
 public class KafkaSchemaController {
-
+    //TODO subject should be replaced with topic
     @Autowired
     KafkaSchemaServiceImpl kafkaSchemaService;
 
