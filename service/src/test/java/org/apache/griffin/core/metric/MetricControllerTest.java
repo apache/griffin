@@ -57,7 +57,7 @@ public class MetricControllerTest {
 
         given(service.getOrgByMeasureName("m14")).willReturn("bullseye");
 
-        mvc.perform(get("/metrics/org?measureName=m14").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/orgName?measureName=m14").contentType(MediaType.APPLICATION_JSON))
 //                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isString())

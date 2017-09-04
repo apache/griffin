@@ -47,19 +47,15 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @PropertySource("classpath:application.properties")
 public class KafkaSchemaServiceImplTest {
-    /*@TestConfiguration
-    public static class KafkaSchemaServiceConfiguration {
-        @Bean
-        public KafkaSchemaServiceImpl service() {
-            return new KafkaSchemaServiceImpl();
-        }
-    }*/
+
 
     @InjectMocks
     private KafkaSchemaServiceImpl service;
@@ -80,8 +76,8 @@ public class KafkaSchemaServiceImplTest {
     @Test
     public void testGetSchemaString(){
         try {
-            String regUrl="null/schemas/ids/1";
-            when(restTemplate.getForEntity(regUrl, SchemaString.class)).thenReturn(new ResponseEntity<SchemaString>(new SchemaString(), HttpStatus.OK));
+
+            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new SchemaString(), HttpStatus.OK));
             SchemaString tmp = service.getSchemaString(1);
             assertTrue(true);
         }catch (Throwable t){
@@ -92,8 +88,7 @@ public class KafkaSchemaServiceImplTest {
     @Test
     public void testGetSubjects(){
         try {
-            String regUrl="null/subjects";
-            when(restTemplate.getForEntity(regUrl, String[].class)).thenReturn(new ResponseEntity<String[]>(new String[2], HttpStatus.OK));
+            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new String[2], HttpStatus.OK));
             Iterable<String> tmp = service.getSubjects();
             assertTrue(true);
         }catch (Throwable t){
@@ -104,8 +99,7 @@ public class KafkaSchemaServiceImplTest {
     @Test
     public void testGetSubjectVersions(){
         try {
-            String regUrl="null/subjects/1.0/versions";
-            when(restTemplate.getForEntity(regUrl, Integer[].class)).thenReturn(new ResponseEntity<Integer[]>(new Integer[2], HttpStatus.OK));
+            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Integer[2], HttpStatus.OK));
             Iterable<Integer> tmp = service.getSubjectVersions("1.0");
             assertTrue(true);
         }catch (Throwable t){
@@ -116,8 +110,7 @@ public class KafkaSchemaServiceImplTest {
     @Test
     public void testGetSubjectSchema(){
         try {
-            String regUrl="null/subjects/subject1/versions/version1";
-            when(restTemplate.getForEntity(regUrl, Schema.class)).thenReturn(new ResponseEntity<Schema>(new Schema("",0,0, ""), HttpStatus.OK));
+            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Schema("",0,0, ""), HttpStatus.OK));
             Schema tmp = service.getSubjectSchema("subject1","version1");
             assertTrue(true);
         }catch (Throwable t){
@@ -128,8 +121,7 @@ public class KafkaSchemaServiceImplTest {
     @Test
     public void testGetTopLevelConfig(){
         try {
-            String regUrl="null/config";
-            when(restTemplate.getForEntity(regUrl, Config.class)).thenReturn(new ResponseEntity<Config>(new Config(), HttpStatus.OK));
+            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Config(), HttpStatus.OK));
             Config tmp = service.getTopLevelConfig();
             assertTrue(true);
         }catch (Throwable t){
@@ -140,8 +132,7 @@ public class KafkaSchemaServiceImplTest {
     @Test
     public void testGetSubjectLevelConfig(){
         try {
-            String regUrl="null/config/";
-            when(restTemplate.getForEntity(regUrl, Config.class)).thenReturn(new ResponseEntity<Config>(new Config(), HttpStatus.OK));
+            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Config(), HttpStatus.OK));
             Config tmp = service.getSubjectLevelConfig("");
             assertTrue(true);
         }catch (Throwable t){
