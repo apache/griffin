@@ -62,16 +62,10 @@ import java.util.Properties;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-/*
-@RunWith(PowerMockRunner.class)
-*/
-@PrepareForTest(value = {SparkSubmitJob.class, JobExecutionContext.class})
-@RunWith(SpringRunner.class)
 
+@RunWith(SpringRunner.class)
 public class SparkSubmitJobTest{
 
-    @MockBean
-    JobExecutionContext context;
 
     @InjectMocks
     private SparkSubmitJob ssj=new SparkSubmitJob();
@@ -145,8 +139,8 @@ public class SparkSubmitJobTest{
         when(jdmap.getString("periodTime")).thenReturn("10");
         Measure measure = createATestMeasure("viewitem_hourly","bullseye");
         when(measureRepo.findOne(Long.valueOf("0"))).thenReturn(measure);
-            Properties sparkJobProperties=new Properties();
-            sparkJobProperties.load(new FileInputStream(new ClassPathResource("sparkJob.properties").getFile()));
+        Properties sparkJobProperties=new Properties();
+        sparkJobProperties.load(new FileInputStream(new ClassPathResource("sparkJob.properties").getFile()));
         when(sparkJobProps.getProperty("sparkJob.dateAndHour")).thenReturn(sparkJobProperties.getProperty("sparkJob.dateAndHour"));
         when(sparkJobProps.getProperty("sparkJob.numExecutors")).thenReturn(sparkJobProperties.getProperty("sparkJob.numExecutors"));
         when(sparkJobProps.getProperty("sparkJob.executorCores")).thenReturn(sparkJobProperties.getProperty("sparkJob.executorCores"));
