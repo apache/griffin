@@ -57,9 +57,9 @@ public class MeasureServiceImpl implements MeasureService {
         return measureRepo.findOne(id);
     }
 
-    /*
-        TODO: require to be fixed: deleting measure doesn't deal with job protocol related to it, leading quartz to throw error that measure cannot be found.
-     */
+
+
+
     @Override
     public GriffinOperationMessage deleteMeasureById(Long measureId) {
         if (measureRepo.exists(measureId) == false) {
@@ -85,7 +85,7 @@ public class MeasureServiceImpl implements MeasureService {
                 return GriffinOperationMessage.CREATE_MEASURE_FAIL;
             }
         } else {
-            LOGGER.info("Failed to create new measure " + measure.getName() + ", it already exists");
+            LOGGER.warn("Failed to create new measure " + measure.getName() + ", it already exists");
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
     }

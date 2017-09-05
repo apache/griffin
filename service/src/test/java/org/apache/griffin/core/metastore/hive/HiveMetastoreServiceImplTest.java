@@ -113,7 +113,7 @@ public class HiveMetastoreServiceImplTest {
         try {
             String useDbName="default";
             given(client.getAllTables(useDbName)).willReturn(Arrays.asList("cout","cout1"));
-            List<Table> tmp = service.getAllTable(useDbName);
+            List<Table> tmp = service.getAllTablesByDbName(useDbName);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all tables in default db");
@@ -121,7 +121,7 @@ public class HiveMetastoreServiceImplTest {
         try {
             given(client.getAllTables("default")).willThrow(MetaException.class);
             doNothing().when(client).reconnect();
-            service.getAllTable("default");
+            service.getAllTablesByDbName("default");
         } catch (Exception e) {
             log.info("testGetAllTableByDBName: test catch "+e);
         }

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 public class CacheEvictor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheEvictor.class);
 
-    @Scheduled(fixedRateString = "${cache.evict.hive.fixedRate}")
+    @Scheduled(fixedRateString = "${cache.evict.hive.fixedRate.in.milliseconds}")
     @CacheEvict(cacheNames = "hive", allEntries = true, beforeInvocation = true)
     public void evictHiveCache() {
         LOGGER.info("Evict hive cache");
