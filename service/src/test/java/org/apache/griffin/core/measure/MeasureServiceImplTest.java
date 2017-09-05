@@ -39,10 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
@@ -134,32 +131,33 @@ public class MeasureServiceImplTest {
             fail("Cannot delete Measure in db By name: viewitem_hourly");
         }
     }*/
-
     @Test
-    public void testCreateNewMeasure() throws Exception {
-/*
+    public void testCreateNewMeasure()  {
         try {
-*/
-            String measureName="viewitem_hourly";
-            String org="bullseye";
-            Measure measure=createATestMeasure(measureName,org);
-            given(measureRepo.findOne(0L)).willReturn(null);
-            GriffinOperationMessage message=service.createMeasure(measure);
-            assertEquals(message,GriffinOperationMessage.CREATE_MEASURE_FAIL);
-            assertTrue(true);
-
-            Measure measure1=createATestMeasure(measureName,"bullseye1");
-            given(measureRepo.findOne(0L)).willReturn(measure1);
-            GriffinOperationMessage message1=service.createMeasure(measure);
-            assertEquals(message1,GriffinOperationMessage.CREATE_MEASURE_FAIL);
-
-            given(measureRepo.findOne(0L)).willReturn(null);
+            // CREATE_MEASURE_SUCCESS
+            String measureName = "viewitem_hourly";
+            String org = "bullseye";
+            Measure measure = createATestMeasure(measureName, org);
+            given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
             given(measureRepo.save(measure)).willReturn(measure);
-            GriffinOperationMessage message2=service.createMeasure(measure);
-            assertEquals(message2,GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
-        /*}catch (Throwable t){
-            fail("Cannot create new measure viewitem_hourly");
-        }*/
+            GriffinOperationMessage message = service.createMeasure(measure);
+            assertEquals(message, GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
+            assertTrue(true);
+            // CREATE_MEASURE_FAIL_DUPLICATE
+            Measure measure1 = createATestMeasure(measureName, "bullseye1");
+            LinkedList<Measure> list = new LinkedList<>();
+            list.add(measure);
+            given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(list);
+            GriffinOperationMessage message1 = service.createMeasure(measure);
+            assertEquals(message1, GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
+            // CREATE_MEASURE_FAIL
+            given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
+            given(measureRepo.save(measure)).willReturn(null);
+            GriffinOperationMessage message2 = service.createMeasure(measure);
+            assertEquals(message2, GriffinOperationMessage.CREATE_MEASURE_FAIL);
+            }catch (Throwable t){
+                fail("Cannot create new measure viewitem_hourly");
+            }
     }
 
     @Test
