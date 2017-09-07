@@ -24,7 +24,8 @@ import org.apache.griffin.measure.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
 case class DataSourceParam( @JsonProperty("name") name: String,
-                            @JsonProperty("connectors") connectors: List[DataConnectorParam]
+                            @JsonProperty("connectors") connectors: List[DataConnectorParam],
+                            @JsonProperty("cache") cache: Map[String, Any]
                           ) extends Param {
 
 }

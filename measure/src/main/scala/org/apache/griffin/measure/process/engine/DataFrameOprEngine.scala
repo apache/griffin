@@ -32,9 +32,9 @@ import org.apache.spark.streaming.StreamingContext
 case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingContext
                              ) extends DqEngine {
 
-  def genDataSource(dataSourceParam: DataSourceParam): Option[DataSource] = {
-    DataSourceFactory.genDataSource(sqlContext, ssc, dataSourceParam)
-  }
+//  def genDataSource(dataSourceParam: DataSourceParam): Option[DirectDataSource] = {
+//    DataSourceFactory.genDataSource(sqlContext, ssc, dataSourceParam)
+//  }
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {

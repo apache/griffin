@@ -18,26 +18,61 @@ under the License.
 */
 package org.apache.griffin.measure.data.source
 
-import org.apache.griffin.measure.config.params.user.DataSourceParam
-import org.apache.griffin.measure.data.connector.DataConnectorFactory
+import org.apache.griffin.measure.config.params.user._
+import org.apache.griffin.measure.data.connector.batch.BatchDataConnector
+import org.apache.griffin.measure.data.connector.streaming.StreamingDataConnector
+import org.apache.griffin.measure.data.connector.{DataConnector, DataConnectorFactory}
+import org.apache.griffin.measure.log.Loggable
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.streaming.StreamingContext
 
-import scala.util.Success
+import scala.util.{Success, Try}
 
-object DataSourceFactory {
+object DataSourceFactory extends Loggable {
 
-  def genDataSource(sqlContext: SQLContext, ssc: StreamingContext, dataSourceParam: DataSourceParam
-                   ): Option[DataSource] = {
+  val HiveRegex = """^(?i)hive$""".r
+  val TextRegex = """^(?i)text$""".r
+  val AvroRegex = """^(?i)avro$""".r
+
+  def genDataSources(sqlContext: SQLContext, ssc: StreamingContext,
+                     dataSourceParams: Seq[DataSourceParam], metricName: String): Seq[DataSource] = {
+    dataSourceParams.zipWithIndex.flatMap { pair =>
+      val (param, index) = pair
+      genDataSource(sqlContext, ssc, param, metricName, index)
+    }
+  }
+
+  private def genDataSource(sqlContext: SQLContext, ssc: StreamingContext,
+                            dataSourceParam: DataSourceParam,
+                            metricName: String, index: Int
+                           ): Option[DataSource] = {
     val name = dataSourceParam.name
     val connectorParams = dataSourceParam.connectors
+    val cacheParam = dataSourceParam.cache
     val dataConnectors = connectorParams.flatMap { connectorParam =>
       DataConnectorFactory.getDirectDataConnector(sqlContext, ssc, connectorParam) match {
         case Success(connector) => Some(connector)
         case _ => None
       }
     }
-    Some(DataSource(name, dataConnectors))
+    val dataSourceCacheOpt = genDataSourceCache(sqlContext, cacheParam, metricName, index)
+
+    Some(DataSource(name, dataConnectors, dataSourceCacheOpt))
+  }
+
+  private def genDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
+                                 metricName: String, index: Int
+                                ) = {
+    if (param != null) {
+      try {
+        Some(DataSourceCache(sqlContext, param, metricName, index))
+      } catch {
+        case e: Throwable => {
+          error(s"generate data source cache fails")
+          None
+        }
+      }
+    } else None
   }
 
 }

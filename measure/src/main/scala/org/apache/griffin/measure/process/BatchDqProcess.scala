@@ -23,6 +23,7 @@ import java.util.Date
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
+import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
 import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
@@ -73,14 +74,17 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     val applicationId = sparkContext.applicationId
     persist.start(applicationId)
 
-    // generate rule steps
-    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam)
-
     // get dq engines
     val dqEngines = DqEngineFactory.genDqEngines(sqlContext, null)
 
+    // generate data sources
+    val dataSources = DataSourceFactory.genDataSources(sqlContext, null, userParam.dataSources, metricName)
+
     // init data sources
-    dqEngines.initDataSources(userParam.dataSources)
+    dqEngines.loadData(dataSources)
+
+    // generate rule steps
+    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam)
 
     // run rules
     dqEngines.runRuleSteps(ruleSteps)

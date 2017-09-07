@@ -16,8 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.data.connector.direct
+package org.apache.griffin.measure.data.connector.batch
 
+import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
 import org.apache.spark.rdd.RDD
@@ -27,8 +28,8 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 import scala.util.{Success, Try}
 
 // data connector for hive
-case class HiveDirectDataConnector(sqlContext: SQLContext, config: Map[String, Any]
-                                  ) extends DirectDataConnector {
+case class HiveBatchDataConnector(sqlContext: SQLContext, config: Map[String, Any]
+                                  ) extends BatchDataConnector {
 
   if (!sqlContext.isInstanceOf[HiveContext]) {
     throw new Exception("hive context not prepared!")

@@ -29,12 +29,12 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
-  def initDataSources(dataSourceParams: Seq[DataSourceParam]): Unit = {
-    val dataSources = dataSourceParams.flatMap { param =>
-      genDataSource(param)
-    }
+  def loadData(dataSources: Seq[DataSource]): Unit = {
+//    val dataSources = dataSourceParams.flatMap { param =>
+//      genDataSource(param)
+//    }
     dataSources.foreach { ds =>
-      ds.init
+      ds.loadData
     }
   }
 
@@ -71,13 +71,13 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     }
   }
 
-  def genDataSource(dataSourceParam: DataSourceParam): Option[DataSource] = {
-    val ret = engines.foldLeft(None: Option[DataSource]) { (dsOpt, engine) =>
-      if (dsOpt.isEmpty) engine.genDataSource(dataSourceParam) else dsOpt
-    }
-    if (ret.isEmpty) warn(s"init data source warn: no dq engine support ${dataSourceParam}")
-    ret
-  }
+//  def genDataSource(dataSourceParam: DataSourceParam): Option[DirectDataSource] = {
+//    val ret = engines.foldLeft(None: Option[DirectDataSource]) { (dsOpt, engine) =>
+//      if (dsOpt.isEmpty) engine.genDataSource(dataSourceParam) else dsOpt
+//    }
+//    if (ret.isEmpty) warn(s"init data source warn: no dq engine support ${dataSourceParam}")
+//    ret
+//  }
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     val ret = engines.foldLeft(false) { (done, engine) =>

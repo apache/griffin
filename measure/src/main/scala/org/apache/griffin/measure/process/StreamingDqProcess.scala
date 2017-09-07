@@ -18,9 +18,23 @@ under the License.
 */
 package org.apache.griffin.measure.process
 
+import java.util.Date
+
+import org.apache.griffin.measure.algo.streaming.TimingProcess
+import org.apache.griffin.measure.cache.info.InfoCacheInstance
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
+import org.apache.griffin.measure.data.source.DataSourceFactory
+import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.process.engine.DqEngineFactory
+import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
+import org.apache.griffin.measure.rules.udf.GriffinUdfs
+import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.streaming.{Milliseconds, StreamingContext}
+import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.util.Try
 
@@ -29,14 +43,111 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
   val envParam: EnvParam = allParam.envParam
   val userParam: UserParam = allParam.userParam
 
+  val metricName = userParam.name
+  val sparkParam = envParam.sparkParam
+
+  var sparkContext: SparkContext = _
+  var sqlContext: SQLContext = _
+
   def retriable: Boolean = true
 
-  def init: Try[_] = Try {}
+  def init: Try[_] = Try {
+    val conf = new SparkConf().setAppName(metricName)
+    conf.setAll(sparkParam.config)
+    sparkContext = new SparkContext(conf)
+    sparkContext.setLogLevel(sparkParam.logLevel)
+    sqlContext = new HiveContext(sparkContext)
 
-  def run: Try[_] = Try {
-    ;
+    // init info cache instance
+    InfoCacheInstance.initInstance(envParam.infoCacheParams, metricName)
+    InfoCacheInstance.init
+
+    // register udf
+    GriffinUdfs.register(sqlContext)
+
+    // init adaptors
+    val dataSourceNames = userParam.dataSources.map(_.name)
+    RuleAdaptorGroup.init(sqlContext, dataSourceNames)
   }
 
-  def end: Try[_] = Try {}
+  def run: Try[_] = Try {
+    val ssc = StreamingContext.getOrCreate(sparkParam.cpDir, () => {
+      try {
+        createStreamingContext
+      } catch {
+        case e: Throwable => {
+          error(s"create streaming context error: ${e.getMessage}")
+          throw e
+        }
+      }
+    })
+
+    // start time
+    val startTime = new Date().getTime()
+
+    // get persists to persist measure result
+    val persist: Persist = PersistFactory(envParam.persistParams, metricName).getPersists(startTime)
+
+    // persist start id
+    val applicationId = sparkContext.applicationId
+    persist.start(applicationId)
+
+    // get dq engines
+    val dqEngines = DqEngineFactory.genDqEngines(sqlContext, ssc)
+
+    // generate data sources
+    val dataSources = DataSourceFactory.genDataSources(sqlContext, null, userParam.dataSources, metricName)
+
+    // init data sources
+    dqEngines.loadData(dataSources)
+
+    // generate rule steps
+    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam)
+
+    // run rules
+    dqEngines.runRuleSteps(ruleSteps)
+
+    // persist results
+    dqEngines.persistAllResults(ruleSteps, persist)
+
+    // end time
+    val endTime = new Date().getTime
+    persist.log(endTime, s"process using time: ${endTime - startTime} ms")
+
+//    val processInterval = TimeUtil.milliseconds(sparkParam.processInterval) match {
+//      case Some(interval) => interval
+//      case _ => throw new Exception("invalid batch interval")
+//    }
+//    val process = TimingProcess(processInterval, streamingAccuracyProcess)
+//    process.startup()
+
+    ssc.start()
+    ssc.awaitTermination()
+    ssc.stop(stopSparkContext=true, stopGracefully=true)
+
+    // finish
+    persist.finish()
+
+//    process.shutdown()
+  }
+
+  def end: Try[_] = Try {
+    sparkContext.stop
+
+    InfoCacheInstance.close
+  }
+
+  def createStreamingContext: StreamingContext = {
+    val batchInterval = TimeUtil.milliseconds(sparkParam.batchInterval) match {
+      case Some(interval) => Milliseconds(interval)
+      case _ => throw new Exception("invalid batch interval")
+    }
+    val ssc = new StreamingContext(sparkContext, batchInterval)
+    ssc.checkpoint(sparkParam.cpDir)
+
+
+
+    ssc
+  }
 
 }

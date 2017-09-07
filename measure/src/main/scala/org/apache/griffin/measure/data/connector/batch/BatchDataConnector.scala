@@ -16,9 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.data.connector.direct
+package org.apache.griffin.measure.data.connector.batch
 
-import org.apache.griffin.measure.data.connector.DataConnector
+import org.apache.griffin.measure.data.connector._
 //import org.apache.griffin.measure.data.connector.cache.DataUpdatable
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
@@ -26,10 +26,10 @@ import org.apache.spark.sql.types.StructType
 import scala.util.{Failure, Success, Try}
 
 
-trait DirectDataConnector extends DataConnector {
+trait BatchDataConnector extends DataConnector {
 
 //  def metaData(): Option[StructType]
 
-  def data(): Option[DataFrame]
+  def init(): Unit = {}
 
 }

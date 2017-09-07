@@ -28,7 +28,7 @@ import org.apache.spark.sql.DataFrame
 
 trait DqEngine extends Loggable with Serializable {
 
-  def genDataSource(dataSourceParam: DataSourceParam): Option[DataSource]
+//  def genDataSource(dataSourceParam: DataSourceParam): Option[DirectDataSource]
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean
 

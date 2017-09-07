@@ -27,4 +27,10 @@ trait DataConnector extends Loggable with Serializable {
 
 //  def available(): Boolean
 
+  def init(): Unit
+
+  def data(): Option[DataFrame]
+
+//  def preProcess(dfOpt: Option[DataFrame]): Option[DataFrame]
+
 }
