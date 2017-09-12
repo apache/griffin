@@ -83,10 +83,10 @@ object Application extends Loggable {
 
     // choose algorithm
 //    val dqType = allParam.userParam.dqType
-    val procType = allParam.userParam.procType
+    val procType = ProcessType(allParam.userParam.procType)
     val proc: DqProcess = procType match {
-      case ProcessType.batch() => BatchDqProcess(allParam)
-      case ProcessType.streaming() => StreamingDqProcess(allParam)
+      case BatchProcessType => BatchDqProcess(allParam)
+      case StreamingProcessType => StreamingDqProcess(allParam)
       case _ => {
         error(s"${procType} is unsupported process type!")
         sys.exit(-4)

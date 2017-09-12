@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.process
 
-import org.apache.griffin.measure.algo.ProcessType
+import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
@@ -77,10 +77,10 @@ class StreamingProcessTest extends FunSuite with Matchers with BeforeAndAfter wi
   }
 
   test ("streaming process") {
-    val procType = allParam.userParam.procType
+    val procType = ProcessType(allParam.userParam.procType)
     val proc: DqProcess = procType match {
-      case ProcessType.batch() => BatchDqProcess(allParam)
-      case ProcessType.streaming() => StreamingDqProcess(allParam)
+      case BatchProcessType => BatchDqProcess(allParam)
+      case StreamingProcessType => StreamingDqProcess(allParam)
       case _ => {
         error(s"${procType} is unsupported process type!")
         sys.exit(-4)

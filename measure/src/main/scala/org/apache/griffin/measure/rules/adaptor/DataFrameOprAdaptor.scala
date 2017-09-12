@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.rules.adaptor
 
+import org.apache.griffin.measure.algo.ProcessType
 import org.apache.griffin.measure.rules.step._
 
-case class DataFrameOprAdaptor() extends RuleAdaptor {
+case class DataFrameOprAdaptor(processType: ProcessType) extends RuleAdaptor {
 
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
     DfOprStep(getName(param), getRule(param), getDetails(param), getPersistType(param)) :: Nil

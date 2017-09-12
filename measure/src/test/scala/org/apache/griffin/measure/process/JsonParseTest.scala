@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.process
 
-import org.apache.griffin.measure.algo.ProcessType
+import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._

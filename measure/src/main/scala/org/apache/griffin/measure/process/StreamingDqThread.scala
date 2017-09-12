@@ -21,6 +21,7 @@ package org.apache.griffin.measure.process
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
+import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 import org.apache.griffin.measure.config.params.user.EvaluateRuleParam
 import org.apache.griffin.measure.data.source.DataSource
@@ -32,7 +33,7 @@ import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
 case class StreamingDqThread(dqEngines: DqEngines,
                              dataSources: Seq[DataSource],
                              evaluateRuleParam: EvaluateRuleParam,
-                             persist: Persist
+                             appPersist: Persist
                             ) extends Runnable with Loggable {
 
   val lock = InfoCacheInstance.genLock("process")
@@ -46,7 +47,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
       try {
 
         val st = new Date().getTime
-        persist.log(st, s"starting process ...")
+        appPersist.log(st, s"starting process ...")
 
         TimeInfoCache.startTimeInfoCache
 
@@ -54,21 +55,21 @@ case class StreamingDqThread(dqEngines: DqEngines,
         dqEngines.loadData(dataSources)
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(evaluateRuleParam)
+        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(evaluateRuleParam, StreamingProcessType)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
 
         val ct = new Date().getTime
-        persist.log(ct, s"calculation using time: ${ct - st} ms")
+        appPersist.log(ct, s"calculation using time: ${ct - st} ms")
 
         // persist results
-        dqEngines.persistAllResults(ruleSteps, persist)
+        dqEngines.persistAllResults(ruleSteps, appPersist)
 
         TimeInfoCache.endTimeInfoCache
 
         val et = new Date().getTime
-        persist.log(et, s"persist using time: ${et - ct} ms")
+        appPersist.log(et, s"persist using time: ${et - ct} ms")
 
       } catch {
         case e: Throwable => error(s"process error: ${e.getMessage}")

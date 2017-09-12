@@ -20,6 +20,8 @@ package org.apache.griffin.measure.rules.adaptor
 
 import java.util.concurrent.atomic.AtomicLong
 
+import org.apache.griffin.measure.algo._
+
 import scala.collection.mutable.{Set => MutableSet}
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.log.Loggable
@@ -27,6 +29,8 @@ import org.apache.griffin.measure.rules.step.{ConcreteRuleStep, RuleStep}
 import org.apache.griffin.measure.rules.dsl.{DslType, PersistType}
 
 trait RuleAdaptor extends Loggable with Serializable {
+
+  val processType: ProcessType
 
   val _name = "name"
   val _rule = "rule"

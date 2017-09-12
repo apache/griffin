@@ -18,9 +18,30 @@ under the License.
 */
 package org.apache.griffin.measure.algo
 
+import scala.util.matching.Regex
+
+sealed trait ProcessType {
+  val regex: Regex
+  val desc: String
+}
+
 object ProcessType {
+  private val procTypes: List[ProcessType] = List(BatchProcessType, StreamingProcessType)
+  def apply(ptn: String): ProcessType = {
+    procTypes.filter(tp => ptn match {
+      case tp.regex() => true
+      case _ => false
+    }).headOption.getOrElse(BatchProcessType)
+  }
+  def unapply(pt: ProcessType): Option[String] = Some(pt.desc)
+}
 
-  val batch = """^(?i)batch$""".r
-  val streaming = """^(?i)streaming$""".r
+final case object BatchProcessType extends ProcessType {
+  val regex = """^(?i)batch$""".r
+  val desc = "batch"
+}
 
+final case object StreamingProcessType extends ProcessType {
+  val regex = """^(?i)streaming$""".r
+  val desc = "streaming"
 }

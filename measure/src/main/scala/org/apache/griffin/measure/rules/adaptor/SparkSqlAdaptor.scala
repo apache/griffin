@@ -18,10 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.rules.adaptor
 
+import org.apache.griffin.measure.algo.ProcessType
 import org.apache.griffin.measure.rules.dsl.PersistType
 import org.apache.griffin.measure.rules.step._
 
-case class SparkSqlAdaptor() extends RuleAdaptor {
+case class SparkSqlAdaptor(processType: ProcessType) extends RuleAdaptor {
 
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
     SparkSqlStep(getName(param), getRule(param), getDetails(param), getPersistType(param)) :: Nil

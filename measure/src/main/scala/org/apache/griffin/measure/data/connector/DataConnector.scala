@@ -20,6 +20,7 @@ package org.apache.griffin.measure.data.connector
 
 import java.util.concurrent.atomic.AtomicLong
 
+import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.engine._
@@ -50,7 +51,7 @@ trait DataConnector extends Loggable with Serializable {
   protected def suffix(ms: Long): String = s"${id}_${ms}"
   protected def thisName(ms: Long): String = s"this_${suffix(ms)}"
 
-  final val tmstColName = "__tmst"
+  final val tmstColName = GroupByColumn.tmst
 
   def preProcess(dfOpt: Option[DataFrame], ms: Long): Option[DataFrame] = {
     val thisTable = thisName(ms)
@@ -63,7 +64,7 @@ trait DataConnector extends Loggable with Serializable {
         df.registerTempTable(thisTable)
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(preProcRules, DslType("spark-sql"))
+        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(preProcRules, DslType("spark-sql"), BatchProcessType)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
@@ -101,4 +102,8 @@ object DataConnectorIdGenerator {
   private def increment: Long = {
     counter.incrementAndGet()
   }
+}
+
+object GroupByColumn {
+  val tmst = "__tmst"
 }

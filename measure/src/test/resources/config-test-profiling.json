@@ -32,6 +32,18 @@
           },
           "group.metric": true
         }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "rule": "source.user_id.count() as cnt",
+        "details": {
+          "source": "source",
+          "profiling": {
+            "name": "count",
+            "persist.type": "metric"
+          }
+        }
       }
     ]
   }

@@ -110,7 +110,8 @@
           },
           "miss": "miss_count",
           "total": "total_count",
-          "matched": "matched_count"
+          "matched": "matched_count",
+          "group.metric": true
         }
       }
     ]

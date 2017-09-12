@@ -20,6 +20,7 @@ package org.apache.griffin.measure.process
 
 import java.util.Date
 
+import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
@@ -85,7 +86,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dqEngines.loadData(dataSources)
 
     // generate rule steps
-    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam)
+    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam, BatchProcessType)
 
     // run rules
     dqEngines.runRuleSteps(ruleSteps)
