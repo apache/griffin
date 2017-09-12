@@ -34,7 +34,7 @@ trait StreamingDataConnector extends DataConnector {
 
   protected def stream(): Try[InputDStream[(K, V)]]
 
-  def transform(rdd: RDD[(K, V)], ms: Long): Option[DataFrame]
+  def transform(rdd: RDD[(K, V)]): Option[DataFrame]
 
   def data(): Option[DataFrame] = None
 

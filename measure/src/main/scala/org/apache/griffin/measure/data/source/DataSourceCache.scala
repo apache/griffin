@@ -92,9 +92,6 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
               HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
             } else false
 
-            // submit ms
-            submitCacheTime(ms)
-            submitReadyTime(ms)
           } catch {
             case e: Throwable => error(s"save data error: ${e.getMessage}")
           } finally {
@@ -107,6 +104,9 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       }
     }
 
+    // submit cache time and ready time
+    submitCacheTime(ms)
+    submitReadyTime(ms)
   }
 
   def readData(): Option[DataFrame] = {
@@ -127,15 +127,14 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     if (partitionPaths.isEmpty) {
       None
     } else {
-//      val filePaths = partitionPaths.mkString(",")
-//      val rdd: RDD[String] = sqlContext.sparkContext.textFile(filePaths)
-//
-//      // decode data
-//      rdd.flatMap { row =>
-//        decode(row)
-//      }
-      val df = sqlContext.read.text(partitionPaths: _*)
-      Some(df)
+      try {
+        Some(sqlContext.read.json(partitionPaths: _*))
+      } catch {
+        case e: Throwable => {
+          error(s"read data source cache error: ${e.getMessage}")
+          None
+        }
+      }
     }
   }
 

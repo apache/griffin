@@ -96,30 +96,34 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     val dqEngines = DqEngineFactory.genDqEngines(sqlContext, ssc)
 
     // generate data sources
-    val dataSources = DataSourceFactory.genDataSources(sqlContext, null, userParam.dataSources, metricName)
+    val dataSources = DataSourceFactory.genDataSources(sqlContext, ssc, dqEngines, userParam.dataSources, metricName)
+    dataSources.foreach(_.init)
+
+    // process thread
+    val dqThread = StreamingDqThread(dqEngines, dataSources, userParam.evaluateRuleParam, persist)
 
     // init data sources
-    dqEngines.loadData(dataSources)
-
-    // generate rule steps
-    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam)
-
-    // run rules
-    dqEngines.runRuleSteps(ruleSteps)
-
-    // persist results
-    dqEngines.persistAllResults(ruleSteps, persist)
+//    dqEngines.loadData(dataSources)
+//
+//    // generate rule steps
+//    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam)
+//
+//    // run rules
+//    dqEngines.runRuleSteps(ruleSteps)
+//
+//    // persist results
+//    dqEngines.persistAllResults(ruleSteps, persist)
 
     // end time
-    val endTime = new Date().getTime
-    persist.log(endTime, s"process using time: ${endTime - startTime} ms")
+//    val endTime = new Date().getTime
+//    persist.log(endTime, s"process using time: ${endTime - startTime} ms")
 
-//    val processInterval = TimeUtil.milliseconds(sparkParam.processInterval) match {
-//      case Some(interval) => interval
-//      case _ => throw new Exception("invalid batch interval")
-//    }
-//    val process = TimingProcess(processInterval, streamingAccuracyProcess)
-//    process.startup()
+    val processInterval = TimeUtil.milliseconds(sparkParam.processInterval) match {
+      case Some(interval) => interval
+      case _ => throw new Exception("invalid batch interval")
+    }
+    val process = TimingProcess(processInterval, dqThread)
+    process.startup()
 
     ssc.start()
     ssc.awaitTermination()

@@ -483,4 +483,50 @@ class JsonParseTest extends FunSuite with Matchers with BeforeAndAfter with Logg
     val functionNames = functions.map(_.getString(0)).collect
     functionNames.foreach(println)
   }
+
+  test ("test text file read") {
+    val partitionPaths = Seq[String](
+      "hdfs://localhost/griffin/streaming/dump/source/418010/25080625/1504837518000",
+      "hdfs://localhost/griffin/streaming/dump/target/418010/25080625/1504837518000")
+    val df = sqlContext.read.json(partitionPaths: _*)
+    df.printSchema()
+    df.show(10)
+  }
+
+  test ("list paths") {
+    val filePath = "hdfs://localhost/griffin/streaming/dump/source"
+    val partitionRanges = List[(Long, Long)]((0, 0), (-2, 0))
+    val partitionPaths = listPathsBetweenRanges(filePath :: Nil, partitionRanges)
+    println(partitionPaths)
+  }
+
+  private def listPathsBetweenRanges(paths: List[String],
+                                     partitionRanges: List[(Long, Long)]
+                                    ): List[String] = {
+    partitionRanges match {
+      case Nil => paths
+      case head :: tail => {
+        val (lb, ub) = head
+        val curPaths = paths.flatMap { path =>
+          val names = HdfsUtil.listSubPaths(path, "dir").toList
+          println(names)
+          names.filter { name =>
+            str2Long(name) match {
+              case Some(t) => (t >= lb) && (t <= ub)
+              case _ => false
+            }
+          }.map(HdfsUtil.getHdfsFilePath(path, _))
+        }
+        listPathsBetweenRanges(curPaths, tail)
+      }
+    }
+  }
+
+  private def str2Long(str: String): Option[Long] = {
+    try {
+      Some(str.toLong)
+    } catch {
+      case e: Throwable => None
+    }
+  }
 }

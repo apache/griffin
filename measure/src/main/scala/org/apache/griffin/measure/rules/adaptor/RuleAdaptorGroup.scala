@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rules.adaptor
 
-import org.apache.griffin.measure.config.params.user.{EvaluateRuleParam, RuleParam}
+import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 import org.apache.spark.sql.SQLContext
@@ -46,11 +46,11 @@ object RuleAdaptorGroup {
     }
   }
 
-  private def genRuleAdaptor(dslType: DslType, dataSourceNames: Seq[String]): Option[RuleAdaptor] = {
+  private def genRuleAdaptor(dslType: DslType, dsNames: Seq[String]): Option[RuleAdaptor] = {
     dslType match {
       case SparkSqlType => Some(SparkSqlAdaptor())
       case DfOprType => Some(DataFrameOprAdaptor())
-      case GriffinDslType => Some(GriffinDslAdaptor(dataSourceNames, functionNames))
+      case GriffinDslType => Some(GriffinDslAdaptor(dsNames, functionNames))
       case _ => None
     }
   }
@@ -75,9 +75,13 @@ object RuleAdaptorGroup {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
+    genConcreteRuleSteps(ruleParams, defaultDslType)
+  }
+
+  def genConcreteRuleSteps(ruleParams: Seq[Map[String, Any]], defDslType: DslType): Seq[ConcreteRuleStep] = {
     val (steps, dsNames) = ruleParams.foldLeft((Seq[ConcreteRuleStep](), dataSourceNames)) { (res, param) =>
       val (preSteps, preNames) = res
-      val dslType = getDslType(param, defaultDslType)
+      val dslType = getDslType(param, defDslType)
       val (curSteps, curNames) = genRuleAdaptor(dslType, preNames) match {
         case Some(ruleAdaptor) => (ruleAdaptor.genConcreteRuleStep(param), preNames ++ ruleAdaptor.getTempSourceNames(param))
         case _ => (Nil, preNames)
@@ -86,7 +90,6 @@ object RuleAdaptorGroup {
     }
     steps
   }
-
 
 
 }

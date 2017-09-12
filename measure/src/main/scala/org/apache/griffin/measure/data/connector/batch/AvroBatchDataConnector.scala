@@ -18,7 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure.data.connector.batch
 
+import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.data.connector._
+import org.apache.griffin.measure.process.engine.DqEngines
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
 import org.apache.griffin.measure.utils.HdfsUtil
@@ -28,8 +30,10 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 import scala.util.Try
 
 // data connector for avro file
-case class AvroBatchDataConnector(sqlContext: SQLContext, config: Map[String, Any]
-                                  ) extends BatchDataConnector {
+case class AvroBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, dcParam: DataConnectorParam
+                                 ) extends BatchDataConnector {
+
+  val config = dcParam.config
 
   val FilePath = "file.path"
   val FileName = "file.name"

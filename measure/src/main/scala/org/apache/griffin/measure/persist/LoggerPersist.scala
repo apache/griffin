@@ -34,7 +34,7 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
   def available(): Boolean = true
 
   def start(msg: String): Unit = {
-    println(s"[${timeStamp}] ${metricName} start")
+    println(s"[${timeStamp}] ${metricName} start: ${msg}")
   }
   def finish(): Unit = {
     println(s"[${timeStamp}] ${metricName} finish")

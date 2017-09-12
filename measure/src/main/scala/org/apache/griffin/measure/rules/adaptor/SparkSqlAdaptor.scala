@@ -18,7 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.rules.adaptor
 
-import org.apache.griffin.measure.config.params.user.RuleParam
 import org.apache.griffin.measure.rules.dsl.PersistType
 import org.apache.griffin.measure.rules.step._
 

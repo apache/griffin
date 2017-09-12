@@ -26,7 +26,7 @@ import org.apache.griffin.measure.config.params.Param
 case class DataConnectorParam( @JsonProperty("type") conType: String,
                                @JsonProperty("version") version: String,
                                @JsonProperty("config") config: Map[String, Any],
-                               @JsonProperty("pre.proc") preProc: List[RuleParam]
+                               @JsonProperty("pre.proc") preProc: List[Map[String, Any]]
                              ) extends Param {
 
 

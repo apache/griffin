@@ -23,6 +23,7 @@ import org.apache.griffin.measure.data.connector.batch.BatchDataConnector
 import org.apache.griffin.measure.data.connector.streaming.StreamingDataConnector
 import org.apache.griffin.measure.data.connector.{DataConnector, DataConnectorFactory}
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.process.engine.{DqEngine, DqEngines}
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.streaming.StreamingContext
 
@@ -34,15 +35,16 @@ object DataSourceFactory extends Loggable {
   val TextRegex = """^(?i)text$""".r
   val AvroRegex = """^(?i)avro$""".r
 
-  def genDataSources(sqlContext: SQLContext, ssc: StreamingContext,
+  def genDataSources(sqlContext: SQLContext, ssc: StreamingContext, dqEngines: DqEngines,
                      dataSourceParams: Seq[DataSourceParam], metricName: String): Seq[DataSource] = {
     dataSourceParams.zipWithIndex.flatMap { pair =>
       val (param, index) = pair
-      genDataSource(sqlContext, ssc, param, metricName, index)
+      genDataSource(sqlContext, ssc, dqEngines, param, metricName, index)
     }
   }
 
   private def genDataSource(sqlContext: SQLContext, ssc: StreamingContext,
+                            dqEngines: DqEngines,
                             dataSourceParam: DataSourceParam,
                             metricName: String, index: Int
                            ): Option[DataSource] = {
@@ -50,7 +52,7 @@ object DataSourceFactory extends Loggable {
     val connectorParams = dataSourceParam.connectors
     val cacheParam = dataSourceParam.cache
     val dataConnectors = connectorParams.flatMap { connectorParam =>
-      DataConnectorFactory.getDirectDataConnector(sqlContext, ssc, connectorParam) match {
+      DataConnectorFactory.getDataConnector(sqlContext, ssc, dqEngines, connectorParam) match {
         case Success(connector) => Some(connector)
         case _ => None
       }

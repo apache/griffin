@@ -1,11 +1,11 @@
 {
-  "name": "accu_batch_test",
+  "name": "accu_streaming",
 
   "process.type": "streaming",
 
   "data.sources": [
     {
-      "name": "src",
+      "name": "source",
       "connectors": [
         {
           "type": "kafka",
@@ -24,9 +24,17 @@
           "pre.proc": [
             {
               "dsl.type": "df-opr",
-              "name": "source",
+              "name": "${s1}",
               "rule": "from_json",
-              "persist.type": "cache"
+              "persist.type": "cache",
+              "details": {
+                "df.name": "${this}"
+              }
+            },
+            {
+              "dsl.type": "spark-sql",
+              "name": "${this}",
+              "rule": "select name, age from ${s1}"
             }
           ]
         }
@@ -39,7 +47,7 @@
         "time.range": ["-2m", "0"]
       }
     }, {
-      "name": "tgt",
+      "name": "target",
       "connectors": [
         {
           "type": "kafka",
@@ -58,9 +66,17 @@
           "pre.proc": [
             {
               "dsl.type": "df-opr",
-              "name": "target",
+              "name": "${t1}",
               "rule": "from_json",
-              "persist.type": "cache"
+              "persist.type": "cache",
+              "details": {
+                "df.name": "${this}"
+              }
+            },
+            {
+              "dsl.type": "spark-sql",
+              "name": "${this}",
+              "rule": "select name, age from ${t1}"
             }
           ]
         }

@@ -18,9 +18,17 @@ under the License.
 */
 package org.apache.griffin.measure.data.connector
 
+import java.util.concurrent.atomic.AtomicLong
+
+import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.process.engine._
+import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
+import org.apache.griffin.measure.rules.dsl._
+import org.apache.griffin.measure.rules.preproc.PreProcRuleGenerator
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, SQLContext}
 
 
 trait DataConnector extends Loggable with Serializable {
@@ -31,6 +39,66 @@ trait DataConnector extends Loggable with Serializable {
 
   def data(): Option[DataFrame]
 
-//  def preProcess(dfOpt: Option[DataFrame]): Option[DataFrame]
+  val dqEngines: DqEngines
 
+  val dcParam: DataConnectorParam
+
+  val sqlContext: SQLContext
+
+  val id: String = DataConnectorIdGenerator.genId
+
+  protected def suffix(ms: Long): String = s"${id}_${ms}"
+  protected def thisName(ms: Long): String = s"this_${suffix(ms)}"
+
+  final val tmstColName = "__tmst"
+
+  def preProcess(dfOpt: Option[DataFrame], ms: Long): Option[DataFrame] = {
+    val thisTable = thisName(ms)
+    val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
+    val names = PreProcRuleGenerator.getRuleNames(preProcRules).toSet + thisTable
+
+    try {
+      dfOpt.flatMap { df =>
+        // in data
+        df.registerTempTable(thisTable)
+
+        // generate rule steps
+        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(preProcRules, DslType("spark-sql"))
+
+        // run rules
+        dqEngines.runRuleSteps(ruleSteps)
+
+        // out data
+        val outDf = sqlContext.table(thisTable)
+
+        // drop temp table
+        names.foreach(name => sqlContext.dropTempTable(name))
+
+        // add tmst
+        val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
+
+        Some(withTmstDf)
+      }
+    } catch {
+      case e: Throwable => {
+        error(s"preporcess of data connector [${id}] error: ${e.getMessage}")
+        None
+      }
+    }
+
+  }
+
+}
+
+object DataConnectorIdGenerator {
+  private val counter: AtomicLong = new AtomicLong(0L)
+  private val head: String = "dc"
+
+  def genId: String = {
+    s"${head}${increment}"
+  }
+
+  private def increment: Long = {
+    counter.incrementAndGet()
+  }
 }

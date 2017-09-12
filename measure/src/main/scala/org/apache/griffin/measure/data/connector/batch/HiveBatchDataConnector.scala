@@ -18,7 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure.data.connector.batch
 
+import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.data.connector._
+import org.apache.griffin.measure.process.engine.DqEngines
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
 import org.apache.spark.rdd.RDD
@@ -28,8 +30,10 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 import scala.util.{Success, Try}
 
 // data connector for hive
-case class HiveBatchDataConnector(sqlContext: SQLContext, config: Map[String, Any]
+case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, dcParam: DataConnectorParam
                                   ) extends BatchDataConnector {
+
+  val config = dcParam.config
 
   if (!sqlContext.isInstanceOf[HiveContext]) {
     throw new Exception("hive context not prepared!")

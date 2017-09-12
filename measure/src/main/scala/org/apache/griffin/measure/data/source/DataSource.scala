@@ -44,7 +44,7 @@ case class DataSource(name: String,
         df.registerTempTable(name)
       }
       case None => {
-        throw new Exception(s"load data source ${name} fails")
+        throw new Exception(s"load data source [${name}] fails")
       }
     }
   }

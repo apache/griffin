@@ -20,7 +20,8 @@ package org.apache.griffin.measure.data.connector
 
 import kafka.serializer.StringDecoder
 import org.apache.griffin.measure.config.params.user._
-import org.apache.griffin.measure.data.connector.streaming.{KafkaStreamingDataConnector, StreamingDataConnector}
+import org.apache.griffin.measure.data.connector.streaming.{KafkaStreamingDataConnector, KafkaStreamingStringDataConnector, StreamingDataConnector}
+import org.apache.griffin.measure.process.engine.{DqEngine, DqEngines}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
@@ -46,22 +47,23 @@ object DataConnectorFactory {
 
   val TextRegex = """^(?i)text$""".r
 
-  def getDirectDataConnector(sqlContext: SQLContext,
-                             ssc: StreamingContext,
-                             dataConnectorParam: DataConnectorParam
-                            ): Try[DataConnector] = {
+  def getDataConnector(sqlContext: SQLContext,
+                       @transient ssc: StreamingContext,
+                       dqEngines: DqEngines,
+                       dataConnectorParam: DataConnectorParam
+                      ): Try[DataConnector] = {
     val conType = dataConnectorParam.conType
     val version = dataConnectorParam.version
     val config = dataConnectorParam.config
     Try {
       conType match {
-        case HiveRegex() => HiveBatchDataConnector(sqlContext, config)
-        case AvroRegex() => AvroBatchDataConnector(sqlContext, config)
+        case HiveRegex() => HiveBatchDataConnector(sqlContext, dqEngines, dataConnectorParam)
+        case AvroRegex() => AvroBatchDataConnector(sqlContext, dqEngines, dataConnectorParam)
         case KafkaRegex() => {
 //          val ksdcTry = getStreamingDataConnector(ssc, dataConnectorParam)
 //          val cdcTry = getCacheDataConnector(sqlContext, dataConnectorParam.cache)
 //          KafkaCacheDirectDataConnector(ksdcTry, cdcTry, dataConnectorParam)
-          getStreamingDataConnector(sqlContext, ssc, dataConnectorParam)
+          getStreamingDataConnector(sqlContext, ssc, dqEngines, dataConnectorParam)
         }
         case _ => throw new Exception("connector creation error!")
       }
@@ -69,14 +71,15 @@ object DataConnectorFactory {
   }
 
   private def getStreamingDataConnector(sqlContext: SQLContext,
-                                        ssc: StreamingContext,
+                                        @transient ssc: StreamingContext,
+                                        dqEngines: DqEngines,
                                         dataConnectorParam: DataConnectorParam
                                        ): StreamingDataConnector = {
+    if (ssc == null) throw new Exception("streaming context is null!")
     val conType = dataConnectorParam.conType
     val version = dataConnectorParam.version
-    val config = dataConnectorParam.config
     conType match {
-      case KafkaRegex() => genKafkaDataConnector(sqlContext, ssc, config)
+      case KafkaRegex() => genKafkaDataConnector(sqlContext, ssc, dqEngines, dataConnectorParam)
       case _ => throw new Exception("streaming connector creation error!")
     }
   }
@@ -98,37 +101,18 @@ object DataConnectorFactory {
 //  }
 //
   private def genKafkaDataConnector(sqlContext: SQLContext,
-                                    ssc: StreamingContext,
-                                    config: Map[String, Any]
+                                    @transient ssc: StreamingContext,
+                                    dqEngines: DqEngines,
+                                    dataConnectorParam: DataConnectorParam
                                    ) = {
+    val config = dataConnectorParam.config
     val KeyType = "key.type"
     val ValueType = "value.type"
     val keyType = config.getOrElse(KeyType, "java.lang.String").toString
     val valueType = config.getOrElse(ValueType, "java.lang.String").toString
     (getClassTag(keyType), getClassTag(valueType)) match {
       case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
-        if (ssc == null) throw new Exception("streaming context is null!  ")
-        new KafkaStreamingDataConnector(sqlContext, ssc, config) {
-          type K = String
-          type KD = StringDecoder
-          type V = String
-          type VD = StringDecoder
-          case class Value(value: K, _tmst: Long) {}
-          def createDStream(topicSet: Set[String]): InputDStream[(K, V)] = {
-            KafkaUtils.createDirectStream[K, V, KD, VD](ssc, kafkaConfig, topicSet)
-          }
-          def transform(rdd: RDD[(K, V)], ms: Long): Option[DataFrame] = {
-            val rdd1 = rdd.map(d => Value(d._2, ms))
-            try {
-              Some(sqlContext.createDataFrame(rdd1, classOf[Value]))
-            } catch {
-              case e: Throwable => {
-                error(s"streaming data transform fails")
-                None
-              }
-            }
-          }
-        }
+        KafkaStreamingStringDataConnector(sqlContext, ssc, dqEngines, dataConnectorParam)
       }
       case _ => {
         throw new Exception("not supported type kafka data connector")

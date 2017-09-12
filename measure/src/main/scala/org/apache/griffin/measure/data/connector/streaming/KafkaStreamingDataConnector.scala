@@ -19,22 +19,16 @@ under the License.
 package org.apache.griffin.measure.data.connector.streaming
 
 import kafka.serializer.Decoder
-import org.apache.griffin.measure.result.{DataInfo, TimeStampInfo}
-import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
-import org.apache.griffin.measure.utils.JsonUtil
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
 
 import scala.util.{Failure, Success, Try}
 
-abstract class KafkaStreamingDataConnector(sqlContext: SQLContext,
-                                           @transient ssc: StreamingContext,
-                                           config: Map[String, Any]
-                                          ) extends StreamingDataConnector {
+trait KafkaStreamingDataConnector extends StreamingDataConnector {
+
   type KD <: Decoder[K]
   type VD <: Decoder[V]
+
+  val config = dcParam.config
 
   val KafkaConfig = "kafka.config"
   val Topics = "topics"
@@ -57,10 +51,12 @@ abstract class KafkaStreamingDataConnector(sqlContext: SQLContext,
     ds.foreachRDD((rdd, time) => {
       val ms = time.milliseconds
 
-      val dfOpt = transform(rdd, ms)
+      val dfOpt = transform(rdd)
+
+      val preDfOpt = preProcess(dfOpt, ms)
 
       // save data frame
-      dataSourceCacheOpt.foreach(_.saveData(dfOpt, ms))
+      dataSourceCacheOpt.foreach(_.saveData(preDfOpt, ms))
     })
   }
 
@@ -71,3 +67,6 @@ abstract class KafkaStreamingDataConnector(sqlContext: SQLContext,
 
   protected def createDStream(topicSet: Set[String]): InputDStream[(K, V)]
 }
+
+
+
