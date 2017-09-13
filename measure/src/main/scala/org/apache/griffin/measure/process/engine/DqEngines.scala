@@ -25,6 +25,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
+import org.apache.spark.rdd.RDD
 
 case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
@@ -46,46 +47,80 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
   }
 
   def persistAllResults(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory): Unit = {
-    // 1. group by same persist types
-    val groupedRuleSteps = ruleSteps.groupBy(_.persistType)
-
-    // 2. persist results in order [metric, record]
-    persistOrder.foreach { prstType =>
-      val steps = groupedRuleSteps.get(prstType) match {
-        case Some(a) => a
-        case _ => Nil
-      }
-      prstType match {
-        case MetricPersistType => {
-//          val metrics = steps.foldLeft(Map[String, Any]())(_ ++ collectMetrics(_))
-          val metrics: Map[Long, Map[String, Any]] = {
-            steps.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
-              val metrics = collectMetrics(step)
-              metrics.foldLeft(ret) { (total, pair) =>
-                val (k, v) = pair
-                ret.get(k) match {
-                  case Some(map) => ret + (k -> (map ++ v))
-                  case _ => ret + pair
-                }
-              }
-            }
+    // 1. persist metric
+    val metricSteps = ruleSteps.filter(_.persistType == MetricPersistType)
+    val allMetrics: Map[Long, Map[String, Any]] = {
+      metricSteps.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
+        val metrics = collectMetrics(step)
+        metrics.foldLeft(ret) { (total, pair) =>
+          val (k, v) = pair
+          total.get(k) match {
+            case Some(map) => total + (k -> (map ++ v))
+            case _ => total + pair
           }
-          metrics.foreach { pair =>
-            val (t, metric) = pair
-            val persist = persistFactory.getPersists(t)
-            persist.persistMetrics(metric)
-          }
-        }
-        case RecordPersistType => {
-          steps.foreach { ruleStep =>
-            persistRecords(ruleStep, persistFactory)
-          }
-        }
-        case _ => {
-          warn(s"${prstType} is not persistable")
         }
       }
     }
+    println(allMetrics)
+    val updateTimeGroups = allMetrics.keys
+    allMetrics.foreach { pair =>
+      val (t, metric) = pair
+      val persist = persistFactory.getPersists(t)
+      persist.persistMetrics(metric)
+    }
+
+    // 2. persist record
+    val recordSteps = ruleSteps.filter(_.persistType == RecordPersistType)
+    recordSteps.foreach { step =>
+      val name = step.name
+      val records = collectRecords(step, updateTimeGroups)
+      records.foreach { pair =>
+        val (t, recs) = pair
+        val persist = persistFactory.getPersists(t)
+        persist.persistRecords(recs, name)
+      }
+    }
+
+    // 1. group by same persist types
+//    val groupedRuleSteps = ruleSteps.groupBy(_.persistType)
+//
+//    // 2. persist results in order [metric, record]
+//    persistOrder.foreach { prstType =>
+//      val steps = groupedRuleSteps.get(prstType) match {
+//        case Some(a) => a
+//        case _ => Nil
+//      }
+//      prstType match {
+//        case MetricPersistType => {
+////          val metrics = steps.foldLeft(Map[String, Any]())(_ ++ collectMetrics(_))
+//          val allMetrics: Map[Long, Map[String, Any]] = {
+//            steps.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
+//              val metrics = collectMetrics(step)
+//              metrics.foldLeft(ret) { (total, pair) =>
+//                val (k, v) = pair
+//                total.get(k) match {
+//                  case Some(map) => total + (k -> (map ++ v))
+//                  case _ => total + pair
+//                }
+//              }
+//            }
+//          }
+//          allMetrics.foreach { pair =>
+//            val (t, metric) = pair
+//            val persist = persistFactory.getPersists(t)
+//            persist.persistMetrics(metric)
+//          }
+//        }
+//        case RecordPersistType => {
+//          steps.foreach { ruleStep =>
+//            persistRecords(ruleStep, persistFactory)
+//          }
+//        }
+//        case _ => {
+//          warn(s"${prstType} is not persistable")
+//        }
+//      }
+//    }
   }
 
 //  def genDataSource(dataSourceParam: DataSourceParam): Option[DirectDataSource] = {
@@ -104,11 +139,18 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     ret
   }
 
-  def persistRecords(ruleStep: ConcreteRuleStep, persistFactory: PersistFactory): Boolean = {
-    val ret = engines.foldLeft(false) { (done, engine) =>
-      done || engine.persistRecords(ruleStep, persistFactory)
+//  def persistRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long], persistFactory: PersistFactory): Boolean = {
+//    val ret = engines.foldLeft(false) { (done, engine) =>
+//      done || engine.persistRecords(ruleStep, timeGroups, persistFactory)
+//    }
+//    if (!ret) error(s"persist result warn: no dq engine support ${ruleStep}")
+//    ret
+//  }
+  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, RDD[String]] = {
+    val ret = engines.foldLeft(Map[Long, RDD[String]]()) { (ret, engine) =>
+      ret ++ engine.collectRecords(ruleStep, timeGroups)
     }
-    if (!ret) error(s"persist result warn: no dq engine support ${ruleStep}")
+    if (ret.isEmpty) warn(s"collect records warn: no records collected for ${ruleStep}")
     ret
   }
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {

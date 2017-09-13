@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
+import org.apache.griffin.measure.cache.result.CacheResultProcesser
 import org.apache.griffin.measure.config.params.user.EvaluateRuleParam
 import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
@@ -69,6 +70,9 @@ case class StreamingDqThread(dqEngines: DqEngines,
 
         TimeInfoCache.endTimeInfoCache
 
+        // clean old data
+        cleanData
+
         val et = new Date().getTime
         appPersist.log(et, s"persist using time: ${et - ct} ms")
 
@@ -85,18 +89,18 @@ case class StreamingDqThread(dqEngines: DqEngines,
   }
 
   // clean old data and old result cache
-//  def cleanData(): Unit = {
-//    try {
+  private def cleanData(): Unit = {
+    try {
 //      sourceDataConnector.cleanOldData
 //      targetDataConnector.cleanOldData
-//
-//      val cleanTime = TimeInfoCache.getCleanTime
-//      cacheResultProcesser.refresh(cleanTime)
-//    } catch {
-//      case e: Throwable => error(s"clean data error: ${e.getMessage}")
-//    }
-//  }
-//
+
+      val cleanTime = TimeInfoCache.getCleanTime
+      CacheResultProcesser.refresh(cleanTime)
+    } catch {
+      case e: Throwable => error(s"clean data error: ${e.getMessage}")
+    }
+  }
+
 //  // calculate accuracy between source data and target data
 //  private def accuracy(sourceData: RDD[(Product, (Map[String, Any], Map[String, Any]))],
 //               targetData: RDD[(Product, (Map[String, Any], Map[String, Any]))],

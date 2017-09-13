@@ -70,7 +70,7 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
     }
   }
 
-  def persistRecords(ruleStep: ConcreteRuleStep, persistFactory: PersistFactory): Boolean = {
+//  def persistRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long], persistFactory: PersistFactory): Boolean = {
 //    val curTime = new Date().getTime
 //    ruleStep match {
 //      case DfOprStep(name, _, _, RecordPersistType) => {
@@ -93,7 +93,31 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
 //      }
 //      case _ => false
 //    }
-    true
+//    true
+//  }
+
+  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, RDD[String]] = {
+    ruleStep match {
+      case DfOprStep(name, _, _, RecordPersistType) => {
+        try {
+          val pdf = sqlContext.table(s"`${name}`")
+          timeGroups.flatMap { timeGroup =>
+            try {
+              val rdd = pdf.filter(s"`${GroupByColumn.tmst}` = ${timeGroup}").toJSON
+              Some((timeGroup, rdd))
+            } catch {
+              case e: Throwable => None
+            }
+          }.toMap
+        } catch {
+          case e: Throwable => {
+            error(s"persist result ${name} error: ${e.getMessage}")
+            Map[Long, RDD[String]]()
+          }
+        }
+      }
+      case _ => Map[Long, RDD[String]]()
+    }
   }
 
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
@@ -208,8 +232,6 @@ object DataFrameOprs {
     sqlContext.read.json(rdd)
   }
 
-  final val cacheResultProcesser = CacheResultProcesser()
-
   def accuracy(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
     val _dfName = "df.name"
     val _miss = "miss"
@@ -233,23 +255,26 @@ object DataFrameOprs {
     }
 
     val df = sqlContext.table(s"`${dfName}`")
-    val results = df.map { row =>
+    df.show(10)
+    val results = df.flatMap { row =>
       val t = getLong(row, tmst)
-      val missCount = getLong(row, miss)
-      val totalCount = getLong(row, total)
-      val ar = AccuracyResult(missCount, totalCount)
-      (t, ar)
+      if (t > 0) {
+        val missCount = getLong(row, miss)
+        val totalCount = getLong(row, total)
+        val ar = AccuracyResult(missCount, totalCount)
+        Some((t, ar))
+      } else None
     }.collect
 
     val updateResults = results.flatMap { pair =>
       val (t, result) = pair
-      val updatedCacheResultOpt = cacheResultProcesser.genUpdateCacheResult(t, updateTime, result)
+      val updatedCacheResultOpt = CacheResultProcesser.genUpdateCacheResult(t, updateTime, result)
       updatedCacheResultOpt
     }
 
     // update
     updateResults.foreach { r =>
-      cacheResultProcesser.update(r)
+      CacheResultProcesser.update(r)
     }
 
     val schema = StructType(Array(

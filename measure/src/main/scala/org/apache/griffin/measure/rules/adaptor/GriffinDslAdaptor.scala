@@ -263,9 +263,9 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 //        }
         val accuracyMetricSql = {
           s"""
-             |SELECT `${missTableName}`.`${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,
-             |`${totalTableName}`.`${totalColName}` AS `${totalColName}`,
-             |`${missTableName}`.`${missColName}` AS `${missColName}`
+             |SELECT `${totalTableName}`.`${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,
+             |`${missTableName}`.`${missColName}` AS `${missColName}`,
+             |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
              |FROM `${totalTableName}` FULL JOIN `${missTableName}`
              |ON `${totalTableName}`.`${GroupByColumn.tmst}` = `${missTableName}`.`${GroupByColumn.tmst}`
           """.stripMargin
@@ -279,7 +279,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           NonePersistType
         )
 
-        // 5. test
+        // 5. accuracy metric filter
         val accuracyStep = DfOprStep(
           accuracyMetricName,
           "accuracy",

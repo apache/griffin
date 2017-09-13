@@ -24,6 +24,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 trait DqEngine extends Loggable with Serializable {
@@ -34,7 +35,9 @@ trait DqEngine extends Loggable with Serializable {
 
 //  def persistResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist, persistType: PersistType): Boolean
 
-  def persistRecords(ruleStep: ConcreteRuleStep, persistFactory: PersistFactory): Boolean
+//  def persistRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long], persistFactory: PersistFactory): Boolean
+
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]]
 
+  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, RDD[String]]
 }

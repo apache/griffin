@@ -27,7 +27,8 @@ import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 import org.apache.griffin.measure.utils.JsonUtil
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{DataFrame, GroupedData, SQLContext}
 import org.apache.spark.streaming.StreamingContext
 
 case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingContext
@@ -55,7 +56,7 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
     }
   }
 
-  def persistRecords(ruleStep: ConcreteRuleStep, persistFactory: PersistFactory): Boolean = {
+//  def persistRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long], persistFactory: PersistFactory): Boolean = {
 //    val curTime = new Date().getTime
 //    ruleStep match {
 //      case SparkSqlStep(name, _, _, RecordPersistType) => {
@@ -63,10 +64,14 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
 //          val pdf = sqlContext.table(s"`${name}`")
 //          val records = pdf.toJSON
 //
-//          persist.persistRecords(records, name)
+//          timeGroups.foreach { timeGroup =>
+//            val persist = persistFactory.getPersists(timeGroup)
 //
-//          val recordLog = s"[ ${name} ] persist records"
-//          persist.log(curTime, recordLog)
+//            persist.persistRecords(records, name)
+//
+////            val recordLog = s"[ ${name} ] persist records"
+////            persist.log(curTime, recordLog)
+//          }
 //
 //          true
 //        } catch {
@@ -78,7 +83,30 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
 //      }
 //      case _ => false
 //    }
-    true
+//  }
+
+  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, RDD[String]] = {
+    ruleStep match {
+      case SparkSqlStep(name, _, _, RecordPersistType) => {
+        try {
+          val pdf = sqlContext.table(s"`${name}`")
+          timeGroups.flatMap { timeGroup =>
+            try {
+              val rdd = pdf.filter(s"`${GroupByColumn.tmst}` = ${timeGroup}").toJSON
+              Some((timeGroup, rdd))
+            } catch {
+              case e: Throwable => None
+            }
+          }.toMap
+        } catch {
+          case e: Throwable => {
+            error(s"persist result ${name} error: ${e.getMessage}")
+            Map[Long, RDD[String]]()
+          }
+        }
+      }
+      case _ => Map[Long, RDD[String]]()
+    }
   }
 
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
