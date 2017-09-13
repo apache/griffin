@@ -26,13 +26,14 @@ import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 import org.apache.griffin.measure.config.params.user.EvaluateRuleParam
 import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.persist.Persist
+import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
 import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
 
 case class StreamingDqThread(dqEngines: DqEngines,
                              dataSources: Seq[DataSource],
                              evaluateRuleParam: EvaluateRuleParam,
+                             persistFactory: PersistFactory,
                              appPersist: Persist
                             ) extends Runnable with Loggable {
 

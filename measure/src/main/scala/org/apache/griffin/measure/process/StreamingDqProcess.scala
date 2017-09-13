@@ -86,7 +86,8 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     val startTime = new Date().getTime()
 
     // get persists to persist measure result
-    val persist: Persist = PersistFactory(envParam.persistParams, metricName).getPersists(startTime)
+    val persistFactory = PersistFactory(envParam.persistParams, metricName)
+    val persist: Persist = persistFactory.getPersists(startTime)
 
     // persist start id
     val applicationId = sparkContext.applicationId
@@ -100,7 +101,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     dataSources.foreach(_.init)
 
     // process thread
-    val dqThread = StreamingDqThread(dqEngines, dataSources, userParam.evaluateRuleParam, persist)
+    val dqThread = StreamingDqThread(dqEngines, dataSources, userParam.evaluateRuleParam, persistFactory, persist)
 
     // init data sources
 //    dqEngines.loadData(dataSources)
