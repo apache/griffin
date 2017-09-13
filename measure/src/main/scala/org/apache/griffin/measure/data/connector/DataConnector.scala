@@ -38,7 +38,7 @@ trait DataConnector extends Loggable with Serializable {
 
   def init(): Unit
 
-  def data(): Option[DataFrame]
+  def data(ms: Long): Option[DataFrame]
 
   val dqEngines: DqEngines
 

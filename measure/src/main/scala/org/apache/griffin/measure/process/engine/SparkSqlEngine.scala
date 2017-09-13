@@ -21,8 +21,9 @@ package org.apache.griffin.measure.process.engine
 import java.util.Date
 
 import org.apache.griffin.measure.config.params.user.DataSourceParam
+import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.data.source._
-import org.apache.griffin.measure.persist.Persist
+import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 import org.apache.griffin.measure.utils.JsonUtil
@@ -54,32 +55,33 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
     }
   }
 
-  def persistRecords(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
-    val curTime = new Date().getTime
-    ruleStep match {
-      case SparkSqlStep(name, _, _, RecordPersistType) => {
-        try {
-          val pdf = sqlContext.table(s"`${name}`")
-          val records = pdf.toJSON
-
-          persist.persistRecords(records, name)
-
-          val recordLog = s"[ ${name} ] persist records"
-          persist.log(curTime, recordLog)
-
-          true
-        } catch {
-          case e: Throwable => {
-            error(s"persist result ${name} error: ${e.getMessage}")
-            false
-          }
-        }
-      }
-      case _ => false
-    }
+  def persistRecords(ruleStep: ConcreteRuleStep, persistFactory: PersistFactory): Boolean = {
+//    val curTime = new Date().getTime
+//    ruleStep match {
+//      case SparkSqlStep(name, _, _, RecordPersistType) => {
+//        try {
+//          val pdf = sqlContext.table(s"`${name}`")
+//          val records = pdf.toJSON
+//
+//          persist.persistRecords(records, name)
+//
+//          val recordLog = s"[ ${name} ] persist records"
+//          persist.log(curTime, recordLog)
+//
+//          true
+//        } catch {
+//          case e: Throwable => {
+//            error(s"persist result ${name} error: ${e.getMessage}")
+//            false
+//          }
+//        }
+//      }
+//      case _ => false
+//    }
+    true
   }
 
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[String, Any] = {
+  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
     val emptyMap = Map[String, Any]()
     ruleStep match {
       case SparkSqlStep(name, _, _, MetricPersistType) => {
@@ -87,35 +89,66 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
           val pdf = sqlContext.table(s"`${name}`")
           val records = pdf.toJSON.collect()
 
-          if (ruleStep.isGroupMetric) {
-            val arr = records.flatMap { rec =>
-              try {
-                Some(JsonUtil.toAnyMap(rec))
-              } catch {
-                case e: Throwable => None
-              }
-            }
-            Map[String, Any]((name -> arr))
-          } else {
-            records.headOption match {
-              case Some(head) => {
-                try {
-                  JsonUtil.toAnyMap(head)
-                } catch {
-                  case e: Throwable => emptyMap
+          val pairs = records.flatMap { rec =>
+            try {
+              val value = JsonUtil.toAnyMap(rec)
+              value.get(GroupByColumn.tmst) match {
+                case Some(t) => {
+                  val key = t.toString.toLong
+                  Some((key, value))
                 }
+                case _ => None
               }
-              case _ => emptyMap
+            } catch {
+              case e: Throwable => None
             }
           }
+          val groupedPairs = pairs.foldLeft(Map[Long, Seq[Map[String, Any]]]()) { (ret, pair) =>
+            val (k, v) = pair
+            ret.get(k) match {
+              case Some(seq) => ret + (k -> (seq :+ v))
+              case _ => ret + (k -> (v :: Nil))
+            }
+          }
+          groupedPairs.mapValues { vs =>
+            if (vs.size > 1) {
+              Map[String, Any]((name -> vs))
+            } else {
+              vs.headOption.getOrElse(emptyMap)
+            }
+          }
+
+//          if (ruleStep.isGroupMetric) {
+//            val arr = records.flatMap { rec =>
+//              try {
+//                Some(JsonUtil.toAnyMap(rec))
+//              } catch {
+//                case e: Throwable => None
+//              }
+//            }
+//            Map[String, Any]((name -> arr))
+//          } else {
+//            records.headOption match {
+//              case Some(head) => {
+//                try {
+//                  JsonUtil.toAnyMap(head)
+//                } catch {
+//                  case e: Throwable => emptyMap
+//                }
+//              }
+//              case _ => emptyMap
+//            }
+//          }
         } catch {
           case e: Throwable => {
             error(s"persist result ${name} error: ${e.getMessage}")
-            emptyMap
+//            emptyMap
+            Map[Long, Map[String, Any]]()
           }
         }
       }
-      case _ => emptyMap
+//      case _ => emptyMap
+      case _ => Map[Long, Map[String, Any]]()
     }
   }
 

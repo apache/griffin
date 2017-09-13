@@ -84,7 +84,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dataSources.foreach(_.init)
 
     // init data sources
-    dqEngines.loadData(dataSources)
+    dqEngines.loadData(dataSources, startTime)
 
     // generate rule steps
     val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam, BatchProcessType)
@@ -93,7 +93,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dqEngines.runRuleSteps(ruleSteps)
 
     // persist results
-    dqEngines.persistAllResults(ruleSteps, persist)
+    dqEngines.persistAllResults(ruleSteps, persistFactory)
 
     // end time
     val endTime = new Date().getTime

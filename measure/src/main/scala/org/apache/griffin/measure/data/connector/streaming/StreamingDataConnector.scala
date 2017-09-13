@@ -36,7 +36,7 @@ trait StreamingDataConnector extends DataConnector {
 
   def transform(rdd: RDD[(K, V)]): Option[DataFrame]
 
-  def data(): Option[DataFrame] = None
+  def data(ms: Long): Option[DataFrame] = None
 
   var dataSourceCacheOpt: Option[DataSourceCache] = None
 

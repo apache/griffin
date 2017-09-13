@@ -53,7 +53,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
         TimeInfoCache.startTimeInfoCache
 
         // init data sources
-        dqEngines.loadData(dataSources)
+        dqEngines.loadData(dataSources, st)
 
         // generate rule steps
         val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(evaluateRuleParam, StreamingProcessType)
@@ -65,7 +65,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
         appPersist.log(ct, s"calculation using time: ${ct - st} ms")
 
         // persist results
-        dqEngines.persistAllResults(ruleSteps, appPersist)
+        dqEngines.persistAllResults(ruleSteps, persistFactory)
 
         TimeInfoCache.endTimeInfoCache
 

@@ -19,9 +19,10 @@ under the License.
 package org.apache.griffin.measure.process.engine
 
 import org.apache.griffin.measure.config.params.user.DataSourceParam
+import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.persist.Persist
+import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 
@@ -29,12 +30,12 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
-  def loadData(dataSources: Seq[DataSource]): Unit = {
+  def loadData(dataSources: Seq[DataSource], ms: Long): Unit = {
 //    val dataSources = dataSourceParams.flatMap { param =>
 //      genDataSource(param)
 //    }
     dataSources.foreach { ds =>
-      ds.loadData
+      ds.loadData(ms)
     }
   }
 
@@ -44,7 +45,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     }
   }
 
-  def persistAllResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist): Unit = {
+  def persistAllResults(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory): Unit = {
     // 1. group by same persist types
     val groupedRuleSteps = ruleSteps.groupBy(_.persistType)
 
@@ -56,12 +57,28 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
       }
       prstType match {
         case MetricPersistType => {
-          val metrics = steps.foldLeft(Map[String, Any]())(_ ++ collectMetrics(_))
-          persist.persistMetrics(metrics)
+//          val metrics = steps.foldLeft(Map[String, Any]())(_ ++ collectMetrics(_))
+          val metrics: Map[Long, Map[String, Any]] = {
+            steps.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
+              val metrics = collectMetrics(step)
+              metrics.foldLeft(ret) { (total, pair) =>
+                val (k, v) = pair
+                ret.get(k) match {
+                  case Some(map) => ret + (k -> (map ++ v))
+                  case _ => ret + pair
+                }
+              }
+            }
+          }
+          metrics.foreach { pair =>
+            val (t, metric) = pair
+            val persist = persistFactory.getPersists(t)
+            persist.persistMetrics(metric)
+          }
         }
         case RecordPersistType => {
           steps.foreach { ruleStep =>
-            persistRecords(ruleStep, persist)
+            persistRecords(ruleStep, persistFactory)
           }
         }
         case _ => {
@@ -87,19 +104,31 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     ret
   }
 
-  def persistRecords(ruleStep: ConcreteRuleStep, persist: Persist): Boolean = {
+  def persistRecords(ruleStep: ConcreteRuleStep, persistFactory: PersistFactory): Boolean = {
     val ret = engines.foldLeft(false) { (done, engine) =>
-      done || engine.persistRecords(ruleStep, persist)
+      done || engine.persistRecords(ruleStep, persistFactory)
     }
     if (!ret) error(s"persist result warn: no dq engine support ${ruleStep}")
     ret
   }
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[String, Any] = {
-    val ret = engines.foldLeft(Map[String, Any]()) { (ret, engine) =>
+  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
+    val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
       ret ++ engine.collectMetrics(ruleStep)
     }
-    if (ret.isEmpty) error(s"collect metrics warn: no metrics collected for ${ruleStep}")
+    if (ret.isEmpty) warn(s"collect metrics warn: no metrics collected for ${ruleStep}")
     ret
+//    val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
+//      val metrics: Map[Long, Map[String, Any]] = engine.collectMetrics(ruleStep)
+//      metrics.foldLeft(ret) { (total, pair) =>
+//        val (k, v) = pair
+//        ret.get(k) match {
+//          case Some(map) => ret + (k -> (map ++ v))
+//          case _ => ret + pair
+//        }
+//      }
+//    }
+//    if (ret.isEmpty) error(s"collect metrics warn: no metrics collected for ${ruleStep}")
+//    ret
   }
 
 //  def persistResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist, persistType: PersistType): Boolean = {

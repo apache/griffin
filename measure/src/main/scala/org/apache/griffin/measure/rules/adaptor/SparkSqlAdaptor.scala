@@ -18,8 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.rules.adaptor
 
-import org.apache.griffin.measure.algo.ProcessType
-import org.apache.griffin.measure.rules.dsl.PersistType
+import org.apache.griffin.measure.algo._
+import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.rules.step._
 
 case class SparkSqlAdaptor(processType: ProcessType) extends RuleAdaptor {
@@ -29,7 +29,17 @@ case class SparkSqlAdaptor(processType: ProcessType) extends RuleAdaptor {
   }
   def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
     ruleStep match {
-      case rs @ SparkSqlStep(_, _, _, _) => rs :: Nil
+      case rs @ SparkSqlStep(name, rule, details, persistType) => {
+        processType match {
+          case BatchProcessType => rs :: Nil
+          case StreamingProcessType => {
+            val repSel = rule.replaceFirst("(?i)select", s"SELECT `${GroupByColumn.tmst}`,")
+            val groupbyRule = repSel.concat(s" GROUP BY `${GroupByColumn.tmst}`")
+            val nrs = SparkSqlStep(name, groupbyRule, details, persistType)
+            nrs :: Nil
+          }
+        }
+      }
       case _ => Nil
     }
   }

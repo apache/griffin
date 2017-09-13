@@ -21,7 +21,7 @@ package org.apache.griffin.measure.process.engine
 import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.persist.Persist
+import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 import org.apache.spark.sql.DataFrame
@@ -34,7 +34,7 @@ trait DqEngine extends Loggable with Serializable {
 
 //  def persistResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist, persistType: PersistType): Boolean
 
-  def persistRecords(ruleStep: ConcreteRuleStep, persist: Persist): Boolean
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[String, Any]
+  def persistRecords(ruleStep: ConcreteRuleStep, persistFactory: PersistFactory): Boolean
+  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]]
 
 }

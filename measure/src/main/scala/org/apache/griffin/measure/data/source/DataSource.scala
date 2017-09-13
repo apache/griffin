@@ -38,8 +38,8 @@ case class DataSource(name: String,
     dataConnectors.foreach(_.init)
   }
 
-  def loadData(): Unit = {
-    data match {
+  def loadData(ms: Long): Unit = {
+    data(ms) match {
       case Some(df) => {
         df.registerTempTable(name)
       }
@@ -49,9 +49,9 @@ case class DataSource(name: String,
     }
   }
 
-  private def data(): Option[DataFrame] = {
+  private def data(ms: Long): Option[DataFrame] = {
     val batchDataFrameOpt = batchDataConnectors.flatMap { dc =>
-      dc.data
+      dc.data(ms)
     }.reduceOption(_ unionAll _)
 
     val cacheDataFrameOpt = dataSourceCacheOpt.flatMap(_.readData())

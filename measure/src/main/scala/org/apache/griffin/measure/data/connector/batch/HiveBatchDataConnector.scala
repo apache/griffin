@@ -50,10 +50,12 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
   val concreteTableName = s"${database}.${tableName}"
   val partitions = partitionsString.split(";").map(s => s.split(",").map(_.trim))
 
-  def data(): Option[DataFrame] = {
+  def data(ms: Long): Option[DataFrame] = {
     try {
       val df = sqlContext.sql(dataSql)
-      Some(df)
+      val dfOpt = Some(df)
+      val preDfOpt = preProcess(dfOpt, ms)
+      preDfOpt
     } catch {
       case e: Throwable => {
         error(s"load hive table ${concreteTableName} fails")

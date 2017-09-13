@@ -51,10 +51,12 @@ case class AvroBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
     HdfsUtil.existPath(concreteFileFullPath)
   }
 
-  def data(): Option[DataFrame] = {
+  def data(ms: Long): Option[DataFrame] = {
     try {
       val df = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
-      Some(df)
+      val dfOpt = Some(df)
+      val preDfOpt = preProcess(dfOpt, ms)
+      preDfOpt
     } catch {
       case e: Throwable => {
         error(s"load avro file ${concreteFileFullPath} fails")

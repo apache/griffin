@@ -23,16 +23,20 @@ object PreProcRuleGenerator {
   val _name = "name"
 
   def genPreProcRules(rules: Seq[Map[String, Any]], suffix: String): Seq[Map[String, Any]] = {
-    rules.map { rule =>
-      genPreProcRule(rule, suffix)
+    if (rules == null) Nil else {
+      rules.map { rule =>
+        genPreProcRule(rule, suffix)
+      }
     }
   }
 
   def getRuleNames(rules: Seq[Map[String, Any]]): Seq[String] = {
-    rules.flatMap { rule =>
-      rule.get(_name) match {
-        case Some(s: String) => Some(s)
-        case _ => None
+    if (rules == null) Nil else {
+      rules.flatMap { rule =>
+        rule.get(_name) match {
+          case Some(s: String) => Some(s)
+          case _ => None
+        }
       }
     }
   }

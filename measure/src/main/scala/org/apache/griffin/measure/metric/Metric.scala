@@ -16,20 +16,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rules.step
+package org.apache.griffin.measure.metric
 
-import org.apache.griffin.measure.rules.dsl._
-
-trait ConcreteRuleStep extends RuleStep {
-
-  val persistType: PersistType
-
-//  def isGroupMetric: Boolean = {
-//    val _GroupMetric = "group.metric"
-//    details.get(_GroupMetric) match {
-//      case Some(b: Boolean) => b
-//      case _ => false
-//    }
-//  }
+case class Metric(value: Map[String, Any]) extends Serializable {
 
 }
