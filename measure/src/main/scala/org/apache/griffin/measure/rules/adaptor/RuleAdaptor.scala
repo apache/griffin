@@ -30,16 +30,18 @@ import org.apache.griffin.measure.rules.dsl.{DslType, PersistType}
 
 trait RuleAdaptor extends Loggable with Serializable {
 
-  val processType: ProcessType
+  val adaptPhase: AdaptPhase
 
   val _name = "name"
   val _rule = "rule"
   val _persistType = "persist.type"
+  val _updateDataSource = "update.data.source"
   val _details = "details"
 
   protected def getName(param: Map[String, Any]) = param.getOrElse(_name, RuleStepNameGenerator.genName).toString
   protected def getRule(param: Map[String, Any]) = param.getOrElse(_rule, "").toString
   protected def getPersistType(param: Map[String, Any]) = PersistType(param.getOrElse(_persistType, "").toString)
+  protected def getUpdateDataSource(param: Map[String, Any]) = param.get(_updateDataSource).map(_.toString)
   protected def getDetails(param: Map[String, Any]) = param.get(_details) match {
     case Some(dt: Map[String, Any]) => dt
     case _ => Map[String, Any]()

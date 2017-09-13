@@ -138,6 +138,37 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     }
   }
 
+  def updateOldData(t: Long, oldData: Iterable[Map[String, Any]]): Unit = {
+    // fixme
+    // parallel process different time groups, lock is unnecessary
+//    val ptns = getPartition(t)
+//    val ptnsPath = genPartitionHdfsPath(ptns)
+//    val dirPath = s"${filePath}/${ptnsPath}"
+//    val dataFileName = s"${t}"
+//    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+//
+//    try {
+//      // remove out time old data
+//      HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
+//
+//      // save updated old data
+//      if (oldData.size > 0) {
+//        val recordDatas = oldData.flatMap { dt =>
+//          encode(dt, t)
+//        }
+//        val dumped = HdfsFileDumpUtil.dump(dataFilePath, recordDatas, rowSepLiteral)
+//      }
+//    } catch {
+//      case e: Throwable => error(s"update old data error: ${e.getMessage}")
+//    }
+  }
+
+  override protected def genCleanTime(ms: Long): Long = {
+    val minPartitionUnit = partitionUnits.last
+    val t1 = TimeUtil.timeToUnit(ms, minPartitionUnit)
+    val t2 = TimeUtil.timeFromUnit(t1, minPartitionUnit)
+    t2
+  }
 
   private def getPartition(ms: Long): List[Long] = {
     partitionUnits.map { unit =>

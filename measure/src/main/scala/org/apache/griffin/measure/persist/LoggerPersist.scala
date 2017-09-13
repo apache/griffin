@@ -116,6 +116,7 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
   }
 
   def persistRecords(records: RDD[String], name: String): Unit = {
+    println(s"${name} [${timeStamp}] records: ")
     try {
       val recordCount = records.count.toInt
       val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)

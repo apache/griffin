@@ -20,7 +20,8 @@ package org.apache.griffin.measure.rules.step
 
 import org.apache.griffin.measure.rules.dsl._
 
-case class GriffinDslStep(name: String, rule: String, dqType: DqType, details: Map[String, Any]) extends RuleStep {
+case class GriffinDslStep(name: String, rule: String, dqType: DqType, details: Map[String, Any]
+                         ) extends RuleStep {
 
   val dslType: DslType = GriffinDslType
 

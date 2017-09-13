@@ -22,20 +22,21 @@ import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.rules.step._
 
-case class SparkSqlAdaptor(processType: ProcessType) extends RuleAdaptor {
+case class SparkSqlAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
 
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
-    SparkSqlStep(getName(param), getRule(param), getDetails(param), getPersistType(param)) :: Nil
+    SparkSqlStep(getName(param), getRule(param), getDetails(param),
+      getPersistType(param), getUpdateDataSource(param)) :: Nil
   }
   def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
     ruleStep match {
-      case rs @ SparkSqlStep(name, rule, details, persistType) => {
-        processType match {
-          case BatchProcessType => rs :: Nil
-          case StreamingProcessType => {
-            val repSel = rule.replaceFirst("(?i)select", s"SELECT `${GroupByColumn.tmst}`,")
+      case rs @ SparkSqlStep(name, rule, details, persistType, udsOpt) => {
+        adaptPhase match {
+          case PreProcPhase => rs :: Nil
+          case RunPhase => {
+            val repSel = rule.replaceFirst("(?i)select", s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,")
             val groupbyRule = repSel.concat(s" GROUP BY `${GroupByColumn.tmst}`")
-            val nrs = SparkSqlStep(name, groupbyRule, details, persistType)
+            val nrs = SparkSqlStep(name, groupbyRule, details, persistType, udsOpt)
             nrs :: Nil
           }
         }

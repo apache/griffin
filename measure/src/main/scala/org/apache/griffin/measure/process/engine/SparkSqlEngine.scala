@@ -40,7 +40,7 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
-      case SparkSqlStep(name, rule, _, _) => {
+      case SparkSqlStep(name, rule, _, _, _) => {
         try {
           val rdf = sqlContext.sql(rule)
           rdf.registerTempTable(name)
@@ -87,7 +87,7 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
 
   def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, RDD[String]] = {
     ruleStep match {
-      case SparkSqlStep(name, _, _, RecordPersistType) => {
+      case SparkSqlStep(name, _, _, RecordPersistType, _) => {
         try {
           val pdf = sqlContext.table(s"`${name}`")
           timeGroups.flatMap { timeGroup =>
@@ -112,7 +112,7 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
     val emptyMap = Map[String, Any]()
     ruleStep match {
-      case SparkSqlStep(name, _, _, MetricPersistType) => {
+      case SparkSqlStep(name, _, _, MetricPersistType, _) => {
         try {
           val pdf = sqlContext.table(s"`${name}`")
           val records = pdf.toJSON.collect()

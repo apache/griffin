@@ -28,14 +28,16 @@ import org.apache.griffin.measure.rules.step._
 
 case class GriffinDslAdaptor(dataSourceNames: Seq[String],
                              functionNames: Seq[String],
-                             processType: ProcessType
+                             adaptPhase: AdaptPhase
                             ) extends RuleAdaptor {
 
   object StepInfo {
     val _Name = "name"
     val _PersistType = "persist.type"
-    def getNameOpt(param: Map[String, Any]): Option[String] = param.get(_Name).flatMap(a => Some(a.toString))
+    val _UpdateDataSource = "update.data.source"
+    def getNameOpt(param: Map[String, Any]): Option[String] = param.get(_Name).map(_.toString)
     def getPersistType(param: Map[String, Any]): PersistType = PersistType(param.getOrElse(_PersistType, "").toString)
+    def getUpdateDataSourceOpt(param: Map[String, Any]): Option[String] = param.get(_UpdateDataSource).map(_.toString)
   }
   object AccuracyInfo {
     val _Source = "source"
@@ -51,7 +53,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val _Profiling = "profiling"
   }
 
-  def getNameOpt(param: Map[String, Any], key: String): Option[String] = param.get(key).flatMap(a => Some(a.toString))
+  def getNameOpt(param: Map[String, Any], key: String): Option[String] = param.get(key).map(_.toString)
   def resultName(param: Map[String, Any], key: String): String = {
     val nameOpt = param.get(key) match {
       case Some(prm: Map[String, Any]) => StepInfo.getNameOpt(prm)
@@ -63,6 +65,12 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     param.get(key) match {
       case Some(prm: Map[String, Any]) => StepInfo.getPersistType(prm)
       case _ => defPersistType
+    }
+  }
+  def resultUpdateDataSourceOpt(param: Map[String, Any], key: String): Option[String] = {
+    param.get(key) match {
+      case Some(prm: Map[String, Any]) => StepInfo.getUpdateDataSourceOpt(prm)
+      case _ => None
     }
   }
 
@@ -182,7 +190,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           missRecordsName,
           missRecordsSql,
           Map[String, Any](),
-          resultPersistType(details, AccuracyInfo._MissRecords, RecordPersistType)
+          resultPersistType(details, AccuracyInfo._MissRecords, RecordPersistType),
+          resultUpdateDataSourceOpt(details, AccuracyInfo._MissRecords)
         )
 
         // 2. miss count
@@ -197,13 +206,14 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 //          }
 //        }
         val missSql = {
-          s"SELECT `${GroupByColumn.tmst}`, COUNT(*) AS `${missColName}` FROM `${missRecordsName}` GROUP BY `${GroupByColumn.tmst}`"
+          s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`, COUNT(*) AS `${missColName}` FROM `${missRecordsName}` GROUP BY `${GroupByColumn.tmst}`"
         }
         val missStep = SparkSqlStep(
           missTableName,
           missSql,
           Map[String, Any](),
-          NonePersistType
+          NonePersistType,
+          None
         )
 
         // 3. total count
@@ -218,13 +228,14 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 //          }
 //        }
         val totalSql = {
-          s"SELECT `${GroupByColumn.tmst}`, COUNT(*) AS `${totalColName}` FROM `${sourceName}` GROUP BY `${GroupByColumn.tmst}`"
+          s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`, COUNT(*) AS `${totalColName}` FROM `${sourceName}` GROUP BY `${GroupByColumn.tmst}`"
         }
         val totalStep = SparkSqlStep(
           totalTableName,
           totalSql,
           Map[String, Any](),
-          NonePersistType
+          NonePersistType,
+          None
         )
 
         // 4. accuracy metric
@@ -276,7 +287,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           accuracyMetricSql,
           details,
 //          resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType)
-          NonePersistType
+          NonePersistType,
+          None
         )
 
         // 5. accuracy metric filter
@@ -290,7 +302,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
             ("matched" -> matchedColName),
             ("tmst" -> GroupByColumn.tmst)
           ),
-          resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType)
+          resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType),
+          None
         )
 
         missRecordsStep :: missStep :: totalStep :: accuracyMetricStep :: accuracyStep :: Nil
@@ -330,7 +343,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           profilingMetricName,
           profilingSql,
           details,
-          resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType)
+          resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType),
+          None
         )
 
         profilingStep :: Nil

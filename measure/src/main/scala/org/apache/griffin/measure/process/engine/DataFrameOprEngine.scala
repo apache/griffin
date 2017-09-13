@@ -43,7 +43,7 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
-      case DfOprStep(name, rule, details, _) => {
+      case DfOprStep(name, rule, details, _, _) => {
         try {
           rule match {
             case DataFrameOprs._fromJson => {
@@ -98,7 +98,7 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
 
   def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, RDD[String]] = {
     ruleStep match {
-      case DfOprStep(name, _, _, RecordPersistType) => {
+      case DfOprStep(name, _, _, RecordPersistType, _) => {
         try {
           val pdf = sqlContext.table(s"`${name}`")
           timeGroups.flatMap { timeGroup =>
@@ -123,7 +123,7 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
     val emptyMap = Map[String, Any]()
     ruleStep match {
-      case DfOprStep(name, _, _, MetricPersistType) => {
+      case DfOprStep(name, _, _, MetricPersistType, _) => {
         try {
           val pdf = sqlContext.table(s"`${name}`")
           val records = pdf.toJSON.collect()
@@ -255,7 +255,6 @@ object DataFrameOprs {
     }
 
     val df = sqlContext.table(s"`${dfName}`")
-    df.show(10)
     val results = df.flatMap { row =>
       val t = getLong(row, tmst)
       if (t > 0) {

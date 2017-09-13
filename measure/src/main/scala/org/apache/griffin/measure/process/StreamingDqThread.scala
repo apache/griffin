@@ -29,7 +29,7 @@ import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
-import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
+import org.apache.griffin.measure.rules.adaptor.{RuleAdaptorGroup, RunPhase}
 
 case class StreamingDqThread(dqEngines: DqEngines,
                              dataSources: Seq[DataSource],
@@ -57,7 +57,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
         dqEngines.loadData(dataSources, st)
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(evaluateRuleParam, StreamingProcessType)
+        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(evaluateRuleParam, RunPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
@@ -65,8 +65,10 @@ case class StreamingDqThread(dqEngines: DqEngines,
         val ct = new Date().getTime
         appPersist.log(ct, s"calculation using time: ${ct - st} ms")
 
-        // persist results
-        dqEngines.persistAllResults(ruleSteps, persistFactory)
+        // persist results and cache records
+        val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
+        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
+        dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
 
         TimeInfoCache.endTimeInfoCache
 

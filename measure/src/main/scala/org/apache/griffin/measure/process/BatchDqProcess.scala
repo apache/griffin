@@ -27,7 +27,7 @@ import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
-import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
+import org.apache.griffin.measure.rules.adaptor.{RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rules.udf.GriffinUdfs
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.SQLContext
@@ -87,13 +87,14 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dqEngines.loadData(dataSources, startTime)
 
     // generate rule steps
-    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam, BatchProcessType)
+    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam, RunPhase)
 
     // run rules
     dqEngines.runRuleSteps(ruleSteps)
 
     // persist results
-    dqEngines.persistAllResults(ruleSteps, persistFactory)
+    val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
+    dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
 
     // end time
     val endTime = new Date().getTime

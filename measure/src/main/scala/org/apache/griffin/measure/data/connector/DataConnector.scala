@@ -24,7 +24,7 @@ import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.engine._
-import org.apache.griffin.measure.rules.adaptor.RuleAdaptorGroup
+import org.apache.griffin.measure.rules.adaptor.{PreProcPhase, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.preproc.PreProcRuleGenerator
 import org.apache.spark.rdd.RDD
@@ -64,7 +64,7 @@ trait DataConnector extends Loggable with Serializable {
         df.registerTempTable(thisTable)
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(preProcRules, DslType("spark-sql"), BatchProcessType)
+        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(preProcRules, DslType("spark-sql"), PreProcPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)

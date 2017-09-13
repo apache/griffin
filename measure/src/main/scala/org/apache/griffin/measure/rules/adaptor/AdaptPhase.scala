@@ -16,14 +16,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rules.step
+package org.apache.griffin.measure.rules.adaptor
 
-import org.apache.griffin.measure.rules.dsl._
+sealed trait AdaptPhase {}
 
-case class DfOprStep(name: String, rule: String, details: Map[String, Any],
-                     persistType: PersistType, updateDataSource: Option[String]
-                    ) extends ConcreteRuleStep {
+final case object PreProcPhase extends AdaptPhase {}
 
-  val dslType: DslType = DfOprType
-
-}
+final case object RunPhase extends AdaptPhase {}

@@ -24,6 +24,8 @@ trait ConcreteRuleStep extends RuleStep {
 
   val persistType: PersistType
 
+  val updateDataSource: Option[String]
+
 //  def isGroupMetric: Boolean = {
 //    val _GroupMetric = "group.metric"
 //    details.get(_GroupMetric) match {
