@@ -23,6 +23,7 @@ import java.util.Date
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 import scala.util.Try
 
@@ -196,7 +197,8 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
 
-  def persistRecords(records: RDD[String], name: String): Unit = {
+  def persistRecords(df: DataFrame, name: String): Unit = {
+    val records = df.toJSON
     val path = filePath(name)
     try {
       val recordCount = records.count

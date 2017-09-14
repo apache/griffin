@@ -21,6 +21,7 @@ package org.apache.griffin.measure.persist
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.result._
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 import scala.util.Try
 
@@ -42,7 +43,7 @@ trait Persist extends Loggable with Serializable {
 //  def records(recs: RDD[String], tp: String): Unit
 //  def records(recs: Iterable[String], tp: String): Unit
 
-  def persistRecords(records: RDD[String], name: String): Unit
+  def persistRecords(df: DataFrame, name: String): Unit
 //  def persistMetrics(metrics: Seq[String], name: String): Unit
   def persistMetrics(metrics: Map[String, Any]): Unit
 

@@ -26,6 +26,7 @@ import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
@@ -169,8 +170,8 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 //    if (!ret) error(s"persist result warn: no dq engine support ${ruleStep}")
 //    ret
 //  }
-  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, RDD[String]] = {
-    val ret = engines.foldLeft(Map[Long, RDD[String]]()) { (ret, engine) =>
+  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame] = {
+    val ret = engines.foldLeft(Map[Long, DataFrame]()) { (ret, engine) =>
       ret ++ engine.collectRecords(ruleStep, timeGroups)
     }
 //    if (ret.isEmpty) warn(s"collect records warn: no records collected for ${ruleStep}")

@@ -23,6 +23,7 @@ import java.util.Date
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 // persist result and data to hdfs
 case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
@@ -115,7 +116,8 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
     println(s"[${timeStamp}] ${rt}: ${msg}")
   }
 
-  def persistRecords(records: RDD[String], name: String): Unit = {
+  def persistRecords(df: DataFrame, name: String): Unit = {
+    val records = df.toJSON
     println(s"${name} [${timeStamp}] records: ")
     try {
       val recordCount = records.count.toInt

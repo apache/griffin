@@ -85,15 +85,15 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
 //    }
 //  }
 
-  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, RDD[String]] = {
+  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame] = {
     ruleStep match {
       case SparkSqlStep(name, _, _, RecordPersistType, _) => {
         try {
           val pdf = sqlContext.table(s"`${name}`")
           timeGroups.flatMap { timeGroup =>
             try {
-              val rdd = pdf.filter(s"`${GroupByColumn.tmst}` = ${timeGroup}").toJSON
-              Some((timeGroup, rdd))
+              val tdf = pdf.filter(s"`${GroupByColumn.tmst}` = ${timeGroup}")
+              Some((timeGroup, tdf))
             } catch {
               case e: Throwable => None
             }
@@ -101,11 +101,11 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
         } catch {
           case e: Throwable => {
             error(s"persist result ${name} error: ${e.getMessage}")
-            Map[Long, RDD[String]]()
+            Map[Long, DataFrame]()
           }
         }
       }
-      case _ => Map[Long, RDD[String]]()
+      case _ => Map[Long, DataFrame]()
     }
   }
 
