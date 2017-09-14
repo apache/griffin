@@ -131,36 +131,68 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         Some(sqlContext.read.json(partitionPaths: _*))
       } catch {
         case e: Throwable => {
-          error(s"read data source cache error: ${e.getMessage}")
+          warn(s"read data source cache warn: ${e.getMessage}")
           None
         }
       }
     }
   }
 
-  def updateOldData(t: Long, oldData: Iterable[Map[String, Any]]): Unit = {
-    // fixme
-    // parallel process different time groups, lock is unnecessary
-//    val ptns = getPartition(t)
-//    val ptnsPath = genPartitionHdfsPath(ptns)
-//    val dirPath = s"${filePath}/${ptnsPath}"
-//    val dataFileName = s"${t}"
-//    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
-//
-//    try {
-//      // remove out time old data
-//      HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
-//
-//      // save updated old data
-//      if (oldData.size > 0) {
-//        val recordDatas = oldData.flatMap { dt =>
-//          encode(dt, t)
-//        }
-//        val dumped = HdfsFileDumpUtil.dump(dataFilePath, recordDatas, rowSepLiteral)
-//      }
-//    } catch {
-//      case e: Throwable => error(s"update old data error: ${e.getMessage}")
-//    }
+  def updateData(df: DataFrame, ms: Long): Unit = {
+    val ptns = getPartition(ms)
+    val ptnsPath = genPartitionHdfsPath(ptns)
+    val dirPath = s"${filePath}/${ptnsPath}"
+    val dataFileName = s"${ms}"
+    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+
+    try {
+      val records = df.toJSON
+      val arr = records.collect
+      val needSave = !arr.isEmpty
+
+      // remove out time old data
+      HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
+      println(s"remove file path: ${dirPath}/${dataFileName}")
+
+      // save updated data
+      val dumped = if (needSave) {
+        HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
+        println(s"update file path: ${dataFilePath}")
+      } else false
+    } catch {
+      case e: Throwable => error(s"update data error: ${e.getMessage}")
+    }
+  }
+
+  def cleanOldData(): Unit = {
+    val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
+    if (oldCacheLocked) {
+      try {
+        val cleanTime = readCleanTime()
+        cleanTime match {
+          case Some(ct) => {
+            // drop partitions
+            val bounds = getPartition(ct)
+
+            // list partition paths
+            val earlierPaths = listPathsEarlierThanBounds(filePath :: Nil, bounds)
+
+            // delete out time data path
+            earlierPaths.foreach { path =>
+              println(s"delete hdfs path: ${path}")
+              HdfsUtil.deleteHdfsPath(path)
+            }
+          }
+          case _ => {
+            // do nothing
+          }
+        }
+      } catch {
+        case e: Throwable => error(s"clean old data error: ${e.getMessage}")
+      } finally {
+        oldCacheLock.unlock()
+      }
+    }
   }
 
   override protected def genCleanTime(ms: Long): Long = {

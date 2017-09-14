@@ -32,13 +32,17 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
-  def loadData(dataSources: Seq[DataSource], ms: Long): Unit = {
+  def loadData(dataSources: Seq[DataSource], ms: Long): Map[String, Boolean] = {
 //    val dataSources = dataSourceParams.flatMap { param =>
 //      genDataSource(param)
 //    }
-    dataSources.foreach { ds =>
-      ds.loadData(ms)
-    }
+//    dataSources.foreach { ds =>
+//      ds.loadData(ms)
+//    }
+    dataSources.map { ds =>
+      val load = ds.loadData(ms)
+      (ds.name, load)
+    }.toMap
   }
 
   def runRuleSteps(ruleSteps: Seq[ConcreteRuleStep]): Unit = {
@@ -87,29 +91,26 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   def updateDataSources(ruleSteps: Seq[ConcreteRuleStep], dataSources: Seq[DataSource],
                         timeGroups: Iterable[Long]): Unit = {
-    // fixme
-//    val recordSteps = ruleSteps.filter(_.persistType == RecordPersistType)
-//    recordSteps.foreach { step =>
-//      val name = step.name
-//      val udpateDataSources = dataSources.filter { ds =>
-//        step.updateDataSource match {
-//          case Some(dsName) if (dsName == ds.name) => true
-//          case _ => false
-//        }
-//      }
-//      if (udpateDataSources.size > 0) {
-//        val records = collectRecords(step, timeGroups)
-//
-//        records.foreach { pair =>
-//          val (t, recs) = pair
-//          udpateDataSources.foreach { ds =>
-//            ds.updateData(recs, t)
-//          }
-////          val persist = persistFactory.getPersists(t)
-////          persist.persistRecords(recs, name)
-//        }
-//      }
-//    }
+    val recordSteps = ruleSteps.filter(_.persistType == RecordPersistType)
+    recordSteps.foreach { step =>
+      val name = step.name
+      val udpateDataSources = dataSources.filter { ds =>
+        step.updateDataSource match {
+          case Some(dsName) if (dsName == ds.name) => true
+          case _ => false
+        }
+      }
+      if (udpateDataSources.size > 0) {
+        val records = collectRecords(step, timeGroups)
+
+        records.foreach { pair =>
+          val (t, recs) = pair
+          udpateDataSources.foreach { ds =>
+            ds.updateData(recs, t)
+          }
+        }
+      }
+    }
   }
 
 //  def persistAllResults(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory): Unit = {

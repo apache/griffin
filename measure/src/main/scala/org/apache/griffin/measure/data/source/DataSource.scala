@@ -25,7 +25,8 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
-case class DataSource(name: String,
+case class DataSource(sqlContext: SQLContext,
+                      name: String,
                       dataConnectors: Seq[DataConnector],
                       dataSourceCacheOpt: Option[DataSourceCache]
                      ) extends Loggable with Serializable {
@@ -39,34 +40,59 @@ case class DataSource(name: String,
     dataConnectors.foreach(_.init)
   }
 
-  def loadData(ms: Long): Unit = {
+  def loadData(ms: Long): Boolean = {
     data(ms) match {
       case Some(df) => {
         df.registerTempTable(name)
+        true
       }
       case None => {
-        throw new Exception(s"load data source [${name}] fails")
+//        val df = sqlContext.emptyDataFrame
+//        df.registerTempTable(name)
+        warn(s"load data source [${name}] fails")
+        false
+//        throw new Exception(s"load data source [${name}] fails")
       }
+    }
+  }
+
+  def dropTable(): Unit = {
+    try {
+      sqlContext.dropTempTable(name)
+    } catch {
+      case e: Throwable => warn(s"drop table [${name}] fails")
     }
   }
 
   private def data(ms: Long): Option[DataFrame] = {
     val batchDataFrameOpt = batchDataConnectors.flatMap { dc =>
       dc.data(ms)
-    }.reduceOption(_ unionAll _)
+    }.reduceOption((a, b) => unionDataFrames(a, b))
 
     val cacheDataFrameOpt = dataSourceCacheOpt.flatMap(_.readData())
 
     (batchDataFrameOpt, cacheDataFrameOpt) match {
-      case (Some(bdf), Some(cdf)) => Some(bdf unionAll cdf)
+      case (Some(bdf), Some(cdf)) => Some(unionDataFrames(bdf, cdf))
       case (Some(bdf), _) => Some(bdf)
       case (_, Some(cdf)) => Some(cdf)
       case _ => None
     }
   }
 
-  def updateData(rdd: Option[DataFrame], ms: Long): Unit = {
-    // fixme
+  private def unionDataFrames(df1: DataFrame, df2: DataFrame): DataFrame = {
+    try {
+      df1 unionAll df2
+    } catch {
+      case e: Throwable => df1
+    }
+  }
+
+  def updateData(df: DataFrame, ms: Long): Unit = {
+    dataSourceCacheOpt.foreach(_.updateData(df, ms))
+  }
+
+  def cleanOldData(): Unit = {
+    dataSourceCacheOpt.foreach(_.cleanOldData)
   }
 
 }

@@ -59,7 +59,7 @@ object DataSourceFactory extends Loggable {
     }
     val dataSourceCacheOpt = genDataSourceCache(sqlContext, cacheParam, metricName, index)
 
-    Some(DataSource(name, dataConnectors, dataSourceCacheOpt))
+    Some(DataSource(sqlContext, name, dataConnectors, dataSourceCacheOpt))
   }
 
   private def genDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],

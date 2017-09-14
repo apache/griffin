@@ -52,6 +52,7 @@ case class DataFrameOprEngine(sqlContext: SQLContext, @transient ssc: StreamingC
             }
             case DataFrameOprs._accuracy => {
               val df = DataFrameOprs.accuracy(sqlContext, details)
+              df.show(10)
               df.registerTempTable(name)
             }
             case _ => {

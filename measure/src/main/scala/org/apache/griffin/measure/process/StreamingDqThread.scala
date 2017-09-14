@@ -65,10 +65,12 @@ case class StreamingDqThread(dqEngines: DqEngines,
         val ct = new Date().getTime
         appPersist.log(ct, s"calculation using time: ${ct - st} ms")
 
-        // persist results and cache records
+        // persist results
         val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
-        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
         dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
+
+        // update data source
+        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
 
         TimeInfoCache.endTimeInfoCache
 
@@ -93,8 +95,8 @@ case class StreamingDqThread(dqEngines: DqEngines,
   // clean old data and old result cache
   private def cleanData(): Unit = {
     try {
-//      sourceDataConnector.cleanOldData
-//      targetDataConnector.cleanOldData
+      dataSources.foreach(_.cleanOldData)
+      dataSources.foreach(_.dropTable)
 
       val cleanTime = TimeInfoCache.getCleanTime
       CacheResultProcesser.refresh(cleanTime)
