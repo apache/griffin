@@ -90,12 +90,23 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 //    val recordSteps = ruleSteps.filter(_.persistType == RecordPersistType)
 //    recordSteps.foreach { step =>
 //      val name = step.name
-//      val records = collectRecords(step, timeGroups)
-//      records.foreach { pair =>
-//        val (t, recs) = pair
-//        dataSources
-//        val persist = persistFactory.getPersists(t)
-//        persist.persistRecords(recs, name)
+//      val udpateDataSources = dataSources.filter { ds =>
+//        step.updateDataSource match {
+//          case Some(dsName) if (dsName == ds.name) => true
+//          case _ => false
+//        }
+//      }
+//      if (udpateDataSources.size > 0) {
+//        val records = collectRecords(step, timeGroups)
+//
+//        records.foreach { pair =>
+//          val (t, recs) = pair
+//          udpateDataSources.foreach { ds =>
+//            ds.updateData(recs, t)
+//          }
+////          val persist = persistFactory.getPersists(t)
+////          persist.persistRecords(recs, name)
+//        }
 //      }
 //    }
   }

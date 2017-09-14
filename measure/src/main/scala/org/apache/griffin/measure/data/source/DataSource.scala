@@ -22,6 +22,7 @@ import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
 import org.apache.griffin.measure.log.Loggable
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 case class DataSource(name: String,
@@ -62,6 +63,10 @@ case class DataSource(name: String,
       case (_, Some(cdf)) => Some(cdf)
       case _ => None
     }
+  }
+
+  def updateData(rdd: Option[DataFrame], ms: Long): Unit = {
+    // fixme
   }
 
 }
