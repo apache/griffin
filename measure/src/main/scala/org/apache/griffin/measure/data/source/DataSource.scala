@@ -40,17 +40,15 @@ case class DataSource(sqlContext: SQLContext,
     dataConnectors.foreach(_.init)
   }
 
-  def loadData(ms: Long): Boolean = {
+  def loadData(ms: Long): Unit = {
     data(ms) match {
       case Some(df) => {
         df.registerTempTable(name)
-        true
       }
       case None => {
 //        val df = sqlContext.emptyDataFrame
 //        df.registerTempTable(name)
         warn(s"load data source [${name}] fails")
-        false
 //        throw new Exception(s"load data source [${name}] fails")
       }
     }

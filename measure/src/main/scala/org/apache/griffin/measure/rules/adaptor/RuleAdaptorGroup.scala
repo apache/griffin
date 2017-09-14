@@ -20,6 +20,7 @@ package org.apache.griffin.measure.rules.adaptor
 
 import org.apache.griffin.measure.algo.ProcessType
 import org.apache.griffin.measure.config.params.user._
+import org.apache.griffin.measure.process.check.DataChecker
 import org.apache.griffin.measure.rules.dsl._
 import org.apache.griffin.measure.rules.step._
 import org.apache.spark.sql.SQLContext
@@ -33,10 +34,14 @@ object RuleAdaptorGroup {
   var dataSourceNames: Seq[String] = _
   var functionNames: Seq[String] = _
 
+  var dataChecker: DataChecker = _
+
   def init(sqlContext: SQLContext, dsNames: Seq[String]): Unit = {
     val functions = sqlContext.sql("show functions")
     functionNames = functions.map(_.getString(0)).collect
     dataSourceNames = dsNames
+
+    dataChecker = DataChecker(sqlContext)
   }
 
   private def getDslType(param: Map[String, Any], defDslType: DslType) = {
@@ -72,14 +77,18 @@ object RuleAdaptorGroup {
 //    steps
 //  }
 
-  def genConcreteRuleSteps(evaluateRuleParam: EvaluateRuleParam, adaptPhase: AdaptPhase): Seq[ConcreteRuleStep] = {
+  def genConcreteRuleSteps(evaluateRuleParam: EvaluateRuleParam,
+                           adaptPhase: AdaptPhase
+                          ): Seq[ConcreteRuleStep] = {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
     genConcreteRuleSteps(ruleParams, defaultDslType, adaptPhase)
   }
 
-  def genConcreteRuleSteps(ruleParams: Seq[Map[String, Any]], defDslType: DslType, adaptPhase: AdaptPhase): Seq[ConcreteRuleStep] = {
+  def genConcreteRuleSteps(ruleParams: Seq[Map[String, Any]],
+                           defDslType: DslType, adaptPhase: AdaptPhase
+                          ): Seq[ConcreteRuleStep] = {
     val (steps, dsNames) = ruleParams.foldLeft((Seq[ConcreteRuleStep](), dataSourceNames)) { (res, param) =>
       val (preSteps, preNames) = res
       val dslType = getDslType(param, defDslType)
