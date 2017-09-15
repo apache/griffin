@@ -2,6 +2,8 @@
   "name": "accu-test",
   "type": "accuracy",
 
+  "process.type": "batch",
+
   "source": {
     "type": "hive",
     "version": "1.2",

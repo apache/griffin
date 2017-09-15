@@ -1,0 +1,61 @@
+{
+  "name": "accu2",
+  "type": "accuracy",
+
+  "process.type": "steaming",
+
+  "source": {
+    "type": "kafka",
+    "version": "0.8",
+    "config": {
+      "kafka.config": {
+        "bootstrap.servers": "a.b.c.d:9092",
+        "group.id": "group1",
+        "auto.offset.reset": "smallest",
+        "auto.commit.enable": "false",
+      },
+      "topics": "src",
+      "key.type": "java.lang.String",
+      "value.type": "java.lang.String",
+      "cache": {
+        "type": "df",
+        "config": {
+          "table.name": "source",
+          "info.path": "src",
+          "ready.time.interval": "1m",
+          "ready.time.delay": "1m"
+        }
+      }
+    }
+  },
+
+  "target": {
+    "type": "kafka",
+    "version": "0.8",
+    "config": {
+      "kafka.config": {
+        "bootstrap.servers": "a.b.c.d:9092",
+        "group.id": "group1",
+        "auto.offset.reset": "smallest",
+        "auto.commit.enable": "false",
+      },
+      "topics": "tgt",
+      "key.type": "java.lang.String",
+      "value.type": "java.lang.String",
+      "cache": {
+        "type": "hive",
+        "version": 1.2,
+        "config": {
+          "database": "default",
+          "table.name": "target_table",
+          "info.path": "tgt"
+        }
+      }
+    }
+  },
+
+  "evaluateRule": {
+    "sampleRatio": 0.2,
+    "rules": "$source.json().seeds[*].json().url = $target.json().groups[0].attrsList['name' = 'URL'].values[0] AND $source.json().seeds[*].json().metadata.json().tracker.crawlRequestCreateTS = $target.json().groups[0].attrsList['name' = 'CRAWLMETADATA'].values[0].json().tracker.crawlRequestCreateTS WHEN $source._timestamp_ + 24h < $target._timestamp_"
+  }
+}

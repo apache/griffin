@@ -1,18 +1,21 @@
-/*-
- * Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
- */
-
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 define(['./module'], function (controllers) {
     'use strict';
     controllers.controller('RuleCtrl', ['$scope', '$http', '$config', '$location', '$timeout', '$route', 'toaster', '$filter', function ($scope, $http, $config, $location, $timeout, $route, toaster, $filter) {
@@ -38,9 +41,10 @@ define(['./module'], function (controllers) {
 
         if(start == 0 && !$scope.rowCollection){
          $http.get(allModels).then(function successCallback(data) {
-           data.data.sort(function(a,b){
-             return -(a.createDate - b.createDate);
-           });
+           // data.data.sort(function(a,b){
+           //   return -(a.createDate - b.createDate);
+           // });
+           data.data.reverse();
            originalRowCollection = angular.copy(data.data);
            $scope.rowCollection = angular.copy(data.data);
 
@@ -96,7 +100,7 @@ define(['./module'], function (controllers) {
 
 
       $scope.remove = function remove(row) {
-        var getModelUrl = $config.uri.getModel + '/' +row.name;
+        var getModelUrl = $config.uri.getModel + '/' +row.id;
         $http.get(getModelUrl).then(function successCallback(data){
   			  $scope.deletedRow = data.data;
               $scope.sourceTable = $scope.deletedRow.source.config["table.name"];
@@ -109,16 +113,16 @@ define(['./module'], function (controllers) {
 
       $scope.confirmDelete = function(){
         var row =   $scope.deletedBriefRow;
-        var deleteModelUrl = $config.uri.deleteModel + '/' + row.name;
+        var deleteModelUrl = $config.uri.deleteModel + '/' + row.id;
         $http.delete(deleteModelUrl).then(function successCallback(data){
-          if(data.data=="DELETE_MEASURE_BY_NAME_SUCCESS"){
+          if(data.data.description=="Delete Measures By Name Succeed"){
               var index = $scope.rowCollection.indexOf(row);
               $scope.rowCollection.splice(index, 1);
               index = $scope.displayed.indexOf(row);
               $scope.displayed.splice(index, 1);
           }
           else {
-              toaster.pop('error', 'Error when deleting measure', data.data);
+              toaster.pop('error', 'Error when deleting measure', data.data.description);
           }
           $('#deleteConfirmation').modal('hide');
 
@@ -127,16 +131,12 @@ define(['./module'], function (controllers) {
         });
       }
 
-
-
       $scope.edit = function edit() {
       }
-
 
       $scope.$on('$viewContentLoaded', function() {
         $scope.$emit('initReq');
       });
-
 
 /*
        function createRowCollection(){

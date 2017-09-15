@@ -1,17 +1,20 @@
 <!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
 
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
 -->
 
 <div class="container-fluid" id="viewJobContent" style="overflow:auto;">
@@ -24,7 +27,7 @@ limitations under the License.
             <div id="viewrule-definition" class="viewrule-content">
                 <div class="row">
                     <label class="col-md-4 col-lg-4 col-sm-4">
-                        Source Partition:
+                        Source Pattern:
                     </label>
 
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
@@ -34,7 +37,7 @@ limitations under the License.
 
                 <div class="row">
                     <label class="col-md-4 col-lg-4 col-sm-4">
-                        Target Partition:
+                        Target Pattern:
                     </label>
 
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
@@ -48,17 +51,17 @@ limitations under the License.
                     </label>
 
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                        {{Measures[measure]}}
+                        {{Measures[measure].name}}
                     </div>
                 </div>
 
                 <div class="row">
                     <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                        Start after:
+                        Start at:
                     </label>
 
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                        {{jobStartTime}}
+                        {{jobStartTime}}&nbsp; {{timeDetail}}
                     </div>
                 </div>
 
@@ -67,7 +70,7 @@ limitations under the License.
                         Interval:
                     </label>
 
-                    <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff"  >{{periodTime}}
+                    <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff"  >{{periodTime}}&nbsp;{{timeType}}
 
                     </div>
                 </div>

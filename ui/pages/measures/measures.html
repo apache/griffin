@@ -1,17 +1,20 @@
 <!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
 
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
 -->
 <div >
     <p>
@@ -43,7 +46,7 @@ limitations under the License.
                 <td colspan="7" style="text-align:center">No content!</td>
             </tr>
             <tr ng-repeat="row in displayed">
-                <td><a href="#!/viewrule/{{row.name}}">{{row.name}}</a></td>
+                <td><a href="#!/viewrule/{{row.id}}">{{row.name}}</a></td>
                 <!--<td>{{row.system|strmap:'modelsystem'}}</td>-->
                 <td>{{row.type|strmap:'modeltype'}}</td>
                 <td>{{row.description}}</td>
@@ -52,11 +55,11 @@ limitations under the License.
                 <td>{{row.organization}}</td>
                 <td>
                     &nbsp;
-                    <a ng-class="" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
+                    <a ng-class="(!adminAccess && ntAccount!=row.owner)?'disabled':''" href="" ng-click="remove(row)" title="delete" style="text-decoration:none">
                         <i class="fa fa-trash-o"></i>
                     </a>
                     &nbsp;
-                    <a href="#!/viewrule/{{row.name}}" title="subscribe">
+                    <a href="#!/viewrule/{{row.id}}" title="subscribe">
                         <i class="fa fa-eye"></i>
                     </a>
                 </td>
@@ -93,8 +96,9 @@ limitations under the License.
                     <ng-include src="'/pages/measures/delete-confirm.html'"/>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" ng-click="confirmDelete()">Yes</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <p style="text-align: left;color: white;font-size: 150%;">If you delete this measure, your running jobs on this measure will also be deleted, please be careful!</p>
+                    <button type="button" class="btn btn-default" ng-click="confirmDelete()">Yes</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
                 </div>
             </div>
         </div>

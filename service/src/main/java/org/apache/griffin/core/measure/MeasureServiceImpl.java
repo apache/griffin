@@ -1,108 +1,111 @@
-/*-
- * Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
- */
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 
 package org.apache.griffin.core.measure;
 
 
+import org.apache.griffin.core.job.JobServiceImpl;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
-public class MeasureServiceImpl implements MeasureService{
-    private static final Logger log = LoggerFactory.getLogger(MeasureServiceImpl.class);
+public class MeasureServiceImpl implements MeasureService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeasureServiceImpl.class);
 
     @Autowired
-    MeasureRepo measureRepo;
-
-    public Iterable<Measure> getAllMeasures() {
-        return measureRepo.findAll();
+    JobServiceImpl jobService;
+    @Autowired
+    private MeasureRepo measureRepo;
+    @Autowired
+    private SchedulerFactoryBean factory;
+    @Override
+    public Iterable<Measure> getAllAliveMeasures() {
+        return measureRepo.findByDeleted(false);
     }
 
-    public Measure getMeasuresById(@PathVariable("id") long id) {
+    @Override
+    public Measure getMeasureById(@PathVariable("id") long id) {
         return measureRepo.findOne(id);
     }
 
-    public Measure getMeasuresByName(@PathVariable("measureName") String measureName) {
-        return measureRepo.findByName(measureName);
-    }
-
-    public void deleteMeasuresById(@PathVariable("MeasureId") Long MeasureId) { measureRepo.delete(MeasureId);}
 
 
-    public GriffinOperationMessage deleteMeasuresByName(@PathVariable("measureName") String measureName) {
-        Measure temp_mesaure=measureRepo.findByName(measureName);
-        if(temp_mesaure==null){
+
+    @Override
+    public GriffinOperationMessage deleteMeasureById(Long measureId) {
+        if (measureRepo.exists(measureId) == false) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        }
-        else{
-            measureRepo.delete(temp_mesaure.getId());
-            return GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS;
+        } else {
+            //pause all jobs related to the measure
+            Measure measure = measureRepo.findOne(measureId);
+            jobService.deleteJobsRelateToMeasure(measure);
+            measure.setDeleted(true);
+            measureRepo.save(measure);
+            return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
         }
     }
 
-    public GriffinOperationMessage createNewMeasure(@RequestBody Measure measure) {
-        String name=measure.getName();
-        Measure temp_mesaure=measureRepo.findByName(name);
-        if (temp_mesaure==null){
-            if (measureRepo.save(measure)!=null)
+
+    @Override
+    public GriffinOperationMessage createMeasure(Measure measure) {
+        List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
+        if (aliveMeasureList.size() == 0) {
+            if (measureRepo.save(measure) != null)
                 return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
-            else{
+            else {
                 return GriffinOperationMessage.CREATE_MEASURE_FAIL;
             }
-        } else{
-            log.info("Failed to create new measure "+name+", it already exists");
+        } else {
+            LOGGER.warn("Failed to create new measure " + measure.getName() + ", it already exists");
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
     }
 
-    public List<String> getAllMeasureNameByOwner(String owner){
-        List<String> res=new ArrayList<String>();
-        for (Measure measure:measureRepo.findAll()){
-            if(measure.getOwner().equals(owner)){
-                res.add(measure.getName());
-            }
+    @Override
+    public List<Map<String, String>> getAllAliveMeasureNameIdByOwner(String owner) {
+        List<Map<String, String>> res = new ArrayList<>();
+        for(Measure measure: measureRepo.findByOwnerAndDeleted(owner, false)){
+            HashMap<String, String> map = new HashMap<>();
+            map.put("name", measure.getName());
+            map.put("id", measure.getId().toString());
+            res.add(map);
         }
         return res;
     }
 
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
-//        Long measureId=measure.getId();
-//        if (measureRepo.findOne(measureId)==null){
-//            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-//        }else{
-//            measureRepo.updateMeasure(measureId,measure.getDescription(),measure.getOrganization(),measure.getSource(),measure.getTarget(),measure.getEvaluateRule());
-////            System.out.print(res);
-//            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
-//        }
-        String name=measure.getName();
-        Measure temp_mesaure=measureRepo.findByName(name);
-        if (temp_mesaure==null){
+        if (measureRepo.exists(measure.getId()) == false) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        }else{
-            //in this way, id will changed
-            //TODO, FRONTEND ID?
-            measureRepo.delete(temp_mesaure.getId());
+        } else {
             measureRepo.save(measure);
             return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
         }
