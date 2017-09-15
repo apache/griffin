@@ -77,7 +77,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     persist.start(applicationId)
 
     // get dq engines
-    val dqEngines = DqEngineFactory.genDqEngines(sqlContext, null)
+    val dqEngines = DqEngineFactory.genDqEngines(sqlContext)
 
     // generate data sources
     val dataSources = DataSourceFactory.genDataSources(sqlContext, null, dqEngines, userParam.dataSources, metricName)

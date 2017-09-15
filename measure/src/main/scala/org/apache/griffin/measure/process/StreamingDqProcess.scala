@@ -94,7 +94,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     persist.start(applicationId)
 
     // get dq engines
-    val dqEngines = DqEngineFactory.genDqEngines(sqlContext, ssc)
+    val dqEngines = DqEngineFactory.genDqEngines(sqlContext)
 
     // generate data sources
     val dataSources = DataSourceFactory.genDataSources(sqlContext, ssc, dqEngines, userParam.dataSources, metricName)

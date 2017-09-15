@@ -29,17 +29,17 @@ object DqEngineFactory {
   private final val SparkSqlEngineType = "spark-sql"
   private final val DataFrameOprEngineType = "df-opr"
 
-  def genDqEngines(sqlContext: SQLContext, ssc: StreamingContext): DqEngines = {
+  def genDqEngines(sqlContext: SQLContext): DqEngines = {
     val engines = engineTypes.flatMap { et =>
-      genDqEngine(et, sqlContext, ssc)
+      genDqEngine(et, sqlContext)
     }
     DqEngines(engines)
   }
 
-  private def genDqEngine(engineType: String, sqlContext: SQLContext, ssc: StreamingContext): Option[DqEngine] = {
+  private def genDqEngine(engineType: String, sqlContext: SQLContext): Option[DqEngine] = {
     engineType match {
-      case SparkSqlEngineType => Some(SparkSqlEngine(sqlContext, ssc))
-      case DataFrameOprEngineType => Some(DataFrameOprEngine(sqlContext, ssc))
+      case SparkSqlEngineType => Some(SparkSqlEngine(sqlContext))
+      case DataFrameOprEngineType => Some(DataFrameOprEngine(sqlContext))
       case _ => None
     }
   }

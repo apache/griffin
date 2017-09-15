@@ -29,13 +29,7 @@ import org.apache.spark.sql.DataFrame
 
 trait DqEngine extends Loggable with Serializable {
 
-//  def genDataSource(dataSourceParam: DataSourceParam): Option[DirectDataSource]
-
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean
-
-//  def persistResults(ruleSteps: Seq[ConcreteRuleStep], persist: Persist, persistType: PersistType): Boolean
-
-//  def persistRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long], persistFactory: PersistFactory): Boolean
 
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]]
 
