@@ -100,7 +100,31 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
           }.toMap
         } catch {
           case e: Throwable => {
-            error(s"persist result ${name} error: ${e.getMessage}")
+            error(s"collect records ${name} error: ${e.getMessage}")
+            Map[Long, DataFrame]()
+          }
+        }
+      }
+      case _ => Map[Long, DataFrame]()
+    }
+  }
+
+  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame] = {
+    ruleStep match {
+      case SparkSqlStep(name, _, _, _, Some(ds)) => {
+        try {
+          val pdf = sqlContext.table(s"`${name}`")
+          timeGroups.flatMap { timeGroup =>
+            try {
+              val tdf = pdf.filter(s"`${GroupByColumn.tmst}` = ${timeGroup}")
+              Some((timeGroup, tdf))
+            } catch {
+              case e: Throwable => None
+            }
+          }.toMap
+        } catch {
+          case e: Throwable => {
+            error(s"collect update cache datas ${name} error: ${e.getMessage}")
             Map[Long, DataFrame]()
           }
         }
@@ -169,7 +193,7 @@ case class SparkSqlEngine(sqlContext: SQLContext, @transient ssc: StreamingConte
 //          }
         } catch {
           case e: Throwable => {
-            error(s"persist result ${name} error: ${e.getMessage}")
+            error(s"collect metrics ${name} error: ${e.getMessage}")
 //            emptyMap
             Map[Long, Map[String, Any]]()
           }

@@ -96,7 +96,7 @@ object HdfsUtil {
 //    }
 //  }
 
-  def listSubPaths(dirPath: String, subType: String, fullPath: Boolean = false): Iterable[String] = {
+  def listSubPathsByType(dirPath: String, subType: String, fullPath: Boolean = false): Iterable[String] = {
     val path = new Path(dirPath)
     try {
       val fileStatusArray = dfs.listStatus(path)
@@ -115,6 +115,12 @@ object HdfsUtil {
         println(s"list path files error: ${e.getMessage}")
         Nil
       }
+    }
+  }
+
+  def listSubPathsByTypes(dirPath: String, subTypes: Iterable[String], fullPath: Boolean = false): Iterable[String] = {
+    subTypes.flatMap { subType =>
+      listSubPathsByType(dirPath, subType, fullPath)
     }
   }
 }

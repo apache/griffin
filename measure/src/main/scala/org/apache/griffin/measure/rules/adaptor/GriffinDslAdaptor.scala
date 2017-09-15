@@ -292,7 +292,18 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
             None
           )
 
-          profilingStep :: Nil
+          // 2. clear processed data
+          val clearDataSourceStep = DfOprStep(
+            s"${profilingMetricName}_clear",
+            "clear",
+            Map[String, Any](
+              ("df.name" -> sourceName)
+            ),
+            NonePersistType,
+            Some(sourceName)
+          )
+
+          profilingStep :: clearDataSourceStep :: Nil
         }
 
       }

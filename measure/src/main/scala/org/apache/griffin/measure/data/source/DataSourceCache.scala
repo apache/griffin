@@ -235,7 +235,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       case head :: tail => {
         val (lb, ub) = head
         val curPaths = paths.flatMap { path =>
-          val names = HdfsUtil.listSubPaths(path, "dir").toList
+          val names = HdfsUtil.listSubPathsByType(path, "dir").toList
           names.filter { name =>
             str2Long(name) match {
               case Some(t) => (t >= lb) && (t <= ub)
@@ -253,7 +253,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       case Nil => paths
       case head :: tail => {
         val earlierPaths = paths.flatMap { path =>
-          val names = HdfsUtil.listSubPaths(path, "dir").toList
+          val names = HdfsUtil.listSubPathsByType(path, "dir").toList
           names.filter { name =>
             str2Long(name) match {
               case Some(t) => (t < head)
@@ -262,7 +262,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
           }.map(HdfsUtil.getHdfsFilePath(path, _))
         }
         val equalPaths = paths.flatMap { path =>
-          val names = HdfsUtil.listSubPaths(path, "dir").toList
+          val names = HdfsUtil.listSubPathsByType(path, "dir").toList
           names.filter { name =>
             str2Long(name) match {
               case Some(t) => (t == head)

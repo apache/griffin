@@ -40,4 +40,6 @@ trait DqEngine extends Loggable with Serializable {
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]]
 
   def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame]
+
+  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame]
 }

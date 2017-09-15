@@ -508,7 +508,7 @@ class JsonParseTest extends FunSuite with Matchers with BeforeAndAfter with Logg
       case head :: tail => {
         val (lb, ub) = head
         val curPaths = paths.flatMap { path =>
-          val names = HdfsUtil.listSubPaths(path, "dir").toList
+          val names = HdfsUtil.listSubPathsByType(path, "dir").toList
           println(names)
           names.filter { name =>
             str2Long(name) match {

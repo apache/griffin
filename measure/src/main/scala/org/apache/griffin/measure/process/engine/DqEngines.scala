@@ -91,9 +91,8 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   def updateDataSources(ruleSteps: Seq[ConcreteRuleStep], dataSources: Seq[DataSource],
                         timeGroups: Iterable[Long]): Unit = {
-    val recordSteps = ruleSteps.filter(_.persistType == RecordPersistType)
+    val recordSteps = ruleSteps.filter(_.updateDataSource.nonEmpty)
     recordSteps.foreach { step =>
-      val name = step.name
       val udpateDataSources = dataSources.filter { ds =>
         step.updateDataSource match {
           case Some(dsName) if (dsName == ds.name) => true
@@ -101,7 +100,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
         }
       }
       if (udpateDataSources.size > 0) {
-        val records = collectRecords(step, timeGroups)
+        val records = collectUpdateCacheDatas(step, timeGroups)
 
         records.foreach { pair =>
           val (t, recs) = pair
@@ -176,6 +175,13 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
       ret ++ engine.collectRecords(ruleStep, timeGroups)
     }
 //    if (ret.isEmpty) warn(s"collect records warn: no records collected for ${ruleStep}")
+    ret
+  }
+  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame] = {
+    val ret = engines.foldLeft(Map[Long, DataFrame]()) { (ret, engine) =>
+      ret ++ engine.collectUpdateCacheDatas(ruleStep, timeGroups)
+    }
+    //    if (ret.isEmpty) warn(s"collect records warn: no records collected for ${ruleStep}")
     ret
   }
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
