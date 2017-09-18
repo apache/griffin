@@ -41,7 +41,7 @@ case class KafkaStreamingStringDataConnector(sqlContext: SQLContext,
 
   val valueColName = "value"
   val schema = StructType(Array(
-    StructField("value", StringType)
+    StructField(valueColName, StringType)
   ))
 
   def createDStream(topicSet: Set[String]): InputDStream[(K, V)] = {

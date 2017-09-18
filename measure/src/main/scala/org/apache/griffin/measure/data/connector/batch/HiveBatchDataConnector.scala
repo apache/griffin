@@ -28,6 +28,7 @@ import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 import scala.util.{Success, Try}
+import org.apache.griffin.measure.utils.ParamUtil._
 
 // data connector for hive
 case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, dcParam: DataConnectorParam
@@ -43,9 +44,9 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
   val TableName = "table.name"
   val Partitions = "partitions"
 
-  val database = config.getOrElse(Database, "default").toString
-  val tableName = config.getOrElse(TableName, "").toString
-  val partitionsString = config.getOrElse(Partitions, "").toString
+  val database = config.getString(Database, "default")
+  val tableName = config.getString(TableName, "")
+  val partitionsString = config.getString(Partitions, "")
 
   val concreteTableName = s"${database}.${tableName}"
   val partitions = partitionsString.split(";").map(s => s.split(",").map(_.trim))

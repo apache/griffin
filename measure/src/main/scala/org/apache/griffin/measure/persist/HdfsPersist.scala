@@ -26,6 +26,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 import scala.util.Try
+import org.apache.griffin.measure.utils.ParamUtil._
 
 // persist result and data to hdfs
 case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
@@ -35,8 +36,8 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val MaxLinesPerFile = "max.lines.per.file"
 
   val path = config.getOrElse(Path, "").toString
-  val maxPersistLines = try { config.getOrElse(MaxPersistLines, -1).toString.toInt } catch { case _: Throwable => -1 }
-  val maxLinesPerFile = try { config.getOrElse(MaxLinesPerFile, 10000).toString.toLong } catch { case _: Throwable => 10000 }
+  val maxPersistLines = config.getInt(MaxPersistLines, -1)
+  val maxLinesPerFile = config.getLong(MaxLinesPerFile, 10000)
 
   val separator = "/"
 

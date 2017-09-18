@@ -25,6 +25,7 @@ import org.apache.griffin.measure.rules.dsl.analyzer._
 import org.apache.griffin.measure.rules.dsl.expr._
 import org.apache.griffin.measure.rules.dsl.parser.GriffinDslParser
 import org.apache.griffin.measure.rules.step._
+import org.apache.griffin.measure.utils.ParamUtil._
 
 case class GriffinDslAdaptor(dataSourceNames: Seq[String],
                              functionNames: Seq[String],
@@ -36,7 +37,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val _PersistType = "persist.type"
     val _UpdateDataSource = "update.data.source"
     def getNameOpt(param: Map[String, Any]): Option[String] = param.get(_Name).map(_.toString)
-    def getPersistType(param: Map[String, Any]): PersistType = PersistType(param.getOrElse(_PersistType, "").toString)
+    def getPersistType(param: Map[String, Any]): PersistType = PersistType(param.getString(_PersistType, ""))
     def getUpdateDataSourceOpt(param: Map[String, Any]): Option[String] = param.get(_UpdateDataSource).map(_.toString)
   }
   object AccuracyInfo {
@@ -76,7 +77,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 
   val _dqType = "dq.type"
 
-  protected def getDqType(param: Map[String, Any]) = DqType(param.getOrElse(_dqType, "").toString)
+  protected def getDqType(param: Map[String, Any]) = DqType(param.getString(_dqType, ""))
 
   val filteredFunctionNames = functionNames.filter { fn =>
     fn.matches("""^[a-zA-Z_]\w*$""")

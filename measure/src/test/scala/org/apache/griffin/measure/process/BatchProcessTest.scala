@@ -36,8 +36,8 @@ import scala.util.{Failure, Success, Try}
 class BatchProcessTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
 
   val envFile = "src/test/resources/env-test.json"
-  val confFile = "src/test/resources/config-test-profiling.json"
-//  val confFile = "src/test/resources/config-test-accuracy.json"
+//  val confFile = "src/test/resources/config-test-profiling.json"
+  val confFile = "src/test/resources/config-test-accuracy.json"
 
   val envFsType = "local"
   val userFsType = "local"

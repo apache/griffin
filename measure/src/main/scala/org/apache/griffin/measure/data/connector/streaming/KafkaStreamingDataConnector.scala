@@ -22,6 +22,7 @@ import kafka.serializer.Decoder
 import org.apache.spark.streaming.dstream.InputDStream
 
 import scala.util.{Failure, Success, Try}
+import org.apache.griffin.measure.utils.ParamUtil._
 
 trait KafkaStreamingDataConnector extends StreamingDataConnector {
 
@@ -33,11 +34,8 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
   val KafkaConfig = "kafka.config"
   val Topics = "topics"
 
-  val kafkaConfig = config.get(KafkaConfig) match {
-    case Some(map: Map[String, Any]) => map.mapValues(_.toString).map(identity)
-    case _ => Map[String, String]()
-  }
-  val topics = config.getOrElse(Topics, "").toString
+  val kafkaConfig = config.getAnyRef(KafkaConfig, Map[String, String]())
+  val topics = config.getString(Topics, "")
 
   def available(): Boolean = {
     true

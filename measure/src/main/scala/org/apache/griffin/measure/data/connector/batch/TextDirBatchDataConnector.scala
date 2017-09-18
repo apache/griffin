@@ -19,51 +19,45 @@ under the License.
 package org.apache.griffin.measure.data.connector.batch
 
 import org.apache.griffin.measure.config.params.user.DataConnectorParam
-import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.process.engine.DqEngines
-import org.apache.griffin.measure.result._
-import org.apache.griffin.measure.rule.{ExprValueUtil, RuleExprs}
 import org.apache.griffin.measure.utils.HdfsUtil
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.griffin.measure.utils.ParamUtil._
 
-import scala.util.Try
-
 // data connector for avro file
-case class AvroBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, dcParam: DataConnectorParam
-                                 ) extends BatchDataConnector {
+case class TextDirBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, dcParam: DataConnectorParam
+                                    ) extends BatchDataConnector {
 
   val config = dcParam.config
 
-  val FilePath = "file.path"
-  val FileName = "file.name"
+  val DirPath = "dir.path"
+  val Recursive = "recursive"
+  val Removable = "removable"
+  val FilePrefix = "file.prefix"
 
-  val filePath = config.getString(FilePath, "")
-  val fileName = config.getString(FileName, "")
+  val dirPath = config.getString(DirPath, "")
+  val recursive = config.getBoolean(Recursive, true)
+  val removable = config.getBoolean(Removable, false)
+  val filePrefix = config.getString(FilePrefix, "_")
 
-  val concreteFileFullPath = if (pathPrefix) s"${filePath}${fileName}" else fileName
-
-  private def pathPrefix(): Boolean = {
-    filePath.nonEmpty
-  }
-
-  private def fileExist(): Boolean = {
-    HdfsUtil.existPath(concreteFileFullPath)
+  private def dirExist(): Boolean = {
+    HdfsUtil.existPath(dirPath)
   }
 
   def data(ms: Long): Option[DataFrame] = {
-    try {
-      val df = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
-      val dfOpt = Some(df)
-      val preDfOpt = preProcess(dfOpt, ms)
-      preDfOpt
-    } catch {
-      case e: Throwable => {
-        error(s"load avro file ${concreteFileFullPath} fails")
-        None
-      }
-    }
+    // fixme
+    None
+//    try {
+//      val df = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
+//      val dfOpt = Some(df)
+//      val preDfOpt = preProcess(dfOpt, ms)
+//      preDfOpt
+//    } catch {
+//      case e: Throwable => {
+//        error(s"load avro file ${concreteFileFullPath} fails")
+//        None
+//      }
+//    }
   }
 
 //  def available(): Boolean = {

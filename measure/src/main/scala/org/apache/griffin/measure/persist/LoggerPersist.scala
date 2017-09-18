@@ -24,13 +24,14 @@ import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
+import org.apache.griffin.measure.utils.ParamUtil._
 
 // persist result and data to hdfs
 case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
   val MaxLogLines = "max.log.lines"
 
-  val maxLogLines = try { config.getOrElse(MaxLogLines, 100).toString.toInt } catch { case _: Throwable => 100 }
+  val maxLogLines = config.getInt(MaxLogLines, 100)
 
   def available(): Boolean = true
 

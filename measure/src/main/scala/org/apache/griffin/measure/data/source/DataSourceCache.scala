@@ -29,6 +29,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 import scala.util.{Failure, Success}
+import org.apache.griffin.measure.utils.ParamUtil._
 
 case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
                            metricName: String, index: Int
@@ -45,10 +46,10 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
   val defFilePath = s"hdfs:///griffin/cache/${metricName}/${index}"
   val defInfoPath = s"${index}"
 
-  val filePath: String = param.getOrElse(_FilePath, defFilePath).toString
-  val cacheInfoPath: String = param.getOrElse(_InfoPath, defInfoPath).toString
-  val readyTimeInterval: Long = TimeUtil.milliseconds(param.getOrElse(_ReadyTimeInterval, "1m").toString).getOrElse(60000L)
-  val readyTimeDelay: Long = TimeUtil.milliseconds(param.getOrElse(_ReadyTimeDelay, "1m").toString).getOrElse(60000L)
+  val filePath: String = param.getString(_FilePath, defFilePath)
+  val cacheInfoPath: String = param.getString(_InfoPath, defInfoPath)
+  val readyTimeInterval: Long = TimeUtil.milliseconds(param.getString(_ReadyTimeInterval, "1m")).getOrElse(60000L)
+  val readyTimeDelay: Long = TimeUtil.milliseconds(param.getString(_ReadyTimeDelay, "1m")).getOrElse(60000L)
   val deltaTimeRange: (Long, Long) = {
     def negative(n: Long): Long = if (n <= 0) n else 0
     param.get(_TimeRange) match {

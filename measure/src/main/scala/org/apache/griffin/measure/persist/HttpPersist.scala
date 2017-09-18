@@ -24,6 +24,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 import scala.util.Try
+import org.apache.griffin.measure.utils.ParamUtil._
 
 // persist result by http way
 case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
@@ -31,8 +32,8 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val Api = "api"
   val Method = "method"
 
-  val api = config.getOrElse(Api, "").toString
-  val method = config.getOrElse(Method, "post").toString
+  val api = config.getString(Api, "")
+  val method = config.getString(Method, "post")
 
   val _Value = "value"
 
