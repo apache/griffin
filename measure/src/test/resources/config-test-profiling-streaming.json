@@ -54,7 +54,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "source.name.count()",
+        "rule": "source.name.count() where source.age > 5",
         "details": {
           "source": "source",
           "profiling": {
