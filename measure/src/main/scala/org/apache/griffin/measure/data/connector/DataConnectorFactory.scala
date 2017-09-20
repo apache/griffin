@@ -42,6 +42,7 @@ object DataConnectorFactory {
 
   val HiveRegex = """^(?i)hive$""".r
   val AvroRegex = """^(?i)avro$""".r
+  val TextDirRegex = """^(?i)text-dir$""".r
 
   val KafkaRegex = """^(?i)kafka$""".r
 
@@ -59,6 +60,7 @@ object DataConnectorFactory {
       conType match {
         case HiveRegex() => HiveBatchDataConnector(sqlContext, dqEngines, dataConnectorParam)
         case AvroRegex() => AvroBatchDataConnector(sqlContext, dqEngines, dataConnectorParam)
+        case TextDirRegex() => TextDirBatchDataConnector(sqlContext, dqEngines, dataConnectorParam)
         case KafkaRegex() => {
 //          val ksdcTry = getStreamingDataConnector(ssc, dataConnectorParam)
 //          val cdcTry = getCacheDataConnector(sqlContext, dataConnectorParam.cache)

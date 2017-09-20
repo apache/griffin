@@ -23,7 +23,7 @@ import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 case class DataSource(sqlContext: SQLContext,
                       name: String,
@@ -79,7 +79,16 @@ case class DataSource(sqlContext: SQLContext,
 
   private def unionDataFrames(df1: DataFrame, df2: DataFrame): DataFrame = {
     try {
-      df1 unionAll df2
+      val cols = df1.columns
+      val rdd2 = df2.map{ row =>
+        val values = cols.map { col =>
+          row.getAs[Any](col)
+        }
+        Row(values: _*)
+      }
+      val ndf2 = sqlContext.createDataFrame(rdd2, df1.schema)
+      df1 unionAll ndf2
+//      df1 unionAll df2
     } catch {
       case e: Throwable => df1
     }

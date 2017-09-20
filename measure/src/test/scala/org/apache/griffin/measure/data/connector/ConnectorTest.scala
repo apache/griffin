@@ -25,14 +25,17 @@ import kafka.serializer.StringDecoder
 import org.apache.griffin.measure.algo.streaming.TimingProcess
 import org.apache.griffin.measure.cache.info.InfoCacheInstance
 import org.apache.griffin.measure.config.params.env._
-import org.apache.griffin.measure.config.params.user.{DataCacheParam, DataConnectorParam, EvaluateRuleParam}
+import org.apache.griffin.measure.config.params.user.{DataConnectorParam, EvaluateRuleParam}
 import org.apache.griffin.measure.config.reader.ParamRawStringReader
+import org.apache.griffin.measure.data.connector.batch.TextDirBatchDataConnector
+import org.apache.griffin.measure.process.engine.DqEngines
 import org.apache.griffin.measure.result.{DataInfo, TimeStampInfo}
 import org.apache.griffin.measure.rule.expr.{Expr, StatementExpr}
 import org.apache.griffin.measure.rule._
 import org.apache.griffin.measure.utils.{HdfsFileDumpUtil, HdfsUtil, TimeUtil}
 import org.apache.griffin.measure.rule.{DataTypeCalculationUtil, ExprValueUtil, RuleExprs}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.types.{DataType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.spark.streaming.dstream.InputDStream

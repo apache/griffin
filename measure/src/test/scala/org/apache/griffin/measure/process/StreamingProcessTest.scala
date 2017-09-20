@@ -36,7 +36,8 @@ import scala.util.{Failure, Success, Try}
 class StreamingProcessTest extends FunSuite with Matchers with BeforeAndAfter with Loggable {
 
   val envFile = "src/test/resources/env-streaming.json"
-  val confFile = "src/test/resources/config-test-accuracy-streaming.json"
+  val confFile = "src/test/resources/config-test-accuracy-streaming-multids.json"
+//  val confFile = "src/test/resources/config-test-accuracy-streaming.json"
 //  val confFile = "src/test/resources/config-test-profiling-streaming.json"
 
   val envFsType = "local"

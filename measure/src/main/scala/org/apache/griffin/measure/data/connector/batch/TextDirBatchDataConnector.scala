@@ -31,33 +31,62 @@ case class TextDirBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngine
   val config = dcParam.config
 
   val DirPath = "dir.path"
-  val Recursive = "recursive"
-  val Removable = "removable"
-  val FilePrefix = "file.prefix"
+  val DataDirDepth = "data.dir.depth"
+  val SuccessFile = "success.file"
+  val DoneFile = "done.file"
 
   val dirPath = config.getString(DirPath, "")
-  val recursive = config.getBoolean(Recursive, true)
-  val removable = config.getBoolean(Removable, false)
-  val filePrefix = config.getString(FilePrefix, "_")
+  val dataDirDepth = config.getInt(DataDirDepth, 0)
+  val successFile = config.getString(SuccessFile, "_SUCCESS")
+  val doneFile = config.getString(DoneFile, "_DONE")
+
+  val ignoreFilePrefix = "_"
 
   private def dirExist(): Boolean = {
     HdfsUtil.existPath(dirPath)
   }
 
   def data(ms: Long): Option[DataFrame] = {
-    // fixme
-    None
-//    try {
-//      val df = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
-//      val dfOpt = Some(df)
-//      val preDfOpt = preProcess(dfOpt, ms)
-//      preDfOpt
-//    } catch {
-//      case e: Throwable => {
-//        error(s"load avro file ${concreteFileFullPath} fails")
-//        None
-//      }
-//    }
+    try {
+      val dataDirs = listSubDirs(dirPath :: Nil, dataDirDepth, readable)
+      // touch done file for read dirs
+      dataDirs.foreach(dir => touchDone(dir))
+
+      val validDataDirs = dataDirs.filter(dir => !emptyDir(dir))
+
+      if (validDataDirs.size > 0) {
+        val df = sqlContext.read.text(validDataDirs:  _*)
+        val dfOpt = Some(df)
+        val preDfOpt = preProcess(dfOpt, ms)
+        preDfOpt
+      } else {
+        None
+      }
+    } catch {
+      case e: Throwable => {
+        error(s"load text dir ${dirPath} fails: ${e.getMessage}")
+        None
+      }
+    }
+  }
+
+  private def listSubDirs(paths: Seq[String], depth: Int, filteFunc: (String) => Boolean): Seq[String] = {
+    val subDirs = paths.flatMap { path => HdfsUtil.listSubPathsByType(path, "dir", true) }
+    if (depth <= 0) {
+      subDirs.filter(filteFunc)
+    } else {
+      listSubDirs(subDirs, depth, filteFunc)
+    }
+  }
+
+  private def readable(dir: String): Boolean = isSuccess(dir) && !isDone(dir)
+  private def isDone(dir: String): Boolean = HdfsUtil.existFileInDir(dir, doneFile)
+  private def isSuccess(dir: String): Boolean = HdfsUtil.existFileInDir(dir, successFile)
+
+  private def touchDone(dir: String): Unit = HdfsUtil.createEmptyFile(HdfsUtil.getHdfsFilePath(dir, doneFile))
+
+  private def emptyDir(dir: String): Boolean = {
+    HdfsUtil.listSubPathsByType(dir, "file").filter(!_.startsWith(ignoreFilePrefix)).size == 0
   }
 
 //  def available(): Boolean = {

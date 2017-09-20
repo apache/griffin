@@ -42,8 +42,9 @@
           "type": "text-dir",
           "config": {
             "dir.path": "hdfs://localhost/griffin/text",
-            "recursive": true,
-            "removable": false
+            "data.dir.depth": 0,
+            "success.file": "_SUCCESS",
+            "done.file": "_DONE"
           },
           "pre.proc": [
             {
