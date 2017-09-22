@@ -24,8 +24,8 @@ import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.rules.dsl._
-import org.apache.griffin.measure.rules.step._
+import org.apache.griffin.measure.rule.dsl._
+import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, GroupedData, SQLContext}

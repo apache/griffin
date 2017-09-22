@@ -24,9 +24,9 @@ import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.engine._
-import org.apache.griffin.measure.rules.adaptor.{PreProcPhase, RuleAdaptorGroup, RunPhase}
-import org.apache.griffin.measure.rules.dsl._
-import org.apache.griffin.measure.rules.preproc.PreProcRuleGenerator
+import org.apache.griffin.measure.rule.adaptor.{PreProcPhase, RuleAdaptorGroup, RunPhase}
+import org.apache.griffin.measure.rule.dsl._
+import org.apache.griffin.measure.rule.preproc.PreProcRuleGenerator
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SQLContext}

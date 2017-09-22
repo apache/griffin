@@ -16,24 +16,22 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.process.engine
+package org.apache.griffin.measure.rule.step
 
-import org.apache.griffin.measure.config.params.user.DataSourceParam
-import org.apache.griffin.measure.data.source.DataSource
-import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.step._
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
 
-trait DqEngine extends Loggable with Serializable {
+trait ConcreteRuleStep extends RuleStep {
 
-  def runRuleStep(ruleStep: ConcreteRuleStep): Boolean
+  val persistType: PersistType
 
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]]
+  val updateDataSource: Option[String]
 
-  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame]
+//  def isGroupMetric: Boolean = {
+//    val _GroupMetric = "group.metric"
+//    details.get(_GroupMetric) match {
+//      case Some(b: Boolean) => b
+//      case _ => false
+//    }
+//  }
 
-  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame]
 }

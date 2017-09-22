@@ -20,8 +20,8 @@ package org.apache.griffin.measure.process.engine
 
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.rules.dsl.{MetricPersistType, RecordPersistType}
-import org.apache.griffin.measure.rules.step._
+import org.apache.griffin.measure.rule.dsl.{MetricPersistType, RecordPersistType}
+import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.{DataFrame, SQLContext}
 

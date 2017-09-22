@@ -29,7 +29,7 @@ import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
-import org.apache.griffin.measure.rules.adaptor.{RuleAdaptorGroup, RunPhase}
+import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
 
 case class StreamingDqThread(dqEngines: DqEngines,
                              dataSources: Seq[DataSource],
