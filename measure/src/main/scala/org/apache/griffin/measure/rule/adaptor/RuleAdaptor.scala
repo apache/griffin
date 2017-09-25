@@ -20,7 +20,6 @@ package org.apache.griffin.measure.rule.adaptor
 
 import java.util.concurrent.atomic.AtomicLong
 
-import org.apache.griffin.measure.algo._
 
 import scala.collection.mutable.{Set => MutableSet}
 import org.apache.griffin.measure.config.params.user._

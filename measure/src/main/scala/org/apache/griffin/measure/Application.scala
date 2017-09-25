@@ -18,9 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure
 
-import org.apache.griffin.measure.algo._
-//import org.apache.griffin.measure.algo.batch._
-//import org.apache.griffin.measure.algo.streaming._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._

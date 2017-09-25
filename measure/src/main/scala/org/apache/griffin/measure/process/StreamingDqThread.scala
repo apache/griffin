@@ -21,7 +21,6 @@ package org.apache.griffin.measure.process
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
-import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 import org.apache.griffin.measure.cache.result.CacheResultProcesser
 import org.apache.griffin.measure.config.params.user.EvaluateRuleParam

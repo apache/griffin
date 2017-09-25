@@ -29,7 +29,6 @@ import scala.util.Success
 //import org.apache.griffin.measure.data.connector.cache._
 import org.apache.griffin.measure.data.connector.batch._
 //import org.apache.griffin.measure.data.connector.streaming._
-import org.apache.griffin.measure.rule.RuleExprs
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream

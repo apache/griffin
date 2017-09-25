@@ -20,7 +20,6 @@ package org.apache.griffin.measure.process
 
 import java.util.Date
 
-import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._

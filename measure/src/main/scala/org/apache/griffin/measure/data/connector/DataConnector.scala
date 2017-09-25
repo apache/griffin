@@ -20,7 +20,6 @@ package org.apache.griffin.measure.data.connector
 
 import java.util.concurrent.atomic.AtomicLong
 
-import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.engine._

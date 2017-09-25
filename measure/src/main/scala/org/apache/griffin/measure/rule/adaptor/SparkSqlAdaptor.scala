@@ -18,7 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
-import org.apache.griffin.measure.algo._
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.rule.step._
 
