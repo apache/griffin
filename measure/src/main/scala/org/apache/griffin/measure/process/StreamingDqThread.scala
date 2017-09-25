@@ -62,14 +62,26 @@ case class StreamingDqThread(dqEngines: DqEngines,
         dqEngines.runRuleSteps(ruleSteps)
 
         val ct = new Date().getTime
-        appPersist.log(ct, s"calculation using time: ${ct - st} ms")
+        val calculationTimeStr = s"calculation using time: ${ct - st} ms"
+        println(calculationTimeStr)
+        appPersist.log(ct, calculationTimeStr)
 
         // persist results
         val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
-        dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
+
+        // get rdd of steps
+        val stepRdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
+
+        dqEngines.persistAllRecords(stepRdds, persistFactory)
+
+        val rt = new Date().getTime
+        val persistResultTimeStr = s"persist result and records using time: ${rt - ct} ms"
+        println(persistResultTimeStr)
+        appPersist.log(rt, persistResultTimeStr)
 
         // update data source
-        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
+//        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
+        dqEngines.updateDataSources(stepRdds, dataSources)
 
         TimeInfoCache.endTimeInfoCache
 
@@ -77,7 +89,9 @@ case class StreamingDqThread(dqEngines: DqEngines,
         cleanData
 
         val et = new Date().getTime
-        appPersist.log(et, s"persist using time: ${et - ct} ms")
+        val persistTimeStr = s"update data source using time: ${et - rt} ms"
+        println(persistTimeStr)
+        appPersist.log(et, persistTimeStr)
 
       } catch {
         case e: Throwable => error(s"process error: ${e.getMessage}")

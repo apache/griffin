@@ -139,6 +139,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     }
   }
 
+  // -- deprecated --
   def updateData(df: DataFrame, ms: Long): Unit = {
     val ptns = getPartition(ms)
     val ptnsPath = genPartitionHdfsPath(ptns)
@@ -162,6 +163,70 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       } else false
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
+    }
+  }
+
+  def updateData(rdd: RDD[String], ms: Long, cnt: Long): Unit = {
+    val ptns = getPartition(ms)
+    val ptnsPath = genPartitionHdfsPath(ptns)
+    val dirPath = s"${filePath}/${ptnsPath}"
+    val dataFileName = s"${ms}"
+    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+
+    try {
+//      val needSave = !rdd.isEmpty
+
+      // remove out time old data
+      HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
+      println(s"remove file path: ${dirPath}/${dataFileName}")
+
+      // save updated data
+      val dumped = if (cnt > 0) {
+        HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
+        println(s"update file path: ${dataFilePath}")
+      } else false
+    } catch {
+      case e: Throwable => error(s"update data error: ${e.getMessage}")
+    } finally {
+      rdd.unpersist()
+    }
+  }
+
+  def updateData(rdd: Iterable[String], ms: Long): Unit = {
+    val ptns = getPartition(ms)
+    val ptnsPath = genPartitionHdfsPath(ptns)
+    val dirPath = s"${filePath}/${ptnsPath}"
+    val dataFileName = s"${ms}"
+    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+
+    try {
+      val needSave = !rdd.isEmpty
+
+      // remove out time old data
+      HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
+      println(s"remove file path: ${dirPath}/${dataFileName}")
+
+      // save updated data
+      val dumped = if (needSave) {
+        HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
+        println(s"update file path: ${dataFilePath}")
+      } else false
+    } catch {
+      case e: Throwable => error(s"update data error: ${e.getMessage}")
+    }
+  }
+
+  def updateDataMap(dfMap: Map[Long, DataFrame]): Unit = {
+    val dataMap = dfMap.map { pair =>
+      val (t, recs) = pair
+      val rdd = recs.toJSON
+//      rdd.cache
+      (t, rdd, rdd.count)
+    }
+
+    dataMap.foreach { pair =>
+      val (t, arr, cnt) = pair
+      updateData(arr, t, cnt)
     }
   }
 

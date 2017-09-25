@@ -98,6 +98,10 @@ case class DataSource(sqlContext: SQLContext,
     dataSourceCacheOpt.foreach(_.updateData(df, ms))
   }
 
+  def updateDataMap(dfMap: Map[Long, DataFrame]): Unit = {
+    dataSourceCacheOpt.foreach(_.updateDataMap(dfMap))
+  }
+
   def cleanOldData(): Unit = {
     dataSourceCacheOpt.foreach(_.cleanOldData)
   }

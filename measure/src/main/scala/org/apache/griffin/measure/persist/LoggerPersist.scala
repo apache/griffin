@@ -132,6 +132,18 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
     }
   }
 
+  def persistRecords(records: Iterable[String], name: String): Unit = {
+    try {
+      val recordCount = records.size
+      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+      if (count > 0) {
+        records.foreach(println)
+      }
+    } catch {
+      case e: Throwable => error(e.getMessage)
+    }
+  }
+
 //  def persistMetrics(metrics: Seq[String], name: String): Unit = {
 //    try {
 //      val recordCount = metrics.size

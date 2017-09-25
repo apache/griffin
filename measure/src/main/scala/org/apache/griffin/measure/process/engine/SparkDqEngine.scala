@@ -23,6 +23,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.rule.dsl.{MetricPersistType, RecordPersistType}
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 trait SparkDqEngine extends DqEngine {
@@ -74,6 +75,35 @@ trait SparkDqEngine extends DqEngine {
         }
       }
       case _ => Map[Long, Map[String, Any]]()
+    }
+  }
+
+  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]
+                      ): Option[RDD[(Long, Iterable[String])]] = {
+    ruleStep match {
+      case step: ConcreteRuleStep if (step.persistType == RecordPersistType) => {
+        val name = step.name
+        try {
+          val pdf = sqlContext.table(s"`${name}`")
+          val cols = pdf.columns
+          val rdd = pdf.flatMap { row =>
+            val values = cols.flatMap { col =>
+              Some((col, row.getAs[Any](col)))
+            }.toMap
+            values.get(GroupByColumn.tmst) match {
+              case Some(t: Long) if (timeGroups.exists(_ == t)) => Some((t, JsonUtil.toJson(values)))
+              case _ => None
+            }
+          }.groupByKey()
+          Some(rdd)
+        } catch {
+          case e: Throwable => {
+            error(s"collect records ${name} error: ${e.getMessage}")
+            None
+          }
+        }
+      }
+      case _ => None
     }
   }
 

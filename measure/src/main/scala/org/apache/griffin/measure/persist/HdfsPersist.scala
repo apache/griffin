@@ -227,6 +227,30 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     }
   }
 
+  def persistRecords(records: Iterable[String], name: String): Unit = {
+    val path = filePath(name)
+    try {
+      val recordCount = records.size
+      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+      if (count > 0) {
+        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
+        if (groupCount <= 1) {
+          val recs = records.take(count.toInt)
+          persistRecords(path, recs)
+        } else {
+          val groupedRecords = records.grouped(groupCount).zipWithIndex
+          groupedRecords.take(groupCount).foreach { group =>
+            val (recs, gid) = group
+            val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
+            persistRecords(hdfsPath, recs)
+          }
+        }
+      }
+    } catch {
+      case e: Throwable => error(e.getMessage)
+    }
+  }
+
 //  def persistMetrics(metrics: Seq[String], name: String): Unit = {
 //    val path = filePath(name)
 //    try {
