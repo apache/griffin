@@ -81,7 +81,8 @@ trait SparkDqEngine extends DqEngine {
   def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]
                       ): Option[RDD[(Long, Iterable[String])]] = {
     ruleStep match {
-      case step: ConcreteRuleStep if (step.persistType == RecordPersistType) => {
+      case step: ConcreteRuleStep if ((step.persistType == RecordPersistType)
+        || (step.updateDataSource.nonEmpty)) => {
         val name = step.name
         try {
           val pdf = sqlContext.table(s"`${name}`")
@@ -107,54 +108,60 @@ trait SparkDqEngine extends DqEngine {
     }
   }
 
-  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame] = {
-    ruleStep match {
-      case step: ConcreteRuleStep if (step.persistType == RecordPersistType) => {
-        val name = step.name
-        try {
-          val pdf = sqlContext.table(s"`${name}`")
-          timeGroups.flatMap { timeGroup =>
-            try {
-              val tdf = pdf.filter(s"`${GroupByColumn.tmst}` = ${timeGroup}")
-              Some((timeGroup, tdf))
-            } catch {
-              case e: Throwable => None
-            }
-          }.toMap
-        } catch {
-          case e: Throwable => {
-            error(s"collect records ${name} error: ${e.getMessage}")
-            Map[Long, DataFrame]()
-          }
-        }
-      }
-      case _ => Map[Long, DataFrame]()
-    }
-  }
-
-  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame] = {
-    ruleStep match {
-      case step: ConcreteRuleStep if (step.updateDataSource.nonEmpty) => {
-        val name = step.name
-        try {
-          val pdf = sqlContext.table(s"`${name}`")
-          timeGroups.flatMap { timeGroup =>
-            try {
-              val tdf = pdf.filter(s"`${GroupByColumn.tmst}` = ${timeGroup}")
-              Some((timeGroup, tdf))
-            } catch {
-              case e: Throwable => None
-            }
-          }.toMap
-        } catch {
-          case e: Throwable => {
-            error(s"collect update cache datas ${name} error: ${e.getMessage}")
-            Map[Long, DataFrame]()
-          }
-        }
-      }
-      case _ => Map[Long, DataFrame]()
-    }
-  }
+//  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]] = {
+//    ruleStep match {
+//      case step: ConcreteRuleStep if (step.persistType == RecordPersistType) => {
+//        val name = step.name
+//        try {
+//          val pdf = sqlContext.table(s"`${name}`")
+//          val cols = pdf.columns
+//          val rdd = pdf.flatMap { row =>
+//            val values = cols.flatMap { col =>
+//              Some((col, row.getAs[Any](col)))
+//            }.toMap
+//            values.get(GroupByColumn.tmst) match {
+//              case Some(t: Long) if (timeGroups.exists(_ == t)) => Some((t, JsonUtil.toJson(values)))
+//              case _ => None
+//            }
+//          }.groupByKey()
+//          Some(rdd)
+//        } catch {
+//          case e: Throwable => {
+//            error(s"collect records ${name} error: ${e.getMessage}")
+//            None
+//          }
+//        }
+//      }
+//      case _ => None
+//    }
+//  }
+//
+//  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]] = {
+//    ruleStep match {
+//      case step: ConcreteRuleStep if (step.updateDataSource.nonEmpty) => {
+//        val name = step.name
+//        try {
+//          val pdf = sqlContext.table(s"`${name}`")
+//          val cols = pdf.columns
+//          val rdd = pdf.flatMap { row =>
+//            val values = cols.flatMap { col =>
+//              Some((col, row.getAs[Any](col)))
+//            }.toMap
+//            values.get(GroupByColumn.tmst) match {
+//              case Some(t: Long) if (timeGroups.exists(_ == t)) => Some((t, JsonUtil.toJson(values)))
+//              case _ => None
+//            }
+//          }.groupByKey()
+//          Some(rdd)
+//        } catch {
+//          case e: Throwable => {
+//            error(s"collect update cache datas ${name} error: ${e.getMessage}")
+//            None
+//          }
+//        }
+//      }
+//      case _ => None
+//    }
+//  }
 
 }

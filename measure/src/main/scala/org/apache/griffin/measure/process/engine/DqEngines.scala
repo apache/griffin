@@ -33,16 +33,9 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
   def loadData(dataSources: Seq[DataSource], ms: Long): Unit = {
-//    val dataSources = dataSourceParams.flatMap { param =>
-//      genDataSource(param)
-//    }
     dataSources.foreach { ds =>
       ds.loadData(ms)
     }
-//    dataSources.flatMap { ds =>
-//      val success = ds.loadData(ms)
-//      if (success) Some(ds.name) else None
-//    }
   }
 
   def runRuleSteps(ruleSteps: Seq[ConcreteRuleStep]): Unit = {
@@ -75,94 +68,56 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     updateTimeGroups
   }
 
-  def persistAllRecords(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory,
-                        timeGroups: Iterable[Long]): Unit = {
-    val recordSteps = ruleSteps.filter(_.persistType == RecordPersistType)
-    recordSteps.foreach { step =>
-      val name = step.name
-      val records = collectRecords(step, timeGroups)
-      records.foreach { pair =>
-        val (t, recs) = pair
-        val persist = persistFactory.getPersists(t)
-        persist.persistRecords(recs, name)
-      }
-    }
-  }
-
-  def updateDataSources(ruleSteps: Seq[ConcreteRuleStep], dataSources: Seq[DataSource],
-                        timeGroups: Iterable[Long]): Unit = {
-    val recordSteps = ruleSteps.filter(_.updateDataSource.nonEmpty)
-    recordSteps.foreach { step =>
-      val udpateDataSources = dataSources.filter { ds =>
-        step.updateDataSource match {
-          case Some(dsName) if (dsName == ds.name) => true
-          case _ => false
-        }
-      }
-      if (udpateDataSources.size > 0) {
-//        val records = collectUpdateCacheDatas(step, timeGroups)
-//
-//        udpateDataSources.foreach { ds =>
-//          ds.updateDataMap(records)
-//        }
-
-        collectUpdateRDD(step, timeGroups) match {
-          case Some(rdd) => {
-            rdd.foreach { pair =>
-              val (t, items) = pair
-              udpateDataSources.foreach { ds =>
-                ds.dataSourceCacheOpt.foreach(_.updateData(items, t))
-              }
-            }
-          }
-          case _ => println("empty update data source")
-        }
-      }
-    }
-  }
-
-//  def persistAllResults(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory): Unit = {
-//    // 1. persist metric
-//    val metricSteps = ruleSteps.filter(_.persistType == MetricPersistType)
-//    val allMetrics: Map[Long, Map[String, Any]] = {
-//      metricSteps.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
-//        val metrics = collectMetrics(step)
-//        metrics.foldLeft(ret) { (total, pair) =>
-//          val (k, v) = pair
-//          total.get(k) match {
-//            case Some(map) => total + (k -> (map ++ v))
-//            case _ => total + pair
-//          }
-//        }
-//      }
-//    }
-//    val updateTimeGroups = allMetrics.keys
-//    allMetrics.foreach { pair =>
-//      val (t, metric) = pair
-//      val persist = persistFactory.getPersists(t)
-//      persist.persistMetrics(metric)
-//    }
-//
-//    // 2. persist record
+//  def persistAllRecords(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory,
+//                        timeGroups: Iterable[Long]): Unit = {
 //    val recordSteps = ruleSteps.filter(_.persistType == RecordPersistType)
 //    recordSteps.foreach { step =>
-//      val name = step.name
-//      val records = collectRecords(step, updateTimeGroups)
-//      records.foreach { pair =>
-//        val (t, recs) = pair
-//        val persist = persistFactory.getPersists(t)
-//        persist.persistRecords(recs, name)
+//      collectRecords(step, timeGroups) match {
+//        case Some(rdd) => {
+//          val name = step.name
+//          rdd.foreach { pair =>
+//            val (t, items) = pair
+//            val persist = persistFactory.getPersists(t)
+//            persist.persistRecords(items, name)
+//          }
+//        }
+//        case _ => {
+//          println(s"empty records to persist")
+//        }
+//      }
+//    }
+//  }
+//
+//  def updateDataSources(ruleSteps: Seq[ConcreteRuleStep], dataSources: Seq[DataSource],
+//                        timeGroups: Iterable[Long]): Unit = {
+//    val updateSteps = ruleSteps.filter(_.updateDataSource.nonEmpty)
+//    updateSteps.foreach { step =>
+//      collectUpdateCacheDatas(step, timeGroups) match {
+//        case Some(rdd) => {
+//          val udpateDataSources = dataSources.filter { ds =>
+//            step.updateDataSource match {
+//              case Some(dsName) if (dsName == ds.name) => true
+//              case _ => false
+//            }
+//          }
+//          if (udpateDataSources.size > 0) {
+//            val name = step.name
+//            rdd.foreach { pair =>
+//              val (t, items) = pair
+//              udpateDataSources.foreach { ds =>
+//                ds.dataSourceCacheOpt.foreach(_.updateData(items, t))
+//              }
+//            }
+//          }
+//        }
+//        case _ => {
+//          println(s"empty data source to update")
+//        }
 //      }
 //    }
 //  }
 
-//  def genDataSource(dataSourceParam: DataSourceParam): Option[DirectDataSource] = {
-//    val ret = engines.foldLeft(None: Option[DirectDataSource]) { (dsOpt, engine) =>
-//      if (dsOpt.isEmpty) engine.genDataSource(dataSourceParam) else dsOpt
-//    }
-//    if (ret.isEmpty) warn(s"init data source warn: no dq engine support ${dataSourceParam}")
-//    ret
-//  }
+  ///////////////////////////
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     val ret = engines.foldLeft(false) { (done, engine) =>
@@ -172,27 +127,18 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     ret
   }
 
-//  def persistRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long], persistFactory: PersistFactory): Boolean = {
-//    val ret = engines.foldLeft(false) { (done, engine) =>
-//      done || engine.persistRecords(ruleStep, timeGroups, persistFactory)
-//    }
-//    if (!ret) error(s"persist result warn: no dq engine support ${ruleStep}")
-//    ret
+  ///////////////////////////
+
+//  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]] = {
+//    engines.flatMap { engine =>
+//      engine.collectRecords(ruleStep, timeGroups)
+//    }.headOption
 //  }
-  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame] = {
-    val ret = engines.foldLeft(Map[Long, DataFrame]()) { (ret, engine) =>
-      ret ++ engine.collectRecords(ruleStep, timeGroups)
-    }
-//    if (ret.isEmpty) warn(s"collect records warn: no records collected for ${ruleStep}")
-    ret
-  }
-  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Map[Long, DataFrame] = {
-    val ret = engines.foldLeft(Map[Long, DataFrame]()) { (ret, engine) =>
-      ret ++ engine.collectUpdateCacheDatas(ruleStep, timeGroups)
-    }
-    //    if (ret.isEmpty) warn(s"collect records warn: no records collected for ${ruleStep}")
-    ret
-  }
+//  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]] = {
+//    engines.flatMap { engine =>
+//      engine.collectUpdateCacheDatas(ruleStep, timeGroups)
+//    }.headOption
+//  }
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
     val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
       ret ++ engine.collectMetrics(ruleStep)
@@ -201,11 +147,14 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     ret
   }
 
-  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]] = {
+  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]
+                      ): Option[RDD[(Long, Iterable[String])]] = {
     engines.flatMap { engine =>
       engine.collectUpdateRDD(ruleStep, timeGroups)
     }.headOption
   }
+
+  ////////////////////////////
 
   def collectUpdateRDDs(ruleSteps: Seq[ConcreteRuleStep], timeGroups: Iterable[Long]
                        ): Seq[(ConcreteRuleStep, RDD[(Long, Iterable[String])])] = {

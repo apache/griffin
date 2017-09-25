@@ -94,9 +94,8 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // persist results
     val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
 
-    val stepRdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
-
-    dqEngines.persistAllRecords(stepRdds, persistFactory)
+    val rdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
+    dqEngines.persistAllRecords(rdds, persistFactory)
 //    dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
 
     // end time

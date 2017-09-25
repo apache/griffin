@@ -69,19 +69,25 @@ case class StreamingDqThread(dqEngines: DqEngines,
         // persist results
         val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
 
-        // get rdd of steps
-        val stepRdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
-
-        dqEngines.persistAllRecords(stepRdds, persistFactory)
-
         val rt = new Date().getTime
-        val persistResultTimeStr = s"persist result and records using time: ${rt - ct} ms"
+        val persistResultTimeStr = s"persist result using time: ${rt - ct} ms"
         println(persistResultTimeStr)
         appPersist.log(rt, persistResultTimeStr)
 
+        val rdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
+
+        val lt = new Date().getTime
+        val collectoRddTimeStr = s"collect records using time: ${lt - rt} ms"
+        println(collectoRddTimeStr)
+        appPersist.log(lt, collectoRddTimeStr)
+
+        // persist records
+        dqEngines.persistAllRecords(rdds, persistFactory)
+//        dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
+
         // update data source
+        dqEngines.updateDataSources(rdds, dataSources)
 //        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
-        dqEngines.updateDataSources(stepRdds, dataSources)
 
         TimeInfoCache.endTimeInfoCache
 
@@ -89,7 +95,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
         cleanData
 
         val et = new Date().getTime
-        val persistTimeStr = s"update data source using time: ${et - rt} ms"
+        val persistTimeStr = s"persist records using time: ${et - lt} ms"
         println(persistTimeStr)
         appPersist.log(et, persistTimeStr)
 
