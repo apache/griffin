@@ -75,6 +75,12 @@ case class StreamingDqThread(dqEngines: DqEngines,
         appPersist.log(rt, persistResultTimeStr)
 
         val rdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
+        rdds.foreach(_._2.cache())
+        rdds.foreach { pr =>
+          val (step, rdd) = pr
+          val cnt = rdd.count
+          println(s"step [${step.name}] group count: ${cnt}")
+        }
 
         val lt = new Date().getTime
         val collectoRddTimeStr = s"collect records using time: ${lt - rt} ms"
@@ -88,6 +94,8 @@ case class StreamingDqThread(dqEngines: DqEngines,
         // update data source
         dqEngines.updateDataSources(rdds, dataSources)
 //        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
+
+        rdds.foreach(_._2.unpersist())
 
         TimeInfoCache.endTimeInfoCache
 
