@@ -315,7 +315,14 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
   }
 
   private def checkDataSourceExists(name: String): Boolean = {
-    RuleAdaptorGroup.dataChecker.existDataSourceName(name)
+    try {
+      RuleAdaptorGroup.dataChecker.existDataSourceName(name)
+    } catch {
+      case e: Throwable => {
+        error(s"check data source exists error: ${e.getMessage}")
+        false
+      }
+    }
   }
 
 }

@@ -64,7 +64,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
   }
 
   val rowSepLiteral = "\n"
-  val partitionUnits: List[String] = List("hour", "min")
+  val partitionUnits: List[String] = List("hour", "min", "sec")
 
   val newCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.new")
   val oldCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.old")
