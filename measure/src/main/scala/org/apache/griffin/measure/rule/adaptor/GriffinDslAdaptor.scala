@@ -264,7 +264,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           case Some(name) => name
           case _ => dataSourceNames.head
         }
-        val analyzer = ProfilingAnalyzer(expr.asInstanceOf[CombinedClause], sourceName)
+        val analyzer = ProfilingAnalyzer(expr.asInstanceOf[ProfilingClause], sourceName)
 
         val selClause = analyzer.selectionExprs.map { sel =>
           val alias = sel match {
@@ -274,14 +274,23 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           s"${sel.desc}${alias}"
         }.mkString(", ")
 
-        val tailClause = analyzer.tailsExprs.map(_.desc).mkString(" ")
+//        val tailClause = analyzer.tailsExprs.map(_.desc).mkString(" ")
+        val tmstGroupbyClause = GroupbyClause(LiteralStringExpr(s"`${GroupByColumn.tmst}`") :: Nil, None)
+        val mergedGroubbyClause = tmstGroupbyClause.merge(analyzer.groupbyExprOpt match {
+          case Some(gbc) => gbc
+          case _ => GroupbyClause(Nil, None)
+        })
+        val groupbyClause = mergedGroubbyClause.desc
+        val preGroupbyClause = analyzer.preGroupbyExprs.map(_.desc).mkString(" ")
+        val postGroupbyClause = analyzer.postGroupbyExprs.map(_.desc).mkString(" ")
 
         if (!checkDataSourceExists(sourceName)) {
           Nil
         } else {
           // 1. select statement
           val profilingSql = {
-            s"SELECT `${GroupByColumn.tmst}`, ${selClause} FROM ${sourceName} ${tailClause} GROUP BY `${GroupByColumn.tmst}`"
+//            s"SELECT `${GroupByColumn.tmst}`, ${selClause} FROM ${sourceName} ${tailClause} GROUP BY `${GroupByColumn.tmst}`"
+            s"SELECT `${GroupByColumn.tmst}`, ${selClause} FROM ${sourceName} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
           }
           val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
           val profilingStep = SparkSqlStep(

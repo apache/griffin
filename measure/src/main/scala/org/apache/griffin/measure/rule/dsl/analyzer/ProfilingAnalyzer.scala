@@ -21,7 +21,7 @@ package org.apache.griffin.measure.rule.dsl.analyzer
 import org.apache.griffin.measure.rule.dsl.expr._
 
 
-case class ProfilingAnalyzer(expr: CombinedClause, sourceName: String) extends BasicAnalyzer {
+case class ProfilingAnalyzer(expr: ProfilingClause, sourceName: String) extends BasicAnalyzer {
 
   val dataSourceNames = expr.preOrderTraverseDepthFirst(Set[String]())(seqDataSourceNames, combDataSourceNames)
 
@@ -30,9 +30,10 @@ case class ProfilingAnalyzer(expr: CombinedClause, sourceName: String) extends B
     expr.selectClause.preOrderTraverseDepthFirst(Seq[SelectionExpr]())(seq, combSelectionExprs)
   }
 
-  val selectionExprs = {
-    expr.selectClause.exprs.map(_.extractSelf)
-  }
-  val tailsExprs = expr.tails.map(_.extractSelf)
+  val selectionExprs = expr.selectClause.exprs.map(_.extractSelf)
+
+  val groupbyExprOpt = expr.groupbyClauseOpt
+  val preGroupbyExprs = expr.preGroupbyClauses.map(_.extractSelf)
+  val postGroupbyExprs = expr.postGroupbyClauses.map(_.extractSelf)
 
 }

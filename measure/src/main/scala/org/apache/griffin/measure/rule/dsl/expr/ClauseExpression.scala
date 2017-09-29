@@ -46,18 +46,30 @@ case class GroupbyClause(exprs: Seq[Expr], havingClauseOpt: Option[Expr]) extend
   def desc: String = {
     val gbs = exprs.map(_.desc).mkString(", ")
     havingClauseOpt match {
-//      case Some(having) => s"GROUP BY ${gbs} HAVING ${having.desc}"
-      case Some(having) => s"GROUP BY ${gbs}"
+      case Some(having) => s"GROUP BY ${gbs} HAVING ${having.desc}"
       case _ => s"GROUP BY ${gbs}"
     }
   }
   def coalesceDesc: String = {
     val gbs = exprs.map(_.desc).mkString(", ")
     havingClauseOpt match {
-//      case Some(having) => s"GROUP BY ${gbs} HAVING ${having.coalesceDesc}"
-      case Some(having) => s"GROUP BY ${gbs}"
+      case Some(having) => s"GROUP BY ${gbs} HAVING ${having.coalesceDesc}"
       case _ => s"GROUP BY ${gbs}"
     }
+  }
+
+  def merge(other: GroupbyClause): GroupbyClause = {
+    val newHavingClauseOpt = (havingClauseOpt, other.havingClauseOpt) match {
+      case (Some(hc), Some(ohc)) => {
+        val logical1 = LogicalFactorExpr(hc, false, None)
+        val logical2 = LogicalFactorExpr(ohc, false, None)
+        Some(BinaryLogicalExpr(logical1, ("AND", logical2) :: Nil))
+      }
+      case (a @ Some(_), _) => a
+      case (_, b @ Some(_)) => b
+      case (_, _) => None
+    }
+    GroupbyClause(exprs ++ other.exprs, newHavingClauseOpt)
   }
 
 }
@@ -109,5 +121,30 @@ case class CombinedClause(selectClause: SelectClause, tails: Seq[ClauseExpressio
     tails.foldLeft(selectClause.coalesceDesc) { (head, tail) =>
       s"${head} ${tail.coalesceDesc}"
     }
+  }
+}
+
+case class ProfilingClause(selectClause: SelectClause, groupbyClauseOpt: Option[GroupbyClause],
+                           preGroupbyClauses: Seq[ClauseExpression],
+                           postGroupbyClauses: Seq[ClauseExpression]
+                          ) extends ClauseExpression {
+  addChildren(groupbyClauseOpt match {
+    case Some(gc) => (selectClause +: preGroupbyClauses) ++ (gc +: postGroupbyClauses)
+    case _ => (selectClause +: preGroupbyClauses) ++ postGroupbyClauses
+  })
+
+  def desc: String = {
+    val selectDesc = selectClause.desc
+    val groupbyDesc = groupbyClauseOpt.map(_.desc).mkString(" ")
+    val preDesc = preGroupbyClauses.map(_.desc).mkString(" ")
+    val postDesc = postGroupbyClauses.map(_.desc).mkString(" ")
+    s"${selectDesc} ${preDesc} ${groupbyDesc} ${postDesc}"
+  }
+  def coalesceDesc: String = {
+    val selectDesc = selectClause.coalesceDesc
+    val groupbyDesc = groupbyClauseOpt.map(_.coalesceDesc).mkString(" ")
+    val preDesc = preGroupbyClauses.map(_.coalesceDesc).mkString(" ")
+    val postDesc = postGroupbyClauses.map(_.coalesceDesc).mkString(" ")
+    s"${selectDesc} ${preDesc} ${groupbyDesc} ${postDesc}"
   }
 }

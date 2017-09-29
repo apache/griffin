@@ -54,11 +54,11 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "source.name.count(), source.age.avg(), source.age.max(), source.age.min()",
+        "rule": "source.name.count(), source.age.avg(), source.age.max(), source.age.min() group by source.name having source.name.count() > 0 limit 2",
         "details": {
           "source": "source",
           "profiling": {
-            "name": "count",
+            "name": "prof",
             "persist.type": "metric"
           }
         }
