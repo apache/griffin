@@ -72,7 +72,13 @@ trait DataConnector extends Loggable with Serializable {
         val outDf = sqlContext.table(thisTable)
 
         // drop temp table
-        names.foreach(name => sqlContext.dropTempTable(name))
+        names.foreach { name =>
+          try {
+            sqlContext.dropTempTable(name)
+          } catch {
+            case e: Throwable => warn(s"drop temp table ${name} fails")
+          }
+        }
 
         // add tmst
         val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
