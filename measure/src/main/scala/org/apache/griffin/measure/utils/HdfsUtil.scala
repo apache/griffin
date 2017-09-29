@@ -28,7 +28,7 @@ object HdfsUtil extends Loggable {
 
   private val conf = new Configuration()
   conf.set("dfs.support.append", "true")
-  conf.set("fs.defaultFS", "hdfs://localhost")    // debug @localhost
+//  conf.set("fs.defaultFS", "hdfs://localhost")    // debug @localhost
 
   private val dfs = FileSystem.get(conf)
 
