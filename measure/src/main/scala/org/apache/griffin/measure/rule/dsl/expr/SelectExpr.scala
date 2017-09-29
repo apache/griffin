@@ -27,6 +27,11 @@ case class DataSourceHeadExpr(name: String) extends HeadExpr {
   def coalesceDesc: String = desc
 }
 
+case class FieldNameHeadExpr(field: String) extends HeadExpr {
+  def desc: String = field
+  def coalesceDesc: String = desc
+}
+
 case class OtherHeadExpr(expr: Expr) extends HeadExpr {
 
   addChild(expr)

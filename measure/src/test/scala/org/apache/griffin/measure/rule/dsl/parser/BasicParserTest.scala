@@ -195,4 +195,11 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     result3.get.desc should be ("source.age + 2 * 5 + target.offset * func('a', source.name)")
   }
 
+  test ("order by clause") {
+    val rule = "order by source.user_id, item"
+    val result = parser.parseAll(parser.orderbyClause, rule)
+    result.successful should be (true)
+    println(result.get.desc)
+  }
+
 }

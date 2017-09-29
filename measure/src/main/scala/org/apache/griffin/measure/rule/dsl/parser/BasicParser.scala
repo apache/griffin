@@ -94,14 +94,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val MATH_UNARY: Parser[String] = "+" | "-"
     val MATH_BINARIES: Seq[Parser[String]] = Seq(("*" | "/" | "%"), ("+" | "-"))
 
-    val NOT: Parser[String] = """(?i)not""".r | "!"
-    val AND: Parser[String] = """(?i)and""".r | "&&"
-    val OR: Parser[String] = """(?i)or""".r | "||"
-    val IN: Parser[String] = """(?i)in""".r
-    val BETWEEN: Parser[String] = """(?i)between""".r
-    val AND_ONLY: Parser[String] = """(?i)and""".r
-    val IS: Parser[String] = """(?i)is""".r
-    val LIKE: Parser[String] = """(?i)like""".r
+    val NOT: Parser[String] = """(?i)not\s""".r | "!"
+    val AND: Parser[String] = """(?i)and\s""".r | "&&"
+    val OR: Parser[String] = """(?i)or\s""".r | "||"
+    val IN: Parser[String] = """(?i)in\s""".r
+    val BETWEEN: Parser[String] = """(?i)between\s""".r
+    val AND_ONLY: Parser[String] = """(?i)and\s""".r
+    val IS: Parser[String] = """(?i)is\s""".r
+    val LIKE: Parser[String] = """(?i)like\s""".r
     val COMPARE: Parser[String] = "=" | "!=" | "<>" | "<=" | ">=" | "<" | ">"
     val LOGICAL_UNARY: Parser[String] = NOT
     val LOGICAL_BINARIES: Seq[Parser[String]] = Seq((COMPARE), (AND), (OR))
@@ -118,15 +118,15 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val UQUOTE: Parser[String] = "`"
     val COMMA: Parser[String] = ","
 
-    val AS: Parser[String] = "(?i)as".r
-    val WHERE: Parser[String] = "(?i)where".r
-    val GROUP: Parser[String] = "(?i)group".r
-    val ORDER: Parser[String] = "(?i)order".r
-    val BY: Parser[String] = "(?i)by".r
-    val DESC: Parser[String] = "(?i)desc".r
-    val ASC: Parser[String] = "(?i)asc".r
-    val HAVING: Parser[String] = "(?i)having".r
-    val LIMIT: Parser[String] = "(?i)limit".r
+    val AS: Parser[String] = """(?i)as\s""".r
+    val WHERE: Parser[String] = """(?i)where\s""".r
+    val GROUP: Parser[String] = """(?i)group\s""".r
+    val ORDER: Parser[String] = """(?i)order\s""".r
+    val BY: Parser[String] = """(?i)by\s""".r
+    val DESC: Parser[String] = """(?i)desc""".r
+    val ASC: Parser[String] = """(?i)asc""".r
+    val HAVING: Parser[String] = """(?i)having\s""".r
+    val LIMIT: Parser[String] = """(?i)limit\s""".r
   }
   import Operator._
 
@@ -177,7 +177,13 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   def selection: Parser[SelectionExpr] = selectionHead ~ rep(selector) ~ opt(asAlias) ^^ {
     case head ~ sels ~ aliasOpt => SelectionExpr(head, sels, aliasOpt)
   }
-  def selectionHead: Parser[HeadExpr] = DataSourceName ^^ { DataSourceHeadExpr(_) } | function ^^ { OtherHeadExpr(_) }
+  def selectionHead: Parser[HeadExpr] = DataSourceName ^^ {
+    DataSourceHeadExpr(_)
+  } | function ^^ {
+    OtherHeadExpr(_)
+  } | TableFieldName ^^ {
+    FieldNameHeadExpr(_)
+  }
   def selector: Parser[SelectExpr] = functionSelect | fieldSelect | indexSelect
   def fieldSelect: Parser[FieldSelectExpr] = DOT ~> TableFieldName ^^ { FieldSelectExpr(_) }
   def indexSelect: Parser[IndexSelectExpr] = LSQBR ~> argument <~ RSQBR ^^ { IndexSelectExpr(_) }
@@ -307,7 +313,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   def orderbyItem: Parser[OrderbyItem] = expression ~ opt(DESC | ASC) ^^ {
     case expr ~ orderOpt => OrderbyItem(expr, orderOpt)
   }
-  def orderbyClause: Parser[OrderbyClause] = ORDER ~> BY ~> rep1sep(orderbyItem, COMMA) ^^ { OrderbyClause(_) }
+  def orderbyClause: Parser[OrderbyClause] = ORDER ~ BY ~ rep1sep(orderbyItem, COMMA) ^^ {
+    case _ ~ _ ~ cols => OrderbyClause(cols)
+  }
   def limitClause: Parser[LimitClause] = LIMIT ~> expression ^^ { LimitClause(_) }
 
   /**
@@ -318,7 +326,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   def combinedClause: Parser[CombinedClause] = selectClause ~ opt(whereClause) ~
     opt(groupbyClause) ~ opt(orderbyClause) ~ opt(limitClause) ^^ {
     case sel ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
-      val tails = Seq(whereOpt, groupbyOpt,  orderbyOpt, limitOpt).flatMap(opt => opt)
+      val tails = Seq(whereOpt, groupbyOpt, orderbyOpt, limitOpt).flatMap(opt => opt)
       CombinedClause(sel, tails)
     }
   }

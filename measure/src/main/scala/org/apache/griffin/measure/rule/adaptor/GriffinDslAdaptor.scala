@@ -120,6 +120,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           val result = parser.parseRule(rule, dqType)
           if (result.successful) Some(result.get)
           else {
+            println(result)
             warn(s"adapt concrete rule step warn: parse rule [ ${rule} ] fails")
             None
           }

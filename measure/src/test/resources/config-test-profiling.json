@@ -23,7 +23,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "source.user_id.count() as cnt",
+        "rule": "user_id.count() as cnt group by user_id order by cnt desc, user_id desc limit 3",
         "details": {
           "source": "source",
           "profiling": {
