@@ -160,7 +160,7 @@ case class BinaryLogicalExpr(factor: LogicalExpr, tails: Seq[(String, LogicalExp
     s match {
       case "&&" => "AND"
       case "||" => "OR"
-      case _ => s.toUpperCase
+      case _ => s.trim.toUpperCase
     }
   }
   override def extractSelf: Expr = {
