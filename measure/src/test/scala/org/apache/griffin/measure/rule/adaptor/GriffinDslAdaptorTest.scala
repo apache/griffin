@@ -36,11 +36,11 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
         |{
         |  "dsl.type": "griffin-dsl",
         |  "dq.type": "profiling",
-        |  "rule": "source.user_id.count() as cnt group by source.age having source.desc.count() > 5",
+        |  "rule": "source.user_id.count() as cnt group by source.age having source.desc.count() > 5 order by source.user_id",
         |  "details": {
         |    "source": "source",
         |    "profiling": {
-        |      "name": "count",
+        |      "name": "prof",
         |      "persist.type": "metric"
         |    }
         |  }

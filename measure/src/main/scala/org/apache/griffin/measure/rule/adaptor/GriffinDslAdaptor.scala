@@ -266,13 +266,14 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         }
         val analyzer = ProfilingAnalyzer(expr.asInstanceOf[ProfilingClause], sourceName)
 
-        val selClause = analyzer.selectionExprs.map { sel =>
+        val selExprDescs = analyzer.selectionExprs.map { sel =>
           val alias = sel match {
-            case s: AliasableExpr if (s.alias.nonEmpty) => s" AS ${s.alias.get}"
+            case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.get}`"
             case _ => ""
           }
           s"${sel.desc}${alias}"
-        }.mkString(", ")
+        }
+        val selClause = (s"`${GroupByColumn.tmst}`" +: selExprDescs).mkString(", ")
 
 //        val tailClause = analyzer.tailsExprs.map(_.desc).mkString(" ")
         val tmstGroupbyClause = GroupbyClause(LiteralStringExpr(s"`${GroupByColumn.tmst}`") :: Nil, None)
@@ -290,7 +291,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           // 1. select statement
           val profilingSql = {
 //            s"SELECT `${GroupByColumn.tmst}`, ${selClause} FROM ${sourceName} ${tailClause} GROUP BY `${GroupByColumn.tmst}`"
-            s"SELECT `${GroupByColumn.tmst}`, ${selClause} FROM ${sourceName} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
+            s"SELECT ${selClause} FROM ${sourceName} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
           }
           val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
           val profilingStep = SparkSqlStep(
@@ -303,7 +304,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 
           // 2. clear processed data
           val clearDataSourceStep = DfOprStep(
-            s"${profilingMetricName}_clear",
+            s"${sourceName}_clear",
             "clear",
             Map[String, Any](
               ("df.name" -> sourceName)
