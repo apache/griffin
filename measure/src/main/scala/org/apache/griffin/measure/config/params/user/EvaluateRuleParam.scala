@@ -23,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.griffin.measure.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
-case class EvaluateRuleParam( @JsonProperty("sampleRatio") sampleRatio: Double,
-                              @JsonProperty("rules") rules: String
+case class EvaluateRuleParam( @JsonProperty("dsl.type") dslType: String,
+                              @JsonProperty("rules") rules: List[Map[String, Any]]
                             ) extends Param {
 
 }

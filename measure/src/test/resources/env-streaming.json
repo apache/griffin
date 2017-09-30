@@ -5,6 +5,7 @@
     "batch.interval": "2s",
     "process.interval": "10s",
     "config": {
+      "spark.master": "local[*]",
       "spark.task.maxFailures": 5,
       "spark.streaming.kafkaMaxRatePerPartition": 1000,
       "spark.streaming.concurrentJobs": 4,

@@ -1,0 +1,96 @@
+{
+  "name": "accu batch test",
+
+  "process.type": "batch",
+
+  "data.sources": [
+    {
+      "name": "source",
+      "connectors": [
+        {
+          "type": "hive",
+          "version": "1.2",
+          "config": {
+            "database": "default",
+            "table.name": "src"
+          }
+        }
+      ]
+    }, {
+      "name": "target",
+      "connectors": [
+        {
+          "type": "hive",
+          "version": "1.2",
+          "config": {
+            "database": "default",
+            "table.name": "tgt"
+          }
+        }
+      ]
+    }
+  ],
+
+  "evaluateRule": {
+    "rules": [
+      {
+        "dsl.type": "df-opr",
+        "name": "source",
+        "rule": "from_json",
+        "details": {
+          "df.name": "source"
+        }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "seeds",
+        "rule": "SELECT explode(seeds) as seed FROM source"
+      },
+      {
+        "dsl.type": "df-opr",
+        "name": "seeds",
+        "rule": "from_json",
+        "details": {
+          "df.name": "seeds",
+          "col.name": "seed"
+        }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "source",
+        "rule": "SELECT url, get_json_object(metadata, '$.tracker.crawlRequestCreateTS') AS ts FROM seeds"
+      },
+      {
+        "dsl.type": "spark-opr",
+        "name": "target",
+        "rule": "from_json(target.value)"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "attrs",
+        "rule": "SELECT groups[0].attrsList AS attrs FROM target"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "target",
+        "rule": "SELECT attrs.values[index_of(attrs.name, 'URL')][0] AS url, get_json_object(attrs.values[index_of(attrs.name, 'CRAWLMETADATA')][0], '$.tracker.crawlRequestCreateTS') AS ts FROM df2"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "miss.record",
+        "rule": "SELECT source.url, source.ts FROM source LEFT JOIN target ON coalesce(source.url, '') = coalesce(target.url, '') AND coalesce(source.ts, '') = coalesce(target.ts, '') WHERE (NOT (source.url IS NULL AND source.ts IS NULL)) AND (target.url IS NULL AND target.ts IS NULL)",
+        "persist.type": "record"
+      }, {
+        "dsl.type": "spark-sql",
+        "name": "miss.count",
+        "rule": "SELECT COUNT(*) AS `miss.count` FROM `miss.record`",
+        "persist.type": "metric"
+      }, {
+        "dsl.type": "spark-sql",
+        "name": "total.count",
+        "rule": "SELECT COUNT(*) AS `total.count` FROM source",
+        "persist.type": "metric"
+      }
+    ]
+  }
+}

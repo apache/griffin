@@ -1,0 +1,54 @@
+{
+  "name": "accu1",
+
+  "process.type": "batch",
+
+  "data.sources": [
+    {
+      "name": "source",
+      "connectors": [
+        {
+          "type": "hive",
+          "version": "1.2",
+          "config": {
+            "database": "default",
+            "table.name": "users_info_src",
+            "partitions": "dt=23123, hour=432; dt=35464, hour=4657"
+          }
+        }
+      ]
+    }, {
+      "name": "target",
+      "connectors": [
+        {
+          "type": "hive",
+          "version": "1.2",
+          "config": {
+            "database": "default",
+            "table.name": "users_info_target",
+            "partitions": "dt=23123, hour=432; dt=35464, hour=4657"
+          }
+        }
+      ]
+    }
+  ],
+
+  "evaluateRule": {
+    "dsl.type": "spark-sql",
+    "rules": [
+      {
+        "name": "miss.record",
+        "rule": "SELECT source.name FROM source LEFT JOIN target ON coalesce(source.name, 'null') = coalesce(target.name, 'null') WHERE (NOT (source.name IS NULL)) AND (target.name IS NULL)",
+        "persist.type": "record"
+      }, {
+        "name": "miss.count",
+        "rule": "SELECT COUNT(*) FROM miss",
+        "persist.type": "metric"
+      }, {
+        "name": "total.count",
+        "rule": "SELECT COUNT(*) FROM source",
+        "persist.type": "metric"
+      }
+    ]
+  }
+}
