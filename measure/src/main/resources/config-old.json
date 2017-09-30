@@ -1,0 +1,31 @@
+{
+  "name": "accu1",
+  "type": "accuracy",
+
+  "process.type": "batch",
+
+  "source": {
+    "type": "hive",
+    "version": "1.2",
+    "config": {
+      "database": "default",
+      "table.name": "users_info_src",
+      "partitions": "dt=23123, hour=432; dt=35464, hour=4657"
+    }
+  },
+
+  "target": {
+    "type": "hive",
+    "version": "1.2",
+    "config": {
+      "database": "default",
+      "table.name": "users_info_target",
+      "partitions": "dt=23123, hour=432; dt=35464, hour=4657"
+    }
+  },
+
+  "evaluateRule": {
+    "sampleRatio": 0.2,
+    "rules": "$source.user_id = $target.user_id AND $source.first_name = $target.first_name AND $source.last_name = $target.last_name AND $source.address = $target.address AND $source.email = $target.email AND $source.phone = $target.phone AND $source.post_code = $target.post_code"
+  }
+}

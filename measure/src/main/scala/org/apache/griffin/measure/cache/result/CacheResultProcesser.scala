@@ -23,7 +23,7 @@ import org.apache.griffin.measure.result._
 
 import scala.collection.mutable.{Map => MutableMap}
 
-case class CacheResultProcesser() extends Loggable {
+object CacheResultProcesser extends Loggable {
 
   val cacheGroup: MutableMap[Long, CacheResult] = MutableMap()
 
