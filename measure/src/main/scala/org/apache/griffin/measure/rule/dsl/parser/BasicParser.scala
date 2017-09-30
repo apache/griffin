@@ -80,7 +80,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
 
   protected def genNamesParser(names: Seq[String]): Parser[String] = {
     names.reverse.map {
-      fn => s"""${fn}""": Parser[String]
+      fn => s"""(?i)${fn}""".r: Parser[String]
     }.reduce(_ | _)
   }
 
@@ -183,8 +183,11 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     OtherHeadExpr(_)
   } | TableFieldName ^^ {
     FieldNameHeadExpr(_)
+  } | ALLSL ^^ { _ =>
+    ALLSelectHeadExpr()
   }
-  def selector: Parser[SelectExpr] = functionSelect | fieldSelect | indexSelect
+  def selector: Parser[SelectExpr] = functionSelect | allFieldsSelect | fieldSelect | indexSelect
+  def allFieldsSelect: Parser[AllFieldsSelectExpr] = DOT ~> ALLSL ^^ { _ => AllFieldsSelectExpr() }
   def fieldSelect: Parser[FieldSelectExpr] = DOT ~> TableFieldName ^^ { FieldSelectExpr(_) }
   def indexSelect: Parser[IndexSelectExpr] = LSQBR ~> argument <~ RSQBR ^^ { IndexSelectExpr(_) }
   def functionSelect: Parser[FunctionSelectExpr] = DOT ~ FunctionName ~ LBR ~ repsep(argument, COMMA) ~ RBR ^^ {

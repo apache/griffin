@@ -32,6 +32,11 @@ case class FieldNameHeadExpr(field: String) extends HeadExpr {
   def coalesceDesc: String = desc
 }
 
+case class ALLSelectHeadExpr() extends HeadExpr {
+  def desc: String = "*"
+  def coalesceDesc: String = desc
+}
+
 case class OtherHeadExpr(expr: Expr) extends HeadExpr {
 
   addChild(expr)
@@ -43,6 +48,12 @@ case class OtherHeadExpr(expr: Expr) extends HeadExpr {
 // -------------
 
 trait SelectExpr extends Expr with AliasableExpr {
+}
+
+case class AllFieldsSelectExpr() extends SelectExpr {
+  def desc: String = s".*"
+  def coalesceDesc: String = desc
+  def alias: Option[String] = None
 }
 
 case class FieldSelectExpr(field: String) extends SelectExpr {

@@ -31,6 +31,19 @@ case class ProfilingAnalyzer(expr: ProfilingClause, sourceName: String) extends 
   }
 
   val selectionExprs = expr.selectClause.exprs.map(_.extractSelf)
+  def containsAllSelectionExpr = {
+    selectionExprs.filter { expr =>
+      expr match {
+        case SelectionExpr(head: ALLSelectHeadExpr, selectors: Seq[SelectExpr], _) => {
+          selectors.isEmpty
+        }
+        case SelectionExpr(head: DataSourceHeadExpr, selectors: Seq[SelectExpr], _) => {
+          (head == sourceName) && (selectors.size == 1) && (selectors.head.isInstanceOf[AllFieldsSelectExpr])
+        }
+        case _ => false
+      }
+    }.size > 0
+  }
 
   val groupbyExprOpt = expr.groupbyClauseOpt
   val preGroupbyExprs = expr.preGroupbyClauses.map(_.extractSelf)

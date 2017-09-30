@@ -267,6 +267,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         }
         val analyzer = ProfilingAnalyzer(expr.asInstanceOf[ProfilingClause], sourceName)
 
+        analyzer.selectionExprs.foreach(println)
+
         val selExprDescs = analyzer.selectionExprs.map { sel =>
           val alias = sel match {
             case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.get}`"
@@ -274,7 +276,13 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           }
           s"${sel.desc}${alias}"
         }
-        val selClause = (s"`${GroupByColumn.tmst}`" +: selExprDescs).mkString(", ")
+
+//        val selClause = (s"`${GroupByColumn.tmst}`" +: selExprDescs).mkString(", ")
+        val selClause = if (analyzer.containsAllSelectionExpr) {
+          selExprDescs.mkString(", ")
+        } else {
+          (s"`${GroupByColumn.tmst}`" +: selExprDescs).mkString(", ")
+        }
 
 //        val tailClause = analyzer.tailsExprs.map(_.desc).mkString(" ")
         val tmstGroupbyClause = GroupbyClause(LiteralStringExpr(s"`${GroupByColumn.tmst}`") :: Nil, None)
