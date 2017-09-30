@@ -45,15 +45,15 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     result2.successful should be (true)
     result2.get.desc should be ("NaN")
 
-    val rule3 = """'testing'"""
+    val rule3 = """'test\'ing'"""
     val result3 = parser.parseAll(parser.literal, rule3)
     result3.successful should be (true)
-    result3.get.desc should be ("'testing'")
+    result3.get.desc should be ("'test\\'ing'")
 
-    val rule4 = """"test again""""
+    val rule4 = """"test\" again""""
     val result4 = parser.parseAll(parser.literal, rule4)
     result4.successful should be (true)
-    result4.get.desc should be ("\"test again\"")
+    result4.get.desc should be ("\"test\\\" again\"")
 
     val rule5 = """-1.342"""
     val result5 = parser.parseAll(parser.literal, rule5)
