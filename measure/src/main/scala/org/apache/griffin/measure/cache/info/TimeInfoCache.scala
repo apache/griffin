@@ -109,7 +109,7 @@ object TimeInfoCache extends Loggable with Serializable {
         case _ => -1
       }
     } catch {
-      case _ => -1
+      case e: Throwable => -1
     }
   }
 
