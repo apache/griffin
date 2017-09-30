@@ -18,10 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
+import org.apache.griffin.measure.log.Loggable
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileSystem, Path}
 
-object HdfsUtil {
+object HdfsUtil extends Loggable {
 
   private val seprator = "/"
 
@@ -32,8 +33,17 @@ object HdfsUtil {
   private val dfs = FileSystem.get(conf)
 
   def existPath(filePath: String): Boolean = {
-    val path = new Path(filePath)
-    dfs.exists(path)
+    try {
+      val path = new Path(filePath)
+      dfs.exists(path)
+    } catch {
+      case e: Throwable => false
+    }
+  }
+
+  def existFileInDir(dirPath: String, fileName: String): Boolean = {
+    val filePath = getHdfsFilePath(dirPath, fileName)
+    existPath(filePath)
   }
 
   def createFile(filePath: String): FSDataOutputStream = {
@@ -75,8 +85,12 @@ object HdfsUtil {
   }
 
   def deleteHdfsPath(dirPath: String): Unit = {
-    val path = new Path(dirPath)
-    if (dfs.exists(path)) dfs.delete(path, true)
+    try {
+      val path = new Path(dirPath)
+      if (dfs.exists(path)) dfs.delete(path, true)
+    } catch {
+      case e: Throwable => error(s"delete path [${dirPath}] error: ${e.getMessage}")
+    }
   }
 
 //  def listPathFiles(dirPath: String): Iterable[String] = {
@@ -96,25 +110,38 @@ object HdfsUtil {
 //    }
 //  }
 
-  def listSubPaths(dirPath: String, subType: String, fullPath: Boolean = false): Iterable[String] = {
-    val path = new Path(dirPath)
-    try {
-      val fileStatusArray = dfs.listStatus(path)
-      fileStatusArray.filter { fileStatus =>
-        subType match {
-          case "dir" => fileStatus.isDirectory
-          case "file" => fileStatus.isFile
-          case _ => true
+  def listSubPathsByType(dirPath: String, subType: String, fullPath: Boolean = false): Iterable[String] = {
+    if (existPath(dirPath)) {
+      try {
+        val path = new Path(dirPath)
+        val fileStatusArray = dfs.listStatus(path)
+        fileStatusArray.filter { fileStatus =>
+          subType match {
+            case "dir" => fileStatus.isDirectory
+            case "file" => fileStatus.isFile
+            case _ => true
+          }
+        }.map { fileStatus =>
+          val fname = fileStatus.getPath.getName
+          if (fullPath) getHdfsFilePath(dirPath, fname) else fname
         }
-      }.map { fileStatus =>
-        val fname = fileStatus.getPath.getName
-        if (fullPath) getHdfsFilePath(dirPath, fname) else fname
+      } catch {
+        case e: Throwable => {
+          warn(s"list path [${dirPath}] warn: ${e.getMessage}")
+          Nil
+        }
       }
-    } catch {
-      case e: Throwable => {
-        println(s"list path files error: ${e.getMessage}")
-        Nil
-      }
+    } else Nil
+  }
+
+  def listSubPathsByTypes(dirPath: String, subTypes: Iterable[String], fullPath: Boolean = false): Iterable[String] = {
+    subTypes.flatMap { subType =>
+      listSubPathsByType(dirPath, subType, fullPath)
     }
+  }
+
+  def fileNameFromPath(filePath: String): String = {
+    val path = new Path(filePath)
+    path.getName
   }
 }

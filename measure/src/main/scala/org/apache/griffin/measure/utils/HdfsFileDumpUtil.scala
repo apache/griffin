@@ -68,7 +68,7 @@ object HdfsFileDumpUtil {
 
   def remove(path: String, filename: String, withSuffix: Boolean): Unit = {
     if (withSuffix) {
-      val files = HdfsUtil.listSubPaths(path, "file")
+      val files = HdfsUtil.listSubPathsByType(path, "file")
       val patternFiles = files.filter(samePattern(_, filename))
       patternFiles.foreach { f =>
         val rmPath = HdfsUtil.getHdfsFilePath(path, f)

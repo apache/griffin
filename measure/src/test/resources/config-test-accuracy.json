@@ -1,0 +1,56 @@
+{
+  "name": "accu_batch_test",
+
+  "process.type": "batch",
+
+  "data.sources": [
+    {
+      "name": "src",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/users_info_src.avro"
+          }
+        }
+      ]
+    }, {
+      "name": "tgt",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/users_info_target.avro"
+          }
+        }
+      ]
+    }
+  ],
+
+  "evaluateRule": {
+    "rules": [
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "accuracy",
+        "rule": "src.user_id = tgt.user_id AND upper(src.first_name) = upper(tgt.first_name) AND src.last_name = tgt.last_name AND src.address = tgt.address AND src.email = tgt.email AND src.phone = tgt.phone AND src.post_code = tgt.post_code",
+        "details": {
+          "source": "src",
+          "target": "tgt",
+          "miss.records": {
+            "name": "miss.records",
+            "persist.type": "record"
+          },
+          "accuracy": {
+            "name": "accu",
+            "persist.type": "metric"
+          },
+          "miss": "miss_count",
+          "total": "total_count",
+          "matched": "matched_count"
+        }
+      }
+    ]
+  }
+}

@@ -21,6 +21,7 @@ package org.apache.griffin.measure.persist
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 import scala.util.Try
 
@@ -39,14 +40,19 @@ case class MultiPersists(persists: Iterable[Persist]) extends Persist {
   def start(msg: String): Unit = { persists.foreach(_.start(msg)) }
   def finish(): Unit = { persists.foreach(_.finish()) }
 
-  def result(rt: Long, result: Result): Unit = { persists.foreach(_.result(rt, result)) }
-
-  def records(recs: RDD[String], tp: String): Unit = { persists.foreach(_.records(recs, tp)) }
-  def records(recs: Iterable[String], tp: String): Unit = { persists.foreach(_.records(recs, tp)) }
+//  def result(rt: Long, result: Result): Unit = { persists.foreach(_.result(rt, result)) }
+//
+//  def records(recs: RDD[String], tp: String): Unit = { persists.foreach(_.records(recs, tp)) }
+//  def records(recs: Iterable[String], tp: String): Unit = { persists.foreach(_.records(recs, tp)) }
 
 //  def missRecords(records: RDD[String]): Unit = { persists.foreach(_.missRecords(records)) }
 //  def matchRecords(records: RDD[String]): Unit = { persists.foreach(_.matchRecords(records)) }
 
   def log(rt: Long, msg: String): Unit = { persists.foreach(_.log(rt, msg)) }
+
+//  def persistRecords(df: DataFrame, name: String): Unit = { persists.foreach(_.persistRecords(df, name)) }
+  def persistRecords(records: Iterable[String], name: String): Unit = { persists.foreach(_.persistRecords(records, name)) }
+//  def persistMetrics(metrics: Seq[String], name: String): Unit = { persists.foreach(_.persistMetrics(metrics, name)) }
+  def persistMetrics(metrics: Map[String, Any]): Unit = { persists.foreach(_.persistMetrics(metrics)) }
 
 }

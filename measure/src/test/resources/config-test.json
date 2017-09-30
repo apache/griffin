@@ -1,0 +1,55 @@
+{
+  "name": "accu batch test",
+
+  "process.type": "batch",
+
+  "data.sources": [
+    {
+      "name": "source",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/users_info_src.avro"
+          }
+        }
+      ]
+    }, {
+      "name": "target",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/users_info_target.avro"
+          }
+        }
+      ]
+    }
+  ],
+
+  "evaluateRule": {
+    "rules": [
+      {
+        "dsl.type": "spark-sql",
+        "name": "miss.records",
+        "rule": "SELECT source.user_id, source.first_name, source.last_name, source.address, source.email, source.phone, source.post_code FROM source LEFT JOIN target ON coalesce(source.user_id, 'null') = coalesce(target.user_id, 'null') AND coalesce(source.first_name, 'null') = coalesce(target.first_name, 'null') AND coalesce(source.last_name, 'null') = coalesce(target.last_name, 'null') AND coalesce(source.address, 'null') = coalesce(target.address, 'null') AND coalesce(source.email, 'null') = coalesce(target.email, 'null') AND coalesce(source.phone, 'null') = coalesce(target.phone, 'null') AND coalesce(source.post_code, 'null') = coalesce(target.post_code, 'null') WHERE (NOT (source.user_id IS NULL AND source.first_name IS NULL AND source.last_name IS NULL AND source.address IS NULL AND source.email IS NULL AND source.phone IS NULL AND source.post_code IS NULL)) AND (target.user_id IS NULL AND target.first_name IS NULL AND target.last_name IS NULL AND target.address IS NULL AND target.email IS NULL AND target.phone IS NULL AND target.post_code IS NULL)",
+        "persist.type": "record"
+      }, {
+        "dsl.type": "spark-sql",
+        "name": "miss",
+        "rule": "SELECT COUNT(*) AS `miss` FROM `miss.records`",
+      }, {
+        "dsl.type": "spark-sql",
+        "name": "total",
+        "rule": "SELECT COUNT(*) AS `total` FROM source",
+      }, {
+        "dsl.type": "spark-sql",
+        "name": "accuracy",
+        "rule": "SELECT `total`.`total` AS `total`, `miss`.`miss` AS `miss`, (`total`.`total` - `miss`.`miss`) AS `matched` FROM total JOIN miss",
+        "persist.type": "metric"
+      }
+    ]
+  }
+}
