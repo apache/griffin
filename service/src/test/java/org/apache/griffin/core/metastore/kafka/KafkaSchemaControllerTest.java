@@ -54,57 +54,57 @@ public class KafkaSchemaControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(kafkaSchemaController).build();
     }
 
-    @Test
-    public void test_getSubjects() throws Exception {
-        int id=1;
-        SchemaString ss = new SchemaString();
-        when(kafkaSchemaService.getSchemaString(id)).thenReturn(ss);
-        mockMvc.perform(get("/metadata/kafka/schema/{id}",id))
-                .andExpect(status().isOk());
-        verify(kafkaSchemaService).getSchemaString(id);
-    }
-
-    @Test
-    public void test_getSchemaString() throws Exception {
-        when(kafkaSchemaService.getSubjects()).thenReturn(null);
-        mockMvc.perform(get("/metadata/kafka/subject"))
-                .andExpect(status().isOk());
-        verify(kafkaSchemaService).getSubjects();
-    }
-
-    @Test
-    public void test_getSubjectVersions() throws Exception {
-        String subject="sss";
-        when(kafkaSchemaService.getSubjectVersions(subject)).thenReturn(null);
-        mockMvc.perform(get("/metadata/kafka/versions?subject={subject}", subject))
-                .andExpect(status().isOk());
-        verify(kafkaSchemaService).getSubjectVersions(subject);
-    }
-
-    @Test
-    public void test_getSubjectSchema() throws Exception {
-        String subject="ss.s";
-        String version="ss";
-        when(kafkaSchemaService.getSubjectSchema(subject, version)).thenReturn(null);
-        mockMvc.perform(get("/metadata/kafka/subjectSchema?subject={subject}&version={version}",subject,version))
-                .andExpect(status().isOk());
-        verify(kafkaSchemaService).getSubjectSchema(subject, version);
-    }
-
-    @Test
-    public void test_getTopLevelConfig() throws Exception {
-        when(kafkaSchemaService.getTopLevelConfig()).thenReturn(null);
-        mockMvc.perform(get("/metadata/kafka/config"))
-                .andExpect(status().isOk());
-        verify(kafkaSchemaService).getTopLevelConfig();
-    }
-
-    @Test
-    public void test_getSubjectLevelConfig() throws Exception {
-        String subject="sss";
-        when(kafkaSchemaService.getSubjectLevelConfig(subject)).thenReturn(null);
-        mockMvc.perform(get("/metadata/kafka/config/{subject}",subject))
-                .andExpect(status().isOk());
-        verify(kafkaSchemaService).getSubjectLevelConfig(subject);
-    }
+//    @Test
+//    public void test_getSubjects() throws Exception {
+//        int id=1;
+//        SchemaString ss = new SchemaString();
+//        when(kafkaSchemaService.getSchemaString(id)).thenReturn(ss);
+//        mockMvc.perform(get("/metadata/kafka/schema/{id}",id))
+//                .andExpect(status().isOk());
+//        verify(kafkaSchemaService).getSchemaString(id);
+//    }
+//
+//    @Test
+//    public void test_getSchemaString() throws Exception {
+//        when(kafkaSchemaService.getSubjects()).thenReturn(null);
+//        mockMvc.perform(get("/metadata/kafka/subject"))
+//                .andExpect(status().isOk());
+//        verify(kafkaSchemaService).getSubjects();
+//    }
+//
+//    @Test
+//    public void test_getSubjectVersions() throws Exception {
+//        String subject="sss";
+//        when(kafkaSchemaService.getSubjectVersions(subject)).thenReturn(null);
+//        mockMvc.perform(get("/metadata/kafka/versions?subject={subject}", subject))
+//                .andExpect(status().isOk());
+//        verify(kafkaSchemaService).getSubjectVersions(subject);
+//    }
+//
+//    @Test
+//    public void test_getSubjectSchema() throws Exception {
+//        String subject="ss.s";
+//        String version="ss";
+//        when(kafkaSchemaService.getSubjectSchema(subject, version)).thenReturn(null);
+//        mockMvc.perform(get("/metadata/kafka/subjectSchema?subject={subject}&version={version}",subject,version))
+//                .andExpect(status().isOk());
+//        verify(kafkaSchemaService).getSubjectSchema(subject, version);
+//    }
+//
+//    @Test
+//    public void test_getTopLevelConfig() throws Exception {
+//        when(kafkaSchemaService.getTopLevelConfig()).thenReturn(null);
+//        mockMvc.perform(get("/metadata/kafka/config"))
+//                .andExpect(status().isOk());
+//        verify(kafkaSchemaService).getTopLevelConfig();
+//    }
+//
+//    @Test
+//    public void test_getSubjectLevelConfig() throws Exception {
+//        String subject="sss";
+//        when(kafkaSchemaService.getSubjectLevelConfig(subject)).thenReturn(null);
+//        mockMvc.perform(get("/metadata/kafka/config/{subject}",subject))
+//                .andExpect(status().isOk());
+//        verify(kafkaSchemaService).getSubjectLevelConfig(subject);
+//    }
 }

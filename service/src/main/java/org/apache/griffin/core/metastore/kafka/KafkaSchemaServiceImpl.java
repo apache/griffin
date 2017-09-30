@@ -31,13 +31,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class KafkaSchemaServiceImpl implements KafkaSchemaService{
 
     private static final Logger log = LoggerFactory.getLogger(KafkaSchemaServiceImpl.class);
 
-    @Value("${kafka.schema.registry.url}")
+    @Value("${kafka.rest.proxy.url}")
     private String url;
 
     RestTemplate restTemplate = new RestTemplate();
@@ -50,58 +51,67 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
         }
         return "";
     }
+//
+//    @Override
+//    public SchemaString getSchemaString(Integer id) {
+//        String path = "/schemas/ids/" + id;
+//        String regUrl = registryUrl(path);
+//        ResponseEntity<SchemaString> res = restTemplate.getForEntity(regUrl, SchemaString.class);
+//        SchemaString result = res.getBody();
+//        return result;
+//    }
+//
+//    @Override
+//    public Iterable<String> getSubjects() {
+//        String path = "/subjects";
+//        String regUrl = registryUrl(path);
+//        ResponseEntity<String[]> res = restTemplate.getForEntity(regUrl, String[].class);
+//        Iterable<String> result = Arrays.asList(res.getBody());
+//        return result;
+//    }
+//
+//    @Override
+//    public Iterable<Integer> getSubjectVersions(String subject) {
+//        String path = "/subjects/" + subject + "/versions";
+//        String regUrl = registryUrl(path);
+//        ResponseEntity<Integer[]> res = restTemplate.getForEntity(regUrl, Integer[].class);
+//        Iterable<Integer> result = Arrays.asList(res.getBody());
+//        return result;
+//    }
+//
+//    @Override
+//    public Schema getSubjectSchema(String subject, String version) {
+//        String path = "/subjects/" + subject + "/versions/" + version;
+//        String regUrl = registryUrl(path);
+//        ResponseEntity<Schema> res = restTemplate.getForEntity(regUrl, Schema.class);
+//        Schema result = res.getBody();
+//        return result;
+//    }
 
     @Override
-    public SchemaString getSchemaString(Integer id) {
-        String path = "/schemas/ids/" + id;
-        String regUrl = registryUrl(path);
-        ResponseEntity<SchemaString> res = restTemplate.getForEntity(regUrl, SchemaString.class);
-        SchemaString result = res.getBody();
-        return result;
-    }
-
-    @Override
-    public Iterable<String> getSubjects() {
-        String path = "/subjects";
+    public Iterable<String> getTopics() {
+        String path = "/topics";
         String regUrl = registryUrl(path);
         ResponseEntity<String[]> res = restTemplate.getForEntity(regUrl, String[].class);
-        Iterable<String> result = Arrays.asList(res.getBody());
+        List<String> result = Arrays.asList(res.getBody());
         return result;
     }
 
-    @Override
-    public Iterable<Integer> getSubjectVersions(String subject) {
-        String path = "/subjects/" + subject + "/versions";
-        String regUrl = registryUrl(path);
-        ResponseEntity<Integer[]> res = restTemplate.getForEntity(regUrl, Integer[].class);
-        Iterable<Integer> result = Arrays.asList(res.getBody());
-        return result;
-    }
-
-    @Override
-    public Schema getSubjectSchema(String subject, String version) {
-        String path = "/subjects/" + subject + "/versions/" + version;
-        String regUrl = registryUrl(path);
-        ResponseEntity<Schema> res = restTemplate.getForEntity(regUrl, Schema.class);
-        Schema result = res.getBody();
-        return result;
-    }
-
-    @Override
-    public Config getTopLevelConfig() {
-        String path = "/config";
-        String regUrl = registryUrl(path);
-        ResponseEntity<Config> res = restTemplate.getForEntity(regUrl, Config.class);
-        Config result = res.getBody();
-        return result;
-    }
-
-    @Override
-    public Config getSubjectLevelConfig(String subject) {
-        String path = "/config/" + subject;
-        String regUrl = registryUrl(path);
-        ResponseEntity<Config> res = restTemplate.getForEntity(regUrl, Config.class);
-        Config result = res.getBody();
-        return result;
-    }
+//    @Override
+//    public Config getTopLevelConfig() {
+//        String path = "/config";
+//        String regUrl = registryUrl(path);
+//        ResponseEntity<Config> res = restTemplate.getForEntity(regUrl, Config.class);
+//        Config result = res.getBody();
+//        return result;
+//    }
+//
+//    @Override
+//    public Config getSubjectLevelConfig(String subject) {
+//        String path = "/config/" + subject;
+//        String regUrl = registryUrl(path);
+//        ResponseEntity<Config> res = restTemplate.getForEntity(regUrl, Config.class);
+//        Config result = res.getBody();
+//        return result;
+//    }
 }

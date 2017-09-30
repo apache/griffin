@@ -155,9 +155,9 @@ public class MeasureServiceImplTest {
             given(measureRepo.save(measure)).willReturn(null);
             GriffinOperationMessage message2 = service.createMeasure(measure);
             assertEquals(message2, GriffinOperationMessage.CREATE_MEASURE_FAIL);
-            }catch (Throwable t){
-                fail("Cannot create new measure viewitem_hourly");
-            }
+        }catch (Throwable t){
+            fail("Cannot create new measure viewitem_hourly");
+        }
     }
 
     @Test
@@ -187,7 +187,7 @@ public class MeasureServiceImplTest {
             fail("Cannot create new measure viewitem_hourly");
         }
     }
-
+    //TODO: catch exception in this method, delete exception handling in other test
     private Measure createATestMeasure(String name,String org)throws IOException,Exception{
         HashMap<String,String> configMap1;
         configMap1 = new HashMap<>();

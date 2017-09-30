@@ -73,70 +73,70 @@ public class KafkaSchemaServiceImplTest {
 */
     }
 
-    @Test
-    public void testGetSchemaString(){
-        try {
-
-            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new SchemaString(), HttpStatus.OK));
-            SchemaString tmp = service.getSchemaString(1);
-            assertTrue(true);
-        }catch (Throwable t){
-            fail("Cannot get all tables from all dbs");
-        }
-    }
-
-    @Test
-    public void testGetSubjects(){
-        try {
-            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new String[2], HttpStatus.OK));
-            Iterable<String> tmp = service.getSubjects();
-            assertTrue(true);
-        }catch (Throwable t){
-            fail("Cannot get all tables from all dbs");
-        }
-    }
-
-    @Test
-    public void testGetSubjectVersions(){
-        try {
-            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Integer[2], HttpStatus.OK));
-            Iterable<Integer> tmp = service.getSubjectVersions("1.0");
-            assertTrue(true);
-        }catch (Throwable t){
-            fail("Cannot get all tables from all dbs");
-        }
-    }
-
-    @Test
-    public void testGetSubjectSchema(){
-        try {
-            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Schema("",0,0, ""), HttpStatus.OK));
-            Schema tmp = service.getSubjectSchema("subject1","version1");
-            assertTrue(true);
-        }catch (Throwable t){
-            fail("Cannot get all tables from all dbs");
-        }
-    }
-
-    @Test
-    public void testGetTopLevelConfig(){
-        try {
-            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Config(), HttpStatus.OK));
-            Config tmp = service.getTopLevelConfig();
-            assertTrue(true);
-        }catch (Throwable t){
-            fail("Cannot get all tables from all dbs");
-        }
-    }
-
-    @Test
-    public void testGetSubjectLevelConfig(){
-        try {
-            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Config(), HttpStatus.OK));
-            Config tmp = service.getSubjectLevelConfig("");
-            assertTrue(true);
-        }catch (Throwable t){
-            fail("Cannot get all tables from all dbs");
-        }
-    }
+//    @Test
+//    public void testGetSchemaString(){
+//        try {
+//
+//            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new SchemaString(), HttpStatus.OK));
+//            SchemaString tmp = service.getSchemaString(1);
+//            assertTrue(true);
+//        }catch (Throwable t){
+//            fail("Cannot get all tables from all dbs");
+//        }
+//    }
+//
+//    @Test
+//    public void testGetSubjects(){
+//        try {
+//            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new String[2], HttpStatus.OK));
+//            Iterable<String> tmp = service.getSubjects();
+//            assertTrue(true);
+//        }catch (Throwable t){
+//            fail("Cannot get all tables from all dbs");
+//        }
+//    }
+//
+//    @Test
+//    public void testGetSubjectVersions(){
+//        try {
+//            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Integer[2], HttpStatus.OK));
+//            Iterable<Integer> tmp = service.getSubjectVersions("1.0");
+//            assertTrue(true);
+//        }catch (Throwable t){
+//            fail("Cannot get all tables from all dbs");
+//        }
+//    }
+//
+//    @Test
+//    public void testGetSubjectSchema(){
+//        try {
+//            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Schema("",0,0, ""), HttpStatus.OK));
+//            Schema tmp = service.getSubjectSchema("subject1","version1");
+//            assertTrue(true);
+//        }catch (Throwable t){
+//            fail("Cannot get all tables from all dbs");
+//        }
+//    }
+//
+//    @Test
+//    public void testGetTopLevelConfig(){
+//        try {
+//            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Config(), HttpStatus.OK));
+//            Config tmp = service.getTopLevelConfig();
+//            assertTrue(true);
+//        }catch (Throwable t){
+//            fail("Cannot get all tables from all dbs");
+//        }
+//    }
+//
+//    @Test
+//    public void testGetSubjectLevelConfig(){
+//        try {
+//            when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(new Config(), HttpStatus.OK));
+//            Config tmp = service.getSubjectLevelConfig("");
+//            assertTrue(true);
+//        }catch (Throwable t){
+//            fail("Cannot get all tables from all dbs");
+//        }
+//    }
 }
