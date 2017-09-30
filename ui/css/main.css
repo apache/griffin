@@ -1049,3 +1049,76 @@ tbody {
   border-color: transparent;
   cursor: default;
 }
+
+.normal{
+  background-color: #00C853;
+  border-radius: 5px; 
+  padding:3px 4px;
+}
+
+.unnormal{
+  background-color: #EF5350;
+  border-radius: 5px; 
+  padding:3px 4px;
+}
+
+
+#timePopup{
+  position: absolute;
+  z-index:1;
+  height:100px;
+  background-color:white; 
+  /*width:80%;*/
+  text-align: center;
+  border: 5px solid #c5c5c5;
+  border-radius: 3px;
+}
+
+#hourSelector{
+  width: 20%;
+  height: 100%;
+  display: inline-block;
+}
+
+#minuteSelector{
+  width:20%;
+  height:100%;
+  display: inline-block;
+
+}
+
+
+#secondSelector{
+  width:20%;
+  height:100%;
+  display: inline-block;
+
+}
+
+.division{
+  display: inline-block;
+  width:10%;
+  height:100%;
+  position:relative;
+  top: -30px;
+}
+
+.icon{
+  color: #fff;
+  position: absolute;
+  left: 50%;
+  top:20%;
+}
+
+
+
+.ng-cloak{display:none !important;}
+
+.mask{
+  width:100%;
+  height:100%;
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:1;
+}

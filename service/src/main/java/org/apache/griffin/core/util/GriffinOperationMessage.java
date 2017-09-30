@@ -20,35 +20,57 @@ under the License.
 package org.apache.griffin.core.util;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum GriffinOperationMessage {
-    RESOURCE_NOT_FOUND(-1, "Resource Not Found"),
-    DELETE_MEASURE_BY_NAME_SUCCESS(0, "Delete Measures By Name Succeed"),
-    DELETE_MEASURE_BY_NAME_FAIL(1, "Delete Measures By Name Failed"),
-    UPDATE_MEASURE_SUCCESS(2, "Update Measure Succeed"),
-    UPDATE_MEASURE_FAIL(3, "Update Measure Failed"),
-    CREATE_MEASURE_SUCCESS(4, "Create Measure Succeed"),
-    CREATE_MEASURE_FAIL(5, "Create Measure Failed"),
-    CREATE_MEASURE_FAIL_DUPLICATE(6, "Create Measure Failed, duplicate records"),
+    //success
+    CREATE_MEASURE_SUCCESS(201, "Create Measure Succeed"),
+    DELETE_MEASURE_BY_ID_SUCCESS(202,"Delete Measures By Name Succeed"),
+    DELETE_MEASURE_BY_NAME_SUCCESS(203, "Delete Measures By Name Succeed"),
+    UPDATE_MEASURE_SUCCESS(204, "Update Measure Succeed"),
+    CREATE_JOB_SUCCESS(205,"CREATE Job Succeed"),
+    DELETE_JOB_SUCCESS(206,"Delete Job Succeed"),
+    SET_JOB_DELETED_STATUS_SUCCESS(207,"Set Job Deleted Status Succeed"),
+    PAUSE_JOB_SUCCESS(208,"Pause Job Succeed"),
+    UPDATE_JOB_INSTANCE_SUCCESS(209,"Update Job Instance Succeed"),
+
+    //failed
+    RESOURCE_NOT_FOUND(400, "Resource Not Found"),
+    CREATE_MEASURE_FAIL(401, "Create Measure Failed"),
+    DELETE_MEASURE_BY_ID_FAIL(402,"Delete Measures By Name Failed"),
+    DELETE_MEASURE_BY_NAME_FAIL(403, "Delete Measures By Name Failed"),
+    UPDATE_MEASURE_FAIL(404, "Update Measure Failed"),
+    CREATE_JOB_FAIL(405,"Create Job Failed"),
+    DELETE_JOB_FAIL(406,"Delete Job Failed"),
+    SET_JOB_DELETED_STATUS_FAIL(407,"Set Job Deleted Status Failed"),
+    PAUSE_JOB_FAIL(408,"Pause Job Failed"),
+    UPDATE_JOB_INSTANCE_FAIL(409,"Update Job Instance Failed"),
+    CREATE_MEASURE_FAIL_DUPLICATE(410, "Create Measure Failed, duplicate records"),
+    UNEXPECTED_RUNTIME_EXCEPTION(411, "Unexpected RuntimeException")
     ;
 
     private final int code;
     private final String description;
 
-    private GriffinOperationMessage(int code, String description) {
+    GriffinOperationMessage(int code, String description) {
         this.code = code;
         this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public int getCode() {
         return code;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public String toString() {
-        return code + ": " + description;
+        return "GriffinOperationMessage{" +
+                "code=" + code +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

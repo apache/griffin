@@ -112,8 +112,12 @@ define(['./app'], function(app) {
         });
 
         $routeProvider.when('/mydashboard', {
-            templateUrl: '/pages/mydashboard/mydashboard.html',
-            controller: 'MyDashboardCtrl'
+
+            // templateUrl: '/pages/mydashboard/mydashboard.html',
+            // controller: 'MyDashboardCtrl'
+            templateUrl: '/pages/metrics/dashboard.html',
+            controller: 'MetricsCtrl'
+
         });
 
         $routeProvider.when('/subscribemodel', {
@@ -220,13 +224,13 @@ define(['./app'], function(app) {
 
 function isSpinnerRequired(Config, url){
     var names = [
-        "dbtree",
-        "getdataasset",
+        // "dbtree",
+        // "getdataasset",
         "allModels",
         "getModel",
-        "heatmap",
-        "metricdetail",
-        "dashboard",
+        //"heatmap",
+        //"metricdetail",
+        //"dashboard",
         "getmydashboard",
         "getsubscribe"
     ];

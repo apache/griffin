@@ -21,11 +21,17 @@ package org.apache.griffin.core.measure;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.griffin.core.job.JobServiceImpl;
+import org.apache.griffin.core.measure.entity.DataConnector;
+import org.apache.griffin.core.measure.entity.EvaluateRule;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,9 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
@@ -45,18 +49,25 @@ import static org.mockito.BDDMockito.given;
 @RunWith(SpringRunner.class)
 public class MeasureServiceImplTest {
 
-    @TestConfiguration
+    /*@TestConfiguration
     public static class MeasureServiceImplConfiguration{
         @Bean
         public MeasureServiceImpl service(){
             return new MeasureServiceImpl();
         }
-    }
-    @MockBean
-    private MeasureRepo measureRepo;
 
-    @Autowired
+        @Bean
+        public JobServiceImpl JobService(){
+            return new JobServiceImpl();
+        }
+
+    }*/
+
+
+    @InjectMocks
     private MeasureServiceImpl service;
+    @Mock
+    private MeasureRepo measureRepo;
 
     @Before
     public void setup(){
@@ -65,7 +76,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testGetAllMeasures(){
         try {
-            Iterable<Measure> tmp = service.getAllMeasures();
+            Iterable<Measure> tmp = service.getAllAliveMeasures();
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all Measure from dbs");
@@ -75,86 +86,89 @@ public class MeasureServiceImplTest {
     @Test
     public void testGetMeasuresById(){
         try {
-            Measure tmp = service.getMeasuresById(1);
+            Measure tmp = service.getMeasureById(1);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get Measure in db By Id: 1");
         }
     }
 
-    @Test
+  /*  @Test
     public void testGetMeasuresByName(){
         try {
-            Measure tmp = service.getMeasuresByName("viewitem_hourly");
+            Measure tmp = service.getMeasureByName("viewitem_hourly");
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get Measure in db By name: viewitem_hourly");
         }
-    }
+    }*/
 
     @Test
     public void testDeleteMeasuresById(){
         try {
-            service.deleteMeasuresById(1L);
+            service.deleteMeasureById(1L);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot delete Measure in db By Id: 1");
         }
     }
 
-    @Test
+    /*@Test
     public void testDeleteMeasuresByName(){
         try {
             String measureName="viewitem_hourly";
             given(measureRepo.findByName(measureName)).willReturn(null);
-            GriffinOperationMessage message=service.deleteMeasuresByName("viewitem_hourly");
+            GriffinOperationMessage message=service.deleteMeasureByName("viewitem_hourly");
             assertEquals(message,GriffinOperationMessage.RESOURCE_NOT_FOUND);
             assertTrue(true);
 
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
             given(measureRepo.findByName(measureName)).willReturn(measure);
-            GriffinOperationMessage message1=service.deleteMeasuresByName("viewitem_hourly");
+            GriffinOperationMessage message1=service.deleteMeasureByName("viewitem_hourly");
             assertEquals(message1,GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS);
         }catch (Throwable t){
             fail("Cannot delete Measure in db By name: viewitem_hourly");
         }
-    }
-
+    }*/
     @Test
-    public void testCreateNewMeasure(){
+    public void testCreateNewMeasure()  {
         try {
-            String measureName="viewitem_hourly";
-            String org="bullseye";
-            Measure measure=createATestMeasure(measureName,org);
-            given(measureRepo.findByName(measureName)).willReturn(null);
-            GriffinOperationMessage message=service.createNewMeasure(measure);
-            assertEquals(message,GriffinOperationMessage.CREATE_MEASURE_FAIL);
-            assertTrue(true);
-
-            Measure measure1=createATestMeasure(measureName,"bullseye1");
-            given(measureRepo.findByName(measureName)).willReturn(measure1);
-            GriffinOperationMessage message1=service.createNewMeasure(measure);
-            assertEquals(message1,GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
-
-            given(measureRepo.findByName(measureName)).willReturn(null);
+            // CREATE_MEASURE_SUCCESS
+            String measureName = "viewitem_hourly";
+            String org = "bullseye";
+            Measure measure = createATestMeasure(measureName, org);
+            given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
             given(measureRepo.save(measure)).willReturn(measure);
-            GriffinOperationMessage message2=service.createNewMeasure(measure);
-            assertEquals(message2,GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
-        }catch (Throwable t){
-            fail("Cannot create new measure viewitem_hourly");
-        }
+            GriffinOperationMessage message = service.createMeasure(measure);
+            assertEquals(message, GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
+            assertTrue(true);
+            // CREATE_MEASURE_FAIL_DUPLICATE
+            Measure measure1 = createATestMeasure(measureName, "bullseye1");
+            LinkedList<Measure> list = new LinkedList<>();
+            list.add(measure);
+            given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(list);
+            GriffinOperationMessage message1 = service.createMeasure(measure);
+            assertEquals(message1, GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
+            // CREATE_MEASURE_FAIL
+            given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
+            given(measureRepo.save(measure)).willReturn(null);
+            GriffinOperationMessage message2 = service.createMeasure(measure);
+            assertEquals(message2, GriffinOperationMessage.CREATE_MEASURE_FAIL);
+            }catch (Throwable t){
+                fail("Cannot create new measure viewitem_hourly");
+            }
     }
 
     @Test
-    public void testGetAllMeasureNameByOwner(){
+    public void testGetAllMeasureByOwner(){
         try {
             String measureName="viewitem_hourly";
             String org="bullseye";
             Measure measure=createATestMeasure(measureName,org);
             String owner="test1";
             given(measureRepo.findAll()).willReturn(Arrays.asList(measure));
-            List<String> namelist=service.getAllMeasureNameByOwner(owner);
+            List<Map<String, String>> namelist=service.getAllAliveMeasureNameIdByOwner(owner);
             assertTrue(true);
         }catch (Throwable t){
             fail("Cannot get all measure name by owner test1");
@@ -190,6 +204,7 @@ public class MeasureServiceImplTest {
         String rules = "$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
         EvaluateRule eRule = new EvaluateRule(1,rules);
         Measure measure = new Measure(name,"bevssoj description", Measure.MearuseType.accuracy, org, source, target, eRule,"test1");
+        measure.setId(0L);
         return measure;
     }
 

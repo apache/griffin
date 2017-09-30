@@ -27,8 +27,11 @@ define(['./module'], function (controllers) {
 
       function pageInit() {
         $scope.$emit('initReq');
-
-        var getModelUrl = $config.uri.getModel+"/"+$routeParams.modelname;
+        console.log($routeParams);
+        var getModelUrl;
+        if(!isNaN($routeParams.modelname))
+            getModelUrl = $config.uri.getModel+"/"+$routeParams.modelname;
+        else getModelUrl = $config.uri.getModel+"?measureName="+$routeParams.modelname;
         console.log(getModelUrl);
         $http.get(getModelUrl).then(function successCallback(data){
           $scope.ruleData = data.data;
@@ -52,7 +55,7 @@ define(['./module'], function (controllers) {
         //   toaster.pop('error', data.message);
         // });
          },function errorCallback(response) {
-          toaster.pop('error', 'Error when deleting record', response.message);
+          toaster.pop('error', 'Error when geting record', response.message);
         });
 
         $scope.anTypes = ['', 'History Trend Detection', 'Bollinger Bands Detection', 'Deviation Detection'];

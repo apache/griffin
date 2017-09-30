@@ -37,62 +37,52 @@ define(['./module'], function(controllers) {
         var dbtreeUrl = $config.uri.dbtree;
         var schemaDefinitionUrl = $config.uri.schemadefinition;
 
-        $http.get(dbtreeUrl).then(function successCallback(data) {
-                    var dbList = [];
-                    if (data.data) {
-                        angular.forEach(data.data,function(db,key){
-                        console.log(db);
-                        var dbNode = {
-                            name: key,
-                            l1: true,
-                            children: []
-                        };
-                        dbList.push(dbNode);
-                        if (db) {
-                               angular.forEach(db,function(table){
-                                   // console.log(table);
-                                   // console.log(typeof(table));
-                                   var dsNode = {
-                                       name: table.tableName,
-                                       l2: true,
-                                       children: []
-                                   };
-                                   dbNode.children.push(dsNode);
-                                   dsNode.parent = db;
-
-                                   if (table.sd.cols) {
-                                       table.sd.cols.sort(function(a, b){
-                                         return (a.name<b.name?-1:(a.name>b.name?1:0));
-                                       });
-                                       angular.forEach(table.sd.cols,function(col) {
-                                           var schemaNode = {
-                                               name: col.name,
-                                               type: col.type,
-                                               l3: true
-                                           };
-//                                           schemaNode.parent = dsNode;
-//                                           dsNode.children.push(schemaNode);
-                                       });
-                                   }
-
-                               });
-                          };
-                        });
-                    $scope.dbList = dbList;
-                    $scope.dbListTarget = angular.copy(dbList);
-                    }
-
+        $http.get(dbtreeUrl,{cache: true}).then(function successCallback(data) {
+            var dbList = [];
+            if (data.data) {
+                angular.forEach(data.data,function(db,key){
+                    var dbNode = {
+                        name: key,
+                        l1: true,
+                        children: []
+                    };
+                    dbList.push(dbNode);
+                    if (db) {
+                        angular.forEach(db,function(table){
+                            var dsNode = {
+                                name: table.tableName,
+                                l2: true,
+                                children: []
+                            };
+                            dbNode.children.push(dsNode);
+                            dsNode.parent = db;
+                            if (table.sd.cols) {
+                                table.sd.cols.sort(function(a, b){
+                                    return (a.name<b.name?-1:(a.name>b.name?1:0));
+                                });
+                                angular.forEach(table.sd.cols,function(col) {
+                                    var schemaNode = {
+                                        name: col.name,
+                                        type: col.type,
+                                        l3: true
+                                    };
+                                });
+                            }
+                         });
+                    };
                 });
+                $scope.dbList = dbList;
+                $scope.dbListTarget = angular.copy(dbList);
+            }
+        });
 
         //trigger after select schema for src
         $scope.$watch('currentNode', function(newValue) {
             console.log(newValue);
             $scope.selection = [];
             $scope.selectedAll = false;
-
-            // $scope.schemaCollection = null;
             if (newValue) {
-                $http.get(schemaDefinitionUrl+ '/' + newValue.parent[0].dbName+'/table/'+newValue.name).then(function successCallback(data) {
+                $http.get(schemaDefinitionUrl+ '?db=' + newValue.parent[0].dbName+'&table='+newValue.name).then(function successCallback(data) {
                 console.log(data);
                 $scope.schemaCollection = data.data.sd.cols;
                 console.log($scope.schemaCollection);
@@ -102,71 +92,32 @@ define(['./module'], function(controllers) {
         });
 
         $scope.selectNodeLabelTarget = function(selectedNode) {
-
             //remove highlight from previous node
             if ($scope.currentNodeTarget && $scope.currentNodeTarget.selected) {
                 $scope.currentNodeTarget.selected = undefined;
             }
-
             if (selectedNode.children && selectedNode.children.length > 0) {
                 $scope.selectNodeHead(selectedNode);
             } else {
                 //set highlight to selected node
                 selectedNode.selected = 'selected';
             }
-
             //set currentNode
             $scope.currentNodeTarget = selectedNode;
-            console.log('currentNodeTarget');
-            console.log($scope.currentNodeTarget);
             $scope.dataAsset = $scope.currentNodeTarget.name + ',' + $scope.currentNode.name;
-            console.log($scope.dataAsset);
-        }
-        ;
-
+        };
         //trigger after select schema
         $scope.$watch('currentNodeTarget', function(newValue) {
-            console.log('currentNodeTarget');
-            console.log($scope.currentNodeTarget);
-            console.log(newValue);
             $scope.selectionTarget = [];
             $scope.selectedAllTarget = false;
-
-            // $scope.schemaCollection = null;
-//            if (newValue) {
-//
-//                //retrieve the schema definition and display the table
-//                if(newValue.l3){//System selected
-//                  var sysName = newValue.parent.name;
-//                  $scope.form.basic.system = $filter('stridx')(sysName, 'modelsystem') + '';
-//                  $http.get(schemaDefinitionUrl + '/' + newValue.id).success(function(data) {
-//
-//                      $scope.schemaCollectionTarget = data.schema;
-//                  });
-//                }
-//
-//
-//            }
             if (newValue) {
-                $http.get(schemaDefinitionUrl + '/' + newValue.parent[0].dbName+'/table/'+newValue.name).then(function successCallback(data) {
-                console.log(data);
+                $http.get(schemaDefinitionUrl + '?db=' + newValue.parent[0].dbName+'&table='+newValue.name).then(function successCallback(data) {
                 $scope.schemaCollectionTarget = data.data.sd.cols;
-                console.log($scope.schemaCollectionTarget);
                 });
             }
             if($scope.currentNodeTarget)
                 $scope.dataAsset = $scope.currentNodeTarget.name + ',' + $scope.currentNode.name;
-            console.log($scope.dataAsset);
         });
-
-        // $scope.$watch('selectionTarget', function(newValue) {
-        //     if (newValue && newValue.length > 0) {
-        //         $scope.pk = newValue[0];
-        //         // console.log('-----$scope.pk: ' + $scope.pk);
-        //     }
-        // });
-
-        //column selection
 
         $scope.toggleSelection = function toggleSelection($event) {
             var value = $event.target.value;
@@ -177,12 +128,10 @@ define(['./module'], function(controllers) {
                 $scope.selectedAll = false;
             }
             // is newly selected
-
             else {
                 $scope.selection.push(value);
             }
-        }
-        ;
+        };
 
         $scope.toggleAll = function() {
             if ($scope.selectedAll) {
@@ -190,7 +139,6 @@ define(['./module'], function(controllers) {
             } else {
                 $scope.selectedAll = false;
             }
-
             $scope.selection = [];
             angular.forEach($scope.schemaCollection, function(item) {
                 item.selected = $scope.selectedAll;
@@ -198,7 +146,6 @@ define(['./module'], function(controllers) {
                     $scope.selection.push($scope.currentNode.name + '.' + item.name);
                 }
             });
-
         }
 
         $scope.toggleSelectionTarget = function($event) {
@@ -209,8 +156,6 @@ define(['./module'], function(controllers) {
                 $scope.selectionTarget.splice(idx, 1);
                 $scope.selectedAllTarget = false;
             }
-            // is newly selected
-
             else {
                 $scope.selectionTarget.push(value);
             }
@@ -229,14 +174,8 @@ define(['./module'], function(controllers) {
                 item.selected = $scope.selectedAllTarget;
                 if ($scope.selectedAllTarget) {
                     $scope.selectionTarget.push($scope.currentNodeTarget.name + '.' + item.name);
-                    console.log('currentNodeTarget');
-                    console.log($scope.currentNodeTarget);
-                    console.log($scope.currentNodeTarget.parent);
-
                 }
-
             });
-
         }
 
         $scope.toggleSelectionPK = function($event) {
@@ -267,18 +206,7 @@ define(['./module'], function(controllers) {
         };
 
         $scope.$on('$viewContentLoaded', function() {
-            // console.log($('#footerwrap').css('height'));
-            // console.log($('.formStep').offset());
-            $scope.$emit('initReq');
             resizeWindow();
-
-            //  $('#confirm').on('hidden.bs.modal', function (e) {
-            //    console.log('hidden');
-            //   //  $('#confirm').off('hidden.bs.modal');
-            //    $location.path('/rules');
-            //   });
-
-            // $('.formStep').css({height: 800});
         });
 
         $scope.$on('resizeHandler', function(e) {
@@ -288,17 +216,19 @@ define(['./module'], function(controllers) {
             }
         });
 
-
         function resizeWindow() {
+
                     var stepSelection = '.formStep[id=step-' + $scope.currentStep + ']';
                     $(stepSelection).css({
                         height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
                     });
+                    //to fix this bug later
 //                    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
-                    document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
-                    $('.y-scrollable').css({
-                        'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
-                    });
+//                    document.getElementByTag('fieldset').style.minHeight = $(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80;
+//                    $('.y-scrollable').css({
+//                        'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+//                    });
+
 
         }
 
@@ -306,21 +236,6 @@ define(['./module'], function(controllers) {
         $scope.scheduleTypes = $filter('strarr')('scheduletype');//['Daily', 'Weekly', 'Monthly', 'Hourly'];
         $scope.ruleSystems = $filter('strarr')('modelsystem');//['Bullseye', 'GPS', 'Hadoop', 'PDS', 'IDLS', 'Pulsar', 'Kafka'];
         $scope.matchFunctions = ['==', '!==', '>', '>=','<',"<="];
-
-        // $scope.ruleType = function(index){
-        //   var types = ['', 'Accuracy', 'Validity', 'Anomaly Detection', 'Publish Metrics'];
-        //   return types[index];
-        // }
-        //
-        // $scope.scheduleType = function(index){
-        //   var types = ['', 'Daily', 'Weekly', 'Monthly', 'Hourly'];
-        //   return types[index];
-        // }
-        //
-        // $scope.ruleSystem = function(index){
-        //   var sys = ['', 'Bullseye', 'GPS', 'Hadoop', 'PDS', 'IDLS', 'Pulsar', 'Kafka'];
-        //   return sys[index];
-        // }
 
         // Initial Value
         $scope.form = {
@@ -432,16 +347,6 @@ define(['./module'], function(controllers) {
                     });
                     rule = rules.join(" AND ");
 
-//                    for(var i = 0;i<$scope.selectionTarget.length;i++){
-//                         console.log($scope.selection[i]);
-//                         var s =$scope.selection[i].split('.');
-//                         var t = $scope.selectionTarget[i].split('.');
-//
-//                         console.log( $scope.matches[i]);
-//                         rule += "${source}['" + s[1] + "'] "+ $scope.matches[i]+" ${target}['" + t[1] + "'];" ;
-//                    }
-
-
                     $scope.rules = rule;
                     this.data.evaluateRule.rules = rule;
                     for(var i =0; i < $scope.selectionTarget.length; i ++){
@@ -450,56 +355,28 @@ define(['./module'], function(controllers) {
                                       matchMethod: $scope.matches[i],
                                       isPk: ($scope.selectionPK.indexOf($scope.selectionTarget[i])>-1)?true:false});
                     }
-
                     $('#confirm').modal('show');
                 }
             },
 
             save: function() {
-
-
                 //::TODO: Need to save the data to backend with POST/PUT method
-                console.log(JSON.stringify($scope.form.data));
-
                 var newModel = $config.uri.addModels;
                 $http.post(newModel, this.data).then(function successCallback(data) {
-                	// if(data.status=='0')
-                	// {
-                	  console.log(data);
-                      if(data.data=='CREATE_MEASURE_FAIL_DUPLICATE'){
-                          toaster.pop('error', 'Please modify the name of measure, because there is already a same measure in database ', data.message);
-                          return;
-                      }
-
-	                  $('#confirm').on('hidden.bs.modal', function(e) {
-	                      $('#confirm').off('hidden.bs.modal');
-	                      $location.path('/rules').replace();
-	                      $scope.$apply();
-	                  });
-	                	$('#confirm').modal('hide');
-	                // }
-                	// else
-                	// {
-                	// 	errorMessage(0, data.result);
-                	// }
-
-                // }).error(function(data){
-                //   // errorMessage(0, 'Save model failed, please try again!');
-                //   toaster.pop('error', 'Save measure failed, please try again!', data.message);
-                // });
-                      },function errorCallback(response) {
-                            toaster.pop('error', 'Save measure failed, please try again!', response.message);
+                    if(data.data.code=='408')
+                        toaster.pop('error','Create Measure Failed, duplicate records');
+                    $('#confirm').on('hidden.bs.modal', function(e) {
+                        $('#confirm').off('hidden.bs.modal');
+                        $location.path('/measures').replace();
+                        $scope.$apply();
                     });
-
+                    $('#confirm').modal('hide');
+                },function errorCallback(response) {
+                    toaster.pop('error', 'Error when creating measure', response.message);
+                }
+                );
             },
-
-            // reset: function() {
-            //
-            // },
-            //
-            // ruleType: 1
         }
-
 
         var nextStep = function() {
             $scope.currentStep++;
