@@ -32,30 +32,30 @@ import java.util.Map;
 
 public class MeasureController {
     @Autowired
-    MeasureService measureService;
+    private MeasureService measureService;
 
-    @RequestMapping(value = "/measures",method = RequestMethod.GET)
+    @RequestMapping(value = "/measures", method = RequestMethod.GET)
     public Iterable<Measure> getAllAliveMeasures() {
         return measureService.getAllAliveMeasures();
     }
 
-    @RequestMapping(value = "/measure/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/measure/{id}", method = RequestMethod.GET)
     public Measure getMeasureById(@PathVariable("id") long id) {
         return measureService.getMeasureById(id);
     }
 
-    @RequestMapping(value = "/measure/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/measure/{id}", method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteMeasureById(@PathVariable("id") Long id) {
         return measureService.deleteMeasureById(id);
     }
 
-    @RequestMapping(value = "/measure",method = RequestMethod.PUT)
+    @RequestMapping(value = "/measure", method = RequestMethod.PUT)
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         return measureService.updateMeasure(measure);
     }
 
-    @RequestMapping(value = "/measures/owner/{owner}",method = RequestMethod.GET)
-    public List<Map<String, String>> getAllAliveMeasureNameIdByOwner(@PathVariable("owner") String owner){
+    @RequestMapping(value = "/measures/owner/{owner}", method = RequestMethod.GET)
+    public List<Map<String, String>> getAllAliveMeasureNameIdByOwner(@PathVariable("owner") String owner) {
         return measureService.getAllAliveMeasureNameIdByOwner(owner);
     }
 

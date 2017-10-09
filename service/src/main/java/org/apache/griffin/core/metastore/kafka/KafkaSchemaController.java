@@ -28,36 +28,36 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/metadata/kafka")
 public class KafkaSchemaController {
-    //TODO subject should be replaced with topic
+
     @Autowired
     KafkaSchemaServiceImpl kafkaSchemaService;
 
-    @RequestMapping(value = "/schema/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/schema/{id}", method = RequestMethod.GET)
     public SchemaString getSchemaString(@PathVariable("id") Integer id) {
         return kafkaSchemaService.getSchemaString(id);
     }
 
-    @RequestMapping(value = "/subject",method = RequestMethod.GET)
+    @RequestMapping(value = "/subject", method = RequestMethod.GET)
     public Iterable<String> getSubjects() {
         return kafkaSchemaService.getSubjects();
     }
 
-    @RequestMapping(value = "/versions",method = RequestMethod.GET)
+    @RequestMapping(value = "/versions", method = RequestMethod.GET)
     public Iterable<Integer> getSubjectVersions(@RequestParam("subject") String subject) {
         return kafkaSchemaService.getSubjectVersions(subject);
     }
 
-    @RequestMapping(value = "/subjectSchema",method = RequestMethod.GET)
+    @RequestMapping(value = "/subjectSchema", method = RequestMethod.GET)
     public Schema getSubjectSchema(@RequestParam("subject") String subject, @RequestParam("version") String version) {
         return kafkaSchemaService.getSubjectSchema(subject, version);
     }
 
-    @RequestMapping(value = "/config",method = RequestMethod.GET)
+    @RequestMapping(value = "/config", method = RequestMethod.GET)
     public Config getTopLevelConfig() {
         return kafkaSchemaService.getTopLevelConfig();
     }
 
-    @RequestMapping(value = "/config/{subject}",method = RequestMethod.GET)
+    @RequestMapping(value = "/config/{subject}", method = RequestMethod.GET)
     public Config getSubjectLevelConfig(@PathVariable("subject") String subject) {
         return kafkaSchemaService.getSubjectLevelConfig(subject);
     }

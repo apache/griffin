@@ -18,9 +18,6 @@ under the License.
 */
 package org.apache.griffin.core.job.entity;
 
-/**
- * Created by xiangrchen on 4/27/17.
- */
 public class JobRequestBody {
     private String sourcePattern;
     private String targetPattern;

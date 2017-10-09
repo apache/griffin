@@ -31,15 +31,15 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 
 @Component
-public class HiveMetastoreProxy
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetastoreProxy.class);
+public class HiveMetaStoreProxy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetaStoreProxy.class);
 
     @Value("${hive.metastore.uris}")
     private String uris;
 
     /**
      * Set attempts and interval for HiveMetastoreClient to retry.
+     *
      * @hive.hmshandler.retry.attempts: The number of times to retry a HMSHandler call if there were a connection error.
      * @hive.hmshandler.retry.interval: The time between HMSHandler retry attempts on failure.
      */
@@ -52,7 +52,7 @@ public class HiveMetastoreProxy
     private HiveMetaStoreClient client = null;
 
     @Bean
-    public HiveMetaStoreClient initHiveMetastoreClient(){
+    public HiveMetaStoreClient initHiveMetastoreClient() {
         HiveConf hiveConf = new HiveConf();
         hiveConf.set("hive.metastore.local", "false");
         hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
@@ -60,9 +60,9 @@ public class HiveMetastoreProxy
         hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);
         try {
-            client= new HiveMetaStoreClient(hiveConf);
+            client = new HiveMetaStoreClient(hiveConf);
         } catch (MetaException e) {
-            LOGGER.error("Failed to connect hive metastore",e.getMessage());
+            LOGGER.error("Failed to connect hive metastore. {}", e.getMessage());
             client = null;
         }
 
@@ -71,7 +71,7 @@ public class HiveMetastoreProxy
 
     @PreDestroy
     public void destroy() throws Exception {
-        if(null!=client) {
+        if (null != client) {
             client.close();
         }
     }

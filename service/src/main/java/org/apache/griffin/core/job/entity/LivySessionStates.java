@@ -21,9 +21,6 @@ package org.apache.griffin.core.job.entity;
 
 import com.cloudera.livy.sessions.SessionState;
 
-/**
- * Created by xiangrchen on 7/31/17.
- */
 public class LivySessionStates {
 
     /**
@@ -44,8 +41,8 @@ public class LivySessionStates {
         unknown
     }
 
-    public static SessionState toSessionState(State state){
-        switch (state){
+    public static SessionState toSessionState(State state) {
+        switch (state) {
             case not_started:
                 return new SessionState.NotStarted();
             case starting:
@@ -71,21 +68,21 @@ public class LivySessionStates {
         }
     }
 
-    public static boolean isActive(State state){
-        if (State.unknown.equals(state)){
+    public static boolean isActive(State state) {
+        if (State.unknown.equals(state)) {
             // set unknown isactive() as false.
             return false;
         }
-        SessionState sessionState=toSessionState(state);
-        if (sessionState==null){
+        SessionState sessionState = toSessionState(state);
+        if (sessionState == null) {
             return false;
-        }else {
+        } else {
             return sessionState.isActive();
         }
     }
 
-    public static boolean isHeathy(State state){
-        if (State.error.equals(state) || State.dead.equals(state) || State.shutting_down.equals(state)){
+    public static boolean isHeathy(State state) {
+        if (State.error.equals(state) || State.dead.equals(state) || State.shutting_down.equals(state)) {
             return false;
         }
         return true;

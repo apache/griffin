@@ -26,6 +26,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
-
-
 }
