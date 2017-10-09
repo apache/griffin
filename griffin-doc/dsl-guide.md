@@ -79,5 +79,25 @@ Griffin DSL is SQL-like, case insensitive, and easy to learn.
 	e.g. `source.age between 3 and 30, source.age between (3, 30)`
 - **like**: like clause like sql.  
 	e.g. `source.name like "%abc%"`
-- **logical factor**: 
+- **is null**: is null operator like sql.  
+	e.g. `source.desc is not null`
+- **is nan**: check if the value is not a number, the syntax like `is null`  
+	e.g. `source.age is not nan`
+- **logical factor**: math expression or logical expressions above or other logical expressions with brackets.  
+	e.g. `(source.user_id = target.user_id AND source.age > target.age)`
+- **unary logical expression**: unary logical operator with factor.  
+	e.g. `NOT source.has_data`
+- **binary logical expression**: logical factors with binary logical operators, including `and`, `or` and comparison operators.  
+	e.g. `source.age = target.age OR source.ticket = target.tck`
 
+
+### Expression
+- **expression**: logical expression and math expression.
+
+### Function
+- **argument**: expression.
+- **function**: function name with arguments between brackets.  
+	e.g. `max(source.age, target.age), count(*)`
+
+### Clause
+- **select clause**: 
