@@ -17,12 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.config;
+package org.apache.griffin.core.measure.repo;
 
-import org.springframework.context.annotation.Configuration;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.apache.griffin.core.measure.entity.Rule;
+import org.springframework.data.repository.CrudRepository;
 
-@Configuration
-@EnableSwagger2
-public class SwaggerConfig {
+public interface RuleRepo extends CrudRepository<Rule,Long> {
 }

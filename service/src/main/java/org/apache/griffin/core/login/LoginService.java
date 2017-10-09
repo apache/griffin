@@ -23,13 +23,13 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
-public interface LoginService  {
+public interface LoginService {
 
-    public ResponseEntity<Map<String, Object>> login(Map<String, String> map);
+    ResponseEntity<Map<String, Object>> login(Map<String, String> map);
 
-    public ResponseEntity<Map<String, Object>> loginDefault(Map<String, String> map);
+    ResponseEntity<Map<String, Object>> loginDefault(Map<String, String> map);
 
-    public ResponseEntity<Map<String, Object>> loginLDAP(Map<String, String> map);
+    ResponseEntity<Map<String, Object>> loginLDAP(Map<String, String> map);
 
 
 }

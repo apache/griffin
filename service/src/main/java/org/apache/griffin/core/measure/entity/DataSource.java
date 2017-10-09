@@ -20,35 +20,40 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import javax.persistence.*;
 import java.util.List;
 
-
 @Entity
-public class EvaluateRule extends AuditableEntity {
-    private static final long serialVersionUID = 4240072518233967528L;
+public class DataSource extends AuditableEntity {
+    private static final long serialVersionUID = -4748881017079815794L;
+
+    private String name;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @JoinColumn(name = "evaluateRule_id")
-    @Fetch(FetchMode.SUBSELECT)
-    private List<Rule> rules;
+    @JoinColumn(name = "dataSource_id")
+    private List<DataConnector> connectors;
 
-    public List<Rule> getRules() {
-        return rules;
+    public String getName() {
+        return name;
     }
 
-    public void setRules(List<Rule> rules) {
-        this.rules = rules;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public EvaluateRule() {
+    public List<DataConnector> getConnectors() {
+        return connectors;
     }
 
-    public EvaluateRule(List<Rule> rules) {
-        this.rules = rules;
+    public void setConnectors(List<DataConnector> connectors) {
+        this.connectors = connectors;
+    }
+
+    public DataSource() {
+    }
+
+    public DataSource(String name, List<DataConnector> connectors) {
+        this.name = name;
+        this.connectors = connectors;
     }
 }
-

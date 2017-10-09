@@ -25,11 +25,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
@@ -39,8 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value=MetricController.class,secure = false)
+@WebMvcTest(value = MetricController.class, secure = false)
 public class MetricControllerTest {
+
     @Autowired
     private MockMvc mvc;
 
@@ -48,21 +46,19 @@ public class MetricControllerTest {
     private MetricService service;
 
     @Before
-    public void setup(){
+    public void setup() {
     }
 
 
     @Test
-    public void testGetOrgByMeasureName() throws IOException,Exception{
+    public void testGetOrgByMeasureName() throws Exception {
+        String measureName = "default";
+        String org = "ebay";
+        given(service.getOrgByMeasureName(measureName)).willReturn(org);
 
-        given(service.getOrgByMeasureName("m14")).willReturn("bullseye");
-
-        mvc.perform(get("/orgName?measureName=m14").contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
+        mvc.perform(get("/metrics/org").param("measureName", measureName))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isString())
-                .andExpect(jsonPath("$",is("bullseye")))
-        ;
+                .andExpect(jsonPath("$", is(org)));
     }
 
 }

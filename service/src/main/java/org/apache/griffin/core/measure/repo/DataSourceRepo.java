@@ -17,23 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.metastore.hive;
+package org.apache.griffin.core.measure.repo;
 
-import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.griffin.core.measure.entity.DataSource;
+import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
-import java.util.Map;
-
-public interface HiveMetastoreService {
-
-    Iterable<String> getAllDatabases() ;
-
-    Iterable<String> getAllTableNames(String dbName) ;
-
-    List<Table> getAllTablesByDbName(String db) ;
-
-    Map<String,List<Table>> getAllTable() ;
-
-    Table getTable(String dbName, String tableName) ;
-
+public interface DataSourceRepo extends CrudRepository<DataSource,Long> {
 }

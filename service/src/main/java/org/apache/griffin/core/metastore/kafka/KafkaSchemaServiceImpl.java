@@ -33,7 +33,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 
 @Service
-public class KafkaSchemaServiceImpl implements KafkaSchemaService{
+public class KafkaSchemaServiceImpl implements KafkaSchemaService {
 
     private static final Logger log = LoggerFactory.getLogger(KafkaSchemaServiceImpl.class);
 

@@ -35,7 +35,7 @@ public abstract class AuditableEntity implements Serializable {
 //    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @JsonIgnore
@@ -52,11 +52,21 @@ public abstract class AuditableEntity implements Serializable {
         this.id = id;
     }
 
-    public Timestamp getCreatedDate() { return createdDate; }
-    public void setCreatedDate(Timestamp createdDate) { this.createdDate = createdDate; }
+    public Timestamp getCreatedDate() {
+        return createdDate;
+    }
 
-    public Timestamp getModifiedDate() { return modifiedDate; } 
-    public void setModifiedDate(Timestamp modifiedDate) { this.modifiedDate = modifiedDate; }
+    public void setCreatedDate(Timestamp createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
 
     @Override
     public int hashCode() {
