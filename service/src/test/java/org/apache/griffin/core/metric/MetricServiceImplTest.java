@@ -29,15 +29,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 public class MetricServiceImplTest {
     @TestConfiguration
-    static class MetricServiceConfiguration{
+    static class MetricServiceConfiguration {
         @Bean
-        public MetricServiceImpl service(){
+        public MetricServiceImpl service() {
             return new MetricServiceImpl();
         }
     }
@@ -49,17 +49,14 @@ public class MetricServiceImplTest {
     private MetricServiceImpl service;
 
     @Before
-    public void setup(){
+    public void setup() {
     }
 
     @Test
-    public void testGetOrgByMeasureName(){
-        try {
-            String measureName="viewitem_hourly";
-            String tmp = service.getOrgByMeasureName(measureName);
-            assertTrue(true);
-        }catch (Throwable t){
-            fail("Cannot get org by measure name viewitem_hourly");
-        }
+    public void testGetOrgByMeasureName() {
+        String measureName = "default";
+        String org = "ebay";
+        given(measureRepo.findOrgByName("default")).willReturn(org);
+        assertEquals(service.getOrgByMeasureName(measureName), org);
     }
 }

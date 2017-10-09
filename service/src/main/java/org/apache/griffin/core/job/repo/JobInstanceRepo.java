@@ -25,17 +25,15 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 
 @Repository
-public interface JobInstanceRepo extends CrudRepository<JobInstance,Long>{
+public interface JobInstanceRepo extends CrudRepository<JobInstance, Long> {
     /**
-     *
-     * @param group is group name
-     * @param name is job name
+     * @param group    is group name
+     * @param name     is job name
      * @param pageable
      * @return all job instances scheduled at different time using the same prototype job,
      * the prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.
@@ -49,18 +47,16 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance,Long>{
             "where s.groupName= ?1 and s.jobName=?2 ")
     List<JobInstance> findByGroupNameAndJobName(String group, String name);
 
-    @Query("select DISTINCT s.groupName, s.jobName from JobInstance s")
+    @Query("select DISTINCT s.groupName, s.jobName, s.id from JobInstance s")
     List<Object> findGroupWithJobName();
 
-    @Transactional
     @Modifying
     @Query("delete from JobInstance s " +
             "where s.groupName= ?1 and s.jobName=?2 ")
-    void deleteByGroupAndjobName(String groupName, String jobName);
+    void deleteByGroupAndJobName(String groupName, String jobName);
 
-    @Transactional
     @Modifying
-    @Query("update JobInstance s "+
+    @Query("update JobInstance s " +
             "set s.state= ?2, s.appId= ?3, s.appUri= ?4 where s.id= ?1")
     void update(Long Id, LivySessionStates.State state, String appId, String appUri);
 

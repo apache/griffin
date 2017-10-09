@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+
 package org.apache.griffin.core.error.exception;
 
 import org.apache.griffin.core.util.GriffinOperationMessage;
@@ -32,33 +33,30 @@ import org.springframework.web.context.request.ServletWebRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-/**
- * Created by xiangrchen on 7/24/17.
- */
 @ControllerAdvice
 @ResponseBody
 public class RuntimeExceptionHandler {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RuntimeExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuntimeExceptionHandler.class);
 
-  @ExceptionHandler(RuntimeException.class)
-  public ResponseEntity<Map<String, Object>> handleUnexpectedRuntimeException(RuntimeException e, HttpServletRequest request){
-    LOGGER.error("Unexpected RuntimeException. "+e);
-    return setExceptionResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, GriffinOperationMessage.UNEXPECTED_RUNTIME_EXCEPTION);
-  }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, Object>> handleUnexpectedRuntimeException(RuntimeException e, HttpServletRequest request) {
+        LOGGER.error("Unexpected RuntimeException. " + e);
+        return setExceptionResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, GriffinOperationMessage.UNEXPECTED_RUNTIME_EXCEPTION);
+    }
 
-  @ExceptionHandler(value = GriffinException.class)
-  public void handleCustomException(GriffinException e) throws GriffinException {
-    throw e;
-  }
+    @ExceptionHandler(value = GriffinException.class)
+    public void handleCustomException(GriffinException e) throws GriffinException {
+        throw e;
+    }
 
-  private ResponseEntity<Map<String, Object>> setExceptionResponse(HttpServletRequest request, HttpStatus status,
-      GriffinOperationMessage message) {
-    request.setAttribute("javax.servlet.error.status_code", status.value());
-    request.setAttribute("javax.servlet.error.message", message.getDescription());
-    request.setAttribute("javax.servlet.error.error", status.toString());
-    request.setAttribute("javax.servlet.error.request_uri", request.getRequestURI());
-    Map<String, Object> map=(new DefaultErrorAttributes())
-        .getErrorAttributes(new ServletWebRequest(request), false);
-    return new ResponseEntity(map, status);
-  }
+    private ResponseEntity<Map<String, Object>> setExceptionResponse(HttpServletRequest request, HttpStatus status,
+                                                                     GriffinOperationMessage message) {
+        request.setAttribute("javax.servlet.error.status_code", status.value());
+        request.setAttribute("javax.servlet.error.message", message.getDescription());
+        request.setAttribute("javax.servlet.error.error", status.toString());
+        request.setAttribute("javax.servlet.error.request_uri", request.getRequestURI());
+        Map<String, Object> map = (new DefaultErrorAttributes())
+                .getErrorAttributes(new ServletWebRequest(request), false);
+        return new ResponseEntity(map, status);
+    }
 }

@@ -35,7 +35,9 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -45,29 +47,31 @@ public class LoginServiceImpl implements LoginService {
     private Environment env;
 
     @Override
-    public ResponseEntity<Map<String, Object>> login(Map<String, String> map){
+    public ResponseEntity<Map<String, Object>> login(Map<String, String> map) {
         String strategy = env.getProperty("login.strategy");
-        switch (strategy){
-            case "ldap": return loginLDAP(map);
-            case "default":return loginDefault(map);
+        switch (strategy) {
+            case "ldap":
+                return loginLDAP(map);
+            case "default":
+                return loginDefault(map);
             default: {
                 LOGGER.error("Missing login strategy configuration");
-                return new ResponseEntity<Map<String, Object>>(new HashMap<String,Object>(), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<Map<String, Object>>(new HashMap<String, Object>(), HttpStatus.NOT_FOUND);
             }
         }
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> loginDefault(Map<String, String> map){
+    public ResponseEntity<Map<String, Object>> loginDefault(Map<String, String> map) {
         String username = map.get("username");
         String password = map.get("password");
-        if(username == null || password == null){
+        if (username == null || password == null) {
             LOGGER.error("Missing default login input");
             return null;
         }
         String fullName = null;
-        if(username.equals("user")){
-            if(password.equals("test")){
+        if (username.equals("user")) {
+            if (password.equals("test")) {
                 fullName = "Default";
             }
         }
@@ -78,7 +82,7 @@ public class LoginServiceImpl implements LoginService {
     public ResponseEntity<Map<String, Object>> loginLDAP(Map<String, String> map) {
         String ntAccount = map.get("username");
         String password = map.get("password");
-        if(ntAccount == null || password == null){
+        if (ntAccount == null || password == null) {
             LOGGER.error("Missing ldap login input");
             return null;
         }
@@ -86,10 +90,10 @@ public class LoginServiceImpl implements LoginService {
         return getResponse(ntAccount, fullName);
     }
 
-    private String searchLDAP(String ntAccount, String password){
+    private String searchLDAP(String ntAccount, String password) {
         String domainComponent = env.getProperty("ldap.dc");
         Hashtable<String, String> ht = getLDAPEnvironmrnt(ntAccount, password);
-        if(domainComponent == null || ht == null){
+        if (domainComponent == null || ht == null) {
             return null;
         }
         LdapContext ctx;
@@ -106,7 +110,7 @@ public class LoginServiceImpl implements LoginService {
                 Attributes attrs = searchResult.getAttributes();
                 if (attrs != null && attrs.get("cn") != null) {
                     String cnName = (String) attrs.get("cn").get();
-                    if(cnName.indexOf("(") > 0){
+                    if (cnName.indexOf("(") > 0) {
                         fullName = cnName.substring(0, cnName.indexOf("("));
                     }
                 }
@@ -118,12 +122,12 @@ public class LoginServiceImpl implements LoginService {
         return null;
     }
 
-    private Hashtable<String, String> getLDAPEnvironmrnt(String ntAccount, String password){
+    private Hashtable<String, String> getLDAPEnvironmrnt(String ntAccount, String password) {
         String ldapUrl = env.getProperty("ldap.url");
         String domain = env.getProperty("ldap.domain");
         String connectTimeout = env.getProperty("ldap.connect-timeout");
         String readTimeout = env.getProperty("ldap.read-timeout");
-        if(ldapUrl == null || domain == null ||connectTimeout == null || readTimeout == null){
+        if (ldapUrl == null || domain == null || connectTimeout == null || readTimeout == null) {
             LOGGER.error("Missing ldap properties");
             return null;
         }
@@ -139,14 +143,14 @@ public class LoginServiceImpl implements LoginService {
         return ht;
     }
 
-    private ResponseEntity<Map<String,Object>> getResponse(String ntAccount, String fullName){
-        Map<String,Object> message = new HashMap<String,Object>();
-        if(fullName!=null){
+    private ResponseEntity<Map<String, Object>> getResponse(String ntAccount, String fullName) {
+        Map<String, Object> message = new HashMap<String, Object>();
+        if (fullName != null) {
             message.put("ntAccount", ntAccount);
             message.put("fullName", fullName);
             message.put("status", 0);
             return new ResponseEntity<Map<String, Object>>(message, HttpStatus.OK);
-        }else {
+        } else {
             return new ResponseEntity<Map<String, Object>>(message, HttpStatus.NOT_FOUND);
         }
     }
