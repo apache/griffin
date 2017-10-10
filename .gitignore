@@ -31,3 +31,6 @@ ui/bower_components/*
 ui/node_modules/*
 ui/debug.log
 ui/package-lock.json
+
+derby.log
+metastore_db
