@@ -1,0 +1,11 @@
+.table-striped > tbody > tr{
+     background-color: #1f1f1f; 
+}
+a{
+	color: white;
+}
+
+#pagination .pagination{
+	margin:20px 0 0 0 ;
+}
+

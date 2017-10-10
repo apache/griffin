@@ -1,0 +1,9 @@
+<div id="bigChartContainer"  class="big-chart-container" (window:resize)="onResize($event)" style="display:none;">
+    <div id="bigChartShow" class="big-chart-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div id="bigChartDiv" echarts [options]="chartOption" ></div>
+            </div>
+        </div>
+    </div>
+</div>
