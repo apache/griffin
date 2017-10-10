@@ -44,10 +44,10 @@ class HdfsUtilTest extends FunSuite with Matchers with BeforeAndAfter {
   conf2.addResource(new Path("file:///Users/lliu13/test/hadoop/hdfs-site.xml"))
   private val dfs2 = FileSystem.get(conf2)
 
-  val conf = new SparkConf().setAppName("test_hdfs").setMaster("local[*]")
-  val sparkContext = new SparkContext(conf)
-  sparkContext.setLogLevel("WARN")
-  val sqlContext = new HiveContext(sparkContext)
+//  val conf = new SparkConf().setAppName("test_hdfs").setMaster("local[*]")
+//  val sparkContext = new SparkContext(conf)
+//  sparkContext.setLogLevel("WARN")
+//  val sqlContext = new HiveContext(sparkContext)
 
   def listSubPaths(dfs: FileSystem, dirPath: String, subType: String, fullPath: Boolean = false): Iterable[String] = {
     val path = new Path(dirPath)
@@ -75,58 +75,58 @@ class HdfsUtilTest extends FunSuite with Matchers with BeforeAndAfter {
     if (parentPath.endsWith(seprator)) parentPath + fileName else parentPath + seprator + fileName
   }
 
-  test ("test multiple hdfs") {
-    val list1 = listSubPaths(dfs1, "/", "dir", false)
-    println(list1)
-
-    val list2 = listSubPaths(dfs2, "/", "dir", false)
-    println(list2)
-
-    val path1 = "/depth/discovery_file_sample.txt"
-    val istream1 = dfs1.open(new Path(path1))
-    val reader1 = new BufferedReader(new InputStreamReader(istream1))
-    val seq1 = scala.collection.mutable.MutableList[String]()
-    try {
-      var line = reader1.readLine()
-      while (line != null) {
-        val arr = line.split("\u0007")
-        seq1 ++= arr
-        line = reader1.readLine()
-      }
-    } finally {
-      reader1.close()
-      istream1.close()
-    }
-
-//    val scanner = new java.util.Scanner(istream1,"UTF-8").useDelimiter("\u0007")
-//    val theString = if (scanner.hasNext()) scanner.next() else ""
-//    println(theString)
-//    scanner.close()
-
-    println(seq1.size)
-    println(seq1.take(10))
-    seq1.take(10).foreach(println)
-
-//    val path2 = "/griffin/json/env.json"
-//    val istream2 = dfs2.open(new Path(path2))
-//    val reader2 = new BufferedReader(new InputStreamReader(istream2))
-//    val seq2 = scala.collection.mutable.MutableList[String]()
+//  test ("test multiple hdfs") {
+//    val list1 = listSubPaths(dfs1, "/", "dir", false)
+//    println(list1)
+//
+//    val list2 = listSubPaths(dfs2, "/", "dir", false)
+//    println(list2)
+//
+//    val path1 = "/depth/discovery_file_sample.txt"
+//    val istream1 = dfs1.open(new Path(path1))
+//    val reader1 = new BufferedReader(new InputStreamReader(istream1))
+//    val seq1 = scala.collection.mutable.MutableList[String]()
 //    try {
-//      var line = reader2.readLine()
+//      var line = reader1.readLine()
 //      while (line != null) {
-//        line = reader2.readLine()
-//        seq2 += line
-//      }
-//    } catch {
-//      case e: Throwable => {
-//        println("error in reading")
+//        val arr = line.split("\u0007")
+//        seq1 ++= arr
+//        line = reader1.readLine()
 //      }
 //    } finally {
-//      reader2.close()
-//      istream2.close()
+//      reader1.close()
+//      istream1.close()
 //    }
-//    println(seq2.size)
-//    println(seq2.take(10))
-  }
+//
+////    val scanner = new java.util.Scanner(istream1,"UTF-8").useDelimiter("\u0007")
+////    val theString = if (scanner.hasNext()) scanner.next() else ""
+////    println(theString)
+////    scanner.close()
+//
+//    println(seq1.size)
+//    println(seq1.take(10))
+//    seq1.take(10).foreach(println)
+//
+////    val path2 = "/griffin/json/env.json"
+////    val istream2 = dfs2.open(new Path(path2))
+////    val reader2 = new BufferedReader(new InputStreamReader(istream2))
+////    val seq2 = scala.collection.mutable.MutableList[String]()
+////    try {
+////      var line = reader2.readLine()
+////      while (line != null) {
+////        line = reader2.readLine()
+////        seq2 += line
+////      }
+////    } catch {
+////      case e: Throwable => {
+////        println("error in reading")
+////      }
+////    } finally {
+////      reader2.close()
+////      istream2.close()
+////    }
+////    println(seq2.size)
+////    println(seq2.take(10))
+//  }
 
 }

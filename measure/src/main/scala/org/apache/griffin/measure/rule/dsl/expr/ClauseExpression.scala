@@ -26,7 +26,14 @@ case class SelectClause(exprs: Seq[Expr]) extends ClauseExpression {
   addChildren(exprs)
 
   def desc: String = s"${exprs.map(_.desc).mkString(", ")}"
-  def coalesceDesc: String = s"${exprs.map(_.desc).mkString(", ")}"
+  def coalesceDesc: String = desc
+
+}
+
+case class FromClause(dataSource: String) extends ClauseExpression {
+
+  def desc: String = s"FROM `${dataSource}`"
+  def coalesceDesc: String = desc
 
 }
 
@@ -107,44 +114,61 @@ case class LimitClause(expr: Expr) extends ClauseExpression {
   def coalesceDesc: String = s"LIMIT ${expr.coalesceDesc}"
 }
 
-case class CombinedClause(selectClause: SelectClause, tails: Seq[ClauseExpression]
+case class CombinedClause(selectClause: SelectClause, fromClauseOpt: Option[FromClause],
+                          tails: Seq[ClauseExpression]
                          ) extends ClauseExpression {
 
-  addChildren(selectClause +: tails)
+  addChildren({
+    val headClauses: Seq[ClauseExpression] = selectClause +: (fromClauseOpt.toSeq)
+    headClauses ++ tails
+  })
 
   def desc: String = {
-    tails.foldLeft(selectClause.desc) { (head, tail) =>
+    val selectDesc = s"SELECT ${selectClause.desc}"
+    val fromDesc = fromClauseOpt.map(_.desc).mkString(" ")
+    val headDesc = s"${selectDesc} ${fromDesc}"
+    tails.foldLeft(headDesc) { (head, tail) =>
       s"${head} ${tail.desc}"
     }
   }
   def coalesceDesc: String = {
-    tails.foldLeft(selectClause.coalesceDesc) { (head, tail) =>
+    val selectDesc = s"SELECT ${selectClause.coalesceDesc}"
+    val fromDesc = fromClauseOpt.map(_.coalesceDesc).mkString(" ")
+    val headDesc = s"${selectDesc} ${fromDesc}"
+    tails.foldLeft(headDesc) { (head, tail) =>
       s"${head} ${tail.coalesceDesc}"
     }
   }
 }
 
-case class ProfilingClause(selectClause: SelectClause, groupbyClauseOpt: Option[GroupbyClause],
+case class ProfilingClause(selectClause: SelectClause,
+                           fromClauseOpt: Option[FromClause],
+                           groupbyClauseOpt: Option[GroupbyClause],
                            preGroupbyClauses: Seq[ClauseExpression],
                            postGroupbyClauses: Seq[ClauseExpression]
                           ) extends ClauseExpression {
-  addChildren(groupbyClauseOpt match {
-    case Some(gc) => (selectClause +: preGroupbyClauses) ++ (gc +: postGroupbyClauses)
-    case _ => (selectClause +: preGroupbyClauses) ++ postGroupbyClauses
+  addChildren({
+    val headClauses: Seq[ClauseExpression] = selectClause +: (fromClauseOpt.toSeq)
+    groupbyClauseOpt match {
+      case Some(gc) => (headClauses ++ preGroupbyClauses) ++ (gc +: postGroupbyClauses)
+      case _ => (headClauses ++ preGroupbyClauses) ++ postGroupbyClauses
+    }
   })
 
   def desc: String = {
     val selectDesc = selectClause.desc
+    val fromDesc = fromClauseOpt.map(_.desc).mkString(" ")
     val groupbyDesc = groupbyClauseOpt.map(_.desc).mkString(" ")
     val preDesc = preGroupbyClauses.map(_.desc).mkString(" ")
     val postDesc = postGroupbyClauses.map(_.desc).mkString(" ")
-    s"${selectDesc} ${preDesc} ${groupbyDesc} ${postDesc}"
+    s"${selectDesc} ${fromDesc} ${preDesc} ${groupbyDesc} ${postDesc}"
   }
   def coalesceDesc: String = {
     val selectDesc = selectClause.coalesceDesc
+    val fromDesc = fromClauseOpt.map(_.coalesceDesc).mkString(" ")
     val groupbyDesc = groupbyClauseOpt.map(_.coalesceDesc).mkString(" ")
     val preDesc = preGroupbyClauses.map(_.coalesceDesc).mkString(" ")
     val postDesc = postGroupbyClauses.map(_.coalesceDesc).mkString(" ")
-    s"${selectDesc} ${preDesc} ${groupbyDesc} ${postDesc}"
+    s"${selectDesc} ${fromDesc} ${preDesc} ${groupbyDesc} ${postDesc}"
   }
 }

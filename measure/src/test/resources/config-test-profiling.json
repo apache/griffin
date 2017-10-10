@@ -23,9 +23,8 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "user_id as id, user_id.approx_count_distinct() as cnt group by user_id order by cnt desc, id desc limit 3",
+        "rule": "select user_id as id, user_id.count() as cnt from source group by user_id order by cnt desc, id desc limit 3",
         "details": {
-          "source": "source",
           "profiling": {
             "name": "count",
             "persist.type": "metric"
