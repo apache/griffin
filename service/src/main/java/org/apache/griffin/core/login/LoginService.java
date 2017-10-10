@@ -17,23 +17,19 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.metastore.hive;
+package org.apache.griffin.core.login;
 
-import org.apache.hadoop.hive.metastore.api.Table;
+import org.springframework.http.ResponseEntity;
 
-import java.util.List;
 import java.util.Map;
 
-public interface HiveMetastoreService {
+public interface LoginService {
 
-    Iterable<String> getAllDatabases() ;
+    ResponseEntity<Map<String, Object>> login(Map<String, String> map);
 
-    Iterable<String> getAllTableNames(String dbName) ;
+    ResponseEntity<Map<String, Object>> loginDefault(Map<String, String> map);
 
-    List<Table> getAllTablesByDbName(String db) ;
+    ResponseEntity<Map<String, Object>> loginLDAP(Map<String, String> map);
 
-    Map<String,List<Table>> getAllTable() ;
-
-    Table getTable(String dbName, String tableName) ;
 
 }

@@ -25,9 +25,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Properties;
 
-/**
- * Created by xiangrchen on 7/26/17.
- */
 @Configuration
 public class SparkJobConfig {
     @Bean(name = "sparkJobProps")

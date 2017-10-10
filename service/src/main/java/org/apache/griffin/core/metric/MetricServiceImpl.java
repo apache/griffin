@@ -25,9 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MetricServiceImpl implements MetricService{
+public class MetricServiceImpl implements MetricService {
     @Autowired
-    MeasureRepo measureRepo;
+    private MeasureRepo measureRepo;
+
     @Override
     public String getOrgByMeasureName(String measureName) {
         return measureRepo.findOrgByName(measureName);

@@ -17,12 +17,23 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.config;
+package org.apache.griffin.core.metastore.hive;
 
-import org.springframework.context.annotation.Configuration;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.apache.hadoop.hive.metastore.api.Table;
 
-@Configuration
-@EnableSwagger2
-public class SwaggerConfig {
+import java.util.List;
+import java.util.Map;
+
+public interface HiveMetaStoreService {
+
+    Iterable<String> getAllDatabases();
+
+    Iterable<String> getAllTableNames(String dbName);
+
+    List<Table> getAllTable(String db);
+
+    Map<String, List<Table>> getAllTable();
+
+    Table getTable(String dbName, String tableName);
+
 }

@@ -17,29 +17,33 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.metric;
+package org.apache.griffin.core.login;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * In griffin, metricName usually equals to measureName, and we only save measureName in server.
- */
+import java.util.Map;
 
 @RestController
-@RequestMapping("/metrics")
-public class MetricController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetricController.class);
-    @Autowired
-    MetricService metricService;
+@RequestMapping("/api/v1/login")
+public class LoginController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
-    @RequestMapping(value = "/org", method = RequestMethod.GET)
-    public String getOrgByMeasureName(@RequestParam("measureName") String measureName) {
-        return metricService.getOrgByMeasureName(measureName);
+    @Autowired
+    private LoginService loginService;
+
+    @Autowired
+    private Environment env;
+
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> map) {
+        return loginService.login(map);
     }
 }

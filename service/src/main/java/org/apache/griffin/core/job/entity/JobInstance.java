@@ -24,9 +24,6 @@ import org.apache.griffin.core.measure.entity.AuditableEntity;
 
 import javax.persistence.*;
 
-/**
- * Created by xiangrchen on 5/31/17.
- */
 @Entity
 public class JobInstance extends AuditableEntity {
 
@@ -36,12 +33,12 @@ public class JobInstance extends AuditableEntity {
     private String jobName;
     private int sessionId;
     @Enumerated(EnumType.STRING)
-    State state;
-    String appId;
+    private State state;
+    private String appId;
     @Lob
-    @Column(length=1024) //2^10=1024
+    @Column(length = 1024) //2^10=1024
     private String appUri;
-    long timestamp;
+    private long timestamp;
 
     public String getGroupName() {
         return groupName;
