@@ -261,13 +261,19 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         }
       }
       case ProfilingType => {
-        val sourceName = getNameOpt(details, ProfilingInfo._Source) match {
-          case Some(name) => name
-          case _ => dataSourceNames.head
+        val profilingClause = expr.asInstanceOf[ProfilingClause]
+        val sourceName = profilingClause.fromClauseOpt match {
+          case Some(fc) => fc.dataSource
+          case _ => {
+            getNameOpt(details, ProfilingInfo._Source) match {
+              case Some(name) => name
+              case _ => dataSourceNames.head
+            }
+          }
         }
-        val analyzer = ProfilingAnalyzer(expr.asInstanceOf[ProfilingClause], sourceName)
+        val analyzer = ProfilingAnalyzer(profilingClause, sourceName)
 
-        analyzer.selectionExprs.foreach(println)
+//        analyzer.selectionExprs.foreach(println)
 
         val selExprDescs = analyzer.selectionExprs.map { sel =>
           val alias = sel match {
@@ -283,6 +289,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         } else {
           (s"`${GroupByColumn.tmst}`" +: selExprDescs).mkString(", ")
         }
+
+        val fromClause = profilingClause.fromClauseOpt.getOrElse(FromClause(sourceName)).desc
 
 //        val tailClause = analyzer.tailsExprs.map(_.desc).mkString(" ")
         val tmstGroupbyClause = GroupbyClause(LiteralStringExpr(s"`${GroupByColumn.tmst}`") :: Nil, None)
@@ -300,7 +308,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           // 1. select statement
           val profilingSql = {
 //            s"SELECT `${GroupByColumn.tmst}`, ${selClause} FROM ${sourceName} ${tailClause} GROUP BY `${GroupByColumn.tmst}`"
-            s"SELECT ${selClause} FROM ${sourceName} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
+            s"SELECT ${selClause} ${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
           }
           val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
           val profilingStep = SparkSqlStep(

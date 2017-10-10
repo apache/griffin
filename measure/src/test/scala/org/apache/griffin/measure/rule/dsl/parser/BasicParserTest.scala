@@ -202,4 +202,18 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     println(result.get.desc)
   }
 
+  test ("select clause") {
+    val rule = "select source.user_id, item, source.func()"
+    val result = parser.parseAll(parser.selectClause, rule)
+    result.successful should be (true)
+    println(result.get.desc)
+  }
+
+  test ("from clause") {
+    val rule = "from source"
+    val result = parser.parseAll(parser.fromClause, rule)
+    result.successful should be (true)
+    println(result.get.desc)
+  }
+
 }
