@@ -27,6 +27,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   val dataSourceNames: Seq[String]
   val functionNames: Seq[String]
 
+  private def trim(str: String): String = {
+    val regex = """`(.*)`""".r
+    str match {
+      case regex(s) => s
+      case _ => str
+    }
+  }
+
   /**
     * BNF for basic parser
     *
@@ -118,6 +126,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val UQUOTE: Parser[String] = "`"
     val COMMA: Parser[String] = ","
 
+    val SELECT: Parser[String] = """(?i)select\s""".r
+    val FROM: Parser[String] = """(?i)from\s""".r
     val AS: Parser[String] = """(?i)as\s""".r
     val WHERE: Parser[String] = """(?i)where\s""".r
     val GROUP: Parser[String] = """(?i)group\s""".r
@@ -307,7 +317,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <limit-clause> = <limit> <expr>
     */
 
-  def selectClause: Parser[SelectClause] = rep1sep(expression, COMMA) ^^ { SelectClause(_) }
+  def selectClause: Parser[SelectClause] = opt(SELECT) ~> rep1sep(expression, COMMA) ^^ { SelectClause(_) }
+  def fromClause: Parser[FromClause] = FROM ~> TableFieldName ^^ { ds => FromClause(trim(ds)) }
   def whereClause: Parser[WhereClause] = WHERE ~> expression ^^ { WhereClause(_) }
   def havingClause: Parser[Expr] = HAVING ~> expression
   def groupbyClause: Parser[GroupbyClause] = GROUP ~ BY ~ rep1sep(expression, COMMA) ~ opt(havingClause) ^^ {
@@ -323,14 +334,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
 
   /**
     * -- combined clauses --
-    * <combined-clauses> = <select-clause> [ <where-clause> ]+ [ <groupby-clause> ]+ [ <orderby-clause> ]+ [ <limit-clause> ]+
+    * <combined-clauses> = <select-clause> [ <from-clause> ]+ [ <where-clause> ]+ [ <groupby-clause> ]+ [ <orderby-clause> ]+ [ <limit-clause> ]+
     */
 
-  def combinedClause: Parser[CombinedClause] = selectClause ~ opt(whereClause) ~
+  def combinedClause: Parser[CombinedClause] = selectClause ~ opt(fromClause) ~ opt(whereClause) ~
     opt(groupbyClause) ~ opt(orderbyClause) ~ opt(limitClause) ^^ {
-    case sel ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
+    case sel ~ fromOpt ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
       val tails = Seq(whereOpt, groupbyOpt, orderbyOpt, limitOpt).flatMap(opt => opt)
-      CombinedClause(sel, tails)
+      CombinedClause(sel, fromOpt, tails)
     }
   }
 
