@@ -64,26 +64,30 @@ public class HiveMetaStoreServiceImplTest {
     }
 
     @Test
-    public void testGetAllDatabases() throws MetaException {
+    public void testGetAllDatabasesForNormalRun() throws MetaException {
         given(client.getAllDatabases()).willReturn(Arrays.asList("default"));
         assertEquals(service.getAllDatabases().iterator().hasNext(), true);
+    }
 
-        // MetaException
+    @Test
+    public void testGetAllDatabasesForMetaException() throws MetaException {
         given(client.getAllDatabases()).willThrow(MetaException.class);
         doNothing().when(client).reconnect();
         service.getAllDatabases();
         assertTrue(service.getAllDatabases() == null);
-
     }
 
 
     @Test
-    public void testGetAllTableNames() throws MetaException {
+    public void testGetAllTableNamesForNormalRun() throws MetaException {
         String dbName = "default";
         given(client.getAllTables(dbName)).willReturn(Arrays.asList(dbName));
         assertEquals(service.getAllTableNames(dbName).iterator().hasNext(), true);
+    }
 
-        // MetaException
+    @Test
+    public void testGetAllTableNamesForMetaException() throws MetaException {
+        String dbName = "default";
         given(client.getAllTables(dbName)).willThrow(MetaException.class);
         doNothing().when(client).reconnect();
         assertTrue(service.getAllTableNames(dbName) == null);
@@ -91,21 +95,24 @@ public class HiveMetaStoreServiceImplTest {
     }
 
     @Test
-    public void testGetAllTableByDBName() throws TException {
+    public void testGetAllTableByDBNameForNormalRun() throws TException {
         String useDbName = "default";
         String tableName = "table";
         given(client.getAllTables(useDbName)).willReturn(Arrays.asList(tableName));
         given(client.getTable(useDbName, tableName)).willReturn(new Table());
         assertEquals(service.getAllTable(useDbName).size(), 1);
+    }
 
-        // MetaException
+    @Test
+    public void testGetAllTableByDBNameForMetaException() throws TException {
+        String useDbName = "default";
         given(client.getAllTables(useDbName)).willThrow(MetaException.class);
         doNothing().when(client).reconnect();
         assertEquals(service.getAllTable(useDbName).size(), 0);
     }
 
     @Test
-    public void testGetAllTable() throws TException {
+    public void testGetAllTableForNormalRun() throws TException {
         String useDbName = "default";
         String tableName = "table";
         List<String> databases = Arrays.asList(useDbName);
@@ -113,31 +120,37 @@ public class HiveMetaStoreServiceImplTest {
         given(client.getAllTables(databases.iterator().next())).willReturn(Arrays.asList(tableName));
         given(client.getTable(useDbName, tableName)).willReturn(new Table());
         assertEquals(service.getAllTable().size(), 1);
+    }
 
-        //pls attention:do not change the position of the following two MetaException test
-        //because we use throw exception,so they are in order.
-        // MetaException1
+    @Test
+    public void testGetAllTableForMetaException1() throws TException {
+        String useDbName = "default";
+        List<String> databases = Arrays.asList(useDbName);
         given(client.getAllDatabases()).willReturn(databases);
         given(client.getAllTables(useDbName)).willThrow(MetaException.class);
         doNothing().when(client).reconnect();
         assertEquals(service.getAllTable().get(useDbName).size(), 0);
-
-        // MetaException2
-        given(client.getAllDatabases()).willThrow(MetaException.class);
-        doNothing().when(client).reconnect();
-        assertEquals(service.getAllTable().size(), 0);
-
-
     }
 
     @Test
-    public void testGetTable() throws Exception {
+    public void testGetAllTableForMetaException2() throws TException {
+        given(client.getAllDatabases()).willThrow(MetaException.class);
+        doNothing().when(client).reconnect();
+        assertEquals(service.getAllTable().size(), 0);
+    }
+
+    @Test
+    public void testGetTableForNormalRun() throws Exception {
         String dbName = "default";
         String tableName = "tableName";
         given(client.getTable(dbName, tableName)).willReturn(new Table());
         assertTrue(service.getTable(dbName, tableName) != null);
+    }
 
-        //getTable throws Exception
+    @Test
+    public void testGetTableForException() throws Exception {
+        String dbName = "default";
+        String tableName = "tableName";
         given(client.getTable(dbName, tableName)).willThrow(Exception.class);
         doNothing().when(client).reconnect();
         assertTrue(service.getTable(dbName, tableName) == null);
