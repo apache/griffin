@@ -208,7 +208,7 @@ public class JobServiceImpl implements JobService {
             Scheduler scheduler = factory.getObject();
             scheduler.pauseJob(new JobKey(name, group));
             return GriffinOperationMessage.PAUSE_JOB_SUCCESS;
-        } catch (SchedulerException e) {
+        } catch (SchedulerException | NullPointerException e) {
             LOGGER.error("{} {}", GriffinOperationMessage.PAUSE_JOB_FAIL, e.getMessage());
             return GriffinOperationMessage.PAUSE_JOB_FAIL;
         }
@@ -221,7 +221,7 @@ public class JobServiceImpl implements JobService {
             jobDetail.getJobDataMap().putAsString("deleted", true);
             scheduler.addJob(jobDetail, true);
             return GriffinOperationMessage.SET_JOB_DELETED_STATUS_SUCCESS;
-        } catch (SchedulerException e) {
+        } catch (SchedulerException | NullPointerException e) {
             LOGGER.error("{} {}", GriffinOperationMessage.PAUSE_JOB_FAIL, e.getMessage());
             return GriffinOperationMessage.SET_JOB_DELETED_STATUS_FAIL;
         }
@@ -253,21 +253,17 @@ public class JobServiceImpl implements JobService {
      *
      * @param measure
      */
-    public void deleteJobsRelateToMeasure(Measure measure) {
+    //TODO
+    public void deleteJobsRelateToMeasure(Measure measure) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
-        try {
-            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {//get all jobs
-                JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-                JobDataMap jobDataMap = jobDetail.getJobDataMap();
-                if (jobDataMap.getString("measureId").equals(measure.getId().toString())) {
-                    //select jobs related to measureId,
-                    deleteJob(jobKey.getGroup(), jobKey.getName());
-                    LOGGER.info("{} {} is paused and logically deleted.", jobKey.getGroup(), jobKey.getName());
-                }
+        for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {//get all jobs
+            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+            JobDataMap jobDataMap = jobDetail.getJobDataMap();
+            if (jobDataMap.getString("measureId").equals(measure.getId().toString())) {
+                //select jobs related to measureId,
+                deleteJob(jobKey.getGroup(), jobKey.getName());
+                LOGGER.info("{} {} is paused and logically deleted.", jobKey.getGroup(), jobKey.getName());
             }
-        } catch (SchedulerException e) {
-            LOGGER.error("Fail to stop jobs related to measure id: {} name: {}", measure.getId(), measure.getName());
-            LOGGER.error("Fail to stop jobs related to measure id: {} name: {}", measure.getId(), measure.getName());
         }
     }
 
