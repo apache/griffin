@@ -75,3 +75,64 @@ Above lists environment parameters.
 
 
 ## DQ Job Parameters
+```
+{
+  "name": "accu_batch",
+
+  "process.type": "batch",
+
+  "data.sources": [
+    {
+      "name": "src",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "<path>/<to>/<source-file>.avro"
+          }
+        }
+      ]
+    }, {
+      "name": "tgt",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "<path>/<to>/<target-file>.avro"
+          }
+        }
+      ]
+    }
+  ],
+
+  "evaluateRule": {
+    "rules": [
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "accuracy",
+        "rule": "src.user_id = tgt.user_id AND upper(src.first_name) = upper(tgt.first_name) AND src.last_name = tgt.last_name",
+        "details": {
+          "source": "src",
+          "target": "tgt",
+          "miss.records": {
+            "name": "miss.records",
+            "persist.type": "record"
+          },
+          "accuracy": {
+            "name": "accu",
+            "persist.type": "metric"
+          },
+          "miss": "miss_count",
+          "total": "total_count",
+          "matched": "matched_count"
+        }
+      }
+    ]
+  }
+}
+```
+Above lists DQ job configure parameters.  
+
+- 
