@@ -35,6 +35,8 @@ under the License.
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
+    <node.version>v6.11.3</node.version>
+    <npm.version>3.10.10</npm.version>
   </properties>
 
 
@@ -53,22 +55,46 @@ under the License.
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>${exec-maven-plugin.version}</version>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <workingDirectory>angular</workingDirectory>
+          <installDirectory>.tmp</installDirectory>
+        </configuration>
         <executions>
+          <!-- It will install nodejs and npm -->
           <execution>
-            <id>exec-bower-install</id>
-            <phase>generate-sources</phase>
-            <configuration>
-              <executable>bower</executable>
-              <arguments>
-                <argument>install</argument>
-              </arguments>
-            </configuration>
+            <id>install node and npm</id>
             <goals>
-              <goal>exec</goal>
+              <goal>install-node-and-npm</goal>
             </goals>
+            <configuration>
+              <nodeVersion>${node.version}</nodeVersion>
+              <npmVersion>${npm.version}</npmVersion>
+            </configuration>
+          </execution>
+
+          <!-- It will execute command "npm install" inside "/angular" directory -->
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+
+          <!-- It will execute command "npm build" inside "/angular" directory to clean and create "/.tmp" directory-->
+          <execution>
+            <id>npm build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -96,7 +122,7 @@ under the License.
               </nonFilteredFileExtensions>
               <resources>
                 <resource>
-                  <directory>${basedir}</directory>
+                  <directory>${basedir}/angular/dist</directory>
                   <excludes>
                     <exclude>src/**</exclude>
                     <exclude>target/**</exclude>

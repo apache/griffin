@@ -66,12 +66,36 @@ Griffin measure module needs two configuration files to define the parameters of
   ]
 }
 ```
-Above lists environment parameters.
+Above lists environment parameters.  
 
 - **spark**: This field configures spark and spark streaming parameters.  
-- **persist**: This field configures the metrics persist parameters, multiple persist ways are supported.
-- **info.cache**: This field configures the information cache parameters, multiple cache ways are supported. It is only for streaming dq case.
-
+	+ log.level: Level of spark log.
+	+ checkpoint.dir: Check point directory of spark streaming, for streaming mode.
+	+ batch.interval: Interval of dumping streaming data, for streaming mode.
+	+ process.interval: Interval of processing dumped streaming data, for streaming mode.
+	+ config: Configuration of spark parameters.
+- **persist**: This field configures list of metrics persist parameters, multiple persist ways are supported.
+	+ type: Metrics persist type, "log", "hdfs" or "http".
+	+ config: Configure parameters of each persist type.
+		* log persist
+			- max.log.lines: the max lines of log.
+		* hdfs persist
+			- path: hdfs path to persist metrics
+			- max.persist.lines: the max lines of total persist data.
+			- max.lines.per.file: the max lines of each persist file.
+		* http persist
+			- api: api to submit persist metrics.
+			- method: http method, "post" default.
+- **info.cache**: This field configures list of information cache parameters, multiple cache ways are supported. It is only for streaming dq case.
+	+ type: Information cache type, "zk" for zookeeper cache.
+	+ config: Configure parameters of info cache type.
+		* zookeeper cache
+			- hosts: zookeeper hosts list as a string, separated by comma.
+			- namespace: namespace of cache info, "" default.
+			- lock.path: path of lock info, "lock" default.
+			- mode: create mode of zookeeper node, "persist" default.
+			- init.clear: clear cache info when initialize, true default.
+			- close.clear: clear cache info when close connection, false default.
 
 
 ## DQ Job Parameters

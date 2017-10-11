@@ -24,6 +24,7 @@ import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,11 +61,17 @@ public class MeasureServiceImpl implements MeasureService {
         if (!measureRepo.exists(measureId)) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         } else {
-            //pause all jobs related to the measure
             Measure measure = measureRepo.findOne(measureId);
-            jobService.deleteJobsRelateToMeasure(measure);
-            measure.setDeleted(true);
-            measureRepo.save(measure);
+            try{
+                //pause all jobs related to the measure
+                jobService.deleteJobsRelateToMeasure(measure);
+                measure.setDeleted(true);
+                measureRepo.save(measure);
+            }catch (SchedulerException e){
+                LOGGER.error("Delete measure id: {} name: {} failure. {}", measure.getId(), measure.getName(),e.getMessage());
+                return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
+            }
+
             return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
         }
     }

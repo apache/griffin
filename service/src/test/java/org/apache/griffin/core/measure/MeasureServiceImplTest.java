@@ -76,14 +76,8 @@ public class MeasureServiceImplTest {
 
 
     @Test
-    public void testDeleteMeasuresById() throws Exception {
+    public void testDeleteMeasuresByIdForSuccess() throws Exception {
         Measure measure = createATestMeasure("view_item_hourly", "ebay");
-        // RESOURCE_NOT_FOUND
-        given(measureRepo.exists(1L)).willReturn(false);
-        GriffinOperationMessage message1 = service.deleteMeasureById(1L);
-        assertEquals(message1, GriffinOperationMessage.RESOURCE_NOT_FOUND);
-
-        //DELETE_MEASURE_BY_ID_SUCCESS
         given(measureRepo.exists(1L)).willReturn(true);
         given(measureRepo.findOne(1L)).willReturn(measure);
         doNothing().when(jobService).deleteJobsRelateToMeasure(measure);
@@ -93,27 +87,41 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testCreateNewMeasure() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
-        // CREATE_MEASURE_SUCCESS
+    public void testDeleteMeasuresByIdForNotFound() throws Exception {
+        given(measureRepo.exists(1L)).willReturn(false);
+        GriffinOperationMessage message = service.deleteMeasureById(1L);
+        assertEquals(message, GriffinOperationMessage.RESOURCE_NOT_FOUND);
+    }
+
+    @Test
+    public void testCreateNewMeasureForSuccess() throws Exception {
         String measureName = "view_item_hourly";
+        Measure measure = createATestMeasure(measureName, "ebay");
         given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
         given(measureRepo.save(measure)).willReturn(measure);
         GriffinOperationMessage message = service.createMeasure(measure);
         assertEquals(message, GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
+    }
 
-        // CREATE_MEASURE_FAIL_DUPLICATE
+    @Test
+    public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
+        String measureName = "view_item_hourly";
+        Measure measure = createATestMeasure(measureName, "ebay");
         LinkedList<Measure> list = new LinkedList<>();
         list.add(measure);
         given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(list);
-        GriffinOperationMessage message1 = service.createMeasure(measure);
-        assertEquals(message1, GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
+        GriffinOperationMessage message = service.createMeasure(measure);
+        assertEquals(message, GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
+    }
 
-        // CREATE_MEASURE_FAIL
+    @Test
+    public void testCreateNewMeasureForFailWithSaveException() throws Exception {
+        String measureName = "view_item_hourly";
+        Measure measure = createATestMeasure(measureName, "ebay");
         given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
         given(measureRepo.save(measure)).willReturn(null);
-        GriffinOperationMessage message2 = service.createMeasure(measure);
-        assertEquals(message2, GriffinOperationMessage.CREATE_MEASURE_FAIL);
+        GriffinOperationMessage message = service.createMeasure(measure);
+        assertEquals(message, GriffinOperationMessage.CREATE_MEASURE_FAIL);
     }
 
     @Test
@@ -127,19 +135,29 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testUpdateMeasure() throws Exception {
+    public void testUpdateMeasureForSuccess() throws Exception {
         Measure measure = createATestMeasure("view_item_hourly", "ebay");
-        // RESOURCE_NOT_FOUND
-        given(measureRepo.exists(measure.getId())).willReturn(false);
-        GriffinOperationMessage message1 = service.updateMeasure(measure);
-        assertEquals(message1, GriffinOperationMessage.RESOURCE_NOT_FOUND);
-
-        //UPDATE_MEASURE_SUCCESS
         given(measureRepo.exists(measure.getId())).willReturn(true);
         given(measureRepo.save(measure)).willReturn(measure);
-        GriffinOperationMessage message2 = service.updateMeasure(measure);
-        assertEquals(message2, GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
+        GriffinOperationMessage message = service.updateMeasure(measure);
+        assertEquals(message, GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
     }
 
+    @Test
+    public void testUpdateMeasureForNotFound() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        given(measureRepo.exists(measure.getId())).willReturn(false);
+        GriffinOperationMessage message = service.updateMeasure(measure);
+        assertEquals(message, GriffinOperationMessage.RESOURCE_NOT_FOUND);
+    }
+
+    @Test
+    public void testUpdateMeasureForFailWithSaveException() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        given(measureRepo.exists(measure.getId())).willReturn(true);
+        given(measureRepo.save(measure)).willThrow(Exception.class);
+        GriffinOperationMessage message = service.updateMeasure(measure);
+        assertEquals(message, GriffinOperationMessage.UPDATE_MEASURE_FAIL);
+    }
 
 }
