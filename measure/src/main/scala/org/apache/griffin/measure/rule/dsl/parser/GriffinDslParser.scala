@@ -26,15 +26,15 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
 
   /**
     * -- profiling clauses --
-    * <profiling-clauses> = <select-clause> [ <where-clause> ]+ [ <groupby-clause> ]+ [ <orderby-clause> ]+ [ <limit-clause> ]+
+    * <profiling-clauses> = <select-clause> [ <from-clause> ]+ [ <where-clause> ]+ [ <groupby-clause> ]+ [ <orderby-clause> ]+ [ <limit-clause> ]+
     */
 
-  def profilingClause: Parser[ProfilingClause] = selectClause ~ opt(whereClause) ~
+  def profilingClause: Parser[ProfilingClause] = selectClause ~ opt(fromClause) ~ opt(whereClause) ~
     opt(groupbyClause) ~ opt(orderbyClause) ~ opt(limitClause) ^^ {
-    case sel ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
+    case sel ~ fromOpt ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
       val preClauses = Seq(whereOpt).flatMap(opt => opt)
       val postClauses = Seq(orderbyOpt, limitOpt).flatMap(opt => opt)
-      ProfilingClause(sel, groupbyOpt, preClauses, postClauses)
+      ProfilingClause(sel, fromOpt, groupbyOpt, preClauses, postClauses)
     }
   }
 
