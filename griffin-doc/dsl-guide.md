@@ -155,7 +155,7 @@ Griffin supports spark-sql directly, you can write rule in sql like this:
 	"name": "source",
 	"rule": "SELECT count(id) AS cnt, max(timestamp) AS fresh_time FROM source"
 }
-```  
+```
 Griffin will calculate it in spark-sql engine directly.  
 
 ### Data frame operation
@@ -169,7 +169,7 @@ Griffin supports some other operations on data frame in spark, like converting j
 		"df.name": "json_source"
 	}
 }
-```  
+```
 Griffin will do the operation to extract json strings.  
 Actually, you can also extend the df-opr engine and df-opr adaptor in Griffin to support more types of data frame operations.  
 
