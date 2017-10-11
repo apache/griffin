@@ -207,4 +207,5 @@ Above lists DQ job configure parameters.
 		* total: alias of total column in result table.
 		* matched: alias of matched column in result table.
 	+ profiling dq type detail configuration
+		* source: the data source name which as source in profiling, default is the name of first data source in "data.sources" if not configured. If the griffin-dsl rule contains from clause, this parameter is ignored.
 		* profiling: step information of profiling result table step in profiling.
