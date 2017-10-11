@@ -60,7 +60,7 @@ under the License.
         <version>1.0</version>
         <configuration>
           <workingDirectory>angular</workingDirectory>
-          <installDirectory>tmp</installDirectory>
+          <installDirectory>.tmp</installDirectory>
         </configuration>
         <executions>
           <!-- It will install nodejs and npm -->
@@ -86,7 +86,7 @@ under the License.
             </configuration>
           </execution>
 
-          <!-- It will execute command "npm build" inside "/angular" directory to clean and create "/dist" directory-->
+          <!-- It will execute command "npm build" inside "/angular" directory to clean and create "/.tmp" directory-->
           <execution>
             <id>npm build</id>
             <goals>
