@@ -16,7 +16,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 # Measure streaming sample
 Measures consists of batch measure and streaming measure. This document is for the streaming measure sample.
 

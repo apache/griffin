@@ -17,3 +17,12 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+# Measure Batch Sample
+Measures consists of batch measure and streaming measure. This document is for the batch measure sample.
+
+### Data source
+At current, we support avro, hive and text-dir as batch data source.  
+In this sample, we will use avro file as data source.
+
+### Measure type
+At current, we support accuracy measure in streaming mode.
