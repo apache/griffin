@@ -28,6 +28,8 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { AngularEchartsModule } from 'ngx-echarts';
 // import { MdDatepickerModule, MdNativeDateModule} from '@angular/material';
 import { MatDatepickerModule, MatNativeDateModule} from '@angular/material';
+import {LocationStrategy, HashLocationStrategy} from '@angular/common';
+
 
 import {ToasterModule, ToasterService} from 'angular2-toaster';
 import { FormsModule } from '@angular/forms';
@@ -107,10 +109,10 @@ const appRoutes: Routes = [
   {
     path: 'login',
     component:LoginComponent
-  },
+  }
   // {
-  //   path: '**',
-  //   component: AppComponent
+  //    path: '**',
+  //    component: AppComponent
   // }
 
 ];
@@ -145,7 +147,8 @@ const appRoutes: Routes = [
     DataTableModule,
     RouterModule.forRoot(
       appRoutes,
-      { enableTracing: false } // <-- debugging purposes only
+      // { enableTracing: false } // <-- debugging purposes only
+      {useHash: true}
     ),
     MatNativeDateModule,
     MatDatepickerModule

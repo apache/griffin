@@ -22,6 +22,8 @@ import { Router} from "@angular/router";
 import { HttpClient} from '@angular/common/http';
 import * as $ from 'jquery';
 import {ServiceService} from './service/service.service';
+import {LocationStrategy, HashLocationStrategy} from '@angular/common';
+
 
 // import jQuery from 'jquery';
 
