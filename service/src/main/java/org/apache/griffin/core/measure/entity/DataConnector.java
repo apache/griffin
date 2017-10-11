@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,24 +27,54 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 import java.io.IOException;
 import java.util.Map;
 
 @Entity
-public class DataConnector extends AuditableEntity  {
-    private final static Logger log = LoggerFactory.getLogger(DataConnector.class);
+public class DataConnector extends AuditableEntity {
+    private static final long serialVersionUID = -4748881017029815594L;
 
-    private static final long serialVersionUID = -4748881017029815794L;
-    
-    public enum ConnectorType {
-        HIVE
+    private final static Logger LOGGER = LoggerFactory.getLogger(DataConnector.class);
+
+    private String type;
+
+    private String version;
+
+    private String config;
+
+    @JsonIgnore
+    @Transient
+    private Map<String, String> configInMaps;
+
+    public Map<String, String> getConfigInMaps() {
+        TypeReference<Map<String, String>> mapType = new TypeReference<Map<String, String>>() {
+        };
+        if (this.configInMaps == null) {
+            try {
+                this.configInMaps = GriffinUtil.toEntity(config, mapType);
+            } catch (IOException e) {
+                LOGGER.error("Error in converting json to map. {}", e.getMessage());
+            }
+        }
+        return configInMaps;
     }
-    
-    @Enumerated(EnumType.STRING)
-    private ConnectorType type;
+
+    public void setConfig(Map<String, String> configInMaps) throws JsonProcessingException {
+        this.config = GriffinUtil.toJson(configInMaps);
+    }
+
+    public Map<String, String> getConfig() {
+        return getConfigInMaps();
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getVersion() {
         return version;
@@ -55,63 +84,20 @@ public class DataConnector extends AuditableEntity  {
         this.version = version;
     }
 
-    private String version;
-
-    private String config;
-
-    @JsonIgnore
-    @Transient
-    private Map<String,String> configInMaps;
-
-    public Map<String,String> getConfigInMaps() {
-        TypeReference<Map<String,String>> mapType=new TypeReference<Map<String,String>>(){};
-        if (this.configInMaps == null) {
-            try {
-                this.configInMaps = GriffinUtil.toEntity(config, mapType);
-            } catch (IOException e) {
-                log.error("Error in converting json to map",e);
-            }
-        }
-        return configInMaps;
-    }
-
-    public void setConfig(Map<String,String> configInMaps) throws JsonProcessingException {
-        String configJson = GriffinUtil.toJson(configInMaps);
-        this.config = configJson;
-    }
-
-    public ConnectorType getType() {
-        return type;
-    }
-
-    public void setType(ConnectorType type) {
-        this.type = type;
-    }
-
-    public Map<String,String> getConfig() {
-        return getConfigInMaps();
-    }
-
 
     public DataConnector() {
     }
 
-    public DataConnector(ConnectorType type,String version, Map<String,String> config){
-        this.type = type;
-        this.version = version;
-        this.configInMaps = config;
-        this.config = GriffinUtil.toJson(configInMaps);
-    }
-
-    public DataConnector(ConnectorType type, String version, String config) {
+    public DataConnector(String type, String version, String config) {
         this.type = type;
         this.version = version;
         this.config = config;
-        TypeReference<Map<String,String>> mapType=new TypeReference<Map<String,String>>(){};
+        TypeReference<Map<String, String>> mapType = new TypeReference<Map<String, String>>() {
+        };
         try {
-            this.configInMaps = GriffinUtil.toEntity(config,mapType);
+            this.configInMaps = GriffinUtil.toEntity(config, mapType);
         } catch (IOException e) {
-            log.error("Error in converting json to map",e);
+            LOGGER.error("Error in converting json to map. {}", e.getMessage());
         }
     }
 

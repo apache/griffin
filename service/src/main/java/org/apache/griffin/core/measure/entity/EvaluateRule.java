@@ -17,45 +17,38 @@ specific language governing permissions and limitations
 under the License.
 */
 
-
 package org.apache.griffin.core.measure.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import javax.persistence.*;
+import java.util.List;
+
 
 @Entity
-public class EvaluateRule  extends AuditableEntity {
-    
-    private static final long serialVersionUID = -3589222812544556642L;
+public class EvaluateRule extends AuditableEntity {
+    private static final long serialVersionUID = 4240072518233967528L;
 
-    public int getSampleRatio() {
-        return sampleRatio;
-    }
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @JoinColumn(name = "evaluateRule_id")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Rule> rules;
 
-    public void setSampleRatio(int sampleRatio) {
-        this.sampleRatio = sampleRatio;
-    }
-
-    public String getRules() {
+    public List<Rule> getRules() {
         return rules;
     }
 
-    public void setRules(String rules) {
+    public void setRules(List<Rule> rules) {
         this.rules = rules;
     }
 
-    private int sampleRatio;
-
-    @Lob
-    @Column(length=1048576) //2^20=1048576
-    private String rules;
-    
     public EvaluateRule() {
     }
 
-    public EvaluateRule(int sampleRatio, String rules) {
-        this.sampleRatio = sampleRatio;
+    public EvaluateRule(List<Rule> rules) {
         this.rules = rules;
     }
 }
+

@@ -19,54 +19,35 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
-
+import java.util.List;
 
 @Entity
-public class Measure extends AuditableEntity   {
-
-    private static final long serialVersionUID = -4748881017029815794L;
+public class Measure extends AuditableEntity {
+    private static final long serialVersionUID = -4748881017029815714L;
 
     private String name;
 
     private String description;
 
-    public enum MearuseType {
-        accuracy,
-    }
-
-    public enum ProcessType{
-        batch,
-        streaming
-    }
-
     private String organization;
-    @Enumerated(EnumType.STRING)
-    private MearuseType type;
 
-    @Enumerated(EnumType.STRING)
-    private ProcessType processType=ProcessType.batch;
+    private String processType;
 
-    @ManyToOne(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @JoinColumn(name = "source_id")
-    private DataConnector source;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @JoinColumn(name = "target_id")
-    private DataConnector target;
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @JoinColumn(name = "measure_id")
+    private List<DataSource> dataSources;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "evaluateRule_id")
     private EvaluateRule evaluateRule;
 
-    /**
-     * owner means owner name
-     */
     private String owner;
     private Boolean deleted = false;
+
     public String getName() {
         return name;
     }
@@ -99,38 +80,24 @@ public class Measure extends AuditableEntity   {
         this.owner = owner;
     }
 
-    public MearuseType getType() {
-        return type;
-    }
-
-    public void setType(MearuseType type) {
-        this.type = type;
-    }
-
     @JsonProperty("process.type")
-    public ProcessType getProcessType() {
+    public String getProcessType() {
         return processType;
     }
 
     @JsonProperty("process.type")
-    public void setProcessType(ProcessType processType) {
+    public void setProcessType(String processType) {
         this.processType = processType;
     }
 
-    public DataConnector getSource() {
-        return source;
+    @JsonProperty("data.sources")
+    public List<DataSource> getDataSources() {
+        return dataSources;
     }
 
-    public void setSource(DataConnector source) {
-        this.source = source;
-    }
-
-    public DataConnector getTarget() {
-        return target;
-    }
-
-    public void setTarget(DataConnector target) {
-        this.target = target;
+    @JsonProperty("data.sources")
+    public void setDataSources(List<DataSource> dataSources) {
+        this.dataSources = dataSources;
     }
 
     public EvaluateRule getEvaluateRule() {
@@ -152,14 +119,13 @@ public class Measure extends AuditableEntity   {
     public Measure() {
     }
 
-    public Measure(String name, String description, MearuseType type, String organization, DataConnector source, DataConnector target, EvaluateRule evaluateRule, String owner) {
+    public Measure(String name, String description, String organization, String processType, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
         this.name = name;
-        this.description=description;
+        this.description = description;
         this.organization = organization;
-        this.type = type;
-        this.source = source;
-        this.target = target;
-        this.evaluateRule = evaluateRule;
+        this.processType = processType;
         this.owner = owner;
+        this.dataSources = dataSources;
+        this.evaluateRule = evaluateRule;
     }
 }

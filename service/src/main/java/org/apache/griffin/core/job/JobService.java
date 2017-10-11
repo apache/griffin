@@ -36,7 +36,7 @@ public interface JobService {
 
     GriffinOperationMessage pauseJob(String group, String name);
 
-    GriffinOperationMessage deleteJob(String groupName,String jobName);
+    GriffinOperationMessage deleteJob(String groupName, String jobName);
 
     List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
 

@@ -1,0 +1,36 @@
+{
+  "name": "prof_batch_test",
+
+  "process.type": "batch",
+
+  "data.sources": [
+    {
+      "name": "source",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/users_info_src.avro"
+          }
+        }
+      ]
+    }
+  ],
+
+  "evaluateRule": {
+    "rules": [
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "rule": "select user_id as id, user_id.count() as cnt from source group by user_id order by cnt desc, id desc limit 3",
+        "details": {
+          "profiling": {
+            "name": "count",
+            "persist.type": "metric"
+          }
+        }
+      }
+    ]
+  }
+}

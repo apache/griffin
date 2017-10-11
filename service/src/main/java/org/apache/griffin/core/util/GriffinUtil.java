@@ -30,50 +30,47 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * Created by xiangrchen on 7/21/17.
- */
 public class GriffinUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(GriffinUtil.class);
 
-    public static String toJson(Object obj)  {
-        ObjectMapper mapper=new ObjectMapper();
-        String jsonStr=null;
+    public static String toJson(Object obj) {
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonStr = null;
         try {
-            jsonStr=mapper.writeValueAsString(obj);
+            jsonStr = mapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            LOGGER.error("convert to json failed. "+obj);
+            LOGGER.error("convert to json failed. {}", obj);
         }
         return jsonStr;
     }
 
-    public static <T>T toEntity(String jsonStr,Class<T> type) throws IOException {
-        if (jsonStr==null || jsonStr.length()==0){
-            LOGGER.warn("jsonStr "+type+" is empty!");
+    public static <T> T toEntity(String jsonStr, Class<T> type) throws IOException {
+        if (jsonStr == null || jsonStr.length() == 0) {
+            LOGGER.warn("jsonStr {} is empty!", type);
             return null;
         }
-        ObjectMapper mapper=new ObjectMapper();
-        return mapper.readValue(jsonStr,type);
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(jsonStr, type);
     }
 
-    public static <T>T toEntity(String jsonStr,TypeReference type) throws IOException {
-        if (jsonStr==null || jsonStr.length()==0){
-            LOGGER.warn("jsonStr "+type+" is empty!");
+    public static <T> T toEntity(String jsonStr, TypeReference type) throws IOException {
+        if (jsonStr == null || jsonStr.length() == 0) {
+            LOGGER.warn("jsonStr {} is empty!", type);
             return null;
         }
-        ObjectMapper mapper=new ObjectMapper();
-        return mapper.readValue(jsonStr,type);
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(jsonStr, type);
     }
 
     public static Properties getProperties(String propertiesPath) {
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
         propertiesFactoryBean.setLocation(new ClassPathResource(propertiesPath));
-        Properties properties=null;
+        Properties properties = null;
         try {
             propertiesFactoryBean.afterPropertiesSet();
-            properties=propertiesFactoryBean.getObject();
+            properties = propertiesFactoryBean.getObject();
         } catch (IOException e) {
-            LOGGER.error("get properties from "+propertiesPath+" failed. "+e);
+            LOGGER.error("get properties from {} failed. {}", propertiesPath, e.getMessage());
         }
         return properties;
     }

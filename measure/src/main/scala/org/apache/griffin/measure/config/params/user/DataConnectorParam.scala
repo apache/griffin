@@ -26,12 +26,8 @@ import org.apache.griffin.measure.config.params.Param
 case class DataConnectorParam( @JsonProperty("type") conType: String,
                                @JsonProperty("version") version: String,
                                @JsonProperty("config") config: Map[String, Any],
-                               @JsonProperty("cache") cache: DataCacheParam,
-                               @JsonProperty("match.once") matchOnce: Boolean
+                               @JsonProperty("pre.proc") preProc: List[Map[String, Any]]
                              ) extends Param {
 
-  def getMatchOnce(): Boolean = {
-    if (matchOnce == null) false else matchOnce
-  }
 
 }
