@@ -73,13 +73,12 @@ public class JobControllerTest {
     }
 
     @Test
-    public void testAddJob() throws Exception {
+    public void testAddJobForSuccess() throws Exception {
         String groupName = "BA";
         String jobName = "job1";
         long measureId = 0;
         JobRequestBody jobRequestBody = new JobRequestBody("YYYYMMdd-HH", "YYYYMMdd-HH", "111", "20170607", "100");
-        ObjectMapper mapper = new ObjectMapper();
-        String schedulerRequestBodyJson = mapper.writeValueAsString(jobRequestBody);
+        String schedulerRequestBodyJson = new ObjectMapper().writeValueAsString(jobRequestBody);
         given(service.addJob(groupName, jobName, measureId, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS);
 
         mvc.perform(post("/jobs").param("group", groupName).param("jobName", jobName)
@@ -93,7 +92,26 @@ public class JobControllerTest {
     }
 
     @Test
-    public void testDeleteJob() throws Exception {
+    public void testAddJobForFail() throws Exception {
+        String groupName = "BA";
+        String jobName = "job1";
+        long measureId = 0;
+        JobRequestBody jobRequestBody = new JobRequestBody("YYYYMMdd-HH", "YYYYMMdd-HH", "111", "20170607", "100");
+        String schedulerRequestBodyJson = new ObjectMapper().writeValueAsString(jobRequestBody);
+        given(service.addJob(groupName, jobName, measureId, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_FAIL);
+
+        mvc.perform(post("/jobs").param("group", groupName).param("jobName", jobName)
+                .param("measureId", String.valueOf(measureId))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(schedulerRequestBodyJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(405)))
+                .andExpect(jsonPath("$.description", is("Create Job Failed")))
+                .andDo(print());
+    }
+
+    @Test
+    public void testDeleteJobForSuccess() throws Exception {
         String groupName = "BA";
         String jobName = "job1";
         given(service.deleteJob(groupName, jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_SUCCESS);
@@ -102,6 +120,18 @@ public class JobControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(206)))
                 .andExpect(jsonPath("$.description", is("Delete Job Succeed")));
+    }
+
+    @Test
+    public void testDeleteJobForFail() throws Exception {
+        String groupName = "BA";
+        String jobName = "job1";
+        given(service.deleteJob(groupName, jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_FAIL);
+
+        mvc.perform(delete("/jobs").param("group", groupName).param("jobName", jobName))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(406)))
+                .andExpect(jsonPath("$.description", is("Delete Job Failed")));
     }
 
     @Test
