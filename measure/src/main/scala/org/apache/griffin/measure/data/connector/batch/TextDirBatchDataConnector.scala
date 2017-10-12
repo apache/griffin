@@ -75,7 +75,7 @@ case class TextDirBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngine
     if (depth <= 0) {
       subDirs.filter(filteFunc)
     } else {
-      listSubDirs(subDirs, depth, filteFunc)
+      listSubDirs(subDirs, depth - 1, filteFunc)
     }
   }
 
