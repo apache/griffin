@@ -35,6 +35,7 @@ import java.util.Map;
 
 
 @RestController
+@RequestMapping(value = "/api/v1")
 public class GriffinController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GriffinController.class);
 

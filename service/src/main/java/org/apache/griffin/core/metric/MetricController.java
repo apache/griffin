@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("/metrics")
+@RequestMapping("/api/v1/metrics")
 public class MetricController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetricController.class);
     @Autowired
