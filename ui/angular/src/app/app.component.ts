@@ -6,9 +6,7 @@ regarding copyright ownership.  The ASF licenses this file
 to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
-
   http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
 "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,6 +20,8 @@ import { Router} from "@angular/router";
 import { HttpClient} from '@angular/common/http';
 import * as $ from 'jquery';
 import {ServiceService} from './service/service.service';
+import {LocationStrategy, HashLocationStrategy} from '@angular/common';
+
 
 // import jQuery from 'jquery';
 
@@ -50,11 +50,11 @@ export class AppComponent {
     this.fullName = this.getCookie("fullName");
     this.timestamp = new Date();
   }
-  constructor(private router:Router,private http:HttpClient,public serviceService:ServiceService){
+  constructor(private router:Router,private http:HttpClient,public servicecService:ServiceService){
 
   }
   setCookie(name, value, days){
-    
+
     let expires;
         if (days) {
             var date = new Date();
@@ -113,11 +113,10 @@ export class AppComponent {
   login(){
       var name = $('input:eq(0)').val();
       var password = $('input:eq(1)').val();
-      console.log(name);
-      var loginUrl = 'http://localhost:8080/api/v1/login/authenticate';
+      var loginUrl = this.servicecService.config.uri.login;
       this.loginBtnWait();
 
-      this.http   
+      this.http
       .post(loginUrl,{username:name, password:password})
       .subscribe(data => {
         this.results = data;
@@ -138,7 +137,7 @@ export class AppComponent {
               this.showLoginFailed();
               this.loginBtnActive();
           };
-      
+
     },
     err => {
           this.showLoginFailed();
@@ -147,5 +146,3 @@ export class AppComponent {
 
   }
 }
-
-
