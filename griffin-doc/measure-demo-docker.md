@@ -21,7 +21,7 @@ under the License.
 We've prepared a docker for griffin measure demo.
 
 ## Preparation
-1. Install docker.
+1. Install [docker](https://docs.docker.com/engine/installation/).
 2. Download docker image. In this image, the environment for measure module has been prepared, including: hadoop, hive, spark, mysql.  
 ```
 docker pull bhlx3lyx7/griffin_measure_demo:0.0.1
