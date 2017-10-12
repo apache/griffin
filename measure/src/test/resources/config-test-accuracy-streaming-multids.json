@@ -51,7 +51,6 @@
               "dsl.type": "df-opr",
               "name": "${s1}",
               "rule": "from_json",
-              "persist.type": "cache",
               "details": {
                 "df.name": "${this}"
               }
@@ -93,7 +92,6 @@
               "dsl.type": "df-opr",
               "name": "${t1}",
               "rule": "from_json",
-              "persist.type": "cache",
               "details": {
                 "df.name": "${this}"
               }

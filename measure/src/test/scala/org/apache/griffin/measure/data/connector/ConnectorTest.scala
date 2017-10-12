@@ -67,5 +67,31 @@ class ConnectorTest extends FunSuite with Matchers with BeforeAndAfter {
     val clazz = Class.forName(tp)
     ClassTag(clazz)
   }
+
+  test ("test sql") {
+    val concreteTableName = "default.demo_src"
+    val partitionsString = " dt=1, hr=2; dt=1 ; ;,hr=4; dt=2 ;;dt=5"
+    val partitions: Array[Array[String]] = partitionsString.split(";").flatMap { s =>
+      val arr = s.trim.split(",").flatMap { t =>
+        t.trim match {
+          case p if (p.nonEmpty) => Some(p)
+          case _ => None
+        }
+      }
+      if (arr.size > 0) Some(arr) else None
+    }
+
+    val tableClause = s"SELECT * FROM ${concreteTableName}"
+    val validPartitions = partitions.filter(_.size > 0)
+    val ret = if (validPartitions.size > 0) {
+      val clauses = validPartitions.map { prtn =>
+        val cls = prtn.mkString(" AND ")
+        s"${tableClause} WHERE ${cls}"
+      }
+      clauses.mkString(" UNION ALL ")
+    } else tableClause
+
+    println(ret)
+  }
 }
 

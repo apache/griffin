@@ -48,17 +48,28 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
   val partitionsString = config.getString(Partitions, "")
 
   val concreteTableName = s"${database}.${tableName}"
-  val partitions = partitionsString.split(";").map(s => s.split(",").map(_.trim))
+//  val partitions = partitionsString.split(";").map(s => s.split(",").map(_.trim))
+  val partitions: Array[Array[String]] = partitionsString.split(";").flatMap { s =>
+    val arr = s.trim.split(",").flatMap { t =>
+      t.trim match {
+        case p if (p.nonEmpty) => Some(p)
+        case _ => None
+      }
+    }
+    if (arr.size > 0) Some(arr) else None
+  }
 
   def data(ms: Long): Option[DataFrame] = {
     try {
-      val df = sqlContext.sql(dataSql)
+      val dtSql = dataSql
+      info(dtSql)
+      val df = sqlContext.sql(dtSql)
       val dfOpt = Some(df)
       val preDfOpt = preProcess(dfOpt, ms)
       preDfOpt
     } catch {
       case e: Throwable => {
-        error(s"load hive table ${concreteTableName} fails")
+        error(s"load hive table ${concreteTableName} fails: ${e.getMessage}")
         None
       }
     }
@@ -131,12 +142,15 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
   }
 
   private def dataSql(): String = {
-    val clauses = partitions.map { prtn =>
-      val cls = prtn.mkString(" AND ")
-      if (cls.isEmpty) s"SELECT * FROM ${concreteTableName}"
-      else s"SELECT * FROM ${concreteTableName} WHERE ${cls}"
-    }
-    clauses.mkString(" UNION ALL ")
+    val tableClause = s"SELECT * FROM ${concreteTableName}"
+    val validPartitions = partitions.filter(_.size > 0)
+    if (validPartitions.size > 0) {
+      val clauses = validPartitions.map { prtn =>
+        val cls = prtn.mkString(" AND ")
+        s"${tableClause} WHERE ${cls}"
+      }
+      clauses.mkString(" UNION ALL ")
+    } else tableClause
   }
 
 //  private def toTuple[A <: AnyRef](as: Seq[A]): Product = {

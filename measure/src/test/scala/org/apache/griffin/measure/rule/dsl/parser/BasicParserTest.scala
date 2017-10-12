@@ -164,11 +164,13 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
   test ("test expression") {
     val rule3 = "source.age + 2 * 5 + target.offset"
     val result3 = parser.parseAll(parser.expression, rule3)
+    println(result3)
     result3.successful should be (true)
     result3.get.desc should be ("source.age + 2 * 5 + target.offset")
 
     val rule4 = "(source.age + 2) * (5 + target.offset)"
     val result4 = parser.parseAll(parser.expression, rule4)
+    println(result4)
     result4.successful should be (true)
     result4.get.desc should be ("(source.age + 2) * (5 + target.offset)")
 
@@ -203,14 +205,15 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
   }
 
   test ("select clause") {
-    val rule = "select source.user_id, item, source.func()"
+    val rule = "select `source`.user_id, item, `source`.age.func()"
     val result = parser.parseAll(parser.selectClause, rule)
+    println(result)
     result.successful should be (true)
     println(result.get.desc)
   }
 
   test ("from clause") {
-    val rule = "from source"
+    val rule = "from `source`"
     val result = parser.parseAll(parser.fromClause, rule)
     result.successful should be (true)
     println(result.get.desc)
