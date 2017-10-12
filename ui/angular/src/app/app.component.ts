@@ -6,9 +6,7 @@ regarding copyright ownership.  The ASF licenses this file
 to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
-
   http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
 "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -56,7 +54,7 @@ export class AppComponent {
 
   }
   setCookie(name, value, days){
-    
+
     let expires;
         if (days) {
             var date = new Date();
@@ -118,7 +116,7 @@ export class AppComponent {
       var loginUrl = this.servicecService.config.uri.login;
       this.loginBtnWait();
 
-      this.http   
+      this.http
       .post(loginUrl,{username:name, password:password})
       .subscribe(data => {
         this.results = data;
@@ -139,7 +137,7 @@ export class AppComponent {
               this.showLoginFailed();
               this.loginBtnActive();
           };
-      
+
     },
     err => {
           this.showLoginFailed();
@@ -148,5 +146,3 @@ export class AppComponent {
 
   }
 }
-
-

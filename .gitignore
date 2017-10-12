@@ -13,6 +13,7 @@ target/**
 *.ear
 target
 service/src/main/resources/public/
+ui/.tmp/
 
 
 .project
