@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/jobs")
+@RequestMapping("/api/v1/jobs")
 public class JobController {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobController.class);
 
