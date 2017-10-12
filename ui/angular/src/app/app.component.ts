@@ -52,7 +52,7 @@ export class AppComponent {
     this.fullName = this.getCookie("fullName");
     this.timestamp = new Date();
   }
-  constructor(private router:Router,private http:HttpClient,public serviceService:ServiceService){
+  constructor(private router:Router,private http:HttpClient,public servicecService:ServiceService){
 
   }
   setCookie(name, value, days){
@@ -115,8 +115,7 @@ export class AppComponent {
   login(){
       var name = $('input:eq(0)').val();
       var password = $('input:eq(1)').val();
-      console.log(name);
-      var loginUrl = 'http://localhost:8080/api/v1/login/authenticate';
+      var loginUrl = this.servicecService.config.uri.login;
       this.loginBtnWait();
 
       this.http   
