@@ -28,11 +28,8 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { AngularEchartsModule } from 'ngx-echarts';
 // import { MdDatepickerModule, MdNativeDateModule} from '@angular/material';
 import { MatDatepickerModule, MatNativeDateModule} from '@angular/material';
-<<<<<<< HEAD
 import {LocationStrategy, HashLocationStrategy} from '@angular/common';
 
-=======
->>>>>>> apache/master
 
 import {ToasterModule, ToasterService} from 'angular2-toaster';
 import { FormsModule } from '@angular/forms';
