@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.service;
 
 import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.util.URLHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +56,7 @@ public class GriffinControllerTest {
 
     @Test
     public void testGreeting() throws Exception {
-        mockMvc.perform(get("/version"))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/version"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(is("0.1.0")));
     }
@@ -63,7 +64,7 @@ public class GriffinControllerTest {
     @Test
     public void testGetOrgs() throws Exception {
         when(measureRepo.findOrganizations()).thenReturn(Arrays.asList("ebay"));
-        mockMvc.perform(get("/org"))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0]", is("ebay")));
     }
@@ -72,7 +73,7 @@ public class GriffinControllerTest {
     public void testGetMetricNameListByOrg() throws Exception {
         String org = "hadoop";
         when(measureRepo.findNameByOrganization(org)).thenReturn(Arrays.asList(org));
-        mockMvc.perform(get("/org/{org}", org))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/{org}", org))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0]", is(org)));
     }
