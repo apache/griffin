@@ -30,6 +30,7 @@ import java.util.Map;
 @RestController
 //@Api("MeasureController")
 
+@RequestMapping(value = "/api/v1")
 public class MeasureController {
     @Autowired
     private MeasureService measureService;
