@@ -19,8 +19,9 @@ import { Component ,Directive,ViewContainerRef} from '@angular/core';
 import { Router} from "@angular/router";
 import { HttpClient} from '@angular/common/http';
 import * as $ from 'jquery';
-import {ServiceService} from './service/service.service';
-import {LocationStrategy, HashLocationStrategy} from '@angular/common';
+import { ServiceService} from './service/service.service';
+import { UserService} from './service/user.service';
+import { Location, LocationStrategy, HashLocationStrategy} from '@angular/common';
 
 
 // import jQuery from 'jquery';
@@ -32,117 +33,36 @@ import {LocationStrategy, HashLocationStrategy} from '@angular/common';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers:[ServiceService]
+  providers:[ServiceService,UserService]
 })
 export class AppComponent {
   title = 'app';
   ntAccount : string;
-  // ntAccount = "test";
   timestamp:Date;
+  fullName: string;
   onResize(event){
-   this.resizeMainWindow();
+    this.resizeMainWindow();
 
   }
-  results:any;
-  fullName ="hello";
+  goback(){
+    this.location.back();
+  }
   ngOnInit(){
-    this.ntAccount = this.getCookie("ntAccount");
-    this.fullName = this.getCookie("fullName");
-    this.timestamp = new Date();
+    this.ntAccount = this.userService.getCookie("ntAccount");
+    this.fullName = this.userService.getCookie("fullName");
   }
-  constructor(private router:Router,private http:HttpClient,public servicecService:ServiceService){
+  constructor(private router:Router,private http:HttpClient,private location: Location,public serviceService:ServiceService,public userService:UserService){
 
   }
-  setCookie(name, value, days){
-
-    let expires;
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            console.log(date);
-            expires = "; expires=" + date.toUTCString();
-      } else {
-          expires = "";
-      }
-      // document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
-      document.cookie = name + "=" + value + expires + "; path=/";
-  }
-
-  getCookie(key) {
-        console.log(document.cookie);
-        var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
-        return keyValue ? keyValue[2] : null;
-    }
-
-  loginBtnWait() {
-      $('#login-btn').addClass('disabled')
-        .text('Logging in......');
-    }
-
-  loginBtnActive() {
-        $('#login-btn').removeClass('disabled')
-        .text('Log in');
-    }
-
-  showLoginFailed() {
-      $('#loginMsg').show()
-        .text('Login failed. Try again.');
-    }
   resizeMainWindow(){
     $('#mainWindow').height(window.innerHeight-56-90);
   }
   logout(){
-      this.ntAccount = undefined;
-      this.setCookie('ntAccount', undefined, -1);
-      this.setCookie('fullName', undefined, -1);
-    // this.router.navigate(['/login']) ;
-    // window.location.replace ('login.html');
-
+    this.ntAccount = undefined;
+    this.userService.setCookie('ntAccount', undefined, -1);
+    this.userService.setCookie('fullName', undefined, -1);
+    this.router.navigate(['login']);
+    window.location.reload();
+    // window.location.replace ('login');
    }
-  submit(event){
-    if(event.which == 13){//enter
-        event.preventDefault();
-        $('#login-btn').click();
-        $('#login-btn').focus();
-      }
-  }
-  focus($event){
-    $('#loginMsg').hide();
-  }
-
-  login(){
-      var name = $('input:eq(0)').val();
-      var password = $('input:eq(1)').val();
-      var loginUrl = this.servicecService.config.uri.login;
-      this.loginBtnWait();
-
-      this.http
-      .post(loginUrl,{username:name, password:password})
-      .subscribe(data => {
-        this.results = data;
-        if(this.results.status == 0)
-          {//logon success
-           if($('input:eq(2)').prop('checked')){
-            this.setCookie('ntAccount', this.results.ntAccount, 30);
-            this.setCookie('fullName', this.results.fullName, 30);
-           }else
-           {
-              this.setCookie('ntAccount', this.results.ntAccount,0);
-              this.setCookie('fullName', this.results.fullName,0);
-           }
-            this.loginBtnActive()
-            window.location.replace('/');
-          }
-          else{
-              this.showLoginFailed();
-              this.loginBtnActive();
-          };
-
-    },
-    err => {
-          this.showLoginFailed();
-          this.loginBtnActive();
-    });
-
-  }
 }
