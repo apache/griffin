@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @Entity
-public class DataConnector extends AuditableEntity {
+public class DataConnector extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815594L;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DataConnector.class);

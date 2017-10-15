@@ -25,7 +25,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class Measure extends AuditableEntity {
+public class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
 
     private String name;

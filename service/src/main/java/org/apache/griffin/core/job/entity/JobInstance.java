@@ -20,12 +20,12 @@ under the License.
 package org.apache.griffin.core.job.entity;
 
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
-import org.apache.griffin.core.measure.entity.AuditableEntity;
+import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
 import javax.persistence.*;
 
 @Entity
-public class JobInstance extends AuditableEntity {
+public class JobInstance extends AbstractAuditableEntity {
 
     private static final long serialVersionUID = -4748881017029815874L;
 
@@ -36,7 +36,7 @@ public class JobInstance extends AuditableEntity {
     private State state;
     private String appId;
     @Lob
-    @Column(length = 1024) //2^10=1024
+    @Column(length = 1024)
     private String appUri;
     private long timestamp;
 
