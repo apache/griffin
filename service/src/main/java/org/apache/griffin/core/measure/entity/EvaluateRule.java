@@ -28,7 +28,7 @@ import java.util.List;
 
 
 @Entity
-public class EvaluateRule extends AuditableEntity {
+public class EvaluateRule extends AbstractAuditableEntity {
     private static final long serialVersionUID = 4240072518233967528L;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})

@@ -78,18 +78,27 @@ public class JobRequestBody {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         JobRequestBody that = (JobRequestBody) o;
 
-        if (sourcePattern != null ? !sourcePattern.equals(that.sourcePattern) : that.sourcePattern != null)
+        if (sourcePattern != null ? !sourcePattern.equals(that.sourcePattern) : that.sourcePattern != null) {
             return false;
-        if (targetPattern != null ? !targetPattern.equals(that.targetPattern) : that.targetPattern != null)
+        }
+        if (targetPattern != null ? !targetPattern.equals(that.targetPattern) : that.targetPattern != null) {
             return false;
-        if (blockStartTimestamp != null ? !blockStartTimestamp.equals(that.blockStartTimestamp) : that.blockStartTimestamp != null)
+        }
+        if (blockStartTimestamp != null ? !blockStartTimestamp.equals(that.blockStartTimestamp) : that.blockStartTimestamp != null) {
             return false;
-        if (jobStartTime != null ? !jobStartTime.equals(that.jobStartTime) : that.jobStartTime != null) return false;
+        }
+        if (jobStartTime != null ? !jobStartTime.equals(that.jobStartTime) : that.jobStartTime != null){
+            return false;
+        }
         return interval != null ? interval.equals(that.interval) : that.interval == null;
     }
 

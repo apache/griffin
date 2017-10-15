@@ -60,10 +60,11 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     }
 
     private String getUseDbName(String dbName) {
-        if (!StringUtils.hasText(dbName))
+        if (!StringUtils.hasText(dbName)) {
             return defaultDbName;
-        else
+        } else {
             return dbName;
+        }
     }
 
     @Override
@@ -108,8 +109,9 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Map<String, List<Table>> results = new HashMap<>();
         Iterable<String> dbs = getAllDatabases();
         //MetaException happens
-        if (dbs == null)
+        if (dbs == null) {
             return results;
+        }
         for (String db : dbs) {
             results.put(db, getTables(db));
         }
