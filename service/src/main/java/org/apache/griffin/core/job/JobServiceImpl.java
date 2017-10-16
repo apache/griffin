@@ -253,14 +253,14 @@ public class JobServiceImpl implements JobService {
      *
      * @param measure
      */
-    //TODO
     public void deleteJobsRelateToMeasure(Measure measure) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
-        for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {//get all jobs
+        //get all jobs
+        for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             JobDataMap jobDataMap = jobDetail.getJobDataMap();
             if (jobDataMap.getString("measureId").equals(measure.getId().toString())) {
-                //select jobs related to measureId,
+                //select jobs related to measureId
                 deleteJob(jobKey.getGroup(), jobKey.getName());
                 LOGGER.info("{} {} is paused and logically deleted.", jobKey.getGroup(), jobKey.getName());
             }

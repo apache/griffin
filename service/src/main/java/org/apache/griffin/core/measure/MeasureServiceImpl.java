@@ -81,8 +81,9 @@ public class MeasureServiceImpl implements MeasureService {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
         if (aliveMeasureList.size() == 0) {
             try {
-                if (measureRepo.save(measure) != null)
+                if (measureRepo.save(measure) != null) {
                     return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
+                }
                 else {
                     return GriffinOperationMessage.CREATE_MEASURE_FAIL;
                 }
@@ -109,6 +110,7 @@ public class MeasureServiceImpl implements MeasureService {
         return res;
     }
 
+    @Override
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         if (!measureRepo.exists(measure.getId())) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;

@@ -24,7 +24,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class DataSource extends AuditableEntity {
+public class DataSource extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017079815794L;
 
     private String name;

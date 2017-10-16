@@ -45,7 +45,9 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService {
     private String registryUrl(final String path) {
         if (StringUtils.hasText(path)) {
             String usePath = path;
-            if (!path.startsWith("/")) usePath = "/" + path;
+            if (!path.startsWith("/")){
+                usePath = "/" + path;
+            }
             return this.url + usePath;
         }
         return "";

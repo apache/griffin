@@ -27,10 +27,9 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Date;
 
 @MappedSuperclass
-public abstract class AuditableEntity implements Serializable {
+public abstract class AbstractAuditableEntity implements Serializable {
 
 //    private static final long serialVersionUID = 1L;
 
@@ -39,7 +38,7 @@ public abstract class AuditableEntity implements Serializable {
     private Long id;
 
     @JsonIgnore
-    Timestamp createdDate = new Timestamp(new Date().getTime());
+    Timestamp createdDate = new Timestamp(System.currentTimeMillis());
 
     @JsonIgnore
     Timestamp modifiedDate;
@@ -78,18 +77,23 @@ public abstract class AuditableEntity implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        AuditableEntity other = (AuditableEntity) obj;
+        }
+        AbstractAuditableEntity other = (AbstractAuditableEntity) obj;
         if (id == null) {
-            if (other.id != null)
+            if (other.id != null) {
                 return false;
-        } else if (!id.equals(other.id))
+            }
+        } else if (!id.equals(other.id)) {
             return false;
+        }
         return true;
     }
 
