@@ -26,9 +26,9 @@ import javax.persistence.Entity;
 
 
 @Entity
-public class Rule extends AuditableEntity {
+public class Rule extends AbstractAuditableEntity {
 
-    //three type:1.griffin-dsl 2.df-opr 3.spark-sql
+    /**three type:1.griffin-dsl 2.df-opr 3.spark-sql**/
     private String dslType;
 
     private String dqType;

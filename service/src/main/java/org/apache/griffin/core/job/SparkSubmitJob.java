@@ -92,10 +92,12 @@ public class SparkSubmitJob implements Job {
         long currentBlockStartTimestamp = setCurrentBlockStartTimestamp(System.currentTimeMillis());
         LOGGER.info("currentBlockStartTimestamp: {}", currentBlockStartTimestamp);
         try {
-            if (StringUtils.isNotEmpty(sourcePattern))
+            if (StringUtils.isNotEmpty(sourcePattern)) {
                 setAllDataConnectorPartitions(measure.getDataSources(), sourcePattern.split("-"), partitionItems, "source", currentBlockStartTimestamp);
-            if (StringUtils.isNotEmpty(targetPattern))
+            }
+            if (StringUtils.isNotEmpty(targetPattern)) {
                 setAllDataConnectorPartitions(measure.getDataSources(), targetPattern.split("-"), partitionItems, "target", currentBlockStartTimestamp);
+            }
         } catch (Exception e) {
             LOGGER.error("Can not execute job.Set partitions error. {}", e.getMessage());
             return;
@@ -140,8 +142,9 @@ public class SparkSubmitJob implements Job {
     }
 
     private void setAllDataConnectorPartitions(List<DataSource> sources, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
-        if (sources == null)
+        if (sources == null) {
             return;
+        }
         for (DataSource dataSource : sources) {
             setDataSourcePartitions(dataSource, patternItemSet, partitionItems, sourceName, timestamp);
         }
@@ -150,8 +153,9 @@ public class SparkSubmitJob implements Job {
     private void setDataSourcePartitions(DataSource dataSource, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
         String name = dataSource.getName();
         for (DataConnector dataConnector : dataSource.getConnectors()) {
-            if (sourceName.equals(name))
+            if (sourceName.equals(name)) {
                 setDataConnectorPartitions(dataConnector, patternItemSet, partitionItems, timestamp);
+            }
         }
     }
 
@@ -226,7 +230,7 @@ public class SparkSubmitJob implements Job {
         // measure
         String measureJson;
         measureJson = GriffinUtil.toJson(measure);
-        args.add(measureJson);  //partition
+        args.add(measureJson);
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));
         sparkJobDO.setArgs(args);
 
