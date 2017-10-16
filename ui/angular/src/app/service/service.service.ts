@@ -34,10 +34,10 @@ export class ServiceService {
           uri: {
               base: this.BACKEND_SERVER + this.API_ROOT_PATH,
 
-              dbtree:this.BACKEND_SERVER + '/metadata/hive/allTables',
-              schemadefinition: this.BACKEND_SERVER + '/metadata/hive/table',
-              dataassetlist: this.BACKEND_SERVER + '/metadata/hive/allTables',
-
+              login:this.BACKEND_SERVER + this.API_ROOT_PATH+ '/login/authenticate',
+              dbtree:this.BACKEND_SERVER + this.API_ROOT_PATH+ '/metadata/hive/allTables',
+              schemadefinition: this.BACKEND_SERVER + this.API_ROOT_PATH+ '/metadata/hive/table',
+              dataassetlist: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metadata/hive/allTables',
 
               // adddataasset: this.BACKEND_SERVER + this.API_ROOT_PATH + '/dataassets',
               // updatedataasset: this.BACKEND_SERVER + this.API_ROOT_PATH + '/dataassets',
@@ -50,37 +50,48 @@ export class ServiceService {
               // newsubscribe: this.BACKEND_SERVER + this.API_ROOT_PATH + '/subscribe',
 
               //metrics
-              statistics: this.BACKEND_SERVER + '/jobs/health',
+
+              statistics: this.BACKEND_SERVER + this.API_ROOT_PATH + '/jobs/health',
+
+
               // briefmetrics: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/briefmetrics',
               heatmap: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/heatmap' ,
               // metricdetail: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/complete',
               // rulemetric: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/brief',
 //              organization:this.BACKEND_SERVER+'/org',
-              orgmap: this.BACKEND_SERVER+'/metrics/org',
+
+              orgmap: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/org',
+
+
 
 
               metricsByOrg:'',
 //              organization:'/org.json',
 //              dashboard:'/dashboard.json',
 
-              organization:this.BACKEND_SERVER + '/orgWithMetricsName',
+
+              organization:this.BACKEND_SERVER + this.API_ROOT_PATH + '/orgWithMetricsName',
+
+
               dashboard:this.ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
               metricsample: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/sample',
               metricdownload: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/download',
 
               //Models
-              allModels: this.BACKEND_SERVER + '/measures',
-              addModels: this.BACKEND_SERVER + '/measure',
-              deleteModel:this.BACKEND_SERVER + '/measure',
-              getModel: this.BACKEND_SERVER + '/measure',
+
+              allModels: this.BACKEND_SERVER + this.API_ROOT_PATH + '/measures',
+              addModels: this.BACKEND_SERVER + this.API_ROOT_PATH + '/measure',
+              deleteModel:this.BACKEND_SERVER + this.API_ROOT_PATH + '/measure',
+              getModel: this.BACKEND_SERVER + this.API_ROOT_PATH + '/measure',
               enableModel: this.BACKEND_SERVER + this.API_ROOT_PATH + '/models/enableModel',
 
               //Jobs
-              allJobs:this.BACKEND_SERVER + '/jobs/',
-              addJobs:this.BACKEND_SERVER+'/jobs',
-              getMeasuresByOwner:this.BACKEND_SERVER+'/measures/owner/',
-              deleteJob:this.BACKEND_SERVER + '/jobs',
-              getInstances:this.BACKEND_SERVER + '/jobs/instances',
+              allJobs:this.BACKEND_SERVER + this.API_ROOT_PATH + '/jobs/',
+              addJobs:this.BACKEND_SERVER + this.API_ROOT_PATH + '/jobs',
+              getMeasuresByOwner:this.BACKEND_SERVER + this.API_ROOT_PATH +'/measures/owner/',
+              deleteJob:this.BACKEND_SERVER + this.API_ROOT_PATH + '/jobs',
+              getInstances:this.BACKEND_SERVER + this.API_ROOT_PATH + '/jobs/instances',
+
 //              allJobs:'/jobs.json',
               newAccuracyModel: this.BACKEND_SERVER + this.API_ROOT_PATH + '/models' ,
               newValidityModel: this.BACKEND_SERVER + this.API_ROOT_PATH + '/models' ,

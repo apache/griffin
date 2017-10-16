@@ -42,7 +42,7 @@ export class MeasureComponent implements OnInit {
   public visible = false;
   public visibleAnimate = false;
   deletedRow : any;
-  sourceTable :string;
+  // sourceTable :string;
   targetTable :string;
   deleteId : number;
   deleteIndex:number;
@@ -68,8 +68,8 @@ export class MeasureComponent implements OnInit {
     this.deleteId = row.id;
     this.deleteIndex = this.results.indexOf(row);
     this.deletedRow = row;
-    this.sourceTable = this.deletedRow.source.config["table.name"];
-    this.targetTable = this.deletedRow.target.config["table.name"];
+    // this.sourceTable = this.deletedRow.source.config["table.name"];
+    // this.targetTable = this.deletedRow.target.config["table.name"];
   }
 
   confirmDelete(){
@@ -82,7 +82,7 @@ export class MeasureComponent implements OnInit {
         var self = this;
         setTimeout(function () {
           self.results.splice(self.deleteIndex,1);
-          self.source.load(self.results);
+          // self.source.load(self.results);
           self.hide();
         },200);
       }
