@@ -229,7 +229,7 @@ public class SparkSubmitJob implements Job {
         args.add(sparkJobProps.getProperty("sparkJob.args_1"));
         // measure
         String measureJson;
-        measureJson = GriffinUtil.toJson(measure);
+        measureJson = GriffinUtil.toJsonWithFormat(measure);
         args.add(measureJson);
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));
         sparkJobDO.setArgs(args);
