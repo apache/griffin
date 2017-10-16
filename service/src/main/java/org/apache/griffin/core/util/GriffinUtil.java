@@ -22,12 +22,14 @@ package org.apache.griffin.core.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class GriffinUtil {
@@ -35,6 +37,17 @@ public class GriffinUtil {
 
     public static String toJson(Object obj) {
         ObjectMapper mapper = new ObjectMapper();
+        String jsonStr = null;
+        try {
+            jsonStr = mapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            LOGGER.error("convert to json failed. {}", obj);
+        }
+        return jsonStr;
+    }
+
+    public static String toJsonWithFormat(Object obj) {
+        ObjectWriter mapper = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String jsonStr = null;
         try {
             jsonStr = mapper.writeValueAsString(obj);
@@ -74,4 +87,5 @@ public class GriffinUtil {
         }
         return properties;
     }
+
 }

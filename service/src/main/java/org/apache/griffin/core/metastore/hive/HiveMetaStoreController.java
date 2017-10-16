@@ -31,7 +31,7 @@ import java.util.Map;
 public class HiveMetaStoreController {
 
     @Autowired
-    HiveMetaStoreService hiveMetaStoreService;
+    private HiveMetaStoreService hiveMetaStoreService;
 
 
     @RequestMapping(value = "/db", method = RequestMethod.GET)
