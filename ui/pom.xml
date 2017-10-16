@@ -60,6 +60,7 @@ under the License.
         <version>1.0</version>
         <configuration>
           <workingDirectory>angular</workingDirectory>
+
           <installDirectory>.tmp</installDirectory>
         </configuration>
         <executions>
