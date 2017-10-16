@@ -45,8 +45,8 @@ under the License.
             </tr>
             </tbody>
             <tbody *ngFor="let row of mf.data">
-            <tr (click) = "showInstances(row)">
-                <td [ngClass]="{accordion:true}" style="cursor: pointer;">
+            <tr>
+                <td  (click) = "showInstances(row)" [ngClass]="{accordion:true}" style="cursor: pointer;">
                     <i *ngIf="!row.showDetail" class="fa fa-chevron-circle-right blue"></i>
                     <i *ngIf="row.showDetail" class="fa fa-chevron-circle-down blue"></i>
                     {{row.jobName}}
@@ -66,7 +66,7 @@ under the License.
                 <td>
                     &nbsp;
                     <a (click)="remove(row)" title="delete" style="text-decoration:none">
-                        <i class="fa fa-trash-o"></i>
+                        <i class="fa fa-trash-o po"></i>
                     </a>
                     &nbsp;
                 </td>
