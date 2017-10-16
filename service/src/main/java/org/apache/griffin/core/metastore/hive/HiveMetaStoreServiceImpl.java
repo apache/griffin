@@ -57,6 +57,13 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     public HiveMetaStoreServiceImpl() {
         singleThreadExecutor = new ThreadPoolExecutor(1, 1, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1));
         LOGGER.info("HiveMetaStoreServiceImpl single thread pool created.");
+        refreshCache();
+        LOGGER.info("cache hive tables");
+    }
+
+    @Override
+    public void refreshCache() {
+        getAllTable();
     }
 
     private String getUseDbName(String dbName) {
@@ -69,7 +76,6 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
     @Override
     @Cacheable
-
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
@@ -131,6 +137,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         }
         return result;
     }
+
 
 
     private List<Table> getTables(String db) {

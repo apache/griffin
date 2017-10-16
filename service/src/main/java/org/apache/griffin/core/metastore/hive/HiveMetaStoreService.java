@@ -36,4 +36,5 @@ public interface HiveMetaStoreService {
 
     Table getTable(String dbName, String tableName);
 
+    void refreshCache();
 }
