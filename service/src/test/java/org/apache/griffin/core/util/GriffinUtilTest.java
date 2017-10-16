@@ -41,6 +41,7 @@ public class GriffinUtilTest {
     public void testToJson() {
         JobHealth jobHealth = new JobHealth(5, 10);
         String jobHealthStr = GriffinUtil.toJson(jobHealth);
+        System.out.println(jobHealthStr);
         assertEquals(jobHealthStr, "{\"healthyJobCount\":5,\"jobCount\":10}");
     }
 
@@ -71,6 +72,13 @@ public class GriffinUtilTest {
     public void testGetPropertiesForFailWithWrongPath() {
         Properties properties = GriffinUtil.getProperties(".././quartz.properties");
         assertEquals(properties, null);
+    }
+
+    @Test
+    public void testToJsonWithFormat() {
+        JobHealth jobHealth = new JobHealth(5, 10);
+        String jobHealthStr = GriffinUtil.toJsonWithFormat(jobHealth);
+        System.out.println(jobHealthStr);
     }
 
 }
