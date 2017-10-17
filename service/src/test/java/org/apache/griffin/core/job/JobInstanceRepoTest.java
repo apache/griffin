@@ -54,7 +54,7 @@ public class JobInstanceRepoTest {
     @Test
     public void testFindGroupWithJobName() {
         List<Object> list = jobInstanceRepo.findGroupWithJobName();
-        assertThat(list.size()).isEqualTo(2);
+        assertThat(list.size()).isEqualTo(3);
     }
 
     @Test
