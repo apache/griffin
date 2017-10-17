@@ -46,7 +46,7 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance, Long> {
             "where s.groupName= ?1 and s.jobName=?2 ")
     List<JobInstance> findByGroupNameAndJobName(String group, String name);
 
-    @Query("select DISTINCT s.groupName, s.jobName, s.id from JobInstance s")
+    @Query("select DISTINCT s.groupName, s.jobName from JobInstance s")
     List<Object> findGroupWithJobName();
 
     @Modifying
