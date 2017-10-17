@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/metadata/hive")
+@RequestMapping("/api/v1/metadata/hive")
 public class HiveMetaStoreController {
 
     @Autowired
-    HiveMetaStoreService hiveMetaStoreService;
+    private HiveMetaStoreService hiveMetaStoreService;
 
 
     @RequestMapping(value = "/db", method = RequestMethod.GET)

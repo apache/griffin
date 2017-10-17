@@ -16,17 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-.table-striped > tbody > tr{
-     background-color: #1f1f1f; 
-}
-a{
-	color: white;
-}
 
-.po{
-	cursor: pointer;
-}
-#pagination .pagination{
-	margin:20px 0 0 0 ;
-}
+package org.apache.griffin.core.util;
 
+public class URLHelper {
+    public static final String API_VERSION_PATH = "/api/v1";
+}

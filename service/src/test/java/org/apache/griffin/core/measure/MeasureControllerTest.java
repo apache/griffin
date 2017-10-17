@@ -21,6 +21,7 @@ package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.apache.griffin.core.util.URLHelper;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class MeasureControllerTest {
         Measure measure = createATestMeasure("view_item_hourly", "ebay");
         given(service.getAllAliveMeasures()).willReturn(Arrays.asList(measure));
 
-        mvc.perform(get("/measures").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].name", is("view_item_hourly")));
     }
@@ -72,7 +73,7 @@ public class MeasureControllerTest {
         Measure measure = createATestMeasure("view_item_hourly", "ebay");
         given(service.getMeasureById(1L)).willReturn(measure);
 
-        mvc.perform(get("/measure/1").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("view_item_hourly")))
         ;
@@ -82,7 +83,7 @@ public class MeasureControllerTest {
     public void testDeleteMeasuresByIdForSuccess() throws Exception {
         given(service.deleteMeasureById(1L)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS);
 
-        mvc.perform(delete("/measure/1").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Delete Measures By Name Succeed")))
                 .andExpect(jsonPath("$.code", is(202)));
@@ -92,7 +93,7 @@ public class MeasureControllerTest {
     public void testDeleteMeasuresByIdForNotFound() throws Exception {
         given(service.deleteMeasureById(1L)).willReturn(GriffinOperationMessage.RESOURCE_NOT_FOUND);
 
-        mvc.perform(delete("/measure/1").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Resource Not Found")))
                 .andExpect(jsonPath("$.code", is(400)));
@@ -102,7 +103,7 @@ public class MeasureControllerTest {
     public void testDeleteMeasuresByIdForFail() throws Exception {
         given(service.deleteMeasureById(1L)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL);
 
-        mvc.perform(delete("/measure/1").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Delete Measures By Name Failed")))
                 .andExpect(jsonPath("$.code", is(402)));
@@ -114,7 +115,7 @@ public class MeasureControllerTest {
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
 
-        mvc.perform(put("/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Update Measure Succeed")))
                 .andExpect(jsonPath("$.code", is(204)));
@@ -126,7 +127,7 @@ public class MeasureControllerTest {
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.RESOURCE_NOT_FOUND);
 
-        mvc.perform(put("/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Resource Not Found")))
                 .andExpect(jsonPath("$.code", is(400)));
@@ -139,7 +140,7 @@ public class MeasureControllerTest {
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_FAIL);
 
-        mvc.perform(put("/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Update Measure Failed")))
                 .andExpect(jsonPath("$.code", is(404)));
@@ -155,7 +156,7 @@ public class MeasureControllerTest {
         measureList.add(map);
         given(service.getAllAliveMeasureNameIdByOwner(owner)).willReturn(measureList);
 
-        mvc.perform(get("/measures/owner/" + owner).contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures/owner/" + owner).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].name", is("view_item_hourly")))
         ;
@@ -167,7 +168,7 @@ public class MeasureControllerTest {
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
 
-        mvc.perform(post("/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Create Measure Succeed")))
                 .andExpect(jsonPath("$.code", is(201)));
@@ -179,7 +180,7 @@ public class MeasureControllerTest {
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
 
-        mvc.perform(post("/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Create Measure Failed, duplicate records")))
                 .andExpect(jsonPath("$.code", is(410)));
@@ -191,7 +192,7 @@ public class MeasureControllerTest {
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL);
 
-        mvc.perform(post("/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Create Measure Failed")))
                 .andExpect(jsonPath("$.code", is(401)));
