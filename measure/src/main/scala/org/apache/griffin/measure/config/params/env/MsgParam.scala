@@ -16,19 +16,21 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+
 package org.apache.griffin.measure.config.params.env
 
-import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import org.apache.griffin.measure.config.params.Param
 
+/**
+  * Created by xiaoqiu.duan on 2017/10/23.
+  */
 @JsonInclude(Include.NON_NULL)
-case class EnvParam( @JsonProperty("spark") sparkParam: SparkParam,
-                     @JsonProperty("persist") persistParams: List[PersistParam],
-                     @JsonProperty("info.cache") infoCacheParams: List[InfoCacheParam],
-                     @JsonProperty("mail") emailParam: EmailParam,
-                     @JsonProperty("msg") msgParam: MsgParam,
-                     @JsonProperty("cleaner") cleanerParam: CleanerParam
-                   ) extends Param {
+case class MsgParam(@JsonProperty("host") host: String,
+                      @JsonProperty("id") id: String,
+                      @JsonProperty("key") key: String,
+                      @JsonProperty("UUID") uuid: String
+                     ) extends Param {
 
 }

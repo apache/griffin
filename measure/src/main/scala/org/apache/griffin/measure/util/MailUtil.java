@@ -1,5 +1,26 @@
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
+
 package org.apache.griffin.measure.util;
 
+
+import org.apache.griffin.measure.config.params.env.EmailParam;
 
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -10,16 +31,16 @@ import java.util.Properties;
  */
 public class MailUtil {
 
-    public static void SendMail(String name,String UserArr,String Title,String Info) throws MessagingException {
+    public static void SendMail(String name, String UserArr, String Title, String Info, EmailParam emailParam) throws MessagingException {
         Properties prop = new Properties();
-        prop.setProperty("mail.transport.protocol", "smtp"); //协议
-        prop.setProperty("mail.smtp.host", "smtp.163.com"); //主机名
-        prop.setProperty("mail.smtp.auth", "NTLM"); //是否开启权限控制
-        prop.setProperty("mail.debug", "true"); //返回发送的cmd源码
+        prop.setProperty("mail.transport.protocol", "smtp");
+        prop.setProperty("mail.smtp.host", emailParam.host());
+        prop.setProperty("mail.smtp.auth", "NTLM");
+        prop.setProperty("mail.debug", "true");
         Session session = Session.getInstance(prop);
         Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress("xiaoqiu2017wy@163.com")); //自己的email
-        //msg.setRecipient(Message.RecipientType.TO, new InternetAddress(UserArr)); // 要发送的email，可以设置数组
+        msg.setFrom(new InternetAddress(emailParam.mail()));
+        //msg.setRecipient(Message.RecipientType.TO, new InternetAddress(UserArr));
         String[] arr=null;
         if (UserArr.indexOf(",")==-1) {
             arr=new String[]{UserArr};
@@ -32,26 +53,19 @@ public class MailUtil {
             tos[i] = new InternetAddress(arr[i]);
         }
         msg.setRecipients(Message.RecipientType.TO,tos);
-        msg.setSubject(Title);//邮件标题
-        // MiniMultipart类是一个容器类，包含MimeBodyPart类型的对象
+        msg.setSubject(Title);
         Multipart mainPart = new MimeMultipart();
-        // 创建一个包含HTML内容的MimeBodyPart
         BodyPart html = new MimeBodyPart();
-        // 设置HTML内容
         html.setContent(Info, "text/html; charset=utf-8");
         mainPart.addBodyPart(html);
-        // 将MiniMultipart对象设置为邮件内容
         msg.setContent(mainPart);
-        //msg.setText(Info);//邮件正文
-        //不被当作垃圾邮件的关键代码--Begin ，如果不加这些代码，发送的邮件会自动进入对方的垃圾邮件列表
         msg.addHeader("X-Priority", "3");
         msg.addHeader("X-MSMail-Priority", "Normal");
         msg.addHeader("X-Mailer", "Microsoft Outlook Express 6.00.2900.2869"); //本文以outlook名义发送邮件，不会被当作垃圾邮件
         msg.addHeader("X-MimeOLE", "Produced By Microsoft MimeOLE V6.00.2900.2869");
         msg.addHeader("ReturnReceipt", "1");
-        //不被当作垃圾邮件的关键代码--end
         Transport trans = session.getTransport();
-        trans.connect("xiaoqiu2017wy@163.com", "xiaoqiu2017"); // 邮件的账号密码
+        trans.connect(emailParam.usr(), emailParam.pwd());
         trans.sendMessage(msg, msg.getAllRecipients());
     }
 
