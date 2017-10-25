@@ -55,7 +55,6 @@ Release:
     -p 33306:3306 -p 39000:9000 -p 38042:8042 -p 38080:8080 -p 37017:27017 \
     -p 39083:9083 -p 38998:8998 -p 39200:9200 bhlx3lyx7/griffin_demo:0.0.1
     ```
-    
 5. Now you can visit UI through your browser, login with account "test" and password "test" if required.
     ```
     http://<your local IP address>:38080/
