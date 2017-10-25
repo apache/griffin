@@ -27,10 +27,10 @@ import org.apache.griffin.measure.config.params.Param
   * Created by xiaoqiu.duan on 2017/10/23.
   */
 @JsonInclude(Include.NON_NULL)
-case class MsgParam(@JsonProperty("host") host: String,
-                      @JsonProperty("id") id: String,
-                      @JsonProperty("key") key: String,
-                      @JsonProperty("UUID") uuid: String
+case class SMSParam(@JsonProperty("host") host: String,
+                    @JsonProperty("id") id: String,
+                    @JsonProperty("key") key: String,
+                    @JsonProperty("UUID") uuid: String
                      ) extends Param {
 
 }

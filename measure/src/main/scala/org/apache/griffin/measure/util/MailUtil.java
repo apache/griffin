@@ -61,7 +61,7 @@ public class MailUtil {
         msg.setContent(mainPart);
         msg.addHeader("X-Priority", "3");
         msg.addHeader("X-MSMail-Priority", "Normal");
-        msg.addHeader("X-Mailer", "Microsoft Outlook Express 6.00.2900.2869"); //本文以outlook名义发送邮件，不会被当作垃圾邮件
+        msg.addHeader("X-Mailer", "Microsoft Outlook Express 6.00.2900.2869");
         msg.addHeader("X-MimeOLE", "Produced By Microsoft MimeOLE V6.00.2900.2869");
         msg.addHeader("ReturnReceipt", "1");
         Transport trans = session.getTransport();

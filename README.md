@@ -55,6 +55,7 @@ Release:
     -p 33306:3306 -p 39000:9000 -p 38042:8042 -p 38080:8080 -p 37017:27017 \
     -p 39083:9083 -p 38998:8998 -p 39200:9200 bhlx3lyx7/griffin_demo:0.0.1
     ```
+    
 5. Now you can visit UI through your browser, login with account "test" and password "test" if required.
     ```
     http://<your local IP address>:38080/
@@ -103,6 +104,26 @@ Release:
     ```
     ES_SERVER = "http://<your IP>:9200"
     ```
+    Modify SMTP Server configuration and SMS Server configuration.
+    measure/src/main/resources/env.json
+    ```        
+    "mail":[
+            {
+              "host":"smtp.163.com",//mail host(163)
+              "mail":"xxx@163.com",//mail
+              "user":"xxx@163.com",//mail user
+              "password":"xxx"//mail password
+            }
+    ],
+    "sms":[
+            {
+              "host":"xxx",//meassage url
+              "id":"xx",//id
+              "key":"xxx",//key
+              "UUID":"xxx"//uuid
+            }
+    ]
+    
     Configure measure/measure-batch/src/main/resources/env.json for your environment, and put it into Hdfs <griffin env path>/
 10. Build the whole project and deploy.(NPM should be installed , on mac you can try 'brew install node')
     ```

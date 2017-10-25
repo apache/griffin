@@ -18,7 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.util;
 
-
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 
-import org.apache.griffin.measure.config.params.env.MsgParam;
+import org.apache.griffin.measure.config.params.env.SMSParam;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,11 +42,11 @@ import org.json.JSONObject;
 public class MessageUtil {
 
 
-    public static String sendSMSCode(String teamPhone, String content, MsgParam msgParam){
-        String url=msgParam.host(); //"http://osp-proxy-remote.vip.vip.com:9080/rest/com.vip.api.umc.producer.service.UmcAccessService-1.0.4/directSendSms";
-        String SYS_ID=msgParam.id(); //"JR_DATA";//sysId
-        String KEY=msgParam.key();// "f4c87dd954e04afcacd8e36f8b4d553c";
-        String sendContext="["+msgParam.uuid()+"]: "+content ;
+    public static String sendSMSCode(String teamPhone, String content, SMSParam smsParam){
+        String url=smsParam.host();
+        String SYS_ID=smsParam.id();
+        String KEY=smsParam.key();
+        String sendContext="["+smsParam.uuid()+"]: "+content ;
         System.out.println(" sendContext:  "+sendContext);
         Long timestamp=new Date().getTime()+20610;
         System.out.println(" timestamp:  "+timestamp);
