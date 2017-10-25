@@ -104,26 +104,6 @@ Release:
     ```
     ES_SERVER = "http://<your IP>:9200"
     ```
-    Modify SMTP Server configuration and SMS Server configuration.
-    measure/src/main/resources/env.json
-    ```        
-    "mail":[
-            {
-              "host":"smtp.163.com",//mail host(163)
-              "mail":"xxx@163.com",//mail
-              "user":"xxx@163.com",//mail user
-              "password":"xxx"//mail password
-            }
-    ],
-    "sms":[
-            {
-              "host":"xxx",//meassage url
-              "id":"xx",//id
-              "key":"xxx",//key
-              "UUID":"xxx"//uuid
-            }
-    ]
-    
     Configure measure/measure-batch/src/main/resources/env.json for your environment, and put it into Hdfs <griffin env path>/
 10. Build the whole project and deploy.(NPM should be installed , on mac you can try 'brew install node')
     ```

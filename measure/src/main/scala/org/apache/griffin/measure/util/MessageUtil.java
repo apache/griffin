@@ -90,7 +90,7 @@ public class MessageUtil {
         HttpURLConnection connection=null;
         try{
            String result= postRequestUrl(url, jsonParam.toString(), "utf-8");
-            return "发送成功";
+            return "send success";
         }catch(Exception e){
             e.printStackTrace();
             return null;
