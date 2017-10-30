@@ -1,0 +1,38 @@
+{
+  "spark": {
+    "log.level": "WARN",
+    "checkpoint.dir": "hdfs:///griffin/batch/cp",
+    "batch.interval": "10s",
+    "process.interval": "10m",
+    "config": {
+      "spark.master": "local[*]"
+    }
+  },
+
+  "persist": [
+    {
+      "type": "log",
+      "config": {
+        "max.log.lines": 100
+      }
+    }
+  ],
+
+  "info.cache": [
+    {
+      "type": "zk",
+      "config": {
+        "hosts": "localhost:2181",
+        "namespace": "griffin/infocache",
+        "lock.path": "lock",
+        "mode": "persist",
+        "init.clear": true,
+        "close.clear": false
+      }
+    }
+  ],
+
+  "cleaner": {
+
+  }
+}

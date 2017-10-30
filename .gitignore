@@ -13,6 +13,7 @@ target/**
 *.ear
 target
 service/src/main/resources/public/
+ui/.tmp/
 
 
 .project
@@ -31,3 +32,7 @@ ui/bower_components/*
 ui/node_modules/*
 ui/debug.log
 ui/package-lock.json
+ui/tmp
+
+derby.log
+metastore_db

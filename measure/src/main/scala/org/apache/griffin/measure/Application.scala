@@ -18,9 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure
 
-import org.apache.griffin.measure.algo._
-import org.apache.griffin.measure.algo.batch._
-import org.apache.griffin.measure.algo.streaming._
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
@@ -28,6 +25,7 @@ import org.apache.griffin.measure.config.reader._
 import org.apache.griffin.measure.config.validator.AllParamValidator
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.PersistThreadPool
+import org.apache.griffin.measure.process._
 
 import scala.util.{Failure, Success, Try}
 
@@ -81,39 +79,91 @@ object Application extends Loggable {
     }
 
     // choose algorithm
-    val dqType = allParam.userParam.dqType
-    val procType = allParam.userParam.procType
-    val algo: Algo = (dqType, procType) match {
-      case (MeasureType.accuracy(), ProcessType.batch()) => BatchAccuracyAlgo(allParam)
-      case (MeasureType.profile(), ProcessType.batch()) => BatchProfileAlgo(allParam)
-      case (MeasureType.accuracy(), ProcessType.streaming()) => StreamingAccuracyAlgo(allParam)
-//      case (MeasureType.profile(), ProcessType.streaming()) => StreamingProfileAlgo(allParam)
+//    val dqType = allParam.userParam.dqType
+    val procType = ProcessType(allParam.userParam.procType)
+    val proc: DqProcess = procType match {
+      case BatchProcessType => BatchDqProcess(allParam)
+      case StreamingProcessType => StreamingDqProcess(allParam)
       case _ => {
-        error(s"${dqType} with ${procType} is unsupported dq type!")
+        error(s"${procType} is unsupported process type!")
         sys.exit(-4)
       }
     }
 
-    // algorithm run
-    algo.run match {
-      case Failure(ex) => {
-        error(s"app error: ${ex.getMessage}")
-
-        procType match {
-          case ProcessType.streaming() => {
-            // streaming need to attempt more times by spark streaming itself
-            throw ex
-          }
-          case _ => {
-            shutdown
-            sys.exit(-5)
-          }
-        }
+    // process init
+    proc.init match {
+      case Success(_) => {
+        info("process init success")
       }
-      case _ => {
-        info("app finished and success")
+      case Failure(ex) => {
+        error(s"process init error: ${ex.getMessage}")
+        shutdown
+        sys.exit(-5)
       }
     }
+
+    // process run
+    proc.run match {
+      case Success(_) => {
+        info("process run success")
+      }
+      case Failure(ex) => {
+        error(s"process run error: ${ex.getMessage}")
+
+        if (proc.retriable) {
+          throw ex
+        } else {
+          shutdown
+          sys.exit(-5)
+        }
+      }
+    }
+
+    // process end
+    proc.end match {
+      case Success(_) => {
+        info("process end success")
+      }
+      case Failure(ex) => {
+        error(s"process end error: ${ex.getMessage}")
+        shutdown
+        sys.exit(-5)
+      }
+    }
+
+    shutdown
+
+//    val algo: Algo = (dqType, procType) match {
+//      case (MeasureType.accuracy(), ProcessType.batch()) => BatchAccuracyAlgo(allParam)
+//      case (MeasureType.profile(), ProcessType.batch()) => BatchProfileAlgo(allParam)
+//      case (MeasureType.accuracy(), ProcessType.streaming()) => StreamingAccuracyAlgo(allParam)
+////      case (MeasureType.profile(), ProcessType.streaming()) => StreamingProfileAlgo(allParam)
+//      case _ => {
+//        error(s"${dqType} with ${procType} is unsupported dq type!")
+//        sys.exit(-4)
+//      }
+//    }
+
+    // algorithm run
+//    algo.run match {
+//      case Failure(ex) => {
+//        error(s"app error: ${ex.getMessage}")
+//
+//        procType match {
+//          case ProcessType.streaming() => {
+//            // streaming need to attempt more times by spark streaming itself
+//            throw ex
+//          }
+//          case _ => {
+//            shutdown
+//            sys.exit(-5)
+//          }
+//        }
+//      }
+//      case _ => {
+//        info("app finished and success")
+//      }
+//    }
   }
 
   private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {

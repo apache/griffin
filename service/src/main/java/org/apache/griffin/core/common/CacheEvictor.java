@@ -18,8 +18,10 @@ under the License.
 */
 package org.apache.griffin.core.common;
 
+import org.apache.griffin.core.metastore.hive.HiveMetaStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,9 +30,14 @@ import org.springframework.stereotype.Component;
 public class CacheEvictor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheEvictor.class);
 
+    @Autowired
+    private HiveMetaStoreService hiveMetaStoreService;
+
     @Scheduled(fixedRateString = "${cache.evict.hive.fixedRate.in.milliseconds}")
     @CacheEvict(cacheNames = "hive", allEntries = true, beforeInvocation = true)
     public void evictHiveCache() {
         LOGGER.info("Evict hive cache");
+        hiveMetaStoreService.getAllTable();
+        LOGGER.info("After evict hive cache,automatically refresh hive tables cache.");
     }
 }

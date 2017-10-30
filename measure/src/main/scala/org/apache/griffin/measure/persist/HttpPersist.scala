@@ -21,8 +21,10 @@ package org.apache.griffin.measure.persist
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 import scala.util.Try
+import org.apache.griffin.measure.utils.ParamUtil._
 
 // persist result by http way
 case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
@@ -30,8 +32,10 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val Api = "api"
   val Method = "method"
 
-  val api = config.getOrElse(Api, "").toString
-  val method = config.getOrElse(Method, "post").toString
+  val api = config.getString(Api, "")
+  val method = config.getString(Method, "post")
+
+  val _Value = "value"
 
   def available(): Boolean = {
     api.nonEmpty
@@ -40,21 +44,21 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
   def start(msg: String): Unit = {}
   def finish(): Unit = {}
 
-  def result(rt: Long, result: Result): Unit = {
-    result match {
-      case ar: AccuracyResult => {
-        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
-        httpResult(dataMap)
-      }
-      case pr: ProfileResult => {
-        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> pr.getTotal), ("matched" -> pr.getMatch))
-        httpResult(dataMap)
-      }
-      case _ => {
-        info(s"result: ${result}")
-      }
-    }
-  }
+//  def result(rt: Long, result: Result): Unit = {
+//    result match {
+//      case ar: AccuracyResult => {
+//        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> ar.getTotal), ("matched" -> ar.getMatch))
+//        httpResult(dataMap)
+//      }
+//      case pr: ProfileResult => {
+//        val dataMap = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp), ("total" -> pr.getTotal), ("matched" -> pr.getMatch))
+//        httpResult(dataMap)
+//      }
+//      case _ => {
+//        info(s"result: ${result}")
+//      }
+//    }
+//  }
 
   private def httpResult(dataMap: Map[String, Any]) = {
     try {
@@ -77,12 +81,34 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   }
 
-  def records(recs: RDD[String], tp: String): Unit = {}
-  def records(recs: Iterable[String], tp: String): Unit = {}
+//  def records(recs: RDD[String], tp: String): Unit = {}
+//  def records(recs: Iterable[String], tp: String): Unit = {}
 
 //  def missRecords(records: RDD[String]): Unit = {}
 //  def matchRecords(records: RDD[String]): Unit = {}
 
   def log(rt: Long, msg: String): Unit = {}
+
+//  def persistRecords(df: DataFrame, name: String): Unit = {}
+  def persistRecords(records: Iterable[String], name: String): Unit = {}
+
+//  def persistMetrics(metrics: Seq[String], name: String): Unit = {
+//    val maps = metrics.flatMap { m =>
+//      try {
+//        Some(JsonUtil.toAnyMap(m) ++ Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp)))
+//      } catch {
+//        case e: Throwable => None
+//      }
+//    }
+//    maps.foreach { map =>
+//      httpResult(map)
+//    }
+//  }
+
+  def persistMetrics(metrics: Map[String, Any]): Unit = {
+    val head = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp))
+    val result = head + (_Value -> metrics)
+    httpResult(result)
+  }
 
 }

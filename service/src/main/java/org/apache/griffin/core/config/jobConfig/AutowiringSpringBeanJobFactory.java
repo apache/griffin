@@ -28,27 +28,27 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 public final class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
-		implements ApplicationContextAware {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AutowiringSpringBeanJobFactory.class);
+        implements ApplicationContextAware {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutowiringSpringBeanJobFactory.class);
 
-	private transient AutowireCapableBeanFactory beanFactory;
+    private transient AutowireCapableBeanFactory beanFactory;
 
-	@Override
-	public void setApplicationContext(final ApplicationContext context) {
-		beanFactory = context.getAutowireCapableBeanFactory();
-	}
-
-	@Override
-	protected Object createJobInstance(final TriggerFiredBundle bundle) {
-
-    try {
-      final Object job = super.createJobInstance(bundle);
-      beanFactory.autowireBean(job);
-      return job;
-
-    } catch (Exception e) {
-      LOGGER.error("fail to create job instance. "+e);
+    @Override
+    public void setApplicationContext(final ApplicationContext context) {
+        beanFactory = context.getAutowireCapableBeanFactory();
     }
-    return null;
-	}
+
+    @Override
+    protected Object createJobInstance(final TriggerFiredBundle bundle) {
+
+        try {
+            final Object job = super.createJobInstance(bundle);
+            beanFactory.autowireBean(job);
+            return job;
+
+        } catch (Exception e) {
+            LOGGER.error("fail to create job instance. {}", e.getMessage());
+        }
+        return null;
+    }
 }

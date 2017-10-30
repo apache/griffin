@@ -19,15 +19,13 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.apache.griffin.core.measure.entity.EvaluateRule;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.apache.griffin.core.util.URLHelper;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,9 +33,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
 import java.util.*;
 
+import static org.apache.griffin.core.measure.MeasureTestHelper.createATestMeasure;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -45,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value=MeasureController.class,secure = false)
+@WebMvcTest(value = MeasureController.class, secure = false)
 public class MeasureControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -53,125 +51,149 @@ public class MeasureControllerTest {
     @MockBean
     private MeasureService service;
 
+
     @Before
-    public void setup(){
+    public void setup() {
+
     }
 
     @Test
-    public void testGetAllMeasures() throws IOException,Exception{
-        Measure measure = createATestMeasure("viewitem_hourly","bullseye");
-
+    public void testGetAllMeasures() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
         given(service.getAllAliveMeasures()).willReturn(Arrays.asList(measure));
 
-        mvc.perform(get("/measures").contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name",is("viewitem_hourly")))
-        ;
+                .andExpect(jsonPath("$.[0].name", is("view_item_hourly")));
     }
 
 
     @Test
-    public void testGetMeasuresById() throws IOException,Exception{
-        Measure measure = createATestMeasure("viewitem_hourly","bullseye");
-
+    public void testGetMeasuresById() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
         given(service.getMeasureById(1L)).willReturn(measure);
 
-        mvc.perform(get("/measure/1").contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name",is("viewitem_hourly")))
+                .andExpect(jsonPath("$.name", is("view_item_hourly")))
         ;
     }
 
-
     @Test
-    public void testDeleteMeasuresById() throws Exception{
+    public void testDeleteMeasuresByIdForSuccess() throws Exception {
         given(service.deleteMeasureById(1L)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS);
-        mvc.perform(delete("/measure/1").contentType(MediaType.APPLICATION_JSON))
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS.getCode())))
-                .andExpect(jsonPath("$.description", is(GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS.getDescription())))
-        ;
+                .andExpect(jsonPath("$.description", is("Delete Measures By Id Succeed")))
+                .andExpect(jsonPath("$.code", is(202)));
     }
 
-/*    @Test
-    public void testDeleteMeasuresByName() throws Exception{
-        given(service.deleteMeasureById(0L)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_NAME_SUCCESS);
+    @Test
+    public void testDeleteMeasuresByIdForNotFound() throws Exception {
+        given(service.deleteMeasureById(1L)).willReturn(GriffinOperationMessage.RESOURCE_NOT_FOUND);
 
-        mvc.perform(delete("/measures/deleteByName/"+measureName).contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",is("DELETE_MEASURE_BY_NAME_SUCCESS")))
-        ;
-    }*/
+                .andExpect(jsonPath("$.description", is("Resource Not Found")))
+                .andExpect(jsonPath("$.code", is(400)));
+    }
 
     @Test
-    public void testUpdateMeasure() throws Exception{
-        String measureName="viewitem_hourly";
-        String org="bullseye";
-        Measure measure=createATestMeasure(measureName,org);
-        ObjectMapper mapper=new ObjectMapper();
-        String measureJson=mapper.writeValueAsString(measure);
+    public void testDeleteMeasuresByIdForFail() throws Exception {
+        given(service.deleteMeasureById(1L)).willReturn(GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL);
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description", is("Delete Measures By Id Failed")))
+                .andExpect(jsonPath("$.code", is(402)));
+    }
+
+    @Test
+    public void testUpdateMeasureForSuccess() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
 
-        mvc.perform(put("/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description",is(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS.getDescription())))
-                .andExpect(jsonPath("$.code", is(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS.getCode())))
+                .andExpect(jsonPath("$.description", is("Update Measure Succeed")))
+                .andExpect(jsonPath("$.code", is(204)));
+    }
+
+    @Test
+    public void testUpdateMeasureForNotFound() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        String measureJson = new ObjectMapper().writeValueAsString(measure);
+        given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.RESOURCE_NOT_FOUND);
+
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description", is("Resource Not Found")))
+                .andExpect(jsonPath("$.code", is(400)));
+
+    }
+
+    @Test
+    public void testUpdateMeasureForFail() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        String measureJson = new ObjectMapper().writeValueAsString(measure);
+        given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_FAIL);
+
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description", is("Update Measure Failed")))
+                .andExpect(jsonPath("$.code", is(404)));
+    }
+
+    @Test
+    public void testGetAllMeasuresByOwner() throws Exception {
+        String owner = "test";
+        List<Measure> measureList = new LinkedList<>();
+        Measure measure = createATestMeasure("view_item_hourly", owner);
+        measureList.add(measure);
+        given(service.getAliveMeasuresByOwner(owner)).willReturn(measureList);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures/owner/" + owner).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].name", is("view_item_hourly")))
         ;
     }
 
     @Test
-    public void testGetAllAliveMeasureNameIdByOwner() throws Exception{
-        String Owner="test1";
-        List<Map<String, String>> measureList=new LinkedList<>();
-        HashMap<String, String> map = new HashMap<>();
-        map.put("name", "viewitem_hourly");
-        map.put("id", "0");
-        measureList.add(map);
-        given(service.getAllAliveMeasureNameIdByOwner(Owner)).willReturn(measureList);
-
-        mvc.perform(get("/measures/owner/"+Owner).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name",is("viewitem_hourly")))
-        ;
-    }
-
-    @Test
-    public void testCreateNewMeasure() throws Exception{
-        String measureName="viewitem_hourly";
-        String org="bullseye";
-        Measure measure=createATestMeasure(measureName,org);
-        ObjectMapper mapper=new ObjectMapper();
-        String measureJson=mapper.writeValueAsString(measure);
+    public void testCreateNewMeasureForSuccess() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
 
-        mvc.perform(post("/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description",is(GriffinOperationMessage.CREATE_MEASURE_SUCCESS.getDescription())))
-                .andExpect(jsonPath("$.code", is(GriffinOperationMessage.CREATE_MEASURE_SUCCESS.getCode())))
-        ;
+                .andExpect(jsonPath("$.description", is("Create Measure Succeed")))
+                .andExpect(jsonPath("$.code", is(201)));
     }
 
-    private Measure createATestMeasure(String name,String org)throws IOException,Exception{
-        HashMap<String,String> configMap1=new HashMap<>();
-        configMap1.put("database","default");
-        configMap1.put("table.name","test_data_src");
-        HashMap<String,String> configMap2=new HashMap<>();
-        configMap2.put("database","default");
-        configMap2.put("table.name","test_data_tgt");
-        String configJson1 = new ObjectMapper().writeValueAsString(configMap1);
-        String configJson2 = new ObjectMapper().writeValueAsString(configMap2);
+    @Test
+    public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        String measureJson = new ObjectMapper().writeValueAsString(measure);
+        given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
 
-        DataConnector source = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson1);
-        DataConnector target = new DataConnector(DataConnector.ConnectorType.HIVE, "1.2", configJson2);
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description", is("Create Measure Failed, duplicate records")))
+                .andExpect(jsonPath("$.code", is(410)));
+    }
 
-        String rules = "$source.uage > 100 AND $source.ue = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1";
+    @Test
+    public void testCreateNewMeasureForFailWithSaveException() throws Exception {
+        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        String measureJson = new ObjectMapper().writeValueAsString(measure);
+        given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL);
 
-        EvaluateRule eRule = new EvaluateRule(1,rules);
-
-        Measure measure = new Measure(name,"bevssoj description", Measure.MearuseType.accuracy, org, source, target, eRule,"test1");
-        return measure;
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measure").contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description", is("Create Measure Failed")))
+                .andExpect(jsonPath("$.code", is(401)));
     }
 
 

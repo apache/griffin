@@ -22,20 +22,20 @@ package org.apache.griffin.core.error.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-/**
- * Created by xiangrchen on 7/27/17.
- */
-public abstract class GriffinException extends RuntimeException{
-  @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT,reason="Fail to Connect Kafka")
-  public static class KafkaConnectionException extends GriffinException{
-  }
-  @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT,reason="Fail to Connect Hive")
-  public static class HiveConnectionException extends GriffinException{
-  }
-  @ResponseStatus(value = HttpStatus.NOT_FOUND,reason="Fail to Get HealthInfo")
-  public static class GetHealthInfoFailureException extends GriffinException {
-  }
-  @ResponseStatus(value = HttpStatus.NOT_FOUND,reason="Fail to Get Jobs")
-  public static class GetJobsFailureException extends GriffinException {
-  }
+public abstract class GriffinException extends RuntimeException {
+    @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT, reason = "Fail to Connect Kafka")
+    public static class KafkaConnectionException extends GriffinException {
+    }
+
+    @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT, reason = "Fail to Connect Hive")
+    public static class HiveConnectionException extends GriffinException {
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Fail to Get HealthInfo")
+    public static class GetHealthInfoFailureException extends GriffinException {
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Fail to Get Jobs")
+    public static class GetJobsFailureException extends GriffinException {
+    }
 }

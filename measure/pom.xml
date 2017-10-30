@@ -171,6 +171,12 @@ under the License.
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>javax.mail</artifactId>
+      <version>1.4.4</version>
+    </dependency>
+
   </dependencies>
 
   <build>

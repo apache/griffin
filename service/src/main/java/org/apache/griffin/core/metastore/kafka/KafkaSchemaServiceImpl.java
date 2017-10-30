@@ -33,7 +33,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 
 @Service
-public class KafkaSchemaServiceImpl implements KafkaSchemaService{
+public class KafkaSchemaServiceImpl implements KafkaSchemaService {
 
     private static final Logger log = LoggerFactory.getLogger(KafkaSchemaServiceImpl.class);
 
@@ -45,7 +45,9 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService{
     private String registryUrl(final String path) {
         if (StringUtils.hasText(path)) {
             String usePath = path;
-            if (!path.startsWith("/")) usePath = "/" + path;
+            if (!path.startsWith("/")){
+                usePath = "/" + path;
+            }
             return this.url + usePath;
         }
         return "";
