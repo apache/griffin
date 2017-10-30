@@ -30,7 +30,7 @@ import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.util.GriffinUtil;
+import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,10 +92,12 @@ public class SparkSubmitJob implements Job {
         long currentBlockStartTimestamp = setCurrentBlockStartTimestamp(System.currentTimeMillis());
         LOGGER.info("currentBlockStartTimestamp: {}", currentBlockStartTimestamp);
         try {
-            if (StringUtils.isNotEmpty(sourcePattern))
+            if (StringUtils.isNotEmpty(sourcePattern)) {
                 setAllDataConnectorPartitions(measure.getDataSources(), sourcePattern.split("-"), partitionItems, "source", currentBlockStartTimestamp);
-            if (StringUtils.isNotEmpty(targetPattern))
+            }
+            if (StringUtils.isNotEmpty(targetPattern)) {
                 setAllDataConnectorPartitions(measure.getDataSources(), targetPattern.split("-"), partitionItems, "target", currentBlockStartTimestamp);
+            }
         } catch (Exception e) {
             LOGGER.error("Can not execute job.Set partitions error. {}", e.getMessage());
             return;
@@ -140,8 +142,9 @@ public class SparkSubmitJob implements Job {
     }
 
     private void setAllDataConnectorPartitions(List<DataSource> sources, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
-        if (sources == null)
+        if (sources == null) {
             return;
+        }
         for (DataSource dataSource : sources) {
             setDataSourcePartitions(dataSource, patternItemSet, partitionItems, sourceName, timestamp);
         }
@@ -150,8 +153,9 @@ public class SparkSubmitJob implements Job {
     private void setDataSourcePartitions(DataSource dataSource, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
         String name = dataSource.getName();
         for (DataConnector dataConnector : dataSource.getConnectors()) {
-            if (sourceName.equals(name))
+            if (sourceName.equals(name)) {
                 setDataConnectorPartitions(dataConnector, patternItemSet, partitionItems, timestamp);
+            }
         }
     }
 
@@ -225,8 +229,8 @@ public class SparkSubmitJob implements Job {
         args.add(sparkJobProps.getProperty("sparkJob.args_1"));
         // measure
         String measureJson;
-        measureJson = GriffinUtil.toJson(measure);
-        args.add(measureJson);  //partition
+        measureJson = JsonUtil.toJsonWithFormat(measure);
+        args.add(measureJson);
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));
         sparkJobDO.setArgs(args);
 
@@ -251,29 +255,31 @@ public class SparkSubmitJob implements Job {
         sparkJobDO.setFiles(files);
     }
 
-    private void saveJobInstance(String groupName, String jobName, String result) {
-        //save JobInstance info into DataBase
-        Map<String, Object> resultMap = new HashMap<>();
-        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
-        };
+    public void saveJobInstance(String groupName, String jobName, String result) {
+        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {};
         try {
-            resultMap = GriffinUtil.toEntity(result, type);
+            Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
+            if (resultMap != null) {
+                JobInstance jobInstance = genJobInstance(groupName, jobName, resultMap);
+                jobInstanceRepo.save(jobInstance);
+            }
         } catch (IOException e) {
             LOGGER.error("jobInstance jsonStr convert to map failed. {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Livy status is illegal. {}", e.getMessage());
         }
+    }
+
+    private JobInstance genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException{
         JobInstance jobInstance = new JobInstance();
-        if (resultMap != null) {
-            jobInstance.setGroupName(groupName);
-            jobInstance.setJobName(jobName);
-            try {
-                jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
-                jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
-                jobInstance.setAppId(resultMap.get("appId").toString());
-            } catch (Exception e) {
-                LOGGER.warn("jobInstance has null field. {}", e.getMessage());
-            }
-            jobInstance.setTimestamp(System.currentTimeMillis());
-            jobInstanceRepo.save(jobInstance);
+        jobInstance.setGroupName(groupName);
+        jobInstance.setJobName(jobName);
+        jobInstance.setTimestamp(System.currentTimeMillis());
+        jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
+        jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
+        if (resultMap.get("appId") != null) {
+            jobInstance.setAppId(resultMap.get("appId").toString());
         }
+        return jobInstance;
     }
 }

@@ -1,0 +1,25 @@
+griffin:
+  image: bhlx3lyx7/svc_msr:0.1.6
+  hostname: griffin
+  links:
+    - es
+  environment:
+    ES_HOSTNAME: es
+  ports:
+    - 32122:2122
+    - 38088:8088
+    - 33306:3306
+    - 38042:8042
+    - 39083:9083
+    - 38998:8998
+    - 38080:8080
+  tty: true
+  container_name: griffin
+
+es:
+  image: elasticsearch:5
+  hostname: es
+  ports:
+    - 39200:9200
+    - 39300:9300
+  container_name: es

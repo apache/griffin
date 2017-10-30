@@ -16,11 +16,29 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+import { Injectable } from '@angular/core';
 
-package org.apache.griffin.core.measure.repo;
+@Injectable()
+export class UserService {
 
-import org.apache.griffin.core.measure.entity.DataSource;
-import org.springframework.data.repository.CrudRepository;
+  ntAccount : string;
+  timestamp:Date;
+  setCookie(name, value, days){
+    let expires;
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            console.log(date);
+            expires = "; expires=" + date.toUTCString();
+        } else {
+            expires = "";
+        }
+      // document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+    document.cookie = name + "=" + value + expires + "; path=/";
+  }
 
-public interface DataSourceRepo extends CrudRepository<DataSource,Long> {
+  getCookie(key) {
+    var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+    return keyValue ? keyValue[2] : null;
+  }  
 }

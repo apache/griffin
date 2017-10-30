@@ -22,6 +22,7 @@ package org.apache.griffin.core.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
@@ -30,11 +31,22 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.util.Properties;
 
-public class GriffinUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GriffinUtil.class);
+public class JsonUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtil.class);
 
     public static String toJson(Object obj) {
         ObjectMapper mapper = new ObjectMapper();
+        String jsonStr = null;
+        try {
+            jsonStr = mapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            LOGGER.error("convert to json failed. {}", obj);
+        }
+        return jsonStr;
+    }
+
+    public static String toJsonWithFormat(Object obj) {
+        ObjectWriter mapper = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String jsonStr = null;
         try {
             jsonStr = mapper.writeValueAsString(obj);
@@ -62,16 +74,4 @@ public class GriffinUtil {
         return mapper.readValue(jsonStr, type);
     }
 
-    public static Properties getProperties(String propertiesPath) {
-        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
-        propertiesFactoryBean.setLocation(new ClassPathResource(propertiesPath));
-        Properties properties = null;
-        try {
-            propertiesFactoryBean.afterPropertiesSet();
-            properties = propertiesFactoryBean.getObject();
-        } catch (IOException e) {
-            LOGGER.error("get properties from {} failed. {}", propertiesPath, e.getMessage());
-        }
-        return properties;
-    }
 }

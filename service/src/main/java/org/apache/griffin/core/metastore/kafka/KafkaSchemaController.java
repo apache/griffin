@@ -22,11 +22,15 @@ package org.apache.griffin.core.metastore.kafka;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Config;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
+@Api(tags = "Kafka metastore")
+@ApiIgnore
 @RestController
-@RequestMapping("/metadata/kafka")
+@RequestMapping("/api/v1/metadata/kafka")
 public class KafkaSchemaController {
 
     @Autowired

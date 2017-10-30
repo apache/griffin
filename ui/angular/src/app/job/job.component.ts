@@ -89,7 +89,7 @@ export class JobComponent implements OnInit {
         self.hide();
         setTimeout(function () {
           self.results.splice(self.deleteIndex,1);
-          self.source.load(self.results);
+          // self.source.load(self.results);
         },0);
       }
     },
@@ -113,7 +113,7 @@ export class JobComponent implements OnInit {
         row.showDetail = !row.showDetail;     
         this.allInstances = data;   
         setTimeout(function(){
-          console.log($('.pagination'));
+          // console.log($('.pagination'));
           $('.pagination').css("marginBottom","-10px");
         },0);
 

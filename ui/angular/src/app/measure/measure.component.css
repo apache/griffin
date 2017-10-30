@@ -25,6 +25,9 @@ under the License.
 	font-size:18px;
 }
 
+.po{
+  cursor: pointer;
+}
 .ng2-st-actions-title .ng2-smart-title{
 	color:#1e6bb8;
 }

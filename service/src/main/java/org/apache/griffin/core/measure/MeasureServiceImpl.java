@@ -81,8 +81,9 @@ public class MeasureServiceImpl implements MeasureService {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
         if (aliveMeasureList.size() == 0) {
             try {
-                if (measureRepo.save(measure) != null)
+                if (measureRepo.save(measure) != null) {
                     return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
+                }
                 else {
                     return GriffinOperationMessage.CREATE_MEASURE_FAIL;
                 }
@@ -98,17 +99,11 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public List<Map<String, String>> getAllAliveMeasureNameIdByOwner(String owner) {
-        List<Map<String, String>> res = new ArrayList<>();
-        for (Measure measure : measureRepo.findByOwnerAndDeleted(owner, false)) {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("name", measure.getName());
-            map.put("id", measure.getId().toString());
-            res.add(map);
-        }
-        return res;
+    public List<Measure> getAliveMeasuresByOwner(String owner) {
+        return measureRepo.findByOwnerAndDeleted(owner, false);
     }
 
+    @Override
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         if (!measureRepo.exists(measure.getId())) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;

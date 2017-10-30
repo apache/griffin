@@ -19,7 +19,8 @@ under the License.
 
 package org.apache.griffin.core.config.jobConfig;
 
-import org.apache.griffin.core.util.GriffinUtil;
+import org.apache.griffin.core.util.JsonUtil;
+import org.apache.griffin.core.util.PropertiesUtil;
 import org.quartz.spi.JobFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -53,6 +54,6 @@ public class SchedulerConfig {
 
 	@Bean
 	public Properties quartzProperties() {
-		return GriffinUtil.getProperties("/quartz.properties");
+		return PropertiesUtil.getProperties("/quartz.properties");
 	}
 }

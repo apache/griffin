@@ -17,10 +17,20 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.measure.config.params.env
 
-import org.apache.griffin.core.measure.entity.Rule;
-import org.springframework.data.repository.CrudRepository;
+import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
+import org.apache.griffin.measure.config.params.Param
 
-public interface RuleRepo extends CrudRepository<Rule,Long> {
+/**
+  * Created by xiaoqiu.duan on 2017/10/23.
+  */
+@JsonInclude(Include.NON_NULL)
+case class SMSParam(@JsonProperty("host") host: String,
+                    @JsonProperty("id") id: String,
+                    @JsonProperty("key") key: String,
+                    @JsonProperty("UUID") uuid: String
+                     ) extends Param {
+
 }

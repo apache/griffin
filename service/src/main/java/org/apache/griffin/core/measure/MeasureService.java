@@ -46,7 +46,7 @@ public interface MeasureService {
 
     GriffinOperationMessage updateMeasure(Measure measure);
 
-    List<Map<String, String>> getAllAliveMeasureNameIdByOwner(String owner);
+    List<Measure> getAliveMeasuresByOwner(String owner);
 
     GriffinOperationMessage createMeasure(Measure measure);
 }

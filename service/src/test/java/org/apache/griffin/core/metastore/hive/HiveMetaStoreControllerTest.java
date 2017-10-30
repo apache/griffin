@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
+import org.apache.griffin.core.util.URLHelper;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,20 +58,11 @@ public class HiveMetaStoreControllerTest {
         String dbName = "default";
         given(hiveMetaStoreService.getAllDatabases()).willReturn(Arrays.asList(dbName));
 
-        mockMvc.perform(get("/metadata/hive/db"))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/dbs"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0]", is(dbName)));
     }
 
-    @Test
-    public void testGetDefAllTables() throws Exception {
-        String tableName = "table";
-        given(hiveMetaStoreService.getAllTableNames("")).willReturn(Arrays.asList(tableName));
-
-        mockMvc.perform(get("/metadata/hive/table"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0]", is(tableName)));
-    }
 
     @Test
     public void testGetAllTableNames() throws Exception {
@@ -78,7 +70,7 @@ public class HiveMetaStoreControllerTest {
         String tableName = "table";
         given(hiveMetaStoreService.getAllTableNames(dbName)).willReturn(Arrays.asList(tableName));
 
-        mockMvc.perform(get("/metadata/hive/allTableNames").param("db", dbName))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/tables/names").param("db", dbName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0]", is(tableName)));
     }
@@ -88,7 +80,7 @@ public class HiveMetaStoreControllerTest {
         String dbName = "default";
         given(hiveMetaStoreService.getAllTable(dbName)).willReturn(Arrays.asList(new Table()));
 
-        mockMvc.perform(get("/metadata/hive/db/allTables").param("db", dbName))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/tables").param("db", dbName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].tableName", is(nullValue())));
     }
@@ -99,21 +91,11 @@ public class HiveMetaStoreControllerTest {
         results.put("table", new ArrayList<>());
         given(hiveMetaStoreService.getAllTable()).willReturn(results);
 
-        mockMvc.perform(get("/metadata/hive/allTables"))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/dbs/tables"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.table", hasSize(0)));
     }
 
-    @Test
-    public void testGetDefTable() throws Exception {
-        String dbName = "";
-        String tableName = "table";
-        given(hiveMetaStoreService.getTable(dbName, tableName)).willReturn(new Table(tableName, null, null, 0, 0, 0, null, null, null, null, null, null));
-
-        mockMvc.perform(get("/metadata/hive/default/{table}", tableName))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.tableName", is(tableName)));
-    }
 
     @Test
     public void testGetTable() throws Exception {
@@ -121,7 +103,7 @@ public class HiveMetaStoreControllerTest {
         String tableName = "table";
         given(hiveMetaStoreService.getTable(dbName, tableName)).willReturn(new Table(tableName, null, null, 0, 0, 0, null, null, null, null, null, null));
 
-        mockMvc.perform(get("/metadata/hive").param("db", dbName).param("table", tableName))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/table").param("db", dbName).param("table", tableName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tableName", is(tableName)));
     }

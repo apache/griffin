@@ -20,16 +20,18 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class DataSource extends AuditableEntity {
+public class DataSource extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017079815794L;
 
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "dataSource_id")
     private List<DataConnector> connectors;
 

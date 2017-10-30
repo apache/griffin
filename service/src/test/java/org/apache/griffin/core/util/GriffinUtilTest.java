@@ -40,14 +40,15 @@ public class GriffinUtilTest {
     @Test
     public void testToJson() {
         JobHealth jobHealth = new JobHealth(5, 10);
-        String jobHealthStr = GriffinUtil.toJson(jobHealth);
+        String jobHealthStr = JsonUtil.toJson(jobHealth);
+        System.out.println(jobHealthStr);
         assertEquals(jobHealthStr, "{\"healthyJobCount\":5,\"jobCount\":10}");
     }
 
     @Test
     public void testToEntityWithParamClass() throws IOException {
         String str = "{\"healthyJobCount\":5,\"jobCount\":10}";
-        JobHealth jobHealth = GriffinUtil.toEntity(str, JobHealth.class);
+        JobHealth jobHealth = JsonUtil.toEntity(str, JobHealth.class);
         assertEquals(jobHealth.getJobCount(), 10);
         assertEquals(jobHealth.getHealthyJobCount(), 5);
     }
@@ -57,20 +58,26 @@ public class GriffinUtilTest {
         String str = "{\"aaa\":12, \"bbb\":13}";
         TypeReference<HashMap<String, Integer>> type = new TypeReference<HashMap<String, Integer>>() {
         };
-        Map map = GriffinUtil.toEntity(str, type);
+        Map map = JsonUtil.toEntity(str, type);
         assertEquals(map.get("aaa"), 12);
     }
 
     @Test
     public void testGetPropertiesForSuccess() {
-        Properties properties = GriffinUtil.getProperties("/quartz.properties");
+        Properties properties = PropertiesUtil.getProperties("/quartz.properties");
         assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
     }
 
     @Test
     public void testGetPropertiesForFailWithWrongPath() {
-        Properties properties = GriffinUtil.getProperties(".././quartz.properties");
+        Properties properties = PropertiesUtil.getProperties(".././quartz.properties");
         assertEquals(properties, null);
     }
 
+    @Test
+    public void testToJsonWithFormat() {
+        JobHealth jobHealth = new JobHealth(5, 10);
+        String jobHealthStr = JsonUtil.toJsonWithFormat(jobHealth);
+        System.out.println(jobHealthStr);
+    }
 }

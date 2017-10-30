@@ -60,15 +60,15 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     }
 
     private String getUseDbName(String dbName) {
-        if (!StringUtils.hasText(dbName))
+        if (!StringUtils.hasText(dbName)) {
             return defaultDbName;
-        else
+        } else {
             return dbName;
+        }
     }
 
     @Override
-    @Cacheable
-
+    @Cacheable(key = "#root.methodName")
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
@@ -82,7 +82,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName.concat(#dbName)")
     public Iterable<String> getAllTableNames(String dbName) {
         Iterable<String> results = null;
         try {
@@ -96,20 +96,26 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName.concat(#db)")
     public List<Table> getAllTable(String db) {
         return getTables(db);
     }
 
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName")
     public Map<String, List<Table>> getAllTable() {
         Map<String, List<Table>> results = new HashMap<>();
-        Iterable<String> dbs = getAllDatabases();
+        Iterable<String> dbs = null;
+        // if hive.metastore.uris in application.properties configs wrong, client will be injected failure and will be null.
+        if (client != null) {
+            dbs = getAllDatabases();
+            LOGGER.error("hive client is null.Please check your hive config.");
+        }
         //MetaException happens
-        if (dbs == null)
+        if (dbs == null) {
             return results;
+        }
         for (String db : dbs) {
             results.put(db, getTables(db));
         }
@@ -118,7 +124,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName.concat(#dbName).concat(#tableName)")
     public Table getTable(String dbName, String tableName) {
         Table result = null;
         try {

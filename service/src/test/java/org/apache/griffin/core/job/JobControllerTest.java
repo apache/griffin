@@ -24,6 +24,7 @@ import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.apache.griffin.core.util.URLHelper;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,6 +61,7 @@ public class JobControllerTest {
     public void setup() {
     }
 
+
     @Test
     public void testGetJobs() throws Exception {
         Map<String, Serializable> map = new HashMap<>();
@@ -67,7 +69,7 @@ public class JobControllerTest {
         map.put("groupName", "BA");
         given(service.getAliveJobs()).willReturn(Arrays.asList(map));
 
-        mvc.perform(get("/jobs/").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].jobName", is("job1")));
     }
@@ -81,13 +83,13 @@ public class JobControllerTest {
         String schedulerRequestBodyJson = new ObjectMapper().writeValueAsString(jobRequestBody);
         given(service.addJob(groupName, jobName, measureId, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS);
 
-        mvc.perform(post("/jobs").param("group", groupName).param("jobName", jobName)
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs").param("group", groupName).param("jobName", jobName)
                 .param("measureId", String.valueOf(measureId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(schedulerRequestBodyJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(205)))
-                .andExpect(jsonPath("$.description", is("CREATE Job Succeed")))
+                .andExpect(jsonPath("$.description", is("Create Job Succeed")))
                 .andDo(print());
     }
 
@@ -100,7 +102,7 @@ public class JobControllerTest {
         String schedulerRequestBodyJson = new ObjectMapper().writeValueAsString(jobRequestBody);
         given(service.addJob(groupName, jobName, measureId, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_FAIL);
 
-        mvc.perform(post("/jobs").param("group", groupName).param("jobName", jobName)
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs").param("group", groupName).param("jobName", jobName)
                 .param("measureId", String.valueOf(measureId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(schedulerRequestBodyJson))
@@ -116,7 +118,7 @@ public class JobControllerTest {
         String jobName = "job1";
         given(service.deleteJob(groupName, jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_SUCCESS);
 
-        mvc.perform(delete("/jobs").param("group", groupName).param("jobName", jobName))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("group", groupName).param("jobName", jobName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(206)))
                 .andExpect(jsonPath("$.description", is("Delete Job Succeed")));
@@ -128,7 +130,7 @@ public class JobControllerTest {
         String jobName = "job1";
         given(service.deleteJob(groupName, jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_FAIL);
 
-        mvc.perform(delete("/jobs").param("group", groupName).param("jobName", jobName))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("group", groupName).param("jobName", jobName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(406)))
                 .andExpect(jsonPath("$.description", is("Delete Job Failed")));
@@ -143,7 +145,7 @@ public class JobControllerTest {
         JobInstance jobInstance = new JobInstance(groupName, jobName, 1, LivySessionStates.State.running, "", "", System.currentTimeMillis());
         given(service.findInstancesOfJob(groupName, jobName, page, size)).willReturn(Arrays.asList(jobInstance));
 
-        mvc.perform(get("/jobs/instances").param("group", groupName).param("jobName", jobName)
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param("group", groupName).param("jobName", jobName)
                 .param("page", String.valueOf(page)).param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].groupName", is("BA")));
@@ -154,7 +156,7 @@ public class JobControllerTest {
         JobHealth jobHealth = new JobHealth(1, 3);
         given(service.getHealthInfo()).willReturn(jobHealth);
 
-        mvc.perform(get("/jobs/health"))
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.healthyJobCount", is(1)));
     }

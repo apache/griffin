@@ -39,15 +39,14 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance, Long> {
      * the prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.
      */
     @Query("select s from JobInstance s " +
-            "where s.groupName= ?1 and s.jobName=?2 "/*+
-            "order by s.timestamp desc"*/)
+            "where s.groupName= ?1 and s.jobName=?2 ")
     List<JobInstance> findByGroupNameAndJobName(String group, String name, Pageable pageable);
 
     @Query("select s from JobInstance s " +
             "where s.groupName= ?1 and s.jobName=?2 ")
     List<JobInstance> findByGroupNameAndJobName(String group, String name);
 
-    @Query("select DISTINCT s.groupName, s.jobName, s.id from JobInstance s")
+    @Query("select DISTINCT s.groupName, s.jobName from JobInstance s")
     List<Object> findGroupWithJobName();
 
     @Modifying
@@ -58,6 +57,6 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance, Long> {
     @Modifying
     @Query("update JobInstance s " +
             "set s.state= ?2, s.appId= ?3, s.appUri= ?4 where s.id= ?1")
-    void update(Long Id, LivySessionStates.State state, String appId, String appUri);
+    void update(Long id, LivySessionStates.State state, String appId, String appUri);
 
 }

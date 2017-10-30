@@ -48,15 +48,18 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <literal-nan> ::= nan
     *
     * -- selection --
-    * <selection> ::= <selection-head> [ <field-sel> | <index-sel> | <function-sel> ]*
-    * <selection-head> ::= ("data source name registered") | <function>
+    * <selection> ::= <selection-head> [ <field-sel> | <index-sel> | <function-sel> ]* [<as-alias>]?
+    * <selection-head> ::= ("data source name registered") | <function> | <field-name> | <all-selection>
     * <field-sel> ::= "." <field-name> | "[" <quote-field-name> "]"
     * <index-sel> ::= "[" <arg> "]"
     * <function-sel> ::= "." <function-name> "(" [<arg>]? [, <arg>]* ")"
     * <arg> ::= <math-expr>
     *
+    * -- as alias --
+    * <as-alias> ::= <as> <field-name>
+    *
     * -- math expr --
-    * <math-factor> ::= <literal> | <alias-expr> | <function> | <selection> | "(" <math-expr> ")"
+    * <math-factor> ::= <literal> | <function> | <selection> | "(" <math-expr> ")" [<as-alias>]?
     * <unary-math-expr> ::= [<unary-opr>]* <math-factor>
     * <binary-math-expr> ::= <unary-math-expr> [<binary-opr> <unary-math-expr>]+
     * <math-expr> ::= <binary-math-expr>
@@ -69,7 +72,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <is-null-expr> ::= <math-expr> <is> [<not>]? <null>
     * <is-nan-expr> ::= <math-expr> <is> [<not>]? <nan>
     *
-    * <logical-factor> ::= <math-expr> | <in-expr> | <between-expr> | <like-expr> | <is-null-expr> | <is-nan-expr> | "(" <logical-expr> ")"
+    * <logical-factor> ::= <math-expr> | <in-expr> | <between-expr> | <like-expr> | <is-null-expr> | <is-nan-expr> | "(" <logical-expr> ")" [<as-alias>]?
     * <unary-logical-expr> ::= [<unary-logical-opr>]* <logical-factor>
     * <binary-logical-expr> ::= <unary-logical-expr> [<binary-logical-opr> <unary-logical-expr>]+
     * <logical-expr> ::= <binary-logical-expr>
@@ -78,15 +81,30 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <expr> = <math-expr> | <logical-expr>
     *
     * -- function expr --
-    * <function> ::= <function-name> "(" [<arg>] [, <arg>]+ ")"
+    * <function> ::= <function-name> "(" [<arg>] [, <arg>]+ ")" [<as-alias>]?
     * <function-name> ::= ("function name registered")
     * <arg> ::= <expr>
     *
-    * -- alias expr --
-    * <alias-expr> = <expr> <as> <name>
+    * -- clauses --
+    * <select-clause> = <expr> [, <expr>]*
+    * <where-clause> = <where> <expr>
+    * <from-clause> = <from> ("data source name registered")
+    * <having-clause> = <having> <expr>
+    * <groupby-clause> = <group> <by> <expr> [ <having-clause> ]?
+    * <orderby-item> = <expr> [ <DESC> ]?
+    * <orderby-clause> = <order> <by> <orderby-item> [ , <orderby-item> ]*
+    * <limit-clause> = <limit> <expr>
+    *
+    * -- combined clauses --
+    * <combined-clauses> = <select-clause> [ <from-clause> ]+ [ <where-clause> ]+ [ <groupby-clause> ]+ [ <orderby-clause> ]+ [ <limit-clause> ]+
     */
 
-  protected def genNamesParser(names: Seq[String]): Parser[String] = {
+  protected def genDataSourceNamesParser(names: Seq[String]): Parser[String] = {
+    names.reverse.map {
+      fn => s"""(?i)`${fn}`|${fn}""".r: Parser[String]
+    }.reduce(_ | _)
+  }
+  protected def genFunctionNamesParser(names: Seq[String]): Parser[String] = {
     names.reverse.map {
       fn => s"""(?i)${fn}""".r: Parser[String]
     }.reduce(_ | _)
@@ -143,9 +161,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   object Strings {
     def AnyString: Parser[String] = """"(?:[^\"]|\")*"""".r | """'(?:[^']|\')*'""".r
     def UQuoteTableFieldName: Parser[String] = """`(?:[^`]|[\\][`])*`""".r
-    def TableFieldName: Parser[String] = UQuoteTableFieldName | """[a-zA-Z_]\w*""".r
-    def DataSourceName: Parser[String] = genNamesParser(dataSourceNames)
-    def FunctionName: Parser[String] = genNamesParser(functionNames)
+    def FieldName: Parser[String] = UQuoteTableFieldName | """[a-zA-Z_]\w*""".r
+    def DataSourceName: Parser[String] = genDataSourceNamesParser(dataSourceNames)
+    def FunctionName: Parser[String] = genFunctionNamesParser(functionNames)
 
     def IntegerNumber: Parser[String] = """[+\-]?\d+""".r
     def DoubleNumber: Parser[String] = """[+\-]?(\.\d+|\d+\.\d*)""".r
@@ -176,8 +194,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
 
   /**
     * -- selection --
-    * <selection> ::= <selection-head> [ <field-sel> | <index-sel> | <function-sel> ]*
-    * <selection-head> ::= ("data source name registered") | <function>
+    * <selection> ::= <selection-head> [ <field-sel> | <index-sel> | <function-sel> ]* [<as-alias>]?
+    * <selection-head> ::= ("data source name registered") | <function> | <field-name> | <all-selection>
     * <field-sel> ::= "." <field-name> | "[" <quote-field-name> "]"
     * <index-sel> ::= "[" <arg> "]"
     * <function-sel> ::= "." <function-name> "(" [<arg>]? [, <arg>]* ")"
@@ -191,24 +209,28 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     DataSourceHeadExpr(_)
   } | function ^^ {
     OtherHeadExpr(_)
-  } | TableFieldName ^^ {
+  } | FieldName ^^ {
     FieldNameHeadExpr(_)
   } | ALLSL ^^ { _ =>
     ALLSelectHeadExpr()
   }
   def selector: Parser[SelectExpr] = functionSelect | allFieldsSelect | fieldSelect | indexSelect
   def allFieldsSelect: Parser[AllFieldsSelectExpr] = DOT ~> ALLSL ^^ { _ => AllFieldsSelectExpr() }
-  def fieldSelect: Parser[FieldSelectExpr] = DOT ~> TableFieldName ^^ { FieldSelectExpr(_) }
+  def fieldSelect: Parser[FieldSelectExpr] = DOT ~> FieldName ^^ { FieldSelectExpr(_) }
   def indexSelect: Parser[IndexSelectExpr] = LSQBR ~> argument <~ RSQBR ^^ { IndexSelectExpr(_) }
   def functionSelect: Parser[FunctionSelectExpr] = DOT ~ FunctionName ~ LBR ~ repsep(argument, COMMA) ~ RBR ^^ {
     case _ ~ name ~ _ ~ args ~ _ => FunctionSelectExpr(name, args)
   }
 
-  def asAlias: Parser[String] = AS ~> TableFieldName
+  /**
+    * -- as alias --
+    * <as-alias> ::= <as> <field-name>
+    */
+  def asAlias: Parser[String] = AS ~> FieldName
 
   /**
     * -- math expr --
-    * <math-factor> ::= <literal> | <alias-expr> | <function> | <selection> | "(" <math-expr> ")"
+    * <math-factor> ::= <literal> | <function> | <selection> | "(" <math-expr> ")" [<as-alias>]?
     * <unary-math-expr> ::= [<unary-opr>]* <math-factor>
     * <binary-math-expr> ::= <unary-math-expr> [<binary-opr> <unary-math-expr>]+
     * <math-expr> ::= <binary-math-expr>
@@ -243,7 +265,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <is-null-expr> ::= <math-expr> <is> [<not>]? <null>
     * <is-nan-expr> ::= <math-expr> <is> [<not>]? <nan>
     *
-    * <logical-factor> ::= <math-expr> | <in-expr> | <between-expr> | <like-expr> | <is-null-expr> | <is-nan-expr> | "(" <logical-expr> ")"
+    * <logical-factor> ::= <math-expr> | <in-expr> | <between-expr> | <like-expr> | <is-null-expr> | <is-nan-expr> | "(" <logical-expr> ")" [<as-alias>]?
     * <unary-logical-expr> ::= [<unary-logical-opr>]* <logical-factor>
     * <binary-logical-expr> ::= <unary-logical-expr> [<binary-logical-opr> <unary-logical-expr>]+
     * <logical-expr> ::= <binary-logical-expr>
@@ -296,7 +318,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
 
   /**
     * -- function expr --
-    * <function> ::= <function-name> "(" [<arg>] [, <arg>]+ ")"
+    * <function> ::= <function-name> "(" [<arg>] [, <arg>]+ ")" [<as-alias>]?
     * <function-name> ::= ("function name registered")
     * <arg> ::= <expr>
     */
@@ -310,6 +332,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * -- clauses --
     * <select-clause> = <expr> [, <expr>]*
     * <where-clause> = <where> <expr>
+    * <from-clause> = <from> ("data source name registered")
     * <having-clause> = <having> <expr>
     * <groupby-clause> = <group> <by> <expr> [ <having-clause> ]?
     * <orderby-item> = <expr> [ <DESC> ]?
@@ -318,7 +341,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     */
 
   def selectClause: Parser[SelectClause] = opt(SELECT) ~> rep1sep(expression, COMMA) ^^ { SelectClause(_) }
-  def fromClause: Parser[FromClause] = FROM ~> TableFieldName ^^ { ds => FromClause(trim(ds)) }
+  def fromClause: Parser[FromClause] = FROM ~> DataSourceName ^^ { ds => FromClause(trim(ds)) }
   def whereClause: Parser[WhereClause] = WHERE ~> expression ^^ { WhereClause(_) }
   def havingClause: Parser[Expr] = HAVING ~> expression
   def groupbyClause: Parser[GroupbyClause] = GROUP ~ BY ~ rep1sep(expression, COMMA) ~ opt(havingClause) ^^ {
