@@ -26,10 +26,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public enum GriffinOperationMessage {
     //success
     CREATE_MEASURE_SUCCESS(201, "Create Measure Succeed"),
-    DELETE_MEASURE_BY_ID_SUCCESS(202, "Delete Measures By Name Succeed"),
+    DELETE_MEASURE_BY_ID_SUCCESS(202, "Delete Measures By Id Succeed"),
     DELETE_MEASURE_BY_NAME_SUCCESS(203, "Delete Measures By Name Succeed"),
     UPDATE_MEASURE_SUCCESS(204, "Update Measure Succeed"),
-    CREATE_JOB_SUCCESS(205, "CREATE Job Succeed"),
+    CREATE_JOB_SUCCESS(205, "Create Job Succeed"),
     DELETE_JOB_SUCCESS(206, "Delete Job Succeed"),
     SET_JOB_DELETED_STATUS_SUCCESS(207, "Set Job Deleted Status Succeed"),
     PAUSE_JOB_SUCCESS(208, "Pause Job Succeed"),
@@ -38,7 +38,7 @@ public enum GriffinOperationMessage {
     //failed
     RESOURCE_NOT_FOUND(400, "Resource Not Found"),
     CREATE_MEASURE_FAIL(401, "Create Measure Failed"),
-    DELETE_MEASURE_BY_ID_FAIL(402, "Delete Measures By Name Failed"),
+    DELETE_MEASURE_BY_ID_FAIL(402, "Delete Measures By Id Failed"),
     DELETE_MEASURE_BY_NAME_FAIL(403, "Delete Measures By Name Failed"),
     UPDATE_MEASURE_FAIL(404, "Update Measure Failed"),
     CREATE_JOB_FAIL(405, "Create Job Failed"),

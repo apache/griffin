@@ -41,6 +41,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -49,6 +52,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 @RunWith(SpringRunner.class)
@@ -89,7 +93,7 @@ public class JobServiceImplTest {
         given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("group"));
         HashSet<JobKey> set = new HashSet<>();
         set.add(new JobKey("name", "group"));
-        given(scheduler.getJobKeys(GroupMatcher.jobGroupEquals("group"))).willReturn(set);
+        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn(set);
         List<Trigger> triggers = Arrays.asList(newTriggerInstance("name", "group", 3000));
         JobKey jobKey = set.iterator().next();
         given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
@@ -117,7 +121,7 @@ public class JobServiceImplTest {
         given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("group"));
         HashSet<JobKey> set = new HashSet<>();
         set.add(new JobKey("name", "group"));
-        given(scheduler.getJobKeys(GroupMatcher.jobGroupEquals("group"))).willReturn(set);
+        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn(set);
         JobKey jobKey = set.iterator().next();
         GriffinException.GetJobsFailureException exception = getTriggersOfJobExpectException(scheduler, jobKey);
         assertTrue(exception != null);
@@ -204,6 +208,20 @@ public class JobServiceImplTest {
         assertEquals(service.findInstancesOfJob(groupName, jobName, page, size).size(), 1);
     }
 
+//    @Test
+//    public void testSyncInstancesOfJob() {
+//        JobInstance instance = newJobInstance();
+//        instance.setSessionId(1234564);
+//        String group = "groupName";
+//        String jobName = "jobName";
+//        RestTemplate restTemplate = mock(RestTemplate.class);
+//        given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+//        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+//        given(restTemplate.getForObject("uri", String.class)).willThrow(RestClientException.class);
+//        RestClientException restClientException = getJobInstanceStatusExpectException();
+//        assert (restClientException != null);
+//    }
+
     @Test
     public void testGetHealthInfoWithHealthy() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
@@ -212,7 +230,7 @@ public class JobServiceImplTest {
         JobKey jobKey = new JobKey("test");
         Set<JobKey> jobKeySet = new HashSet<>();
         jobKeySet.add(jobKey);
-        given(scheduler.getJobKeys(GroupMatcher.jobGroupEquals("BA"))).willReturn((jobKeySet));
+        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn((jobKeySet));
 
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
         List<JobInstance> scheduleStateList = new ArrayList<>();
@@ -246,6 +264,16 @@ public class JobServiceImplTest {
                 withSchedule(SimpleScheduleBuilder.simpleSchedule()
                         .withIntervalInSeconds(internalInSeconds)
                         .repeatForever()).startAt(new Date()).build();
+    }
+
+    private RestClientException getJobInstanceStatusExpectException() {
+        RestClientException exception = null;
+        try {
+            service.syncInstancesOfAllJobs();
+        } catch (RestClientException e) {
+            exception = e;
+        }
+        return exception;
     }
 
     private GriffinException.GetJobsFailureException getTriggersOfJobExpectException(Scheduler scheduler, JobKey jobKey) {

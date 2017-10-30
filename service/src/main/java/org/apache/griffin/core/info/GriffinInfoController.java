@@ -17,36 +17,22 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure;
+package org.apache.griffin.core.info;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.util.GriffinOperationMessage;
+@Api(tags = "Basic introduce", description = "griffin version")
+@RestController
+@RequestMapping("/api/v1")
+public class GriffinInfoController {
 
-import java.util.List;
-import java.util.Map;
-
-public interface MeasureService {
-
-    Iterable<Measure> getAllAliveMeasures();
-
-    Measure getMeasureById(long id);
-
-/*
-    Measure getMeasureByName(String measureName);
-*/
-
-
-    GriffinOperationMessage deleteMeasureById(Long id);
-
-
-/*
-    GriffinOperationMessage deleteMeasureByName(String measureName) ;
-*/
-
-    GriffinOperationMessage updateMeasure(Measure measure);
-
-    List<Measure> getAliveMeasuresByOwner(String owner);
-
-    GriffinOperationMessage createMeasure(Measure measure);
+    @ApiOperation(value = "Get griffin version", response = String.class)
+    @RequestMapping(value = "/version", method = RequestMethod.GET)
+    public String greeting() {
+        return "0.1.0";
+    }
 }

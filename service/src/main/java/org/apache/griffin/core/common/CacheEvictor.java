@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +38,6 @@ public class CacheEvictor {
     public void evictHiveCache() {
         LOGGER.info("Evict hive cache");
         hiveMetaStoreService.getAllTable();
-        LOGGER.info("After evict hive cache,automatically get hive tables to cache again.");
+        LOGGER.info("After evict hive cache,automatically refresh hive tables cache.");
     }
 }

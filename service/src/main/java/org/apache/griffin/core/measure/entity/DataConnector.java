@@ -22,7 +22,7 @@ package org.apache.griffin.core.measure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.griffin.core.util.GriffinUtil;
+import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,7 @@ public class DataConnector extends AbstractAuditableEntity {
         };
         if (this.configInMaps == null) {
             try {
-                this.configInMaps = GriffinUtil.toEntity(config, mapType);
+                this.configInMaps = JsonUtil.toEntity(config, mapType);
             } catch (IOException e) {
                 LOGGER.error("Error in converting json to map. {}", e.getMessage());
             }
@@ -61,7 +61,7 @@ public class DataConnector extends AbstractAuditableEntity {
     }
 
     public void setConfig(Map<String, String> configInMaps) throws JsonProcessingException {
-        this.config = GriffinUtil.toJson(configInMaps);
+        this.config = JsonUtil.toJson(configInMaps);
     }
 
     public Map<String, String> getConfig() {
@@ -95,7 +95,7 @@ public class DataConnector extends AbstractAuditableEntity {
         TypeReference<Map<String, String>> mapType = new TypeReference<Map<String, String>>() {
         };
         try {
-            this.configInMaps = GriffinUtil.toEntity(config, mapType);
+            this.configInMaps = JsonUtil.toEntity(config, mapType);
         } catch (IOException e) {
             LOGGER.error("Error in converting json to map. {}", e.getMessage());
         }
