@@ -155,6 +155,11 @@ under the License.
                                 <exclude>**/velocity.log*</exclude>
                                 <exclude>**/*.json</exclude>
                                 <exclude>**/bower_components/**</exclude>
+                                <exclude>**/node_modules/**</exclude>
+                                <exclude>**/.tmp/**</exclude>
+                                <exclude>**/angular/src/assets/.gitkeep</exclude>
+                                <exclude>**/angular/.editorconfig</exclude>
+                                <exclude>**/dist/**</exclude>
                                 <exclude>**/.bowerrc</exclude>
                                 <exclude>**/src/main/resources/public/**</exclude>
                                 <exclude>**/pom.xml.releaseBackup</exclude>
