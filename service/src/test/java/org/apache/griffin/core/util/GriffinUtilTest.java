@@ -20,14 +20,11 @@ under the License.
 package org.apache.griffin.core.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.gson.Gson;
 import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.metastore.hive.entity.HiveDebugTable;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -43,7 +40,7 @@ public class GriffinUtilTest {
     @Test
     public void testToJson() {
         JobHealth jobHealth = new JobHealth(5, 10);
-        String jobHealthStr = GriffinUtil.toJson(jobHealth);
+        String jobHealthStr = JsonUtil.toJson(jobHealth);
         System.out.println(jobHealthStr);
         assertEquals(jobHealthStr, "{\"healthyJobCount\":5,\"jobCount\":10}");
     }
@@ -51,7 +48,7 @@ public class GriffinUtilTest {
     @Test
     public void testToEntityWithParamClass() throws IOException {
         String str = "{\"healthyJobCount\":5,\"jobCount\":10}";
-        JobHealth jobHealth = GriffinUtil.toEntity(str, JobHealth.class);
+        JobHealth jobHealth = JsonUtil.toEntity(str, JobHealth.class);
         assertEquals(jobHealth.getJobCount(), 10);
         assertEquals(jobHealth.getHealthyJobCount(), 5);
     }
@@ -61,34 +58,26 @@ public class GriffinUtilTest {
         String str = "{\"aaa\":12, \"bbb\":13}";
         TypeReference<HashMap<String, Integer>> type = new TypeReference<HashMap<String, Integer>>() {
         };
-        Map map = GriffinUtil.toEntity(str, type);
+        Map map = JsonUtil.toEntity(str, type);
         assertEquals(map.get("aaa"), 12);
     }
 
     @Test
     public void testGetPropertiesForSuccess() {
-        Properties properties = GriffinUtil.getProperties("/quartz.properties");
+        Properties properties = PropertiesUtil.getProperties("/quartz.properties");
         assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
     }
 
     @Test
     public void testGetPropertiesForFailWithWrongPath() {
-        Properties properties = GriffinUtil.getProperties(".././quartz.properties");
+        Properties properties = PropertiesUtil.getProperties(".././quartz.properties");
         assertEquals(properties, null);
     }
 
     @Test
     public void testToJsonWithFormat() {
         JobHealth jobHealth = new JobHealth(5, 10);
-        String jobHealthStr = GriffinUtil.toJsonWithFormat(jobHealth);
+        String jobHealthStr = JsonUtil.toJsonWithFormat(jobHealth);
         System.out.println(jobHealthStr);
-    }
-
-    @Test
-    public void testToEntityFromFile() throws Exception {
-        Gson gson=new Gson();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new ClassPathResource("hive_tables.json").getInputStream()));
-        HiveDebugTable table=gson.fromJson(reader,HiveDebugTable.class);
-        assertEquals(table.getDbTables().size(),2);
     }
 }

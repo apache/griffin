@@ -99,15 +99,8 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public List<Map<String, String>> getAllAliveMeasureNameIdByOwner(String owner) {
-        List<Map<String, String>> res = new ArrayList<>();
-        for (Measure measure : measureRepo.findByOwnerAndDeleted(owner, false)) {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("name", measure.getName());
-            map.put("id", measure.getId().toString());
-            res.add(map);
-        }
-        return res;
+    public List<Measure> getAliveMeasuresByOwner(String owner) {
+        return measureRepo.findByOwnerAndDeleted(owner, false);
     }
 
     @Override

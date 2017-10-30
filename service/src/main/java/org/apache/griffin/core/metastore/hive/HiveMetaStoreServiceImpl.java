@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import org.apache.griffin.core.util.GriffinUtil;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -32,8 +31,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
-import javax.ws.rs.POST;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +40,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
-//@Service
+@Service
 @CacheConfig(cacheNames = "hive")
 public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
@@ -71,7 +68,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     }
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName")
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
@@ -85,7 +82,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName.concat(#dbName)")
     public Iterable<String> getAllTableNames(String dbName) {
         Iterable<String> results = null;
         try {
@@ -99,21 +96,21 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName.concat(#db)")
     public List<Table> getAllTable(String db) {
         return getTables(db);
     }
 
 
-
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName")
     public Map<String, List<Table>> getAllTable() {
         Map<String, List<Table>> results = new HashMap<>();
         Iterable<String> dbs = null;
         // if hive.metastore.uris in application.properties configs wrong, client will be injected failure and will be null.
         if (client != null) {
             dbs = getAllDatabases();
+            LOGGER.error("hive client is null.Please check your hive config.");
         }
         //MetaException happens
         if (dbs == null) {
@@ -127,7 +124,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(key = "#root.methodName.concat(#dbName).concat(#tableName)")
     public Table getTable(String dbName, String tableName) {
         Table result = null;
         try {
