@@ -19,6 +19,9 @@ under the License.
 
 package org.apache.griffin.core.login;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +32,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
+@Api(tags = "Auth", description = "user authentication")
 @RestController
 @RequestMapping("/api/v1/login")
 public class LoginController {
@@ -42,8 +47,11 @@ public class LoginController {
     @Autowired
     private Environment env;
 
+    @ApiOperation(value = "Get all jobs", response = ResponseEntity.class)
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> map) {
+    public ResponseEntity<Map<String, Object>> login(
+            @ApiParam(value = "a map contains user name and password", required = true)
+            @RequestBody Map<String, String> map) {
         return loginService.login(map);
     }
 }

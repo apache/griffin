@@ -17,12 +17,12 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.service;
+package org.apache.griffin.core.measure;
 
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,20 +33,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+@Api(tags = "Organization Dimension", description = "measure belongs to")
 @RestController
 @RequestMapping(value = "/api/v1")
-public class GriffinController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GriffinController.class);
-
+public class MeasureOrgController {
     @Autowired
-    MeasureRepo measureRepo;
+    private MeasureRepo measureRepo;
 
-    @RequestMapping(value = "/version", method = RequestMethod.GET)
-    public String greeting() {
-        return "0.1.0";
-    }
-
+    @ApiOperation(value = "Get orgs for measure", response = List.class)
     @RequestMapping(value = "/org", method = RequestMethod.GET)
     public List<String> getOrgs() {
         return measureRepo.findOrganizations();
@@ -54,16 +48,18 @@ public class GriffinController {
 
     /**
      * @param org
-     * @return list of the name of metric, and a metric is the result of executing the job sharing the same name with
+     * @return list of metric name, and a metric is the result of executing the job sharing the same name with
      * measure.
      */
+    @ApiOperation(value = "Get measure names by org", response = List.class)
     @RequestMapping(value = "/org/{org}", method = RequestMethod.GET)
-    public List<String> getMetricNameListByOrg(@PathVariable("org") String org) {
+    public List<String> getMetricNameListByOrg(@ApiParam(value = "organization name") @PathVariable("org") String org) {
         return measureRepo.findNameByOrganization(org);
     }
 
-    @RequestMapping(value = "/orgWithMetricsName", method = RequestMethod.GET)
-    public Map<String, List<String>> getOrgsWithMetricsName() {
+    @ApiOperation(value = "Get measure names group by org", response = Map.class)
+    @RequestMapping(value = "/org/measure/names", method = RequestMethod.GET)
+    public Map<String, List<String>> getMeasureNamesGroupByOrg() {
         Map<String, List<String>> orgWithMetricsMap = new HashMap<>();
         List<String> orgList = measureRepo.findOrganizations();
         for (String org : orgList) {
@@ -73,6 +69,4 @@ public class GriffinController {
         }
         return orgWithMetricsMap;
     }
-
 }
-

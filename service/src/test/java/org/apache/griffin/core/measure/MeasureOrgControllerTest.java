@@ -17,11 +17,10 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.service;
+package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.URLHelper;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,52 +30,55 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = GriffinController.class)
-public class GriffinControllerTest {
+@WebMvcTest(value = MeasureOrgController.class, secure = false)
+public class MeasureOrgControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    MeasureRepo measureRepo;
+    private MeasureRepo measureRepo;
 
-
-    @Before
-    public void setup() {
-
-    }
-
-    @Test
-    public void testGreeting() throws Exception {
-        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/version"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(is("0.1.0")));
-    }
 
     @Test
     public void testGetOrgs() throws Exception {
-        when(measureRepo.findOrganizations()).thenReturn(Arrays.asList("ebay"));
+        String org = "orgName";
+        when(measureRepo.findOrganizations()).thenReturn(Arrays.asList(org));
+
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0]", is("ebay")));
+                .andExpect(jsonPath("$.[0]", is(org)));
     }
 
     @Test
     public void testGetMetricNameListByOrg() throws Exception {
         String org = "hadoop";
         when(measureRepo.findNameByOrganization(org)).thenReturn(Arrays.asList(org));
+
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/{org}", org))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0]", is(org)));
     }
 
+    @Test
+    public void testGetMeasureNamesGroupByOrg() throws Exception {
+        List<String> orgs = Arrays.asList("orgName");
+        when(measureRepo.findOrganizations()).thenReturn(orgs);
+        when(measureRepo.findNameByOrganization(orgs.get(0))).thenReturn(Arrays.asList("measureName"));
+
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/measure/names"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orgName", hasSize(1)));
+    }
 
 }
