@@ -144,7 +144,7 @@ For example, the dsl rule is `source.cntry, source.id.count(), source.age.max() 
 
 After the translation, the metrics will be persisted in table `profiling`.  
 
-## ALternative Rules
+## Alternative Rules
 You can simply use Griffin DSL rule to describe your problem in DQ domain, for some complicate requirement, you can also use some alternative rules supported by Griffin.  
 
 ### Spark sql
