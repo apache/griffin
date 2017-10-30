@@ -25,8 +25,10 @@ import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "Kafka metastore", hidden = true)
+@Api(tags = "Kafka metastore")
+@ApiIgnore
 @RestController
 @RequestMapping("/api/v1/metadata/kafka")
 public class KafkaSchemaController {

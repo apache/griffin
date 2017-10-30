@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Api(tags = "Organizations", description = "measure belongs to")
+@Api(tags = "Organization Dimension", description = "measure belongs to")
 @RestController
 @RequestMapping(value = "/api/v1")
 public class MeasureOrgController {
