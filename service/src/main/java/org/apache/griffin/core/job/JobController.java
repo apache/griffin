@@ -35,7 +35,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-@Api(tags = "Jobs",description = "execute your measure periodically")
+@Api(tags = "Jobs", description = "execute your measure periodically")
 @RestController
 @RequestMapping("/api/v1/jobs")
 public class JobController {
@@ -53,10 +53,10 @@ public class JobController {
     @ApiOperation(value = "Add job", response = GriffinOperationMessage.class)
     @RequestMapping(value = "", method = RequestMethod.POST)
     public GriffinOperationMessage addJob(@ApiParam(value = "job group name", required = true) @RequestParam("group") String groupName,
-                                          @ApiParam(value = "job name", required = true)  @RequestParam("jobName") String jobName,
-                                          @ApiParam(value = "measure id, required = true") @RequestParam("measureId") Long measureId,
+                                          @ApiParam(value = "job name", required = true) @RequestParam("jobName") String jobName,
+                                          @ApiParam(value = "measure id", required = true) @RequestParam("measureId") Long measureId,
                                           @ApiParam(value = "custom class composed of job key parameters", required = true)
-                                              @RequestBody JobRequestBody jobRequestBody) {
+                                          @RequestBody JobRequestBody jobRequestBody) {
         return jobService.addJob(groupName, jobName, measureId, jobRequestBody);
     }
 
