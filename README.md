@@ -45,6 +45,11 @@ Release:
     docker pull bhlx3lyx7/svc_msr:0.1.6
     docker pull elasticsearch:5
     ```
+   You can pull the images faster through mirror acceleration if you are in China.
+    ```
+    docker pull registry.docker-cn.com/bhlx3lyx7/svc_msr:0.1.6
+    docker pull registry.docker-cn.com/elasticsearch:5
+    ```
 3. Increase vm.max_map_count of your local machine, to use elasticsearch.  
     ```
     sysctl -w vm.max_map_count=262144
