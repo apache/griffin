@@ -39,27 +39,23 @@ Snapshot:
 Release:
 
 ### How to run in docker
-1. Install [docker](https://www.docker.com/).
-2. Pull our built docker image.
+1. Install [docker](https://docs.docker.com/engine/installation/) and [docker compose](https://docs.docker.com/compose/install/).
+2. Pull our built docker image and elasticsearch image.
     ```
-    docker pull bhlx3lyx7/griffin_demo:0.0.1
+    docker pull bhlx3lyx7/svc_msr:0.1.6
+    docker pull elasticsearch:5
     ```
 3. Increase vm.max_map_count of your local machine, to use elasticsearch.  
     ```
     sysctl -w vm.max_map_count=262144
-    ```  
-4. Run this docker image, wait for about one minute, then griffin is ready.
     ```
-    docker run -it -h sandbox --name griffin_demo -m 8G --memory-swap -1 \
-    -p 32122:2122 -p 37077:7077 -p 36066:6066 -p 38088:8088 -p 38040:8040 \
-    -p 33306:3306 -p 39000:9000 -p 38042:8042 -p 38080:8080 -p 37017:27017 \
-    -p 39083:9083 -p 38998:8998 -p 39200:9200 bhlx3lyx7/griffin_demo:0.0.1
+4. Copy [docker-compose.yml](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/docker/svc_msr/docker-compose.yml) to your work path.
+5. In your work path, start docker containers by using docker compose, wait for about one minutes, then griffin service is ready.
     ```
-5. Now you can visit UI through your browser, login with account "test" and password "test" if required.
+    docker-compose up -d
     ```
-    http://<your local IP address>:38080/
-    ```
-    You can also follow the steps using UI [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/dockerUIguide.md#webui-test-case-guide).
+6. Now you can try griffin APIs by using postman after importing the [json files](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/postman).
+   In which you need to modify the environment `BASE_PATH` value into `<your local IP address>:38080`.
 
 ### How to deploy and run at local
 1. Install jdk (1.8 or later versions).
