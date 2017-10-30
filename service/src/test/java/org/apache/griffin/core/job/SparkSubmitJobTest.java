@@ -23,7 +23,8 @@ import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.SparkJobDO;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.util.GriffinUtil;
+import org.apache.griffin.core.util.JsonUtil;
+import org.apache.griffin.core.util.PropertiesUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,7 +58,7 @@ public class SparkSubmitJobTest {
 
         @Bean
         public Properties sparkJobProps() {
-            return GriffinUtil.getProperties("/sparkJob.properties");
+            return PropertiesUtil.getProperties("/sparkJob.properties");
         }
 
     }
@@ -90,9 +91,6 @@ public class SparkSubmitJobTest {
         given(jobInstanceRepo.save(new JobInstance())).willReturn(new JobInstance());
         sparkSubmitJob.execute(context);
         assertTrue(true);
-
-
     }
-
 
 }

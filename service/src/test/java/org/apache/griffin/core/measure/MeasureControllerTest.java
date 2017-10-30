@@ -85,7 +85,7 @@ public class MeasureControllerTest {
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description", is("Delete Measures By Name Succeed")))
+                .andExpect(jsonPath("$.description", is("Delete Measures By Id Succeed")))
                 .andExpect(jsonPath("$.code", is(202)));
     }
 
@@ -105,7 +105,7 @@ public class MeasureControllerTest {
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description", is("Delete Measures By Name Failed")))
+                .andExpect(jsonPath("$.description", is("Delete Measures By Id Failed")))
                 .andExpect(jsonPath("$.code", is(402)));
     }
 
@@ -147,14 +147,12 @@ public class MeasureControllerTest {
     }
 
     @Test
-    public void testGetAllMeasuresOfOwner() throws Exception {
+    public void testGetAllMeasuresByOwner() throws Exception {
         String owner = "test";
-        List<Map<String, String>> measureList = new LinkedList<>();
-        HashMap<String, String> map = new HashMap<>();
-        map.put("name", "view_item_hourly");
-        map.put("id", "0");
-        measureList.add(map);
-        given(service.getAllAliveMeasureNameIdByOwner(owner)).willReturn(measureList);
+        List<Measure> measureList = new LinkedList<>();
+        Measure measure = createATestMeasure("view_item_hourly", owner);
+        measureList.add(measure);
+        given(service.getAliveMeasuresByOwner(owner)).willReturn(measureList);
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures/owner/" + owner).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

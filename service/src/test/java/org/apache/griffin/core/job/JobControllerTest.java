@@ -89,7 +89,7 @@ public class JobControllerTest {
                 .content(schedulerRequestBodyJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(205)))
-                .andExpect(jsonPath("$.description", is("CREATE Job Succeed")))
+                .andExpect(jsonPath("$.description", is("Create Job Succeed")))
                 .andDo(print());
     }
 

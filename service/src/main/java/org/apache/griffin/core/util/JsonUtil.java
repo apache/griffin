@@ -29,11 +29,10 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
-public class GriffinUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GriffinUtil.class);
+public class JsonUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtil.class);
 
     public static String toJson(Object obj) {
         ObjectMapper mapper = new ObjectMapper();
@@ -73,19 +72,6 @@ public class GriffinUtil {
         }
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(jsonStr, type);
-    }
-
-    public static Properties getProperties(String propertiesPath) {
-        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
-        propertiesFactoryBean.setLocation(new ClassPathResource(propertiesPath));
-        Properties properties = null;
-        try {
-            propertiesFactoryBean.afterPropertiesSet();
-            properties = propertiesFactoryBean.getObject();
-        } catch (IOException e) {
-            LOGGER.error("get properties from {} failed. {}", propertiesPath, e.getMessage());
-        }
-        return properties;
     }
 
 }

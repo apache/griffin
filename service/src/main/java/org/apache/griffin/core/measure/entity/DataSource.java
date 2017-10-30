@@ -20,6 +20,8 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class DataSource extends AbstractAuditableEntity {
 
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "dataSource_id")
     private List<DataConnector> connectors;
 
