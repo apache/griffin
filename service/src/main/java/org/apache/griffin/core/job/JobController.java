@@ -35,11 +35,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-<<<<<<< HEAD
 @Api(tags = "Jobs", description = "execute your measure periodically")
-=======
-@Api(tags = "Jobs",description = "execute your measure periodically")
->>>>>>> 1f984da1aea86e8be507db37f426b5e28d0d81e8
 @RestController
 @RequestMapping("/api/v1/jobs")
 public class JobController {
