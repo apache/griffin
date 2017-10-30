@@ -20,11 +20,14 @@ under the License.
 package org.apache.griffin.core.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.Gson;
 import org.apache.griffin.core.job.entity.JobHealth;
+import org.apache.griffin.core.metastore.hive.entity.HiveDebugTable;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -81,4 +84,11 @@ public class GriffinUtilTest {
         System.out.println(jobHealthStr);
     }
 
+    @Test
+    public void testToEntityFromFile() throws Exception {
+        Gson gson=new Gson();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new ClassPathResource("hive_tables.json").getInputStream()));
+        HiveDebugTable table=gson.fromJson(reader,HiveDebugTable.class);
+        assertEquals(table.getDbTables().size(),2);
+    }
 }

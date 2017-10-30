@@ -290,10 +290,10 @@ public class JobServiceImpl implements JobService {
     }
 
     /**
-     * call livy to update jobInstance table in mysql.
+     * call livy to update part of jobInstance table data associated with group and jobName in mysql.
      *
-     * @param group
-     * @param jobName
+     * @param group group name of jobInstance
+     * @param jobName job name of jobInstance
      */
     private void syncInstancesOfJob(String group, String jobName) {
         //update all instance info belongs to this group and job.

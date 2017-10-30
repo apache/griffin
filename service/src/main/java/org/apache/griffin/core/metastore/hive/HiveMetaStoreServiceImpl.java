@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
+import org.apache.griffin.core.util.GriffinUtil;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -31,6 +32,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
+import javax.ws.rs.POST;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +43,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
-@Service
+//@Service
 @CacheConfig(cacheNames = "hive")
 public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
@@ -57,13 +60,6 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     public HiveMetaStoreServiceImpl() {
         singleThreadExecutor = new ThreadPoolExecutor(1, 1, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1));
         LOGGER.info("HiveMetaStoreServiceImpl single thread pool created.");
-        refreshCache();
-        LOGGER.info("cache hive tables");
-    }
-
-    @Override
-    public void refreshCache() {
-        getAllTable();
     }
 
     private String getUseDbName(String dbName) {
@@ -109,11 +105,16 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     }
 
 
+
     @Override
     @Cacheable
     public Map<String, List<Table>> getAllTable() {
         Map<String, List<Table>> results = new HashMap<>();
-        Iterable<String> dbs = getAllDatabases();
+        Iterable<String> dbs = null;
+        // if hive.metastore.uris in application.properties configs wrong, client will be injected failure and will be null.
+        if (client != null) {
+            dbs = getAllDatabases();
+        }
         //MetaException happens
         if (dbs == null) {
             return results;
@@ -137,7 +138,6 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         }
         return result;
     }
-
 
 
     private List<Table> getTables(String db) {
