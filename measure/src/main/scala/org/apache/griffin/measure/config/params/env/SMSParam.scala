@@ -17,36 +17,20 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure;
+package org.apache.griffin.measure.config.params.env
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
+import org.apache.griffin.measure.config.params.Param
 
-import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.util.GriffinOperationMessage;
+/**
+  * Created by xiaoqiu.duan on 2017/10/23.
+  */
+@JsonInclude(Include.NON_NULL)
+case class SMSParam(@JsonProperty("host") host: String,
+                    @JsonProperty("id") id: String,
+                    @JsonProperty("key") key: String,
+                    @JsonProperty("UUID") uuid: String
+                     ) extends Param {
 
-import java.util.List;
-import java.util.Map;
-
-public interface MeasureService {
-
-    Iterable<Measure> getAllAliveMeasures();
-
-    Measure getMeasureById(long id);
-
-/*
-    Measure getMeasureByName(String measureName);
-*/
-
-
-    GriffinOperationMessage deleteMeasureById(Long id);
-
-
-/*
-    GriffinOperationMessage deleteMeasureByName(String measureName) ;
-*/
-
-    GriffinOperationMessage updateMeasure(Measure measure);
-
-    List<Measure> getAliveMeasuresByOwner(String owner);
-
-    GriffinOperationMessage createMeasure(Measure measure);
 }

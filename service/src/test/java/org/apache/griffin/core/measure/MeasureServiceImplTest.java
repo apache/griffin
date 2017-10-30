@@ -130,8 +130,8 @@ public class MeasureServiceImplTest {
         Measure measure = createATestMeasure("view_item_hourly", "ebay");
         measure.setId(1L);
         given(measureRepo.findByOwnerAndDeleted(owner, false)).willReturn(Arrays.asList(measure));
-        List<Map<String, String>> list = service.getAllAliveMeasureNameIdByOwner(owner);
-        assertEquals(list.get(0).get("name"), measure.getName());
+        List<Measure> list = service.getAliveMeasuresByOwner(owner);
+        assertEquals(list.get(0).getName(), measure.getName());
     }
 
     @Test
