@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.URLHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +29,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -47,13 +48,13 @@ public class MeasureOrgControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private MeasureRepo measureRepo;
+    private MeasureOrgService measureOrgService;
 
 
     @Test
     public void testGetOrgs() throws Exception {
         String org = "orgName";
-        when(measureRepo.findOrganizations()).thenReturn(Arrays.asList(org));
+        when(measureOrgService.getOrgs()).thenReturn(Arrays.asList(org));
 
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org"))
                 .andExpect(status().isOk())
@@ -63,7 +64,7 @@ public class MeasureOrgControllerTest {
     @Test
     public void testGetMetricNameListByOrg() throws Exception {
         String org = "hadoop";
-        when(measureRepo.findNameByOrganization(org)).thenReturn(Arrays.asList(org));
+        when(measureOrgService.getMetricNameListByOrg(org)).thenReturn(Arrays.asList(org));
 
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/{org}", org))
                 .andExpect(status().isOk())
@@ -72,9 +73,10 @@ public class MeasureOrgControllerTest {
 
     @Test
     public void testGetMeasureNamesGroupByOrg() throws Exception {
-        List<String> orgs = Arrays.asList("orgName");
-        when(measureRepo.findOrganizations()).thenReturn(orgs);
-        when(measureRepo.findNameByOrganization(orgs.get(0))).thenReturn(Arrays.asList("measureName"));
+        List<String> measures = Arrays.asList("measureName");
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("orgName", measures);
+        when(measureOrgService.getMeasureNamesGroupByOrg()).thenReturn(map);
 
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/measure/names"))
                 .andExpect(status().isOk())

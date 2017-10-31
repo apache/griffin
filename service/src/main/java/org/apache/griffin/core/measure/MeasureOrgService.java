@@ -17,18 +17,16 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.info;
+package org.apache.griffin.core.measure;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Map;
 
-@RestController
-@RequestMapping("/api/v1")
-public class GriffinInfoController {
+public interface MeasureOrgService {
 
-    @RequestMapping(value = "/version", method = RequestMethod.GET)
-    public String greeting() {
-        return "0.1.0";
-    }
+    List<String> getOrgs();
+
+    List<String> getMetricNameListByOrg(String org);
+
+    Map<String, List<String>> getMeasureNamesGroupByOrg();
 }
