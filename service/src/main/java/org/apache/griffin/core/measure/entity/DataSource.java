@@ -20,8 +20,6 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
-import io.swagger.annotations.ApiModelProperty;
-
 import javax.persistence.*;
 import java.util.List;
 
