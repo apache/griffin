@@ -23,35 +23,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-/**
- * SparkJobDO
- * {
- * "file": "hdfs:///griffin/griffin-measure.jar",
- * "className": "org.apache.griffin.measure.batch.Application",
- * "args": [
- * "/benchmark/test/env.json",
- * "{\"name\":\"data_rdm\",\"type\":\"accuracy\",\"source\":{\"type\":\"hive\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"data_rdm\"} },\"target\":{\"type\":\"hive\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"data_rdm\"} },\"evaluateRule\":{\"sampleRatio\":1,\"rules\":\"$source.uage > 100 AND $source.uid = $target.uid AND $source.uage + 12 = $target.uage + 10 + 2 AND $source.udes + 11 = $target.udes + 1 + 1\"} }",
- * "hdfs,raw"
- * ],
- * "name": "griffin-livy",
- * "queue": "default",
- * "numExecutors": 2,
- * "executorCores": 4,
- * "driverMemory": "2g",
- * "executorMemory": "2g",
- * "conf": {
- * "spark.jars.packages": "com.databricks:spark-avro_2.10:2.0.1"
- * },
- * "jars": [
- * "/livy/datanucleus-api-jdo-3.2.6.jar",
- * "/livy/datanucleus-core-3.2.10.jar",
- * "/livy/datanucleus-rdbms-3.2.9.jar"
- * ],
- * "files": [
- * "/livy/hive-site.xml"
- * ]
- * }'
- */
 public class SparkJobDO implements Serializable {
 
     private String file;
