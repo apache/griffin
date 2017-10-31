@@ -19,9 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
@@ -35,7 +32,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-@Api(tags = "Jobs", description = "execute your measure periodically")
 @RestController
 @RequestMapping("/api/v1/jobs")
 public class JobController {
@@ -44,39 +40,28 @@ public class JobController {
     @Autowired
     private JobService jobService;
 
-    @ApiOperation(value = "Get jobs", response = List.class)
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Map<String, Serializable>> getJobs() {
         return jobService.getAliveJobs();
     }
 
-    @ApiOperation(value = "Add job", response = GriffinOperationMessage.class)
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public GriffinOperationMessage addJob(@ApiParam(value = "job group name", required = true) @RequestParam("group") String groupName,
-                                          @ApiParam(value = "job name", required = true) @RequestParam("jobName") String jobName,
-                                          @ApiParam(value = "measure id", required = true) @RequestParam("measureId") Long measureId,
-                                          @ApiParam(value = "custom class composed of job key parameters", required = true)
-                                          @RequestBody JobRequestBody jobRequestBody) {
+    public GriffinOperationMessage addJob(@RequestParam("group") String groupName, @RequestParam("jobName") String jobName,
+                                          @RequestParam("measureId") Long measureId, @RequestBody JobRequestBody jobRequestBody) {
         return jobService.addJob(groupName, jobName, measureId, jobRequestBody);
     }
 
-    @ApiOperation(value = "Delete job", response = GriffinOperationMessage.class)
     @RequestMapping(value = "", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteJob(@ApiParam(value = "job group name", required = true) @RequestParam("group") String group,
-                                             @ApiParam(value = "job name", required = true) @RequestParam("jobName") String jobName) {
+    public GriffinOperationMessage deleteJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName) {
         return jobService.deleteJob(group, jobName);
     }
 
-    @ApiOperation(value = "Get job instances", response = List.class)
     @RequestMapping(value = "/instances", method = RequestMethod.GET)
-    public List<JobInstance> findInstancesOfJob(@ApiParam(value = "job group name", required = true) @RequestParam("group") String group,
-                                                @ApiParam(value = "job name", required = true) @RequestParam("jobName") String jobName,
-                                                @ApiParam(value = "page you want starting from index 0", required = true) @RequestParam("page") int page,
-                                                @ApiParam(value = "instance number per page", required = true) @RequestParam("size") int size) {
+    public List<JobInstance> findInstancesOfJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName,
+                                                @RequestParam("page") int page, @RequestParam("size") int size) {
         return jobService.findInstancesOfJob(group, jobName, page, size);
     }
 
-    @ApiOperation(value = "Get job healthy statistics", response = JobHealth.class)
     @RequestMapping(value = "/health", method = RequestMethod.GET)
     public JobHealth getHealthInfo() {
         return jobService.getHealthInfo();
