@@ -80,7 +80,7 @@ public class SparkSubmitJob implements Job {
     /**
      * execute method is used to submit sparkJobDO to Livy.
      *
-     * @param context
+     * @param context Job execution context
      */
     @Override
     public void execute(JobExecutionContext context) {

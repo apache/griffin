@@ -241,9 +241,9 @@ public class JobServiceImpl implements JobService {
      * 1. pause these jobs
      * 2. set these jobs as deleted status
      *
-     * @param group
-     * @param name
-     * @return
+     * @param group job group name
+     * @param name job name
+     * @return  custom information
      */
     @Override
     public GriffinOperationMessage deleteJob(String group, String name) {
@@ -260,7 +260,9 @@ public class JobServiceImpl implements JobService {
      * 1. search jobs related to measure
      * 2. deleteJob
      *
-     * @param measure
+     * @param measure measure data quality between source and target dataset
+     * @throws SchedulerException  quartz throws if schedule has problem
+     *
      */
     public void deleteJobsRelateToMeasure(Measure measure) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
@@ -308,11 +310,11 @@ public class JobServiceImpl implements JobService {
         //update all instance info belongs to this group and job.
         List<JobInstance> jobInstanceList = jobInstanceRepo.findByGroupNameAndJobName(group, jobName);
         for (JobInstance jobInstance : jobInstanceList) {
-            if (!LivySessionStates.isActive(jobInstance.getState())) {
-                continue;
+            if (LivySessionStates.isActive(jobInstance.getState())) {
+                String uri = sparkJobProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
+                setJobInstanceInfo(jobInstance, uri, group, jobName);
             }
-            String uri = sparkJobProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
-            setJobInstanceInfo(jobInstance, uri, group, jobName);
+
         }
     }
 
@@ -355,7 +357,7 @@ public class JobServiceImpl implements JobService {
     /**
      * a job is regard as healthy job when its latest instance is in healthy state.
      *
-     * @return
+     * @return job healthy statistics
      */
     @Override
     public JobHealth getHealthInfo() {
