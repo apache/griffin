@@ -19,39 +19,39 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
-@RequestMapping(value = "/api/v1")
-public class MeasureOrgController {
+@Service
+public class MeasureOrgServiceImpl implements MeasureOrgService {
 
     @Autowired
-    private MeasureOrgService measureOrgService;
+    private MeasureRepo measureRepo;
 
-    @RequestMapping(value = "/org", method = RequestMethod.GET)
+    @Override
     public List<String> getOrgs() {
-        return measureOrgService.getOrgs();
+        return measureRepo.findOrganizations();
     }
 
-    /**
-     * @param org organization name
-     * @return list of metric name, and a metric is the result of executing the job sharing the same name with
-     * measure.
-     */
-    @RequestMapping(value = "/org/{org}", method = RequestMethod.GET)
-    public List<String> getMetricNameListByOrg(@PathVariable("org") String org) {
-        return measureOrgService.getMetricNameListByOrg(org);
+    @Override
+    public List<String> getMetricNameListByOrg(String org) {
+        return measureRepo.findNameByOrganization(org);
     }
 
-    @RequestMapping(value = "/org/measure/names", method = RequestMethod.GET)
+    @Override
     public Map<String, List<String>> getMeasureNamesGroupByOrg() {
-        return measureOrgService.getMeasureNamesGroupByOrg();
+        Map<String, List<String>> orgWithMetricsMap = new HashMap<>();
+        List<String> orgList = measureRepo.findOrganizations();
+        for (String org : orgList) {
+            if (org != null) {
+                orgWithMetricsMap.put(org, measureRepo.findNameByOrganization(org));
+            }
+        }
+        return orgWithMetricsMap;
     }
 }

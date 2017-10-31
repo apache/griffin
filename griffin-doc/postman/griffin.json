@@ -1027,7 +1027,7 @@
 			"currentHelper": "normal",
 			"helperAttributes": {},
 			"time": 1508998395708,
-			"name": "Get measures by org",
+			"name": "Get measures by owner",
 			"description": "`GET /api/v1/measures/owner/{owner}`\n\n#### Path Variable\n- owner -`required` `String` owner name\n\n#### Request Sample\n\n`/api/v1/measures/owner/test`\n\n#### Response Body Sample\n```\n[\n  {\n    \"name\": \"demo-accu\",\n    \"id\": \"2\"\n  }\n]\n```",
 			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
 			"responses": [
@@ -1094,7 +1094,7 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"name": "Get measures by org example",
+					"name": "Get measures by owner example",
 					"id": "498dd59c-2bde-9c41-bafa-d1fa85c50ec0",
 					"request": {
 						"url": "{{BASE_PATH}}/api/v1/measures/owner/:owner",
