@@ -19,56 +19,46 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
-@Api(tags = "Measures",description = "measure data quality between source and target dataset")
 @RestController
 @RequestMapping(value = "/api/v1")
 public class MeasureController {
     @Autowired
     private MeasureService measureService;
 
-    @ApiOperation(value ="Get measures",response = Iterable.class)
     @RequestMapping(value = "/measures", method = RequestMethod.GET)
     public Iterable<Measure> getAllAliveMeasures() {
         return measureService.getAllAliveMeasures();
     }
 
-    @ApiOperation(value ="Get measure by id",response = Measure.class)
     @RequestMapping(value = "/measure/{id}", method = RequestMethod.GET)
-    public Measure getMeasureById(@ApiParam(value = "measure id", required = true)  @PathVariable("id") long id) {
+    public Measure getMeasureById(@PathVariable("id") long id) {
         return measureService.getMeasureById(id);
     }
 
-    @ApiOperation(value ="Delete measure",response = GriffinOperationMessage.class)
     @RequestMapping(value = "/measure/{id}", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteMeasureById(@ApiParam(value = "measure id", required = true) @PathVariable("id") Long id) {
+    public GriffinOperationMessage deleteMeasureById(@PathVariable("id") Long id) {
         return measureService.deleteMeasureById(id);
     }
-    @ApiOperation(value ="Update measure",response = GriffinOperationMessage.class)
+
     @RequestMapping(value = "/measure", method = RequestMethod.PUT)
-    public GriffinOperationMessage updateMeasure(@ApiParam(value = "measure entity", required = true) @RequestBody Measure measure) {
+    public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         return measureService.updateMeasure(measure);
     }
 
-    @ApiOperation(value ="Get measures by owner",response = List.class)
     @RequestMapping(value = "/measures/owner/{owner}", method = RequestMethod.GET)
-    public List<Measure> getAliveMeasuresByOwner(@ApiParam(value = "owner name", required = true) @PathVariable("owner") String owner) {
+    public List<Measure> getAliveMeasuresByOwner(@PathVariable("owner") String owner) {
         return measureService.getAliveMeasuresByOwner(owner);
     }
 
-    @ApiOperation(value ="Add measure",response = GriffinOperationMessage.class)
     @RequestMapping(value = "/measure", method = RequestMethod.POST)
-    public GriffinOperationMessage createMeasure(@ApiParam(value = "measure entity", required = true) @RequestBody Measure measure) {
+    public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
         return measureService.createMeasure(measure);
     }
 }

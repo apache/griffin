@@ -19,18 +19,14 @@ under the License.
 
 package org.apache.griffin.core.info;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "Basic introduce", description = "griffin version")
 @RestController
 @RequestMapping("/api/v1")
 public class GriffinInfoController {
 
-    @ApiOperation(value = "Get griffin version", response = String.class)
     @RequestMapping(value = "/version", method = RequestMethod.GET)
     public String greeting() {
         return "0.1.0";
