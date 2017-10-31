@@ -34,7 +34,7 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance, Long> {
     /**
      * @param group    is group name
      * @param name     is job name
-     * @param pageable
+     * @param pageable page info
      * @return all job instances scheduled at different time using the same prototype job,
      * the prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.
      */

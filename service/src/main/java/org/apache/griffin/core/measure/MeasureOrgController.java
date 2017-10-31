@@ -47,7 +47,7 @@ public class MeasureOrgController {
     }
 
     /**
-     * @param org
+     * @param org organization name
      * @return list of metric name, and a metric is the result of executing the job sharing the same name with
      * measure.
      */

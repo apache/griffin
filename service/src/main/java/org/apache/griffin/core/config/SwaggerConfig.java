@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.config;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +36,7 @@ public class SwaggerConfig {
 
     /**
      * exclude the basic-error-controller from swagger api
+     * @return this Docket
      */
     @Bean
     public Docket excludeSwaggerErrorControllerApi() {
@@ -48,13 +48,13 @@ public class SwaggerConfig {
                 .apiInfo(metaData());
     }
 
-    private ApiInfo metaData(){
-        ApiInfo apiInfo =new ApiInfo(
+    private ApiInfo metaData() {
+        ApiInfo apiInfo = new ApiInfo(
                 "REST API Document",
                 "Spring Boot REST API for Apache Griffin",
                 "0.1.0",
                 "",
-                new Contact("","",""),
+                new Contact("", "", ""),
                 "Apache License Version 2.0",
                 "https://www.apache.org/licenses/LICENSE-2.0");
         return apiInfo;
