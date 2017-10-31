@@ -57,7 +57,7 @@ public class HiveMetaStoreController {
         return hiveMetaStoreService.getAllTable();
     }
 
-
+    @RequestMapping(value = "/table", method = RequestMethod.GET)
     public Table getTable(@RequestParam("db") String dbName, @RequestParam("table") String tableName) {
         return hiveMetaStoreService.getTable(dbName, tableName);
     }
