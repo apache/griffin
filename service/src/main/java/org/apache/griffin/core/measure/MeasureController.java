@@ -60,9 +60,9 @@ public class MeasureController {
         return measureService.updateMeasure(measure);
     }
 
-    @ApiOperation(value ="Get measures by org",response = List.class)
+    @ApiOperation(value ="Get measures by owner",response = List.class)
     @RequestMapping(value = "/measures/owner/{owner}", method = RequestMethod.GET)
-    public List<Measure> getAliveMeasuresByOwner(@ApiParam(value = "org name", required = true) @PathVariable("owner") String owner) {
+    public List<Measure> getAliveMeasuresByOwner(@ApiParam(value = "owner name", required = true) @PathVariable("owner") String owner) {
         return measureService.getAliveMeasuresByOwner(owner);
     }
 

@@ -106,18 +106,17 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     @Cacheable(key = "#root.methodName")
     public Map<String, List<Table>> getAllTable() {
         Map<String, List<Table>> results = new HashMap<>();
-        Iterable<String> dbs = null;
+        Iterable<String> dbs;
         // if hive.metastore.uris in application.properties configs wrong, client will be injected failure and will be null.
-        if (client != null) {
-            dbs = getAllDatabases();
+        if (client == null) {
             LOGGER.error("hive client is null.Please check your hive config.");
-        }
-        //MetaException happens
-        if (dbs == null) {
             return results;
         }
-        for (String db : dbs) {
-            results.put(db, getTables(db));
+        dbs = getAllDatabases();
+        if (dbs != null) {
+            for (String db : dbs) {
+                results.put(db, getTables(db));
+            }
         }
         return results;
     }

@@ -308,11 +308,11 @@ public class JobServiceImpl implements JobService {
         //update all instance info belongs to this group and job.
         List<JobInstance> jobInstanceList = jobInstanceRepo.findByGroupNameAndJobName(group, jobName);
         for (JobInstance jobInstance : jobInstanceList) {
-            if (!LivySessionStates.isActive(jobInstance.getState())) {
-                continue;
+            if (LivySessionStates.isActive(jobInstance.getState())) {
+                String uri = sparkJobProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
+                setJobInstanceInfo(jobInstance, uri, group, jobName);
             }
-            String uri = sparkJobProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
-            setJobInstanceInfo(jobInstance, uri, group, jobName);
+
         }
     }
 
