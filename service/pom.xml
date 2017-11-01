@@ -23,7 +23,7 @@ under the License.
     <parent>
         <groupId>org.apache.griffin</groupId>
         <artifactId>griffin</artifactId>
-        <version>0.1.6-incubating-SNAPSHOT</version>
+        <version>griffin-0.1.6-incubating</version>
     </parent>
 
     <artifactId>service</artifactId>
