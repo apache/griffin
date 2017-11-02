@@ -59,7 +59,7 @@ public class MeasureServiceImplTest {
 
     @Test
     public void testGetAllMeasures() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
         List<Measure> measures = (List<Measure>) service.getAllAliveMeasures();
         assertThat(measures.size()).isEqualTo(1);
@@ -68,7 +68,7 @@ public class MeasureServiceImplTest {
 
     @Test
     public void testGetMeasuresById() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         given(measureRepo.findOne(1L)).willReturn(measure);
         Measure m = service.getMeasureById(1);
         assertEquals(m.getName(), measure.getName());
@@ -77,7 +77,7 @@ public class MeasureServiceImplTest {
 
     @Test
     public void testDeleteMeasuresByIdForSuccess() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         given(measureRepo.exists(1L)).willReturn(true);
         given(measureRepo.findOne(1L)).willReturn(measure);
         doNothing().when(jobService).deleteJobsRelateToMeasure(measure);
@@ -96,7 +96,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testCreateNewMeasureForSuccess() throws Exception {
         String measureName = "view_item_hourly";
-        Measure measure = createATestMeasure(measureName, "ebay");
+        Measure measure = createATestMeasure(measureName, "test");
         given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
         given(measureRepo.save(measure)).willReturn(measure);
         GriffinOperationMessage message = service.createMeasure(measure);
@@ -106,7 +106,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
         String measureName = "view_item_hourly";
-        Measure measure = createATestMeasure(measureName, "ebay");
+        Measure measure = createATestMeasure(measureName, "test");
         LinkedList<Measure> list = new LinkedList<>();
         list.add(measure);
         given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(list);
@@ -117,7 +117,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testCreateNewMeasureForFailWithSaveException() throws Exception {
         String measureName = "view_item_hourly";
-        Measure measure = createATestMeasure(measureName, "ebay");
+        Measure measure = createATestMeasure(measureName, "test");
         given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
         given(measureRepo.save(measure)).willReturn(null);
         GriffinOperationMessage message = service.createMeasure(measure);
@@ -127,7 +127,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testGetAllMeasureByOwner() throws Exception {
         String owner = "test";
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         measure.setId(1L);
         given(measureRepo.findByOwnerAndDeleted(owner, false)).willReturn(Arrays.asList(measure));
         List<Measure> list = service.getAliveMeasuresByOwner(owner);
@@ -136,7 +136,7 @@ public class MeasureServiceImplTest {
 
     @Test
     public void testUpdateMeasureForSuccess() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         given(measureRepo.exists(measure.getId())).willReturn(true);
         given(measureRepo.save(measure)).willReturn(measure);
         GriffinOperationMessage message = service.updateMeasure(measure);
@@ -145,7 +145,7 @@ public class MeasureServiceImplTest {
 
     @Test
     public void testUpdateMeasureForNotFound() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         given(measureRepo.exists(measure.getId())).willReturn(false);
         GriffinOperationMessage message = service.updateMeasure(measure);
         assertEquals(message, GriffinOperationMessage.RESOURCE_NOT_FOUND);
@@ -153,7 +153,7 @@ public class MeasureServiceImplTest {
 
     @Test
     public void testUpdateMeasureForFailWithSaveException() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         given(measureRepo.exists(measure.getId())).willReturn(true);
         given(measureRepo.save(measure)).willThrow(Exception.class);
         GriffinOperationMessage message = service.updateMeasure(measure);

@@ -55,7 +55,7 @@ public class MetricServiceImplTest {
     @Test
     public void testGetOrgByMeasureName() {
         String measureName = "default";
-        String org = "ebay";
+        String org = "test";
         given(measureRepo.findOrgByName("default")).willReturn(org);
         assertEquals(service.getOrgByMeasureName(measureName), org);
     }
