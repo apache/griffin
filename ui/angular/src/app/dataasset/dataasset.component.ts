@@ -47,7 +47,7 @@ export class DataassetComponent implements OnInit {
       this.hide();
     }
   }
-  constructor(private http:HttpClient,public servicecService:ServiceService) { }
+  constructor(private http:HttpClient,public serviceService:ServiceService) { }
   parseDate(time){
     time = new Date(time);
     var year = time.getFullYear();
@@ -67,7 +67,7 @@ export class DataassetComponent implements OnInit {
 
 
   ngOnInit() {
-    var allDataassets = this.servicecService.config.uri.dataassetlist;
+    var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{
         for (let db in data) {
             for(let table of data[db]){           

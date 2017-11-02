@@ -35,7 +35,7 @@ export class MetricComponent implements OnInit {
   constructor(
   	public chartService:ChartService,
   	// public getMetricService:GetMetricService,
-    public servicecService:ServiceService,
+    public serviceService:ServiceService,
   	private http: HttpClient,
   	private router:Router) { }
   orgs = [];
@@ -61,7 +61,8 @@ export class MetricComponent implements OnInit {
   selectedOrgIndex = 0;
   // var formatUtil = echarts.format;
   metricData = [];
-
+  orgWithMeasure:any;
+  
   // metricData = {
   // "hits" : {
   //   "hits" : [
@@ -148,7 +149,132 @@ export class MetricComponent implements OnInit {
   //   ]
   // }
   // };
-
+//   allData = {
+//     "hits": {
+//         "hits": [
+//             {
+//                 "_source": {
+//                     "name": "measure-BA-0-1508478922000",
+//                     "tmst": 1509519051606,
+//                     "value": {
+//                         "__tmst": 1509519051606,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 124989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measure-BA-0-1508478922000",
+//                     "tmst": 1509520857510,
+//                     "value": {
+//                         "__tmst": 1509520857510,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 124989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measure-BA-0-1508478922000",
+//                     "tmst": 1509521461108,
+//                     "value": {
+//                         "__tmst": 1509521461108,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 124989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measure-BA-0-1508478922000",
+//                     "tmst": 1509522049476,
+//                     "value": {
+//                         "__tmst": 1509522049476,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 124989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measure-BA-0-1508478922000",
+//                     "tmst": 1509525642052,
+//                     "value": {
+//                         "__tmst": 1509525642052,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 124989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measure-BA-0-1508478922000",
+//                     "tmst": 1509534346669,
+//                     "value": {
+//                         "__tmst": 1509534346669,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 124989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measureName-BA-0-1509430761000",
+//                     "tmst": 1509535555023,
+//                     "value": {
+//                         "__tmst": 1509535555023,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 124989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measureName-BA-0-1509430761000",
+//                     "tmst": 1509537356548,
+//                     "value": {
+//                         "__tmst": 1509537356548,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 124989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measureName-BA-0-1509431586000",
+//                     "tmst": 1509537947647,
+//                     "value": {
+//                         "__tmst": 1509537947647,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 104989
+//                     }
+//                 }
+//             },
+//             {
+//                 "_source": {
+//                     "name": "measureName-BA-0-1509431586000",
+//                     "tmst": 1509540049924,
+//                     "value": {
+//                         "__tmst": 1509540049924,
+//                         "miss": 11,
+//                         "total": 125000,
+//                         "matched": 122989
+//                     }
+//                 }
+//             }
+//         ]
+//     }
+// }
   public duplicateArray() {
   let arr = [];
   this.finalData.forEach((x) => {
@@ -180,23 +306,56 @@ export class MetricComponent implements OnInit {
   
 
   renderData(){
-    var url_organization = this.servicecService.config.uri.organization;
-    this.http.get(url_organization).subscribe(data => {
-      let orgWithMeasure = data;
+    var url_organization = this.serviceService.config.uri.organization;
+    // this.http.get(url_organization).subscribe(data => {
+      this.orgWithMeasure = {
+    "orgName1": {
+        "measureName2": [
+            "measureName-BA-0-1509431586000",
+            "measure-BA-0-1508478922000"
+        ],
+        "measureName": [
+            "measureName-BA-0-1509431586000",
+            "measureName-BA-0-2509430761000"
+        ]
+    },
+    "orgName2": {
+        "measureName3": [
+            "measure-BA-0-1508478922000"
+        ],
+        "measureName4": [
+            "measureName-BA-0-1509431586000",
+            "measureName-BA-0-1509430761000"
+        ]
+    }
+};
+      // let orgWithMeasure = data;
       var orgNode = null;
-      for(let orgName in orgWithMeasure){
+      for(let orgName in this.orgWithMeasure){
         orgNode = new Object();
         orgNode.name = orgName;
-        orgNode.measureMap = orgWithMeasure[orgName];
+        orgNode.jobMap = [];
+        orgNode.measureMap = [];
+        for(let key in this.orgWithMeasure[orgName]){
+          orgNode.measureMap.push(key);
+          this.measureOptions.push(key);
+          for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
+            orgNode.jobMap.push(this.orgWithMeasure[orgName][key][i]);
+          }
+        }
         this.orgs.push(orgNode);
       }
       this.originalOrgs = this.orgs;
-      let url_dashboard = this.servicecService.config.uri.dashboard;
+      // console.log(this.originalOrgs);
+      let url_dashboard = this.serviceService.config.uri.dashboard;
       this.http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).subscribe(data => {
-            // this.originalData = JSON.parse(JSON.stringify(data));
             this.originalData = data;
             this.myData = JSON.parse(JSON.stringify(this.originalData.hits.hits));
+            // this.myData = this.allData.hits.hits;
             this.metricName = [];
+            // for(var i = 0;i<this.myData.length;i++){
+            //     this.metricName.push(this.myData[i]._source.name);
+            // }
             for(var i = 0;i<this.myData.length;i++){
                 this.metricName.push(this.myData[i]._source.name);
             }
@@ -221,7 +380,7 @@ export class MetricComponent implements OnInit {
                 node.dq = 0;
                 node.metrics = new Array();
                 for (let metric of this.metricData){
-                    if(sys.measureMap.indexOf(metric[metric.length-1]._source.name)!= -1){
+                    if(sys.jobMap.indexOf(metric[metric.length-1]._source.name)!= -1){
                         var metricNode = {
                             'name':'',
                             'timestamp':'',
@@ -230,7 +389,7 @@ export class MetricComponent implements OnInit {
                         }
                         metricNode.name = metric[metric.length-1]._source.name;
                         metricNode.timestamp = metric[metric.length-1]._source.tmst;
-                        metricNode.dq = metric[metric.length-1]._source.matched/metric[metric.length-1]._source.total*100;
+                        metricNode.dq = metric[metric.length-1]._source.value.matched/metric[metric.length-1]._source.value.total*100;
                         metricNode.details = metric;
                         node.metrics.push(metricNode);
                     }
@@ -248,7 +407,7 @@ export class MetricComponent implements OnInit {
             // return JSON.parse(JSON.stringify(this.finalData));
             return this.finalData;
       });
-    });
+    // });
   };
 
 
@@ -303,12 +462,21 @@ export class MetricComponent implements OnInit {
       }
       else {
         var org = this.originalData[this.selectedOrgIndex-1];
-        this.finalData.push(org);
-        for(let metric of org.metrics){
-        	if(this.measureOptions.indexOf(metric.name) == -1){
-        		this.measureOptions.push(metric.name);
-        	}
+        for(let key in this.orgWithMeasure){
+           if(key == org.name){
+              for(let measure in this.orgWithMeasure[key]){
+                this.measureOptions.push(measure);
+              }
+           }
         }
+        this.finalData.push(org);
+        // console.log(this.finalData);
+        // for(let metric of org.metrics){
+        // 	if(this.measureOptions.indexOf(metric.name) == -1){
+        // 		this.measureOptions.push(metric.name);
+        // 	}
+        // }
+
       }
       var self = this;
       // self.data = self.renderData();
@@ -316,31 +484,54 @@ export class MetricComponent implements OnInit {
           // self.redraw(self.finalData);
           self.redraw(self.finalData);
       }, 0);
-      console.log(this.originalData);
+      // console.log(this.originalData);
   };
 
   changeMeasure() {
       this.finalData = [];
+      var jobdetail = [];
       if(this.selectedOrgIndex == 0){
       	for(let data of this.originalData){
       		this.finalData.push(data);
       	}
       } else {
-        // var org = this.originalData[this.selectedOrgIndex-1];
-        var org = JSON.parse(JSON.stringify(this.originalData[this.selectedOrgIndex-1]));
+        var org = JSON.parse(JSON.stringify(this.originalData[this.selectedOrgIndex-1]));   
         this.finalData.push(org);
-      }
+      // }
       if(this.selectedMeasureIndex != undefined && this.selectedMeasureIndex != 0){
         var measure = this.measureOptions[this.selectedMeasureIndex-1];
+        for(let key in this.orgWithMeasure){
+           if(key == org.name){
+              for(let measurename in this.orgWithMeasure[key]){
+                if(measurename == measure){
+                  // console.log(this.orgWithMeasure[key][measurename]);
+                  for(let i=0;i< this.orgWithMeasure[key][measurename].length;i++){
+                    jobdetail.push(this.orgWithMeasure[key][measurename][i]);
+                     
+
+
+                  }
+                }
+              }
+           }
+        }
         	for(let sys of this.finalData){
             let oldMetrics = sys.metrics;
             sys.metrics = [];
             for(let i = 0;i<oldMetrics.length;i++){
-              if(oldMetrics[i].name == measure) {
+              
+              // console.log(jobdetail);
+              for(let j=0;j< jobdetail.length;j++){
+                console.log(oldMetrics[i].name);
+                console.log(jobdetail[j]);
+                if(oldMetrics[i].name == jobdetail[j]) {
                 sys.metrics.push(oldMetrics[i]);
               }
+              }
+              
             };
         };
+      }
       }
       var self = this;
       // self.data = self.renderData();
@@ -348,7 +539,7 @@ export class MetricComponent implements OnInit {
           // self.redraw(self.finalData);
           self.redraw(self.finalData);
       }, 0);
-      console.log(this.originalData);
+      // console.log(this.originalData);
   }
 
         // function resizePieChart() {

@@ -23,7 +23,7 @@ under the License.
 
     <parent>
         <groupId>org.apache.griffin</groupId>
-        <artifactId>griffin</artifactId>
+        <artifactId>griffin-parent</artifactId>
         <version>0.1.6-incubating-SNAPSHOT</version>
     </parent>
   <artifactId>ui</artifactId>
@@ -60,6 +60,7 @@ under the License.
         <version>1.0</version>
         <configuration>
           <workingDirectory>angular</workingDirectory>
+
           <installDirectory>.tmp</installDirectory>
         </configuration>
         <executions>

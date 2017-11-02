@@ -35,7 +35,7 @@ export class SidebarComponent implements OnInit {
 
   constructor(private http: HttpClient,
   	private router:Router,
-    public servicecService:ServiceService,
+    public serviceService:ServiceService,
   	public chartService:ChartService) {
   }
 
@@ -55,8 +55,8 @@ export class SidebarComponent implements OnInit {
   // var formatUtil = echarts.format;
 
   pageInit() {
-    // var allDataassets = this.servicecService.config.uri.dataassetlist;
-    var health_url = this.servicecService.config.uri.statistics;
+    // var allDataassets = this.serviceService.config.uri.dataassetlist;
+    var health_url = this.serviceService.config.uri.statistics;
         this.http.get(health_url).subscribe(data => {
           // this.status.health = data.healthyJobCount;
           // this.status.invalid = data.jobCount - data.healthyJobCount;
@@ -107,8 +107,8 @@ export class SidebarComponent implements OnInit {
 
     sideBarList(sysName){
     	// this.finalData = this.getMetricService.renderData();
-      var url_organization = this.servicecService.config.uri.organization;
-    this.http.get(url_organization).subscribe(data => {
+      var url_organization = this.serviceService.config.uri.organization;
+      this.http.get(url_organization).subscribe(data => {
       let orgWithMeasure = data;
       var orgNode = null;
       for(let orgName in orgWithMeasure){
@@ -118,7 +118,7 @@ export class SidebarComponent implements OnInit {
         this.orgs.push(orgNode);
       }
       this.originalOrgs = this.orgs;
-      let url_dashboard = this.servicecService.config.uri.dashboard;
+      let url_dashboard = this.serviceService.config.uri.dashboard;
       this.http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).subscribe(data => {
             // this.originalData = JSON.parse(JSON.stringify(data));
             this.originalData = data;
