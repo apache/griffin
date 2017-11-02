@@ -40,22 +40,29 @@ Release:
 
 ### How to run in docker
 1. Install [docker](https://docs.docker.com/engine/installation/) and [docker compose](https://docs.docker.com/compose/install/).
-2. Pull our built docker image and elasticsearch image.
+2. Pull our pre-built docker image and elasticsearch image.
     ```
     docker pull bhlx3lyx7/svc_msr:0.1.6
-    docker pull elasticsearch:5
+    docker pull bhlx3lyx7/elasticsearch
+    ```
+   You can pull the images faster through mirror acceleration if you are in China.
+    ```
+    docker pull registry.docker-cn.com/bhlx3lyx7/svc_msr:0.1.6
+    docker pull registry.docker-cn.com/bhlx3lyx7/elasticsearch
     ```
 3. Increase vm.max_map_count of your local machine, to use elasticsearch.  
     ```
     sysctl -w vm.max_map_count=262144
     ```
-4. Copy [docker-compose.yml](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/docker/svc_msr/docker-compose.yml) to your work path.
+4. Copy [docker-compose-batch.yml](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/docker/svc_msr/docker-compose-batch.yml) to your work path.
 5. In your work path, start docker containers by using docker compose, wait for about one minutes, then griffin service is ready.
     ```
-    docker-compose up -d
+    docker-compose -f docker-compose-batch.yml up -d
     ```
 6. Now you can try griffin APIs by using postman after importing the [json files](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/postman).
    In which you need to modify the environment `BASE_PATH` value into `<your local IP address>:38080`.
+
+More details about griffin docker [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/griffin-docker-guide.md).
 
 ### How to deploy and run at local
 1. Install jdk (1.8 or later versions).
