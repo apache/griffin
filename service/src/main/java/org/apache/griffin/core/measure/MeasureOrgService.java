@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -29,4 +30,6 @@ public interface MeasureOrgService {
     List<String> getMetricNameListByOrg(String org);
 
     Map<String, List<String>> getMeasureNamesGroupByOrg();
+
+    Map<String, Map<String, List<Map<String, Serializable>>>> getMeasureWithJobDetailsGroupByOrg(Map<String, List<Map<String, Serializable>>> jobDetailsGroupByMeasure);
 }
