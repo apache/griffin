@@ -86,7 +86,7 @@ public class SparkSubmitJobTest {
         JobExecutionContext context = mock(JobExecutionContext.class);
         JobDetail jd = createJobDetail();
         given(context.getJobDetail()).willReturn(jd);
-        given(measureRepo.findOne(Long.valueOf(jd.getJobDataMap().getString("measureId")))).willReturn(createATestMeasure("view_item_hourly", "ebay"));
+        given(measureRepo.findOne(Long.valueOf(jd.getJobDataMap().getString("measureId")))).willReturn(createATestMeasure("view_item_hourly", "test"));
         given(restTemplate.postForObject(livyUri, new SparkJobDO(), String.class)).willReturn(result);
         given(jobInstanceRepo.save(new JobInstance())).willReturn(new JobInstance());
         sparkSubmitJob.execute(context);

@@ -59,7 +59,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testGetAllMeasures() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         given(service.getAllAliveMeasures()).willReturn(Arrays.asList(measure));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures").contentType(MediaType.APPLICATION_JSON))
@@ -70,7 +70,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testGetMeasuresById() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         given(service.getMeasureById(1L)).willReturn(measure);
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
@@ -111,7 +111,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForSuccess() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
 
@@ -123,7 +123,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForNotFound() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.RESOURCE_NOT_FOUND);
 
@@ -136,7 +136,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForFail() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_FAIL);
 
@@ -162,7 +162,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForSuccess() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
 
@@ -174,7 +174,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
 
@@ -186,7 +186,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForFailWithSaveException() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "ebay");
+        Measure measure = createATestMeasure("view_item_hourly", "test");
         String measureJson = new ObjectMapper().writeValueAsString(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL);
 
