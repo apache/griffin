@@ -29,6 +29,7 @@ import org.apache.griffin.core.job.entity.JobRequestBody;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
@@ -242,8 +243,8 @@ public class JobServiceImpl implements JobService {
      * 2. set these jobs as deleted status
      *
      * @param group job group name
-     * @param name job name
-     * @return  custom information
+     * @param name  job name
+     * @return custom information
      */
     @Override
     public GriffinOperationMessage deleteJob(String group, String name) {
@@ -384,5 +385,18 @@ public class JobServiceImpl implements JobService {
             throw new GetHealthInfoFailureException();
         }
         return new JobHealth(jobCount - notHealthyCount, jobCount);
+    }
+
+    @Override
+    public Map<String, List<Map<String, Serializable>>> getJobDetailsGroupByMeasureId() {
+        Map<String, List<Map<String, Serializable>>> jobDetailsMap = new HashMap<>();
+        List<Map<String, Serializable>> jobInfoList = getAliveJobs();
+        for (Map<String, Serializable> jobInfo : jobInfoList) {
+            String measureId = (String) jobInfo.get("measureId");
+            List<Map<String, Serializable>> jobs = jobDetailsMap.getOrDefault(measureId, new ArrayList<Map<String, Serializable>>());
+            jobs.add(jobInfo);
+            jobDetailsMap.put(measureId, jobs);
+        }
+        return jobDetailsMap;
     }
 }
