@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -65,9 +67,11 @@ public class MeasureOrgServiceImplTest {
 
     @Test
     public void testGetMeasureNamesGroupByOrg(){
-        List<String> orgs = Arrays.asList("orgName");
-        when(measureRepo.findOrganizations()).thenReturn(orgs);
-        when(measureRepo.findNameByOrganization(orgs.get(0))).thenReturn(Arrays.asList("measureName"));
+        Measure measure = new Measure("measure", "desc", "org", "proctype", "owner", null, null);
+        List<Measure> measures = new ArrayList<>();
+        measures.add(measure);
+
+        when(measureRepo.findByDeleted(false)).thenReturn(measures);
 
         Map<String,List<String>> map = service.getMeasureNamesGroupByOrg();
         assertThat(map.size()).isEqualTo(1);
