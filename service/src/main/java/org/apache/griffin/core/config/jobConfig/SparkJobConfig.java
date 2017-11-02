@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.config.jobConfig;
 
-import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.PropertiesUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

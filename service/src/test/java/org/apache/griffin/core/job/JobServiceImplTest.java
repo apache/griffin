@@ -25,13 +25,17 @@ import org.apache.griffin.core.job.entity.JobRequestBody;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.apache.griffin.core.util.PropertiesUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.powermock.reflect.Whitebox;
 import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,7 +45,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -78,11 +81,19 @@ public class JobServiceImplTest {
     @MockBean
     private SchedulerFactoryBean factory;
 
+    @MockBean
+    private Properties sparkJobProps;
+
+    @MockBean
+    private RestTemplate restTemplate;
+
     @Autowired
-    public JobServiceImpl service;
+    private JobServiceImpl service;
+
 
     @Before
     public void setup() {
+//        service.restTemplate = mock(RestTemplate.class);
     }
 
     @Test
@@ -208,19 +219,41 @@ public class JobServiceImplTest {
         assertEquals(service.findInstancesOfJob(groupName, jobName, page, size).size(), 1);
     }
 
-//    @Test
-//    public void testSyncInstancesOfJob() {
-//        JobInstance instance = newJobInstance();
-//        instance.setSessionId(1234564);
-//        String group = "groupName";
-//        String jobName = "jobName";
-//        RestTemplate restTemplate = mock(RestTemplate.class);
-//        given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-//        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
-//        given(restTemplate.getForObject("uri", String.class)).willThrow(RestClientException.class);
-//        RestClientException restClientException = getJobInstanceStatusExpectException();
-//        assert (restClientException != null);
-//    }
+    @Test
+    public void testSyncInstancesOfJobForRestClientException() {
+        JobInstance instance = newJobInstance();
+        instance.setSessionId(1234564);
+        String group = "groupName";
+        String jobName = "jobName";
+        given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        given(sparkJobProps.getProperty("livy.uri")).willReturn(PropertiesUtil.getProperties("/sparkJob.properties").getProperty("livy.uri"));
+        service.syncInstancesOfAllJobs();
+    }
+
+    @Test
+    public void testSyncInstancesOfJobForIOException() throws Exception {
+        JobInstance instance = newJobInstance();
+        String group = "groupName";
+        String jobName = "jobName";
+        given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        Whitebox.setInternalState(service,"restTemplate",restTemplate);
+        given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("result");
+        service.syncInstancesOfAllJobs();
+    }
+
+    @Test
+    public void testSyncInstancesOfJobForIllegalArgumentException() throws Exception {
+        JobInstance instance = newJobInstance();
+        String group = "groupName";
+        String jobName = "jobName";
+        given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        Whitebox.setInternalState(service,"restTemplate",restTemplate);
+        given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("{\"state\":\"wrong\"}");
+        service.syncInstancesOfAllJobs();
+    }
 
     @Test
     public void testGetHealthInfoWithHealthy() throws SchedulerException {
@@ -228,6 +261,15 @@ public class JobServiceImplTest {
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("BA"));
         JobKey jobKey = new JobKey("test");
+        SimpleTrigger trigger = new SimpleTriggerImpl();
+        List<Trigger> triggers = new ArrayList<>();
+        triggers.add(trigger);
+        given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
+        JobDataMap jobDataMap = mock(JobDataMap.class);
+        JobDetailImpl jobDetail = new JobDetailImpl();
+        jobDetail.setJobDataMap(jobDataMap);
+        given(scheduler.getJobDetail(jobKey)).willReturn(jobDetail);
+        given(jobDataMap.getBooleanFromString("deleted")).willReturn(false);
         Set<JobKey> jobKeySet = new HashSet<>();
         jobKeySet.add(jobKey);
         given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn((jobKeySet));
@@ -266,15 +308,6 @@ public class JobServiceImplTest {
                         .repeatForever()).startAt(new Date()).build();
     }
 
-    private RestClientException getJobInstanceStatusExpectException() {
-        RestClientException exception = null;
-        try {
-            service.syncInstancesOfAllJobs();
-        } catch (RestClientException e) {
-            exception = e;
-        }
-        return exception;
-    }
 
     private GriffinException.GetJobsFailureException getTriggersOfJobExpectException(Scheduler scheduler, JobKey jobKey) {
         GriffinException.GetJobsFailureException exception = null;

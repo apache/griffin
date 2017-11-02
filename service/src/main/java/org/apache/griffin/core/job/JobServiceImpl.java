@@ -66,8 +66,11 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private Properties sparkJobProps;
 
+    private RestTemplate restTemplate;
+
 
     public JobServiceImpl() {
+        restTemplate = new RestTemplate();
     }
 
     @Override
@@ -318,7 +321,6 @@ public class JobServiceImpl implements JobService {
     }
 
     private void setJobInstanceInfo(JobInstance jobInstance, String uri, String group, String jobName) {
-        RestTemplate restTemplate = new RestTemplate();
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         try {
