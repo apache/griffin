@@ -20,8 +20,12 @@ griffin:
   hostname: griffin
   links:
     - es
+    - zk
+    - kafka
   environment:
     ES_HOSTNAME: es
+    ZK_HOSTNAME: zk
+    KAFKA_HOSTNAME: kafka
   ports:
     - 32122:2122
     - 38088:8088
@@ -34,9 +38,24 @@ griffin:
   container_name: griffin
 
 es:
-  image: elasticsearch:5
+  image: bhlx3lyx7/elasticsearch
   hostname: es
   ports:
     - 39200:9200
-    - 39300:9300
   container_name: es
+
+zk:
+  image: zookeeper:3.5
+  hostname: zk
+  ports:
+    - 32181:2181
+  container_name: zk
+  restart: always
+
+kafka:
+  image: bhlx3lyx7/kafka
+  hostname: kafka
+  ports:
+    - 39092:9092
+  container_name: kafka
+  tty: true
