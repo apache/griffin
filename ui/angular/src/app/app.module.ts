@@ -50,6 +50,7 @@ import { PrComponent } from './measure/create-measure/pr/pr.component';
 import { LoginComponent } from './login/login.component';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
+import {TruncatePipe} from './sidebar/truncate.pipe';
 
 
 
@@ -137,6 +138,7 @@ const appRoutes: Routes = [
     PrComponent,
     LoginComponent,
     RuleComponent,
+    TruncatePipe
   ],
   imports: [
     BrowserModule,

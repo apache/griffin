@@ -63,218 +63,7 @@ export class MetricComponent implements OnInit {
   metricData = [];
   orgWithMeasure:any;
   
-  // metricData = {
-  // "hits" : {
-  //   "hits" : [
-  //     {
-  //       "_source" : {
-  //         "name" : "xixi",
-  //         "tmst" : 1493962623461,
-  //         "total" : 8043288,
-  //         "matched" : 8034775
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "xixi",
-  //         "tmst" : 1493973423461,
-  //         "total" : 9479698,
-  //         "matched" : 9476094
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "xixi",
-  //         "tmst" : 1493987823461,
-  //         "total" : 9194117,
-  //         "matched" : 9164237
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "xixi",
-  //         "tmst" : 1493995023461,
-  //         "total" : 9429018,
-  //         "matched" : 9375324
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "xixi",
-  //         "tmst" : 1494009423461,
-  //         "total" : 8029660,
-  //         "matched" : 7979653
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "haha",
-  //         "tmst" : 1493959023461,
-  //         "total" : 1086389,
-  //         "matched" : 1083336
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "haha",
-  //         "tmst" : 1493973423461,
-  //         "total" : 1090650,
-  //         "matched" : 1090445
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "haha",
-  //         "tmst" : 1493980623461,
-  //         "total" : 1088940,
-  //         "matched" : 1079003
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "haha",
-  //         "tmst" : 1493995023461,
-  //         "total" : 1048833,
-  //         "matched" : 1047890
-  //       }
-  //     },
-  //     {
-  //       "_source" : {
-  //         "name" : "haha",
-  //         "tmst" : 1494013023461,
-  //         "total" : 1063349,
-  //         "matched" : 1055783
-  //       }
-  //     }
-  //   ]
-  // }
-  // };
-//   allData = {
-//     "hits": {
-//         "hits": [
-//             {
-//                 "_source": {
-//                     "name": "measure-BA-0-1508478922000",
-//                     "tmst": 1509519051606,
-//                     "value": {
-//                         "__tmst": 1509519051606,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 124989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measure-BA-0-1508478922000",
-//                     "tmst": 1509520857510,
-//                     "value": {
-//                         "__tmst": 1509520857510,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 124989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measure-BA-0-1508478922000",
-//                     "tmst": 1509521461108,
-//                     "value": {
-//                         "__tmst": 1509521461108,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 124989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measure-BA-0-1508478922000",
-//                     "tmst": 1509522049476,
-//                     "value": {
-//                         "__tmst": 1509522049476,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 124989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measure-BA-0-1508478922000",
-//                     "tmst": 1509525642052,
-//                     "value": {
-//                         "__tmst": 1509525642052,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 124989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measure-BA-0-1508478922000",
-//                     "tmst": 1509534346669,
-//                     "value": {
-//                         "__tmst": 1509534346669,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 124989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measureName-BA-0-1509430761000",
-//                     "tmst": 1509535555023,
-//                     "value": {
-//                         "__tmst": 1509535555023,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 124989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measureName-BA-0-1509430761000",
-//                     "tmst": 1509537356548,
-//                     "value": {
-//                         "__tmst": 1509537356548,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 124989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measureName-BA-0-1509431586000",
-//                     "tmst": 1509537947647,
-//                     "value": {
-//                         "__tmst": 1509537947647,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 104989
-//                     }
-//                 }
-//             },
-//             {
-//                 "_source": {
-//                     "name": "measureName-BA-0-1509431586000",
-//                     "tmst": 1509540049924,
-//                     "value": {
-//                         "__tmst": 1509540049924,
-//                         "miss": 11,
-//                         "total": 125000,
-//                         "matched": 122989
-//                     }
-//                 }
-//             }
-//         ]
-//     }
-// }
+
   public duplicateArray() {
   let arr = [];
   this.finalData.forEach((x) => {
@@ -307,29 +96,8 @@ export class MetricComponent implements OnInit {
 
   renderData(){
     var url_organization = this.serviceService.config.uri.organization;
-    // this.http.get(url_organization).subscribe(data => {
-      this.orgWithMeasure = {
-    "orgName1": {
-        "measureName2": [
-            "measureName-BA-0-1509431586000",
-            "measure-BA-0-1508478922000"
-        ],
-        "measureName": [
-            "measureName-BA-0-1509431586000",
-            "measureName-BA-0-2509430761000"
-        ]
-    },
-    "orgName2": {
-        "measureName3": [
-            "measure-BA-0-1508478922000"
-        ],
-        "measureName4": [
-            "measureName-BA-0-1509431586000",
-            "measureName-BA-0-1509430761000"
-        ]
-    }
-};
-      // let orgWithMeasure = data;
+    this.http.get(url_organization).subscribe(data => {
+      this.orgWithMeasure = data;
       var orgNode = null;
       for(let orgName in this.orgWithMeasure){
         orgNode = new Object();
@@ -339,8 +107,9 @@ export class MetricComponent implements OnInit {
         for(let key in this.orgWithMeasure[orgName]){
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
+          // console.log(this.measureOptions);
           for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
-            orgNode.jobMap.push(this.orgWithMeasure[orgName][key][i]);
+            orgNode.jobMap.push(this.orgWithMeasure[orgName][key][i].jobName);
           }
         }
         this.orgs.push(orgNode);
@@ -407,7 +176,7 @@ export class MetricComponent implements OnInit {
             // return JSON.parse(JSON.stringify(this.finalData));
             return this.finalData;
       });
-    // });
+    });
   };
 
 
@@ -506,10 +275,7 @@ export class MetricComponent implements OnInit {
                 if(measurename == measure){
                   // console.log(this.orgWithMeasure[key][measurename]);
                   for(let i=0;i< this.orgWithMeasure[key][measurename].length;i++){
-                    jobdetail.push(this.orgWithMeasure[key][measurename][i]);
-                     
-
-
+                    jobdetail.push(this.orgWithMeasure[key][measurename][i].jobName);
                   }
                 }
               }

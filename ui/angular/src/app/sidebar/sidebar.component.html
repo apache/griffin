@@ -64,7 +64,7 @@ under the License.
                                     <i class="fa fa-line-chart faArrows"></i>
                                     <span class="side-date">{{items.timestamp | date:'short' }}</span>
                                     &nbsp;&nbsp;
-                                    <span class="side-name" title="{{items.name}}">{{items.name }}</span>
+                                    <span class="side-name" title="{{items.name}}">{{items.name |truncate :10}}</span>
                                     <!-- <span ng-if="items.dq <= 100" class="pull-right" [ngClass]="items.dqfail?'side-percent-red':'side-percent'">{{items.dq}}%</span> -->
                                     <!-- <span ng-if="items.dq > 100" class="pull-right" [ngClass]="items.dqfail?'side-percent-red':''">{{items.dq/1000}}K</span> -->
                                 </a>

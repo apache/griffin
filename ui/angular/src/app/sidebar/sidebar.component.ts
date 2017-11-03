@@ -22,6 +22,7 @@ import  {Router} from "@angular/router";
 import {ChartService} from '../service/chart.service';
 import  {DatePipe} from '@angular/common';
 import {ServiceService} from '../service/service.service';
+import {TruncatePipe} from './truncate.pipe';
 // import {GetMetricService} from '../service/get-metric.service';
 import * as $ from 'jquery';
 
@@ -29,6 +30,7 @@ import * as $ from 'jquery';
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
+  // pipes: [TruncatePipe],
   providers:[ChartService,ServiceService]
 })
 export class SidebarComponent implements OnInit {
@@ -52,6 +54,8 @@ export class SidebarComponent implements OnInit {
   metricNameUnique = [];
   myData = [];
   chartOption = new Map();
+  orgWithMeasure:any;
+  measureOptions = [];
   // var formatUtil = echarts.format;
 
   pageInit() {
@@ -109,21 +113,34 @@ export class SidebarComponent implements OnInit {
     	// this.finalData = this.getMetricService.renderData();
       var url_organization = this.serviceService.config.uri.organization;
       this.http.get(url_organization).subscribe(data => {
-      let orgWithMeasure = data;
+      this.orgWithMeasure = data;
       var orgNode = null;
-      for(let orgName in orgWithMeasure){
+      for(let orgName in this.orgWithMeasure){
         orgNode = new Object();
         orgNode.name = orgName;
-        orgNode.measureMap = orgWithMeasure[orgName];
+        orgNode.jobMap = [];
+        orgNode.measureMap = [];
+        for(let key in this.orgWithMeasure[orgName]){
+          orgNode.measureMap.push(key);
+          this.measureOptions.push(key);
+          // console.log(this.measureOptions);
+          for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
+            orgNode.jobMap.push(this.orgWithMeasure[orgName][key][i].jobName);
+          }
+        }
         this.orgs.push(orgNode);
       }
       this.originalOrgs = this.orgs;
+      // console.log(this.originalOrgs);
       let url_dashboard = this.serviceService.config.uri.dashboard;
       this.http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).subscribe(data => {
-            // this.originalData = JSON.parse(JSON.stringify(data));
             this.originalData = data;
             this.myData = JSON.parse(JSON.stringify(this.originalData.hits.hits));
+            // this.myData = this.allData.hits.hits;
             this.metricName = [];
+            // for(var i = 0;i<this.myData.length;i++){
+            //     this.metricName.push(this.myData[i]._source.name);
+            // }
             for(var i = 0;i<this.myData.length;i++){
                 this.metricName.push(this.myData[i]._source.name);
             }
@@ -148,7 +165,7 @@ export class SidebarComponent implements OnInit {
                 node.dq = 0;
                 node.metrics = new Array();
                 for (let metric of this.metricData){
-                    if(sys.measureMap.indexOf(metric[metric.length-1]._source.name)!= -1){
+                    if(sys.jobMap.indexOf(metric[metric.length-1]._source.name)!= -1){
                         var metricNode = {
                             'name':'',
                             'timestamp':'',
@@ -157,13 +174,14 @@ export class SidebarComponent implements OnInit {
                         }
                         metricNode.name = metric[metric.length-1]._source.name;
                         metricNode.timestamp = metric[metric.length-1]._source.tmst;
-                        metricNode.dq = metric[metric.length-1]._source.matched/metric[metric.length-1]._source.total*100;
+                        metricNode.dq = metric[metric.length-1]._source.value.matched/metric[metric.length-1]._source.value.total*100;
                         metricNode.details = metric;
                         node.metrics.push(metricNode);
                     }
                 }
                 this.finalData.push(node);
             }
+            this.originalData = JSON.parse(JSON.stringify(this.finalData));
             console.log(this.finalData);
             // return JSON.parse(JSON.stringify(this.finalData));
             return this.finalData;
