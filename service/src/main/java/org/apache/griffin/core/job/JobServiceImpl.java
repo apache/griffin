@@ -150,7 +150,7 @@ public class JobServiceImpl implements JobService {
                 return CREATE_JOB_FAIL;
             }
 
-            if (!isMeasureIdExist(measureId)) {
+            if (!isMeasureIdAvailable(measureId)) {
                 LOGGER.error("The measure id {} does't exist.", measureId);
                 return CREATE_JOB_FAIL;
             }
@@ -167,9 +167,9 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    private Boolean isMeasureIdExist(long measureId) {
+    private Boolean isMeasureIdAvailable(long measureId) {
         Measure measure = measureRepo.findOne(measureId);
-        if (measure != null) {
+        if (measure != null && !measure.getDeleted()) {
             return true;
         }
         return false;
@@ -415,5 +415,18 @@ public class JobServiceImpl implements JobService {
             }
         }
         return false;
+    }
+
+    @Override
+    public Map<String, List<Map<String, Serializable>>> getJobDetailsGroupByMeasureId() {
+        Map<String, List<Map<String, Serializable>>> jobDetailsMap = new HashMap<>();
+        List<Map<String, Serializable>> jobInfoList = getAliveJobs();
+        for (Map<String, Serializable> jobInfo : jobInfoList) {
+            String measureId = (String) jobInfo.get("measureId");
+            List<Map<String, Serializable>> jobs = jobDetailsMap.getOrDefault(measureId, new ArrayList<>());
+            jobs.add(jobInfo);
+            jobDetailsMap.put(measureId, jobs);
+        }
+        return jobDetailsMap;
     }
 }

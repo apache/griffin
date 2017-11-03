@@ -45,7 +45,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -93,7 +92,6 @@ public class JobServiceImplTest {
 
     @Before
     public void setup() {
-//        service.restTemplate = mock(RestTemplate.class);
     }
 
     @Test
@@ -226,7 +224,7 @@ public class JobServiceImplTest {
         String jobName = "jobName";
         given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
         given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
-        Whitebox.setInternalState(service,"restTemplate",restTemplate);
+        Whitebox.setInternalState(service, "restTemplate", restTemplate);
         String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
         service.syncInstancesOfAllJobs();
@@ -252,7 +250,7 @@ public class JobServiceImplTest {
         String jobName = "jobName";
         given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
         given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
-        Whitebox.setInternalState(service,"restTemplate",restTemplate);
+        Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("result");
         service.syncInstancesOfAllJobs();
     }
@@ -264,7 +262,7 @@ public class JobServiceImplTest {
         String jobName = "jobName";
         given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
         given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
-        Whitebox.setInternalState(service,"restTemplate",restTemplate);
+        Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("{\"state\":\"wrong\"}");
         service.syncInstancesOfAllJobs();
     }
