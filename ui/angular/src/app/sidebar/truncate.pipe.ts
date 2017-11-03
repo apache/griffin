@@ -16,24 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-.icon{
-  color: #fff;
-  position: absolute;
-  left: 50%;
-  top: 80%;
+import {Pipe, PipeTransform} from '@angular/core'
+
+@Pipe({
+  name: 'truncate'
+})
+export class TruncatePipe {
+  transform(value: string, limit: number) : string {
+
+    let trail = '...';
+
+    return value.length > limit ? value.substring(0, limit) + trail : value;
+  }
 }
-
-
-.table-striped > tbody > tr{
-     background-color: #1f1f1f; 
-}
-
-.table > tbody + tbody {
-    border-top: 1px solid transparent;
-}
-
-.reco > tbody:nth-of-type(even) >tr {
-     background-color: #080808;
-}
-
-

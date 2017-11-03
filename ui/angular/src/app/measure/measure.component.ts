@@ -43,7 +43,7 @@ export class MeasureComponent implements OnInit {
   public visibleAnimate = false;
   deletedRow : any;
   // sourceTable :string;
-  targetTable :string;
+  // targetTable :string;
   deleteId : number;
   deleteIndex:number;
   // measureData= [{"id":22,"name":"i","description":"i","organization":"waq","type":"accuracy","source":{"id":43,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":44,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":22,"sampleRatio":0,"rules":"$source['id'] == $target['id']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":23,"name":"y","description":"y","organization":"waq","type":"accuracy","source":{"id":45,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":46,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":23,"sampleRatio":0,"rules":"$source['age'] > $target['age']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":24,"name":"ggg","description":"g","organization":"waq","type":"accuracy","source":{"id":47,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":48,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":24,"sampleRatio":0,"rules":"$source['id'] !== $target['id']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":25,"name":"t","description":"t","organization":"qaq","type":"accuracy","source":{"id":49,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"target":{"id":50,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"evaluateRule":{"id":25,"sampleRatio":0,"rules":"$source['name'] >= $target['name']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":26,"name":"yyy","description":"yyy","organization":"yyy","type":"accuracy","source":{"id":51,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":52,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":26,"sampleRatio":0,"rules":"$source['id'] !== $target['name']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":27,"name":"dd","description":"dd","organization":"waq","type":"accuracy","source":{"id":53,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"target":{"id":54,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"evaluateRule":{"id":27,"sampleRatio":0,"rules":"$source['name'] !== $target['id']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":28,"name":"yyyyyyyyy","description":"y","organization":"waq","type":"accuracy","source":{"id":55,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":56,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":28,"sampleRatio":0,"rules":"$source['id'] !== $target['id']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":29,"name":"this","description":null,"organization":"hadoop","type":"accuracy","source":{"id":57,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":58,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":29,"sampleRatio":0,"rules":"$source['id'] == $target['id'] AND $source['name'] !== $target['name'] AND $source['age'] > $target['age']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":30,"name":"new","description":null,"organization":"griffin","type":"accuracy","source":{"id":59,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":60,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":30,"sampleRatio":0,"rules":"$source['id'] !== $target['id'] AND $source['name'] == $target['name'] AND $source['age'] > $target['age']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":31,"name":"www","description":"wn","organization":"waq","type":"accuracy","source":{"id":61,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":62,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":31,"sampleRatio":0,"rules":"$source['id'] > $target['id'] AND $source['name'] == $target['name'] AND $source['age'] !== $target['age']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":32,"name":"testtest","description":null,"organization":"waq","type":"accuracy","source":{"id":63,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"target":{"id":64,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"evaluateRule":{"id":32,"sampleRatio":0,"rules":"$source['id'] !== $target['id'] AND $source['name'] > $target['name'] AND $source['age'] == $target['age']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":33,"name":"search_hourly","description":"search","organization":"waq","type":"accuracy","source":{"id":65,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":66,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":33,"sampleRatio":0,"rules":"$source['id'] !== $target['id'] AND $source['name'] == $target['name'] AND $source['age'] >= $target['age']"},"owner":"test","deleted":false,"process.type":"batch"},{"id":34,"name":"testt","description":null,"organization":"waq","type":"accuracy","source":{"id":67,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext"}},"target":{"id":68,"type":"HIVE","version":"1.2","config":{"database":"default","table.name":"ext1"}},"evaluateRule":{"id":34,"sampleRatio":0,"rules":"$source['id'] !== $target['id'] AND $source['name'] == $target['name'] AND $source['age'] > $target['age']"},"owner":"test","deleted":false,"process.type":"batch"}];
@@ -59,7 +59,7 @@ export class MeasureComponent implements OnInit {
     }
   }
  
-  constructor(private http:HttpClient,private router:Router,public servicecService:ServiceService) { 
+  constructor(private http:HttpClient,private router:Router,public serviceService:ServiceService) { 
   };
 
   remove(row){
@@ -73,7 +73,7 @@ export class MeasureComponent implements OnInit {
   }
 
   confirmDelete(){
-    var deleteModel = this.servicecService.config.uri.deleteModel;
+    var deleteModel = this.serviceService.config.uri.deleteModel;
     let deleteUrl = deleteModel + '/' + this.deleteId;
     this.http.delete(deleteUrl).subscribe(data => {
       let deleteResult:any = data;
@@ -90,11 +90,15 @@ export class MeasureComponent implements OnInit {
   };
 
   ngOnInit():void {
-    var allModels = this.servicecService.config.uri.allModels;
+    var allModels = this.serviceService.config.uri.allModels;
   	this.http.get(allModels).subscribe(data =>{
         for(let measure in data){
           data[measure].trueName = data[measure].name;
-          data[measure].type = data[measure].evaluateRule.rules[0]["dq.type"];
+          if(data[measure].evaluateRule.rules[0]){
+            data[measure].type = data[measure].evaluateRule.rules[0]["dq.type"];
+          }else{
+            data[measure].type = '';
+          }
         }
   		  this.results = Object.keys(data).map(function(index){
           let measure = data[index];

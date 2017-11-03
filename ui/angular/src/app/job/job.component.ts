@@ -54,7 +54,7 @@ export class JobComponent implements OnInit {
 
 
   
-  constructor(private http:HttpClient,private router:Router,public servicecService:ServiceService) { };
+  constructor(private http:HttpClient,private router:Router,public serviceService:ServiceService) { };
 
   public hide(): void {
     this.visibleAnimate = false;
@@ -79,7 +79,7 @@ export class JobComponent implements OnInit {
   }
 
   confirmDelete(){
-    let deleteJob = this.servicecService.config.uri.deleteJob;
+    let deleteJob = this.serviceService.config.uri.deleteJob;
     let deleteUrl = deleteJob + '?group=' + this.deleteGroup + '&jobName=' + this.deleteJob;
     this.http.delete(deleteUrl).subscribe(data => {
       let deleteResult:any = data;
@@ -107,7 +107,7 @@ export class JobComponent implements OnInit {
     let index  = this.results.indexOf(row);
     if (this.oldindex!=undefined &&this.oldindex != index){
         this.results[this.oldindex].showDetail = false;}
-    let getInstances = this.servicecService.config.uri.getInstances;
+    let getInstances = this.serviceService.config.uri.getInstances;
     let getInstanceUrl = getInstances+ '?group=' + 'BA' + '&jobName=' + row.jobName +'&page='+'0'+'&size='+'200';
     this.http.get(getInstanceUrl).subscribe(data =>{      
         row.showDetail = !row.showDetail;     
@@ -150,7 +150,7 @@ export class JobComponent implements OnInit {
   ngOnInit():void {
 
     var self = this;
-    let allJobs = this.servicecService.config.uri.allJobs;
+    let allJobs = this.serviceService.config.uri.allJobs;
   	this.http.get(allJobs).subscribe(data =>{       
         this.results = Object.keys(data).map(function(index){
           let job = data[index];
