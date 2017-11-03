@@ -220,6 +220,20 @@ public class JobServiceImplTest {
     }
 
     @Test
+    public void testSyncInstancesOfJobForSuccess() {
+        JobInstance instance = newJobInstance();
+        String group = "groupName";
+        String jobName = "jobName";
+        given(jobInstanceRepo.findGroupWithJobName()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        Whitebox.setInternalState(service,"restTemplate",restTemplate);
+        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+        given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
+        service.syncInstancesOfAllJobs();
+    }
+
+
+    @Test
     public void testSyncInstancesOfJobForRestClientException() {
         JobInstance instance = newJobInstance();
         instance.setSessionId(1234564);

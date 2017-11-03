@@ -29,6 +29,7 @@ import org.apache.griffin.core.job.entity.JobRequestBody;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
@@ -65,6 +66,8 @@ public class JobServiceImpl implements JobService {
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
     private Properties sparkJobProps;
+    @Autowired
+    private MeasureRepo measureRepo;
 
     private RestTemplate restTemplate;
 
@@ -147,6 +150,11 @@ public class JobServiceImpl implements JobService {
                 return CREATE_JOB_FAIL;
             }
 
+            if (!isMeasureIdExist(measureId)) {
+                LOGGER.error("The measure id {} does't exist.", measureId);
+                return CREATE_JOB_FAIL;
+            }
+
             JobDetail jobDetail = addJobDetail(scheduler, groupName, jobName, measureId, jobRequestBody);
             scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, jobStartTime));
             return GriffinOperationMessage.CREATE_JOB_SUCCESS;
@@ -157,6 +165,14 @@ public class JobServiceImpl implements JobService {
             LOGGER.error("SchedulerException when add job. {}", e.getMessage());
             return CREATE_JOB_FAIL;
         }
+    }
+
+    private Boolean isMeasureIdExist(long measureId) {
+        Measure measure = measureRepo.findOne(measureId);
+        if (measure != null) {
+            return true;
+        }
+        return false;
     }
 
     private JobDetail addJobDetail(Scheduler scheduler, String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody) throws SchedulerException {
@@ -366,8 +382,8 @@ public class JobServiceImpl implements JobService {
         int jobCount = 0;
         int notHealthyCount = 0;
         try {
-            Set<JobKey> jobKeys =  scheduler.getJobKeys(GroupMatcher.anyGroup());
-            for (JobKey jobKey :jobKeys) {
+            Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyGroup());
+            for (JobKey jobKey : jobKeys) {
                 List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
                 if (triggers != null && triggers.size() != 0 && !isJobDeleted(scheduler, jobKey)) {
                     jobCount++;
@@ -381,7 +397,7 @@ public class JobServiceImpl implements JobService {
         return new JobHealth(jobCount - notHealthyCount, jobCount);
     }
 
-    private int getJobNotHealthyCount(int notHealthyCount,JobKey jobKey){
+    private int getJobNotHealthyCount(int notHealthyCount, JobKey jobKey) {
         if (!isJobHealthy(jobKey)) {
             notHealthyCount++;
         }
