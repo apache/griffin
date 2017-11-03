@@ -81,7 +81,7 @@ public class LivySessionStates {
         }
     }
 
-    public static boolean isHeathy(State state) {
+    public static boolean isHealthy(State state) {
         if (State.error.equals(state) || State.dead.equals(state) || State.shutting_down.equals(state)) {
             return false;
         }
