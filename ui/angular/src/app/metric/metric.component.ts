@@ -108,8 +108,10 @@ export class MetricComponent implements OnInit {
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
           // console.log(this.measureOptions);
-          for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
+          if(this.orgWithMeasure[orgName][key]!=null){
+            for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
             orgNode.jobMap.push(this.orgWithMeasure[orgName][key][i].jobName);
+          }
           }
         }
         this.orgs.push(orgNode);
@@ -172,7 +174,7 @@ export class MetricComponent implements OnInit {
               self.redraw(self.finalData);
 
             },0)
-            console.log(this.finalData);
+            // console.log(this.finalData);
             // return JSON.parse(JSON.stringify(this.finalData));
             return this.finalData;
       });

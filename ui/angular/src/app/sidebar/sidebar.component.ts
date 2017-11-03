@@ -124,8 +124,10 @@ export class SidebarComponent implements OnInit {
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
           // console.log(this.measureOptions);
-          for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
+          if(this.orgWithMeasure[orgName][key]!=null){
+            for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
             orgNode.jobMap.push(this.orgWithMeasure[orgName][key][i].jobName);
+          }
           }
         }
         this.orgs.push(orgNode);
@@ -182,7 +184,7 @@ export class SidebarComponent implements OnInit {
                 this.finalData.push(node);
             }
             this.originalData = JSON.parse(JSON.stringify(this.finalData));
-            console.log(this.finalData);
+            // console.log(this.finalData);
             // return JSON.parse(JSON.stringify(this.finalData));
             return this.finalData;
       });
