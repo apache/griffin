@@ -184,8 +184,12 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 //  }
 
   private def persistRecords(hdfsPath: String, records: Iterable[String]): Unit = {
-    val recStr = records.mkString("\n")
-    HdfsUtil.writeContent(hdfsPath, recStr)
+    try {
+      val recStr = records.mkString("\n")
+      HdfsUtil.writeContent(hdfsPath, recStr)
+    } catch {
+      case e: Throwable => error(e.getMessage)
+    }
   }
 
   def log(rt: Long, msg: String): Unit = {
@@ -276,9 +280,9 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 //  }
 
   def persistMetrics(metrics: Map[String, Any]): Unit = {
-    val json = JsonUtil.toJson(metrics)
     try {
-      info(s"${json}")
+      val json = JsonUtil.toJson(metrics)
+      println(s"hdfs persist metrics: ${json}")
       persistRecords(MetricsFile, json :: Nil)
     } catch {
       case e: Throwable => error(e.getMessage)
