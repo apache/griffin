@@ -24,12 +24,14 @@ import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
+import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.PropertiesUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.reflect.Whitebox;
 import org.quartz.*;
@@ -49,6 +51,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static org.apache.griffin.core.measure.MeasureTestHelper.createATestMeasure;
 import static org.apache.griffin.core.measure.MeasureTestHelper.createJobDetail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -89,9 +92,13 @@ public class JobServiceImplTest {
     @Autowired
     private JobServiceImpl service;
 
+    @MockBean
+    private MeasureRepo measureRepo;
+
 
     @Before
     public void setup() {
+
     }
 
     @Test
@@ -137,12 +144,13 @@ public class JobServiceImplTest {
     }
 
     @Test
-    public void testAddJobForSuccess() {
+    public void testAddJobForSuccess() throws Exception {
         JobRequestBody jobRequestBody = new JobRequestBody("YYYYMMdd-HH", "YYYYMMdd-HH",
                 String.valueOf(System.currentTimeMillis()), String.valueOf(System.currentTimeMillis()), "1000");
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getObject()).willReturn(scheduler);
-        assertEquals(service.addJob("BA", "jobName", 0L, jobRequestBody), GriffinOperationMessage.CREATE_JOB_SUCCESS);
+        given(measureRepo.findOne(1L)).willReturn(createATestMeasure("measureName","org"));
+        assertEquals(service.addJob("BA", "jobName", 1L, jobRequestBody), GriffinOperationMessage.CREATE_JOB_SUCCESS);
     }
 
     @Test
