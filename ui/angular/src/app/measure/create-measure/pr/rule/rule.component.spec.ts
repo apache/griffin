@@ -16,24 +16,28 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-.icon{
-  color: #fff;
-  position: absolute;
-  left: 50%;
-  top: 80%;
-}
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { RuleComponent } from './rule.component';
 
-.table-striped > tbody > tr{
-     background-color: #1f1f1f; 
-}
+describe('RuleComponent', () => {
+  let component: RuleComponent;
+  let fixture: ComponentFixture<RuleComponent>;
 
-.table > tbody + tbody {
-    border-top: 1px solid transparent;
-}
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ RuleComponent ]
+    })
+    .compileComponents();
+  }));
 
-.reco > tbody:nth-of-type(even) >tr {
-     background-color: #080808;
-}
+  beforeEach(() => {
+    fixture = TestBed.createComponent(RuleComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-
+  it('should be created', () => {
+    expect(component).toBeTruthy();
+  });
+});

@@ -74,7 +74,7 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
             String orgName = measure.getOrganization();
             String measureName = measure.getName();
             String measureId = measure.getId().toString();
-            List<Map<String, Serializable>> jobList = jobDetails.get(measureId);
+            List<Map<String, Serializable>> jobList = jobDetails.getOrDefault(measureId, new ArrayList<>());
             Map<String, List<Map<String, Serializable>>> measureWithJobs = result.getOrDefault(orgName, new HashMap<>());
             measureWithJobs.put(measureName, jobList);
             result.put(orgName, measureWithJobs);

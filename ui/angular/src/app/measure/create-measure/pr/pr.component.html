@@ -16,16 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<div class="container-fluid">
+<div class="container-fluid" (window:resize)="onResize($event)">
   <div class="row">
     <h5 class="over-title margin-bottom-15">Create Measure</h5>
   </div>
   <div class="row">
-    <form name="Form" id="form" (ngSubmit)="submit(prForm)" #prForm="ngForm" novalidate>
-      <div id="wizard" class="swMain" >
+    <form name="Form" id="form" #prForm="ngForm" novalidate>
+      <div id="wizard" class="swMain">
         <ul>
-          <li (click)="goTo(1)" >
+          <li (click)="goTo(1)">
             <a [ngClass]="{'selected' : currentStep >= 1, 'done' : currentStep > 1}" class="selected">
               <div class="stepNumber">
                 1
@@ -51,212 +50,174 @@ under the License.
           </li>
         </ul>
       </div>
-
-        <div id="step-1" *ngIf="currentStep == 1" class="formStep" >
-          <label class="stepDesc">This step let you choose the single source of truth for data quality comparision with target. Currently you can only select the attributes from one schema</label>
-          <div class="container-fluid">
-           
-            <div class="col-md-4 col-lg-4 col-sm-4">
-              <fieldset>
-                <legend>Please select schema</legend>
-                <tree-root [nodes]="nodeList" [options]="options"></tree-root>
-              </fieldset>
-            </div>
-            <div class="col-md-8 col-lg-8 col-sm-8">
-              <fieldset>
-                <legend>
-                  Select attributes
-                </legend>
-                <div class="y-scrollable">
-                  <div>
-                    <label>View schema:</label> 
-                    <i
-                    style="color:#fff;font-weight: bold;">{{currentDB}}.{{currentTable}}
+      <div id="step-1" *ngIf="currentStep == 1" class="formStep">
+        <label class="stepDesc">This step let you choose the single source of truth for data quality comparision with target. Currently you can only select the attributes from one schema</label>
+        <div class="container-fluid">
+          <div class="col-md-4 col-lg-4 col-sm-4">
+            <fieldset>
+              <legend>Please select schema</legend>
+              <tree-root [nodes]="nodeList" [options]="options"></tree-root>
+            </fieldset>
+          </div>
+          <div class="col-md-8 col-lg-8 col-sm-8">
+            <fieldset>
+              <legend>
+                Select attributes
+              </legend>
+              <div class="y-scrollable">
+                <div>
+                  <label>View schema:</label>
+                  <i style="color:#fff;font-weight: bold;">{{currentDB}}.{{currentTable}}
                     </i>
-                  </div>
-                  <div>
-                    <table class="table table-striped">
-                      <thead>
+                </div>
+                <div>
+                  <table class="table table-striped no-border">
+                    <thead>
                       <tr style="background-color:#7D95CC">
-                        <th><input type="checkbox" (click)="toggleAll()" [checked]="selectedAll"
-                        /></th>
+                        <th>
+                          <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll" />
+                        </th>
                         <th>Column Name</th>
                         <th>Type</th>
                         <th>Comment</th>
                       </tr>
-                      </thead>
-                      <tbody>
+                    </thead>
+                    <tbody>
                       <tr *ngIf="!schemaCollection || schemaCollection.length == 0">
-                        <td colspan="5" style="text-align:center" ><span class="highlight">Please select a schema from the left tree first</span></td>
+                        <td colspan="5" style="text-align:center;"><span class="highlight">Please select a schema from the left tree first</span></td>
                       </tr>
                       <tr *ngFor="let row of schemaCollection">
                         <td>
-                        <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}}
-                        />
+                          <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}} />
                         </td>
                         <td>{{row.name}}</td>
                         <td>{{row.type}}</td>
                         <td>{{row.comment}}</td>
                       </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-            <div class="form-group btn-container">
-              <toaster-container></toaster-container>
-              <button class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="next(Form)">
-                Next <i class="fa fa-arrow-circle-right"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div id="step-2" *ngIf="currentStep == 2" class="formStep" >
-        <label class="stepDesc">Please choose one of the profiling models provided below:</label>
-        <div class="container-fluid">
-          <div class="col-md-12 col-lg-12 col-sm-12">
-            <fieldset>
-              <div class="y-scrollable">
-                <div class="container col-md-12 col-lg-12 col-sm-12">
-                  <div class="row">
-                    <div class="col-md-12 col-lg-12 col-sm-12" *ngFor="let item of selection;let itemIndex = index" >
-                      <p style="font-weight: bold;font-size: 120%;cursor:pointer" 
-                      (click)="item.isExpanded = !item.isExpanded">
-                      <i *ngIf="!item.isExpanded" class="fa fa-chevron-circle-right blue"></i>
-                      <i *ngIf="item.isExpanded" class="fa fa-chevron-circle-down blue"></i>&nbsp;{{currentDB}}.{{currentTable}}.{{item.name}}
-                      <i>:{{item.ruleLength}}&nbsp;rules</i>
-                      </p>
-                      <div *ngIf="item.isExpanded">
-                        <div id="simple{{itemIndex}}">
-                          <h5>Simple Statistics</h5>
-                          <div *ngFor="let rule of item.newRules;let ruleIndex = index" >
-                            <div *ngIf="rule!=null">
-                              <a class="btn btn-primary btn-o" style="background-color: #337ab7;" 
-                          (click)="removeRule(item,ruleIndex)">
-                                <i class="fa fa-times"></i>
-                              </a>
-                              <label style="width: 7%;text-align:center;">Rule:</label>
-                              <select class="form-control" style="width: 25%;display: inline-block;" 
-                              id="simpleRule" name='simpleRule-{{itemIndex}}{{ruleIndex}}' [(ngModel)]='rule.type'>
-                                <option>Total Count</option>
-                                <option>Distinct Count</option>
-                                <option>Null Detection Count</option>
-                                <option *ngIf="item.type=='string'||item.type=='varchar'||item.type=='char'">Regular Expression Detection Count</option>
-                                <option>Rule Detection Count</option>
-                                <option *ngIf='item.isNum'>Maximum</option>
-                                <option *ngIf='item.isNum'>Minimum</option>
-                                <option *ngIf='item.isNum'>Median</option>
-                                <option *ngIf='item.isNum'>Average</option>
-                                <option>Enum Detection Count</option>
-                              </select>
-                              <!-- <a class="btn btn-primary btn-o" style="background-color: #337ab7;"
-                              (click)="addCond(item,ruleIndex)">
-                                <i class="fa fa-plus"></i>
-                              </a> -->
-                              <div style="display: inline-block;font-size: 130%;vertical-align: middle;" *ngFor="let cond of rule.conditionGroup;let condIndex=index">
-                                <input type="checkbox" 
-                                name="condition-{{itemIndex}}{{ruleIndex}}{{condIndex}}" 
-                                value="cond.type" 
-                                (click)='toggleSelectionCond(cond,condIndex,ruleIndex,item)'  
-                                [disabled]="!cond.avaliable" [(ngModel)]="cond.chosen" style="width:18px;height: 18px;">
-                                <!-- <span class="badge">&check;</span> -->
-                                <label>{{cond.type}}</label>
-                                <br>
-                              </div>
-                              <div *ngFor="let cond of rule.conditionGroup;let condIndex=index" style="margin-left:12%;">
-                                <label style="width: 7%;" *ngIf="cond.chosen">{{cond.type}}</label>
-                                <input *ngIf="cond.chosen" 
-                                name="conditionDetail-{{itemIndex}}{{ruleIndex}}{{condIndex}}" type="text" class="form-control" style="width: 40%;display: inline-block;" [(ngModel)]="cond.content"/>
-                              </div>
-                        
-                            </div> 
-
-                          </div>
-                         
-                           <a class="btn btn-primary btn-o" style="background-color: #337ab7;" 
-                          (click)="addRule(item)">
-                              <i class="fa fa-plus"></i>
-                            </a>
-                        <br>
-                      </div>
-                      </div>
-                    </div>
-                    <!-- <div class="col-md-9 col-lg-9 col-sm-9" ng-include="'/pages/rules/va-explaination.html'">
-                    </div> -->
-                  </div>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </fieldset>
           </div>
-          <div class="form-group btn-container" >
-            <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev(Form)">
-                <i class="fa fa-arrow-circle-left"></i> Back
-            </button>
+          <div class="form-group btn-container">
             <toaster-container></toaster-container>
             <button class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="next(Form)">
-                Next <i class="fa fa-arrow-circle-right"></i>
+              Next <i class="fa fa-arrow-circle-right"></i>
             </button>
           </div>
         </div>
       </div>
-
-      <div id="step-3" *ngIf="currentStep == 3" class="formStep" >
-          <label class="stepDesc">Please setup the measure required information</label>
-          <div class="container-fluid">
-            <div class="col-md-12 col-lg-12 col-sm-12">
-              <fieldset>
-                <legend>
-                  Required Information
-                </legend>
-                <div class="y-scrollable">
-                  <div class="col-md-12 col-lg-12 col-sm-12">
-                    <div class="form-group" [ngClass]="{'has-error':prName.dirty&&prName.invalid, 'has-success':prName.valid}">
-                      <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                        Measure Name<span class="symbol required"></span>:
-                      </label>
-                      <div class="col-md-10 col-lg-10 col-sm-10 ">
-                        <input type="text" class="form-control" [(ngModel)]="name" #prName="ngModel" name="prName" placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$">
-                        <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.required)">Measure Name is required</span>
-                        <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
-                      </div>
+      <div id="step-2" *ngIf="currentStep == 2" class="formStep">
+        <label class="stepDesc">Please choose one of the profiling models provided below:</label>
+        <div class="container-fluid" id="notshowrule">
+          <div class="col-md-12 col-lg-12 col-sm-12">
+            <fieldset style="max-height:400px;overflow-y:scroll">
+              <div class="y-scrollable">
+                <div style="display:block">
+                  <label style="color:#888888">View schema:</label> <i style="color:#fff;font-weight: bold;">{{currentDB}}.{{currentTable}}</i>
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12" style="z-index:100">
+                  <table class="table table-striped" [mfData]="results" #mf="mfDataTable">
+                    <thead>
+                      <tr style="background-color:#7D95CC">
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        <th>Rule&nbsp;&nbsp;&nbsp;&nbsp;<i style="color:#b2c831;" class="fa fa-question-circle fa-lg"></i><i style="font-family: 'Open Sans', sans-serif;">Click <a (click)="showRule()" class="bark-link po">here</a> to view the rule definition</i></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of selection">
+                        <td class="middle">{{item.name}}</td>
+                        <td class="middle">{{item.type}}</td>
+                        <td class="col-md-5 middle">
+                          <angular2-multiselect [data]="dropdownList[item.name]" name="rules-{{item.name}}" [(ngModel)]="selectedItems[item.name]" [settings]="dropdownSettings"></angular2-multiselect>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- <div *ngFor="let index of transrule">&nbsp;&nbsp;&nbsp;&nbsp;{{index}}</div> -->
+              </div>
+            </fieldset>
+          </div>
+          <div class="form-group btn-container">
+            <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev(Form)">
+              <i class="fa fa-arrow-circle-left"></i> Back
+            </button>
+            <toaster-container></toaster-container>
+            <button class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="next(Form)">
+              Next <i class="fa fa-arrow-circle-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid" id="showrule" style="display:none;">
+        <div class="col-md-12 col-lg-12 col-sm-12">
+          <fieldset>
+            <app-rule></app-rule>
+          </fieldset>
+        </div>
+        <div class="form-group btn-container">
+          <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="back()">
+            <i class="fa fa-arrow-circle-left"></i> Back
+          </button>
+        </div>
+      </div>
+      <div id="step-3" *ngIf="currentStep == 3" class="formStep">
+        <label class="stepDesc">Please setup the measure required information</label>
+        <div class="container-fluid">
+          <div class="col-md-12 col-lg-12 col-sm-12">
+            <fieldset>
+              <legend>
+                Required Information
+              </legend>
+              <div class="y-scrollable">
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group" [ngClass]="{'has-error':prName.dirty&&prName.invalid, 'has-success':prName.valid}">
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Measure Name<span class="symbol required"></span>:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10 ">
+                      <input type="text" class="form-control" [(ngModel)]="name" #prName="ngModel" name="prName" placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$">
+                      <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.required)">Measure Name is required</span>
+                      <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
                     </div>
                   </div>
-                  <div class="col-md-12 col-lg-12 col-sm-12">
-                    <div class="form-group">
-                      <label for="typeSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                        Measure Type:
-                      </label>
-                      <div class="col-md-10 col-lg-10 col-sm-10 ">
-                        <select id="typeSelector" class="form-control" [(ngModel)]="type"  disabled required name="type">
-                          <option>{{type}}</option>
-                        </select>
-                      </div>
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group">
+                    <label for="typeSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Measure Type:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10 ">
+                      <select id="typeSelector" class="form-control" [(ngModel)]="type" disabled required name="type">
+                        <option>{{type}}</option>
+                      </select>
                     </div>
                   </div>
-                  <div class="col-md-12 col-lg-12 col-sm-12">
-                    <div class="form-group">
-                      <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                        Organization:
-                      </label>
-                      <div class="col-md-10 col-lg-10 col-sm-10 ">
-                        <input type="text" id="systemSelector" class="form-control"  required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org" value="{{currentDB}}" disabled>
-                      </div>
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group">
+                    <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Organization:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10 ">
+                      <input type="text" id="systemSelector" class="form-control" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org" value="{{currentDB}}" disabled>
                     </div>
                   </div>
-                  <div class="col-md-12 col-lg-12 col-sm-12">
-                    <div class="form-group">
-                      <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                        DataAsset:
-                      </label>
-                      <div class="col-md-10 col-lg-10 col-sm-10">
-                        <input type="text" class="form-control" name="DataAsset"
-                        value="{{currentTable}}" disabled>
-                      </div>
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group">
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      DataAsset:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10">
+                      <input type="text" class="form-control" name="DataAsset" value="{{currentTable}}" disabled>
                     </div>
                   </div>
-                  <!-- <div class="col-md-12 col-lg-12 col-sm-12">
+                </div>
+                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
                     <div class="form-group">
                       <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                         Owner:
@@ -267,77 +228,73 @@ under the License.
                       </div>
                     </div>
                   </div> -->
-                </div>
-                <div style="color:#b2c831">
-                  <p>
-                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" routerLink="/measures">Measures</a>" to check the measure status
-                  </p>
-                </div>
-              </fieldset>
-            </div>
-
-            <div class="form-group btn-container" >
-              <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev(Form)">
-                <i class="fa fa-arrow-circle-left"></i> Back
-              </button>
-              <toaster-container></toaster-container>
-              <button type="submit" class="btn btn-primary btn-o next-step btn-wide pull-right">
-                Submit
-              </button>
-            </div>
+              </div>
+              <div style="color:#b2c831">
+                <p>
+                  <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" routerLink="/measures">Measures</a>" to check the measure status
+                </p>
+              </div>
+            </fieldset>
+          </div>
+          <div class="form-group btn-container">
+            <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev(Form)">
+              <i class="fa fa-arrow-circle-left"></i> Back
+            </button>
+            <toaster-container></toaster-container>
+            <button type="submit" (click)="submit(prForm)" class="btn btn-primary btn-o next-step btn-wide pull-right">
+              Submit
+            </button>
           </div>
         </div>
-
-        <div class="modal fade" id="confirm" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}"
-       [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
-       (click)="onContainerClicked($event)">
-          <div class="modal-dialog modal-xg modal-lg">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Save the measure with the below information?</h4>
-              </div>
-              <div class="modal-body">
-                <div class="container-fluid" id="viewruleContent" style="overflow:auto;">
-                  <div class="row">
-                    <h5 class="over-title margin-bottom-15">Basic information</h5>
-                  </div>
-                  <div class="row">
-                    <div  class="col-lg-12 col-md-12 col-sm-12">
-                      <div id="viewrule-definition" class="viewrule-content">
-                        <div class="row">
-                          <label class="col-md-4 col-lg-4 col-sm-4">
-                            Measure Name:
-                          </label>
-                          <div class="col-md-8 col-lg-8 col-sm-8 ">
-                            {{name}}
-                          </div>
+      </div>
+      <div class="modal fade" id="confirm" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
+        <div class="modal-dialog modal-xg modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">Save the measure with the below information?</h4>
+            </div>
+            <div class="modal-body">
+              <div class="container-fluid" id="viewruleContent" style="overflow:auto;">
+                <div class="row">
+                  <h5 class="over-title margin-bottom-15">Basic information</h5>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div id="viewrule-definition" class="viewrule-content">
+                      <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Measure Name:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8 ">
+                          {{name}}
                         </div>
-                        <div class="row">
-                          <label class="col-md-4 col-lg-4 col-sm-4">
-                            Measure Type:
-                          </label>
-                          <div class="col-md-8 col-lg-8 col-sm-8 ">
-                            {{type}}
-                          </div>
+                      </div>
+                      <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Measure Type:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8 ">
+                          {{type}}
                         </div>
-                        <div class="row">
-                          <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                            Organization:
-                          </label>
-                          <div class="col-md-8 col-lg-8 col-sm-8 ">
-                            {{currentDB}}
-                          </div>
+                      </div>
+                      <div class="row">
+                        <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
+                          Organization:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8 ">
+                          {{currentDB}}
                         </div>
-                        <div class="row">
-                          <label class="col-md-4 col-lg-4 col-sm-4">
-                            DataAsset:
-                          </label>
-                          <div class="col-md-8 col-lg-8 col-sm-8">
+                      </div>
+                      <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          DataAsset:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
                           {{currentTable}}
-                          </div>
                         </div>
-<!--                         <div class="row">
+                      </div>
+                      <!--                         <div class="row">
                           <label class="col-md-4 col-lg-4 col-sm-4">
                             Owner:
                           </label>
@@ -345,17 +302,22 @@ under the License.
                             {{owner}}
                           </div>
                         </div> -->
-                        
-                      </div>
                     </div>
                   </div>
-                  <h5 class="row">Rules</h5>
-                    <div class="row" *ngFor = "let newRule of newMeasure.evaluateRule.rules">
-                      {{newRule.rule}}
-                    </div>
-                  <br/>
-                  <!-- <h5 class="row">Mapping rules</h5> -->
-                  <!-- <div class="row">
+                </div>
+                <h5 class="row">Rules</h5>
+                <div class="row" *ngFor="let index of transrule;">
+                  &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
+                </div>
+                <div class="row" *ngFor="let index of transnullrule;">
+                  &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
+                </div>
+                <div class="row" *ngFor="let index of transenumrule;">
+                  &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
+                </div>
+                <br/>
+                <!-- <h5 class="row">Mapping rules</h5> -->
+                <!-- <div class="row">
                     <p>{{rules}}</p>
                     <p>
                       <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
@@ -378,15 +340,15 @@ under the License.
                       </div>
                     </div>
                   </div> -->
-                </div>
               </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" (click)="hide()">Cancel</button>
-                <button type="button" class="btn btn-primary" (click)="save()">Save</button>
-              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" (click)="hide()">Cancel</button>
+              <button type="button" class="btn btn-primary" (click)="save()">Save</button>
             </div>
           </div>
         </div>
+      </div>
     </form>
   </div>
 </div>
