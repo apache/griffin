@@ -16,24 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-.icon{
-  color: #fff;
-  position: absolute;
-  left: 50%;
-  top: 80%;
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-rule',
+  templateUrl: './rule.component.html',
+  styleUrls: ['./rule.component.css']
+})
+export class RuleComponent implements OnInit {
+  
+  vaType : string;
+  constructor() { }
+
+  ngOnInit() {
+  	this.vaType = '2';
+  }
+
 }
-
-
-.table-striped > tbody > tr{
-     background-color: #1f1f1f; 
-}
-
-.table > tbody + tbody {
-    border-top: 1px solid transparent;
-}
-
-.reco > tbody:nth-of-type(even) >tr {
-     background-color: #080808;
-}
-
-
