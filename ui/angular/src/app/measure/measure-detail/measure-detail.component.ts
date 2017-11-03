@@ -33,7 +33,7 @@ import {ServiceService} from '../../service/service.service';
 export class MeasureDetailComponent implements OnInit {
   currentId:string;
   constructor(private route: ActivatedRoute,
-  private router: Router,private http:HttpClient,public servicecService:ServiceService) { };
+  private router: Router,private http:HttpClient,public serviceService:ServiceService) { };
   ruleData : any;
   sourceLength : number;
   sourceDB : string;
@@ -47,7 +47,7 @@ export class MeasureDetailComponent implements OnInit {
       'evaluateRule':''
     };
   	var getModelUrl;
-    var getModel = this.servicecService.config.uri.getModel; 
+    var getModel = this.serviceService.config.uri.getModel; 
   	this.currentId = this.route.snapshot.paramMap.get('id');
 
     getModelUrl = getModel+"/"+this.currentId;
