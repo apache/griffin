@@ -333,7 +333,11 @@ export class AcComponent implements OnInit {
           return rules;
       }
       var self = this;
-      var rules = this.selectionTarget.map(function(item, i) {
+      console.log(this.selectionTarget);
+      // var rules = this.selectionTarget.map(function(item, i) {
+      //     return mappingRule(self.selection[i], item, self.matches[i]);
+      // });
+      var rules = this.mappings.map(function(item, i) {
           return mappingRule(self.selection[i], item, self.matches[i]);
       });
       rule = rules.join(" AND ");
@@ -350,7 +354,7 @@ export class AcComponent implements OnInit {
 
   save() {
 
-    var addModels = this.servicecService.config.uri.addModels;
+    var addModels = this.serviceService.config.uri.addModels;
 
     this.http
     .post(addModels, this.newMeasure)
@@ -370,123 +374,6 @@ export class AcComponent implements OnInit {
     
   }
 
-  // data: { [key: string]: Array<object>; } = {
-  //   "default": [
-  //       {
-  //           "tableName": "ext",
-  //           "dbName": "default",
-  //           "owner": "hadoop",
-  //           "createTime": 1488353464,
-  //           "lastAccessTime": 0,
-  //           "retention": 0,
-  //           "sd": {
-  //               "cols": [
-  //                   {
-  //                       "name": "id",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "name",
-  //                       "type": "string",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "age",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   }
-  //               ],
-  //               "location": "hdfs://10.9.246.187/user/hive/ext",
-  //           },
-  //       },
-  //       {
-  //           "tableName": "ext1",
-  //           "dbName": "default",
-  //           "owner": "hadoop",
-  //           "createTime": 1489382943,
-  //           "lastAccessTime": 0,
-  //           "retention": 0,
-  //           "sd": {
-  //               "cols": [
-  //                   {
-  //                       "name": "id",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "name",
-  //                       "type": "string",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "age",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   }
-  //               ],
-  //               "location": "hdfs://10.9.246.187/user/hive/ext1",
-  //           },
-  //       }
-  //   ],
-  //   "griffin": [
-  //       {
-  //           "tableName": "avr_out",
-  //           "dbName": "griffin",
-  //           "owner": "hadoop",
-  //           "createTime": 1493892603,
-  //           "lastAccessTime": 0,
-  //           "retention": 0,
-  //           "sd": {
-  //               "cols": [
-  //                   {
-  //                       "name": "id",
-  //                       "type": "bigint",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "age",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "desc",
-  //                       "type": "string",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   }
-  //               ],
-  //               "location": "hdfs://10.9.246.187/griffin/data/batch/avr_out",
-  //           },
-  //       }
-  //   ],
-  // };
   
   options: ITreeOptions = {
     displayField: 'name',
@@ -542,12 +429,11 @@ export class AcComponent implements OnInit {
 
   nodeList:object[];
   nodeListTarget:object[];
-  constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public servicecService:ServiceService) {
+  constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
   
   onResize(event){
-    console.log("Width: " + event.target.innerWidth);
    this.resizeWindow();
   }
 
@@ -559,7 +445,7 @@ export class AcComponent implements OnInit {
   }
 
   ngOnInit() {
-    var allDataassets = this.servicecService.config.uri.dataassetlist;
+    var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{
       this.nodeList = new Array();
       let i = 1;
