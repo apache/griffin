@@ -23,7 +23,7 @@ export class ServiceService {
 
   constructor() { }
     // public this.BACKEND_SERVER = 'http://10.65.145.88:38080';
-    public BACKEND_SERVER = 'http://localhost:8080';
+    // public BACKEND_SERVER = 'http://localhost:8080';
     public BACKEND_SERVER = '';
     public API_ROOT_PATH = '/api/v1';
     public ES_SERVER = "http://" + location.host.replace("8080", "9200");
