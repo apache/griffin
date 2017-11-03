@@ -17,8 +17,18 @@ specific language governing permissions and limitations
 under the License.
 */
 
-.table-striped > tbody > tr:nth-of-type(odd) {
+.table-striped > tbody > tr:nth-of-type(even) {
      background-color: #1f1f1f; 
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+     background-color: #080808; 
+}
+
+.icon{
+  color: #fff;
+  position: absolute;
+  left: 50%;
+  top: 80%;
 }
 
 #measureTable{
@@ -52,7 +62,7 @@ under the License.
     border-radius: 5px
 }
 
-.swMain>div.formStep{
+.formStep{
   background-color: #000000;
   border-radius: 5px;
   padding:10px;
@@ -199,7 +209,7 @@ fieldset{
 }
 
 fieldset legend{
-  background-color: #1f1f1f;
+  background-color: #000000;
   left: 10px;
   padding: 0 10px;
   position: absolute;

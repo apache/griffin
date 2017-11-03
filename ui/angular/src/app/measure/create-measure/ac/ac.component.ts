@@ -350,7 +350,7 @@ export class AcComponent implements OnInit {
 
   save() {
 
-    var addModels = this.servicecService.config.uri.addModels;
+    var addModels = this.serviceService.config.uri.addModels;
 
     this.http
     .post(addModels, this.newMeasure)
@@ -542,12 +542,11 @@ export class AcComponent implements OnInit {
 
   nodeList:object[];
   nodeListTarget:object[];
-  constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public servicecService:ServiceService) {
+  constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
   
   onResize(event){
-    console.log("Width: " + event.target.innerWidth);
    this.resizeWindow();
   }
 
@@ -559,7 +558,7 @@ export class AcComponent implements OnInit {
   }
 
   ngOnInit() {
-    var allDataassets = this.servicecService.config.uri.dataassetlist;
+    var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{
       this.nodeList = new Array();
       let i = 1;

@@ -1132,3 +1132,35 @@ tbody {
   left:0;
   z-index:1;
 }
+
+.selected-list .c-list .c-token{
+  margin-top: 4px;
+}
+
+.myclass * .c-token{
+  background: #518dab !important;
+}
+
+.myclass * div.selected-list .c-btn , .myclass * ul , .list-filter input{
+  background: #dcdad6; 
+}
+
+.myclass * div.arrow-up{
+  border-bottom: 15px solid #dcdad6;
+}
+
+.myclass * div .list-grp h4{
+  color: #518dab;
+}
+
+input{
+  color: #888;
+}
+
+.table > tbody > tr > td,.table > thead > tr > th{
+   border: 1px solid transparent;
+ }
+
+ .toggle-children{
+    background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAApUlEQVQ4T8XULQ7CQBCG4fcTWBJuVodEcAEEBtcbcAU0Bq7ATQgKi0PQTAOhzdD0b7aC9fPs7O43K+AEbIArCUtmZpLepRdgFYU+QLXxFzoD2dhmfgAHFcABWA9BrUAE6gUa0BbYNzsaBTjoAeQeCgFtUBLgoPt/AEn1XYQ68IX1MXwSu0Ij6Qnsws8ozQp49SayI8oLg/kRbstQlJOHadI4T/1QSjKSYdGc5u4/AAAAAElFTkSuQmCC') !important;
+ }
