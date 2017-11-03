@@ -48,11 +48,35 @@ case class MultiPersists(persists: Iterable[Persist]) extends Persist {
 //  def missRecords(records: RDD[String]): Unit = { persists.foreach(_.missRecords(records)) }
 //  def matchRecords(records: RDD[String]): Unit = { persists.foreach(_.matchRecords(records)) }
 
-  def log(rt: Long, msg: String): Unit = { persists.foreach(_.log(rt, msg)) }
+  def log(rt: Long, msg: String): Unit = {
+    persists.foreach { persist =>
+      try {
+        persist.log(rt, msg)
+      } catch {
+        case e: Throwable => error(s"log error: ${e.getMessage}")
+      }
+    }
+  }
 
 //  def persistRecords(df: DataFrame, name: String): Unit = { persists.foreach(_.persistRecords(df, name)) }
-  def persistRecords(records: Iterable[String], name: String): Unit = { persists.foreach(_.persistRecords(records, name)) }
+  def persistRecords(records: Iterable[String], name: String): Unit = {
+    persists.foreach { persist =>
+      try {
+        persist.persistRecords(records, name)
+      } catch {
+        case e: Throwable => error(s"persist records error: ${e.getMessage}")
+      }
+    }
+  }
 //  def persistMetrics(metrics: Seq[String], name: String): Unit = { persists.foreach(_.persistMetrics(metrics, name)) }
-  def persistMetrics(metrics: Map[String, Any]): Unit = { persists.foreach(_.persistMetrics(metrics)) }
+  def persistMetrics(metrics: Map[String, Any]): Unit = {
+    persists.foreach { persist =>
+      try {
+        persist.persistMetrics(metrics)
+      } catch {
+        case e: Throwable => error(s"persist metrics error: ${e.getMessage}")
+      }
+    }
+  }
 
 }
