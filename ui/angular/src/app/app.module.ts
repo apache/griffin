@@ -48,6 +48,9 @@ import { CreateJobComponent } from './job/create-job/create-job.component';
 import { AcComponent} from './measure/create-measure/ac/ac.component';
 import { PrComponent } from './measure/create-measure/pr/pr.component';
 import { LoginComponent } from './login/login.component';
+import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
+import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
+import {TruncatePipe} from './sidebar/truncate.pipe';
 
 
 
@@ -134,6 +137,8 @@ const appRoutes: Routes = [
     AcComponent,
     PrComponent,
     LoginComponent,
+    RuleComponent,
+    TruncatePipe
   ],
   imports: [
     BrowserModule,
@@ -145,6 +150,7 @@ const appRoutes: Routes = [
     FormsModule,
     AngularEchartsModule,
     DataTableModule,
+    AngularMultiSelectModule,
     RouterModule.forRoot(
       appRoutes,
       {useHash: true},

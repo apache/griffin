@@ -29,6 +29,7 @@ import org.apache.griffin.core.job.entity.JobRequestBody;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
@@ -65,9 +66,14 @@ public class JobServiceImpl implements JobService {
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
     private Properties sparkJobProps;
+    @Autowired
+    private MeasureRepo measureRepo;
+
+    private RestTemplate restTemplate;
 
 
     public JobServiceImpl() {
+        restTemplate = new RestTemplate();
     }
 
     @Override
@@ -144,6 +150,11 @@ public class JobServiceImpl implements JobService {
                 return CREATE_JOB_FAIL;
             }
 
+            if (!isMeasureIdAvailable(measureId)) {
+                LOGGER.error("The measure id {} does't exist.", measureId);
+                return CREATE_JOB_FAIL;
+            }
+
             JobDetail jobDetail = addJobDetail(scheduler, groupName, jobName, measureId, jobRequestBody);
             scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, jobStartTime));
             return GriffinOperationMessage.CREATE_JOB_SUCCESS;
@@ -154,6 +165,14 @@ public class JobServiceImpl implements JobService {
             LOGGER.error("SchedulerException when add job. {}", e.getMessage());
             return CREATE_JOB_FAIL;
         }
+    }
+
+    private Boolean isMeasureIdAvailable(long measureId) {
+        Measure measure = measureRepo.findOne(measureId);
+        if (measure != null && !measure.getDeleted()) {
+            return true;
+        }
+        return false;
     }
 
     private JobDetail addJobDetail(Scheduler scheduler, String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody) throws SchedulerException {
@@ -242,8 +261,8 @@ public class JobServiceImpl implements JobService {
      * 2. set these jobs as deleted status
      *
      * @param group job group name
-     * @param name job name
-     * @return  custom information
+     * @param name  job name
+     * @return custom information
      */
     @Override
     public GriffinOperationMessage deleteJob(String group, String name) {
@@ -261,8 +280,7 @@ public class JobServiceImpl implements JobService {
      * 2. deleteJob
      *
      * @param measure measure data quality between source and target dataset
-     * @throws SchedulerException  quartz throws if schedule has problem
-     *
+     * @throws SchedulerException quartz throws if schedule has problem
      */
     public void deleteJobsRelateToMeasure(Measure measure) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
@@ -319,7 +337,6 @@ public class JobServiceImpl implements JobService {
     }
 
     private void setJobInstanceInfo(JobInstance jobInstance, String uri, String group, String jobName) {
-        RestTemplate restTemplate = new RestTemplate();
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         try {
@@ -365,18 +382,12 @@ public class JobServiceImpl implements JobService {
         int jobCount = 0;
         int notHealthyCount = 0;
         try {
-            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {
-                jobCount++;
-                String jobName = jobKey.getName();
-                String jobGroup = jobKey.getGroup();
-                Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
-                JobInstance latestJobInstance;
-                List<JobInstance> jobInstances = jobInstanceRepo.findByGroupNameAndJobName(jobGroup, jobName, pageRequest);
-                if (jobInstances != null && jobInstances.size() > 0) {
-                    latestJobInstance = jobInstances.get(0);
-                    if (!LivySessionStates.isHeathy(latestJobInstance.getState())) {
-                        notHealthyCount++;
-                    }
+            Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyGroup());
+            for (JobKey jobKey : jobKeys) {
+                List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+                if (triggers != null && triggers.size() != 0 && !isJobDeleted(scheduler, jobKey)) {
+                    jobCount++;
+                    notHealthyCount = getJobNotHealthyCount(notHealthyCount, jobKey);
                 }
             }
         } catch (SchedulerException e) {
@@ -384,5 +395,38 @@ public class JobServiceImpl implements JobService {
             throw new GetHealthInfoFailureException();
         }
         return new JobHealth(jobCount - notHealthyCount, jobCount);
+    }
+
+    private int getJobNotHealthyCount(int notHealthyCount, JobKey jobKey) {
+        if (!isJobHealthy(jobKey)) {
+            notHealthyCount++;
+        }
+        return notHealthyCount;
+    }
+
+    private Boolean isJobHealthy(JobKey jobKey) {
+        Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
+        JobInstance latestJobInstance;
+        List<JobInstance> jobInstances = jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(), jobKey.getName(), pageRequest);
+        if (jobInstances != null && jobInstances.size() > 0) {
+            latestJobInstance = jobInstances.get(0);
+            if (LivySessionStates.isHealthy(latestJobInstance.getState())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Map<String, List<Map<String, Serializable>>> getJobDetailsGroupByMeasureId() {
+        Map<String, List<Map<String, Serializable>>> jobDetailsMap = new HashMap<>();
+        List<Map<String, Serializable>> jobInfoList = getAliveJobs();
+        for (Map<String, Serializable> jobInfo : jobInfoList) {
+            String measureId = (String) jobInfo.get("measureId");
+            List<Map<String, Serializable>> jobs = jobDetailsMap.getOrDefault(measureId, new ArrayList<>());
+            jobs.add(jobInfo);
+            jobDetailsMap.put(measureId, jobs);
+        }
+        return jobDetailsMap;
     }
 }

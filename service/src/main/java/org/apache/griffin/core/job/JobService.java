@@ -40,5 +40,7 @@ public interface JobService {
 
     List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
 
+    Map<String, List<Map<String, Serializable>>> getJobDetailsGroupByMeasureId();
+
     JobHealth getHealthInfo();
 }

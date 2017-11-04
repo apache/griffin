@@ -19,6 +19,11 @@ under the License.
 @import url('../../../../../node_modules/angular2-toaster/toaster.css');
 @import url('../../measure.component.css');
 
+.selected-list .c-list .c-token{
+    background: #6faece;   
+}
+
+
 div.tree div.tree-children::before,
 div.tree::before {
     content: "";
@@ -153,4 +158,12 @@ label{
 {
     /* Move the check mark back when checked */
     text-indent: 0;
+}
+
+.middle{
+    vertical-align: middle;
+}
+
+.no-border{
+    border: 1px solid transparent !important;
 }

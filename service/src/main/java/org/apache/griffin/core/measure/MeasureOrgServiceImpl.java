@@ -19,10 +19,13 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,12 +49,36 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
     @Override
     public Map<String, List<String>> getMeasureNamesGroupByOrg() {
         Map<String, List<String>> orgWithMetricsMap = new HashMap<>();
-        List<String> orgList = measureRepo.findOrganizations();
-        for (String org : orgList) {
-            if (org != null) {
-                orgWithMetricsMap.put(org, measureRepo.findNameByOrganization(org));
-            }
+        List<Measure> measures = measureRepo.findByDeleted(false);
+        if (measures == null) {
+            return null;
+        }
+        for (Measure measure : measures) {
+            String orgName = measure.getOrganization();
+            String measureName = measure.getName();
+            List<String> measureList = orgWithMetricsMap.getOrDefault(orgName, new ArrayList<String>());
+            measureList.add(measureName);
+            orgWithMetricsMap.put(orgName, measureList);
         }
         return orgWithMetricsMap;
+    }
+
+    @Override
+    public Map<String, Map<String, List<Map<String, Serializable>>>> getMeasureWithJobDetailsGroupByOrg(Map<String, List<Map<String, Serializable>>> jobDetails) {
+        Map<String, Map<String, List<Map<String, Serializable>>>> result = new HashMap<>();
+        List<Measure> measures = measureRepo.findByDeleted(false);
+        if (measures == null) {
+            return null;
+        }
+        for (Measure measure : measures) {
+            String orgName = measure.getOrganization();
+            String measureName = measure.getName();
+            String measureId = measure.getId().toString();
+            List<Map<String, Serializable>> jobList = jobDetails.getOrDefault(measureId, new ArrayList<>());
+            Map<String, List<Map<String, Serializable>>> measureWithJobs = result.getOrDefault(orgName, new HashMap<>());
+            measureWithJobs.put(measureName, jobList);
+            result.put(orgName, measureWithJobs);
+        }
+        return result;
     }
 }

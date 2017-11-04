@@ -63,7 +63,7 @@ export class ChartService {
     var chartData = metric.details;
     for(var i = 0; i < chartData.length; i++){
            if(chartData[i]._source.total!=0)
-             data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.matched/chartData[i]._source.total*100).toFixed(2))]);
+             data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.value.matched/chartData[i]._source.value.total*100).toFixed(2))]);
            else
              data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((0).toFixed(2))]);
       }

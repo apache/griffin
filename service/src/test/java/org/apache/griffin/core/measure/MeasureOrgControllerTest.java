@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import org.apache.griffin.core.job.JobService;
 import org.apache.griffin.core.util.URLHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +51,8 @@ public class MeasureOrgControllerTest {
     @MockBean
     private MeasureOrgService measureOrgService;
 
+    @MockBean
+    private JobService jobService;
 
     @Test
     public void testGetOrgs() throws Exception {
