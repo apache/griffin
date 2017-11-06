@@ -308,7 +308,6 @@ public class JobServiceImplTest {
         triggers.add(trigger);
         given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
         mockJsonDataMap(scheduler, jobKey, false);
-
         Set<JobKey> jobKeySet = new HashSet<>();
         jobKeySet.add(jobKey);
         given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn((jobKeySet));
