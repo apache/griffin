@@ -49,7 +49,7 @@ public class MeasureOrgServiceImplTest {
     @Test
     public void testGetOrgs(){
         String orgName = "orgName";
-        given(measureRepo.findOrganizations()).willReturn(Arrays.asList(orgName));
+        given(measureRepo.findOrganizations(false)).willReturn(Arrays.asList(orgName));
         List<String> orgs =service.getOrgs();
         assertThat(orgs.size()).isEqualTo(1);
         assertThat(orgs.get(0)).isEqualTo(orgName);
@@ -59,7 +59,7 @@ public class MeasureOrgServiceImplTest {
     public void testGetMetricNameListByOrg(){
         String orgName = "orgName";
         String measureName = "measureName";
-        given(measureRepo.findNameByOrganization(orgName)).willReturn(Arrays.asList(measureName));
+        given(measureRepo.findNameByOrganization(orgName,false)).willReturn(Arrays.asList(measureName));
         List<String> measureNames=service.getMetricNameListByOrg(orgName);
         assertThat(measureNames.size()).isEqualTo(1);
         assertThat(measureNames.get(0)).isEqualTo(measureName);
