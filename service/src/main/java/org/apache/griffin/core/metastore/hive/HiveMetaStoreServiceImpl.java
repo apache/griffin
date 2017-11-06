@@ -55,7 +55,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     private ThreadPoolExecutor singleThreadExecutor;
 
     public HiveMetaStoreServiceImpl() {
-        singleThreadExecutor = new ThreadPoolExecutor(1, 1, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1));
+        singleThreadExecutor = new ThreadPoolExecutor(1, 5, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(3),new ThreadPoolExecutor.DiscardPolicy());
         LOGGER.info("HiveMetaStoreServiceImpl single thread pool created.");
     }
 
