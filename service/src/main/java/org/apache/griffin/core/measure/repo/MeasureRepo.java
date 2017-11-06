@@ -35,12 +35,14 @@ public interface MeasureRepo extends CrudRepository<Measure, Long> {
 
     List<Measure> findByOwnerAndDeleted(String owner, Boolean deleted);
 
-    @Query("select DISTINCT m.organization from Measure m")
-    List<String> findOrganizations();
+    Measure findByIdAndDeleted(Long id, Boolean deleted);
+
+    @Query("select DISTINCT m.organization from Measure m where m.deleted = ?1")
+    List<String> findOrganizations(Boolean deleted);
 
     @Query("select m.name from Measure m " +
-            "where m.organization= ?1")
-    List<String> findNameByOrganization(String organization);
+            "where m.organization= ?1 and m.deleted= ?2")
+    List<String> findNameByOrganization(String organization, Boolean deleted);
 
     @Query("select m.organization from Measure m " +
             "where m.name= ?1")

@@ -298,6 +298,16 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobInstance> findInstancesOfJob(String group, String jobName, int page, int size) {
+        try {
+            Scheduler scheduler = factory.getObject();
+            JobKey jobKey = new JobKey(jobName, group);
+            if (!scheduler.checkExists(jobKey) || isJobDeleted(scheduler, jobKey)) {
+                return new ArrayList<>();
+            }
+        } catch (SchedulerException e) {
+            LOGGER.error("Quartz schedule error. {}", e.getMessage());
+            return new ArrayList<>();
+        }
         //query and return instances
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
         return jobInstanceRepo.findByGroupNameAndJobName(group, jobName, pageRequest);
