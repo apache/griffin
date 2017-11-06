@@ -36,6 +36,11 @@ public class Measure extends AbstractAuditableEntity {
 
     private String processType;
 
+    /**
+     * record triggered time of measure
+     */
+    private Long triggerTimeStamp = -1L;
+
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "measure_id")
@@ -114,6 +119,16 @@ public class Measure extends AbstractAuditableEntity {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    @JsonProperty("timestamp")
+    public Long getTriggerTimeStamp() {
+        return triggerTimeStamp;
+    }
+
+    @JsonProperty("timestamp")
+    public void setTriggerTimeStamp(Long triggerTimeStamp) {
+        this.triggerTimeStamp = triggerTimeStamp;
     }
 
     public Measure() {
