@@ -176,11 +176,6 @@ export class AcComponent implements OnInit {
   }
 
   toggleSelection (row) {
-    if(this.selection.length == 3){
-          this.selectedAll = this.selectedAll;
-      }else{
-        this.selectedAll = false;
-      }
       row.selected = !row.selected;
       var idx = this.selection.indexOf(row.name);
       // is currently selected
