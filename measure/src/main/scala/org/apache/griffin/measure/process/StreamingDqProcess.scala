@@ -82,7 +82,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     })
 
     // start time
-    val startTime = new Date().getTime()
+    val startTime = getStartTime
 
     // get persists to persist measure result
     val persistFactory = PersistFactory(envParam.persistParams, metricName)

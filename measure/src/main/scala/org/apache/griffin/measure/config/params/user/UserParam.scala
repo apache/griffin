@@ -24,6 +24,7 @@ import org.apache.griffin.measure.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
 case class UserParam( @JsonProperty("name") name: String,
+                      @JsonProperty("timestamp") timestamp: Long,
                       @JsonProperty("process.type") procType: String,
                       @JsonProperty("data.sources") dataSources: List[DataSourceParam],
                       @JsonProperty("evaluateRule") evaluateRuleParam: EvaluateRuleParam
