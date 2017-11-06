@@ -187,6 +187,11 @@ export class AcComponent implements OnInit {
       else {
           this.selection.push(row.name);
       }
+      if(this.selection.length == 3){
+          this.selectedAll = true;
+      }else{
+        this.selectedAll = false;
+      }
   };
 
   toggleSelectionTarget (row) {
@@ -200,6 +205,11 @@ export class AcComponent implements OnInit {
       // is newly selected
       else {
           this.selectionTarget.push(row.name);
+      }
+      if(this.selectionTarget.length == 3){
+          this.selectedAllTarget = true;
+      }else{
+        this.selectedAllTarget = false;
       }
       let l = this.selectionTarget.length;
       for(let i =0;i<l;i++)
@@ -333,12 +343,8 @@ export class AcComponent implements OnInit {
           return rules;
       }
       var self = this;
-      console.log(this.selectionTarget);
-      // var rules = this.selectionTarget.map(function(item, i) {
-      //     return mappingRule(self.selection[i], item, self.matches[i]);
-      // });
       var rules = this.mappings.map(function(item, i) {
-          return mappingRule(self.selection[i], item, self.matches[i]);
+          return mappingRule(item,self.selectionTarget[i], self.matches[i]);
       });
       rule = rules.join(" AND ");
       this.rules = rule;
@@ -374,14 +380,13 @@ export class AcComponent implements OnInit {
     
   }
 
-  
   options: ITreeOptions = {
     displayField: 'name',
     isExpandedField: 'expanded',
     idField: 'id',
     actionMapping: {
       mouse: {
-        click: (tree, node, $event) => {
+        click: (tree, node, $event) => {         
           if (node.hasChildren) {
             this.currentDB = node.data.name;
             this.currentTable = '';
@@ -392,6 +397,11 @@ export class AcComponent implements OnInit {
             this.currentTable = node.data.name;
             this.currentDB = node.data.parent;
             this.schemaCollection = node.data.cols;
+            this.selectedAll = false;
+            this.selection = [];
+            for(let row of this.schemaCollection){
+              row.selected = false;
+            }
           }
         }
       }
@@ -418,6 +428,11 @@ export class AcComponent implements OnInit {
             this.currentTableTarget = node.data.name;
             this.currentDBTarget = node.data.parent;
             this.schemaCollectionTarget = node.data.cols;
+            this.selectedAllTarget = false;
+            this.selectionTarget = [];
+            for(let row of this.schemaCollectionTarget){
+              row.selected = false;
+            }
           }
         }
       }
