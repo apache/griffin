@@ -41,7 +41,7 @@ import  {Router} from "@angular/router";
 })
 export class CreateJobComponent implements OnInit {
 
-  constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public servicecService:ServiceService) {
+  constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
 
@@ -72,7 +72,7 @@ export class CreateJobComponent implements OnInit {
   Measures:object;
 
   measure:string;
-  measureid:string;
+  measureid:any;
   ntAccount = 0;
   newJob={
         "sourcePattern":'',
@@ -137,6 +137,7 @@ export class CreateJobComponent implements OnInit {
   }
 
   submit (jobForm) {
+      this.measureid = this.getMeasureId();
       // jobForm.markAsPristine();
       var period;
       if(this.timeType=='minutes')
@@ -162,7 +163,7 @@ export class CreateJobComponent implements OnInit {
         this.toasterService.pop('error', 'Error!', 'Please complete the form!');
         return false;
       }
-
+      
       this.newJob={
         "sourcePattern":this.sourcePat,
         "targetPattern":this.targetPat,
@@ -179,7 +180,7 @@ export class CreateJobComponent implements OnInit {
     var month = date.getMonth()+1;
     var timestamp = Date.parse(datastr);
     var jobName = this.measure + '-BA-' + this.ntAccount + '-' + timestamp;
-    var addJobs = this.servicecService.config.uri.addJobs;
+    var addJobs = this.serviceService.config.uri.addJobs;
     var newJob = addJobs + '?group=' + this.newJob.groupName + '&jobName=' + jobName + '&measureId=' + this.measureid;
     this.http
     .post(newJob, this.newJob)
@@ -217,12 +218,21 @@ export class CreateJobComponent implements OnInit {
   	$('#md-datepicker-0').height(250);
   }
 
+  getMeasureId(){
+    for(let index in this.Measures){
+      if(this.measure == this.Measures[index].name){
+        return this.Measures[index].id;
+      }     
+    }
+  }
   ngOnInit() {
-    var allModels = this.servicecService.config.uri.allModels;
+    var allModels = this.serviceService.config.uri.allModels;
     this.http.get(allModels).subscribe(data =>{
       this.Measures = data;
-      this.measure = this.Measures[0].name;
-      this.measureid = this.Measures[0].id;
+      // for(let index in data){
+      // this.measure = data[index].name;
+      // this.measureid = data[index].id;
+      // }
     });
   }
 

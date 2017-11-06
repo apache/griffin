@@ -28,5 +28,12 @@ under the License.
      background-color: #1f1f1f; 
 }
 
+.table > tbody + tbody {
+    border-top: 1px solid transparent;
+}
+
+.reco > tbody:nth-of-type(even) >tr {
+     background-color: #080808;
+}
 
 

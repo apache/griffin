@@ -16,18 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.config.params.user
+import {Pipe, PipeTransform} from '@angular/core'
 
-import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
-import com.fasterxml.jackson.annotation.JsonInclude.Include
-import org.apache.griffin.measure.config.params.Param
+@Pipe({
+  name: 'truncate'
+})
+export class TruncatePipe {
+  transform(value: string, limit: number) : string {
 
-@JsonInclude(Include.NON_NULL)
-case class UserParam( @JsonProperty("name") name: String,
-                      @JsonProperty("timestamp") timestamp: Long,
-                      @JsonProperty("process.type") procType: String,
-                      @JsonProperty("data.sources") dataSources: List[DataSourceParam],
-                      @JsonProperty("evaluateRule") evaluateRuleParam: EvaluateRuleParam
-                    ) extends Param {
+    let trail = '...';
 
+    return value.length > limit ? value.substring(0, limit) + trail : value;
+  }
 }

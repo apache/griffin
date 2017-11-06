@@ -16,18 +16,28 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.config.params.user
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
-import com.fasterxml.jackson.annotation.JsonInclude.Include
-import org.apache.griffin.measure.config.params.Param
+import { RuleComponent } from './rule.component';
 
-@JsonInclude(Include.NON_NULL)
-case class UserParam( @JsonProperty("name") name: String,
-                      @JsonProperty("timestamp") timestamp: Long,
-                      @JsonProperty("process.type") procType: String,
-                      @JsonProperty("data.sources") dataSources: List[DataSourceParam],
-                      @JsonProperty("evaluateRule") evaluateRuleParam: EvaluateRuleParam
-                    ) extends Param {
+describe('RuleComponent', () => {
+  let component: RuleComponent;
+  let fixture: ComponentFixture<RuleComponent>;
 
-}
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ RuleComponent ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(RuleComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should be created', () => {
+    expect(component).toBeTruthy();
+  });
+});

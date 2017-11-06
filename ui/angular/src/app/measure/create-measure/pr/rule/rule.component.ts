@@ -16,18 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.config.params.user
+import { Component, OnInit } from '@angular/core';
 
-import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
-import com.fasterxml.jackson.annotation.JsonInclude.Include
-import org.apache.griffin.measure.config.params.Param
+@Component({
+  selector: 'app-rule',
+  templateUrl: './rule.component.html',
+  styleUrls: ['./rule.component.css']
+})
+export class RuleComponent implements OnInit {
+  
+  vaType : string;
+  constructor() { }
 
-@JsonInclude(Include.NON_NULL)
-case class UserParam( @JsonProperty("name") name: String,
-                      @JsonProperty("timestamp") timestamp: Long,
-                      @JsonProperty("process.type") procType: String,
-                      @JsonProperty("data.sources") dataSources: List[DataSourceParam],
-                      @JsonProperty("evaluateRule") evaluateRuleParam: EvaluateRuleParam
-                    ) extends Param {
+  ngOnInit() {
+  	this.vaType = '2';
+  }
 
 }
