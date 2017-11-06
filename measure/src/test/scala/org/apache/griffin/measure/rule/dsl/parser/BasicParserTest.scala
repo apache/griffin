@@ -90,7 +90,7 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val result3 = parser.parseAll(parser.selection, rule3)
     result3.successful should be (true)
     result3.get.desc should be ("source[12].age")
-    result3.get.alias should be (Some("age"))
+    result3.get.alias should be (Some("12_age"))
 
     val rule4 = """source.name.func(target.name)"""
     val result4 = parser.parseAll(parser.selection, rule4)

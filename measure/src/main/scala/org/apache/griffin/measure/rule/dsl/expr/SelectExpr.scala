@@ -18,8 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.rule.dsl.expr
 
-trait HeadExpr extends Expr {
-
+trait HeadExpr extends Expr with AliasableExpr {
+  def alias: Option[String] = None
 }
 
 case class DataSourceHeadExpr(name: String) extends HeadExpr {
@@ -30,6 +30,7 @@ case class DataSourceHeadExpr(name: String) extends HeadExpr {
 case class FieldNameHeadExpr(field: String) extends HeadExpr {
   def desc: String = field
   def coalesceDesc: String = desc
+  override def alias: Option[String] = Some(field)
 }
 
 case class ALLSelectHeadExpr() extends HeadExpr {
@@ -43,6 +44,7 @@ case class OtherHeadExpr(expr: Expr) extends HeadExpr {
 
   def desc: String = expr.desc
   def coalesceDesc: String = expr.coalesceDesc
+  override def alias: Option[String] = Some(expr.desc)
 }
 
 // -------------
@@ -68,7 +70,7 @@ case class IndexSelectExpr(index: Expr) extends SelectExpr {
 
   def desc: String = s"[${index.desc}]"
   def coalesceDesc: String = desc
-  def alias: Option[String] = Some(desc)
+  def alias: Option[String] = Some(index.desc)
 }
 
 case class FunctionSelectExpr(functionName: String, args: Seq[Expr]) extends SelectExpr {
@@ -106,10 +108,8 @@ case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: O
   }
   def alias: Option[String] = {
     if (aliasOpt.isEmpty) {
-      selectors.lastOption match {
-        case Some(last) => last.alias
-        case _ => None
-      }
+      val aliasSeq = (head +: selectors).flatMap(_.alias)
+      if (aliasSeq.size > 0) Some(aliasSeq.mkString("_")) else None
     } else aliasOpt
   }
 }
