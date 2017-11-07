@@ -339,6 +339,21 @@ public class JobServiceImplTest {
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 0);
     }
 
+    @Test
+    public void testGetJobDetailsGroupByMeasureId() throws SchedulerException {
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
+        JobDetailImpl jobDetail = createJobDetail();
+        given(factory.getObject()).willReturn(scheduler);
+        HashSet<JobKey> set = new HashSet<>();
+        set.add(new JobKey("name", "group"));
+        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn(set);
+        List<Trigger> triggers = Arrays.asList(newTriggerInstance("name", "group", 3000));
+        JobKey jobKey = set.iterator().next();
+        given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
+        given(scheduler.getJobDetail(jobKey)).willReturn(jobDetail);
+        assertTrue(service.getJobDetailsGroupByMeasureId().containsKey("1"));
+    }
+
     private void mockJsonDataMap(Scheduler scheduler,JobKey jobKey,Boolean deleted) throws SchedulerException {
         JobDataMap jobDataMap = mock(JobDataMap.class);
         JobDetailImpl jobDetail = new JobDetailImpl();
