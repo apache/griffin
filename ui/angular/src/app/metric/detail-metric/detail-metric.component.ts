@@ -56,24 +56,29 @@ export class DetailMetricComponent implements OnInit {
     var self = this;
     var metricDetailUrl = this.serviceService.config.uri.dashboard;
     this.http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": this.currentMeasure }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":10000}).subscribe( data=> {
-    var metric = {
+      var metric = {
         'name':'',
         'timestamp':0,
         'dq':0,
         'details':[]
-    };
-    this.data = data;
-    metric.name = this.data.hits.hits[0]._source.name;
-    metric.timestamp =this.data.hits.hits[this.data.hits.hits.length-1]._source.tmst;
-    metric.dq = this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched/this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched*100;
-    metric.details = new Array();
-    for(let point of this.data.hits.hits){
-        metric.details.push(point);
-    };
-    this.chartOption = this.chartService.getOptionBig(metric);
-    $('#bigChartDiv').height(window.innerHeight-120+'px');
-    $('#bigChartDiv').width(window.innerWidth-400+'px');
-    $('#bigChartContainer').show();
+      };
+      this.data = data;
+      if(this.data){
+        metric.name = this.data.hits.hits[0]._source.name;
+        metric.timestamp =this.data.hits.hits[this.data.hits.hits.length-1]._source.tmst;
+        metric.dq = this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched/this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched*100;
+        metric.details = new Array();
+        for(let point of this.data.hits.hits){
+          metric.details.push(point);
+        };
+      }
+      this.chartOption = this.chartService.getOptionBig(metric);
+      $('#bigChartDiv').height(window.innerHeight-120+'px');
+      $('#bigChartDiv').width(window.innerWidth-400+'px');
+      $('#bigChartContainer').show();
+    },
+    err => {
+      console.log('Error occurs when connect to elasticsearh!');
     });  
   }
 
