@@ -38,6 +38,7 @@ export class HealthComponent implements OnInit {
   orgs = [];
   dataData = [];
   finalData = [];
+  oData = [];
   // originalData = [];
   originalData:any;
   metricName = [];
@@ -58,10 +59,8 @@ export class HealthComponent implements OnInit {
   
   onChartClick($event){
     if($event.data.name){
-        // this.router.navigate(['/detailed/'+$event.data.name]);
         this.router.navigate(['/detailed/'+$event.data.name]);
         window.location.reload();
-        // window.location.href = '/detailed/'+$event.data.name;
     }
   }
 
@@ -183,6 +182,7 @@ export class HealthComponent implements OnInit {
 
   renderData(){
     var url_organization = this.serviceService.config.uri.organization;
+    let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_organization).subscribe(data => {
       this.orgWithMeasure = data;
       var orgNode = null;
@@ -191,80 +191,47 @@ export class HealthComponent implements OnInit {
         orgNode.name = orgName;
         orgNode.jobMap = [];
         orgNode.measureMap = [];
+        var node = null;
+        node = new Object();
+        node.name = orgName;
+        node.dq = 0;
+        var metricNode = {
+          'name':'',
+          'timestamp':'',
+          'dq':0,
+          'details':[]
+        }
+        var array = [];
+        node.metrics = array;
         for(let key in this.orgWithMeasure[orgName]){
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
-          // console.log(this.measureOptions);
-          if(this.orgWithMeasure[orgName][key]!=null){
-            for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
-            orgNode.jobMap.push(this.orgWithMeasure[orgName][key][i].jobName);
-          }
-          }
-        }
-        this.orgs.push(orgNode);
-      }
-      this.originalOrgs = this.orgs;
-      // console.log(this.originalOrgs);
-      let url_dashboard = this.serviceService.config.uri.dashboard;
-      this.http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).subscribe(data => {
-            this.originalData = data;
-            this.myData = JSON.parse(JSON.stringify(this.originalData.hits.hits));
-            // this.myData = this.allData.hits.hits;
-            this.metricName = [];
-            // for(var i = 0;i<this.myData.length;i++){
-            //     this.metricName.push(this.myData[i]._source.name);
-            // }
-            for(var i = 0;i<this.myData.length;i++){
-                this.metricName.push(this.myData[i]._source.name);
-            }
-            this.metricNameUnique = [];
-            for(let name of this.metricName){
-                if(this.metricNameUnique.indexOf(name) === -1){
-                    this.metricData[this.metricNameUnique.length] = new Array();
-                    this.metricNameUnique.push(name);
-                }
-            };
-            for(var i = 0;i<this.myData.length;i++){
-                for(var j = 0 ;j<this.metricNameUnique.length;j++){
-                    if(this.myData[i]._source.name==this.metricNameUnique[j]){
-                        this.metricData[j].push(this.myData[i]);
-                    }
-                }
-            }
-            for(let sys of this.originalOrgs){
-                var node = null;
-                node = new Object();
-                node.name = sys.name;
-                node.dq = 0;
-                node.metrics = new Array();
-                for (let metric of this.metricData){
-                    if(sys.jobMap.indexOf(metric[metric.length-1]._source.name)!= -1){
-                        var metricNode = {
-                            'name':'',
-                            'timestamp':'',
-                            'dq':0,
-                            'details':[]
-                        }
-                        metricNode.name = metric[metric.length-1]._source.name;
-                        metricNode.timestamp = metric[metric.length-1]._source.tmst;
-                        metricNode.dq = metric[metric.length-1]._source.value.matched/metric[metric.length-1]._source.value.total*100;
-                        metricNode.details = metric;
-                        node.metrics.push(metricNode);
-                    }
-                }
-                this.finalData.push(node);
-            }
-            this.originalData = JSON.parse(JSON.stringify(this.finalData));
-            var self = this;
-            setTimeout(function function_name(argument) {
-              // body...
-              self.renderTreeMap(self.finalData);
+          var jobs = this.orgWithMeasure[orgName][key];          
+            for(let i = 0;i < jobs.length;i++){
+               orgNode.jobMap.push(jobs[i].jobName);
+               var job = jobs[i].jobName;
+               this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( data=> { 
+                 this.originalData = data;
+                 if(this.originalData.hits){
+                   this.metricData = this.originalData.hits.hits;
+                   metricNode.details = this.metricData;                                
+                   metricNode.name = this.metricData[0]._source.name;
+                   metricNode.timestamp = this.metricData[0]._source.tmst;
+                   metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
+                   node.metrics.push(Object.assign({}, metricNode));
+                 }
 
-            },0)
-            console.log(this.finalData);
-            // return JSON.parse(JSON.stringify(this.finalData));
-            return this.finalData;
-      });
+            });           
+            }                           
+        } 
+          this.finalData.push(node); 
+          this.orgs.push(orgNode);                
+      }
+      this.oData = this.finalData.slice(0);
+      var self = this;
+            setTimeout(function function_name(argument) {
+              self.renderTreeMap(self.oData);
+            },1000) 
     });
   };
 
