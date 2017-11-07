@@ -120,7 +120,10 @@ export class MetricComponent implements OnInit {
                    metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
                    node.metrics.push(Object.assign({}, metricNode));
                  }
-            });           
+               },
+               err => {
+               console.log('Error occurs when connect to elasticsearh!');
+               });           
             }                           
         } 
           this.finalData.push(node); 
