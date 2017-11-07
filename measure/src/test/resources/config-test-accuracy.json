@@ -1,6 +1,8 @@
 {
   "name": "accu_batch_test",
 
+  "timestamp": 12124214,
+
   "process.type": "batch",
 
   "data.sources": [

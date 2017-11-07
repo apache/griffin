@@ -52,14 +52,14 @@ public class MeasureRepoTest {
 
     @Test
     public void testFindAllOrganizations() {
-        List<String> orgs = measureRepo.findOrganizations();
+        List<String> orgs = measureRepo.findOrganizations(false);
         assertThat(orgs.size()).isEqualTo(3);
     }
 
 
     @Test
     public void testFindNameByOrganization() {
-        List<String> orgs = measureRepo.findNameByOrganization("org1");
+        List<String> orgs = measureRepo.findNameByOrganization("org1",false);
         assertThat(orgs.size()).isEqualTo(1);
         assertThat(orgs.get(0)).isEqualToIgnoringCase("m1");
 

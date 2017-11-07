@@ -29,7 +29,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
-@RunWith(classOf[JUnitRunner])
+//@RunWith(classOf[JUnitRunner])
 class HdfsUtilTest extends FunSuite with Matchers with BeforeAndAfter {
 
   private val seprator = "/"

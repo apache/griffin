@@ -38,12 +38,12 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
 
     @Override
     public List<String> getOrgs() {
-        return measureRepo.findOrganizations();
+        return measureRepo.findOrganizations(false);
     }
 
     @Override
     public List<String> getMetricNameListByOrg(String org) {
-        return measureRepo.findNameByOrganization(org);
+        return measureRepo.findNameByOrganization(org,false);
     }
 
     @Override
