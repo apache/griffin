@@ -28,11 +28,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
+import static org.apache.griffin.core.measure.MeasureTestHelper.createATestMeasure;
+import static org.apache.griffin.core.measure.MeasureTestHelper.createJobDetailMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -76,6 +76,23 @@ public class MeasureOrgServiceImplTest {
         Map<String,List<String>> map = service.getMeasureNamesGroupByOrg();
         assertThat(map.size()).isEqualTo(1);
 
+    }
+
+    @Test
+    public void testMeasureWithJobDetailsGroupByOrg() throws Exception {
+        Measure measure = createATestMeasure("measure", "org");
+        measure.setId(1L);
+        given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
+
+        Map<String, Serializable> jobDetail = createJobDetailMap();
+        List<Map<String, Serializable>> jobList = Arrays.asList(jobDetail);
+        Map<String, List<Map<String, Serializable>>> measuresById = new HashMap<>();
+        measuresById.put("1", jobList);
+
+        Map<String, Map<String, List<Map<String, Serializable>>>> map = service.getMeasureWithJobDetailsGroupByOrg(measuresById);
+        assertThat(map.size()).isEqualTo(1);
+        assertThat(map).containsKey("org");
+        assertThat(map.get("org").get("measure")).isEqualTo(jobList);
     }
 
 }

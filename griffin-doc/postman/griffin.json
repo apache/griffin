@@ -1,5 +1,5 @@
 {
-	"id": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+	"id": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 	"name": "Griffin",
 	"description": "",
 	"order": [],
@@ -7,422 +7,106 @@
 		{
 			"name": "Auth",
 			"description": "user authentication",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"order": [
-				"f2bbd2ad-1848-19f8-6b66-f242208befaf"
+				"37578eb8-93b0-4903-0e51-42361aec3a90"
 			],
-			"owner": "503523",
+			"owner": "2830994",
 			"folders_order": [],
-			"id": "6b68e8ee-75c7-df61-d8af-fbc308b3a0b8"
+			"id": "c42b54fc-895c-d10c-72b0-01642ce776e8"
 		},
 		{
 			"name": "Basic",
 			"description": "",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"order": [
-				"3e447ce4-f938-0532-fb50-776abaff7132"
+				"4495d595-55a8-88af-4afb-85b2d722d00f"
 			],
-			"owner": "503523",
+			"owner": "2830994",
 			"folders_order": [],
-			"id": "a4d04609-5fcd-b74d-3ce5-282306d5ca6d"
+			"id": "20092b46-e67b-f886-5433-32d7105b6379"
 		},
 		{
 			"name": "Hive MetaStore",
 			"description": "",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"order": [
-				"b54feb96-9536-e295-f3ec-2825c8958ccc",
-				"b1b53c58-75bb-7a66-efca-d536e5d8a2f2",
-				"9cc56d64-a000-b640-ed20-68e810e4e73c",
-				"cacd1e36-aeaf-1561-575d-9c74098fcacc",
-				"66b4a4fd-ff49-7f48-9568-2c25ff2a4bdc"
+				"bb002dbb-fc6e-b885-21c6-9896a8ae0521",
+				"d0eb17bc-7eea-8cc6-1a21-fccabd3e5d8b",
+				"b84b34c1-8861-7ed7-f4e3-396ea5908d0c",
+				"79d22e4f-89e4-5e61-7c24-92f4e2f6450e",
+				"eb6eb4a9-89f6-b0c1-34e7-1d5a24659554"
 			],
-			"owner": "503523",
+			"owner": "2830994",
 			"folders_order": [],
-			"id": "db8f71a4-af1c-f20b-eb3c-8b0cecd3656c"
+			"id": "022408d6-3e26-da08-eb52-ca3c83d8f226"
 		},
 		{
 			"name": "Jobs",
 			"description": "",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"order": [
-				"6877595b-3010-08e9-be1b-5e7339482992",
-				"86fc3991-57b4-b644-adf3-cacfc7be0c5b",
-				"94f0ffb4-59a4-1849-2e77-a816c6631531",
-				"4c757a03-f5d2-59c8-a504-ae91c8af9735",
-				"c323c910-64c6-bbc0-2d41-b80d0aa58c56"
+				"742889e2-52e1-58eb-9c50-9a225bba87bb",
+				"78aae644-ccbe-9381-0a64-4d463b1d76c0",
+				"02e56b82-6e21-4c68-f6a9-61e9f8a1b8bf",
+				"63066f6e-27ad-546d-27bc-e424dc0bd636",
+				"82c3a170-5bf6-2dc9-5295-3cca6e628d18"
 			],
-			"owner": "503523",
+			"owner": "2830994",
 			"folders_order": [],
-			"id": "bfce335d-cf4e-59c6-d1ba-6f8674f9028c"
+			"id": "a6877336-53f6-b720-ee4f-313d6c9d9c94"
 		},
 		{
 			"name": "Measures",
 			"description": "",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"order": [
-				"cc7d5841-3b32-281a-c5ed-2e02057dae83",
-				"200bd6d4-71a0-8928-aecc-0036337f7b82",
-				"6e759a74-d4cf-12ba-468c-ea084654c307",
-				"7373af1c-d2a3-8917-24c1-0440b1c81c14",
-				"6b0c4489-2164-0076-9a03-08199dc96f01",
-				"81592a70-44b1-b503-9954-fe1aec99a094"
+				"da6be1fb-a790-b275-f2a5-0f584e8f4fcb",
+				"f5b9e3cb-f691-12b5-f675-48ac51da6b14",
+				"a85f7d39-c0bc-dd29-4739-18d3651c9796",
+				"9d390c13-a375-54c6-dcc2-4753edd4e9e4",
+				"cca39e41-3c38-eef6-f9d1-e797936eb7e9",
+				"9a0a2201-2a06-daeb-5abb-c9e08f4ee00c"
 			],
-			"owner": "503523",
+			"owner": "2830994",
 			"folders_order": [
-				"7297e7c1-2efa-48a2-cb75-815239ba0c8b"
+				"a59711e8-e3ea-db95-56cf-6c6c70e150a8"
 			],
-			"id": "c44648fe-8b95-448a-168a-a3d01d181549"
+			"id": "7511d4fa-72ce-8671-54d0-2f3432d86445"
 		},
 		{
 			"name": "OrgnizationDimension",
 			"description": "",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"order": [
-				"32155f9f-7eb1-6156-6080-058277f84010",
-				"5a281a05-e75f-ccc4-08fc-d5347d9ffabb",
-				"decff1b5-0241-8e08-c134-fc4217e89448"
+				"d9fa6f9b-14eb-7b02-9d8e-6017d6d442a7",
+				"2cc34a2b-d4e0-ff5d-3e73-4be4b1bcbfb8",
+				"7f475e07-d86e-8ff8-b087-57d926389f10",
+				"d49b0e8b-53f9-3089-895e-ad013220f306"
 			],
-			"owner": "503523",
-			"folder": "c44648fe-8b95-448a-168a-a3d01d181549",
+			"owner": "2830994",
+			"folder": "7511d4fa-72ce-8671-54d0-2f3432d86445",
 			"folders_order": [],
-			"id": "7297e7c1-2efa-48a2-cb75-815239ba0c8b"
+			"id": "a59711e8-e3ea-db95-56cf-6c6c70e150a8"
 		}
 	],
 	"folders_order": [
-		"a4d04609-5fcd-b74d-3ce5-282306d5ca6d",
-		"c44648fe-8b95-448a-168a-a3d01d181549",
-		"bfce335d-cf4e-59c6-d1ba-6f8674f9028c",
-		"db8f71a4-af1c-f20b-eb3c-8b0cecd3656c",
-		"6b68e8ee-75c7-df61-d8af-fbc308b3a0b8"
+		"20092b46-e67b-f886-5433-32d7105b6379",
+		"7511d4fa-72ce-8671-54d0-2f3432d86445",
+		"a6877336-53f6-b720-ee4f-313d6c9d9c94",
+		"022408d6-3e26-da08-eb52-ca3c83d8f226",
+		"c42b54fc-895c-d10c-72b0-01642ce776e8"
 	],
 	"timestamp": 0,
-	"owner": "503523",
+	"owner": "2830994",
 	"public": false,
 	"requests": [
 		{
-			"id": "200bd6d4-71a0-8928-aecc-0036337f7b82",
+			"id": "02e56b82-6e21-4c68-f6a9-61e9f8a1b8bf",
 			"headers": "",
 			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/measure/:id",
-			"folder": "c44648fe-8b95-448a-168a-a3d01d181549",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {
-				"id": "1"
-			},
-			"pathVariableData": [
-				{
-					"key": "id",
-					"value": "1"
-				}
-			],
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1509333180809,
-			"name": "Get measure by id",
-			"description": "`GET /api/v1/measure/{id}`\n#### Path Variable\n- id -`required` `Long` measure id\n\n#### Request Sample\n\n`/api/v1/measure/2`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK",
-						"detail": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request the response will contain an entity describing or containing the result of the action."
-					},
-					"time": 49,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Mon, 30 Oct 2017 03:09:22 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "{\"id\":1,\"name\":\"measureName_test_edit\",\"description\":\"This is a test measure\",\"organization\":\"orgName\",\"evaluateRule\":{\"id\":20,\"rules\":[{\"id\":12,\"rule\":\"source.id = target.id and source.age = target.age and source.desc = target.desc\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":39,\"name\":\"source\",\"connectors\":[{\"id\":23,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":40,\"name\":\"target\",\"connectors\":[{\"id\":24,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]}",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"name": "Get measure by id example",
-					"id": "a783dbd8-33bb-cfa2-12b5-67a4f749faa3",
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/measure/:id",
-						"pathVariables": {
-							"id": "1"
-						},
-						"pathVariableData": [
-							{
-								"key": "id",
-								"value": "1"
-							}
-						],
-						"queryParams": [],
-						"headerData": [],
-						"headers": "",
-						"data": null,
-						"method": "GET",
-						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "32155f9f-7eb1-6156-6080-058277f84010",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/org",
-			"folder": "7297e7c1-2efa-48a2-cb75-815239ba0c8b",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1508996888357,
-			"name": "Get orgs for measure",
-			"description": "`GET /api/v1/org`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK"
-					},
-					"time": 50,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Wed, 25 Oct 2017 05:55:00 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "[\"ebay\",\"test\",\"orgName\"]",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"id": "b6ee6e78-15fa-c5fe-3aed-e09c95022978",
-					"name": "Get orgs for measure example",
-					"isSample": true,
-					"scrollToResult": false,
-					"runTests": false,
-					"request": {
-						"url": "http://localhost:8080/api/v1/org",
-						"pathVariables": {},
-						"pathVariableData": [],
-						"queryParams": [],
-						"headerData": [],
-						"headers": "",
-						"data": null,
-						"method": "GET",
-						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "3e447ce4-f938-0532-fb50-776abaff7132",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/version",
-			"folder": "a4d04609-5fcd-b74d-3ce5-282306d5ca6d",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1508997903989,
-			"name": "Get griffin version",
-			"description": "`GET /api/v1/version`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK"
-					},
-					"time": 63,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-length",
-							"key": "content-length",
-							"value": "5",
-							"description": "The length of the response body in octets (8-bit bytes)"
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "text/plain;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Thu, 26 Oct 2017 05:45:09 GMT",
-							"description": "The date and time that the message was sent"
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "0.1.0",
-					"language": "plainText",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"name": "Get griffin version example",
-					"id": "843835ec-8b82-70f2-98e3-02515e3653f1",
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/version",
-						"pathVariables": {},
-						"pathVariableData": [],
-						"queryParams": [],
-						"headerData": [],
-						"headers": "",
-						"data": null,
-						"method": "GET",
-						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "4c757a03-f5d2-59c8-a504-ae91c8af9735",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/jobs?group=BA&jobName=measure_name-BA-0-1508847304000",
-			"folder": "bfce335d-cf4e-59c6-d1ba-6f8674f9028c",
+			"url": "{{BASE_PATH}}/api/v1/jobs/instances?group=BA&jobName=measure-BA-0-1508478921000&page=0&size=10",
+			"folder": "a6877336-53f6-b720-ee4f-313d6c9d9c94",
 			"queryParams": [
 				{
 					"key": "group",
@@ -433,7 +117,21 @@
 				},
 				{
 					"key": "jobName",
-					"value": "measure_name-BA-0-1508847304000",
+					"value": "measure-BA-0-1508478921000",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "page",
+					"value": "0",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "size",
+					"value": "10",
 					"equals": true,
 					"description": "",
 					"enabled": true
@@ -442,16 +140,16 @@
 			"preRequestScript": null,
 			"pathVariables": {},
 			"pathVariableData": [],
-			"method": "DELETE",
+			"method": "GET",
 			"data": null,
 			"dataMode": "params",
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1508997593266,
-			"name": "Delete  job",
-			"description": "`DELETE /api/v1/jobs`\n#### Request Parameters \n\n<center>name<center/> | <center>description<center/> | <center>type<center/> | <center>example value<center/>\n--- | --- | --- | ---\ngroup | job group name | String | BA\njobName | job name | String | measure_name-BA-0-1508846730000\n\n#### Response Body Sample\n```\n{\n  \"code\": 206,\n  \"description\": \"Delete Job Succeed\"\n}\n\n```\nIt may return failed messages.Such as,\n```\n{\n    \"code\": 406,\n    \"description\": \"Delete Job Failed\"\n}\n```\nThe reason for failure may be that there is no corresponding job of provided group and jobName.You should check group and jobName to make sure they exist .",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"time": 1508997518626,
+			"name": "Get job instances",
+			"description": "`GET /api/v1/instances`\n\nGet all job instances scheduled at different time using the same prototype job.The prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.\n\n<center>name<center/> | <center>description<center/> | <center>type<center/> | <center>example value<center/>\n--- | --- | --- | ---\ngroup | job group name | String | BA\njobName | job name | String | measure-BA-job-1\npage | page you want starting from index 0 | int | 0\nsize | instance number per page | int | 10",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -459,7 +157,7 @@
 						"code": 200,
 						"name": "OK"
 					},
-					"time": 67,
+					"time": 3755,
 					"headers": [
 						{
 							"name": "access-control-allow-headers",
@@ -494,7 +192,7 @@
 						{
 							"name": "date",
 							"key": "date",
-							"value": "Tue, 24 Oct 2017 12:07:39 GMT",
+							"value": "Wed, 25 Oct 2017 01:43:23 GMT",
 							"description": "The date and time that the message was sent"
 						},
 						{
@@ -506,7 +204,7 @@
 					],
 					"cookies": [],
 					"mime": "",
-					"text": "{\"code\":206,\"description\":\"Delete Job Succeed\"}",
+					"text": "[{\"id\":6248,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17887,\"state\":\"unknown\",\"appId\":null,\"appUri\":null,\"timestamp\":1508895600513},{\"id\":6245,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17884,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508895300471},{\"id\":6243,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17882,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508895000461},{\"id\":6241,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17880,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508894700451},{\"id\":6239,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17878,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508894400457},{\"id\":6237,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17876,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508894100455},{\"id\":6235,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17874,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508893800444},{\"id\":6233,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17872,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508893500452},{\"id\":6231,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17870,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508893200452},{\"id\":6229,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17868,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508892900452}]",
 					"language": "json",
 					"rawDataType": "text",
 					"previewType": "text",
@@ -515,13 +213,13 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"id": "79fe52c9-6406-4088-00eb-769d7709b71f",
-					"name": "Delete  job example",
+					"id": "bfa36b71-8fc0-c26b-34d0-41d77aecafc3",
+					"name": "Get job instances example",
 					"isSample": true,
 					"scrollToResult": false,
 					"runTests": false,
 					"request": {
-						"url": "{{BASE_PATH}}/api/v1/jobs?group=BA&jobName=measure_name-BA-0-1508846730000",
+						"url": "{{BASE_PATH}}/api/v1/jobs/instances?group=BA&jobName=measure-BA-0-1508478921000&page=0&size=10",
 						"pathVariables": {},
 						"pathVariableData": [],
 						"queryParams": [
@@ -534,7 +232,21 @@
 							},
 							{
 								"key": "jobName",
-								"value": "measure_name-BA-0-1508846730000",
+								"value": "measure-BA-0-1508478921000",
+								"equals": true,
+								"description": "",
+								"enabled": true
+							},
+							{
+								"key": "page",
+								"value": "0",
+								"equals": true,
+								"description": "",
+								"enabled": true
+							},
+							{
+								"key": "size",
+								"value": "10",
 								"equals": true,
 								"description": "",
 								"enabled": true
@@ -543,18 +255,20 @@
 						"headerData": [],
 						"headers": "",
 						"data": null,
-						"method": "DELETE",
+						"method": "GET",
 						"dataMode": "params"
-					}
+					},
+					"owner": "2830994"
 				}
-			]
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "5a281a05-e75f-ccc4-08fc-d5347d9ffabb",
+			"id": "2cc34a2b-d4e0-ff5d-3e73-4be4b1bcbfb8",
 			"headers": "",
 			"headerData": [],
 			"url": "{{BASE_PATH}}/api/v1/org/:org",
-			"folder": "7297e7c1-2efa-48a2-cb75-815239ba0c8b",
+			"folder": "a59711e8-e3ea-db95-56cf-6c6c70e150a8",
 			"queryParams": [],
 			"preRequestScript": null,
 			"pathVariables": {
@@ -575,7 +289,7 @@
 			"time": 1508998400445,
 			"name": "Get measure names by org",
 			"description": "`GET /api/v1/org/{org}`\n#### Path Variable\n- org - `required` `String` organization name.\n\n#### Request Sample\n`/api/v1/org/test`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -641,7 +355,7 @@
 					"empty": false,
 					"failed": false,
 					"name": "Get measure names by org example",
-					"id": "6787487f-80fd-e6d8-0149-4f5fe6cfa5a0",
+					"id": "a665b053-90d1-668b-880b-5fb87c093669",
 					"request": {
 						"url": "{{BASE_PATH}}/api/v1/org/:org",
 						"pathVariables": {
@@ -659,39 +373,39 @@
 						"data": null,
 						"method": "GET",
 						"dataMode": "params"
-					}
+					},
+					"owner": "2830994"
 				}
-			]
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "66b4a4fd-ff49-7f48-9568-2c25ff2a4bdc",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/metadata/hive/tables?db=default",
-			"folder": "db8f71a4-af1c-f20b-eb3c-8b0cecd3656c",
-			"queryParams": [
+			"id": "37578eb8-93b0-4903-0e51-42361aec3a90",
+			"headers": "Content-Type: application/json\n",
+			"headerData": [
 				{
-					"key": "db",
-					"value": "default",
-					"equals": true,
+					"key": "Content-Type",
+					"value": "application/json",
 					"description": "",
 					"enabled": true
 				}
 			],
+			"url": "{{BASE_PATH}}/api/v1/login/authenticate",
+			"folder": "c42b54fc-895c-d10c-72b0-01642ce776e8",
+			"queryParams": [],
 			"preRequestScript": null,
 			"pathVariables": {},
 			"pathVariableData": [],
-			"method": "GET",
+			"method": "POST",
 			"data": null,
 			"dataMode": "params",
-			"version": 2,
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1508997728908,
-			"name": "Get tables metadata",
-			"description": "`GET /api/v1/metadata/hive/tables`\n#### Request Parameter\nname | description | typ | example value\n--- | --- | --- | ---\ndb | hive database name | String | default",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"time": 1508997889462,
+			"name": "User authentication",
+			"description": "`POST /api/v1/login/authenticate`\n\n#### Request Parameter\nname | description | type |example value\n--- | --- | --- | ---\nmap | a map contains user name and password | Map |  `{\"username\":\"user\",\"password\":\"test\"}`",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -699,7 +413,7 @@
 						"code": 200,
 						"name": "OK"
 					},
-					"time": 28,
+					"time": 70,
 					"headers": [
 						{
 							"name": "access-control-allow-headers",
@@ -734,7 +448,7 @@
 						{
 							"name": "date",
 							"key": "date",
-							"value": "Wed, 25 Oct 2017 05:50:07 GMT",
+							"value": "Wed, 25 Oct 2017 08:18:38 GMT",
 							"description": "The date and time that the message was sent"
 						},
 						{
@@ -746,7 +460,7 @@
 					],
 					"cookies": [],
 					"mime": "",
-					"text": "[{\"tableName\":\"demo_src\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_src\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setParameters\":true,\"parametersSize\":2,\"setName\":false,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[],\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColValues\":true,\"setSkewedColNames\":true},\"storedAsSubDirectories\":false,\"colsSize\":3,\"setParameters\":true,\"parametersSize\":0,\"bucketColsSize\":0,\"setOutputFormat\":true,\"bucketColsIterator\":[],\"sortColsIterator\":[],\"setStoredAsSubDirectories\":true,\"sortColsSize\":0,\"setInputFormat\":true,\"setLocation\":true,\"setBucketCols\":true,\"setCols\":true,\"setSortCols\":true,\"setCompressed\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"setNumBuckets\":true,\"setSerdeInfo\":true,\"setSkewedInfo\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897403\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setOwner\":true,\"setRetention\":true,\"setTableType\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTableName\":true,\"setDbName\":true,\"setCreateTime\":true,\"setTemporary\":false,\"partitionKeysIterator\":[],\"partitionKeysSize\":0,\"parametersSize\":5,\"setViewOriginalText\":false,\"setPartitionKeys\":true,\"setLastAccessTime\":true,\"setViewExpandedText\":false},{\"tableName\":\"demo_tgt\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_tgt\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setParameters\":true,\"parametersSize\":2,\"setName\":false,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[],\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColValues\":true,\"setSkewedColNames\":true},\"storedAsSubDirectories\":false,\"colsSize\":3,\"setParameters\":true,\"parametersSize\":0,\"bucketColsSize\":0,\"setOutputFormat\":true,\"bucketColsIterator\":[],\"sortColsIterator\":[],\"setStoredAsSubDirectories\":true,\"sortColsSize\":0,\"setInputFormat\":true,\"setLocation\":true,\"setBucketCols\":true,\"setCols\":true,\"setSortCols\":true,\"setCompressed\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"setNumBuckets\":true,\"setSerdeInfo\":true,\"setSkewedInfo\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897404\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setOwner\":true,\"setRetention\":true,\"setTableType\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTableName\":true,\"setDbName\":true,\"setCreateTime\":true,\"setTemporary\":false,\"partitionKeysIterator\":[],\"partitionKeysSize\":0,\"parametersSize\":5,\"setViewOriginalText\":false,\"setPartitionKeys\":true,\"setLastAccessTime\":true,\"setViewExpandedText\":false}]",
+					"text": "{\"fullName\":\"Default\",\"ntAccount\":\"user\",\"status\":0}",
 					"language": "json",
 					"rawDataType": "text",
 					"previewType": "text",
@@ -755,19 +469,254 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"id": "5ccafd65-4677-09b2-78ae-d9c63f446f41",
-					"name": "Get tables metadata example",
+					"id": "c115cb54-3bf9-e7c8-827a-a7d93bf21946",
+					"name": "User authentication example",
 					"isSample": true,
 					"scrollToResult": false,
 					"runTests": false,
 					"request": {
-						"url": "{{BASE_PATH}}/api/v1/metadata/hive/tables?db=default",
+						"url": "{{BASE_PATH}}/api/v1/login/authenticate",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"enabled": true,
+								"description": ""
+							}
+						],
+						"headers": "Content-Type: application/json\n",
+						"data": "{\"username\":\"user\",\"password\":\"test\"}",
+						"method": "POST",
+						"dataMode": "raw"
+					},
+					"owner": "2830994"
+				}
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "4495d595-55a8-88af-4afb-85b2d722d00f",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/version",
+			"folder": "20092b46-e67b-f886-5433-32d7105b6379",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1508997903989,
+			"name": "Get griffin version",
+			"description": "`GET /api/v1/version`",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 63,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-length",
+							"key": "content-length",
+							"value": "5",
+							"description": "The length of the response body in octets (8-bit bytes)"
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "text/plain;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Thu, 26 Oct 2017 05:45:09 GMT",
+							"description": "The date and time that the message was sent"
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "0.1.0",
+					"language": "plainText",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"name": "Get griffin version example",
+					"id": "f4d01121-2424-8457-eb37-75b3d2638732",
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/version",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"owner": "2830994"
+				}
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "63066f6e-27ad-546d-27bc-e424dc0bd636",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/jobs?group=BA&jobName=measure_name-BA-0-1508847304000",
+			"folder": "a6877336-53f6-b720-ee4f-313d6c9d9c94",
+			"queryParams": [
+				{
+					"key": "group",
+					"value": "BA",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "jobName",
+					"value": "measure_name-BA-0-1508847304000",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "DELETE",
+			"data": null,
+			"dataMode": "params",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1508997593266,
+			"name": "Delete  job",
+			"description": "`DELETE /api/v1/jobs`\n#### Request Parameters \n\n<center>name<center/> | <center>description<center/> | <center>type<center/> | <center>example value<center/>\n--- | --- | --- | ---\ngroup | job group name | String | BA\njobName | job name | String | measure_name-BA-0-1508846730000\n\n#### Response Body Sample\n```\n{\n  \"code\": 206,\n  \"description\": \"Delete Job Succeed\"\n}\n\n```\nIt may return failed messages.Such as,\n```\n{\n    \"code\": 406,\n    \"description\": \"Delete Job Failed\"\n}\n```\nThe reason for failure may be that there is no corresponding job of provided group and jobName.You should check group and jobName to make sure they exist .",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 67,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Tue, 24 Oct 2017 12:07:39 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "{\"code\":206,\"description\":\"Delete Job Succeed\"}",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"id": "5c1651fb-044e-de26-c5df-f72d03d51e13",
+					"name": "Delete  job example",
+					"isSample": true,
+					"scrollToResult": false,
+					"runTests": false,
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/jobs?group=BA&jobName=measure_name-BA-0-1508846730000",
 						"pathVariables": {},
 						"pathVariableData": [],
 						"queryParams": [
 							{
-								"key": "db",
-								"value": "default",
+								"key": "group",
+								"value": "BA",
+								"equals": true,
+								"description": "",
+								"enabled": true
+							},
+							{
+								"key": "jobName",
+								"value": "measure_name-BA-0-1508846730000",
 								"equals": true,
 								"description": "",
 								"enabled": true
@@ -776,18 +725,20 @@
 						"headerData": [],
 						"headers": "",
 						"data": null,
-						"method": "GET",
+						"method": "DELETE",
 						"dataMode": "params"
-					}
+					},
+					"owner": "2830994"
 				}
-			]
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "6877595b-3010-08e9-be1b-5e7339482992",
+			"id": "742889e2-52e1-58eb-9c50-9a225bba87bb",
 			"headers": "",
 			"headerData": [],
 			"url": "{{BASE_PATH}}/api/v1/jobs",
-			"folder": "bfce335d-cf4e-59c6-d1ba-6f8674f9028c",
+			"folder": "a6877336-53f6-b720-ee4f-313d6c9d9c94",
 			"queryParams": [],
 			"preRequestScript": null,
 			"pathVariables": {},
@@ -802,7 +753,7 @@
 			"time": 1509005652378,
 			"name": "Get jobs",
 			"description": "`GET /api/v1/jobs/`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -866,7 +817,7 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"id": "c7b55594-e4e8-7f52-9f3b-a66e6eee1125",
+					"id": "53709f60-4690-0ab3-7b7f-d183a20d3c1d",
 					"name": "Get jobs example",
 					"isSample": true,
 					"scrollToResult": false,
@@ -881,467 +832,18 @@
 						"data": null,
 						"method": "GET",
 						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "6b0c4489-2164-0076-9a03-08199dc96f01",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{BASE_PATH}}/api/v1/measure",
-			"folder": "c44648fe-8b95-448a-168a-a3d01d181549",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "PUT",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1509333182624,
-			"name": "Update measure",
-			"description": "`PUT /api/v1/measure`\n\n#### Request Header\nkey | value\n--- | ---\nContent-Type | application/json\n\n#### Request Body\n\nname | description | type\n--- | --- | --- \nmeasure | measure entity | Measure\n\n#### Response Body Sample\n```\n{\n  \"code\": 204,\n  \"description\": \"Update Measure Succeed\"\n}\n```\n\nIt may return failed messages.Such as,\n\n```\n {\n  \"code\": 400,\n  \"description\": \"Resource Not Found\"\n}\n\n```\n\nThe reason for failure may be that measure id doesn't exist or the measure has been deleted by logically.You should check your measure.",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK"
 					},
-					"time": 157,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Tue, 24 Oct 2017 11:05:46 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "{\"code\":204,\"description\":\"Update Measure Succeed\"}",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"id": "eeeb8fd6-2bbf-beb6-f542-3e903147baab",
-					"name": "Update measure example",
-					"isSample": true,
-					"scrollToResult": false,
-					"runTests": false,
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/measure",
-						"pathVariables": {},
-						"pathVariableData": [],
-						"queryParams": [],
-						"headerData": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"enabled": true,
-								"description": ""
-							}
-						],
-						"headers": "Content-Type: application/json\n",
-						"data": "{\n        \"id\": 2,\n        \"name\": \"measureName_test_edit\",\n        \"description\": \"This is a test measure\",\n        \"organization\": \"orgName\",\n        \"evaluateRule\": {\n            \"rules\": [\n                {\n                    \"rule\": \"source.id = target.id and source.age = target.age and source.desc = target.desc\",\n                    \"dsl.type\": \"griffin-dsl\",\n                    \"dq.type\": \"accuracy\"\n                }\n            ]\n        },\n        \"owner\": \"test\",\n        \"deleted\": false,\n        \"process.type\": \"batch\",\n        \"data.sources\": [\n            {\n                \"name\": \"source\",\n                \"connectors\": [\n                    {\n                        \"type\": \"HIVE\",\n                        \"version\": \"1.2\",\n                        \"config\": {\n                            \"database\": \"default\",\n                            \"table.name\": \"demo_src\"\n                        }\n                    }\n                ]\n            },\n            {\n                \"name\": \"target\",\n                \"connectors\": [\n                    {\n                        \"type\": \"HIVE\",\n                        \"version\": \"1.2\",\n                        \"config\": {\n                            \"database\": \"default\",\n                            \"table.name\": \"demo_tgt\"\n                        }\n                    }\n                ]\n            }\n        ]\n}",
-						"method": "PUT",
-						"dataMode": "raw"
-					}
+					"owner": "2830994"
 				}
 			],
-			"rawModeData": "{\n        \"id\": 1,\n        \"name\": \"measureName_test_edit\",\n        \"description\": \"This is a test measure\",\n        \"organization\": \"orgName\",\n        \"evaluateRule\": {\n            \"rules\": [\n                {\n                    \"rule\": \"source.id = target.id and source.age = target.age and source.desc = target.desc\",\n                    \"dsl.type\": \"griffin-dsl\",\n                    \"dq.type\": \"accuracy\"\n                }\n            ]\n        },\n        \"owner\": \"test\",\n        \"deleted\": false,\n        \"process.type\": \"batch\",\n        \"data.sources\": [\n            {\n                \"name\": \"source\",\n                \"connectors\": [\n                    {\n                        \"type\": \"HIVE\",\n                        \"version\": \"1.2\",\n                        \"config\": {\n                            \"database\": \"default\",\n                            \"table.name\": \"demo_src\"\n                        }\n                    }\n                ]\n            },\n            {\n                \"name\": \"target\",\n                \"connectors\": [\n                    {\n                        \"type\": \"HIVE\",\n                        \"version\": \"1.2\",\n                        \"config\": {\n                            \"database\": \"default\",\n                            \"table.name\": \"demo_tgt\"\n                        }\n                    }\n                ]\n            }\n        ]\n}"
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "6e759a74-d4cf-12ba-468c-ea084654c307",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/measures/owner/:owner",
-			"folder": "c44648fe-8b95-448a-168a-a3d01d181549",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {
-				"owner": "test"
-			},
-			"pathVariableData": [
-				{
-					"key": "owner",
-					"value": "test"
-				}
-			],
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"version": 2,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1508998395708,
-			"name": "Get measures by owner",
-			"description": "`GET /api/v1/measures/owner/{owner}`\n\n#### Path Variable\n- owner -`required` `String` owner name\n\n#### Request Sample\n\n`/api/v1/measures/owner/test`\n\n#### Response Body Sample\n```\n[\n  {\n    \"name\": \"demo-accu\",\n    \"id\": \"2\"\n  }\n]\n```",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK",
-						"detail": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request the response will contain an entity describing or containing the result of the action."
-					},
-					"time": 67,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Thu, 26 Oct 2017 06:12:10 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "[{\"id\":2,\"name\":\"measureName_test_edit\",\"description\":\"This is a test measure\",\"organization\":\"orgName\",\"evaluateRule\":{\"id\":18,\"rules\":[{\"id\":10,\"rule\":\"source.id==target.id\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":35,\"name\":\"source\",\"connectors\":[{\"id\":19,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":36,\"name\":\"target\",\"connectors\":[{\"id\":20,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]},{\"id\":6,\"name\":\"third_measure\",\"description\":null,\"organization\":\"ebay\",\"evaluateRule\":{\"id\":6,\"rules\":[{\"id\":6,\"rule\":\"source.id=target.id AND source.age=target.age\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":11,\"name\":\"source\",\"connectors\":[{\"id\":11,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":12,\"name\":\"target\",\"connectors\":[{\"id\":12,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]},{\"id\":8,\"name\":\"measure1\",\"description\":null,\"organization\":\"test\",\"evaluateRule\":{\"id\":8,\"rules\":[{\"id\":8,\"rule\":\"source.age=target.age\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":15,\"name\":\"source\",\"connectors\":[{\"id\":15,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":16,\"name\":\"target\",\"connectors\":[{\"id\":16,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]},{\"id\":9,\"name\":\"measureName_test_edit\",\"description\":\"This is a test measure\",\"organization\":\"orgName\",\"evaluateRule\":{\"id\":14,\"rules\":[]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":27,\"name\":null,\"connectors\":[]},{\"id\":28,\"name\":null,\"connectors\":[]}]},{\"id\":10,\"name\":\"measureName1\",\"description\":\"This is a test measure\",\"organization\":\"orgName\",\"evaluateRule\":{\"id\":19,\"rules\":[{\"id\":11,\"rule\":\"source.id==target.id\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":37,\"name\":\"source\",\"connectors\":[{\"id\":21,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":38,\"name\":\"target\",\"connectors\":[{\"id\":22,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]}]",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"name": "Get measures by owner example",
-					"id": "498dd59c-2bde-9c41-bafa-d1fa85c50ec0",
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/measures/owner/:owner",
-						"pathVariables": {
-							"owner": "test"
-						},
-						"pathVariableData": [
-							{
-								"key": "owner",
-								"value": "test"
-							}
-						],
-						"queryParams": [],
-						"headerData": [],
-						"headers": "",
-						"data": null,
-						"method": "GET",
-						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "7373af1c-d2a3-8917-24c1-0440b1c81c14",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{BASE_PATH}}/api/v1/measure",
-			"folder": "c44648fe-8b95-448a-168a-a3d01d181549",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1509330288995,
-			"name": "Add measure",
-			"description": "`POST /api/v1/measure`\n\n#### Request Header\nkey | value\n--- | ---\nContent-Type | application/json\n\n#### Request Body\n\nname | description | type\n--- | --- | --- \nmeasure | measure entity | Measure\n\n#### Response Body Sample\n```\n{\n  \"code\": 201,\n  \"description\": \"Create Measure Succeed\"\n}\n```\n\nIt may return failed messages.Such as,\n\n```\n {\n  \"code\": 410,\n  \"description\": \"Create Measure Failed, duplicate records\"\n}\n\n```\n\nThe reason for failure may be that measure name already exists.You can change measure name to make it unique.",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK"
-					},
-					"time": 629,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Tue, 24 Oct 2017 10:59:21 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "{\"code\":201,\"description\":\"Create Measure Succeed\"}",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"id": "81d34925-ac08-dfa3-a094-6e6aa1bdff08",
-					"name": "Add measure  example",
-					"isSample": true,
-					"scrollToResult": false,
-					"runTests": false,
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/measure",
-						"pathVariables": {},
-						"pathVariableData": [],
-						"queryParams": [],
-						"headerData": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"enabled": true,
-								"description": ""
-							}
-						],
-						"headers": "Content-Type: application/json\n",
-						"data": "{\r\n    \"name\": \"measureName\",\r\n    \"process.type\": \"batch\",\r\n    \"owner\": \"test\",\r\n    \"description\": \"This is a test measure\",\r\n    \"organization\": \"orgName\",\r\n    \"data.sources\": [\r\n        {\r\n            \"name\": \"source\",\r\n            \"connectors\": [\r\n                {\r\n                    \"type\": \"HIVE\",\r\n                    \"version\": \"1.2\",\r\n                    \"config\": {\r\n                        \"database\": \"default\",\r\n                        \"table.name\": \"demo_src\"\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"name\": \"target\",\r\n            \"connectors\": [\r\n                {\r\n                    \"type\": \"HIVE\",\r\n                    \"version\": \"1.2\",\r\n                    \"config\": {\r\n                        \"database\": \"default\",\r\n                        \"table.name\": \"demo_tgt\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"evaluateRule\": {\r\n        \"rules\": [\r\n            {\r\n                \"dsl.type\": \"griffin-dsl\",\r\n                \"dq.type\": \"accuracy\",\r\n                \"rule\": \"source.id=target.id\"\r\n            }\r\n        ]\r\n    }\r\n}",
-						"method": "POST",
-						"dataMode": "raw"
-					}
-				}
-			],
-			"rawModeData": "{\r\n    \"name\": \"measureName1\",\r\n    \"process.type\": \"batch\",\r\n    \"owner\": \"test\",\r\n    \"description\": \"This is a test measure\",\r\n    \"organization\": \"orgName\",\r\n    \"data.sources\": [\r\n        {\r\n            \"name\": \"source\",\r\n            \"connectors\": [\r\n                {\r\n                    \"type\": \"HIVE\",\r\n                    \"version\": \"1.2\",\r\n                    \"config\": {\r\n                        \"database\": \"default\",\r\n                        \"table.name\": \"demo_src\"\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"name\": \"target\",\r\n            \"connectors\": [\r\n                {\r\n                    \"type\": \"HIVE\",\r\n                    \"version\": \"1.2\",\r\n                    \"config\": {\r\n                        \"database\": \"default\",\r\n                        \"table.name\": \"demo_tgt\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"evaluateRule\": {\r\n        \"rules\": [\r\n            {\r\n                \"dsl.type\": \"griffin-dsl\",\r\n                \"dq.type\": \"accuracy\",\r\n                \"rule\": \"source.id = target.id and source.age = target.age and source.desc = target.desc\"\r\n            }\r\n        ]\r\n    }\r\n}"
-		},
-		{
-			"id": "81592a70-44b1-b503-9954-fe1aec99a094",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/measure/1",
-			"folder": "c44648fe-8b95-448a-168a-a3d01d181549",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "DELETE",
-			"data": null,
-			"dataMode": "params",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1508997393184,
-			"name": "Delete measure",
-			"description": "`DELETE /api/v1/measure/{id}`\n\n#### Path Variable\n- id -`required` `Long` measure id\n\n#### Request Sample\n\n`/api/v1/measure/1`\n\n#### Response Body Sample\n```\n{\n  \"code\": 202,\n  \"description\": \"Delete Measures By Id Succeed\"\n}\n```\n\nIt may return failed messages.Such as,\n\n```\n {\n  \"code\": 400,\n  \"description\": \"Resource Not Found\"\n}\n\n```\n\nThe reason for failure may be that measure id doesn't exist.You should check your measure.",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK"
-					},
-					"time": 673,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Tue, 24 Oct 2017 11:39:45 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "{\"code\":202,\"description\":\"Delete Measures By Id Succeed\"}",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"id": "6e618a43-9562-2b95-47b2-fbaeec62043a",
-					"name": "Delete measure example",
-					"isSample": true,
-					"scrollToResult": false,
-					"runTests": false,
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/measure/1",
-						"pathVariables": {},
-						"pathVariableData": [],
-						"queryParams": [],
-						"headerData": [],
-						"headers": "",
-						"data": null,
-						"method": "DELETE",
-						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "86fc3991-57b4-b644-adf3-cacfc7be0c5b",
+			"id": "78aae644-ccbe-9381-0a64-4d463b1d76c0",
 			"headers": "",
 			"headerData": [],
 			"url": "{{BASE_PATH}}/api/v1/jobs/health",
-			"folder": "bfce335d-cf4e-59c6-d1ba-6f8674f9028c",
+			"folder": "a6877336-53f6-b720-ee4f-313d6c9d9c94",
 			"queryParams": [],
 			"preRequestScript": null,
 			"pathVariables": {},
@@ -1355,7 +857,7 @@
 			"time": 1508997449658,
 			"name": "Get job healthy statistics",
 			"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"healthyJobCount\": 17,\n  \"jobCount\": 23\n}\n```",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -1419,7 +921,7 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"id": "e27b3d68-94b6-e3ba-7648-6ef7ad6a58cd",
+					"id": "a77d6763-143e-a77a-1fbd-0ff26897b84e",
 					"name": "Get job healthy statistics example",
 					"isSample": true,
 					"scrollToResult": false,
@@ -1434,176 +936,18 @@
 						"data": null,
 						"method": "GET",
 						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "94f0ffb4-59a4-1849-2e77-a816c6631531",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/jobs/instances?group=BA&jobName=measure-BA-0-1508478921000&page=0&size=10",
-			"folder": "bfce335d-cf4e-59c6-d1ba-6f8674f9028c",
-			"queryParams": [
-				{
-					"key": "group",
-					"value": "BA",
-					"equals": true,
-					"description": "",
-					"enabled": true
-				},
-				{
-					"key": "jobName",
-					"value": "measure-BA-0-1508478921000",
-					"equals": true,
-					"description": "",
-					"enabled": true
-				},
-				{
-					"key": "page",
-					"value": "0",
-					"equals": true,
-					"description": "",
-					"enabled": true
-				},
-				{
-					"key": "size",
-					"value": "10",
-					"equals": true,
-					"description": "",
-					"enabled": true
+					},
+					"owner": "2830994"
 				}
 			],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1508997518626,
-			"name": "Get job instances",
-			"description": "`GET /api/v1/instances`\n\nGet all job instances scheduled at different time using the same prototype job.The prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.\n\n<center>name<center/> | <center>description<center/> | <center>type<center/> | <center>example value<center/>\n--- | --- | --- | ---\ngroup | job group name | String | BA\njobName | job name | String | measure-BA-job-1\npage | page you want starting from index 0 | int | 0\nsize | instance number per page | int | 10",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK"
-					},
-					"time": 3755,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Wed, 25 Oct 2017 01:43:23 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "[{\"id\":6248,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17887,\"state\":\"unknown\",\"appId\":null,\"appUri\":null,\"timestamp\":1508895600513},{\"id\":6245,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17884,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508895300471},{\"id\":6243,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17882,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508895000461},{\"id\":6241,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17880,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508894700451},{\"id\":6239,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17878,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508894400457},{\"id\":6237,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17876,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508894100455},{\"id\":6235,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17874,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508893800444},{\"id\":6233,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17872,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508893500452},{\"id\":6231,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17870,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508893200452},{\"id\":6229,\"groupName\":\"BA\",\"jobName\":\"measure-BA-0-1508478921000\",\"sessionId\":17868,\"state\":\"dead\",\"appId\":null,\"appUri\":null,\"timestamp\":1508892900452}]",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"id": "a1e3273c-3b1f-5d71-a0e0-a7ca78f824f4",
-					"name": "Get job instances example",
-					"isSample": true,
-					"scrollToResult": false,
-					"runTests": false,
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/jobs/instances?group=BA&jobName=measure-BA-0-1508478921000&page=0&size=10",
-						"pathVariables": {},
-						"pathVariableData": [],
-						"queryParams": [
-							{
-								"key": "group",
-								"value": "BA",
-								"equals": true,
-								"description": "",
-								"enabled": true
-							},
-							{
-								"key": "jobName",
-								"value": "measure-BA-0-1508478921000",
-								"equals": true,
-								"description": "",
-								"enabled": true
-							},
-							{
-								"key": "page",
-								"value": "0",
-								"equals": true,
-								"description": "",
-								"enabled": true
-							},
-							{
-								"key": "size",
-								"value": "10",
-								"equals": true,
-								"description": "",
-								"enabled": true
-							}
-						],
-						"headerData": [],
-						"headers": "",
-						"data": null,
-						"method": "GET",
-						"dataMode": "params"
-					}
-				}
-			]
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "9cc56d64-a000-b640-ed20-68e810e4e73c",
+			"id": "79d22e4f-89e4-5e61-7c24-92f4e2f6450e",
 			"headers": "",
 			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/metadata/hive/tables/names?db=default",
-			"folder": "db8f71a4-af1c-f20b-eb3c-8b0cecd3656c",
+			"url": "{{BASE_PATH}}/api/v1/metadata/hive/table?db=default&table=demo_src",
+			"folder": "022408d6-3e26-da08-eb52-ca3c83d8f226",
 			"queryParams": [
 				{
 					"key": "db",
@@ -1611,6 +955,13 @@
 					"equals": true,
 					"description": "",
 					"enabled": true
+				},
+				{
+					"key": "table",
+					"value": "demo_src",
+					"equals": true,
+					"description": "",
+					"enabled": true
 				}
 			],
 			"preRequestScript": null,
@@ -1622,10 +973,10 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1508997683445,
-			"name": "Get table names",
-			"description": "`GET /api/v1/metadata/hive/tables/names`\n#### Request Parameter\nname | description | typ | example value\n--- | --- | --- | ---\ndb | hive database name | String | default",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"time": 1508997723742,
+			"name": "Get table metadata",
+			"description": "`GET /api/v1/metadata/hive/table`\n#### Request Parameters\n name  |  description |  type  |  example value \n---- | ---------- | ----- |-----\ndb | hive database name | String | default\ntable | hive table name | String | demo_src",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -1633,7 +984,7 @@
 						"code": 200,
 						"name": "OK"
 					},
-					"time": 226,
+					"time": 289,
 					"headers": [
 						{
 							"name": "access-control-allow-headers",
@@ -1668,7 +1019,7 @@
 						{
 							"name": "date",
 							"key": "date",
-							"value": "Wed, 25 Oct 2017 05:11:54 GMT",
+							"value": "Wed, 25 Oct 2017 05:06:48 GMT",
 							"description": "The date and time that the message was sent"
 						},
 						{
@@ -1680,7 +1031,7 @@
 					],
 					"cookies": [],
 					"mime": "",
-					"text": "[\"demo_src\",\"demo_tgt\"]",
+					"text": "{\"tableName\":\"demo_src\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_src\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setName\":false,\"setParameters\":true,\"parametersSize\":2,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColNames\":true,\"setSkewedColValues\":true,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[]},\"storedAsSubDirectories\":false,\"setParameters\":true,\"parametersSize\":0,\"bucketColsIterator\":[],\"setOutputFormat\":true,\"bucketColsSize\":0,\"sortColsIterator\":[],\"setCols\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false}],\"colsSize\":3,\"setLocation\":true,\"setInputFormat\":true,\"setCompressed\":true,\"setNumBuckets\":true,\"setSerdeInfo\":true,\"sortColsSize\":0,\"setSortCols\":true,\"setSkewedInfo\":true,\"setBucketCols\":true,\"setStoredAsSubDirectories\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897403\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setCreateTime\":true,\"setTableName\":true,\"setRetention\":true,\"setOwner\":true,\"setDbName\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTemporary\":false,\"setTableType\":true,\"partitionKeysIterator\":[],\"setViewExpandedText\":false,\"setViewOriginalText\":false,\"partitionKeysSize\":0,\"setLastAccessTime\":true,\"setPartitionKeys\":true,\"parametersSize\":5}",
 					"language": "json",
 					"rawDataType": "text",
 					"previewType": "text",
@@ -1689,13 +1040,13 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"id": "56719423-80e6-8ae9-3ae1-23e7effb7a87",
-					"name": "Get table names example",
+					"id": "0d2eb90a-90db-83ae-ffb6-a14acd9cfece",
+					"name": "Get table metadata example",
 					"isSample": true,
 					"scrollToResult": false,
 					"runTests": false,
 					"request": {
-						"url": "{{BASE_PATH}}/api/v1/metadata/hive/tables/names?db=default",
+						"url": "{{BASE_PATH}}/api/v1/metadata/hive/table?db=default&table=demo_src",
 						"pathVariables": {},
 						"pathVariableData": [],
 						"queryParams": [
@@ -1705,6 +1056,13 @@
 								"equals": true,
 								"description": "",
 								"enabled": true
+							},
+							{
+								"key": "table",
+								"value": "demo_src",
+								"equals": true,
+								"description": "",
+								"enabled": true
 							}
 						],
 						"headerData": [],
@@ -1712,118 +1070,18 @@
 						"data": null,
 						"method": "GET",
 						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "b1b53c58-75bb-7a66-efca-d536e5d8a2f2",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/metadata/hive/dbs",
-			"folder": "db8f71a4-af1c-f20b-eb3c-8b0cecd3656c",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "GET",
-			"data": null,
-			"dataMode": "params",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1508997670920,
-			"name": "Get database names",
-			"description": "`GET /api/v1/metadata/hive/dbs`\n \n #### Get all database names",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK"
 					},
-					"time": 225,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Wed, 25 Oct 2017 05:12:36 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "[\"default\"]",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"id": "7bdd738d-9e41-ca11-79ec-83fb32bf95c2",
-					"name": "Get db names example",
-					"isSample": true,
-					"scrollToResult": false,
-					"runTests": false,
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/metadata/hive/dbs",
-						"pathVariables": {},
-						"pathVariableData": [],
-						"queryParams": [],
-						"headerData": [],
-						"headers": "",
-						"data": null,
-						"method": "GET",
-						"dataMode": "params"
-					}
+					"owner": "2830994"
 				}
-			]
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "b54feb96-9536-e295-f3ec-2825c8958ccc",
+			"id": "7f475e07-d86e-8ff8-b087-57d926389f10",
 			"headers": "",
 			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/metadata/hive/dbs/tables",
-			"folder": "db8f71a4-af1c-f20b-eb3c-8b0cecd3656c",
+			"url": "{{BASE_PATH}}/api/v1/org/measure/names",
+			"folder": "a59711e8-e3ea-db95-56cf-6c6c70e150a8",
 			"queryParams": [],
 			"preRequestScript": null,
 			"pathVariables": {},
@@ -1835,10 +1093,10 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1508997646817,
-			"name": "Get all database tables metadata",
-			"description": "`GET /api/v1/metadata/hive/dbs/tables`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"time": 1509332871323,
+			"name": "Get  measure names group by org",
+			"description": "`GET /api/v1/org/measure/names`",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -1846,7 +1104,7 @@
 						"code": 200,
 						"name": "OK"
 					},
-					"time": 36,
+					"time": 5216,
 					"headers": [
 						{
 							"name": "access-control-allow-headers",
@@ -1881,7 +1139,7 @@
 						{
 							"name": "date",
 							"key": "date",
-							"value": "Wed, 25 Oct 2017 05:47:03 GMT",
+							"value": "Mon, 30 Oct 2017 03:07:48 GMT",
 							"description": "The date and time that the message was sent"
 						},
 						{
@@ -1893,7 +1151,7 @@
 					],
 					"cookies": [],
 					"mime": "",
-					"text": "{\"default\":[{\"tableName\":\"demo_src\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_src\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setParameters\":true,\"parametersSize\":2,\"setName\":false,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[],\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColValues\":true,\"setSkewedColNames\":true},\"storedAsSubDirectories\":false,\"colsSize\":3,\"setParameters\":true,\"parametersSize\":0,\"bucketColsSize\":0,\"setOutputFormat\":true,\"bucketColsIterator\":[],\"sortColsIterator\":[],\"setStoredAsSubDirectories\":true,\"sortColsSize\":0,\"setInputFormat\":true,\"setLocation\":true,\"setBucketCols\":true,\"setCols\":true,\"setSortCols\":true,\"setCompressed\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"setNumBuckets\":true,\"setSerdeInfo\":true,\"setSkewedInfo\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897403\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setOwner\":true,\"setRetention\":true,\"setTableType\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTableName\":true,\"setDbName\":true,\"setCreateTime\":true,\"setTemporary\":false,\"partitionKeysIterator\":[],\"partitionKeysSize\":0,\"parametersSize\":5,\"setViewOriginalText\":false,\"setPartitionKeys\":true,\"setLastAccessTime\":true,\"setViewExpandedText\":false},{\"tableName\":\"demo_tgt\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_tgt\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setParameters\":true,\"parametersSize\":2,\"setName\":false,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[],\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColValues\":true,\"setSkewedColNames\":true},\"storedAsSubDirectories\":false,\"colsSize\":3,\"setParameters\":true,\"parametersSize\":0,\"bucketColsSize\":0,\"setOutputFormat\":true,\"bucketColsIterator\":[],\"sortColsIterator\":[],\"setStoredAsSubDirectories\":true,\"sortColsSize\":0,\"setInputFormat\":true,\"setLocation\":true,\"setBucketCols\":true,\"setCols\":true,\"setSortCols\":true,\"setCompressed\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"setNumBuckets\":true,\"setSerdeInfo\":true,\"setSkewedInfo\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897404\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setOwner\":true,\"setRetention\":true,\"setTableType\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTableName\":true,\"setDbName\":true,\"setCreateTime\":true,\"setTemporary\":false,\"partitionKeysIterator\":[],\"partitionKeysSize\":0,\"parametersSize\":5,\"setViewOriginalText\":false,\"setPartitionKeys\":true,\"setLastAccessTime\":true,\"setViewExpandedText\":false}]}",
+					"text": "{\"orgName\":[\"measureName_test_edit\",\"measureName_test_edit\",\"measureName1\"],\"test\":[\"measure1\"],\"ebay\":[\"new_measure_test_again\",\"third_measure\",\"fourth_measure\",\"fifth_measure\",\"third_measure\",\"measure\"]}",
 					"language": "json",
 					"rawDataType": "text",
 					"previewType": "text",
@@ -1902,13 +1160,10 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"id": "090918bd-9a57-04d2-c2b1-d5d921eee3ba",
-					"name": "Get all database tables metadata example",
-					"isSample": true,
-					"scrollToResult": false,
-					"runTests": false,
+					"name": "Get  measure names group by org example",
+					"id": "2acc9f74-c6e2-badd-2c40-c8a45e4fb88f",
 					"request": {
-						"url": "{{BASE_PATH}}/api/v1/metadata/hive/dbs/tables",
+						"url": "{{BASE_PATH}}/api/v1/org/measure/names",
 						"pathVariables": {},
 						"pathVariableData": [],
 						"queryParams": [],
@@ -1917,12 +1172,14 @@
 						"data": null,
 						"method": "GET",
 						"dataMode": "params"
-					}
+					},
+					"owner": "2830994"
 				}
-			]
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "c323c910-64c6-bbc0-2d41-b80d0aa58c56",
+			"id": "82c3a170-5bf6-2dc9-5295-3cca6e628d18",
 			"headers": "Content-Type: application/json\n",
 			"headerData": [
 				{
@@ -1933,7 +1190,7 @@
 				}
 			],
 			"url": "{{BASE_PATH}}/api/v1/jobs?group=BA&jobName=measure-BA-0-1508478934000&measureId=1",
-			"folder": "bfce335d-cf4e-59c6-d1ba-6f8674f9028c",
+			"folder": "a6877336-53f6-b720-ee4f-313d6c9d9c94",
 			"queryParams": [
 				{
 					"key": "group",
@@ -1969,7 +1226,7 @@
 			"time": 1509333184841,
 			"name": "Add job",
 			"description": "`POST /api/v1/jobs`\n\n#### Request Header\nkey | value\n--- | ---\nContent-Type | application/json\n\n#### Request Parameters\nname | description | type | example value\n--- | --- | --- | ---\ngroup | job group name | String | BA\njobName | job name | String | measure-BA-0-1508466621000 \nmeasureId | measure id | Long | 4\n\n#### Request Body\nname | description | type | example value\n--- | --- | --- | ---\njobRequestBody | custom class composed of job key parameters | JobRequestBody | `{\"sourcePattern\":\"YYYYMMdd-HH\",\"targetPattern\":\"YYYYMMdd-HH\",\"jobStartTime\":1508428800000,\"interval\":36000,\"groupName\":\"BA\"}`\n\n\n#### Response Body Sample\n```\n{\n  \"code\": 205,\n  \"description\": \"Create Job Succeed\"\n}\n```\nIt may return failed messages.Such as,\n\n```\n{\n  \"code\": 405,\n  \"description\": \"Create Job Failed\"\n}\n```\n\nThe reason for failure may be that trigger key already exists or the measure id associated with job may not exist. Firstly,You should check group and job name to make trigger key unique. Secondly,you should check whether your measure id exists.",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -2035,7 +1292,7 @@
 					"empty": false,
 					"failed": false,
 					"name": "Add job example",
-					"id": "9815c619-fbd7-65fc-e5b7-70cbdc2b9399",
+					"id": "4a978d95-809e-b126-ef14-95aaf7ee33b3",
 					"request": {
 						"url": "{{BASE_PATH}}/api/v1/jobs?group=BA&jobName=measure-BA-0-1508478934000&measureId=1",
 						"pathVariables": {},
@@ -2075,45 +1332,32 @@
 						"data": "{\r\n\t\"sourcePattern\":\"YYYYMMdd-HH\",\r\n\t\"targetPattern\":\"YYYYMMdd-HH\",\r\n\t\"jobStartTime\":1508256000000,\r\n\t\"interval\":300,\r\n\t\"groupName\":\"BA\"\r\n}",
 						"method": "POST",
 						"dataMode": "raw"
-					}
-				}
-			]
-		},
-		{
-			"id": "cacd1e36-aeaf-1561-575d-9c74098fcacc",
-			"headers": "",
-			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/metadata/hive/table?db=default&table=demo_src",
-			"folder": "db8f71a4-af1c-f20b-eb3c-8b0cecd3656c",
-			"queryParams": [
-				{
-					"key": "db",
-					"value": "default",
-					"equals": true,
-					"description": "",
-					"enabled": true
-				},
-				{
-					"key": "table",
-					"value": "demo_src",
-					"equals": true,
-					"description": "",
-					"enabled": true
+					},
+					"owner": "2830994"
 				}
 			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "9a0a2201-2a06-daeb-5abb-c9e08f4ee00c",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/measure/1",
+			"folder": "7511d4fa-72ce-8671-54d0-2f3432d86445",
+			"queryParams": [],
 			"preRequestScript": null,
 			"pathVariables": {},
 			"pathVariableData": [],
-			"method": "GET",
+			"method": "DELETE",
 			"data": null,
 			"dataMode": "params",
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1508997723742,
-			"name": "Get table metadata",
-			"description": "`GET /api/v1/metadata/hive/table`\n#### Request Parameters\n name  |  description |  type  |  example value \n---- | ---------- | ----- |-----\ndb | hive database name | String | default\ntable | hive table name | String | demo_src",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"time": 1508997393184,
+			"name": "Delete measure",
+			"description": "`DELETE /api/v1/measure/{id}`\n\n#### Path Variable\n- id -`required` `Long` measure id\n\n#### Request Sample\n\n`/api/v1/measure/1`\n\n#### Response Body Sample\n```\n{\n  \"code\": 202,\n  \"description\": \"Delete Measures By Id Succeed\"\n}\n```\n\nIt may return failed messages.Such as,\n\n```\n {\n  \"code\": 400,\n  \"description\": \"Resource Not Found\"\n}\n\n```\n\nThe reason for failure may be that measure id doesn't exist.You should check your measure.",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -2121,7 +1365,7 @@
 						"code": 200,
 						"name": "OK"
 					},
-					"time": 289,
+					"time": 673,
 					"headers": [
 						{
 							"name": "access-control-allow-headers",
@@ -2156,7 +1400,7 @@
 						{
 							"name": "date",
 							"key": "date",
-							"value": "Wed, 25 Oct 2017 05:06:48 GMT",
+							"value": "Tue, 24 Oct 2017 11:39:45 GMT",
 							"description": "The date and time that the message was sent"
 						},
 						{
@@ -2168,7 +1412,7 @@
 					],
 					"cookies": [],
 					"mime": "",
-					"text": "{\"tableName\":\"demo_src\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_src\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setName\":false,\"setParameters\":true,\"parametersSize\":2,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColNames\":true,\"setSkewedColValues\":true,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[]},\"storedAsSubDirectories\":false,\"setParameters\":true,\"parametersSize\":0,\"bucketColsIterator\":[],\"setOutputFormat\":true,\"bucketColsSize\":0,\"sortColsIterator\":[],\"setCols\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setType\":true,\"setComment\":false}],\"colsSize\":3,\"setLocation\":true,\"setInputFormat\":true,\"setCompressed\":true,\"setNumBuckets\":true,\"setSerdeInfo\":true,\"sortColsSize\":0,\"setSortCols\":true,\"setSkewedInfo\":true,\"setBucketCols\":true,\"setStoredAsSubDirectories\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897403\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setCreateTime\":true,\"setTableName\":true,\"setRetention\":true,\"setOwner\":true,\"setDbName\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTemporary\":false,\"setTableType\":true,\"partitionKeysIterator\":[],\"setViewExpandedText\":false,\"setViewOriginalText\":false,\"partitionKeysSize\":0,\"setLastAccessTime\":true,\"setPartitionKeys\":true,\"parametersSize\":5}",
+					"text": "{\"code\":202,\"description\":\"Delete Measures By Id Succeed\"}",
 					"language": "json",
 					"rawDataType": "text",
 					"previewType": "text",
@@ -2177,26 +1421,367 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"id": "2e7458ea-7bba-078d-f233-7b4becddbe4a",
-					"name": "Get table metadata example",
+					"id": "84eb0730-82fb-9d5a-7093-9428787c2131",
+					"name": "Delete measure example",
 					"isSample": true,
 					"scrollToResult": false,
 					"runTests": false,
 					"request": {
-						"url": "{{BASE_PATH}}/api/v1/metadata/hive/table?db=default&table=demo_src",
+						"url": "{{BASE_PATH}}/api/v1/measure/1",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "DELETE",
+						"dataMode": "params"
+					},
+					"owner": "2830994"
+				}
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "9d390c13-a375-54c6-dcc2-4753edd4e9e4",
+			"headers": "Content-Type: application/json\n",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"url": "{{BASE_PATH}}/api/v1/measure",
+			"folder": "7511d4fa-72ce-8671-54d0-2f3432d86445",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "POST",
+			"data": [],
+			"dataMode": "raw",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1509330288995,
+			"name": "Add measure",
+			"description": "`POST /api/v1/measure`\n\n#### Request Header\nkey | value\n--- | ---\nContent-Type | application/json\n\n#### Request Body\n\nname | description | type\n--- | --- | --- \nmeasure | measure entity | Measure\n\n#### Response Body Sample\n```\n{\n  \"code\": 201,\n  \"description\": \"Create Measure Succeed\"\n}\n```\n\nIt may return failed messages.Such as,\n\n```\n {\n  \"code\": 410,\n  \"description\": \"Create Measure Failed, duplicate records\"\n}\n\n```\n\nThe reason for failure may be that measure name already exists.You can change measure name to make it unique.",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 629,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Tue, 24 Oct 2017 10:59:21 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "{\"code\":201,\"description\":\"Create Measure Succeed\"}",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"id": "da49437f-ea4f-fcac-47e9-93cc622da278",
+					"name": "Add measure  example",
+					"isSample": true,
+					"scrollToResult": false,
+					"runTests": false,
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/measure",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"enabled": true,
+								"description": ""
+							}
+						],
+						"headers": "Content-Type: application/json\n",
+						"data": "{\r\n    \"name\": \"measureName\",\r\n    \"process.type\": \"batch\",\r\n    \"owner\": \"test\",\r\n    \"description\": \"This is a test measure\",\r\n    \"organization\": \"orgName\",\r\n    \"data.sources\": [\r\n        {\r\n            \"name\": \"source\",\r\n            \"connectors\": [\r\n                {\r\n                    \"type\": \"HIVE\",\r\n                    \"version\": \"1.2\",\r\n                    \"config\": {\r\n                        \"database\": \"default\",\r\n                        \"table.name\": \"demo_src\"\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"name\": \"target\",\r\n            \"connectors\": [\r\n                {\r\n                    \"type\": \"HIVE\",\r\n                    \"version\": \"1.2\",\r\n                    \"config\": {\r\n                        \"database\": \"default\",\r\n                        \"table.name\": \"demo_tgt\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"evaluateRule\": {\r\n        \"rules\": [\r\n            {\r\n                \"dsl.type\": \"griffin-dsl\",\r\n                \"dq.type\": \"accuracy\",\r\n                \"rule\": \"source.id=target.id\"\r\n            }\r\n        ]\r\n    }\r\n}",
+						"method": "POST",
+						"dataMode": "raw"
+					},
+					"owner": "2830994"
+				}
+			],
+			"rawModeData": "{\r\n    \"name\": \"measureName1\",\r\n    \"process.type\": \"batch\",\r\n    \"owner\": \"test\",\r\n    \"description\": \"This is a test measure\",\r\n    \"organization\": \"orgName\",\r\n    \"data.sources\": [\r\n        {\r\n            \"name\": \"source\",\r\n            \"connectors\": [\r\n                {\r\n                    \"type\": \"HIVE\",\r\n                    \"version\": \"1.2\",\r\n                    \"config\": {\r\n                        \"database\": \"default\",\r\n                        \"table.name\": \"demo_src\"\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"name\": \"target\",\r\n            \"connectors\": [\r\n                {\r\n                    \"type\": \"HIVE\",\r\n                    \"version\": \"1.2\",\r\n                    \"config\": {\r\n                        \"database\": \"default\",\r\n                        \"table.name\": \"demo_tgt\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"evaluateRule\": {\r\n        \"rules\": [\r\n            {\r\n                \"dsl.type\": \"griffin-dsl\",\r\n                \"dq.type\": \"accuracy\",\r\n                \"rule\": \"source.id = target.id and source.age = target.age and source.desc = target.desc\"\r\n            }\r\n        ]\r\n    }\r\n}",
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "a85f7d39-c0bc-dd29-4739-18d3651c9796",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/measures/owner/:owner",
+			"folder": "7511d4fa-72ce-8671-54d0-2f3432d86445",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {
+				"owner": "test"
+			},
+			"pathVariableData": [
+				{
+					"key": "owner",
+					"value": "test"
+				}
+			],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1508998395708,
+			"name": "Get measures by owner",
+			"description": "`GET /api/v1/measures/owner/{owner}`\n\n#### Path Variable\n- owner -`required` `String` owner name\n\n#### Request Sample\n\n`/api/v1/measures/owner/test`\n\n#### Response Body Sample\n```\n[\n  {\n    \"name\": \"demo-accu\",\n    \"id\": \"2\"\n  }\n]\n```",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK",
+						"detail": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request the response will contain an entity describing or containing the result of the action."
+					},
+					"time": 67,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Thu, 26 Oct 2017 06:12:10 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "[{\"id\":2,\"name\":\"measureName_test_edit\",\"description\":\"This is a test measure\",\"organization\":\"orgName\",\"evaluateRule\":{\"id\":18,\"rules\":[{\"id\":10,\"rule\":\"source.id==target.id\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":35,\"name\":\"source\",\"connectors\":[{\"id\":19,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":36,\"name\":\"target\",\"connectors\":[{\"id\":20,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]},{\"id\":6,\"name\":\"third_measure\",\"description\":null,\"organization\":\"ebay\",\"evaluateRule\":{\"id\":6,\"rules\":[{\"id\":6,\"rule\":\"source.id=target.id AND source.age=target.age\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":11,\"name\":\"source\",\"connectors\":[{\"id\":11,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":12,\"name\":\"target\",\"connectors\":[{\"id\":12,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]},{\"id\":8,\"name\":\"measure1\",\"description\":null,\"organization\":\"test\",\"evaluateRule\":{\"id\":8,\"rules\":[{\"id\":8,\"rule\":\"source.age=target.age\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":15,\"name\":\"source\",\"connectors\":[{\"id\":15,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":16,\"name\":\"target\",\"connectors\":[{\"id\":16,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]},{\"id\":9,\"name\":\"measureName_test_edit\",\"description\":\"This is a test measure\",\"organization\":\"orgName\",\"evaluateRule\":{\"id\":14,\"rules\":[]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":27,\"name\":null,\"connectors\":[]},{\"id\":28,\"name\":null,\"connectors\":[]}]},{\"id\":10,\"name\":\"measureName1\",\"description\":\"This is a test measure\",\"organization\":\"orgName\",\"evaluateRule\":{\"id\":19,\"rules\":[{\"id\":11,\"rule\":\"source.id==target.id\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":37,\"name\":\"source\",\"connectors\":[{\"id\":21,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":38,\"name\":\"target\",\"connectors\":[{\"id\":22,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]}]",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"name": "Get measures by owner example",
+					"id": "d3a53fb8-7fb0-1d44-4d5e-2688cc67f544",
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/measures/owner/:owner",
+						"pathVariables": {
+							"owner": "test"
+						},
+						"pathVariableData": [
+							{
+								"key": "owner",
+								"value": "test"
+							}
+						],
+						"queryParams": [],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"owner": "2830994"
+				}
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "b84b34c1-8861-7ed7-f4e3-396ea5908d0c",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/metadata/hive/tables/names?db=default",
+			"folder": "022408d6-3e26-da08-eb52-ca3c83d8f226",
+			"queryParams": [
+				{
+					"key": "db",
+					"value": "default",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1508997683445,
+			"name": "Get table names",
+			"description": "`GET /api/v1/metadata/hive/tables/names`\n#### Request Parameter\nname | description | typ | example value\n--- | --- | --- | ---\ndb | hive database name | String | default",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 226,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Wed, 25 Oct 2017 05:11:54 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "[\"demo_src\",\"demo_tgt\"]",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"id": "ad379b58-e78a-ffbb-9fca-bf26b689e9c2",
+					"name": "Get table names example",
+					"isSample": true,
+					"scrollToResult": false,
+					"runTests": false,
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/metadata/hive/tables/names?db=default",
 						"pathVariables": {},
 						"pathVariableData": [],
 						"queryParams": [
 							{
 								"key": "db",
 								"value": "default",
-								"equals": true,
-								"description": "",
-								"enabled": true
-							},
-							{
-								"key": "table",
-								"value": "demo_src",
 								"equals": true,
 								"description": "",
 								"enabled": true
@@ -2207,16 +1792,509 @@
 						"data": null,
 						"method": "GET",
 						"dataMode": "params"
-					}
+					},
+					"owner": "2830994"
 				}
-			]
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "cc7d5841-3b32-281a-c5ed-2e02057dae83",
+			"id": "bb002dbb-fc6e-b885-21c6-9896a8ae0521",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/metadata/hive/dbs/tables",
+			"folder": "022408d6-3e26-da08-eb52-ca3c83d8f226",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1508997646817,
+			"name": "Get all database tables metadata",
+			"description": "`GET /api/v1/metadata/hive/dbs/tables`",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 36,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Wed, 25 Oct 2017 05:47:03 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "{\"default\":[{\"tableName\":\"demo_src\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_src\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setParameters\":true,\"parametersSize\":2,\"setName\":false,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[],\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColValues\":true,\"setSkewedColNames\":true},\"storedAsSubDirectories\":false,\"colsSize\":3,\"setParameters\":true,\"parametersSize\":0,\"bucketColsSize\":0,\"setOutputFormat\":true,\"bucketColsIterator\":[],\"sortColsIterator\":[],\"setStoredAsSubDirectories\":true,\"sortColsSize\":0,\"setInputFormat\":true,\"setLocation\":true,\"setBucketCols\":true,\"setCols\":true,\"setSortCols\":true,\"setCompressed\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"setNumBuckets\":true,\"setSerdeInfo\":true,\"setSkewedInfo\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897403\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setOwner\":true,\"setRetention\":true,\"setTableType\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTableName\":true,\"setDbName\":true,\"setCreateTime\":true,\"setTemporary\":false,\"partitionKeysIterator\":[],\"partitionKeysSize\":0,\"parametersSize\":5,\"setViewOriginalText\":false,\"setPartitionKeys\":true,\"setLastAccessTime\":true,\"setViewExpandedText\":false},{\"tableName\":\"demo_tgt\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_tgt\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setParameters\":true,\"parametersSize\":2,\"setName\":false,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[],\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColValues\":true,\"setSkewedColNames\":true},\"storedAsSubDirectories\":false,\"colsSize\":3,\"setParameters\":true,\"parametersSize\":0,\"bucketColsSize\":0,\"setOutputFormat\":true,\"bucketColsIterator\":[],\"sortColsIterator\":[],\"setStoredAsSubDirectories\":true,\"sortColsSize\":0,\"setInputFormat\":true,\"setLocation\":true,\"setBucketCols\":true,\"setCols\":true,\"setSortCols\":true,\"setCompressed\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"setNumBuckets\":true,\"setSerdeInfo\":true,\"setSkewedInfo\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897404\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setOwner\":true,\"setRetention\":true,\"setTableType\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTableName\":true,\"setDbName\":true,\"setCreateTime\":true,\"setTemporary\":false,\"partitionKeysIterator\":[],\"partitionKeysSize\":0,\"parametersSize\":5,\"setViewOriginalText\":false,\"setPartitionKeys\":true,\"setLastAccessTime\":true,\"setViewExpandedText\":false}]}",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"id": "d72d3908-1ad1-00e3-9985-2491b708a1a7",
+					"name": "Get all database tables metadata example",
+					"isSample": true,
+					"scrollToResult": false,
+					"runTests": false,
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/metadata/hive/dbs/tables",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"owner": "2830994"
+				}
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "cca39e41-3c38-eef6-f9d1-e797936eb7e9",
+			"headers": "Content-Type: application/json\n",
+			"headerData": [
+				{
+					"key": "Content-Type",
+					"value": "application/json",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"url": "{{BASE_PATH}}/api/v1/measure",
+			"folder": "7511d4fa-72ce-8671-54d0-2f3432d86445",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "PUT",
+			"data": [],
+			"dataMode": "raw",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1509333182624,
+			"name": "Update measure",
+			"description": "`PUT /api/v1/measure`\n\n#### Request Header\nkey | value\n--- | ---\nContent-Type | application/json\n\n#### Request Body\n\nname | description | type\n--- | --- | --- \nmeasure | measure entity | Measure\n\n#### Response Body Sample\n```\n{\n  \"code\": 204,\n  \"description\": \"Update Measure Succeed\"\n}\n```\n\nIt may return failed messages.Such as,\n\n```\n {\n  \"code\": 400,\n  \"description\": \"Resource Not Found\"\n}\n\n```\n\nThe reason for failure may be that measure id doesn't exist or the measure has been deleted by logically.You should check your measure.",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 157,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Tue, 24 Oct 2017 11:05:46 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "{\"code\":204,\"description\":\"Update Measure Succeed\"}",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"id": "3c43d46c-ea90-8280-7c0c-2ca7bab2e7d0",
+					"name": "Update measure example",
+					"isSample": true,
+					"scrollToResult": false,
+					"runTests": false,
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/measure",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"enabled": true,
+								"description": ""
+							}
+						],
+						"headers": "Content-Type: application/json\n",
+						"data": "{\n        \"id\": 2,\n        \"name\": \"measureName_test_edit\",\n        \"description\": \"This is a test measure\",\n        \"organization\": \"orgName\",\n        \"evaluateRule\": {\n            \"rules\": [\n                {\n                    \"rule\": \"source.id = target.id and source.age = target.age and source.desc = target.desc\",\n                    \"dsl.type\": \"griffin-dsl\",\n                    \"dq.type\": \"accuracy\"\n                }\n            ]\n        },\n        \"owner\": \"test\",\n        \"deleted\": false,\n        \"process.type\": \"batch\",\n        \"data.sources\": [\n            {\n                \"name\": \"source\",\n                \"connectors\": [\n                    {\n                        \"type\": \"HIVE\",\n                        \"version\": \"1.2\",\n                        \"config\": {\n                            \"database\": \"default\",\n                            \"table.name\": \"demo_src\"\n                        }\n                    }\n                ]\n            },\n            {\n                \"name\": \"target\",\n                \"connectors\": [\n                    {\n                        \"type\": \"HIVE\",\n                        \"version\": \"1.2\",\n                        \"config\": {\n                            \"database\": \"default\",\n                            \"table.name\": \"demo_tgt\"\n                        }\n                    }\n                ]\n            }\n        ]\n}",
+						"method": "PUT",
+						"dataMode": "raw"
+					},
+					"owner": "2830994"
+				}
+			],
+			"rawModeData": "{\n        \"id\": 1,\n        \"name\": \"measureName_test_edit\",\n        \"description\": \"This is a test measure\",\n        \"organization\": \"orgName\",\n        \"evaluateRule\": {\n            \"rules\": [\n                {\n                    \"rule\": \"source.id = target.id and source.age = target.age and source.desc = target.desc\",\n                    \"dsl.type\": \"griffin-dsl\",\n                    \"dq.type\": \"accuracy\"\n                }\n            ]\n        },\n        \"owner\": \"test\",\n        \"deleted\": false,\n        \"process.type\": \"batch\",\n        \"data.sources\": [\n            {\n                \"name\": \"source\",\n                \"connectors\": [\n                    {\n                        \"type\": \"HIVE\",\n                        \"version\": \"1.2\",\n                        \"config\": {\n                            \"database\": \"default\",\n                            \"table.name\": \"demo_src\"\n                        }\n                    }\n                ]\n            },\n            {\n                \"name\": \"target\",\n                \"connectors\": [\n                    {\n                        \"type\": \"HIVE\",\n                        \"version\": \"1.2\",\n                        \"config\": {\n                            \"database\": \"default\",\n                            \"table.name\": \"demo_tgt\"\n                        }\n                    }\n                ]\n            }\n        ]\n}",
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "d0eb17bc-7eea-8cc6-1a21-fccabd3e5d8b",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/metadata/hive/dbs",
+			"folder": "022408d6-3e26-da08-eb52-ca3c83d8f226",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1508997670920,
+			"name": "Get database names",
+			"description": "`GET /api/v1/metadata/hive/dbs`\n \n #### Get all database names",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 225,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Wed, 25 Oct 2017 05:12:36 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "[\"default\"]",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"id": "7ee1d444-9ed5-4ceb-5ca5-4d9db938e2c8",
+					"name": "Get db names example",
+					"isSample": true,
+					"scrollToResult": false,
+					"runTests": false,
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/metadata/hive/dbs",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"owner": "2830994"
+				}
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "d49b0e8b-53f9-3089-895e-ad013220f306",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/org/measure/jobs",
+			"queryParams": [],
+			"pathVariables": {},
+			"pathVariableData": [],
+			"preRequestScript": null,
+			"method": "GET",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"data": null,
+			"dataMode": "params",
+			"name": "Get measures and job details group by org",
+			"description": "`GET /api/v1/org/measure/jobs`",
+			"descriptionFormat": "html",
+			"time": 1509963763694,
+			"version": 2,
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 0,
+					"headers": [],
+					"cookies": [],
+					"mime": "",
+					"text": "{\n    \"orgName\": {\n        \"measureName2\": [],\n        \"measureName\": [\n            {\n                \"jobName\": \"measureName-BA-0-1509431586000\",\n                \"measureId\": \"1\",\n                \"groupName\": \"BA\",\n                \"targetPattern\": \"YYYYMMdd-HH\",\n                \"triggerState\": \"NORMAL\",\n                \"nextFireTime\": 1509613420000,\n                \"previousFireTime\": 1509613400000,\n                \"interval\": \"20\",\n                \"sourcePattern\": \"YYYYMMdd-HH\",\n                \"jobStartTime\": \"1509379200000\"\n            },\n            {\n                \"jobName\": \"measureName-BA-0-1509430761000\",\n                \"measureId\": \"1\",\n                \"groupName\": \"BA\",\n                \"targetPattern\": \"YYYYMMdd-HH\",\n                \"triggerState\": \"NORMAL\",\n                \"nextFireTime\": 1509613440000,\n                \"previousFireTime\": 1509613410000,\n                \"interval\": \"30\",\n                \"sourcePattern\": \"YYYYMMdd-HH\",\n                \"jobStartTime\": \"1509379200000\"\n            }\n        ]\n    }\n}",
+					"language": "json",
+					"rawDataType": "",
+					"previewType": "parsed",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"name": "Get measures and job details group by org",
+					"id": "b443f2cb-8ff3-1cd2-eaf3-d8739fe66fde",
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/org/measure/jobs",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					}
+				}
+			],
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"folder": "a59711e8-e3ea-db95-56cf-6c6c70e150a8"
+		},
+		{
+			"id": "d9fa6f9b-14eb-7b02-9d8e-6017d6d442a7",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/org",
+			"folder": "a59711e8-e3ea-db95-56cf-6c6c70e150a8",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1508996888357,
+			"name": "Get orgs for measure",
+			"description": "`GET /api/v1/org`",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK"
+					},
+					"time": 50,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Wed, 25 Oct 2017 05:55:00 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "[\"ebay\",\"test\",\"orgName\"]",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"id": "966ef950-ef55-7967-2c39-8c45d81f2368",
+					"name": "Get orgs for measure example",
+					"isSample": true,
+					"scrollToResult": false,
+					"runTests": false,
+					"request": {
+						"url": "http://localhost:8080/api/v1/org",
+						"pathVariables": {},
+						"pathVariableData": [],
+						"queryParams": [],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"owner": "2830994"
+				}
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "da6be1fb-a790-b275-f2a5-0f584e8f4fcb",
 			"headers": "",
 			"headerData": [],
 			"url": "{{BASE_PATH}}/api/v1/measures",
-			"folder": "c44648fe-8b95-448a-168a-a3d01d181549",
+			"folder": "7511d4fa-72ce-8671-54d0-2f3432d86445",
 			"queryParams": [],
 			"preRequestScript": null,
 			"pathVariables": {},
@@ -2231,7 +2309,7 @@
 			"time": 1508997057521,
 			"name": "Get measures",
 			"description": "`GET /api/v1/measures`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -2295,7 +2373,7 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"id": "f4c75772-824b-4b9b-34a5-a2e040d6754c",
+					"id": "f7a314da-c6cc-cec0-c9a8-5a92750c2900",
 					"name": "Get measures example",
 					"isSample": true,
 					"scrollToResult": false,
@@ -2310,17 +2388,27 @@
 						"data": null,
 						"method": "GET",
 						"dataMode": "params"
-					}
+					},
+					"owner": "2830994"
 				}
-			]
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		},
 		{
-			"id": "decff1b5-0241-8e08-c134-fc4217e89448",
+			"id": "eb6eb4a9-89f6-b0c1-34e7-1d5a24659554",
 			"headers": "",
 			"headerData": [],
-			"url": "{{BASE_PATH}}/api/v1/org/measure/names",
-			"folder": "7297e7c1-2efa-48a2-cb75-815239ba0c8b",
-			"queryParams": [],
+			"url": "{{BASE_PATH}}/api/v1/metadata/hive/tables?db=default",
+			"folder": "022408d6-3e26-da08-eb52-ca3c83d8f226",
+			"queryParams": [
+				{
+					"key": "db",
+					"value": "default",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
 			"preRequestScript": null,
 			"pathVariables": {},
 			"pathVariableData": [],
@@ -2331,10 +2419,10 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1509332871323,
-			"name": "Get  measure names group by org",
-			"description": "`GET /api/v1/orgWithMetricsName`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
+			"time": 1508997728908,
+			"name": "Get tables metadata",
+			"description": "`GET /api/v1/metadata/hive/tables`\n#### Request Parameter\nname | description | typ | example value\n--- | --- | --- | ---\ndb | hive database name | String | default",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
 			"responses": [
 				{
 					"status": "",
@@ -2342,7 +2430,7 @@
 						"code": 200,
 						"name": "OK"
 					},
-					"time": 5216,
+					"time": 28,
 					"headers": [
 						{
 							"name": "access-control-allow-headers",
@@ -2377,7 +2465,7 @@
 						{
 							"name": "date",
 							"key": "date",
-							"value": "Mon, 30 Oct 2017 03:07:48 GMT",
+							"value": "Wed, 25 Oct 2017 05:50:07 GMT",
 							"description": "The date and time that the message was sent"
 						},
 						{
@@ -2389,7 +2477,7 @@
 					],
 					"cookies": [],
 					"mime": "",
-					"text": "{\"orgName\":[\"measureName_test_edit\",\"measureName_test_edit\",\"measureName1\"],\"test\":[\"measure1\"],\"ebay\":[\"new_measure_test_again\",\"third_measure\",\"fourth_measure\",\"fifth_measure\",\"third_measure\",\"measure\"]}",
+					"text": "[{\"tableName\":\"demo_src\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_src\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setParameters\":true,\"parametersSize\":2,\"setName\":false,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[],\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColValues\":true,\"setSkewedColNames\":true},\"storedAsSubDirectories\":false,\"colsSize\":3,\"setParameters\":true,\"parametersSize\":0,\"bucketColsSize\":0,\"setOutputFormat\":true,\"bucketColsIterator\":[],\"sortColsIterator\":[],\"setStoredAsSubDirectories\":true,\"sortColsSize\":0,\"setInputFormat\":true,\"setLocation\":true,\"setBucketCols\":true,\"setCols\":true,\"setSortCols\":true,\"setCompressed\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"setNumBuckets\":true,\"setSerdeInfo\":true,\"setSkewedInfo\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897403\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setOwner\":true,\"setRetention\":true,\"setTableType\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTableName\":true,\"setDbName\":true,\"setCreateTime\":true,\"setTemporary\":false,\"partitionKeysIterator\":[],\"partitionKeysSize\":0,\"parametersSize\":5,\"setViewOriginalText\":false,\"setPartitionKeys\":true,\"setLastAccessTime\":true,\"setViewExpandedText\":false},{\"tableName\":\"demo_tgt\",\"dbName\":\"default\",\"owner\":\"root\",\"createTime\":1507861756,\"lastAccessTime\":0,\"retention\":0,\"sd\":{\"cols\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"location\":\"hdfs://griffin:9000/griffin/data/batch/demo_tgt\",\"inputFormat\":\"org.apache.hadoop.mapred.TextInputFormat\",\"outputFormat\":\"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\",\"compressed\":false,\"numBuckets\":-1,\"serdeInfo\":{\"name\":null,\"serializationLib\":\"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\",\"parameters\":{\"field.delim\":\"|\",\"serialization.format\":\"|\"},\"setParameters\":true,\"parametersSize\":2,\"setName\":false,\"setSerializationLib\":true},\"bucketCols\":[],\"sortCols\":[],\"parameters\":{},\"skewedInfo\":{\"skewedColNames\":[],\"skewedColValues\":[],\"skewedColValueLocationMaps\":{},\"skewedColValueLocationMapsSize\":0,\"skewedColNamesIterator\":[],\"setSkewedColValueLocationMaps\":true,\"skewedColValuesIterator\":[],\"skewedColNamesSize\":0,\"skewedColValuesSize\":0,\"setSkewedColValues\":true,\"setSkewedColNames\":true},\"storedAsSubDirectories\":false,\"colsSize\":3,\"setParameters\":true,\"parametersSize\":0,\"bucketColsSize\":0,\"setOutputFormat\":true,\"bucketColsIterator\":[],\"sortColsIterator\":[],\"setStoredAsSubDirectories\":true,\"sortColsSize\":0,\"setInputFormat\":true,\"setLocation\":true,\"setBucketCols\":true,\"setCols\":true,\"setSortCols\":true,\"setCompressed\":true,\"colsIterator\":[{\"name\":\"id\",\"type\":\"bigint\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"age\",\"type\":\"int\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true},{\"name\":\"desc\",\"type\":\"string\",\"comment\":null,\"setName\":true,\"setComment\":false,\"setType\":true}],\"setNumBuckets\":true,\"setSerdeInfo\":true,\"setSkewedInfo\":true},\"partitionKeys\":[],\"parameters\":{\"totalSize\":\"0\",\"EXTERNAL\":\"TRUE\",\"COLUMN_STATS_ACCURATE\":\"true\",\"numFiles\":\"0\",\"transient_lastDdlTime\":\"1508897404\"},\"viewOriginalText\":null,\"viewExpandedText\":null,\"tableType\":\"EXTERNAL_TABLE\",\"privileges\":null,\"temporary\":false,\"setSd\":true,\"setOwner\":true,\"setRetention\":true,\"setTableType\":true,\"setParameters\":true,\"setPrivileges\":false,\"setTableName\":true,\"setDbName\":true,\"setCreateTime\":true,\"setTemporary\":false,\"partitionKeysIterator\":[],\"partitionKeysSize\":0,\"parametersSize\":5,\"setViewOriginalText\":false,\"setPartitionKeys\":true,\"setLastAccessTime\":true,\"setViewExpandedText\":false}]",
 					"language": "json",
 					"rawDataType": "text",
 					"previewType": "text",
@@ -2398,137 +2486,150 @@
 					"write": true,
 					"empty": false,
 					"failed": false,
-					"name": "Get  measure names group by org example",
-					"id": "8f9c18f8-a3f3-3c45-5d3d-5f6c46fb11d4",
+					"id": "e519c954-dfe1-7861-fcbd-d04203340ac5",
+					"name": "Get tables metadata example",
+					"isSample": true,
+					"scrollToResult": false,
+					"runTests": false,
 					"request": {
-						"url": "{{BASE_PATH}}/api/v1/org/measure/names",
+						"url": "{{BASE_PATH}}/api/v1/metadata/hive/tables?db=default",
 						"pathVariables": {},
 						"pathVariableData": [],
+						"queryParams": [
+							{
+								"key": "db",
+								"value": "default",
+								"equals": true,
+								"description": "",
+								"enabled": true
+							}
+						],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					},
+					"owner": "2830994"
+				}
+			],
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
+		},
+		{
+			"id": "f5b9e3cb-f691-12b5-f675-48ac51da6b14",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/measure/:id",
+			"folder": "7511d4fa-72ce-8671-54d0-2f3432d86445",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {
+				"id": "1"
+			},
+			"pathVariableData": [
+				{
+					"key": "id",
+					"value": "1"
+				}
+			],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1509333180809,
+			"name": "Get measure by id",
+			"description": "`GET /api/v1/measure/{id}`\n#### Path Variable\n- id -`required` `Long` measure id\n\n#### Request Sample\n\n`/api/v1/measure/2`",
+			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK",
+						"detail": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request the response will contain an entity describing or containing the result of the action."
+					},
+					"time": 49,
+					"headers": [
+						{
+							"name": "access-control-allow-headers",
+							"key": "access-control-allow-headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"name": "access-control-allow-methods",
+							"key": "access-control-allow-methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"name": "access-control-allow-origin",
+							"key": "access-control-allow-origin",
+							"value": "*",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"name": "access-control-max-age",
+							"key": "access-control-max-age",
+							"value": "3600",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"name": "content-type",
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "date",
+							"key": "date",
+							"value": "Mon, 30 Oct 2017 03:09:22 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "transfer-encoding",
+							"key": "transfer-encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "{\"id\":1,\"name\":\"measureName_test_edit\",\"description\":\"This is a test measure\",\"organization\":\"orgName\",\"evaluateRule\":{\"id\":20,\"rules\":[{\"id\":12,\"rule\":\"source.id = target.id and source.age = target.age and source.desc = target.desc\",\"dsl.type\":\"griffin-dsl\",\"dq.type\":\"accuracy\"}]},\"owner\":\"test\",\"deleted\":false,\"process.type\":\"batch\",\"data.sources\":[{\"id\":39,\"name\":\"source\",\"connectors\":[{\"id\":23,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_src\"}}]},{\"id\":40,\"name\":\"target\",\"connectors\":[{\"id\":24,\"type\":\"HIVE\",\"version\":\"1.2\",\"config\":{\"database\":\"default\",\"table.name\":\"demo_tgt\"}}]}]}",
+					"language": "json",
+					"rawDataType": "text",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"name": "Get measure by id example",
+					"id": "68a5e9f4-6594-91e2-9237-b679377a2128",
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/measure/:id",
+						"pathVariables": {
+							"id": "1"
+						},
+						"pathVariableData": [
+							{
+								"key": "id",
+								"value": "1"
+							}
+						],
 						"queryParams": [],
 						"headerData": [],
 						"headers": "",
 						"data": null,
 						"method": "GET",
 						"dataMode": "params"
-					}
-				}
-			]
-		},
-		{
-			"id": "f2bbd2ad-1848-19f8-6b66-f242208befaf",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
+					},
+					"owner": "2830994"
 				}
 			],
-			"url": "{{BASE_PATH}}/api/v1/login/authenticate",
-			"folder": "6b68e8ee-75c7-df61-d8af-fbc308b3a0b8",
-			"queryParams": [],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "POST",
-			"data": null,
-			"dataMode": "params",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1508997889462,
-			"name": "User authentication",
-			"description": "`POST /api/v1/login/authenticate`\n\n#### Request Parameter\nname | description | type |example value\n--- | --- | --- | ---\nmap | a map contains user name and password | Map |  `{\"username\":\"user\",\"password\":\"test\"}`",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-			"responses": [
-				{
-					"status": "",
-					"responseCode": {
-						"code": 200,
-						"name": "OK"
-					},
-					"time": 70,
-					"headers": [
-						{
-							"name": "access-control-allow-headers",
-							"key": "access-control-allow-headers",
-							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
-							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
-						},
-						{
-							"name": "access-control-allow-methods",
-							"key": "access-control-allow-methods",
-							"value": "POST, GET, OPTIONS, DELETE,PUT",
-							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
-						},
-						{
-							"name": "access-control-allow-origin",
-							"key": "access-control-allow-origin",
-							"value": "*",
-							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-						},
-						{
-							"name": "access-control-max-age",
-							"key": "access-control-max-age",
-							"value": "3600",
-							"description": "Indicates how long the results of a preflight request can be cached in seconds."
-						},
-						{
-							"name": "content-type",
-							"key": "content-type",
-							"value": "application/json;charset=UTF-8",
-							"description": "The mime type of this content"
-						},
-						{
-							"name": "date",
-							"key": "date",
-							"value": "Wed, 25 Oct 2017 08:18:38 GMT",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"name": "transfer-encoding",
-							"key": "transfer-encoding",
-							"value": "chunked",
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
-						}
-					],
-					"cookies": [],
-					"mime": "",
-					"text": "{\"fullName\":\"Default\",\"ntAccount\":\"user\",\"status\":0}",
-					"language": "json",
-					"rawDataType": "text",
-					"previewType": "text",
-					"searchResultScrolledTo": -1,
-					"forceNoPretty": false,
-					"write": true,
-					"empty": false,
-					"failed": false,
-					"id": "696cd902-1da7-991f-f05a-43685335c7d3",
-					"name": "User authentication example",
-					"isSample": true,
-					"scrollToResult": false,
-					"runTests": false,
-					"request": {
-						"url": "{{BASE_PATH}}/api/v1/login/authenticate",
-						"pathVariables": {},
-						"pathVariableData": [],
-						"queryParams": [],
-						"headerData": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"enabled": true,
-								"description": ""
-							}
-						],
-						"headers": "Content-Type: application/json\n",
-						"data": "{\"username\":\"user\",\"password\":\"test\"}",
-						"method": "POST",
-						"dataMode": "raw"
-					}
-				}
-			]
+			"collection_id": "871762c3-97f9-1ac0-f17c-d17bd3446b87"
 		}
 	]
 }
