@@ -51,9 +51,7 @@ export class MetricComponent implements OnInit {
   	'invalid':number
   };
   chartOption = new Map();
-  // var formatUtil = echarts.format;
   dataData = [];
-  // originalData = [];
   originalData:any;
   metricName = [];
   metricNameUnique = [];
@@ -73,7 +71,6 @@ export class MetricComponent implements OnInit {
   this.oData.forEach((x) => {
     arr.push(Object.assign({}, x));
   });
-  console.log(arr);
   // arr.map((x) => {x.status = DEFAULT});
   return this.oData.concat(arr);
   }
@@ -109,16 +106,13 @@ export class MetricComponent implements OnInit {
         for(let key in this.orgWithMeasure[orgName]){
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
-          var jobs = this.orgWithMeasure[orgName][key];
-          
+          var jobs = this.orgWithMeasure[orgName][key];          
             for(let i = 0;i < jobs.length;i++){
                orgNode.jobMap.push(jobs[i].jobName);
                var job = jobs[i].jobName;
-               console.log(job);
                this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( data=> { 
                  this.originalData = data;
                  if(this.originalData.hits){
-                   // this.metricData = JSON.parse(JSON.stringify(this.originalData.hits.hits));
                    this.metricData = this.originalData.hits.hits;
                    metricNode.details = this.metricData;                                
                    metricNode.name = this.metricData[0]._source.name;
@@ -132,8 +126,6 @@ export class MetricComponent implements OnInit {
           this.finalData.push(node); 
           this.orgs.push(orgNode);                
       }
-      this.originalData = JSON.parse(JSON.stringify(this.finalData));
-      console.log(this.finalData);
       this.oData = this.finalData.slice(0);
       var self = this;
             setTimeout(function function_name(argument) {
@@ -176,7 +168,6 @@ export class MetricComponent implements OnInit {
       }
       else {
         var org = this.orgs[this.selectedOrgIndex-1];
-        console.log(org);
         this.measureOptions = org.measureMap;
         for(let i = 0;i<this.oData.length;i++){
           if(this.oData[i].name!=org.name){
@@ -197,31 +188,23 @@ export class MetricComponent implements OnInit {
 
   changeMeasure() {
       var jobdetail = [];  
-      // this.fData = this.mData.slice(0);
       this.fData = JSON.parse(JSON.stringify(this.mData));
-      console.log(this.fData);
       this.oData = this.fData; 
       if(this.selectedMeasureIndex != undefined && this.selectedMeasureIndex != 0){
-        console.log(this.fData);
         var measure = this.measureOptions[this.selectedMeasureIndex-1];
-        console.log(measure);
-        console.log(this.fData);
-        console.log(this.orgWithMeasure);
         for(let key in this.orgWithMeasure){
           if(key == this.fData[0].name){
             for(let measurename in this.orgWithMeasure[key]){
               if(measurename == measure){
                 var jobname = this.orgWithMeasure[key][measurename];
-                for(let i=0;i< this.orgWithMeasure[key][measurename].length;i++){
-                    jobdetail.push(this.orgWithMeasure[key][measurename][i].jobName);
+                for(let i=0;i< jobname.length;i++){
+                    jobdetail.push(jobname[i].jobName);
                   }
               }
             }
           }
         }
-        console.log(this.fData[0].metrics);
         for(let i = 0;i<this.fData[0].metrics.length;i++){
-          console.log(this.fData[0].metrics[i].name);
             if(jobdetail.indexOf(this.fData[0].metrics[i].name) === -1){
               for(var j = i; j < this.fData[0].metrics.length - 1; j++){
                  this.fData[0].metrics[j] = this.fData[0].metrics[j + 1];

@@ -29,16 +29,16 @@ under the License.
 .reco > tbody:nth-of-type(odd) >tr {
      background-color: #1f1f1f;
 }
-
+.co{
+  border-collapse: separate;
+}
 .table > tbody + tbody {
     border-top: 1px solid transparent;
 }
 a{
 	color: white;
 }
-tfoot,tbody,thead{
-  border-right: 1px solid #1f1f1f !important; 
-}
+
 .icon{
   color: #fff;
   position: absolute;

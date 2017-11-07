@@ -59,10 +59,8 @@ export class HealthComponent implements OnInit {
   
   onChartClick($event){
     if($event.data.name){
-        // this.router.navigate(['/detailed/'+$event.data.name]);
         this.router.navigate(['/detailed/'+$event.data.name]);
         window.location.reload();
-        // window.location.href = '/detailed/'+$event.data.name;
     }
   }
 
@@ -197,7 +195,6 @@ export class HealthComponent implements OnInit {
         node = new Object();
         node.name = orgName;
         node.dq = 0;
-        //node.metrics = new Array();
         var metricNode = {
           'name':'',
           'timestamp':'',
@@ -209,12 +206,10 @@ export class HealthComponent implements OnInit {
         for(let key in this.orgWithMeasure[orgName]){
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
-          var jobs = this.orgWithMeasure[orgName][key];
-          
+          var jobs = this.orgWithMeasure[orgName][key];          
             for(let i = 0;i < jobs.length;i++){
                orgNode.jobMap.push(jobs[i].jobName);
                var job = jobs[i].jobName;
-               console.log(job);
                this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( data=> { 
                  this.originalData = data;
                  if(this.originalData.hits){
@@ -232,7 +227,6 @@ export class HealthComponent implements OnInit {
           this.finalData.push(node); 
           this.orgs.push(orgNode);                
       }
-      this.originalData = JSON.parse(JSON.stringify(this.finalData));
       this.oData = this.finalData.slice(0);
       var self = this;
             setTimeout(function function_name(argument) {

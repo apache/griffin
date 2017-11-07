@@ -71,7 +71,7 @@ export class SidebarComponent implements OnInit {
   }
   
   onResize(event){
-    console.log('sidebar resize');
+    // console.log('sidebar resize');
     if(window.innerWidth < 992) {
       $('#rightbar').css('display', 'none');
     } else {
@@ -138,12 +138,10 @@ export class SidebarComponent implements OnInit {
         for(let key in this.orgWithMeasure[orgName]){
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
-          var jobs = this.orgWithMeasure[orgName][key];
-          
+          var jobs = this.orgWithMeasure[orgName][key];          
             for(let i = 0;i < jobs.length;i++){
                orgNode.jobMap.push(jobs[i].jobName);
                var job = jobs[i].jobName;
-               console.log(job);
                this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( data=> { 
                  this.originalData = data;
                  if(this.originalData.hits){
@@ -161,7 +159,6 @@ export class SidebarComponent implements OnInit {
           this.finalData.push(node); 
           this.orgs.push(orgNode);                
       }
-      this.originalData = JSON.parse(JSON.stringify(this.finalData));
       this.oData = this.finalData.slice(0);
     });
     }

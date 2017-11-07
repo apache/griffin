@@ -22,7 +22,9 @@ under the License.
   left: 50%;
   top: 80%;
 }
-
+.co{
+	border-collapse: separate;
+}
 .co > tbody > tr:nth-of-type(even) {
      background-color: #1f1f1f;
 }
