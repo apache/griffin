@@ -229,6 +229,7 @@ public class SparkSubmitJob implements Job {
         args.add(sparkJobProps.getProperty("sparkJob.args_1"));
         // measure
         String measureJson;
+        measure.setTriggerTimeStamp(System.currentTimeMillis());
         measureJson = JsonUtil.toJsonWithFormat(measure);
         args.add(measureJson);
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));

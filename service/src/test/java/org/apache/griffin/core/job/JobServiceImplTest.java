@@ -214,15 +214,37 @@ public class JobServiceImplTest {
     }
 
     @Test
-    public void testFindInstancesOfJob() {
+    public void testFindInstancesOfJob() throws SchedulerException {
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
         String groupName = "BA";
         String jobName = "job1";
         int page = 0;
         int size = 2;
+        JobKey jobKey = new JobKey(jobName,groupName);
         JobInstance jobInstance = new JobInstance(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
         given(jobInstanceRepo.findByGroupNameAndJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
+        given(factory.getObject()).willReturn(scheduler);
+        given(scheduler.checkExists(jobKey)).willReturn(true);
+        mockJsonDataMap(scheduler, jobKey,false);
         assertEquals(service.findInstancesOfJob(groupName, jobName, page, size).size(), 1);
+    }
+
+    @Test
+    public void testFindInstancesOfJobForDeleted() throws SchedulerException {
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
+        String groupName = "BA";
+        String jobName = "job1";
+        int page = 0;
+        int size = 2;
+        JobKey jobKey = new JobKey(jobName,groupName);
+        JobInstance jobInstance = new JobInstance(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
+        Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
+        given(jobInstanceRepo.findByGroupNameAndJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
+        given(factory.getObject()).willReturn(scheduler);
+        given(scheduler.checkExists(jobKey)).willReturn(true);
+        mockJsonDataMap(scheduler, jobKey,true);
+        assertEquals(service.findInstancesOfJob(groupName, jobName, page, size).size(), 0);
     }
 
     @Test
@@ -285,11 +307,7 @@ public class JobServiceImplTest {
         List<Trigger> triggers = new ArrayList<>();
         triggers.add(trigger);
         given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
-        JobDataMap jobDataMap = mock(JobDataMap.class);
-        JobDetailImpl jobDetail = new JobDetailImpl();
-        jobDetail.setJobDataMap(jobDataMap);
-        given(scheduler.getJobDetail(jobKey)).willReturn(jobDetail);
-        given(jobDataMap.getBooleanFromString("deleted")).willReturn(false);
+        mockJsonDataMap(scheduler, jobKey, false);
         Set<JobKey> jobKeySet = new HashSet<>();
         jobKeySet.add(jobKey);
         given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn((jobKeySet));
@@ -319,6 +337,29 @@ public class JobServiceImplTest {
         scheduleStateList.add(jobInstance);
         given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 0);
+    }
+
+    @Test
+    public void testGetJobDetailsGroupByMeasureId() throws SchedulerException {
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
+        JobDetailImpl jobDetail = createJobDetail();
+        given(factory.getObject()).willReturn(scheduler);
+        HashSet<JobKey> set = new HashSet<>();
+        set.add(new JobKey("name", "group"));
+        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn(set);
+        List<Trigger> triggers = Arrays.asList(newTriggerInstance("name", "group", 3000));
+        JobKey jobKey = set.iterator().next();
+        given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
+        given(scheduler.getJobDetail(jobKey)).willReturn(jobDetail);
+        assertTrue(service.getJobDetailsGroupByMeasureId().containsKey("1"));
+    }
+
+    private void mockJsonDataMap(Scheduler scheduler,JobKey jobKey,Boolean deleted) throws SchedulerException {
+        JobDataMap jobDataMap = mock(JobDataMap.class);
+        JobDetailImpl jobDetail = new JobDetailImpl();
+        jobDetail.setJobDataMap(jobDataMap);
+        given(scheduler.getJobDetail(jobKey)).willReturn(jobDetail);
+        given(jobDataMap.getBooleanFromString("deleted")).willReturn(deleted);
     }
 
     private Trigger newTriggerInstance(String name, String group, int internalInSeconds) {

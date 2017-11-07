@@ -25,5 +25,9 @@ case class FunctionExpr(functionName: String, args: Seq[Expr], aliasOpt: Option[
 
   def desc: String = s"${functionName}(${args.map(_.desc).mkString(", ")})"
   def coalesceDesc: String = desc
-  def alias: Option[String] = if (aliasOpt.isEmpty) Some(functionName) else aliasOpt
+  def alias: Option[String] = {
+    if (aliasOpt.isEmpty) {
+      Some(functionName)
+    } else aliasOpt
+  }
 }
