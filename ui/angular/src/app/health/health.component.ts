@@ -221,7 +221,10 @@ export class HealthComponent implements OnInit {
                    node.metrics.push(Object.assign({}, metricNode));
                  }
 
-            });           
+            },
+               err => {
+               console.log('Error occurs when connect to elasticsearh!');
+               });           
             }                           
         } 
           this.finalData.push(node); 
