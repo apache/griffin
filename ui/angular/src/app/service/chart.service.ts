@@ -71,7 +71,6 @@ export class ChartService {
     data.sort(function(a, b){
       return a[0] - b[0];
     });
-
     return data;
   }
 
@@ -270,14 +269,14 @@ export class ChartService {
         left: '2%',
         containLabel: true
       },
-      dataZoom: [{
-        type: 'inside',
-        start: 0,
-        throttle: 50
-      },{
-        show: true,
-        start: 0
-      }],
+      // dataZoom: [{
+      //   type: 'inside',
+      //   start: 0,
+      //   throttle: 50
+      // },{
+      //   show: true,
+      //   start: 0
+      // }],
       tooltip : {
           trigger: 'axis',
           formatter : function(params) {

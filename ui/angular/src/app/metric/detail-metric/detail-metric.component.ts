@@ -59,7 +59,7 @@ export class DetailMetricComponent implements OnInit {
       // let url_dashboard = this.serviceService.config.uri.dashboard;
     var metricDetailUrl = this.serviceService.config.uri.dashboard;
       // let data = this.metricData;
-      this.http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": this.currentMeasure }}]}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).subscribe( data=> {
+    this.http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": this.currentMeasure }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( data=> {
     var metric = {
            'name':'',
            'timestamp':0,
@@ -67,7 +67,6 @@ export class DetailMetricComponent implements OnInit {
            'details':[]
          };
     this.data = data;
-    console.log(this.data);
     // this.data = this.allData;
     metric.name = this.data.hits.hits[0]._source.name;
     metric.timestamp =this.data.hits.hits[this.data.hits.hits.length-1]._source.tmst;

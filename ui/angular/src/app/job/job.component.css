@@ -36,7 +36,9 @@ under the License.
 a{
 	color: white;
 }
-
+tfoot,tbody,thead{
+  border-right: 1px solid #1f1f1f !important; 
+}
 .icon{
   color: #fff;
   position: absolute;
