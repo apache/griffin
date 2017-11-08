@@ -132,7 +132,7 @@ export class CreateJobComponent implements OnInit {
     this.maskOpen = false;
   }
 
-  prev(form){
+  prev(){
   	history.back();
   }
 
