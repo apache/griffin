@@ -94,16 +94,16 @@ export class SidebarComponent implements OnInit {
   }
 
   draw (metric, parentIndex, index) {
-   		$('#'+this.oData[parentIndex].name+index).toggleClass('collapse');
-       var chartId = 'chart' + parentIndex + '-' + index;
-       document.getElementById(chartId).style.width = ($('.panel-heading').innerWidth()-40)+'px';
-       document.getElementById(chartId).style.height = '200px';
-       this.chartOption.set(chartId,this.chartService.getOptionSide(metric));
-       var self = this;
-       $('#'+chartId).unbind('click');
-       $('#'+chartId).click(function(e) {
-         self.router.navigate(['/detailed/'+self.oData[parentIndex].metrics[index].name]) ;
-       });
+    $('#side'+parentIndex+index).toggleClass('collapse');
+    var chartId = 'chart' + parentIndex + '-' + index;
+    document.getElementById(chartId).style.width = ($('.panel-heading').innerWidth()-40)+'px';
+    document.getElementById(chartId).style.height = '200px';
+    this.chartOption.set(chartId,this.chartService.getOptionSide(metric));
+    var self = this;
+    $('#'+chartId).unbind('click');
+    $('#'+chartId).click(function(e) {
+      self.router.navigate(['/detailed/'+self.oData[parentIndex].metrics[index].name]) ;
+    });
   };
 
   getOption(parent,i){
@@ -164,7 +164,7 @@ export class SidebarComponent implements OnInit {
         this.finalData.push(node); 
         this.orgs.push(orgNode);                 
       }
-      this.oData = this.finalData.slice(0); 
+      this.oData = this.finalData.slice(0);
     });
   }
   
