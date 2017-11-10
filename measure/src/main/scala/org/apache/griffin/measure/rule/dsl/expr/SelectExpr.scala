@@ -30,7 +30,12 @@ case class DataSourceHeadExpr(name: String) extends HeadExpr {
 case class FieldNameHeadExpr(field: String) extends HeadExpr {
   def desc: String = field
   def coalesceDesc: String = desc
-  override def alias: Option[String] = Some(field)
+  override def alias: Option[String] = {
+    val innerField = if (field.startsWith("`") && field.endsWith("`")) {
+      field.substring(1, field.length - 1)
+    } else field
+    Some(innerField)
+  }
 }
 
 case class ALLSelectHeadExpr() extends HeadExpr {
@@ -61,7 +66,12 @@ case class AllFieldsSelectExpr() extends SelectExpr {
 case class FieldSelectExpr(field: String) extends SelectExpr {
   def desc: String = s".${field}"
   def coalesceDesc: String = desc
-  def alias: Option[String] = Some(field)
+  override def alias: Option[String] = {
+    val innerField = if (field.startsWith("`") && field.endsWith("`")) {
+      field.substring(1, field.length - 1)
+    } else field
+    Some(innerField)
+  }
 }
 
 case class IndexSelectExpr(index: Expr) extends SelectExpr {
