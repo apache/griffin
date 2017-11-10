@@ -99,8 +99,7 @@ class Col{
     this.groupby = '';
     this.rules = [];
     this.RE = '';
-    this.newRules = [
-    ];
+    this.newRules = [];
     
     var patt = new RegExp('int|double|float/i');
     if(patt.test(this.type)){
@@ -136,6 +135,7 @@ export class PrComponent implements OnInit {
   totallen = 0;
   type = 'profiling';
   data:any;
+  currentDBstr: string;
   newMeasure = {
     "name": "",
     "process.type": "batch",
@@ -336,12 +336,15 @@ resizeWindow(){
         return this.selection && this.selection.length > 0;
     } else if (step == 2) {
       var len = 0;
-      console.log(this.selection);
-      console.log(this.selectedItems);
+      var selectedlen = 0;
       for(let key in this.selectedItems){
-         len += this.selectedItems[key].length;
+        selectedlen ++;
+        len = this.selectedItems[key].length;
+        if(len == 0){
+          return false;
+        }        
       }
-      return (this.selection.length == len) ? true :false;
+      return (this.selection.length == selectedlen) ? true :false;
     } else if (step == 3) {
     }
     return false;
@@ -550,6 +553,7 @@ resizeWindow(){
         click: (tree, node, $event) => {
           if (node.hasChildren) {
             this.currentDB = node.data.name;
+            this.currentDBstr = this.currentDB + '.';
             this.currentTable = '';
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
           }

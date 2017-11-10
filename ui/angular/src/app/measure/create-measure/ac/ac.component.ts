@@ -87,6 +87,8 @@ export class AcComponent implements OnInit {
   schemaCollectionTarget:Col[];
   matchFunctions = ['=', '!=', '>', '>=','<',"<="];
   data:any;
+  currentDBTargetStr: string;
+  currentDBstr: string; 
 
   measureTypes = ['accuracy','validity','anomaly detection','publish metrics'];
   type = 'accuracy';
@@ -389,6 +391,7 @@ export class AcComponent implements OnInit {
         click: (tree, node, $event) => {         
           if (node.hasChildren) {
             this.currentDB = node.data.name;
+            this.currentDBstr = this.currentDB + '.';
             this.currentTable = '';
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
           }
@@ -420,6 +423,7 @@ export class AcComponent implements OnInit {
         click: (tree, node, $event) => {
           if (node.hasChildren) {
             this.currentDBTarget = node.data.name;
+            this.currentDBTargetStr = this.currentDBTarget + '.';
             this.currentTableTarget = '';
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
           }
