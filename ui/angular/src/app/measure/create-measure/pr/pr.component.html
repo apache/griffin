@@ -203,7 +203,7 @@ under the License.
                       Organization:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" id="systemSelector" class="form-control" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org" value="{{currentDB}}" disabled>
+                      <input type="text" id="systemSelector" class="form-control" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org" [(ngModel)]="org">
                     </div>
                   </div>
                 </div>
@@ -283,7 +283,7 @@ under the License.
                           Organization:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{currentDB}}
+                          {{org}}
                         </div>
                       </div>
                       <div class="row">

@@ -1141,7 +1141,7 @@ tbody {
   background: #518dab !important;
 }
 
-.myclass * div.selected-list .c-btn , .myclass * ul , .list-filter input{
+.myclass * div.selected-list .c-btn , .myclass * ul ,.myclass * div.list-area, .list-filter input{
   background: #dcdad6; 
 }
 

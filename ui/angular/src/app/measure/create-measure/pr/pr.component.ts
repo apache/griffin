@@ -117,6 +117,7 @@ class Col{
 })
 export class PrComponent implements OnInit {
   
+  org:string;
   transrule = [];
   transenumrule = [];
   transnullrule = [];
@@ -139,6 +140,7 @@ export class PrComponent implements OnInit {
   newMeasure = {
     "name": "",
     "process.type": "batch",
+    "organization":"",
     "data.sources": [
       {
         "name": "source",
@@ -159,8 +161,12 @@ export class PrComponent implements OnInit {
         {
           "dsl.type": "griffin-dsl",
           "dq.type": "profiling",
-          "rule": ""
-          // "details": {}
+          "rule": "",
+          "details": {
+            // "profiling": {
+            // "name": ""
+            // }
+          }
         }
       ]
     }
@@ -217,25 +223,25 @@ resizeWindow(){
       for(let item of this.selection){
         if(item.isNum == true){
           this.dropdownList[item.name] = [
-                              {"id":1,"itemName":"Null Count","category": "Simple Statistics"},
-                              {"id":2,"itemName":"Distinct Count","category": "Simple Statistics"},
-                              {"id":3,"itemName":"Total Count","category": "Summary Statistics"},
-                              {"id":4,"itemName":"Maximum","category": "Summary Statistics"},
-                              {"id":5,"itemName":"Minimum","category": "Summary Statistics"},
-                              {"id":6,"itemName":"Average","category": "Summary Statistics"},
-                              // {"id":7,"itemName":"Median","category": "Summary Statistics"},
-                              // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
-                              {"id":9,"itemName":"Enum Detection Count","category": "Advanced Statistics"}
-                            ];
+            {"id":1,"itemName":"Null Count","category": "Simple Statistics"},
+            {"id":2,"itemName":"Distinct Count","category": "Simple Statistics"},
+            {"id":3,"itemName":"Total Count","category": "Summary Statistics"},
+            {"id":4,"itemName":"Maximum","category": "Summary Statistics"},
+            {"id":5,"itemName":"Minimum","category": "Summary Statistics"},
+            {"id":6,"itemName":"Average","category": "Summary Statistics"},
+            // {"id":7,"itemName":"Median","category": "Summary Statistics"},
+            // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
+            {"id":9,"itemName":"Enum Detection Count","category": "Advanced Statistics"}
+          ];
         }else{
           this.dropdownList[item.name] = [
-                              {"id":1,"itemName":"Null Count","category": "Simple Statistics"},
-                              {"id":2,"itemName":"Distinct Count","category": "Simple Statistics"},
-                              {"id":3,"itemName":"Total Count","category": "Summary Statistics"},
-                              // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
-                              {"id":9,"itemName":"Enum Detection Count","category": "Advanced Statistics"},
-                              // {"id":10,"itemName":"Regular Expression Detection Count","category": "Advanced Statistics"}
-                            ];
+            {"id":1,"itemName":"Null Count","category": "Simple Statistics"},
+            {"id":2,"itemName":"Distinct Count","category": "Simple Statistics"},
+            {"id":3,"itemName":"Total Count","category": "Summary Statistics"},
+            // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
+            {"id":9,"itemName":"Enum Detection Count","category": "Advanced Statistics"},
+            // {"id":10,"itemName":"Regular Expression Detection Count","category": "Advanced Statistics"}
+          ];
         }
       }
     }
@@ -291,31 +297,7 @@ resizeWindow(){
       case 'Average':
         return 'avg(source.`'+col.name+'`) AS `'+col.name+'-average`';
       case 'Enum Detection Count':
-        return 'source.`'+col.name+'`,count(*) AS `'+col.name+'-enum` GROUP BY source.`'+col.name+'`';
-      // case 'Groupby Count':
-      //   return 'source.'+col.name+' group by source.'+col.name+'';
-      // case 'total count':
-      //   return 'SELECT COUNT(*) FROM source';
-      // case 'distinct count':
-      //   return 'SELECT DISTINCT COUNT(source.'+col.name+') FROM source';
-      // case 'null detection count':
-      //   return 'SELECT COUNT(source.'+col.name+') FROM source WHERE source.'+col.name+' is null';
-      // case 'regular expression detection count':
-      //   return 'SELECT COUNT(source.'+col.name+') FROM source WHERE source.'+col.name+' like '+col.RE;
-      // case 'rule detection count':
-      //   return 'SELECT COUNT(source.'+col.name+') FROM source WHERE source.'+col.name+' like ';
-      // case 'max':
-      //   return 'SELECT max(source.'+col.name+') FROM source';
-      // case 'min':
-      //   return 'SELECT min(source.'+col.name+') FROM source';
-      // case 'median':
-      //   return 'SELECT median(source.'+col.name+') FROM source';
-      // case 'avg':
-      //   return 'SELECT average(source.'+col.name+') FROM source';
-      // case 'enum detection group count':
-      //   return 'source.'+col.name+' group by source.'+col.name+'';
-      // case 'groupby count':
-      //   return 'source.'+col.name+' group by source.'+col.name+' '+col.groupby;
+        return 'source.`'+col.name+'`,count(*) AS `'+col.name+'-grp` GROUP BY source.`'+col.name+'`';
     }
   }
 
@@ -365,6 +347,7 @@ resizeWindow(){
     this.newMeasure = {
         "name": this.name,
         "process.type": "batch",
+        "organization":this.org,
         "data.sources": [
           {
             "name": "source",
@@ -385,8 +368,8 @@ resizeWindow(){
             // {
             //   "dsl.type": "griffin-dsl",
             //   "dq.type": "profiling",
-            //   "rule": ""
-              // "details": {}
+            //   "rule": "",
+            //   "details": {}
             // }
           ]
         }
@@ -396,18 +379,36 @@ resizeWindow(){
     setTimeout(() => this.visibleAnimate = true, 100);
   }
   
-  getRule(trans){
-    var self = this;
+  getRule(trans){    
     var rule = '';
     for(let i of trans){
        rule = rule + i + ',';
     }
     rule = rule.substring(0,rule.lastIndexOf(','));
+    this.pushRule(rule);    
+  }
+
+  pushEnmRule(rule,grpname){
+    var self = this;
     self.newMeasure.evaluateRule.rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       "rule": rule,
-      // "details": {}
+      "details": {
+        "profiling": {
+          "name": grpname
+        }
+      }
+    });
+  }
+
+  pushRule(rule){
+    var self = this;
+    self.newMeasure.evaluateRule.rules.push({
+      "dsl.type": "griffin-dsl",
+      "dq.type": "profiling",
+      "rule": rule,
+      "details": {}
     });
   }
 
@@ -425,124 +426,6 @@ resizeWindow(){
       console.log('Something went wrong!');
     });
   }
-
-  // data: { [key: string]: Array<object>; } = {
-  //   "default": [
-  //       {
-  //           "tableName": "ext",
-  //           "dbName": "default",
-  //           "owner": "hadoop",
-  //           "createTime": 1488353464,
-  //           "lastAccessTime": 0,
-  //           "retention": 0,
-  //           "sd": {
-  //               "cols": [
-  //                   {
-  //                       "name": "id",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "name",
-  //                       "type": "string",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "age",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   }
-  //               ],
-  //               "location": "hdfs://10.9.246.187/user/hive/ext",
-  //           },
-  //       },
-  //       {
-  //           "tableName": "ext1",
-  //           "dbName": "default",
-  //           "owner": "hadoop",
-  //           "createTime": 1489382943,
-  //           "lastAccessTime": 0,
-  //           "retention": 0,
-  //           "sd": {
-  //               "cols": [
-  //                   {
-  //                       "name": "id",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "name",
-  //                       "type": "string",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "age",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   }
-  //               ],
-  //               "location": "hdfs://10.9.246.187/user/hive/ext1",
-  //           },
-  //       }
-  //   ],
-  //   "griffin": [
-  //       {
-  //           "tableName": "avr_out",
-  //           "dbName": "griffin",
-  //           "owner": "hadoop",
-  //           "createTime": 1493892603,
-  //           "lastAccessTime": 0,
-  //           "retention": 0,
-  //           "sd": {
-  //               "cols": [
-  //                   {
-  //                       "name": "id",
-  //                       "type": "bigint",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "age",
-  //                       "type": "int",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   },
-  //                   {
-  //                       "name": "desc",
-  //                       "type": "string",
-  //                       "comment": null,
-  //                       "setName": true,
-  //                       "setComment": false,
-  //                       "setType": true
-  //                   }
-  //               ],
-  //               "location": "hdfs://10.9.246.187/griffin/data/batch/avr_out",
-  //           },
-  //       }
-  //   ],
-  // };
   
   options: ITreeOptions = {
     displayField: 'name',
@@ -586,24 +469,28 @@ resizeWindow(){
   getGrouprule(){
     var selected = {name: ''};
     var value = '';
+    var nullvalue = '';
+    var enmvalue = '';
+    var grpname = '';
     for(let key in this.selectedItems){
       selected.name = key;
       for(let i = 0;i<this.selectedItems[key].length;i++){
         var originrule = this.selectedItems[key][i].itemName;
-        if(originrule == 'Enum Detection Count'){
-          value = this.transferRule(originrule,selected);
-          this.transenumrule.push(value);
+        if(originrule == 'Enum Detection Count'){          
+          enmvalue = this.transferRule(originrule,selected);
+          grpname = selected.name + '-grp';
+          this.transenumrule.push(enmvalue);
+          this.pushEnmRule(enmvalue,grpname);
         }else if(originrule == 'Null Count'){
-          value = this.transferRule(originrule,selected);
-          this.transnullrule.push(value);
+          nullvalue = this.transferRule(originrule,selected);
+          this.transnullrule.push(nullvalue);
+          this.pushRule(nullvalue);
         }else{ 
           value = this.transferRule(originrule,selected);      
           this.transrule.push(value);
         }
       }  
     }
-    this.getRule(this.transenumrule);
-    this.getRule(this.transnullrule);
     this.getRule(this.transrule);
   }
 
@@ -658,18 +545,15 @@ resizeWindow(){
 
     });
     this.dropdownSettings = { 
-                                  singleSelection: false, 
-                                  text:"Select Rule",
-                                  // selectAllText:'Select All',
-                                  // unSelectAllText:'UnSelect All',
-                                  // badgeShowLimit: 5,
-                                  enableCheckAll: false,
-                                  enableSearchFilter: true,
-                                  classes: "myclass",
-                                  groupBy: "category"
-                                };  
-
-
-    
+      singleSelection: false, 
+      text:"Select Rule",
+      selectAllText:'Select All',
+      unSelectAllText:'UnSelect All',
+      // badgeShowLimit: 5,
+      enableCheckAll: true,
+      enableSearchFilter: true,
+      classes: "myclass",
+      groupBy: "category"
+      };     
   };
 }
