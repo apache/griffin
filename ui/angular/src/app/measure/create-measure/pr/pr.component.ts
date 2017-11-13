@@ -443,6 +443,7 @@ resizeWindow(){
             this.currentDBstr = this.currentDB + '.';
             this.currentTable = '';
             this.schemaCollection = [];
+            this.selectedAll = false;
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
           }
           else if(node.data.cols)
