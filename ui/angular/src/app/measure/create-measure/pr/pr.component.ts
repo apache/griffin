@@ -249,7 +249,6 @@ resizeWindow(){
 
   toggleSelection (row) {
     row.selected = !row.selected;
-    // console.log(row);
     var idx = this.selection.indexOf(row);
     // is currently selected
     if (idx > -1) {
@@ -260,6 +259,11 @@ resizeWindow(){
     // is newly selected
     else {
         this.selection.push(row);
+    }
+    if(this.selection.length == 3){
+        this.selectedAll = true;
+    }else{
+        this.selectedAll = false;
     }
     this.setDropdownList();
   };
@@ -438,6 +442,7 @@ resizeWindow(){
             this.currentDB = node.data.name;
             this.currentDBstr = this.currentDB + '.';
             this.currentTable = '';
+            this.schemaCollection = [];
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
           }
           else if(node.data.cols)
@@ -445,6 +450,11 @@ resizeWindow(){
             this.currentTable = node.data.name;
             this.currentDB = node.data.parent;
             this.schemaCollection = node.data.cols;
+            this.selectedAll = false;
+            this.selection = [];
+            for(let row of this.schemaCollection){
+              row.selected = false;
+            }
           }
         }
       }
