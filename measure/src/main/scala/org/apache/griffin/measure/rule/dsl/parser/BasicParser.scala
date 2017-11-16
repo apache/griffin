@@ -159,8 +159,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   import Operator._
 
   object Strings {
-    def AnyString: Parser[String] = """"(?:[^\"]|\")*"""".r | """'(?:[^']|\')*'""".r
-    def UQuoteTableFieldName: Parser[String] = """`(?:[^`]|[\\][`])*`""".r
+    def AnyString: Parser[String] = """"(?:\"|[^\"])*"""".r | """'(?:\'|[^'])*'""".r
+    def UQuoteTableFieldName: Parser[String] = """`(?:[\\][`]|[^`])*`""".r
     def FieldName: Parser[String] = UQuoteTableFieldName | """[a-zA-Z_]\w*""".r
     def DataSourceName: Parser[String] = genDataSourceNamesParser(dataSourceNames)
     def FunctionName: Parser[String] = genFunctionNamesParser(functionNames)
