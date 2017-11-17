@@ -14,7 +14,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component ,Directive,ViewContainerRef} from '@angular/core';
+import { Component ,Directive,ViewContainerRef,OnInit,AfterViewChecked} from '@angular/core';
 // import { RouterModule, Routes } from '@angular/router';
 import { Router} from "@angular/router";
 import { HttpClient} from '@angular/common/http';
@@ -35,7 +35,7 @@ import { Location, LocationStrategy, HashLocationStrategy} from '@angular/common
   styleUrls: ['./app.component.css'],
   providers:[ServiceService,UserService]
 })
-export class AppComponent {
+export class AppComponent implements AfterViewChecked, OnInit{
   title = 'app';
   ntAccount : string;
   timestamp:Date;
@@ -55,7 +55,8 @@ export class AppComponent {
 
   }
   resizeMainWindow(){
-    $('#mainWindow').height(window.innerHeight-56-90);
+    // $('#mainWindow').height(window.innerHeight-56-90);
+    $('#mainWindow').height(window.innerHeight-56-20);
   }
   logout(){
     this.ntAccount = undefined;
@@ -64,5 +65,8 @@ export class AppComponent {
     this.router.navigate(['login']);
     window.location.reload();
     // window.location.replace ('login');
+   }
+   ngAfterViewChecked(){
+    this.resizeMainWindow();
    }
 }

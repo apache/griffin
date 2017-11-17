@@ -65,12 +65,12 @@ under the License.
                 Select attributes
               </legend>
               <div class="y-scrollable">
-                <div>
+                <div style="margin-top:10px;">
                   <label>View schema:</label>
                   <i style="color:#fff;font-weight: bold;">{{currentDBstr}}{{currentTable}}
                     </i>
                 </div>
-                <div>
+                <div style="margin-top:5px;">
                   <table class="table table-striped no-border">
                     <thead>
                       <tr style="background-color:#7D95CC">
@@ -112,12 +112,13 @@ under the License.
         <label class="stepDesc">Please choose one of the profiling models provided below:</label>
         <div class="container-fluid" id="notshowrule">
           <div class="col-md-12 col-lg-12 col-sm-12">
-            <fieldset style="max-height:400px;overflow-y:scroll">
+            <!-- <fieldset style="max-height:400px;overflow-y:scroll;"> -->
+            <fieldset>
               <div class="y-scrollable">
                 <div style="display:block">
-                  <label style="color:#888888">View schema:</label> <i style="color:#fff;font-weight: bold;">{{currentDB}}.{{currentTable}}</i>
+                  <label style="margin-left:15px">View schema:</label> <i style="color:#fff;font-weight: bold;">{{currentDB}}.{{currentTable}}</i>
                 </div>
-                <div class="col-md-12 col-lg-12 col-sm-12" style="z-index:100">
+                <div class="col-md-12 col-lg-12 col-sm-12" style="z-index:100;margin-top:5px;">
                   <table class="table table-striped" [mfData]="results" #mf="mfDataTable">
                     <thead>
                       <tr style="background-color:#7D95CC">
@@ -151,17 +152,17 @@ under the License.
             </button>
           </div>
         </div>
-      </div>
-      <div class="container-fluid" id="showrule" style="display:none;">
-        <div class="col-md-12 col-lg-12 col-sm-12">
-          <fieldset>
-            <app-rule></app-rule>
-          </fieldset>
-        </div>
-        <div class="form-group btn-container">
-          <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="back()">
-            <i class="fa fa-arrow-circle-left"></i> Back
-          </button>
+        <div class="container-fluid formStep" id="showrule" style="display:none;">
+          <div class="col-md-12 col-lg-12 col-sm-12">
+            <fieldset>
+               <app-rule></app-rule>
+            </fieldset>
+          </div>
+          <div class="form-group btn-container">
+            <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="back()">
+              <i class="fa fa-arrow-circle-left"></i> Back
+            </button>
+          </div>
         </div>
       </div>
       <div id="step-3" *ngIf="currentStep == 3" class="formStep">
@@ -173,7 +174,7 @@ under the License.
                 Required Information
               </legend>
               <div class="y-scrollable">
-                <div class="col-md-12 col-lg-12 col-sm-12">
+                <div class="col-md-12 col-lg-12 col-sm-12" style="margin-top:30px;">
                   <div class="form-group" [ngClass]="{'has-error':prName.dirty&&prName.invalid, 'has-success':prName.valid}">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Measure Name<span class="symbol required"></span>:

@@ -133,6 +133,7 @@ export class MetricComponent implements OnInit {
         this.orgs.push(orgNode);                 
       }
       this.oData = this.finalData.slice(0);
+      console.log(this.oData);
       var self = this;
       setTimeout(function function_name(argument) {
         self.redraw(self.oData);

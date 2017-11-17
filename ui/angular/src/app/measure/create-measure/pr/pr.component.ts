@@ -27,7 +27,7 @@ import * as $ from 'jquery';
 import { HttpClient} from '@angular/common/http';
 import { Router} from "@angular/router";
 import {DataTableModule} from "angular2-datatable";
-import { AfterViewInit, ElementRef} from '@angular/core';
+import { AfterViewChecked, ElementRef} from '@angular/core';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 
 
@@ -115,7 +115,7 @@ class Col{
   providers:[ServiceService],
   styleUrls: ['./pr.component.css']
 })
-export class PrComponent implements OnInit {
+export class PrComponent implements  AfterViewChecked, OnInit{
   
   org:string;
   transrule = [];
@@ -195,18 +195,20 @@ export class PrComponent implements OnInit {
   
 onResize(event){
    this.resizeWindow();
-  }
+}
 
 resizeWindow(){
     var stepSelection = '.formStep';
     $(stepSelection).css({
-        height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
+        // height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
+        height: window.innerHeight - $(stepSelection).offset().top
     });
-    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
+    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 130);
     $('.y-scrollable').css({
-        'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+        // 'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+        'height': $('fieldset').height()
     });
-  }
+}
 
   // toggleSelectionCond(cond,condIndex,ruleIndex,item){
   //   cond.chosen = !cond.chosen;
@@ -344,10 +346,10 @@ resizeWindow(){
   }
   submit (form) {            
       // form.$setPristine();
-      // if (!form.valid) {
-      //   this.toasterService.pop('error', 'Error!', 'please complete the form in this step before proceeding');
-      //   return false;
-      // }
+    if (!form.valid) {
+      this.toasterService.pop('error', 'Error!', 'please complete the form in this step before proceeding');
+      return false;
+    }
     this.newMeasure = {
         "name": this.name,
         "process.type": "batch",
@@ -558,13 +560,16 @@ resizeWindow(){
     this.dropdownSettings = { 
       singleSelection: false, 
       text:"Select Rule",
-      selectAllText:'Select All',
-      unSelectAllText:'UnSelect All',
+      // selectAllText:'Select All',
+      // unSelectAllText:'UnSelect All',
       // badgeShowLimit: 5,
-      enableCheckAll: true,
+      enableCheckAll: false,
       enableSearchFilter: true,
       classes: "myclass",
       groupBy: "category"
       };     
   };
+  ngAfterViewChecked(){
+    this.resizeWindow();
+  }
 }

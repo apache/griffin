@@ -30,6 +30,7 @@ body {
   background:#1f1f1f;
     font-family: 'Open Sans', sans-serif;
     height: 100%;
+    overflow: hidden;
 }
 
 html{
@@ -56,8 +57,11 @@ h3 {
 h5 {
   color:#b2c831;
   margin-left:5px;
+  font-size: 20px;
 }
-
+label {
+  font-weight: bold !important;
+}
 /***********BLOCKS & WRAPS***********/
 
 /*--- Dash Unit / Used in Dashboard page ---*/
@@ -894,7 +898,8 @@ a:hover {
 
 #footerwrap {
     padding-left: 30px;
-    height: 90px;
+    /*height: 90px;*/
+    height: 20px;
     background:#1f1f1f;
     padding-top:10px;
     padding-bottom: 10px;
@@ -1164,3 +1169,22 @@ input{
  .toggle-children{
     background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAApUlEQVQ4T8XULQ7CQBCG4fcTWBJuVodEcAEEBtcbcAU0Bq7ATQgKi0PQTAOhzdD0b7aC9fPs7O43K+AEbIArCUtmZpLepRdgFYU+QLXxFzoD2dhmfgAHFcABWA9BrUAE6gUa0BbYNzsaBTjoAeQeCgFtUBLgoPt/AEn1XYQ68IX1MXwSu0Ij6Qnsws8ozQp49SayI8oLg/kRbstQlJOHadI4T/1QSjKSYdGc5u4/AAAAAElFTkSuQmCC') !important;
  }
+
+/* .myclass {
+    position: relative;
+    z-index: 9999;
+}
+
+#mainWindow {
+    position: relative;
+    z-index: 1;
+}*/
+
+#toast-container {
+  margin-top: 50px;
+}
+
+.y-scrollable {
+  overflow-y: auto;
+  overflow-x: hidden;
+}

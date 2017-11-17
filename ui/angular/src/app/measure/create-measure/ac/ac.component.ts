@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FormsModule, Validator} from '@angular/forms';
 import {ServiceService} from '../../../service/service.service';
@@ -65,7 +65,7 @@ class Col{
   styleUrls: ['./ac.component.css']
 })
 
-export class AcComponent implements OnInit {
+export class AcComponent implements OnInit , AfterViewChecked {
 
   currentStep = 1;
   org:string;
@@ -458,14 +458,19 @@ export class AcComponent implements OnInit {
   };
   
   onResize(event){
-   this.resizeWindow();
+    this.resizeWindow();
   }
 
   resizeWindow(){
-      var stepSelection = '.formStep[id=step-' + this.currentStep + ']';
-                    $(stepSelection).css({
-                        height: window.innerHeight - $(stepSelection).offset().top
-                    });
+    var stepSelection = '.formStep[id=step-' + this.currentStep + ']';
+    $(stepSelection).css({
+      height: window.innerHeight - $(stepSelection).offset().top
+    });
+    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 130);
+    $('.y-scrollable').css({
+        // 'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+        'height': $('fieldset').height()
+    });
   }
 
   ngOnInit() {
@@ -498,7 +503,10 @@ export class AcComponent implements OnInit {
         this.nodeList.push(new_node);
     }
     this.nodeListTarget = JSON.parse(JSON.stringify(this.nodeList));
-    });
-    
+    });   
   };
+
+  ngAfterViewChecked(){
+    this.resizeWindow();
+  }
 }
