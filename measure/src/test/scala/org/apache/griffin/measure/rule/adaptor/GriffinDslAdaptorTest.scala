@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
+import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.process.check.DataChecker
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
@@ -29,14 +30,14 @@ import org.scalamock.scalatest.MockFactory
 class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter with MockFactory {
 
   test ("profiling groupby") {
-    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, RunPhase)
+    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, StreamingProcessType, RunPhase)
 
     val ruleJson =
       """
         |{
         |  "dsl.type": "griffin-dsl",
         |  "dq.type": "profiling",
-        |  "rule": "source.age, source.`age`.count(), (source.user_id.COUNT() + 1s) as cnt group by source.age having source.desc.count() > 5 or false order by user_id desc, user_name asc limit 5",
+        |  "rule": "source.age, source.`age`.count() from source group by source.age",
         |  "details": {
         |    "source": "source",
         |    "profiling": {
@@ -53,6 +54,38 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
 
     val dataCheckerMock = mock[DataChecker]
     dataCheckerMock.existDataSourceName _ expects ("source") returning (true)
+    RuleAdaptorGroup.dataChecker = dataCheckerMock
+
+    val steps = adaptor.genConcreteRuleStep(rule)
+
+    steps.foreach { step =>
+      println(s"${step.name} [${step.dslType}]: ${step.rule}")
+    }
+  }
+
+  test ("accuracy") {
+    val adaptor = GriffinDslAdaptor("source" :: "target" :: Nil, "count" :: Nil, StreamingProcessType, RunPhase)
+
+    val ruleJson =
+      """
+        |{
+        |  "dsl.type": "griffin-dsl",
+        |  "dq.type": "accuracy",
+        |  "rule": "source.id = target.id and source.name = target.name",
+        |  "details": {
+        |    "source": "source",
+        |    "target": "target"
+        |  }
+        |}
+      """.stripMargin
+
+    // rule: Map[String, Any]
+    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
+    println(rule)
+
+    val dataCheckerMock = mock[DataChecker]
+    dataCheckerMock.existDataSourceName _ expects ("source") returns (true)
+    dataCheckerMock.existDataSourceName _ expects ("target") returns (true)
     RuleAdaptorGroup.dataChecker = dataCheckerMock
 
     val steps = adaptor.genConcreteRuleStep(rule)

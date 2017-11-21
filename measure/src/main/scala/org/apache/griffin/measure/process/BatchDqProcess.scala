@@ -86,7 +86,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dqEngines.loadData(dataSources, startTime)
 
     // generate rule steps
-    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam, RunPhase)
+    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam, BatchProcessType, RunPhase)
 
     // run rules
     dqEngines.runRuleSteps(ruleSteps)

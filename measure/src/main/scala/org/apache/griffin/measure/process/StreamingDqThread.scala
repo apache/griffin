@@ -56,7 +56,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
         dqEngines.loadData(dataSources, st)
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(evaluateRuleParam, RunPhase)
+        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(evaluateRuleParam, StreamingProcessType, RunPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)

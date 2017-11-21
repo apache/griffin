@@ -52,11 +52,13 @@ object RuleAdaptorGroup {
     }
   }
 
-  private def genRuleAdaptor(dslType: DslType, dsNames: Seq[String], adaptPhase: AdaptPhase): Option[RuleAdaptor] = {
+  private def genRuleAdaptor(dslType: DslType, dsNames: Seq[String],
+                             procType: ProcessType, adaptPhase: AdaptPhase
+                            ): Option[RuleAdaptor] = {
     dslType match {
       case SparkSqlType => Some(SparkSqlAdaptor(adaptPhase))
       case DfOprType => Some(DataFrameOprAdaptor(adaptPhase))
-      case GriffinDslType => Some(GriffinDslAdaptor(dsNames, functionNames, adaptPhase))
+      case GriffinDslType => Some(GriffinDslAdaptor(dsNames, functionNames, procType, adaptPhase))
       case _ => None
     }
   }
@@ -78,21 +80,21 @@ object RuleAdaptorGroup {
 //  }
 
   def genConcreteRuleSteps(evaluateRuleParam: EvaluateRuleParam,
-                           adaptPhase: AdaptPhase
+                           procType: ProcessType, adaptPhase: AdaptPhase
                           ): Seq[ConcreteRuleStep] = {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
-    genConcreteRuleSteps(ruleParams, defaultDslType, adaptPhase)
+    genConcreteRuleSteps(ruleParams, defaultDslType, procType, adaptPhase)
   }
 
-  def genConcreteRuleSteps(ruleParams: Seq[Map[String, Any]],
-                           defDslType: DslType, adaptPhase: AdaptPhase
+  def genConcreteRuleSteps(ruleParams: Seq[Map[String, Any]], defDslType: DslType,
+                           procType: ProcessType, adaptPhase: AdaptPhase
                           ): Seq[ConcreteRuleStep] = {
     val (steps, dsNames) = ruleParams.foldLeft((Seq[ConcreteRuleStep](), dataSourceNames)) { (res, param) =>
       val (preSteps, preNames) = res
       val dslType = getDslType(param, defDslType)
-      val (curSteps, curNames) = genRuleAdaptor(dslType, preNames, adaptPhase) match {
+      val (curSteps, curNames) = genRuleAdaptor(dslType, preNames, procType, adaptPhase) match {
         case Some(ruleAdaptor) => (ruleAdaptor.genConcreteRuleStep(param), preNames ++ ruleAdaptor.getTempSourceNames(param))
         case _ => (Nil, preNames)
       }
