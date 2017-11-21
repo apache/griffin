@@ -159,9 +159,12 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   import Operator._
 
   object Strings {
+    def innerString(s: String): String = s.substring(1, s.size - 1)
+
     def AnyString: Parser[String] = """"(?:\"|[^\"])*"""".r | """'(?:\'|[^'])*'""".r
-    def UQuoteTableFieldName: Parser[String] = """`(?:[\\][`]|[^`])*`""".r
-    def FieldName: Parser[String] = UQuoteTableFieldName | """[a-zA-Z_]\w*""".r
+    def SimpleTableFieldName: Parser[String] = """[a-zA-Z_]\w*""".r
+    def UnQuoteTableFieldName: Parser[String] = """`(?:[\\][`]|[^`])*`""".r
+//    def FieldName: Parser[String] = UnQuoteTableFieldName | SimpleTableFieldName
     def DataSourceName: Parser[String] = genDataSourceNamesParser(dataSourceNames)
     def FunctionName: Parser[String] = genFunctionNamesParser(functionNames)
 
@@ -209,14 +212,21 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     DataSourceHeadExpr(_)
   } | function ^^ {
     OtherHeadExpr(_)
-  } | FieldName ^^ {
+  } | SimpleTableFieldName ^^ {
     FieldNameHeadExpr(_)
+  } | UnQuoteTableFieldName ^^ { s =>
+    FieldNameHeadExpr(innerString(s))
   } | ALLSL ^^ { _ =>
     ALLSelectHeadExpr()
   }
   def selector: Parser[SelectExpr] = functionSelect | allFieldsSelect | fieldSelect | indexSelect
   def allFieldsSelect: Parser[AllFieldsSelectExpr] = DOT ~> ALLSL ^^ { _ => AllFieldsSelectExpr() }
-  def fieldSelect: Parser[FieldSelectExpr] = DOT ~> FieldName ^^ { FieldSelectExpr(_) }
+  def fieldSelect: Parser[FieldSelectExpr] = DOT ~> (
+    SimpleTableFieldName ^^ {
+      FieldSelectExpr(_)
+    } | UnQuoteTableFieldName ^^ {s =>
+      FieldSelectExpr(innerString(s))
+    })
   def indexSelect: Parser[IndexSelectExpr] = LSQBR ~> argument <~ RSQBR ^^ { IndexSelectExpr(_) }
   def functionSelect: Parser[FunctionSelectExpr] = DOT ~ FunctionName ~ LBR ~ repsep(argument, COMMA) ~ RBR ^^ {
     case _ ~ name ~ _ ~ args ~ _ => FunctionSelectExpr(name, args)
@@ -226,7 +236,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * -- as alias --
     * <as-alias> ::= <as> <field-name>
     */
-  def asAlias: Parser[String] = AS ~> FieldName
+  def asAlias: Parser[String] = AS ~> (SimpleTableFieldName | UnQuoteTableFieldName ^^ { innerString(_) })
 
   /**
     * -- math expr --
