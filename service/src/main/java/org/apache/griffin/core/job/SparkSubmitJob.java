@@ -222,7 +222,7 @@ public class SparkSubmitJob implements Job {
     }
 
     private String escapeCharactor(String str, String regex) {
-        String escapeCh = "\\\\" + regex;
+        String escapeCh = "\\" + regex;
         return str.replaceAll(regex, escapeCh);
     }
 
@@ -238,7 +238,7 @@ public class SparkSubmitJob implements Job {
         measureJson = JsonUtil.toJsonWithFormat(measure);
 
         // to fix livy bug: ` will be ignored by livy
-        String finalMeasureJson = escapeCharactor(measureJson, "`");
+        String finalMeasureJson = escapeCharactor(measureJson, "\\`");
         args.add(finalMeasureJson);
 
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));
