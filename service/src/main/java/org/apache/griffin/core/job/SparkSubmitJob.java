@@ -221,6 +221,11 @@ public class SparkSubmitJob implements Job {
         return currentBlockStartTimestamp;
     }
 
+    private String escapeCharactor(String str, String regex) {
+        String escapeCh = "\\\\" + regex;
+        return str.replaceAll(regex, escapeCh);
+    }
+
     private void setSparkJobDO() {
         sparkJobDO.setFile(sparkJobProps.getProperty("sparkJob.file"));
         sparkJobDO.setClassName(sparkJobProps.getProperty("sparkJob.className"));
@@ -231,7 +236,11 @@ public class SparkSubmitJob implements Job {
         String measureJson;
         measure.setTriggerTimeStamp(System.currentTimeMillis());
         measureJson = JsonUtil.toJsonWithFormat(measure);
-        args.add(measureJson);
+
+        // to fix livy bug: ` will be ignored by livy
+        String finalMeasureJson = escapeCharactor(measureJson, "`");
+        args.add(finalMeasureJson);
+
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));
         sparkJobDO.setArgs(args);
 
