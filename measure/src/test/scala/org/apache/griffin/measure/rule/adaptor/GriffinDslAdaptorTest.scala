@@ -30,7 +30,7 @@ import org.scalamock.scalatest.MockFactory
 class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter with MockFactory {
 
   test ("profiling groupby") {
-    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, StreamingProcessType, RunPhase)
+    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, BatchProcessType, RunPhase)
 
     val ruleJson =
       """
