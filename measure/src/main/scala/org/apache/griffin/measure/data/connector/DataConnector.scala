@@ -20,6 +20,7 @@ package org.apache.griffin.measure.data.connector
 
 import java.util.concurrent.atomic.AtomicLong
 
+import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.{BatchDqProcess, BatchProcessType}
@@ -38,7 +39,7 @@ trait DataConnector extends Loggable with Serializable {
 
   def init(): Unit
 
-  def data(ms: Long): Option[DataFrame]
+  def data(ms: Long): (Option[DataFrame], Set[Long])
 
   val dqEngines: DqEngines
 
@@ -53,6 +54,9 @@ trait DataConnector extends Loggable with Serializable {
 
   final val tmstColName = GroupByColumn.tmst
 
+  protected def saveTmst(t: Long) = TmstCache.insert(t)
+  protected def readTmst(t: Long) = TmstCache.range(t, t + 1)
+
   def preProcess(dfOpt: Option[DataFrame], ms: Long): Option[DataFrame] = {
     val thisTable = thisName(ms)
     val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
@@ -63,9 +67,11 @@ trait DataConnector extends Loggable with Serializable {
         // in data
         df.registerTempTable(thisTable)
 
+        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
+
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(preProcRules,
-          DslType("spark-sql"), BatchProcessType, PreProcPhase)
+        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
+          preProcRules, dsTmsts, DslType("spark-sql"), BatchProcessType, PreProcPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
@@ -84,6 +90,9 @@ trait DataConnector extends Loggable with Serializable {
 
         // add tmst
         val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
+
+        // tmst cache
+        saveTmst(ms)
 
         Some(withTmstDf)
       }

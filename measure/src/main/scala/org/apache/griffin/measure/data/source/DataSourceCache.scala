@@ -21,6 +21,7 @@ package org.apache.griffin.measure.data.source
 import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
+import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.data.connector.streaming.StreamingDataConnector
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.log.Loggable
@@ -110,7 +111,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     submitReadyTime(ms)
   }
 
-  def readData(): Option[DataFrame] = {
+  def readData(): (Option[DataFrame], Set[Long]) = {
     val timeRange = TimeInfoCache.getTimeRange
     submitLastProcTime(timeRange._2)
 
@@ -125,7 +126,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     // list partition paths
     val partitionPaths = listPathsBetweenRanges(filePath :: Nil, partitionRanges)
 
-    if (partitionPaths.isEmpty) {
+    val dfOpt = if (partitionPaths.isEmpty) {
       None
     } else {
       try {
@@ -137,6 +138,11 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         }
       }
     }
+
+    // from until tmst range
+    val (from, until) = (reviseTimeRange._1, reviseTimeRange._2 + 1)
+    val tmstSet = TmstCache.range(from, until)
+    (dfOpt, tmstSet)
   }
 
   // -- deprecated --

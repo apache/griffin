@@ -79,23 +79,24 @@ object RuleAdaptorGroup {
 //    steps
 //  }
 
-  def genConcreteRuleSteps(evaluateRuleParam: EvaluateRuleParam,
+  def genConcreteRuleSteps(evaluateRuleParam: EvaluateRuleParam, dsTmsts: Map[String, Set[Long]],
                            procType: ProcessType, adaptPhase: AdaptPhase
                           ): Seq[ConcreteRuleStep] = {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
-    genConcreteRuleSteps(ruleParams, defaultDslType, procType, adaptPhase)
+    genConcreteRuleSteps(ruleParams, dsTmsts, defaultDslType, procType, adaptPhase)
   }
 
-  def genConcreteRuleSteps(ruleParams: Seq[Map[String, Any]], defDslType: DslType,
-                           procType: ProcessType, adaptPhase: AdaptPhase
+  def genConcreteRuleSteps(ruleParams: Seq[Map[String, Any]], dsTmsts: Map[String, Set[Long]],
+                           defDslType: DslType, procType: ProcessType, adaptPhase: AdaptPhase
                           ): Seq[ConcreteRuleStep] = {
     val (steps, dsNames) = ruleParams.foldLeft((Seq[ConcreteRuleStep](), dataSourceNames)) { (res, param) =>
       val (preSteps, preNames) = res
       val dslType = getDslType(param, defDslType)
       val (curSteps, curNames) = genRuleAdaptor(dslType, preNames, procType, adaptPhase) match {
-        case Some(ruleAdaptor) => (ruleAdaptor.genConcreteRuleStep(param), preNames ++ ruleAdaptor.getTempSourceNames(param))
+        case Some(ruleAdaptor) => (ruleAdaptor.genConcreteRuleStep(param, dsTmsts),
+          preNames ++ ruleAdaptor.getTempSourceNames(param))
         case _ => (Nil, preNames)
       }
       (preSteps ++ curSteps, curNames)

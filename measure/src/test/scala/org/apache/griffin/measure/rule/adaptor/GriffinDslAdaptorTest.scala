@@ -56,7 +56,8 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
     dataCheckerMock.existDataSourceName _ expects ("source") returning (true)
     RuleAdaptorGroup.dataChecker = dataCheckerMock
 
-    val steps = adaptor.genConcreteRuleStep(rule)
+    val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
+    val steps = adaptor.genConcreteRuleStep(rule, dsTmsts)
 
     steps.foreach { step =>
       println(s"${step.name} [${step.dslType}]: ${step.rule}")
@@ -88,7 +89,8 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
     dataCheckerMock.existDataSourceName _ expects ("target") returns (true)
     RuleAdaptorGroup.dataChecker = dataCheckerMock
 
-    val steps = adaptor.genConcreteRuleStep(rule)
+    val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)), ("target" -> Set[Long](1234)))
+    val steps = adaptor.genConcreteRuleStep(rule, dsTmsts)
 
     steps.foreach { step =>
       println(s"${step.name} [${step.dslType}]: ${step.rule}")

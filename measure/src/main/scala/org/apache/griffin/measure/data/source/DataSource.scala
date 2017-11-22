@@ -40,8 +40,9 @@ case class DataSource(sqlContext: SQLContext,
     dataConnectors.foreach(_.init)
   }
 
-  def loadData(ms: Long): Unit = {
-    data(ms) match {
+  def loadData(ms: Long): Set[Long] = {
+    val (dfOpt, tmsts) = data(ms)
+    dfOpt match {
       case Some(df) => {
         df.registerTempTable(name)
       }
@@ -52,6 +53,7 @@ case class DataSource(sqlContext: SQLContext,
 //        throw new Exception(s"load data source [${name}] fails")
       }
     }
+    tmsts
   }
 
   def dropTable(): Unit = {
@@ -62,17 +64,25 @@ case class DataSource(sqlContext: SQLContext,
     }
   }
 
-  private def data(ms: Long): Option[DataFrame] = {
-    val batchDataFrameOpt = batchDataConnectors.flatMap { dc =>
-      dc.data(ms)
-    }.reduceOption((a, b) => unionDataFrames(a, b))
+  private def data(ms: Long): (Option[DataFrame], Set[Long]) = {
+    val (batchDataFrameOpt, batchTmsts) = batchDataConnectors.map(_.data(ms)).reduce( (a, b) =>
+      (unionDfOpts(a._1, b._1), a._2 ++ b._2)
+    )
 
-    val cacheDataFrameOpt = dataSourceCacheOpt.flatMap(_.readData())
+    val (cacheDataFrameOpt, cacheTmsts) = dataSourceCacheOpt match {
+      case Some(dsc) => dsc.readData()
+      case _ => (None, Set.empty[Long])
+    }
 
-    (batchDataFrameOpt, cacheDataFrameOpt) match {
-      case (Some(bdf), Some(cdf)) => Some(unionDataFrames(bdf, cdf))
-      case (Some(bdf), _) => Some(bdf)
-      case (_, Some(cdf)) => Some(cdf)
+    (unionDfOpts(batchDataFrameOpt, cacheDataFrameOpt), batchTmsts ++ cacheTmsts)
+  }
+
+  private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
+                         ): Option[DataFrame] = {
+    (dfOpt1, dfOpt2) match {
+      case (Some(df1), Some(df2)) => Some(unionDataFrames(df1, df2))
+      case (Some(df1), _) => dfOpt1
+      case (_, Some(df2)) => dfOpt2
       case _ => None
     }
   }
@@ -88,7 +98,6 @@ case class DataSource(sqlContext: SQLContext,
       }
       val ndf2 = sqlContext.createDataFrame(rdd2, df1.schema)
       df1 unionAll ndf2
-//      df1 unionAll df2
     } catch {
       case e: Throwable => df1
     }

@@ -83,10 +83,11 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dataSources.foreach(_.init)
 
     // init data sources
-    dqEngines.loadData(dataSources, startTime)
+    val dsTmsts = dqEngines.loadData(dataSources, startTime)
 
     // generate rule steps
-    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam, BatchProcessType, RunPhase)
+    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
+      userParam.evaluateRuleParam, dsTmsts, BatchProcessType, RunPhase)
 
     // run rules
     dqEngines.runRuleSteps(ruleSteps)

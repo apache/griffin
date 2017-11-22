@@ -51,8 +51,8 @@ case class AvroBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
     HdfsUtil.existPath(concreteFileFullPath)
   }
 
-  def data(ms: Long): Option[DataFrame] = {
-    try {
+  def data(ms: Long): (Option[DataFrame], Set[Long]) = {
+    val dfOpt = try {
       val df = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
       val dfOpt = Some(df)
       val preDfOpt = preProcess(dfOpt, ms)
@@ -63,6 +63,7 @@ case class AvroBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
         None
       }
     }
+    (dfOpt, readTmst(ms))
   }
 
 //  def available(): Boolean = {

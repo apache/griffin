@@ -3,6 +3,8 @@
 
   "process.type": "batch",
 
+  "timestamp": 1234,
+
   "data.sources": [
     {
       "name": "source",
@@ -23,7 +25,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "select count(user_id) from source where source.user_id > 10049",
+        "rule": "select count(user_id) from source where user_id > 10049",
         "details": {
           "profiling": {
             "name": "count",

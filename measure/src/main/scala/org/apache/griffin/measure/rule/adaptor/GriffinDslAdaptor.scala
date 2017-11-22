@@ -126,7 +126,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     }
   }
 
-  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
+  def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]
+                           ): Seq[ConcreteRuleStep] = {
     ruleStep match {
       case rs @ GriffinDslStep(_, rule, dqType, _) => {
         val exprOpt = try {
@@ -147,7 +148,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         exprOpt match {
           case Some(expr) => {
             try {
-              transConcreteRuleSteps(rs, expr)
+              transConcreteRuleStep(rs, expr, dsTmsts)
             } catch {
               case e: Throwable => {
                 error(s"trans concrete rule step error: ${e.getMessage}")
@@ -162,7 +163,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     }
   }
 
-  private def transAccuracyRuleStep(details: Map[String, Any], expr: Expr
+  private def transAccuracyRuleStep(details: Map[String, Any], expr: Expr, dsTmsts: Map[String, Set[Long]]
                                    ): Seq[ConcreteRuleStep] = {
     val sourceName = getNameOpt(details, AccuracyInfo._Source).getOrElse(dataSourceNames.head)
     val targetName = getNameOpt(details, AccuracyInfo._Target).getOrElse(dataSourceNames.tail.head)
@@ -270,7 +271,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     }
   }
 
-  private def transProfilingRuleStep(details: Map[String, Any], expr: Expr
+  private def transProfilingRuleStep(details: Map[String, Any], expr: Expr, dsTmsts: Map[String, Set[Long]]
                                     ): Seq[ConcreteRuleStep] = {
     val profilingClause = expr.asInstanceOf[ProfilingClause]
     val sourceName = profilingClause.fromClauseOpt match {
@@ -282,6 +283,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         }
       }
     }
+    val tmsts = dsTmsts.getOrElse(sourceName, Set.empty[Long])
     val analyzer = ProfilingAnalyzer(profilingClause, sourceName)
 
     val selExprDescs = analyzer.selectionExprs.map { sel =>
@@ -320,29 +322,64 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     if (!checkDataSourceExists(sourceName)) {
       Nil
     } else {
-      // 1. select statement
-      val profilingSql = {
-        s"SELECT ${selClause} ${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
-      }
-      val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
-      val profilingStep = SparkSqlStep(
-        profilingMetricName,
-        profilingSql,
-        details,
-        resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType),
-        None
-      )
+      tmsts.map { tmst =>
+        // 1. where statement
+        val filterSql = {
+          s"SELECT * ${fromClause} WHERE `${GroupByColumn.tmst}` = ${tmst}"
+        }
+        println(filterSql)
+        val filteredSourceName = dsTmstName(sourceName, tmst)
+        val filterStep = SparkSqlStep(
+          filteredSourceName,
+          filterSql,
+          Map[String, Any](),
+          NonePersistType,
+          None
+        )
 
-      profilingStep :: Nil
+        // 2. select statement
+        val partFromClause = FromClause(filteredSourceName).desc
+        val profilingSql = {
+          s"SELECT ${selClause} ${partFromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
+        }
+        println(profilingSql)
+        val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
+        val profilingStep = SparkSqlStep(
+          profilingMetricName,
+          profilingSql,
+          details,
+          resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType),
+          None
+        )
+
+        filterStep :: profilingStep :: Nil
+      }.reduce(_ ::: _)
+
+//      // 1. select statement
+//      val profilingSql = {
+//        s"SELECT ${selClause} ${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
+//      }
+//      val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
+//      val profilingStep = SparkSqlStep(
+//        profilingMetricName,
+//        profilingSql,
+//        details,
+//        resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType),
+//        None
+//      )
+//
+//      profilingStep :: Nil
     }
   }
 
-  private def transConcreteRuleSteps(ruleStep: GriffinDslStep, expr: Expr
-                                    ): Seq[ConcreteRuleStep] = {
+  private def dsTmstName(dsName: String, tmst: Long) = s"${dsName}_${tmst}"
+
+  private def transConcreteRuleStep(ruleStep: GriffinDslStep, expr: Expr, dsTmsts: Map[String, Set[Long]]
+                                   ): Seq[ConcreteRuleStep] = {
     val details = ruleStep.details
     ruleStep.dqType match {
       case AccuracyType => {
-        transAccuracyRuleStep(details, expr)
+        transAccuracyRuleStep(details, expr, dsTmsts)
 
 //        val sourceName = getNameOpt(details, AccuracyInfo._Source) match {
 //          case Some(name) => name
@@ -450,7 +487,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 //        }
       }
       case ProfilingType => {
-        transProfilingRuleStep(details, expr)
+        transProfilingRuleStep(details, expr, dsTmsts)
 
 //        val profilingClause = expr.asInstanceOf[ProfilingClause]
 //        val sourceName = profilingClause.fromClauseOpt match {

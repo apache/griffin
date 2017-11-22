@@ -27,7 +27,7 @@ case class SparkSqlAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
     SparkSqlStep(getName(param), getRule(param), getDetails(param),
       getPersistType(param), getUpdateDataSource(param)) :: Nil
   }
-  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
+  def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]): Seq[ConcreteRuleStep] = {
     ruleStep match {
       case rs @ SparkSqlStep(name, rule, details, persistType, udsOpt) => {
         adaptPhase match {

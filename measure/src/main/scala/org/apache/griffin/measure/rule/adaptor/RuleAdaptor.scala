@@ -49,12 +49,13 @@ trait RuleAdaptor extends Loggable with Serializable {
   def getTempSourceNames(param: Map[String, Any]): Seq[String]
 
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep]
-  def genConcreteRuleStep(param: Map[String, Any]): Seq[ConcreteRuleStep] = {
+  def genConcreteRuleStep(param: Map[String, Any], dsTmsts: Map[String, Set[Long]]
+                         ): Seq[ConcreteRuleStep] = {
     genRuleStep(param).flatMap { rs =>
-      adaptConcreteRuleStep(rs)
+      adaptConcreteRuleStep(rs, dsTmsts)
     }
   }
-  protected def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep]
+  protected def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]): Seq[ConcreteRuleStep]
 
 }
 

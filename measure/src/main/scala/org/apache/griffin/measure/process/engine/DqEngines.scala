@@ -32,10 +32,10 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
-  def loadData(dataSources: Seq[DataSource], ms: Long): Unit = {
-    dataSources.foreach { ds =>
-      ds.loadData(ms)
-    }
+  def loadData(dataSources: Seq[DataSource], ms: Long): Map[String, Set[Long]] = {
+    dataSources.map { ds =>
+      (ds.name, ds.loadData(ms))
+    }.toMap
   }
 
   def runRuleSteps(ruleSteps: Seq[ConcreteRuleStep]): Unit = {

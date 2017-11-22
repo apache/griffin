@@ -38,6 +38,8 @@ trait SparkDqEngine extends DqEngine {
           val name = step.name
           try {
             val pdf = sqlContext.table(s"`${name}`")
+            println(name)
+            pdf.show(10)
             val records = pdf.toJSON.collect()
 
             val pairs = records.flatMap { rec =>
