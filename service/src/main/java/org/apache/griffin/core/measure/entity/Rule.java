@@ -22,15 +22,12 @@ package org.apache.griffin.core.measure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.avro.data.Json;
 import org.apache.griffin.core.util.JsonUtil;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -97,7 +94,7 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("details")
-    public void setDetailsMap(Map<String,Object> details) throws IOException {
+    public void setDetailsMap(Map<String, Object> details) throws IOException {
         this.detailsMap = details;
         this.details = JsonUtil.toJson(details);
     }
@@ -105,7 +102,7 @@ public class Rule extends AbstractAuditableEntity {
     public Rule() {
     }
 
-    public Rule(String dslType, String dqType, String rule, Map<String,Object> details) throws IOException {
+    public Rule(String dslType, String dqType, String rule, Map<String, Object> details) throws IOException {
         this.dslType = dslType;
         this.dqType = dqType;
         this.rule = rule;
