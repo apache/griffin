@@ -221,17 +221,21 @@ public class SparkSubmitJob implements Job {
         return currentBlockStartTimestamp;
     }
 
+    private String escapeCharacter(String str, String regex) {
+        String escapeCh = "\\" + regex;
+        return str.replaceAll(regex, escapeCh);
+    }
+
     private void setSparkJobDO() {
         sparkJobDO.setFile(sparkJobProps.getProperty("sparkJob.file"));
         sparkJobDO.setClassName(sparkJobProps.getProperty("sparkJob.className"));
 
         List<String> args = new ArrayList<>();
         args.add(sparkJobProps.getProperty("sparkJob.args_1"));
-        // measure
-        String measureJson;
-        measure.setTriggerTimeStamp(System.currentTimeMillis());
-        measureJson = JsonUtil.toJsonWithFormat(measure);
-        args.add(measureJson);
+        String measureJson = JsonUtil.toJsonWithFormat(measure);
+        // to fix livy bug: ` will be ignored by livy
+        String finalMeasureJson = escapeCharacter(measureJson, "\\`");
+        args.add(finalMeasureJson);
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));
         sparkJobDO.setArgs(args);
 
@@ -257,7 +261,8 @@ public class SparkSubmitJob implements Job {
     }
 
     public void saveJobInstance(String groupName, String jobName, String result) {
-        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {};
+        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
+        };
         try {
             Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
             if (resultMap != null) {
@@ -271,7 +276,7 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private JobInstance genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException{
+    private JobInstance genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException {
         JobInstance jobInstance = new JobInstance();
         jobInstance.setGroupName(groupName);
         jobInstance.setJobName(jobName);

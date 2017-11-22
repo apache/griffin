@@ -19,22 +19,34 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.JsonObject;
+import org.apache.griffin.core.util.JsonUtil;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
+import java.io.IOException;
+import java.util.Map;
 
 
 @Entity
 public class Rule extends AbstractAuditableEntity {
 
-    /**three type:1.griffin-dsl 2.df-opr 3.spark-sql**/
+    /**
+     * three type:1.griffin-dsl 2.df-opr 3.spark-sql
+     */
     private String dslType;
 
     private String dqType;
 
     @Column(length = 1024)
     private String rule;
+
+    private String details;
+
 
     @JsonProperty("dsl.type")
     public String getDslType() {
@@ -62,6 +74,14 @@ public class Rule extends AbstractAuditableEntity {
 
     public void setRule(String rule) {
         this.rule = rule;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(Object details) {
+        this.details = JsonUtil.toJson(details);
     }
 
     public Rule() {
