@@ -21,9 +21,7 @@ package org.apache.griffin.measure.rule.step
 import org.apache.griffin.measure.persist._
 import org.apache.griffin.measure.rule.dsl._
 
-case class SparkSqlStep(name: String, rule: String, details: Map[String, Any],
-                        persistType: PersistType, updateDataSource: Option[String]
-                       ) extends ConcreteRuleStep {
+case class SparkSqlStep(timeInfo: TimeInfo, ruleInfo: RuleInfo) extends ConcreteRuleStep {
 
   val dslType: DslType = SparkSqlType
 

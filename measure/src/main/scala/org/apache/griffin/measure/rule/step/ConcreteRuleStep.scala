@@ -22,9 +22,17 @@ import org.apache.griffin.measure.rule.dsl._
 
 trait ConcreteRuleStep extends RuleStep {
 
-  val persistType: PersistType
+//  val _persistType = "persist.type"
+//  val _updateDataSource = "update.data.source"
+//
+//  def persistType = PersistType(ruleInfo.details.getOrElse(_persistType, "").toString)
+//  def updateDataSourceOpt = ruleInfo.details.get(_updateDataSource).map(_.toString)
 
-  val updateDataSource: Option[String]
+
+
+//  val persistType: PersistType
+
+//  val updateDataSource: Option[String]
 
 //  def isGroupMetric: Boolean = {
 //    val _GroupMetric = "group.metric"

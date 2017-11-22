@@ -46,7 +46,8 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   def persistAllMetrics(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory
                        ): Iterable[Long] = {
-    val metricSteps = ruleSteps.filter(_.persistType == MetricPersistType)
+    val metricSteps = ruleSteps.filter(_.ruleInfo.persistType == MetricPersistType)
+    println(metricSteps)
     val allMetrics: Map[Long, Map[String, Any]] = {
       metricSteps.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
         val metrics = collectMetrics(step)
@@ -169,7 +170,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
                         persistFactory: PersistFactory): Unit = {
     stepRdds.foreach { stepRdd =>
       val (step, rdd) = stepRdd
-      if (step.persistType == RecordPersistType) {
+      if (step.ruleInfo.persistType == RecordPersistType) {
         val name = step.name
         rdd.foreach { pair =>
           val (t, items) = pair
@@ -184,9 +185,9 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
                         dataSources: Seq[DataSource]): Unit = {
     stepRdds.foreach { stepRdd =>
       val (step, rdd) = stepRdd
-      if (step.updateDataSource.nonEmpty) {
+      if (step.ruleInfo.updateDataSourceOpt.nonEmpty) {
         val udpateDataSources = dataSources.filter { ds =>
-          step.updateDataSource match {
+          step.ruleInfo.updateDataSourceOpt match {
             case Some(dsName) if (dsName == ds.name) => true
             case _ => false
           }

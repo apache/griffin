@@ -29,6 +29,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
+import org.apache.griffin.measure.rule.step.TimeInfo
 
 case class StreamingDqThread(dqEngines: DqEngines,
                              dataSources: Seq[DataSource],
@@ -57,7 +58,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
 
         // generate rule steps
         val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
-          st, evaluateRuleParam, dsTmsts, StreamingProcessType, RunPhase)
+          TimeInfo(st, st), evaluateRuleParam, dsTmsts, StreamingProcessType, RunPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)

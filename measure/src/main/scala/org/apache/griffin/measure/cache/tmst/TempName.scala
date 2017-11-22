@@ -19,15 +19,19 @@ under the License.
 package org.apache.griffin.measure.cache.tmst
 
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.rule.step.TimeInfo
 
 object TempName extends Loggable {
 
   //-- temp df name --
   private val tmstNameRegex = """^(.*)\[(\d*)\]\((\d*)\)$""".r
-  def tmstName(name: String, tmst: Long, groupId: Long) = s"${name}[${tmst}](${groupId})"
+  def tmstName(name: String, timeInfo: TimeInfo) = {
+    val TimeInfo(calcTime, tmst) = timeInfo
+    s"${name}[${tmst}](${calcTime})"
+  }
   def extractTmstName(tmstName: String): (String, Option[Long]) = {
     tmstName match {
-      case tmstNameRegex(name, tmst, groupId) => {
+      case tmstNameRegex(name, tmst, _) => {
         try { (name, Some(tmst.toLong)) } catch { case e: Throwable => (tmstName, None) }
       }
       case _ => (tmstName, None)

@@ -37,14 +37,14 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
-      case SparkSqlStep(name, rule, _, _, _) => {
+      case SparkSqlStep(_, ri) => {
         try {
-          val rdf = sqlContext.sql(rule)
-          rdf.registerTempTable(name)
+          val rdf = sqlContext.sql(ri.rule)
+          rdf.registerTempTable(ri.name)
           true
         } catch {
           case e: Throwable => {
-            error(s"run spark sql [ ${rule} ] error: ${e.getMessage}")
+            error(s"run spark sql [ ${ri.rule} ] error: ${e.getMessage}")
             false
           }
         }

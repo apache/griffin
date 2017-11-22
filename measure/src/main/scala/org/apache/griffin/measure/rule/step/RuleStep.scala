@@ -18,14 +18,40 @@ under the License.
 */
 package org.apache.griffin.measure.rule.step
 
-import org.apache.griffin.measure.rule.dsl.{DslType, PersistType}
+import org.apache.griffin.measure.rule.dsl._
 
 trait RuleStep extends Serializable {
 
   val dslType: DslType
 
-  val name: String
-  val rule: String
-  val details: Map[String, Any]
+  val timeInfo: TimeInfo
 
+  val ruleInfo: RuleInfo
+
+  def name = ruleInfo.name
+
+//  val name: String
+//  val rule: String
+//  val details: Map[String, Any]
+
+}
+
+case class TimeInfo(calcTime: Long, tmst: Long) {}
+
+case class RuleInfo(name: String, rule: String, details: Map[String, Any]) {
+  private val _persistType = "persist.type"
+  private val _updateDataSource = "update.data.source"
+
+  def persistType = PersistType(details.getOrElse(_persistType, "").toString)
+  def updateDataSourceOpt = details.get(_updateDataSource).map(_.toString)
+
+  def withPersistType(pt: PersistType): RuleInfo = {
+    RuleInfo(name, rule, details + (_persistType -> pt.desc))
+  }
+  def withUpdateDataSourceOpt(udsOpt: Option[String]): RuleInfo = {
+    udsOpt match {
+      case Some(uds) => RuleInfo(name, rule, details + (_updateDataSource -> uds))
+      case _ => this
+    }
+  }
 }

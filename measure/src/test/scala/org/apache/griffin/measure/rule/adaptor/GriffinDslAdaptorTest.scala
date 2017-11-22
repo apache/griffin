@@ -20,6 +20,7 @@ package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.process.check.DataChecker
+import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -30,7 +31,7 @@ import org.scalamock.scalatest.MockFactory
 class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter with MockFactory {
 
   test ("profiling groupby") {
-    val adaptor = GriffinDslAdaptor(0, "source" :: Nil, "count" :: Nil, BatchProcessType, RunPhase)
+    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, BatchProcessType, RunPhase)
 
     val ruleJson =
       """
@@ -57,15 +58,15 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
     RuleAdaptorGroup.dataChecker = dataCheckerMock
 
     val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
-    val steps = adaptor.genConcreteRuleStep(rule, dsTmsts)
+    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
 
     steps.foreach { step =>
-      println(s"${step.name} [${step.dslType}]: ${step.rule}")
+      println(s"${step.name} [${step.dslType}]: ${step.ruleInfo.rule}")
     }
   }
 
   test ("accuracy") {
-    val adaptor = GriffinDslAdaptor(0, "source" :: "target" :: Nil, "count" :: Nil, StreamingProcessType, RunPhase)
+    val adaptor = GriffinDslAdaptor("source" :: "target" :: Nil, "count" :: Nil, StreamingProcessType, RunPhase)
 
     val ruleJson =
       """
@@ -90,10 +91,10 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
     RuleAdaptorGroup.dataChecker = dataCheckerMock
 
     val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)), ("target" -> Set[Long](1234)))
-    val steps = adaptor.genConcreteRuleStep(rule, dsTmsts)
+    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
 
     steps.foreach { step =>
-      println(s"${step.name} [${step.dslType}]: ${step.rule}")
+      println(s"${step.name} [${step.dslType}]: ${step.ruleInfo.rule}")
     }
   }
 

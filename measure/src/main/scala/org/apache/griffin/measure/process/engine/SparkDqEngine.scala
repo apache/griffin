@@ -35,7 +35,7 @@ trait SparkDqEngine extends DqEngine {
     if (collectable) {
       val emptyMap = Map[String, Any]()
       ruleStep match {
-        case step: ConcreteRuleStep if (step.persistType == MetricPersistType) => {
+        case step: ConcreteRuleStep if (step.ruleInfo.persistType == MetricPersistType) => {
           val name = step.name
           try {
             val pdf = sqlContext.table(s"`${name}`")
@@ -81,8 +81,8 @@ trait SparkDqEngine extends DqEngine {
                       ): Option[RDD[(Long, Iterable[String])]] = {
     if (collectable) {
       ruleStep match {
-        case step: ConcreteRuleStep if ((step.persistType == RecordPersistType)
-          || (step.updateDataSource.nonEmpty)) => {
+        case step: ConcreteRuleStep if ((step.ruleInfo.persistType == RecordPersistType)
+          || (step.ruleInfo.updateDataSourceOpt.nonEmpty)) => {
           val name = step.name
           try {
             val pdf = sqlContext.table(s"`${name}`")
