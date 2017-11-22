@@ -47,33 +47,33 @@ public class MeasureOrgServiceImplTest {
     private MeasureRepo measureRepo;
 
     @Test
-    public void testGetOrgs(){
+    public void testGetOrgs() {
         String orgName = "orgName";
         given(measureRepo.findOrganizations(false)).willReturn(Arrays.asList(orgName));
-        List<String> orgs =service.getOrgs();
+        List<String> orgs = service.getOrgs();
         assertThat(orgs.size()).isEqualTo(1);
         assertThat(orgs.get(0)).isEqualTo(orgName);
     }
 
     @Test
-    public void testGetMetricNameListByOrg(){
+    public void testGetMetricNameListByOrg() {
         String orgName = "orgName";
         String measureName = "measureName";
-        given(measureRepo.findNameByOrganization(orgName,false)).willReturn(Arrays.asList(measureName));
-        List<String> measureNames=service.getMetricNameListByOrg(orgName);
+        given(measureRepo.findNameByOrganization(orgName, false)).willReturn(Arrays.asList(measureName));
+        List<String> measureNames = service.getMetricNameListByOrg(orgName);
         assertThat(measureNames.size()).isEqualTo(1);
         assertThat(measureNames.get(0)).isEqualTo(measureName);
     }
 
     @Test
-    public void testGetMeasureNamesGroupByOrg(){
+    public void testGetMeasureNamesGroupByOrg() {
         Measure measure = new Measure("measure", "desc", "org", "proctype", "owner", null, null);
         List<Measure> measures = new ArrayList<>();
         measures.add(measure);
 
         when(measureRepo.findByDeleted(false)).thenReturn(measures);
 
-        Map<String,List<String>> map = service.getMeasureNamesGroupByOrg();
+        Map<String, List<String>> map = service.getMeasureNamesGroupByOrg();
         assertThat(map.size()).isEqualTo(1);
 
     }

@@ -20,16 +20,14 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.entity.SegmentPredict;
 import org.apache.griffin.core.job.entity.SparkJobDO;
+import org.apache.griffin.core.job.factory.PredictorFactory;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -38,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @PersistJobDataAfterExecution
@@ -47,93 +44,75 @@ public class SparkSubmitJob implements Job {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparkSubmitJob.class);
 
     @Autowired
-    private MeasureRepo measureRepo;
-    @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
     private Properties sparkJobProps;
-
-    /**
-     * partitionItems
-     * for example
-     * partitionItems like "date","hour",...
-     */
-    private String[] partitionItems;
-    /**
-     * sourcePatternItems targetPatternItems
-     * for example
-     * sourcePatternItems or targetPatternItems is like "YYYYMMDD","HH",...
-     */
-    private String[] sourcePatternItems, targetPatternItems;
+    @Autowired
+    private JobServiceImpl jobService;
 
     private Measure measure;
-    private String sourcePattern, targetPattern;
-    private String blockStartTimestamp, lastBlockStartTimestamp;
-    private String interval;
-    private String uri;
+    private String livyUri;
+    private List<SegmentPredict> mPredicts;
     private RestTemplate restTemplate = new RestTemplate();
     private SparkJobDO sparkJobDO = new SparkJobDO();
 
     public SparkSubmitJob() {
     }
 
-    /**
-     * execute method is used to submit sparkJobDO to Livy.
-     *
-     * @param context Job execution context
-     */
     @Override
     public void execute(JobExecutionContext context) {
-        JobDetail jd = context.getJobDetail();
-        String groupName = jd.getJobDataMap().getString("groupName");
-        String jobName = jd.getJobDataMap().getString("jobName");
-        initParam(jd);
-        //prepare current system timestamp
-        long currentBlockStartTimestamp = setCurrentBlockStartTimestamp(System.currentTimeMillis());
-        LOGGER.info("currentBlockStartTimestamp: {}", currentBlockStartTimestamp);
-        try {
-            if (StringUtils.isNotEmpty(sourcePattern)) {
-                setAllDataConnectorPartitions(measure.getDataSources(), sourcePattern.split("-"), partitionItems, "source", currentBlockStartTimestamp);
-            }
-            if (StringUtils.isNotEmpty(targetPattern)) {
-                setAllDataConnectorPartitions(measure.getDataSources(), targetPattern.split("-"), partitionItems, "target", currentBlockStartTimestamp);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Can not execute job.Set partitions error. {}", e.getMessage());
-            return;
-        }
-        jd.getJobDataMap().put("lastBlockStartTimestamp", currentBlockStartTimestamp + "");
-        setSparkJobDO();
+        JobDetail jobDetail = context.getJobDetail();
         String result;
         try {
-            result = restTemplate.postForObject(uri, sparkJobDO, String.class);
+            initParam(jobDetail);
+            setSparkJobDO();
+            if (predict(mPredicts)) {
+                result = restTemplate.postForObject(livyUri, sparkJobDO, String.class);
+                LOGGER.info(result);
+//                result = "{\"id\":1,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+                JobDataMap jobDataMap = jobDetail.getJobDataMap();
+                saveJobInstance(jobDataMap.getString("groupName"), jobDataMap.getString("jobName"), result);
+                jobService.deleteJob(jobDetail.getKey().getGroup(), jobDetail.getKey().getName());
+            }
         } catch (Exception e) {
-            LOGGER.error("Post spark task error. {}", e.getMessage());
-            return;
+            LOGGER.error("Post spark task error.", e);
         }
-        LOGGER.info(result);
-        saveJobInstance(groupName, jobName, result);
     }
 
-    private void initParam(JobDetail jd) {
-        /**
-         * the field measureId is generated from `setJobData` in `JobServiceImpl`
-         */
-        String measureId = jd.getJobDataMap().getString("measureId");
-        measure = measureRepo.findOne(Long.valueOf(measureId));
-        if (measure == null) {
-            LOGGER.error("Measure with id {} is not find!", measureId);
+    private boolean predict(List<SegmentPredict> predicts) throws IOException {
+        if (mPredicts == null || mPredicts.size() == 0) {
+            return false;
+        }
+        for (SegmentPredict segmentPredict : predicts) {
+            Predictor predict = PredictorFactory.newPredictInstance(segmentPredict);
+            if (!predict.predict()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private void initParam(JobDetail jd) throws IOException {
+        mPredicts = new ArrayList<>();
+        livyUri = sparkJobProps.getProperty("livy.uri");
+        measure = JsonUtil.toEntity(jd.getJobDataMap().getString("measure"), Measure.class);
+        initPredicts(jd.getJobDataMap().getString("predicts"));
+        setMeasureInstanceName(measure, jd);
+
+    }
+
+    private void initPredicts(String json) throws IOException {
+        if (StringUtils.isEmpty(json)) {
             return;
         }
-        setMeasureInstanceName(measure, jd);
-        partitionItems = sparkJobProps.getProperty("sparkJob.dateAndHour").split(",");
-        uri = sparkJobProps.getProperty("livy.uri");
-        sourcePattern = jd.getJobDataMap().getString("sourcePattern");
-        targetPattern = jd.getJobDataMap().getString("targetPattern");
-        blockStartTimestamp = jd.getJobDataMap().getString("blockStartTimestamp");
-        lastBlockStartTimestamp = jd.getJobDataMap().getString("lastBlockStartTimestamp");
-        LOGGER.info("lastBlockStartTimestamp:{}", lastBlockStartTimestamp);
-        interval = jd.getJobDataMap().getString("interval");
+        List<Map> maps = JsonUtil.toEntity(json, List.class);
+        for (Map<String, String> map : maps) {
+            SegmentPredict segmentPredict = new SegmentPredict();
+            segmentPredict.setType(map.get("type"));
+            segmentPredict.setConfig(JsonUtil.toEntity(map.get("config"), Map.class));
+            mPredicts.add(segmentPredict);
+        }
     }
 
     private void setMeasureInstanceName(Measure measure, JobDetail jd) {
@@ -141,97 +120,22 @@ public class SparkSubmitJob implements Job {
         measure.setName(jd.getJobDataMap().getString("jobName"));
     }
 
-    private void setAllDataConnectorPartitions(List<DataSource> sources, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
-        if (sources == null) {
-            return;
-        }
-        for (DataSource dataSource : sources) {
-            setDataSourcePartitions(dataSource, patternItemSet, partitionItems, sourceName, timestamp);
-        }
+    private String escapeCharacter(String str, String regex) {
+        String escapeCh = "\\" + regex;
+        return str.replaceAll(regex, escapeCh);
     }
 
-    private void setDataSourcePartitions(DataSource dataSource, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
-        String name = dataSource.getName();
-        for (DataConnector dataConnector : dataSource.getConnectors()) {
-            if (sourceName.equals(name)) {
-                setDataConnectorPartitions(dataConnector, patternItemSet, partitionItems, timestamp);
-            }
-        }
-    }
-
-    private void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItems, long timestamp) {
-        Map<String, String> partitionItemMap = genPartitionMap(patternItemSet, partitionItems, timestamp);
-        /**
-         * partitions must be a string like: "dt=20170301, hour=12"
-         * partitionItemMap.toString() is like "{dt=20170301, hour=12}"
-         */
-        String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
-        Map<String, String> configMap = dc.getConfigInMaps();
-        //config should not be null
-        configMap.put("partitions", partitions);
-        try {
-            dc.setConfig(configMap);
-        } catch (JsonProcessingException e) {
-            LOGGER.error(e.getMessage());
-        }
-    }
-
-
-    private Map<String, String> genPartitionMap(String[] patternItemSet, String[] partitionItems, long timestamp) {
-        /**
-         * patternItemSet:{YYYYMMdd,HH}
-         * partitionItems:{dt,hour}
-         * partitionItemMap:{dt=20170804,hour=09}
-         */
-        int comparableSizeMin = Math.min(patternItemSet.length, partitionItems.length);
-        Map<String, String> partitionItemMap = new HashMap<>();
-        for (int i = 0; i < comparableSizeMin; i++) {
-            /**
-             * in order to get a standard date like 20170427 01 (YYYYMMdd-HH)
-             */
-            String pattern = patternItemSet[i].replace("mm", "MM");
-            pattern = pattern.replace("DD", "dd");
-            pattern = pattern.replace("hh", "HH");
-            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-            partitionItemMap.put(partitionItems[i], sdf.format(new Date(timestamp)));
-        }
-        return partitionItemMap;
-    }
-
-
-    private long setCurrentBlockStartTimestamp(long currentSystemTimestamp) {
-        long currentBlockStartTimestamp = 0;
-        if (StringUtils.isNotEmpty(lastBlockStartTimestamp)) {
-            try {
-                currentBlockStartTimestamp = Long.parseLong(lastBlockStartTimestamp) + Integer.parseInt(interval) * 1000;
-            } catch (Exception e) {
-                LOGGER.info("lastBlockStartTimestamp or interval format problem! {}", e.getMessage());
-            }
-        } else {
-            if (StringUtils.isNotEmpty(blockStartTimestamp)) {
-                try {
-                    currentBlockStartTimestamp = Long.parseLong(blockStartTimestamp);
-                } catch (Exception e) {
-                    LOGGER.info("blockStartTimestamp format problem! {}", e.getMessage());
-                }
-            } else {
-                currentBlockStartTimestamp = currentSystemTimestamp;
-            }
-        }
-        return currentBlockStartTimestamp;
-    }
-
-    private void setSparkJobDO() {
+    private void setSparkJobDO() throws JsonProcessingException {
         sparkJobDO.setFile(sparkJobProps.getProperty("sparkJob.file"));
         sparkJobDO.setClassName(sparkJobProps.getProperty("sparkJob.className"));
 
         List<String> args = new ArrayList<>();
         args.add(sparkJobProps.getProperty("sparkJob.args_1"));
-        // measure
-        String measureJson;
         measure.setTriggerTimeStamp(System.currentTimeMillis());
-        measureJson = JsonUtil.toJsonWithFormat(measure);
-        args.add(measureJson);
+        String measureJson = JsonUtil.toJsonWithFormat(measure);
+        // to fix livy bug: ` will be ignored by livy
+        String finalMeasureJson = escapeCharacter(measureJson, "\\`");
+        args.add(finalMeasureJson);
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));
         sparkJobDO.setArgs(args);
 
@@ -256,10 +160,9 @@ public class SparkSubmitJob implements Job {
         sparkJobDO.setFiles(files);
     }
 
-    public void saveJobInstance(String groupName, String jobName, String result) {
-        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {};
+    private void saveJobInstance(String groupName, String jobName, String result) {
         try {
-            Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
+            Map resultMap = JsonUtil.toEntity(result, Map.class);
             if (resultMap != null) {
                 JobInstance jobInstance = genJobInstance(groupName, jobName, resultMap);
                 jobInstanceRepo.save(jobInstance);
@@ -271,16 +174,21 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private JobInstance genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException{
+    private JobInstance genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException {
         JobInstance jobInstance = new JobInstance();
         jobInstance.setGroupName(groupName);
         jobInstance.setJobName(jobName);
         jobInstance.setTimestamp(System.currentTimeMillis());
-        jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
-        jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
+        if(resultMap.get("state")!=null){
+            jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
+        }
+        if (resultMap.get("id") != null) {
+            jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
+        }
         if (resultMap.get("appId") != null) {
             jobInstance.setAppId(resultMap.get("appId").toString());
         }
         return jobInstance;
     }
+
 }

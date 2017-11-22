@@ -34,26 +34,14 @@ import java.util.Properties;
 public class JsonUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtil.class);
 
-    public static String toJson(Object obj) {
+    public static String toJson(Object obj) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        String jsonStr = null;
-        try {
-            jsonStr = mapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            LOGGER.error("convert to json failed. {}", obj);
-        }
-        return jsonStr;
+        return mapper.writeValueAsString(obj);
     }
 
-    public static String toJsonWithFormat(Object obj) {
+    public static String toJsonWithFormat(Object obj) throws JsonProcessingException {
         ObjectWriter mapper = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String jsonStr = null;
-        try {
-            jsonStr = mapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            LOGGER.error("convert to json failed. {}", obj);
-        }
-        return jsonStr;
+        return mapper.writeValueAsString(obj);
     }
 
     public static <T> T toEntity(String jsonStr, Class<T> type) throws IOException {

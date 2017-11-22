@@ -22,6 +22,7 @@ package org.apache.griffin.core.job;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
+import org.apache.griffin.core.job.repo.JobDataSegmentRepo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +73,7 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindGroupWithJobName() {
-        List<Object> list = jobInstanceRepo.findGroupWithJobName();
+        List<Object> list = jobInstanceRepo.findGroupAndJobNameWithState();
         assertThat(list.size()).isEqualTo(3);
     }
 

@@ -45,27 +45,22 @@ public class DataConnector extends AbstractAuditableEntity {
 
     @JsonIgnore
     @Transient
-    private Map<String, String> configInMaps;
+    private Map<String, String> configMap;
 
-    public Map<String, String> getConfigInMaps() {
-        TypeReference<Map<String, String>> mapType = new TypeReference<Map<String, String>>() {
-        };
-        if (this.configInMaps == null) {
-            try {
-                this.configInMaps = JsonUtil.toEntity(config, mapType);
-            } catch (IOException e) {
-                LOGGER.error("Error in converting json to map. {}", e.getMessage());
-            }
+    public Map<String, String> getConfigMap() throws IOException {
+        if(configMap == null){
+            configMap = JsonUtil.toEntity(config, Map.class);
         }
-        return configInMaps;
+        return configMap;
     }
 
-    public void setConfig(Map<String, String> configInMaps) throws JsonProcessingException {
-        this.config = JsonUtil.toJson(configInMaps);
+    public void setConfig(Map<String, String> configMap) throws JsonProcessingException {
+        this.configMap = configMap;
+        this.config = JsonUtil.toJson(configMap);
     }
 
-    public Map<String, String> getConfig() {
-        return getConfigInMaps();
+    public Map<String, String> getConfig() throws IOException {
+        return getConfigMap();
     }
 
     public String getType() {
@@ -95,7 +90,7 @@ public class DataConnector extends AbstractAuditableEntity {
         TypeReference<Map<String, String>> mapType = new TypeReference<Map<String, String>>() {
         };
         try {
-            this.configInMaps = JsonUtil.toEntity(config, mapType);
+            this.configMap = JsonUtil.toEntity(config, mapType);
         } catch (IOException e) {
             LOGGER.error("Error in converting json to map. {}", e.getMessage());
         }

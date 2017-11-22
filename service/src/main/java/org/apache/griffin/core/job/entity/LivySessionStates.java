@@ -70,7 +70,7 @@ public class LivySessionStates {
 
     public static boolean isActive(State state) {
         if (State.unknown.equals(state)) {
-            // set unknown isactive() as false.
+            // set unknown isActive() as false.
             return false;
         }
         SessionState sessionState = toSessionState(state);

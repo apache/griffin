@@ -22,6 +22,7 @@ package org.apache.griffin.core.job;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +47,8 @@ public class JobController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public GriffinOperationMessage addJob(@RequestParam("group") String groupName, @RequestParam("jobName") String jobName,
-                                          @RequestParam("measureId") Long measureId, @RequestBody JobRequestBody jobRequestBody) {
-        return jobService.addJob(groupName, jobName, measureId, jobRequestBody);
+    public GriffinOperationMessage addJob(@RequestBody JobSchedule jobSchedule) {
+        return jobService.addJob(jobSchedule);
     }
 
     @RequestMapping(value = "", method = RequestMethod.DELETE)

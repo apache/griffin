@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.junit.Before;
@@ -38,7 +39,7 @@ public class GriffinUtilTest {
     }
 
     @Test
-    public void testToJson() {
+    public void testToJson() throws JsonProcessingException {
         JobHealth jobHealth = new JobHealth(5, 10);
         String jobHealthStr = JsonUtil.toJson(jobHealth);
         System.out.println(jobHealthStr);
@@ -75,7 +76,7 @@ public class GriffinUtilTest {
     }
 
     @Test
-    public void testToJsonWithFormat() {
+    public void testToJsonWithFormat() throws JsonProcessingException {
         JobHealth jobHealth = new JobHealth(5, 10);
         String jobHealthStr = JsonUtil.toJsonWithFormat(jobHealth);
         System.out.println(jobHealthStr);

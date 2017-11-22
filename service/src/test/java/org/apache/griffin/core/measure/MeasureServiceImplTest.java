@@ -34,7 +34,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import static org.apache.griffin.core.measure.MeasureTestHelper.createATestMeasure;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,7 +68,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testGetMeasuresById() throws Exception {
         Measure measure = createATestMeasure("view_item_hourly", "test");
-        given(measureRepo.findByIdAndDeleted(1L,false)).willReturn(measure);
+        given(measureRepo.findByIdAndDeleted(1L, false)).willReturn(measure);
         Measure m = service.getMeasureById(1);
         assertEquals(m.getName(), measure.getName());
     }
@@ -137,7 +136,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testUpdateMeasureForSuccess() throws Exception {
         Measure measure = createATestMeasure("view_item_hourly", "test");
-        given(measureRepo.findByIdAndDeleted(measure.getId(),false)).willReturn(new Measure());
+        given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(new Measure());
         given(measureRepo.save(measure)).willReturn(measure);
         GriffinOperationMessage message = service.updateMeasure(measure);
         assertEquals(message, GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
@@ -146,7 +145,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testUpdateMeasureForNotFound() throws Exception {
         Measure measure = createATestMeasure("view_item_hourly", "test");
-        given(measureRepo.findByIdAndDeleted(measure.getId(),false)).willReturn(null);
+        given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(null);
         GriffinOperationMessage message = service.updateMeasure(measure);
         assertEquals(message, GriffinOperationMessage.RESOURCE_NOT_FOUND);
     }
@@ -154,7 +153,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testUpdateMeasureForFailWithSaveException() throws Exception {
         Measure measure = createATestMeasure("view_item_hourly", "test");
-        given(measureRepo.findByIdAndDeleted(measure.getId(),false)).willReturn(new Measure());
+        given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(new Measure());
         given(measureRepo.save(measure)).willThrow(Exception.class);
         GriffinOperationMessage message = service.updateMeasure(measure);
         assertEquals(message, GriffinOperationMessage.UPDATE_MEASURE_FAIL);

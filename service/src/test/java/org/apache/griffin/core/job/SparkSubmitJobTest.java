@@ -20,10 +20,8 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.SparkJobDO;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.PropertiesUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +86,7 @@ public class SparkSubmitJobTest {
         JobDetail jd = createJobDetail();
         given(context.getJobDetail()).willReturn(jd);
         given(measureRepo.findOne(Long.valueOf(jd.getJobDataMap().getString("measureId")))).willReturn(createATestMeasure("view_item_hourly", "ebay"));
-        Whitebox.setInternalState(sparkSubmitJob,"restTemplate",restTemplate);
+        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
         given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(), Matchers.any())).willReturn(result);
         given(jobInstanceRepo.save(new JobInstance())).willReturn(new JobInstance());
         sparkSubmitJob.execute(context);
