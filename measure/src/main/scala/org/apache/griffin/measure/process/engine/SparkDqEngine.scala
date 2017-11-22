@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.process.engine
 
+import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.rule.dsl.{MetricPersistType, RecordPersistType}
@@ -38,25 +39,19 @@ trait SparkDqEngine extends DqEngine {
           val name = step.name
           try {
             val pdf = sqlContext.table(s"`${name}`")
-            println(name)
-            pdf.show(10)
-            val records = pdf.toJSON.collect()
+            val records: Array[String] = pdf.toJSON.collect()
+
+            val (metricName, tmstOpt) = TmstCache.extractTmstName(name)
 
             val pairs = records.flatMap { rec =>
               try {
                 val value = JsonUtil.toAnyMap(rec)
-                value.get(GroupByColumn.tmst) match {
-                  case Some(t) => {
-                    val key = t.toString.toLong
-                    Some((key, value))
-                  }
-                  case _ => None
-                }
+                tmstOpt.map((_, value))
               } catch {
                 case e: Throwable => None
               }
             }
-            val groupedPairs = pairs.foldLeft(Map[Long, Seq[Map[String, Any]]]()) { (ret, pair) =>
+            val groupedPairs: Map[Long, Seq[Map[String, Any]]] = pairs.foldLeft(Map[Long, Seq[Map[String, Any]]]()) { (ret, pair) =>
               val (k, v) = pair
               ret.get(k) match {
                 case Some(seq) => ret + (k -> (seq :+ v))
@@ -65,7 +60,7 @@ trait SparkDqEngine extends DqEngine {
             }
             groupedPairs.mapValues { vs =>
               if (vs.size > 1) {
-                Map[String, Any]((name -> vs))
+                Map[String, Any]((metricName -> vs))
               } else {
                 vs.headOption.getOrElse(emptyMap)
               }

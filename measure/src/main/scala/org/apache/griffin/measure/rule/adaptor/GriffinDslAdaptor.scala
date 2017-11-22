@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
+import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
 import org.apache.griffin.measure.rule.dsl._
@@ -328,9 +329,9 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           s"SELECT * ${fromClause} WHERE `${GroupByColumn.tmst}` = ${tmst}"
         }
         println(filterSql)
-        val filteredSourceName = dsTmstName(sourceName, tmst)
+        val tmstSourceName = TmstCache.tmstName(sourceName, tmst)
         val filterStep = SparkSqlStep(
-          filteredSourceName,
+          tmstSourceName,
           filterSql,
           Map[String, Any](),
           NonePersistType,
@@ -338,14 +339,15 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         )
 
         // 2. select statement
-        val partFromClause = FromClause(filteredSourceName).desc
+        val partFromClause = FromClause(tmstSourceName).desc
         val profilingSql = {
           s"SELECT ${selClause} ${partFromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
         }
         println(profilingSql)
-        val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
+        val metricName = resultName(details, ProfilingInfo._Profiling)
+        val tmstMetricName = TmstCache.tmstName(metricName, tmst)
         val profilingStep = SparkSqlStep(
-          profilingMetricName,
+          tmstMetricName,
           profilingSql,
           details,
           resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType),
@@ -371,8 +373,6 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 //      profilingStep :: Nil
     }
   }
-
-  private def dsTmstName(dsName: String, tmst: Long) = s"${dsName}_${tmst}"
 
   private def transConcreteRuleStep(ruleStep: GriffinDslStep, expr: Expr, dsTmsts: Map[String, Set[Long]]
                                    ): Seq[ConcreteRuleStep] = {

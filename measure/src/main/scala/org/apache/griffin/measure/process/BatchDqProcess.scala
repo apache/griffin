@@ -65,11 +65,13 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 
   def run: Try[_] = Try {
     // start time
-    val startTime = getStartTime
+    val startTime = new Date().getTime
+
+    val appTime = getAppTime
 
     // get persists to persist measure result
     val persistFactory = PersistFactory(envParam.persistParams, metricName)
-    val persist: Persist = persistFactory.getPersists(startTime)
+    val persist: Persist = persistFactory.getPersists(appTime)
 
     // persist start id
     val applicationId = sparkContext.applicationId

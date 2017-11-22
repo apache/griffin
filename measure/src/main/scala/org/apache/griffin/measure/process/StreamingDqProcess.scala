@@ -82,11 +82,11 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     })
 
     // start time
-    val startTime = getStartTime
+    val appTime = getAppTime
 
     // get persists to persist measure result
     val persistFactory = PersistFactory(envParam.persistParams, metricName)
-    val persist: Persist = persistFactory.getPersists(startTime)
+    val persist: Persist = persistFactory.getPersists(appTime)
 
     // persist start id
     val applicationId = sparkContext.applicationId
