@@ -29,6 +29,7 @@ import org.apache.griffin.measure.rule.dsl.{DslType, PersistType}
 
 trait RuleAdaptor extends Loggable with Serializable {
 
+  val timeStamp: Long
   val adaptPhase: AdaptPhase
 
   val _name = "name"

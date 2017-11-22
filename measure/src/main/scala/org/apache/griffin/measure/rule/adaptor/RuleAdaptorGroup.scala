@@ -52,13 +52,13 @@ object RuleAdaptorGroup {
     }
   }
 
-  private def genRuleAdaptor(dslType: DslType, dsNames: Seq[String],
+  private def genRuleAdaptor(timeStamp: Long, dslType: DslType, dsNames: Seq[String],
                              procType: ProcessType, adaptPhase: AdaptPhase
                             ): Option[RuleAdaptor] = {
     dslType match {
-      case SparkSqlType => Some(SparkSqlAdaptor(adaptPhase))
-      case DfOprType => Some(DataFrameOprAdaptor(adaptPhase))
-      case GriffinDslType => Some(GriffinDslAdaptor(dsNames, functionNames, procType, adaptPhase))
+      case SparkSqlType => Some(SparkSqlAdaptor(timeStamp, adaptPhase))
+      case DfOprType => Some(DataFrameOprAdaptor(timeStamp, adaptPhase))
+      case GriffinDslType => Some(GriffinDslAdaptor(timeStamp, dsNames, functionNames, procType, adaptPhase))
       case _ => None
     }
   }
@@ -79,22 +79,24 @@ object RuleAdaptorGroup {
 //    steps
 //  }
 
-  def genConcreteRuleSteps(evaluateRuleParam: EvaluateRuleParam, dsTmsts: Map[String, Set[Long]],
-                           procType: ProcessType, adaptPhase: AdaptPhase
+  def genConcreteRuleSteps(timeStamp: Long, evaluateRuleParam: EvaluateRuleParam,
+                           dsTmsts: Map[String, Set[Long]], procType: ProcessType,
+                           adaptPhase: AdaptPhase
                           ): Seq[ConcreteRuleStep] = {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
-    genConcreteRuleSteps(ruleParams, dsTmsts, defaultDslType, procType, adaptPhase)
+    genConcreteRuleSteps(timeStamp, ruleParams, dsTmsts, defaultDslType, procType, adaptPhase)
   }
 
-  def genConcreteRuleSteps(ruleParams: Seq[Map[String, Any]], dsTmsts: Map[String, Set[Long]],
-                           defDslType: DslType, procType: ProcessType, adaptPhase: AdaptPhase
+  def genConcreteRuleSteps(timeStamp: Long, ruleParams: Seq[Map[String, Any]],
+                           dsTmsts: Map[String, Set[Long]], defDslType: DslType,
+                           procType: ProcessType, adaptPhase: AdaptPhase
                           ): Seq[ConcreteRuleStep] = {
     val (steps, dsNames) = ruleParams.foldLeft((Seq[ConcreteRuleStep](), dataSourceNames)) { (res, param) =>
       val (preSteps, preNames) = res
       val dslType = getDslType(param, defDslType)
-      val (curSteps, curNames) = genRuleAdaptor(dslType, preNames, procType, adaptPhase) match {
+      val (curSteps, curNames) = genRuleAdaptor(timeStamp, dslType, preNames, procType, adaptPhase) match {
         case Some(ruleAdaptor) => (ruleAdaptor.genConcreteRuleStep(param, dsTmsts),
           preNames ++ ruleAdaptor.getTempSourceNames(param))
         case _ => (Nil, preNames)

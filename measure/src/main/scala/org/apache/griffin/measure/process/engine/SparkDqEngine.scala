@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.process.engine
 
-import org.apache.griffin.measure.cache.tmst.TmstCache
+import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.rule.dsl.{MetricPersistType, RecordPersistType}
@@ -41,7 +41,7 @@ trait SparkDqEngine extends DqEngine {
             val pdf = sqlContext.table(s"`${name}`")
             val records: Array[String] = pdf.toJSON.collect()
 
-            val (metricName, tmstOpt) = TmstCache.extractTmstName(name)
+            val (metricName, tmstOpt) = TempName.extractTmstName(name)
 
             val pairs = records.flatMap { rec =>
               try {

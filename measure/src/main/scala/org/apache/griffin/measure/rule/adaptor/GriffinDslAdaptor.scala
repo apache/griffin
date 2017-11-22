@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
-import org.apache.griffin.measure.cache.tmst.TmstCache
+import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
 import org.apache.griffin.measure.rule.dsl._
@@ -28,7 +28,8 @@ import org.apache.griffin.measure.rule.dsl.parser.GriffinDslParser
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.ParamUtil._
 
-case class GriffinDslAdaptor(dataSourceNames: Seq[String],
+case class GriffinDslAdaptor(timeStamp: Long,
+                             dataSourceNames: Seq[String],
                              functionNames: Seq[String],
                              procType: ProcessType,
                              adaptPhase: AdaptPhase
@@ -329,7 +330,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           s"SELECT * ${fromClause} WHERE `${GroupByColumn.tmst}` = ${tmst}"
         }
         println(filterSql)
-        val tmstSourceName = TmstCache.tmstName(sourceName, tmst)
+        val tmstSourceName = TempName.tmstName(sourceName, tmst, timeStamp)
         val filterStep = SparkSqlStep(
           tmstSourceName,
           filterSql,
@@ -345,7 +346,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         }
         println(profilingSql)
         val metricName = resultName(details, ProfilingInfo._Profiling)
-        val tmstMetricName = TmstCache.tmstName(metricName, tmst)
+        val tmstMetricName = TempName.tmstName(metricName, tmst, timeStamp)
         val profilingStep = SparkSqlStep(
           tmstMetricName,
           profilingSql,
@@ -356,21 +357,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 
         filterStep :: profilingStep :: Nil
       }.reduce(_ ::: _)
-
-//      // 1. select statement
-//      val profilingSql = {
-//        s"SELECT ${selClause} ${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
-//      }
-//      val profilingMetricName = resultName(details, ProfilingInfo._Profiling)
-//      val profilingStep = SparkSqlStep(
-//        profilingMetricName,
-//        profilingSql,
-//        details,
-//        resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType),
-//        None
-//      )
-//
-//      profilingStep :: Nil
+      
     }
   }
 

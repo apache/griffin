@@ -21,7 +21,7 @@ package org.apache.griffin.measure.rule.adaptor
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.rule.step._
 
-case class SparkSqlAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
+case class SparkSqlAdaptor(timeStamp: Long, adaptPhase: AdaptPhase) extends RuleAdaptor {
 
   def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
     SparkSqlStep(getName(param), getRule(param), getDetails(param),

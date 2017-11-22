@@ -71,7 +71,7 @@ trait DataConnector extends Loggable with Serializable {
 
         // generate rule steps
         val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
-          preProcRules, dsTmsts, DslType("spark-sql"), BatchProcessType, PreProcPhase)
+          ms, preProcRules, dsTmsts, DslType("spark-sql"), BatchProcessType, PreProcPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
