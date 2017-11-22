@@ -38,10 +38,10 @@ public abstract class AbstractAuditableEntity implements Serializable {
     private Long id;
 
     @JsonIgnore
-    Timestamp createdDate = new Timestamp(System.currentTimeMillis());
+    private Timestamp createdDate = new Timestamp(System.currentTimeMillis());
 
     @JsonIgnore
-    Timestamp modifiedDate;
+    private Timestamp modifiedDate;
 
     public Long getId() {
         return id;
