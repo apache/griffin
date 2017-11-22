@@ -52,60 +52,34 @@ export class DetailMetricComponent implements OnInit {
   finalData:any;
 
   ngOnInit() {
-  	console.log('init');
   	this.currentMeasure = this.route.snapshot.paramMap.get('name');
-    // this.finalData = this.getData(this.currentMeasure);
     var self = this;
-      // let url_dashboard = this.serviceService.config.uri.dashboard;
     var metricDetailUrl = this.serviceService.config.uri.dashboard;
-      // let data = this.metricData;
-      this.http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": this.currentMeasure }}]}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).subscribe( data=> {
-    var metric = {
-           'name':'',
-           'timestamp':0,
-           'dq':0,
-           'details':[]
-         };
-    this.data = data;
-    console.log(this.data);
-    // this.data = this.allData;
-    metric.name = this.data.hits.hits[0]._source.name;
-    metric.timestamp =this.data.hits.hits[this.data.hits.hits.length-1]._source.tmst;
-    metric.dq = this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched/this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched*100;
-    metric.details = new Array();
-    for(let point of this.data.hits.hits){
-         metric.details.push(point);
-    };
-    this.chartOption = this.chartService.getOptionBig(metric);
-    $('#bigChartDiv').height(window.innerHeight-120+'px');
-    $('#bigChartDiv').width(window.innerWidth-400+'px');
-    $('#bigChartContainer').show();
-         // return metric;
-      });
-    // setTimeout(function function_name(argument) {
-    //   // body...
-    
-    // })
-    
-  }
-  ngAfterContentInit (){
-    console.log('after content init');
-  }
-
-  ngAfterContentChecked(){
-    console.log('after content checked');
-  }
-
-  ngOnDestroy(){
-  	console.log('destroy');
-  }
-
-  ngAfterViewInit(){
-  	console.log('after view init')
-  }
-
-  ngAfterViewChecked(){
-    console.log('after view checked');
+    this.http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": this.currentMeasure }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":10000}).subscribe( data=> {
+      var metric = {
+        'name':'',
+        'timestamp':0,
+        'dq':0,
+        'details':[]
+      };
+      this.data = data;
+      if(this.data){
+        metric.name = this.data.hits.hits[0]._source.name;
+        metric.timestamp =this.data.hits.hits[this.data.hits.hits.length-1]._source.tmst;
+        metric.dq = this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched/this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched*100;
+        metric.details = new Array();
+        for(let point of this.data.hits.hits){
+          metric.details.push(point);
+        };
+      }
+      this.chartOption = this.chartService.getOptionBig(metric);
+      $('#bigChartDiv').height(window.innerHeight-120+'px');
+      $('#bigChartDiv').width(window.innerWidth-400+'px');
+      $('#bigChartContainer').show();
+    },
+    err => {
+      console.log('Error occurs when connect to elasticsearh!');
+    });  
   }
 
   onResize(event){

@@ -25,7 +25,7 @@ under the License.
 	            <label>Organization: </label>
 	            <select ng-disabled="orgSelectDisabled" class="form-control"  (change)="changeOrg()" id="orgSelector" [(ngModel)]="selectedOrgIndex">
                    <option value="0">-- All --</option>
-                   <option *ngFor="let opt of originalOrgs;let m = index" value="{{m+1}}"  >{{opt.name}}</option>
+                   <option *ngFor="let opt of orgs;let m = index" value="{{m+1}}"  >{{opt.name}}</option>
 	            </select>
 	      	</span>
 				<span style="padding-left:30px;">
@@ -37,7 +37,7 @@ under the License.
 	      	</span>
 			</div>
 		</div>
-		<div *ngFor="let outerItems of finalData;let parent=index">
+		<div *ngFor="let outerItems of oData;let parent=index">
 			<div class="row" >
 				<div class="col-sm-12 col-md-12 col-lg-12">
 					<h4>{{outerItems.name}}</h4>

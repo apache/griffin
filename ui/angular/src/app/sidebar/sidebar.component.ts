@@ -40,7 +40,8 @@ export class SidebarComponent implements OnInit {
     public serviceService:ServiceService,
   	public chartService:ChartService) {
   }
-
+  
+  oData = [];
   orgs = [];
   finalData = [];
   originalOrgs = [];
@@ -70,7 +71,7 @@ export class SidebarComponent implements OnInit {
   }
   
   onResize(event){
-    console.log('sidebar resize');
+    // console.log('sidebar resize');
     if(window.innerWidth < 992) {
       $('#rightbar').css('display', 'none');
     } else {
@@ -83,36 +84,38 @@ export class SidebarComponent implements OnInit {
     $('#side-bar-metrics').css({
            height: $('#mainContent').height()-$('#side-bar-stats').outerHeight()+70
     });
-    for(let i=0;i<this.finalData.length;i++){
-      for(let j=0;j<this.finalData[i].metrics.length;j++){
-        if (!this.finalData[i].metrics[j].tag) {
-          this.draw(this.finalData[i].metrics[j], i, j);
+    for(let i=0;i<this.oData.length;i++){
+      for(let j=0;j<this.oData[i].metrics.length;j++){
+        if (!this.oData[i].metrics[j].tag) {
+          this.draw(this.oData[i].metrics[j], i, j);
         }
       }
     }
   }
 
-   draw (metric, parentIndex, index) {
-   		$('#'+this.finalData[parentIndex].name+index).toggleClass('collapse');
-       var chartId = 'chart' + parentIndex + '-' + index;
-       document.getElementById(chartId).style.width = ($('.panel-heading').innerWidth()-40)+'px';
-       document.getElementById(chartId).style.height = '200px';
-       this.chartOption.set(chartId,this.chartService.getOptionSide(metric));
-       var self = this;
-       $('#'+chartId).unbind('click');
-       $('#'+chartId).click(function(e) {
-         self.router.navigate(['/detailed/'+self.finalData[parentIndex].metrics[index].name]) ;
-       });
-   };
+  draw (metric, parentIndex, index) {
+    $('#side'+parentIndex+index).toggleClass('collapse');
+    var chartId = 'chart' + parentIndex + '-' + index;
+    document.getElementById(chartId).style.width = ($('.panel-heading').innerWidth()-40)+'px';
+    document.getElementById(chartId).style.height = '200px';
+    this.chartOption.set(chartId,this.chartService.getOptionSide(metric));
+    var self = this;
+    $('#'+chartId).unbind('click');
+    $('#'+chartId).click(function(e) {
+      self.router.navigate(['/detailed/'+self.oData[parentIndex].metrics[index].name]) ;
+    });
+  };
 
-   getOption(parent,i){
+  getOption(parent,i){
    	return this.chartOption.get('chart'+parent+'-'+i);
-   }
+  }
 
-    sideBarList(sysName){
+  sideBarList(sysName){
     	// this.finalData = this.getMetricService.renderData();
       var url_organization = this.serviceService.config.uri.organization;
+      let url_dashboard = this.serviceService.config.uri.dashboard;
       this.http.get(url_organization).subscribe(data => {
+      var jobMap = new Map();
       this.orgWithMeasure = data;
       var orgNode = null;
       for(let orgName in this.orgWithMeasure){
@@ -120,76 +123,62 @@ export class SidebarComponent implements OnInit {
         orgNode.name = orgName;
         orgNode.jobMap = [];
         orgNode.measureMap = [];
+        var node = null;
+        node = new Object();
+        node.name = orgName;
+        node.dq = 0;
+        //node.metrics = new Array();
+        var metricNode = {
+          'name':'',
+          'timestamp':'',
+          'dq':0,
+          'details':[]
+        }
+        var array = [];
+        node.metrics = array;
         for(let key in this.orgWithMeasure[orgName]){
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
-          // console.log(this.measureOptions);
-          if(this.orgWithMeasure[orgName][key]!=null){
-            for(let i = 0;i < this.orgWithMeasure[orgName][key].length;i++){
-            orgNode.jobMap.push(this.orgWithMeasure[orgName][key][i].jobName);
-          }
-          }
-        }
-        this.orgs.push(orgNode);
+          var jobs = this.orgWithMeasure[orgName][key];          
+            for(let i = 0;i < jobs.length;i++){
+               orgNode.jobMap.push(jobs[i].jobName);
+               var job = jobs[i].jobName;
+               jobMap.set(job, orgNode.name);
+               this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( jobes=> { 
+                 this.originalData = jobes;
+                 if(this.originalData.hits){
+                   this.metricData = this.originalData.hits.hits;
+                   metricNode.details = this.metricData;                                
+                   metricNode.name = this.metricData[0]._source.name;
+                   metricNode.timestamp = this.metricData[0]._source.tmst;
+                   metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
+                   this.pushToNode(jobMap, metricNode);
+                 }
+               },
+               err => {
+                 // console.log(err);
+               console.log('Error occurs when connect to elasticsearh!');
+               });            
+            }                          
+        } 
+        this.finalData.push(node); 
+        this.orgs.push(orgNode);                 
       }
-      this.originalOrgs = this.orgs;
-      // console.log(this.originalOrgs);
-      let url_dashboard = this.serviceService.config.uri.dashboard;
-      this.http.post(url_dashboard, {"query": {"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}],"size":1000}).subscribe(data => {
-            this.originalData = data;
-            this.myData = JSON.parse(JSON.stringify(this.originalData.hits.hits));
-            // this.myData = this.allData.hits.hits;
-            this.metricName = [];
-            // for(var i = 0;i<this.myData.length;i++){
-            //     this.metricName.push(this.myData[i]._source.name);
-            // }
-            for(var i = 0;i<this.myData.length;i++){
-                this.metricName.push(this.myData[i]._source.name);
-            }
-            this.metricNameUnique = [];
-            for(let name of this.metricName){
-                if(this.metricNameUnique.indexOf(name) === -1){
-                    this.metricData[this.metricNameUnique.length] = new Array();
-                    this.metricNameUnique.push(name);
-                }
-            };
-            for(var i = 0;i<this.myData.length;i++){
-                for(var j = 0 ;j<this.metricNameUnique.length;j++){
-                    if(this.myData[i]._source.name==this.metricNameUnique[j]){
-                        this.metricData[j].push(this.myData[i]);
-                    }
-                }
-            }
-            for(let sys of this.originalOrgs){
-                var node = null;
-                node = new Object();
-                node.name = sys.name;
-                node.dq = 0;
-                node.metrics = new Array();
-                for (let metric of this.metricData){
-                    if(sys.jobMap.indexOf(metric[metric.length-1]._source.name)!= -1){
-                        var metricNode = {
-                            'name':'',
-                            'timestamp':'',
-                            'dq':0,
-                            'details':[]
-                        }
-                        metricNode.name = metric[metric.length-1]._source.name;
-                        metricNode.timestamp = metric[metric.length-1]._source.tmst;
-                        metricNode.dq = metric[metric.length-1]._source.value.matched/metric[metric.length-1]._source.value.total*100;
-                        metricNode.details = metric;
-                        node.metrics.push(metricNode);
-                    }
-                }
-                this.finalData.push(node);
-            }
-            this.originalData = JSON.parse(JSON.stringify(this.finalData));
-            // console.log(this.finalData);
-            // return JSON.parse(JSON.stringify(this.finalData));
-            return this.finalData;
-      });
+      this.oData = this.finalData.slice(0);
     });
+  }
+  
+  pushToNode(jobMap, metricNode){
+    var jobName = metricNode.name;
+    var orgName = jobMap.get(jobName);
+    var org = null;
+    for(var i = 0; i < this.finalData.length; i ++){
+      org = this.finalData[i];
+      if(orgName == org.name){
+        org.metrics.push(Object.assign({}, metricNode));
+      }
     }
+  }  
 
   ngOnInit() {
   	this.sideBarList(null);

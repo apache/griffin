@@ -232,6 +232,7 @@ public class SparkSubmitJob implements Job {
 
         List<String> args = new ArrayList<>();
         args.add(sparkJobProps.getProperty("sparkJob.args_1"));
+        measure.setTriggerTimeStamp(System.currentTimeMillis());
         String measureJson = JsonUtil.toJsonWithFormat(measure);
         // to fix livy bug: ` will be ignored by livy
         String finalMeasureJson = escapeCharacter(measureJson, "\\`");

@@ -19,17 +19,12 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.JsonObject;
 import org.apache.griffin.core.util.JsonUtil;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
-import java.io.IOException;
-import java.util.Map;
 
 
 @Entity
@@ -45,6 +40,7 @@ public class Rule extends AbstractAuditableEntity {
     @Column(length = 1024)
     private String rule;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String details;
 
 
@@ -87,9 +83,10 @@ public class Rule extends AbstractAuditableEntity {
     public Rule() {
     }
 
-    public Rule(String dslType, String dqType, String rule) {
+    public Rule(String dslType, String dqType, String rule, String details) {
         this.dslType = dslType;
         this.dqType = dqType;
         this.rule = rule;
+        this.details = details;
     }
 }
