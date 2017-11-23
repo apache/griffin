@@ -19,22 +19,40 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.util.JsonUtil;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
+import java.io.IOException;
+import java.util.Map;
 
 
 @Entity
 public class Rule extends AbstractAuditableEntity {
 
-    /**three type:1.griffin-dsl 2.df-opr 3.spark-sql**/
+    /**
+     * three type:1.griffin-dsl 2.df-opr 3.spark-sql
+     */
     private String dslType;
 
     private String dqType;
 
     @Column(length = 1024)
     private String rule;
+
+    @JsonIgnore
+    private String details;
+
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, Object> detailsMap;
+
 
     @JsonProperty("dsl.type")
     public String getDslType() {
@@ -64,12 +82,35 @@ public class Rule extends AbstractAuditableEntity {
         this.rule = rule;
     }
 
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    @JsonProperty("details")
+    public Map<String, Object> getDetailsMap() throws IOException {
+        if (detailsMap == null && !StringUtils.isEmpty(details)) {
+            detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {});
+        }
+        return detailsMap;
+    }
+
+    @JsonProperty("details")
+    public void setDetailsMap(Map<String, Object> details) throws IOException {
+        this.detailsMap = details;
+        this.details = JsonUtil.toJson(details);
+    }
+
     public Rule() {
     }
 
-    public Rule(String dslType, String dqType, String rule) {
+    public Rule(String dslType, String dqType, String rule, Map<String, Object> details) throws IOException {
         this.dslType = dslType;
         this.dqType = dqType;
         this.rule = rule;
+        setDetailsMap(details);
     }
 }

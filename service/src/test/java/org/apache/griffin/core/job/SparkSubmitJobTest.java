@@ -46,51 +46,51 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 
-@RunWith(SpringRunner.class)
-public class SparkSubmitJobTest {
+//@RunWith(SpringRunner.class)
+//public class SparkSubmitJobTest {
 
-    @TestConfiguration
-    public static class SchedulerServiceConfiguration {
-        @Bean
-        public SparkSubmitJob sparkSubmitJobBean() {
-            return new SparkSubmitJob();
-        }
+//    @TestConfiguration
+//    public static class SchedulerServiceConfiguration {
+//        @Bean
+//        public SparkSubmitJob sparkSubmitJobBean() {
+//            return new SparkSubmitJob();
+//        }
+//
+//        @Bean
+//        public Properties sparkJobProps() {
+//            return PropertiesUtil.getProperties("/sparkJob.properties");
+//        }
+//
+//    }
+//
+//    @Autowired
+//    private SparkSubmitJob sparkSubmitJob;
+//
+//    @MockBean
+//    private MeasureRepo measureRepo;
+//
+//    @MockBean
+//    private RestTemplate restTemplate;
+//
+//    @MockBean
+//    private JobInstanceRepo jobInstanceRepo;
+//
+//    @Before
+//    public void setUp() {
+//    }
+//
+//    @Test
+//    public void testExecute() throws Exception {
+//        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+//        JobExecutionContext context = mock(JobExecutionContext.class);
+//        JobDetail jd = createJobDetail();
+//        given(context.getJobDetail()).willReturn(jd);
+//        given(measureRepo.findOne(Long.valueOf(jd.getJobDataMap().getString("measureId")))).willReturn(createATestMeasure("view_item_hourly", "ebay"));
+//        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
+//        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(), Matchers.any())).willReturn(result);
+//        given(jobInstanceRepo.save(new JobInstance())).willReturn(new JobInstance());
+//        sparkSubmitJob.execute(context);
+//        assertTrue(true);
+//    }
 
-        @Bean
-        public Properties sparkJobProps() {
-            return PropertiesUtil.getProperties("/sparkJob.properties");
-        }
-
-    }
-
-    @Autowired
-    private SparkSubmitJob sparkSubmitJob;
-
-    @MockBean
-    private MeasureRepo measureRepo;
-
-    @MockBean
-    private RestTemplate restTemplate;
-
-    @MockBean
-    private JobInstanceRepo jobInstanceRepo;
-
-    @Before
-    public void setUp() {
-    }
-
-    @Test
-    public void testExecute() throws Exception {
-        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
-        JobExecutionContext context = mock(JobExecutionContext.class);
-        JobDetail jd = createJobDetail();
-        given(context.getJobDetail()).willReturn(jd);
-        given(measureRepo.findOne(Long.valueOf(jd.getJobDataMap().getString("measureId")))).willReturn(createATestMeasure("view_item_hourly", "ebay"));
-        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
-        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(), Matchers.any())).willReturn(result);
-        given(jobInstanceRepo.save(new JobInstance())).willReturn(new JobInstance());
-        sparkSubmitJob.execute(context);
-        assertTrue(true);
-    }
-
-}
+//}

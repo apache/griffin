@@ -40,8 +40,8 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
-import java.util.regex.*;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
@@ -52,6 +52,12 @@ import static org.quartz.TriggerKey.triggerKey;
 @DisallowConcurrentExecution
 public class PredictJob implements Job {
     private static final Logger LOGGER = LoggerFactory.getLogger(PredictJob.class);
+    public static final String MEASURE_KEY = "measure";
+    public static final String PREDICTS_KEY = "predicts";
+    public static final String JOB_NAME_KEY = "jobName";
+    public static final String GROUP_NAME_KEY = "groupName";
+    public static final String DELETED_KEY = "deleted";
+    public static final String PATH_CONNECTOR_CHARACTER = ",";
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -118,7 +124,7 @@ public class PredictJob implements Job {
         for (JobDataSegment dataSegment : segments) {
             String connectorIndex = dataSegment.getDataConnectorIndex();
             if (connectorIndex == null || !connectorIndex.matches("(source|target)\\[\\d+]")) {
-                    throw new IllegalArgumentException("Data segments connector index format error.");
+                throw new IllegalArgumentException("Data segments connector index format error.");
             }
             for (DataSource source : sources) {
                 setDataSourcePartitions(dataSegment, source);
@@ -126,12 +132,12 @@ public class PredictJob implements Job {
         }
     }
 
-    private int getIndex(String connectorIndex){
+    private int getIndex(String connectorIndex) {
         Pattern pattern = Pattern.compile("\\[.*]");
         Matcher matcher = pattern.matcher(connectorIndex);
         int index = 0;
         while (matcher.find()) {
-            String group =matcher.group();
+            String group = matcher.group();
             group = group.replace("[", "").replace("]", "");
             index = Integer.parseInt(group);
         }
@@ -166,9 +172,7 @@ public class PredictJob implements Job {
     private String getMeasureConnectorIndex(DataSource source, int index) {
         StringBuilder sb = new StringBuilder();
         sb.append(source.getName());
-        sb.append("[");
-        sb.append(index);
-        sb.append("]");
+        sb.append("[").append(index).append("]");
         return sb.toString();
     }
 
@@ -207,11 +211,13 @@ public class PredictJob implements Job {
      */
     private void setSegmentPredictsConf(JobDataSegment segment, Long[] sampleTimestamps) throws IOException {
         List<SegmentPredict> predicts = segment.getPredicts();
-        for (SegmentPredict predict : predicts) {
-            genConfMap(predict.getConfigMap(), sampleTimestamps);
-            //Do not forget to update origin string config
-            predict.setConfig(predict.getConfigMap());
-            mPredicts.add(predict);
+        if (predicts != null) {
+            for (SegmentPredict predict : predicts) {
+                genConfMap(predict.getConfigMap(), sampleTimestamps);
+                //Do not forget to update origin string config
+                predict.setConfig(predict.getConfigMap());
+                mPredicts.add(predict);
+            }
         }
     }
 
@@ -247,7 +253,8 @@ public class PredictJob implements Job {
     /**
      * @param conf             map with file predict,data split and partitions info
      * @param sampleTimestamps collection of data split start timestamp
-     * @return all config data combine,like {"partitions": "year=2017, month=11, dt=15, hour=09;year=2017, month=11, dt=15, hour=10"}
+     * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
+     *          or like
      */
     private Map<String, String> genConfMap(Map<String, String> conf, Long[] sampleTimestamps) {
         for (Map.Entry<String, String> entry : conf.entrySet()) {
@@ -272,7 +279,7 @@ public class PredictJob implements Job {
             if (!it.hasNext()) {
                 return sb.toString();
             }
-            sb.append(",");
+            sb.append(PATH_CONNECTOR_CHARACTER);
         }
 
     }
@@ -345,11 +352,11 @@ public class PredictJob implements Job {
     }
 
     private void setJobDataMap(JobDetail jobDetail, JobExecutionContext context) throws JsonProcessingException {
-        jobDetail.getJobDataMap().put("measure", JsonUtil.toJson(measure));
-        jobDetail.getJobDataMap().put("predicts", JsonUtil.toJson(mPredicts));
-        jobDetail.getJobDataMap().put("jobName", context.getJobDetail().getKey().getName());
-        jobDetail.getJobDataMap().put("groupName", context.getJobDetail().getKey().getGroup());
-        jobDetail.getJobDataMap().putAsString("deleted", false);
+        jobDetail.getJobDataMap().put(MEASURE_KEY, JsonUtil.toJson(measure));
+        jobDetail.getJobDataMap().put(PREDICTS_KEY, JsonUtil.toJson(mPredicts));
+        jobDetail.getJobDataMap().put(JOB_NAME_KEY, context.getJobDetail().getKey().getName());
+        jobDetail.getJobDataMap().put(GROUP_NAME_KEY, context.getJobDetail().getKey().getGroup());
+        jobDetail.getJobDataMap().putAsString(DELETED_KEY, false);
     }
 
 }

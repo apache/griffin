@@ -22,6 +22,8 @@ package org.apache.griffin.core.job.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.util.JsonUtil;
 
@@ -66,13 +68,13 @@ public class JobDataSegment extends AbstractAuditableEntity {
     }
 
     public void setConfig(Map<String, String> configMap) throws JsonProcessingException {
-        this.setConfigMap(configMap);
+        this.configMap = configMap;
         this.config = JsonUtil.toJson(configMap);
     }
 
     public Map<String, String> getConfigMap() throws IOException {
-        if(configMap == null){
-            configMap = JsonUtil.toEntity(config, Map.class);
+        if(configMap == null && !StringUtils.isEmpty(config)){
+            configMap = JsonUtil.toEntity(config, new TypeReference<Map<String,String>>(){});
         }
         return configMap;
     }

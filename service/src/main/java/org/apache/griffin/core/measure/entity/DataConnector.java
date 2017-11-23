@@ -22,6 +22,7 @@ package org.apache.griffin.core.measure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +49,8 @@ public class DataConnector extends AbstractAuditableEntity {
     private Map<String, String> configMap;
 
     public Map<String, String> getConfigMap() throws IOException {
-        if(configMap == null){
-            configMap = JsonUtil.toEntity(config, Map.class);
+        if(configMap == null && !StringUtils.isEmpty(config)){
+            configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {});
         }
         return configMap;
     }

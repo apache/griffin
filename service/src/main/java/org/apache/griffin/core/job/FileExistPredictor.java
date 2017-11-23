@@ -25,7 +25,12 @@ import org.apache.griffin.core.util.FSUtil;
 import java.io.IOException;
 import java.util.Map;
 
+import static org.apache.griffin.core.job.PredictJob.PATH_CONNECTOR_CHARACTER;
+
 public class FileExistPredictor implements Predictor {
+
+    public static final String PREDICT_PATH = "path";
+    public static final String PREDICT_ROOT_PATH = "root.path";
 
     private SegmentPredict predict;
 
@@ -36,15 +41,15 @@ public class FileExistPredictor implements Predictor {
     @Override
     public boolean predict() throws IOException {
         Map<String, String> config = predict.getConfigMap();
-        String[] paths = config.get("path").split(";");
-        String rootPath = config.get("root.path");
+        String[] paths = null;
+        if (config.get(PREDICT_PATH) != null) {
+            paths = config.get(PREDICT_PATH).split(PATH_CONNECTOR_CHARACTER);
+        }
+        String rootPath = config.get(PREDICT_ROOT_PATH);
         if (paths == null || rootPath == null) {
             throw new NullPointerException("Predicts path null.Please check predicts config root.path and path.");
         }
         for (String path : paths) {
-//            if (!FSUtil1.isFileExist("hdfs://10.149.247.250:9000/yao/_success")) {
-//                return false;
-//            }
             if (!FSUtil.isFileExist(rootPath + path)) {
                 return false;
             }

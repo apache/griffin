@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstance;
 import org.apache.griffin.core.job.entity.LivySessionStates;
@@ -37,6 +38,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.*;
+
+import static org.apache.griffin.core.job.PredictJob.*;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
@@ -69,10 +72,10 @@ public class SparkSubmitJob implements Job {
             if (predict(mPredicts)) {
                 result = restTemplate.postForObject(livyUri, sparkJobDO, String.class);
                 LOGGER.info(result);
-//                result = "{\"id\":1,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
                 JobDataMap jobDataMap = jobDetail.getJobDataMap();
-                saveJobInstance(jobDataMap.getString("groupName"), jobDataMap.getString("jobName"), result);
+                saveJobInstance(jobDataMap.getString(GROUP_NAME_KEY), jobDataMap.getString(JOB_NAME_KEY), result);
                 jobService.deleteJob(jobDetail.getKey().getGroup(), jobDetail.getKey().getName());
+
             }
         } catch (Exception e) {
             LOGGER.error("Post spark task error.", e);
@@ -80,8 +83,8 @@ public class SparkSubmitJob implements Job {
     }
 
     private boolean predict(List<SegmentPredict> predicts) throws IOException {
-        if (mPredicts == null || mPredicts.size() == 0) {
-            return false;
+        if (predicts == null) {
+            return true;
         }
         for (SegmentPredict segmentPredict : predicts) {
             Predictor predict = PredictorFactory.newPredictInstance(segmentPredict);
@@ -96,8 +99,8 @@ public class SparkSubmitJob implements Job {
     private void initParam(JobDetail jd) throws IOException {
         mPredicts = new ArrayList<>();
         livyUri = sparkJobProps.getProperty("livy.uri");
-        measure = JsonUtil.toEntity(jd.getJobDataMap().getString("measure"), Measure.class);
-        initPredicts(jd.getJobDataMap().getString("predicts"));
+        measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), Measure.class);
+        initPredicts(jd.getJobDataMap().getString(PREDICTS_KEY));
         setMeasureInstanceName(measure, jd);
 
     }
@@ -161,8 +164,10 @@ public class SparkSubmitJob implements Job {
     }
 
     private void saveJobInstance(String groupName, String jobName, String result) {
+        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
+        };
         try {
-            Map resultMap = JsonUtil.toEntity(result, Map.class);
+            Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
             if (resultMap != null) {
                 JobInstance jobInstance = genJobInstance(groupName, jobName, resultMap);
                 jobInstanceRepo.save(jobInstance);
@@ -179,7 +184,7 @@ public class SparkSubmitJob implements Job {
         jobInstance.setGroupName(groupName);
         jobInstance.setJobName(jobName);
         jobInstance.setTimestamp(System.currentTimeMillis());
-        if(resultMap.get("state")!=null){
+        if (resultMap.get("state") != null) {
             jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
         }
         if (resultMap.get("id") != null) {

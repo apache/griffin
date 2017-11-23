@@ -73,21 +73,16 @@ public class FSUtil {
 
     /**
      * list all sub dir of a dir
-     *
-     * @param dir
-     * @return
-     * @throws IOException
      */
     public static List<String> listSubDir(String dir) throws IOException {
         if (fileSystem == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
+        List<String> fileList = new ArrayList<>();
         Path path = new Path(dir);
         if (fileSystem.isFile(path)) {
-            return new ArrayList<>();
+            return fileList;
         }
-
-        List<String> fileList = new ArrayList<String>();
         FileStatus[] statuses = fileSystem.listStatus(path);
         for (FileStatus fileStatus : statuses) {
             if (fileStatus.isDirectory()) {
@@ -100,20 +95,16 @@ public class FSUtil {
 
     /**
      * get all file status of a dir.
-     *
-     * @param dir
-     * @return
-     * @throws IOException
      */
     public static List<FileStatus> listFileStatus(String dir) throws IOException {
         if (fileSystem == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
+        List<FileStatus> fileStatusList = new ArrayList<>();
         Path path = new Path(dir);
         if (fileSystem.isFile(path)) {
-            return null;
+            return fileStatusList;
         }
-        List<FileStatus> fileStatusList = new ArrayList<FileStatus>();
         FileStatus[] statuses = fileSystem.listStatus(path);
         for (FileStatus fileStatus : statuses) {
             if (!fileStatus.isDirectory()) {
@@ -125,9 +116,6 @@ public class FSUtil {
 
     /**
      * touch file
-     *
-     * @param filePath
-     * @throws IOException
      */
     public static void touch(String filePath) throws IOException {
         if (fileSystem == null) {
@@ -161,10 +149,7 @@ public class FSUtil {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
         Path hdfsPath = new Path(path);
-        if (fileSystem.isFile(hdfsPath) || fileSystem.isDirectory(hdfsPath)) {
-            return true;
-        }
-        return false;
+        return fileSystem.isFile(hdfsPath) || fileSystem.isDirectory(hdfsPath);
     }
 
 }

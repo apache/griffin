@@ -26,10 +26,8 @@ import org.quartz.JobDataMap;
 import org.quartz.Trigger;
 import org.quartz.impl.JobDetailImpl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.io.Serializable;
+import java.util.*;
 
 public class MeasureTestHelper {
     public static Measure createATestMeasure(String name, String org) throws Exception{
@@ -49,7 +47,9 @@ public class MeasureTestHelper {
         dataSources.add(dataSource);
         dataSources.add(targetSource);
         String rules = "source.id=target.id AND source.name=target.name AND source.age=target.age";
-        Rule rule = new Rule("griffin-dsl", "accuracy", rules);
+        Map<String, Object> map = new HashMap<>();
+        map.put("detail", "detail info");
+        Rule rule = new Rule("griffin-dsl", "accuracy", rules,map);
         EvaluateRule evaluateRule = new EvaluateRule(Arrays.asList(rule));
         return new Measure(name, "description", org, "batch", "test", dataSources, evaluateRule);
     }
@@ -70,5 +70,20 @@ public class MeasureTestHelper {
         jobInfoMap.put("jobName","jobName");
         jobDetail.setJobDataMap(jobInfoMap);
         return jobDetail;
+    }
+
+    public static Map<String, Serializable> createJobDetailMap() {
+        Map<String, Serializable> jobDetailMap = new HashMap<>();
+        jobDetailMap.put("jobName","jobName");
+        jobDetailMap.put("measureId", "1");
+        jobDetailMap.put("groupName","BA");
+        jobDetailMap.put("targetPattern", "YYYYMMdd-HH");
+        jobDetailMap.put("triggerState", Trigger.TriggerState.NORMAL);
+        jobDetailMap.put("nextFireTime", "1509613440000");
+        jobDetailMap.put("previousFireTime", "1509613410000");
+        jobDetailMap.put("interval", "3000");
+        jobDetailMap.put("sourcePattern", "YYYYMMdd-HH");
+        jobDetailMap.put("jobStartTime", "1506356105876");
+        return jobDetailMap;
     }
 }
