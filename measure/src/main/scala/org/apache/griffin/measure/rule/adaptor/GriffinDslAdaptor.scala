@@ -351,6 +351,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val preGroupbyClause = analyzer.preGroupbyExprs.map(_.desc).mkString(" ")
     val postGroupbyClause = analyzer.postGroupbyExprs.map(_.desc).mkString(" ")
 
+    println("begin adaptor")
+
     if (!checkDataSourceExists(sourceName)) {
       Nil
     } else {

@@ -47,7 +47,6 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
   def persistAllMetrics(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory
                        ): Iterable[Long] = {
     val metricSteps = ruleSteps.filter(_.ruleInfo.persistType == MetricPersistType)
-    println(metricSteps)
     val allMetrics: Map[Long, Map[String, Any]] = {
       metricSteps.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
         val metrics = collectMetrics(step)
