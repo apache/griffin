@@ -143,7 +143,6 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
       ret ++ engine.collectMetrics(ruleStep)
     }
-//    if (ret.isEmpty) warn(s"collect metrics warn: no metrics collected for ${ruleStep}")
     ret
   }
 
