@@ -19,12 +19,16 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.griffin.core.util.JsonUtil;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
+import java.io.IOException;
+import java.util.Map;
 
 
 @Entity
@@ -40,8 +44,12 @@ public class Rule extends AbstractAuditableEntity {
     @Column(length = 1024)
     private String rule;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnore
     private String details;
+
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, Object> detailsMap;
 
 
     @JsonProperty("dsl.type")
@@ -76,17 +84,28 @@ public class Rule extends AbstractAuditableEntity {
         return details;
     }
 
-    public void setDetails(Object details) {
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    @JsonProperty("details")
+    public Map<String, Object> getDetailsMap() {
+        return detailsMap;
+    }
+
+    @JsonProperty("details")
+    public void setDetailsMap(Map<String, Object> details) throws IOException {
+        this.detailsMap = details;
         this.details = JsonUtil.toJson(details);
     }
 
     public Rule() {
     }
 
-    public Rule(String dslType, String dqType, String rule, String details) {
+    public Rule(String dslType, String dqType, String rule, Map<String, Object> details) throws IOException {
         this.dslType = dslType;
         this.dqType = dqType;
         this.rule = rule;
-        this.details = details;
+        setDetailsMap(details);
     }
 }
