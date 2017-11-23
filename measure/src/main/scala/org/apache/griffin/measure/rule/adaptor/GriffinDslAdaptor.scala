@@ -361,13 +361,28 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     } else {
       tmsts.map { tmst =>
         val timeInfo = TimeInfo(ruleStep.timeInfo.calcTime, tmst)
+        val tmstSourceName = TempName.tmstName(sourceName, timeInfo)
+
+//        val selExprDescs = analyzer.selectionExprs.map { sel =>
+//          sel.head match {
+//            case head @ DataSourceHeadExpr(name) if (name == sourceName) => {
+//              head.name = s"`${tmstSourceName}`"
+//            }
+//            case _ => {}
+//          }
+//          val alias = sel match {
+//            case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.get}`"
+//            case _ => ""
+//          }
+//          s"${sel.desc}${alias}"
+//        }
+//        val selClause = selExprDescs.mkString(", ")
 
         // 1. where statement
         val filterSql = {
           s"SELECT * ${fromClause} WHERE `${GroupByColumn.tmst}` = ${tmst}"
         }
         println(filterSql)
-        val tmstSourceName = TempName.tmstName(sourceName, timeInfo)
         val filterStep = SparkSqlStep(
           timeInfo,
           RuleInfo(tmstSourceName, filterSql, Map[String, Any]())

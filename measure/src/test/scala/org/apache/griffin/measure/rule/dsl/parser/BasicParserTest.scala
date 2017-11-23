@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.dsl.parser
 
+import org.apache.griffin.measure.rule.dsl.ProfilingType
 import org.apache.griffin.measure.rule.dsl.expr._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -217,6 +218,17 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val result = parser.parseAll(parser.fromClause, rule)
     result.successful should be (true)
     println(result.get.desc)
+  }
+
+  test ("profiling") {
+    val griffinParser = GriffinDslParser(
+      "target" :: Nil,
+      "max" :: "min" :: Nil
+    )
+    val rule = "source.name, source.name.max(), source.name.min() group by source.name"
+    val result = griffinParser.parseRule(rule, ProfilingType)
+    result.successful should be (true)
+    println(result.get)
   }
 
 }

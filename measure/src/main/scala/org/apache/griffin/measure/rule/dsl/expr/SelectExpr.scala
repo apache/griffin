@@ -22,7 +22,7 @@ trait HeadExpr extends Expr with AliasableExpr {
   def alias: Option[String] = None
 }
 
-case class DataSourceHeadExpr(name: String) extends HeadExpr {
+case class DataSourceHeadExpr(var name: String) extends HeadExpr {
   def desc: String = name
   def coalesceDesc: String = desc
 }
@@ -38,7 +38,7 @@ case class FieldNameHeadExpr(field: String) extends HeadExpr {
   }
 }
 
-case class ALLSelectHeadExpr() extends HeadExpr {
+case class AllSelectHeadExpr() extends HeadExpr {
   def desc: String = "*"
   def coalesceDesc: String = desc
 }

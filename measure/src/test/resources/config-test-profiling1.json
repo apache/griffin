@@ -25,20 +25,9 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "select user_id.max() as max, user_id.min() as min, user_id.count() as cnt from source",
+        "rule": "select source.user_id.max() as max, user_id.min() as min, user_id.count() as cnt from source",
         "details": {
           "profiling": {
-            "persist.type": "metric"
-          }
-        }
-      },
-      {
-        "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
-        "rule": "select user_id as id, user_id.count() as cnt from source group by user_id order by cnt desc, id desc limit 3",
-        "details": {
-          "profiling": {
-            "name": "id-group",
             "persist.type": "metric"
           }
         }

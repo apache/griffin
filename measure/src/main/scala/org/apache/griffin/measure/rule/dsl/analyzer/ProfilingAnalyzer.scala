@@ -30,11 +30,19 @@ case class ProfilingAnalyzer(expr: ProfilingClause, sourceName: String) extends 
     expr.selectClause.preOrderTraverseDepthFirst(Seq[SelectionExpr]())(seq, combSelectionExprs)
   }
 
-  val selectionExprs = expr.selectClause.exprs.map(_.extractSelf)
+  val selectionExprs: Seq[SelectionExpr] = {
+    expr.selectClause.exprs.map(_.extractSelf).flatMap { expr =>
+      expr match {
+        case e: SelectionExpr => Some(e)
+        case _ => None
+      }
+    }
+  }
+
   def containsAllSelectionExpr = {
     selectionExprs.filter { expr =>
       expr match {
-        case SelectionExpr(head: ALLSelectHeadExpr, selectors: Seq[SelectExpr], _) => {
+        case SelectionExpr(head: AllSelectHeadExpr, selectors: Seq[SelectExpr], _) => {
           selectors.isEmpty
         }
         case SelectionExpr(head: DataSourceHeadExpr, selectors: Seq[SelectExpr], _) => {

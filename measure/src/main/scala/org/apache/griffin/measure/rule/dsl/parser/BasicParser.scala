@@ -217,7 +217,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   } | UnQuoteTableFieldName ^^ { s =>
     FieldNameHeadExpr(innerString(s))
   } | ALLSL ^^ { _ =>
-    ALLSelectHeadExpr()
+    AllSelectHeadExpr()
   }
   def selector: Parser[SelectExpr] = functionSelect | allFieldsSelect | fieldSelect | indexSelect
   def allFieldsSelect: Parser[AllFieldsSelectExpr] = DOT ~> ALLSL ^^ { _ => AllFieldsSelectExpr() }

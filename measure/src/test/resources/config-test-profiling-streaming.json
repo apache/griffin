@@ -54,7 +54,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "name.count(), age.avg(), age.max(), age.min() group by name",
+        "rule": "source.name.count(), source.age.avg(), source.age.max(), source.age.min() group by source.name",
         "details": {
           "source": "source",
           "profiling": {
