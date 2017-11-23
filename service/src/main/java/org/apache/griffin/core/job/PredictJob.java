@@ -254,7 +254,7 @@ public class PredictJob implements Job {
      * @param conf             map with file predict,data split and partitions info
      * @param sampleTimestamps collection of data split start timestamp
      * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
-     *          or like
+     *          or like {"path": "/year=#2017/month=11/dt=15/hour=09/_DONE,/year=#2017/month=11/dt=15/hour=10/_DONE"}
      */
     private Map<String, String> genConfMap(Map<String, String> conf, Long[] sampleTimestamps) {
         for (Map.Entry<String, String> entry : conf.entrySet()) {

@@ -9,7 +9,7 @@
     "version": "1.2",
     "config": {
       "table.name": "rheos_view_event",
-      "partitions": "dt=20170410, hour=15"
+      "where": "dt=20170410 AND hour=15"
     }
   },
 
@@ -18,7 +18,7 @@
     "version": "1.2",
     "config": {
       "table.name": "be_view_event_queue",
-      "partitions": "dt=20170410, hour=15; dt=20170410, hour=16"
+      "where": "dt=20170410 AND hour=15, dt=20170410 AND hour=16"
     }
   },
 

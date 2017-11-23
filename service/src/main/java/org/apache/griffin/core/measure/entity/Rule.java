@@ -93,7 +93,8 @@ public class Rule extends AbstractAuditableEntity {
     @JsonProperty("details")
     public Map<String, Object> getDetailsMap() throws IOException {
         if (detailsMap == null && !StringUtils.isEmpty(details)) {
-            detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {});
+            detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
+            });
         }
         return detailsMap;
     }
