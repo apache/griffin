@@ -39,7 +39,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val _PersistType = "persist.type"
     val _UpdateDataSource = "update.data.source"
     def getNameOpt(param: Map[String, Any]): Option[String] = param.get(_Name).map(_.toString)
-    def getPersistType(param: Map[String, Any]): PersistType = PersistType(param.getString(_PersistType, ""))
+    def getPersistType(param: Map[String, Any], defPersistType: PersistType): PersistType = PersistType(param.getString(_PersistType, defPersistType.desc))
     def getUpdateDataSourceOpt(param: Map[String, Any]): Option[String] = param.get(_UpdateDataSource).map(_.toString)
   }
   object AccuracyInfo {
@@ -66,7 +66,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
   }
   def resultPersistType(param: Map[String, Any], key: String, defPersistType: PersistType): PersistType = {
     param.get(key) match {
-      case Some(prm: Map[String, Any]) => StepInfo.getPersistType(prm)
+      case Some(prm: Map[String, Any]) => StepInfo.getPersistType(prm, defPersistType)
       case _ => defPersistType
     }
   }

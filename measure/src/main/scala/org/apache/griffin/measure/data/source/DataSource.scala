@@ -65,12 +65,22 @@ case class DataSource(sqlContext: SQLContext,
   }
 
   private def data(ms: Long): (Option[DataFrame], Set[Long]) = {
+    if (batchDataConnectors.size > 0)
     val batchPairs = batchDataConnectors.map(_.data(ms))
     println(batchPairs.size)
     val (batchDataFrameOpt, batchTmsts) = (None, Set.empty[Long])
 //    val (batchDataFrameOpt, batchTmsts) = batchDataConnectors.map(_.data(ms)).reduce( (a, b) =>
 //      (unionDfOpts(a._1, b._1), a._2 ++ b._2)
 //    )
+    val batches: Seq[(DataFrame, Set[Long])] = batchDataConnectors.flatMap { dc =>
+      val (dfOpt, tmsts) = dc.data(ms)
+      dfOpt.map((_, tmsts))
+    }
+    val caches: List[(Option[DataFrame], Set[Long])] = dataSourceCacheOpt match {
+      case Some(dsc) => dsc.readData() :: Nil
+      case _ => Nil
+    }
+    val pairs: Seq[Option[DataFrame], Set[Long]] = batches ++ caches
 
     val (cacheDataFrameOpt, cacheTmsts) = dataSourceCacheOpt match {
       case Some(dsc) => dsc.readData()
