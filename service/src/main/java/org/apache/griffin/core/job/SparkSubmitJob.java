@@ -141,7 +141,7 @@ public class SparkSubmitJob implements Job {
         measure.setName(jd.getJobDataMap().getString("jobName"));
     }
 
-    private void setAllDataConnectorPartitions(List<DataSource> sources, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
+    private void setAllDataConnectorPartitions(List<DataSource> sources, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) throws IOException {
         if (sources == null) {
             return;
         }
@@ -150,7 +150,7 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private void setDataSourcePartitions(DataSource dataSource, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
+    private void setDataSourcePartitions(DataSource dataSource, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) throws IOException {
         String name = dataSource.getName();
         for (DataConnector dataConnector : dataSource.getConnectors()) {
             if (sourceName.equals(name)) {
@@ -159,7 +159,7 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItems, long timestamp) {
+    private void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItems, long timestamp) throws IOException {
         Map<String, String> partitionItemMap = genPartitionMap(patternItemSet, partitionItems, timestamp);
         /**
          * partitions must be a string like: "dt=20170301, hour=12"
