@@ -166,9 +166,10 @@ public class SparkSubmitJob implements Job {
          * partitionItemMap.toString() is like "{dt=20170301, hour=12}"
          */
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
+        partitions = partitions.replaceAll(",", " AND ");
         Map<String, String> configMap = dc.getConfigInMaps();
         //config should not be null
-        configMap.put("partitions", partitions);
+        configMap.put("where", partitions);
         try {
             dc.setConfig(configMap);
         } catch (JsonProcessingException e) {
