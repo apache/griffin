@@ -33,6 +33,8 @@ import org.apache.spark.streaming.StreamingContext
 
 case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
+  override protected def collectable(): Boolean = true
+
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
       case SparkSqlStep(name, rule, _, _, _) => {
