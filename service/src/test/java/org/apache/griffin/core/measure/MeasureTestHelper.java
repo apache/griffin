@@ -47,7 +47,9 @@ public class MeasureTestHelper {
         dataSources.add(dataSource);
         dataSources.add(targetSource);
         String rules = "source.id=target.id AND source.name=target.name AND source.age=target.age";
-        Rule rule = new Rule("griffin-dsl", "accuracy", rules);
+        Map<String, Object> map = new HashMap<>();
+        map.put("detail", "detail info");
+        Rule rule = new Rule("griffin-dsl", "accuracy", rules,map);
         EvaluateRule evaluateRule = new EvaluateRule(Arrays.asList(rule));
         return new Measure(name, "description", org, "batch", "test", dataSources, evaluateRule);
     }

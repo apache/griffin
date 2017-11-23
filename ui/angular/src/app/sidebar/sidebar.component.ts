@@ -93,28 +93,29 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-   draw (metric, parentIndex, index) {
-   		$('#'+this.oData[parentIndex].name+index).toggleClass('collapse');
-       var chartId = 'chart' + parentIndex + '-' + index;
-       document.getElementById(chartId).style.width = ($('.panel-heading').innerWidth()-40)+'px';
-       document.getElementById(chartId).style.height = '200px';
-       this.chartOption.set(chartId,this.chartService.getOptionSide(metric));
-       var self = this;
-       $('#'+chartId).unbind('click');
-       $('#'+chartId).click(function(e) {
-         self.router.navigate(['/detailed/'+self.oData[parentIndex].metrics[index].name]) ;
-       });
-   };
+  draw (metric, parentIndex, index) {
+    $('#side'+parentIndex+index).toggleClass('collapse');
+    var chartId = 'chart' + parentIndex + '-' + index;
+    document.getElementById(chartId).style.width = ($('.panel-heading').innerWidth()-40)+'px';
+    document.getElementById(chartId).style.height = '200px';
+    this.chartOption.set(chartId,this.chartService.getOptionSide(metric));
+    var self = this;
+    $('#'+chartId).unbind('click');
+    $('#'+chartId).click(function(e) {
+      self.router.navigate(['/detailed/'+self.oData[parentIndex].metrics[index].name]) ;
+    });
+  };
 
-   getOption(parent,i){
+  getOption(parent,i){
    	return this.chartOption.get('chart'+parent+'-'+i);
-   }
+  }
 
-    sideBarList(sysName){
+  sideBarList(sysName){
     	// this.finalData = this.getMetricService.renderData();
       var url_organization = this.serviceService.config.uri.organization;
       let url_dashboard = this.serviceService.config.uri.dashboard;
       this.http.get(url_organization).subscribe(data => {
+      var jobMap = new Map();
       this.orgWithMeasure = data;
       var orgNode = null;
       for(let orgName in this.orgWithMeasure){
@@ -142,26 +143,42 @@ export class SidebarComponent implements OnInit {
             for(let i = 0;i < jobs.length;i++){
                orgNode.jobMap.push(jobs[i].jobName);
                var job = jobs[i].jobName;
-               this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( data=> { 
-                 this.originalData = data;
+               jobMap.set(job, orgNode.name);
+               this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( jobes=> { 
+                 this.originalData = jobes;
                  if(this.originalData.hits){
                    this.metricData = this.originalData.hits.hits;
                    metricNode.details = this.metricData;                                
                    metricNode.name = this.metricData[0]._source.name;
                    metricNode.timestamp = this.metricData[0]._source.tmst;
                    metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
-                   node.metrics.push(Object.assign({}, metricNode));
+                   this.pushToNode(jobMap, metricNode);
                  }
-
-            });           
-            }                           
+               },
+               err => {
+                 // console.log(err);
+               console.log('Error occurs when connect to elasticsearh!');
+               });            
+            }                          
         } 
-          this.finalData.push(node); 
-          this.orgs.push(orgNode);                
+        this.finalData.push(node); 
+        this.orgs.push(orgNode);                 
       }
       this.oData = this.finalData.slice(0);
     });
+  }
+  
+  pushToNode(jobMap, metricNode){
+    var jobName = metricNode.name;
+    var orgName = jobMap.get(jobName);
+    var org = null;
+    for(var i = 0; i < this.finalData.length; i ++){
+      org = this.finalData[i];
+      if(orgName == org.name){
+        org.metrics.push(Object.assign({}, metricNode));
+      }
     }
+  }  
 
   ngOnInit() {
   	this.sideBarList(null);
