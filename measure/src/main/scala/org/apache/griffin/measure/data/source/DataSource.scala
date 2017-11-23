@@ -65,14 +65,18 @@ case class DataSource(sqlContext: SQLContext,
   }
 
   private def data(ms: Long): (Option[DataFrame], Set[Long]) = {
-    val (batchDataFrameOpt, batchTmsts) = batchDataConnectors.map(_.data(ms)).reduce( (a, b) =>
-      (unionDfOpts(a._1, b._1), a._2 ++ b._2)
-    )
+    val batchPairs = batchDataConnectors.map(_.data(ms))
+    println(batchPairs.size)
+    val (batchDataFrameOpt, batchTmsts) = (None, Set.empty[Long])
+//    val (batchDataFrameOpt, batchTmsts) = batchDataConnectors.map(_.data(ms)).reduce( (a, b) =>
+//      (unionDfOpts(a._1, b._1), a._2 ++ b._2)
+//    )
 
     val (cacheDataFrameOpt, cacheTmsts) = dataSourceCacheOpt match {
       case Some(dsc) => dsc.readData()
       case _ => (None, Set.empty[Long])
     }
+    println("go")
 
     (unionDfOpts(batchDataFrameOpt, cacheDataFrameOpt), batchTmsts ++ cacheTmsts)
   }

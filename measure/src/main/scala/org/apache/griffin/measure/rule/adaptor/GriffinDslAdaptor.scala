@@ -326,26 +326,28 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       s"${sel.desc}${alias}"
     }
 
-    val selClause = procType match {
-      case BatchProcessType => selExprDescs.mkString(", ")
-      case StreamingProcessType => {
-        if (analyzer.containsAllSelectionExpr) {
-          selExprDescs.mkString(", ")
-        } else {
-          (s"`${GroupByColumn.tmst}`" +: selExprDescs).mkString(", ")
-        }
-      }
-    }
+    val selClause = selExprDescs.mkString(", ")
+//    val selClause = procType match {
+//      case BatchProcessType => selExprDescs.mkString(", ")
+//      case StreamingProcessType => {
+//        if (analyzer.containsAllSelectionExpr) {
+//          selExprDescs.mkString(", ")
+//        } else {
+//          (s"`${GroupByColumn.tmst}`" +: selExprDescs).mkString(", ")
+//        }
+//      }
+//    }
 
     val fromClause = profilingClause.fromClauseOpt.getOrElse(FromClause(sourceName)).desc
 
-    val groupByClauseOpt = procType match {
-      case BatchProcessType => analyzer.groupbyExprOpt
-      case StreamingProcessType => {
-        val tmstGroupByClause = GroupbyClause(LiteralStringExpr(s"`${GroupByColumn.tmst}`") :: Nil, None)
-        Some(tmstGroupByClause.merge(analyzer.groupbyExprOpt.getOrElse(GroupbyClause(Nil, None))))
-      }
-    }
+    val groupByClauseOpt = analyzer.groupbyExprOpt
+//    val groupByClauseOpt = procType match {
+//      case BatchProcessType => analyzer.groupbyExprOpt
+//      case StreamingProcessType => {
+//        val tmstGroupByClause = GroupbyClause(LiteralStringExpr(s"`${GroupByColumn.tmst}`") :: Nil, None)
+//        Some(tmstGroupByClause.merge(analyzer.groupbyExprOpt.getOrElse(GroupbyClause(Nil, None))))
+//      }
+//    }
 
     val groupbyClause = groupByClauseOpt.map(_.desc).getOrElse("")
     val preGroupbyClause = analyzer.preGroupbyExprs.map(_.desc).mkString(" ")
