@@ -155,7 +155,7 @@ under the License.
         <div class="container-fluid formStep" id="showrule" style="display:none;">
           <div class="col-md-12 col-lg-12 col-sm-12">
             <fieldset>
-               <app-rule></app-rule>
+              <app-rule></app-rule>
             </fieldset>
           </div>
           <div class="form-group btn-container">
@@ -188,6 +188,16 @@ under the License.
                 </div>
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Measure Description:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10 ">
+                      <input type="text" class="form-control" [(ngModel)]="desc" placeholder="Please input detailed description of your measure" name="desc">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group">
                     <label for="typeSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Measure Type:
                     </label>
@@ -201,7 +211,7 @@ under the License.
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Organization:
+                      Organization<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
                       <input type="text" id="systemSelector" class="form-control" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org" [(ngModel)]="org">
@@ -218,17 +228,16 @@ under the License.
                     </div>
                   </div>
                 </div>
-                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
-                    <div class="form-group">
-                      <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                        Owner:
-                      </label>
-                      <div class="col-md-10 col-lg-10 col-sm-10">
-                        <input type="text"  class="form-control" name="owner" disabled
-                        [(ngModel)]="owner" >
-                      </div>
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group">
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Owner:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10">
+                      <input type="text" class="form-control" name="owner" disabled [(ngModel)]="owner">
                     </div>
-                  </div> -->
+                  </div>
+                </div>
               </div>
               <div style="color:#b2c831">
                 <p>
@@ -273,6 +282,14 @@ under the License.
                       </div>
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
+                          Measure Description:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8 ">
+                          {{desc}}
+                        </div>
+                      </div>
+                      <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
                           Measure Type:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
@@ -295,14 +312,14 @@ under the License.
                           {{currentTable}}
                         </div>
                       </div>
-                      <!--                         <div class="row">
-                          <label class="col-md-4 col-lg-4 col-sm-4">
-                            Owner:
-                          </label>
-                          <div class="col-md-8 col-lg-8 col-sm-8" >
-                            {{owner}}
-                          </div>
-                        </div> -->
+                      <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Owner:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{owner}}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -317,30 +334,6 @@ under the License.
                   &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
                 </div>
                 <br/>
-                <!-- <h5 class="row">Mapping rules</h5> -->
-                <!-- <div class="row">
-                    <p>{{rules}}</p>
-                    <p>
-                      <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
-                    </p>
-                    <div class="col-md-12 col-lg-12 col-sm-12" style="color:#fff;font-size:16px;display: flex;                align-items: center">
-                      <div class="" style="text-align:right;display:block;float:left;width:20%;">
-                        Accuracy Rate(%) =
-                      </div>
-                      <div class="" style="text-align:center;display:block;float:left;margin:0 10px 0 10px">
-                        <div class="formula-text-up" style="border-bottom:1px solid;">
-                          Total Count of Matched records between <span class="badge">{{selectionTarget.length}}</span> <span style="color:green;">{{currentTableTarget}}</span>  and <span class="badge">{{mappings.length}}
-                          </span> <span style="color:green;">{{currentTable}}</span>  fields
-                        </div>
-                        <div>
-                          Total Count of records in <span style="color:green;font-weight:bold;">{{currentDB}}.{{currentTable}}</span>
-                        </div>
-                      </div>
-                      <div class="" style="text-align:left;display:block;float:left;width:10%;">
-                        x 100%
-                      </div>
-                    </div>
-                  </div> -->
               </div>
             </div>
             <div class="modal-footer">

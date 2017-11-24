@@ -43,38 +43,6 @@ class node {
 
 class Rule{
   type:string;
-  // conditionGroup = [
-  //   {
-  //     'type':'where',
-  //     'content':'',
-  //     'chosen':false,
-  //     'avaliable':true
-  //   },
-  //   {
-  //     'type':'groupby',
-  //     'content':'',
-  //     'chosen':false,
-  //     'avaliable':true
-  //   },
-  //   {
-  //     'type':'having',
-  //     'content':'',
-  //     'chosen':false,
-  //     'avaliable':false
-  //   },
-  //   {
-  //     'type':'orderby',
-  //     'content':'',
-  //     'chosen':false,
-  //     'avaliable':true
-  //   },
-  //   {
-  //     'type':'limit',
-  //     'content':'',
-  //     'chosen':false,
-  //     'avaliable':true
-  //   }
-  // ];
 }
 
 class Col{
@@ -136,10 +104,14 @@ export class PrComponent implements  AfterViewChecked, OnInit{
   totallen = 0;
   type = 'profiling';
   data:any;
+  desc:string;
+  owner = 'test';
   currentDBstr: string;
   newMeasure = {
     "name": "",
     "process.type": "batch",
+    "owner":"",
+    "description":"",
     "organization":"",
     "data.sources": [
       {
@@ -193,33 +165,23 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     }
   }
   
-onResize(event){
-   this.resizeWindow();
-}
+  onResize(event){
+    this.resizeWindow();
+  }
 
-resizeWindow(){
+  resizeWindow(){
     var stepSelection = '.formStep';
     $(stepSelection).css({
-        // height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
-        height: window.innerHeight - $(stepSelection).offset().top
+      // height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
+      height: window.innerHeight - $(stepSelection).offset().top
     });
     $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 130);
     $('.y-scrollable').css({
-        // 'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
-        'height': $('fieldset').height()
+      // 'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
+      'height': $('fieldset').height()
     });
-}
+  }
 
-  // toggleSelectionCond(cond,condIndex,ruleIndex,item){
-  //   cond.chosen = !cond.chosen;
-  //   if(condIndex==1&&cond.chosen)
-  //     item.newRules[ruleIndex].conditionGroup[2].avaliable = true;
-  //   if(condIndex==1&&!cond.chosen){
-  //     item.newRules[ruleIndex].conditionGroup[2].avaliable = false;
-  //     item.newRules[ruleIndex].conditionGroup[2].chosen = false;
-  //   }
-  // }
-  
   setDropdownList(){
     if(this.selection){
       for(let item of this.selection){
@@ -255,17 +217,22 @@ resizeWindow(){
     // is currently selected
     if (idx > -1) {
         this.selection.splice(idx, 1);
-        this.selectedAll = false;       
-        this.selectedItems[row.name] = [];
+        this.selectedAll = false;
+        for(let key in this.selectedItems){
+          if(key === row.name){
+            delete this.selectedItems[key];
+          }
+        }             
+        //this.selectedItems[row.name] = [];
     }
     // is newly selected
     else {
-        this.selection.push(row);
+      this.selection.push(row);
     }
     if(this.selection.length == 3){
-        this.selectedAll = true;
+      this.selectedAll = true;
     }else{
-        this.selectedAll = false;
+      this.selectedAll = false;
     }
     this.setDropdownList();
   };
@@ -276,7 +243,7 @@ resizeWindow(){
     for(var i =0; i < this.schemaCollection.length; i ++){
       this.schemaCollection[i].selected = this.selectedAll;
       if (this.selectedAll) {
-          this.selection.push(this.schemaCollection[i]);
+        this.selection.push(this.schemaCollection[i]);
       }
     }
     this.setDropdownList();
@@ -312,16 +279,16 @@ resizeWindow(){
       this.currentStep++;
     }else{
       this.toasterService.pop('error','Error!','Please select at least one attribute!');
-          return false;
+        return false;
     }
   }
 
   formValidation = function(step) {
     if (step == undefined) {
-        step = this.currentStep;
+      step = this.currentStep;
     }
     if (step == 1) {
-        return this.selection && this.selection.length > 0;
+      return this.selection && this.selection.length > 0;
     } else if (step == 2) {
       var len = 0;
       var selectedlen = 0;
@@ -353,6 +320,8 @@ resizeWindow(){
     this.newMeasure = {
         "name": this.name,
         "process.type": "batch",
+        "owner":this.owner,
+        "description":this.desc,
         "organization":this.org,
         "data.sources": [
           {
@@ -402,7 +371,23 @@ resizeWindow(){
       "rule": rule,
       "details": {
         "profiling": {
-          "name": grpname
+          "name": grpname,
+          "persist.type": "metric"
+        }
+      }
+    });
+  }
+  
+  pushNullRule(rule,nullname){
+    var self = this;
+    self.newMeasure.evaluateRule.rules.push({
+      "dsl.type": "griffin-dsl",
+      "dq.type": "profiling",
+      "rule": rule,
+      "details": {
+        "profiling": {
+          "name": nullname,
+          "persist.type": "metric"
         }
       }
     });
@@ -419,7 +404,6 @@ resizeWindow(){
   }
 
   save() {
-    console.log(this.newMeasure);
     var addModels = this.serviceService.config.uri.addModels;
     this.http
     .post(addModels, this.newMeasure)
@@ -483,6 +467,7 @@ resizeWindow(){
     var selected = {name: ''};
     var value = '';
     var nullvalue = '';
+    var nullname = '';
     var enmvalue = '';
     var grpname = '';
     for(let key in this.selectedItems){
@@ -496,15 +481,18 @@ resizeWindow(){
           this.pushEnmRule(enmvalue,grpname);
         }else if(originrule == 'Null Count'){
           nullvalue = this.transferRule(originrule,selected);
+          nullname = selected.name + '-nullct';
           this.transnullrule.push(nullvalue);
-          this.pushRule(nullvalue);
+          this.pushNullRule(nullvalue,nullname);
         }else{ 
           value = this.transferRule(originrule,selected);      
           this.transrule.push(value);
         }
       }  
     }
-    this.getRule(this.transrule);
+    if(this.transrule.length != 0){
+      this.getRule(this.transrule);
+    }   
   }
 
   // OnItemDeSelect(item){

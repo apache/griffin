@@ -91,7 +91,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   currentDBstr: string; 
 
   measureTypes = ['accuracy','validity','anomaly detection','publish metrics'];
-  type = 'accuracy';
+  type = "accuracy";
   newMeasure = {
     "name":'',
     "process.type": "batch",
@@ -178,44 +178,44 @@ export class AcComponent implements OnInit , AfterViewChecked {
   }
 
   toggleSelection (row) {
-      row.selected = !row.selected;
-      var idx = this.selection.indexOf(row.name);
-      // is currently selected
-      if (idx > -1) {
-        this.selection.splice(idx, 1);
-        this.selectedAll = false;
-      }
-      // is newly selected
-      else {
-        this.selection.push(row.name);
-      }
-      if(this.selection.length == 3){
-        this.selectedAll = true;
-      }else{
-        this.selectedAll = false;
-      }
+    row.selected = !row.selected;
+    var idx = this.selection.indexOf(row.name);
+    // is currently selected
+    if (idx > -1) {
+      this.selection.splice(idx, 1);
+      this.selectedAll = false;
+    }
+    // is newly selected
+    else {
+      this.selection.push(row.name);
+    }
+    if(this.selection.length == 3){
+      this.selectedAll = true;
+    }else{
+      this.selectedAll = false;
+    }
   };
 
   toggleSelectionTarget (row) {
-      row.selected = !row.selected;
-      var idx = this.selectionTarget.indexOf(row.name);
-      // is currently selected
-      if (idx > -1) {
-          this.selectionTarget.splice(idx, 1);
-          this.selectedAllTarget = false;
-      }
-      // is newly selected
-      else {
-          this.selectionTarget.push(row.name);
-      }
-      if(this.selectionTarget.length == 3){
-          this.selectedAllTarget = true;
-      }else{
-        this.selectedAllTarget = false;
-      }
-      let l = this.selectionTarget.length;
-      for(let i =0;i<l;i++)
-        this.matches[i] = "=";
+    row.selected = !row.selected;
+    var idx = this.selectionTarget.indexOf(row.name);
+    // is currently selected
+    if (idx > -1) {
+      this.selectionTarget.splice(idx, 1);
+      this.selectedAllTarget = false;
+    }
+    // is newly selected
+    else {
+      this.selectionTarget.push(row.name);
+    }
+    if(this.selectionTarget.length == 3){
+      this.selectedAllTarget = true;
+    }else{
+      this.selectedAllTarget = false;
+    }
+    let l = this.selectionTarget.length;
+    for(let i =0;i<l;i++)
+      this.matches[i] = "=";
   };
 
   toggleAll () {
@@ -224,8 +224,8 @@ export class AcComponent implements OnInit , AfterViewChecked {
     for(var i =0; i < this.schemaCollection.length; i ++){
       this.schemaCollection[i].selected = this.selectedAll;
       if (this.selectedAll) {
-          this.selection.push(this.schemaCollection[i].name);
-          this.matches[i] = "=";
+        this.selection.push(this.schemaCollection[i].name);
+        this.matches[i] = "=";
       }
     }
   };
@@ -236,7 +236,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     for(var i =0; i < this.schemaCollectionTarget.length; i ++){
       this.schemaCollectionTarget[i].selected = this.selectedAllTarget;
       if (this.selectedAllTarget) {
-          this.selectionTarget.push(this.schemaCollectionTarget[i].name);
+        this.selectionTarget.push(this.schemaCollectionTarget[i].name);
       }
     }
   };
@@ -246,32 +246,32 @@ export class AcComponent implements OnInit , AfterViewChecked {
       this.currentStep++;
     }else{
       this.toasterService.pop('error','Error!','Please select at least one attribute!');
-          return false;
+        return false;
     }
   }
 
   formValidation = function(step) {
-       if (step == undefined) {
-           step = this.currentStep;
-       }
-       if (step == 1) {
-           return this.selection && this.selection.length > 0;
-       } else if (step == 2) {
-           return (this.selectionTarget && this.selectionTarget.length > 0)//at least one target is selected
-                   // && !((this.currentTable.name == this.currentTableTarget.name)&&(this.currentDB.name == this.currentDBTarget.name));//target and source should be different
-       } else if (step == 3) {
-           return this.selectionTarget && this.selectionTarget.length == this.mappings.length
-                   && this.mappings.indexOf('') == -1
-       } else if (step == 4) {
-       }
-       return false;
-   } 
+    if (step == undefined) {
+      step = this.currentStep;
+    }
+    if (step == 1) {
+      return this.selection && this.selection.length > 0;
+    } else if (step == 2) {
+      return (this.selectionTarget && this.selectionTarget.length > 0)//at least one target is selected
+      // && !((this.currentTable.name == this.currentTableTarget.name)&&(this.currentDB.name == this.currentDBTarget.name));//target and source should be different
+    } else if (step == 3) {
+        return this.selectionTarget && this.selectionTarget.length == this.mappings.length
+          && this.mappings.indexOf('') == -1
+    } else if (step == 4) {
+    }
+    return false;
+  } 
 
   prev (form) {
-      this.currentStep--;
+    this.currentStep--;
   }
   goTo (i) {
-      this.currentStep = i;
+    this.currentStep = i;
   }
   submit (form) {                
       // form.$setPristine();
@@ -351,19 +351,12 @@ export class AcComponent implements OnInit , AfterViewChecked {
       rule = rules.join(" AND ");
       this.rules = rule;
       this.newMeasure.evaluateRule.rules[0].rule = rule;
-      // for(var i =0; i < this.selectionTarget.length; i ++){
-      //   this.newMeasure.mappings.push({target:this.selectionTarget[i],
-      //                   // src:this.mappings[i],
-      //                   matchMethod: this.matches[i]});
-      // }
       this.visible = true;
       setTimeout(() => this.visibleAnimate = true, 100);
   }
 
   save() {
-
     var addModels = this.serviceService.config.uri.addModels;
-
     this.http
     .post(addModels, this.newMeasure)
     .subscribe(data => {
@@ -379,7 +372,6 @@ export class AcComponent implements OnInit , AfterViewChecked {
     err => {
       console.log('Something went wrong!');
     });
-    
   }
 
   options: ITreeOptions = {

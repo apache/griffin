@@ -66,7 +66,13 @@ export class AppComponent implements AfterViewChecked, OnInit{
     window.location.reload();
     // window.location.replace ('login');
    }
-   ngAfterViewChecked(){
+  ngAfterViewChecked(){
     this.resizeMainWindow();
+    $('#rightbar').css({
+      height: $('#mainWindow').height()+20
+    });
+    $('#side-bar-metrics').css({
+      height: $('#mainContent').height()-$('#side-bar-stats').outerHeight()+70
+    });
    }
 }

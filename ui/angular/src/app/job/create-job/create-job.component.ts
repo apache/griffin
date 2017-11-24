@@ -197,7 +197,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     $(stepSelection).css({
         height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
     });
-    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
+    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 200);
     $('.y-scrollable').css({
         'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
     });

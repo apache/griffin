@@ -210,12 +210,12 @@ a>.side-name:hover{
 }
 
 #side-bar-metrics{
-	position: absolute;
+	/*position: absolute;*/
 	margin-top:20px;
 	overflow-y:auto;
 	overflow-x:hidden;
 	margin-left:0;
 	margin-right:0;
-	height:300%;
+	height:1px;
 	width: 95%;
 }

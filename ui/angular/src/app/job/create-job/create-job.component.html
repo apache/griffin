@@ -16,19 +16,18 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<div class="mask" *ngIf = 'maskOpen' (click)="close()"></div>
-
+<div class="mask" *ngIf='maskOpen' (click)="close()"></div>
 <div class="container-fluid">
   <div class="row">
     <h5 class="over-title margin-bottom-15 job">Create Job</h5>
-  </div><!--//row-->
+  </div>
+  <!--//row-->
   <div class="row">
     <!-- <form name="Form" id="form" novalidate> -->
-    <form name= "Form" id="form" (ngSubmit)="submit(jobForm)" #jobForm="ngForm" novalidate>
-      <div  class="formStep" >
+    <form name="Form" id="form" (ngSubmit)="submit(jobForm)" #jobForm="ngForm" novalidate>
+      <div class="formStep">
         <label class="stepDesc info">Please setup the job required information</label>
         <div class="container-fluid">
-
           <!-- schema definition list -->
           <div class="col-md-12 col-lg-12 col-sm-12">
             <fieldset (window:resize)="onResize($event)">
@@ -37,16 +36,12 @@ under the License.
               </legend>
               <div class="y-scrollable">
                 <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group"
-                       [ngClass]="{'has-error':jobName.dirty&&jobName.invalid, 'has-success':jobName.valid}">
+                  <div class="form-group" [ngClass]="{'has-error':jobName.dirty&&jobName.invalid, 'has-success':jobName.valid}">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Source Pattern<span class="symbol required"></span>:
                     </label>
-
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="sourcePat" #jobName="ngModel" name="jobName" placeholder="Please input the source partition, such as 'YYYYMMdd-HH'." required
-                             pattern="YYYYMMdd-HH"
-                             maxlength='11'>
+                      <input type="text" class="form-control" [(ngModel)]="sourcePat" #jobName="ngModel" name="jobName" placeholder="Please input the source partition, such as 'YYYYMMdd-HH'." required pattern="YYYYMMdd-HH" maxlength='11'>
                       <!-- /i<span class="error text-small block " *ngIf="jobName.dirty && jobName.errors.Pattern">Please input partition like 'YYYYMMdd-HH'</span> jobName.dirty && jobName.errors.pattern-->
                       <span class="error text-small block " *ngIf="jobName.dirty&&jobName.invalid">Please input partition like 'YYYYMMdd-HH'</span>
                     </div>
@@ -58,8 +53,7 @@ under the License.
                       Target Pattern<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'."
-                             required pattern="YYYYMMdd-HH" maxlength='11' name="targetName" #targetName="ngModel">
+                      <input type="text" class="form-control" [(ngModel)]="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'." required pattern="YYYYMMdd-HH" maxlength='11' name="targetName" #targetName="ngModel">
                       <span class="error text-small block " *ngIf="targetName.dirty&&targetName.invalid">Please input partition like 'YYYYMMdd-HH'</span>
                     </div>
                   </div>
@@ -69,40 +63,31 @@ under the License.
                     <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Measure Name:
                     </label>
-
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select id="measureSelector" class="form-control" 
-                       ngControl="name" required name="measure.name" [(ngModel)]="measure">
+                      <select id="measureSelector" class="form-control" ngControl="name" required name="measure.name" [(ngModel)]="measure">
                         <option *ngFor="let row of Measures" value="{{row.name}}">{{row.name}}</option>
                       </select>
                     </div>
                   </div>
                 </div>
                 <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group" >
+                  <div class="form-group">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Start At:
                     </label>
-
                     <!-- <div class="col-md-5 col-lg-5 col-sm-5 ">
                         <input type="text" id="datepicker" class="form-control" name="jobStartTime" [(ngModel)]="jobStartTime" >
                     </div> -->
                     <div class="col-md-5 col-lg-5 col-sm-5 ">
                       <!-- <md-form-field> -->
-                      <input matInput [matDatepicker]="picker" placeholder="Choose a date" style="color:black;" [(ngModel)]="jobStartTime" name="jobStartTime"
-                      >
+                      <input matInput [matDatepicker]="picker" placeholder="Choose a date" style="color:black;" [(ngModel)]="jobStartTime" name="jobStartTime">
                       <mat-datepicker-toggle mdSuffix [for]="picker" (click)="setHeight()"></mat-datepicker-toggle>
-                      <mat-datepicker #picker ></mat-datepicker>
-
-
+                      <mat-datepicker #picker></mat-datepicker>
                       <!-- </md-form-field> -->
                     </div>
                     <div class="col-md-5 col-lg-5 col-sm-5" [ngClass]="{'has-error':timeDetail.invalid, 'has-success':timeDetail.valid}">
-                      <input type="text" class="form-control" id="timeDetail" (click)="showTime()" value="{{hourDetail}}:{{minuteDetail}}:{{secondDetail}} "
-                             [(ngModel)]="timeDetail" name="time"
-
-                      >
-                      <div id="timePopup"  class="col-md-11 col-lg-11 col-sm-11 setgrey" *ngIf="isOpen">
+                      <input type="text" class="form-control" id="timeDetail" (click)="showTime()" value="{{hourDetail}}:{{minuteDetail}}:{{secondDetail}} " [(ngModel)]="timeDetail" name="time">
+                      <div id="timePopup" class="col-md-11 col-lg-11 col-sm-11 setgrey" *ngIf="isOpen">
                         <div id="hourSelector">
                           <p (click)="changeTime(0,23,true,hourDetail,1)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
                           <p>{{hourDetail}}</p>
@@ -113,7 +98,7 @@ under the License.
                         </div>
                         <div id="minuteSelector">
                           <p (click)="changeTime(0,59,true,minuteDetail,2)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
-                          <p >{{minuteDetail}}</p>
+                          <p>{{minuteDetail}}</p>
                           <p (click)="changeTime(0,59,false,minuteDetail,2)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
                         </div>
                         <div class="division">
@@ -121,7 +106,7 @@ under the License.
                         </div>
                         <div id="secondSelector">
                           <p (click)="changeTime(0,59,true,secondDetail,3)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
-                          <p >{{secondDetail}}</p>
+                          <p>{{secondDetail}}</p>
                           <p (click)="changeTime(0,59,false,secondDetail,3)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
                         </div>
                       </div>
@@ -133,52 +118,42 @@ under the License.
                     <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Interval:
                     </label>
-
                     <div class="col-md-5 col-lg-5 col-sm-5 ">
-                      <input type="text" id="systemSelector" class="form-control" [(ngModel)]="periodTime"  required placeholder="How often it works" name="periodTime"
-                             onblur="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
-                             onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+                      <input type="text" id="systemSelector" class="form-control" [(ngModel)]="periodTime" required placeholder="How often it works" name="periodTime" onblur="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
                     </div>
                     <div class="col-md-5 col-lg-5 col-sm-5 ">
                       <select id="timeSelector" class="form-control" [(ngModel)]="timeType" name="timeSelector" required>
                         <!--<option  value="hours" >hours</option>-->
                         <!--<option  value="minutes" >minutes</option>-->
                         <!--<option  value="seconds" >seconds</option>-->
-                        <option *ngFor="let time of Times"  >{{time}}</option>
+                        <option *ngFor="let time of Times">{{time}}</option>
                       </select>
                     </div>
                   </div>
                 </div>
               </div>
-
               <div class="setcolor">
                 <p>
                   <i class="fa fa-info-circle"></i> After submitted, please go to "
                   <a class="bark-link" href="/jobs">Jobs</a>" to check the job status
                 </p>
               </div>
-
             </fieldset>
           </div>
-
-          <div class="form-group btn-container" >
+          <div class="form-group btn-container">
             <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev()">
               <i class="fa fa-arrow-circle-left"></i> Back
             </button>
             <!-- <button class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="form.submit(Form)"> -->
             <toaster-container></toaster-container>
-            <button type="submit" class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="submit(jobForm)"
-            >
+            <button type="submit" class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="submit(jobForm)">
               <!-- <button class="btn btn-primary btn-o next-step btn-wide pull-right" data-toggle="modal" data-target="#confirm"> -->
               Submit
             </button>
           </div>
         </div>
       </div>
-
-      <div class="modal fade" id="confirm-job" role="dialog" [ngClass]="{'in': visibleAnimate}"
-           [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
-           (click)="onContainerClicked($event)">
+      <div class="modal fade" id="confirm-job" role="dialog" [ngClass]="{'in': visibleAnimate}" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
         <div class="modal-dialog modal-xg modal-lg">
           <div class="modal-content">
             <div class="modal-header">
@@ -190,9 +165,10 @@ under the License.
               <div class="container-fluid" id="viewJobContent" style="overflow:auto;">
                 <div class="row">
                   <h5 class="over-title margin-bottom-15">Basic information</h5>
-                </div><!--//row-->
+                </div>
+                <!--//row-->
                 <div class="row">
-                  <div  class="col-lg-12 col-md-12 col-sm-12">
+                  <div class="col-lg-12 col-md-12 col-sm-12">
                     <div id="viewrule-definition" class="viewrule-content">
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
@@ -236,7 +212,8 @@ under the License.
                       </div>
                     </div>
                   </div>
-                </div><!--//row-->
+                </div>
+                <!--//row-->
                 <br/>
               </div>
             </div>
@@ -248,5 +225,6 @@ under the License.
         </div>
       </div>
     </form>
-  </div><!--//row-->
+  </div>
+  <!--//row-->
 </div>

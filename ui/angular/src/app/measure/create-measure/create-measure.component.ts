@@ -36,12 +36,6 @@ export class CreateMeasureComponent implements AfterViewInit {
 
   constructor(private router:Router) { }
 
-
-  // ngOnInit() {
-  // 	$('#panel-2 >.panel-body').css({height: $('#panel-1 >.panel-body').outerHeight() + $('#panel-1 >.panel-footer').outerHeight() - $('#panel-2 >.panel-footer').outerHeight()});
-  //   $('#panel-4 >.panel-body').css({height: $('#panel-3 >.panel-body').outerHeight() + $('#panel-3 >.panel-footer').outerHeight() - $('#panel-4 >.panel-footer').outerHeight()});
-
-  // }
   click(type){
   	this.router.navigate(['/createmeasure'+type]);
   }
@@ -49,7 +43,6 @@ export class CreateMeasureComponent implements AfterViewInit {
     $('#panel-2 >.panel-body').css({height: $('#panel-1 >.panel-body').outerHeight() + $('#panel-1 >.panel-footer').outerHeight() - $('#panel-2 >.panel-footer').outerHeight()});
     $('#panel-4 >.panel-body').css({height: $('#panel-3 >.panel-body').outerHeight() + $('#panel-3 >.panel-footer').outerHeight() - $('#panel-4 >.panel-footer').outerHeight()});
   }
-
 }
 
 
