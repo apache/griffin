@@ -22,6 +22,7 @@ package org.apache.griffin.core.measure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,24 +48,19 @@ public class DataConnector extends AbstractAuditableEntity {
     @Transient
     private Map<String, String> configInMaps;
 
-    public Map<String, String> getConfigInMaps() {
-        TypeReference<Map<String, String>> mapType = new TypeReference<Map<String, String>>() {
-        };
-        if (this.configInMaps == null) {
-            try {
-                this.configInMaps = JsonUtil.toEntity(config, mapType);
-            } catch (IOException e) {
-                LOGGER.error("Error in converting json to map. {}", e.getMessage());
-            }
+    public Map<String, String> getConfigInMaps() throws IOException {
+        if (this.configInMaps == null && !StringUtils.isEmpty(config)) {
+            this.configInMaps = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {});
         }
         return configInMaps;
     }
 
     public void setConfig(Map<String, String> configInMaps) throws JsonProcessingException {
+        this.configInMaps = configInMaps;
         this.config = JsonUtil.toJson(configInMaps);
     }
 
-    public Map<String, String> getConfig() {
+    public Map<String, String> getConfig() throws IOException {
         return getConfigInMaps();
     }
 
