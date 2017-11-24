@@ -159,6 +159,17 @@ object ParamUtil {
         case _: Throwable => defValue
       }
     }
+
+    def getParamMapOpt(key: String): Option[Map[String, Any]] = {
+      try {
+        params.get(key) match {
+          case Some(v: Map[String, Any]) => Some(v)
+          case _ => None
+        }
+      } catch {
+        case _: Throwable => None
+      }
+    }
   }
 
 }

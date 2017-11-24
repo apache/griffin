@@ -45,6 +45,7 @@ under the License.
     <avro.version>1.7.7</avro.version>
     <jackson.version>2.8.7</jackson.version>
     <scalaj.version>2.3.0</scalaj.version>
+    <mongo.version>2.1.0</mongo.version>
     <junit.version>4.11</junit.version>
     <scalatest.version>3.0.0</scalatest.version>
     <slf4j.version>1.7.21</slf4j.version>
@@ -103,6 +104,13 @@ under the License.
       <groupId>org.scalaj</groupId>
       <artifactId>scalaj-http_${scala.binary.version}</artifactId>
       <version>${scalaj.version}</version>
+    </dependency>
+
+    <!--mongo request-->
+    <dependency>
+      <groupId>org.mongodb.scala</groupId>
+      <artifactId>mongo-scala-driver_2.11</artifactId>
+      <version>${mongo.version}</version>
     </dependency>
 
     <!--avro-->
