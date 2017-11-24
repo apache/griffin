@@ -60,18 +60,13 @@ export class SidebarComponent implements OnInit {
   // var formatUtil = echarts.format;
 
   pageInit() {
-    // var allDataassets = this.serviceService.config.uri.dataassetlist;
     var health_url = this.serviceService.config.uri.statistics;
-        this.http.get(health_url).subscribe(data => {
-          // this.status.health = data.healthyJobCount;
-          // this.status.invalid = data.jobCount - data.healthyJobCount;
-          // renderDataAssetPie(this.status);
-          this.sideBarList(null);
-        },err => {});
+    this.http.get(health_url).subscribe(data => {
+      this.sideBarList(null);
+    },err => {});
   }
   
   onResize(event){
-    // console.log('sidebar resize');
     if(window.innerWidth < 992) {
       $('#rightbar').css('display', 'none');
     } else {
@@ -82,7 +77,7 @@ export class SidebarComponent implements OnInit {
 
   resizeSideChart(){
     $('#side-bar-metrics').css({
-           height: $('#mainContent').height()-$('#side-bar-stats').outerHeight()+70
+      height: $('#mainContent').height()-$('#side-bar-stats').outerHeight()+70
     });
     for(let i=0;i<this.oData.length;i++){
       for(let j=0;j<this.oData[i].metrics.length;j++){
@@ -111,10 +106,10 @@ export class SidebarComponent implements OnInit {
   }
 
   sideBarList(sysName){
-    	// this.finalData = this.getMetricService.renderData();
-      var url_organization = this.serviceService.config.uri.organization;
-      let url_dashboard = this.serviceService.config.uri.dashboard;
-      this.http.get(url_organization).subscribe(data => {
+    // this.finalData = this.getMetricService.renderData();
+    var url_organization = this.serviceService.config.uri.organization;
+    let url_dashboard = this.serviceService.config.uri.dashboard;
+    this.http.get(url_organization).subscribe(data => {
       var jobMap = new Map();
       this.orgWithMeasure = data;
       var orgNode = null;
@@ -141,24 +136,26 @@ export class SidebarComponent implements OnInit {
           this.measureOptions.push(key);
           var jobs = this.orgWithMeasure[orgName][key];          
             for(let i = 0;i < jobs.length;i++){
-               orgNode.jobMap.push(jobs[i].jobName);
-               var job = jobs[i].jobName;
-               jobMap.set(job, orgNode.name);
-               this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( jobes=> { 
-                 this.originalData = jobes;
-                 if(this.originalData.hits){
-                   this.metricData = this.originalData.hits.hits;
-                   metricNode.details = this.metricData;                                
-                   metricNode.name = this.metricData[0]._source.name;
-                   metricNode.timestamp = this.metricData[0]._source.tmst;
-                   metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
-                   this.pushToNode(jobMap, metricNode);
-                 }
-               },
-               err => {
-                 // console.log(err);
-               console.log('Error occurs when connect to elasticsearh!');
-               });            
+              orgNode.jobMap.push(jobs[i].jobName);
+              var job = jobs[i].jobName;
+              jobMap.set(job, orgNode.name);
+              this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( jobes=> { 
+                this.originalData = jobes;
+                if(this.originalData.hits){
+                  this.metricData = this.originalData.hits.hits;
+                  if(this.metricData[0]._source.value.miss != undefined){
+                    metricNode.details = this.metricData;                                
+                    metricNode.name = this.metricData[0]._source.name;
+                    metricNode.timestamp = this.metricData[0]._source.tmst;
+                    metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
+                    this.pushToNode(jobMap, metricNode);
+                  }
+                }
+              },
+              err => {
+                // console.log(err);
+              console.log('Error occurs when connect to elasticsearh!');
+              });            
             }                          
         } 
         this.finalData.push(node); 

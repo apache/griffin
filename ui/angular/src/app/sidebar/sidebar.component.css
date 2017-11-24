@@ -66,25 +66,25 @@ under the License.
 	overflow-x: hidden;
 }
 
-.sideBar::-webkit-scrollbar-track
+#side-bar-metrics::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	border-radius: 10px;
 	background-color: #F5F5F5;
 }
 
-.sideBar::-webkit-scrollbar
+#side-bar-metrics::-webkit-scrollbar
 {
-	width: 12px;
+	width: 7px;
 	border-radius: 10px;
 	background-color: #F5F5F5;
 }
 
-.sideBar::-webkit-scrollbar-thumb
+#side-bar-metrics::-webkit-scrollbar-thumb
 {
-	border-radius: 10px;
+	border-radius: 2px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-	background-color: #D62929;
+	background-color: #ADADAD;
 }
 
 .well .side-metrics{
@@ -210,10 +210,12 @@ a>.side-name:hover{
 }
 
 #side-bar-metrics{
+	/*position: absolute;*/
 	margin-top:20px;
 	overflow-y:auto;
 	overflow-x:hidden;
 	margin-left:0;
 	margin-right:0;
-	height:auto;
+	height:1px;
+	width: 95%;
 }
