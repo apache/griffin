@@ -83,9 +83,9 @@ case class StreamingDqThread(dqEngines: DqEngines,
         }
 
         val lt = new Date().getTime
-        val collectoRddTimeStr = s"collect records using time: ${lt - rt} ms"
-        println(collectoRddTimeStr)
-        appPersist.log(lt, collectoRddTimeStr)
+        val collectRddTimeStr = s"collect records using time: ${lt - rt} ms"
+        println(collectRddTimeStr)
+        appPersist.log(lt, collectRddTimeStr)
 
         // persist records
         dqEngines.persistAllRecords(rdds, persistFactory)

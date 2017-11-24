@@ -22,7 +22,7 @@ import scala.util.{Failure, Success, Try}
 
 object TimeUtil {
 
-  final val TimeRegex = """^([+\-]?\d+)(d|h|m|s|ms)$""".r
+  final val TimeRegex = """^([+\-]?\d+)(ms|s|m|h|d)$""".r
   final val PureTimeRegex = """^([+\-]?\d+)$""".r
 
   def milliseconds(timeString: String): Option[Long] = {

@@ -31,81 +31,85 @@ trait SparkDqEngine extends DqEngine {
   val sqlContext: SQLContext
 
   def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
-    val emptyMap = Map[String, Any]()
-    ruleStep match {
-      case step: ConcreteRuleStep if (step.persistType == MetricPersistType) => {
-        val name = step.name
-        try {
-          val pdf = sqlContext.table(s"`${name}`")
-          val records = pdf.toJSON.collect()
+    if (collectable) {
+      val emptyMap = Map[String, Any]()
+      ruleStep match {
+        case step: ConcreteRuleStep if (step.persistType == MetricPersistType) => {
+          val name = step.name
+          try {
+            val pdf = sqlContext.table(s"`${name}`")
+            val records = pdf.toJSON.collect()
 
-          val pairs = records.flatMap { rec =>
-            try {
-              val value = JsonUtil.toAnyMap(rec)
-              value.get(GroupByColumn.tmst) match {
-                case Some(t) => {
-                  val key = t.toString.toLong
-                  Some((key, value))
+            val pairs = records.flatMap { rec =>
+              try {
+                val value = JsonUtil.toAnyMap(rec)
+                value.get(GroupByColumn.tmst) match {
+                  case Some(t) => {
+                    val key = t.toString.toLong
+                    Some((key, value))
+                  }
+                  case _ => None
                 }
-                case _ => None
+              } catch {
+                case e: Throwable => None
               }
-            } catch {
-              case e: Throwable => None
             }
-          }
-          val groupedPairs = pairs.foldLeft(Map[Long, Seq[Map[String, Any]]]()) { (ret, pair) =>
-            val (k, v) = pair
-            ret.get(k) match {
-              case Some(seq) => ret + (k -> (seq :+ v))
-              case _ => ret + (k -> (v :: Nil))
+            val groupedPairs = pairs.foldLeft(Map[Long, Seq[Map[String, Any]]]()) { (ret, pair) =>
+              val (k, v) = pair
+              ret.get(k) match {
+                case Some(seq) => ret + (k -> (seq :+ v))
+                case _ => ret + (k -> (v :: Nil))
+              }
             }
-          }
-          groupedPairs.mapValues { vs =>
-            if (vs.size > 1) {
-              Map[String, Any]((name -> vs))
-            } else {
-              vs.headOption.getOrElse(emptyMap)
+            groupedPairs.mapValues { vs =>
+              if (vs.size > 1) {
+                Map[String, Any]((name -> vs))
+              } else {
+                vs.headOption.getOrElse(emptyMap)
+              }
             }
-          }
-        } catch {
-          case e: Throwable => {
-            error(s"collect metrics ${name} error: ${e.getMessage}")
-            Map[Long, Map[String, Any]]()
+          } catch {
+            case e: Throwable => {
+              error(s"collect metrics ${name} error: ${e.getMessage}")
+              Map[Long, Map[String, Any]]()
+            }
           }
         }
+        case _ => Map[Long, Map[String, Any]]()
       }
-      case _ => Map[Long, Map[String, Any]]()
-    }
+    } else Map[Long, Map[String, Any]]()
   }
 
   def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]
                       ): Option[RDD[(Long, Iterable[String])]] = {
-    ruleStep match {
-      case step: ConcreteRuleStep if ((step.persistType == RecordPersistType)
-        || (step.updateDataSource.nonEmpty)) => {
-        val name = step.name
-        try {
-          val pdf = sqlContext.table(s"`${name}`")
-          val cols = pdf.columns
-          val rdd = pdf.flatMap { row =>
-            val values = cols.flatMap { col =>
-              Some((col, row.getAs[Any](col)))
-            }.toMap
-            values.get(GroupByColumn.tmst) match {
-              case Some(t: Long) if (timeGroups.exists(_ == t)) => Some((t, JsonUtil.toJson(values)))
-              case _ => None
+    if (collectable) {
+      ruleStep match {
+        case step: ConcreteRuleStep if ((step.persistType == RecordPersistType)
+          || (step.updateDataSource.nonEmpty)) => {
+          val name = step.name
+          try {
+            val pdf = sqlContext.table(s"`${name}`")
+            val cols = pdf.columns
+            val rdd = pdf.flatMap { row =>
+              val values = cols.flatMap { col =>
+                Some((col, row.getAs[Any](col)))
+              }.toMap
+              values.get(GroupByColumn.tmst) match {
+                case Some(t: Long) if (timeGroups.exists(_ == t)) => Some((t, JsonUtil.toJson(values)))
+                case _ => None
+              }
+            }.groupByKey()
+            Some(rdd)
+          } catch {
+            case e: Throwable => {
+              error(s"collect records ${name} error: ${e.getMessage}")
+              None
             }
-          }.groupByKey()
-          Some(rdd)
-        } catch {
-          case e: Throwable => {
-            error(s"collect records ${name} error: ${e.getMessage}")
-            None
           }
         }
+        case _ => None
       }
-      case _ => None
-    }
+    } else None
   }
 
 //  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]] = {

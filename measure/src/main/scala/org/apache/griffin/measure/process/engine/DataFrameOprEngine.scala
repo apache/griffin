@@ -96,12 +96,13 @@ object DataFrameOprs {
     val _miss = "miss"
     val _total = "total"
     val _matched = "matched"
-    val _tmst = "tmst"
+//    val _tmst = "tmst"
     val dfName = details.getOrElse(_dfName, _dfName).toString
     val miss = details.getOrElse(_miss, _miss).toString
     val total = details.getOrElse(_total, _total).toString
     val matched = details.getOrElse(_matched, _matched).toString
-    val tmst = details.getOrElse(_tmst, _tmst).toString
+//    val tmst = details.getOrElse(_tmst, _tmst).toString
+    val tmst = GroupByColumn.tmst
 
     val updateTime = new Date().getTime
 

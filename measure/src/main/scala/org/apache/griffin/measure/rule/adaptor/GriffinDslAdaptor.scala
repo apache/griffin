@@ -230,7 +230,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
                |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
                |FROM `${totalTableName}` FULL JOIN `${missTableName}`
                |ON `${totalTableName}`.`${GroupByColumn.tmst}` = `${missTableName}`.`${GroupByColumn.tmst}`
-          """.stripMargin
+            """.stripMargin
           }
           val accuracyMetricName = resultName(details, AccuracyInfo._Accuracy)
           val accuracyMetricStep = SparkSqlStep(
@@ -250,8 +250,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
               ("df.name" -> accuracyMetricName),
               ("miss" -> missColName),
               ("total" -> totalColName),
-              ("matched" -> matchedColName),
-              ("tmst" -> GroupByColumn.tmst)
+              ("matched" -> matchedColName)
             ),
             resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType),
             None
