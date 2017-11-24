@@ -22,6 +22,8 @@ package org.apache.griffin.core.measure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.util.JsonUtil;
 
 import javax.persistence.Column;
@@ -89,7 +91,10 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("details")
-    public Map<String, Object> getDetailsMap() {
+    public Map<String, Object> getDetailsMap() throws IOException {
+        if (detailsMap == null && !StringUtils.isEmpty(details)) {
+            detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {});
+        }
         return detailsMap;
     }
 
