@@ -28,43 +28,43 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class FSUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FSUtil.class);
 
-    @Value("${fs.defaultFS}")
-    private static String fsDefaultName;
+    private String fsDefaultName;
 
     private static FileSystem fileSystem;
 
-    static {
+    public FSUtil(@Value("${fs.defaultFS}") String fsDefaultName) {
         try {
+            this.fsDefaultName = fsDefaultName;
             initFileSystem();
-        } catch (IOException e) {
-            LOGGER.error("cannot get hdfs file system.", e);
+        } catch (Exception e) {
+            LOGGER.error("Can not get hdfs file system.", e);
         }
     }
 
-    private static void initFileSystem() throws IOException {
+
+    private void initFileSystem() throws IOException {
         Configuration conf = new Configuration();
         if (!StringUtils.isEmpty(fsDefaultName)) {
             conf.set("fs.defaultFS", fsDefaultName);
-            LOGGER.info("Setting fs.defaultFS:{}",fsDefaultName);
+            LOGGER.info("Setting fs.defaultFS:{}", fsDefaultName);
         }
         if (StringUtils.isEmpty(conf.get("fs.hdfs.impl"))) {
-            LOGGER.info("Setting fs.hdfs.impl:{}",org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+            LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
             conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
         }
         if (StringUtils.isEmpty(conf.get("fs.file.impl"))) {
-            LOGGER.info("Setting fs.hdfs.impl:{}",org.apache.hadoop.fs.LocalFileSystem.class.getName());
+            LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.fs.LocalFileSystem.class.getName());
             conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
         }
         fileSystem = FileSystem.get(conf);
@@ -141,7 +141,6 @@ public class FSUtil {
         }
 
     }
-
 
 
     public static boolean isFileExist(String path) throws IOException {
