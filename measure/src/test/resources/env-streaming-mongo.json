@@ -27,15 +27,9 @@
     {
       "type": "mongo",
       "config": {
-        "url": "10.103.178.206",
-        "database": "unitdb0",
-        "collection": "dq_metrics_values",
-        "id.gen": {
-          "url": "10.103.178.206",
-          "database": "unitdb0",
-          "collection": "SEQUENCE",
-          "_id": "SEQ_ID"
-        }
+        "url": "10.149.247.156",
+        "database": "test",
+        "collection": "sss"
       }
     }
   ],

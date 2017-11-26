@@ -403,7 +403,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         )
 
         filterStep :: profilingStep :: Nil
-      }.reduce(_ ::: _)
+      }.foldLeft(Nil: List[ConcreteRuleStep])(_ ::: _)
       
     }
   }

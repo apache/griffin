@@ -19,39 +19,29 @@ under the License.
 package org.apache.griffin.measure.persist
 
 import org.junit.runner.RunWith
+import org.mongodb.scala.{Completed, Document}
+import org.mongodb.scala.model.{Filters, UpdateOptions, Updates}
+import org.mongodb.scala.result.UpdateResult
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
+
+import scala.util.Success
 
 @RunWith(classOf[JUnitRunner])
 class MongoPersistTest extends FunSuite with Matchers with BeforeAndAfter {
 
-  val config: Map[String, Any] = Map[String, Any](
-    ("url" -> "10.149.247.156"),
-    ("database" -> "test"),
-    ("collection" -> "sss"),
-    ("id.gen" -> Map[String, Any](
-      ("url" -> "10.149.247.156"),
-      ("database" -> "test"),
-      ("collection" -> "SEQUENCE"),
-      ("_id" -> "SSS_ID")
-    ))
+  val config = Map[String, Any](
+    ("url" -> "mongodb://111.111.111.111"),
+    ("database" -> "db"),
+    ("collection" -> "cl")
   )
-  val metricName: String = "m7"
-//  val timeStamp: Long = 123456789L
+  val metricName: String = "metric"
+  val timeStamp: Long = 123456789L
 
-//  val mongoPersist = MongoPersist(config, metricName, timeStamp)
+  val mongoPersist = MongoPersist(config, metricName, timeStamp)
 
-  test ("test persist metric") {
-    val metrics = Map[String, Any](
-      ("cnt" -> 1234),
-      ("avg" -> 12),
-      ("min" -> 3)
-    )
-
-    val mongoPersist1 = MongoPersist(config, metricName, 12345L)
-    mongoPersist1.persistMetrics(metrics)
-
-    Thread.sleep(5000L)
+  test("available") {
+    mongoPersist.available should be (true)
   }
 
 }
