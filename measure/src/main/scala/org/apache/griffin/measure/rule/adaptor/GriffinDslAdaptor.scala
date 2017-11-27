@@ -172,6 +172,12 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val sourceName = getNameOpt(details, AccuracyInfo._Source).getOrElse(dataSourceNames.head)
     val targetName = getNameOpt(details, AccuracyInfo._Target).getOrElse(dataSourceNames.tail.head)
     val analyzer = AccuracyAnalyzer(expr.asInstanceOf[LogicalExpr], sourceName, targetName)
+
+    println(expr)
+
+    val tmsts = dsTmsts.getOrElse(sourceName, Set.empty[Long])
+//    val targetTmsts = dsTmsts.getOrElse(targetName, Set.empty[Long])
+
     if (!checkDataSourceExists(sourceName)) {
       Nil
     } else {
@@ -199,109 +205,80 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           .withPersistType(resultPersistType(details, AccuracyInfo._MissRecords, RecordPersistType))
           .withUpdateDataSourceOpt(resultUpdateDataSourceOpt(details, AccuracyInfo._MissRecords))
       )
-//      val missRecordsStep = SparkSqlStep(
-//        missRecordsName,
-//        missRecordsSql,
-//        Map[String, Any](),
-//        resultPersistType(details, AccuracyInfo._MissRecords, RecordPersistType),
-//        resultUpdateDataSourceOpt(details, AccuracyInfo._MissRecords)
-//      )
 
-      // 2. miss count
-      val missTableName = "_miss_"
-      val missColName = getNameOpt(details, AccuracyInfo._Miss).getOrElse(AccuracyInfo._Miss)
-      val missSql = procType match {
-        case BatchProcessType => s"SELECT COUNT(*) AS `${missColName}` FROM `${missRecordsName}`"
-        case StreamingProcessType => s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`, COUNT(*) AS `${missColName}` FROM `${missRecordsName}` GROUP BY `${GroupByColumn.tmst}`"
-      }
-      val missStep = SparkSqlStep(
-        ruleStep.timeInfo,
-        RuleInfo(missTableName, missSql, Map[String, Any]())
-      )
-//      val missStep = SparkSqlStep(
-//        missTableName,
-//        missSql,
-//        Map[String, Any](),
-//        NonePersistType,
-//        None
-//      )
+      val tmstStepsPair = tmsts.map { tmst =>
+        val timeInfo = TimeInfo(ruleStep.timeInfo.calcTime, tmst)
 
-      // 3. total count
-      val totalTableName = "_total_"
-      val totalColName = getNameOpt(details, AccuracyInfo._Total).getOrElse(AccuracyInfo._Total)
-      val totalSql = procType match {
-        case BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
-        case StreamingProcessType => s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`, COUNT(*) AS `${totalColName}` FROM `${sourceName}` GROUP BY `${GroupByColumn.tmst}`"
-      }
-      val totalStep = SparkSqlStep(
-        ruleStep.timeInfo,
-        RuleInfo(totalTableName, totalSql, Map[String, Any]())
-      )
-//      val totalStep = SparkSqlStep(
-//        totalTableName,
-//        totalSql,
-//        Map[String, Any](),
-//        NonePersistType,
-//        None
-//      )
+        // 2. miss count
+        val missTableName = "_miss_"
+        val tmstMissTableName = TempName.tmstName(missTableName, timeInfo)
+        val missColName = getNameOpt(details, AccuracyInfo._Miss).getOrElse(AccuracyInfo._Miss)
+        val missSql = procType match {
+          case BatchProcessType => s"SELECT COUNT(*) AS `${missColName}` FROM `${missRecordsName}`"
+          case StreamingProcessType => s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`, COUNT(*) AS `${missColName}` FROM `${missRecordsName}` GROUP BY `${GroupByColumn.tmst}`"
+        }
+        val missStep = SparkSqlStep(
+          timeInfo,
+          RuleInfo(tmstMissTableName, missSql, Map[String, Any]())
+        )
 
-      // 4. accuracy metric
-      val matchedColName = getNameOpt(details, AccuracyInfo._Matched).getOrElse(AccuracyInfo._Matched)
-      val accuracyMetricSql = procType match {
-        case BatchProcessType =>
-          s"""
-             |SELECT `${missTableName}`.`${missColName}` AS `${missColName}`,
-             |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
-             |FROM `${totalTableName}` FULL JOIN `${missTableName}`
+        // 3. total count
+        val totalTableName = "_total_"
+        val tmstTotalTableName = TempName.tmstName(totalTableName, timeInfo)
+        val totalColName = getNameOpt(details, AccuracyInfo._Total).getOrElse(AccuracyInfo._Total)
+        val totalSql = procType match {
+          case BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
+          case StreamingProcessType => s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`, COUNT(*) AS `${totalColName}` FROM `${sourceName}` GROUP BY `${GroupByColumn.tmst}`"
+        }
+        val totalStep = SparkSqlStep(
+          timeInfo,
+          RuleInfo(tmstTotalTableName, totalSql, Map[String, Any]())
+        )
+
+        // 4. accuracy metric
+        val accuracyMetricName = resultName(details, AccuracyInfo._Accuracy)
+        val tmstAccuracyMetricName = TempName.tmstName(accuracyMetricName, timeInfo)
+        val matchedColName = getNameOpt(details, AccuracyInfo._Matched).getOrElse(AccuracyInfo._Matched)
+        val accuracyMetricSql = procType match {
+          case BatchProcessType =>
+            s"""
+               |SELECT `${missTableName}`.`${missColName}` AS `${missColName}`,
+               |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
+               |FROM `${totalTableName}` FULL JOIN `${missTableName}`
            """.stripMargin
-        case StreamingProcessType =>
-          s"""
-             |SELECT `${totalTableName}`.`${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,
-             |`${missTableName}`.`${missColName}` AS `${missColName}`,
-             |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
-             |FROM `${totalTableName}` FULL JOIN `${missTableName}`
-             |ON `${totalTableName}`.`${GroupByColumn.tmst}` = `${missTableName}`.`${GroupByColumn.tmst}`
+          case StreamingProcessType =>
+            s"""
+               |SELECT `${totalTableName}`.`${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,
+               |`${missTableName}`.`${missColName}` AS `${missColName}`,
+               |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
+               |FROM `${totalTableName}` FULL JOIN `${missTableName}`
+               |ON `${totalTableName}`.`${GroupByColumn.tmst}` = `${missTableName}`.`${GroupByColumn.tmst}`
            """.stripMargin
+        }
+        val accuracyMetricStep = SparkSqlStep(
+          timeInfo,
+          RuleInfo(tmstAccuracyMetricName, accuracyMetricSql, details)
+            .withName(accuracyMetricName)
+        )
+
+        // 5. accuracy metric filter
+        val accuracyStep = DfOprStep(
+          ruleStep.timeInfo,
+          RuleInfo(tmstAccuracyMetricName, "accuracy", Map[String, Any](
+            ("df.name" -> tmstAccuracyMetricName),
+            ("miss" -> missColName),
+            ("total" -> totalColName),
+            ("matched" -> matchedColName)
+          )).withPersistType(resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType))
+            .withName(accuracyMetricName)
+        )
+
+        (missStep :: totalStep :: accuracyMetricStep :: Nil, accuracyStep :: Nil)
+      }.foldLeft((Nil: Seq[ConcreteRuleStep], Nil: Seq[ConcreteRuleStep])) { (ret, next) =>
+        (ret._1 ++ next._1, ret._2 ++ next._2)
       }
-      val accuracyMetricName = resultName(details, AccuracyInfo._Accuracy)
-      val accuracyMetricStep = SparkSqlStep(
-        ruleStep.timeInfo,
-        RuleInfo(accuracyMetricName, accuracyMetricSql, details)
-          .withName(accuracyMetricName)
-      )
-//      val accuracyMetricStep = SparkSqlStep(
-//        accuracyMetricName,
-//        accuracyMetricSql,
-//        details,
-//        NonePersistType,
-//        None
-//      )
 
-      // 5. accuracy metric filter
-      val accuracyStep = DfOprStep(
-        ruleStep.timeInfo,
-        RuleInfo(accuracyMetricName, "accuracy", Map[String, Any](
-          ("df.name" -> accuracyMetricName),
-          ("miss" -> missColName),
-          ("total" -> totalColName),
-          ("matched" -> matchedColName)
-        )).withPersistType(resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType))
-          .withName(accuracyMetricName)
-      )
-//      val accuracyStep = DfOprStep(
-//        accuracyMetricName,
-//        "accuracy",
-//        Map[String, Any](
-//          ("df.name" -> accuracyMetricName),
-//          ("miss" -> missColName),
-//          ("total" -> totalColName),
-//          ("matched" -> matchedColName)
-//        ),
-//        resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType),
-//        None
-//      )
-
-      missRecordsStep :: missStep :: totalStep :: accuracyMetricStep :: accuracyStep :: Nil
+      missRecordsStep +: (tmstStepsPair._1 ++ tmstStepsPair._2)
     }
   }
 
@@ -369,7 +346,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         )
 
         filterStep :: profilingStep :: Nil
-      }.foldLeft(Nil: List[ConcreteRuleStep])(_ ::: _)
+      }.foldLeft(Nil: Seq[ConcreteRuleStep])(_ ++ _)
       
     }
   }
