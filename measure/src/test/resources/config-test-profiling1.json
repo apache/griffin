@@ -35,12 +35,13 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "source.user_id, count(*) from source group by source.user_id",
+        "rule": "source.last_name, count(*) as `cnt` from source group by source.last_name",
         "details": {
           "profiling": {
             "name": "pri",
             "persist.type": "metric"
-          }
+          },
+          "as.array": true
         }
       }
     ]

@@ -52,15 +52,16 @@ trait SparkDqEngine extends DqEngine {
                 case e: Throwable => None
               }
             }
-            val groupedPairs: Map[Long, Seq[Map[String, Any]]] = pairs.foldLeft(Map[Long, Seq[Map[String, Any]]]()) { (ret, pair) =>
-              val (k, v) = pair
-              ret.get(k) match {
-                case Some(seq) => ret + (k -> (seq :+ v))
-                case _ => ret + (k -> (v :: Nil))
+            val groupedPairs: Map[Long, Seq[Map[String, Any]]] =
+              pairs.foldLeft(Map[Long, Seq[Map[String, Any]]]()) { (ret, pair) =>
+                val (k, v) = pair
+                ret.get(k) match {
+                  case Some(seq) => ret + (k -> (seq :+ v))
+                  case _ => ret + (k -> (v :: Nil))
+                }
               }
-            }
             groupedPairs.mapValues { vs =>
-              if (vs.size > 1) {
+              if (step.ruleInfo.asArray || vs.size > 1) {
                 Map[String, Any]((metricName -> vs))
               } else {
                 vs.headOption.getOrElse(emptyMap)

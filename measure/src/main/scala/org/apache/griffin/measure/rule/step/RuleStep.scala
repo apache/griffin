@@ -41,6 +41,7 @@ case class TimeInfo(calcTime: Long, tmst: Long) {}
 case class RuleInfo(name: String, rule: String, details: Map[String, Any]) {
   private val _name = "name"
   private val _persistType = "persist.type"
+  private val _asArray = "as.array"
   private val _updateDataSource = "update.data.source"
 
   def persistType = PersistType(details.getOrElse(_persistType, "").toString)
@@ -61,5 +62,15 @@ case class RuleInfo(name: String, rule: String, details: Map[String, Any]) {
 
   def originName: String = {
     details.getOrElse(_name, name).toString
+  }
+  def asArray: Boolean = {
+    try {
+      details.get(_asArray) match {
+        case Some(v) => v.toString.toBoolean
+        case _ => false
+      }
+    } catch {
+      case e: Throwable => false
+    }
   }
 }
