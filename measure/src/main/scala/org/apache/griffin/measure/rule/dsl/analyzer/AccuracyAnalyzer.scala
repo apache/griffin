@@ -27,9 +27,7 @@ case class AccuracyAnalyzer(expr: LogicalExpr, sourceName: String, targetName: S
 
   val sourceSelectionExprs = {
     val seq = seqSelectionExprs(sourceName)
-    val a = expr.preOrderTraverseDepthFirst(Seq[SelectionExpr]())(seq, combSelectionExprs)
-    println(a)
-    a
+    expr.preOrderTraverseDepthFirst(Seq[SelectionExpr]())(seq, combSelectionExprs)
   }
   val targetSelectionExprs = {
     val seq = seqSelectionExprs(targetName)

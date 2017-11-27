@@ -38,19 +38,19 @@ case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
-      case DfOprStep(_, ri) => {
+      case DfOprStep(ti, ri) => {
         try {
           ri.rule match {
             case DataFrameOprs._fromJson => {
-              val df = DataFrameOprs.fromJson(sqlContext, ri.details)
+              val df = DataFrameOprs.fromJson(sqlContext, ri)
               df.registerTempTable(ri.name)
             }
             case DataFrameOprs._accuracy => {
-              val df = DataFrameOprs.accuracy(sqlContext, ri.details)
+              val df = DataFrameOprs.accuracy(sqlContext, ti, ri)
               df.registerTempTable(ri.name)
             }
             case DataFrameOprs._clear => {
-              val df = DataFrameOprs.clear(sqlContext, ri.details)
+              val df = DataFrameOprs.clear(sqlContext, ri)
               df.registerTempTable(ri.name)
             }
             case _ => {
@@ -77,7 +77,9 @@ object DataFrameOprs {
   final val _accuracy = "accuracy"
   final val _clear = "clear"
 
-  def fromJson(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
+  def fromJson(sqlContext: SQLContext, ruleInfo: RuleInfo): DataFrame = {
+    val details = ruleInfo.details
+
     val _dfName = "df.name"
     val _colName = "col.name"
     val dfName = details.getOrElse(_dfName, "").toString
@@ -91,7 +93,9 @@ object DataFrameOprs {
     sqlContext.read.json(rdd)
   }
 
-  def accuracy(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
+  def accuracy(sqlContext: SQLContext, timeInfo: TimeInfo, ruleInfo: RuleInfo): DataFrame = {
+    val details = ruleInfo.details
+
     val _dfName = "df.name"
     val _miss = "miss"
     val _total = "total"
@@ -102,7 +106,7 @@ object DataFrameOprs {
     val total = details.getOrElse(_total, _total).toString
     val matched = details.getOrElse(_matched, _matched).toString
 //    val tmst = details.getOrElse(_tmst, _tmst).toString
-    val tmst = GroupByColumn.tmst
+//    val tmst = GroupByColumn.tmst
 
     val updateTime = new Date().getTime
 
@@ -116,13 +120,14 @@ object DataFrameOprs {
 
     val df = sqlContext.table(s"`${dfName}`")
     val results = df.flatMap { row =>
-      val t = getLong(row, tmst)
-      if (t > 0) {
+      try {
         val missCount = getLong(row, miss)
         val totalCount = getLong(row, total)
         val ar = AccuracyResult(missCount, totalCount)
-        Some((t, ar))
-      } else None
+        Some((timeInfo.tmst, ar))
+      } catch {
+        case e: Throwable => None
+      }
     }.collect
 
     val updateResults = results.flatMap { pair =>
@@ -137,21 +142,22 @@ object DataFrameOprs {
     }
 
     val schema = StructType(Array(
-      StructField(tmst, LongType),
       StructField(miss, LongType),
       StructField(total, LongType),
       StructField(matched, LongType)
     ))
     val rows = updateResults.map { r =>
       val ar = r.result.asInstanceOf[AccuracyResult]
-      Row(r.timeGroup, ar.miss, ar.total, ar.getMatch)
+      Row(ar.miss, ar.total, ar.getMatch)
     }
     val rowRdd = sqlContext.sparkContext.parallelize(rows)
     sqlContext.createDataFrame(rowRdd, schema)
 
   }
 
-  def clear(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
+  def clear(sqlContext: SQLContext, ruleInfo: RuleInfo): DataFrame = {
+    val details = ruleInfo.details
+
     val _dfName = "df.name"
     val dfName = details.getOrElse(_dfName, "").toString
 

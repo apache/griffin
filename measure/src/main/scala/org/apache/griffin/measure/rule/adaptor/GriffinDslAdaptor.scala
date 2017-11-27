@@ -173,8 +173,6 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val targetName = getNameOpt(details, AccuracyInfo._Target).getOrElse(dataSourceNames.tail.head)
     val analyzer = AccuracyAnalyzer(expr.asInstanceOf[LogicalExpr], sourceName, targetName)
 
-    println(expr)
-
     val tmsts = dsTmsts.getOrElse(sourceName, Set.empty[Long])
 //    val targetTmsts = dsTmsts.getOrElse(targetName, Set.empty[Long])
 
@@ -213,9 +211,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         val missTableName = "_miss_"
         val tmstMissTableName = TempName.tmstName(missTableName, timeInfo)
         val missColName = getNameOpt(details, AccuracyInfo._Miss).getOrElse(AccuracyInfo._Miss)
-        val missSql = procType match {
-          case BatchProcessType => s"SELECT COUNT(*) AS `${missColName}` FROM `${missRecordsName}`"
-          case StreamingProcessType => s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`, COUNT(*) AS `${missColName}` FROM `${missRecordsName}` GROUP BY `${GroupByColumn.tmst}`"
+        val missSql = {
+          s"SELECT COUNT(*) AS `${missColName}` FROM `${missRecordsName}` WHERE `${GroupByColumn.tmst}` = ${tmst}"
         }
         val missStep = SparkSqlStep(
           timeInfo,
@@ -226,9 +223,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         val totalTableName = "_total_"
         val tmstTotalTableName = TempName.tmstName(totalTableName, timeInfo)
         val totalColName = getNameOpt(details, AccuracyInfo._Total).getOrElse(AccuracyInfo._Total)
-        val totalSql = procType match {
-          case BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
-          case StreamingProcessType => s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`, COUNT(*) AS `${totalColName}` FROM `${sourceName}` GROUP BY `${GroupByColumn.tmst}`"
+        val totalSql = {
+          s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}` WHERE `${GroupByColumn.tmst}` = ${tmst}"
         }
         val totalStep = SparkSqlStep(
           timeInfo,
@@ -239,20 +235,11 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         val accuracyMetricName = resultName(details, AccuracyInfo._Accuracy)
         val tmstAccuracyMetricName = TempName.tmstName(accuracyMetricName, timeInfo)
         val matchedColName = getNameOpt(details, AccuracyInfo._Matched).getOrElse(AccuracyInfo._Matched)
-        val accuracyMetricSql = procType match {
-          case BatchProcessType =>
-            s"""
-               |SELECT `${missTableName}`.`${missColName}` AS `${missColName}`,
-               |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
-               |FROM `${totalTableName}` FULL JOIN `${missTableName}`
-           """.stripMargin
-          case StreamingProcessType =>
-            s"""
-               |SELECT `${totalTableName}`.`${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,
-               |`${missTableName}`.`${missColName}` AS `${missColName}`,
-               |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
-               |FROM `${totalTableName}` FULL JOIN `${missTableName}`
-               |ON `${totalTableName}`.`${GroupByColumn.tmst}` = `${missTableName}`.`${GroupByColumn.tmst}`
+        val accuracyMetricSql = {
+          s"""
+             |SELECT `${tmstMissTableName}`.`${missColName}` AS `${missColName}`,
+             |`${tmstTotalTableName}`.`${totalColName}` AS `${totalColName}`
+             |FROM `${tmstTotalTableName}` FULL JOIN `${tmstMissTableName}`
            """.stripMargin
         }
         val accuracyMetricStep = SparkSqlStep(
@@ -263,7 +250,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 
         // 5. accuracy metric filter
         val accuracyStep = DfOprStep(
-          ruleStep.timeInfo,
+          timeInfo,
           RuleInfo(tmstAccuracyMetricName, "accuracy", Map[String, Any](
             ("df.name" -> tmstAccuracyMetricName),
             ("miss" -> missColName),
