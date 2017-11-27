@@ -25,9 +25,20 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "select source.user_id.max(), user_id.min(), user_id.count() from `source`",
+        "rule": "count(*) from source",
         "details": {
           "profiling": {
+            "persist.type": "metric"
+          }
+        }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "rule": "source.user_id, count(*) from source group by source.user_id",
+        "details": {
+          "profiling": {
+            "name": "pri",
             "persist.type": "metric"
           }
         }
