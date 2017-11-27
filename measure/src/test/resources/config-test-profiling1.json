@@ -3,7 +3,7 @@
 
   "process.type": "batch",
 
-  "timestamp": 1234,
+  "timestamp": 123456,
 
   "data.sources": [
     {

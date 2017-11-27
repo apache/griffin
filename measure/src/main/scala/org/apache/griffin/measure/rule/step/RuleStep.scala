@@ -39,12 +39,16 @@ trait RuleStep extends Serializable {
 case class TimeInfo(calcTime: Long, tmst: Long) {}
 
 case class RuleInfo(name: String, rule: String, details: Map[String, Any]) {
+  private val _name = "name"
   private val _persistType = "persist.type"
   private val _updateDataSource = "update.data.source"
 
   def persistType = PersistType(details.getOrElse(_persistType, "").toString)
   def updateDataSourceOpt = details.get(_updateDataSource).map(_.toString)
 
+  def withName(n: String): RuleInfo = {
+    RuleInfo(name, rule, details + (_name -> n))
+  }
   def withPersistType(pt: PersistType): RuleInfo = {
     RuleInfo(name, rule, details + (_persistType -> pt.desc))
   }
@@ -53,5 +57,9 @@ case class RuleInfo(name: String, rule: String, details: Map[String, Any]) {
       case Some(uds) => RuleInfo(name, rule, details + (_updateDataSource -> uds))
       case _ => this
     }
+  }
+
+  def originName: String = {
+    details.getOrElse(_name, name).toString
   }
 }

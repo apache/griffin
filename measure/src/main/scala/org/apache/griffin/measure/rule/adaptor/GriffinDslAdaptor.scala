@@ -195,6 +195,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val missRecordsStep = SparkSqlStep(
         ruleStep.timeInfo,
         RuleInfo(missRecordsName, missRecordsSql, Map[String, Any]())
+          .withName(missRecordsName)
           .withPersistType(resultPersistType(details, AccuracyInfo._MissRecords, RecordPersistType))
           .withUpdateDataSourceOpt(resultUpdateDataSourceOpt(details, AccuracyInfo._MissRecords))
       )
@@ -266,6 +267,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val accuracyMetricStep = SparkSqlStep(
         ruleStep.timeInfo,
         RuleInfo(accuracyMetricName, accuracyMetricSql, details)
+          .withName(accuracyMetricName)
       )
 //      val accuracyMetricStep = SparkSqlStep(
 //        accuracyMetricName,
@@ -284,6 +286,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           ("total" -> totalColName),
           ("matched" -> matchedColName)
         )).withPersistType(resultPersistType(details, AccuracyInfo._Accuracy, MetricPersistType))
+          .withName(accuracyMetricName)
       )
 //      val accuracyStep = DfOprStep(
 //        accuracyMetricName,
@@ -361,7 +364,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         val profilingStep = SparkSqlStep(
           timeInfo,
           RuleInfo(tmstMetricName, profilingSql, details)
-              .withPersistType(resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType))
+            .withName(metricName)
+            .withPersistType(resultPersistType(details, ProfilingInfo._Profiling, MetricPersistType))
         )
 
         filterStep :: profilingStep :: Nil

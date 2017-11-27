@@ -41,12 +41,13 @@ trait SparkDqEngine extends DqEngine {
             val pdf = sqlContext.table(s"`${name}`")
             val records: Array[String] = pdf.toJSON.collect()
 
-            val (metricName, tmstOpt) = TempName.extractTmstName(name)
+            val metricName = step.ruleInfo.originName
+            val tmst = step.timeInfo.tmst
 
             val pairs = records.flatMap { rec =>
               try {
                 val value = JsonUtil.toAnyMap(rec)
-                tmstOpt.map((_, value))
+                Some((tmst, value))
               } catch {
                 case e: Throwable => None
               }
