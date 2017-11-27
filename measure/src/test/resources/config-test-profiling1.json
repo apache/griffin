@@ -25,7 +25,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "select source.user_id.max() as max, user_id.min() as min, user_id.count() as cnt from source",
+        "rule": "select source.user_id.max(), user_id.min(), user_id.count() from `source`",
         "details": {
           "profiling": {
             "persist.type": "metric"

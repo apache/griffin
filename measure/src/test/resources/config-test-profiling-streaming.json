@@ -54,7 +54,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "name, *.count() group by name",
+        "rule": "source.name, source.*.count() from source group by source.name",
         "details": {
           "source": "source",
           "profiling": {
@@ -66,10 +66,22 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "name.count(), age.min(), age.avg(), age.max()",
+        "rule": "name.count(), source.age.min(), age.avg(), source.age.max()",
         "details": {
           "source": "source",
           "profiling": {
+            "persist.type": "metric"
+          }
+        }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "rule": "name.count() as `name-null-count` where source.name IS NULL",
+        "details": {
+          "source": "source",
+          "profiling": {
+            "name": "null-count",
             "persist.type": "metric"
           }
         }

@@ -30,4 +30,8 @@ case class FunctionExpr(functionName: String, args: Seq[Expr], aliasOpt: Option[
       Some(functionName)
     } else aliasOpt
   }
+
+  override def map(func: (Expr) => Expr): FunctionExpr = {
+    FunctionExpr(functionName, args.map(func(_)), aliasOpt)
+  }
 }

@@ -22,20 +22,15 @@ trait HeadExpr extends Expr with AliasableExpr {
   def alias: Option[String] = None
 }
 
-case class DataSourceHeadExpr(var name: String) extends HeadExpr {
-  def desc: String = name
+case class DataSourceHeadExpr(name: String) extends HeadExpr {
+  def desc: String = s"`${name}`"
   def coalesceDesc: String = desc
 }
 
 case class FieldNameHeadExpr(field: String) extends HeadExpr {
-  def desc: String = field
+  def desc: String = s"`${field}`"
   def coalesceDesc: String = desc
-  override def alias: Option[String] = {
-    val innerField = if (field.startsWith("`") && field.endsWith("`")) {
-      field.substring(1, field.length - 1)
-    } else field
-    Some(innerField)
-  }
+  override def alias: Option[String] = Some(field)
 }
 
 case class AllSelectHeadExpr() extends HeadExpr {
@@ -50,6 +45,10 @@ case class OtherHeadExpr(expr: Expr) extends HeadExpr {
   def desc: String = expr.desc
   def coalesceDesc: String = expr.coalesceDesc
   override def alias: Option[String] = Some(expr.desc)
+
+  override def map(func: (Expr) => Expr): OtherHeadExpr = {
+    OtherHeadExpr(func(expr))
+  }
 }
 
 // -------------
@@ -64,14 +63,9 @@ case class AllFieldsSelectExpr() extends SelectExpr {
 }
 
 case class FieldSelectExpr(field: String) extends SelectExpr {
-  def desc: String = s".${field}"
+  def desc: String = s".`${field}`"
   def coalesceDesc: String = desc
-  override def alias: Option[String] = {
-    val innerField = if (field.startsWith("`") && field.endsWith("`")) {
-      field.substring(1, field.length - 1)
-    } else field
-    Some(innerField)
-  }
+  override def alias: Option[String] = Some(field)
 }
 
 case class IndexSelectExpr(index: Expr) extends SelectExpr {
@@ -81,6 +75,10 @@ case class IndexSelectExpr(index: Expr) extends SelectExpr {
   def desc: String = s"[${index.desc}]"
   def coalesceDesc: String = desc
   def alias: Option[String] = Some(index.desc)
+
+  override def map(func: (Expr) => Expr): IndexSelectExpr = {
+    IndexSelectExpr(func(index))
+  }
 }
 
 case class FunctionSelectExpr(functionName: String, args: Seq[Expr]) extends SelectExpr {
@@ -90,6 +88,10 @@ case class FunctionSelectExpr(functionName: String, args: Seq[Expr]) extends Sel
   def desc: String = ""
   def coalesceDesc: String = desc
   def alias: Option[String] = Some(functionName)
+
+  override def map(func: (Expr) => Expr): FunctionSelectExpr = {
+    FunctionSelectExpr(functionName, args.map(func(_)))
+  }
 }
 
 // -------------
@@ -121,5 +123,10 @@ case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: O
       val aliasSeq = (head +: selectors).flatMap(_.alias)
       if (aliasSeq.size > 0) Some(aliasSeq.mkString("_")) else None
     } else aliasOpt
+  }
+
+  override def map(func: (Expr) => Expr): SelectionExpr = {
+    SelectionExpr(func(head).asInstanceOf[HeadExpr],
+      selectors.map(func(_).asInstanceOf[SelectExpr]), aliasOpt)
   }
 }

@@ -316,45 +316,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       }
     }
     val tmsts = dsTmsts.getOrElse(sourceName, Set.empty[Long])
-    val analyzer = ProfilingAnalyzer(profilingClause, sourceName)
-
-    val selExprDescs = analyzer.selectionExprs.map { sel =>
-      val alias = sel match {
-        case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.get}`"
-        case _ => ""
-      }
-      s"${sel.desc}${alias}"
-    }
-
-    val selClause = selExprDescs.mkString(", ")
-//    val selClause = procType match {
-//      case BatchProcessType => selExprDescs.mkString(", ")
-//      case StreamingProcessType => {
-//        if (analyzer.containsAllSelectionExpr) {
-//          selExprDescs.mkString(", ")
-//        } else {
-//          (s"`${GroupByColumn.tmst}`" +: selExprDescs).mkString(", ")
-//        }
-//      }
-//    }
-
     val fromClause = profilingClause.fromClauseOpt.getOrElse(FromClause(sourceName)).desc
-
-    val groupByClauseOpt = analyzer.groupbyExprOpt
-//    val groupByClauseOpt = procType match {
-//      case BatchProcessType => analyzer.groupbyExprOpt
-//      case StreamingProcessType => {
-//        val tmstGroupByClause = GroupbyClause(LiteralStringExpr(s"`${GroupByColumn.tmst}`") :: Nil, None)
-//        Some(tmstGroupByClause.merge(analyzer.groupbyExprOpt.getOrElse(GroupbyClause(Nil, None))))
-//      }
-//    }
-
-    val groupbyClause = groupByClauseOpt.map(_.desc).getOrElse("")
-    val preGroupbyClause = analyzer.preGroupbyExprs.map(_.desc).mkString(" ")
-    val postGroupbyClause = analyzer.postGroupbyExprs.map(_.desc).mkString(" ")
-
-    println("begin adaptor")
-    println(s"sourceName: ${sourceName}")
 
     if (!checkDataSourceExists(sourceName)) {
       Nil
@@ -363,37 +325,37 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         val timeInfo = TimeInfo(ruleStep.timeInfo.calcTime, tmst)
         val tmstSourceName = TempName.tmstName(sourceName, timeInfo)
 
-//        val selExprDescs = analyzer.selectionExprs.map { sel =>
-//          sel.head match {
-//            case head @ DataSourceHeadExpr(name) if (name == sourceName) => {
-//              head.name = s"`${tmstSourceName}`"
-//            }
-//            case _ => {}
-//          }
-//          val alias = sel match {
-//            case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.get}`"
-//            case _ => ""
-//          }
-//          s"${sel.desc}${alias}"
-//        }
-//        val selClause = selExprDescs.mkString(", ")
+        val tmstProfilingClause = profilingClause.map(dsHeadReplace(sourceName, tmstSourceName))
+        val tmstAnalyzer = ProfilingAnalyzer(tmstProfilingClause, tmstSourceName)
+
+        val selExprDescs = tmstAnalyzer.selectionExprs.map { sel =>
+          val alias = sel match {
+            case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.get}`"
+            case _ => ""
+          }
+          s"${sel.desc}${alias}"
+        }
+        val selClause = selExprDescs.mkString(", ")
+        val tmstFromClause = tmstProfilingClause.fromClauseOpt.getOrElse(FromClause(tmstSourceName)).desc
+        val groupByClauseOpt = tmstAnalyzer.groupbyExprOpt
+        val groupbyClause = groupByClauseOpt.map(_.desc).getOrElse("")
+        val preGroupbyClause = tmstAnalyzer.preGroupbyExprs.map(_.desc).mkString(" ")
+        val postGroupbyClause = tmstAnalyzer.postGroupbyExprs.map(_.desc).mkString(" ")
 
         // 1. where statement
         val filterSql = {
           s"SELECT * ${fromClause} WHERE `${GroupByColumn.tmst}` = ${tmst}"
         }
-        println(filterSql)
         val filterStep = SparkSqlStep(
           timeInfo,
           RuleInfo(tmstSourceName, filterSql, Map[String, Any]())
         )
 
         // 2. select statement
-        val partFromClause = FromClause(tmstSourceName).desc
+//        val partFromClause = FromClause(tmstSourceName).desc
         val profilingSql = {
-          s"SELECT ${selClause} ${partFromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
+          s"SELECT ${selClause} ${tmstFromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
         }
-        println(profilingSql)
         val metricName = resultName(details, ProfilingInfo._Profiling)
         val tmstMetricName = TempName.tmstName(metricName, timeInfo)
         val profilingStep = SparkSqlStep(
@@ -405,6 +367,18 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         filterStep :: profilingStep :: Nil
       }.foldLeft(Nil: List[ConcreteRuleStep])(_ ::: _)
       
+    }
+  }
+
+  private def dsHeadReplace(originName: String, replaceName: String): (Expr) => Expr = { expr: Expr =>
+    expr match {
+      case DataSourceHeadExpr(sn) if (sn == originName) => {
+        DataSourceHeadExpr(replaceName)
+      }
+      case FromClause(sn) if (sn == originName) => {
+        FromClause(replaceName)
+      }
+      case _ => expr.map(dsHeadReplace(originName, replaceName))
     }
   }
 
