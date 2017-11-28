@@ -38,6 +38,10 @@ trait DataConnector extends Loggable with Serializable {
 
 //  def available(): Boolean
 
+  var tmstCache: TmstCache = _
+  protected def saveTmst(t: Long) = tmstCache.insert(t)
+  protected def readTmst(t: Long) = tmstCache.range(t, t + 1)
+
   def init(): Unit
 
   def data(ms: Long): (Option[DataFrame], Set[Long])
@@ -54,9 +58,6 @@ trait DataConnector extends Loggable with Serializable {
   protected def thisName(ms: Long): String = s"this_${suffix(ms)}"
 
   final val tmstColName = GroupByColumn.tmst
-
-  protected def saveTmst(t: Long) = TmstCache.insert(t)
-  protected def readTmst(t: Long) = TmstCache.range(t, t + 1)
 
   def preProcess(dfOpt: Option[DataFrame], ms: Long): Option[DataFrame] = {
     val thisTable = thisName(ms)

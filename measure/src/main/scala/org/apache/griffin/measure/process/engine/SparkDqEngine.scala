@@ -98,7 +98,14 @@ trait SparkDqEngine extends DqEngine {
                 case _ => None
               }
             }.groupByKey()
-            Some(rdd)
+
+            // find other keys in time groups, create empty records for those timestamps
+            val existKeys = rdd.keys.collect
+            val otherKeys = timeGroups.filter(t => !existKeys.exists(_ == t))
+            val otherPairs = otherKeys.map((_, Iterable[String]())).toSeq
+            val otherPairRdd = sqlContext.sparkContext.parallelize(otherPairs)
+
+            Some(rdd union otherPairRdd)
           } catch {
             case e: Throwable => {
               error(s"collect records ${name} error: ${e.getMessage}")

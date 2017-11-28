@@ -25,7 +25,7 @@ import org.apache.griffin.measure.log.Loggable
 import scala.collection.mutable.{SortedSet => MutableSortedSet}
 
 
-object TmstCache extends Loggable {
+case class TmstCache() extends Loggable {
 
   private val tmstGroup: MutableSortedSet[Long] = MutableSortedSet.empty[Long]
 

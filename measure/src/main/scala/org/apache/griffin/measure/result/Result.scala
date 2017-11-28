@@ -23,6 +23,8 @@ trait Result extends Serializable {
 
   type T <: Result
 
+  def isLegal(): Boolean = true
+
   def update(delta: T): T
 
   def eventual(): Boolean

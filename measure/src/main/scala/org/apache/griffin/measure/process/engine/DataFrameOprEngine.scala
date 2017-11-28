@@ -124,7 +124,7 @@ object DataFrameOprs {
         val missCount = getLong(row, miss)
         val totalCount = getLong(row, total)
         val ar = AccuracyResult(missCount, totalCount)
-        Some((timeInfo.tmst, ar))
+        if (ar.isLegal) Some((timeInfo.tmst, ar)) else None
       } catch {
         case e: Throwable => None
       }

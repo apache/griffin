@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.data.source
 
+import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
@@ -35,9 +36,14 @@ case class DataSource(sqlContext: SQLContext,
   val streamingDataConnectors = DataConnectorFactory.filterStreamingDataConnectors(dataConnectors)
   streamingDataConnectors.foreach(_.dataSourceCacheOpt = dataSourceCacheOpt)
 
+  val tmstCache: TmstCache = TmstCache()
+
   def init(): Unit = {
     dataSourceCacheOpt.foreach(_.init)
     dataConnectors.foreach(_.init)
+
+    dataSourceCacheOpt.map(_.tmstCache = tmstCache)
+    dataConnectors.map(_.tmstCache = tmstCache)
   }
 
   def loadData(ms: Long): Set[Long] = {

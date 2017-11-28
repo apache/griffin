@@ -36,6 +36,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
                            metricName: String, index: Int
                           ) extends DataCacheable with Loggable with Serializable {
 
+  var tmstCache: TmstCache = _
+  protected def rangeTmsts(from: Long, until: Long) = tmstCache.range(from, until)
+  protected def clearTmstsUntil(until: Long) = {
+    val outDateTmsts = tmstCache.until(until)
+    tmstCache.remove(outDateTmsts)
+  }
+
   val name = ""
 
   val _FilePath = "file.path"
@@ -141,7 +148,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
 
     // from until tmst range
     val (from, until) = (reviseTimeRange._1, reviseTimeRange._2 + 1)
-    val tmstSet = TmstCache.range(from, until)
+    val tmstSet = rangeTmsts(from, until)
     (dfOpt, tmstSet)
   }
 
@@ -243,6 +250,9 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         val cleanTime = readCleanTime()
         cleanTime match {
           case Some(ct) => {
+            // clear out date tmsts
+            clearTmstsUntil(ct)
+
             // drop partitions
             val bounds = getPartition(ct)
 
