@@ -83,13 +83,11 @@ export class JobComponent implements OnInit {
     let deleteUrl = deleteJob + '?group=' + this.deleteGroup + '&jobName=' + this.deleteJob;
     this.http.delete(deleteUrl).subscribe(data => {
       let deleteResult:any = data;
-      console.log(deleteResult.code);
       if(deleteResult.code==206){
         var self = this;
         self.hide();
         setTimeout(function () {
           self.results.splice(self.deleteIndex,1);
-          // self.source.load(self.results);
         },0);
       }
     },

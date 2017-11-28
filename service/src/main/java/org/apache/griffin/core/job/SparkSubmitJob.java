@@ -24,9 +24,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.LivyConf;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
-import org.apache.griffin.core.job.entity.LivyConf;
 import org.apache.griffin.core.job.factory.PredicatorFactory;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.Measure;
@@ -35,7 +35,6 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -54,8 +53,6 @@ public class SparkSubmitJob implements Job {
     private Properties livyConfProps;
     @Autowired
     private JobServiceImpl jobService;
-    @Autowired
-    private SchedulerFactoryBean factory;
 
     private Measure measure;
     private String livyUri;
