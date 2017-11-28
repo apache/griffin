@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { MaxLengthValidator } from '@angular/forms';
@@ -39,18 +39,11 @@ import  {Router} from "@angular/router";
   providers:[ServiceService],
   styleUrls: ['./create-job.component.css']
 })
-export class CreateJobComponent implements OnInit {
+export class CreateJobComponent implements OnInit, AfterViewChecked {
 
   constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
-
-  public toasterconfig : ToasterConfig =
-        new ToasterConfig({
-            showCloseButton: true,
-            tapToDismiss: false,
-            timeout: 0
-        });
 
   currentStep = 1;
   Times = ['seconds','minutes','hours'];
@@ -204,7 +197,7 @@ export class CreateJobComponent implements OnInit {
     $(stepSelection).css({
         height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
     });
-    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 80);
+    $('fieldset').height($(stepSelection).height() - $(stepSelection + '>.stepDesc').height() - $('.btn-container').height() - 200);
     $('.y-scrollable').css({
         'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
     });
@@ -234,6 +227,9 @@ export class CreateJobComponent implements OnInit {
       // this.measureid = data[index].id;
       // }
     });
+  }
+  ngAfterViewChecked(){
+    this.resizeWindow();
   }
 
 }

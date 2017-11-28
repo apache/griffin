@@ -24,9 +24,13 @@ under the License.
 	color: #b2c831;
 }
 
+.btn-o{
+  background:0 0!important;
+}
+
 legend{
-    background-color: #1f1f1f;
-     color: #007AFF; 
+    background-color: #000;
+    color: #007AFF; 
     left: 10px;
     padding: 0 10px;
     position: absolute;
@@ -47,6 +51,10 @@ fieldset {
     min-width: 0;
     display: block;
     height: 320px;
+}
+
+.formStep{
+    background-color: #000;
 }
 .setcolor{
 	color: #b2c831;
