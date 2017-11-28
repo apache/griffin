@@ -83,7 +83,7 @@ export class DetailMetricComponent implements OnInit {
   }
 
   onResize(event){
-   this.resizeTreeMap();
+    this.resizeTreeMap();
   }
 
   resizeTreeMap(){
