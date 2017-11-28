@@ -317,6 +317,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           }
           s"${sel.desc}${alias}"
         }
+        val selCondition = tmstProfilingClause.selectClause.extraConditionOpt.map(_.desc).mkString
         val selClause = selExprDescs.mkString(", ")
         val tmstFromClause = tmstProfilingClause.fromClauseOpt.getOrElse(FromClause(tmstSourceName)).desc
         val groupByClauseOpt = tmstAnalyzer.groupbyExprOpt
@@ -336,8 +337,9 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         // 2. select statement
 //        val partFromClause = FromClause(tmstSourceName).desc
         val profilingSql = {
-          s"SELECT ${selClause} ${tmstFromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
+          s"SELECT ${selCondition} ${selClause} ${tmstFromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
         }
+//        println(profilingSql)
         val metricName = resultName(details, ProfilingInfo._Profiling)
         val tmstMetricName = TempName.tmstName(metricName, timeInfo)
         val profilingStep = SparkSqlStep(

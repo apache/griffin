@@ -25,9 +25,20 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "count(*) from source",
+        "rule": "select count(*) from source",
         "details": {
           "profiling": {
+            "persist.type": "metric"
+          }
+        }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "rule": "select count ( distinct source.post_code ) as `dis-cnt` from source",
+        "details": {
+          "profiling": {
+            "name": "dist-name",
             "persist.type": "metric"
           }
         }

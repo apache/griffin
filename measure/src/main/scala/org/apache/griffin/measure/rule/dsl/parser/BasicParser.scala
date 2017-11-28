@@ -145,6 +145,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val COMMA: Parser[String] = ","
 
     val SELECT: Parser[String] = """(?i)select\s""".r
+    val DISTINCT: Parser[String] = """(?i)distinct""".r
+//    val ALL: Parser[String] = """(?i)all""".r
     val FROM: Parser[String] = """(?i)from\s""".r
     val AS: Parser[String] = """(?i)as\s""".r
     val WHERE: Parser[String] = """(?i)where\s""".r
@@ -331,8 +333,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <arg> ::= <expr>
     */
 
-  def function: Parser[FunctionExpr] = FunctionName ~ LBR ~ repsep(argument, COMMA) ~ RBR ~ opt(asAlias) ^^ {
-    case name ~ _ ~ args ~ _ ~ aliasOpt => FunctionExpr(name, args, aliasOpt)
+  def function: Parser[FunctionExpr] = FunctionName ~ LBR ~ opt(DISTINCT) ~ repsep(argument, COMMA) ~ RBR ~ opt(asAlias) ^^ {
+    case name ~ _ ~ extraCdtnOpt ~ args ~ _ ~ aliasOpt =>
+      FunctionExpr(name, args, extraCdtnOpt.map(ExtraConditionExpr(_)), aliasOpt)
   }
   def argument: Parser[Expr] = expression
 
@@ -348,7 +351,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <limit-clause> = <limit> <expr>
     */
 
-  def selectClause: Parser[SelectClause] = opt(SELECT) ~> rep1sep(expression, COMMA) ^^ { SelectClause(_) }
+  def selectClause: Parser[SelectClause] = opt(SELECT) ~> opt(DISTINCT) ~ rep1sep(expression, COMMA) ^^ {
+    case extraCdtnOpt ~ exprs => SelectClause(exprs, extraCdtnOpt.map(ExtraConditionExpr(_)))
+  }
   def fromClause: Parser[FromClause] = FROM ~> DataSourceName ^^ { ds => FromClause(trim(ds)) }
   def whereClause: Parser[WhereClause] = WHERE ~> expression ^^ { WhereClause(_) }
   def havingClause: Parser[Expr] = HAVING ~> expression

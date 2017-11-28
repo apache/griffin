@@ -21,15 +21,21 @@ package org.apache.griffin.measure.rule.dsl.expr
 trait ClauseExpression extends Expr {
 }
 
-case class SelectClause(exprs: Seq[Expr]) extends ClauseExpression {
+case class SelectClause(exprs: Seq[Expr], extraConditionOpt: Option[ExtraConditionExpr]
+                       ) extends ClauseExpression {
 
   addChildren(exprs)
 
-  def desc: String = s"${exprs.map(_.desc).mkString(", ")}"
+  def desc: String = {
+    extraConditionOpt match {
+      case Some(cdtn) => s"${cdtn.desc} ${exprs.map(_.desc).mkString(", ")}"
+      case _ => s"${exprs.map(_.desc).mkString(", ")}"
+    }
+  }
   def coalesceDesc: String = desc
 
   override def map(func: (Expr) => Expr): SelectClause = {
-    SelectClause(exprs.map(func(_)))
+    SelectClause(exprs.map(func(_)), extraConditionOpt.map(func(_).asInstanceOf[ExtraConditionExpr]))
   }
 
 }
