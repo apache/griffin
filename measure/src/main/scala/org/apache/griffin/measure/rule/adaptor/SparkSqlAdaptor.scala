@@ -26,25 +26,13 @@ case class SparkSqlAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
   def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep] = {
     val ruleInfo = RuleInfo(getName(param), getRule(param), getDetails(param))
     SparkSqlStep(timeInfo, ruleInfo) :: Nil
-//    SparkSqlStep(getName(param), getRule(param), getDetails(param),
-//      getPersistType(param), getUpdateDataSource(param)) :: Nil
   }
   def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]): Seq[ConcreteRuleStep] = {
     ruleStep match {
       case rs @ SparkSqlStep(ti, ri) => {
         adaptPhase match {
           case PreProcPhase => rs :: Nil
-          case RunPhase => {
-//            val repSel = rule.replaceFirst("(?i)select", s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,")
-//            val groupbyRule = repSel.concat(s" GROUP BY `${GroupByColumn.tmst}`")
-//            val nrs = SparkSqlStep(name, groupbyRule, details, persistType, udsOpt)
-//            nrs :: Nil
-            val repSel = ri.rule.replaceFirst("(?i)select", s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,")
-            val groupbyRule = repSel.concat(s" GROUP BY `${GroupByColumn.tmst}`")
-            val nri = RuleInfo(ri.name, groupbyRule, ri.details)
-            val nrs = SparkSqlStep(ti, nri)
-            nrs :: Nil
-          }
+          case RunPhase => rs :: Nil
         }
       }
       case _ => Nil
