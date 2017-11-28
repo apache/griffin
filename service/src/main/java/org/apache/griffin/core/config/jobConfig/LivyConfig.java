@@ -26,9 +26,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Properties;
 
 @Configuration
-public class SparkJobConfig {
-    @Bean(name = "sparkJobProps")
-    public Properties sparkJobProperties() {
+public class LivyConfig {
+    @Bean(name = "livyConfProps")
+    public Properties livyConfProperties() {
         return PropertiesUtil.getProperties("/sparkJob.properties");
     }
 }

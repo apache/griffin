@@ -19,20 +19,20 @@ under the License.
 
 package org.apache.griffin.core.job.factory;
 
-import org.apache.griffin.core.job.FileExistPredictor;
-import org.apache.griffin.core.job.Predictor;
-import org.apache.griffin.core.job.entity.SegmentPredict;
+import org.apache.griffin.core.job.FileExistPredicator;
+import org.apache.griffin.core.job.Predicator;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
 
-public class PredictorFactory {
-    public static Predictor newPredictInstance(SegmentPredict segmentPredict) {
-        Predictor predict = null;
-        switch (segmentPredict.getType()) {
+public class PredicatorFactory {
+    public static Predicator newPredicateInstance(SegmentPredicate segPredicate) {
+        Predicator predicate = null;
+        switch (segPredicate.getType()) {
             case "file.exist":
-                predict = new FileExistPredictor(segmentPredict);
+                predicate = new FileExistPredicator(segPredicate);
                 break;
             default:
                 break;
         }
-        return predict;
+        return predicate;
     }
 }

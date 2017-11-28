@@ -20,8 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
@@ -57,8 +56,8 @@ public class JobController {
     }
 
     @RequestMapping(value = "/instances", method = RequestMethod.GET)
-    public List<JobInstance> findInstancesOfJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName,
-                                                @RequestParam("page") int page, @RequestParam("size") int size) {
+    public List<JobInstanceBean> findInstancesOfJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName,
+                                                    @RequestParam("page") int page, @RequestParam("size") int size) {
         return jobService.findInstancesOfJob(group, jobName, page, size);
     }
 

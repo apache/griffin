@@ -29,6 +29,7 @@ import org.apache.griffin.core.util.JsonUtil;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class JobDataSegment extends AbstractAuditableEntity {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "segment_id")
-    private List<SegmentPredict> predicts;
+    private List<SegmentPredicate> predicates =new ArrayList<>();
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name ="segment_split_id")
@@ -68,7 +69,7 @@ public class JobDataSegment extends AbstractAuditableEntity {
     }
 
     public void setConfig(Map<String, String> configMap) throws JsonProcessingException {
-        this.configMap = configMap;
+        setConfigMap(configMap);
         this.config = JsonUtil.toJson(configMap);
     }
 
@@ -79,17 +80,20 @@ public class JobDataSegment extends AbstractAuditableEntity {
         return configMap;
     }
 
-    public void setConfigMap(Map<String, String> configMap) {
+    private void setConfigMap(Map<String, String> configMap) {
         this.configMap = configMap;
     }
 
 
-    public List<SegmentPredict> getPredicts() {
-        return predicts;
+    public List<SegmentPredicate> getPredicates() {
+        return predicates;
     }
 
-    public void setPredicts(List<SegmentPredict> predicts) {
-        this.predicts = predicts;
+    public void setPredicates(List<SegmentPredicate> predicates) {
+        if (predicates == null) {
+            predicates = new ArrayList<>();
+        }
+        this.predicates = predicates;
     }
 
     @JsonProperty("segment.split")

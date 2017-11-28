@@ -19,43 +19,10 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.error.exception.GriffinException;
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.LivySessionStates;
-import org.apache.griffin.core.job.repo.JobInstanceRepo;
-import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.apache.griffin.core.util.PropertiesUtil;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
-import org.powermock.reflect.Whitebox;
-import org.quartz.*;
-import org.quartz.impl.JobDetailImpl;
-import org.quartz.impl.matchers.GroupMatcher;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.*;
-
-import static org.apache.griffin.core.measure.MeasureTestHelper.createJobDetail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.quartz.TriggerBuilder.newTrigger;
 
 //@RunWith(SpringRunner.class)
 //public class JobServiceImplTest {
@@ -218,7 +185,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //        int page = 0;
 //        int size = 2;
 //        JobKey jobKey = new JobKey(jobName,groupName);
-//        JobInstance jobInstance = new JobInstance(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
+//        JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
 //        Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
 //        given(jobInstanceRepo.findByGroupNameAndJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
 //        given(factory.getObject()).willReturn(scheduler);
@@ -235,7 +202,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //        int page = 0;
 //        int size = 2;
 //        JobKey jobKey = new JobKey(jobName,groupName);
-//        JobInstance jobInstance = new JobInstance(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
+//        JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
 //        Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
 //        given(jobInstanceRepo.findByGroupNameAndJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
 //        given(factory.getObject()).willReturn(scheduler);
@@ -246,7 +213,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //
 //    @Test
 //    public void testSyncInstancesOfJobForSuccess() {
-//        JobInstance instance = newJobInstance();
+//        JobInstanceBean instance = newJobInstance();
 //        String group = "groupName";
 //        String jobName = "jobName";
 //        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
@@ -260,7 +227,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //
 //    @Test
 //    public void testSyncInstancesOfJobForRestClientException() {
-//        JobInstance instance = newJobInstance();
+//        JobInstanceBean instance = newJobInstance();
 //        instance.setSessionId(1234564);
 //        String group = "groupName";
 //        String jobName = "jobName";
@@ -272,7 +239,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //
 //    @Test
 //    public void testSyncInstancesOfJobForIOException() throws Exception {
-//        JobInstance instance = newJobInstance();
+//        JobInstanceBean instance = newJobInstance();
 //        String group = "groupName";
 //        String jobName = "jobName";
 //        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
@@ -284,7 +251,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //
 //    @Test
 //    public void testSyncInstancesOfJobForIllegalArgumentException() throws Exception {
-//        JobInstance instance = newJobInstance();
+//        JobInstanceBean instance = newJobInstance();
 //        String group = "groupName";
 //        String jobName = "jobName";
 //        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
@@ -310,7 +277,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn((jobKeySet));
 //
 //        Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
-//        List<JobInstance> scheduleStateList = new ArrayList<>();
+//        List<JobInstanceBean> scheduleStateList = new ArrayList<>();
 //        scheduleStateList.add(newJobInstance());
 //        given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
 //        assertEquals(service.getHealthInfo().getHealthyJobCount(), 1);
@@ -328,8 +295,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //        given(scheduler.getJobKeys(GroupMatcher.jobGroupEquals("BA"))).willReturn((jobKeySet));
 //
 //        Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
-//        List<JobInstance> scheduleStateList = new ArrayList<>();
-//        JobInstance jobInstance = newJobInstance();
+//        List<JobInstanceBean> scheduleStateList = new ArrayList<>();
+//        JobInstanceBean jobInstance = newJobInstance();
 //        jobInstance.setState(LivySessionStates.State.error);
 //        scheduleStateList.add(jobInstance);
 //        given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
@@ -365,8 +332,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 //        return exception;
 //    }
 
-//    private JobInstance newJobInstance() {
-//        JobInstance jobInstance = new JobInstance();
+//    private JobInstanceBean newJobInstance() {
+//        JobInstanceBean jobInstance = new JobInstanceBean();
 //        jobInstance.setGroupName("BA");
 //        jobInstance.setJobName("job1");
 //        jobInstance.setSessionId(1);

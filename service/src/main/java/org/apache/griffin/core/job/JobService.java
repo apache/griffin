@@ -20,11 +20,9 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.quartz.SchedulerException;
 
 import java.io.Serializable;
 import java.util.List;
@@ -40,7 +38,7 @@ public interface JobService {
 
     GriffinOperationMessage deleteJob(String groupName, String jobName);
 
-    List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
+    List<JobInstanceBean> findInstancesOfJob(String group, String name, int page, int size);
 
     Map<String, List<Map<String, Serializable>>> getJobDetailsGroupByMeasureId();
 

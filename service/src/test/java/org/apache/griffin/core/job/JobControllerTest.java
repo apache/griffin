@@ -20,12 +20,10 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.URLHelper;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -142,7 +140,7 @@ public class JobControllerTest {
         String jobName = "job1";
         int page = 0;
         int size = 2;
-        JobInstance jobInstance = new JobInstance(groupName, jobName, 1, LivySessionStates.State.running, "", "", System.currentTimeMillis());
+        JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.running, "", "", System.currentTimeMillis());
         given(service.findInstancesOfJob(groupName, jobName, page, size)).willReturn(Arrays.asList(jobInstance));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param("group", groupName).param("jobName", jobName)

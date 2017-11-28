@@ -29,9 +29,9 @@ public class TimeUtilTest {
     }
 
     private Long[] genSampleTimestamps(String offsetStr, String rangeStr, String unitStr) throws Exception {
-        Long offset = TimeUtil.timeString2Long(offsetStr);
-        Long range = TimeUtil.timeString2Long(rangeStr);
-        Long dataUnit = TimeUtil.timeString2Long(unitStr);
+        Long offset = TimeUtil.str2Long(offsetStr);
+        Long range = TimeUtil.str2Long(rangeStr);
+        Long dataUnit = TimeUtil.str2Long(unitStr);
         //offset usually is negative
         Long dataStartTime = 123 + offset;
         if (range < 0) {

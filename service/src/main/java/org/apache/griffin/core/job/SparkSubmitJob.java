@@ -21,12 +21,13 @@ package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.job.entity.JobInstance;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
-import org.apache.griffin.core.job.entity.SegmentPredict;
-import org.apache.griffin.core.job.entity.SparkJobDO;
-import org.apache.griffin.core.job.factory.PredictorFactory;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
+import org.apache.griffin.core.job.entity.LivyConf;
+import org.apache.griffin.core.job.factory.PredicatorFactory;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.JsonUtil;
@@ -34,12 +35,13 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.*;
 
-import static org.apache.griffin.core.job.PredictJob.*;
+import static org.apache.griffin.core.job.JobInstance.*;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
@@ -49,18 +51,17 @@ public class SparkSubmitJob implements Job {
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
-    private Properties sparkJobProps;
+    private Properties livyConfProps;
     @Autowired
     private JobServiceImpl jobService;
+    @Autowired
+    private SchedulerFactoryBean factory;
 
     private Measure measure;
     private String livyUri;
-    private List<SegmentPredict> mPredicts;
+    private List<SegmentPredicate> mPredicts;
     private RestTemplate restTemplate = new RestTemplate();
-    private SparkJobDO sparkJobDO = new SparkJobDO();
-
-    public SparkSubmitJob() {
-    }
+    private LivyConf livyConf = new LivyConf();
 
     @Override
     public void execute(JobExecutionContext context) {
@@ -69,8 +70,8 @@ public class SparkSubmitJob implements Job {
         try {
             initParam(jobDetail);
             setSparkJobDO();
-            if (predict(mPredicts)) {
-                result = restTemplate.postForObject(livyUri, sparkJobDO, String.class);
+            if (success(mPredicts)) {
+                result = restTemplate.postForObject(livyUri, livyConf, String.class);
                 LOGGER.info(result);
                 JobDataMap jobDataMap = jobDetail.getJobDataMap();
                 saveJobInstance(jobDataMap.getString(GROUP_NAME_KEY), jobDataMap.getString(JOB_NAME_KEY), result);
@@ -82,13 +83,13 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private boolean predict(List<SegmentPredict> predicts) throws IOException {
-        if (predicts == null) {
+    private boolean success(List<SegmentPredicate> predicates) throws IOException {
+        if (CollectionUtils.isEmpty(predicates)) {
             return true;
         }
-        for (SegmentPredict segmentPredict : predicts) {
-            Predictor predict = PredictorFactory.newPredictInstance(segmentPredict);
-            if (!predict.predict()) {
+        for (SegmentPredicate segPredicate : predicates) {
+            Predicator predicate = PredicatorFactory.newPredicateInstance(segPredicate);
+            if (!predicate.predicate()) {
                 return false;
             }
         }
@@ -96,27 +97,27 @@ public class SparkSubmitJob implements Job {
     }
 
 
-    private void initParam(JobDetail jd) throws IOException {
+    private void initParam(JobDetail jd) throws IOException, SchedulerException {
         mPredicts = new ArrayList<>();
-        livyUri = sparkJobProps.getProperty("livy.uri");
+        livyUri = livyConfProps.getProperty("livy.uri");
         measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), Measure.class);
-        initPredicts(jd.getJobDataMap().getString(PREDICTS_KEY));
+        setPredicts(jd.getJobDataMap().getString(PREDICTS_KEY));
         setMeasureInstanceName(measure, jd);
-
     }
 
-    private void initPredicts(String json) throws IOException {
+    private void setPredicts(String json) throws IOException {
         if (StringUtils.isEmpty(json)) {
             return;
         }
         List<Map> maps = JsonUtil.toEntity(json, List.class);
         for (Map<String, String> map : maps) {
-            SegmentPredict segmentPredict = new SegmentPredict();
-            segmentPredict.setType(map.get("type"));
-            segmentPredict.setConfig(JsonUtil.toEntity(map.get("config"), Map.class));
-            mPredicts.add(segmentPredict);
+            SegmentPredicate sp = new SegmentPredicate();
+            sp.setType(map.get("type"));
+            sp.setConfig(JsonUtil.toEntity(map.get("config"), Map.class));
+            mPredicts.add(sp);
         }
     }
+
 
     private void setMeasureInstanceName(Measure measure, JobDetail jd) {
         // in order to keep metric name unique, we set measure name as jobName at present
@@ -129,38 +130,38 @@ public class SparkSubmitJob implements Job {
     }
 
     private void setSparkJobDO() throws JsonProcessingException {
-        sparkJobDO.setFile(sparkJobProps.getProperty("sparkJob.file"));
-        sparkJobDO.setClassName(sparkJobProps.getProperty("sparkJob.className"));
+        livyConf.setFile(livyConfProps.getProperty("sparkJob.file"));
+        livyConf.setClassName(livyConfProps.getProperty("sparkJob.className"));
 
         List<String> args = new ArrayList<>();
-        args.add(sparkJobProps.getProperty("sparkJob.args_1"));
-        measure.setTriggerTimeStamp(System.currentTimeMillis());
+        args.add(livyConfProps.getProperty("sparkJob.args_1"));
         String measureJson = JsonUtil.toJsonWithFormat(measure);
         // to fix livy bug: ` will be ignored by livy
         String finalMeasureJson = escapeCharacter(measureJson, "\\`");
+        LOGGER.info(finalMeasureJson);
         args.add(finalMeasureJson);
-        args.add(sparkJobProps.getProperty("sparkJob.args_3"));
-        sparkJobDO.setArgs(args);
+        args.add(livyConfProps.getProperty("sparkJob.args_3"));
+        livyConf.setArgs(args);
 
-        sparkJobDO.setName(sparkJobProps.getProperty("sparkJob.name"));
-        sparkJobDO.setQueue(sparkJobProps.getProperty("sparkJob.queue"));
-        sparkJobDO.setNumExecutors(Long.parseLong(sparkJobProps.getProperty("sparkJob.numExecutors")));
-        sparkJobDO.setExecutorCores(Long.parseLong(sparkJobProps.getProperty("sparkJob.executorCores")));
-        sparkJobDO.setDriverMemory(sparkJobProps.getProperty("sparkJob.driverMemory"));
-        sparkJobDO.setExecutorMemory(sparkJobProps.getProperty("sparkJob.executorMemory"));
+        livyConf.setName(livyConfProps.getProperty("sparkJob.name"));
+        livyConf.setQueue(livyConfProps.getProperty("sparkJob.queue"));
+        livyConf.setNumExecutors(Long.parseLong(livyConfProps.getProperty("sparkJob.numExecutors")));
+        livyConf.setExecutorCores(Long.parseLong(livyConfProps.getProperty("sparkJob.executorCores")));
+        livyConf.setDriverMemory(livyConfProps.getProperty("sparkJob.driverMemory"));
+        livyConf.setExecutorMemory(livyConfProps.getProperty("sparkJob.executorMemory"));
 
         Map<String, String> conf = new HashMap<>();
-        conf.put("spark.jars.packages", sparkJobProps.getProperty("sparkJob.spark.jars.packages"));
-        sparkJobDO.setConf(conf);
+        conf.put("spark.jars.packages", livyConfProps.getProperty("sparkJob.spark.jars.packages"));
+        livyConf.setConf(conf);
 
         List<String> jars = new ArrayList<>();
-        jars.add(sparkJobProps.getProperty("sparkJob.jars_1"));
-        jars.add(sparkJobProps.getProperty("sparkJob.jars_2"));
-        jars.add(sparkJobProps.getProperty("sparkJob.jars_3"));
-        sparkJobDO.setJars(jars);
+        jars.add(livyConfProps.getProperty("sparkJob.jars_1"));
+        jars.add(livyConfProps.getProperty("sparkJob.jars_2"));
+        jars.add(livyConfProps.getProperty("sparkJob.jars_3"));
+        livyConf.setJars(jars);
 
         List<String> files = new ArrayList<>();
-        sparkJobDO.setFiles(files);
+        livyConf.setFiles(files);
     }
 
     private void saveJobInstance(String groupName, String jobName, String result) {
@@ -169,7 +170,7 @@ public class SparkSubmitJob implements Job {
         try {
             Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
             if (resultMap != null) {
-                JobInstance jobInstance = genJobInstance(groupName, jobName, resultMap);
+                JobInstanceBean jobInstance = genJobInstance(groupName, jobName, resultMap);
                 jobInstanceRepo.save(jobInstance);
             }
         } catch (IOException e) {
@@ -179,8 +180,8 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private JobInstance genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException {
-        JobInstance jobInstance = new JobInstance();
+    private JobInstanceBean genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException {
+        JobInstanceBean jobInstance = new JobInstanceBean();
         jobInstance.setGroupName(groupName);
         jobInstance.setJobName(jobName);
         jobInstance.setTimestamp(System.currentTimeMillis());

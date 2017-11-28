@@ -20,9 +20,11 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobDataSegment;
 import org.apache.griffin.core.job.entity.JobSchedule;
-import org.apache.griffin.core.job.entity.SegmentPredict;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.entity.SegmentSplit;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
@@ -50,8 +52,8 @@ import static org.quartz.TriggerKey.triggerKey;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
-public class PredictJob implements Job {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PredictJob.class);
+public class JobInstance implements Job {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobInstance.class);
     public static final String MEASURE_KEY = "measure";
     public static final String PREDICTS_KEY = "predicts";
     public static final String JOB_NAME_KEY = "jobName";
@@ -68,7 +70,7 @@ public class PredictJob implements Job {
 
     private JobSchedule jobSchedule;
     private Measure measure;
-    private List<SegmentPredict> mPredicts;
+    private List<SegmentPredicate> mPredicts;
     private Long jobStartTime;
 
 
@@ -77,18 +79,10 @@ public class PredictJob implements Job {
         try {
             initParam(context);
             setDataSourcesPartitions(measure.getDataSources());
-            newPredictJob(interval(jobSchedule.getConfigMap()), Long.valueOf(jobSchedule.getConfigMap().get("repeat")), context);
+            createJobInstance(jobSchedule.getConfigMap(), context);
         } catch (Exception e) {
             LOGGER.error("Create job failure.", e);
         }
-    }
-
-    private Long interval(Map<String, String> confMap) {
-        if (confMap != null && confMap.containsKey("interval")) {
-            String interval = confMap.get("interval");
-            return TimeUtil.timeString2Long(interval);
-        }
-        return null;
     }
 
     private void initParam(JobExecutionContext context) throws SchedulerException {
@@ -116,16 +110,16 @@ public class PredictJob implements Job {
 
 
     private void setDataSourcesPartitions(List<DataSource> sources) throws Exception {
-        if (sources == null || sources.size() == 0) {
-            LOGGER.error("Measure data sources can not be empty.");
-            return;
+        if (CollectionUtils.isEmpty(sources)) {
+            throw new NullPointerException("Measure data sources can not be empty.");
         }
         List<JobDataSegment> segments = jobSchedule.getSegments();
         for (JobDataSegment dataSegment : segments) {
             String connectorIndex = dataSegment.getDataConnectorIndex();
-            if (connectorIndex == null || !connectorIndex.matches("(source|target)\\[\\d+]")) {
+            if (connectorIndex == null || !connectorIndex.matches(".+\\[\\d+]")) {
                 throw new IllegalArgumentException("Data segments connector index format error.");
             }
+
             for (DataSource source : sources) {
                 setDataSourcePartitions(dataSegment, source);
             }
@@ -146,10 +140,6 @@ public class PredictJob implements Job {
 
     private void setDataSourcePartitions(JobDataSegment dataSegment, DataSource dataSource) throws Exception {
         List<DataConnector> connectors = dataSource.getConnectors();
-        if (connectors == null || connectors.size() == 0) {
-            LOGGER.error("Measure data connector can not be empty.");
-            return;
-        }
         if (getIndex(dataSegment.getDataConnectorIndex()) >= connectors.size()) {
             throw new ArrayIndexOutOfBoundsException("Data segments connector index format error.");
         }
@@ -159,17 +149,16 @@ public class PredictJob implements Job {
     }
 
 
-    private void setDataConnectorPartitions(JobDataSegment dataSegment, DataSource source, DataConnector dataConnector, int index) throws Exception {
-////        JobDataSegment segment = findSegmentOfDataConnector(segments, dataConnector.getId());
-        if (dataSegment.getDataConnectorIndex().equals(getMeasureConnectorIndex(source, index))
-                && dataSegment.getSegmentSplit() != null && dataSegment.getConfig() != null) {
-            Long[] sampleTimestamps = genSampleTimestamps(dataSegment.getSegmentSplit());
-            setDataConnectorConf(dataConnector, dataSegment, sampleTimestamps);
-            setSegmentPredictsConf(dataSegment, sampleTimestamps);
+    private void setDataConnectorPartitions(JobDataSegment ds, DataSource source, DataConnector dataConnector, int index) throws Exception {
+        if (ds.getDataConnectorIndex().equals(getConnectorIndex(source, index))
+                && ds.getSegmentSplit() != null && ds.getConfig() != null) {
+            Long[] sampleTimestamps = genSampleTs(ds.getSegmentSplit());
+            setDataConnectorConf(dataConnector, ds, sampleTimestamps);
+            setSegPredictsConf(ds, sampleTimestamps);
         }
     }
 
-    private String getMeasureConnectorIndex(DataSource source, int index) {
+    private String getConnectorIndex(DataSource source, int index) {
         StringBuilder sb = new StringBuilder();
         sb.append(source.getName());
         sb.append("[").append(index).append("]");
@@ -179,13 +168,13 @@ public class PredictJob implements Job {
     /**
      * split data into several part and get every part start timestamp
      *
-     * @param segmentSplit config of data
+     * @param segSplit config of data
      * @return split timestamps of data
      */
-    private Long[] genSampleTimestamps(SegmentSplit segmentSplit) {
-        Long offset = TimeUtil.timeString2Long(segmentSplit.getOffset());
-        Long range = TimeUtil.timeString2Long(segmentSplit.getRange());
-        Long dataUnit = TimeUtil.timeString2Long(segmentSplit.getDataUnit());
+    private Long[] genSampleTs(SegmentSplit segSplit) {
+        Long offset = TimeUtil.str2Long(segSplit.getOffset());
+        Long range = TimeUtil.str2Long(segSplit.getRange());
+        Long dataUnit = TimeUtil.str2Long(segSplit.getDataUnit());
         //offset usually is negative
         Long dataStartTime = jobStartTime + offset;
         if (range < 0) {
@@ -204,138 +193,94 @@ public class PredictJob implements Job {
     }
 
     /**
-     * set all class SegmentPredict configs
+     * set all class SegmentPredicate configs
      *
-     * @param segment          job data segment
-     * @param sampleTimestamps collection of data split start timestamp
+     * @param segment  job data segment
+     * @param sampleTs collection of data split start timestamp
      */
-    private void setSegmentPredictsConf(JobDataSegment segment, Long[] sampleTimestamps) throws IOException {
-        List<SegmentPredict> predicts = segment.getPredicts();
-        if (predicts != null) {
-            for (SegmentPredict predict : predicts) {
-                genConfMap(predict.getConfigMap(), sampleTimestamps);
+    private void setSegPredictsConf(JobDataSegment segment, Long[] sampleTs) throws IOException {
+        List<SegmentPredicate> predicates = segment.getPredicates();
+        if (predicates != null) {
+            for (SegmentPredicate predicate : predicates) {
+                genConfMap(predicate.getConfigMap(), sampleTs);
                 //Do not forget to update origin string config
-                predict.setConfig(predict.getConfigMap());
-                mPredicts.add(predict);
+                predicate.setConfig(predicate.getConfigMap());
+                mPredicts.add(predicate);
             }
         }
     }
 
     /**
-     * set all class SegmentPredict configs
+     * set all class SegmentPredicate configs
      *
-     * @param segment          job data segment
-     * @param sampleTimestamps collection of data split start timestamp
+     * @param segment  job data segment
+     * @param sampleTs collection of data split start timestamp
      */
-    private void setDataConnectorConf(DataConnector dataConnector, JobDataSegment segment, Long[] sampleTimestamps) throws IOException {
-        Map<String, String> segmentConfMap = genConfMap(segment.getConfigMap(), sampleTimestamps);
+    private void setDataConnectorConf(DataConnector dc, JobDataSegment segment, Long[] sampleTs) throws IOException {
+        Map<String, String> segConfMap = genConfMap(segment.getConfigMap(), sampleTs);
         segment.setConfig(segment.getConfigMap());
-        Map<String, String> confMap = dataConnector.getConfigMap();
-        for (Map.Entry<String, String> entry : segmentConfMap.entrySet()) {
+        Map<String, String> confMap = dc.getConfigMap();
+        for (Map.Entry<String, String> entry : segConfMap.entrySet()) {
             confMap.put(entry.getKey(), entry.getValue());
         }
         //Do not forget to update data connector String config
-        dataConnector.setConfig(confMap);
+        dc.setConfig(confMap);
     }
 
-    private JobDataSegment findSegmentOfDataConnector(List<JobDataSegment> segments, Long dataConnectorId) {
-        if (segments == null || segments.size() == 0) {
-            return null;
-        }
-        for (JobDataSegment segment : segments) {
-            if (dataConnectorId.equals(segment.getDataConnectorId())) {
-                return segment;
-            }
-        }
-        return null;
-    }
 
     /**
-     * @param conf             map with file predict,data split and partitions info
-     * @param sampleTimestamps collection of data split start timestamp
+     * @param conf     map with file predicate,data split and partitions info
+     * @param sampleTs collection of data split start timestamp
      * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
-     *          or like {"path": "/year=#2017/month=11/dt=15/hour=09/_DONE,/year=#2017/month=11/dt=15/hour=10/_DONE"}
+     * or like {"path": "/year=#2017/month=11/dt=15/hour=09/_DONE,/year=#2017/month=11/dt=15/hour=10/_DONE"}
      */
-    private Map<String, String> genConfMap(Map<String, String> conf, Long[] sampleTimestamps) {
+    private Map<String, String> genConfMap(Map<String, String> conf, Long[] sampleTs) {
         for (Map.Entry<String, String> entry : conf.entrySet()) {
             String value = entry.getValue();
             Set<String> set = new HashSet<>();
-            for (Long timestamp : sampleTimestamps) {
-                set.add(TimeUtil.replaceTimeFormat(value, timestamp));
+            for (Long timestamp : sampleTs) {
+                set.add(TimeUtil.format(value, timestamp));
             }
-            conf.put(entry.getKey(), set2String(set));
+            conf.put(entry.getKey(), StringUtils.join(set, ","));
         }
         return conf;
     }
 
-    private String set2String(Set<String> set) {
-        Iterator<String> it = set.iterator();
-        StringBuilder sb = new StringBuilder();
-        if (!it.hasNext()) {
-            return null;
+    private boolean createJobInstance(Map<String, String> confMap, JobExecutionContext context) throws Exception {
+        if (confMap == null || confMap.get("interval") == null || confMap.get("repeat") == null) {
+            throw new NullPointerException("Predicate config is null.");
         }
-        for (; ; ) {
-            sb.append(it.next());
-            if (!it.hasNext()) {
-                return sb.toString();
-            }
-            sb.append(PATH_CONNECTOR_CHARACTER);
-        }
-
-    }
-
-    public boolean newPredictJob(Long interval, Long repeatCount, JobExecutionContext context) {
-        if (interval == null || repeatCount == null) {
-            return false;
-        }
-        String groupName = "predict_group";
+        Long interval = TimeUtil.str2Long(confMap.get("interval"));
+        Integer repeat = Integer.valueOf(confMap.get("repeat"));
+        String groupName = "predicate_group";
         String jobName = measure.getName() + "_" + groupName + "_" + System.currentTimeMillis();
         Scheduler scheduler = factory.getObject();
         TriggerKey triggerKey = triggerKey(jobName, groupName);
-        if (isTriggerKeyExist(scheduler, jobName, groupName, triggerKey) || !addJob(scheduler, jobName, groupName, triggerKey, interval, repeatCount, context)) {
-            return false;
-        }
+        return !(scheduler.checkExists(triggerKey) || !createJobInstance(scheduler, triggerKey, interval, repeat, context));
+    }
+
+
+    private boolean createJobInstance(Scheduler scheduler, TriggerKey triggerKey, Long interval, Integer repeatCount, JobExecutionContext context) throws Exception {
+        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, context);
+        scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, repeatCount));
         return true;
     }
 
-    private boolean isTriggerKeyExist(Scheduler scheduler, String jobName, String groupName, TriggerKey triggerKey) {
-        try {
-            if (scheduler.checkExists(triggerKey)) {
-                LOGGER.error("The triggerKey({},{})  has been used.", jobName, groupName);
-                return true;
-            }
-        } catch (SchedulerException e) {
-            LOGGER.error("Schedule exception.{}", e.getMessage());
-        }
-        return false;
-    }
 
-    private boolean addJob(Scheduler scheduler, String jobName, String groupName, TriggerKey triggerKey, Long interval, Long repeatCount, JobExecutionContext context) {
-        try {
-            JobDetail jobDetail = addJobDetail(scheduler, jobName, groupName, context);
-            scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, repeatCount));
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("Add job failure.{}", e.getMessage());
-        }
-        return false;
-    }
-
-
-    private Trigger newTriggerInstance(TriggerKey triggerKey, JobDetail jobDetail, Long interval, Long repeatCount) throws ParseException {
+    private Trigger newTriggerInstance(TriggerKey triggerKey, JobDetail jobDetail, Long interval, Integer repeatCount) throws ParseException {
         return newTrigger()
                 .withIdentity(triggerKey)
                 .forJob(jobDetail)
                 .startNow()
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                         .withIntervalInMilliseconds(interval)
-                        .withRepeatCount(Math.toIntExact(repeatCount))
+                        .withRepeatCount(repeatCount)
                 )
                 .build();
     }
 
-    private JobDetail addJobDetail(Scheduler scheduler, String jobName, String groupName, JobExecutionContext context) throws SchedulerException, JsonProcessingException {
-        JobKey jobKey = jobKey(jobName, groupName);
+    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey, JobExecutionContext context) throws SchedulerException, JsonProcessingException {
+        JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);
         if (isJobKeyExist) {

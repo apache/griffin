@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -33,7 +34,7 @@ import java.util.regex.Pattern;
 public class TimeUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtil.class);
 
-    public static Long timeString2Long(String timeStr) {
+    public static Long str2Long(String timeStr) {
         if (timeStr == null) {
             LOGGER.error("Time string can not be empty.");
             return 0L;
@@ -79,7 +80,7 @@ public class TimeUtil {
                 return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.DAYS);
             } else {
                 LOGGER.error("Time string format error.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.)");
-                return 0L;
+                throw new IllegalArgumentException();
             }
         } catch (Exception e) {
             LOGGER.error("Parse exception occur. {}",e);
@@ -91,17 +92,16 @@ public class TimeUtil {
         return unit.toMillis(duration);
     }
 
-    public static String replaceTimeFormat(String timeStr, long time) {
+    public static String format(String timeFormat, long time) {
         String timePattern = "#(?:\\\\#|[^#])*#";
         Date t = new Date(time);
         Pattern ptn = Pattern.compile(timePattern);
-        Matcher matcher = ptn.matcher(timeStr);
+        Matcher matcher = ptn.matcher(timeFormat);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             String group = matcher.group();
             String content = group.substring(1, group.length() - 1);
             String pattern = refreshEscapeHashTag(content);
-            pattern = format2StandardDateFormat(pattern);
             SimpleDateFormat sdf = new SimpleDateFormat(pattern);
             matcher.appendReplacement(sb, sdf.format(t));
         }
@@ -116,10 +116,4 @@ public class TimeUtil {
         return str.replaceAll(escapeHashTagPattern, hashTag);
     }
 
-    private static String format2StandardDateFormat(String pattern) {
-        pattern = pattern.replace("mm", "MM");
-        pattern = pattern.replace("DD", "dd");
-        pattern = pattern.replace("hh", "HH");
-        return pattern;
-    }
 }

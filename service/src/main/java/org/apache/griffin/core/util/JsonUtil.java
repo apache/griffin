@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
@@ -45,8 +46,8 @@ public class JsonUtil {
     }
 
     public static <T> T toEntity(String jsonStr, Class<T> type) throws IOException {
-        if (jsonStr == null || jsonStr.length() == 0) {
-            LOGGER.warn("jsonStr {} is empty!", type);
+        if (StringUtils.isEmpty(jsonStr)) {
+            LOGGER.warn("jsonStr :q{} is empty!", type);
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -54,7 +55,7 @@ public class JsonUtil {
     }
 
     public static <T> T toEntity(String jsonStr, TypeReference type) throws IOException {
-        if (jsonStr == null || jsonStr.length() == 0) {
+        if (StringUtils.isEmpty(jsonStr)) {
             LOGGER.warn("jsonStr {} is empty!", type);
             return null;
         }

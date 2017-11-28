@@ -39,21 +39,23 @@ public class FSUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FSUtil.class);
 
-    private String fsDefaultName;
+    private static String fsDefaultName;
 
     private static FileSystem fileSystem;
 
-    public FSUtil(@Value("${fs.defaultFS}") String fsDefaultName) {
-        try {
-            this.fsDefaultName = fsDefaultName;
+    private static FileSystem getFileSystem() {
+        if (fileSystem == null) {
             initFileSystem();
-        } catch (Exception e) {
-            LOGGER.error("Can not get hdfs file system.", e);
         }
+        return fileSystem;
+    }
+
+    public FSUtil(@Value("${fs.defaultFS}") String defaultName) {
+        fsDefaultName = defaultName;
     }
 
 
-    private void initFileSystem() throws IOException {
+    private static void initFileSystem() {
         Configuration conf = new Configuration();
         if (!StringUtils.isEmpty(fsDefaultName)) {
             conf.set("fs.defaultFS", fsDefaultName);
@@ -67,7 +69,12 @@ public class FSUtil {
             LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.fs.LocalFileSystem.class.getName());
             conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
         }
-        fileSystem = FileSystem.get(conf);
+        try {
+            fileSystem = FileSystem.get(conf);
+        } catch (Exception e) {
+            LOGGER.error("Can not get hdfs file system.", e);
+        }
+
     }
 
 
@@ -75,7 +82,7 @@ public class FSUtil {
      * list all sub dir of a dir
      */
     public static List<String> listSubDir(String dir) throws IOException {
-        if (fileSystem == null) {
+        if (getFileSystem() == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
         List<String> fileList = new ArrayList<>();
@@ -97,7 +104,7 @@ public class FSUtil {
      * get all file status of a dir.
      */
     public static List<FileStatus> listFileStatus(String dir) throws IOException {
-        if (fileSystem == null) {
+        if (getFileSystem() == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
         List<FileStatus> fileStatusList = new ArrayList<>();
@@ -118,7 +125,7 @@ public class FSUtil {
      * touch file
      */
     public static void touch(String filePath) throws IOException {
-        if (fileSystem == null) {
+        if (getFileSystem() == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
         Path path = new Path(filePath);
@@ -144,7 +151,7 @@ public class FSUtil {
 
 
     public static boolean isFileExist(String path) throws IOException {
-        if (fileSystem == null) {
+        if (getFileSystem() == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
         Path hdfsPath = new Path(path);

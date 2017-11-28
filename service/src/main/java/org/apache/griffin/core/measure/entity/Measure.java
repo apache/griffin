@@ -20,8 +20,10 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -102,6 +104,9 @@ public class Measure extends AbstractAuditableEntity {
 
     @JsonProperty("data.sources")
     public void setDataSources(List<DataSource> dataSources) {
+        if (CollectionUtils.isEmpty(dataSources)) {
+            throw new NullPointerException("Data source can not be empty.");
+        }
         this.dataSources = dataSources;
     }
 
@@ -110,6 +115,9 @@ public class Measure extends AbstractAuditableEntity {
     }
 
     public void setEvaluateRule(EvaluateRule evaluateRule) {
+        if (evaluateRule == null) {
+            throw new NullPointerException("Evaluate rule can not be empty.");
+        }
         this.evaluateRule = evaluateRule;
     }
 

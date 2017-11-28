@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.core.job.repo;
 
-import org.apache.griffin.core.job.entity.JobInstance;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -30,7 +30,7 @@ import java.util.List;
 
 
 @Repository
-public interface JobInstanceRepo extends CrudRepository<JobInstance, Long> {
+public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
     /**
      * @param group    is group name
      * @param name     is job name
@@ -38,25 +38,25 @@ public interface JobInstanceRepo extends CrudRepository<JobInstance, Long> {
      * @return all job instances scheduled at different time using the same prototype job,
      * the prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.
      */
-    @Query("select s from JobInstance s " +
+    @Query("select s from JobInstanceBean s " +
             "where s.groupName= ?1 and s.jobName=?2 ")
-    List<JobInstance> findByGroupNameAndJobName(String group, String name, Pageable pageable);
+    List<JobInstanceBean> findByGroupNameAndJobName(String group, String name, Pageable pageable);
 
-    @Query("select s from JobInstance s " +
+    @Query("select s from JobInstanceBean s " +
             "where s.groupName= ?1 and s.jobName=?2 ")
-    List<JobInstance> findByGroupNameAndJobName(String group, String name);
+    List<JobInstanceBean> findByGroupNameAndJobName(String group, String name);
 
-    @Query("select DISTINCT s.groupName, s.jobName from JobInstance s " +
-            "where state ='starting' or state ='not_started' or state = 'recovering' or state = 'idle' or state = 'running'or state = 'busy'")
+    @Query("select DISTINCT s.groupName, s.jobName from JobInstanceBean s " +
+            "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")
     List<Object> findGroupAndJobNameWithState();
 
     @Modifying
-    @Query("delete from JobInstance s " +
+    @Query("delete from JobInstanceBean s " +
             "where s.groupName= ?1 and s.jobName=?2 ")
     void deleteByGroupAndJobName(String groupName, String jobName);
 
     @Modifying
-    @Query("update JobInstance s " +
+    @Query("update JobInstanceBean s " +
             "set s.state= ?2, s.appId= ?3, s.appUri= ?4 where s.id= ?1")
     void update(Long id, LivySessionStates.State state, String appId, String appUri);
 

@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @Entity
-public class SegmentPredict extends AbstractAuditableEntity {
+public class SegmentPredicate extends AbstractAuditableEntity {
 
     private String type;
 
@@ -56,7 +56,7 @@ public class SegmentPredict extends AbstractAuditableEntity {
     }
 
     public void setConfig(Map<String, String> configMap) throws JsonProcessingException {
-        this.configMap = configMap;
+        setConfigMap(configMap);
         this.config = JsonUtil.toJson(configMap);
     }
 
@@ -67,10 +67,10 @@ public class SegmentPredict extends AbstractAuditableEntity {
         return configMap;
     }
 
-    public void setConfigMap(Map<String, String> configMap) {
+    private void setConfigMap(Map<String, String> configMap) {
         this.configMap = configMap;
     }
 
-    public SegmentPredict() {
+    public SegmentPredicate() {
     }
 }

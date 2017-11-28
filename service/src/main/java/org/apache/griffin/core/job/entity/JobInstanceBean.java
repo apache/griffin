@@ -25,7 +25,7 @@ import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import javax.persistence.*;
 
 @Entity
-public class JobInstance extends AbstractAuditableEntity {
+public class JobInstanceBean extends AbstractAuditableEntity {
 
     private static final long serialVersionUID = -4748881017029815874L;
 
@@ -96,10 +96,10 @@ public class JobInstance extends AbstractAuditableEntity {
         this.timestamp = timestamp;
     }
 
-    public JobInstance() {
+    public JobInstanceBean() {
     }
 
-    public JobInstance(String groupName, String jobName, int sessionId, State state, String appId, String appUri, long timestamp) {
+    public JobInstanceBean(String groupName, String jobName, int sessionId, State state, String appId, String appUri, long timestamp) {
         this.groupName = groupName;
         this.jobName = jobName;
         this.sessionId = sessionId;

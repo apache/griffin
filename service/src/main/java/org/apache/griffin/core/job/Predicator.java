@@ -21,6 +21,6 @@ package org.apache.griffin.core.job;
 
 import java.io.IOException;
 
-public interface Predictor {
-    boolean predict() throws IOException;
+public interface Predicator {
+    boolean predicate() throws IOException;
 }

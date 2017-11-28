@@ -22,16 +22,23 @@ package org.apache.griffin.core.job.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.util.JsonUtil;
+import org.quartz.CronExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Entity
 public class JobSchedule extends AbstractAuditableEntity {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedule.class);
 
     private Long measureId;
 
@@ -39,7 +46,7 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     private String timeZone;
 
-    private String predictConfig;
+    private String predicateConfig;
 
     @JsonIgnore
     @Transient
@@ -47,7 +54,7 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "job_schedule_id")
-    private List<JobDataSegment> segments;
+    private List<JobDataSegment> segments = new ArrayList<>();
 
     @JsonProperty("measure.id")
     public Long getMeasureId() {
@@ -66,6 +73,9 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     @JsonProperty("cron.expression")
     public void setCronExpression(String cronExpression) {
+        if (StringUtils.isEmpty(cronExpression) ||  !isCronExpressionValid(cronExpression)) {
+            throw new IllegalArgumentException("Cron expression is invalid.Please check your cron expression.");
+        }
         this.cronExpression = cronExpression;
     }
 
@@ -89,28 +99,36 @@ public class JobSchedule extends AbstractAuditableEntity {
         this.segments = segments;
     }
 
-    @JsonProperty("predict.config")
-    public String getPredictConfig() {
-        return predictConfig;
+    @JsonProperty("predicate.config")
+    public String getPredicateConfig() {
+        return predicateConfig;
     }
 
-    @JsonProperty("predict.config")
-    public void setPredictConfig(Map<String,String> configMap) throws JsonProcessingException {
+    @JsonProperty("predicate.config")
+    public void setPredicateConfig(Map<String, String> configMap) throws JsonProcessingException {
         this.setConfigMap(configMap);
-        this.predictConfig = JsonUtil.toJson(configMap);
+        this.predicateConfig = JsonUtil.toJson(configMap);
     }
 
     public Map<String, String> getConfigMap() throws IOException {
-        if(configMap == null){
-            configMap = JsonUtil.toEntity(predictConfig, Map.class);
+        if (configMap == null) {
+            configMap = JsonUtil.toEntity(predicateConfig, Map.class);
         }
         return configMap;
     }
 
-    public void setConfigMap(Map<String, String> configMap) {
+    private void setConfigMap(Map<String, String> configMap) {
         this.configMap = configMap;
     }
 
-    public JobSchedule(){
+    private boolean isCronExpressionValid(String cronExpression) {
+        if (!CronExpression.isValidExpression(cronExpression)) {
+            LOGGER.error("Cron expression {} is invalid.", cronExpression);
+            return false;
+        }
+        return true;
+    }
+
+    public JobSchedule() {
     }
 }
