@@ -40,6 +40,24 @@
         "details": {
           "persist.type": "record"
         }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "miss-count",
+        "rule": "SELECT count(*) as miss FROM `miss-records`"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "total-count",
+        "rule": "SELECT count(*) as total FROM source"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "accu",
+        "rule": "SELECT `miss-count`.miss, `total-count`.total, (`total-count`.total - `miss-count`.miss) as matched FROM `miss-count` FULL JOIN `total-count`",
+        "details": {
+          "persist.type": "metric"
+        }
       }
     ]
   }
