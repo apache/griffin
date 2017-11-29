@@ -48,10 +48,10 @@ public class JobDataSegment extends AbstractAuditableEntity {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "segment_id")
-    private List<SegmentPredicate> predicates =new ArrayList<>();
+    private List<SegmentPredicate> predicates = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name ="segment_split_id")
+    @JoinColumn(name = "segment_split_id")
     private SegmentSplit segmentSplit;
 
     @JsonProperty("data.connector.id")
@@ -74,8 +74,9 @@ public class JobDataSegment extends AbstractAuditableEntity {
     }
 
     public Map<String, String> getConfigMap() throws IOException {
-        if(configMap == null && !StringUtils.isEmpty(config)){
-            configMap = JsonUtil.toEntity(config, new TypeReference<Map<String,String>>(){});
+        if (configMap == null && !StringUtils.isEmpty(config)) {
+            configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
+            });
         }
         return configMap;
     }
@@ -115,6 +116,7 @@ public class JobDataSegment extends AbstractAuditableEntity {
     public void setDataConnectorIndex(String dataConnectorIndex) {
         this.dataConnectorIndex = dataConnectorIndex;
     }
+
     public JobDataSegment() {
     }
 }

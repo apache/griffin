@@ -131,4 +131,11 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     public JobSchedule() {
     }
+
+    public JobSchedule(Long measureId, String cronExpression, Map predicateConfig, List<JobDataSegment> segments) throws JsonProcessingException {
+        this.measureId = measureId;
+        this.cronExpression = cronExpression;
+        setPredicateConfig(predicateConfig);
+        this.segments = segments;
+    }
 }

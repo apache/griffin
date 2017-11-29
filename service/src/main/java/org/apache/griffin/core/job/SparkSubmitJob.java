@@ -46,6 +46,7 @@ import static org.apache.griffin.core.job.JobInstance.*;
 @DisallowConcurrentExecution
 public class SparkSubmitJob implements Job {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparkSubmitJob.class);
+    public static final String SPARK_JOB_JARS_SPLIT = ";";
 
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
@@ -66,7 +67,7 @@ public class SparkSubmitJob implements Job {
         String result;
         try {
             initParam(jobDetail);
-            setSparkJobDO();
+            setLivyConf();
             if (success(mPredicts)) {
                 result = restTemplate.postForObject(livyUri, livyConf, String.class);
                 LOGGER.info(result);
@@ -126,39 +127,40 @@ public class SparkSubmitJob implements Job {
         return str.replaceAll(regex, escapeCh);
     }
 
-    private void setSparkJobDO() throws JsonProcessingException {
+    private void setLivyConf() throws JsonProcessingException {
+        setLivyParams();
+        setLivyArgs();
+        setLivyJars();
+    }
+
+    private void setLivyParams() {
         livyConf.setFile(livyConfProps.getProperty("sparkJob.file"));
         livyConf.setClassName(livyConfProps.getProperty("sparkJob.className"));
-
-        List<String> args = new ArrayList<>();
-        args.add(livyConfProps.getProperty("sparkJob.args_1"));
-        String measureJson = JsonUtil.toJsonWithFormat(measure);
-        // to fix livy bug: ` will be ignored by livy
-        String finalMeasureJson = escapeCharacter(measureJson, "\\`");
-        LOGGER.info(finalMeasureJson);
-        args.add(finalMeasureJson);
-        args.add(livyConfProps.getProperty("sparkJob.args_3"));
-        livyConf.setArgs(args);
-
         livyConf.setName(livyConfProps.getProperty("sparkJob.name"));
         livyConf.setQueue(livyConfProps.getProperty("sparkJob.queue"));
         livyConf.setNumExecutors(Long.parseLong(livyConfProps.getProperty("sparkJob.numExecutors")));
         livyConf.setExecutorCores(Long.parseLong(livyConfProps.getProperty("sparkJob.executorCores")));
         livyConf.setDriverMemory(livyConfProps.getProperty("sparkJob.driverMemory"));
         livyConf.setExecutorMemory(livyConfProps.getProperty("sparkJob.executorMemory"));
+        livyConf.setFiles(new ArrayList<>());
+    }
 
-        Map<String, String> conf = new HashMap<>();
-        conf.put("spark.jars.packages", livyConfProps.getProperty("sparkJob.spark.jars.packages"));
-        livyConf.setConf(conf);
+    private void setLivyArgs() throws JsonProcessingException {
+        List<String> args = new ArrayList<>();
+        args.add(livyConfProps.getProperty("sparkJob.args_1"));
+        String measureJson = JsonUtil.toJsonWithFormat(measure);
+        // to fix livy bug: character ` will be ignored by livy
+        String finalMeasureJson = escapeCharacter(measureJson, "\\`");
+        LOGGER.info(finalMeasureJson);
+        args.add(finalMeasureJson);
+        args.add(livyConfProps.getProperty("sparkJob.args_3"));
+        livyConf.setArgs(args);
+    }
 
-        List<String> jars = new ArrayList<>();
-        jars.add(livyConfProps.getProperty("sparkJob.jars_1"));
-        jars.add(livyConfProps.getProperty("sparkJob.jars_2"));
-        jars.add(livyConfProps.getProperty("sparkJob.jars_3"));
+    private void setLivyJars() {
+        String jarProp = livyConfProps.getProperty("sparkJob.jars");
+        List<String> jars = Arrays.asList(jarProp.split(SPARK_JOB_JARS_SPLIT));
         livyConf.setJars(jars);
-
-        List<String> files = new ArrayList<>();
-        livyConf.setFiles(files);
     }
 
     private void saveJobInstance(String groupName, String jobName, String result) {

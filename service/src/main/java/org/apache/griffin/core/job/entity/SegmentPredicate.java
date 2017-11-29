@@ -61,8 +61,9 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     }
 
     public Map<String, String> getConfigMap() throws IOException {
-        if(configMap == null &&!StringUtils.isEmpty(config)){
-            configMap = JsonUtil.toEntity(config, new TypeReference<Map<String,String>>(){});
+        if (configMap == null && !StringUtils.isEmpty(config)) {
+            configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
+            });
         }
         return configMap;
     }

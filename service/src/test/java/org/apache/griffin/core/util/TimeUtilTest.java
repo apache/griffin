@@ -22,30 +22,6 @@ package org.apache.griffin.core.util;
 import org.junit.Test;
 
 public class TimeUtilTest {
-    @Test
-    public void testTimeString2Long() throws Exception {
-//        Long[] time = new Long[0];
-        System.out.println(genSampleTimestamps("-1h", "-2h", "1").length);
-    }
 
-    private Long[] genSampleTimestamps(String offsetStr, String rangeStr, String unitStr) throws Exception {
-        Long offset = TimeUtil.str2Long(offsetStr);
-        Long range = TimeUtil.str2Long(rangeStr);
-        Long dataUnit = TimeUtil.str2Long(unitStr);
-        //offset usually is negative
-        Long dataStartTime = 123 + offset;
-        if (range < 0) {
-            dataStartTime += range;
-            range = Math.abs(range);
-        }
-        if (Math.abs(dataUnit) >= range|| dataUnit == 0) {
-            return new Long[]{dataStartTime};
-        }
-        int count = (int) (range / dataUnit);
-        Long[] timestamps = new Long[count];
-        for (int index = 0; index < count; index++) {
-            timestamps[index] = dataStartTime + index * dataUnit;
-        }
-        return timestamps;
-    }
+
 }
