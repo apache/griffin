@@ -86,7 +86,7 @@ public class Rule extends AbstractAuditableEntity {
         return details;
     }
 
-    public void setDetails(String details) {
+    private void setDetails(String details) {
         this.details = details;
     }
 
@@ -102,7 +102,7 @@ public class Rule extends AbstractAuditableEntity {
     @JsonProperty("details")
     public void setDetailsMap(Map<String, Object> details) throws IOException {
         this.detailsMap = details;
-        this.details = JsonUtil.toJson(details);
+        setDetails(JsonUtil.toJson(details));
     }
 
     public Rule() {

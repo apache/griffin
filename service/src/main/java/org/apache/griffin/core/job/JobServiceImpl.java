@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.error.exception.GriffinException.GetHealthInfoFailureException;
 import org.apache.griffin.core.error.exception.GriffinException.GetJobsFailureException;
@@ -46,6 +45,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 

@@ -84,17 +84,11 @@ public class DataConnector extends AbstractAuditableEntity {
     public DataConnector() {
     }
 
-    public DataConnector(String type, String version, String config) {
+    public DataConnector(String type, String version, String config) throws IOException {
         this.type = type;
         this.version = version;
         this.config = config;
-        TypeReference<Map<String, String>> mapType = new TypeReference<Map<String, String>>() {
-        };
-        try {
-            this.configMap = JsonUtil.toEntity(config, mapType);
-        } catch (IOException e) {
-            LOGGER.error("Error in converting json to map. {}", e.getMessage());
-        }
+        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {});
     }
 
     @Override

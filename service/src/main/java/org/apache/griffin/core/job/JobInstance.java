@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobDataSegment;
 import org.apache.griffin.core.job.entity.JobSchedule;
@@ -38,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.text.ParseException;

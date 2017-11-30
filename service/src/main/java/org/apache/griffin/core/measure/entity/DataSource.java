@@ -20,7 +20,8 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
-import org.apache.commons.collections.CollectionUtils;
+
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
