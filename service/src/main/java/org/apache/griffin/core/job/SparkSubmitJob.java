@@ -131,6 +131,7 @@ public class SparkSubmitJob implements Job {
         setLivyParams();
         setLivyArgs();
         setLivyJars();
+        setPropConf();
     }
 
     private void setLivyParams() {
@@ -161,6 +162,12 @@ public class SparkSubmitJob implements Job {
         String jarProp = livyConfProps.getProperty("sparkJob.jars");
         List<String> jars = Arrays.asList(jarProp.split(SPARK_JOB_JARS_SPLIT));
         livyConf.setJars(jars);
+    }
+
+    private void setPropConf() {
+        Map<String, String> conf = new HashMap<>();
+        conf.put("spark.yarn.dist.files", livyConfProps.getProperty("spark.yarn.dist.files"));
+        livyConf.setConf(conf);
     }
 
     private void saveJobInstance(String groupName, String jobName, String result) {
