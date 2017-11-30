@@ -46,6 +46,8 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     private String timeZone;
 
+    private String timestampOffset = "0";
+
     private String predicateConfig;
 
     @JsonIgnore
@@ -97,6 +99,16 @@ public class JobSchedule extends AbstractAuditableEntity {
     @JsonProperty("data.segments")
     public void setSegments(List<JobDataSegment> segments) {
         this.segments = segments;
+    }
+
+    @JsonProperty("timestamp.offset")
+    public String getTimestampOffset() {
+        return timestampOffset;
+    }
+
+    @JsonProperty("timestamp.offset")
+    public void setTimestampOffset(String timestampOffset) {
+        this.timestampOffset = timestampOffset;
     }
 
     @JsonProperty("predicate.config")

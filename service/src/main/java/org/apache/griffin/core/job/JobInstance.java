@@ -96,8 +96,9 @@ public class JobInstance implements Job {
             LOGGER.error("Measure with id {} is not found!", measureId);
             throw new NullPointerException();
         }
-        measure.setTriggerTimeStamp(jobStartTime);
         jobSchedule = jobScheduleRepo.findOne(jobScheduleId);
+        Long timestampOffset = TimeUtil.str2Long(jobSchedule.getTimestampOffset());
+        measure.setTriggerTimeStamp(jobStartTime + timestampOffset);
     }
 
     private void setJobStartTime(JobDetail jobDetail) throws SchedulerException {
