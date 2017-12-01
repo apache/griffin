@@ -22,6 +22,7 @@ package org.apache.griffin.core.job.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.util.JsonUtil;
@@ -48,9 +49,13 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     private String timestampOffset = "0";
 
+    /**
+     * Setting access type is to use setter and getter method while reading data from database
+     */
+    @JsonIgnore
+    @Access(AccessType.PROPERTY)
     private String predicateConfig;
 
-    @JsonIgnore
     @Transient
     private Map<String, String> configMap;
 
@@ -111,26 +116,24 @@ public class JobSchedule extends AbstractAuditableEntity {
         this.timestampOffset = timestampOffset;
     }
 
-    @JsonProperty("predicate.config")
-    public String getPredicateConfig() {
+    private String getPredicateConfig() {
         return predicateConfig;
     }
 
-    @JsonProperty("predicate.config")
-    public void setPredicateConfig(Map<String, String> configMap) throws JsonProcessingException {
-        this.setConfigMap(configMap);
-        this.predicateConfig = JsonUtil.toJson(configMap);
+    private void setPredicateConfig(String config) throws IOException {
+        this.predicateConfig = config;
+        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {});
     }
 
+    @JsonProperty("predicate.config")
     public Map<String, String> getConfigMap() throws IOException {
-        if (configMap == null) {
-            configMap = JsonUtil.toEntity(predicateConfig, Map.class);
-        }
         return configMap;
     }
 
-    private void setConfigMap(Map<String, String> configMap) {
+    @JsonProperty("predicate.config")
+    public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
         this.configMap = configMap;
+        this.predicateConfig = JsonUtil.toJson(configMap);
     }
 
     private boolean isCronExpressionValid(String cronExpression) {
@@ -144,10 +147,10 @@ public class JobSchedule extends AbstractAuditableEntity {
     public JobSchedule() {
     }
 
-    public JobSchedule(Long measureId, String cronExpression, Map predicateConfig, List<JobDataSegment> segments) throws JsonProcessingException {
+    public JobSchedule(Long measureId, String cronExpression, Map configMap, List<JobDataSegment> segments) throws JsonProcessingException {
         this.measureId = measureId;
         this.cronExpression = cronExpression;
-        setPredicateConfig(predicateConfig);
+        setConfigMap(configMap);
         this.segments = segments;
     }
 }

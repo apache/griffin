@@ -107,11 +107,11 @@ public class SparkSubmitJob implements Job {
         if (StringUtils.isEmpty(json)) {
             return;
         }
-        List<Map> maps = JsonUtil.toEntity(json, List.class);
-        for (Map<String, String> map : maps) {
+        List<Map> maps = JsonUtil.toEntity(json, new TypeReference<List<Map>>(){});
+        for (Map<String, Object> map : maps) {
             SegmentPredicate sp = new SegmentPredicate();
-            sp.setType(map.get("type"));
-            sp.setConfig(JsonUtil.toEntity(map.get("config"), Map.class));
+            sp.setType((String) map.get("type"));
+            sp.setConfigMap((Map<String, String>) map.get("config"));
             mPredicts.add(sp);
         }
     }

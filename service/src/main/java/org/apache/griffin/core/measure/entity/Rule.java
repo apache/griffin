@@ -23,12 +23,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
+import org.apache.avro.data.Json;
 import org.apache.griffin.core.util.JsonUtil;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.IOException;
 import java.util.Map;
 
@@ -47,6 +45,7 @@ public class Rule extends AbstractAuditableEntity {
     private String rule;
 
     @JsonIgnore
+    @Access(AccessType.PROPERTY)
     private String details;
 
     @Transient
@@ -86,23 +85,21 @@ public class Rule extends AbstractAuditableEntity {
         return details;
     }
 
-    private void setDetails(String details) {
+    private void setDetails(String details) throws IOException {
         this.details = details;
+        detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
+        });
     }
 
     @JsonProperty("details")
-    public Map<String, Object> getDetailsMap() throws IOException {
-        if (detailsMap == null && !StringUtils.isEmpty(details)) {
-            detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
-            });
-        }
+    public Map<String, Object> getDetailsMap() {
         return detailsMap;
     }
 
     @JsonProperty("details")
     public void setDetailsMap(Map<String, Object> details) throws IOException {
         this.detailsMap = details;
-        setDetails(JsonUtil.toJson(details));
+        this.details = JsonUtil.toJson(details);
     }
 
     public Rule() {

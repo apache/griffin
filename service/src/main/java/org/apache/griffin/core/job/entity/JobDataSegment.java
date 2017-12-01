@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.util.JsonUtil;
 
@@ -38,11 +37,12 @@ public class JobDataSegment extends AbstractAuditableEntity {
 
     private Long dataConnectorId;
 
-    private String config;
-
     private String dataConnectorIndex;
 
     @JsonIgnore
+    @Access(AccessType.PROPERTY)
+    private String config;
+
     @Transient
     private Map<String, String> configMap;
 
@@ -68,21 +68,21 @@ public class JobDataSegment extends AbstractAuditableEntity {
         return config;
     }
 
-    public void setConfig(Map<String, String> configMap) throws JsonProcessingException {
-        setConfigMap(configMap);
-        this.config = JsonUtil.toJson(configMap);
+    public void setConfig(String config) throws IOException {
+        this.config = config;
+        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
+        });
     }
 
-    public Map<String, String> getConfigMap() throws IOException {
-        if (configMap == null && !StringUtils.isEmpty(config)) {
-            configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
-            });
-        }
+    @JsonProperty("config")
+    public Map<String, String> getConfigMap() {
         return configMap;
     }
 
-    private void setConfigMap(Map<String, String> configMap) {
+    @JsonProperty("config")
+    public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
         this.configMap = configMap;
+        this.config = JsonUtil.toJson(configMap);
     }
 
 

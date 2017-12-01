@@ -205,7 +205,7 @@ public class JobInstance implements Job {
             for (SegmentPredicate predicate : predicates) {
                 genConfMap(predicate.getConfigMap(), sampleTs);
                 //Do not forget to update origin string config
-                predicate.setConfig(predicate.getConfigMap());
+                predicate.setConfigMap(predicate.getConfigMap());
                 mPredicts.add(predicate);
             }
         }
@@ -219,13 +219,13 @@ public class JobInstance implements Job {
      */
     private void setDataConnectorConf(DataConnector dc, JobDataSegment segment, Long[] sampleTs) throws IOException {
         Map<String, String> segConfMap = genConfMap(segment.getConfigMap(), sampleTs);
-        segment.setConfig(segment.getConfigMap());
+        segment.setConfigMap(segment.getConfigMap());
         Map<String, String> confMap = dc.getConfigMap();
         for (Map.Entry<String, String> entry : segConfMap.entrySet()) {
             confMap.put(entry.getKey(), entry.getValue());
         }
         //Do not forget to update data connector String config
-        dc.setConfig(confMap);
+        dc.setConfigMap(confMap);
     }
 
 
