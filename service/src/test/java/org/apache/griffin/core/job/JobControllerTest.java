@@ -89,32 +89,19 @@ public class JobControllerTest {
     }
 
     @Test
-    public void testAddJobForFailWithReadable() throws Exception {
-        JobSchedule jobSchedule = new JobSchedule(1L, "0 0/4 * * * ?", null,null);
+    public void testAddJobForFail() throws Exception {
+        Map configMap = new HashMap();
+        configMap.put("interval", "1m");
+        configMap.put("repeat", "2");
+        JobSchedule jobSchedule = new JobSchedule(1L, "0 0/4 * * * ?", configMap,null);
         given(service.addJob(jobSchedule)).willReturn(GriffinOperationMessage.CREATE_JOB_FAIL);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"measure.id\": 1,\"cron.expression\": \"0 0/4 * * * ?\"}"))
+                .content(JsonUtil.toJson(jobSchedule)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(405)))
                 .andExpect(jsonPath("$.description", is("Create Job Failed")))
-                .andDo(print());
-    }
-
-    @Test
-    public void testAddJobForFailWithUnreadable() throws Exception {
-        Map<String, String> configMap = new HashMap<>();
-        configMap.put("interval", "5m");
-        configMap.put("repeat", "12");
-        JobSchedule jobSchedule = new JobSchedule(1L, "0 0/4 * * * ?", configMap,null);
-        String json = JsonUtil.toJson(jobSchedule);
-        given(service.addJob(jobSchedule)).willReturn(GriffinOperationMessage.CREATE_JOB_FAIL);
-
-        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().is(500))
                 .andDo(print());
     }
 
