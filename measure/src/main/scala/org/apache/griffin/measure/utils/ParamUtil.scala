@@ -47,6 +47,8 @@ object ParamUtil {
       }
     }
 
+    def getStringOrKey(key: String): String = getString(key, key)
+
     def getByte(key: String, defValue: Byte): Byte = {
       try {
         params.get(key) match {
@@ -160,7 +162,7 @@ object ParamUtil {
       }
     }
 
-    def getParamMap(key: String, defValue: Map[String, Any]): Map[String, Any] = {
+    def getParamMap(key: String, defValue: Map[String, Any] = Map[String, Any]()): Map[String, Any] = {
       try {
         params.get(key) match {
           case Some(v: Map[String, Any]) => v
@@ -168,6 +170,13 @@ object ParamUtil {
         }
       } catch {
         case _: Throwable => defValue
+      }
+    }
+
+    def addIfNotExist(key: String, value: Any): Map[String, Any] = {
+      params.get(key) match {
+        case Some(v) => params
+        case _ => params + (key -> value)
       }
     }
   }

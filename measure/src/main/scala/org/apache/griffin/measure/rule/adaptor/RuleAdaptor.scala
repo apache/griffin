@@ -68,7 +68,7 @@ object RuleInfoGen {
     RuleInfo(
       param.getString(_name, RuleStepNameGenerator.genName),
       param.getString(_rule, ""),
-      param.getParamMap(_details, Map[String, Any]())
+      param.getParamMap(_details)
     )
   }
 

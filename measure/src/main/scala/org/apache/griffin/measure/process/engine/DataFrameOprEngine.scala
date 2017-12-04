@@ -33,6 +33,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.spark.streaming.StreamingContext
+import org.apache.griffin.measure.utils.ParamUtil._
 
 case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
@@ -101,10 +102,10 @@ object DataFrameOprs {
     val _total = "total"
     val _matched = "matched"
 //    val _tmst = "tmst"
-    val dfName = details.getOrElse(_dfName, _dfName).toString
-    val miss = details.getOrElse(_miss, _miss).toString
-    val total = details.getOrElse(_total, _total).toString
-    val matched = details.getOrElse(_matched, _matched).toString
+    val dfName = details.getStringOrKey(_dfName)
+    val miss = details.getStringOrKey(_miss)
+    val total = details.getStringOrKey(_total)
+    val matched = details.getStringOrKey(_matched)
 //    val tmst = details.getOrElse(_tmst, _tmst).toString
 //    val tmst = GroupByColumn.tmst
 
