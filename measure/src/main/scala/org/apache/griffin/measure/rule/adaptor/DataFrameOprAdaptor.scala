@@ -36,11 +36,11 @@ case class DataFrameOprAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
     }
   }
 
-  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
-    param.get(_name) match {
-      case Some(name) => name.toString :: Nil
-      case _ => Nil
-    }
-  }
+//  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
+//    param.get(_name) match {
+//      case Some(name) => name.toString :: Nil
+//      case _ => Nil
+//    }
+//  }
 
 }

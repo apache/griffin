@@ -34,52 +34,56 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
                              adaptPhase: AdaptPhase
                             ) extends RuleAdaptor {
 
-  object StepInfo {
-    val _Name = "name"
-    val _PersistType = "persist.type"
-    val _UpdateDataSource = "update.data.source"
-    def getNameOpt(param: Map[String, Any]): Option[String] = param.get(_Name).map(_.toString)
-    def getPersistType(param: Map[String, Any], defPersistType: PersistType): PersistType = PersistType(param.getString(_PersistType, defPersistType.desc))
-    def getUpdateDataSourceOpt(param: Map[String, Any]): Option[String] = param.get(_UpdateDataSource).map(_.toString)
-  }
   object AccuracyInfo {
-    val _Source = "source"
-    val _Target = "target"
-    val _MissRecords = "miss.records"
-    val _Accuracy = "accuracy"
-    val _Miss = "miss"
-    val _Total = "total"
-    val _Matched = "matched"
-  }
-  object ProfilingInfo {
-    val _Source = "source"
-    val _Profiling = "profiling"
+    ;
   }
 
-  def getNameOpt(param: Map[String, Any], key: String): Option[String] = param.get(key).map(_.toString)
-  def resultName(param: Map[String, Any], key: String): String = {
-    val nameOpt = param.get(key) match {
-      case Some(prm: Map[String, Any]) => StepInfo.getNameOpt(prm)
-      case _ => None
-    }
-    nameOpt.getOrElse(key)
-  }
-  def resultPersistType(param: Map[String, Any], key: String, defPersistType: PersistType): PersistType = {
-    param.get(key) match {
-      case Some(prm: Map[String, Any]) => StepInfo.getPersistType(prm, defPersistType)
-      case _ => defPersistType
-    }
-  }
-  def resultUpdateDataSourceOpt(param: Map[String, Any], key: String): Option[String] = {
-    param.get(key) match {
-      case Some(prm: Map[String, Any]) => StepInfo.getUpdateDataSourceOpt(prm)
-      case _ => None
-    }
-  }
+//  object StepInfo {
+//    val _Name = "name"
+//    val _PersistType = "persist.type"
+//    val _UpdateDataSource = "update.data.source"
+//    def getNameOpt(param: Map[String, Any]): Option[String] = param.get(_Name).map(_.toString)
+//    def getPersistType(param: Map[String, Any], defPersistType: PersistType): PersistType = PersistType(param.getString(_PersistType, defPersistType.desc))
+//    def getUpdateDataSourceOpt(param: Map[String, Any]): Option[String] = param.get(_UpdateDataSource).map(_.toString)
+//  }
+//  object AccuracyInfo {
+//    val _Source = "source"
+//    val _Target = "target"
+//    val _MissRecords = "miss.records"
+//    val _Accuracy = "accuracy"
+//    val _Miss = "miss"
+//    val _Total = "total"
+//    val _Matched = "matched"
+//  }
+//  object ProfilingInfo {
+//    val _Source = "source"
+//    val _Profiling = "profiling"
+//  }
 
-  val _dqType = "dq.type"
+//  def getNameOpt(param: Map[String, Any], key: String): Option[String] = param.get(key).map(_.toString)
+//  def resultName(param: Map[String, Any], key: String): String = {
+//    val nameOpt = param.get(key) match {
+//      case Some(prm: Map[String, Any]) => StepInfo.getNameOpt(prm)
+//      case _ => None
+//    }
+//    nameOpt.getOrElse(key)
+//  }
+//  def resultPersistType(param: Map[String, Any], key: String, defPersistType: PersistType): PersistType = {
+//    param.get(key) match {
+//      case Some(prm: Map[String, Any]) => StepInfo.getPersistType(prm, defPersistType)
+//      case _ => defPersistType
+//    }
+//  }
+//  def resultUpdateDataSourceOpt(param: Map[String, Any], key: String): Option[String] = {
+//    param.get(key) match {
+//      case Some(prm: Map[String, Any]) => StepInfo.getUpdateDataSourceOpt(prm)
+//      case _ => None
+//    }
+//  }
 
-  protected def getDqType(param: Map[String, Any]) = DqType(param.getString(_dqType, ""))
+//  val _dqType = "dq.type"
+//
+//  protected def getDqType(param: Map[String, Any]) = DqType(param.getString(_dqType, ""))
 
   val filteredFunctionNames = functionNames.filter { fn =>
     fn.matches("""^[a-zA-Z_]\w*$""")
@@ -87,35 +91,36 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
   val parser = GriffinDslParser(dataSourceNames, filteredFunctionNames)
 
   def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep] = {
-    val ruleInfo = RuleInfo(getName(param), getRule(param), getDetails(param))
-    GriffinDslStep(timeInfo, ruleInfo, getDqType(param)) :: Nil
+    val ruleInfo = RuleInfoGen(param)
+    val dqType = RuleInfoGen.dqType(param)
+    GriffinDslStep(timeInfo, ruleInfo, dqType) :: Nil
   }
 
-  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
-    val dqType = getDqType(param)
-    param.get(_name) match {
-      case Some(name) => {
-        dqType match {
-          case AccuracyType => {
-            Seq[String](
-              resultName(param, AccuracyInfo._MissRecords),
-              resultName(param, AccuracyInfo._Accuracy)
-            )
-          }
-          case ProfilingType => {
-            Seq[String](
-              resultName(param, ProfilingInfo._Profiling)
-            )
-          }
-          case TimelinessType => {
-            Nil
-          }
-          case _ => Nil
-        }
-      }
-      case _ => Nil
-    }
-  }
+//  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
+//    val dqType = getDqType(param)
+//    param.get(_name) match {
+//      case Some(name) => {
+//        dqType match {
+//          case AccuracyType => {
+//            Seq[String](
+//              resultName(param, AccuracyInfo._MissRecords),
+//              resultName(param, AccuracyInfo._Accuracy)
+//            )
+//          }
+//          case ProfilingType => {
+//            Seq[String](
+//              resultName(param, ProfilingInfo._Profiling)
+//            )
+//          }
+//          case TimelinessType => {
+//            Nil
+//          }
+//          case _ => Nil
+//        }
+//      }
+//      case _ => Nil
+//    }
+//  }
 
   private def checkDataSourceExists(name: String): Boolean = {
     try {
@@ -132,33 +137,21 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
                            ): Seq[ConcreteRuleStep] = {
     ruleStep match {
       case rs @ GriffinDslStep(_, ri, dqType) => {
-        val exprOpt = try {
+        try {
           val result = parser.parseRule(ri.rule, dqType)
-          if (result.successful) Some(result.get)
-          else {
+          if (result.successful) {
+            val expr = result.get
+            transConcreteRuleStep(rs, expr, dsTmsts)
+          } else {
             println(result)
             warn(s"adapt concrete rule step warn: parse rule [ ${ri.rule} ] fails")
-            None
+            Nil
           }
         } catch {
           case e: Throwable => {
             error(s"adapt concrete rule step error: ${e.getMessage}")
-            None
+            Nil
           }
-        }
-
-        exprOpt match {
-          case Some(expr) => {
-            try {
-              transConcreteRuleStep(rs, expr, dsTmsts)
-            } catch {
-              case e: Throwable => {
-                error(s"trans concrete rule step error: ${e.getMessage}")
-                Nil
-              }
-            }
-          }
-          case _ => Nil
         }
       }
       case _ => Nil
@@ -168,15 +161,9 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
   private def transConcreteRuleStep(ruleStep: GriffinDslStep, expr: Expr, dsTmsts: Map[String, Set[Long]]
                                    ): Seq[ConcreteRuleStep] = {
     ruleStep.dqType match {
-      case AccuracyType => {
-        transAccuracyRuleStep(ruleStep, expr, dsTmsts)
-      }
-      case ProfilingType => {
-        transProfilingRuleStep(ruleStep, expr, dsTmsts)
-      }
-      case TimelinessType => {
-        Nil
-      }
+      case AccuracyType => transAccuracyRuleStep(ruleStep, expr, dsTmsts)
+      case ProfilingType => transProfilingRuleStep(ruleStep, expr, dsTmsts)
+      case TimelinessType => Nil
       case _ => Nil
     }
   }
@@ -184,8 +171,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
   private def transAccuracyRuleStep(ruleStep: GriffinDslStep, expr: Expr, dsTmsts: Map[String, Set[Long]]
                                    ): Seq[ConcreteRuleStep] = {
     val details = ruleStep.ruleInfo.details
-    val sourceName = getNameOpt(details, AccuracyInfo._Source).getOrElse(dataSourceNames.head)
-    val targetName = getNameOpt(details, AccuracyInfo._Target).getOrElse(dataSourceNames.tail.head)
+    val sourceName = details.getString("source", dataSourceNames.head)
+    val targetName = details.getString("target", dataSourceNames.tail.head)
     val analyzer = AccuracyAnalyzer(expr.asInstanceOf[LogicalExpr], sourceName, targetName)
 
     val tmsts = dsTmsts.getOrElse(sourceName, Set.empty[Long])
@@ -216,7 +203,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         RuleInfo(missRecordsName, missRecordsSql, Map[String, Any]())
           .withName(missRecordsName)
           .withPersistType(resultPersistType(details, AccuracyInfo._MissRecords, RecordPersistType))
-          .withUpdateDataSourceOpt(resultUpdateDataSourceOpt(details, AccuracyInfo._MissRecords))
+          .withCacheDataSourceOpt(resultUpdateDataSourceOpt(details, AccuracyInfo._MissRecords))
       )
 
       val tmstStepsPair = tmsts.map { tmst =>

@@ -184,9 +184,9 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
                         dataSources: Seq[DataSource]): Unit = {
     stepRdds.foreach { stepRdd =>
       val (step, rdd) = stepRdd
-      if (step.ruleInfo.updateDataSourceOpt.nonEmpty) {
+      if (step.ruleInfo.cacheDataSourceOpt.nonEmpty) {
         val udpateDataSources = dataSources.filter { ds =>
-          step.ruleInfo.updateDataSourceOpt match {
+          step.ruleInfo.cacheDataSourceOpt match {
             case Some(dsName) if (dsName == ds.name) => true
             case _ => false
           }

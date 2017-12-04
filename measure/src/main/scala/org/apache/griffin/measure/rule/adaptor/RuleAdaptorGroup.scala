@@ -29,7 +29,8 @@ import scala.collection.mutable.{Map => MutableMap}
 
 object RuleAdaptorGroup {
 
-  val _dslType = "dsl.type"
+//  val _dslType = "dsl.type"
+  import RuleInfoKeys._
 
   var dataSourceNames: Seq[String] = _
   var functionNames: Seq[String] = _
@@ -97,8 +98,10 @@ object RuleAdaptorGroup {
       val (preSteps, preNames) = res
       val dslType = getDslType(param, defDslType)
       val (curSteps, curNames) = genRuleAdaptor(dslType, preNames, procType, adaptPhase) match {
-        case Some(ruleAdaptor) => (ruleAdaptor.genConcreteRuleStep(timeInfo, param, dsTmsts),
-          preNames ++ ruleAdaptor.getTempSourceNames(param))
+        case Some(ruleAdaptor) => {
+          val concreteSteps = ruleAdaptor.genConcreteRuleStep(timeInfo, param, dsTmsts)
+          (concreteSteps, preNames ++ ruleAdaptor.getPersistNames(concreteSteps))
+        }
         case _ => (Nil, preNames)
       }
       (preSteps ++ curSteps, curNames)

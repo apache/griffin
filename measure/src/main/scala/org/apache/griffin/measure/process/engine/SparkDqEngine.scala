@@ -41,7 +41,7 @@ trait SparkDqEngine extends DqEngine {
             val pdf = sqlContext.table(s"`${name}`")
             val records: Array[String] = pdf.toJSON.collect()
 
-            val metricName = step.ruleInfo.originName
+            val metricName = step.ruleInfo.persistName
             val tmst = step.timeInfo.tmst
 
             val pairs = records.flatMap { rec =>
@@ -84,7 +84,7 @@ trait SparkDqEngine extends DqEngine {
     if (collectable) {
       ruleStep match {
         case step: ConcreteRuleStep if ((step.ruleInfo.persistType == RecordPersistType)
-          || (step.ruleInfo.updateDataSourceOpt.nonEmpty)) => {
+          || (step.ruleInfo.cacheDataSourceOpt.nonEmpty)) => {
           val name = step.name
           try {
             val pdf = sqlContext.table(s"`${name}`")

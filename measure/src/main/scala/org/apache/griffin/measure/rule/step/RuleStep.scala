@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.rule.step
 
+import java.util.concurrent.atomic.AtomicLong
+
 import org.apache.griffin.measure.rule.dsl._
 
 trait RuleStep extends Serializable {
@@ -38,39 +40,33 @@ trait RuleStep extends Serializable {
 
 case class TimeInfo(calcTime: Long, tmst: Long) {}
 
+object RuleDetailKeys {
+  val _persistName = "persist.name"
+  val _persistType = "persist.type"
+  val _collectType = "collect.type"
+  val _cacheDataSource = "cache.data.source"
+}
+import RuleDetailKeys._
+import org.apache.griffin.measure.utils.ParamUtil._
+
 case class RuleInfo(name: String, rule: String, details: Map[String, Any]) {
-  private val _name = "name"
-  private val _persistType = "persist.type"
-  private val _asArray = "as.array"
-  private val _updateDataSource = "update.data.source"
 
-  def persistType = PersistType(details.getOrElse(_persistType, "").toString)
-  def updateDataSourceOpt = details.get(_updateDataSource).map(_.toString)
+  def persistName = details.getString(_persistName, name)
+  def persistType = PersistType(details.getString(_persistType, ""))
+  def collectType = CollectType(details.getString(_collectType, ""))
+  def cacheDataSourceOpt = details.get(_cacheDataSource).map(_.toString)
 
-  def withName(n: String): RuleInfo = {
-    RuleInfo(name, rule, details + (_name -> n))
+  def withPersistName(n: String): RuleInfo = {
+    RuleInfo(name, rule, details + (_persistName -> n))
   }
   def withPersistType(pt: PersistType): RuleInfo = {
     RuleInfo(name, rule, details + (_persistType -> pt.desc))
   }
-  def withUpdateDataSourceOpt(udsOpt: Option[String]): RuleInfo = {
-    udsOpt match {
-      case Some(uds) => RuleInfo(name, rule, details + (_updateDataSource -> uds))
-      case _ => this
-    }
+  def withCollectType(ct: CollectType): RuleInfo = {
+    RuleInfo(name, rule, details + (_collectType -> ct.desc))
   }
-
-  def originName: String = {
-    details.getOrElse(_name, name).toString
-  }
-  def asArray: Boolean = {
-    try {
-      details.get(_asArray) match {
-        case Some(v) => v.toString.toBoolean
-        case _ => false
-      }
-    } catch {
-      case e: Throwable => false
-    }
+  def withCacheDataSourceOpt(udsOpt: Option[String]): RuleInfo = {
+    udsOpt.map(uds => RuleInfo(name, rule, details + (_cacheDataSource -> uds))).getOrElse(this)
   }
 }
+
