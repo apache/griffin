@@ -24,7 +24,7 @@ import org.apache.griffin.measure.rule.step._
 case class SparkSqlAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
 
   def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep] = {
-    val ruleInfo = RuleInfo(getName(param), getRule(param), getDetails(param))
+    val ruleInfo = RuleInfoGen(param)
     SparkSqlStep(timeInfo, ruleInfo) :: Nil
   }
   def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]): Seq[ConcreteRuleStep] = {

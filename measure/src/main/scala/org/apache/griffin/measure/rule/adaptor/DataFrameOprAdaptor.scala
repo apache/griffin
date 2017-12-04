@@ -24,7 +24,7 @@ import org.apache.griffin.measure.rule.step._
 case class DataFrameOprAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
 
   def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep] = {
-    val ruleInfo = RuleInfo(getName(param), getRule(param), getDetails(param))
+    val ruleInfo = RuleInfoGen(param)
     DfOprStep(timeInfo, ruleInfo) :: Nil
 //    DfOprStep(getName(param), getRule(param), getDetails(param),
 //      getPersistType(param), getUpdateDataSource(param)) :: Nil

@@ -46,11 +46,7 @@ object RuleAdaptorGroup {
   }
 
   private def getDslType(param: Map[String, Any], defDslType: DslType) = {
-    val dt = DslType(param.getOrElse(_dslType, "").toString)
-    dt match {
-      case UnknownDslType => defDslType
-      case _ => dt
-    }
+    DslType(param.getOrElse(_dslType, defDslType.desc).toString)
   }
 
   private def genRuleAdaptor(dslType: DslType, dsNames: Seq[String],
