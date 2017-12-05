@@ -32,8 +32,8 @@ object HdfsFileDumpUtil {
   }
 
   def splitRdd[T](rdd: RDD[T])(implicit m: Manifest[T]): RDD[(Long, Iterable[T])] = {
-    val indexRdd = rdd.zipWithIndex
-    indexRdd.map(p => ((p._2 / sepCount), p._1)).groupByKey()
+    val indexRdd = rdd.zipWithIndex // slow process
+    indexRdd.map(p => ((p._2 / sepCount), p._1)).groupByKey() // slow process
   }
   def splitIterable[T](datas: Iterable[T])(implicit m: Manifest[T]): Iterator[(Int, Iterable[T])] = {
     val groupedData = datas.grouped(sepCount).zipWithIndex

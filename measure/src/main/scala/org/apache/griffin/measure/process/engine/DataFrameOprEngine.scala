@@ -90,7 +90,7 @@ object DataFrameOprs {
       case Some(colName: String) => df.map(_.getAs[String](colName))
       case _ => df.map(_.getAs[String](0))
     }
-    sqlContext.read.json(rdd)
+    sqlContext.read.json(rdd) // slow process
   }
 
   def accuracy(sqlContext: SQLContext, timeInfo: TimeInfo, ruleInfo: RuleInfo): DataFrame = {
