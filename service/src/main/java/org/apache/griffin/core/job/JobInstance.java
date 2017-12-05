@@ -24,7 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobDataSegment;
 import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
-import org.apache.griffin.core.job.entity.SegmentSplit;
+import org.apache.griffin.core.job.entity.SegmentRange;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
@@ -37,13 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
@@ -92,13 +89,7 @@ public class JobInstance implements Job {
         Long jobScheduleId = jobDetail.getJobDataMap().getLong("jobScheduleId");
         setJobStartTime(jobDetail);
         measure = measureRepo.findOne(measureId);
-        if (measure == null) {
-            LOGGER.error("Measure with id {} is not found!", measureId);
-            throw new NullPointerException();
-        }
         jobSchedule = jobScheduleRepo.findOne(jobScheduleId);
-        Long timestampOffset = TimeUtil.str2Long(jobSchedule.getTimestampOffset());
-        measure.setTriggerTimeStamp(jobStartTime + timestampOffset);
     }
 
     private void setJobStartTime(JobDetail jobDetail) throws SchedulerException {
@@ -111,71 +102,54 @@ public class JobInstance implements Job {
 
 
     private void setDataSourcesPartitions(List<DataSource> sources) throws Exception {
-        if (CollectionUtils.isEmpty(sources)) {
-            throw new NullPointerException("Measure data sources can not be empty.");
-        }
-        List<JobDataSegment> segments = jobSchedule.getSegments();
-        for (JobDataSegment dataSegment : segments) {
-            String connectorIndex = dataSegment.getDataConnectorIndex();
-            if (connectorIndex == null || !connectorIndex.matches(".+\\[\\d+]")) {
-                throw new IllegalArgumentException("Data segments connector index format error.");
-            }
-
+        for (JobDataSegment dataSegment : jobSchedule.getSegments()) {
             for (DataSource source : sources) {
                 setDataSourcePartitions(dataSegment, source);
             }
         }
     }
 
-    private int getIndex(String connectorIndex) {
-        Pattern pattern = Pattern.compile("\\[.*]");
-        Matcher matcher = pattern.matcher(connectorIndex);
-        int index = 0;
-        while (matcher.find()) {
-            String group = matcher.group();
-            group = group.replace("[", "").replace("]", "");
-            index = Integer.parseInt(group);
-        }
-        return index;
-    }
-
-    private void setDataSourcePartitions(JobDataSegment dataSegment, DataSource dataSource) throws Exception {
+    private void setDataSourcePartitions(JobDataSegment jds, DataSource dataSource) throws Exception {
         List<DataConnector> connectors = dataSource.getConnectors();
-        if (getIndex(dataSegment.getDataConnectorIndex()) >= connectors.size()) {
-            throw new ArrayIndexOutOfBoundsException("Data segments connector index format error.");
-        }
         for (int index = 0; index < connectors.size(); index++) {
-            setDataConnectorPartitions(dataSegment, dataSource, connectors.get(index), index);
+            setDataConnectorPartitions(jds, dataSource, connectors.get(index), index);
         }
     }
 
 
-    private void setDataConnectorPartitions(JobDataSegment ds, DataSource source, DataConnector dataConnector, int index) throws Exception {
-        if (ds.getDataConnectorIndex().equals(getConnectorIndex(source, index))
-                && ds.getSegmentSplit() != null && ds.getConfig() != null) {
-            Long[] sampleTimestamps = genSampleTs(ds.getSegmentSplit());
-            setDataConnectorConf(dataConnector, ds, sampleTimestamps);
-            setSegPredictsConf(ds, sampleTimestamps);
+    private void setDataConnectorPartitions(JobDataSegment jds, DataSource source, DataConnector dc, int index) throws Exception {
+        String dcIndex = jds.getDataConnectorIndex();
+        if (dcIndex.equals(getConnectorIndex(source, index))) {
+            if (jobSchedule.getBaseline().equals(dcIndex)) {
+                Long timestampOffset = TimeUtil.str2Long(jobSchedule.getBaseline());
+                measure.setDataTimeStamp(jobStartTime + timestampOffset);
+            }
+            Long[] sampleTimestamps = genSampleTs(jds.getSegmentRange(),dc);
+            if (sampleTimestamps != null) {
+                setConnectorConf(dc, sampleTimestamps);
+                setConnectorPredicates(dc, sampleTimestamps);
+            }
         }
     }
 
     private String getConnectorIndex(DataSource source, int index) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(source.getName());
-        sb.append("[").append(index).append("]");
-        return sb.toString();
+        return source.getName() + "[" + index + "]";
     }
 
     /**
      * split data into several part and get every part start timestamp
      *
-     * @param segSplit config of data
+     * @param segRange config of data
      * @return split timestamps of data
      */
-    private Long[] genSampleTs(SegmentSplit segSplit) {
-        Long offset = TimeUtil.str2Long(segSplit.getOffset());
-        Long range = TimeUtil.str2Long(segSplit.getRange());
-        Long dataUnit = TimeUtil.str2Long(segSplit.getDataUnit());
+    private Long[] genSampleTs(SegmentRange segRange,DataConnector dc) throws IOException {
+        Map<String,String> confMap = dc.getConfigMap();
+        if (confMap == null || confMap.get("where") == null || confMap.get("data.unit") == null) {
+            return null;
+        }
+        Long offset = TimeUtil.str2Long(segRange.getBegin());
+        Long range = TimeUtil.str2Long(segRange.getLength());
+        Long dataUnit = TimeUtil.str2Long(confMap.get("data.unit"));
         //offset usually is negative
         Long dataStartTime = jobStartTime + offset;
         if (range < 0) {
@@ -194,13 +168,12 @@ public class JobInstance implements Job {
     }
 
     /**
-     * set all class SegmentPredicate configs
+     * set data connector predicates
      *
-     * @param segment  job data segment
      * @param sampleTs collection of data split start timestamp
      */
-    private void setSegPredictsConf(JobDataSegment segment, Long[] sampleTs) throws IOException {
-        List<SegmentPredicate> predicates = segment.getPredicates();
+    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) throws IOException {
+        List<SegmentPredicate> predicates = dc.getPredicates();
         if (predicates != null) {
             for (SegmentPredicate predicate : predicates) {
                 genConfMap(predicate.getConfigMap(), sampleTs);
@@ -212,20 +185,13 @@ public class JobInstance implements Job {
     }
 
     /**
-     * set all class SegmentPredicate configs
+     * set data connector configs
      *
-     * @param segment  job data segment
      * @param sampleTs collection of data split start timestamp
      */
-    private void setDataConnectorConf(DataConnector dc, JobDataSegment segment, Long[] sampleTs) throws IOException {
-        Map<String, String> segConfMap = genConfMap(segment.getConfigMap(), sampleTs);
-        segment.setConfigMap(segment.getConfigMap());
-        Map<String, String> confMap = dc.getConfigMap();
-        for (Map.Entry<String, String> entry : segConfMap.entrySet()) {
-            confMap.put(entry.getKey(), entry.getValue());
-        }
-        //Do not forget to update data connector String config
-        dc.setConfigMap(confMap);
+    private void setConnectorConf(DataConnector dc, Long[] sampleTs) throws IOException {
+        genConfMap(dc.getConfigMap(), sampleTs);
+        dc.setConfigMap(dc.getConfigMap());
     }
 
 
@@ -235,7 +201,7 @@ public class JobInstance implements Job {
      * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
      * or like {"path": "/year=#2017/month=11/dt=15/hour=09/_DONE,/year=#2017/month=11/dt=15/hour=10/_DONE"}
      */
-    private Map<String, String> genConfMap(Map<String, String> conf, Long[] sampleTs) {
+    private void genConfMap(Map<String, String> conf, Long[] sampleTs) {
         for (Map.Entry<String, String> entry : conf.entrySet()) {
             String value = entry.getValue();
             Set<String> set = new HashSet<>();
@@ -244,13 +210,9 @@ public class JobInstance implements Job {
             }
             conf.put(entry.getKey(), StringUtils.join(set, ","));
         }
-        return conf;
     }
 
     private boolean createJobInstance(Map<String, String> confMap, JobExecutionContext context) throws Exception {
-        if (confMap == null || confMap.get("interval") == null || confMap.get("repeat") == null) {
-            throw new NullPointerException("Predicate config is null.");
-        }
         Long interval = TimeUtil.str2Long(confMap.get("interval"));
         Integer repeat = Integer.valueOf(confMap.get("repeat"));
         String groupName = "predicate_group";

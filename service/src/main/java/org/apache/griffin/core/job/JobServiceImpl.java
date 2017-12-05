@@ -23,12 +23,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.error.exception.GriffinException.GetHealthInfoFailureException;
 import org.apache.griffin.core.error.exception.GriffinException.GetJobsFailureException;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
-import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
+import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
@@ -145,6 +143,10 @@ public class JobServiceImpl implements JobService {
         Scheduler scheduler = factory.getObject();
         Measure measure = isMeasureIdValid(jobSchedule.getMeasureId());
         if (measure != null) {
+            List<String> indexes = getConnectorIndexes(measure);
+            if (isParamValid(jobSchedule.getBaseline(), indexes) || !isConnectorIndexesValid(jobSchedule.getSegments(), indexes)) {
+                return CREATE_JOB_FAIL;
+            }
             String groupName = "BA";
             String jobName = measure.getName() + "_" + groupName + "_" + System.currentTimeMillis();
             TriggerKey triggerKey = triggerKey(jobName, groupName);
@@ -160,6 +162,40 @@ public class JobServiceImpl implements JobService {
         return CREATE_JOB_FAIL;
     }
 
+    private boolean isConnectorIndexesValid(List<JobDataSegment> segments, List<String> indexes) {
+        for (JobDataSegment segment : segments) {
+            if (isParamValid(segment.getDataConnectorIndex(), indexes)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isParamValid(String param, List<String> indexes) {
+        for (String index : indexes) {
+            if (index.equals(param)) {
+                return true;
+            }
+        }
+        LOGGER.error("Param {} is a illegal string.Please input one of strings in {}", param,indexes);
+        return false;
+    }
+
+    private List<String> getConnectorIndexes(Measure measure) {
+        List<String> index = new ArrayList<>();
+        List<DataSource> sources = measure.getDataSources();
+        for (int i = 0; i < sources.size(); i++) {
+            index.add(getConnectorIndex(sources.get(i), i));
+        }
+        return index;
+    }
+
+    private String getConnectorIndex(DataSource source, int index) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(source.getName());
+        sb.append("[").append(index).append("]");
+        return sb.toString();
+    }
 
     private Measure isMeasureIdValid(long measureId) {
         Measure measure = measureRepo.findOne(measureId);

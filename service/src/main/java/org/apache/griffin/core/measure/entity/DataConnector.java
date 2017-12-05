@@ -23,15 +23,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -50,6 +50,18 @@ public class DataConnector extends AbstractAuditableEntity {
 
     @Transient
     private Map<String, String> configMap;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @JoinColumn(name = "segment_id")
+    private List<SegmentPredicate> predicates = new ArrayList<>();
+
+    public List<SegmentPredicate> getPredicates() {
+        return predicates;
+    }
+
+    public void setPredicates(List<SegmentPredicate> predicates) {
+        this.predicates = predicates;
+    }
 
     @JsonProperty("config")
     public Map<String, String> getConfigMap() throws IOException {

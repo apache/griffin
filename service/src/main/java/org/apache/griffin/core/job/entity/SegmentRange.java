@@ -20,46 +20,39 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
-public class SegmentSplit extends AbstractAuditableEntity {
+public class SegmentRange extends AbstractAuditableEntity {
 
-    private String offset;
+    private String begin;
 
-    @Column(name = "data_range")
-    private String range;
+    private String length;
 
-    private String dataUnit;
 
-    public String getOffset() {
-        return offset;
+    public String getBegin() {
+        return begin;
     }
 
-    public void setOffset(String offset) {
-        this.offset = offset;
+    public void setBegin(String begin) {
+        if (StringUtils.isEmpty(begin)) {
+            this.begin = "1h";
+        }
+        this.begin = begin;
     }
 
-    public String getRange() {
-        return range;
+    public String getLength() {
+        return length;
     }
 
-    public void setRange(String range) {
-        this.range = range;
+    public void setLength(String length) {
+        if (StringUtils.isEmpty(length)) {
+            length = "1h";
+        }
+        this.length = length;
     }
 
-
-    @JsonProperty("data.unit")
-    public String getDataUnit() {
-        return dataUnit;
-    }
-
-    @JsonProperty("data.unit")
-    public void setDataUnit(String dataUnit) {
-        this.dataUnit = dataUnit;
-    }
 }

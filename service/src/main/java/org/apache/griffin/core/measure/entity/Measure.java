@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -37,15 +38,12 @@ public class Measure extends AbstractAuditableEntity {
 
     private String processType;
 
-    /**
-     * record triggered time of measure
-     */
-    private Long triggerTimeStamp = -1L;
+    private Long dataTimeStamp = -1L;
 
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "measure_id")
-    private List<DataSource> dataSources;
+    private List<DataSource> dataSources =new ArrayList<>();
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluateRule_id")
@@ -129,13 +127,13 @@ public class Measure extends AbstractAuditableEntity {
     }
 
     @JsonProperty("timestamp")
-    public Long getTriggerTimeStamp() {
-        return triggerTimeStamp;
+    public Long getDataTimeStamp() {
+        return dataTimeStamp;
     }
 
     @JsonProperty("timestamp")
-    public void setTriggerTimeStamp(Long triggerTimeStamp) {
-        this.triggerTimeStamp = triggerTimeStamp;
+    public void setDataTimeStamp(Long dataTimeStamp) {
+        this.dataTimeStamp = dataTimeStamp;
     }
 
     public Measure() {

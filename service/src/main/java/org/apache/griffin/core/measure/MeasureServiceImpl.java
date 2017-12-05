@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -49,7 +48,7 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public Measure getMeasureById(@PathVariable("id") long id) {
+    public Measure getMeasureById(long id) {
         return measureRepo.findByIdAndDeleted(id, false);
     }
 

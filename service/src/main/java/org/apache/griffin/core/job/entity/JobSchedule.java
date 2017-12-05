@@ -47,7 +47,7 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     private String timeZone;
 
-    private String timestampOffset = "0";
+    private String baseline;
 
     /**
      * Setting access type is to use setter and getter method while reading data from database
@@ -81,7 +81,8 @@ public class JobSchedule extends AbstractAuditableEntity {
     @JsonProperty("cron.expression")
     public void setCronExpression(String cronExpression) {
         if (StringUtils.isEmpty(cronExpression) ||  !isCronExpressionValid(cronExpression)) {
-            throw new IllegalArgumentException("Cron expression is invalid.Please check your cron expression.");
+            LOGGER.error("Cron expression is invalid.Please check your cron expression.");
+            throw new IllegalArgumentException();
         }
         this.cronExpression = cronExpression;
     }
@@ -106,14 +107,14 @@ public class JobSchedule extends AbstractAuditableEntity {
         this.segments = segments;
     }
 
-    @JsonProperty("timestamp.offset")
-    public String getTimestampOffset() {
-        return timestampOffset;
+    @JsonProperty("timestamp.baseline")
+    public String getBaseline() {
+        return baseline;
     }
 
-    @JsonProperty("timestamp.offset")
-    public void setTimestampOffset(String timestampOffset) {
-        this.timestampOffset = timestampOffset;
+    @JsonProperty("timestamp.baseline")
+    public void setBaseline(String baseline) {
+        this.baseline = baseline;
     }
 
     private String getPredicateConfig() {
@@ -123,6 +124,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     private void setPredicateConfig(String config) throws IOException {
         this.predicateConfig = config;
         this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {});
+        verifyConfig(configMap);
     }
 
     @JsonProperty("predicate.config")
@@ -134,6 +136,13 @@ public class JobSchedule extends AbstractAuditableEntity {
     public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
         this.configMap = configMap;
         this.predicateConfig = JsonUtil.toJson(configMap);
+        verifyConfig(configMap);
+    }
+
+    private void verifyConfig(Map<String,String> config){
+        if (config == null || config.get("interval") == null || config.get("repeat") == null) {
+            throw new NullPointerException("Predicate config is illegal. Please set it rightly.");
+        }
     }
 
     private boolean isCronExpressionValid(String cronExpression) {
