@@ -23,11 +23,13 @@ package org.apache.griffin.core.job.entity;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
 public class SegmentRange extends AbstractAuditableEntity {
 
+    @Column(name = "data_begin")
     private String begin;
 
     private String length;
