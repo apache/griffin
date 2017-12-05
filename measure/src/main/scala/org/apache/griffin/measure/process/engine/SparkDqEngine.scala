@@ -31,60 +31,49 @@ trait SparkDqEngine extends DqEngine {
 
   val sqlContext: SQLContext
 
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
+  def collectMetrics(ruleStep: ConcreteRuleStep): Option[(Long, Map[String, Any])] = {
     if (collectable) {
       val emptyMap = Map[String, Any]()
       ruleStep match {
         case step: ConcreteRuleStep if (step.ruleInfo.persistType == MetricPersistType) => {
           val name = step.name
+          val tmst = step.timeInfo.tmst
+          val metricName = step.ruleInfo.persistName
           try {
             val pdf = sqlContext.table(s"`${name}`")
             val records: Array[String] = pdf.toJSON.collect()
 
-            val metricName = step.ruleInfo.persistName
-            val tmst = step.timeInfo.tmst
-
-            val pairs = records.flatMap { rec =>
+            val flatRecords = records.flatMap { rec =>
               try {
                 val value = JsonUtil.toAnyMap(rec)
-                Some((tmst, value))
+                Some(value)
               } catch {
                 case e: Throwable => None
               }
-            }
-            val groupedPairs: Map[Long, Seq[Map[String, Any]]] =
-              pairs.foldLeft(Map[Long, Seq[Map[String, Any]]]()) { (ret, pair) =>
-                val (k, v) = pair
-                ret.get(k) match {
-                  case Some(seq) => ret + (k -> (seq :+ v))
-                  case _ => ret + (k -> (v :: Nil))
-                }
+            }.toSeq
+            val metrics = step.ruleInfo.collectType match {
+              case EntriesCollectType => flatRecords.headOption.getOrElse(emptyMap)
+              case ArrayCollectType => Map[String, Any]((metricName -> flatRecords))
+              case MapCollectType => {
+                val v = flatRecords.headOption.getOrElse(emptyMap)
+                Map[String, Any]((metricName -> v))
               }
-
-            groupedPairs.mapValues { vs =>
-              step.ruleInfo.collectType match {
-                case EntriesCollectType => vs.headOption.getOrElse(emptyMap)
-                case ArrayCollectType => Map[String, Any]((metricName -> vs))
-                case MapCollectType => {
-                  val v = vs.headOption.getOrElse(emptyMap)
-                  Map[String, Any]((metricName -> v))
-                }
-                case _ => {
-                  if (vs.size > 1) Map[String, Any]((metricName -> vs))
-                  else vs.headOption.getOrElse(emptyMap)
-                }
+              case _ => {
+                if (flatRecords.size > 1) Map[String, Any]((metricName -> flatRecords))
+                else flatRecords.headOption.getOrElse(emptyMap)
               }
             }
+            Some((tmst, metrics))
           } catch {
             case e: Throwable => {
               error(s"collect metrics ${name} error: ${e.getMessage}")
-              Map[Long, Map[String, Any]]()
+              None
             }
           }
         }
-        case _ => Map[Long, Map[String, Any]]()
+        case _ => None
       }
-    } else Map[Long, Map[String, Any]]()
+    } else None
   }
 
   def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]

@@ -25,9 +25,10 @@
       {
         "dsl.type": "spark-sql",
         "name": "out",
-        "rule": "select source.post_code, count(*) as `dist-cnt` from source group by post_code",
+        "rule": "select post_code, count(*) as `dist-cnt` from source group by post_code",
         "details": {
-          "persist.type": "metric"
+          "persist.type": "metric",
+          "collect.type": "array"
         }
       }
     ]

@@ -35,7 +35,7 @@
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "name": "dist-name",
-        "rule": "select count ( distinct source.post_code ) as `dis-cnt` from source",
+        "rule": "select count ( distinct source.post_code ) as `dis-cnt`, max(source.user_id) from source",
         "details": {
           "persist.type": "metric"
         }
@@ -47,7 +47,7 @@
         "rule": "source.last_name, count(*) as `cnt` from source group by source.last_name",
         "details": {
           "persist.type": "metric",
-          "collect.type": "default|entries|array|map"
+          "collect.type": "list"
         }
       }
     ]

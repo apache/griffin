@@ -33,7 +33,7 @@ trait DqEngine extends Loggable with Serializable {
 
   protected def collectable(): Boolean = false
 
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]]
+  def collectMetrics(ruleStep: ConcreteRuleStep): Option[(Long, Map[String, Any])]
 
   //  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
   //

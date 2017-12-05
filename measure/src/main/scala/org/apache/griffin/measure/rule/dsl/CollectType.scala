@@ -47,7 +47,7 @@ final case object EntriesCollectType extends CollectType {
 }
 
 final case object ArrayCollectType extends CollectType {
-  val regex: Regex = "^(?i)array$".r
+  val regex: Regex = "^(?i)array|list$".r
   val desc: String = "array"
 }
 

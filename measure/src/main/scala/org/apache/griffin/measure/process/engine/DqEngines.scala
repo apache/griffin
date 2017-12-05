@@ -139,9 +139,9 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 //      engine.collectUpdateCacheDatas(ruleStep, timeGroups)
 //    }.headOption
 //  }
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
-    val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
-      ret ++ engine.collectMetrics(ruleStep)
+  def collectMetrics(ruleStep: ConcreteRuleStep): Option[(Long, Map[String, Any])] = {
+    val ret = engines.foldLeft(None: Option[(Long, Map[String, Any])]) { (ret, engine) =>
+      if (ret.nonEmpty) ret else engine.collectMetrics(ruleStep)
     }
     ret
   }
