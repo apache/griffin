@@ -253,7 +253,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         }
         val accuracyMetricStep = SparkSqlStep(
           timeInfo,
-          RuleInfo(tmstAccuracyMetricName, accuracyMetricSql, details)
+          RuleInfo(tmstAccuracyMetricName, accuracyMetricSql, Map[String, Any]())
         )
 
         // 5. accuracy metric filter

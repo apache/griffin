@@ -38,13 +38,11 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
         |{
         |  "dsl.type": "griffin-dsl",
         |  "dq.type": "profiling",
+        |  "name": "prof",
         |  "rule": "count(*)",
         |  "details": {
         |    "source": "source",
-        |    "profiling": {
-        |      "name": "prof",
-        |      "persist.type": "metric"
-        |    }
+        |    "persist.type": "record"
         |  }
         |}
       """.stripMargin
@@ -61,7 +59,7 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
     val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
 
     steps.foreach { step =>
-      println(s"${step.name} [${step.dslType}]: ${step.ruleInfo.rule}")
+      println(s"${step}")
     }
   }
 
@@ -73,10 +71,12 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
         |{
         |  "dsl.type": "griffin-dsl",
         |  "dq.type": "accuracy",
+        |  "name": "accu",
         |  "rule": "source.id = target.id and source.name = target.name",
         |  "details": {
         |    "source": "source",
-        |    "target": "target"
+        |    "target": "target",
+        |    "persist.type": "metric"
         |  }
         |}
       """.stripMargin
@@ -94,7 +94,7 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
     val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
 
     steps.foreach { step =>
-      println(s"${step.name} [${step.dslType}]: ${step.ruleInfo.rule}")
+      println(s"${step}, ${step.ruleInfo.persistType}")
     }
   }
 
