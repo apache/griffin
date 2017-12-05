@@ -20,6 +20,24 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import org.apache.griffin.core.metric.domain.Metric;
+import org.apache.griffin.core.metric.domain.MetricValue;
+import org.apache.griffin.core.metric.entity.MetricTemplate;
+import org.apache.griffin.core.util.GriffinOperationMessage;
+
+import java.util.List;
+
 public interface MetricService {
-    String getOrgByMeasureName(String measureName);
+
+    List<Metric> getAllMetrics();
+
+    Metric getMetricByTemplateId(Long templateId);
+
+    Metric getMetricByMetricName(String metricName);
+
+    List<MetricValue> getMetricValues(String metricName);
+
+    GriffinOperationMessage addMetricValues(List<MetricValue> values);
+
+    GriffinOperationMessage deleteMetricValues(String metricName);
 }

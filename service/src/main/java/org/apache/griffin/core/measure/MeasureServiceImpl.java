@@ -22,15 +22,16 @@ package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.entity.OutcomeMeasure;
+import org.apache.griffin.core.measure.entity.ProcessMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.metric.MetricTemplateService;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -41,7 +42,9 @@ public class MeasureServiceImpl implements MeasureService {
     @Autowired
     private JobServiceImpl jobService;
     @Autowired
-    private MeasureRepo measureRepo;
+    private MeasureRepo<Measure> measureRepo;
+    @Autowired
+    private MetricTemplateService metricTemplateService;
 
     @Override
     public Iterable<Measure> getAllAliveMeasures() {
@@ -49,7 +52,7 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public Measure getMeasureById(@PathVariable("id") long id) {
+    public Measure getMeasureById(long id) {
         return measureRepo.findByIdAndDeleted(id, false);
     }
 
@@ -60,8 +63,12 @@ public class MeasureServiceImpl implements MeasureService {
         } else {
             Measure measure = measureRepo.findOne(measureId);
             try {
-                //pause all jobs related to the measure
-                jobService.deleteJobsRelateToMeasure(measure);
+                if (measure instanceof ProcessMeasure) {
+                    //pause all jobs related to the measure
+                    jobService.deleteJobsRelateToMeasure((ProcessMeasure) measure);
+                } else {
+                    metricTemplateService.deleteTemplateFromMeasure((OutcomeMeasure) measure);
+                }
                 measure.setDeleted(true);
                 measureRepo.save(measure);
             } catch (SchedulerException e) {
@@ -79,6 +86,9 @@ public class MeasureServiceImpl implements MeasureService {
         if (aliveMeasureList.size() == 0) {
             try {
                 if (measureRepo.save(measure) != null) {
+                    if (measure instanceof OutcomeMeasure) {
+                        metricTemplateService.createTemplateFromMeasure((OutcomeMeasure) measure);
+                    }
                     return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
                 } else {
                     return GriffinOperationMessage.CREATE_MEASURE_FAIL;
@@ -100,12 +110,15 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
+    public GriffinOperationMessage updateMeasure(Measure measure) {
         if (measureRepo.findByIdAndDeleted(measure.getId(), false) == null) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         } else {
             try {
                 measureRepo.save(measure);
+                if (measure instanceof OutcomeMeasure) {
+                    metricTemplateService.updateTemplateFromMeasure((OutcomeMeasure) measure);
+                }
             } catch (Exception e) {
                 LOGGER.error("Failed to update measure. {}", e.getMessage());
                 return GriffinOperationMessage.UPDATE_MEASURE_FAIL;

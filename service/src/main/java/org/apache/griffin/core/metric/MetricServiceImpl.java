@@ -20,17 +20,61 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
-import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.metric.domain.Metric;
+import org.apache.griffin.core.metric.domain.MetricValue;
+import org.apache.griffin.core.metric.entity.MetricTemplate;
+import org.apache.griffin.core.metric.repo.MetricTemplateRepo;
+import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class MetricServiceImpl implements MetricService {
+
     @Autowired
-    private MeasureRepo measureRepo;
+    private MetricStore metricStore;
+    @Autowired
+    private MetricTemplateRepo templateRepo;
+    @Autowired
+    private MetricTemplateService templateService;
 
     @Override
-    public String getOrgByMeasureName(String measureName) {
-        return measureRepo.findOrgByName(measureName);
+    public List<Metric> getAllMetrics() {
+        List<Metric> metrics = new ArrayList<>();
+        for (MetricTemplate template : templateRepo.findAll()) {
+            metrics.add(getMetricByTemplateId(template.getId()));
+        }
+        return metrics;
+    }
+
+    @Override
+    public Metric getMetricByTemplateId(Long templateId) {
+        MetricTemplate template = templateRepo.findOne(templateId);
+        List<MetricValue> metricValues = getMetricValues(template.getMetricName());
+        return new Metric(template, metricValues);
+    }
+
+    @Override
+    public Metric getMetricByMetricName(String metricName) {
+        MetricTemplate template = templateService.getTemplateByMetricName(metricName);
+        return new Metric(template, getMetricValues(metricName));
+    }
+
+    @Override
+    public List<MetricValue> getMetricValues(String metricName) {
+        return metricStore.getMetricValues(metricName);
+    }
+
+    @Override
+    public GriffinOperationMessage addMetricValues(List<MetricValue> values) {
+        return metricStore.addMetricValues(values);
+    }
+
+    @Override
+    public GriffinOperationMessage deleteMetricValues(String metricName) {
+        return metricStore.deleteMetricValues(metricName);
     }
 }

@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.entity.ProcessMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ import java.util.Map;
 public class MeasureOrgServiceImpl implements MeasureOrgService {
 
     @Autowired
-    private MeasureRepo measureRepo;
+    private MeasureRepo<ProcessMeasure> measureRepo;
 
     @Override
     public List<String> getOrgs() {
@@ -43,13 +44,13 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
 
     @Override
     public List<String> getMetricNameListByOrg(String org) {
-        return measureRepo.findNameByOrganization(org,false);
+        return measureRepo.findNameByOrganization(org, false);
     }
 
     @Override
     public Map<String, List<String>> getMeasureNamesGroupByOrg() {
         Map<String, List<String>> orgWithMetricsMap = new HashMap<>();
-        List<Measure> measures = measureRepo.findByDeleted(false);
+        List<ProcessMeasure> measures = measureRepo.findByDeleted(false);
         if (measures == null) {
             return null;
         }
@@ -66,7 +67,7 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
     @Override
     public Map<String, Map<String, List<Map<String, Serializable>>>> getMeasureWithJobDetailsGroupByOrg(Map<String, List<Map<String, Serializable>>> jobDetails) {
         Map<String, Map<String, List<Map<String, Serializable>>>> result = new HashMap<>();
-        List<Measure> measures = measureRepo.findByDeleted(false);
+        List<ProcessMeasure> measures = measureRepo.findByDeleted(false);
         if (measures == null) {
             return null;
         }
