@@ -144,7 +144,7 @@ public class JobServiceImpl implements JobService {
         Measure measure = isMeasureIdValid(jobSchedule.getMeasureId());
         if (measure != null) {
             List<String> indexes = getConnectorIndexes(measure);
-            if (isParamValid(jobSchedule.getBaseline(), indexes) || !isConnectorIndexesValid(jobSchedule.getSegments(), indexes)) {
+            if (!isParamValid(jobSchedule.getBaseline(), indexes) || !isConnectorIndexesValid(jobSchedule.getSegments(), indexes)) {
                 return CREATE_JOB_FAIL;
             }
             String groupName = "BA";
@@ -177,15 +177,18 @@ public class JobServiceImpl implements JobService {
                 return true;
             }
         }
-        LOGGER.error("Param {} is a illegal string.Please input one of strings in {}", param,indexes);
+        LOGGER.error("Param {} is a illegal string.Please input one of strings in {}", param, indexes);
         return false;
     }
 
     private List<String> getConnectorIndexes(Measure measure) {
         List<String> index = new ArrayList<>();
         List<DataSource> sources = measure.getDataSources();
-        for (int i = 0; i < sources.size(); i++) {
-            index.add(getConnectorIndex(sources.get(i), i));
+        for (DataSource source : sources) {
+            int length = source.getConnectors().size();
+            for (int i = 0; i < length; i++) {
+                index.add(getConnectorIndex(source, i));
+            }
         }
         return index;
     }

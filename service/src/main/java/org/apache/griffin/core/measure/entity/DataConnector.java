@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
@@ -87,7 +88,7 @@ public class DataConnector extends AbstractAuditableEntity {
     }
 
     private void verifyConfig(Map<String,String> config){
-        if (config != null && config.get("where") != null && config.get("data.unit") == null) {
+        if (config != null && !StringUtils.isEmpty(config.get("where")) && StringUtils.isEmpty(config.get("data.unit"))) {
             LOGGER.error("Connector data unit cannot be null when field where is not null.");
             throw new NullPointerException();
         }

@@ -140,7 +140,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     }
 
     private void verifyConfig(Map<String,String> config){
-        if (config == null || config.get("interval") == null || config.get("repeat") == null) {
+        if (config == null ||  StringUtils.isEmpty(config.get("interval")) ||  StringUtils.isEmpty(config.get("repeat"))) {
             LOGGER.error("Predicate config is illegal. Please set it rightly.");
             throw new NullPointerException();
         }

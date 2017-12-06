@@ -121,7 +121,7 @@ public class JobInstance implements Job {
         String dcIndex = jds.getDataConnectorIndex();
         if (dcIndex.equals(getConnectorIndex(source, index))) {
             if (jobSchedule.getBaseline().equals(dcIndex)) {
-                Long timestampOffset = TimeUtil.str2Long(jobSchedule.getBaseline());
+                Long timestampOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
                 measure.setDataTimeStamp(jobStartTime + timestampOffset);
             }
             Long[] sampleTimestamps = genSampleTs(jds.getSegmentRange(),dc);

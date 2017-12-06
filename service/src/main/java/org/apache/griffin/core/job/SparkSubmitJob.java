@@ -107,7 +107,7 @@ public class SparkSubmitJob implements Job {
         if (StringUtils.isEmpty(json)) {
             return;
         }
-        List<Map> maps = JsonUtil.toEntity(json, new TypeReference<List<Map>>(){});
+        List<Map<String,Object>> maps = JsonUtil.toEntity(json, new TypeReference<List<Map>>(){});
         for (Map<String, Object> map : maps) {
             SegmentPredicate sp = new SegmentPredicate();
             sp.setType((String) map.get("type"));
@@ -182,7 +182,7 @@ public class SparkSubmitJob implements Job {
         } catch (IOException e) {
             LOGGER.error("jobInstance jsonStr convert to map failed. {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            LOGGER.warn("Livy status is illegal. {}", e.getMessage());
+            LOGGER.error("Livy status is illegal. {}", e.getMessage());
         }
     }
 

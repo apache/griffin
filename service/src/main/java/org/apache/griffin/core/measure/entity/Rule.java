@@ -43,6 +43,10 @@ public class Rule extends AbstractAuditableEntity {
     @Column(length = 1024)
     private String rule;
 
+    private String name;
+
+    private String description;
+
     @JsonIgnore
     @Access(AccessType.PROPERTY)
     private String details;
@@ -99,6 +103,22 @@ public class Rule extends AbstractAuditableEntity {
     public void setDetailsMap(Map<String, Object> details) throws IOException {
         this.detailsMap = details;
         this.details = JsonUtil.toJson(details);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Rule() {
