@@ -7,32 +7,16 @@ import org.apache.griffin.core.metric.repo.MetricTemplateRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Service
-public class MetricTemplateServiceImpl implements MetricTemplateService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetricTemplateServiceImpl.class);
+@Component
+public class MetricTemplateStoreImpl implements MetricTemplateStore {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricTemplateStoreImpl.class);
 
     @Autowired
     private MetricTemplateRepo templateRepo;
-
-    @Override
-    public List<MetricTemplate> getAllTemplates() {
-        return (List<MetricTemplate>) templateRepo.findAll();
-    }
-
-    @Override
-    public MetricTemplate getTemplateById(Long id) {
-        return templateRepo.findOne(id);
-    }
-
-    @Override
-    public MetricTemplate getTemplateByMetricName(String metricName) {
-        List<MetricTemplate> templates = templateRepo.findByMetricName(metricName);
-        return templates.get(0);
-    }
 
     @Override
     public void createTemplateFromMeasure(OutcomeMeasure measure) {

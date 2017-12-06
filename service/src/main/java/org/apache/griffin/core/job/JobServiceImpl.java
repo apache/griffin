@@ -30,7 +30,7 @@ import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.ProcessMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.metric.MetricTemplateService;
+import org.apache.griffin.core.metric.MetricTemplateStore;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
@@ -70,7 +70,7 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private MeasureRepo<ProcessMeasure> measureRepo;
     @Autowired
-    private MetricTemplateService metricTemplateService;
+    private MetricTemplateStore metricTemplateStore;
 
     private RestTemplate restTemplate;
 
@@ -160,7 +160,7 @@ public class JobServiceImpl implements JobService {
 
             JobDetail jobDetail = addJobDetail(scheduler, groupName, jobName, measureId, jobRequestBody);
             scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, jobStartTime));
-            metricTemplateService.createTemplateFromJob(measureRepo.findOne(measureId), triggerKey.toString(), jobName);
+            metricTemplateStore.createTemplateFromJob(measureRepo.findOne(measureId), triggerKey.toString(), jobName);
             return GriffinOperationMessage.CREATE_JOB_SUCCESS;
         } catch (NumberFormatException e) {
             LOGGER.info("jobStartTime or interval format error! {}", e.getMessage());
@@ -273,7 +273,7 @@ public class JobServiceImpl implements JobService {
         //logically delete
         if (pauseJob(group, name).equals(PAUSE_JOB_SUCCESS) &&
                 setJobDeleted(group, name).equals(SET_JOB_DELETED_STATUS_SUCCESS)) {
-            metricTemplateService.deleteTemplateFromJob(new TriggerKey(name, group).toString(), name);
+            metricTemplateStore.deleteTemplateFromJob(new TriggerKey(name, group).toString(), name);
             return GriffinOperationMessage.DELETE_JOB_SUCCESS;
         }
         return GriffinOperationMessage.DELETE_JOB_FAIL;

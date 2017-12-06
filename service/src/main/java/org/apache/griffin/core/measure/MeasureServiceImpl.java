@@ -25,7 +25,7 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.entity.OutcomeMeasure;
 import org.apache.griffin.core.measure.entity.ProcessMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.metric.MetricTemplateService;
+import org.apache.griffin.core.metric.MetricTemplateStore;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class MeasureServiceImpl implements MeasureService {
     @Autowired
     private MeasureRepo<Measure> measureRepo;
     @Autowired
-    private MetricTemplateService metricTemplateService;
+    private MetricTemplateStore metricTemplateStore;
 
     @Override
     public Iterable<Measure> getAllAliveMeasures() {
@@ -67,7 +67,7 @@ public class MeasureServiceImpl implements MeasureService {
                     //pause all jobs related to the measure
                     jobService.deleteJobsRelateToMeasure((ProcessMeasure) measure);
                 } else {
-                    metricTemplateService.deleteTemplateFromMeasure((OutcomeMeasure) measure);
+                    metricTemplateStore.deleteTemplateFromMeasure((OutcomeMeasure) measure);
                 }
                 measure.setDeleted(true);
                 measureRepo.save(measure);
@@ -87,7 +87,7 @@ public class MeasureServiceImpl implements MeasureService {
             try {
                 if (measureRepo.save(measure) != null) {
                     if (measure instanceof OutcomeMeasure) {
-                        metricTemplateService.createTemplateFromMeasure((OutcomeMeasure) measure);
+                        metricTemplateStore.createTemplateFromMeasure((OutcomeMeasure) measure);
                     }
                     return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
                 } else {
@@ -117,7 +117,7 @@ public class MeasureServiceImpl implements MeasureService {
             try {
                 measureRepo.save(measure);
                 if (measure instanceof OutcomeMeasure) {
-                    metricTemplateService.updateTemplateFromMeasure((OutcomeMeasure) measure);
+                    metricTemplateStore.updateTemplateFromMeasure((OutcomeMeasure) measure);
                 }
             } catch (Exception e) {
                 LOGGER.error("Failed to update measure. {}", e.getMessage());

@@ -38,29 +38,19 @@ public class MetricServiceImpl implements MetricService {
     private MetricStore metricStore;
     @Autowired
     private MetricTemplateRepo templateRepo;
-    @Autowired
-    private MetricTemplateService templateService;
 
     @Override
     public List<Metric> getAllMetrics() {
         List<Metric> metrics = new ArrayList<>();
         for (MetricTemplate template : templateRepo.findAll()) {
-            metrics.add(getMetricByTemplateId(template.getId()));
+            metrics.add(getMetricByTemplate(template));
         }
         return metrics;
     }
 
-    @Override
-    public Metric getMetricByTemplateId(Long templateId) {
-        MetricTemplate template = templateRepo.findOne(templateId);
+    private Metric getMetricByTemplate(MetricTemplate template) {
         List<MetricValue> metricValues = getMetricValues(template.getMetricName());
-        return new Metric(template, metricValues);
-    }
-
-    @Override
-    public Metric getMetricByMetricName(String metricName) {
-        MetricTemplate template = templateService.getTemplateByMetricName(metricName);
-        return new Metric(template, getMetricValues(metricName));
+        return new Metric(template.getName(), template.getDescription(), template.getOrganization(), template.getOwner(), metricValues);
     }
 
     @Override

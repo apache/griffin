@@ -6,13 +6,7 @@ import org.apache.griffin.core.metric.entity.MetricTemplate;
 
 import java.util.List;
 
-public interface  MetricTemplateService {
-
-    List<MetricTemplate> getAllTemplates();
-
-    MetricTemplate getTemplateById(Long id);
-
-    MetricTemplate getTemplateByMetricName(String metricName);
+public interface MetricTemplateStore {
 
     void createTemplateFromMeasure(OutcomeMeasure measure);
 

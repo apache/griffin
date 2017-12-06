@@ -31,10 +31,6 @@ public interface MetricService {
 
     List<Metric> getAllMetrics();
 
-    Metric getMetricByTemplateId(Long templateId);
-
-    Metric getMetricByMetricName(String metricName);
-
     List<MetricValue> getMetricValues(String metricName);
 
     GriffinOperationMessage addMetricValues(List<MetricValue> values);
