@@ -52,7 +52,7 @@ public class DataConnector extends AbstractAuditableEntity {
     private Map<String, String> configMap;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "segment_id")
+    @JoinColumn(name = "predicate_id")
     private List<SegmentPredicate> predicates = new ArrayList<>();
 
     public List<SegmentPredicate> getPredicates() {
@@ -72,16 +72,25 @@ public class DataConnector extends AbstractAuditableEntity {
     public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
         this.configMap = configMap;
         this.config = JsonUtil.toJson(configMap);
+        verifyConfig(configMap);
     }
 
     public void setConfig(String config) throws IOException {
         this.config = config;
         this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
         });
+        verifyConfig(configMap);
     }
 
     public String getConfig() throws IOException {
         return config;
+    }
+
+    private void verifyConfig(Map<String,String> config){
+        if (config != null && config.get("where") != null && config.get("data.unit") == null) {
+            LOGGER.error("Connector data unit cannot be null when field where is not null.");
+            throw new NullPointerException();
+        }
     }
 
     public String getType() {

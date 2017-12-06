@@ -43,7 +43,7 @@ public class Measure extends AbstractAuditableEntity {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "measure_id")
-    private List<DataSource> dataSources =new ArrayList<>();
+    private List<DataSource> dataSources = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluateRule_id")
