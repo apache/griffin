@@ -27,7 +27,7 @@ case class UserParam( @JsonProperty("name") name: String,
                       @JsonProperty("timestamp") timestamp: Long,
                       @JsonProperty("process.type") procType: String,
                       @JsonProperty("data.sources") dataSources: List[DataSourceParam],
-                      @JsonProperty("evaluateRule") evaluateRuleParam: EvaluateRuleParam
+                      @JsonProperty("evaluate.rule") evaluateRuleParam: EvaluateRuleParam
                     ) extends Param {
 
 }

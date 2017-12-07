@@ -50,6 +50,10 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   val LogFile = filePath("_LOG")
 
+  val _MetricName = "metricName"
+  val _Timestamp = "timestamp"
+  val _Value = "value"
+
   var _init = true
   private def isInit = {
     val i = _init
@@ -280,8 +284,10 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 //  }
 
   def persistMetrics(metrics: Map[String, Any]): Unit = {
+    val head = Map[String, Any]((_MetricName -> metricName), (_Timestamp -> timeStamp))
+    val result = head + (_Value -> metrics)
     try {
-      val json = JsonUtil.toJson(metrics)
+      val json = JsonUtil.toJson(result)
       println(s"hdfs persist metrics: ${json}")
       persistRecords(MetricsFile, json :: Nil)
     } catch {

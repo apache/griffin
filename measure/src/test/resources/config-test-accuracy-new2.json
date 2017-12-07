@@ -31,7 +31,7 @@
     }
   ],
 
-  "evaluateRule": {
+  "evaluate.rule": {
     "rules": [
       {
         "dsl.type": "spark-sql",
