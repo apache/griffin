@@ -102,9 +102,9 @@ public class JobInstance implements Job {
 
 
     private void setDataSourcesPartitions(List<DataSource> sources) throws Exception {
-        for (JobDataSegment dataSegment : jobSchedule.getSegments()) {
-            for (DataSource source : sources) {
-                setDataSourcePartitions(dataSegment, source);
+        for (JobDataSegment jds : jobSchedule.getSegments()) {
+            for (DataSource ds : sources) {
+                setDataSourcePartitions(jds, ds);
             }
         }
     }
@@ -122,7 +122,7 @@ public class JobInstance implements Job {
         if (dcIndex.equals(getConnectorIndex(ds, index))) {
             if (jobSchedule.getBaseline().equals(dcIndex)) {
                 Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
-                measure.setDataTimestamp(jobStartTime + tsOffset);
+                measure.setTimestamp(jobStartTime + tsOffset);
             }
             Long[] sampleTs = genSampleTs(jds.getSegmentRange(),dc);
             if (sampleTs != null) {

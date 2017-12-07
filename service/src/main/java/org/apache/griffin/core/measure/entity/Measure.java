@@ -41,7 +41,7 @@ public class Measure extends AbstractAuditableEntity {
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long dataTimestamp;
+    private Long timestamp;
 
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
@@ -131,12 +131,12 @@ public class Measure extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    public Long getDataTimestamp() {
-        return dataTimestamp;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
-    public void setDataTimestamp(Long dataTimestamp) {
-        this.dataTimestamp = dataTimestamp;
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public Measure() {
