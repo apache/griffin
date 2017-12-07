@@ -49,6 +49,24 @@
           "persist.type": "metric",
           "collect.type": "list"
         }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "name": "temp",
+        "rule": "select * from source",
+        "details": {
+          "persist.type": "none"
+        }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "name": "temp-res",
+        "rule": "select count(distinct user_id) as `id-dist-cnt` from temp",
+        "details": {
+          "persist.type": "metric"
+        }
       }
     ]
   }

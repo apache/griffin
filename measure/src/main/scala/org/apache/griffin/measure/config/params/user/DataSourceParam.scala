@@ -24,8 +24,11 @@ import org.apache.griffin.measure.config.params.Param
 
 @JsonInclude(Include.NON_NULL)
 case class DataSourceParam( @JsonProperty("name") name: String,
+                            @JsonProperty("baseline") baseline: Boolean,
                             @JsonProperty("connectors") connectors: List[DataConnectorParam],
                             @JsonProperty("cache") cache: Map[String, Any]
                           ) extends Param {
-
+  def hasName: Boolean = (name != null)
+  def isBaseLine: Boolean = if (baseline == null) false else baseline
+  def falseBaselineClone: DataSourceParam = DataSourceParam(name, false, connectors, cache)
 }

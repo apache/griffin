@@ -44,15 +44,15 @@ case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
           ri.rule match {
             case DataFrameOprs._fromJson => {
               val df = DataFrameOprs.fromJson(sqlContext, ri)
-              df.registerTempTable(ri.name)
+              ri.getNames.foreach(df.registerTempTable(_))
             }
             case DataFrameOprs._accuracy => {
               val df = DataFrameOprs.accuracy(sqlContext, ti, ri)
-              df.registerTempTable(ri.name)
+              ri.getNames.foreach(df.registerTempTable(_))
             }
             case DataFrameOprs._clear => {
               val df = DataFrameOprs.clear(sqlContext, ri)
-              df.registerTempTable(ri.name)
+              ri.getNames.foreach(df.registerTempTable(_))
             }
             case _ => {
               throw new Exception(s"df opr [ ${ri.rule} ] not supported")

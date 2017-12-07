@@ -26,8 +26,39 @@ import org.apache.griffin.measure.config.params.Param
 case class UserParam( @JsonProperty("name") name: String,
                       @JsonProperty("timestamp") timestamp: Long,
                       @JsonProperty("process.type") procType: String,
-                      @JsonProperty("data.sources") dataSources: List[DataSourceParam],
+                      @JsonProperty("data.sources") dataSourceParams: List[DataSourceParam],
                       @JsonProperty("evaluateRule") evaluateRuleParam: EvaluateRuleParam
                     ) extends Param {
+
+  private val validDs = {
+    val (validDsParams, _) = dataSourceParams.foldLeft((Nil: Seq[DataSourceParam], Set[String]())) { (ret, dsParam) =>
+      val (seq, names) = ret
+      if (dsParam.hasName && !names.contains(dsParam.name)) {
+        (seq :+ dsParam, names + dsParam.name)
+      } else ret
+    }
+    validDsParams
+  }
+  private val baselineDsOpt = {
+    val baselines = validDs.filter(_.isBaseLine)
+    if (baselines.size > 0) baselines.headOption
+    else validDs.headOption
+  }
+
+  val baselineDsName = baselineDsOpt match {
+    case Some(ds) => ds.name
+    case _ => ""
+  }
+  val dataSources = {
+    validDs.map { ds =>
+      if (ds.name != baselineDsName && ds.isBaseLine) {
+        ds.falseBaselineClone
+      } else ds
+    }
+  }
+
+  override def validate(): Boolean = {
+    dataSources.size > 0
+  }
 
 }

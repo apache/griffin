@@ -41,6 +41,7 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
         try {
           val rdf = sqlContext.sql(ri.rule)
           rdf.registerTempTable(ri.name)
+          rdf.registerTempTable(ri.tmstName)
           true
         } catch {
           case e: Throwable => {

@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.data.source
 
-import org.apache.griffin.measure.cache.tmst.TmstCache
+import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
@@ -28,6 +28,7 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 case class DataSource(sqlContext: SQLContext,
                       name: String,
+                      baseline: Boolean,
                       dataConnectors: Seq[DataConnector],
                       dataSourceCacheOpt: Option[DataSourceCache]
                      ) extends Loggable with Serializable {
@@ -47,14 +48,18 @@ case class DataSource(sqlContext: SQLContext,
   }
 
   def loadData(ms: Long): Set[Long] = {
+    val tmstName = TempName.tmstName(name, ms)
+    println(s"load data ${name}")
     val (dfOpt, tmsts) = data(ms)
     dfOpt match {
       case Some(df) => {
         df.registerTempTable(name)
+        df.registerTempTable(tmstName)
       }
       case None => {
 //        val df = sqlContext.emptyDataFrame
 //        df.registerTempTable(name)
+//        warn(s"load data source [${name}] fails")
         warn(s"load data source [${name}] fails")
 //        throw new Exception(s"load data source [${name}] fails")
       }
@@ -62,9 +67,10 @@ case class DataSource(sqlContext: SQLContext,
     tmsts
   }
 
-  def dropTable(): Unit = {
+  def dropTable(ms: Long): Unit = {
     try {
-      sqlContext.dropTempTable(name)
+      val tmstName = TempName.tmstName(name, ms)
+      sqlContext.dropTempTable(tmstName)
     } catch {
       case e: Throwable => warn(s"drop table [${name}] fails")
     }

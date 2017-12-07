@@ -18,7 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
+import org.apache.griffin.measure.cache.tmst.TempName
 import org.apache.griffin.measure.config.params.user._
+import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.process.check.DataChecker
 import org.apache.griffin.measure.rule.dsl._
@@ -35,12 +37,16 @@ object RuleAdaptorGroup {
   var dataSourceNames: Seq[String] = _
   var functionNames: Seq[String] = _
 
+  var baselineDsName: String = ""
+
   var dataChecker: DataChecker = _
 
-  def init(sqlContext: SQLContext, dsNames: Seq[String]): Unit = {
+  def init(sqlContext: SQLContext, dsNames: Seq[String], blDsName: String): Unit = {
     val functions = sqlContext.sql("show functions")
     functionNames = functions.map(_.getString(0)).collect
     dataSourceNames = dsNames
+
+    baselineDsName = blDsName
 
     dataChecker = DataChecker(sqlContext)
   }
@@ -49,13 +55,12 @@ object RuleAdaptorGroup {
     DslType(param.getOrElse(_dslType, defDslType.desc).toString)
   }
 
-  private def genRuleAdaptor(dslType: DslType, dsNames: Seq[String],
-                             procType: ProcessType, adaptPhase: AdaptPhase
+  private def genRuleAdaptor(dslType: DslType, dsNames: Seq[String]
                             ): Option[RuleAdaptor] = {
     dslType match {
-      case SparkSqlType => Some(SparkSqlAdaptor(adaptPhase))
-      case DfOprType => Some(DataFrameOprAdaptor(adaptPhase))
-      case GriffinDslType => Some(GriffinDslAdaptor(dsNames, functionNames, procType, adaptPhase))
+      case SparkSqlType => Some(SparkSqlAdaptor())
+      case DfOprType => Some(DataFrameOprAdaptor())
+      case GriffinDslType => Some(GriffinDslAdaptor(dsNames, functionNames))
       case _ => None
     }
   }
@@ -76,33 +81,83 @@ object RuleAdaptorGroup {
 //    steps
 //  }
 
-  def genConcreteRuleSteps(timeInfo: TimeInfo, evaluateRuleParam: EvaluateRuleParam,
-                           dsTmsts: Map[String, Set[Long]], procType: ProcessType,
-                           adaptPhase: AdaptPhase
-                          ): Seq[ConcreteRuleStep] = {
+//  def genConcreteRuleSteps(timeInfo: TimeInfo, evaluateRuleParam: EvaluateRuleParam,
+//                           dsTmsts: Map[String, Set[Long]], procType: ProcessType,
+//                           adaptPhase: AdaptPhase
+//                          ): Seq[ConcreteRuleStep] = {
+//    val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
+//    val defaultDslType = DslType(dslTypeStr)
+//    val ruleParams = evaluateRuleParam.rules
+//    genConcreteRuleSteps(timeInfo, ruleParams, dsTmsts, defaultDslType, procType, adaptPhase)
+//  }
+//
+//  def genConcreteRuleSteps(timeInfo: TimeInfo, ruleParams: Seq[Map[String, Any]],
+//                           dsTmsts: Map[String, Set[Long]], defDslType: DslType,
+//                           procType: ProcessType, adaptPhase: AdaptPhase
+//                          ): Seq[ConcreteRuleStep] = {
+//    val (steps, dsNames) = ruleParams.foldLeft((Seq[ConcreteRuleStep](), dataSourceNames)) { (res, param) =>
+//      val (preSteps, preNames) = res
+//      val dslType = getDslType(param, defDslType)
+//      val (curSteps, curNames) = genRuleAdaptor(dslType, preNames, procType, adaptPhase) match {
+//        case Some(ruleAdaptor) => {
+//          val concreteSteps = ruleAdaptor.genConcreteRuleStep(timeInfo, param, dsTmsts)
+//          (concreteSteps, preNames ++ ruleAdaptor.getPersistNames(concreteSteps))
+//        }
+//        case _ => (Nil, preNames)
+//      }
+//      (preSteps ++ curSteps, curNames)
+//    }
+//    steps
+//  }
+
+
+  // -- gen steps --
+  def genRuleSteps(timeInfo: TimeInfo, evaluateRuleParam: EvaluateRuleParam, dsTmsts: Map[String, Set[Long]]
+                  ): Seq[ConcreteRuleStep] = {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
-    genConcreteRuleSteps(timeInfo, ruleParams, dsTmsts, defaultDslType, procType, adaptPhase)
+    genRuleSteps(timeInfo, ruleParams, dsTmsts, defaultDslType)
   }
 
-  def genConcreteRuleSteps(timeInfo: TimeInfo, ruleParams: Seq[Map[String, Any]],
-                           dsTmsts: Map[String, Set[Long]], defDslType: DslType,
-                           procType: ProcessType, adaptPhase: AdaptPhase
-                          ): Seq[ConcreteRuleStep] = {
-    val (steps, dsNames) = ruleParams.foldLeft((Seq[ConcreteRuleStep](), dataSourceNames)) { (res, param) =>
-      val (preSteps, preNames) = res
-      val dslType = getDslType(param, defDslType)
-      val (curSteps, curNames) = genRuleAdaptor(dslType, preNames, procType, adaptPhase) match {
-        case Some(ruleAdaptor) => {
-          val concreteSteps = ruleAdaptor.genConcreteRuleStep(timeInfo, param, dsTmsts)
-          (concreteSteps, preNames ++ ruleAdaptor.getPersistNames(concreteSteps))
-        }
-        case _ => (Nil, preNames)
+  def genRuleSteps(timeInfo: TimeInfo, ruleParams: Seq[Map[String, Any]],
+                   dsTmsts: Map[String, Set[Long]], defaultDslType: DslType,
+                   adapthase: AdaptPhase = RunPhase
+                  ): Seq[ConcreteRuleStep] = {
+    val tmsts = dsTmsts.getOrElse(baselineDsName, Set[Long]()).toSeq
+    tmsts.flatMap { tmst =>
+      val newTimeInfo = TimeInfo(timeInfo.calcTime, tmst)
+      val initSteps = adapthase match {
+        case RunPhase => genTmstInitStep(newTimeInfo)
+        case PreProcPhase => Nil
       }
-      (preSteps ++ curSteps, curNames)
+      val (steps, dsNames) = ruleParams.foldLeft((initSteps, dataSourceNames)) { (res, param) =>
+        val (preSteps, preNames) = res
+        val dslType = getDslType(param, defaultDslType)
+        val (curSteps, curNames) = genRuleAdaptor(dslType, preNames) match {
+          case Some(ruleAdaptor) => {
+            val concreteSteps = ruleAdaptor.genConcreteRuleStep(newTimeInfo, param)
+            (concreteSteps, preNames ++ ruleAdaptor.getPersistNames(concreteSteps))
+          }
+          case _ => (Nil, preNames)
+        }
+        (preSteps ++ curSteps, curNames)
+      }
+      steps.foreach(println)
+      steps
     }
-    steps
+  }
+
+  private def genTmstInitStep(timeInfo: TimeInfo): Seq[ConcreteRuleStep] = {
+    val TimeInfo(calcTime, tmst) = timeInfo
+    val tmstDsName = TempName.tmstName(baselineDsName, calcTime)
+    val filterSql = {
+      s"SELECT * FROM `${tmstDsName}` WHERE `${GroupByColumn.tmst}` = ${tmst}"
+    }
+    SparkSqlStep(
+      timeInfo,
+      RuleInfo(baselineDsName, baselineDsName, filterSql, Map[String, Any]())
+    ) :: Nil
   }
 
 

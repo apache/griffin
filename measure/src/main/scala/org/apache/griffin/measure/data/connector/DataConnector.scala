@@ -40,7 +40,7 @@ trait DataConnector extends Loggable with Serializable {
 
   var tmstCache: TmstCache = _
   protected def saveTmst(t: Long) = tmstCache.insert(t)
-  protected def readTmst(t: Long) = tmstCache.range(t, t + 1)
+  protected def readTmst(t: Long) = tmstCache.range(t, t + 2)
 
   def init(): Unit
 
@@ -72,8 +72,8 @@ trait DataConnector extends Loggable with Serializable {
         val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
-          TimeInfo(ms, ms), preProcRules, dsTmsts, DslType("spark-sql"), BatchProcessType, PreProcPhase)
+        val ruleSteps = RuleAdaptorGroup.genRuleSteps(
+          TimeInfo(ms, ms), preProcRules, dsTmsts, DslType("spark-sql"), PreProcPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
@@ -92,14 +92,14 @@ trait DataConnector extends Loggable with Serializable {
 
         // add tmst
         val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
-//        val withTmstDf1 = outDf.withColumn(tmstColName, lit(ms + 1)).limit(10)
+        val withTmstDf1 = outDf.withColumn(tmstColName, lit(ms + 1)).limit(10)
 
         // tmst cache
         saveTmst(ms)
-//        saveTmst(ms + 1)
+        saveTmst(ms + 1)
 
         Some(withTmstDf)
-//        Some(withTmstDf unionAll withTmstDf1)
+        Some(withTmstDf unionAll withTmstDf1)
       }
     } catch {
       case e: Throwable => {

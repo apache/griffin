@@ -20,6 +20,8 @@ package org.apache.griffin.measure.rule.adaptor
 
 import java.util.concurrent.atomic.AtomicLong
 
+import org.apache.griffin.measure.cache.tmst.TempName
+
 import scala.collection.mutable.{Set => MutableSet}
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.log.Loggable
@@ -28,7 +30,7 @@ import org.apache.griffin.measure.rule.dsl._
 
 trait RuleAdaptor extends Loggable with Serializable {
 
-  val adaptPhase: AdaptPhase
+//  val adaptPhase: AdaptPhase
 
   protected def genRuleInfo(param: Map[String, Any]): RuleInfo = RuleInfoGen(param)
 
@@ -42,11 +44,11 @@ trait RuleAdaptor extends Loggable with Serializable {
   def getPersistNames(steps: Seq[RuleStep]): Seq[String] = steps.map(_.ruleInfo.persistName)
 
   protected def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep]
-  protected def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]): Seq[ConcreteRuleStep]
-  def genConcreteRuleStep(timeInfo: TimeInfo, param: Map[String, Any], dsTmsts: Map[String, Set[Long]]
+  protected def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep]
+  def genConcreteRuleStep(timeInfo: TimeInfo, param: Map[String, Any]
                          ): Seq[ConcreteRuleStep] = {
     genRuleStep(timeInfo, param).flatMap { rs =>
-      adaptConcreteRuleStep(rs, dsTmsts)
+      adaptConcreteRuleStep(rs)
     }
   }
 
@@ -65,8 +67,20 @@ import org.apache.griffin.measure.utils.ParamUtil._
 
 object RuleInfoGen {
   def apply(param: Map[String, Any]): RuleInfo = {
+    val name = param.getString(_name, RuleStepNameGenerator.genName)
     RuleInfo(
-      param.getString(_name, RuleStepNameGenerator.genName),
+      name,
+      name,
+      param.getString(_rule, ""),
+      param.getParamMap(_details)
+    )
+  }
+  def apply(param: Map[String, Any], timeInfo: TimeInfo): RuleInfo = {
+    val name = param.getString(_name, RuleStepNameGenerator.genName)
+    val tmstName = TempName.tmstName(name, timeInfo)
+    RuleInfo(
+      name,
+      tmstName,
       param.getString(_rule, ""),
       param.getParamMap(_details)
     )

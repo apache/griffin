@@ -36,11 +36,13 @@ trait SparkDqEngine extends DqEngine {
       val emptyMap = Map[String, Any]()
       ruleStep match {
         case step: ConcreteRuleStep if (step.ruleInfo.persistType == MetricPersistType) => {
-          val name = step.name
+//          val name = step.name
           val tmst = step.timeInfo.tmst
-          val metricName = step.ruleInfo.persistName
+//          val metricName = step.ruleInfo.persistName
+          val metricTmstName = step.ruleInfo.tmstNameOpt
+          val metricName = step.ruleInfo.name
           try {
-            val pdf = sqlContext.table(s"`${name}`")
+            val pdf = sqlContext.table(s"`${metricTmstName}`")
             val records: Array[String] = pdf.toJSON.collect()
 
             val flatRecords = records.flatMap { rec =>
@@ -66,7 +68,7 @@ trait SparkDqEngine extends DqEngine {
             Some((tmst, metrics))
           } catch {
             case e: Throwable => {
-              error(s"collect metrics ${name} error: ${e.getMessage}")
+              error(s"collect metrics ${metricTmstName} error: ${e.getMessage}")
               None
             }
           }

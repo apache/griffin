@@ -66,7 +66,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
 
     // init adaptors
     val dataSourceNames = userParam.dataSources.map(_.name)
-    RuleAdaptorGroup.init(sqlContext, dataSourceNames)
+//    RuleAdaptorGroup.init(sqlContext, dataSourceNames)
   }
 
   def run: Try[_] = Try {

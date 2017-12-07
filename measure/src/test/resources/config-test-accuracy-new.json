@@ -8,6 +8,7 @@
   "data.sources": [
     {
       "name": "src",
+      "baseline": true,
       "connectors": [
         {
           "type": "avro",

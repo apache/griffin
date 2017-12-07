@@ -22,7 +22,7 @@ import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.config.reader._
-import org.apache.griffin.measure.config.validator.AllParamValidator
+import org.apache.griffin.measure.config.validator._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.PersistThreadPool
 import org.apache.griffin.measure.process._
@@ -68,7 +68,7 @@ object Application extends Loggable {
     val allParam: AllParam = AllParam(envParam, userParam)
 
     // validate param files
-    validateParams(allParam) match {
+    ParamValidator.validate(allParam) match {
       case Failure(ex) => {
         error(ex.getMessage)
         sys.exit(-3)
@@ -169,11 +169,6 @@ object Application extends Loggable {
   private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {
     val paramReader = ParamReaderFactory.getParamReader(file, fsType)
     paramReader.readConfig[T]
-  }
-
-  private def validateParams(allParam: AllParam): Try[Boolean] = {
-    val allParamValidator = AllParamValidator()
-    allParamValidator.validate(allParam)
   }
 
   private def shutdown(): Unit = {

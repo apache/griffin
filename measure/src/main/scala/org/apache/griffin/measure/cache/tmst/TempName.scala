@@ -23,18 +23,22 @@ import org.apache.griffin.measure.rule.step.TimeInfo
 
 object TempName extends Loggable {
 
+  def tmstName(name: String, ms: Long) = {
+    s"${name}(${ms})"
+  }
+
   //-- temp df name --
-  private val tmstNameRegex = """^(.*)\[(\d*)\]\((\d*)\)$""".r
+  private val tmstNameRegex = """^(.*)\((\d*)\)\[(\d*)\]$""".r
   def tmstName(name: String, timeInfo: TimeInfo) = {
     val TimeInfo(calcTime, tmst) = timeInfo
-    s"${name}[${tmst}](${calcTime})"
+    s"${name}(${calcTime})[${tmst}]"
   }
-  def extractTmstName(tmstName: String): (String, Option[Long]) = {
+  def extractTmstName(tmstName: String): (String, Option[Long], Option[Long]) = {
     tmstName match {
-      case tmstNameRegex(name, tmst, _) => {
-        try { (name, Some(tmst.toLong)) } catch { case e: Throwable => (tmstName, None) }
+      case tmstNameRegex(name, calcTime, tmst) => {
+        try { (name, Some(calcTime.toLong), Some(tmst.toLong)) } catch { case e: Throwable => (tmstName, None, None) }
       }
-      case _ => (tmstName, None)
+      case _ => (tmstName, None, None)
     }
   }
 

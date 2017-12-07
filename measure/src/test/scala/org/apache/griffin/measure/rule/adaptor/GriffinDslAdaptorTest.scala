@@ -31,7 +31,8 @@ import org.scalamock.scalatest.MockFactory
 class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter with MockFactory {
 
   test ("profiling groupby") {
-    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, BatchProcessType, RunPhase)
+//    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, BatchProcessType, RunPhase)
+    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil)
 
     val ruleJson =
       """
@@ -51,12 +52,13 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
     val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
     println(rule)
 
-    val dataCheckerMock = mock[DataChecker]
-    dataCheckerMock.existDataSourceName _ expects ("source") returning (true)
-    RuleAdaptorGroup.dataChecker = dataCheckerMock
+//    val dataCheckerMock = mock[DataChecker]
+//    dataCheckerMock.existDataSourceName _ expects ("source") returning (true)
+//    RuleAdaptorGroup.dataChecker = dataCheckerMock
 
     val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
-    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
+//    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
+    val steps = adaptor.genConcreteRuleStep(TimeInfo(1, 2), rule)
 
     steps.foreach { step =>
       println(s"${step}")
@@ -64,38 +66,38 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
   }
 
   test ("accuracy") {
-    val adaptor = GriffinDslAdaptor("source" :: "target" :: Nil, "count" :: Nil, StreamingProcessType, RunPhase)
-
-    val ruleJson =
-      """
-        |{
-        |  "dsl.type": "griffin-dsl",
-        |  "dq.type": "accuracy",
-        |  "name": "accu",
-        |  "rule": "source.id = target.id and source.name = target.name",
-        |  "details": {
-        |    "source": "source",
-        |    "target": "target",
-        |    "persist.type": "metric"
-        |  }
-        |}
-      """.stripMargin
-
-    // rule: Map[String, Any]
-    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
-    println(rule)
-
-    val dataCheckerMock = mock[DataChecker]
-    dataCheckerMock.existDataSourceName _ expects ("source") returns (true)
-    dataCheckerMock.existDataSourceName _ expects ("target") returns (true)
-    RuleAdaptorGroup.dataChecker = dataCheckerMock
-
-    val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)), ("target" -> Set[Long](1234)))
-    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
-
-    steps.foreach { step =>
-      println(s"${step}, ${step.ruleInfo.persistType}")
-    }
+//    val adaptor = GriffinDslAdaptor("source" :: "target" :: Nil, "count" :: Nil, StreamingProcessType, RunPhase)
+//
+//    val ruleJson =
+//      """
+//        |{
+//        |  "dsl.type": "griffin-dsl",
+//        |  "dq.type": "accuracy",
+//        |  "name": "accu",
+//        |  "rule": "source.id = target.id and source.name = target.name",
+//        |  "details": {
+//        |    "source": "source",
+//        |    "target": "target",
+//        |    "persist.type": "metric"
+//        |  }
+//        |}
+//      """.stripMargin
+//
+//    // rule: Map[String, Any]
+//    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
+//    println(rule)
+//
+//    val dataCheckerMock = mock[DataChecker]
+//    dataCheckerMock.existDataSourceName _ expects ("source") returns (true)
+//    dataCheckerMock.existDataSourceName _ expects ("target") returns (true)
+//    RuleAdaptorGroup.dataChecker = dataCheckerMock
+//
+//    val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)), ("target" -> Set[Long](1234)))
+//    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
+//
+//    steps.foreach { step =>
+//      println(s"${step}, ${step.ruleInfo.persistType}")
+//    }
   }
 
 }

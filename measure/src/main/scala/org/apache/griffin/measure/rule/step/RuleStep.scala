@@ -32,10 +32,6 @@ trait RuleStep extends Serializable {
 
   def name = ruleInfo.name
 
-//  val name: String
-//  val rule: String
-//  val details: Map[String, Any]
-
 }
 
 case class TimeInfo(calcTime: Long, tmst: Long) {}
@@ -49,24 +45,31 @@ object RuleDetailKeys {
 import RuleDetailKeys._
 import org.apache.griffin.measure.utils.ParamUtil._
 
-case class RuleInfo(name: String, rule: String, details: Map[String, Any]) {
+case class RuleInfo(name: String, tmstNameOpt: Option[String], rule: String, details: Map[String, Any]) {
 
-  def persistName = details.getString(_persistName, name)
-  def persistType = PersistType(details.getString(_persistType, ""))
-  def collectType = CollectType(details.getString(_collectType, ""))
-  def cacheDataSourceOpt = details.get(_cacheDataSource).map(_.toString)
+  val persistName = details.getString(_persistName, name)
+  val persistType = PersistType(details.getString(_persistType, ""))
+  val collectType = CollectType(details.getString(_collectType, ""))
+  val cacheDataSourceOpt = details.get(_cacheDataSource).map(_.toString)
 
-  def withPersistName(n: String): RuleInfo = {
-    RuleInfo(name, rule, details + (_persistName -> n))
+  def setName(n: String): RuleInfo = {
+    RuleInfo(n, tmstNameOpt, rule, details)
   }
-  def withPersistType(pt: PersistType): RuleInfo = {
-    RuleInfo(name, rule, details + (_persistType -> pt.desc))
+  def setTmstNameOpt(tnOpt: Option[String]): RuleInfo = {
+    RuleInfo(name, tnOpt, rule, details)
   }
-  def withCollectType(ct: CollectType): RuleInfo = {
-    RuleInfo(name, rule, details + (_collectType -> ct.desc))
+  def setRule(r: String): RuleInfo = {
+    RuleInfo(name, tmstNameOpt, r, details)
   }
-  def withCacheDataSourceOpt(udsOpt: Option[String]): RuleInfo = {
-    udsOpt.map(uds => RuleInfo(name, rule, details + (_cacheDataSource -> uds))).getOrElse(this)
+  def setDetails(d: Map[String, Any]): RuleInfo = {
+    RuleInfo(name, tmstNameOpt, rule, d)
+  }
+
+  def getNames: Seq[String] = {
+    tmstNameOpt match {
+      case Some(tn) => name :: tn :: Nil
+      case _ => name :: Nil
+    }
   }
 }
 
