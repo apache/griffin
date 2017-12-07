@@ -132,12 +132,13 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         s"SELECT ${selClause} FROM `${sourceName}` LEFT JOIN `${targetName}` ON ${onClause} WHERE ${whereClause}"
       }
       val missRecordsName = AccuracyKeys._missRecords
+      val tmstMissRecordsName = TempName.tmstName(missRecordsName, timeInfo)
       val missRecordsParams = details.getParamMap(AccuracyKeys._missRecords)
         .addIfNotExist(RuleDetailKeys._persistType, RecordPersistType.desc)
         .addIfNotExist(RuleDetailKeys._persistName, missRecordsName)
       val missRecordsStep = SparkSqlStep(
         timeInfo,
-        RuleInfo(missRecordsName, None, missRecordsSql, missRecordsParams)
+        RuleInfo(missRecordsName, Some(tmstMissRecordsName), missRecordsSql, missRecordsParams)
       )
 
       // 2. miss count
@@ -171,27 +172,26 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val accuracyMetricSql = {
         s"""
            |SELECT `${missTableName}`.`${missColName}` AS `${missColName}`,
-           |`${totalTableName}`.`${totalColName}` AS `${totalColName}`,
-           |(`${totalColName}` - `${missColName}`) AS `${matchedColName}`
+           |`${totalTableName}`.`${totalColName}` AS `${totalColName}`
            |FROM `${totalTableName}` FULL JOIN `${missTableName}`
          """.stripMargin
       }
-      val accuracyParams = details.addIfNotExist(RuleDetailKeys._persistType, MetricPersistType.desc)
+//      val accuracyParams = details.addIfNotExist(RuleDetailKeys._persistType, MetricPersistType.desc)
       val accuracyMetricStep = SparkSqlStep(
         timeInfo,
-        RuleInfo(accuracyMetricName, Some(tmstAccuracyMetricName), accuracyMetricSql, accuracyParams)
+        RuleInfo(accuracyMetricName, Some(tmstAccuracyMetricName), accuracyMetricSql, Map[String, Any]())
       )
 
       // 5. accuracy metric filter
-//      val accuracyParams = details.addIfNotExist("df.name", tmstAccuracyMetricName)
-//        .addIfNotExist(RuleDetailKeys._persistType, MetricPersistType.desc)
-//        .addIfNotExist(RuleDetailKeys._persistName, accuracyMetricName)
-//      val accuracyStep = DfOprStep(
-//        timeInfo,
-//        RuleInfo(tmstAccuracyMetricName, "accuracy", accuracyParams)
-//      )
+      val accuracyParams = details.addIfNotExist("df.name", accuracyMetricName)
+        .addIfNotExist(RuleDetailKeys._persistType, MetricPersistType.desc)
+        .addIfNotExist(RuleDetailKeys._persistName, accuracyMetricName)
+      val accuracyStep = DfOprStep(
+        timeInfo,
+        RuleInfo(accuracyMetricName, Some(tmstAccuracyMetricName), "accuracy", accuracyParams)
+      )
 
-      missRecordsStep :: missStep :: totalStep :: accuracyMetricStep :: Nil
+      missRecordsStep :: missStep :: totalStep :: accuracyMetricStep :: accuracyStep :: Nil
     }
 
 //    val details = ruleStep.ruleInfo.details

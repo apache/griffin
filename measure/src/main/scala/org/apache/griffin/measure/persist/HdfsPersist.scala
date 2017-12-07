@@ -187,7 +187,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 //    }
 //  }
 
-  private def persistRecords(hdfsPath: String, records: Iterable[String]): Unit = {
+  private def persistRecords2Hdfs(hdfsPath: String, records: Iterable[String]): Unit = {
     try {
       val recStr = records.mkString("\n")
       HdfsUtil.writeContent(hdfsPath, recStr)
@@ -206,34 +206,34 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
 
-//  def persistRecords(df: DataFrame, name: String): Unit = {
-//    val records = df.toJSON
-//    val path = filePath(name)
-//    try {
-//      val recordCount = records.count
-//      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
-//      if (count > 0) {
-//        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
-//        if (groupCount <= 1) {
-//          val recs = records.take(count.toInt)
-//          persistRecords(path, recs)
-//        } else {
-//          val groupedRecords: RDD[(Long, Iterable[String])] =
-//            records.zipWithIndex.flatMap { r =>
-//              val gid = r._2 / maxLinesPerFile
-//              if (gid < groupCount) Some((gid, r._1)) else None
-//            }.groupByKey()
-//          groupedRecords.foreach { group =>
-//            val (gid, recs) = group
-//            val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
-//            persistRecords(hdfsPath, recs)
-//          }
-//        }
-//      }
-//    } catch {
-//      case e: Throwable => error(e.getMessage)
-//    }
-//  }
+  def persistRecords(df: DataFrame, name: String): Unit = {
+    val records = df.toJSON
+    val path = filePath(name)
+    try {
+      val recordCount = records.count
+      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+      if (count > 0) {
+        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
+        if (groupCount <= 1) {
+          val recs = records.take(count.toInt)
+          persistRecords2Hdfs(path, recs)
+        } else {
+          val groupedRecords: RDD[(Long, Iterable[String])] =
+            records.zipWithIndex.flatMap { r =>
+              val gid = r._2 / maxLinesPerFile
+              if (gid < groupCount) Some((gid, r._1)) else None
+            }.groupByKey()
+          groupedRecords.foreach { group =>
+            val (gid, recs) = group
+            val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
+            persistRecords2Hdfs(hdfsPath, recs)
+          }
+        }
+      }
+    } catch {
+      case e: Throwable => error(e.getMessage)
+    }
+  }
 
   def persistRecords(records: Iterable[String], name: String): Unit = {
     val path = filePath(name)
@@ -244,13 +244,13 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
         val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
         if (groupCount <= 1) {
           val recs = records.take(count.toInt)
-          persistRecords(path, recs)
+          persistRecords2Hdfs(path, recs)
         } else {
           val groupedRecords = records.grouped(groupCount).zipWithIndex
           groupedRecords.take(groupCount).foreach { group =>
             val (recs, gid) = group
             val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
-            persistRecords(hdfsPath, recs)
+            persistRecords2Hdfs(hdfsPath, recs)
           }
         }
       }
@@ -289,7 +289,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     try {
       val json = JsonUtil.toJson(result)
       println(s"hdfs persist metrics: ${json}")
-      persistRecords(MetricsFile, json :: Nil)
+      persistRecords2Hdfs(MetricsFile, json :: Nil)
     } catch {
       case e: Throwable => error(e.getMessage)
     }

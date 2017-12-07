@@ -92,7 +92,7 @@ trait DataConnector extends Loggable with Serializable {
 
         // add tmst
         val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
-        val withTmstDf1 = outDf.withColumn(tmstColName, lit(ms + 1)).limit(10)
+        val withTmstDf1 = outDf.withColumn(tmstColName, lit(ms + 1)).limit(48)
 
         // tmst cache
         saveTmst(ms)

@@ -143,7 +143,7 @@ object RuleAdaptorGroup {
         }
         (preSteps ++ curSteps, curNames)
       }
-      steps.foreach(println)
+//      steps.foreach(println)
       steps
     }
   }
@@ -156,7 +156,7 @@ object RuleAdaptorGroup {
     }
     SparkSqlStep(
       timeInfo,
-      RuleInfo(baselineDsName, baselineDsName, filterSql, Map[String, Any]())
+      RuleInfo(baselineDsName, None, filterSql, Map[String, Any]())
     ) :: Nil
   }
 

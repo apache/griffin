@@ -103,13 +103,13 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // persist results
     val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
 
-    val rdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
-    rdds.foreach(_._2.cache())
+    val dfs = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups.toSet)
+    dfs.foreach(_._2.cache())
 
-    dqEngines.persistAllRecords(rdds, persistFactory)
+    dqEngines.persistAllRecords(dfs, persistFactory)
 //    dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
 
-    rdds.foreach(_._2.unpersist())
+    dfs.foreach(_._2.unpersist())
 
     // end time
     val endTime = new Date().getTime
@@ -129,7 +129,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //    }
 //
 //    // -- test --
-    sqlContext.tables().show(50)
+//    sqlContext.tables().show(50)
   }
 
   def end: Try[_] = Try {

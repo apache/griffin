@@ -39,5 +39,5 @@ trait DqEngine extends Loggable with Serializable {
   //
   //  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
 
-  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
+  def collectUpdateRDD(ruleStep: ConcreteRuleStep): Option[DataFrame]
 }

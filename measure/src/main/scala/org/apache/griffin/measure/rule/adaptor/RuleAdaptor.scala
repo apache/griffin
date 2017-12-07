@@ -70,7 +70,7 @@ object RuleInfoGen {
     val name = param.getString(_name, RuleStepNameGenerator.genName)
     RuleInfo(
       name,
-      name,
+      None,
       param.getString(_rule, ""),
       param.getParamMap(_details)
     )
@@ -78,12 +78,15 @@ object RuleInfoGen {
   def apply(param: Map[String, Any], timeInfo: TimeInfo): RuleInfo = {
     val name = param.getString(_name, RuleStepNameGenerator.genName)
     val tmstName = TempName.tmstName(name, timeInfo)
-    RuleInfo(
+    val ri = RuleInfo(
       name,
-      tmstName,
+      None,
       param.getString(_rule, ""),
       param.getParamMap(_details)
     )
+    if (ri.persistType.needPersist) {
+      ri.setTmstNameOpt(Some(tmstName))
+    } else ri
   }
 
   def dslType(param: Map[String, Any]): DslType = DslType(param.getString(_dslType, ""))
