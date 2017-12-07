@@ -307,7 +307,8 @@ public class JobServiceImpl implements JobService {
         for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             JobDataMap jobDataMap = jobDetail.getJobDataMap();
-            if (jobDataMap.getString("measureId").equals(measure.getId().toString())) {
+            String measureId = jobDataMap.getString("measureId");
+            if (measureId != null && measureId.equals(measure.getId().toString())) {
                 //select jobs related to measureId
                 deleteJob(jobKey.getGroup(), jobKey.getName());
                 LOGGER.info("{} {} is paused and logically deleted.", jobKey.getGroup(), jobKey.getName());
