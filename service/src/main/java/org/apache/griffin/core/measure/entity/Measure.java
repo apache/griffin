@@ -46,7 +46,7 @@ public class Measure extends AbstractAuditableEntity {
     private List<DataSource> dataSources = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "evaluateRule_id")
+    @JoinColumn(name = "evaluate_rule_id")
     private EvaluateRule evaluateRule;
 
     private String owner;
@@ -107,10 +107,12 @@ public class Measure extends AbstractAuditableEntity {
         this.dataSources = dataSources;
     }
 
+    @JsonProperty("evaluate.rule")
     public EvaluateRule getEvaluateRule() {
         return evaluateRule;
     }
 
+    @JsonProperty("evaluate.rule")
     public void setEvaluateRule(EvaluateRule evaluateRule) {
         if (evaluateRule == null) {
             throw new NullPointerException("Evaluate rule can not be empty.");
