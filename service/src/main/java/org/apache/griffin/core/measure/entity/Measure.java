@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.util.CollectionUtils;
 
@@ -38,7 +39,9 @@ public class Measure extends AbstractAuditableEntity {
 
     private String processType;
 
-    private Long dataTimeStamp = -1L;
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long dataTimestamp;
 
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
@@ -128,14 +131,12 @@ public class Measure extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    @JsonProperty("timestamp")
-    public Long getDataTimeStamp() {
-        return dataTimeStamp;
+    public Long getDataTimestamp() {
+        return dataTimestamp;
     }
 
-    @JsonProperty("timestamp")
-    public void setDataTimeStamp(Long dataTimeStamp) {
-        this.dataTimeStamp = dataTimeStamp;
+    public void setDataTimestamp(Long dataTimestamp) {
+        this.dataTimestamp = dataTimestamp;
     }
 
     public Measure() {

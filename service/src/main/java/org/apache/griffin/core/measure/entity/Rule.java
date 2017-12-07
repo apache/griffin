@@ -43,8 +43,10 @@ public class Rule extends AbstractAuditableEntity {
     @Column(length = 1024)
     private String rule;
 
+    @JsonIgnore
     private String name;
 
+    @JsonIgnore
     private String description;
 
     @JsonIgnore

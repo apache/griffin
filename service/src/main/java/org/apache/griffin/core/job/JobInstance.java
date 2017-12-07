@@ -109,31 +109,31 @@ public class JobInstance implements Job {
         }
     }
 
-    private void setDataSourcePartitions(JobDataSegment jds, DataSource dataSource) throws Exception {
-        List<DataConnector> connectors = dataSource.getConnectors();
+    private void setDataSourcePartitions(JobDataSegment jds, DataSource ds) throws Exception {
+        List<DataConnector> connectors = ds.getConnectors();
         for (int index = 0; index < connectors.size(); index++) {
-            setDataConnectorPartitions(jds, dataSource, connectors.get(index), index);
+            setDataConnectorPartitions(jds, ds, connectors.get(index), index);
         }
     }
 
 
-    private void setDataConnectorPartitions(JobDataSegment jds, DataSource source, DataConnector dc, int index) throws Exception {
+    private void setDataConnectorPartitions(JobDataSegment jds, DataSource ds, DataConnector dc, int index) throws Exception {
         String dcIndex = jds.getDataConnectorIndex();
-        if (dcIndex.equals(getConnectorIndex(source, index))) {
+        if (dcIndex.equals(getConnectorIndex(ds, index))) {
             if (jobSchedule.getBaseline().equals(dcIndex)) {
-                Long timestampOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
-                measure.setDataTimeStamp(jobStartTime + timestampOffset);
+                Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
+                measure.setDataTimestamp(jobStartTime + tsOffset);
             }
-            Long[] sampleTimestamps = genSampleTs(jds.getSegmentRange(),dc);
-            if (sampleTimestamps != null) {
-                setConnectorConf(dc, sampleTimestamps);
-                setConnectorPredicates(dc, sampleTimestamps);
+            Long[] sampleTs = genSampleTs(jds.getSegmentRange(),dc);
+            if (sampleTs != null) {
+                setConnectorConf(dc, sampleTs);
+                setConnectorPredicates(dc, sampleTs);
             }
         }
     }
 
-    private String getConnectorIndex(DataSource source, int index) {
-        return source.getName() + "[" + index + "]";
+    private String getConnectorIndex(DataSource ds, int index) {
+        return ds.getName() + "[" + index + "]";
     }
 
     /**
