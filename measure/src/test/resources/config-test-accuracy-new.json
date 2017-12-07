@@ -32,7 +32,7 @@
     }
   ],
 
-  "evaluateRule": {
+  "evaluate.rule": {
     "rules": [
       {
         "dsl.type": "griffin-dsl",
