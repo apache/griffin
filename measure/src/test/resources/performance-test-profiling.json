@@ -1,0 +1,44 @@
+{
+  "name": "prof_batch_test",
+
+  "process.type": "batch",
+
+  "timestamp": 123456,
+
+  "data.sources": [
+    {
+      "name": "source",
+      "connectors": [
+        {
+          "type": "HIVE",
+          "version": "1.2",
+          "config": {
+            "table.name": "data_avr"
+          },
+          "pre.proc": [
+            {
+              "dsl.type": "spark-sql",
+              "name": "${this}",
+              "rule": "select * from ${this} limit 10"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "evaluate.rule": {
+    "rules": [
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "name": "pri",
+        "rule": "source.uid, count(*) as `cnt` from source group by source.uid",
+        "details": {
+          "persist.type": "metric",
+          "collect.type": "list"
+        }
+      }
+    ]
+  }
+}

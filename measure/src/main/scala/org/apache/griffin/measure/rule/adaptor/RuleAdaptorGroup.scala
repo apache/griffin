@@ -117,14 +117,14 @@ object RuleAdaptorGroup {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
-    genRuleSteps(timeInfo, ruleParams, dsTmsts, defaultDslType)
+    val tmsts = dsTmsts.getOrElse(baselineDsName, Set[Long]()).toSeq
+    genRuleSteps(timeInfo, ruleParams, tmsts, defaultDslType)
   }
 
   def genRuleSteps(timeInfo: TimeInfo, ruleParams: Seq[Map[String, Any]],
-                   dsTmsts: Map[String, Set[Long]], defaultDslType: DslType,
+                   tmsts: Seq[Long], defaultDslType: DslType,
                    adapthase: AdaptPhase = RunPhase
                   ): Seq[ConcreteRuleStep] = {
-    val tmsts = dsTmsts.getOrElse(baselineDsName, Set[Long]()).toSeq
     tmsts.flatMap { tmst =>
       val newTimeInfo = TimeInfo(timeInfo.calcTime, tmst)
       val initSteps = adapthase match {
@@ -143,7 +143,6 @@ object RuleAdaptorGroup {
         }
         (preSteps ++ curSteps, curNames)
       }
-//      steps.foreach(println)
       steps
     }
   }

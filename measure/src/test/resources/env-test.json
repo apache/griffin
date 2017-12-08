@@ -13,7 +13,7 @@
     {
       "type": "log",
       "config": {
-        "max.log.lines": 10
+        "max.log.lines": 100
       }
     }
   ],

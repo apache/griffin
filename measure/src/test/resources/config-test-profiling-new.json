@@ -14,7 +14,14 @@
           "version": "1.7",
           "config": {
             "file.name": "src/test/resources/users_info_src.avro"
-          }
+          },
+          "pre.proc": [
+            {
+              "dsl.type": "spark-sql",
+              "name": "${this}",
+              "rule": "select * from ${this} where post_code IS NOT NULL"
+            }
+          ]
         }
       ]
     }
