@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -42,9 +43,6 @@ public class EvaluateRule extends AbstractAuditableEntity {
     }
 
     public void setRules(List<Rule> rules) {
-        if (rules == null) {
-            throw new NullPointerException("Evaluate rule can not be empty.");
-        }
         this.rules = rules;
     }
 

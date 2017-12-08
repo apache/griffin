@@ -117,7 +117,7 @@ public class Measure extends AbstractAuditableEntity {
 
     @JsonProperty("evaluate.rule")
     public void setEvaluateRule(EvaluateRule evaluateRule) {
-        if (evaluateRule == null) {
+        if (evaluateRule == null || CollectionUtils.isEmpty(evaluateRule.getRules())) {
             throw new NullPointerException("Evaluate rule can not be empty.");
         }
         this.evaluateRule = evaluateRule;

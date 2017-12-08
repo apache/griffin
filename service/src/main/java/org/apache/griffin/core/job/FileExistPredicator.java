@@ -50,15 +50,17 @@ public class FileExistPredicator implements Predicator {
         }
         String rootPath = config.get(PREDICT_ROOT_PATH);
         if (paths == null || rootPath == null) {
-            throw new NullPointerException("Predicts path null.Please check predicts config root.path and path.");
+            LOGGER.error("Predicate path is null.Please check predicates config root.path and path.");
+            throw new NullPointerException();
         }
         for (String path : paths) {
             String hdfsPath = rootPath + path;
-            LOGGER.info("Predict path:{}", hdfsPath);
+            LOGGER.info("Predicate path: {}", hdfsPath);
             if (!FSUtil.isFileExist(hdfsPath)) {
-                LOGGER.info(hdfsPath + " return false.");
+                LOGGER.info("Predicate path: " + hdfsPath + " doesn't exist.");
                 return false;
             }
+            LOGGER.info("Predicate path: " + hdfsPath + " exists.");
         }
         return true;
     }
