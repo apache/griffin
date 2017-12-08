@@ -34,7 +34,7 @@ public class DataSource extends AbstractAuditableEntity {
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "dataSource_id")
+    @JoinColumn(name = "data_source_id")
     private List<DataConnector> connectors = new ArrayList<>();
 
     public String getName() {

@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,17 +42,22 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedule.class);
 
+    @NotNull
     private Long measureId;
 
+    @NotNull
     private String cronExpression;
 
+    @NotNull
     private String timeZone;
 
+    @NotNull
     private String baseline;
 
     /**
      * Setting access type is to use setter and getter method while reading data from database
      */
+    @NotNull
     @JsonIgnore
     @Access(AccessType.PROPERTY)
     private String predicateConfig;
@@ -59,6 +65,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     @Transient
     private Map<String, String> configMap;
 
+    @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "job_schedule_id")
     private List<JobDataSegment> segments = new ArrayList<>();

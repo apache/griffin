@@ -83,12 +83,12 @@ public class MeasureServiceImpl implements MeasureService {
                     return GriffinOperationMessage.CREATE_MEASURE_FAIL;
                 }
             } catch (Exception e) {
-                LOGGER.info("Failed to create new measure {}.", measure.getName(), e.getMessage());
+                LOGGER.error("Failed to create new measure {}. {}", measure.getName(), e.getMessage());
                 return GriffinOperationMessage.CREATE_MEASURE_FAIL;
             }
 
         } else {
-            LOGGER.info("Failed to create new measure {}, it already exists.", measure.getName());
+            LOGGER.error("Failed to create new measure {}, it already exists.", measure.getName());
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
     }

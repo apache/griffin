@@ -55,7 +55,7 @@ public class DataConnector extends AbstractAuditableEntity {
     private Map<String, String> configMap;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "predicate_id")
+    @JoinColumn(name = "data_connector_id")
     private List<SegmentPredicate> predicates = new ArrayList<>();
 
     public List<SegmentPredicate> getPredicates() {

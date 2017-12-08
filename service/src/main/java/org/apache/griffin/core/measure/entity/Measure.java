@@ -21,9 +21,12 @@ package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,7 @@ import java.util.List;
 public class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
 
+    @NotNull
     private String name;
 
     private String description;
@@ -43,11 +47,12 @@ public class Measure extends AbstractAuditableEntity {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long timestamp;
 
-
+    @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "measure_id")
     private List<DataSource> dataSources = new ArrayList<>();
 
+    @NotNull
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluate_rule_id")
     private EvaluateRule evaluateRule;
