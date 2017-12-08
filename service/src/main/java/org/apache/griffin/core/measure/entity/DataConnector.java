@@ -45,6 +45,8 @@ public class DataConnector extends AbstractAuditableEntity {
 
     private String version;
 
+    private String dataUnit = "365000d";
+
     @JsonIgnore
     @Access(AccessType.PROPERTY)
     private String config;
@@ -73,26 +75,29 @@ public class DataConnector extends AbstractAuditableEntity {
     public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
         this.configMap = configMap;
         this.config = JsonUtil.toJson(configMap);
-        verifyConfig(configMap);
     }
 
     public void setConfig(String config) throws IOException {
         this.config = config;
         this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
         });
-        verifyConfig(configMap);
     }
 
     public String getConfig() throws IOException {
         return config;
     }
 
-    private void verifyConfig(Map<String,String> config){
-        if (config != null && !StringUtils.isEmpty(config.get("where")) && StringUtils.isEmpty(config.get("data.unit"))) {
-            LOGGER.error("Connector data unit cannot be null when field where is not null.");
-            throw new NullPointerException();
-        }
+
+    @JsonProperty("data.unit")
+    public String getDataUnit() {
+        return dataUnit;
     }
+
+    @JsonProperty("data.unit")
+    public void setDataUnit(String dataUnit) {
+        this.dataUnit = dataUnit;
+    }
+
 
     public String getType() {
         return type;

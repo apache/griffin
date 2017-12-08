@@ -125,10 +125,8 @@ public class JobInstance implements Job {
                 measure.setTimestamp(jobStartTime + tsOffset);
             }
             Long[] sampleTs = genSampleTs(jds.getSegmentRange(),dc);
-            if (sampleTs != null) {
-                setConnectorConf(dc, sampleTs);
-                setConnectorPredicates(dc, sampleTs);
-            }
+            setConnectorConf(dc, sampleTs);
+            setConnectorPredicates(dc, sampleTs);
         }
     }
 
@@ -143,13 +141,9 @@ public class JobInstance implements Job {
      * @return split timestamps of data
      */
     private Long[] genSampleTs(SegmentRange segRange,DataConnector dc) throws IOException {
-        Map<String,String> confMap = dc.getConfigMap();
-        if (confMap == null || confMap.get("where") == null || confMap.get("data.unit") == null) {
-            return null;
-        }
         Long offset = TimeUtil.str2Long(segRange.getBegin());
         Long range = TimeUtil.str2Long(segRange.getLength());
-        Long dataUnit = TimeUtil.str2Long(confMap.get("data.unit"));
+        Long dataUnit = TimeUtil.str2Long(dc.getDataUnit());
         //offset usually is negative
         Long dataStartTime = jobStartTime + offset;
         if (range < 0) {

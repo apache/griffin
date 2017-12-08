@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
-import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 

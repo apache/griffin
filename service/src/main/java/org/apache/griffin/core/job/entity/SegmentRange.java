@@ -20,7 +20,6 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
 import javax.persistence.Column;
@@ -30,9 +29,9 @@ import javax.persistence.Entity;
 public class SegmentRange extends AbstractAuditableEntity {
 
     @Column(name = "data_begin")
-    private String begin;
+    private String begin = "1h";
 
-    private String length;
+    private String length = "1h";
 
 
     public String getBegin() {
@@ -40,9 +39,6 @@ public class SegmentRange extends AbstractAuditableEntity {
     }
 
     public void setBegin(String begin) {
-        if (StringUtils.isEmpty(begin)) {
-            this.begin = "1h";
-        }
         this.begin = begin;
     }
 
@@ -51,9 +47,6 @@ public class SegmentRange extends AbstractAuditableEntity {
     }
 
     public void setLength(String length) {
-        if (StringUtils.isEmpty(length)) {
-            length = "1h";
-        }
         this.length = length;
     }
 
