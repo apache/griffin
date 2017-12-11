@@ -23,6 +23,7 @@ import org.apache.griffin.core.error.exception.GriffinException;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
+import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.PropertiesUtil;
@@ -74,8 +75,13 @@ public class JobServiceImplTest {
     }
 
     @MockBean
-    private JobInstanceRepo jobInstanceRepo;
+    private JobScheduleRepo jobScheduleRepo;
 
+    @MockBean
+    private MeasureRepo measureRepo;
+
+    @MockBean
+    private JobInstanceRepo jobInstanceRepo;
 
     @MockBean
     private SchedulerFactoryBean factory;
@@ -88,9 +94,6 @@ public class JobServiceImplTest {
 
     @Autowired
     private JobServiceImpl service;
-
-    @MockBean
-    private MeasureRepo measureRepo;
 
 
     @Before
@@ -217,13 +220,13 @@ public class JobServiceImplTest {
         String jobName = "job1";
         int page = 0;
         int size = 2;
-        JobKey jobKey = new JobKey(jobName,groupName);
+        JobKey jobKey = new JobKey(jobName, groupName);
         JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
         given(jobInstanceRepo.findByGroupNameAndJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(jobKey)).willReturn(true);
-        mockJsonDataMap(scheduler, jobKey,false);
+        mockJsonDataMap(scheduler, jobKey, false);
         assertEquals(service.findInstancesOfJob(groupName, jobName, page, size).size(), 1);
     }
 
@@ -234,13 +237,13 @@ public class JobServiceImplTest {
         String jobName = "job1";
         int page = 0;
         int size = 2;
-        JobKey jobKey = new JobKey(jobName,groupName);
+        JobKey jobKey = new JobKey(jobName, groupName);
         JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
         given(jobInstanceRepo.findByGroupNameAndJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(jobKey)).willReturn(true);
-        mockJsonDataMap(scheduler, jobKey,true);
+        mockJsonDataMap(scheduler, jobKey, true);
         assertEquals(service.findInstancesOfJob(groupName, jobName, page, size).size(), 0);
     }
 
@@ -257,6 +260,11 @@ public class JobServiceImplTest {
         service.syncInstancesOfAllJobs();
     }
 
+    @Test
+    public void testSyncInstancesOfJobForNullGroup() {
+        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(null);
+        service.syncInstancesOfAllJobs();
+    }
 
     @Test
     public void testSyncInstancesOfJobForRestClientException() {
@@ -336,7 +344,7 @@ public class JobServiceImplTest {
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 0);
     }
 
-    private void mockJsonDataMap(Scheduler scheduler,JobKey jobKey,Boolean deleted) throws SchedulerException {
+    private void mockJsonDataMap(Scheduler scheduler, JobKey jobKey, Boolean deleted) throws SchedulerException {
         JobDataMap jobDataMap = mock(JobDataMap.class);
         JobDetailImpl jobDetail = new JobDetailImpl();
         jobDetail.setJobDataMap(jobDataMap);

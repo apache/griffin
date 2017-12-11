@@ -336,6 +336,9 @@ public class JobServiceImpl implements JobService {
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void syncInstancesOfAllJobs() {
         List<Object> groupJobList = jobInstanceRepo.findGroupAndJobNameWithState();
+        if (groupJobList == null) {
+            return;
+        }
         for (Object groupJobObj : groupJobList) {
             try {
                 Object[] groupJob = (Object[]) groupJobObj;
