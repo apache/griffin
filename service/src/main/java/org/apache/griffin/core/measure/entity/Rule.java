@@ -40,7 +40,7 @@ public class Rule extends AbstractAuditableEntity {
 
     private String dqType;
 
-    @Column(length = 1024)
+    @Column(length = 1024*10)
     private String rule;
 
     @JsonIgnore
