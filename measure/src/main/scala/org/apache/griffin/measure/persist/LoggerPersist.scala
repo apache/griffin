@@ -118,13 +118,14 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
   }
 
   def persistRecords(df: DataFrame, name: String): Unit = {
-    val records = df.toJSON
     println(s"${metricName} [${timeStamp}] records: ")
     try {
-      val recordCount = records.count.toInt
+      val recordCount = df.count
       val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-      if (count > 0) {
-        val recordsArray = records.take(count)
+      val maxCount = count.toInt
+      if (maxCount > 0) {
+        val recDf = df.limit(maxCount)
+        val recordsArray = recDf.collect()
         recordsArray.foreach(println)
       }
     } catch {
@@ -162,10 +163,6 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
     println(s"${metricName} [${timeStamp}] metrics: ")
     val json = JsonUtil.toJson(metrics)
     println(json)
-//    metrics.foreach { metric =>
-//      val (key, value) = metric
-//      println(s"${key}: ${value}")
-//    }
   }
 
 

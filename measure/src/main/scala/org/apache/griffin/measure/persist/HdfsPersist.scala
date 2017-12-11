@@ -27,6 +27,7 @@ import org.apache.spark.sql.DataFrame
 
 import scala.util.Try
 import org.apache.griffin.measure.utils.ParamUtil._
+import org.apache.spark.TaskContext
 
 // persist result and data to hdfs
 case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
@@ -37,7 +38,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   val path = config.getOrElse(Path, "").toString
   val maxPersistLines = config.getInt(MaxPersistLines, -1)
-  val maxLinesPerFile = config.getLong(MaxLinesPerFile, 10000)
+  val maxLinesPerFile = math.min(config.getInt(MaxLinesPerFile, 10000), 1000000)
 
   val separator = "/"
 
@@ -187,6 +188,15 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 //    }
 //  }
 
+  private def persistRecords2Hdfs(hdfsPath: String, rdd: RDD[String]): Unit = {
+    try {
+//      rdd.saveAsTextFile(hdfsPath)
+      val recStr = rdd.collect().mkString("\n")
+      HdfsUtil.writeContent(hdfsPath, recStr)
+    } catch {
+      case e: Throwable => error(e.getMessage)
+    }
+  }
   private def persistRecords2Hdfs(hdfsPath: String, records: Iterable[String]): Unit = {
     try {
       val recStr = records.mkString("\n")
@@ -205,27 +215,24 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     }
   }
 
+  private def getHdfsPath(path: String, ptnId: Int, groupId: Int): String = {
+    if (ptnId == 0 && groupId == 0) path else withSuffix(path, s"${ptnId}.${groupId}")
+  }
 
   def persistRecords(df: DataFrame, name: String): Unit = {
-    val records = df.toJSON
     val path = filePath(name)
     try {
-      val recordCount = records.count
+      val recordCount = df.count
       val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
-      if (count > 0) {
-        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
-        if (groupCount <= 1) {
-          val recs = records.take(count.toInt)
-          persistRecords2Hdfs(path, recs)
-        } else {
-          val groupedRecords: RDD[(Long, Iterable[String])] =
-            records.zipWithIndex.flatMap { r =>
-              val gid = r._2 / maxLinesPerFile
-              if (gid < groupCount) Some((gid, r._1)) else None
-            }.groupByKey()
+      val maxCount = count.toInt
+      if (maxCount > 0) {
+        val recDf = df.limit(maxCount)
+        recDf.toJSON.foreachPartition { ptn =>
+          val ptnid = TaskContext.getPartitionId()
+          val groupedRecords = ptn.grouped(maxLinesPerFile).zipWithIndex
           groupedRecords.foreach { group =>
-            val (gid, recs) = group
-            val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
+            val (recs, gid) = group
+            val hdfsPath = getHdfsPath(path, ptnid, gid)
             persistRecords2Hdfs(hdfsPath, recs)
           }
         }
@@ -241,12 +248,12 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
       val recordCount = records.size
       val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
       if (count > 0) {
-        val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
+        val groupCount = (count - 1) / maxLinesPerFile + 1
         if (groupCount <= 1) {
           val recs = records.take(count.toInt)
           persistRecords2Hdfs(path, recs)
         } else {
-          val groupedRecords = records.grouped(groupCount).zipWithIndex
+          val groupedRecords = records.grouped(maxLinesPerFile).zipWithIndex
           groupedRecords.take(groupCount).foreach { group =>
             val (recs, gid) = group
             val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
@@ -288,7 +295,6 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     val result = head + (_Value -> metrics)
     try {
       val json = JsonUtil.toJson(result)
-      println(s"hdfs persist metrics: ${json}")
       persistRecords2Hdfs(MetricsFile, json :: Nil)
     } catch {
       case e: Throwable => error(e.getMessage)

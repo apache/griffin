@@ -124,8 +124,10 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //    ruleSteps.foreach { rs =>
 //      println(rs)
 //      //      sqlContext.dropTempTable(rs.ruleInfo.name)
-//      sqlContext.dropTempTable(s"`${rs.ruleInfo.tmstName}`")
-//      sqlContext.dropTempTable(s"`${rs.ruleInfo.tmstName}`")
+//      rs.ruleInfo.tmstNameOpt match {
+//        case Some(n) => sqlContext.dropTempTable(s"`${n}`")
+//        case _ => {}
+//      }
 //    }
 //
 //    // -- test --

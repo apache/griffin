@@ -3,8 +3,6 @@
 
   "process.type": "batch",
 
-  "timestamp": 123456,
-
   "data.sources": [
     {
       "name": "source",
@@ -13,15 +11,9 @@
           "type": "HIVE",
           "version": "1.2",
           "config": {
-            "table.name": "data_avr"
-          },
-          "pre.proc": [
-            {
-              "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select * from ${this} limit 10"
-            }
-          ]
+            "table.name": "data_avr_big",
+            "where": "pt <= 100"
+          }
         }
       ]
     }
@@ -32,11 +24,9 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "pri",
-        "rule": "source.uid, count(*) as `cnt` from source group by source.uid",
+        "rule": "count(*) as `cnt` from source where uid > 100",
         "details": {
-          "persist.type": "metric",
-          "collect.type": "list"
+          "persist.type": "metric"
         }
       }
     ]
