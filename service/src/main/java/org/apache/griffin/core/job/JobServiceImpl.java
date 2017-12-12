@@ -26,6 +26,7 @@ import org.apache.griffin.core.error.exception.GriffinException.GetJobsFailureEx
 import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
+import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -143,8 +144,9 @@ public class JobServiceImpl implements JobService {
         Scheduler scheduler = factory.getObject();
         Measure measure = isMeasureIdValid(jobSchedule.getMeasureId());
         if (measure != null) {
-            List<String> indexes = getConnectorIndexes(measure);
-            if (!isParamValid(jobSchedule.getBaseline(), indexes) || !isConnectorIndexesValid(jobSchedule.getSegments(), indexes)) {
+            List<String> names = getConnectorNames(measure);
+            List<JobDataSegment> segments = jobSchedule.getSegments();
+            if (!isBaseLineValid(segments) || !isConnectorNamesValid(segments, names)) {
                 return CREATE_JOB_FAIL;
             }
             String groupName = "BA";
@@ -162,35 +164,44 @@ public class JobServiceImpl implements JobService {
         return CREATE_JOB_FAIL;
     }
 
-    private boolean isConnectorIndexesValid(List<JobDataSegment> segments, List<String> indexes) {
+    private boolean isBaseLineValid(List<JobDataSegment> segments) {
+        for (JobDataSegment jds : segments) {
+            if (jds.getBaseline()) {
+                return true;
+            }
+        }
+        LOGGER.error("Please set segment timestamp baseline in as.baseline field.");
+        return false;
+    }
+
+    private boolean isConnectorNamesValid(List<JobDataSegment> segments, List<String> names) {
         for (JobDataSegment segment : segments) {
-            if (isParamValid(segment.getDataConnectorIndex(), indexes)) {
+            if (!isConnectorNameValid(segment.getDataConnectorName(), names)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isConnectorNameValid(String param, List<String> names) {
+        for (String name : names) {
+            if (name.equals(param)) {
                 return true;
             }
         }
+        LOGGER.error("Param {} is a illegal string. Please input one of strings in {}", param, names);
         return false;
     }
 
-    private boolean isParamValid(String param, List<String> indexes) {
-        for (String index : indexes) {
-            if (index.equals(param)) {
-                return true;
-            }
-        }
-        LOGGER.error("Param {} is a illegal string.Please input one of strings in {}", param, indexes);
-        return false;
-    }
-
-    private List<String> getConnectorIndexes(Measure measure) {
-        List<String> index = new ArrayList<>();
+    private List<String> getConnectorNames(Measure measure) {
+        List<String> names = new ArrayList<>();
         List<DataSource> sources = measure.getDataSources();
         for (DataSource source : sources) {
-            int length = source.getConnectors().size();
-            for (int i = 0; i < length; i++) {
-                index.add(getConnectorIndex(source, i));
+            for (DataConnector dc : source.getConnectors()) {
+                names.add(dc.getName());
             }
         }
-        return index;
+        return names;
     }
 
     private String getConnectorIndex(DataSource source, int index) {

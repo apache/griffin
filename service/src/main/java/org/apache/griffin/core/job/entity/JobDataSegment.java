@@ -20,20 +20,37 @@ under the License.
 package org.apache.griffin.core.job.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class JobDataSegment extends AbstractAuditableEntity {
 
-    private String dataConnectorIndex;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobDataSegment.class);
 
+    @NotNull
+    private String dataConnectorName;
+
+    private Boolean baseline = false;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "segment_range_id")
     private SegmentRange segmentRange;
 
+    @JsonProperty("as.baseline")
+    public Boolean getBaseline() {
+        return baseline;
+    }
+
+    @JsonProperty("as.baseline")
+    public void setBaseline(Boolean baseline) {
+        this.baseline = baseline;
+    }
 
     @JsonProperty("segment.range")
     public SegmentRange getSegmentRange() {
@@ -45,14 +62,18 @@ public class JobDataSegment extends AbstractAuditableEntity {
         this.segmentRange = segmentRange;
     }
 
-    @JsonProperty("data.connector.index")
-    public String getDataConnectorIndex() {
-        return dataConnectorIndex;
+    @JsonProperty("data.connector.name")
+    public String getDataConnectorName() {
+        return dataConnectorName;
     }
 
-    @JsonProperty("data.connector.index")
-    public void setDataConnectorIndex(String dataConnectorIndex) {
-        this.dataConnectorIndex = dataConnectorIndex;
+    @JsonProperty("data.connector.name")
+    public void setDataConnectorName(String dataConnectorName) {
+        if (StringUtils.isEmpty(dataConnectorName)) {
+            LOGGER.error(" Data connector name is invalid. Please check your connector name.");
+            throw new NullPointerException();
+        }
+        this.dataConnectorName = dataConnectorName;
     }
 
     public JobDataSegment() {

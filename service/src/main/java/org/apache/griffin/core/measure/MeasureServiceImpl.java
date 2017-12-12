@@ -21,7 +21,10 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.job.JobServiceImpl;
+import org.apache.griffin.core.measure.entity.DataConnector;
+import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.repo.DataConnectorRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.quartz.SchedulerException;
@@ -29,8 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,6 +47,8 @@ public class MeasureServiceImpl implements MeasureService {
     private JobServiceImpl jobService;
     @Autowired
     private MeasureRepo measureRepo;
+    @Autowired
+    private DataConnectorRepo dataConnectorRepo;
 
     @Override
     public Iterable<Measure> getAllAliveMeasures() {
@@ -75,22 +83,39 @@ public class MeasureServiceImpl implements MeasureService {
     @Override
     public GriffinOperationMessage createMeasure(Measure measure) {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
-        if (aliveMeasureList.size() == 0) {
-            try {
-                if (measureRepo.save(measure) != null) {
-                    return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
-                } else {
-                    return GriffinOperationMessage.CREATE_MEASURE_FAIL;
-                }
-            } catch (Exception e) {
-                LOGGER.error("Failed to create new measure {}. {}", measure.getName(), e.getMessage());
-                return GriffinOperationMessage.CREATE_MEASURE_FAIL;
-            }
-
-        } else {
+        if (aliveMeasureList.size() != 0) {
             LOGGER.error("Failed to create new measure {}, it already exists.", measure.getName());
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
+        try {
+            if (isConnectorNamesValid(measure)) {
+                measureRepo.save(measure);
+                return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
+            }
+            LOGGER.error("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
+        } catch (Exception e) {
+            LOGGER.error("Failed to create new measure {}. {}", measure.getName(), e.getMessage());
+        }
+        return GriffinOperationMessage.CREATE_MEASURE_FAIL;
+    }
+
+    private boolean isConnectorNamesValid(Measure measure) {
+        List<String> names = getConnectorNames(measure);
+        List<DataConnector> connectors = dataConnectorRepo.findByConnectorNames(names);
+        return names.size() != 0 && CollectionUtils.isEmpty(connectors);
+    }
+
+    private List<String> getConnectorNames(Measure measure) {
+        List<String> names = new ArrayList<>();
+        for (DataSource source : measure.getDataSources()) {
+            for (DataConnector dc : source.getConnectors()) {
+                String name = dc.getName();
+                if (!StringUtils.isEmpty(name)) {
+                    names.add(name);
+                }
+            }
+        }
+        return names;
     }
 
     @Override
@@ -105,12 +130,11 @@ public class MeasureServiceImpl implements MeasureService {
         } else {
             try {
                 measureRepo.save(measure);
+                return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
             } catch (Exception e) {
                 LOGGER.error("Failed to update measure. {}", e.getMessage());
-                return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
             }
-
-            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
+            return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
         }
     }
 }

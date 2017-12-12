@@ -21,9 +21,15 @@ package org.apache.griffin.core.measure.repo;
 
 
 import org.apache.griffin.core.measure.entity.DataConnector;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
+
+    @Query("select dc from DataConnector dc where name in ?1")
+    List<DataConnector> findByConnectorNames(List<String> names);
 }

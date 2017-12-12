@@ -103,6 +103,10 @@ public class JobInstance implements Job {
 
     private void setDataSourcesPartitions(List<DataSource> sources) throws Exception {
         for (JobDataSegment jds : jobSchedule.getSegments()) {
+            if (jds.getBaseline()) {
+                Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
+                measure.setTimestamp(jobStartTime + tsOffset);
+            }
             for (DataSource ds : sources) {
                 setDataSourcePartitions(jds, ds);
             }
@@ -111,27 +115,19 @@ public class JobInstance implements Job {
 
     private void setDataSourcePartitions(JobDataSegment jds, DataSource ds) throws Exception {
         List<DataConnector> connectors = ds.getConnectors();
-        for (int index = 0; index < connectors.size(); index++) {
-            setDataConnectorPartitions(jds, ds, connectors.get(index), index);
+        for (DataConnector dc : connectors) {
+            setDataConnectorPartitions(jds, dc);
         }
     }
 
 
-    private void setDataConnectorPartitions(JobDataSegment jds, DataSource ds, DataConnector dc, int index) throws Exception {
-        String dcIndex = jds.getDataConnectorIndex();
-        if (dcIndex.equals(getConnectorIndex(ds, index))) {
-            if (jobSchedule.getBaseline().equals(dcIndex)) {
-                Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
-                measure.setTimestamp(jobStartTime + tsOffset);
-            }
-            Long[] sampleTs = genSampleTs(jds.getSegmentRange(),dc);
+    private void setDataConnectorPartitions(JobDataSegment jds, DataConnector dc) throws Exception {
+        String dcName = jds.getDataConnectorName();
+        if (dcName.equals(dc.getName())) {
+            Long[] sampleTs = genSampleTs(jds.getSegmentRange(), dc);
             setConnectorConf(dc, sampleTs);
             setConnectorPredicates(dc, sampleTs);
         }
-    }
-
-    private String getConnectorIndex(DataSource ds, int index) {
-        return ds.getName() + "[" + index + "]";
     }
 
     /**
@@ -140,7 +136,7 @@ public class JobInstance implements Job {
      * @param segRange config of data
      * @return split timestamps of data
      */
-    private Long[] genSampleTs(SegmentRange segRange,DataConnector dc) throws IOException {
+    private Long[] genSampleTs(SegmentRange segRange, DataConnector dc) throws IOException {
         Long offset = TimeUtil.str2Long(segRange.getBegin());
         Long range = TimeUtil.str2Long(segRange.getLength());
         Long dataUnit = TimeUtil.str2Long(dc.getDataUnit());
@@ -206,9 +202,10 @@ public class JobInstance implements Job {
         }
     }
 
-    private boolean createJobInstance(Map<String, String> confMap, JobExecutionContext context) throws Exception {
-        Long interval = TimeUtil.str2Long(confMap.get("interval"));
-        Integer repeat = Integer.valueOf(confMap.get("repeat"));
+    private boolean createJobInstance(Map<String, Object> confMap, JobExecutionContext context) throws Exception {
+        Map<String, Object> scheduleConfig = (Map<String, Object>) confMap.get("checkdonefile.schedule");
+        Long interval = TimeUtil.str2Long((String) scheduleConfig.get("interval"));
+        Integer repeat = (Integer) scheduleConfig.get("repeat");
         String groupName = "predicate_group";
         String jobName = measure.getName() + "_" + groupName + "_" + System.currentTimeMillis();
         Scheduler scheduler = factory.getObject();

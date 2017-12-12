@@ -23,13 +23,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,9 @@ public class DataConnector extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815594L;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DataConnector.class);
+
+    @NotNull
+    private String name;
 
     private String type;
 
@@ -98,6 +102,17 @@ public class DataConnector extends AbstractAuditableEntity {
         this.dataUnit = dataUnit;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (StringUtils.isEmpty(name)) {
+            LOGGER.error("Connector name cannot be empty.");
+            throw new NullPointerException();
+        }
+        this.name = name;
+    }
 
     public String getType() {
         return type;
@@ -119,7 +134,8 @@ public class DataConnector extends AbstractAuditableEntity {
     public DataConnector() {
     }
 
-    public DataConnector(String type, String version, String config) throws IOException {
+    public DataConnector(String name, String type, String version, String config) throws IOException {
+        this.name = name;
         this.type = type;
         this.version = version;
         this.config = config;
@@ -130,6 +146,7 @@ public class DataConnector extends AbstractAuditableEntity {
     @Override
     public String toString() {
         return "DataConnector{" +
+                "name=" + name +
                 "type=" + type +
                 ", version='" + version + '\'' +
                 ", config=" + config +

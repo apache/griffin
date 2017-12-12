@@ -21,13 +21,16 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.job.JobServiceImpl;
+import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.repo.DataConnectorRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -51,6 +54,9 @@ public class MeasureServiceImplTest {
     private MeasureRepo measureRepo;
     @Mock
     private JobServiceImpl jobService;
+
+    @Mock
+    private DataConnectorRepo dataConnectorRepo;
 
     @Before
     public void setup() {
@@ -103,7 +109,19 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
+    public void testCreateNewMeasureForFailureWithConnectorNameRepeat() throws Exception {
+        String measureName = "view_item_hourly";
+        Measure measure = createATestMeasure(measureName, "test");
+        given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
+        DataConnector dc = new DataConnector("name", "", "", "");
+        given(dataConnectorRepo.findByConnectorNames(Matchers.any())).willReturn(Arrays.asList(dc));
+        given(measureRepo.save(measure)).willReturn(measure);
+        GriffinOperationMessage message = service.createMeasure(measure);
+        assertEquals(message, GriffinOperationMessage.CREATE_MEASURE_FAIL);
+    }
+
+    @Test
+    public void testCreateNewMeasureForFailWithMeasureDuplicate() throws Exception {
         String measureName = "view_item_hourly";
         Measure measure = createATestMeasure(measureName, "test");
         LinkedList<Measure> list = new LinkedList<>();

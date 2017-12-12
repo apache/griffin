@@ -34,6 +34,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,19 +52,12 @@ public class JobSchedule extends AbstractAuditableEntity {
     @NotNull
     private String timeZone;
 
-    @NotNull
-    private String baseline;
-
-    /**
-     * Setting access type is to use setter and getter method while reading data from database
-     */
-    @NotNull
     @JsonIgnore
     @Access(AccessType.PROPERTY)
     private String predicateConfig;
 
     @Transient
-    private Map<String, String> configMap;
+    private Map<String, Object> configMap = defaultPredicatesConfig();
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
@@ -87,7 +81,7 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     @JsonProperty("cron.expression")
     public void setCronExpression(String cronExpression) {
-        if (StringUtils.isEmpty(cronExpression) ||  !isCronExpressionValid(cronExpression)) {
+        if (StringUtils.isEmpty(cronExpression) || !isCronExpressionValid(cronExpression)) {
             LOGGER.error("Cron expression is invalid.Please check your cron expression.");
             throw new IllegalArgumentException();
         }
@@ -114,43 +108,41 @@ public class JobSchedule extends AbstractAuditableEntity {
         this.segments = segments;
     }
 
-    @JsonProperty("timestamp.baseline")
-    public String getBaseline() {
-        return baseline;
-    }
-
-    @JsonProperty("timestamp.baseline")
-    public void setBaseline(String baseline) {
-        this.baseline = baseline;
-    }
-
     private String getPredicateConfig() {
         return predicateConfig;
     }
 
     private void setPredicateConfig(String config) throws IOException {
         this.predicateConfig = config;
-        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {});
-        verifyConfig(configMap);
+        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
+        });
     }
 
     @JsonProperty("predicate.config")
-    public Map<String, String> getConfigMap() throws IOException {
+    public Map<String, Object> getConfigMap() throws IOException {
         return configMap;
     }
 
     @JsonProperty("predicate.config")
-    public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
+    public void setConfigMap(Map<String, Object> configMap) throws JsonProcessingException {
         this.configMap = configMap;
         this.predicateConfig = JsonUtil.toJson(configMap);
-        verifyConfig(configMap);
     }
 
-    private void verifyConfig(Map<String,String> config){
-        if (config == null ||  StringUtils.isEmpty(config.get("interval")) ||  StringUtils.isEmpty(config.get("repeat"))) {
-            LOGGER.error("Predicate config is illegal. Please set it rightly.");
-            throw new NullPointerException();
-        }
+    /**
+     * @return set default predicate config
+     * @throws JsonProcessingException json exception
+     */
+    private Map<String, Object> defaultPredicatesConfig() throws JsonProcessingException {
+        Map<String, Object> conf = new HashMap<>();
+        Map<String, Object> scheduleConf = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("interval", "5m");
+        map.put("repeat", 12);
+        scheduleConf.put("checkdonefile.schedule", map);
+        conf.put("predicate.config", scheduleConf);
+        setConfigMap(conf);
+        return conf;
     }
 
     private boolean isCronExpressionValid(String cronExpression) {
@@ -161,7 +153,7 @@ public class JobSchedule extends AbstractAuditableEntity {
         return true;
     }
 
-    public JobSchedule() {
+    public JobSchedule() throws JsonProcessingException {
     }
 
     public JobSchedule(Long measureId, String cronExpression, Map configMap, List<JobDataSegment> segments) throws JsonProcessingException {
