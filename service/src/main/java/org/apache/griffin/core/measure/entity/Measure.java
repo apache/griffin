@@ -28,9 +28,9 @@ import javax.persistence.InheritanceType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({@JsonSubTypes.Type(value = ProcessMeasure.class, name = "process"), @JsonSubTypes.Type(value = OutcomeMeasure.class, name = "outcome")})
-public class Measure extends AbstractAuditableEntity {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+@JsonSubTypes({@JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"), @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
+public abstract class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
 
     protected String name;
@@ -92,4 +92,6 @@ public class Measure extends AbstractAuditableEntity {
         this.organization = organization;
         this.owner = owner;
     }
+
+    public abstract String getType();
 }

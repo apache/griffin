@@ -22,8 +22,8 @@ package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.entity.OutcomeMeasure;
-import org.apache.griffin.core.measure.entity.ProcessMeasure;
+import org.apache.griffin.core.measure.entity.ExternalMeasure;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.metric.MetricTemplateStore;
 import org.apache.griffin.core.util.GriffinOperationMessage;
@@ -63,11 +63,13 @@ public class MeasureServiceImpl implements MeasureService {
         } else {
             Measure measure = measureRepo.findOne(measureId);
             try {
-                if (measure instanceof ProcessMeasure) {
+                if (measure instanceof GriffinMeasure) {
                     //pause all jobs related to the measure
-                    jobService.deleteJobsRelateToMeasure((ProcessMeasure) measure);
+                    jobService.deleteJobsRelateToMeasure((GriffinMeasure) measure);
                 } else {
-                    metricTemplateStore.deleteTemplateFromMeasure((OutcomeMeasure) measure);
+                    if (!metricTemplateStore.deleteFromMeasure((ExternalMeasure) measure)) {
+                        return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
+                    }
                 }
                 measure.setDeleted(true);
                 measureRepo.save(measure);
@@ -85,12 +87,17 @@ public class MeasureServiceImpl implements MeasureService {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
         if (aliveMeasureList.size() == 0) {
             try {
-                if (measureRepo.save(measure) != null) {
-                    if (measure instanceof OutcomeMeasure) {
-                        metricTemplateStore.createTemplateFromMeasure((OutcomeMeasure) measure);
+                if (measure instanceof ExternalMeasure) {
+                    if (!metricTemplateStore.createFromMeasure((ExternalMeasure) measure)) {
+                        return GriffinOperationMessage.CREATE_MEASURE_FAIL;
                     }
+                }
+                if (measureRepo.save(measure) != null) {
                     return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
                 } else {
+                    if (measure instanceof ExternalMeasure) {
+                        metricTemplateStore.deleteFromMeasure((ExternalMeasure) measure);
+                    }
                     return GriffinOperationMessage.CREATE_MEASURE_FAIL;
                 }
             } catch (Exception e) {
@@ -115,15 +122,19 @@ public class MeasureServiceImpl implements MeasureService {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         } else {
             try {
-                measureRepo.save(measure);
-                if (measure instanceof OutcomeMeasure) {
-                    metricTemplateStore.updateTemplateFromMeasure((OutcomeMeasure) measure);
+                if (measure instanceof ExternalMeasure) {
+                    if (!metricTemplateStore.updateFromMeasure((ExternalMeasure) measure)) {
+                        return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
+                    }
                 }
+                measureRepo.save(measure);
             } catch (Exception e) {
                 LOGGER.error("Failed to update measure. {}", e.getMessage());
+                if (measure instanceof ExternalMeasure) {
+                    metricTemplateStore.updateFromMeasure((ExternalMeasure) measureRepo.findOne(measure.getId()));
+                }
                 return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
             }
-
             return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
         }
     }

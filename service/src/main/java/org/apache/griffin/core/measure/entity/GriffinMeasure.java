@@ -5,8 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Measures processed on Griffin
+ */
 @Entity
-public class ProcessMeasure extends Measure {
+public class GriffinMeasure extends Measure {
 
     private String processType;
 
@@ -24,11 +27,11 @@ public class ProcessMeasure extends Measure {
     @JoinColumn(name = "evaluateRule_id")
     private EvaluateRule evaluateRule;
 
-    public ProcessMeasure() {
+    public GriffinMeasure() {
         super();
     }
 
-    public ProcessMeasure(String name, String description, String organization, String owner, String processType, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+    public GriffinMeasure(String name, String description, String organization, String owner, String processType, List<DataSource> dataSources, EvaluateRule evaluateRule) {
         super(name, description, organization, owner);
         this.processType = processType;
         this.dataSources = dataSources;
@@ -71,5 +74,10 @@ public class ProcessMeasure extends Measure {
 
     public void setEvaluateRule(EvaluateRule evaluateRule) {
         this.evaluateRule = evaluateRule;
+    }
+
+    @Override
+    public String getType() {
+        return "griffin";
     }
 }

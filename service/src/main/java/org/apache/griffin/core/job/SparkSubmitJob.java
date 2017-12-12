@@ -28,7 +28,7 @@ import org.apache.griffin.core.job.entity.SparkJobDO;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
-import org.apache.griffin.core.measure.entity.ProcessMeasure;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
@@ -47,7 +47,7 @@ public class SparkSubmitJob implements Job {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparkSubmitJob.class);
 
     @Autowired
-    private MeasureRepo<ProcessMeasure> measureRepo;
+    private MeasureRepo<GriffinMeasure> measureRepo;
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
@@ -66,7 +66,7 @@ public class SparkSubmitJob implements Job {
      */
     private String[] sourcePatternItems, targetPatternItems;
 
-    private ProcessMeasure measure;
+    private GriffinMeasure measure;
     private String sourcePattern, targetPattern;
     private String blockStartTimestamp, lastBlockStartTimestamp;
     private String interval;
@@ -136,7 +136,7 @@ public class SparkSubmitJob implements Job {
         interval = jd.getJobDataMap().getString("interval");
     }
 
-    private void setMeasureInstanceName(ProcessMeasure measure, JobDetail jd) {
+    private void setMeasureInstanceName(GriffinMeasure measure, JobDetail jd) {
         // in order to keep metric name unique, we set measure name as jobName at present
         measure.setName(jd.getJobDataMap().getString("jobName"));
     }

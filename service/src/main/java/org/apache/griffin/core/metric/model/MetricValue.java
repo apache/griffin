@@ -1,4 +1,4 @@
-package org.apache.griffin.core.metric.domain;
+package org.apache.griffin.core.metric.model;
 
 import java.util.Map;
 

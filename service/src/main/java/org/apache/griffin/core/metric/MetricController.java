@@ -19,11 +19,8 @@ under the License.
 
 package org.apache.griffin.core.metric;
 
-import org.apache.griffin.core.metric.domain.Metric;
-import org.apache.griffin.core.metric.domain.MetricValue;
-import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.griffin.core.metric.model.Metric;
+import org.apache.griffin.core.metric.model.MetricValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,17 +43,17 @@ public class MetricController {
     }
 
     @RequestMapping(value = "/metric/values", method = RequestMethod.GET)
-    public List<MetricValue> getMetricValues(@RequestParam("metricName") String metricName) {
-        return metricService.getMetricValues(metricName);
+    public List<MetricValue> getMetricValues(@RequestParam("metricName") String metricName, @RequestParam("size") int size) {
+        return metricService.getMetricValues(metricName, size);
     }
 
     @RequestMapping(value = "/metric/values", method = RequestMethod.POST)
-    public GriffinOperationMessage addMetricValues(@RequestBody List<MetricValue> values) {
+    public String addMetricValues(@RequestBody List<MetricValue> values) {
         return metricService.addMetricValues(values);
     }
 
     @RequestMapping(value = "/metric/values", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteMetricValues(@RequestParam("metricName") String metricName) {
+    public String deleteMetricValues(@RequestParam("metricName") String metricName) {
         return metricService.deleteMetricValues(metricName);
     }
 }

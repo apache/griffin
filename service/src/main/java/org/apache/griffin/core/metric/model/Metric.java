@@ -1,6 +1,4 @@
-package org.apache.griffin.core.metric.domain;
-
-import org.apache.griffin.core.metric.entity.MetricTemplate;
+package org.apache.griffin.core.metric.model;
 
 import java.util.List;
 

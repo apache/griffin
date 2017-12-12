@@ -1,20 +1,20 @@
 package org.apache.griffin.core.metric;
 
+import org.apache.griffin.core.measure.entity.ExternalMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.entity.OutcomeMeasure;
-import org.apache.griffin.core.metric.entity.MetricTemplate;
 
-import java.util.List;
-
+/**
+ * Proxy class to manage metric templates, return true/false if process succeed/failed.
+ */
 public interface MetricTemplateStore {
 
-    void createTemplateFromMeasure(OutcomeMeasure measure);
+    Boolean createFromMeasure(ExternalMeasure measure);
 
-    void updateTemplateFromMeasure(OutcomeMeasure measure);
+    Boolean updateFromMeasure(ExternalMeasure measure);
 
-    void deleteTemplateFromMeasure(OutcomeMeasure measure);
+    Boolean deleteFromMeasure(ExternalMeasure measure);
 
-    void createTemplateFromJob(Measure measure, String jobId, String jobName);
+    Boolean createFromJob(Measure measure, String jobId, String jobName);
 
-    void deleteTemplateFromJob(String jobId, String jobName);
+    Boolean deleteFromJob(String jobId, String jobName);
 }

@@ -20,11 +20,10 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
-import org.apache.griffin.core.metric.domain.Metric;
-import org.apache.griffin.core.metric.domain.MetricValue;
+import org.apache.griffin.core.metric.model.Metric;
+import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.metric.entity.MetricTemplate;
 import org.apache.griffin.core.metric.repo.MetricTemplateRepo;
-import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,28 +42,24 @@ public class MetricServiceImpl implements MetricService {
     public List<Metric> getAllMetrics() {
         List<Metric> metrics = new ArrayList<>();
         for (MetricTemplate template : templateRepo.findAll()) {
-            metrics.add(getMetricByTemplate(template));
+            List<MetricValue> metricValues = getMetricValues(template.getMetricName(), 300);
+            metrics.add(new Metric(template.getName(), template.getDescription(), template.getOrganization(), template.getOwner(), metricValues));
         }
         return metrics;
     }
 
-    private Metric getMetricByTemplate(MetricTemplate template) {
-        List<MetricValue> metricValues = getMetricValues(template.getMetricName());
-        return new Metric(template.getName(), template.getDescription(), template.getOrganization(), template.getOwner(), metricValues);
+    @Override
+    public List<MetricValue> getMetricValues(String metricName, int size) {
+        return metricStore.getMetricValues(metricName, size);
     }
 
     @Override
-    public List<MetricValue> getMetricValues(String metricName) {
-        return metricStore.getMetricValues(metricName);
-    }
-
-    @Override
-    public GriffinOperationMessage addMetricValues(List<MetricValue> values) {
+    public String addMetricValues(List<MetricValue> values) {
         return metricStore.addMetricValues(values);
     }
 
     @Override
-    public GriffinOperationMessage deleteMetricValues(String metricName) {
+    public String deleteMetricValues(String metricName) {
         return metricStore.deleteMetricValues(metricName);
     }
 }

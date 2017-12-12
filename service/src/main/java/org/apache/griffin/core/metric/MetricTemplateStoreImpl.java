@@ -1,7 +1,7 @@
 package org.apache.griffin.core.metric;
 
+import org.apache.griffin.core.measure.entity.ExternalMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.entity.OutcomeMeasure;
 import org.apache.griffin.core.metric.entity.MetricTemplate;
 import org.apache.griffin.core.metric.repo.MetricTemplateRepo;
 import org.slf4j.Logger;
@@ -19,79 +19,92 @@ public class MetricTemplateStoreImpl implements MetricTemplateStore {
     private MetricTemplateRepo templateRepo;
 
     @Override
-    public void createTemplateFromMeasure(OutcomeMeasure measure) {
-        if (templateRepo.findByCreatorTypeAndAndCreatorId("measure", measure.getId().toString()).size() != 0) {
+    public Boolean createFromMeasure(ExternalMeasure measure) {
+        if (templateRepo.findByCreatorTypeAndCreatorId(MetricTemplate.CreatorType.MEASURE, measure.getName()).size() != 0) {
             LOGGER.error("Failed to create metric template from measure {}, records already exist.", measure.getName());
+            return false;
         } else {
-            saveTemplateFromMeasure(new MetricTemplate(), measure);
+            return saveFromMeasure(new MetricTemplate(), measure);
         }
     }
 
     @Override
-    public void updateTemplateFromMeasure(OutcomeMeasure measure) {
-        MetricTemplate template = getTemplateByCreator("measure", measure.getId().toString(), measure.getName());
-        if (template != null) {
-            saveTemplateFromMeasure(template, measure);
+    public Boolean updateFromMeasure(ExternalMeasure measure) {
+        MetricTemplate template = getByCreator(MetricTemplate.CreatorType.MEASURE, measure.getName());
+        if (template == null) {
+            return false;
+        } else {
+            return saveFromMeasure(template, measure);
         }
     }
 
     @Override
-    public void deleteTemplateFromMeasure(OutcomeMeasure measure) {
-        MetricTemplate template = getTemplateByCreator("measure", measure.getId().toString(), measure.getName());
-        if (template != null) {
+    public Boolean deleteFromMeasure(ExternalMeasure measure) {
+        MetricTemplate template = getByCreator(MetricTemplate.CreatorType.MEASURE, measure.getName());
+        if (template == null) {
+            return false;
+        } else {
             templateRepo.delete(template);
+            return true;
         }
     }
 
     @Override
-    public void createTemplateFromJob(Measure measure, String jobId, String jobName) {
-        List<MetricTemplate> templates = templateRepo.findByCreatorTypeAndAndCreatorId("job", jobId);
+    public Boolean createFromJob(Measure measure, String jobId, String jobName) {
+        List<MetricTemplate> templates = templateRepo.findByCreatorTypeAndCreatorId(MetricTemplate.CreatorType.JOB, jobId);
         if (templates.size() != 0) {
             LOGGER.error("Failed to create metric template from job {}, records already exist.", jobName);
+            return false;
         } else {
             MetricTemplate template = new MetricTemplate();
             template.setName(jobName);
-            template.setCreatorType("job");
+            template.setCreatorType(MetricTemplate.CreatorType.JOB);
             template.setCreatorId(jobId);
             template.setMetricName(jobName);
-            saveTemplate(template, measure);
+            return save(template, measure);
         }
     }
 
     @Override
-    public void deleteTemplateFromJob(String jobId, String jobName) {
-        MetricTemplate template = getTemplateByCreator("job", jobId, jobName);
-        if (template != null) {
+    public Boolean deleteFromJob(String jobId, String jobName) {
+        MetricTemplate template = getByCreator(MetricTemplate.CreatorType.JOB, jobId);
+        if (template == null) {
+            return false;
+        } else {
             templateRepo.delete(template);
+            return true;
         }
     }
 
-    private MetricTemplate getTemplateByCreator(String creatorType, String creatorId, String creatorName) {
-        List<MetricTemplate> templates = templateRepo.findByCreatorTypeAndAndCreatorId(creatorType, creatorId);
+    private MetricTemplate getByCreator(MetricTemplate.CreatorType creatorType, String creatorId) {
+        List<MetricTemplate> templates = templateRepo.findByCreatorTypeAndCreatorId(creatorType, creatorId);
         if (templates.size() == 0) {
-            LOGGER.error("Metric template created by {} {} doesn't exist", creatorType, creatorName);
+            LOGGER.error("Metric template created by {} {} doesn't exist", creatorType, creatorId);
             return null;
         } else {
             return templates.get(0);
         }
     }
 
-    private void saveTemplate(MetricTemplate template, Measure measure) {
+    private Boolean saveFromMeasure(MetricTemplate template, ExternalMeasure measure) {
+        template.setName(measure.getName());
+        template.setCreatorType(MetricTemplate.CreatorType.MEASURE);
+        template.setCreatorId(measure.getName());
+        template.setMetricName(measure.getMetricName());
+        return save(template, measure);
+    }
+
+    private Boolean save(MetricTemplate template, Measure measure) {
         template.setDescription(measure.getDescription());
         template.setOrganization(measure.getOrganization());
         template.setOwner(measure.getOwner());
         try {
-            templateRepo.save(template);
+            if (templateRepo.save(template) != null) {
+                return true;
+            }
         } catch (Exception e) {
             LOGGER.error("Failed to save metric template. {}", e.getMessage());
         }
-    }
-
-    private void saveTemplateFromMeasure(MetricTemplate template, OutcomeMeasure measure) {
-        template.setName(measure.getName());
-        template.setCreatorType("measure");
-        template.setCreatorId(measure.getId().toString());
-        template.setMetricName(measure.getMetricName());
-        saveTemplate(template, measure);
+        return false;
     }
 }

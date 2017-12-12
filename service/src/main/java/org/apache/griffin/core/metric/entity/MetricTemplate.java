@@ -5,6 +5,10 @@ import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
 import javax.persistence.Entity;
 
+/**
+ * The template to locate a metric, which contains all the message
+ * (except for the metric values) about a metric DTO.
+ */
 
 @Entity
 public class MetricTemplate extends AbstractAuditableEntity {
@@ -14,7 +18,7 @@ public class MetricTemplate extends AbstractAuditableEntity {
     private String description;
     private String organization;
     private String owner;
-    private String creatorType;
+    private CreatorType creatorType;
     private String creatorId;
     private String metricName;
 
@@ -22,7 +26,7 @@ public class MetricTemplate extends AbstractAuditableEntity {
     public MetricTemplate() {
     }
 
-    public MetricTemplate(String name, String description, String organization, String owner, String creatorType, String creatorId, String metricName) {
+    public MetricTemplate(String name, String description, String organization, String owner, CreatorType creatorType, String creatorId, String metricName) {
         this.name = name;
         this.description = description;
         this.organization = organization;
@@ -64,11 +68,11 @@ public class MetricTemplate extends AbstractAuditableEntity {
         this.owner = owner;
     }
 
-    public String getCreatorType() {
+    public CreatorType getCreatorType() {
         return creatorType;
     }
 
-    public void setCreatorType(String creatorType) {
+    public void setCreatorType(CreatorType creatorType) {
         this.creatorType = creatorType;
     }
 
@@ -86,5 +90,9 @@ public class MetricTemplate extends AbstractAuditableEntity {
 
     public void setMetricName(String metricName) {
         this.metricName = metricName;
+    }
+
+    public enum CreatorType{
+        MEASURE, JOB
     }
 }

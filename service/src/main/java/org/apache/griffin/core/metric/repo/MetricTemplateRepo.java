@@ -9,5 +9,5 @@ public interface MetricTemplateRepo extends CrudRepository<MetricTemplate, Long>
 
     List<MetricTemplate> findByMetricName(String metricName);
 
-    List<MetricTemplate> findByCreatorTypeAndAndCreatorId(String creatorType, String creatorId);
+    List<MetricTemplate> findByCreatorTypeAndCreatorId(MetricTemplate.CreatorType creatorType, String creatorId);
 }
