@@ -23,11 +23,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.error.exception.GriffinException.GetHealthInfoFailureException;
 import org.apache.griffin.core.error.exception.GriffinException.GetJobsFailureException;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.JobRequestBody;
-import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
+
+import org.apache.griffin.core.job.repo.JobScheduleRepo;
+import org.apache.griffin.core.measure.entity.DataConnector;
+import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.metric.MetricTemplateStore;
@@ -44,11 +45,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.*;
 
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
@@ -66,11 +70,13 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
-    private Properties sparkJobProps;
+    private Properties livyConfProps;
     @Autowired
     private MeasureRepo<GriffinMeasure> measureRepo;
     @Autowired
     private MetricTemplateStore metricTemplateStore;
+    @Autowired
+    private JobScheduleRepo jobScheduleRepo;
 
     private RestTemplate restTemplate;
 
@@ -105,7 +111,7 @@ public class JobServiceImpl implements JobService {
     private Map getJobInfoMap(Scheduler scheduler, JobKey jobKey) throws SchedulerException {
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         Map<String, Serializable> jobInfoMap = new HashMap<>();
-        if (triggers == null || triggers.size() == 0) {
+        if (CollectionUtils.isEmpty(triggers)) {
             return jobInfoMap;
         }
         JobDetail jd = scheduler.getJobDetail(jobKey);
@@ -138,99 +144,127 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public GriffinOperationMessage addJob(String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody) {
-        int interval;
-        Date jobStartTime;
-        try {
-            interval = Integer.parseInt(jobRequestBody.getInterval());
-            jobStartTime = new Date(Long.parseLong(jobRequestBody.getJobStartTime()));
-            setJobStartTime(jobStartTime, interval);
-
-            Scheduler scheduler = factory.getObject();
+    public GriffinOperationMessage addJob(JobSchedule jobSchedule) {
+        Scheduler scheduler = factory.getObject();
+        GriffinMeasure measure = isMeasureIdValid(jobSchedule.getMeasureId());
+        if (measure != null) {
+            List<String> names = getConnectorNames(measure);
+            List<JobDataSegment> segments = jobSchedule.getSegments();
+            if (!isBaseLineValid(segments) || !isConnectorNamesValid(segments, names)) {
+                return CREATE_JOB_FAIL;
+            }
+            String groupName = "BA";
+            String jobName = measure.getName() + "_" + groupName + "_" + System.currentTimeMillis();
             TriggerKey triggerKey = triggerKey(jobName, groupName);
-            if (scheduler.checkExists(triggerKey)) {
-                LOGGER.error("the triggerKey({},{})  has been used.", jobName, groupName);
+            if (!metricTemplateStore.createFromJob(measure, triggerKey.toString(), jobName)) {
                 return CREATE_JOB_FAIL;
             }
-
-            if (!isMeasureIdAvailable(measureId)) {
-                LOGGER.error("The measure id {} does't exist.", measureId);
-                return CREATE_JOB_FAIL;
+            try {
+                if (!scheduler.checkExists(triggerKey) && saveAndAddJob(scheduler, triggerKey, jobSchedule)) {
+                    return CREATE_JOB_SUCCESS;
+                }
+            } catch (Exception e) {
+                LOGGER.error("Add job exception happens.", e);
+                metricTemplateStore.deleteFromJob(triggerKey.toString(), jobName);
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             }
-            if (metricTemplateStore.createFromJob(measureRepo.findOne(measureId), triggerKey.toString(), jobName)) {
-                JobDetail jobDetail = addJobDetail(scheduler, groupName, jobName, measureId, jobRequestBody);
-                scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, jobStartTime));
-                return GriffinOperationMessage.CREATE_JOB_SUCCESS;
-            }
-        } catch (NumberFormatException e) {
-            LOGGER.info("jobStartTime or interval format error! {}", e.getMessage());
-        } catch (SchedulerException e) {
-            LOGGER.error("SchedulerException when add job. {}", e.getMessage());
-            metricTemplateStore.deleteFromJob(new JobKey(jobName, groupName).toString(), jobName);
         }
         return CREATE_JOB_FAIL;
     }
 
-    private Boolean isMeasureIdAvailable(long measureId) {
-        GriffinMeasure measure = measureRepo.findOne(measureId);
-        if (measure != null && !measure.getDeleted()) {
-            return true;
+    private boolean isBaseLineValid(List<JobDataSegment> segments) {
+        for (JobDataSegment jds : segments) {
+            if (jds.getBaseline()) {
+                return true;
+            }
         }
+        LOGGER.error("Please set segment timestamp baseline in as.baseline field.");
         return false;
     }
 
-    private JobDetail addJobDetail(Scheduler scheduler, String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody) throws SchedulerException {
-        JobKey jobKey = jobKey(jobName, groupName);
-        JobDetail jobDetail;
-        if (scheduler.checkExists(jobKey)) {
-            jobDetail = scheduler.getJobDetail(jobKey);
-            setJobData(jobDetail, jobRequestBody, measureId, groupName, jobName);
-            scheduler.addJob(jobDetail, true);
-        } else {
-            jobDetail = newJob(SparkSubmitJob.class)
-                    .storeDurably()
-                    .withIdentity(jobKey)
-                    .build();
-            //set JobData
-            setJobData(jobDetail, jobRequestBody, measureId, groupName, jobName);
-            scheduler.addJob(jobDetail, false);
+    private boolean isConnectorNamesValid(List<JobDataSegment> segments, List<String> names) {
+        for (JobDataSegment segment : segments) {
+            if (!isConnectorNameValid(segment.getDataConnectorName(), names)) {
+                return false;
+            }
         }
+        return true;
+    }
+
+    private boolean isConnectorNameValid(String param, List<String> names) {
+        for (String name : names) {
+            if (name.equals(param)) {
+                return true;
+            }
+        }
+        LOGGER.error("Param {} is a illegal string. Please input one of strings in {}", param, names);
+        return false;
+    }
+
+    private List<String> getConnectorNames(GriffinMeasure measure) {
+        List<String> names = new ArrayList<>();
+        List<DataSource> sources = measure.getDataSources();
+        for (DataSource source : sources) {
+            for (DataConnector dc : source.getConnectors()) {
+                names.add(dc.getName());
+            }
+        }
+        return names;
+    }
+
+    private String getConnectorIndex(DataSource source, int index) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(source.getName());
+        sb.append("[").append(index).append("]");
+        return sb.toString();
+    }
+
+    private GriffinMeasure isMeasureIdValid(long measureId) {
+        GriffinMeasure measure = measureRepo.findOne(measureId);
+        if (measure != null && !measure.getDeleted()) {
+            return measure;
+        }
+        LOGGER.error("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
+        return null;
+    }
+
+
+    private boolean saveAndAddJob(Scheduler scheduler, TriggerKey triggerKey, JobSchedule jobSchedule) throws SchedulerException, ParseException {
+        jobSchedule = jobScheduleRepo.save(jobSchedule);
+        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, jobSchedule);
+        scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, jobSchedule));
+        return true;
+    }
+
+
+    private Trigger newTriggerInstance(TriggerKey triggerKey, JobDetail jobDetail, JobSchedule jobSchedule) throws ParseException {
+        return newTrigger()
+                .withIdentity(triggerKey)
+                .forJob(jobDetail)
+                .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(jobSchedule.getCronExpression()))
+                        .inTimeZone(TimeZone.getTimeZone(jobSchedule.getTimeZone()))
+                )
+                .build();
+    }
+
+    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey, JobSchedule jobSchedule) throws SchedulerException {
+        JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
+        JobDetail jobDetail;
+        Boolean isJobKeyExist = scheduler.checkExists(jobKey);
+        if (isJobKeyExist) {
+            jobDetail = scheduler.getJobDetail(jobKey);
+        } else {
+            jobDetail = newJob(JobInstance.class).storeDurably().withIdentity(jobKey).build();
+        }
+        setJobDataMap(jobDetail, jobSchedule);
+        scheduler.addJob(jobDetail, isJobKeyExist);
         return jobDetail;
     }
 
-    private Trigger newTriggerInstance(TriggerKey triggerKey, JobDetail jobDetail, int interval, Date jobStartTime) throws SchedulerException {
-        Trigger trigger = newTrigger()
-                .withIdentity(triggerKey)
-                .forJob(jobDetail)
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .withIntervalInSeconds(interval)
-                        .repeatForever())
-                .startAt(jobStartTime)
-                .build();
-        return trigger;
-    }
 
-    private void setJobStartTime(Date jobStartTime, int interval) {
-        long currentTimestamp = System.currentTimeMillis();
-        long jobStartTimestamp = jobStartTime.getTime();
-        //if jobStartTime is before currentTimestamp, reset it with a future time
-        if (jobStartTime.before(new Date(currentTimestamp))) {
-            long n = (currentTimestamp - jobStartTimestamp) / (long) (interval * 1000);
-            jobStartTimestamp = jobStartTimestamp + (n + 1) * (long) (interval * 1000);
-            jobStartTime.setTime(jobStartTimestamp);
-        }
-    }
-
-    private void setJobData(JobDetail jobDetail, JobRequestBody jobRequestBody, Long measureId, String groupName, String jobName) {
-        jobDetail.getJobDataMap().put("groupName", groupName);
-        jobDetail.getJobDataMap().put("jobName", jobName);
-        jobDetail.getJobDataMap().put("measureId", measureId.toString());
-        jobDetail.getJobDataMap().put("sourcePattern", jobRequestBody.getSourcePattern());
-        jobDetail.getJobDataMap().put("targetPattern", jobRequestBody.getTargetPattern());
-        jobDetail.getJobDataMap().put("blockStartTimestamp", jobRequestBody.getBlockStartTimestamp());
-        jobDetail.getJobDataMap().put("jobStartTime", jobRequestBody.getJobStartTime());
-        jobDetail.getJobDataMap().put("interval", jobRequestBody.getInterval());
-        jobDetail.getJobDataMap().put("lastBlockStartTimestamp", "");
+    private void setJobDataMap(JobDetail jobDetail, JobSchedule jobSchedule) {
+        jobDetail.getJobDataMap().put("measureId", jobSchedule.getMeasureId().toString());
+        jobDetail.getJobDataMap().put("jobScheduleId", jobSchedule.getId().toString());
         jobDetail.getJobDataMap().putAsString("deleted", false);
     }
 
@@ -293,7 +327,8 @@ public class JobServiceImpl implements JobService {
         for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             JobDataMap jobDataMap = jobDetail.getJobDataMap();
-            if (jobDataMap.getString("measureId").equals(measure.getId().toString())) {
+            String measureId = jobDataMap.getString("measureId");
+            if (measureId != null && measureId.equals(measure.getId().toString())) {
                 //select jobs related to measureId
                 deleteJob(jobKey.getGroup(), jobKey.getName());
                 LOGGER.info("{} {} is paused and logically deleted.", jobKey.getGroup(), jobKey.getName());
@@ -302,7 +337,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobInstance> findInstancesOfJob(String group, String jobName, int page, int size) {
+    public List<JobInstanceBean> findInstancesOfJob(String group, String jobName, int page, int size) {
         try {
             Scheduler scheduler = factory.getObject();
             JobKey jobKey = new JobKey(jobName, group);
@@ -320,7 +355,10 @@ public class JobServiceImpl implements JobService {
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void syncInstancesOfAllJobs() {
-        List<Object> groupJobList = jobInstanceRepo.findGroupWithJobName();
+        List<Object> groupJobList = jobInstanceRepo.findGroupAndJobNameWithState();
+        if (groupJobList == null) {
+            return;
+        }
         for (Object groupJobObj : groupJobList) {
             try {
                 Object[] groupJob = (Object[]) groupJobObj;
@@ -341,17 +379,17 @@ public class JobServiceImpl implements JobService {
      */
     private void syncInstancesOfJob(String group, String jobName) {
         //update all instance info belongs to this group and job.
-        List<JobInstance> jobInstanceList = jobInstanceRepo.findByGroupNameAndJobName(group, jobName);
-        for (JobInstance jobInstance : jobInstanceList) {
+        List<JobInstanceBean> jobInstanceList = jobInstanceRepo.findByGroupNameAndJobName(group, jobName);
+        for (JobInstanceBean jobInstance : jobInstanceList) {
             if (LivySessionStates.isActive(jobInstance.getState())) {
-                String uri = sparkJobProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
+                String uri = livyConfProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
                 setJobInstanceInfo(jobInstance, uri, group, jobName);
             }
 
         }
     }
 
-    private void setJobInstanceInfo(JobInstance jobInstance, String uri, String group, String jobName) {
+    private void setJobInstanceInfo(JobInstanceBean jobInstance, String uri, String group, String jobName) {
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         try {
@@ -368,19 +406,19 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    private void setJobInstanceIdAndUri(JobInstance jobInstance, HashMap<String, Object> resultMap) throws IllegalArgumentException {
+    private void setJobInstanceIdAndUri(JobInstanceBean jobInstance, HashMap<String, Object> resultMap) throws IllegalArgumentException {
         if (resultMap != null && resultMap.size() != 0 && resultMap.get("state") != null) {
             jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
             if (resultMap.get("appId") != null) {
                 jobInstance.setAppId(resultMap.get("appId").toString());
-                jobInstance.setAppUri(sparkJobProps.getProperty("spark.uri") + "/cluster/app/" + resultMap.get("appId").toString());
+                jobInstance.setAppUri(livyConfProps.getProperty("spark.uri") + "/cluster/app/" + resultMap.get("appId").toString());
             }
             jobInstanceRepo.save(jobInstance);
         }
 
     }
 
-    private void setJobInstanceUnknownStatus(JobInstance jobInstance) {
+    private void setJobInstanceUnknownStatus(JobInstanceBean jobInstance) {
         //if server cannot get session from Livy, set State as unknown.
         jobInstance.setState(LivySessionStates.State.unknown);
         jobInstanceRepo.save(jobInstance);
@@ -421,8 +459,8 @@ public class JobServiceImpl implements JobService {
 
     private Boolean isJobHealthy(JobKey jobKey) {
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
-        JobInstance latestJobInstance;
-        List<JobInstance> jobInstances = jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(), jobKey.getName(), pageRequest);
+        JobInstanceBean latestJobInstance;
+        List<JobInstanceBean> jobInstances = jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(), jobKey.getName(), pageRequest);
         if (jobInstances != null && jobInstances.size() > 0) {
             latestJobInstance = jobInstances.get(0);
             if (LivySessionStates.isHealthy(latestJobInstance.getState())) {

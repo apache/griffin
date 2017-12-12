@@ -23,7 +23,6 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.URLHelper;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.*;
 
-import static org.apache.griffin.core.measure.MeasureTestHelper.createATestMeasure;
+import static org.apache.griffin.core.measure.MeasureTestHelper.createATestGriffinMeasure;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -60,7 +59,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testGetAllMeasures() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "test");
+        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
         given(service.getAllAliveMeasures()).willReturn(Arrays.asList(measure));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures").contentType(MediaType.APPLICATION_JSON))
@@ -71,7 +70,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testGetMeasuresById() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "test");
+        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
         given(service.getMeasureById(1L)).willReturn(measure);
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measure/1").contentType(MediaType.APPLICATION_JSON))
@@ -112,7 +111,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForSuccess() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "test");
+        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
         String measureJson = JsonUtil.toJson(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_SUCCESS);
 
@@ -124,7 +123,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForNotFound() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "test");
+        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
         String measureJson = JsonUtil.toJson(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.RESOURCE_NOT_FOUND);
 
@@ -137,7 +136,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForFail() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "test");
+        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
         String measureJson = JsonUtil.toJson(measure);
         given(service.updateMeasure(measure)).willReturn(GriffinOperationMessage.UPDATE_MEASURE_FAIL);
 
@@ -151,7 +150,7 @@ public class MeasureControllerTest {
     public void testGetAllMeasuresByOwner() throws Exception {
         String owner = "test";
         List<Measure> measureList = new LinkedList<>();
-        Measure measure = createATestMeasure("view_item_hourly", owner);
+        Measure measure = createATestGriffinMeasure("view_item_hourly", owner);
         measureList.add(measure);
         given(service.getAliveMeasuresByOwner(owner)).willReturn(measureList);
 
@@ -163,7 +162,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForSuccess() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "test");
+        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
         String measureJson = JsonUtil.toJson(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_SUCCESS);
 
@@ -175,7 +174,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "test");
+        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
         String measureJson = JsonUtil.toJson(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE);
 
@@ -187,7 +186,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForFailWithSaveException() throws Exception {
-        Measure measure = createATestMeasure("view_item_hourly", "test");
+        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
         String measureJson = JsonUtil.toJson(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL);
 

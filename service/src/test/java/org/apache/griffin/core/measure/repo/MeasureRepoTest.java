@@ -30,7 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-import static org.apache.griffin.core.measure.MeasureTestHelper.createATestMeasure;
+import static org.apache.griffin.core.measure.MeasureTestHelper.createATestGriffinMeasure;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -73,13 +73,13 @@ public class MeasureRepoTest {
 
 
     public void setEntityManager() throws Exception {
-        Measure measure = createATestMeasure("m1", "org1");
+        Measure measure = createATestGriffinMeasure("m1", "org1");
         entityManager.persistAndFlush(measure);
 
-        Measure measure2 = createATestMeasure("m2", "org2");
+        Measure measure2 = createATestGriffinMeasure("m2", "org2");
         entityManager.persistAndFlush(measure2);
 
-        Measure measure3 = createATestMeasure("m3", "org3");
+        Measure measure3 = createATestGriffinMeasure("m3", "org3");
         entityManager.persistAndFlush(measure3);
     }
 }

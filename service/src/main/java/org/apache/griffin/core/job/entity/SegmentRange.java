@@ -17,19 +17,37 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+
+package org.apache.griffin.core.job.entity;
+
+import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
+@Entity
+public class SegmentRange extends AbstractAuditableEntity {
+
+    @Column(name = "data_begin")
+    private String begin = "1h";
+
+    private String length = "1h";
 
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+    public String getBegin() {
+        return begin;
+    }
 
-import java.util.List;
+    public void setBegin(String begin) {
+        this.begin = begin;
+    }
 
-@Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
+    public String getLength() {
+        return length;
+    }
 
-    @Query("select dc from DataConnector dc where name in ?1")
-    List<DataConnector> findByConnectorNames(List<String> names);
+    public void setLength(String length) {
+        this.length = length;
+    }
+
 }

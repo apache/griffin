@@ -52,11 +52,5 @@ public class MetricServiceImplTest {
     public void setup() {
     }
 
-    @Test
-    public void testGetOrgByMeasureName() {
-        String measureName = "default";
-        String org = "test";
-        given(measureRepo.findOrgByName("default")).willReturn(org);
-        assertEquals(service.getOrgByMeasureName(measureName), org);
-    }
+
 }

@@ -20,12 +20,12 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.URLHelper;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,17 +76,12 @@ public class JobControllerTest {
 
     @Test
     public void testAddJobForSuccess() throws Exception {
-        String groupName = "BA";
-        String jobName = "job1";
-        long measureId = 0;
-        JobRequestBody jobRequestBody = new JobRequestBody("YYYYMMdd-HH", "YYYYMMdd-HH", "111", "20170607", "100");
-        String schedulerRequestBodyJson = new ObjectMapper().writeValueAsString(jobRequestBody);
-        given(service.addJob(groupName, jobName, measureId, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS);
+        JobSchedule jobSchedule = new JobSchedule(1L, "0 0/4 * * * ?", null,null);
+        given(service.addJob(jobSchedule)).willReturn(GriffinOperationMessage.CREATE_JOB_SUCCESS);
 
-        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs").param("group", groupName).param("jobName", jobName)
-                .param("measureId", String.valueOf(measureId))
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(schedulerRequestBodyJson))
+                .content("{\"measure.id\": 1,\"cron.expression\": \"0 0/4 * * * ?\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(205)))
                 .andExpect(jsonPath("$.description", is("Create Job Succeed")))
@@ -95,17 +90,15 @@ public class JobControllerTest {
 
     @Test
     public void testAddJobForFail() throws Exception {
-        String groupName = "BA";
-        String jobName = "job1";
-        long measureId = 0;
-        JobRequestBody jobRequestBody = new JobRequestBody("YYYYMMdd-HH", "YYYYMMdd-HH", "111", "20170607", "100");
-        String schedulerRequestBodyJson = new ObjectMapper().writeValueAsString(jobRequestBody);
-        given(service.addJob(groupName, jobName, measureId, jobRequestBody)).willReturn(GriffinOperationMessage.CREATE_JOB_FAIL);
+        Map configMap = new HashMap();
+        configMap.put("interval", "1m");
+        configMap.put("repeat", "2");
+        JobSchedule jobSchedule = new JobSchedule(1L, "0 0/4 * * * ?", configMap,null);
+        given(service.addJob(jobSchedule)).willReturn(GriffinOperationMessage.CREATE_JOB_FAIL);
 
-        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs").param("group", groupName).param("jobName", jobName)
-                .param("measureId", String.valueOf(measureId))
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(schedulerRequestBodyJson))
+                .content(JsonUtil.toJson(jobSchedule)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(405)))
                 .andExpect(jsonPath("$.description", is("Create Job Failed")))
@@ -142,7 +135,7 @@ public class JobControllerTest {
         String jobName = "job1";
         int page = 0;
         int size = 2;
-        JobInstance jobInstance = new JobInstance(groupName, jobName, 1, LivySessionStates.State.running, "", "", System.currentTimeMillis());
+        JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.running, "", "", System.currentTimeMillis());
         given(service.findInstancesOfJob(groupName, jobName, page, size)).willReturn(Arrays.asList(jobInstance));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param("group", groupName).param("jobName", jobName)

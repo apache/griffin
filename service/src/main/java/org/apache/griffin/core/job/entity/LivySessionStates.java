@@ -41,7 +41,10 @@ public class LivySessionStates {
         unknown
     }
 
-    public static SessionState toSessionState(State state) {
+    private static SessionState toSessionState(State state) {
+        if (state == null) {
+            return null;
+        }
         switch (state) {
             case not_started:
                 return new SessionState.NotStarted();
@@ -70,21 +73,14 @@ public class LivySessionStates {
 
     public static boolean isActive(State state) {
         if (State.unknown.equals(state)) {
-            // set unknown isactive() as false.
+            // set unknown isActive() as false.
             return false;
         }
         SessionState sessionState = toSessionState(state);
-        if (sessionState == null) {
-            return false;
-        } else {
-            return sessionState.isActive();
-        }
+        return sessionState != null && sessionState.isActive();
     }
 
     public static boolean isHealthy(State state) {
-        if (State.error.equals(state) || State.dead.equals(state) || State.shutting_down.equals(state)) {
-            return false;
-        }
-        return true;
+        return !(State.error.equals(state) || State.dead.equals(state) || State.shutting_down.equals(state));
     }
 }

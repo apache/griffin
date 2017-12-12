@@ -17,19 +17,13 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.core.job.repo;
 
-
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.jpa.repository.Query;
+import org.apache.griffin.core.job.entity.JobSchedule;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
+public interface JobScheduleRepo extends CrudRepository<JobSchedule,Long>{
 
-    @Query("select dc from DataConnector dc where name in ?1")
-    List<DataConnector> findByConnectorNames(List<String> names);
 }

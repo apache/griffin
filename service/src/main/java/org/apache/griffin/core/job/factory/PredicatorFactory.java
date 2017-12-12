@@ -17,19 +17,22 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.core.job.factory;
 
+import org.apache.griffin.core.job.FileExistPredicator;
+import org.apache.griffin.core.job.Predicator;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-
-@Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
-
-    @Query("select dc from DataConnector dc where name in ?1")
-    List<DataConnector> findByConnectorNames(List<String> names);
+public class PredicatorFactory {
+    public static Predicator newPredicateInstance(SegmentPredicate segPredicate) {
+        Predicator predicate = null;
+        switch (segPredicate.getType()) {
+            case "file.exist":
+                predicate = new FileExistPredicator(segPredicate);
+                break;
+            default:
+                break;
+        }
+        return predicate;
+    }
 }

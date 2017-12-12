@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.JobInstance;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.junit.Before;
@@ -58,22 +58,22 @@ public class JobInstanceRepoTest {
     @Test
     public void testFindByGroupNameAndJobNameWithPageable() {
         Pageable pageRequest = new PageRequest(0, 10, Sort.Direction.DESC, "timestamp");
-        List<JobInstance> instances = jobInstanceRepo.findByGroupNameAndJobName("BA", "job3", pageRequest);
+        List<JobInstanceBean> instances = jobInstanceRepo.findByGroupNameAndJobName("BA", "job3", pageRequest);
         assertThat(instances.size()).isEqualTo(1);
         assertEquals(instances.get(0).getAppId(), "appId3");
     }
 
     @Test
     public void testFindByGroupNameAndJobName() {
-        List<JobInstance> instances = jobInstanceRepo.findByGroupNameAndJobName("BA", "job1");
+        List<JobInstanceBean> instances = jobInstanceRepo.findByGroupNameAndJobName("BA", "job1");
         assertThat(instances.size()).isEqualTo(1);
         assertEquals(instances.get(0).getAppId(), "appId1");
     }
 
     @Test
     public void testFindGroupWithJobName() {
-        List<Object> list = jobInstanceRepo.findGroupWithJobName();
-        assertThat(list.size()).isEqualTo(3);
+        List<Object> list = jobInstanceRepo.findGroupAndJobNameWithState();
+        assertThat(list.size()).isEqualTo(1);
     }
 
     @Test
@@ -85,20 +85,20 @@ public class JobInstanceRepoTest {
     @Test
     public void testUpdate() {
         Iterable iterable = jobInstanceRepo.findAll();
-        JobInstance instance = (JobInstance) iterable.iterator().next();
+        JobInstanceBean instance = (JobInstanceBean) iterable.iterator().next();
         jobInstanceRepo.update(instance.getId(), LivySessionStates.State.dead, "appIdChanged", "appUriChanged");
-        //you must refresh updated JobInstance, otherwise there will not update.
+        //you must refresh updated JobInstanceBean, otherwise there will not update.
         entityManager.refresh(jobInstanceRepo.findOne(instance.getId()));
         assertEquals(jobInstanceRepo.findOne(instance.getId()).getState(), LivySessionStates.State.dead);
     }
 
 
     private void setEntityManager() {
-        JobInstance instance1 = new JobInstance("BA", "job1", 0, LivySessionStates.State.success,
+        JobInstanceBean instance1 = new JobInstanceBean("BA", "job1", 0, LivySessionStates.State.success,
                 "appId1", "http://domain.com/uri1", System.currentTimeMillis());
-        JobInstance instance2 = new JobInstance("BA", "job2", 1, LivySessionStates.State.error,
+        JobInstanceBean instance2 = new JobInstanceBean("BA", "job2", 1, LivySessionStates.State.error,
                 "appId2", "http://domain.com/uri2", System.currentTimeMillis());
-        JobInstance instance3 = new JobInstance("BA", "job3", 2, LivySessionStates.State.starting,
+        JobInstanceBean instance3 = new JobInstanceBean("BA", "job3", 2, LivySessionStates.State.starting,
                 "appId3", "http://domain.com/uri3", System.currentTimeMillis());
         entityManager.persistAndFlush(instance1);
         entityManager.persistAndFlush(instance2);

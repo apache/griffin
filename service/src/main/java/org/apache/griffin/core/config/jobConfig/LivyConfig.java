@@ -17,19 +17,18 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure.repo;
+package org.apache.griffin.core.config.jobConfig;
 
+import org.apache.griffin.core.util.PropertiesUtil;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Properties;
 
-import java.util.List;
-
-@Repository
-public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
-
-    @Query("select dc from DataConnector dc where name in ?1")
-    List<DataConnector> findByConnectorNames(List<String> names);
+@Configuration
+public class LivyConfig {
+    @Bean(name = "livyConfProps")
+    public Properties livyConfProperties() {
+        return PropertiesUtil.getProperties("/sparkJob.properties");
+    }
 }
