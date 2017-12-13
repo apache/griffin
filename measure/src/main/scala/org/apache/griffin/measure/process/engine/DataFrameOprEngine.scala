@@ -35,6 +35,8 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.griffin.measure.utils.ParamUtil._
 
+import scala.util.Try
+
 case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {

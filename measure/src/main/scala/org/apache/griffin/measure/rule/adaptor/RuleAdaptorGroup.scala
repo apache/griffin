@@ -22,7 +22,7 @@ import org.apache.griffin.measure.cache.tmst.TempName
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.process.ProcessType
-import org.apache.griffin.measure.process.check.DataChecker
+import org.apache.griffin.measure.process.temp.TempTableValidator
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.step._
 import org.apache.spark.sql.SQLContext
@@ -34,21 +34,21 @@ object RuleAdaptorGroup {
 //  val _dslType = "dsl.type"
   import RuleInfoKeys._
 
-  var dataSourceNames: Seq[String] = _
-  var functionNames: Seq[String] = _
+  var dataSourceNames: Seq[String] = Nil
+  var functionNames: Seq[String] = Nil
 
   var baselineDsName: String = ""
 
-  var dataChecker: DataChecker = _
+  var dataChecker: TempTableValidator = _
 
   def init(sqlContext: SQLContext, dsNames: Seq[String], blDsName: String): Unit = {
     val functions = sqlContext.sql("show functions")
-    functionNames = functions.map(_.getString(0)).collect
+    functionNames = functions.map(_.getString(0)).collect.toSeq
     dataSourceNames = dsNames
 
     baselineDsName = blDsName
 
-    dataChecker = DataChecker(sqlContext)
+    dataChecker = TempTableValidator(sqlContext)
   }
 
   private def getDslType(param: Map[String, Any], defDslType: DslType) = {
@@ -127,7 +127,7 @@ object RuleAdaptorGroup {
                   ): Seq[ConcreteRuleStep] = {
     tmsts.flatMap { tmst =>
       val newTimeInfo = TimeInfo(timeInfo.calcTime, tmst)
-      val initSteps = adapthase match {
+      val initSteps: Seq[ConcreteRuleStep] = adapthase match {
         case RunPhase => genTmstInitStep(newTimeInfo)
         case PreProcPhase => Nil
       }
@@ -137,11 +137,12 @@ object RuleAdaptorGroup {
         val (curSteps, curNames) = genRuleAdaptor(dslType, preNames) match {
           case Some(ruleAdaptor) => {
             val concreteSteps = ruleAdaptor.genConcreteRuleStep(newTimeInfo, param)
-            (concreteSteps, preNames ++ ruleAdaptor.getPersistNames(concreteSteps))
+            val persistNames = ruleAdaptor.getPersistNames(concreteSteps)
+            (concreteSteps, persistNames)
           }
-          case _ => (Nil, preNames)
+          case _ => (Nil, Nil)
         }
-        (preSteps ++ curSteps, curNames)
+        (preSteps ++ curSteps, preNames ++ curNames)
       }
       steps
     }

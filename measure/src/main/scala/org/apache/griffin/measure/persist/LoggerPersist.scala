@@ -125,7 +125,7 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
       val maxCount = count.toInt
       if (maxCount > 0) {
         val recDf = df.limit(maxCount)
-        val recordsArray = recDf.collect()
+        val recordsArray = recDf.toJSON.collect()
         recordsArray.foreach(println)
       }
     } catch {

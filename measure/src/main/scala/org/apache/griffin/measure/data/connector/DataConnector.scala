@@ -80,7 +80,7 @@ trait DataConnector extends Loggable with Serializable {
         dqEngines.runRuleSteps(ruleSteps)
 
         // out data
-        val outDf = sqlContext.table(thisTable)
+        val outDf = sqlContext.table(s"`${thisTable}`")
 
         // drop temp table
         names.foreach { name =>

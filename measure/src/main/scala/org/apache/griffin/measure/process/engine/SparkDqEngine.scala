@@ -45,27 +45,32 @@ trait SparkDqEngine extends DqEngine {
                 val pdf = sqlContext.table(s"`${metricTmstName}`")
                 val records: Array[String] = pdf.toJSON.collect()
 
-                val flatRecords = records.flatMap { rec =>
-                  try {
-                    val value = JsonUtil.toAnyMap(rec)
-                    Some(value)
-                  } catch {
-                    case e: Throwable => None
+                if (records.size > 0) {
+                  val flatRecords = records.flatMap { rec =>
+                    try {
+                      val value = JsonUtil.toAnyMap(rec)
+                      Some(value)
+                    } catch {
+                      case e: Throwable => None
+                    }
+                  }.toSeq
+                  val metrics = step.ruleInfo.collectType match {
+                    case EntriesCollectType => flatRecords.headOption.getOrElse(emptyMap)
+                    case ArrayCollectType => Map[String, Any]((metricName -> flatRecords))
+                    case MapCollectType => {
+                      val v = flatRecords.headOption.getOrElse(emptyMap)
+                      Map[String, Any]((metricName -> v))
+                    }
+                    case _ => {
+                      if (flatRecords.size > 1) Map[String, Any]((metricName -> flatRecords))
+                      else flatRecords.headOption.getOrElse(emptyMap)
+                    }
                   }
-                }.toSeq
-                val metrics = step.ruleInfo.collectType match {
-                  case EntriesCollectType => flatRecords.headOption.getOrElse(emptyMap)
-                  case ArrayCollectType => Map[String, Any]((metricName -> flatRecords))
-                  case MapCollectType => {
-                    val v = flatRecords.headOption.getOrElse(emptyMap)
-                    Map[String, Any]((metricName -> v))
-                  }
-                  case _ => {
-                    if (flatRecords.size > 1) Map[String, Any]((metricName -> flatRecords))
-                    else flatRecords.headOption.getOrElse(emptyMap)
-                  }
+                  Some((tmst, metrics))
+                } else {
+                  println(s"empty metrics in table `${metricTmstName}`, not persisted")
+                  None
                 }
-                Some((tmst, metrics))
               } catch {
                 case e: Throwable => {
                   error(s"collect metrics ${metricTmstName} error: ${e.getMessage}")

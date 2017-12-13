@@ -41,86 +41,87 @@ case class StreamingDqThread(dqEngines: DqEngines,
   val lock = InfoCacheInstance.genLock("process")
 
   def run(): Unit = {
-//    val updateTimeDate = new Date()
-//    val updateTime = updateTimeDate.getTime
-//    println(s"===== [${updateTimeDate}] process begins =====")
-//    val locked = lock.lock(5, TimeUnit.SECONDS)
-//    if (locked) {
-//      try {
-//
-//        val st = new Date().getTime
-//        appPersist.log(st, s"starting process ...")
-//
-//        TimeInfoCache.startTimeInfoCache
-//
-//        // init data sources
-//        val dsTmsts = dqEngines.loadData(dataSources, st)
-//
-//        warn(s"data sources timestamps: ${dsTmsts}")
-//
-//        // generate rule steps
-//        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
-//          TimeInfo(st, st), evaluateRuleParam, dsTmsts, StreamingProcessType, RunPhase)
-//
-//        // run rules
-//        dqEngines.runRuleSteps(ruleSteps)
-//
-//        val ct = new Date().getTime
-//        val calculationTimeStr = s"calculation using time: ${ct - st} ms"
+    val updateTimeDate = new Date()
+    val updateTime = updateTimeDate.getTime
+    println(s"===== [${updateTimeDate}] process begins =====")
+    val locked = lock.lock(5, TimeUnit.SECONDS)
+    if (locked) {
+      try {
+
+        val st = new Date().getTime
+        appPersist.log(st, s"starting process ...")
+
+        TimeInfoCache.startTimeInfoCache
+
+        // init data sources
+        val dsTmsts = dqEngines.loadData(dataSources, st)
+
+        println(s"data sources timestamps: ${dsTmsts}")
+
+        // generate rule steps
+        val ruleSteps = RuleAdaptorGroup.genRuleSteps(
+          TimeInfo(st, st), evaluateRuleParam, dsTmsts)
+
+        // run rules
+        dqEngines.runRuleSteps(ruleSteps)
+
+        val ct = new Date().getTime
+        val calculationTimeStr = s"calculation using time: ${ct - st} ms"
 //        println(calculationTimeStr)
-//        appPersist.log(ct, calculationTimeStr)
-//
-//        // persist results
-//        val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
-//
-//        val rt = new Date().getTime
-//        val persistResultTimeStr = s"persist result using time: ${rt - ct} ms"
+        appPersist.log(ct, calculationTimeStr)
+
+        // persist results
+        val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
+        println(s"--- timeGroups: ${timeGroups}")
+
+        val rt = new Date().getTime
+        val persistResultTimeStr = s"persist result using time: ${rt - ct} ms"
 //        println(persistResultTimeStr)
-//        appPersist.log(rt, persistResultTimeStr)
-//
-//        val rdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
-//        rdds.foreach(_._2.cache())
-//        rdds.foreach { pr =>
-//          val (step, rdd) = pr
-//          val cnt = rdd.count
-//          println(s"step [${step.name}] group count: ${cnt}")
-//        }
-//
-//        val lt = new Date().getTime
-//        val collectRddTimeStr = s"collect records using time: ${lt - rt} ms"
+        appPersist.log(rt, persistResultTimeStr)
+
+        val dfs = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups.toSet)
+        dfs.foreach(_._2.cache())
+        dfs.foreach { pr =>
+          val (step, df) = pr
+          val cnt = df.count
+          println(s"step [${step.name}] group count: ${cnt}")
+        }
+
+        val lt = new Date().getTime
+        val collectRddTimeStr = s"collect records using time: ${lt - rt} ms"
 //        println(collectRddTimeStr)
-//        appPersist.log(lt, collectRddTimeStr)
-//
-//        // persist records
-//        dqEngines.persistAllRecords(rdds, persistFactory)
-////        dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
-//
-//        // update data source
-//        dqEngines.updateDataSources(rdds, dataSources)
-////        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
-//
-//        rdds.foreach(_._2.unpersist())
-//
-//        TimeInfoCache.endTimeInfoCache
-//
-//        // clean old data
-//        cleanData(st)
-//
-//        val et = new Date().getTime
-//        val persistTimeStr = s"persist records using time: ${et - lt} ms"
+        appPersist.log(lt, collectRddTimeStr)
+
+        // persist records
+        dqEngines.persistAllRecords(dfs, persistFactory)
+//        dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
+
+        // update data source
+        dqEngines.updateDataSources(dfs, dataSources)
+//        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
+
+        dfs.foreach(_._2.unpersist())
+
+        TimeInfoCache.endTimeInfoCache
+
+        // clean old data
+        cleanData(st)
+
+        val et = new Date().getTime
+        val persistTimeStr = s"persist records using time: ${et - lt} ms"
 //        println(persistTimeStr)
-//        appPersist.log(et, persistTimeStr)
-//
-//      } catch {
-//        case e: Throwable => error(s"process error: ${e.getMessage}")
-//      } finally {
-//        lock.unlock()
-//      }
-//    } else {
-//      println(s"===== [${updateTimeDate}] process ignores =====")
-//    }
-//    val endTime = new Date().getTime
-//    println(s"===== [${updateTimeDate}] process ends, using ${endTime - updateTime} ms =====")
+        appPersist.log(et, persistTimeStr)
+
+      } catch {
+        case e: Throwable => error(s"process error: ${e.getMessage}")
+      } finally {
+        lock.unlock()
+      }
+    } else {
+      println(s"===== [${updateTimeDate}] process ignores =====")
+    }
+    val endTime = new Date().getTime
+    println(s"===== [${updateTimeDate}] process ends, using ${endTime - updateTime} ms =====")
   }
 
   // clean old data and old result cache

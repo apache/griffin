@@ -16,14 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.process.check
+package org.apache.griffin.measure.process.temp
 
 import org.apache.spark.sql.SQLContext
 
-case class DataChecker(sqlContext: SQLContext) {
+case class TempTableValidator(sqlContext: SQLContext) {
 
   def existDataSourceName(name: String): Boolean = {
-    sqlContext.tableNames.exists(_ == name)
+//    sqlContext.tableNames.exists(_ == name)
+
+    TempTables.existTable(name)
   }
 
 }

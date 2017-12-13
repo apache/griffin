@@ -49,7 +49,7 @@ case class DataSource(sqlContext: SQLContext,
 
   def loadData(ms: Long): Set[Long] = {
     val tmstName = TempName.tmstName(name, ms)
-    println(s"load data ${name}")
+    println(s"load data [${name}] (${tmstName})")
     val (dfOpt, tmsts) = data(ms)
     dfOpt match {
       case Some(df) => {
@@ -60,7 +60,7 @@ case class DataSource(sqlContext: SQLContext,
 //        val df = sqlContext.emptyDataFrame
 //        df.registerTempTable(name)
 //        warn(s"load data source [${name}] fails")
-        warn(s"load data source [${name}] fails")
+        warn(s"load data source [${name}] (${tmstName}) fails")
 //        throw new Exception(s"load data source [${name}] fails")
       }
     }
@@ -68,11 +68,11 @@ case class DataSource(sqlContext: SQLContext,
   }
 
   def dropTable(ms: Long): Unit = {
+    val tmstName = TempName.tmstName(name, ms)
     try {
-      val tmstName = TempName.tmstName(name, ms)
-      sqlContext.dropTempTable(tmstName)
+      sqlContext.dropTempTable(s"`${tmstName}`")
     } catch {
-      case e: Throwable => warn(s"drop table [${name}] fails")
+      case e: Throwable => warn(s"drop table [${name}] (${tmstName}) fails")
     }
   }
 

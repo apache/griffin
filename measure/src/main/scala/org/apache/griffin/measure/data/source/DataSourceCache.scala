@@ -38,6 +38,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
 
   var tmstCache: TmstCache = _
   protected def rangeTmsts(from: Long, until: Long) = tmstCache.range(from, until)
+  protected def clearTmst(t: Long) = tmstCache.remove(t)
   protected def clearTmstsUntil(until: Long) = {
     val outDateTmsts = tmstCache.until(until)
     tmstCache.remove(outDateTmsts)
@@ -170,10 +171,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       println(s"remove file path: ${dirPath}/${dataFileName}")
 
       // save updated data
-      val dumped = if (needSave) {
+      if (needSave) {
         HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
         println(s"update file path: ${dataFilePath}")
-      } else false
+      } else {
+        clearTmst(ms)
+        println(s"clear data source timestamp: ${ms}")
+      }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
     }
@@ -250,6 +254,8 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         val cleanTime = readCleanTime()
         cleanTime match {
           case Some(ct) => {
+            println(s"clear timestamps before ${ct}")
+
             // clear out date tmsts
             clearTmstsUntil(ct)
 
