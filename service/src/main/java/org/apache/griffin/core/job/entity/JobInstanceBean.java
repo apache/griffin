@@ -22,7 +22,10 @@ package org.apache.griffin.core.job.entity;
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Entity
 public class JobInstanceBean extends AbstractAuditableEntity {
@@ -35,8 +38,8 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @Enumerated(EnumType.STRING)
     private State state;
     private String appId;
-    @Lob
-    @Column(length = 1024)
+
+    @Column(length = 10 * 1024)
     private String appUri;
     private long timestamp;
 

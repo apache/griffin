@@ -40,7 +40,7 @@ public class Rule extends AbstractAuditableEntity {
 
     private String dqType;
 
-    @Column(length = 1024*10)
+    @Column(length = 10 * 1024)
     private String rule;
 
     @JsonIgnore
@@ -51,6 +51,7 @@ public class Rule extends AbstractAuditableEntity {
 
     @JsonIgnore
     @Access(AccessType.PROPERTY)
+    @Column(length = 10 * 1024)
     private String details;
 
     @Transient
