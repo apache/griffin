@@ -28,10 +28,14 @@ import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
+import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.spark.sql.SQLContext
 
-case class StreamingDqThread(dqEngines: DqEngines,
+case class StreamingDqThread(sqlContext: SQLContext,
+                             dqEngines: DqEngines,
                              dataSources: Seq[DataSource],
                              evaluateRuleParam: EvaluateRuleParam,
                              persistFactory: PersistFactory,
@@ -72,7 +76,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
 
         // persist results
         val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
-        println(s"--- timeGroups: ${timeGroups}")
+//        println(s"--- timeGroups: ${timeGroups}")
 
         val rt = new Date().getTime
         val persistResultTimeStr = s"persist result using time: ${rt - ct} ms"
@@ -128,7 +132,7 @@ case class StreamingDqThread(dqEngines: DqEngines,
   private def cleanData(t: Long): Unit = {
     try {
       dataSources.foreach(_.cleanOldData)
-      dataSources.foreach(_.dropTable(t))
+      TempTables.unregisterTempTables(sqlContext, key(t))
 
       val cleanTime = TimeInfoCache.getCleanTime
       CacheResultProcesser.refresh(cleanTime)

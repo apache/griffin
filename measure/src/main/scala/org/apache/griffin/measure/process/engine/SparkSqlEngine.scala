@@ -21,9 +21,11 @@ package org.apache.griffin.measure.process.engine
 import java.util.Date
 
 import org.apache.griffin.measure.config.params.user.DataSourceParam
-import org.apache.griffin.measure.data.connector.GroupByColumn
+import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
@@ -37,10 +39,10 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
     ruleStep match {
-      case SparkSqlStep(_, ri) => {
+      case SparkSqlStep(ti, ri) => {
         try {
           val rdf = sqlContext.sql(ri.rule)
-          ri.getNames.foreach(rdf.registerTempTable(_))
+          ri.getNames.foreach(TempTables.registerTempTable(rdf, key(ti.calcTime), _))
           true
         } catch {
           case e: Throwable => {

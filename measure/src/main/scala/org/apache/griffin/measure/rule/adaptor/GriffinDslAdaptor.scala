@@ -19,7 +19,9 @@ under the License.
 package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
-import org.apache.griffin.measure.data.connector.GroupByColumn
+import org.apache.griffin.measure.data.connector.InternalColumns
+import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.dsl.analyzer._
@@ -38,7 +40,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val _miss = "miss"
     val _total = "total"
     val _matched = "matched"
-    val _missRecords = "miss.records"
+    val _missRecords = "missRecords"
   }
   object ProfilingKeys {
     val _source = "source"
@@ -53,17 +55,6 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val ruleInfo = RuleInfoGen(param, timeInfo)
     val dqType = RuleInfoGen.dqType(param)
     GriffinDslStep(timeInfo, ruleInfo, dqType) :: Nil
-  }
-
-  private def checkDataSourceExists(name: String): Boolean = {
-    try {
-      RuleAdaptorGroup.dataChecker.existDataSourceName(name)
-    } catch {
-      case e: Throwable => {
-        error(s"check data source exists error: ${e.getMessage}")
-        false
-      }
-    }
   }
 
   def adaptConcreteRuleStep(ruleStep: RuleStep
@@ -105,6 +96,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
                                    ): Seq[ConcreteRuleStep] = {
     val timeInfo = ruleStep.timeInfo
     val ruleInfo = ruleStep.ruleInfo
+    val calcTime = timeInfo.calcTime
     val tmst = timeInfo.tmst
 
     val details = ruleInfo.details
@@ -112,11 +104,11 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val targetName = details.getString(AccuracyKeys._target, dataSourceNames.tail.head)
     val analyzer = AccuracyAnalyzer(expr.asInstanceOf[LogicalExpr], sourceName, targetName)
 
-    if (!checkDataSourceExists(sourceName)) {
+    if (!TempTables.existTable(key(calcTime), sourceName)) {
       Nil
     } else {
       // 1. miss record
-      val missRecordsSql = if (!checkDataSourceExists(targetName)) {
+      val missRecordsSql = if (!TempTables.existTable(key(calcTime), targetName)) {
         val selClause = s"`${sourceName}`.*"
         s"SELECT ${selClause} FROM `${sourceName}`"
       } else {
@@ -193,105 +185,11 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 
       missRecordsStep :: missStep :: totalStep :: accuracyMetricStep :: accuracyStep :: Nil
     }
-
-//    val details = ruleStep.ruleInfo.details
-//    val sourceName = details.getString(AccuracyKeys._source, dataSourceNames.head)
-//    val targetName = details.getString(AccuracyKeys._target, dataSourceNames.tail.head)
-//    val analyzer = AccuracyAnalyzer(expr.asInstanceOf[LogicalExpr], sourceName, targetName)
-//
-//    val tmsts = dsTmsts.getOrElse(sourceName, Set.empty[Long])
-//
-//    if (!checkDataSourceExists(sourceName)) {
-//      Nil
-//    } else {
-//      // 1. miss record
-//      val missRecordsSql = if (!checkDataSourceExists(targetName)) {
-//        val selClause = s"`${sourceName}`.*"
-//        s"SELECT ${selClause} FROM `${sourceName}`"
-//      } else {
-//        val selClause = s"`${sourceName}`.*"
-//        val onClause = expr.coalesceDesc
-//        val sourceIsNull = analyzer.sourceSelectionExprs.map { sel =>
-//          s"${sel.desc} IS NULL"
-//        }.mkString(" AND ")
-//        val targetIsNull = analyzer.targetSelectionExprs.map { sel =>
-//          s"${sel.desc} IS NULL"
-//        }.mkString(" AND ")
-//        val whereClause = s"(NOT (${sourceIsNull})) AND (${targetIsNull})"
-//        s"SELECT ${selClause} FROM `${sourceName}` LEFT JOIN `${targetName}` ON ${onClause} WHERE ${whereClause}"
-//      }
-//      val missRecordsName = AccuracyKeys._missRecords
-//      val missRecordsParams = details.getParamMap(AccuracyKeys._missRecords)
-//        .addIfNotExist(RuleDetailKeys._persistType, RecordPersistType.desc)
-//        .addIfNotExist(RuleDetailKeys._persistName, missRecordsName)
-//      val missRecordsStep = SparkSqlStep(
-//        ruleStep.timeInfo,
-//        RuleInfo(missRecordsName, missRecordsSql, missRecordsParams)
-//      )
-//
-//      val tmstStepsPair = tmsts.map { tmst =>
-//        val timeInfo = TimeInfo(ruleStep.timeInfo.calcTime, tmst)
-//
-//        // 2. miss count
-//        val missTableName = "_miss_"
-//        val tmstMissTableName = TempName.tmstName(missTableName, timeInfo)
-//        val missColName = details.getStringOrKey(AccuracyKeys._miss)
-//        val missSql = {
-//          s"SELECT COUNT(*) AS `${missColName}` FROM `${missRecordsName}` WHERE `${GroupByColumn.tmst}` = ${tmst}"
-//        }
-//        val missStep = SparkSqlStep(
-//          timeInfo,
-//          RuleInfo(tmstMissTableName, missSql, Map[String, Any]())
-//        )
-//
-//        // 3. total count
-//        val totalTableName = "_total_"
-//        val tmstTotalTableName = TempName.tmstName(totalTableName, timeInfo)
-//        val totalColName = details.getStringOrKey(AccuracyKeys._total)
-//        val totalSql = {
-//          s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}` WHERE `${GroupByColumn.tmst}` = ${tmst}"
-//        }
-//        val totalStep = SparkSqlStep(
-//          timeInfo,
-//          RuleInfo(tmstTotalTableName, totalSql, Map[String, Any]())
-//        )
-//
-//        // 4. accuracy metric
-//        val accuracyMetricName = details.getString(RuleDetailKeys._persistName, ruleStep.name)
-//        val tmstAccuracyMetricName = TempName.tmstName(accuracyMetricName, timeInfo)
-//        val matchedColName = details.getStringOrKey(AccuracyKeys._matched)
-//        val accuracyMetricSql = {
-//          s"""
-//             |SELECT `${tmstMissTableName}`.`${missColName}` AS `${missColName}`,
-//             |`${tmstTotalTableName}`.`${totalColName}` AS `${totalColName}`
-//             |FROM `${tmstTotalTableName}` FULL JOIN `${tmstMissTableName}`
-//           """.stripMargin
-//        }
-//        val accuracyMetricStep = SparkSqlStep(
-//          timeInfo,
-//          RuleInfo(tmstAccuracyMetricName, accuracyMetricSql, Map[String, Any]())
-//        )
-//
-//        // 5. accuracy metric filter
-//        val accuracyParams = details.addIfNotExist("df.name", tmstAccuracyMetricName)
-//          .addIfNotExist(RuleDetailKeys._persistType, MetricPersistType.desc)
-//          .addIfNotExist(RuleDetailKeys._persistName, accuracyMetricName)
-//        val accuracyStep = DfOprStep(
-//          timeInfo,
-//          RuleInfo(tmstAccuracyMetricName, "accuracy", accuracyParams)
-//        )
-//
-//        (missStep :: totalStep :: accuracyMetricStep :: Nil, accuracyStep :: Nil)
-//      }.foldLeft((Nil: Seq[ConcreteRuleStep], Nil: Seq[ConcreteRuleStep])) { (ret, next) =>
-//        (ret._1 ++ next._1, ret._2 ++ next._2)
-//      }
-//
-//      missRecordsStep +: (tmstStepsPair._1 ++ tmstStepsPair._2)
-//    }
   }
 
   private def transProfilingRuleStep(ruleStep: GriffinDslStep, expr: Expr
                                     ): Seq[ConcreteRuleStep] = {
+    val calcTime = ruleStep.timeInfo.calcTime
     val details = ruleStep.ruleInfo.details
     val profilingClause = expr.asInstanceOf[ProfilingClause]
     val sourceName = profilingClause.fromClauseOpt match {
@@ -300,9 +198,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     }
     val fromClause = profilingClause.fromClauseOpt.getOrElse(FromClause(sourceName)).desc
 
-//    if (!checkDataSourceExists(sourceName)) {
-    if (false) {
-      println(s"not exist source name: ${sourceName}")
+    if (!TempTables.existTable(key(calcTime), sourceName)) {
       Nil
     } else {
       val timeInfo = ruleStep.timeInfo
@@ -329,16 +225,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val preGroupbyClause = tmstAnalyzer.preGroupbyExprs.map(_.desc).mkString(" ")
       val postGroupbyClause = tmstAnalyzer.postGroupbyExprs.map(_.desc).mkString(" ")
 
-      // 1. where statement
-//      val filterSql = {
-//        s"SELECT * ${fromClause} WHERE `${GroupByColumn.tmst}` = ${tmst}"
-//      }
-//      val filterStep = SparkSqlStep(
-//        timeInfo,
-//        RuleInfo(tmstSourceName, filterSql, Map[String, Any]())
-//      )
-
-      // 2. select statement
+      // 1. select statement
       val profilingSql = {
         s"SELECT ${selCondition} ${selClause} ${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
       }

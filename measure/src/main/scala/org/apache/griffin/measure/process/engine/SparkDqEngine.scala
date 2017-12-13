@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.process.engine
 
 import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
-import org.apache.griffin.measure.data.connector.GroupByColumn
+import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.step._
@@ -68,7 +68,7 @@ trait SparkDqEngine extends DqEngine {
                   }
                   Some((tmst, metrics))
                 } else {
-                  println(s"empty metrics in table `${metricTmstName}`, not persisted")
+                  info(s"empty metrics in table `${metricTmstName}`, not persisted")
                   None
                 }
               } catch {

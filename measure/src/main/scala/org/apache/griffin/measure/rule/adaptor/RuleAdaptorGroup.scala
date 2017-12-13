@@ -20,9 +20,8 @@ package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.cache.tmst.TempName
 import org.apache.griffin.measure.config.params.user._
-import org.apache.griffin.measure.data.connector.GroupByColumn
+import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.process.ProcessType
-import org.apache.griffin.measure.process.temp.TempTableValidator
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.step._
 import org.apache.spark.sql.SQLContext
@@ -39,16 +38,12 @@ object RuleAdaptorGroup {
 
   var baselineDsName: String = ""
 
-  var dataChecker: TempTableValidator = _
-
   def init(sqlContext: SQLContext, dsNames: Seq[String], blDsName: String): Unit = {
     val functions = sqlContext.sql("show functions")
     functionNames = functions.map(_.getString(0)).collect.toSeq
     dataSourceNames = dsNames
 
     baselineDsName = blDsName
-
-    dataChecker = TempTableValidator(sqlContext)
   }
 
   private def getDslType(param: Map[String, Any], defDslType: DslType) = {
@@ -152,7 +147,7 @@ object RuleAdaptorGroup {
     val TimeInfo(calcTime, tmst) = timeInfo
     val tmstDsName = TempName.tmstName(baselineDsName, calcTime)
     val filterSql = {
-      s"SELECT * FROM `${tmstDsName}` WHERE `${GroupByColumn.tmst}` = ${tmst}"
+      s"SELECT * FROM `${tmstDsName}` WHERE `${InternalColumns.tmst}` = ${tmst}"
     }
     SparkSqlStep(
       timeInfo,

@@ -25,7 +25,7 @@
           "type": "avro",
           "version": "1.7",
           "config": {
-            "file.name": "src/test/resources/users_info_target.avro1"
+            "file.name": "src/test/resources/users_info_target.avro"
           }
         }
       ]
@@ -46,7 +46,7 @@
           "miss": "miss_count",
           "total": "total_count",
           "matched": "matched_count",
-          "miss.records": {
+          "missRecords": {
             "persist.type": "record"
           }
         }

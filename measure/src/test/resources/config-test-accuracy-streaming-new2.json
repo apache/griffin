@@ -93,22 +93,39 @@
   "evaluate.rule": {
     "rules": [
       {
-        "dsl.type": "griffin-dsl",
-        "dq.type": "accuracy",
-        "name": "accuracy",
-        "rule": "source.name = target.name and source.age = target.age",
+        "dsl.type": "spark-sql",
+        "name": "missRecords",
+        "rule": "SELECT source.* FROM source LEFT JOIN target ON coalesce(source.name, '') = coalesce(target.name, '') AND coalesce(source.age, '') = coalesce(target.age, '') WHERE (NOT (source.name IS NULL AND source.age IS NULL)) AND (target.name IS NULL AND target.age IS NULL)",
+        "details": {
+          "persist.type": "record",
+          "cache.data.source": "source"
+        }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "miss_count",
+        "rule": "SELECT count(*) as miss FROM `missRecords`"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "total_count",
+        "rule": "SELECT count(*) as total FROM source"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "accu",
+        "rule": "SELECT `miss_count`.miss, `total_count`.total FROM `miss_count` FULL JOIN `total_count`"
+      },
+      {
+        "dsl.type": "df-opr",
+        "name": "accu",
+        "rule": "accuracy",
         "details": {
           "persist.type": "metric",
-          "source": "source",
-          "target": "target",
-          "miss": "miss_count",
-          "total": "total_count",
-          "matched": "matched_count",
-          "missRecords": {
-            "persist.name": "missRecords",
-            "persist.type": "record",
-            "cache.data.source": "source"
-          }
+          "df.name": "accu",
+          "miss": "miss",
+          "total": "total",
+          "matched": "matched_count"
         }
       }
     ]

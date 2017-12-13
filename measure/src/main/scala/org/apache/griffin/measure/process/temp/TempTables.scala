@@ -19,37 +19,85 @@ under the License.
 package org.apache.griffin.measure.process.temp
 
 import org.apache.griffin.measure.log.Loggable
+import org.apache.spark.sql.{DataFrame, SQLContext}
 
-import scala.collection.concurrent.{Map => ConcMap, TrieMap}
+import scala.collection.concurrent.{TrieMap, Map => ConcMap}
 
 object TempTables extends Loggable {
 
-  val tables: ConcMap[Long, Set[String]] = TrieMap[Long, Set[String]]()
+  val tables: ConcMap[String, Set[String]] = TrieMap[String, Set[String]]()
 
-  def registerTable(t: Long, table: String): Unit = {
-    val set = tables.get(t) match {
-      case Some(s) => s + table
-      case _ => Set[String](table)
-    }
-    tables.replace(t, set)
-  }
-
-  def unregisterTable(t: Long, table: String): Unit = {
-    tables.get(t).foreach { set =>
-      val nset = set - table
-      tables.replace(t, nset)
+  private def registerTable(key: String, table: String): Unit = {
+    tables.get(key) match {
+      case Some(set) => {
+        val suc = tables.replace(key, set, set + table)
+        if (!suc) registerTable(key, table)
+      }
+      case _ => {
+        val oldOpt = tables.putIfAbsent(key, Set[String](table))
+        if (oldOpt.nonEmpty) registerTable(key, table)
+      }
     }
   }
 
-  def unregisterTables(t: Long): Unit = {
-    tables.remove(t)
+  private def unregisterTable(key: String, table: String): Option[String] = {
+    tables.get(key) match {
+      case Some(set) => {
+        val ftb = set.find(_ == table)
+        ftb match {
+          case Some(tb) => {
+            val nset = set - tb
+            val suc = tables.replace(key, set, nset)
+            if (suc) Some(tb)
+            else unregisterTable(key, table)
+          }
+          case _ => None
+        }
+      }
+      case _ => None
+    }
   }
 
-  def existTable(t: Long, table: String): Boolean = {
-    tables.get(t) match {
+  private def unregisterTables(key: String): Set[String] = {
+    tables.remove(key) match {
+      case Some(set) => set
+      case _ => Set[String]()
+    }
+  }
+
+  private def dropTempTable(sqlContext: SQLContext, table: String): Unit = {
+    try {
+      sqlContext.dropTempTable(table)
+    } catch {
+      case e: Throwable => warn(s"drop temp table ${table} fails")
+    }
+  }
+
+  // -----
+
+  def registerTempTable(df: DataFrame, key: String, table: String): Unit = {
+    registerTable(key, table)
+    df.registerTempTable(table)
+  }
+
+  def unregisterTempTable(sqlContext: SQLContext, key: String, table: String): Unit = {
+    unregisterTable(key, table).foreach(dropTempTable(sqlContext, _))
+  }
+
+  def unregisterTempTables(sqlContext: SQLContext, key: String): Unit = {
+    unregisterTables(key).foreach(dropTempTable(sqlContext, _))
+  }
+
+  def existTable(key: String, table: String): Boolean = {
+    tables.get(key) match {
       case Some(set) => set.exists(_ == table)
       case _ => false
     }
   }
 
+}
+
+object TempKeys {
+  def key(t: Long): String = s"${t}"
+  def key(head: String, t: Long): String = s"${head}_${t}"
 }

@@ -22,9 +22,11 @@ import java.util.Date
 
 import org.apache.griffin.measure.cache.result.CacheResultProcesser
 import org.apache.griffin.measure.config.params.user.DataSourceParam
-import org.apache.griffin.measure.data.connector.GroupByColumn
+import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.data.source.{DataSource, DataSourceFactory}
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.result.AccuracyResult
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.step._
@@ -46,15 +48,15 @@ case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
           ri.rule match {
             case DataFrameOprs._fromJson => {
               val df = DataFrameOprs.fromJson(sqlContext, ri)
-              ri.getNames.foreach(df.registerTempTable(_))
+              ri.getNames.foreach(TempTables.registerTempTable(df, key(ti.calcTime), _))
             }
             case DataFrameOprs._accuracy => {
               val df = DataFrameOprs.accuracy(sqlContext, ti, ri)
-              ri.getNames.foreach(df.registerTempTable(_))
+              ri.getNames.foreach(TempTables.registerTempTable(df, key(ti.calcTime), _))
             }
             case DataFrameOprs._clear => {
               val df = DataFrameOprs.clear(sqlContext, ri)
-              ri.getNames.foreach(df.registerTempTable(_))
+              ri.getNames.foreach(TempTables.registerTempTable(df, key(ti.calcTime), _))
             }
             case _ => {
               throw new Exception(s"df opr [ ${ri.rule} ] not supported")
@@ -103,13 +105,11 @@ object DataFrameOprs {
     val _miss = "miss"
     val _total = "total"
     val _matched = "matched"
-//    val _tmst = "tmst"
+
     val dfName = details.getStringOrKey(_dfName)
     val miss = details.getStringOrKey(_miss)
     val total = details.getStringOrKey(_total)
     val matched = details.getStringOrKey(_matched)
-//    val tmst = details.getOrElse(_tmst, _tmst).toString
-//    val tmst = GroupByColumn.tmst
 
     val updateTime = new Date().getTime
 

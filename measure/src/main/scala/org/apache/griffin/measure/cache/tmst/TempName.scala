@@ -24,14 +24,15 @@ import org.apache.griffin.measure.rule.step.TimeInfo
 object TempName extends Loggable {
 
   def tmstName(name: String, ms: Long) = {
-    s"${name}(${ms})"
+    s"${name}_${ms}"
   }
 
   //-- temp df name --
-  private val tmstNameRegex = """^(.*)\((\d*)\)\[(\d*)\]$""".r
+//  private val tmstNameRegex = """^(.*)\((\d*)\)\[(\d*)\]$""".r
+  private val tmstNameRegex = """^(.*)_(\d*)_(\d*)$""".r
   def tmstName(name: String, timeInfo: TimeInfo) = {
     val TimeInfo(calcTime, tmst) = timeInfo
-    s"${name}(${calcTime})[${tmst}]"
+    s"${name}_${calcTime}_${tmst}"
   }
   def extractTmstName(tmstName: String): (String, Option[Long], Option[Long]) = {
     tmstName match {

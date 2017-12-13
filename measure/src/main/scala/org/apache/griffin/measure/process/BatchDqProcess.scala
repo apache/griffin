@@ -20,12 +20,16 @@ package org.apache.griffin.measure.process
 
 import java.util.Date
 
+import org.apache.griffin.measure.cache.info.TimeInfoCache
+import org.apache.griffin.measure.cache.result.CacheResultProcesser
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
+import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.rule.udf.GriffinUdfs
@@ -34,6 +38,7 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}
 
+import scala.concurrent.Await
 import scala.util.Try
 
 case class BatchDqProcess(allParam: AllParam) extends DqProcess {
@@ -118,6 +123,9 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // finish
     persist.finish()
 
+    // clean data
+    cleanData(appTime)
+
 //    sqlContext.tables().show(50)
 
     // clear temp table
@@ -132,6 +140,10 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //
 //    // -- test --
 //    sqlContext.tables().show(50)
+  }
+
+  private def cleanData(t: Long): Unit = {
+    TempTables.unregisterTempTables(sqlContext, key(t))
   }
 
   def end: Try[_] = Try {

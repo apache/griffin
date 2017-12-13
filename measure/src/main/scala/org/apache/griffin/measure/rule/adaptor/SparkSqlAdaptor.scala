@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.cache.tmst.TempName
-import org.apache.griffin.measure.data.connector.GroupByColumn
+import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.rule.dsl.MetricPersistType
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.ParamUtil._

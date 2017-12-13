@@ -188,15 +188,15 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 //    }
 //  }
 
-  private def persistRecords2Hdfs(hdfsPath: String, rdd: RDD[String]): Unit = {
-    try {
-//      rdd.saveAsTextFile(hdfsPath)
-      val recStr = rdd.collect().mkString("\n")
-      HdfsUtil.writeContent(hdfsPath, recStr)
-    } catch {
-      case e: Throwable => error(e.getMessage)
-    }
-  }
+//  private def persistRecords2Hdfs(hdfsPath: String, rdd: RDD[String]): Unit = {
+//    try {
+////      rdd.saveAsTextFile(hdfsPath)
+//      val recStr = rdd.collect().mkString("\n")
+//      HdfsUtil.writeContent(hdfsPath, recStr)
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
+//  }
   private def persistRecords2Hdfs(hdfsPath: String, records: Iterable[String]): Unit = {
     try {
       val recStr = records.mkString("\n")
@@ -215,12 +215,22 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
     }
   }
 
+  private def getHdfsPath(path: String, groupId: Int): String = {
+    HdfsUtil.getHdfsFilePath(path, s"${groupId}")
+//    if (groupId == 0) path else withSuffix(path, s"${groupId}")
+  }
   private def getHdfsPath(path: String, ptnId: Int, groupId: Int): String = {
-    if (ptnId == 0 && groupId == 0) path else withSuffix(path, s"${ptnId}.${groupId}")
+    HdfsUtil.getHdfsFilePath(path, s"${ptnId}.${groupId}")
+//    if (ptnId == 0 && groupId == 0) path else withSuffix(path, s"${ptnId}.${groupId}")
+  }
+
+  private def clearOldRecords(path: String): Unit = {
+    HdfsUtil.deleteHdfsPath(path)
   }
 
   def persistRecords(df: DataFrame, name: String): Unit = {
     val path = filePath(name)
+    clearOldRecords(path)
     try {
       val recordCount = df.count
       val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
@@ -244,6 +254,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   def persistRecords(records: Iterable[String], name: String): Unit = {
     val path = filePath(name)
+    clearOldRecords(path)
     try {
       val recordCount = records.size
       val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
@@ -256,7 +267,7 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
           val groupedRecords = records.grouped(maxLinesPerFile).zipWithIndex
           groupedRecords.take(groupCount).foreach { group =>
             val (recs, gid) = group
-            val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
+            val hdfsPath = getHdfsPath(path, gid)
             persistRecords2Hdfs(hdfsPath, recs)
           }
         }

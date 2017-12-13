@@ -27,7 +27,7 @@ object HdfsUtil extends Loggable {
   private val seprator = "/"
 
   private val conf = new Configuration()
-  conf.set("dfs.support.append", "true")
+  conf.setBoolean("dfs.support.append", true)
   conf.set("fs.defaultFS", "hdfs://localhost")    // debug @localhost
 
   private val dfs = FileSystem.get(conf)
@@ -54,7 +54,9 @@ object HdfsUtil extends Loggable {
 
   def appendOrCreateFile(filePath: String): FSDataOutputStream = {
     val path = new Path(filePath)
-    if (dfs.exists(path)) dfs.append(path) else createFile(filePath)
+    if (dfs.getConf.getBoolean("dfs.support.append", false) && dfs.exists(path)) {
+        dfs.append(path)
+    } else createFile(filePath)
   }
 
   def openFile(filePath: String): FSDataInputStream = {

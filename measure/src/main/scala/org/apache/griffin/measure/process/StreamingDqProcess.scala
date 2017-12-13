@@ -103,7 +103,8 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     dataSources.foreach(_.init)
 
     // process thread
-    val dqThread = StreamingDqThread(dqEngines, dataSources, userParam.evaluateRuleParam, persistFactory, persist)
+    val dqThread = StreamingDqThread(sqlContext, dqEngines, dataSources,
+      userParam.evaluateRuleParam, persistFactory, persist)
 
     // init data sources
 //    val dsTmsts = dqEngines.loadData(dataSources, appTime)
