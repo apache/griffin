@@ -20,34 +20,38 @@ package org.apache.griffin.measure.rule.dsl
 
 import scala.util.matching.Regex
 
-
-sealed trait DslType {
+sealed trait CollectType {
   val regex: Regex
   val desc: String
 }
 
-object DslType {
-  private val dslTypes: List[DslType] = List(SparkSqlType, GriffinDslType, DfOprType)
-  def apply(ptn: String): DslType = {
-    dslTypes.filter(tp => ptn match {
+object CollectType {
+  private val collectTypes: List[CollectType] = List(DefaultCollectType, EntriesCollectType, ArrayCollectType, MapCollectType)
+  def apply(ptn: String): CollectType = {
+    collectTypes.filter(tp => ptn match {
       case tp.regex() => true
       case _ => false
-    }).headOption.getOrElse(GriffinDslType)
+    }).headOption.getOrElse(DefaultCollectType)
   }
-  def unapply(pt: DslType): Option[String] = Some(pt.desc)
+  def unapply(pt: CollectType): Option[String] = Some(pt.desc)
 }
 
-final case object SparkSqlType extends DslType {
-  val regex = "^(?i)spark-?sql$".r
-  val desc = "spark-sql"
+final case object DefaultCollectType extends CollectType {
+  val regex: Regex = "".r
+  val desc: String = "default"
 }
 
-final case object DfOprType extends DslType {
-  val regex = "^(?i)df-?opr$".r
-  val desc = "df-opr"
+final case object EntriesCollectType extends CollectType {
+  val regex: Regex = "^(?i)entries$".r
+  val desc: String = "entries"
 }
 
-final case object GriffinDslType extends DslType {
-  val regex = "^(?i)griffin-?dsl$".r
-  val desc = "griffin-dsl"
+final case object ArrayCollectType extends CollectType {
+  val regex: Regex = "^(?i)array|list$".r
+  val desc: String = "array"
+}
+
+final case object MapCollectType extends CollectType {
+  val regex: Regex = "^(?i)map$".r
+  val desc: String = "map"
 }

@@ -29,19 +29,17 @@ import org.scalamock.scalatest.MockFactory
 class SparkSqlAdaptorTest extends FunSuite with Matchers with BeforeAndAfter with MockFactory {
 
   test ("spark sql adaptor test") {
-    val adaptor = SparkSqlAdaptor(RunPhase)
+    val adaptor = SparkSqlAdaptor()
 
     val ruleJson =
       """
         |{
         |  "dsl.type": "spark-sql",
+        |  "name": "out",
         |  "rule": "count(*)",
         |  "details": {
-        |    "source": "source",
-        |    "profiling": {
-        |      "name": "prof",
-        |      "persist.type": "metric"
-        |    }
+        |    "persist.type": "metric",
+        |    "collect.type": "array"
         |  }
         |}
       """.stripMargin
@@ -51,10 +49,10 @@ class SparkSqlAdaptorTest extends FunSuite with Matchers with BeforeAndAfter wit
     println(rule)
 
     val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
-    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
+    val steps = adaptor.genConcreteRuleStep(TimeInfo(1, 2), rule)
 
     steps.foreach { step =>
-      println(s"${step.name} [${step.dslType}]: ${step.ruleInfo.rule}")
+      println(s"${step}")
     }
   }
 

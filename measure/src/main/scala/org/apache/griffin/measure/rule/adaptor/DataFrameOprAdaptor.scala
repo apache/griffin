@@ -21,26 +21,26 @@ package org.apache.griffin.measure.rule.adaptor
 import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.rule.step._
 
-case class DataFrameOprAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
+case class DataFrameOprAdaptor() extends RuleAdaptor {
 
   def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep] = {
-    val ruleInfo = RuleInfo(getName(param), getRule(param), getDetails(param))
+    val ruleInfo = RuleInfoGen(param, timeInfo)
     DfOprStep(timeInfo, ruleInfo) :: Nil
 //    DfOprStep(getName(param), getRule(param), getDetails(param),
 //      getPersistType(param), getUpdateDataSource(param)) :: Nil
   }
-  def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]): Seq[ConcreteRuleStep] = {
+  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
     ruleStep match {
       case rs @ DfOprStep(_, _) => rs :: Nil
       case _ => Nil
     }
   }
 
-  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
-    param.get(_name) match {
-      case Some(name) => name.toString :: Nil
-      case _ => Nil
-    }
-  }
+//  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
+//    param.get(_name) match {
+//      case Some(name) => name.toString :: Nil
+//      case _ => Nil
+//    }
+//  }
 
 }

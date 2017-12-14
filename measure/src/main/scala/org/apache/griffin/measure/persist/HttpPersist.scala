@@ -89,7 +89,7 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
 
   def log(rt: Long, msg: String): Unit = {}
 
-//  def persistRecords(df: DataFrame, name: String): Unit = {}
+  def persistRecords(df: DataFrame, name: String): Unit = {}
   def persistRecords(records: Iterable[String], name: String): Unit = {}
 
 //  def persistMetrics(metrics: Seq[String], name: String): Unit = {

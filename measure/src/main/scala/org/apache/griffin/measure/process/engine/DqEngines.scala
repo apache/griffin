@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.process.engine
 
 import org.apache.griffin.measure.config.params.user.DataSourceParam
-import org.apache.griffin.measure.data.connector.GroupByColumn
+import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
@@ -59,12 +59,25 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
         }
       }
     }
-    val updateTimeGroups = allMetrics.keys
-    allMetrics.foreach { pair =>
+
+    val updateTimeGroups = allMetrics.flatMap { pair =>
+      val (t, metric) = pair
+      metric.get(InternalColumns.ignoreCache) match {
+        case Some(true) => None
+        case _ => Some(t)
+      }
+    }
+
+    val persistMetrics = allMetrics.mapValues { metric =>
+      InternalColumns.clearInternalColumns(metric)
+    }
+
+    persistMetrics.foreach { pair =>
       val (t, metric) = pair
       val persist = persistFactory.getPersists(t)
       persist.persistMetrics(metric)
     }
+
     updateTimeGroups
   }
 
@@ -139,69 +152,117 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 //      engine.collectUpdateCacheDatas(ruleStep, timeGroups)
 //    }.headOption
 //  }
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
-    val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
-      ret ++ engine.collectMetrics(ruleStep)
+  def collectMetrics(ruleStep: ConcreteRuleStep): Option[(Long, Map[String, Any])] = {
+    val ret = engines.foldLeft(None: Option[(Long, Map[String, Any])]) { (ret, engine) =>
+      if (ret.nonEmpty) ret else engine.collectMetrics(ruleStep)
     }
     ret
   }
 
-  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]
-                      ): Option[RDD[(Long, Iterable[String])]] = {
+  def collectUpdateRDD(ruleStep: ConcreteRuleStep): Option[DataFrame] = {
     engines.flatMap { engine =>
-      engine.collectUpdateRDD(ruleStep, timeGroups)
+      engine.collectUpdateRDD(ruleStep)
     }.headOption
   }
 
+//  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]
+//                      ): Option[RDD[(Long, Iterable[String])]] = {
+//    engines.flatMap { engine =>
+//      engine.collectUpdateRDD(ruleStep, timeGroups)
+//    }.headOption
+//  }
+
   ////////////////////////////
 
-  def collectUpdateRDDs(ruleSteps: Seq[ConcreteRuleStep], timeGroups: Iterable[Long]
-                       ): Seq[(ConcreteRuleStep, RDD[(Long, Iterable[String])])] = {
+  def collectUpdateRDDs(ruleSteps: Seq[ConcreteRuleStep], timeGroups: Set[Long]
+                       ): Seq[(ConcreteRuleStep, DataFrame)] = {
     ruleSteps.flatMap { rs =>
-      collectUpdateRDD(rs, timeGroups) match {
-        case Some(rdd) => Some((rs, rdd))
-        case _ => None
-      }
+      val t = rs.timeInfo.tmst
+      if (timeGroups.contains(t)) {
+        collectUpdateRDD(rs).map((rs, _))
+      } else None
     }
   }
 
-  def persistAllRecords(stepRdds: Seq[(ConcreteRuleStep, RDD[(Long, Iterable[String])])],
+//  def collectUpdateRDDs(ruleSteps: Seq[ConcreteRuleStep], timeGroups: Iterable[Long]
+//                       ): Seq[(ConcreteRuleStep, RDD[(Long, Iterable[String])])] = {
+//    ruleSteps.flatMap { rs =>
+//      collectUpdateRDD(rs, timeGroups) match {
+//        case Some(rdd) => Some((rs, rdd))
+//        case _ => None
+//      }
+//    }
+//  }
+
+  def persistAllRecords(stepRdds: Seq[(ConcreteRuleStep, DataFrame)],
                         persistFactory: PersistFactory): Unit = {
     stepRdds.foreach { stepRdd =>
-      val (step, rdd) = stepRdd
+      val (step, df) = stepRdd
       if (step.ruleInfo.persistType == RecordPersistType) {
-        val name = step.name
-        rdd.foreach { pair =>
-          val (t, items) = pair
-          val persist = persistFactory.getPersists(t)
-          persist.persistRecords(items, name)
-        }
+        val name = step.ruleInfo.name
+        val t = step.timeInfo.tmst
+        val persist = persistFactory.getPersists(t)
+        persist.persistRecords(df, name)
       }
     }
   }
 
-  def updateDataSources(stepRdds: Seq[(ConcreteRuleStep, RDD[(Long, Iterable[String])])],
+//  def persistAllRecords(stepRdds: Seq[(ConcreteRuleStep, RDD[(Long, Iterable[String])])],
+//                        persistFactory: PersistFactory): Unit = {
+//    stepRdds.foreach { stepRdd =>
+//      val (step, rdd) = stepRdd
+//      if (step.ruleInfo.persistType == RecordPersistType) {
+//        val name = step.name
+//        rdd.foreach { pair =>
+//          val (t, items) = pair
+//          val persist = persistFactory.getPersists(t)
+//          persist.persistRecords(items, name)
+//        }
+//      }
+//    }
+//  }
+
+  def updateDataSources(stepRdds: Seq[(ConcreteRuleStep, DataFrame)],
                         dataSources: Seq[DataSource]): Unit = {
     stepRdds.foreach { stepRdd =>
-      val (step, rdd) = stepRdd
-      if (step.ruleInfo.updateDataSourceOpt.nonEmpty) {
-        val udpateDataSources = dataSources.filter { ds =>
-          step.ruleInfo.updateDataSourceOpt match {
+      val (step, df) = stepRdd
+      if (step.ruleInfo.cacheDataSourceOpt.nonEmpty) {
+        val udpateDsCaches = dataSources.filter { ds =>
+          step.ruleInfo.cacheDataSourceOpt match {
             case Some(dsName) if (dsName == ds.name) => true
             case _ => false
           }
-        }
-        if (udpateDataSources.size > 0) {
-          val name = step.name
-          rdd.foreach { pair =>
-            val (t, items) = pair
-            udpateDataSources.foreach { ds =>
-              ds.dataSourceCacheOpt.foreach(_.updateData(items, t))
-            }
-          }
+        }.flatMap(_.dataSourceCacheOpt)
+        if (udpateDsCaches.size > 0) {
+          val t = step.timeInfo.tmst
+          udpateDsCaches.foreach(_.updateData(df, t))
         }
       }
     }
   }
+
+//  def updateDataSources(stepRdds: Seq[(ConcreteRuleStep, RDD[(Long, Iterable[String])])],
+//                        dataSources: Seq[DataSource]): Unit = {
+//    stepRdds.foreach { stepRdd =>
+//      val (step, rdd) = stepRdd
+//      if (step.ruleInfo.cacheDataSourceOpt.nonEmpty) {
+//        val udpateDataSources = dataSources.filter { ds =>
+//          step.ruleInfo.cacheDataSourceOpt match {
+//            case Some(dsName) if (dsName == ds.name) => true
+//            case _ => false
+//          }
+//        }
+//        if (udpateDataSources.size > 0) {
+//          val name = step.name
+//          rdd.foreach { pair =>
+//            val (t, items) = pair
+//            udpateDataSources.foreach { ds =>
+//              ds.dataSourceCacheOpt.foreach(_.updateData(items, t))
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
 
 }

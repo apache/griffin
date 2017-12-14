@@ -25,6 +25,8 @@ import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.{BatchDqProcess, BatchProcessType}
 import org.apache.griffin.measure.process.engine._
+import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.rule.adaptor.{PreProcPhase, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.preproc.PreProcRuleGenerator
@@ -57,42 +59,44 @@ trait DataConnector extends Loggable with Serializable {
   protected def suffix(ms: Long): String = s"${id}_${ms}"
   protected def thisName(ms: Long): String = s"this_${suffix(ms)}"
 
-  final val tmstColName = GroupByColumn.tmst
+  final val tmstColName = InternalColumns.tmst
 
   def preProcess(dfOpt: Option[DataFrame], ms: Long): Option[DataFrame] = {
     val thisTable = thisName(ms)
     val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
-    val names = PreProcRuleGenerator.getRuleNames(preProcRules).toSet + thisTable
+//    val names = PreProcRuleGenerator.getRuleNames(preProcRules).toSet + thisTable
 
     try {
       dfOpt.flatMap { df =>
         // in data
-        df.registerTempTable(thisTable)
+        TempTables.registerTempTable(df, key(id, ms), thisTable)
 
-        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
+//        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
+        val tmsts = Seq[Long](ms)
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
-          TimeInfo(ms, ms), preProcRules, dsTmsts, DslType("spark-sql"), BatchProcessType, PreProcPhase)
+        val ruleSteps = RuleAdaptorGroup.genRuleSteps(
+          TimeInfo(ms, ms), preProcRules, tmsts, DslType("spark-sql"), PreProcPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
 
         // out data
-        val outDf = sqlContext.table(thisTable)
+        val outDf = sqlContext.table(s"`${thisTable}`")
 
-        // drop temp table
-        names.foreach { name =>
-          try {
-            sqlContext.dropTempTable(name)
-          } catch {
-            case e: Throwable => warn(s"drop temp table ${name} fails")
-          }
-        }
+        // drop temp tables
+        TempTables.unregisterTempTables(sqlContext, key(id, ms))
+//        names.foreach { name =>
+//          try {
+//            TempTables.unregisterTempTable(sqlContext, ms, name)
+//          } catch {
+//            case e: Throwable => warn(s"drop temp table ${name} fails")
+//          }
+//        }
 
         // add tmst
         val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
-//        val withTmstDf1 = outDf.withColumn(tmstColName, lit(ms + 1))
+//        val withTmstDf1 = outDf.withColumn(tmstColName, lit(ms + 1)).limit(48)
 
         // tmst cache
         saveTmst(ms)
@@ -125,6 +129,13 @@ object DataConnectorIdGenerator {
   }
 }
 
-object GroupByColumn {
+object InternalColumns {
   val tmst = "__tmst"
+  val ignoreCache = "__ignoreCache"
+
+  val columns = List[String](tmst, ignoreCache)
+
+  def clearInternalColumns(v: Map[String, Any]): Map[String, Any] = {
+    v -- columns
+  }
 }

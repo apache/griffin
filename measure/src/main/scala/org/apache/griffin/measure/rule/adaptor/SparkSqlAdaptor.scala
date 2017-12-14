@@ -18,30 +18,21 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
-import org.apache.griffin.measure.data.connector.GroupByColumn
+import org.apache.griffin.measure.cache.tmst.TempName
+import org.apache.griffin.measure.data.connector.InternalColumns
+import org.apache.griffin.measure.rule.dsl.MetricPersistType
 import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.utils.ParamUtil._
 
-case class SparkSqlAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
+case class SparkSqlAdaptor() extends RuleAdaptor {
 
   def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep] = {
-    val ruleInfo = RuleInfo(getName(param), getRule(param), getDetails(param))
+    val ruleInfo = RuleInfoGen(param, timeInfo)
     SparkSqlStep(timeInfo, ruleInfo) :: Nil
   }
-  def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]): Seq[ConcreteRuleStep] = {
+  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
     ruleStep match {
-      case rs @ SparkSqlStep(ti, ri) => {
-        adaptPhase match {
-          case PreProcPhase => rs :: Nil
-          case RunPhase => rs :: Nil
-        }
-      }
-      case _ => Nil
-    }
-  }
-
-  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
-    param.get(_name) match {
-      case Some(name) => name.toString :: Nil
+      case rs @ SparkSqlStep(ti, ri) => rs :: Nil
       case _ => Nil
     }
   }

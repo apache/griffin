@@ -15,6 +15,13 @@
       "config": {
         "max.log.lines": 10
       }
+    },
+    {
+      "type": "hdfs",
+      "config": {
+        "path": "hdfs://localhost/griffin/test",
+        "max.lines.per.file": 10000
+      }
     }
   ],
 

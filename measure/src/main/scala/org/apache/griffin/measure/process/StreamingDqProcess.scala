@@ -28,6 +28,7 @@ import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngineFactory
 import org.apache.griffin.measure.rule.adaptor.RuleAdaptorGroup
+import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.rule.udf.GriffinUdfs
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.sql.SQLContext
@@ -42,8 +43,10 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
   val envParam: EnvParam = allParam.envParam
   val userParam: UserParam = allParam.userParam
 
-  val metricName = userParam.name
   val sparkParam = envParam.sparkParam
+  val metricName = userParam.name
+  val dataSourceNames = userParam.dataSources.map(_.name)
+  val baselineDsName = userParam.baselineDsName
 
   var sparkContext: SparkContext = _
   var sqlContext: SQLContext = _
@@ -66,7 +69,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
 
     // init adaptors
     val dataSourceNames = userParam.dataSources.map(_.name)
-    RuleAdaptorGroup.init(sqlContext, dataSourceNames)
+    RuleAdaptorGroup.init(sqlContext, dataSourceNames, baselineDsName)
   }
 
   def run: Try[_] = Try {
@@ -100,13 +103,15 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     dataSources.foreach(_.init)
 
     // process thread
-    val dqThread = StreamingDqThread(dqEngines, dataSources, userParam.evaluateRuleParam, persistFactory, persist)
+    val dqThread = StreamingDqThread(sqlContext, dqEngines, dataSources,
+      userParam.evaluateRuleParam, persistFactory, persist)
 
     // init data sources
-//    dqEngines.loadData(dataSources)
-//
-//    // generate rule steps
-//    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(userParam.evaluateRuleParam)
+//    val dsTmsts = dqEngines.loadData(dataSources, appTime)
+
+    // generate rule steps
+//    val ruleSteps = RuleAdaptorGroup.genRuleSteps(
+//      TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts)
 //
 //    // run rules
 //    dqEngines.runRuleSteps(ruleSteps)

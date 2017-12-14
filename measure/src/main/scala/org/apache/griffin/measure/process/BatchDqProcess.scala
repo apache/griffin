@@ -20,12 +20,16 @@ package org.apache.griffin.measure.process
 
 import java.util.Date
 
+import org.apache.griffin.measure.cache.info.TimeInfoCache
+import org.apache.griffin.measure.cache.result.CacheResultProcesser
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
+import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.rule.udf.GriffinUdfs
@@ -34,6 +38,7 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}
 
+import scala.concurrent.Await
 import scala.util.Try
 
 case class BatchDqProcess(allParam: AllParam) extends DqProcess {
@@ -41,8 +46,10 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
   val envParam: EnvParam = allParam.envParam
   val userParam: UserParam = allParam.userParam
 
-  val metricName = userParam.name
   val sparkParam = envParam.sparkParam
+  val metricName = userParam.name
+  val dataSourceNames = userParam.dataSources.map(_.name)
+  val baselineDsName = userParam.baselineDsName
 
   var sparkContext: SparkContext = _
   var sqlContext: SQLContext = _
@@ -60,8 +67,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     GriffinUdfs.register(sqlContext)
 
     // init adaptors
-    val dataSourceNames = userParam.dataSources.map(_.name)
-    RuleAdaptorGroup.init(sqlContext, dataSourceNames)
+    RuleAdaptorGroup.init(sqlContext, dataSourceNames, baselineDsName)
   }
 
   def run: Try[_] = Try {
@@ -88,11 +94,13 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // init data sources
     val dsTmsts = dqEngines.loadData(dataSources, appTime)
 
-    debug(s"data sources timestamps: ${dsTmsts}")
+    debug(s"data source timestamps: ${dsTmsts}")
 
     // generate rule steps
-    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
-      TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts, BatchProcessType, RunPhase)
+//    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
+//      TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts, BatchProcessType, RunPhase)
+    val ruleSteps = RuleAdaptorGroup.genRuleSteps(
+      TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts)
 
     // run rules
     dqEngines.runRuleSteps(ruleSteps)
@@ -100,13 +108,13 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // persist results
     val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
 
-    val rdds = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups)
-    rdds.foreach(_._2.cache())
+    val dfs = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups.toSet)
+    dfs.foreach(_._2.cache())
 
-    dqEngines.persistAllRecords(rdds, persistFactory)
+    dqEngines.persistAllRecords(dfs, persistFactory)
 //    dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
 
-    rdds.foreach(_._2.unpersist())
+    dfs.foreach(_._2.unpersist())
 
     // end time
     val endTime = new Date().getTime
@@ -114,10 +122,46 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 
     // finish
     persist.finish()
+
+    // clean data
+    cleanData(appTime)
+
+//    sqlContext.tables().show(50)
+
+    // clear temp table
+//    ruleSteps.foreach { rs =>
+//      println(rs)
+//      //      sqlContext.dropTempTable(rs.ruleInfo.name)
+//      rs.ruleInfo.tmstNameOpt match {
+//        case Some(n) => sqlContext.dropTempTable(s"`${n}`")
+//        case _ => {}
+//      }
+//    }
+//
+//    // -- test --
+//    sqlContext.tables().show(50)
+  }
+
+  private def cleanData(t: Long): Unit = {
+    TempTables.unregisterTempTables(sqlContext, key(t))
   }
 
   def end: Try[_] = Try {
     sparkContext.stop
   }
+
+//  private def cleanData(t: Long): Unit = {
+//    try {
+////      dataSources.foreach(_.cleanOldData)
+////      dataSources.foreach(_.dropTable(t))
+//
+////      val cleanTime = TimeInfoCache.getCleanTime
+////      CacheResultProcesser.refresh(cleanTime)
+//
+//      sqlContext.dropTempTable()
+//    } catch {
+//      case e: Throwable => error(s"clean data error: ${e.getMessage}")
+//    }
+//  }
 
 }

@@ -20,42 +20,77 @@ package org.apache.griffin.measure.rule.adaptor
 
 import java.util.concurrent.atomic.AtomicLong
 
+import org.apache.griffin.measure.cache.tmst.TempName
+
 import scala.collection.mutable.{Set => MutableSet}
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.rule.step._
-import org.apache.griffin.measure.rule.dsl.{DslType, PersistType}
+import org.apache.griffin.measure.rule.dsl._
 
 trait RuleAdaptor extends Loggable with Serializable {
 
-  val adaptPhase: AdaptPhase
+//  val adaptPhase: AdaptPhase
 
-  val _name = "name"
-  val _rule = "rule"
-//  val _persistType = "persist.type"
-//  val _updateDataSource = "update.data.source"
-  val _details = "details"
+  protected def genRuleInfo(param: Map[String, Any]): RuleInfo = RuleInfoGen(param)
 
-  protected def getName(param: Map[String, Any]) = param.getOrElse(_name, RuleStepNameGenerator.genName).toString
-  protected def getRule(param: Map[String, Any]) = param.getOrElse(_rule, "").toString
-//  protected def getPersistType(param: Map[String, Any]) = PersistType(param.getOrElse(_persistType, "").toString)
-//  protected def getUpdateDataSource(param: Map[String, Any]) = param.get(_updateDataSource).map(_.toString)
-  protected def getDetails(param: Map[String, Any]) = param.get(_details) match {
-    case Some(dt: Map[String, Any]) => dt
-    case _ => Map[String, Any]()
-  }
+//  protected def getName(param: Map[String, Any]) = param.getOrElse(_name, RuleStepNameGenerator.genName).toString
+//  protected def getRule(param: Map[String, Any]) = param.getOrElse(_rule, "").toString
+//  protected def getDetails(param: Map[String, Any]) = param.get(_details) match {
+//    case Some(dt: Map[String, Any]) => dt
+//    case _ => Map[String, Any]()
+//  }
 
-  def getTempSourceNames(param: Map[String, Any]): Seq[String]
+  def getPersistNames(steps: Seq[RuleStep]): Seq[String] = steps.map(_.ruleInfo.persistName)
 
-  def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep]
-  def genConcreteRuleStep(timeInfo: TimeInfo, param: Map[String, Any], dsTmsts: Map[String, Set[Long]]
+  protected def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep]
+  protected def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep]
+  def genConcreteRuleStep(timeInfo: TimeInfo, param: Map[String, Any]
                          ): Seq[ConcreteRuleStep] = {
     genRuleStep(timeInfo, param).flatMap { rs =>
-      adaptConcreteRuleStep(rs, dsTmsts)
+      adaptConcreteRuleStep(rs)
     }
   }
-  protected def adaptConcreteRuleStep(ruleStep: RuleStep, dsTmsts: Map[String, Set[Long]]): Seq[ConcreteRuleStep]
 
+}
+
+object RuleInfoKeys {
+  val _name = "name"
+  val _rule = "rule"
+  val _details = "details"
+
+  val _dslType = "dsl.type"
+  val _dqType = "dq.type"
+}
+import RuleInfoKeys._
+import org.apache.griffin.measure.utils.ParamUtil._
+
+object RuleInfoGen {
+  def apply(param: Map[String, Any]): RuleInfo = {
+    val name = param.getString(_name, RuleStepNameGenerator.genName)
+    RuleInfo(
+      name,
+      None,
+      param.getString(_rule, ""),
+      param.getParamMap(_details)
+    )
+  }
+  def apply(param: Map[String, Any], timeInfo: TimeInfo): RuleInfo = {
+    val name = param.getString(_name, RuleStepNameGenerator.genName)
+    val tmstName = TempName.tmstName(name, timeInfo)
+    val ri = RuleInfo(
+      name,
+      None,
+      param.getString(_rule, ""),
+      param.getParamMap(_details)
+    )
+    if (ri.persistType.needPersist) {
+      ri.setTmstNameOpt(Some(tmstName))
+    } else ri
+  }
+
+  def dslType(param: Map[String, Any]): DslType = DslType(param.getString(_dslType, ""))
+  def dqType(param: Map[String, Any]): DqType = DqType(param.getString(_dqType, ""))
 }
 
 object RuleStepNameGenerator {

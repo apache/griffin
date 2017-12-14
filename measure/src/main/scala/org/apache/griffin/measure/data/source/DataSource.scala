@@ -18,16 +18,19 @@ under the License.
 */
 package org.apache.griffin.measure.data.source
 
-import org.apache.griffin.measure.cache.tmst.TmstCache
+import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 case class DataSource(sqlContext: SQLContext,
                       name: String,
+                      baseline: Boolean,
                       dataConnectors: Seq[DataConnector],
                       dataSourceCacheOpt: Option[DataSourceCache]
                      ) extends Loggable with Serializable {
@@ -47,28 +50,33 @@ case class DataSource(sqlContext: SQLContext,
   }
 
   def loadData(ms: Long): Set[Long] = {
+    val tmstName = TempName.tmstName(name, ms)
+    println(s"load data [${name}] (${tmstName})")
     val (dfOpt, tmsts) = data(ms)
     dfOpt match {
       case Some(df) => {
-        df.registerTempTable(name)
+        TempTables.registerTempTable(df, key(ms), name)
+        TempTables.registerTempTable(df, key(ms), tmstName)
       }
       case None => {
 //        val df = sqlContext.emptyDataFrame
 //        df.registerTempTable(name)
-        warn(s"load data source [${name}] fails")
+//        warn(s"load data source [${name}] fails")
+        warn(s"load data source [${name}] (${tmstName}) fails")
 //        throw new Exception(s"load data source [${name}] fails")
       }
     }
     tmsts
   }
 
-  def dropTable(): Unit = {
-    try {
-      sqlContext.dropTempTable(name)
-    } catch {
-      case e: Throwable => warn(s"drop table [${name}] fails")
-    }
-  }
+//  def dropTable(ms: Long): Unit = {
+//    val tmstName = TempName.tmstName(name, ms)
+//    try {
+//      sqlContext.dropTempTable(s"`${tmstName}`")
+//    } catch {
+//      case e: Throwable => warn(s"drop table [${name}] (${tmstName}) fails")
+//    }
+//  }
 
   private def data(ms: Long): (Option[DataFrame], Set[Long]) = {
 //    val batchPairs = batchDataConnectors.map(_.data(ms))

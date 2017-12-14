@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.rule.step
 
+import java.util.concurrent.atomic.AtomicLong
+
 import org.apache.griffin.measure.rule.dsl._
 
 trait RuleStep extends Serializable {
@@ -30,47 +32,44 @@ trait RuleStep extends Serializable {
 
   def name = ruleInfo.name
 
-//  val name: String
-//  val rule: String
-//  val details: Map[String, Any]
-
 }
 
 case class TimeInfo(calcTime: Long, tmst: Long) {}
 
-case class RuleInfo(name: String, rule: String, details: Map[String, Any]) {
-  private val _name = "name"
-  private val _persistType = "persist.type"
-  private val _asArray = "as.array"
-  private val _updateDataSource = "update.data.source"
+object RuleDetailKeys {
+  val _persistName = "persist.name"
+  val _persistType = "persist.type"
+  val _collectType = "collect.type"
+  val _cacheDataSource = "cache.data.source"
+}
+import RuleDetailKeys._
+import org.apache.griffin.measure.utils.ParamUtil._
 
-  def persistType = PersistType(details.getOrElse(_persistType, "").toString)
-  def updateDataSourceOpt = details.get(_updateDataSource).map(_.toString)
+case class RuleInfo(name: String, tmstNameOpt: Option[String], rule: String, details: Map[String, Any]) {
 
-  def withName(n: String): RuleInfo = {
-    RuleInfo(name, rule, details + (_name -> n))
+  val persistName = details.getString(_persistName, name)
+  val persistType = PersistType(details.getString(_persistType, ""))
+  val collectType = CollectType(details.getString(_collectType, ""))
+  val cacheDataSourceOpt = details.get(_cacheDataSource).map(_.toString)
+
+  def setName(n: String): RuleInfo = {
+    RuleInfo(n, tmstNameOpt, rule, details)
   }
-  def withPersistType(pt: PersistType): RuleInfo = {
-    RuleInfo(name, rule, details + (_persistType -> pt.desc))
+  def setTmstNameOpt(tnOpt: Option[String]): RuleInfo = {
+    RuleInfo(name, tnOpt, rule, details)
   }
-  def withUpdateDataSourceOpt(udsOpt: Option[String]): RuleInfo = {
-    udsOpt match {
-      case Some(uds) => RuleInfo(name, rule, details + (_updateDataSource -> uds))
-      case _ => this
-    }
+  def setRule(r: String): RuleInfo = {
+    RuleInfo(name, tmstNameOpt, r, details)
+  }
+  def setDetails(d: Map[String, Any]): RuleInfo = {
+    RuleInfo(name, tmstNameOpt, rule, d)
   }
 
-  def originName: String = {
-    details.getOrElse(_name, name).toString
-  }
-  def asArray: Boolean = {
-    try {
-      details.get(_asArray) match {
-        case Some(v) => v.toString.toBoolean
-        case _ => false
-      }
-    } catch {
-      case e: Throwable => false
+  def getNames: Seq[String] = {
+    tmstNameOpt match {
+      case Some(tn) => name :: tn :: Nil
+      case _ => name :: Nil
     }
   }
 }
+
