@@ -155,6 +155,7 @@ object ParamUtil {
       try {
         params.get(key) match {
           case Some(v: String) => v.toBoolean
+          case Some(v: Boolean) => v
           case _ => defValue
         }
       } catch {

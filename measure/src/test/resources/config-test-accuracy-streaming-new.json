@@ -108,7 +108,8 @@
             "persist.name": "missRecords",
             "persist.type": "record",
             "cache.data.source": "source"
-          }
+          },
+          "enable.ignore.cache": true
         }
       }
     ]

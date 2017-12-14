@@ -32,7 +32,7 @@ import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -111,6 +111,9 @@ object DataFrameOprs {
     val total = details.getStringOrKey(_total)
     val matched = details.getStringOrKey(_matched)
 
+    val _enableIgnoreCache = "enable.ignore.cache"
+    val enableIgnoreCache = details.getBoolean(_enableIgnoreCache, false)
+
     val updateTime = new Date().getTime
 
     def getLong(r: Row, k: String): Long = {
@@ -139,19 +142,36 @@ object DataFrameOprs {
       updatedCacheResultOpt
     }
 
-    // update
+    // update results
     updateResults.foreach { r =>
       CacheResultProcesser.update(r)
     }
 
-    val schema = StructType(Array(
-      StructField(miss, LongType),
-      StructField(total, LongType),
-      StructField(matched, LongType)
-    ))
-    val rows = updateResults.map { r =>
-      val ar = r.result.asInstanceOf[AccuracyResult]
-      Row(ar.miss, ar.total, ar.getMatch)
+    // generate metrics
+    val schema = if (enableIgnoreCache) {
+      StructType(Array(
+        StructField(miss, LongType),
+        StructField(total, LongType),
+        StructField(matched, LongType),
+        StructField(InternalColumns.ignoreCache, BooleanType)
+      ))
+    } else {
+      StructType(Array(
+        StructField(miss, LongType),
+        StructField(total, LongType),
+        StructField(matched, LongType)
+      ))
+    }
+    val rows = if (enableIgnoreCache) {
+      updateResults.map { r =>
+        val ar = r.result.asInstanceOf[AccuracyResult]
+        Row(ar.miss, ar.total, ar.getMatch, ar.initial)
+      }
+    } else {
+      updateResults.map { r =>
+        val ar = r.result.asInstanceOf[AccuracyResult]
+        Row(ar.miss, ar.total, ar.getMatch)
+      }
     }
     val rowRdd = sqlContext.sparkContext.parallelize(rows)
     sqlContext.createDataFrame(rowRdd, schema)

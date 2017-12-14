@@ -153,7 +153,6 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     (dfOpt, tmstSet)
   }
 
-  // -- deprecated --
   def updateData(df: DataFrame, ms: Long): Unit = {
     val ptns = getPartition(ms)
     val ptnsPath = genPartitionHdfsPath(ptns)
@@ -176,7 +175,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         println(s"update file path: ${dataFilePath}")
       } else {
         clearTmst(ms)
-        println(s"clear data source timestamp: ${ms}")
+        println(s"data source [${metricName}] timestamp [${ms}] cleared")
       }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
@@ -198,10 +197,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       println(s"remove file path: ${dirPath}/${dataFileName}")
 
       // save updated data
-      val dumped = if (cnt > 0) {
+      if (cnt > 0) {
         HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
         println(s"update file path: ${dataFilePath}")
-      } else false
+      } else {
+        clearTmst(ms)
+        println(s"data source [${metricName}] timestamp [${ms}] cleared")
+      }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
     } finally {
@@ -224,10 +226,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       println(s"remove file path: ${dirPath}/${dataFileName}")
 
       // save updated data
-      val dumped = if (needSave) {
+      if (needSave) {
         HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
         println(s"update file path: ${dataFilePath}")
-      } else false
+      } else {
+        clearTmst(ms)
+        println(s"data source [${metricName}] timestamp [${ms}] cleared")
+      }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
     }
@@ -254,7 +259,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         val cleanTime = readCleanTime()
         cleanTime match {
           case Some(ct) => {
-            println(s"clear timestamps before ${ct}")
+            println(s"data source [${metricName}] old timestamps clear until [${ct}]")
 
             // clear out date tmsts
             clearTmstsUntil(ct)

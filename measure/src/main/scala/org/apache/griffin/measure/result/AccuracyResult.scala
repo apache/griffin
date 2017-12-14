@@ -29,6 +29,10 @@ case class AccuracyResult(miss: Long, total: Long) extends Result {
     AccuracyResult(delta.miss, total)
   }
 
+  def initial(): Boolean = {
+    getMatch <= 0
+  }
+
   def eventual(): Boolean = {
     this.miss <= 0
   }

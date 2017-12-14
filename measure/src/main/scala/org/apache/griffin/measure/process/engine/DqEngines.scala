@@ -59,11 +59,18 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
         }
       }
     }
-    val updateTimeGroups = allMetrics.keys
     allMetrics.foreach { pair =>
       val (t, metric) = pair
       val persist = persistFactory.getPersists(t)
       persist.persistMetrics(metric)
+    }
+//    val updateTimeGroups = allMetrics.keys
+    val updateTimeGroups = allMetrics.flatMap { pair =>
+      val (t, metric) = pair
+      metric.get(InternalColumns.ignoreCache) match {
+        case Some(true) => None
+        case _ => Some(t)
+      }
     }
     updateTimeGroups
   }
