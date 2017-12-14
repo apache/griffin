@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Service
-@CacheConfig(cacheNames = "hive")
+@CacheConfig(cacheNames = "hive", keyGenerator = "cacheKeyGenerator")
 public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetaStoreService.class);
@@ -55,7 +55,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     private ThreadPoolExecutor singleThreadExecutor;
 
     public HiveMetaStoreServiceImpl() {
-        singleThreadExecutor = new ThreadPoolExecutor(1, 5, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(3),new ThreadPoolExecutor.DiscardPolicy());
+        singleThreadExecutor = new ThreadPoolExecutor(1, 5, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(3), new ThreadPoolExecutor.DiscardPolicy());
         LOGGER.info("HiveMetaStoreServiceImpl single thread pool created.");
     }
 
@@ -68,7 +68,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     }
 
     @Override
-    @Cacheable(key = "#root.methodName")
+    @Cacheable
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
@@ -82,7 +82,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable(key = "#root.methodName.concat(#dbName)")
+    @Cacheable
     public Iterable<String> getAllTableNames(String dbName) {
         Iterable<String> results = null;
         try {
@@ -96,14 +96,14 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable(key = "#root.methodName.concat(#db)")
+    @Cacheable
     public List<Table> getAllTable(String db) {
         return getTables(db);
     }
 
 
     @Override
-    @Cacheable(key = "#root.methodName")
+    @Cacheable
     public Map<String, List<Table>> getAllTable() {
         Map<String, List<Table>> results = new HashMap<>();
         Iterable<String> dbs;
@@ -123,7 +123,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable(key = "#root.methodName.concat(#dbName).concat(#tableName)")
+    @Cacheable
     public Table getTable(String dbName, String tableName) {
         Table result = null;
         try {
