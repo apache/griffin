@@ -59,12 +59,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
         }
       }
     }
-    allMetrics.foreach { pair =>
-      val (t, metric) = pair
-      val persist = persistFactory.getPersists(t)
-      persist.persistMetrics(metric)
-    }
-//    val updateTimeGroups = allMetrics.keys
+
     val updateTimeGroups = allMetrics.flatMap { pair =>
       val (t, metric) = pair
       metric.get(InternalColumns.ignoreCache) match {
@@ -72,6 +67,17 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
         case _ => Some(t)
       }
     }
+
+    val persistMetrics = allMetrics.mapValues { metric =>
+      InternalColumns.clearInternalColumns(metric)
+    }
+
+    persistMetrics.foreach { pair =>
+      val (t, metric) = pair
+      val persist = persistFactory.getPersists(t)
+      persist.persistMetrics(metric)
+    }
+
     updateTimeGroups
   }
 

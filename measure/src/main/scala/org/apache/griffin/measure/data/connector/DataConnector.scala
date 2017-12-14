@@ -132,4 +132,10 @@ object DataConnectorIdGenerator {
 object InternalColumns {
   val tmst = "__tmst"
   val ignoreCache = "__ignoreCache"
+
+  val columns = List[String](tmst, ignoreCache)
+
+  def clearInternalColumns(v: Map[String, Any]): Map[String, Any] = {
+    v -- columns
+  }
 }
