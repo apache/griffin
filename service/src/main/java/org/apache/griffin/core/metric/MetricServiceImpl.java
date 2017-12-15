@@ -20,30 +20,41 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import org.apache.griffin.core.job.entity.Job;
+import org.apache.griffin.core.job.repo.JobRepo;
+import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
-import org.apache.griffin.core.metric.entity.MetricTemplate;
-import org.apache.griffin.core.metric.repo.MetricTemplateRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class MetricServiceImpl implements MetricService {
 
     @Autowired
-    private MetricStore metricStore;
+    private MeasureRepo<Measure> measureRepo;
     @Autowired
-    private MetricTemplateRepo templateRepo;
+    private JobRepo<Job> jobRepo;
+    @Autowired
+    private MetricStore metricStore;
 
     @Override
     public List<Metric> getAllMetrics() {
         List<Metric> metrics = new ArrayList<>();
-        for (MetricTemplate template : templateRepo.findAll()) {
-            List<MetricValue> metricValues = getMetricValues(template.getMetricName(), 300);
-            metrics.add(new Metric(template.getName(), template.getDescription(), template.getOrganization(), template.getOwner(), metricValues));
+        List<Job> jobs = jobRepo.findByDeleted(false);
+        List<Measure> measures = measureRepo.findByDeleted(false);
+        Map<Long, Measure> measureMap = measures.stream().collect(Collectors.toMap(Measure::getId, Function.identity()));
+        for (Job job : jobs) {
+            List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 300);
+            Measure measure = measureMap.get(job.getMeasureId());
+            metrics.add(new Metric(job.getName(), measure.getDescription(), measure.getOrganization(), measure.getOwner(), metricValues));
         }
         return metrics;
     }

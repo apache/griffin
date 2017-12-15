@@ -81,16 +81,16 @@ public class MeasureServiceImplTest {
     }
 
 
-    @Test
-    public void testDeleteMeasuresByIdForSuccess() throws Exception {
-        GriffinMeasure measure = createATestGriffinMeasure("view_item_hourly", "test");
-        given(measureRepo.exists(1L)).willReturn(true);
-        given(measureRepo.findOne(1L)).willReturn(measure);
-        doNothing().when(jobService).deleteJobsRelateToMeasure(measure);
-        given(measureRepo.save(measure)).willReturn(measure);
-        GriffinOperationMessage message = service.deleteMeasureById(1L);
-        assertEquals(message, GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS);
-    }
+//    @Test
+//    public void testDeleteMeasuresByIdForSuccess() throws Exception {
+//        GriffinMeasure measure = createATestGriffinMeasure("view_item_hourly", "test");
+//        given(measureRepo.exists(1L)).willReturn(true);
+//        given(measureRepo.findOne(1L)).willReturn(measure);
+//        doNothing().when(jobService).deleteJobsRelateToMeasure(measure);
+//        given(measureRepo.save(measure)).willReturn(measure);
+//        GriffinOperationMessage message = service.deleteMeasureById(1L);
+//        assertEquals(message, GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS);
+//    }
 
     @Test
     public void testDeleteMeasuresByIdForNotFound() throws Exception {

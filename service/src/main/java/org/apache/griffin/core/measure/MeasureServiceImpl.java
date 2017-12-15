@@ -20,19 +20,17 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
-import org.apache.griffin.core.job.JobServiceImpl;
+import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.job.JobSyncHelper;
 import org.apache.griffin.core.measure.entity.*;
 import org.apache.griffin.core.measure.repo.DataConnectorRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.metric.MetricTemplateStore;
 import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +40,9 @@ public class MeasureServiceImpl implements MeasureService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MeasureServiceImpl.class);
 
     @Autowired
-    private JobServiceImpl jobService;
+    private JobSyncHelper jobSyncHelper;
     @Autowired
     private MeasureRepo<Measure> measureRepo;
-    @Autowired
-    private MetricTemplateStore metricTemplateStore;
     @Autowired
     private DataConnectorRepo dataConnectorRepo;
 
@@ -64,26 +60,20 @@ public class MeasureServiceImpl implements MeasureService {
     public GriffinOperationMessage deleteMeasureById(Long measureId) {
         if (!measureRepo.exists(measureId)) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        } else {
-            Measure measure = measureRepo.findOne(measureId);
-            try {
-                if (measure instanceof GriffinMeasure) {
-                    //pause all jobs related to the measure
-                    jobService.deleteJobsRelateToMeasure((GriffinMeasure) measure);
-                } else {
-                    if (!metricTemplateStore.deleteFromMeasure((ExternalMeasure) measure)) {
-                        return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
-                    }
-                }
-                measure.setDeleted(true);
-                measureRepo.save(measure);
-            } catch (SchedulerException e) {
-                LOGGER.error("Delete measure id: {} name: {} failure. {}", measure.getId(), measure.getName(), e.getMessage());
-                return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
-            }
-
-            return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
         }
+        try {
+            Measure measure = measureRepo.findOne(measureId);
+            measure.setDeleted(true);
+            measureRepo.save(measure);
+            if (jobSyncHelper.deleteJobsRelateToMeasure(measure)) {
+                return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
+            }
+            measure.setDeleted(false);
+            measureRepo.save(measure);
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete measure whose id is {} ", measureId);
+        }
+        return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
     }
 
     @Override
@@ -93,26 +83,42 @@ public class MeasureServiceImpl implements MeasureService {
             LOGGER.error("Failed to create new measure {}, it already exists.", measure.getName());
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
-        if (measure instanceof ExternalMeasure) {
-            if (!metricTemplateStore.createFromMeasure((ExternalMeasure) measure)) {
-                return GriffinOperationMessage.CREATE_MEASURE_FAIL;
-            }
-        } else {
-            if (!isConnectorNamesValid((GriffinMeasure) measure)) {
-                LOGGER.error("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
-                return GriffinOperationMessage.CREATE_MEASURE_FAIL;
-            }
+        if (measure instanceof GriffinMeasure) {
+            return createGriffinMeasure((GriffinMeasure) measure);
+        }
+        return createExternalMeasure((ExternalMeasure) measure);
+    }
+
+
+    private GriffinOperationMessage createGriffinMeasure(GriffinMeasure measure) {
+        if (!isConnectorNamesValid(measure)) {
+            LOGGER.error("Failed to create new measure {}. Its connector names already exist. ", measure.getName());
+            return GriffinOperationMessage.CREATE_MEASURE_FAIL;
         }
         try {
             measureRepo.save(measure);
             return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
         } catch (Exception e) {
             LOGGER.error("Failed to create new measure {}.{}", measure.getName(), e.getMessage());
-            if (measure instanceof ExternalMeasure) {
-                metricTemplateStore.deleteFromMeasure((ExternalMeasure) measure);
-            }
+        }
+        return GriffinOperationMessage.CREATE_MEASURE_FAIL;
+    }
+
+    private GriffinOperationMessage createExternalMeasure(ExternalMeasure measure) {
+        if (StringUtils.isBlank(measure.getMetricName())) {
+            LOGGER.error("Failed to create new measure {}. Its metric name is blank.", measure.getName());
             return GriffinOperationMessage.CREATE_MEASURE_FAIL;
         }
+        try {
+            measure = measureRepo.save(measure);
+            if (jobSyncHelper.createVirtualJob(measure)) {
+                return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
+            }
+            measureRepo.delete(measure);
+        } catch (Exception e) {
+            LOGGER.error("Failed to create new measure {}.{}", measure.getName(), e.getMessage());
+        }
+        return GriffinOperationMessage.CREATE_MEASURE_FAIL;
     }
 
     private boolean isConnectorNamesValid(GriffinMeasure measure) {
@@ -141,23 +147,40 @@ public class MeasureServiceImpl implements MeasureService {
 
     @Override
     public GriffinOperationMessage updateMeasure(Measure measure) {
-        if (measureRepo.findByIdAndDeleted(measure.getId(), false) == null) {
+        Measure originMeasure = measureRepo.findByIdAndDeleted(measure.getId(), false);
+        if (originMeasure == null) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         }
-        if (measure instanceof ExternalMeasure) {
-            if (!metricTemplateStore.updateFromMeasure((ExternalMeasure) measure)) {
-                return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
-            }
+        if (!originMeasure.getType().equals(measure.getType())) {
+            LOGGER.error("Can't update measure to different type.");
+            return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
         }
+        if (measure instanceof GriffinMeasure) {
+            return updateGriffinMeasure((GriffinMeasure) measure);
+        }
+        return updateExternalMeasure((ExternalMeasure) originMeasure, (ExternalMeasure) measure);
+    }
+
+    private GriffinOperationMessage updateGriffinMeasure(GriffinMeasure measure) {
         try {
             measureRepo.save(measure);
             return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
         } catch (Exception e) {
             LOGGER.error("Failed to update measure. {}", e.getMessage());
-            if (measure instanceof ExternalMeasure) {
-                metricTemplateStore.updateFromMeasure((ExternalMeasure) measureRepo.findOne(measure.getId()));
-            }
         }
+        return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
+    }
+
+    private GriffinOperationMessage updateExternalMeasure(ExternalMeasure originMeasure, ExternalMeasure newMeasure) {
+        try {
+            if (jobSyncHelper.updateVirtualJob(newMeasure)) {
+                measureRepo.save(newMeasure);
+                return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to update measure. {}", e.getMessage());
+        }
+        jobSyncHelper.updateVirtualJob(originMeasure);
         return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
     }
 }

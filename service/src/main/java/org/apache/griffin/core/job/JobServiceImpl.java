@@ -25,13 +25,11 @@ import org.apache.griffin.core.error.exception.GriffinException.GetHealthInfoFai
 import org.apache.griffin.core.error.exception.GriffinException.GetJobsFailureException;
 import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
-
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.metric.MetricTemplateStore;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
@@ -73,8 +71,6 @@ public class JobServiceImpl implements JobService {
     private Properties livyConfProps;
     @Autowired
     private MeasureRepo<GriffinMeasure> measureRepo;
-    @Autowired
-    private MetricTemplateStore metricTemplateStore;
     @Autowired
     private JobScheduleRepo jobScheduleRepo;
 
@@ -156,16 +152,12 @@ public class JobServiceImpl implements JobService {
             String groupName = "BA";
             String jobName = measure.getName() + "_" + groupName + "_" + System.currentTimeMillis();
             TriggerKey triggerKey = triggerKey(jobName, groupName);
-            if (!metricTemplateStore.createFromJob(measure, triggerKey.toString(), jobName)) {
-                return CREATE_JOB_FAIL;
-            }
             try {
                 if (!scheduler.checkExists(triggerKey) && saveAndAddJob(scheduler, triggerKey, jobSchedule)) {
                     return CREATE_JOB_SUCCESS;
                 }
             } catch (Exception e) {
                 LOGGER.error("Add job exception happens.", e);
-                metricTemplateStore.deleteFromJob(triggerKey.toString(), jobName);
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             }
         }
@@ -307,33 +299,9 @@ public class JobServiceImpl implements JobService {
         //logically delete
         if (pauseJob(group, name).equals(PAUSE_JOB_SUCCESS) &&
                 setJobDeleted(group, name).equals(SET_JOB_DELETED_STATUS_SUCCESS)) {
-            metricTemplateStore.deleteFromJob(new JobKey(name, group).toString(), name);
             return GriffinOperationMessage.DELETE_JOB_SUCCESS;
         }
         return GriffinOperationMessage.DELETE_JOB_FAIL;
-    }
-
-    /**
-     * deleteJobsRelateToMeasure
-     * 1. search jobs related to measure
-     * 2. deleteJob
-     *
-     * @param measure measure data quality between source and target dataset
-     * @throws SchedulerException quartz throws if schedule has problem
-     */
-    public void deleteJobsRelateToMeasure(GriffinMeasure measure) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
-        //get all jobs
-        for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {
-            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-            JobDataMap jobDataMap = jobDetail.getJobDataMap();
-            String measureId = jobDataMap.getString("measureId");
-            if (measureId != null && measureId.equals(measure.getId().toString())) {
-                //select jobs related to measureId
-                deleteJob(jobKey.getGroup(), jobKey.getName());
-                LOGGER.info("{} {} is paused and logically deleted.", jobKey.getGroup(), jobKey.getName());
-            }
-        }
     }
 
     @Override
