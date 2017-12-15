@@ -45,7 +45,8 @@ object RuleDetailKeys {
 import RuleDetailKeys._
 import org.apache.griffin.measure.utils.ParamUtil._
 
-case class RuleInfo(name: String, tmstNameOpt: Option[String], rule: String, details: Map[String, Any]) {
+case class RuleInfo(name: String, tmstNameOpt: Option[String], rule: String,
+                    details: Map[String, Any], gather: Boolean) {
 
   val persistName = details.getString(_persistName, name)
   val persistType = PersistType(details.getString(_persistType, ""))
@@ -53,16 +54,19 @@ case class RuleInfo(name: String, tmstNameOpt: Option[String], rule: String, det
   val cacheDataSourceOpt = details.get(_cacheDataSource).map(_.toString)
 
   def setName(n: String): RuleInfo = {
-    RuleInfo(n, tmstNameOpt, rule, details)
+    RuleInfo(n, tmstNameOpt, rule, details, gather)
   }
   def setTmstNameOpt(tnOpt: Option[String]): RuleInfo = {
-    RuleInfo(name, tnOpt, rule, details)
+    RuleInfo(name, tnOpt, rule, details, gather)
   }
   def setRule(r: String): RuleInfo = {
-    RuleInfo(name, tmstNameOpt, r, details)
+    RuleInfo(name, tmstNameOpt, r, details, gather)
   }
   def setDetails(d: Map[String, Any]): RuleInfo = {
-    RuleInfo(name, tmstNameOpt, rule, d)
+    RuleInfo(name, tmstNameOpt, rule, d, gather)
+  }
+  def setGather(g: Boolean): RuleInfo = {
+    RuleInfo(name, tmstNameOpt, rule, details, g)
   }
 
   def getNames: Seq[String] = {

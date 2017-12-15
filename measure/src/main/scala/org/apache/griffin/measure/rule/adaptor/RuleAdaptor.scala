@@ -32,7 +32,7 @@ trait RuleAdaptor extends Loggable with Serializable {
 
 //  val adaptPhase: AdaptPhase
 
-  protected def genRuleInfo(param: Map[String, Any]): RuleInfo = RuleInfoGen(param)
+//  protected def genRuleInfo(param: Map[String, Any]): RuleInfo = RuleInfoGen(param)
 
 //  protected def getName(param: Map[String, Any]) = param.getOrElse(_name, RuleStepNameGenerator.genName).toString
 //  protected def getRule(param: Map[String, Any]) = param.getOrElse(_rule, "").toString
@@ -52,6 +52,8 @@ trait RuleAdaptor extends Loggable with Serializable {
     }
   }
 
+  protected def genRuleInfos(param: Map[String, Any]): Seq[RuleInfo] = RuleInfoGen(param) :: Nil
+
 }
 
 object RuleInfoKeys {
@@ -61,6 +63,7 @@ object RuleInfoKeys {
 
   val _dslType = "dsl.type"
   val _dqType = "dq.type"
+  val _gatherStep = "gather.step"
 }
 import RuleInfoKeys._
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -72,19 +75,15 @@ object RuleInfoGen {
       name,
       None,
       param.getString(_rule, ""),
-      param.getParamMap(_details)
+      param.getParamMap(_details),
+      param.getBoolean(_gatherStep, false)
     )
   }
   def apply(param: Map[String, Any], timeInfo: TimeInfo): RuleInfo = {
     val name = param.getString(_name, RuleStepNameGenerator.genName)
-    val tmstName = TempName.tmstName(name, timeInfo)
-    val ri = RuleInfo(
-      name,
-      None,
-      param.getString(_rule, ""),
-      param.getParamMap(_details)
-    )
+    val ri = apply(param)
     if (ri.persistType.needPersist) {
+      val tmstName = TempName.tmstName(name, timeInfo)
       ri.setTmstNameOpt(Some(tmstName))
     } else ri
   }
