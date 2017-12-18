@@ -26,15 +26,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class JobInstanceBean extends AbstractAuditableEntity {
 
     private static final long serialVersionUID = -4748881017029815874L;
 
-    private String groupName;
-    private String jobName;
-    private int sessionId;
+    @NotNull
+    private Long jobId;
+    @NotNull
+    private Long sessionId;
     @Enumerated(EnumType.STRING)
     private State state;
     private String appId;
@@ -43,27 +45,19 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     private String appUri;
     private long timestamp;
 
-    public String getGroupName() {
-        return groupName;
+    public Long getJobId() {
+        return jobId;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setJobId(Long jobId) {
+        this.jobId = jobId;
     }
 
-    public String getJobName() {
-        return jobName;
-    }
-
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
-    }
-
-    public int getSessionId() {
+    public Long getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(int sessionId) {
+    public void setSessionId(Long sessionId) {
         this.sessionId = sessionId;
     }
 
@@ -102,9 +96,8 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     public JobInstanceBean() {
     }
 
-    public JobInstanceBean(String groupName, String jobName, int sessionId, State state, String appId, String appUri, long timestamp) {
-        this.groupName = groupName;
-        this.jobName = jobName;
+    public JobInstanceBean(Long jobId, Long sessionId, State state, String appId, String appUri, long timestamp) {
+        this.jobId = jobId;
         this.sessionId = sessionId;
         this.state = state;
         this.appId = appId;

@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -49,7 +50,12 @@ public class DataConnector extends AbstractAuditableEntity {
 
     private String version;
 
-    private String dataUnit = "365000d";
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String dataUnit;
+
+    @JsonIgnore
+    @Transient
+    private String defaultDataUnit = "365000d";
 
     @JsonIgnore
     @Access(AccessType.PROPERTY)
@@ -94,7 +100,10 @@ public class DataConnector extends AbstractAuditableEntity {
 
     @JsonProperty("data.unit")
     public String getDataUnit() {
-        return dataUnit;
+        if (dataUnit != null) {
+            return dataUnit;
+        }
+        return defaultDataUnit;
     }
 
     @JsonProperty("data.unit")

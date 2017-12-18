@@ -32,17 +32,6 @@ public class GriffinMeasure extends Measure {
     @JoinColumn(name = "evaluate_rule_id")
     private EvaluateRule evaluateRule;
 
-    public GriffinMeasure() {
-        super();
-    }
-
-    public GriffinMeasure(String name, String description, String organization, String processType, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
-        super(name, description, organization, owner);
-        this.processType = processType;
-        this.dataSources = dataSources;
-        this.evaluateRule = evaluateRule;
-    }
-
     @JsonProperty("process.type")
     public String getProcessType() {
         return processType;
@@ -91,4 +80,16 @@ public class GriffinMeasure extends Measure {
     public String getType() {
         return "griffin";
     }
+
+    public GriffinMeasure() {
+        super();
+    }
+
+    public GriffinMeasure(String name, String description, String organization, String processType, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+        super(name, description, organization, owner);
+        this.processType = processType;
+        this.dataSources = dataSources;
+        this.evaluateRule = evaluateRule;
+    }
+
 }

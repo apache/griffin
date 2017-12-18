@@ -20,9 +20,11 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.job.entity.GriffinJob;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
+import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
@@ -80,6 +82,8 @@ public class JobServiceImplTest {
     @MockBean
     private MeasureRepo measureRepo;
 
+    @MockBean
+    private JobRepo<GriffinJob> jobRepo;
     @MockBean
     private JobInstanceRepo jobInstanceRepo;
 
@@ -221,9 +225,9 @@ public class JobServiceImplTest {
         int page = 0;
         int size = 2;
         JobKey jobKey = new JobKey(jobName, groupName);
-        JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
-        given(jobInstanceRepo.findByGroupNameAndJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
+        given(jobInstanceRepo.findByJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(jobKey)).willReturn(true);
         mockJsonDataMap(scheduler, jobKey, false);
@@ -238,9 +242,9 @@ public class JobServiceImplTest {
         int page = 0;
         int size = 2;
         JobKey jobKey = new JobKey(jobName, groupName);
-        JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L,LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
-        given(jobInstanceRepo.findByGroupNameAndJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
+        given(jobInstanceRepo.findByJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(jobKey)).willReturn(true);
         mockJsonDataMap(scheduler, jobKey, true);
@@ -252,8 +256,8 @@ public class JobServiceImplTest {
         JobInstanceBean instance = newJobInstance();
         String group = "groupName";
         String jobName = "jobName";
-        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        given(jobInstanceRepo.findJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+        given(jobInstanceRepo.findByJobName(group, jobName)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
@@ -262,18 +266,18 @@ public class JobServiceImplTest {
 
     @Test
     public void testSyncInstancesOfJobForNullGroup() {
-        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(null);
+        given(jobInstanceRepo.findJobNameWithState()).willReturn(null);
         service.syncInstancesOfAllJobs();
     }
 
     @Test
     public void testSyncInstancesOfJobForRestClientException() {
         JobInstanceBean instance = newJobInstance();
-        instance.setSessionId(1234564);
+        instance.setSessionId(1234564L);
         String group = "groupName";
         String jobName = "jobName";
-        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        given(jobInstanceRepo.findJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+        given(jobInstanceRepo.findByJobName(group, jobName)).willReturn(Arrays.asList(instance));
         given(sparkJobProps.getProperty("livy.uri")).willReturn(PropertiesUtil.getProperties("/sparkJob.properties").getProperty("livy.uri"));
         service.syncInstancesOfAllJobs();
     }
@@ -283,8 +287,8 @@ public class JobServiceImplTest {
         JobInstanceBean instance = newJobInstance();
         String group = "groupName";
         String jobName = "jobName";
-        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        given(jobInstanceRepo.findJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+        given(jobInstanceRepo.findByJobName(group, jobName)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("result");
         service.syncInstancesOfAllJobs();
@@ -295,8 +299,8 @@ public class JobServiceImplTest {
         JobInstanceBean instance = newJobInstance();
         String group = "groupName";
         String jobName = "jobName";
-        given(jobInstanceRepo.findGroupAndJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-        given(jobInstanceRepo.findByGroupNameAndJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        given(jobInstanceRepo.findJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
+        given(jobInstanceRepo.findByJobName(group, jobName)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("{\"state\":\"wrong\"}");
         service.syncInstancesOfAllJobs();
@@ -320,7 +324,7 @@ public class JobServiceImplTest {
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
         List<JobInstanceBean> scheduleStateList = new ArrayList<>();
         scheduleStateList.add(newJobInstance());
-        given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
+        given(jobInstanceRepo.findByJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 1);
 
     }
@@ -340,7 +344,7 @@ public class JobServiceImplTest {
         JobInstanceBean jobInstance = newJobInstance();
         jobInstance.setState(LivySessionStates.State.error);
         scheduleStateList.add(jobInstance);
-        given(jobInstanceRepo.findByGroupNameAndJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
+        given(jobInstanceRepo.findByJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 0);
     }
 
@@ -374,13 +378,12 @@ public class JobServiceImplTest {
     }
 
     private JobInstanceBean newJobInstance() {
-        JobInstanceBean jobInstance = new JobInstanceBean();
-        jobInstance.setGroupName("BA");
-        jobInstance.setJobName("job1");
-        jobInstance.setSessionId(1);
-        jobInstance.setState(LivySessionStates.State.starting);
-        jobInstance.setAppId("app_id");
-        jobInstance.setTimestamp(System.currentTimeMillis());
-        return jobInstance;
+        JobInstanceBean jobBean = new JobInstanceBean();
+        jobBean.setJobId(1L);
+        jobBean.setSessionId(1L);
+        jobBean.setState(LivySessionStates.State.starting);
+        jobBean.setAppId("app_id");
+        jobBean.setTimestamp(System.currentTimeMillis());
+        return jobBean;
     }
 }

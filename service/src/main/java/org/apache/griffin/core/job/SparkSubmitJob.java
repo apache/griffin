@@ -21,7 +21,6 @@ package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivyConf;
 import org.apache.griffin.core.job.entity.LivySessionStates;
@@ -46,7 +45,7 @@ import static org.apache.griffin.core.job.JobInstance.*;
 @DisallowConcurrentExecution
 public class SparkSubmitJob implements Job {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparkSubmitJob.class);
-    public static final String SPARK_JOB_JARS_SPLIT = ";";
+    private static final String SPARK_JOB_JARS_SPLIT = ";";
 
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
@@ -71,10 +70,8 @@ public class SparkSubmitJob implements Job {
             if (success(mPredicts)) {
                 result = restTemplate.postForObject(livyUri, livyConf, String.class);
                 LOGGER.info(result);
-                JobDataMap jobDataMap = jobDetail.getJobDataMap();
-                saveJobInstance(jobDataMap.getString(GROUP_NAME_KEY), jobDataMap.getString(JOB_NAME_KEY), result);
+                saveJobInstance(jobDetail.getJobDataMap().getLongFromString(JOB_ID), result);
                 jobService.deleteJob(jobDetail.getKey().getGroup(), jobDetail.getKey().getName());
-
             }
         } catch (Exception e) {
             LOGGER.error("Post spark task error.", e);
@@ -104,23 +101,23 @@ public class SparkSubmitJob implements Job {
     }
 
     private void setPredicts(String json) throws IOException {
-        if (StringUtils.isEmpty(json)) {
-            return;
-        }
         List<Map<String, Object>> maps = JsonUtil.toEntity(json, new TypeReference<List<Map>>() {
         });
-        for (Map<String, Object> map : maps) {
-            SegmentPredicate sp = new SegmentPredicate();
-            sp.setType((String) map.get("type"));
-            sp.setConfigMap((Map<String, String>) map.get("config"));
-            mPredicts.add(sp);
+        if (maps != null) {
+            for (Map<String, Object> map : maps) {
+                SegmentPredicate sp = new SegmentPredicate();
+                sp.setType((String) map.get("type"));
+                sp.setConfigMap((Map<String, String>) map.get("config"));
+                mPredicts.add(sp);
+            }
         }
+
     }
 
 
     private void setMeasureInstanceName(GriffinMeasure measure, JobDetail jd) {
-        // in order to keep metric name unique, we set measure name as jobName at present
-        measure.setName(jd.getJobDataMap().getString("jobName"));
+        // in order to keep metric name unique, we set job name as measure name at present
+        measure.setName(jd.getJobDataMap().getString(JOB_NAME));
     }
 
     private String escapeCharacter(String str, String regex) {
@@ -171,13 +168,13 @@ public class SparkSubmitJob implements Job {
         livyConf.setConf(conf);
     }
 
-    private void saveJobInstance(String groupName, String jobName, String result) {
+    private void saveJobInstance(Long jobId, String result) {
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         try {
             Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
             if (resultMap != null) {
-                JobInstanceBean jobInstance = genJobInstance(groupName, jobName, resultMap);
+                JobInstanceBean jobInstance = genJobInstance(jobId, resultMap);
                 jobInstanceRepo.save(jobInstance);
             }
         } catch (IOException e) {
@@ -187,21 +184,20 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private JobInstanceBean genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException {
-        JobInstanceBean jobInstance = new JobInstanceBean();
-        jobInstance.setGroupName(groupName);
-        jobInstance.setJobName(jobName);
-        jobInstance.setTimestamp(System.currentTimeMillis());
+    private JobInstanceBean genJobInstance(Long jobId, Map<String, Object> resultMap) {
+        JobInstanceBean jobBean = new JobInstanceBean();
+        jobBean.setJobId(jobId);
+        jobBean.setTimestamp(System.currentTimeMillis());
         if (resultMap.get("state") != null) {
-            jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
+            jobBean.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
         }
         if (resultMap.get("id") != null) {
-            jobInstance.setSessionId(Integer.parseInt(resultMap.get("id").toString()));
+            jobBean.setSessionId(Long.parseLong(resultMap.get("id").toString()));
         }
         if (resultMap.get("appId") != null) {
-            jobInstance.setAppId(resultMap.get("appId").toString());
+            jobBean.setAppId(resultMap.get("appId").toString());
         }
-        return jobInstance;
+        return jobBean;
     }
 
 }

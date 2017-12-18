@@ -135,7 +135,7 @@ public class JobControllerTest {
         String jobName = "job1";
         int page = 0;
         int size = 2;
-        JobInstanceBean jobInstance = new JobInstanceBean(groupName, jobName, 1, LivySessionStates.State.running, "", "", System.currentTimeMillis());
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L, LivySessionStates.State.running, "", "", System.currentTimeMillis());
         given(service.findInstancesOfJob(groupName, jobName, page, size)).willReturn(Arrays.asList(jobInstance));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param("group", groupName).param("jobName", jobName)

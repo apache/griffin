@@ -38,22 +38,19 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
      * @return all job instances scheduled at different time using the same prototype job,
      * the prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.
      */
-    @Query("select s from JobInstanceBean s " +
-            "where s.groupName= ?1 and s.jobName=?2 ")
-    List<JobInstanceBean> findByGroupNameAndJobName(String group, String name, Pageable pageable);
+    @Query("select s from JobInstanceBean s")
+    List<JobInstanceBean> findByJobName(String group, String name, Pageable pageable);
 
-    @Query("select s from JobInstanceBean s " +
-            "where s.groupName= ?1 and s.jobName=?2 ")
-    List<JobInstanceBean> findByGroupNameAndJobName(String group, String name);
+    @Query("select s from JobInstanceBean s ")
+    List<JobInstanceBean> findByJobName(String group, String name);
 
-    @Query("select DISTINCT s.groupName, s.jobName from JobInstanceBean s " +
+    @Query("select DISTINCT s.jobId from JobInstanceBean s " +
             "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")
-    List<Object> findGroupAndJobNameWithState();
+    List<Object> findJobNameWithState();
 
     @Modifying
-    @Query("delete from JobInstanceBean s " +
-            "where s.groupName= ?1 and s.jobName=?2 ")
-    void deleteByGroupAndJobName(String groupName, String jobName);
+    @Query("delete from JobInstanceBean s ")
+    void deleteByJobName(String jobName);
 
     @Modifying
     @Query("update JobInstanceBean s " +

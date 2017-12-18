@@ -21,15 +21,12 @@ package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.job.entity.JobDataSegment;
-import org.apache.griffin.core.job.entity.JobSchedule;
-import org.apache.griffin.core.job.entity.SegmentPredicate;
-import org.apache.griffin.core.job.entity.SegmentRange;
+import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
-import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.TimeUtil;
@@ -43,6 +40,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
+import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
+import static org.apache.griffin.core.job.JobServiceImpl.JOB_SCHEDULE_ID;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -52,22 +51,24 @@ import static org.quartz.TriggerKey.triggerKey;
 @DisallowConcurrentExecution
 public class JobInstance implements Job {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobInstance.class);
-    public static final String MEASURE_KEY = "measure";
-    public static final String PREDICTS_KEY = "predicts";
-    public static final String JOB_NAME_KEY = "jobName";
-    public static final String GROUP_NAME_KEY = "groupName";
-    public static final String DELETED_KEY = "deleted";
-    public static final String PATH_CONNECTOR_CHARACTER = ",";
+    static final String MEASURE_KEY = "measure";
+    static final String PREDICTS_KEY = "predicts";
+    static final String JOB_ID = "jobId";
+    static final String JOB_NAME = "jobName";
+    static final String PATH_CONNECTOR_CHARACTER = ",";
 
     @Autowired
     private SchedulerFactoryBean factory;
     @Autowired
     private MeasureRepo<GriffinMeasure> measureRepo;
     @Autowired
+    private JobRepo<GriffinJob> jobRepo;
+    @Autowired
     private JobScheduleRepo jobScheduleRepo;
 
     private JobSchedule jobSchedule;
     private GriffinMeasure measure;
+    private GriffinJob griffinJob;
     private List<SegmentPredicate> mPredicts;
     private Long jobStartTime;
 
@@ -76,21 +77,24 @@ public class JobInstance implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
             initParam(context);
-            setDataSourcesPartitions(measure.getDataSources());
+            setSourcesPartitionsAndPredicates(measure.getDataSources());
             createJobInstance(jobSchedule.getConfigMap(), context);
         } catch (Exception e) {
-            LOGGER.error("Create job failure.", e);
+            LOGGER.error("Create predicate job failure.", e);
         }
     }
 
     private void initParam(JobExecutionContext context) throws SchedulerException {
         mPredicts = new ArrayList<>();
         JobDetail jobDetail = context.getJobDetail();
-        Long measureId = jobDetail.getJobDataMap().getLong("measureId");
-        Long jobScheduleId = jobDetail.getJobDataMap().getLong("jobScheduleId");
-        setJobStartTime(jobDetail);
-        measure = measureRepo.findOne(measureId);
+        Long jobScheduleId = jobDetail.getJobDataMap().getLong(JOB_SCHEDULE_ID);
+        Long griffinJobId = jobDetail.getJobDataMap().getLong(GRIFFIN_JOB_ID);
         jobSchedule = jobScheduleRepo.findOne(jobScheduleId);
+        Long measureId = jobSchedule.getMeasureId();
+        griffinJob = jobRepo.findOne(griffinJobId);
+        measure = measureRepo.findOne(measureId);
+        setJobStartTime(jobDetail);
+
     }
 
     private void setJobStartTime(JobDetail jobDetail) throws SchedulerException {
@@ -102,7 +106,7 @@ public class JobInstance implements Job {
     }
 
 
-    private void setDataSourcesPartitions(List<DataSource> sources) throws Exception {
+    private void setSourcesPartitionsAndPredicates(List<DataSource> sources) throws Exception {
         for (JobDataSegment jds : jobSchedule.getSegments()) {
             if (jds.getBaseline()) {
                 Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
@@ -199,7 +203,7 @@ public class JobInstance implements Job {
             for (Long timestamp : sampleTs) {
                 set.add(TimeUtil.format(value, timestamp));
             }
-            conf.put(entry.getKey(), StringUtils.join(set, ","));
+            conf.put(entry.getKey(), StringUtils.join(set, PATH_CONNECTOR_CHARACTER));
         }
     }
 
@@ -207,16 +211,27 @@ public class JobInstance implements Job {
         Map<String, Object> scheduleConfig = (Map<String, Object>) confMap.get("checkdonefile.schedule");
         Long interval = TimeUtil.str2Long((String) scheduleConfig.get("interval"));
         Integer repeat = (Integer) scheduleConfig.get("repeat");
-        String groupName = "predicate_group";
-        String jobName = measure.getName() + "_" + groupName + "_" + System.currentTimeMillis();
+        String groupName = "PG";
+        String jobName = griffinJob.getJobName() + "_predicate_" + System.currentTimeMillis();
         Scheduler scheduler = factory.getObject();
         TriggerKey triggerKey = triggerKey(jobName, groupName);
-        return !(scheduler.checkExists(triggerKey) || !createJobInstance(scheduler, triggerKey, interval, repeat, context));
+        return !(scheduler.checkExists(triggerKey)
+                || !saveGriffinJob(jobName, groupName)
+                || !createJobInstance(scheduler, triggerKey, interval, repeat));
     }
 
+    private boolean saveGriffinJob(String pJobName, String pGroupName) {
+        if (!StringUtils.isEmpty(griffinJob.getPredicateJobName())) {
+            griffinJob.setId(null);
+        }
+        griffinJob.setPredicateJobName(pJobName);
+        griffinJob.setPredicateGroupName(pGroupName);
+        jobRepo.save(griffinJob);
+        return true;
+    }
 
-    private boolean createJobInstance(Scheduler scheduler, TriggerKey triggerKey, Long interval, Integer repeatCount, JobExecutionContext context) throws Exception {
-        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, context);
+    private boolean createJobInstance(Scheduler scheduler, TriggerKey triggerKey, Long interval, Integer repeatCount) throws Exception {
+        JobDetail jobDetail = addJobDetail(scheduler, triggerKey);
         scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, repeatCount));
         return true;
     }
@@ -234,7 +249,7 @@ public class JobInstance implements Job {
                 .build();
     }
 
-    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey, JobExecutionContext context) throws SchedulerException, JsonProcessingException {
+    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey) throws SchedulerException, JsonProcessingException {
         JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);
@@ -246,17 +261,16 @@ public class JobInstance implements Job {
                     .withIdentity(jobKey)
                     .build();
         }
-        setJobDataMap(jobDetail, context);
+        setJobDataMap(jobDetail);
         scheduler.addJob(jobDetail, isJobKeyExist);
         return jobDetail;
     }
 
-    private void setJobDataMap(JobDetail jobDetail, JobExecutionContext context) throws JsonProcessingException {
+    private void setJobDataMap(JobDetail jobDetail) throws JsonProcessingException {
         jobDetail.getJobDataMap().put(MEASURE_KEY, JsonUtil.toJson(measure));
         jobDetail.getJobDataMap().put(PREDICTS_KEY, JsonUtil.toJson(mPredicts));
-        jobDetail.getJobDataMap().put(JOB_NAME_KEY, context.getJobDetail().getKey().getName());
-        jobDetail.getJobDataMap().put(GROUP_NAME_KEY, context.getJobDetail().getKey().getGroup());
-        jobDetail.getJobDataMap().putAsString(DELETED_KEY, false);
+        jobDetail.getJobDataMap().put(JOB_NAME, griffinJob.getJobName());
+        jobDetail.getJobDataMap().put(JOB_ID, griffinJob.getId().toString());
     }
 
 }

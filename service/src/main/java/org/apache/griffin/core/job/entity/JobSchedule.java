@@ -47,6 +47,9 @@ public class JobSchedule extends AbstractAuditableEntity {
     private Long measureId;
 
     @NotNull
+    private String jobName;
+
+    @NotNull
     private String cronExpression;
 
     @NotNull
@@ -72,6 +75,20 @@ public class JobSchedule extends AbstractAuditableEntity {
     @JsonProperty("measure.id")
     public void setMeasureId(Long measureId) {
         this.measureId = measureId;
+    }
+
+    @JsonProperty("job.name")
+    public String getJobName() {
+        return jobName;
+    }
+
+    @JsonProperty("job.name")
+    public void setJobName(String jobName) {
+        if (StringUtils.isEmpty(jobName)) {
+            LOGGER.error("Job name cannot be empty.");
+            throw new NullPointerException();
+        }
+        this.jobName = jobName;
     }
 
     @JsonProperty("cron.expression")
