@@ -84,12 +84,12 @@ public class MeasureOrgServiceImplTest {
         measure.setId(1L);
         given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
 
-        Map<String, Serializable> jobDetail = createJobDetailMap();
-        List<Map<String, Serializable>> jobList = Arrays.asList(jobDetail);
-        Map<String, List<Map<String, Serializable>>> measuresById = new HashMap<>();
+        Map<String, Object> jobDetail = createJobDetailMap();
+        List<Map<String, Object>> jobList = Arrays.asList(jobDetail);
+        Map<String, List<Map<String, Object>>> measuresById = new HashMap<>();
         measuresById.put("1", jobList);
 
-        Map<String, Map<String, List<Map<String, Serializable>>>> map = service.getMeasureWithJobDetailsGroupByOrg(measuresById);
+        Map<String, Map<String, List<Map<String, Object>>>> map = service.getMeasureWithJobDetailsGroupByOrg(measuresById);
         assertThat(map.size()).isEqualTo(1);
         assertThat(map).containsKey("org");
         assertThat(map.get("org").get("measure")).isEqualTo(jobList);

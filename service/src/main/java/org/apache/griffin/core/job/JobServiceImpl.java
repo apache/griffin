@@ -50,7 +50,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
 
@@ -87,21 +86,22 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<Map<String, Serializable>> getAliveJobs() {
+    public List<Map<String, Object>> getAliveJobs() {
         Scheduler scheduler = factory.getObject();
-        List<Map<String, Serializable>> list = new ArrayList<>();
+        List<Map<String, Object>> dataList = new ArrayList<>();
         try {
-            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {
-                Map jobInfoMap = getJobInfoMap(scheduler, jobKey);
-                if (jobInfoMap.size() != 0 && !isJobDeleted(scheduler, jobKey)) {
-                    list.add(jobInfoMap);
+            List<GriffinJob> jobs = jobRepo.findByDeleted(false);
+            for (GriffinJob job : jobs) {
+                Map jobDataMap = genJobDataMap(scheduler, jobKey(job.getQuartzJobName(), job.getQuartzGroupName()), job);
+                if (jobDataMap.size() != 0) {
+                    dataList.add(jobDataMap);
                 }
             }
-        } catch (SchedulerException e) {
-            LOGGER.error("failed to get running jobs.{}", e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("Failed to get running jobs.", e);
             throw new GetJobsFailureException();
         }
-        return list;
+        return dataList;
     }
 
     private boolean isJobDeleted(Scheduler scheduler, JobKey jobKey) throws SchedulerException {
@@ -109,39 +109,36 @@ public class JobServiceImpl implements JobService {
         return jobDataMap.getBooleanFromString("deleted");
     }
 
-    private Map getJobInfoMap(Scheduler scheduler, JobKey jobKey) throws SchedulerException {
+    private Map genJobDataMap(Scheduler scheduler, JobKey jobKey, GriffinJob job) throws SchedulerException {
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
-        Map<String, Serializable> jobInfoMap = new HashMap<>();
-        if (CollectionUtils.isEmpty(triggers)) {
-            return jobInfoMap;
+        Map<String, Object> jobDataMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(triggers)) {
+            Trigger trigger = triggers.get(0);
+            Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
+            setTriggerTime(trigger, jobDataMap);
+            jobDataMap.put("jobId", job.getId());
+            jobDataMap.put("jobName", job.getJobName());
+            jobDataMap.put("measureId", job.getMeasureId());
+            jobDataMap.put("triggerState", triggerState);
+            jobDataMap.put("cronExpression", getCronExpression(triggers));
         }
-        JobDetail jd = scheduler.getJobDetail(jobKey);
-        Date nextFireTime = triggers.get(0).getNextFireTime();
-        Date previousFireTime = triggers.get(0).getPreviousFireTime();
-        Trigger.TriggerState triggerState = scheduler.getTriggerState(triggers.get(0).getKey());
+        return jobDataMap;
+    }
 
-        jobInfoMap.put("jobName", jobKey.getName());
-        jobInfoMap.put("groupName", jobKey.getGroup());
-        if (nextFireTime != null) {
-            jobInfoMap.put("nextFireTime", nextFireTime.getTime());
-        } else {
-            jobInfoMap.put("nextFireTime", -1);
+    private String getCronExpression(List<Trigger> triggers) {
+        for (Trigger trigger : triggers) {
+            if (trigger instanceof CronTrigger) {
+                return ((CronTrigger) trigger).getCronExpression();
+            }
         }
-        if (previousFireTime != null) {
-            jobInfoMap.put("previousFireTime", previousFireTime.getTime());
-        } else {
-            jobInfoMap.put("previousFireTime", -1);
-        }
-        jobInfoMap.put("triggerState", triggerState);
-        jobInfoMap.put("measureId", jd.getJobDataMap().getString("measureId"));
-        jobInfoMap.put("sourcePattern", jd.getJobDataMap().getString("sourcePattern"));
-        jobInfoMap.put("targetPattern", jd.getJobDataMap().getString("targetPattern"));
-        if (StringUtils.isNotEmpty(jd.getJobDataMap().getString("blockStartTimestamp"))) {
-            jobInfoMap.put("blockStartTimestamp", jd.getJobDataMap().getString("blockStartTimestamp"));
-        }
-        jobInfoMap.put("jobStartTime", jd.getJobDataMap().getString("jobStartTime"));
-        jobInfoMap.put("interval", jd.getJobDataMap().getString("interval"));
-        return jobInfoMap;
+        return null;
+    }
+
+    private void setTriggerTime(Trigger trigger, Map<String, Object> jobDataMap) throws SchedulerException {
+        Date nextFireTime = trigger.getNextFireTime();
+        Date previousFireTime = trigger.getPreviousFireTime();
+        jobDataMap.put("nextFireTime", nextFireTime != null ? nextFireTime.getTime() : -1);
+        jobDataMap.put("previousFireTime", previousFireTime != null ? previousFireTime.getTime() : -1);
     }
 
     @Override
@@ -489,12 +486,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Map<String, List<Map<String, Serializable>>> getJobDetailsGroupByMeasureId() {
-        Map<String, List<Map<String, Serializable>>> jobDetailsMap = new HashMap<>();
-        List<Map<String, Serializable>> jobInfoList = getAliveJobs();
-        for (Map<String, Serializable> jobInfo : jobInfoList) {
+    public Map<String, List<Map<String, Object>>> getJobDetailsGroupByMeasureId() {
+        Map<String, List<Map<String, Object>>> jobDetailsMap = new HashMap<>();
+        List<Map<String, Object>> jobInfoList = getAliveJobs();
+        for (Map<String, Object> jobInfo : jobInfoList) {
             String measureId = (String) jobInfo.get("measureId");
-            List<Map<String, Serializable>> jobs = jobDetailsMap.getOrDefault(measureId, new ArrayList<>());
+            List<Map<String, Object>> jobs = jobDetailsMap.getOrDefault(measureId, new ArrayList<>());
             jobs.add(jobInfo);
             jobDetailsMap.put(measureId, jobs);
         }

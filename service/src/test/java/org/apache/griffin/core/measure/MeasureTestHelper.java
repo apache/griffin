@@ -72,8 +72,8 @@ public class MeasureTestHelper {
         return jobDetail;
     }
 
-    public static Map<String, Serializable> createJobDetailMap() {
-        Map<String, Serializable> jobDetailMap = new HashMap<>();
+    public static Map<String, Object> createJobDetailMap() {
+        Map<String, Object> jobDetailMap = new HashMap<>();
         jobDetailMap.put("jobName", "jobName");
         jobDetailMap.put("measureId", "1");
         jobDetailMap.put("groupName", "BA");

@@ -61,7 +61,7 @@ public class MeasureOrgController {
     }
 
     @RequestMapping(value = "/org/measure/jobs", method = RequestMethod.GET)
-    public Map<String, Map<String, List<Map<String, Serializable>>>> getMeasureWithJobsGroupByOrg() {
+    public Map<String, Map<String, List<Map<String, Object>>>> getMeasureWithJobsGroupByOrg() {
         return measureOrgService.getMeasureWithJobDetailsGroupByOrg(jobService.getJobDetailsGroupByMeasureId());
     }
 }

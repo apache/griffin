@@ -65,8 +65,8 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
     }
 
     @Override
-    public Map<String, Map<String, List<Map<String, Serializable>>>> getMeasureWithJobDetailsGroupByOrg(Map<String, List<Map<String, Serializable>>> jobDetails) {
-        Map<String, Map<String, List<Map<String, Serializable>>>> result = new HashMap<>();
+    public Map<String, Map<String, List<Map<String, Object>>>> getMeasureWithJobDetailsGroupByOrg(Map<String, List<Map<String, Object>>> jobDetails) {
+        Map<String, Map<String, List<Map<String, Object>>>> result = new HashMap<>();
         List<GriffinMeasure> measures = measureRepo.findByDeleted(false);
         if (measures == null) {
             return null;
@@ -75,8 +75,8 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
             String orgName = measure.getOrganization();
             String measureName = measure.getName();
             String measureId = measure.getId().toString();
-            List<Map<String, Serializable>> jobList = jobDetails.getOrDefault(measureId, new ArrayList<>());
-            Map<String, List<Map<String, Serializable>>> measureWithJobs = result.getOrDefault(orgName, new HashMap<>());
+            List<Map<String, Object>> jobList = jobDetails.getOrDefault(measureId, new ArrayList<>());
+            Map<String, List<Map<String, Object>>> measureWithJobs = result.getOrDefault(orgName, new HashMap<>());
             measureWithJobs.put(measureName, jobList);
             result.put(orgName, measureWithJobs);
         }

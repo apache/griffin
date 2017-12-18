@@ -64,7 +64,7 @@ public class JobControllerTest {
 
     @Test
     public void testGetJobs() throws Exception {
-        Map<String, Serializable> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("jobName", "job1");
         map.put("groupName", "BA");
         given(service.getAliveJobs()).willReturn(Arrays.asList(map));

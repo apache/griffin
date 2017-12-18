@@ -30,7 +30,7 @@ import java.util.Map;
 
 public interface JobService {
 
-    List<Map<String, Serializable>> getAliveJobs();
+    List<Map<String, Object>> getAliveJobs();
 
     GriffinOperationMessage addJob(JobSchedule jobSchedule);
 
@@ -40,7 +40,7 @@ public interface JobService {
 
     List<JobInstanceBean> findInstancesOfJob(String group, String name, int page, int size);
 
-    Map<String, List<Map<String, Serializable>>> getJobDetailsGroupByMeasureId();
+    Map<String, List<Map<String, Object>>> getJobDetailsGroupByMeasureId();
 
     JobHealth getHealthInfo();
 }

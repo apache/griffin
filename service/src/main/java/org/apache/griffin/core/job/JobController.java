@@ -35,13 +35,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/jobs")
 public class JobController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobController.class);
 
     @Autowired
     private JobService jobService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public List<Map<String, Serializable>> getJobs() {
+    public List<Map<String, Object>> getJobs() {
         return jobService.getAliveJobs();
     }
 
