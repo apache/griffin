@@ -19,6 +19,7 @@ under the License.
 package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.process._
+import org.apache.griffin.measure.process.temp._
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
@@ -57,11 +58,16 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
 
     val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
 //    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
-    val steps = adaptor.genConcreteRuleStep(TimeInfo(1, 2), rule)
+//    val steps = adaptor.genConcreteRuleStep(TimeInfo(1, 2), rule)
 
-    steps.foreach { step =>
-      println(s"${step}")
-    }
+//    steps.foreach { step =>
+//      println(s"${step}")
+//    }
+
+    TempTables.registerTempTableNameOnly(TempKeys.key(123), "source")
+
+    val ris = adaptor.genRuleInfos(rule, 123)
+    ris.foreach(println)
   }
 
   test ("accuracy") {

@@ -42,7 +42,7 @@ trait DataConnector extends Loggable with Serializable {
 
   var tmstCache: TmstCache = _
   protected def saveTmst(t: Long) = tmstCache.insert(t)
-  protected def readTmst(t: Long) = tmstCache.range(t, t + 1)
+  protected def readTmst(t: Long) = tmstCache.range(t, t + 20)
 
   def init(): Unit
 
@@ -94,16 +94,20 @@ trait DataConnector extends Loggable with Serializable {
 //          }
 //        }
 
+        val range = if (id == "dc1") (0 until 20).toList else (0 until 1).toList
+        val withTmstDfs = range.map { i =>
+          saveTmst(ms + i)
+          outDf.withColumn(tmstColName, lit(ms + i)).limit(49 - i)
+        }
+        Some(withTmstDfs.reduce(_ unionAll _))
+
         // add tmst
-        val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
-//        val withTmstDf1 = outDf.withColumn(tmstColName, lit(ms + 1)).limit(48)
-
-        // tmst cache
-        saveTmst(ms)
-//        saveTmst(ms + 1)
-
-        Some(withTmstDf)
-//        Some(withTmstDf unionAll withTmstDf1)
+//        val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
+//
+//        // tmst cache
+//        saveTmst(ms)
+//
+//        Some(withTmstDf)
       }
     } catch {
       case e: Throwable => {

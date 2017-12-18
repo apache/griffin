@@ -38,6 +38,12 @@ object RuleAdaptorGroup {
 
   var baselineDsName: String = ""
 
+  def init(dsNames: Seq[String], blDsName: String, funcNames: Seq[String]): Unit = {
+    dataSourceNames = dsNames
+    baselineDsName = blDsName
+    functionNames = funcNames
+  }
+
   def init(sqlContext: SQLContext, dsNames: Seq[String], blDsName: String): Unit = {
     val functions = sqlContext.sql("show functions")
     functionNames = functions.map(_.getString(0)).collect.toSeq
@@ -53,8 +59,8 @@ object RuleAdaptorGroup {
   private def genRuleAdaptor(dslType: DslType, dsNames: Seq[String]
                             ): Option[RuleAdaptor] = {
     dslType match {
-      case SparkSqlType => Some(SparkSqlAdaptor())
-      case DfOprType => Some(DataFrameOprAdaptor())
+//      case SparkSqlType => Some(SparkSqlAdaptor())
+//      case DfOprType => Some(DataFrameOprAdaptor())
       case GriffinDslType => Some(GriffinDslAdaptor(dsNames, functionNames))
       case _ => None
     }
@@ -120,40 +126,133 @@ object RuleAdaptorGroup {
                    tmsts: Seq[Long], defaultDslType: DslType,
                    adapthase: AdaptPhase = RunPhase
                   ): Seq[ConcreteRuleStep] = {
-    tmsts.flatMap { tmst =>
-      val newTimeInfo = TimeInfo(timeInfo.calcTime, tmst)
-      val initSteps: Seq[ConcreteRuleStep] = adapthase match {
-        case RunPhase => genTmstInitStep(newTimeInfo)
-        case PreProcPhase => Nil
-      }
-      val (steps, dsNames) = ruleParams.foldLeft((initSteps, dataSourceNames)) { (res, param) =>
-        val (preSteps, preNames) = res
-        val dslType = getDslType(param, defaultDslType)
-        val (curSteps, curNames) = genRuleAdaptor(dslType, preNames) match {
-          case Some(ruleAdaptor) => {
-            val concreteSteps = ruleAdaptor.genConcreteRuleStep(newTimeInfo, param)
-            val persistNames = ruleAdaptor.getPersistNames(concreteSteps)
-            (concreteSteps, persistNames)
-          }
-          case _ => (Nil, Nil)
+    val calcTime = timeInfo.calcTime
+    val (ruleInfos, dsNames) = ruleParams.foldLeft((Seq[RuleInfo](), dataSourceNames)) { (res, param) =>
+      val (preRuleInfos, preNames) = res
+      val dslType = getDslType(param, defaultDslType)
+      val (curRuleInfos, curNames) = genRuleAdaptor(dslType, preNames) match {
+        case Some(adaptor) => {
+          val ris = adaptor.genRuleInfos(param, calcTime)
+          val rins = ris.map(_.name)
+          (ris, rins)
         }
-        (preSteps ++ curSteps, preNames ++ curNames)
+        case _ => (Nil, Nil)
       }
-      steps
+      (preRuleInfos ++ curRuleInfos, preNames ++ curNames)
+    }
+
+    // fold from right
+//    val riGroups = ruleInfos.foldRight(List[(List[RuleInfo], Boolean, List[String])]()) { (ri, groups) =>
+//      groups match {
+//        case head :: tail => {
+//          if (ri.gather == head._2) (ri :: head._1, head._2, Nil) :: tail
+//          else if (ri.gather) {
+//            val nri = ri.setTmstNameOpt(Some(TempName.tmstName(ri.name, calcTime)))
+//            (nri :: Nil, ri.gather, None) :: (head._1, head._2, Some(ri.name)) :: tail
+//          }
+//          else (ri :: Nil, ri.gather, Nil) :: groups
+//        }
+//        case _ => (ri :: Nil, ri.gather, Nil) :: groups
+//      }
+//    }
+    val riGroups = ruleInfos.foldRight(List[(List[RuleInfo], Boolean)]()) { (ri, groups) =>
+      groups match {
+        case head :: tail if (ri.gather == head._2) => (ri :: head._1, head._2) :: tail
+        case _ => (ri :: Nil, ri.gather) :: groups
+      }
+    }.foldLeft(List[(List[RuleInfo], Boolean, List[String])]()) { (groups, rigs) =>
+      val preGatherNames = groups.lastOption match {
+        case Some(t) => if (t._2) t._3 ::: t._1.map(_.name) else t._3
+        case _ => baselineDsName :: Nil
+      }
+      groups :+ (rigs._1, rigs._2, preGatherNames)
+    }
+
+    riGroups.flatMap { group =>
+      val (ris, gather, srcNames) = group
+      if (gather) {
+        ris.flatMap { ri =>
+          genConcRuleSteps(timeInfo, ri)
+        }
+      } else {
+        tmsts.flatMap { tmst =>
+          val newTimeInfo = TimeInfo(calcTime, tmst)
+          val tmstInitRuleInfos = genTmstInitRuleInfo(newTimeInfo, srcNames)
+          (tmstInitRuleInfos ++ ris).flatMap { ri =>
+            genConcRuleSteps(newTimeInfo, ri)
+          }
+        }
+      }
     }
   }
 
-  private def genTmstInitStep(timeInfo: TimeInfo): Seq[ConcreteRuleStep] = {
-    val TimeInfo(calcTime, tmst) = timeInfo
-    val tmstDsName = TempName.tmstName(baselineDsName, calcTime)
-    val filterSql = {
-      s"SELECT * FROM `${tmstDsName}` WHERE `${InternalColumns.tmst}` = ${tmst}"
+  private def genConcRuleSteps(timeInfo: TimeInfo, ruleInfo: RuleInfo): Seq[ConcreteRuleStep] = {
+    val nri = if (ruleInfo.persistType.needPersist && ruleInfo.tmstNameOpt.isEmpty) {
+      val tmstName = if (ruleInfo.gather) {
+        TempName.tmstName(ruleInfo.name, timeInfo.calcTime)
+      } else {
+        TempName.tmstName(ruleInfo.name, timeInfo)
+      }
+      ruleInfo.setTmstNameOpt(Some(tmstName))
+    } else ruleInfo
+    ruleInfo.dslType match {
+      case SparkSqlType => SparkSqlStep(timeInfo, nri) :: Nil
+      case DfOprType => DfOprStep(timeInfo, nri) :: Nil
+      case _ => Nil
     }
-    SparkSqlStep(
-      timeInfo,
-      RuleInfo(baselineDsName, None, filterSql, Map[String, Any]())
-    ) :: Nil
   }
+
+  private def genTmstInitRuleInfo(timeInfo: TimeInfo, srcNames: Seq[String]): Seq[RuleInfo] = {
+    val TimeInfo(calcTime, tmst) = timeInfo
+    srcNames.map { srcName =>
+      val srcTmstName = TempName.tmstName(srcName, calcTime)
+      val filterSql = {
+        s"SELECT * FROM `${srcTmstName}` WHERE `${InternalColumns.tmst}` = ${tmst}"
+      }
+      RuleInfo(srcName, None, SparkSqlType, filterSql, Map[String, Any](), false)
+    }
+  }
+
+//  def genRuleSteps(timeInfo: TimeInfo, ruleParams: Seq[Map[String, Any]],
+//                   tmsts: Seq[Long], defaultDslType: DslType,
+//                   adapthase: AdaptPhase = RunPhase
+//                  ): Seq[ConcreteRuleStep] = {
+//    tmsts.flatMap { tmst =>
+//      val newTimeInfo = TimeInfo(timeInfo.calcTime, tmst)
+//      val initSteps: Seq[ConcreteRuleStep] = adapthase match {
+//        case RunPhase => genTmstInitStep(newTimeInfo)
+//        case PreProcPhase => Nil
+//      }
+//      val (steps, dsNames) = ruleParams.foldLeft((initSteps, dataSourceNames)) { (res, param) =>
+//        val (preSteps, preNames) = res
+//        val dslType = getDslType(param, defaultDslType)
+//        val (curSteps, curNames) = genRuleAdaptor(dslType, preNames) match {
+//          case Some(ruleAdaptor) => {
+//            val concreteSteps = ruleAdaptor.genConcreteRuleStep(newTimeInfo, param)
+//            val persistNames = ruleAdaptor.getPersistNames(concreteSteps)
+//            (concreteSteps, persistNames)
+//          }
+//          case _ => (Nil, Nil)
+//        }
+//        (preSteps ++ curSteps, preNames ++ curNames)
+//      }
+//      steps
+//    }
+//  }
+
+
+
+//  private def genTmstInitStep(timeInfo: TimeInfo): Seq[ConcreteRuleStep] = {
+//    val TimeInfo(calcTime, tmst) = timeInfo
+//    val tmstDsName = TempName.tmstName(baselineDsName, calcTime)
+//    val filterSql = {
+//      s"SELECT * FROM `${tmstDsName}` WHERE `${InternalColumns.tmst}` = ${tmst}"
+//    }
+//    SparkSqlStep(
+//      timeInfo,
+//      RuleInfo(baselineDsName, None, filterSql, Map[String, Any]())
+//    ) :: Nil
+//  }
 
 
 }

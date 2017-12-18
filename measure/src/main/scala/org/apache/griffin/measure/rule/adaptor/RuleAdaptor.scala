@@ -41,18 +41,22 @@ trait RuleAdaptor extends Loggable with Serializable {
 //    case _ => Map[String, Any]()
 //  }
 
-  def getPersistNames(steps: Seq[RuleStep]): Seq[String] = steps.map(_.ruleInfo.persistName)
 
-  protected def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep]
-  protected def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep]
-  def genConcreteRuleStep(timeInfo: TimeInfo, param: Map[String, Any]
-                         ): Seq[ConcreteRuleStep] = {
-    genRuleStep(timeInfo, param).flatMap { rs =>
-      adaptConcreteRuleStep(rs)
-    }
+
+//  def getPersistNames(steps: Seq[RuleStep]): Seq[String] = steps.map(_.ruleInfo.persistName)
+//
+//  protected def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep]
+//  protected def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep]
+//  def genConcreteRuleStep(timeInfo: TimeInfo, param: Map[String, Any]
+//                         ): Seq[ConcreteRuleStep] = {
+//    genRuleStep(timeInfo, param).flatMap { rs =>
+//      adaptConcreteRuleStep(rs)
+//    }
+//  }
+
+  def genRuleInfos(param: Map[String, Any], calcTime: Long): Seq[RuleInfo] = {
+    RuleInfoGen(param) :: Nil
   }
-
-  protected def genRuleInfos(param: Map[String, Any]): Seq[RuleInfo] = RuleInfoGen(param) :: Nil
 
 }
 
@@ -60,35 +64,37 @@ object RuleInfoKeys {
   val _name = "name"
   val _rule = "rule"
   val _details = "details"
-
   val _dslType = "dsl.type"
-  val _dqType = "dq.type"
   val _gatherStep = "gather.step"
+
+  val _dqType = "dq.type"
 }
 import RuleInfoKeys._
 import org.apache.griffin.measure.utils.ParamUtil._
 
 object RuleInfoGen {
   def apply(param: Map[String, Any]): RuleInfo = {
-    val name = param.getString(_name, RuleStepNameGenerator.genName)
+    val name = param.get(_name) match {
+      case Some(n: String) => n
+      case _ => RuleStepNameGenerator.genName
+    }
     RuleInfo(
       name,
       None,
+      DslType(param.getString(_dslType, "")),
       param.getString(_rule, ""),
       param.getParamMap(_details),
       param.getBoolean(_gatherStep, false)
     )
   }
-  def apply(param: Map[String, Any], timeInfo: TimeInfo): RuleInfo = {
-    val name = param.getString(_name, RuleStepNameGenerator.genName)
-    val ri = apply(param)
+  def apply(ri: RuleInfo, timeInfo: TimeInfo): RuleInfo = {
     if (ri.persistType.needPersist) {
-      val tmstName = TempName.tmstName(name, timeInfo)
+      val tmstName = TempName.tmstName(ri.name, timeInfo)
       ri.setTmstNameOpt(Some(tmstName))
     } else ri
   }
 
-  def dslType(param: Map[String, Any]): DslType = DslType(param.getString(_dslType, ""))
+//  def dslType(param: Map[String, Any]): DslType = DslType(param.getString(_dslType, ""))
   def dqType(param: Map[String, Any]): DqType = DqType(param.getString(_dqType, ""))
 }
 

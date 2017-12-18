@@ -102,6 +102,8 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     val ruleSteps = RuleAdaptorGroup.genRuleSteps(
       TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts)
 
+//    ruleSteps.foreach(println)
+
     // run rules
     dqEngines.runRuleSteps(ruleSteps)
 

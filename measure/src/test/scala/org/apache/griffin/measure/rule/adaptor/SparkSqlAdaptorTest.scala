@@ -29,31 +29,31 @@ import org.scalamock.scalatest.MockFactory
 class SparkSqlAdaptorTest extends FunSuite with Matchers with BeforeAndAfter with MockFactory {
 
   test ("spark sql adaptor test") {
-    val adaptor = SparkSqlAdaptor()
-
-    val ruleJson =
-      """
-        |{
-        |  "dsl.type": "spark-sql",
-        |  "name": "out",
-        |  "rule": "count(*)",
-        |  "details": {
-        |    "persist.type": "metric",
-        |    "collect.type": "array"
-        |  }
-        |}
-      """.stripMargin
-
-    // rule: Map[String, Any]
-    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
-    println(rule)
-
-    val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
-    val steps = adaptor.genConcreteRuleStep(TimeInfo(1, 2), rule)
-
-    steps.foreach { step =>
-      println(s"${step}")
-    }
+//    val adaptor = SparkSqlAdaptor()
+//
+//    val ruleJson =
+//      """
+//        |{
+//        |  "dsl.type": "spark-sql",
+//        |  "name": "out",
+//        |  "rule": "count(*)",
+//        |  "details": {
+//        |    "persist.type": "metric",
+//        |    "collect.type": "array"
+//        |  }
+//        |}
+//      """.stripMargin
+//
+//    // rule: Map[String, Any]
+//    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
+//    println(rule)
+//
+//    val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
+//    val steps = adaptor.genConcreteRuleStep(TimeInfo(1, 2), rule)
+//
+//    steps.foreach { step =>
+//      println(s"${step}")
+//    }
   }
 
 }

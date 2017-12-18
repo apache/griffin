@@ -80,6 +80,10 @@ object TempTables extends Loggable {
     df.registerTempTable(table)
   }
 
+  def registerTempTableNameOnly(key: String, table: String): Unit = {
+    registerTable(key, table)
+  }
+
   def unregisterTempTable(sqlContext: SQLContext, key: String, table: String): Unit = {
     unregisterTable(key, table).foreach(dropTempTable(sqlContext, _))
   }
