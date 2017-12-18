@@ -20,7 +20,7 @@ package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.process.temp._
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo}
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -64,9 +64,10 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
 //      println(s"${step}")
 //    }
 
-    TempTables.registerTempTableNameOnly(TempKeys.key(123), "source")
+    val timeInfo = CalcTimeInfo(123)
+    TempTables.registerTempTableNameOnly(timeInfo.key, "source")
 
-    val ris = adaptor.genRuleInfos(rule, 123)
+    val ris = adaptor.genRuleInfos(rule, timeInfo)
     ris.foreach(println)
   }
 

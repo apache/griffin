@@ -41,7 +41,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "dist-name",
+        "name": "dist_name",
         "rule": "select count ( distinct source.post_code ) as `dis-cnt`, max(source.user_id) from source",
         "details": {
           "persist.type": "metric"
@@ -69,7 +69,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "temp-res",
+        "name": "temp_res",
         "rule": "select count(distinct user_id) as `id-dist-cnt` from temp",
         "details": {
           "persist.type": "metric"

@@ -29,9 +29,8 @@ import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
 import org.apache.griffin.measure.process.temp.TempTables
-import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.rule.udf.GriffinUdfs
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.SQLContext
@@ -75,6 +74,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     val startTime = new Date().getTime
 
     val appTime = getAppTime
+    val calcTimeInfo = CalcTimeInfo(appTime)
 
     // get persists to persist measure result
     val persistFactory = PersistFactory(envParam.persistParams, metricName)
@@ -92,7 +92,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dataSources.foreach(_.init)
 
     // init data sources
-    val dsTmsts = dqEngines.loadData(dataSources, appTime)
+    val dsTmsts = dqEngines.loadData(dataSources, calcTimeInfo)
 
     debug(s"data source timestamps: ${dsTmsts}")
 
@@ -100,7 +100,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
 //      TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts, BatchProcessType, RunPhase)
     val ruleSteps = RuleAdaptorGroup.genRuleSteps(
-      TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts)
+      CalcTimeInfo(appTime), userParam.evaluateRuleParam, dsTmsts)
 
 //    ruleSteps.foreach(println)
 
@@ -125,10 +125,14 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // finish
     persist.finish()
 
+//    sqlContext.tables().show(50)
+//    println(sqlContext.tableNames().size)
+
     // clean data
-    cleanData(appTime)
+    cleanData(calcTimeInfo)
 
 //    sqlContext.tables().show(50)
+//    println(sqlContext.tableNames().size)
 
     // clear temp table
 //    ruleSteps.foreach { rs =>
@@ -144,8 +148,8 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //    sqlContext.tables().show(50)
   }
 
-  private def cleanData(t: Long): Unit = {
-    TempTables.unregisterTempTables(sqlContext, key(t))
+  private def cleanData(timeInfo: TimeInfo): Unit = {
+    TempTables.unregisterTempTables(sqlContext, timeInfo.key)
   }
 
   def end: Try[_] = Try {

@@ -23,7 +23,7 @@ import org.apache.griffin.measure.config.params.user.UserParam
 import org.apache.griffin.measure.config.reader.ParamReaderFactory
 import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.process.temp._
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo, TmstTimeInfo}
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -41,8 +41,9 @@ class RuleAdaptorGroupTest extends FunSuite with Matchers with BeforeAndAfter wi
       "source",
       "coalesce" :: "count" :: "upper" :: Nil
     )
-    TempTables.registerTempTableNameOnly(TempKeys.key(123), "source")
-    TempTables.registerTempTableNameOnly(TempKeys.key(123), "target")
+    val timeInfo = CalcTimeInfo(123)
+    TempTables.registerTempTableNameOnly(timeInfo.key, "source")
+    TempTables.registerTempTableNameOnly(timeInfo.key, "target")
 
     val confFile = "src/test/resources/config-test-accuracy-new.json"
 
@@ -54,7 +55,7 @@ class RuleAdaptorGroupTest extends FunSuite with Matchers with BeforeAndAfter wi
     val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](111, 222, 333)))
 
     val steps = RuleAdaptorGroup.genRuleSteps(
-      TimeInfo(123, 321),
+      TmstTimeInfo(123, 321),
       userParam.evaluateRuleParam,
       dsTmsts
     )

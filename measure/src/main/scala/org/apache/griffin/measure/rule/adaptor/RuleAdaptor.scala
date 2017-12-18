@@ -54,7 +54,7 @@ trait RuleAdaptor extends Loggable with Serializable {
 //    }
 //  }
 
-  def genRuleInfos(param: Map[String, Any], calcTime: Long): Seq[RuleInfo] = {
+  def genRuleInfos(param: Map[String, Any], timeInfo: TimeInfo): Seq[RuleInfo] = {
     RuleInfoGen(param) :: Nil
   }
 

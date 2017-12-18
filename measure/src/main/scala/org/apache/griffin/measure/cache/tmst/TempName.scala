@@ -31,7 +31,8 @@ object TempName extends Loggable {
 //  private val tmstNameRegex = """^(.*)\((\d*)\)\[(\d*)\]$""".r
   private val tmstNameRegex = """^(.*)_(\d*)_(\d*)$""".r
   def tmstName(name: String, timeInfo: TimeInfo) = {
-    val TimeInfo(calcTime, tmst) = timeInfo
+    val calcTime = timeInfo.calcTime
+    val tmst = timeInfo.tmst
     s"${name}_${calcTime}_${tmst}"
   }
   def extractTmstName(tmstName: String): (String, Option[Long], Option[Long]) = {

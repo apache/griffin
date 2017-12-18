@@ -36,7 +36,7 @@
     "rules": [
       {
         "dsl.type": "spark-sql",
-        "name": "miss-records",
+        "name": "miss_records",
         "gather.step": true,
         "rule": "SELECT source.* FROM source LEFT JOIN target ON coalesce(source.user_id, '') = coalesce(target.user_id, '') AND coalesce(source.first_name, '') = coalesce(target.first_name, '') AND coalesce(source.post_code, '') = coalesce(target.post_code, '') WHERE (NOT (source.user_id IS NULL AND source.user_id IS NULL AND source.post_code IS NULL)) AND (target.user_id IS NULL AND target.user_id IS NULL AND target.post_code IS NULL)",
         "details": {
@@ -45,20 +45,26 @@
       },
       {
         "dsl.type": "spark-sql",
-        "name": "miss-count",
-        "rule": "SELECT count(*) as miss FROM `miss-records`"
+        "name": "miss_count",
+        "rule": "SELECT count(*) as miss FROM `miss_records`"
       },
       {
         "dsl.type": "spark-sql",
-        "name": "total-count",
+        "name": "total_count",
         "rule": "SELECT count(*) as total FROM source"
       },
       {
         "dsl.type": "spark-sql",
         "name": "accu",
-        "rule": "SELECT `miss-count`.miss, `total-count`.total, (`total-count`.total - `miss-count`.miss) as matched FROM `miss-count` FULL JOIN `total-count`",
+        "rule": "SELECT `miss_count`.miss, `total_count`.total, (`total_count`.total - `miss_count`.miss) as matched FROM `miss_count` FULL JOIN `total_count`"
+      },
+      {
+        "dsl.type": "df-opr",
+        "name": "accu",
+        "rule": "accuracy",
         "details": {
-          "persist.type": "metric"
+          "persist.type": "metric",
+          "df.name": "accu"
         }
       }
     ]

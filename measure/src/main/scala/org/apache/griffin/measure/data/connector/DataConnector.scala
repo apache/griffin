@@ -26,11 +26,10 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.{BatchDqProcess, BatchProcessType}
 import org.apache.griffin.measure.process.engine._
 import org.apache.griffin.measure.process.temp.TempTables
-import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.rule.adaptor.{PreProcPhase, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.preproc.PreProcRuleGenerator
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -42,7 +41,7 @@ trait DataConnector extends Loggable with Serializable {
 
   var tmstCache: TmstCache = _
   protected def saveTmst(t: Long) = tmstCache.insert(t)
-  protected def readTmst(t: Long) = tmstCache.range(t, t + 20)
+  protected def readTmst(t: Long) = tmstCache.range(t, t + 1)
 
   def init(): Unit
 
@@ -62,6 +61,7 @@ trait DataConnector extends Loggable with Serializable {
   final val tmstColName = InternalColumns.tmst
 
   def preProcess(dfOpt: Option[DataFrame], ms: Long): Option[DataFrame] = {
+    val timeInfo = CalcTimeInfo(ms, id)
     val thisTable = thisName(ms)
     val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
 //    val names = PreProcRuleGenerator.getRuleNames(preProcRules).toSet + thisTable
@@ -69,14 +69,14 @@ trait DataConnector extends Loggable with Serializable {
     try {
       dfOpt.flatMap { df =>
         // in data
-        TempTables.registerTempTable(df, key(id, ms), thisTable)
+        TempTables.registerTempTable(df, timeInfo.key, thisTable)
 
 //        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
         val tmsts = Seq[Long](ms)
 
         // generate rule steps
         val ruleSteps = RuleAdaptorGroup.genRuleSteps(
-          TimeInfo(ms, ms), preProcRules, tmsts, DslType("spark-sql"), PreProcPhase)
+          timeInfo, preProcRules, tmsts, DslType("spark-sql"), PreProcPhase)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
@@ -85,7 +85,7 @@ trait DataConnector extends Loggable with Serializable {
         val outDf = sqlContext.table(s"`${thisTable}`")
 
         // drop temp tables
-        TempTables.unregisterTempTables(sqlContext, key(id, ms))
+        TempTables.unregisterTempTables(sqlContext, timeInfo.key)
 //        names.foreach { name =>
 //          try {
 //            TempTables.unregisterTempTable(sqlContext, ms, name)
@@ -94,20 +94,20 @@ trait DataConnector extends Loggable with Serializable {
 //          }
 //        }
 
-        val range = if (id == "dc1") (0 until 20).toList else (0 until 1).toList
-        val withTmstDfs = range.map { i =>
-          saveTmst(ms + i)
-          outDf.withColumn(tmstColName, lit(ms + i)).limit(49 - i)
-        }
-        Some(withTmstDfs.reduce(_ unionAll _))
+//        val range = if (id == "dc1") (0 until 20).toList else (0 until 1).toList
+//        val withTmstDfs = range.map { i =>
+//          saveTmst(ms + i)
+//          outDf.withColumn(tmstColName, lit(ms + i)).limit(49 - i)
+//        }
+//        Some(withTmstDfs.reduce(_ unionAll _))
 
         // add tmst
-//        val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
-//
-//        // tmst cache
-//        saveTmst(ms)
-//
-//        Some(withTmstDf)
+        val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
+
+        // tmst cache
+        saveTmst(ms)
+
+        Some(withTmstDf)
       }
     } catch {
       case e: Throwable => {

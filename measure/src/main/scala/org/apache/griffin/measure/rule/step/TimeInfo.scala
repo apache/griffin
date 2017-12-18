@@ -18,28 +18,20 @@ under the License.
 */
 package org.apache.griffin.measure.rule.step
 
-import java.util.concurrent.atomic.AtomicLong
+trait TimeInfo extends Serializable {
+  val calcTime: Long
+  val tmst: Long
+  val head: String
 
-import org.apache.griffin.measure.rule.dsl._
-
-trait RuleStep extends Serializable {
-
-  val dslType: DslType
-
-  val timeInfo: TimeInfo
-
-  val ruleInfo: RuleInfo
-
-  def name = ruleInfo.name
-
+  def key: String = if (head.nonEmpty) s"${head}_${calcTime}" else s"${calcTime}"
+  def setHead(h: String): TimeInfo
 }
 
-//case class TimeInfo(calcTime: Long, tmst: Long, head: String = "") {
-//  def key: String = if (head.nonEmpty) s"${head}${calcTime}" else s"${calcTime}"
-//  def setHead(h: String): TimeInfo = TimeInfo(calcTime, tmst, h)
-//}
+case class CalcTimeInfo(calcTime: Long, head: String = "") extends TimeInfo {
+  val tmst: Long = calcTime
+  def setHead(h: String): TimeInfo = CalcTimeInfo(calcTime, h)
+}
 
-
-
-
-
+case class TmstTimeInfo(calcTime: Long, tmst: Long, head: String = "") extends TimeInfo {
+  def setHead(h: String): TimeInfo = TmstTimeInfo(calcTime, tmst, h)
+}

@@ -29,9 +29,8 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
 import org.apache.griffin.measure.process.temp.TempTables
-import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo}
 import org.apache.spark.sql.SQLContext
 
 case class StreamingDqThread(sqlContext: SQLContext,
@@ -54,17 +53,20 @@ case class StreamingDqThread(sqlContext: SQLContext,
 
         val st = new Date().getTime
         appPersist.log(st, s"starting process ...")
+        val calcTimeInfo = CalcTimeInfo(st)
 
         TimeInfoCache.startTimeInfoCache
 
         // init data sources
-        val dsTmsts = dqEngines.loadData(dataSources, st)
+        val dsTmsts = dqEngines.loadData(dataSources, calcTimeInfo)
 
         println(s"data sources timestamps: ${dsTmsts}")
 
         // generate rule steps
         val ruleSteps = RuleAdaptorGroup.genRuleSteps(
-          TimeInfo(st, st), evaluateRuleParam, dsTmsts)
+          CalcTimeInfo(st), evaluateRuleParam, dsTmsts)
+
+//        ruleSteps.foreach(println)
 
         // run rules
         dqEngines.runRuleSteps(ruleSteps)
@@ -109,7 +111,7 @@ case class StreamingDqThread(sqlContext: SQLContext,
         TimeInfoCache.endTimeInfoCache
 
         // clean old data
-        cleanData(st)
+        cleanData(calcTimeInfo)
 
         val et = new Date().getTime
         val persistTimeStr = s"persist records using time: ${et - lt} ms"
@@ -129,10 +131,10 @@ case class StreamingDqThread(sqlContext: SQLContext,
   }
 
   // clean old data and old result cache
-  private def cleanData(t: Long): Unit = {
+  private def cleanData(timeInfo: TimeInfo): Unit = {
     try {
       dataSources.foreach(_.cleanOldData)
-      TempTables.unregisterTempTables(sqlContext, key(t))
+      TempTables.unregisterTempTables(sqlContext, timeInfo.key)
 
       val cleanTime = TimeInfoCache.getCleanTime
       CacheResultProcesser.refresh(cleanTime)

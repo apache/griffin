@@ -21,7 +21,6 @@ package org.apache.griffin.measure.rule.adaptor
 import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
 import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.process.temp.TempTables
-import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.dsl.analyzer._
@@ -51,7 +50,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
   }
   val parser = GriffinDslParser(dataSourceNames, filteredFunctionNames)
 
-  override def genRuleInfos(param: Map[String, Any], calcTime: Long): Seq[RuleInfo] = {
+  override def genRuleInfos(param: Map[String, Any], timeInfo: TimeInfo): Seq[RuleInfo] = {
     val ruleInfo = RuleInfoGen(param)
     val dqType = RuleInfoGen.dqType(param)
     try {
@@ -59,8 +58,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       if (result.successful) {
         val expr = result.get
         dqType match {
-          case AccuracyType => accuracyRuleInfos(ruleInfo, expr, calcTime)
-          case ProfilingType => profilingRuleInfos(ruleInfo, expr, calcTime)
+          case AccuracyType => accuracyRuleInfos(ruleInfo, expr, timeInfo)
+          case ProfilingType => profilingRuleInfos(ruleInfo, expr, timeInfo)
           case TimelinessType => Nil
           case _ => Nil
         }
@@ -76,17 +75,18 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     }
   }
 
-  private def accuracyRuleInfos(ruleInfo: RuleInfo, expr: Expr, calcTime: Long): Seq[RuleInfo] = {
+  private def accuracyRuleInfos(ruleInfo: RuleInfo, expr: Expr, timeInfo: TimeInfo): Seq[RuleInfo] = {
+    val calcTime = timeInfo.calcTime
     val details = ruleInfo.details
     val sourceName = details.getString(AccuracyKeys._source, dataSourceNames.head)
     val targetName = details.getString(AccuracyKeys._target, dataSourceNames.tail.head)
     val analyzer = AccuracyAnalyzer(expr.asInstanceOf[LogicalExpr], sourceName, targetName)
 
-    if (!TempTables.existTable(key(calcTime), sourceName)) {
+    if (!TempTables.existTable(timeInfo.key, sourceName)) {
       Nil
     } else {
       // 1. miss record
-      val missRecordsSql = if (!TempTables.existTable(key(calcTime), targetName)) {
+      val missRecordsSql = if (!TempTables.existTable(timeInfo.key, targetName)) {
         val selClause = s"`${sourceName}`.*"
         s"SELECT ${selClause} FROM `${sourceName}`"
       } else {
@@ -175,7 +175,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         accuracyMetricRuleInfo :: accuracyRuleInfo :: Nil
     }
   }
-  private def profilingRuleInfos(ruleInfo: RuleInfo, expr: Expr, calcTime: Long): Seq[RuleInfo] = {
+  private def profilingRuleInfos(ruleInfo: RuleInfo, expr: Expr, timeInfo: TimeInfo): Seq[RuleInfo] = {
     val details = ruleInfo.details
     val profilingClause = expr.asInstanceOf[ProfilingClause]
     val sourceName = profilingClause.fromClauseOpt match {
@@ -184,7 +184,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     }
     val fromClause = profilingClause.fromClauseOpt.getOrElse(FromClause(sourceName)).desc
 
-    if (!TempTables.existTable(key(calcTime), sourceName)) {
+    if (!TempTables.existTable(timeInfo.key, sourceName)) {
       Nil
     } else {
       val tmstAnalyzer = ProfilingAnalyzer(profilingClause, sourceName)

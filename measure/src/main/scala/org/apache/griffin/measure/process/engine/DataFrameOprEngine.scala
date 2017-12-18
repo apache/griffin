@@ -26,7 +26,6 @@ import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.data.source.{DataSource, DataSourceFactory}
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.temp.TempTables
-import org.apache.griffin.measure.process.temp.TempKeys._
 import org.apache.griffin.measure.result.AccuracyResult
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.step._
@@ -48,15 +47,15 @@ case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
           ri.rule match {
             case DataFrameOprs._fromJson => {
               val df = DataFrameOprs.fromJson(sqlContext, ri)
-              ri.getNames.foreach(TempTables.registerTempTable(df, key(ti.calcTime), _))
+              ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
             }
             case DataFrameOprs._accuracy => {
               val df = DataFrameOprs.accuracy(sqlContext, ti, ri)
-              ri.getNames.foreach(TempTables.registerTempTable(df, key(ti.calcTime), _))
+              ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
             }
             case DataFrameOprs._clear => {
               val df = DataFrameOprs.clear(sqlContext, ri)
-              ri.getNames.foreach(TempTables.registerTempTable(df, key(ti.calcTime), _))
+              ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
             }
             case _ => {
               throw new Exception(s"df opr [ ${ri.rule} ] not supported")

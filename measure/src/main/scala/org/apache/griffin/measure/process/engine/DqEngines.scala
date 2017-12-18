@@ -32,9 +32,9 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
-  def loadData(dataSources: Seq[DataSource], ms: Long): Map[String, Set[Long]] = {
+  def loadData(dataSources: Seq[DataSource], timeInfo: TimeInfo): Map[String, Set[Long]] = {
     dataSources.map { ds =>
-      (ds.name, ds.loadData(ms))
+      (ds.name, ds.loadData(timeInfo))
     }.toMap
   }
 
