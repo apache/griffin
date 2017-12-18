@@ -53,7 +53,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+import static org.apache.griffin.core.util.GriffinOperationMessage.CREATE_JOB_FAIL;
+import static org.apache.griffin.core.util.GriffinOperationMessage.CREATE_JOB_SUCCESS;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -285,28 +286,16 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public GriffinOperationMessage pauseJob(String group, String name) {
-        try {
-            Scheduler scheduler = factory.getObject();
-            scheduler.pauseJob(new JobKey(name, group));
-            return GriffinOperationMessage.PAUSE_JOB_SUCCESS;
-        } catch (SchedulerException | NullPointerException e) {
-            LOGGER.error("{} {}", GriffinOperationMessage.PAUSE_JOB_FAIL, e.getMessage());
-            return GriffinOperationMessage.PAUSE_JOB_FAIL;
-        }
+    public boolean pauseJob(String group, String name) throws SchedulerException {
+        Scheduler scheduler = factory.getObject();
+        scheduler.pauseJob(new JobKey(name, group));
+        return true;
     }
 
-    private GriffinOperationMessage setJobDeleted(String group, String name) {
-        try {
-            Scheduler scheduler = factory.getObject();
-            JobDetail jobDetail = scheduler.getJobDetail(new JobKey(name, group));
-            jobDetail.getJobDataMap().putAsString("deleted", true);
-            scheduler.addJob(jobDetail, true);
-            return GriffinOperationMessage.SET_JOB_DELETED_STATUS_SUCCESS;
-        } catch (SchedulerException | NullPointerException e) {
-            LOGGER.error("{} {}", GriffinOperationMessage.PAUSE_JOB_FAIL, e.getMessage());
-            return GriffinOperationMessage.SET_JOB_DELETED_STATUS_FAIL;
-        }
+    private boolean setJobDeleted(GriffinJob job) throws SchedulerException {
+        job.setDeleted(true);
+        jobRepo.save(job);
+        return true;
     }
 
     /**
@@ -314,18 +303,49 @@ public class JobServiceImpl implements JobService {
      * 1. pause these jobs
      * 2. set these jobs as deleted status
      *
-     * @param group job group name
-     * @param name  job name
+     * @param jobId griffin job id
      * @return custom information
      */
     @Override
-    public GriffinOperationMessage deleteJob(String group, String name) {
-        //logically delete
-        if (pauseJob(group, name).equals(PAUSE_JOB_SUCCESS) &&
-                setJobDeleted(group, name).equals(SET_JOB_DELETED_STATUS_SUCCESS)) {
-            return GriffinOperationMessage.DELETE_JOB_SUCCESS;
+    public GriffinOperationMessage deleteJob(Long jobId) {
+        GriffinJob job = jobRepo.findOne(jobId);
+        return deleteJob(job) ? GriffinOperationMessage.DELETE_JOB_SUCCESS : GriffinOperationMessage.DELETE_JOB_FAIL;
+    }
+
+    /**
+     * logically delete
+     *
+     * @param jobName griffin job name which may not be unique.
+     * @return custom information
+     */
+    @Override
+    public GriffinOperationMessage deleteJob(String jobName) {
+        List<GriffinJob> jobs = jobRepo.findByJobNameAndDeleted(jobName, false);
+        if (CollectionUtils.isEmpty(jobs)) {
+            LOGGER.warn("There is no job with '{}' name.", jobName);
+            return GriffinOperationMessage.DELETE_JOB_FAIL;
         }
-        return GriffinOperationMessage.DELETE_JOB_FAIL;
+        for (GriffinJob job : jobs) {
+            if (!deleteJob(job)) {
+                return GriffinOperationMessage.DELETE_JOB_FAIL;
+            }
+        }
+        return GriffinOperationMessage.DELETE_JOB_SUCCESS;
+    }
+
+    private boolean deleteJob(GriffinJob job) {
+        if (job == null) {
+            LOGGER.warn("Griffin job does not exist.");
+            return false;
+        }
+        try {
+            if (pauseJob(job.getQuartzGroupName(), job.getQuartzJobName()) && setJobDeleted(job)) {
+                return true;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Delete job failure.", e);
+        }
+        return false;
     }
 
     /**
@@ -345,7 +365,7 @@ public class JobServiceImpl implements JobService {
             String measureId = jobDataMap.getString("measureId");
             if (measureId != null && measureId.equals(measure.getId().toString())) {
                 //select jobs related to measureId
-                deleteJob(jobKey.getGroup(), jobKey.getName());
+//                deleteJob(jobKey.getGroup(), jobKey.getName());
                 LOGGER.info("{} {} is paused and logically deleted.", jobKey.getGroup(), jobKey.getName());
             }
         }
@@ -490,7 +510,7 @@ public class JobServiceImpl implements JobService {
         Map<String, List<Map<String, Object>>> jobDetailsMap = new HashMap<>();
         List<Map<String, Object>> jobInfoList = getAliveJobs();
         for (Map<String, Object> jobInfo : jobInfoList) {
-            String measureId = (String) jobInfo.get("measureId");
+            String measureId = String.valueOf(jobInfo.get("measureId"));
             List<Map<String, Object>> jobs = jobDetailsMap.getOrDefault(measureId, new ArrayList<>());
             jobs.add(jobInfo);
             jobDetailsMap.put(measureId, jobs);

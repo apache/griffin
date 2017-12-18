@@ -197,7 +197,7 @@ public class JobServiceImplTest {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.getJobDetail(new JobKey(jobName, groupName))).willReturn(createJobDetail());
-        assertEquals(service.deleteJob(groupName, jobName), GriffinOperationMessage.DELETE_JOB_SUCCESS);
+        assertEquals(service.deleteJob(1L), GriffinOperationMessage.DELETE_JOB_SUCCESS);
     }
 
     @Test
@@ -207,14 +207,14 @@ public class JobServiceImplTest {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getObject()).willReturn(scheduler);
         doThrow(SchedulerException.class).when(scheduler).pauseJob(new JobKey(jobName, groupName));
-        assertEquals(service.deleteJob(groupName, jobName), GriffinOperationMessage.DELETE_JOB_FAIL);
+        assertEquals(service.deleteJob(1L), GriffinOperationMessage.DELETE_JOB_FAIL);
     }
 
     @Test
     public void testDeleteJobForFailWithNull() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getObject()).willReturn(scheduler);
-        assertEquals(service.deleteJob("BA", "jobName"), GriffinOperationMessage.DELETE_JOB_FAIL);
+        assertEquals(service.deleteJob(1L), GriffinOperationMessage.DELETE_JOB_FAIL);
     }
 
     @Test

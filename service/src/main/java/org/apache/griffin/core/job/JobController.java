@@ -23,44 +23,46 @@ import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/jobs")
+@RequestMapping("/api/v1")
 public class JobController {
 
     @Autowired
     private JobService jobService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "/jobs", method = RequestMethod.GET)
     public List<Map<String, Object>> getJobs() {
         return jobService.getAliveJobs();
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/job", method = RequestMethod.POST)
     public GriffinOperationMessage addJob(@RequestBody JobSchedule jobSchedule) {
         return jobService.addJob(jobSchedule);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName) {
-        return jobService.deleteJob(group, jobName);
+    @RequestMapping(value = "/job", method = RequestMethod.DELETE)
+    public GriffinOperationMessage deleteJob(@RequestParam("jobName") String jobName) {
+        return jobService.deleteJob(jobName);
     }
 
-    @RequestMapping(value = "/instances", method = RequestMethod.GET)
+    @RequestMapping(value = "/job/{id}", method = RequestMethod.DELETE)
+    public GriffinOperationMessage deleteJob(@PathVariable("id") Long id) {
+        return jobService.deleteJob(id);
+    }
+
+    @RequestMapping(value = "/jobs/instances", method = RequestMethod.GET)
     public List<JobInstanceBean> findInstancesOfJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName,
                                                     @RequestParam("page") int page, @RequestParam("size") int size) {
         return jobService.findInstancesOfJob(group, jobName, page, size);
     }
 
-    @RequestMapping(value = "/health", method = RequestMethod.GET)
+    @RequestMapping(value = "/job/health", method = RequestMethod.GET)
     public JobHealth getHealthInfo() {
         return jobService.getHealthInfo();
     }

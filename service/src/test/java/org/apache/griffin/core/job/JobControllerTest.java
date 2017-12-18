@@ -107,11 +107,10 @@ public class JobControllerTest {
 
     @Test
     public void testDeleteJobForSuccess() throws Exception {
-        String groupName = "BA";
         String jobName = "job1";
-        given(service.deleteJob(groupName, jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_SUCCESS);
+        given(service.deleteJob(jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_SUCCESS);
 
-        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("group", groupName).param("jobName", jobName))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/job").param("jobName", jobName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(206)))
                 .andExpect(jsonPath("$.description", is("Delete Job Succeed")));
@@ -119,11 +118,10 @@ public class JobControllerTest {
 
     @Test
     public void testDeleteJobForFail() throws Exception {
-        String groupName = "BA";
         String jobName = "job1";
-        given(service.deleteJob(groupName, jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_FAIL);
+        given(service.deleteJob(jobName)).willReturn(GriffinOperationMessage.DELETE_JOB_FAIL);
 
-        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("group", groupName).param("jobName", jobName))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/job").param("jobName", jobName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(406)))
                 .andExpect(jsonPath("$.description", is("Delete Job Failed")));

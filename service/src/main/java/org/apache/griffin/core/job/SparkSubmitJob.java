@@ -71,7 +71,7 @@ public class SparkSubmitJob implements Job {
                 result = restTemplate.postForObject(livyUri, livyConf, String.class);
                 LOGGER.info(result);
                 saveJobInstance(jobDetail.getJobDataMap().getLongFromString(JOB_ID), result);
-                jobService.deleteJob(jobDetail.getKey().getGroup(), jobDetail.getKey().getName());
+                jobService.pauseJob(jobDetail.getKey().getGroup(), jobDetail.getKey().getName());
             }
         } catch (Exception e) {
             LOGGER.error("Post spark task error.", e);

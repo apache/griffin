@@ -33,4 +33,6 @@ public interface JobRepo<T extends AbstractJob> extends CrudRepository<T, Long> 
     int countByJobName(String jobName);
 
     List<T> findByDeleted(boolean deleted);
+
+    List<T> findByJobNameAndDeleted(String jobName, boolean deleted);
 }
