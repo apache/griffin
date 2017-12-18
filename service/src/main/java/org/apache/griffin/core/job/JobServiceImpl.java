@@ -183,12 +183,12 @@ public class JobServiceImpl implements JobService {
 
     private boolean isJobNameValid(String jobName) {
         if (StringUtils.isEmpty(jobName)) {
-            LOGGER.error("Job name cannot be empty.");
+            LOGGER.warn("Job name cannot be empty.");
             return false;
         }
         int size = jobRepo.countByJobName(jobName);
         if (size != 0) {
-            LOGGER.error("Job name already exits.");
+            LOGGER.warn("Job name already exits.");
             return false;
         }
         return true;
@@ -200,7 +200,7 @@ public class JobServiceImpl implements JobService {
                 return true;
             }
         }
-        LOGGER.error("Please set segment timestamp baseline in as.baseline field.");
+        LOGGER.warn("Please set segment timestamp baseline in as.baseline field.");
         return false;
     }
 
@@ -219,7 +219,7 @@ public class JobServiceImpl implements JobService {
                 return true;
             }
         }
-        LOGGER.error("Param {} is a illegal string. Please input one of strings in {}", param, names);
+        LOGGER.warn("Param {} is a illegal string. Please input one of strings in {}", param, names);
         return false;
     }
 
@@ -240,7 +240,7 @@ public class JobServiceImpl implements JobService {
         if (measure != null && !measure.getDeleted()) {
             return measure;
         }
-        LOGGER.error("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
+        LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
         return null;
     }
 
@@ -420,7 +420,7 @@ public class JobServiceImpl implements JobService {
         } catch (IOException e) {
             LOGGER.error("jobInstance jsonStr convert to map failed. {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            LOGGER.warn("Livy status is illegal. {}", group, jobName, e.getMessage());
+            LOGGER.error("Livy status is illegal. {}", group, jobName, e.getMessage());
         }
     }
 

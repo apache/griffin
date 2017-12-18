@@ -83,18 +83,18 @@ public class MeasureServiceImpl implements MeasureService {
     public GriffinOperationMessage createMeasure(Measure measure) {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
         if (!CollectionUtils.isEmpty(aliveMeasureList)) {
-            LOGGER.error("Failed to create new measure {}, it already exists.", measure.getName());
+            LOGGER.warn("Failed to create new measure {}, it already exists.", measure.getName());
             return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
         }
         if (!isConnectorNamesValid((GriffinMeasure) measure)) {
-            LOGGER.error("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
+            LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
             return GriffinOperationMessage.CREATE_MEASURE_FAIL;
         }
         try {
             measureRepo.save(measure);
             return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
         } catch (Exception e) {
-            LOGGER.error("Failed to create new measure {}.{}", measure.getName(), e.getMessage());
+            LOGGER.error("Failed to create new measure {}.", measure.getName(), e);
         }
         return GriffinOperationMessage.CREATE_MEASURE_FAIL;
     }
@@ -132,7 +132,7 @@ public class MeasureServiceImpl implements MeasureService {
             measureRepo.save(measure);
             return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
         } catch (Exception e) {
-            LOGGER.error("Failed to update measure. {}", e.getMessage());
+            LOGGER.error("Failed to update measure. ", e);
         }
         return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
     }
