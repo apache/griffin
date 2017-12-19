@@ -54,8 +54,8 @@ import java.util.*;
 
 import static org.apache.griffin.core.measure.MeasureTestHelper.createJobDetail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -108,44 +108,29 @@ public class JobServiceImplTest {
     @Test
     public void testGetAliveJobsForNormalRun() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        JobDetailImpl jobDetail = createJobDetail();
+        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
         given(factory.getObject()).willReturn(scheduler);
-        given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("group"));
-        HashSet<JobKey> set = new HashSet<>();
-        set.add(new JobKey("name", "group"));
-        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn(set);
-        List<Trigger> triggers = Arrays.asList(newTriggerInstance("name", "group", 3000));
-        JobKey jobKey = set.iterator().next();
+        given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        SimpleTrigger trigger = new SimpleTriggerImpl();
+        List<Trigger> triggers = new ArrayList<>();
+        triggers.add(trigger);
         given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
-        given(scheduler.getJobDetail(jobKey)).willReturn(jobDetail);
         assertEquals(service.getAliveJobs().size(), 1);
     }
 
     @Test
     public void testGetAliveJobsForNoJobsWithTriggerEmpty() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
+        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
         given(factory.getObject()).willReturn(scheduler);
-        given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("group"));
-        HashSet<JobKey> set = new HashSet<>();
-        set.add(new JobKey("name", "group"));
-        given(scheduler.getJobKeys(GroupMatcher.jobGroupEquals("group"))).willReturn(set);
-        JobKey jobKey = set.iterator().next();
-        given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(Arrays.asList());
+        given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        List<Trigger> triggers = new ArrayList<>();
+        given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
         assertEquals(service.getAliveJobs().size(), 0);
     }
 
-    @Test
-    public void testGetAliveJobsForSchedulerException() throws SchedulerException {
-        Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
-        given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("group"));
-        HashSet<JobKey> set = new HashSet<>();
-        set.add(new JobKey("name", "group"));
-        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn(set);
-        JobKey jobKey = set.iterator().next();
-        GriffinException.GetJobsFailureException exception = getTriggersOfJobExpectException(scheduler, jobKey);
-        assertTrue(exception != null);
-    }
 
 //    @Test
 //    public void testAddJobForSuccess() throws Exception {
@@ -191,64 +176,85 @@ public class JobServiceImplTest {
 //    }
 
     @Test
-    public void testDeleteJobForSuccess() throws SchedulerException {
-        String groupName = "BA";
-        String jobName = "jobName";
+    public void testDeleteJobForJobIdSuccess() throws SchedulerException {
+        Long jobId = 1L;
+        GriffinJob job = new GriffinJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
-        given(scheduler.getJobDetail(new JobKey(jobName, groupName))).willReturn(createJobDetail());
-        assertEquals(service.deleteJob(1L), GriffinOperationMessage.DELETE_JOB_SUCCESS);
-    }
-
-    @Test
-    public void testDeleteJobForFailWithPauseFailure() throws SchedulerException {
-        String groupName = "BA";
-        String jobName = "jobName";
-        Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
-        doThrow(SchedulerException.class).when(scheduler).pauseJob(new JobKey(jobName, groupName));
-        assertEquals(service.deleteJob(1L), GriffinOperationMessage.DELETE_JOB_FAIL);
-    }
-
-    @Test
-    public void testDeleteJobForFailWithNull() throws SchedulerException {
-        Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
-        assertEquals(service.deleteJob(1L), GriffinOperationMessage.DELETE_JOB_FAIL);
-    }
-
-    @Test
-    public void testFindInstancesOfJob() throws SchedulerException {
-        Scheduler scheduler = Mockito.mock(Scheduler.class);
-        String groupName = "BA";
-        String jobName = "job1";
-        int page = 0;
-        int size = 2;
-        JobKey jobKey = new JobKey(jobName, groupName);
-        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
-        Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
-        given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(Arrays.asList(jobInstance));
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(jobKey)).willReturn(true);
-        mockJsonDataMap(scheduler, jobKey, false);
+        doNothing().when(scheduler).pauseJob(jobKey);
+        given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
+        assertEquals(service.deleteJob(jobId), GriffinOperationMessage.DELETE_JOB_SUCCESS);
+    }
+
+    @Test
+    public void testDeleteJobForJobIdFailureWithNull() throws SchedulerException {
+        Long jobId = 1L;
+        given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(null);
+        assertEquals(service.deleteJob(jobId), GriffinOperationMessage.DELETE_JOB_FAIL);
+    }
+
+    @Test
+    public void testDeleteJobForJobIdFailureWithTriggerNotExist() throws SchedulerException {
+        Long jobId = 1L;
+        GriffinJob job = new GriffinJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        given(factory.getObject()).willReturn(scheduler);
+        given(scheduler.checkExists(jobKey)).willReturn(false);
+        assertEquals(service.deleteJob(jobId), GriffinOperationMessage.DELETE_JOB_FAIL);
+    }
+
+
+    @Test
+    public void testDeleteJobForJobNameSuccess() throws SchedulerException {
+        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
+        given(factory.getObject()).willReturn(scheduler);
+        given(scheduler.checkExists(jobKey)).willReturn(true);
+        doNothing().when(scheduler).pauseJob(jobKey);
+        assertEquals(service.deleteJob(job.getJobName()), GriffinOperationMessage.DELETE_JOB_SUCCESS);
+    }
+
+    @Test
+    public void testDeleteJobForJobNameFailureWithNull() throws SchedulerException {
+        String jobName = "jobName";
+        given(jobRepo.findByJobNameAndDeleted(jobName, false)).willReturn(new ArrayList<>());
+        assertEquals(service.deleteJob(jobName), GriffinOperationMessage.DELETE_JOB_FAIL);
+    }
+
+    @Test
+    public void testDeleteJobForJobNameFailureWithTriggerNotExist() throws SchedulerException {
+        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
+        given(factory.getObject()).willReturn(scheduler);
+        given(scheduler.checkExists(jobKey)).willReturn(false);
+        assertEquals(service.deleteJob(job.getJobName()), GriffinOperationMessage.DELETE_JOB_FAIL);
+    }
+
+    @Test
+    public void testFindInstancesOfJobForSuccess() throws SchedulerException {
+        Long jobId = 1L;
+        int page = 0;
+        int size = 2;
+        GriffinJob job = new GriffinJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
+        Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
+        given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
+        given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(Arrays.asList(jobInstance));
         assertEquals(service.findInstancesOfJob(1L, page, size).size(), 1);
     }
 
     @Test
-    public void testFindInstancesOfJobForDeleted() throws SchedulerException {
-        Scheduler scheduler = Mockito.mock(Scheduler.class);
-        String groupName = "BA";
-        String jobName = "job1";
-        int page = 0;
-        int size = 2;
-        JobKey jobKey = new JobKey(jobName, groupName);
-        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
-        Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
-        given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(Arrays.asList(jobInstance));
-        given(factory.getObject()).willReturn(scheduler);
-        given(scheduler.checkExists(jobKey)).willReturn(true);
-        mockJsonDataMap(scheduler, jobKey, true);
-        assertEquals(service.findInstancesOfJob(1L, page, size).size(), 0);
+    public void testFindInstancesOfJobForNull() throws SchedulerException {
+        Long jobId = 1L;
+        given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(null);
+        assertEquals(service.findInstancesOfJob(jobId, 0, 2).size(), 0);
     }
 
     @Test
@@ -291,17 +297,14 @@ public class JobServiceImplTest {
     @Test
     public void testGetHealthInfoWithHealthy() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
+        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
         given(factory.getObject()).willReturn(scheduler);
-        given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("BA"));
-        JobKey jobKey = new JobKey("test");
+        given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
         SimpleTrigger trigger = new SimpleTriggerImpl();
         List<Trigger> triggers = new ArrayList<>();
         triggers.add(trigger);
         given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
-        mockJsonDataMap(scheduler, jobKey, false);
-        Set<JobKey> jobKeySet = new HashSet<>();
-        jobKeySet.add(jobKey);
-        given(scheduler.getJobKeys(GroupMatcher.anyGroup())).willReturn((jobKeySet));
 
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
         List<JobInstanceBean> scheduleStateList = new ArrayList<>();
@@ -314,18 +317,20 @@ public class JobServiceImplTest {
     @Test
     public void testGetHealthInfoWithUnhealthy() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
+        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
         given(factory.getObject()).willReturn(scheduler);
-        given(scheduler.getJobGroupNames()).willReturn(Arrays.asList("BA"));
-        JobKey jobKey = new JobKey("test");
-        Set<JobKey> jobKeySet = new HashSet<>();
-        jobKeySet.add(jobKey);
-        given(scheduler.getJobKeys(GroupMatcher.jobGroupEquals("BA"))).willReturn((jobKeySet));
+        given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        SimpleTrigger trigger = new SimpleTriggerImpl();
+        List<Trigger> triggers = new ArrayList<>();
+        triggers.add(trigger);
+        given((List<Trigger>) scheduler.getTriggersOfJob(jobKey)).willReturn(triggers);
 
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
         List<JobInstanceBean> scheduleStateList = new ArrayList<>();
-        JobInstanceBean jobInstance = createJobInstance();
-        jobInstance.setState(LivySessionStates.State.error);
-        scheduleStateList.add(jobInstance);
+        JobInstanceBean instance = createJobInstance();
+        instance.setState(LivySessionStates.State.error);
+        scheduleStateList.add(instance);
         given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(scheduleStateList);
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 0);
     }

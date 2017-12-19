@@ -94,7 +94,7 @@ public class JobServiceImpl implements JobService {
         try {
             List<GriffinJob> jobs = jobRepo.findByDeleted(false);
             for (GriffinJob job : jobs) {
-                Map jobDataMap = genJobDataMap(scheduler, jobKey(job.getQuartzJobName(), job.getQuartzGroupName()), job);
+                Map<String, Object> jobDataMap = genJobDataMap(scheduler, jobKey(job.getQuartzJobName(), job.getQuartzGroupName()), job);
                 if (jobDataMap.size() != 0) {
                     dataList.add(jobDataMap);
                 }
@@ -106,12 +106,8 @@ public class JobServiceImpl implements JobService {
         return dataList;
     }
 
-    private boolean isJobDeleted(Scheduler scheduler, JobKey jobKey) throws SchedulerException {
-        JobDataMap jobDataMap = scheduler.getJobDetail(jobKey).getJobDataMap();
-        return jobDataMap.getBooleanFromString("deleted");
-    }
 
-    private Map genJobDataMap(Scheduler scheduler, JobKey jobKey, GriffinJob job) throws SchedulerException {
+    private Map<String, Object> genJobDataMap(Scheduler scheduler, JobKey jobKey, GriffinJob job) throws SchedulerException {
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         Map<String, Object> jobDataMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(triggers)) {
@@ -289,7 +285,12 @@ public class JobServiceImpl implements JobService {
     @Override
     public boolean pauseJob(String group, String name) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
-        scheduler.pauseJob(new JobKey(name, group));
+        JobKey jobKey = new JobKey(name, group);
+        if (!scheduler.checkExists(jobKey)) {
+            LOGGER.warn("Job({},{}) does not exist.", group, name);
+            return false;
+        }
+        scheduler.pauseJob(jobKey);
         return true;
     }
 
@@ -309,7 +310,7 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public GriffinOperationMessage deleteJob(Long jobId) {
-        GriffinJob job = jobRepo.findOne(jobId);
+        GriffinJob job = jobRepo.findByIdAndDeleted(jobId, false);
         return deleteJob(job) ? GriffinOperationMessage.DELETE_JOB_SUCCESS : GriffinOperationMessage.DELETE_JOB_FAIL;
     }
 
@@ -376,7 +377,7 @@ public class JobServiceImpl implements JobService {
     public List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size) {
         GriffinJob job = jobRepo.findByIdAndDeleted(jobId, false);
         if (job == null) {
-            LOGGER.warn("Job id {} does not exist.",jobId);
+            LOGGER.warn("Job id {} does not exist.", jobId);
             return new ArrayList<>();
         }
         if (size > MAX_PAGE_SIZE) {
@@ -415,12 +416,12 @@ public class JobServiceImpl implements JobService {
         } catch (IOException e) {
             LOGGER.error("Job instance json converts to map failed. {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Livy status is illegal. {}",e.getMessage());
+            LOGGER.error("Livy status is illegal. {}", e.getMessage());
         }
     }
 
 
-    private void setJobInstanceIdAndUri(JobInstanceBean jobInstance, HashMap<String, Object> resultMap){
+    private void setJobInstanceIdAndUri(JobInstanceBean jobInstance, HashMap<String, Object> resultMap) {
         if (resultMap != null && resultMap.size() != 0 && resultMap.get("state") != null) {
             jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
             if (resultMap.get("appId") != null) {
@@ -445,43 +446,37 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public JobHealth getHealthInfo() {
-        Scheduler scheduler = factory.getObject();
-        int jobCount = 0;
-        int notHealthyCount = 0;
+        JobHealth jobHealth = new JobHealth();
+        List<GriffinJob> jobs = jobRepo.findByDeleted(false);
+        for (GriffinJob job : jobs) {
+            jobHealth = getHealthInfo(jobHealth, job);
+        }
+        return jobHealth;
+    }
+
+    private JobHealth getHealthInfo(JobHealth jobHealth, GriffinJob job) {
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        List<Trigger> triggers;
         try {
-            Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyGroup());
-            for (JobKey jobKey : jobKeys) {
-                List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
-                if (triggers != null && triggers.size() != 0 && !isJobDeleted(scheduler, jobKey)) {
-                    jobCount++;
-                    notHealthyCount = getJobNotHealthyCount(notHealthyCount, jobKey);
-                }
-            }
+            triggers = (List<Trigger>) factory.getObject().getTriggersOfJob(jobKey);
         } catch (SchedulerException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Job schedule exception. {}", e.getMessage());
             throw new GetHealthInfoFailureException();
         }
-        return new JobHealth(jobCount - notHealthyCount, jobCount);
-    }
-
-    private int getJobNotHealthyCount(int notHealthyCount, JobKey jobKey) {
-        if (!isJobHealthy(jobKey)) {
-            notHealthyCount++;
+        if (!CollectionUtils.isEmpty(triggers)) {
+            jobHealth.setJobCount(jobHealth.getJobCount() + 1);
+            if (isJobHealthy(job.getId())) {
+                jobHealth.setHealthyJobCount(jobHealth.getHealthyJobCount() + 1);
+            }
         }
-        return notHealthyCount;
+        return jobHealth;
     }
 
-    private Boolean isJobHealthy(JobKey jobKey) {
+
+    private Boolean isJobHealthy(Long jobId) {
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
-//        JobInstanceBean latestJobInstance;
-//        List<JobInstanceBean> jobInstances = jobInstanceRepo.findByJobId(jobKey.getGroup(), jobKey.getName(), pageRequest);
-//        if (jobInstances != null && jobInstances.size() > 0) {
-//            latestJobInstance = jobInstances.get(0);
-//            if (LivySessionStates.isHealthy(latestJobInstance.getState())) {
-//                return true;
-//            }
-//        }
-        return false;
+        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(jobId, pageRequest);
+        return !CollectionUtils.isEmpty(instances) && LivySessionStates.isHealthy(instances.get(0).getState());
     }
 
     @Override
