@@ -37,7 +37,6 @@ import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -52,11 +51,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
-import static org.apache.griffin.core.measure.MeasureTestHelper.createJobDetail;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.quartz.TriggerBuilder.newTrigger;
 
@@ -108,7 +105,7 @@ public class JobServiceImplTest {
     @Test
     public void testGetAliveJobsForNormalRun() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         given(factory.getObject()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
         JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
@@ -122,7 +119,7 @@ public class JobServiceImplTest {
     @Test
     public void testGetAliveJobsForNoJobsWithTriggerEmpty() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         given(factory.getObject()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
         JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
@@ -178,11 +175,14 @@ public class JobServiceImplTest {
     @Test
     public void testDeleteJobForJobIdSuccess() throws SchedulerException {
         Long jobId = 1L;
-        GriffinJob job = new GriffinJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        GriffinJob job = new GriffinJob(1L, "jobName", "quartzJobName", "quartzGroupName", "pJobName", "pGroupName", false);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        JobKey pJobKey = new JobKey(job.getPredicateJobName(), job.getPredicateGroupName());
         given(factory.getObject()).willReturn(scheduler);
+        given(scheduler.checkExists(pJobKey)).willReturn(true);
         given(scheduler.checkExists(jobKey)).willReturn(true);
+        doNothing().when(scheduler).pauseJob(pJobKey);
         doNothing().when(scheduler).pauseJob(jobKey);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
         assertEquals(service.deleteJob(jobId), GriffinOperationMessage.DELETE_JOB_SUCCESS);
@@ -209,7 +209,7 @@ public class JobServiceImplTest {
 
     @Test
     public void testDeleteJobForJobNameSuccess() throws SchedulerException {
-        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
@@ -228,7 +228,7 @@ public class JobServiceImplTest {
 
     @Test
     public void testDeleteJobForJobNameFailureWithTriggerNotExist() throws SchedulerException {
-        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
@@ -297,7 +297,7 @@ public class JobServiceImplTest {
     @Test
     public void testGetHealthInfoWithHealthy() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         given(factory.getObject()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
         JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
@@ -317,7 +317,7 @@ public class JobServiceImplTest {
     @Test
     public void testGetHealthInfoWithUnhealthy() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        GriffinJob job = new GriffinJob(1L,1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         given(factory.getObject()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
         JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());

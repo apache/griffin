@@ -34,7 +34,6 @@ import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -361,22 +360,18 @@ public class JobServiceImpl implements JobService {
      * 1. search jobs related to measure
      * 2. deleteJob
      *
-     * @param measure measure data quality between source and target dataset
-     * @throws SchedulerException quartz throws if schedule has problem
+     * @param measureId measure id
      */
-    public void deleteJobsRelateToMeasure(GriffinMeasure measure) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
-        //get all jobs
-        for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyGroup())) {
-            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-            JobDataMap jobDataMap = jobDetail.getJobDataMap();
-            String measureId = jobDataMap.getString("measureId");
-            if (measureId != null && measureId.equals(measure.getId().toString())) {
-                //select jobs related to measureId
-//                deleteJob(jobKey.getGroup(), jobKey.getName());
-                LOGGER.info("{} {} is paused and logically deleted.", jobKey.getGroup(), jobKey.getName());
-            }
+    public boolean deleteJobsRelateToMeasure(Long measureId) {
+        List<GriffinJob> jobs = jobRepo.findByMeasureIdAndDeleted(measureId, false);
+        if (CollectionUtils.isEmpty(jobs)) {
+            LOGGER.warn("Measure id {} has no related jobs.", measureId);
+            return false;
         }
+        for (GriffinJob job : jobs) {
+            deleteJob(job);
+        }
+        return true;
     }
 
     @Override

@@ -77,10 +77,15 @@ public class GriffinJob extends AbstractJob {
         this.quartzGroupName = qGroupName;
     }
 
+    public GriffinJob(Long measureId, String jobName, String qJobName, String qGroupName, String pJobName,String pGroupName,boolean deleted) {
+        this(measureId, jobName, qJobName, qGroupName, deleted);
+        this.predicateJobName = pJobName;
+        this.predicateGroupName = pGroupName;
+    }
+
     public GriffinJob(Long jobId, Long measureId, String jobName, String qJobName, String qGroupName, boolean deleted) {
-        super(jobId, measureId, jobName, deleted);
-        this.quartzJobName = qJobName;
-        this.quartzGroupName = qGroupName;
+        this(measureId, jobName, qJobName, qGroupName, deleted);
+        setId(jobId);
     }
 
 }

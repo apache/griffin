@@ -51,7 +51,7 @@ public class MeasureTestHelper {
         map.put("detail", "detail info");
         Rule rule = new Rule("griffin-dsl", "accuracy", rules, map);
         EvaluateRule evaluateRule = new EvaluateRule(Arrays.asList(rule));
-        return new GriffinMeasure(name, "description", org, "batch", "test", dataSources, evaluateRule);
+        return new GriffinMeasure(1L,name, "description", org, "batch", "test", dataSources, evaluateRule);
     }
 
     public static JobDetailImpl createJobDetail() {

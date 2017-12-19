@@ -77,11 +77,4 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.jobName = jobName;
         this.deleted = deleted;
     }
-
-    AbstractJob(Long jobId,Long measureId, String jobName, boolean deleted) {
-        setId(jobId);
-        this.measureId = measureId;
-        this.jobName = jobName;
-        this.deleted = deleted;
-    }
 }

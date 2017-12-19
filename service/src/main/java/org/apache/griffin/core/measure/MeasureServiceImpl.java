@@ -28,7 +28,6 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.DataConnectorRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,21 +61,21 @@ public class MeasureServiceImpl implements MeasureService {
 
     @Override
     public GriffinOperationMessage deleteMeasureById(Long measureId) {
-        if (!measureRepo.exists(measureId)) {
+        Measure measure = measureRepo.findByIdAndDeleted(measureId, false);
+        if (measure == null) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        } else {
-            Measure measure = measureRepo.findOne(measureId);
-            try {
-                jobService.deleteJobsRelateToMeasure((GriffinMeasure) measure);
+        }
+        try {
+            if (jobService.deleteJobsRelateToMeasure(measureId)) {
                 measure.setDeleted(true);
                 measureRepo.save(measure);
-            } catch (SchedulerException e) {
-                LOGGER.error("Delete measure id: {} name: {} failure. {}", measure.getId(), measure.getName(), e.getMessage());
-                return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
+                return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
             }
 
-            return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
+        } catch (Exception e) {
+            LOGGER.error("Delete measure id: {} name: {} failure. {}", measure.getId(), measure.getName(), e.getMessage());
         }
+        return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
     }
 
     @Override

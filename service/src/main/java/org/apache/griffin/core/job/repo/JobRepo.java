@@ -36,5 +36,7 @@ public interface JobRepo<T extends AbstractJob> extends CrudRepository<T, Long> 
 
     List<T> findByJobNameAndDeleted(String jobName, boolean deleted);
 
+    List<T> findByMeasureIdAndDeleted(Long measreId, boolean deleted);
+
     T findByIdAndDeleted(Long jobId, boolean deleted);
 }
