@@ -41,7 +41,7 @@ public interface JobService {
 
     GriffinOperationMessage deleteJob(String jobName);
 
-    List<JobInstanceBean> findInstancesOfJob(String group, String name, int page, int size);
+    List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
 
     Map<String, List<Map<String, Object>>> getJobDetailsGroupByMeasureId();
 

@@ -65,6 +65,7 @@ public class JobServiceImpl implements JobService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
     static final String JOB_SCHEDULE_ID = "jobScheduleId";
     static final String GRIFFIN_JOB_ID = "griffinJobId";
+    static final int MAX_PAGE_SIZE = 1024;
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -372,20 +373,17 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobInstanceBean> findInstancesOfJob(String group, String jobName, int page, int size) {
-        try {
-            Scheduler scheduler = factory.getObject();
-            JobKey jobKey = new JobKey(jobName, group);
-            if (!scheduler.checkExists(jobKey) || isJobDeleted(scheduler, jobKey)) {
-                return new ArrayList<>();
-            }
-        } catch (SchedulerException e) {
-            LOGGER.error("Quartz schedule error. {}", e.getMessage());
+    public List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size) {
+        GriffinJob job = jobRepo.findByIdAndDeleted(jobId, false);
+        if (job == null) {
+            LOGGER.warn("Job id {} does not exist.",jobId);
             return new ArrayList<>();
         }
-        //query and return instances
+        if (size > MAX_PAGE_SIZE) {
+            size = MAX_PAGE_SIZE;
+        }
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
-        return jobInstanceRepo.findByJobName(group, jobName, pageRequest);
+        return jobInstanceRepo.findByJobId(jobId, pageRequest);
     }
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
@@ -475,14 +473,14 @@ public class JobServiceImpl implements JobService {
 
     private Boolean isJobHealthy(JobKey jobKey) {
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
-        JobInstanceBean latestJobInstance;
-        List<JobInstanceBean> jobInstances = jobInstanceRepo.findByJobName(jobKey.getGroup(), jobKey.getName(), pageRequest);
-        if (jobInstances != null && jobInstances.size() > 0) {
-            latestJobInstance = jobInstances.get(0);
-            if (LivySessionStates.isHealthy(latestJobInstance.getState())) {
-                return true;
-            }
-        }
+//        JobInstanceBean latestJobInstance;
+//        List<JobInstanceBean> jobInstances = jobInstanceRepo.findByJobId(jobKey.getGroup(), jobKey.getName(), pageRequest);
+//        if (jobInstances != null && jobInstances.size() > 0) {
+//            latestJobInstance = jobInstances.get(0);
+//            if (LivySessionStates.isHealthy(latestJobInstance.getState())) {
+//                return true;
+//            }
+//        }
         return false;
     }
 

@@ -31,15 +31,9 @@ import java.util.List;
 
 @Repository
 public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
-    /**
-     * @param group    is group name
-     * @param name     is job name
-     * @param pageable page info
-     * @return all job instances scheduled at different time using the same prototype job,
-     * the prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.
-     */
-    @Query("select s from JobInstanceBean s")
-    List<JobInstanceBean> findByJobName(String group, String name, Pageable pageable);
+
+    @Query("select s from JobInstanceBean s where s.jobId = ?1")
+    List<JobInstanceBean> findByJobId(Long jobId, Pageable pageable);
 
     @Query("select DISTINCT s from JobInstanceBean s " +
             "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")

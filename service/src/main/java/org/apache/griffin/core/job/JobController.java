@@ -57,9 +57,8 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs/instances", method = RequestMethod.GET)
-    public List<JobInstanceBean> findInstancesOfJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName,
-                                                    @RequestParam("page") int page, @RequestParam("size") int size) {
-        return jobService.findInstancesOfJob(group, jobName, page, size);
+    public List<JobInstanceBean> findInstancesOfJob(@RequestParam("jobId") Long id, @RequestParam("page") int page, @RequestParam("size") int size) {
+        return jobService.findInstancesOfJob(id, page, size);
     }
 
     @RequestMapping(value = "/job/health", method = RequestMethod.GET)

@@ -227,11 +227,11 @@ public class JobServiceImplTest {
         JobKey jobKey = new JobKey(jobName, groupName);
         JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
-        given(jobInstanceRepo.findByJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
+        given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(Arrays.asList(jobInstance));
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(jobKey)).willReturn(true);
         mockJsonDataMap(scheduler, jobKey, false);
-        assertEquals(service.findInstancesOfJob(groupName, jobName, page, size).size(), 1);
+        assertEquals(service.findInstancesOfJob(1L, page, size).size(), 1);
     }
 
     @Test
@@ -242,13 +242,13 @@ public class JobServiceImplTest {
         int page = 0;
         int size = 2;
         JobKey jobKey = new JobKey(jobName, groupName);
-        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L,LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L, LivySessionStates.State.dead, "app_id", "app_uri", System.currentTimeMillis());
         Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
-        given(jobInstanceRepo.findByJobName(groupName, jobName, pageRequest)).willReturn(Arrays.asList(jobInstance));
+        given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(Arrays.asList(jobInstance));
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(jobKey)).willReturn(true);
         mockJsonDataMap(scheduler, jobKey, true);
-        assertEquals(service.findInstancesOfJob(groupName, jobName, page, size).size(), 0);
+        assertEquals(service.findInstancesOfJob(1L, page, size).size(), 0);
     }
 
     @Test
@@ -306,7 +306,7 @@ public class JobServiceImplTest {
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
         List<JobInstanceBean> scheduleStateList = new ArrayList<>();
         scheduleStateList.add(createJobInstance());
-        given(jobInstanceRepo.findByJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
+        given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(scheduleStateList);
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 1);
 
     }
@@ -326,7 +326,7 @@ public class JobServiceImplTest {
         JobInstanceBean jobInstance = createJobInstance();
         jobInstance.setState(LivySessionStates.State.error);
         scheduleStateList.add(jobInstance);
-        given(jobInstanceRepo.findByJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
+        given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(scheduleStateList);
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 0);
     }
 

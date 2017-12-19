@@ -173,8 +173,9 @@ public class JobSchedule extends AbstractAuditableEntity {
     public JobSchedule() throws JsonProcessingException {
     }
 
-    public JobSchedule(Long measureId, String cronExpression, Map configMap, List<JobDataSegment> segments) throws JsonProcessingException {
+    public JobSchedule(Long measureId, String jobName,String cronExpression, Map configMap, List<JobDataSegment> segments) throws JsonProcessingException {
         this.measureId = measureId;
+        this.jobName = jobName;
         this.cronExpression = cronExpression;
         setConfigMap(configMap);
         this.segments = segments;
