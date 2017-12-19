@@ -56,25 +56,20 @@ public class JobInstanceBeanRepoTest {
     }
 
     @Test
-    public void testFindByGroupNameAndJobNameWithPageable() {
+    public void testFindByJobIdWithPageable() {
         Pageable pageRequest = new PageRequest(0, 10, Sort.Direction.DESC, "timestamp");
         List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(1L, pageRequest);
         assertThat(instances.size()).isEqualTo(1);
-        assertEquals(instances.get(0).getAppId(), "appId3");
+        assertEquals(instances.get(0).getAppId(), "appId1");
     }
 
 
     @Test
-    public void testFindGroupWithJobName() {
+    public void testFindByActiveState() {
         List<JobInstanceBean> list = jobInstanceRepo.findByActiveState();
         assertThat(list.size()).isEqualTo(1);
     }
 
-    @Test
-    public void testDeleteByGroupAndJobName() {
-        jobInstanceRepo.deleteByJobName("job1");
-        assertThat(jobInstanceRepo.count()).isEqualTo(2);
-    }
 
     @Test
     public void testUpdate() {
@@ -90,9 +85,9 @@ public class JobInstanceBeanRepoTest {
     private void setEntityManager() {
         JobInstanceBean instance1 = new JobInstanceBean(1L, 0L, LivySessionStates.State.success,
                 "appId1", "http://domain.com/uri1", System.currentTimeMillis());
-        JobInstanceBean instance2 = new JobInstanceBean(1L, 1L, LivySessionStates.State.error,
+        JobInstanceBean instance2 = new JobInstanceBean(2L, 1L, LivySessionStates.State.error,
                 "appId2", "http://domain.com/uri2", System.currentTimeMillis());
-        JobInstanceBean instance3 = new JobInstanceBean(1L, 2L, LivySessionStates.State.starting,
+        JobInstanceBean instance3 = new JobInstanceBean(2L, 2L, LivySessionStates.State.starting,
                 "appId3", "http://domain.com/uri3", System.currentTimeMillis());
         entityManager.persistAndFlush(instance1);
         entityManager.persistAndFlush(instance2);

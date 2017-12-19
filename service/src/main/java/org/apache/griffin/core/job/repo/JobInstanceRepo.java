@@ -40,10 +40,6 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
     List<JobInstanceBean> findByActiveState();
 
     @Modifying
-    @Query("delete from JobInstanceBean s ")
-    void deleteByJobName(String jobName);
-
-    @Modifying
     @Query("update JobInstanceBean s " +
             "set s.state= ?2, s.appId= ?3, s.appUri= ?4 where s.id= ?1")
     void update(Long id, LivySessionStates.State state, String appId, String appUri);
