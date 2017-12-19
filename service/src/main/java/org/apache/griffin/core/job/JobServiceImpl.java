@@ -390,41 +390,21 @@ public class JobServiceImpl implements JobService {
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void syncInstancesOfAllJobs() {
-        List<Object> groupJobList = jobInstanceRepo.findJobNameWithState();
-        if (groupJobList == null) {
-            return;
-        }
-        for (Object groupJobObj : groupJobList) {
-            try {
-                Object[] groupJob = (Object[]) groupJobObj;
-                if (groupJob != null && groupJob.length == 2) {
-                    syncInstancesOfJob(groupJob[0].toString(), groupJob[1].toString());
-                }
-            } catch (Exception e) {
-                LOGGER.error("schedule update instances of all jobs failed. {}", e.getMessage());
+        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState();
+        if (!CollectionUtils.isEmpty(beans)) {
+            for (JobInstanceBean jobInstance : beans) {
+                syncInstancesOfJob(jobInstance);
             }
         }
     }
 
     /**
-     * call livy to update part of jobInstance table data associated with group and jobName in mysql.
+     * call livy to update part of job instance table data associated with group and jobName in mysql.
      *
-     * @param group   group name of jobInstance
-     * @param jobName job name of jobInstance
+     * @param jobInstance job instance livy info
      */
-    private void syncInstancesOfJob(String group, String jobName) {
-        //update all instance info belongs to this group and job.
-        List<JobInstanceBean> jobInstanceList = jobInstanceRepo.findByJobName(group, jobName);
-        for (JobInstanceBean jobInstance : jobInstanceList) {
-            if (LivySessionStates.isActive(jobInstance.getState())) {
-                String uri = livyConfProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
-                setJobInstanceInfo(jobInstance, uri, group, jobName);
-            }
-
-        }
-    }
-
-    private void setJobInstanceInfo(JobInstanceBean jobInstance, String uri, String group, String jobName) {
+    private void syncInstancesOfJob(JobInstanceBean jobInstance) {
+        String uri = livyConfProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         try {
@@ -432,16 +412,17 @@ public class JobServiceImpl implements JobService {
             HashMap<String, Object> resultMap = JsonUtil.toEntity(resultStr, type);
             setJobInstanceIdAndUri(jobInstance, resultMap);
         } catch (RestClientException e) {
-            LOGGER.error("spark session {} has overdue, set state as unknown!\n {}", jobInstance.getSessionId(), e.getMessage());
+            LOGGER.error("Spark session {} has overdue, set state as unknown!\n {}", jobInstance.getSessionId(), e.getMessage());
             setJobInstanceUnknownStatus(jobInstance);
         } catch (IOException e) {
-            LOGGER.error("jobInstance jsonStr convert to map failed. {}", e.getMessage());
+            LOGGER.error("Job instance json converts to map failed. {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Livy status is illegal. {}", group, jobName, e.getMessage());
+            LOGGER.error("Livy status is illegal. {}",e.getMessage());
         }
     }
 
-    private void setJobInstanceIdAndUri(JobInstanceBean jobInstance, HashMap<String, Object> resultMap) throws IllegalArgumentException {
+
+    private void setJobInstanceIdAndUri(JobInstanceBean jobInstance, HashMap<String, Object> resultMap){
         if (resultMap != null && resultMap.size() != 0 && resultMap.get("state") != null) {
             jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
             if (resultMap.get("appId") != null) {

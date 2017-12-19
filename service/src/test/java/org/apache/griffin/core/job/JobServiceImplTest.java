@@ -253,11 +253,8 @@ public class JobServiceImplTest {
 
     @Test
     public void testSyncInstancesOfJobForSuccess() {
-        JobInstanceBean instance = newJobInstance();
-        String group = "groupName";
-        String jobName = "jobName";
-        given(jobInstanceRepo.findJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-        given(jobInstanceRepo.findByJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        JobInstanceBean instance = createJobInstance();
+        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
@@ -265,30 +262,18 @@ public class JobServiceImplTest {
     }
 
     @Test
-    public void testSyncInstancesOfJobForNullGroup() {
-        given(jobInstanceRepo.findJobNameWithState()).willReturn(null);
-        service.syncInstancesOfAllJobs();
-    }
-
-    @Test
     public void testSyncInstancesOfJobForRestClientException() {
-        JobInstanceBean instance = newJobInstance();
+        JobInstanceBean instance = createJobInstance();
         instance.setSessionId(1234564L);
-        String group = "groupName";
-        String jobName = "jobName";
-        given(jobInstanceRepo.findJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-        given(jobInstanceRepo.findByJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         given(sparkJobProps.getProperty("livy.uri")).willReturn(PropertiesUtil.getProperties("/sparkJob.properties").getProperty("livy.uri"));
         service.syncInstancesOfAllJobs();
     }
 
     @Test
     public void testSyncInstancesOfJobForIOException() throws Exception {
-        JobInstanceBean instance = newJobInstance();
-        String group = "groupName";
-        String jobName = "jobName";
-        given(jobInstanceRepo.findJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-        given(jobInstanceRepo.findByJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        JobInstanceBean instance = createJobInstance();
+        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("result");
         service.syncInstancesOfAllJobs();
@@ -296,11 +281,8 @@ public class JobServiceImplTest {
 
     @Test
     public void testSyncInstancesOfJobForIllegalArgumentException() throws Exception {
-        JobInstanceBean instance = newJobInstance();
-        String group = "groupName";
-        String jobName = "jobName";
-        given(jobInstanceRepo.findJobNameWithState()).willReturn(Arrays.asList((Object) (new Object[]{group, jobName})));
-        given(jobInstanceRepo.findByJobName(group, jobName)).willReturn(Arrays.asList(instance));
+        JobInstanceBean instance = createJobInstance();
+        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("{\"state\":\"wrong\"}");
         service.syncInstancesOfAllJobs();
@@ -323,7 +305,7 @@ public class JobServiceImplTest {
 
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
         List<JobInstanceBean> scheduleStateList = new ArrayList<>();
-        scheduleStateList.add(newJobInstance());
+        scheduleStateList.add(createJobInstance());
         given(jobInstanceRepo.findByJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 1);
 
@@ -341,7 +323,7 @@ public class JobServiceImplTest {
 
         Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
         List<JobInstanceBean> scheduleStateList = new ArrayList<>();
-        JobInstanceBean jobInstance = newJobInstance();
+        JobInstanceBean jobInstance = createJobInstance();
         jobInstance.setState(LivySessionStates.State.error);
         scheduleStateList.add(jobInstance);
         given(jobInstanceRepo.findByJobName(jobKey.getGroup(), jobKey.getName(), pageRequest)).willReturn(scheduleStateList);
@@ -377,7 +359,7 @@ public class JobServiceImplTest {
         return exception;
     }
 
-    private JobInstanceBean newJobInstance() {
+    private JobInstanceBean createJobInstance() {
         JobInstanceBean jobBean = new JobInstanceBean();
         jobBean.setJobId(1L);
         jobBean.setSessionId(1L);

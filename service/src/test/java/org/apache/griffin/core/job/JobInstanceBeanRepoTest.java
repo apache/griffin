@@ -63,16 +63,10 @@ public class JobInstanceBeanRepoTest {
         assertEquals(instances.get(0).getAppId(), "appId3");
     }
 
-    @Test
-    public void testFindByGroupNameAndJobName() {
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobName("BA", "job1");
-        assertThat(instances.size()).isEqualTo(1);
-        assertEquals(instances.get(0).getAppId(), "appId1");
-    }
 
     @Test
     public void testFindGroupWithJobName() {
-        List<Object> list = jobInstanceRepo.findJobNameWithState();
+        List<JobInstanceBean> list = jobInstanceRepo.findByActiveState();
         assertThat(list.size()).isEqualTo(1);
     }
 

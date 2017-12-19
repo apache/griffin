@@ -41,12 +41,9 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
     @Query("select s from JobInstanceBean s")
     List<JobInstanceBean> findByJobName(String group, String name, Pageable pageable);
 
-    @Query("select s from JobInstanceBean s ")
-    List<JobInstanceBean> findByJobName(String group, String name);
-
-    @Query("select DISTINCT s.jobId from JobInstanceBean s " +
+    @Query("select DISTINCT s from JobInstanceBean s " +
             "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")
-    List<Object> findJobNameWithState();
+    List<JobInstanceBean> findByActiveState();
 
     @Modifying
     @Query("delete from JobInstanceBean s ")

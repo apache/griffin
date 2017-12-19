@@ -48,7 +48,7 @@ public class JsonUtil {
 
     public static <T> T toEntity(String jsonStr, Class<T> type) throws IOException {
         if (StringUtils.isEmpty(jsonStr)) {
-            LOGGER.warn("jsonStr :q{} is empty!", type);
+            LOGGER.warn("Json string {} is empty!", type);
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -58,7 +58,7 @@ public class JsonUtil {
 
     public static <T> T toEntity(String jsonStr, TypeReference type) throws IOException {
         if (StringUtils.isEmpty(jsonStr)) {
-            LOGGER.warn("jsonStr {} is empty!", type);
+            LOGGER.warn("Json string {} is empty!", type);
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
