@@ -341,7 +341,13 @@ public class JobServiceImpl implements JobService {
             return false;
         }
         try {
-            if (pauseJob(job.getQuartzGroupName(), job.getQuartzJobName()) && setJobDeleted(job)) {
+            boolean predicatePause = true;
+            String pGroup = job.getPredicateGroupName();
+            String pName = job.getPredicateJobName();
+            if (!StringUtils.isEmpty(pGroup) && !StringUtils.isEmpty(pName)) {
+                predicatePause = pauseJob(pGroup, pName);
+            }
+            if (predicatePause && pauseJob(job.getQuartzGroupName(), job.getQuartzJobName()) && setJobDeleted(job)) {
                 return true;
             }
         } catch (Exception e) {
