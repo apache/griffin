@@ -31,9 +31,11 @@ trait SparkDqEngine extends DqEngine {
 
   val sqlContext: SQLContext
 
-  def collectMetrics(ruleStep: ConcreteRuleStep): Option[(Long, Map[String, Any])] = {
+  val emptyMetricMap = Map[Long, Map[String, Any]]()
+  val emptyMap = Map[String, Any]()
+
+  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
     if (collectable) {
-      val emptyMap = Map[String, Any]()
       ruleStep match {
         case step: ConcreteRuleStep if (step.ruleInfo.persistType == MetricPersistType) => {
           val tmst = step.timeInfo.tmst
@@ -43,6 +45,7 @@ trait SparkDqEngine extends DqEngine {
             case Some(metricTmstName) => {
               try {
                 val pdf = sqlContext.table(s"`${metricTmstName}`")
+
                 val records: Array[String] = pdf.toJSON.collect()
 
                 if (records.size > 0) {
@@ -54,7 +57,7 @@ trait SparkDqEngine extends DqEngine {
                       case e: Throwable => None
                     }
                   }.toSeq
-                  val metrics = step.ruleInfo.collectType match {
+                  val metrics: Map[String, Any] = step.ruleInfo.collectType match {
                     case EntriesCollectType => flatRecords.headOption.getOrElse(emptyMap)
                     case ArrayCollectType => Map[String, Any]((metricName -> flatRecords))
                     case MapCollectType => {
@@ -66,24 +69,24 @@ trait SparkDqEngine extends DqEngine {
                       else flatRecords.headOption.getOrElse(emptyMap)
                     }
                   }
-                  Some((tmst, metrics))
+                  emptyMetricMap + (tmst -> metrics)
                 } else {
                   info(s"empty metrics in table `${metricTmstName}`, not persisted")
-                  None
+                  emptyMetricMap
                 }
               } catch {
                 case e: Throwable => {
                   error(s"collect metrics ${metricTmstName} error: ${e.getMessage}")
-                  None
+                  emptyMetricMap
                 }
               }
             }
-            case _ => None
+            case _ => emptyMetricMap
           }
         }
-        case _ => None
+        case _ => emptyMetricMap
       }
-    } else None
+    } else emptyMetricMap
   }
 
   def collectUpdateRDD(ruleStep: ConcreteRuleStep): Option[DataFrame] = {

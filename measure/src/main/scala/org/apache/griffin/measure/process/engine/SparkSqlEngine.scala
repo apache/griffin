@@ -41,7 +41,11 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
       case SparkSqlStep(ti, ri) => {
         try {
           val rdf = sqlContext.sql(ri.rule)
-          ri.getNames.foreach(TempTables.registerTempTable(rdf, ti.key, _))
+          if (ri.global) {
+            ri.getNames.foreach(TempTables.registerGlobalTable(rdf, _))
+          } else {
+            ri.getNames.foreach(TempTables.registerTempTable(rdf, ti.key, _))
+          }
           true
         } catch {
           case e: Throwable => {

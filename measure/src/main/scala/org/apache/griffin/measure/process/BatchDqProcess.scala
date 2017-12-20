@@ -145,11 +145,12 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //    }
 //
 //    // -- test --
-//    sqlContext.tables().show(50)
+    sqlContext.tables().show(50)
   }
 
   private def cleanData(timeInfo: TimeInfo): Unit = {
     TempTables.unregisterTempTables(sqlContext, timeInfo.key)
+    TempTables.unregisterGlobalTables(sqlContext)
   }
 
   def end: Try[_] = Try {

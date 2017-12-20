@@ -134,7 +134,7 @@ object RuleAdaptorGroup {
       val (curRuleInfos, curNames) = genRuleAdaptor(dslType, preNames) match {
         case Some(adaptor) => {
           val ris = adaptor.genRuleInfos(param, timeInfo)
-          val rins = ris.map(_.name)
+          val rins = ris.filter(!_.global).map(_.name)
           (ris, rins)
         }
         case _ => (Nil, Nil)

@@ -25,6 +25,8 @@ object RuleDetailKeys {
   val _persistType = "persist.type"
   val _collectType = "collect.type"
   val _cacheDataSource = "cache.data.source"
+
+  val _global = "global"
 }
 import RuleDetailKeys._
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -36,6 +38,8 @@ case class RuleInfo(name: String, tmstNameOpt: Option[String], dslType: DslType,
   val persistType = PersistType(details.getString(_persistType, ""))
   val collectType = CollectType(details.getString(_collectType, ""))
   val cacheDataSourceOpt = details.get(_cacheDataSource).map(_.toString)
+
+  val global = details.getBoolean(_global, false)
 
   def setName(n: String): RuleInfo = {
     RuleInfo(n, tmstNameOpt, dslType, rule, details, gather)

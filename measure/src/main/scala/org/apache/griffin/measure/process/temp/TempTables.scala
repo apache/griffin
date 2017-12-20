@@ -25,6 +25,8 @@ import scala.collection.concurrent.{TrieMap, Map => ConcMap}
 
 object TempTables extends Loggable {
 
+  final val _global = "_global"
+
   val tables: ConcMap[String, Set[String]] = TrieMap[String, Set[String]]()
 
   private def registerTable(key: String, table: String): Unit = {
@@ -75,6 +77,10 @@ object TempTables extends Loggable {
 
   // -----
 
+  def registerGlobalTable(df: DataFrame, table: String): Unit = {
+    registerTempTable(df, _global, table)
+  }
+
   def registerTempTable(df: DataFrame, key: String, table: String): Unit = {
     registerTable(key, table)
     df.registerTempTable(table)
@@ -88,8 +94,16 @@ object TempTables extends Loggable {
     unregisterTable(key, table).foreach(dropTempTable(sqlContext, _))
   }
 
+  def unregisterGlobalTables(sqlContext: SQLContext): Unit = {
+    unregisterTempTables(sqlContext, _global)
+  }
+
   def unregisterTempTables(sqlContext: SQLContext, key: String): Unit = {
     unregisterTables(key).foreach(dropTempTable(sqlContext, _))
+  }
+
+  def existGlobalTable(table: String): Boolean = {
+    existTable(_global, table)
   }
 
   def existTable(key: String, table: String): Boolean = {

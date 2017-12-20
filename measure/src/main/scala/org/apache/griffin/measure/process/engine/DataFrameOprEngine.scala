@@ -51,6 +51,7 @@ case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
             }
             case DataFrameOprs._accuracy => {
               val df = DataFrameOprs.accuracy(sqlContext, ti, ri)
+              df.show(10)
               ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
             }
             case DataFrameOprs._clear => {
@@ -113,6 +114,8 @@ object DataFrameOprs {
     val _enableIgnoreCache = "enable.ignore.cache"
     val enableIgnoreCache = details.getBoolean(_enableIgnoreCache, false)
 
+    val tmst = InternalColumns.tmst
+
     val updateTime = new Date().getTime
 
     def getLong(r: Row, k: String): Long = {
@@ -124,6 +127,7 @@ object DataFrameOprs {
     }
 
     val df = sqlContext.table(s"`${dfName}`")
+    df.show(10)
     val results = df.flatMap { row =>
       try {
         val missCount = getLong(row, miss)
@@ -156,6 +160,7 @@ object DataFrameOprs {
       ))
     } else {
       StructType(Array(
+//        StructField(tmst, LongType),
         StructField(miss, LongType),
         StructField(total, LongType),
         StructField(matched, LongType)
