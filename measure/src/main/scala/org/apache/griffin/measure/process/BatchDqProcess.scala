@@ -107,6 +107,8 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // run rules
     dqEngines.runRuleSteps(ruleSteps)
 
+    // persist engines...
+
     // persist results
     val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
 
