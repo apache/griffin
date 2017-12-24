@@ -124,8 +124,7 @@
         "name": "metric_accu",
         "rule": "SELECT * FROM `global_accu` WHERE `__metric`",
         "metric": {
-          "name": "accu",
-          "group.key": "__tmst"
+          "name": "accu"
         }
       },
       {
@@ -133,10 +132,9 @@
         "name": "record_accu",
         "rule": "SELECT * FROM `global_accu` WHERE `__record`",
         "record": {
-          "name": "miss",
+          "name": "missRecords",
           "update.data.source": "source",
-          "group.key": "__tmst",
-          "records.table": "missRecords"
+          "origin.DF": "missRecords"
         }
       }
     ]
