@@ -66,6 +66,14 @@
           "name": "name_group",
           "collect.type": "array"
         }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "tmst_grp",
+        "rule": "select `__tmst`, count(*) as `cnt` from source group by `__tmst`",
+        "metric": {
+          "name": "tmst_group"
+        }
       }
     ]
   }
