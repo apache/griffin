@@ -22,13 +22,14 @@ import java.util.Date
 
 import org.apache.griffin.measure.cache.result.CacheResultProcesser
 import org.apache.griffin.measure.config.params.user.DataSourceParam
-import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.data.source.{DataSource, DataSourceFactory}
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TableRegisters
 import org.apache.griffin.measure.result.AccuracyResult
+import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.rule.plan._
+import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types._
@@ -40,32 +41,32 @@ import scala.util.Try
 
 case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
-  def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
+  def runRuleStep(timeInfo: TimeInfo, ruleStep: RuleStep): Boolean = {
     ruleStep match {
-      case DfOprStep(ti, ri) => {
+      case DfOprStep(name, rule, details) => {
         try {
-          ri.rule match {
+          rule match {
             case DataFrameOprs._fromJson => {
-              val df = DataFrameOprs.fromJson(sqlContext, ri)
-              ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
+              val df = DataFrameOprs.fromJson(sqlContext, details)
+              TableRegisters.registerRunTempTable(df, timeInfo.key, name)
             }
-            case DataFrameOprs._accuracy => {
-              val df = DataFrameOprs.accuracy(sqlContext, ti, ri)
-              df.show(10)
-              ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
-            }
+//            case DataFrameOprs._accuracy => {
+//              val df = DataFrameOprs.accuracy(sqlContext, ti, ri)
+//              df.show(10)
+//              ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
+//            }
             case DataFrameOprs._clear => {
-              val df = DataFrameOprs.clear(sqlContext, ri)
-              ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
+              val df = DataFrameOprs.clear(sqlContext, details)
+              TableRegisters.registerRunTempTable(df, timeInfo.key, name)
             }
             case _ => {
-              throw new Exception(s"df opr [ ${ri.rule} ] not supported")
+              throw new Exception(s"df opr [ ${rule} ] not supported")
             }
           }
           true
         } catch {
           case e: Throwable => {
-            error(s"run df opr [ ${ri.rule} ] error: ${e.getMessage}")
+            error(s"run df opr [ ${rule} ] error: ${e.getMessage}")
             false
           }
         }
@@ -82,9 +83,7 @@ object DataFrameOprs {
   final val _accuracy = "accuracy"
   final val _clear = "clear"
 
-  def fromJson(sqlContext: SQLContext, ruleInfo: RuleInfo): DataFrame = {
-    val details = ruleInfo.details
-
+  def fromJson(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
     val _dfName = "df.name"
     val _colName = "col.name"
     val dfName = details.getOrElse(_dfName, "").toString
@@ -98,93 +97,89 @@ object DataFrameOprs {
     sqlContext.read.json(rdd) // slow process
   }
 
-  def accuracy(sqlContext: SQLContext, timeInfo: TimeInfo, ruleInfo: RuleInfo): DataFrame = {
-    val details = ruleInfo.details
+//  def accuracy(sqlContext: SQLContext, timeInfo: TimeInfo, details: Map[String, Any]): DataFrame = {
+//    val _dfName = "df.name"
+//    val _miss = "miss"
+//    val _total = "total"
+//    val _matched = "matched"
+//
+//    val dfName = details.getStringOrKey(_dfName)
+//    val miss = details.getStringOrKey(_miss)
+//    val total = details.getStringOrKey(_total)
+//    val matched = details.getStringOrKey(_matched)
+//
+//    val _enableIgnoreCache = "enable.ignore.cache"
+//    val enableIgnoreCache = details.getBoolean(_enableIgnoreCache, false)
+//
+//    val tmst = InternalColumns.tmst
+//
+//    val updateTime = new Date().getTime
+//
+//    def getLong(r: Row, k: String): Long = {
+//      try {
+//        r.getAs[Long](k)
+//      } catch {
+//        case e: Throwable => 0L
+//      }
+//    }
+//
+//    val df = sqlContext.table(s"`${dfName}`")
+//    df.show(10)
+//    val results = df.flatMap { row =>
+//      try {
+//        val missCount = getLong(row, miss)
+//        val totalCount = getLong(row, total)
+//        val ar = AccuracyResult(missCount, totalCount)
+//        if (ar.isLegal) Some((timeInfo.tmst, ar)) else None
+//      } catch {
+//        case e: Throwable => None
+//      }
+//    }.collect
+//
+//    val updateResults = results.flatMap { pair =>
+//      val (t, result) = pair
+//      val updatedCacheResultOpt = CacheResultProcesser.genUpdateCacheResult(t, updateTime, result)
+//      updatedCacheResultOpt
+//    }
+//
+//    // update results
+//    updateResults.foreach { r =>
+//      CacheResultProcesser.update(r)
+//    }
+//
+//    // generate metrics
+//    val schema = if (enableIgnoreCache) {
+//      StructType(Array(
+//        StructField(miss, LongType),
+//        StructField(total, LongType),
+//        StructField(matched, LongType),
+//        StructField(InternalColumns.ignoreCache, BooleanType)
+//      ))
+//    } else {
+//      StructType(Array(
+////        StructField(tmst, LongType),
+//        StructField(miss, LongType),
+//        StructField(total, LongType),
+//        StructField(matched, LongType)
+//      ))
+//    }
+//    val rows = if (enableIgnoreCache) {
+//      updateResults.map { r =>
+//        val ar = r.result.asInstanceOf[AccuracyResult]
+//        Row(ar.miss, ar.total, ar.getMatch, ar.initial)
+//      }
+//    } else {
+//      updateResults.map { r =>
+//        val ar = r.result.asInstanceOf[AccuracyResult]
+//        Row(ar.miss, ar.total, ar.getMatch)
+//      }
+//    }
+//    val rowRdd = sqlContext.sparkContext.parallelize(rows)
+//    sqlContext.createDataFrame(rowRdd, schema)
+//
+//  }
 
-    val _dfName = "df.name"
-    val _miss = "miss"
-    val _total = "total"
-    val _matched = "matched"
-
-    val dfName = details.getStringOrKey(_dfName)
-    val miss = details.getStringOrKey(_miss)
-    val total = details.getStringOrKey(_total)
-    val matched = details.getStringOrKey(_matched)
-
-    val _enableIgnoreCache = "enable.ignore.cache"
-    val enableIgnoreCache = details.getBoolean(_enableIgnoreCache, false)
-
-    val tmst = InternalColumns.tmst
-
-    val updateTime = new Date().getTime
-
-    def getLong(r: Row, k: String): Long = {
-      try {
-        r.getAs[Long](k)
-      } catch {
-        case e: Throwable => 0L
-      }
-    }
-
-    val df = sqlContext.table(s"`${dfName}`")
-    df.show(10)
-    val results = df.flatMap { row =>
-      try {
-        val missCount = getLong(row, miss)
-        val totalCount = getLong(row, total)
-        val ar = AccuracyResult(missCount, totalCount)
-        if (ar.isLegal) Some((timeInfo.tmst, ar)) else None
-      } catch {
-        case e: Throwable => None
-      }
-    }.collect
-
-    val updateResults = results.flatMap { pair =>
-      val (t, result) = pair
-      val updatedCacheResultOpt = CacheResultProcesser.genUpdateCacheResult(t, updateTime, result)
-      updatedCacheResultOpt
-    }
-
-    // update results
-    updateResults.foreach { r =>
-      CacheResultProcesser.update(r)
-    }
-
-    // generate metrics
-    val schema = if (enableIgnoreCache) {
-      StructType(Array(
-        StructField(miss, LongType),
-        StructField(total, LongType),
-        StructField(matched, LongType),
-        StructField(InternalColumns.ignoreCache, BooleanType)
-      ))
-    } else {
-      StructType(Array(
-//        StructField(tmst, LongType),
-        StructField(miss, LongType),
-        StructField(total, LongType),
-        StructField(matched, LongType)
-      ))
-    }
-    val rows = if (enableIgnoreCache) {
-      updateResults.map { r =>
-        val ar = r.result.asInstanceOf[AccuracyResult]
-        Row(ar.miss, ar.total, ar.getMatch, ar.initial)
-      }
-    } else {
-      updateResults.map { r =>
-        val ar = r.result.asInstanceOf[AccuracyResult]
-        Row(ar.miss, ar.total, ar.getMatch)
-      }
-    }
-    val rowRdd = sqlContext.sparkContext.parallelize(rows)
-    sqlContext.createDataFrame(rowRdd, schema)
-
-  }
-
-  def clear(sqlContext: SQLContext, ruleInfo: RuleInfo): DataFrame = {
-    val details = ruleInfo.details
-
+  def clear(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
     val _dfName = "df.name"
     val dfName = details.getOrElse(_dfName, "").toString
 

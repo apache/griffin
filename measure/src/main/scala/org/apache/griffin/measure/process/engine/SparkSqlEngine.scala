@@ -21,12 +21,13 @@ package org.apache.griffin.measure.process.engine
 import java.util.Date
 
 import org.apache.griffin.measure.config.params.user.DataSourceParam
-import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.rule.adaptor.{GlobalKeys, InternalColumns}
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.rule.plan._
+import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, GroupedData, SQLContext}
@@ -36,20 +37,28 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   override protected def collectable(): Boolean = true
 
-  def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
+  def runRuleStep(timeInfo: TimeInfo, ruleStep: RuleStep): Boolean = {
     ruleStep match {
-      case SparkSqlStep(ti, ri) => {
+      case SparkSqlStep(name, rule, details, global) => {
         try {
-          val rdf = sqlContext.sql(ri.rule)
-          if (ri.global) {
-            ri.getNames.foreach(TempTables.registerGlobalTable(rdf, _))
+          val rdf = if (global && !TableRegisters.existRunGlobalTable(name)) {
+            details.get(GlobalKeys._initRule) match {
+              case Some(initRule: String) => sqlContext.sql(initRule)
+              case _ => sqlContext.emptyDataFrame
+            }
           } else {
-            ri.getNames.foreach(TempTables.registerTempTable(rdf, ti.key, _))
+            sqlContext.sql(rule)
+          }
+
+          if (global) {
+            TableRegisters.registerRunGlobalTable(rdf, name)
+          } else {
+            TableRegisters.registerRunTempTable(rdf, timeInfo.key, name)
           }
           true
         } catch {
           case e: Throwable => {
-            error(s"run spark sql [ ${ri.rule} ] error: ${e.getMessage}")
+            error(s"run spark sql [ ${rule} ] error: ${e.getMessage}")
             false
           }
         }

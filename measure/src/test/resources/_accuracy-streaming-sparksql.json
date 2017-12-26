@@ -110,19 +110,21 @@
       {
         "dsl.type": "spark-sql",
         "name": "accu",
-        "rule": "SELECT `miss_count`.`__tmst`, `miss_count`.`miss` AS `miss`, `total_count`.`total` AS `total`, (`total` - `miss`) AS `matched` FROM `miss_count` FULL JOIN `total_count` ON `miss_count`.`__tmst` = `total_count`.`__tmst`"
+        "rule": "SELECT `total_count`.`__tmst` AS `__tmst`, `total_count`.`total` AS `total`, coalesce(`miss_count`.`miss`, 0) AS `miss` FROM `total_count` FULL JOIN `miss_count` ON `total_count`.`__tmst` = `miss_count`.`__tmst`"
       },
       {
         "dsl.type": "spark-sql",
         "name": "global_accu",
+        "rule": "SELECT coalesce(`global_accu`.`__tmst`, `accu`.`__tmst`) AS `__tmst`, coalesce(`accu`.`miss`, `global_accu`.`miss`) AS `miss`, coalesce(`global_accu`.`total`, `accu`.`total`) AS `total`, ((`accu`.`miss` IS NOT NULL) AND ((`global_accu`.`miss` IS NULL) OR (`accu`.`miss` < `global_accu`.`miss`))) AS `__metric` FROM `global_accu` FULL JOIN `accu` ON `global_accu`.`__tmst` = `accu`.`__tmst`",
         "global": true,
-        "global.init.rule": "SELECT *, (true) AS `__metric`, (true) AS `__record` FROM `accu`",
-        "rule": "SELECT coalesce(`global_accu`.`__tmst`, `accu`.`__tmst`) AS `__tmst`, coalesce(`accu`.`miss`, `global_accu`.`miss`) AS `miss`, coalesce(`global_accu`.`total`, `accu`.`total`) AS `total`, (`total` - `miss`) AS `matched`, (`accu`.`miss` < `global_accu`.`miss`) AS `__metric`, (`__metric` AND `matched` > 0) AS `__record` FROM `global_accu` FULL JOIN `accu` ON `global_accu`.`__tmst` = `accu`.`__tmst`"
+        "details": {
+          "init.rule": "SELECT `__tmst`, `total`, `miss`, (true) AS `__metric` FROM `accu`"
+        }
       },
       {
         "dsl.type": "spark-sql",
         "name": "metric_accu",
-        "rule": "SELECT * FROM `global_accu` WHERE `__metric`",
+        "rule": "SELECT `__tmst`, `total`, `miss`, (`total` - `miss`) AS `matched` FROM `global_accu` WHERE `__metric`",
         "metric": {
           "name": "accu"
         }
@@ -130,12 +132,18 @@
       {
         "dsl.type": "spark-sql",
         "name": "record_accu",
-        "rule": "SELECT * FROM `global_accu` WHERE `__record`",
+        "rule": "SELECT `__tmst` FROM `metric_accu` WHERE `matched` > 0",
         "record": {
           "name": "missRecords",
-          "update.data.source": "source",
+          "data.source.cache": "source",
           "origin.DF": "missRecords"
         }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "global_accu",
+        "rule": "SELECT * FROM `global_accu` WHERE (`miss` > 0)",
+        "global": true
       }
     ]
   }

@@ -28,7 +28,7 @@ import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
-import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TableRegisters
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.rule.udf.GriffinUdfs
@@ -99,26 +99,33 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // generate rule steps
 //    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
 //      TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts, BatchProcessType, RunPhase)
-    val ruleSteps = RuleAdaptorGroup.genRuleSteps(
-      CalcTimeInfo(appTime), userParam.evaluateRuleParam, dsTmsts)
+//    val ruleSteps = RuleAdaptorGroup.genRuleSteps(
+//      CalcTimeInfo(appTime), userParam.evaluateRuleParam, dsTmsts)
 
-//    ruleSteps.foreach(println)
+    val rulePlan = RuleAdaptorGroup.genRulePlan(
+      calcTimeInfo, userParam.evaluateRuleParam, StreamingProcessType)
+
+    rulePlan.ruleSteps.foreach(println)
+    println("====")
+    rulePlan.metricExports.foreach(println)
+    println("====")
+    rulePlan.recordExports.foreach(println)
+    println("====")
 
     // run rules
-    dqEngines.runRuleSteps(ruleSteps)
+    dqEngines.runRuleSteps(calcTimeInfo, rulePlan.ruleSteps)
 
     // persist engines...
 
     // persist results
-    val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
+    dqEngines.persistAllMetrics(calcTimeInfo, rulePlan.metricExports, StreamingProcessType, persistFactory)
 
-    val dfs = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups.toSet)
-    dfs.foreach(_._2.cache())
+//    val dfs = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups.toSet)
+//    dfs.foreach(_._2.cache())
+//
+//    dqEngines.persistAllRecords(dfs, persistFactory)
 
-    dqEngines.persistAllRecords(dfs, persistFactory)
-//    dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
-
-    dfs.foreach(_._2.unpersist())
+//    dfs.foreach(_._2.unpersist())
 
     // end time
     val endTime = new Date().getTime
@@ -130,8 +137,10 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //    sqlContext.tables().show(50)
 //    println(sqlContext.tableNames().size)
 
+    sqlContext.tables().show(50)
+
     // clean data
-    cleanData(calcTimeInfo)
+    cleanRunData(calcTimeInfo)
 
 //    sqlContext.tables().show(50)
 //    println(sqlContext.tableNames().size)
@@ -150,9 +159,11 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     sqlContext.tables().show(50)
   }
 
-  private def cleanData(timeInfo: TimeInfo): Unit = {
-    TempTables.unregisterTempTables(sqlContext, timeInfo.key)
-    TempTables.unregisterGlobalTables(sqlContext)
+  private def cleanRunData(timeInfo: TimeInfo): Unit = {
+    TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)
+    TableRegisters.unregisterRunGlobalTables(sqlContext)
+    TableRegisters.unregisterCompileTempTables(timeInfo.key)
+    TableRegisters.unregisterCompileGlobalTables
   }
 
   def end: Try[_] = Try {

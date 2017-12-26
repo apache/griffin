@@ -18,18 +18,15 @@ under the License.
 */
 package org.apache.griffin.measure.process.temp
 
-import org.apache.griffin.measure.log.Loggable
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.SQLContext
 
 import scala.collection.concurrent.{TrieMap, Map => ConcMap}
 
-object TempTables extends Loggable {
+case class TableRegs() {
 
-  final val _global = "_global"
+  private val tables: ConcMap[String, Set[String]] = TrieMap[String, Set[String]]()
 
-  val tables: ConcMap[String, Set[String]] = TrieMap[String, Set[String]]()
-
-  private def registerTable(key: String, table: String): Unit = {
+  def registerTable(key: String, table: String): Unit = {
     tables.get(key) match {
       case Some(set) => {
         val suc = tables.replace(key, set, set + table)
@@ -42,7 +39,7 @@ object TempTables extends Loggable {
     }
   }
 
-  private def unregisterTable(key: String, table: String): Option[String] = {
+  def unregisterTable(key: String, table: String): Option[String] = {
     tables.get(key) match {
       case Some(set) => {
         val ftb = set.find(_ == table)
@@ -60,50 +57,11 @@ object TempTables extends Loggable {
     }
   }
 
-  private def unregisterTables(key: String): Set[String] = {
+  def unregisterTables(key: String): Set[String] = {
     tables.remove(key) match {
       case Some(set) => set
       case _ => Set[String]()
     }
-  }
-
-  private def dropTempTable(sqlContext: SQLContext, table: String): Unit = {
-    try {
-      sqlContext.dropTempTable(table)
-    } catch {
-      case e: Throwable => warn(s"drop temp table ${table} fails")
-    }
-  }
-
-  // -----
-
-  def registerGlobalTable(df: DataFrame, table: String): Unit = {
-    registerTempTable(df, _global, table)
-  }
-
-  def registerTempTable(df: DataFrame, key: String, table: String): Unit = {
-    registerTable(key, table)
-    df.registerTempTable(table)
-  }
-
-  def registerTempTableNameOnly(key: String, table: String): Unit = {
-    registerTable(key, table)
-  }
-
-  def unregisterTempTable(sqlContext: SQLContext, key: String, table: String): Unit = {
-    unregisterTable(key, table).foreach(dropTempTable(sqlContext, _))
-  }
-
-  def unregisterGlobalTables(sqlContext: SQLContext): Unit = {
-    unregisterTempTables(sqlContext, _global)
-  }
-
-  def unregisterTempTables(sqlContext: SQLContext, key: String): Unit = {
-    unregisterTables(key).foreach(dropTempTable(sqlContext, _))
-  }
-
-  def existGlobalTable(table: String): Boolean = {
-    existTable(_global, table)
   }
 
   def existTable(key: String, table: String): Boolean = {
@@ -114,8 +72,3 @@ object TempTables extends Loggable {
   }
 
 }
-
-//object TempKeys {
-//  def key(t: Long): String = s"${t}"
-//  def key(head: String, t: Long): String = s"${head}_${t}"
-//}

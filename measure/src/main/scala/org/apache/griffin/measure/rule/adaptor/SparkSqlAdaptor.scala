@@ -19,9 +19,10 @@ under the License.
 package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.cache.tmst.TempName
-import org.apache.griffin.measure.data.connector.InternalColumns
+import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.rule.dsl.MetricPersistType
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.rule.plan._
+import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.utils.ParamUtil._
 
 case class SparkSqlAdaptor() extends RuleAdaptor {
@@ -36,5 +37,13 @@ case class SparkSqlAdaptor() extends RuleAdaptor {
 //      case _ => Nil
 //    }
 //  }
+
+  import RuleParamKeys._
+
+  def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any], procType: ProcessType): RulePlan = {
+    val name = getRuleName(param)
+    val step = SparkSqlStep(name, getRule(param), getDetails(param), getGlobal(param))
+    RulePlan(step :: Nil, genRuleExports(param, name, name))
+  }
 
 }

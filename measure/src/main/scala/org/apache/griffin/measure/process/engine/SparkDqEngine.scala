@@ -19,13 +19,16 @@ under the License.
 package org.apache.griffin.measure.process.engine
 
 import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
-import org.apache.griffin.measure.data.connector.InternalColumns
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
+import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
+import org.apache.griffin.measure.rule.plan.MetricExport
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.griffin.measure.utils.ParamUtil._
 
 trait SparkDqEngine extends DqEngine {
 
@@ -34,88 +37,107 @@ trait SparkDqEngine extends DqEngine {
   val emptyMetricMap = Map[Long, Map[String, Any]]()
   val emptyMap = Map[String, Any]()
 
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]] = {
+  private def getMetricMaps(dfName: String): Seq[Map[String, Any]] = {
+    val pdf = sqlContext.table(s"`${dfName}`")
+    val records = pdf.toJSON.collect()
+    if (records.size > 0) {
+      records.flatMap { rec =>
+        try {
+          val value = JsonUtil.toAnyMap(rec)
+          Some(value)
+        } catch {
+          case e: Throwable => None
+        }
+      }.toSeq
+    } else Nil
+  }
+
+  private def normalizeMetric(metrics: Seq[Map[String, Any]], name: String, collectType: CollectType
+                             ): Map[String, Any] = {
+    collectType match {
+      case EntriesCollectType => metrics.headOption.getOrElse(emptyMap)
+      case ArrayCollectType => Map[String, Any]((name -> metrics))
+      case MapCollectType => {
+        val v = metrics.headOption.getOrElse(emptyMap)
+        Map[String, Any]((name -> v))
+      }
+      case _ => {
+        if (metrics.size > 1) Map[String, Any]((name -> metrics))
+        else metrics.headOption.getOrElse(emptyMap)
+      }
+    }
+  }
+
+  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport, procType: ProcessType
+                    ): Map[Long, Map[String, Any]] = {
     if (collectable) {
-      ruleStep match {
-        case step: ConcreteRuleStep if (step.ruleInfo.persistType == MetricPersistType) => {
-          val tmst = step.timeInfo.tmst
-          val metricName = step.ruleInfo.name
-
-          step.ruleInfo.tmstNameOpt match {
-            case Some(metricTmstName) => {
-              try {
-                val pdf = sqlContext.table(s"`${metricTmstName}`")
-
-                val records: Array[String] = pdf.toJSON.collect()
-
-                if (records.size > 0) {
-                  val flatRecords = records.flatMap { rec =>
-                    try {
-                      val value = JsonUtil.toAnyMap(rec)
-                      Some(value)
-                    } catch {
-                      case e: Throwable => None
-                    }
-                  }.toSeq
-                  val metrics: Map[String, Any] = step.ruleInfo.collectType match {
-                    case EntriesCollectType => flatRecords.headOption.getOrElse(emptyMap)
-                    case ArrayCollectType => Map[String, Any]((metricName -> flatRecords))
-                    case MapCollectType => {
-                      val v = flatRecords.headOption.getOrElse(emptyMap)
-                      Map[String, Any]((metricName -> v))
-                    }
-                    case _ => {
-                      if (flatRecords.size > 1) Map[String, Any]((metricName -> flatRecords))
-                      else flatRecords.headOption.getOrElse(emptyMap)
-                    }
-                  }
-                  emptyMetricMap + (tmst -> metrics)
-                } else {
-                  info(s"empty metrics in table `${metricTmstName}`, not persisted")
-                  emptyMetricMap
-                }
-              } catch {
-                case e: Throwable => {
-                  error(s"collect metrics ${metricTmstName} error: ${e.getMessage}")
-                  emptyMetricMap
-                }
+      val MetricExport(name, stepName, collectType) = metricExport
+      try {
+        val metricMaps = getMetricMaps(stepName)
+        if (metricMaps.size > 0) {
+          procType match {
+            case BatchProcessType => {
+              val metrics: Map[String, Any] = normalizeMetric(metricMaps, name, collectType)
+              emptyMetricMap + (timeInfo.calcTime -> metrics)
+            }
+            case StreamingProcessType => {
+              val tmstMetrics = metricMaps.map { metric =>
+                val tmst = metric.getLong(InternalColumns.tmst, timeInfo.calcTime)
+                val pureMetric = metric.removeKeys(InternalColumns.columns)
+                (tmst, pureMetric)
+              }
+              tmstMetrics.groupBy(_._1).map { pair =>
+                val (k, v) = pair
+                val maps = v.map(_._2)
+                val mtc = normalizeMetric(maps, name, collectType)
+                (k, mtc)
               }
             }
-            case _ => emptyMetricMap
           }
+        } else {
+          info(s"empty metrics of [${name}], not persisted")
+          emptyMetricMap
         }
-        case _ => emptyMetricMap
+      } catch {
+        case e: Throwable => {
+          error(s"collect metrics ${name} error: ${e.getMessage}")
+          emptyMetricMap
+        }
       }
     } else emptyMetricMap
   }
+//
+//  def collectUpdateRDD(ruleStep: ConcreteRuleStep): Option[DataFrame] = {
+//    if (collectable) {
+//      ruleStep match {
+//        case step: ConcreteRuleStep if ((step.ruleInfo.persistType == RecordPersistType)
+//          || (step.ruleInfo.cacheDataSourceOpt.nonEmpty)) => {
+//          val tmst = step.timeInfo.tmst
+////          val metricName = step.ruleInfo.name
+//
+//          step.ruleInfo.tmstNameOpt match {
+//            case Some(metricTmstName) => {
+//              try {
+//                val pdf = sqlContext.table(s"`${metricTmstName}`")
+//                Some(pdf)
+//              } catch {
+//                case e: Throwable => {
+//                  error(s"collect records ${metricTmstName} error: ${e.getMessage}")
+//                  None
+//                }
+//              }
+//            }
+//            case _ => None
+//          }
+//        }
+//        case _ => None
+//      }
+//    } else None
+//  }
 
-  def collectUpdateRDD(ruleStep: ConcreteRuleStep): Option[DataFrame] = {
-    if (collectable) {
-      ruleStep match {
-        case step: ConcreteRuleStep if ((step.ruleInfo.persistType == RecordPersistType)
-          || (step.ruleInfo.cacheDataSourceOpt.nonEmpty)) => {
-          val tmst = step.timeInfo.tmst
-//          val metricName = step.ruleInfo.name
 
-          step.ruleInfo.tmstNameOpt match {
-            case Some(metricTmstName) => {
-              try {
-                val pdf = sqlContext.table(s"`${metricTmstName}`")
-                Some(pdf)
-              } catch {
-                case e: Throwable => {
-                  error(s"collect records ${metricTmstName} error: ${e.getMessage}")
-                  None
-                }
-              }
-            }
-            case _ => None
-          }
-        }
-        case _ => None
-      }
-    } else None
-  }
+
+
 
 //  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]
 //                      ): Option[RDD[(Long, Iterable[String])]] = {

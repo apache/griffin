@@ -174,11 +174,26 @@ object ParamUtil {
       }
     }
 
+    def getParamMapOpt(key: String): Option[Map[String, Any]] = {
+      try {
+        params.get(key) match {
+          case Some(v: Map[String, Any]) => Some(v)
+          case _ => None
+        }
+      } catch {
+        case _: Throwable => None
+      }
+    }
+
     def addIfNotExist(key: String, value: Any): Map[String, Any] = {
       params.get(key) match {
         case Some(v) => params
         case _ => params + (key -> value)
       }
+    }
+
+    def removeKeys(keys: Iterable[String]): Map[String, Any] = {
+      params -- keys
     }
   }
 

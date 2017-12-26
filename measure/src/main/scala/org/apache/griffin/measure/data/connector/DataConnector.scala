@@ -25,8 +25,8 @@ import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.{BatchDqProcess, BatchProcessType}
 import org.apache.griffin.measure.process.engine._
-import org.apache.griffin.measure.process.temp.TempTables
-import org.apache.griffin.measure.rule.adaptor.{PreProcPhase, RuleAdaptorGroup, RunPhase}
+import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.rule.adaptor.{InternalColumns, PreProcPhase, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.preproc.PreProcRuleGenerator
 import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo}
@@ -69,23 +69,24 @@ trait DataConnector extends Loggable with Serializable {
     try {
       dfOpt.flatMap { df =>
         // in data
-        TempTables.registerTempTable(df, timeInfo.key, thisTable)
+        TableRegisters.registerRunTempTable(df, timeInfo.key, thisTable)
 
 //        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
         val tmsts = Seq[Long](ms)
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genRuleSteps(
-          timeInfo, preProcRules, tmsts, DslType("spark-sql"), PreProcPhase)
+        val rulePlan = RuleAdaptorGroup.genRulePlan(
+          timeInfo, preProcRules, SparkSqlType, BatchProcessType)
 
         // run rules
-        dqEngines.runRuleSteps(ruleSteps)
+        dqEngines.runRuleSteps(timeInfo, rulePlan.ruleSteps)
 
         // out data
         val outDf = sqlContext.table(s"`${thisTable}`")
+        println(outDf.count)
 
         // drop temp tables
-        TempTables.unregisterTempTables(sqlContext, timeInfo.key)
+        TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)
 //        names.foreach { name =>
 //          try {
 //            TempTables.unregisterTempTable(sqlContext, ms, name)
@@ -94,7 +95,7 @@ trait DataConnector extends Loggable with Serializable {
 //          }
 //        }
 
-        val range = if (id == "dc1") (0 until 10).toList else (0 until 1).toList
+        val range = if (id == "dc1") (0 until 20).toList else (0 until 1).toList
         val withTmstDfs = range.map { i =>
           saveTmst(ms + i)
           outDf.withColumn(tmstColName, lit(ms + i)).limit(49 - i)
@@ -133,13 +134,3 @@ object DataConnectorIdGenerator {
   }
 }
 
-object InternalColumns {
-  val tmst = "__tmst"
-  val ignoreCache = "__ignoreCache"
-
-  val columns = List[String](tmst, ignoreCache)
-
-  def clearInternalColumns(v: Map[String, Any]): Map[String, Any] = {
-    v -- columns
-  }
-}

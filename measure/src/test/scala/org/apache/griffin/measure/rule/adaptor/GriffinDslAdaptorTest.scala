@@ -32,18 +32,38 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
 
   test ("profiling groupby") {
 //    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, BatchProcessType, RunPhase)
-    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil)
+    val adaptor = GriffinDslAdaptor("source" :: "target" :: Nil, "count" :: Nil)
+//    val adaptor = SparkSqlAdaptor()
+
+//    val ruleJson =
+//      """
+//        |{
+//        |  "dsl.type": "griffin-dsl",
+//        |  "dq.type": "profiling",
+//        |  "name": "prof",
+//        |  "rule": "count(*)"
+//        |}
+//      """.stripMargin
 
     val ruleJson =
       """
         |{
         |  "dsl.type": "griffin-dsl",
-        |  "dq.type": "profiling",
-        |  "name": "prof",
-        |  "rule": "count(*)",
+        |  "dq.type": "accuracy",
+        |  "name": "accu",
+        |  "rule": "source.user_id = target.user_id",
         |  "details": {
         |    "source": "source",
-        |    "persist.type": "record"
+        |    "target": "target",
+        |    "miss": "miss_count",
+        |    "total": "total_count",
+        |    "matched": "matched_count"
+        |  },
+        |  "metric": {
+        |    "name": "accu"
+        |  },
+        |  "record": {
+        |    "name": "missRecords"
         |  }
         |}
       """.stripMargin
@@ -65,10 +85,11 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
 //    }
 
     val timeInfo = CalcTimeInfo(123)
-    TempTables.registerTempTableNameOnly(timeInfo.key, "source")
+    TableRegisters.registerCompileTempTable(timeInfo.key, "source")
 
-    val ris = adaptor.genRuleInfos(rule, timeInfo)
-    ris.foreach(println)
+    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
+    rp.ruleSteps.foreach(println)
+    rp.ruleExports.foreach(println)
   }
 
   test ("accuracy") {

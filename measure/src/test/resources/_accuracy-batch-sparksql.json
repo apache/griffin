@@ -53,7 +53,7 @@
       {
         "dsl.type": "spark-sql",
         "name": "accu",
-        "rule": "SELECT `miss_count`.`miss` AS `miss`, `total_count`.`total` AS `total`, (`total` - `miss`) AS `matched` FROM `miss_count` FULL JOIN `total_count`",
+        "rule": "SELECT `total_count`.`total` AS `total`, coalesce(`miss_count`.`miss`, 0) AS `miss`, (`total` - `miss`) AS `matched` FROM `total_count` FULL JOIN `miss_count`",
         "metric": {
           "name": "accu"
         }

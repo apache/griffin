@@ -102,14 +102,15 @@
           "target": "target",
           "miss": "miss_count",
           "total": "total_count",
-          "matched": "matched_count"
+          "matched": "matched_count",
+          "global.metric.keep": "1d"
         },
         "metric": {
           "name": "accu"
         },
         "record": {
           "name": "missRecords",
-          "update.data.source": "source"
+          "data.source.cache": "source"
         }
       }
     ]

@@ -42,8 +42,8 @@ class RuleAdaptorGroupTest extends FunSuite with Matchers with BeforeAndAfter wi
       "coalesce" :: "count" :: "upper" :: Nil
     )
     val timeInfo = CalcTimeInfo(123)
-    TempTables.registerTempTableNameOnly(timeInfo.key, "source")
-    TempTables.registerTempTableNameOnly(timeInfo.key, "target")
+    TableRegisters.registerCompileTempTable(timeInfo.key, "source")
+    TableRegisters.registerCompileTempTable(timeInfo.key, "target")
 
     val confFile = "src/test/resources/config-test-accuracy-new.json"
 
@@ -54,12 +54,12 @@ class RuleAdaptorGroupTest extends FunSuite with Matchers with BeforeAndAfter wi
 
     val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](111, 222, 333)))
 
-    val steps = RuleAdaptorGroup.genRuleSteps(
-      TmstTimeInfo(123, 321),
-      userParam.evaluateRuleParam,
-      dsTmsts
-    )
-    steps.foreach(println)
+//    val steps = RuleAdaptorGroup.genRuleSteps(
+//      TmstTimeInfo(123, 321),
+//      userParam.evaluateRuleParam,
+//      dsTmsts
+//    )
+//    steps.foreach(println)
   }
 
   private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {

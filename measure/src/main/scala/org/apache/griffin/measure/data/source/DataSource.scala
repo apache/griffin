@@ -23,7 +23,7 @@ import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.process.temp.TempTables
+import org.apache.griffin.measure.process.temp.TableRegisters
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
@@ -56,8 +56,8 @@ case class DataSource(sqlContext: SQLContext,
     val (dfOpt, tmsts) = data(calcTime)
     dfOpt match {
       case Some(df) => {
-        TempTables.registerTempTable(df, timeInfo.key, name)
-        TempTables.registerTempTable(df, timeInfo.key, tmstName)
+        TableRegisters.registerRunTempTable(df, timeInfo.key, name)
+        TableRegisters.registerRunTempTable(df, timeInfo.key, tmstName)
       }
       case None => {
 //        val df = sqlContext.emptyDataFrame
