@@ -83,7 +83,6 @@ trait DataConnector extends Loggable with Serializable {
 
         // out data
         val outDf = sqlContext.table(s"`${thisTable}`")
-        println(outDf.count)
 
         // drop temp tables
         TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)

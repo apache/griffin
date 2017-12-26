@@ -105,22 +105,22 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     val rulePlan = RuleAdaptorGroup.genRulePlan(
       calcTimeInfo, userParam.evaluateRuleParam, StreamingProcessType)
 
-    rulePlan.ruleSteps.foreach(println)
-    println("====")
-    rulePlan.metricExports.foreach(println)
-    println("====")
-    rulePlan.recordExports.foreach(println)
-    println("====")
+//    rulePlan.ruleSteps.foreach(println)
+//    println("====")
+//    rulePlan.metricExports.foreach(println)
+//    println("====")
+//    rulePlan.recordExports.foreach(println)
+//    println("====")
 
     // run rules
     dqEngines.runRuleSteps(calcTimeInfo, rulePlan.ruleSteps)
 
-    // persist engines...
+    // TODO: persist engines might be better
 
     // persist results
     dqEngines.persistAllMetrics(calcTimeInfo, rulePlan.metricExports, StreamingProcessType, persistFactory)
 
-//    val dfs = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups.toSet)
+    dqEngines.persistAllRecords(calcTimeInfo, rulePlan.recordExports, StreamingProcessType, persistFactory)
 //    dfs.foreach(_._2.cache())
 //
 //    dqEngines.persistAllRecords(dfs, persistFactory)

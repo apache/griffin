@@ -25,7 +25,7 @@ import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.plan.{MetricExport, RuleExport, RuleStep}
+import org.apache.griffin.measure.rule.plan.{MetricExport, RecordExport, RuleExport, RuleStep}
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
@@ -66,6 +66,23 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
       val (t, metric) = pair
       val persist = persistFactory.getPersists(t)
       persist.persistMetrics(metric)
+    }
+  }
+
+  def persistAllRecords(timeInfo: TimeInfo, recordExports: Seq[RecordExport],
+                        procType: ProcessType, persistFactory: PersistFactory
+                       ): Unit = {
+    recordExports.foreach { recordExport =>
+      val records = collectRecords(timeInfo, recordExport, procType)
+
+      // TODO: persist records, maybe multiThreads
+
+      records.foreach { pair =>
+        val (tmst, df) = pair
+        println(tmst)
+//        println(df.count)
+//        df.show(10)
+      }
     }
   }
 
@@ -144,6 +161,14 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
                     ): Map[Long, Map[String, Any]] = {
     val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
       if (ret.nonEmpty) ret else engine.collectMetrics(timeInfo, metricExport, procType)
+    }
+    ret
+  }
+
+  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport, procType: ProcessType
+                    ): Map[Long, DataFrame] = {
+    val ret = engines.foldLeft(Map[Long, DataFrame]()) { (ret, engine) =>
+      if (ret.nonEmpty) ret else engine.collectRecords(timeInfo, recordExport, procType)
     }
     ret
   }

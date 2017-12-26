@@ -24,7 +24,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.plan.{MetricExport, RuleStep}
+import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
@@ -43,4 +43,6 @@ trait DqEngine extends Loggable with Serializable {
   //  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
 
 //  def collectUpdateRDD(ruleStep: RuleStep): Option[DataFrame]
+  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport, procType: ProcessType
+                    ): Map[Long, DataFrame]
 }

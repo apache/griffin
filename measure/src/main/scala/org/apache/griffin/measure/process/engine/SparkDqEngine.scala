@@ -23,7 +23,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.plan.MetricExport
+import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
@@ -36,6 +36,7 @@ trait SparkDqEngine extends DqEngine {
 
   val emptyMetricMap = Map[Long, Map[String, Any]]()
   val emptyMap = Map[String, Any]()
+  val emptyRecordMap = Map[Long, DataFrame]()
 
   private def getMetricMaps(dfName: String): Seq[Map[String, Any]] = {
     val pdf = sqlContext.table(s"`${dfName}`")
@@ -106,6 +107,43 @@ trait SparkDqEngine extends DqEngine {
       }
     } else emptyMetricMap
   }
+
+
+  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport, procType: ProcessType
+                    ): Map[Long, DataFrame] = {
+    if (collectable) {
+      val RecordExport(_, stepName, _, originDFOpt) = recordExport
+      val stepDf = sqlContext.table(s"`${stepName}`")
+      val recordsDf = originDFOpt match {
+        case Some(originName) => sqlContext.table(s"`${originName}`")
+        case _ => stepDf
+      }
+
+      procType match {
+        case BatchProcessType => {
+          val recordsDf = sqlContext.table(s"`${stepName}`")
+          emptyRecordMap + (timeInfo.calcTime -> recordsDf)
+        }
+        case StreamingProcessType => {
+          originDFOpt match {
+            case Some(originName) => {
+              val recordsDf = sqlContext.table(s"`${originName}`")
+              stepDf.collect.map { row =>
+                val tmst = row.getAs[Long](InternalColumns.tmst)
+                val trdf = recordsDf.filter(s"`${InternalColumns.tmst}` = ${tmst}")
+                (tmst, trdf)
+              }.toMap
+            }
+            case _ => {
+              val recordsDf = sqlContext.table(s"`${stepName}`")
+              emptyRecordMap + (timeInfo.calcTime -> recordsDf)
+            }
+          }
+        }
+      }
+    } else emptyRecordMap
+  }
+
 //
 //  def collectUpdateRDD(ruleStep: ConcreteRuleStep): Option[DataFrame] = {
 //    if (collectable) {
