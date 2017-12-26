@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.process.engine
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.log.Loggable
@@ -29,6 +31,11 @@ import org.apache.griffin.measure.rule.plan.{MetricExport, RecordExport, RuleExp
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
+
+import scala.concurrent._
+import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success}
+import ExecutionContext.Implicits.global
 
 case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
@@ -75,14 +82,30 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     recordExports.foreach { recordExport =>
       val records = collectRecords(timeInfo, recordExport, procType)
 
-      // TODO: persist records, maybe multiThreads
-
+      val pc = ParallelCounter(records.size)
+      val pro = promise[Boolean]
       records.foreach { pair =>
         val (tmst, df) = pair
-        println(tmst)
-//        println(df.count)
-//        df.show(10)
+        val future = Future {
+          // TODO: persist records
+          println(tmst)
+          df.show(10)
+          true
+        }
+        future.onComplete {
+          case Success(v) => {
+            pc.finishOne(v)
+            if (pc.checkDone) pro.trySuccess(pc.checkResult)
+          }
+          case Failure(ex) => {
+            println(s"plan step failure: ${ex.getMessage}")
+            pc.finishOne(false)
+            if (pc.checkDone) pro.trySuccess(pc.checkResult)
+          }
+        }
       }
+      Await.result(pro.future, Duration.Inf)
+
     }
   }
 
@@ -281,4 +304,19 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 //    }
 //  }
 
+}
+
+case class ParallelCounter(total: Int) extends Serializable {
+  private val done: AtomicInteger = new AtomicInteger(0)
+  private val result: AtomicInteger = new AtomicInteger(0)
+  def finishOne(suc: Boolean): Unit = {
+    if (suc) result.incrementAndGet
+    done.incrementAndGet
+  }
+  def checkDone: Boolean = {
+    done.get() >= total
+  }
+  def checkResult: Boolean = {
+    if (total > 0) result.get() > 0 else true
+  }
 }

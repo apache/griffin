@@ -50,10 +50,7 @@ object TimeUtil extends Loggable {
         }
       } match {
         case Success(v) => Some(v)
-        case Failure(ex) => {
-          error(ex.getMessage)
-          None
-        }
+        case Failure(ex) => None
       }
     }
     value
