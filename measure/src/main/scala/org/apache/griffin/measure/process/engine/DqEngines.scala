@@ -76,20 +76,23 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     }
   }
 
-  def persistAllRecords(timeInfo: TimeInfo, recordExports: Seq[RecordExport],
-                        procType: ProcessType, persistFactory: PersistFactory
-                       ): Unit = {
-    recordExports.foreach { recordExport =>
-      val records = collectRecords(timeInfo, recordExport, procType)
-
-      val pc = ParallelCounter(records.size)
-      val pro = promise[Boolean]
+  private def persistCollectedRecords(recordExport: RecordExport, records: Map[Long, DataFrame],
+                                      persistFactory: PersistFactory, dataSources: Seq[DataSource]): Unit = {
+    val pc = ParallelCounter(records.size)
+    val pro = promise[Boolean]
+    if (records.size > 0) {
       records.foreach { pair =>
         val (tmst, df) = pair
+        val persist = persistFactory.getPersists(tmst)
+        val updateDsCaches = recordExport.dataSourceCacheOpt match {
+          case Some(dsName) => dataSources.filter(_.name == dsName).flatMap(_.dataSourceCacheOpt)
+          case _ => Nil
+        }
         val future = Future {
-          // TODO: persist records
-          println(tmst)
-          df.show(10)
+//        df.cache
+          persist.persistRecords(df, recordExport.name)
+          updateDsCaches.foreach(_.updateData(df, tmst))
+//        df.unpersist
           true
         }
         future.onComplete {
@@ -104,8 +107,17 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
           }
         }
       }
-      Await.result(pro.future, Duration.Inf)
+    } else pro.trySuccess(true)
 
+    Await.result(pro.future, Duration.Inf)
+  }
+
+  def persistAllRecords(timeInfo: TimeInfo, recordExports: Seq[RecordExport], procType: ProcessType,
+                        persistFactory: PersistFactory, dataSources: Seq[DataSource]
+                       ): Unit = {
+    recordExports.foreach { recordExport =>
+      val records = collectRecords(timeInfo, recordExport, procType)
+      persistCollectedRecords(recordExport, records, persistFactory, dataSources)
     }
   }
 

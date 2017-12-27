@@ -137,6 +137,14 @@ object TableRegisters extends Loggable {
     compileTableRegs.existTable(key, table)
   }
 
+  def getRunGlobalTables(): Set[String] = {
+    getRunTempTables(_global)
+  }
+
+  def getRunTempTables(key: String): Set[String] = {
+    runTableRegs.getTables(key)
+  }
+
 }
 
 //object TempKeys {

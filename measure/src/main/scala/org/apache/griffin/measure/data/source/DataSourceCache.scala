@@ -33,7 +33,7 @@ import scala.util.{Failure, Success}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                           metricName: String, index: Int
+                           dsName: String, index: Int
                           ) extends DataCacheable with Loggable with Serializable {
 
   var tmstCache: TmstCache = _
@@ -44,15 +44,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     tmstCache.remove(outDateTmsts)
   }
 
-  val name = ""
-
   val _FilePath = "file.path"
   val _InfoPath = "info.path"
   val _ReadyTimeInterval = "ready.time.interval"
   val _ReadyTimeDelay = "ready.time.delay"
   val _TimeRange = "time.range"
 
-  val defFilePath = s"hdfs:///griffin/cache/${metricName}/${index}"
+  val defFilePath = s"hdfs:///griffin/cache/${dsName}/${index}"
   val defInfoPath = s"${index}"
 
   val filePath: String = param.getString(_FilePath, defFilePath)
@@ -74,6 +72,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
 
   val rowSepLiteral = "\n"
   val partitionUnits: List[String] = List("hour", "min", "sec")
+  val minUnitTime: Long = TimeUtil.timeFromUnit(1, partitionUnits.last)
 
   val newCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.new")
   val oldCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.old")
@@ -120,7 +119,8 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
   }
 
   def readData(): (Option[DataFrame], Set[Long]) = {
-    val timeRange = TimeInfoCache.getTimeRange
+    val tr = TimeInfoCache.getTimeRange
+    val timeRange = (tr._1 + minUnitTime, tr._2)
     submitLastProcTime(timeRange._2)
 
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
@@ -175,7 +175,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         println(s"update file path: ${dataFilePath}")
       } else {
         clearTmst(ms)
-        println(s"data source [${metricName}] timestamp [${ms}] cleared")
+        println(s"data source [${dsName}] timestamp [${ms}] cleared")
       }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
@@ -202,7 +202,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         println(s"update file path: ${dataFilePath}")
       } else {
         clearTmst(ms)
-        println(s"data source [${metricName}] timestamp [${ms}] cleared")
+        println(s"data source [${dsName}] timestamp [${ms}] cleared")
       }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
@@ -231,7 +231,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         println(s"update file path: ${dataFilePath}")
       } else {
         clearTmst(ms)
-        println(s"data source [${metricName}] timestamp [${ms}] cleared")
+        println(s"data source [${dsName}] timestamp [${ms}] cleared")
       }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
@@ -259,7 +259,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         val cleanTime = readCleanTime()
         cleanTime match {
           case Some(ct) => {
-            println(s"data source [${metricName}] old timestamps clear until [${ct}]")
+            println(s"data source [${dsName}] old timestamps clear until [${ct}]")
 
             // clear out date tmsts
             clearTmstsUntil(ct)
@@ -319,7 +319,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
   }
 
 
-  // here the range means [min, max], but the best range should be (min, max]
+  // here the range means [min, max]
   private def listPathsBetweenRanges(paths: List[String],
                                      partitionRanges: List[(Long, Long)]
                                     ): List[String] = {

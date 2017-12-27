@@ -36,18 +36,18 @@ object DataSourceFactory extends Loggable {
   val AvroRegex = """^(?i)avro$""".r
 
   def genDataSources(sqlContext: SQLContext, ssc: StreamingContext, dqEngines: DqEngines,
-                     dataSourceParams: Seq[DataSourceParam], metricName: String) = {
+                     dataSourceParams: Seq[DataSourceParam]) = {
     val filteredDsParams = trimDataSourceParams(dataSourceParams)
     filteredDsParams.zipWithIndex.flatMap { pair =>
       val (param, index) = pair
-      genDataSource(sqlContext, ssc, dqEngines, param, metricName, index)
+      genDataSource(sqlContext, ssc, dqEngines, param, index)
     }
   }
 
   private def genDataSource(sqlContext: SQLContext, ssc: StreamingContext,
                             dqEngines: DqEngines,
                             dataSourceParam: DataSourceParam,
-                            metricName: String, index: Int
+                            index: Int
                            ): Option[DataSource] = {
     val name = dataSourceParam.name
     val baseline = dataSourceParam.isBaseLine
@@ -59,17 +59,17 @@ object DataSourceFactory extends Loggable {
         case _ => None
       }
     }
-    val dataSourceCacheOpt = genDataSourceCache(sqlContext, cacheParam, metricName, index)
+    val dataSourceCacheOpt = genDataSourceCache(sqlContext, cacheParam, name, index)
 
     Some(DataSource(sqlContext, name, baseline, dataConnectors, dataSourceCacheOpt))
   }
 
   private def genDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                                 metricName: String, index: Int
+                                 name: String, index: Int
                                 ) = {
     if (param != null) {
       try {
-        Some(DataSourceCache(sqlContext, param, metricName, index))
+        Some(DataSourceCache(sqlContext, param, name, index))
       } catch {
         case e: Throwable => {
           error(s"generate data source cache fails")

@@ -118,19 +118,19 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
   }
 
   def persistRecords(df: DataFrame, name: String): Unit = {
-    println(s"${metricName} [${timeStamp}] records: ")
-    try {
-      val recordCount = df.count
-      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-      val maxCount = count.toInt
-      if (maxCount > 0) {
-        val recDf = df.limit(maxCount)
-        val recordsArray = recDf.toJSON.collect()
-        recordsArray.foreach(println)
-      }
-    } catch {
-      case e: Throwable => error(e.getMessage)
-    }
+//    println(s"${metricName} [${timeStamp}] records: ")
+//    try {
+//      val recordCount = df.count
+//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+//      val maxCount = count.toInt
+//      if (maxCount > 0) {
+//        val recDf = df.limit(maxCount)
+//        val recordsArray = recDf.toJSON.collect()
+//        recordsArray.foreach(println)
+//      }
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
   }
 
   def persistRecords(records: Iterable[String], name: String): Unit = {

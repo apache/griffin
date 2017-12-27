@@ -46,11 +46,10 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
               case Some(initRule: String) => sqlContext.sql(initRule)
               case _ => sqlContext.emptyDataFrame
             }
-          } else {
-            sqlContext.sql(rule)
-          }
+          } else sqlContext.sql(rule)
 
           if (global) {
+            rdf.cache
             TableRegisters.registerRunGlobalTable(rdf, name)
           } else {
             TableRegisters.registerRunTempTable(rdf, timeInfo.key, name)

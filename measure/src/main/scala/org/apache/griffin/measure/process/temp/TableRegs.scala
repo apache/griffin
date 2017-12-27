@@ -71,4 +71,11 @@ case class TableRegs() {
     }
   }
 
+  def getTables(key: String): Set[String] = {
+    tables.get(key) match {
+      case Some(set) => set
+      case _ => Set[String]()
+    }
+  }
+
 }

@@ -88,7 +88,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     val dqEngines = DqEngineFactory.genDqEngines(sqlContext)
 
     // generate data sources
-    val dataSources = DataSourceFactory.genDataSources(sqlContext, null, dqEngines, userParam.dataSources, metricName)
+    val dataSources = DataSourceFactory.genDataSources(sqlContext, null, dqEngines, userParam.dataSources)
     dataSources.foreach(_.init)
 
     // init data sources
@@ -103,7 +103,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //      CalcTimeInfo(appTime), userParam.evaluateRuleParam, dsTmsts)
 
     val rulePlan = RuleAdaptorGroup.genRulePlan(
-      calcTimeInfo, userParam.evaluateRuleParam, StreamingProcessType)
+      calcTimeInfo, userParam.evaluateRuleParam, BatchProcessType)
 
 //    rulePlan.ruleSteps.foreach(println)
 //    println("====")
@@ -115,12 +115,12 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // run rules
     dqEngines.runRuleSteps(calcTimeInfo, rulePlan.ruleSteps)
 
-    // TODO: persist engines might be better
-
     // persist results
-    dqEngines.persistAllMetrics(calcTimeInfo, rulePlan.metricExports, StreamingProcessType, persistFactory)
+    dqEngines.persistAllMetrics(calcTimeInfo, rulePlan.metricExports,
+      BatchProcessType, persistFactory)
 
-    dqEngines.persistAllRecords(calcTimeInfo, rulePlan.recordExports, StreamingProcessType, persistFactory)
+    dqEngines.persistAllRecords(calcTimeInfo, rulePlan.recordExports,
+      BatchProcessType, persistFactory, dataSources)
 //    dfs.foreach(_._2.cache())
 //
 //    dqEngines.persistAllRecords(dfs, persistFactory)
@@ -137,10 +137,10 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //    sqlContext.tables().show(50)
 //    println(sqlContext.tableNames().size)
 
-    sqlContext.tables().show(50)
+//    sqlContext.tables().show(50)
 
     // clean data
-    cleanRunData(calcTimeInfo)
+    cleanData(calcTimeInfo)
 
 //    sqlContext.tables().show(50)
 //    println(sqlContext.tableNames().size)
@@ -156,17 +156,18 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //    }
 //
 //    // -- test --
-    sqlContext.tables().show(50)
+//    sqlContext.tables().show(50)
   }
 
-  private def cleanRunData(timeInfo: TimeInfo): Unit = {
+  private def cleanData(timeInfo: TimeInfo): Unit = {
     TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)
-    TableRegisters.unregisterRunGlobalTables(sqlContext)
     TableRegisters.unregisterCompileTempTables(timeInfo.key)
-    TableRegisters.unregisterCompileGlobalTables
   }
 
   def end: Try[_] = Try {
+    TableRegisters.unregisterRunGlobalTables(sqlContext)
+    TableRegisters.unregisterCompileGlobalTables
+
     sparkContext.stop
   }
 
