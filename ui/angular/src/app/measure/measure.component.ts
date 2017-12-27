@@ -18,8 +18,7 @@ under the License.
 */
 import { Component, OnInit} from '@angular/core';
 import { HttpClient} from '@angular/common/http';
-import { Ng2SmartTableModule ,LocalDataSource} from 'ng2-smart-table';
-import {DataTableModule} from "angular2-datatable";
+import { DataTableModule} from "angular2-datatable";
 import { Router} from "@angular/router";
 import { FormControl } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -38,7 +37,6 @@ import * as $ from 'jquery';
 export class MeasureComponent implements OnInit {
   //results:object[];
   results:any;
-  source:LocalDataSource;
   public visible = false;
   public visibleAnimate = false;
   deletedRow : any;

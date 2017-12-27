@@ -24,7 +24,7 @@ under the License.
   <!--//row-->
   <div class="row">
     <!-- <form name="Form" id="form" novalidate> -->
-    <form name="Form" id="form" (ngSubmit)="submit(jobForm)" #jobForm="ngForm" novalidate>
+    <form name="Form" id="form" novalidate>
       <div class="formStep">
         <label class="stepDesc info">Please setup the job required information</label>
         <div class="container-fluid">
@@ -36,35 +36,12 @@ under the License.
               </legend>
               <div class="y-scrollable">
                 <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group" [ngClass]="{'has-error':jobName.dirty&&jobName.invalid, 'has-success':jobName.valid}">
-                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Source Pattern<span class="symbol required"></span>:
-                    </label>
-                    <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="sourcePat" #jobName="ngModel" name="jobName" placeholder="Please input the source partition, such as 'YYYYMMdd-HH'." required pattern="YYYYMMdd-HH" maxlength='11'>
-                      <!-- /i<span class="error text-small block " *ngIf="jobName.dirty && jobName.errors.Pattern">Please input partition like 'YYYYMMdd-HH'</span> jobName.dirty && jobName.errors.pattern-->
-                      <span class="error text-small block " *ngIf="jobName.dirty&&jobName.invalid">Please input partition like 'YYYYMMdd-HH'</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group" [ngClass]="{'has-error':targetName.dirty&&targetName.invalid, 'has-success':targetName.valid}">
-                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Target Pattern<span class="symbol required"></span>:
-                    </label>
-                    <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="targetPat" placeholder="Please input target partition of your job, such as 'YYYYMMdd-HH'." required pattern="YYYYMMdd-HH" maxlength='11' name="targetName" #targetName="ngModel">
-                      <span class="error text-small block " *ngIf="targetName.dirty&&targetName.invalid">Please input partition like 'YYYYMMdd-HH'</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Measure Name:
+                      Measure Name<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select id="measureSelector" class="form-control" ngControl="name" required name="measure.name" [(ngModel)]="measure">
+                      <select id="measureSelector" class="form-control" ngControl="name" required name="measure.name" [(ngModel)]="measure" (ngModelChange)="onChange($event)">
                         <option *ngFor="let row of Measures" value="{{row.name}}">{{row.name}}</option>
                       </select>
                     </div>
@@ -72,64 +49,52 @@ under the License.
                 </div>
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
-                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Start At:
+                    <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Cron Expression:
                     </label>
-                    <!-- <div class="col-md-5 col-lg-5 col-sm-5 ">
-                        <input type="text" id="datepicker" class="form-control" name="jobStartTime" [(ngModel)]="jobStartTime" >
-                    </div> -->
-                    <div class="col-md-5 col-lg-5 col-sm-5 ">
-                      <!-- <md-form-field> -->
-                      <input matInput [matDatepicker]="picker" placeholder="Choose a date" style="color:black;" [(ngModel)]="jobStartTime" name="jobStartTime">
-                      <mat-datepicker-toggle mdSuffix [for]="picker" (click)="setHeight()"></mat-datepicker-toggle>
-                      <mat-datepicker #picker></mat-datepicker>
-                      <!-- </md-form-field> -->
-                    </div>
-                    <div class="col-md-5 col-lg-5 col-sm-5" [ngClass]="{'has-error':timeDetail.invalid, 'has-success':timeDetail.valid}">
-                      <input type="text" class="form-control" id="timeDetail" (click)="showTime()" value="{{hourDetail}}:{{minuteDetail}}:{{secondDetail}} " [(ngModel)]="timeDetail" name="time">
-                      <div id="timePopup" class="col-md-11 col-lg-11 col-sm-11 setgrey" *ngIf="isOpen">
-                        <div id="hourSelector">
-                          <p (click)="changeTime(0,23,true,hourDetail,1)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
-                          <p>{{hourDetail}}</p>
-                          <p (click)="changeTime(0,23,false,hourDetail,1)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
-                        </div>
-                        <div class="division">
-                          <p>:</p>
-                        </div>
-                        <div id="minuteSelector">
-                          <p (click)="changeTime(0,59,true,minuteDetail,2)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
-                          <p>{{minuteDetail}}</p>
-                          <p (click)="changeTime(0,59,false,minuteDetail,2)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
-                        </div>
-                        <div class="division">
-                          <p>:</p>
-                        </div>
-                        <div id="secondSelector">
-                          <p (click)="changeTime(0,59,true,secondDetail,3)"><i class="fa fa-caret-up" aria-hidden="true"></i></p>
-                          <p>{{secondDetail}}</p>
-                          <p (click)="changeTime(0,59,false,secondDetail,3)"><i class="fa fa-caret-down" aria-hidden="true"></i></p>
-                        </div>
-                      </div>
+                    <div class="col-md-10 col-lg-10 col-sm-10 ">
+                      <input class="form-control" [(ngModel)]="cronExp" name="cronExp">
                     </div>
                   </div>
                 </div>
-                <div class="col-md-12 col-lg-12 col-sm-12">
+                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
-                    <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Interval:
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Time Baseline:
                     </label>
-                    <div class="col-md-5 col-lg-5 col-sm-5 ">
-                      <input type="text" id="systemSelector" class="form-control" [(ngModel)]="periodTime" required placeholder="How often it works" name="periodTime" onblur="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
-                    </div>
-                    <div class="col-md-5 col-lg-5 col-sm-5 ">
-                      <select id="timeSelector" class="form-control" [(ngModel)]="timeType" name="timeSelector" required>
-                        <!--<option  value="hours" >hours</option>-->
-                        <!--<option  value="minutes" >minutes</option>-->
-                        <!--<option  value="seconds" >seconds</option>-->
-                        <option *ngFor="let time of Times">{{time}}</option>
+                    <div class="col-md-10 col-lg-10 col-sm-10 ">
+                      <select id="baseline" class="form-control" ngControl="name" required name="baseline" [(ngModel)]="baseline" >
+                        <option *ngFor="let row of dropdownList" value="{{row.name}}">{{row.name}}</option>
                       </select>
                     </div>
                   </div>
+                </div> -->
+                <div *ngFor="let connector of this.dropdownList; let i=index">
+                  <div>
+                    <!-- <input style="margin-left:30px" type="checkbox" [checked]="needrange[i]" (change)="needrange[i]=!needrange[i];"> -->
+                    <label style="padding-left: 30px;padding-top: 10px;">
+                      please select data range for {{connector.name}}
+                    </label>
+                  </div>
+                  <p style="margin-left:60px" class="setcolor">
+                    <i class="fa fa-info-circle"></i> One step means a partition size,and {{connector.name}} partition size = {{connector.size}}
+                  </p>
+                  <!-- <div class="col-md-12 col-lg-12 col-sm-12"> -->
+                    <div class="col-md-11 col-lg-11 col-sm-11 center">
+                      begin :
+                      <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}" [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}" (ngModelChange)="changeRange(index,someKeyboard[i][0],i)">
+                      end :
+                      <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}" [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
+                    </div>
+                      <!-- <div>                       -->
+                      <!-- <button class="btn-info col-md-1 col-lg-1 col-sm-1" style="margin-top: 6px;" (click)="updateSliderRange()">
+                        range 
+                      </button> -->
+                      <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]" (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()" (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
+                      <!-- </div>                       -->
+                      <!-- <div class="range">Range: {{ someKeyboard[i] | json }}</div> -->
+                    
+                  <!-- </div> -->
                 </div>
               </div>
               <div class="setcolor">
@@ -170,7 +135,7 @@ under the License.
                 <div class="row">
                   <div class="col-lg-12 col-md-12 col-sm-12">
                     <div id="viewrule-definition" class="viewrule-content">
-                      <div class="row">
+                      <!-- <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Source Pattern:
                         </label>
@@ -185,7 +150,7 @@ under the License.
                         <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
                           {{targetPat}}
                         </div>
-                      </div>
+                      </div> -->
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Measure Name:
@@ -196,6 +161,37 @@ under the License.
                         </div>
                       </div>
                       <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Cron Expression:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                          {{cronExp}}
+                        </div>
+                      </div>
+                      <div *ngFor="let connector of this.dropdownList; let i=index">
+                        <div class="row">
+                          <label class="col-md-12 col-lg-12 col-sm-12">
+                            {{connector.name}}:
+                          </label>
+                        </div>
+                        <div class="row">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                            Begin:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{originBegin[i]}}
+                          </div>
+                        </div>
+                        <div class="row">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                            Length:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{originLength[i]}}
+                          </div>
+                        </div>
+                      </div>
+                      <!-- <div class="row">
                         <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
                           Start at:
                         </label>
@@ -209,7 +205,7 @@ under the License.
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff">{{periodTime}}&nbsp;{{timeType}}
                         </div>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                 </div>

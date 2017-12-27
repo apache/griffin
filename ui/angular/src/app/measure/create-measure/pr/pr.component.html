@@ -45,6 +45,14 @@ under the License.
               <div class="stepNumber">
                 3
               </div>
+              <span class="stepDesc text-small">Partition Configuration </span>
+            </a>
+          </li>
+          <li (click)="goTo(4)">
+            <a [ngClass]="{'selected' : currentStep >= 4, 'done' : currentStep > 4}">
+              <div class="stepNumber">
+                4
+              </div>
               <span class="stepDesc text-small"> Configuration </span>
             </a>
           </li>
@@ -166,6 +174,35 @@ under the License.
         </div>
       </div>
       <div id="step-3" *ngIf="currentStep == 3" class="formStep">
+        <label class="stepDesc">Please complete the partition configuration for {{currentTable}}</label>
+        <div class="container-fluid">
+          <div class="col-md-12 col-lg-12 col-sm-12">
+            <fieldset>
+              <legend>
+                Required Information
+              </legend>
+              <div class="y-scrollable">
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group" style="text-align:center">
+                    Data Source:{{currentDB}}.{{currentTable}}
+                  </div>
+                  <app-configuration [data]="config" [location]="srclocation" (event)="getData($event)"></app-configuration>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="form-group btn-container">
+            <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev(Form)">
+              <i class="fa fa-arrow-circle-left"></i> Back
+            </button>
+            <toaster-container></toaster-container>
+            <button class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="next(Form)">
+              Next <i class="fa fa-arrow-circle-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="step-4" *ngIf="currentStep == 4" class="formStep">
         <label class="stepDesc">Please setup the measure required information</label>
         <div class="container-fluid">
           <div class="col-md-12 col-lg-12 col-sm-12">
@@ -208,7 +245,7 @@ under the License.
                     </div>
                   </div>
                 </div>
-                <div class="col-md-12 col-lg-12 col-sm-12">
+                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Organization<span class="symbol required"></span>:
@@ -217,11 +254,11 @@ under the License.
                       <input type="text" id="systemSelector" class="form-control" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org" [(ngModel)]="org">
                     </div>
                   </div>
-                </div>
+                </div> -->
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      DataAsset:
+                      DataSource:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10">
                       <input type="text" class="form-control" name="DataAsset" value="{{currentTable}}" disabled>
@@ -261,7 +298,7 @@ under the License.
         <div class="modal-dialog modal-xg modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <button type="button" class="close" (click)="hide()">&times;</button>
               <h4 class="modal-title">Save the measure with the below information?</h4>
             </div>
             <div class="modal-body">
@@ -296,20 +333,20 @@ under the License.
                           {{type}}
                         </div>
                       </div>
-                      <div class="row">
+                      <!-- <div class="row">
                         <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
                           Organization:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
                           {{org}}
                         </div>
-                      </div>
+                      </div> -->
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
-                          DataAsset:
+                          DataSource:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8">
-                          {{currentTable}}
+                          {{currentDB}}.{{currentTable}}
                         </div>
                       </div>
                       <div class="row">
@@ -324,7 +361,18 @@ under the License.
                   </div>
                 </div>
                 <h5 class="row">Rules</h5>
-                <div class="row" *ngFor="let index of transrule;">
+                <!-- <div *ngIf="selectedItems">
+                  <div class="row" *ngFor="let key of objectKeys(selectedItems)">
+                  &nbsp;&nbsp;&nbsp;&nbsp;{{key}}:
+                  <div style="display:inline-block" *ngFor="let index of objectKeys(selectedItems[key])" >
+                    {{selectedItems[key][index].itemName}}&nbsp;,
+                  </div>
+                  </div>
+                </div> -->
+                <div class="row" *ngFor="let index of noderule;">
+                  &nbsp;&nbsp;&nbsp;&nbsp;{{index.name}}&nbsp;:&nbsp;{{index.infos}}
+                </div>
+                <!-- <div class="row" *ngFor="let index of transrule;">
                   &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
                 </div>
                 <div class="row" *ngFor="let index of transnullrule;">
@@ -332,7 +380,7 @@ under the License.
                 </div>
                 <div class="row" *ngFor="let index of transenumrule;">
                   &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
-                </div>
+                </div> -->
                 <br/>
               </div>
             </div>

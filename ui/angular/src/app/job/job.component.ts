@@ -18,7 +18,6 @@ under the License.
 */
 import { Component, OnInit } from '@angular/core';
 import { HttpClient} from '@angular/common/http';
-import { Ng2SmartTableModule ,LocalDataSource} from 'ng2-smart-table';
 import {DataTableModule} from "angular2-datatable";
 import {ServiceService} from '../service/service.service';
 
@@ -36,7 +35,6 @@ export class JobComponent implements OnInit {
   // results:object[];
   allInstances:any;
   results:any;
-  source:LocalDataSource;
   deletedBriefRow:object;
   jobName:string;
   public visible = false;

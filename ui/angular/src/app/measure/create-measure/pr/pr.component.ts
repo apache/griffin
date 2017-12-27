@@ -19,16 +19,17 @@ under the License.
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-import {ServiceService} from '../../../service/service.service';
+import { ServiceService } from '../../../service/service.service';
 import { TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from 'angular-tree-component';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { ToasterModule, ToasterService,ToasterContainerComponent} from 'angular2-toaster';
 import * as $ from 'jquery';
-import { HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router} from "@angular/router";
-import {DataTableModule} from "angular2-datatable";
-import { AfterViewChecked, ElementRef} from '@angular/core';
+import { DataTableModule } from "angular2-datatable";
+import { AfterViewChecked, ElementRef } from '@angular/core';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
+import { ConfigurationComponent } from "../configuration/configuration.component";
 
 
 
@@ -39,6 +40,7 @@ class node {
   isExpanded:boolean;
   cols:Col[];
   parent:string;
+  location:string;
 };
 
 class Rule{
@@ -85,6 +87,7 @@ class Col{
 })
 export class PrComponent implements  AfterViewChecked, OnInit{
   
+  noderule = [];
   org:string;
   transrule = [];
   transenumrule = [];
@@ -92,6 +95,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
   showrule = false;
   dropdownList = {};
   selectedItems = {};
+  allRules = {};
   dropdownSettings = {};
   currentStep = 1;
   firstCond = false;
@@ -107,23 +111,40 @@ export class PrComponent implements  AfterViewChecked, OnInit{
   desc:string;
   owner = 'test';
   currentDBstr: string;
+  rulenode = {
+    "name": "",
+    "noderules": ""
+  };
   newMeasure = {
     "name": "",
+    "type":"griffin",
     "process.type": "batch",
     "owner":"",
     "description":"",
-    "organization":"",
+    // "organization":"",
     "data.sources": [
       {
         "name": "source",
         "connectors": [
           {
+            "name":"",
             "type": "hive",
             "version": "1.2",
+            "data.unit":"",
             "config": {
               "database": "",
-              "table.name":""
-            }
+              "table.name":"",
+              "where":''
+            },
+            "predicates":[
+              {
+                "type":"file.exist",
+                "config":{
+                  "root.path":"hdfs:///griffin/demo_src",
+                  "path":""
+                }
+              }
+            ]
           }
         ]
       }
@@ -146,6 +167,19 @@ export class PrComponent implements  AfterViewChecked, OnInit{
   name:'';
   createResult :any;
   newCond:any;
+  srclocation: string;
+  srcname: string;
+  config = {
+    "where":'',
+    "num":1,
+    "timetype":'day',
+    "needpath":false,
+    "path":''
+  };
+  where: string;
+  size: string;
+  path: string;
+  location: string;
 
   private toasterService: ToasterService;
   public visible = false;
@@ -157,6 +191,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     this.transrule = [];
     this.transenumrule = [];
     this.transnullrule = [];
+    this.noderule = [];
   }
 
   public onContainerClicked(event: MouseEvent): void {
@@ -301,6 +336,8 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       }
       return (this.selection.length == selectedlen) ? true :false;
     } else if (step == 3) {
+      return true;
+    } else if(step == 4){
     }
     return false;
   } 
@@ -311,7 +348,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
   goTo (i) {
     this.currentStep = i;
   }
-  submit (form) {            
+  submit (form) {         
       // form.$setPristine();
     if (!form.valid) {
       this.toasterService.pop('error', 'Error!', 'please complete the form in this step before proceeding');
@@ -319,21 +356,34 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     }
     this.newMeasure = {
         "name": this.name,
+        "type":"griffin",
         "process.type": "batch",
         "owner":this.owner,
         "description":this.desc,
-        "organization":this.org,
+        // "organization":this.org,
         "data.sources": [
           {
             "name": "source",
             "connectors": [
-              {
+              { 
+                "name":this.srcname,
                 "type": "hive",
                 "version": "1.2",
+                "data.unit":this.size,
                 "config": {
                   "database": this.currentDB,
-                  "table.name":this.currentTable
-                }
+                  "table.name":this.currentTable,
+                  "where":this.where
+                },
+                "predicates":[
+                  {
+                    "type":"file.exist",
+                    "config":{
+                      "root.path":"hdfs:///griffin/demo_src",
+                      "path":this.path
+                    }
+                  }
+                ]
               }
             ]
           }
@@ -350,6 +400,10 @@ export class PrComponent implements  AfterViewChecked, OnInit{
         }
     };   
     this.getGrouprule();
+    if(this.size.indexOf('0')==0){
+        delete this.newMeasure['data.sources'][0]['connectors'][0]['data.unit'];
+      }
+    console.log(this.newMeasure);
     this.visible = true;
     setTimeout(() => this.visibleAnimate = true, 100);
   }
@@ -437,6 +491,8 @@ export class PrComponent implements  AfterViewChecked, OnInit{
             this.currentTable = node.data.name;
             this.currentDB = node.data.parent;
             this.schemaCollection = node.data.cols;
+            this.srcname = 'source' + new Date().getTime();
+            this.srclocation = node.data.location;
             this.selectedAll = false;
             this.selection = [];
             for(let row of this.schemaCollection){
@@ -472,8 +528,10 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     var grpname = '';
     for(let key in this.selectedItems){
       selected.name = key;
+      var info = '';
       for(let i = 0;i<this.selectedItems[key].length;i++){
-        var originrule = this.selectedItems[key][i].itemName;
+        var originrule = this.selectedItems[key][i].itemName;        
+        info = info + originrule + ',';
         if(originrule == 'Enum Detection Count'){          
           enmvalue = this.transferRule(originrule,selected);
           grpname = selected.name + '-grp';
@@ -488,7 +546,12 @@ export class PrComponent implements  AfterViewChecked, OnInit{
           value = this.transferRule(originrule,selected);      
           this.transrule.push(value);
         }
-      }  
+      }
+      info = info.substring(0,info.lastIndexOf(','));
+      this.noderule.push({
+        "name":key,
+        "infos":info
+      });  
     }
     if(this.transrule.length != 0){
       this.getRule(this.transrule);
@@ -512,6 +575,13 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     document.getElementById('showrule').style.display = 'none';
     document.getElementById('notshowrule').style.display = '';
   }
+  
+  getData(evt){
+    this.config = evt;
+    this.where = evt.where;
+    this.size = evt.num + evt.timetype;
+    this.path = evt.path;
+  }
 
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
@@ -531,6 +601,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
             new_child.name = this.data[db][i]['tableName'];
             new_node.children.push(new_child);
             new_child.isExpanded = false;
+            new_child.location = this.data[db][i]['sd']['location'];
             new_child.parent = db;
             new_child.cols = Array<Col>();
             for(let j = 0;j<this.data[db][i]['sd']['cols'].length;j++){
@@ -555,7 +626,8 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       enableSearchFilter: true,
       classes: "myclass",
       groupBy: "category"
-      };     
+    };
+    this.size = '1day';     
   };
   ngAfterViewChecked(){
     this.resizeWindow();
