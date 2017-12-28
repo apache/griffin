@@ -27,7 +27,7 @@ import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row}
 
 trait DqEngine extends Loggable with Serializable {
 
@@ -45,4 +45,8 @@ trait DqEngine extends Loggable with Serializable {
 //  def collectUpdateRDD(ruleStep: RuleStep): Option[DataFrame]
   def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport, procType: ProcessType
                     ): Map[Long, DataFrame]
+
+
+  def collectBatchRecords(recordExport: RecordExport): Option[RDD[String]]
+  def collectStreamingRecords(recordExport: RecordExport): Option[RDD[(Long, Iterable[String])]]
 }

@@ -20,6 +20,7 @@ package org.apache.griffin.measure.persist
 
 import org.mongodb.scala._
 import org.apache.griffin.measure.utils.ParamUtil._
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.mongodb.scala.model.{Filters, UpdateOptions, Updates}
 import org.mongodb.scala.result.UpdateResult
@@ -44,6 +45,7 @@ case class MongoPersist(config: Map[String, Any], metricName: String, timeStamp:
   def log(rt: Long, msg: String): Unit = {}
 
   def persistRecords(df: DataFrame, name: String): Unit = {}
+  def persistRecords(records: RDD[String], name: String): Unit = {}
   def persistRecords(records: Iterable[String], name: String): Unit = {}
 
   def persistMetrics(metrics: Map[String, Any]): Unit = {

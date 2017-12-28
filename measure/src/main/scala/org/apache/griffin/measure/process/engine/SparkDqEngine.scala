@@ -27,7 +27,7 @@ import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 trait SparkDqEngine extends DqEngine {
@@ -142,6 +142,47 @@ trait SparkDqEngine extends DqEngine {
         }
       }
     } else emptyRecordMap
+  }
+
+  private def getRecordDataFrame(recordExport: RecordExport): Option[DataFrame] = {
+    if (collectable) {
+      val RecordExport(_, stepName, _, _) = recordExport
+      val stepDf = sqlContext.table(s"`${stepName}`")
+      Some(stepDf)
+    } else None
+  }
+
+  def collectBatchRecords(recordExport: RecordExport): Option[RDD[String]] = {
+    getRecordDataFrame(recordExport).map(_.toJSON)
+  }
+
+  def collectStreamingRecords(recordExport: RecordExport): Option[RDD[(Long, Iterable[String])]] = {
+    val RecordExport(_, _, _, originDFOpt) = recordExport
+    getRecordDataFrame(recordExport).flatMap { stepDf =>
+      originDFOpt match {
+        case Some(originName) => {
+          val tmsts = stepDf.collect.flatMap { row =>
+            try { Some(row.getAs[Long](InternalColumns.tmst)) } catch { case _: Throwable => None }
+          }
+          if (tmsts.size > 0) {
+            val recordsDf = sqlContext.table(s"`${originName}`")
+            val records = recordsDf.flatMap { row =>
+              val tmst = row.getAs[Long](InternalColumns.tmst)
+              if (tmsts.contains(tmst)) {
+                try {
+                  val map = SparkRowFormatter.formatRow(row)
+                  val str = JsonUtil.toJson(map)
+                  Some((tmst, str))
+                } catch {
+                  case e: Throwable => None
+                }
+              } else None
+            }
+            Some(records.groupByKey)
+          } else None
+        }
+      }
+    }
   }
 
 //

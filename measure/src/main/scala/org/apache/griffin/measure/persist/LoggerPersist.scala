@@ -133,17 +133,32 @@ case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp
 //    }
   }
 
+  def persistRecords(records: RDD[String], name: String): Unit = {
+//    println(s"${metricName} [${timeStamp}] records: ")
+//    try {
+//      val recordCount = records.count
+//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+//      val maxCount = count.toInt
+//      if (maxCount > 0) {
+//        val recordsArray = records.take(maxCount)
+//        recordsArray.foreach(println)
+//      }
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
+  }
+
   def persistRecords(records: Iterable[String], name: String): Unit = {
-    println(s"${metricName} [${timeStamp}] records: ")
-    try {
-      val recordCount = records.size
-      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-      if (count > 0) {
-        records.foreach(println)
-      }
-    } catch {
-      case e: Throwable => error(e.getMessage)
-    }
+//    println(s"${metricName} [${timeStamp}] records: ")
+//    try {
+//      val recordCount = records.size
+//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
+//      if (count > 0) {
+//        records.foreach(println)
+//      }
+//    } catch {
+//      case e: Throwable => error(e.getMessage)
+//    }
   }
 
 //  def persistMetrics(metrics: Seq[String], name: String): Unit = {

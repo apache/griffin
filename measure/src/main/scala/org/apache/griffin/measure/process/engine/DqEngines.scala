@@ -24,13 +24,14 @@ import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.process.ProcessType
+import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan.{MetricExport, RecordExport, RuleExport, RuleStep}
 import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration
@@ -115,9 +116,64 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
   def persistAllRecords(timeInfo: TimeInfo, recordExports: Seq[RecordExport], procType: ProcessType,
                         persistFactory: PersistFactory, dataSources: Seq[DataSource]
                        ): Unit = {
+    // method 1: multi thread persist multi data frame
+//    recordExports.foreach { recordExport =>
+//      val records = collectRecords(timeInfo, recordExport, procType)
+//      persistCollectedRecords(recordExport, records, persistFactory, dataSources)
+//    }
+
+    // method 2: multi thread persist multi iterable
     recordExports.foreach { recordExport =>
-      val records = collectRecords(timeInfo, recordExport, procType)
-      persistCollectedRecords(recordExport, records, persistFactory, dataSources)
+//      val records = collectRecords(timeInfo, recordExport, procType)
+      procType match {
+        case BatchProcessType => {
+          collectBatchRecords(recordExport).foreach { rdd =>
+            persistCollectedBatchRecords(timeInfo, recordExport, rdd, persistFactory)
+          }
+        }
+        case StreamingProcessType => {
+          collectStreamingRecords(recordExport).foreach { rdd =>
+            persistCollectedStreamingRecords(recordExport, rdd, persistFactory, dataSources)
+          }
+        }
+      }
+    }
+  }
+
+  def collectBatchRecords(recordExport: RecordExport): Option[RDD[String]] = {
+    val ret = engines.foldLeft(None: Option[RDD[String]]) { (ret, engine) =>
+      if (ret.nonEmpty) ret else engine.collectBatchRecords(recordExport)
+    }
+    ret
+  }
+  def collectStreamingRecords(recordExport: RecordExport): Option[RDD[(Long, Iterable[String])]] = {
+    val ret = engines.foldLeft(None: Option[RDD[(Long, Iterable[String])]]) { (ret, engine) =>
+      if (ret.nonEmpty) ret else engine.collectStreamingRecords(recordExport)
+    }
+    ret
+  }
+
+  private def persistCollectedBatchRecords(timeInfo: TimeInfo, recordExport: RecordExport,
+                                           records: RDD[String], persistFactory: PersistFactory
+                                          ): Unit = {
+    val persist = persistFactory.getPersists(timeInfo.calcTime)
+    persist.persistRecords(records, recordExport.name)
+  }
+
+  private def persistCollectedStreamingRecords(recordExport: RecordExport, records: RDD[(Long, Iterable[String])],
+                                               persistFactory: PersistFactory, dataSources: Seq[DataSource]
+                                              ): Unit = {
+    val updateDsCaches = recordExport.dataSourceCacheOpt match {
+      case Some(dsName) => dataSources.filter(_.name == dsName).flatMap(_.dataSourceCacheOpt)
+      case _ => Nil
+    }
+
+    records.foreach { pair =>
+      val (tmst, strs) = pair
+      val persist = persistFactory.getPersists(tmst)
+
+      persist.persistRecords(strs, recordExport.name)
+      updateDsCaches.foreach(_.updateData(strs, tmst))
     }
   }
 
