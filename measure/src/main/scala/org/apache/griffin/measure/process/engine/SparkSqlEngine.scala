@@ -47,9 +47,9 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
               case _ => sqlContext.emptyDataFrame
             }
           } else sqlContext.sql(rule)
+          rdf.cache
 
           if (global) {
-            rdf.cache
             TableRegisters.registerRunGlobalTable(rdf, name)
           } else {
             TableRegisters.registerRunTempTable(rdf, timeInfo.key, name)

@@ -45,24 +45,13 @@ case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
     ruleStep match {
       case DfOprStep(name, rule, details) => {
         try {
-          rule match {
-            case DataFrameOprs._fromJson => {
-              val df = DataFrameOprs.fromJson(sqlContext, details)
-              TableRegisters.registerRunTempTable(df, timeInfo.key, name)
-            }
-//            case DataFrameOprs._accuracy => {
-//              val df = DataFrameOprs.accuracy(sqlContext, ti, ri)
-//              df.show(10)
-//              ri.getNames.foreach(TempTables.registerTempTable(df, ti.key, _))
-//            }
-            case DataFrameOprs._clear => {
-              val df = DataFrameOprs.clear(sqlContext, details)
-              TableRegisters.registerRunTempTable(df, timeInfo.key, name)
-            }
-            case _ => {
-              throw new Exception(s"df opr [ ${rule} ] not supported")
-            }
+          val df = rule match {
+            case DataFrameOprs._fromJson => DataFrameOprs.fromJson(sqlContext, details)
+            case DataFrameOprs._clear => DataFrameOprs.clear(sqlContext, details)
+            case _ => throw new Exception(s"df opr [ ${rule} ] not supported")
           }
+          df.cache
+          TableRegisters.registerRunTempTable(df, timeInfo.key, name)
           true
         } catch {
           case e: Throwable => {
