@@ -48,5 +48,5 @@ trait DqEngine extends Loggable with Serializable {
 
 
   def collectBatchRecords(recordExport: RecordExport): Option[RDD[String]]
-  def collectStreamingRecords(recordExport: RecordExport): Option[RDD[(Long, Iterable[String])]]
+  def collectStreamingRecords(recordExport: RecordExport): Option[(RDD[(Long, Iterable[String])], Set[Long])]
 }

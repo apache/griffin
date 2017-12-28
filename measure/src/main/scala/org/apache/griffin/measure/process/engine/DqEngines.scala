@@ -132,8 +132,8 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
           }
         }
         case StreamingProcessType => {
-          collectStreamingRecords(recordExport).foreach { rdd =>
-            persistCollectedStreamingRecords(recordExport, rdd, persistFactory, dataSources)
+          collectStreamingRecords(recordExport).foreach { rddPair =>
+            persistCollectedStreamingRecords(recordExport, rddPair._1, rddPair._2, persistFactory, dataSources)
           }
         }
       }
@@ -146,8 +146,8 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     }
     ret
   }
-  def collectStreamingRecords(recordExport: RecordExport): Option[RDD[(Long, Iterable[String])]] = {
-    val ret = engines.foldLeft(None: Option[RDD[(Long, Iterable[String])]]) { (ret, engine) =>
+  def collectStreamingRecords(recordExport: RecordExport): Option[(RDD[(Long, Iterable[String])], Set[Long])] = {
+    val ret = engines.foldLeft(None: Option[(RDD[(Long, Iterable[String])], Set[Long])]) { (ret, engine) =>
       if (ret.nonEmpty) ret else engine.collectStreamingRecords(recordExport)
     }
     ret
@@ -161,7 +161,8 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
   }
 
   private def persistCollectedStreamingRecords(recordExport: RecordExport, records: RDD[(Long, Iterable[String])],
-                                               persistFactory: PersistFactory, dataSources: Seq[DataSource]
+                                               emtpyRecordKeys: Set[Long], persistFactory: PersistFactory,
+                                               dataSources: Seq[DataSource]
                                               ): Unit = {
     val updateDsCaches = recordExport.dataSourceCacheOpt match {
       case Some(dsName) => dataSources.filter(_.name == dsName).flatMap(_.dataSourceCacheOpt)
@@ -174,6 +175,12 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
       persist.persistRecords(strs, recordExport.name)
       updateDsCaches.foreach(_.updateData(strs, tmst))
+    }
+
+    emtpyRecordKeys.foreach { t =>
+      val persist = persistFactory.getPersists(t)
+      persist.persistRecords(Nil, recordExport.name)
+      updateDsCaches.foreach(_.updateData(Nil, t))
     }
   }
 

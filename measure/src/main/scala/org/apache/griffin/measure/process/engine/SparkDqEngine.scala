@@ -156,14 +156,14 @@ trait SparkDqEngine extends DqEngine {
     getRecordDataFrame(recordExport).map(_.toJSON)
   }
 
-  def collectStreamingRecords(recordExport: RecordExport): Option[RDD[(Long, Iterable[String])]] = {
+  def collectStreamingRecords(recordExport: RecordExport): Option[(RDD[(Long, Iterable[String])], Set[Long])] = {
     val RecordExport(_, _, _, originDFOpt) = recordExport
     getRecordDataFrame(recordExport).flatMap { stepDf =>
       originDFOpt match {
         case Some(originName) => {
-          val tmsts = stepDf.collect.flatMap { row =>
+          val tmsts = (stepDf.collect.flatMap { row =>
             try { Some(row.getAs[Long](InternalColumns.tmst)) } catch { case _: Throwable => None }
-          }
+          }).toSet
           if (tmsts.size > 0) {
             val recordsDf = sqlContext.table(s"`${originName}`")
             val records = recordsDf.flatMap { row =>
@@ -178,7 +178,10 @@ trait SparkDqEngine extends DqEngine {
                 }
               } else None
             }
-            Some(records.groupByKey)
+            val recordGroups = records.groupByKey
+            val groupKeys = recordGroups.keys.collect.toSet
+            val emptyRecordKeys = tmsts -- groupKeys
+            Some((records.groupByKey, emptyRecordKeys))
           } else None
         }
       }
