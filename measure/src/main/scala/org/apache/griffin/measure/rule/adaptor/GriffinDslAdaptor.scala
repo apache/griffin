@@ -203,7 +203,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           val accuracyRecordTableName = "__accuracyRecords"
           val accuracyRecordSql = {
             s"""
-               |SELECT `${InternalColumns.tmst}`
+               |SELECT `${InternalColumns.tmst}`, `${InternalColumns.empty}`
                |FROM `${accuracyMetricTableName}` WHERE `${InternalColumns.record}`
              """.stripMargin
           }

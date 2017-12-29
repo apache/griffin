@@ -117,6 +117,8 @@ object DataFrameOprs {
     }
 
     val df = sqlContext.table(s"`${dfName}`")
+    df.cache()
+
     val results = df.flatMap { row =>
       try {
         val tmst = getLong(row, InternalColumns.tmst).getOrElse(timeInfo.calcTime)
@@ -146,15 +148,19 @@ object DataFrameOprs {
       StructField(miss, LongType),
       StructField(total, LongType),
       StructField(matched, LongType),
-      StructField(InternalColumns.record, BooleanType)
+      StructField(InternalColumns.record, BooleanType),
+      StructField(InternalColumns.empty, BooleanType)
     ))
     val rows = updateResults.map { r =>
       val ar = r.result.asInstanceOf[AccuracyResult]
-      Row(r.timeGroup, ar.miss, ar.total, ar.getMatch, !ar.initial)
+      Row(r.timeGroup, ar.miss, ar.total, ar.getMatch, !ar.initial, ar.eventual)
     }
     val rowRdd = sqlContext.sparkContext.parallelize(rows)
-    sqlContext.createDataFrame(rowRdd, schema)
+    val retDf = sqlContext.createDataFrame(rowRdd, schema)
 
+    df.unpersist()
+
+    retDf
   }
 
   def clear(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {

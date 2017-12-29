@@ -22,8 +22,7 @@ object InternalColumns {
   val tmst = "__tmst"
   val metric = "__metric"
   val record = "__record"
-  //  val ignoreCache = "__ignoreCache"
+  val empty = "__empty"
 
-  val columns = List[String](tmst, metric, record)
-//  val columns = List[String](tmst, ignoreCache)
+  val columns = List[String](tmst, metric, record, empty)
 }

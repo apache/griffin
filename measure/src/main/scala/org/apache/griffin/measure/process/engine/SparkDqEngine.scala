@@ -161,13 +161,21 @@ trait SparkDqEngine extends DqEngine {
       originDFOpt match {
         case Some(originName) => {
           val tmsts = (stepDf.collect.flatMap { row =>
-            try { Some(row.getAs[Long](InternalColumns.tmst)) } catch { case _: Throwable => None }
-          }).toSet
-          if (tmsts.size > 0) {
+            try {
+              val tmst = row.getAs[Long](InternalColumns.tmst)
+              val empty = row.getAs[Boolean](InternalColumns.empty)
+              Some((tmst, empty))
+            } catch {
+              case _: Throwable => None
+            }
+          })
+          val emptyTmsts = tmsts.filter(_._2).map(_._1).toSet
+          val recordTmsts = tmsts.filter(!_._2).map(_._1).toSet
+          if (recordTmsts.size > 0) {
             val recordsDf = sqlContext.table(s"`${originName}`")
             val records = recordsDf.flatMap { row =>
               val tmst = row.getAs[Long](InternalColumns.tmst)
-              if (tmsts.contains(tmst)) {
+              if (recordTmsts.contains(tmst)) {
                 try {
                   val map = SparkRowFormatter.formatRow(row)
                   val str = JsonUtil.toJson(map)
@@ -177,10 +185,7 @@ trait SparkDqEngine extends DqEngine {
                 }
               } else None
             }
-            val recordGroups = records.groupByKey
-            val groupKeys = recordGroups.keys.collect.toSet
-            val emptyRecordKeys = tmsts -- groupKeys
-            Some((records.groupByKey, emptyRecordKeys))
+            Some((records.groupByKey, emptyTmsts))
           } else None
         }
       }

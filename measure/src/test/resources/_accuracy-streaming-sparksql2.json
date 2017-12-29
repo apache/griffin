@@ -130,7 +130,7 @@
       {
         "dsl.type": "spark-sql",
         "name": "accu_miss_records",
-        "rule": "SELECT `__tmst` FROM `metric_accu` WHERE `__record`",
+        "rule": "SELECT `__tmst`, `__empty` FROM `metric_accu` WHERE `__record`",
         "record": {
           "name": "missRecords",
           "data.source.cache": "source",
