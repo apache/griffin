@@ -21,9 +21,9 @@ package org.apache.griffin.measure.rule.adaptor
 object InternalColumns {
   val tmst = "__tmst"
   val metric = "__metric"
-//  val record = "__record"
+  val record = "__record"
   //  val ignoreCache = "__ignoreCache"
 
-  val columns = List[String](tmst, metric)
+  val columns = List[String](tmst, metric, record)
 //  val columns = List[String](tmst, ignoreCache)
 }

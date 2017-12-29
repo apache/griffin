@@ -27,7 +27,7 @@ import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngineFactory
-import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.RuleAdaptorGroup
 import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.rule.udf.GriffinUdfs
@@ -144,6 +144,9 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
   def end: Try[_] = Try {
     TableRegisters.unregisterCompileGlobalTables()
     TableRegisters.unregisterRunGlobalTables(sqlContext)
+
+    DataFrameCaches.uncacheGlobalDataFrames()
+    DataFrameCaches.clearGlobalTrashDataFrames()
 
     sparkContext.stop
 

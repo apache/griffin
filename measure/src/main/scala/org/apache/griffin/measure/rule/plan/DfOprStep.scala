@@ -22,11 +22,11 @@ import org.apache.griffin.measure.rule.dsl._
 
 case class DfOprStep(name: String,
                      rule: String,
-                     details: Map[String, Any]
+                     details: Map[String, Any],
+                     cache: Boolean = false,
+                     global: Boolean = false
                     ) extends RuleStep {
 
   val dslType: DslType = DfOprType
-
-  val global: Boolean = false
 
 }

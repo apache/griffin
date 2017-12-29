@@ -28,7 +28,7 @@ import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
-import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo}
 import org.apache.spark.sql.SQLContext
@@ -155,6 +155,10 @@ case class StreamingDqThread(sqlContext: SQLContext,
 
       TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)
       TableRegisters.unregisterCompileTempTables(timeInfo.key)
+
+      DataFrameCaches.uncacheDataFrames(timeInfo.key)
+      DataFrameCaches.clearTrashDataFrames(timeInfo.key)
+      DataFrameCaches.clearGlobalTrashDataFrames()
 
       val cleanTime = TimeInfoCache.getCleanTime
       CacheResultProcesser.refresh(cleanTime)

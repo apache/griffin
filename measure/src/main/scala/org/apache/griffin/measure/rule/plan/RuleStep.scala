@@ -28,8 +28,13 @@ trait RuleStep extends Serializable {
 
   val rule: String
 
+  val cache: Boolean
+
   val global: Boolean
 
   val details: Map[String, Any]
 
+  def needCache: Boolean = cache || global
+
+  def isGlobal: Boolean = global
 }

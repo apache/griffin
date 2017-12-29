@@ -19,8 +19,9 @@ under the License.
 package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
+import org.apache.griffin.measure.process.engine.DataFrameOprs.AccuracyOprKeys
 import org.apache.griffin.measure.process.temp.TableRegisters
-import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
+import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.dsl.analyzer._
 import org.apache.griffin.measure.rule.dsl.expr._
@@ -89,6 +90,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     }
   }
 
+  // with accuracy opr
   private def accuracyRulePlan(timeInfo: TimeInfo, name: String, expr: Expr,
                                param: Map[String, Any], processType: ProcessType
                               ): RulePlan = {
@@ -116,7 +118,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         val whereClause = s"(NOT (${sourceIsNull})) AND (${targetIsNull})"
         s"SELECT ${selClause} FROM `${sourceName}` LEFT JOIN `${targetName}` ON ${onClause} WHERE ${whereClause}"
       }
-      val missRecordsStep = SparkSqlStep(missRecordsTableName, missRecordsSql, emptyMap)
+      val missRecordsStep = SparkSqlStep(missRecordsTableName, missRecordsSql, emptyMap, true)
       val missRecordsExports = processType match {
         case BatchProcessType => {
           val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
@@ -184,47 +186,26 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val streamingAccuPlan = processType match {
         case BatchProcessType => emptyRulePlan
         case StreamingProcessType => {
-          // 5. global accuracy metric merge
-          val globalAccuracyTableName = "__globalAccuracy"
-          val globalAccuracySql = {
-            s"""
-               |SELECT coalesce(`${globalAccuracyTableName}`.`${InternalColumns.tmst}`, `${accuracyTableName}`.`${InternalColumns.tmst}`) AS `${InternalColumns.tmst}`,
-               |coalesce(`${accuracyTableName}`.`${missColName}`, `${globalAccuracyTableName}`.`${missColName}`) AS `${missColName}`,
-               |coalesce(`${globalAccuracyTableName}`.`${totalColName}`, `${accuracyTableName}`.`${totalColName}`) AS `${totalColName}`,
-               |((`${accuracyTableName}`.`${missColName}` IS NOT NULL) AND ((`${globalAccuracyTableName}`.`${missColName}` IS NULL) OR (`${accuracyTableName}`.`${missColName}` < `${globalAccuracyTableName}`.`${missColName}`))) AS `${InternalColumns.metric}`
-               |FROM `${globalAccuracyTableName}` FULL JOIN `${accuracyTableName}`
-               |ON `${globalAccuracyTableName}`.`${InternalColumns.tmst}` = `${accuracyTableName}`.`${InternalColumns.tmst}`
-            """.stripMargin
-          }
-          val globalAccuracyInitSql = {
-            s"""
-               |SELECT `${InternalColumns.tmst}`, `${totalColName}`, `${missColName}`,
-               |(true) AS `${InternalColumns.metric}`
-               |FROM `${accuracyTableName}`
-             """.stripMargin
-          }
-          val globalAccuracyDetails = Map[String, Any](GlobalKeys._initRule -> globalAccuracyInitSql)
-          val globalAccuracyStep = SparkSqlStep(globalAccuracyTableName, globalAccuracySql, globalAccuracyDetails, true)
-
-          // 6. collect accuracy metrics
-          val accuracyMetricTableName = name
-          val accuracyMetricSql = {
-            s"""
-               |SELECT `${InternalColumns.tmst}`, `${totalColName}`, `${missColName}`,
-               |(`${totalColName}` - `${missColName}`) AS `${matchedColName}`
-               |FROM `${globalAccuracyTableName}` WHERE `${InternalColumns.metric}`
-             """.stripMargin
-          }
-          val accuracyMetricStep = SparkSqlStep(accuracyMetricTableName, accuracyMetricSql, emptyMap)
+          // 5. accuracy metric merge
+          val accuracyMetricTableName = "__accuracy"
+          val accuracyMetricRule = "accuracy"
+          val accuracyMetricDetails = Map[String, Any](
+            (AccuracyOprKeys._dfName -> accuracyTableName),
+            (AccuracyOprKeys._miss -> missColName),
+            (AccuracyOprKeys._total -> totalColName),
+            (AccuracyOprKeys._matched -> matchedColName)
+          )
+          val accuracyMetricStep = DfOprStep(accuracyMetricTableName,
+            accuracyMetricRule, accuracyMetricDetails)
           val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
-          val accuracyMetricExports = genMetricExport(metricParam, accuracyMetricTableName, accuracyMetricTableName) :: Nil
+          val accuracyMetricExports = genMetricExport(metricParam, name, accuracyMetricTableName) :: Nil
 
-          // 7. collect accuracy records
+          // 6. collect accuracy records
           val accuracyRecordTableName = "__accuracyRecords"
           val accuracyRecordSql = {
             s"""
                |SELECT `${InternalColumns.tmst}`
-               |FROM `${accuracyMetricTableName}` WHERE `${matchedColName}` > 0
+               |FROM `${accuracyMetricTableName}` WHERE `${InternalColumns.record}`
              """.stripMargin
           }
           val accuracyRecordStep = SparkSqlStep(accuracyRecordTableName, accuracyRecordSql, emptyMap)
@@ -234,27 +215,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           val accuracyRecordExports = genRecordExport(
             accuracyRecordParam, missRecordsTableName, accuracyRecordTableName) :: Nil
 
-          // 8. update global accuracy metric
-          val updateGlobalAccuracyTableName = globalAccuracyTableName
-          val globalMetricKeepTime = details.getString(GlobalKeys._globalMetricKeep, "")
-          val updateGlobalAccuracySql = TimeUtil.milliseconds(globalMetricKeepTime) match {
-            case Some(kt) => {
-              s"""
-                 |SELECT * FROM `${globalAccuracyTableName}`
-                 |WHERE (`${missColName}` > 0) AND (`${InternalColumns.tmst}` > ${timeInfo.calcTime - kt})
-               """.stripMargin
-            }
-            case _ => {
-              s"""
-                 |SELECT * FROM `${globalAccuracyTableName}`
-                 |WHERE (`${missColName}` > 0)
-               """.stripMargin
-            }
-          }
-          val updateGlobalAccuracyStep = SparkSqlStep(updateGlobalAccuracyTableName, updateGlobalAccuracySql, emptyMap, true)
-
           // gen accu plan
-          val extraSteps = globalAccuracyStep :: accuracyMetricStep :: accuracyRecordStep :: updateGlobalAccuracyStep :: Nil
+          val extraSteps = accuracyMetricStep :: accuracyRecordStep :: Nil
           val extraExports = accuracyMetricExports ++ accuracyRecordExports
           val extraPlan = RulePlan(extraSteps, extraExports)
 
@@ -267,6 +229,187 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 
     }
   }
+
+//  private def accuracyRulePlan(timeInfo: TimeInfo, name: String, expr: Expr,
+//                               param: Map[String, Any], processType: ProcessType
+//                              ): RulePlan = {
+//    val details = getDetails(param)
+//    val sourceName = details.getString(AccuracyKeys._source, dataSourceNames.head)
+//    val targetName = details.getString(AccuracyKeys._target, dataSourceNames.tail.head)
+//    val analyzer = AccuracyAnalyzer(expr.asInstanceOf[LogicalExpr], sourceName, targetName)
+//
+//    if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
+//      emptyRulePlan
+//    } else {
+//      // 1. miss record
+//      val missRecordsTableName = "__missRecords"
+//      val selClause = s"`${sourceName}`.*"
+//      val missRecordsSql = if (!TableRegisters.existRunTempTable(timeInfo.key, targetName)) {
+//        s"SELECT ${selClause} FROM `${sourceName}`"
+//      } else {
+//        val onClause = expr.coalesceDesc
+//        val sourceIsNull = analyzer.sourceSelectionExprs.map { sel =>
+//          s"${sel.desc} IS NULL"
+//        }.mkString(" AND ")
+//        val targetIsNull = analyzer.targetSelectionExprs.map { sel =>
+//          s"${sel.desc} IS NULL"
+//        }.mkString(" AND ")
+//        val whereClause = s"(NOT (${sourceIsNull})) AND (${targetIsNull})"
+//        s"SELECT ${selClause} FROM `${sourceName}` LEFT JOIN `${targetName}` ON ${onClause} WHERE ${whereClause}"
+//      }
+//      val missRecordsStep = SparkSqlStep(missRecordsTableName, missRecordsSql, emptyMap, true)
+//      val missRecordsExports = processType match {
+//        case BatchProcessType => {
+//          val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
+//          genRecordExport(recordParam, missRecordsTableName, missRecordsTableName) :: Nil
+//        }
+//        case StreamingProcessType => Nil
+//      }
+//
+//      // 2. miss count
+//      val missCountTableName = "__missCount"
+//      val missColName = details.getStringOrKey(AccuracyKeys._miss)
+//      val missCountSql = processType match {
+//        case BatchProcessType => s"SELECT COUNT(*) AS `${missColName}` FROM `${missRecordsTableName}`"
+//        case StreamingProcessType => s"SELECT `${InternalColumns.tmst}`, COUNT(*) AS `${missColName}` FROM `${missRecordsTableName}` GROUP BY `${InternalColumns.tmst}`"
+//      }
+//      val missCountStep = SparkSqlStep(missCountTableName, missCountSql, emptyMap)
+//
+//      // 3. total count
+//      val totalCountTableName = "__totalCount"
+//      val totalColName = details.getStringOrKey(AccuracyKeys._total)
+//      val totalCountSql = processType match {
+//        case BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
+//        case StreamingProcessType => s"SELECT `${InternalColumns.tmst}`, COUNT(*) AS `${totalColName}` FROM `${sourceName}` GROUP BY `${InternalColumns.tmst}`"
+//      }
+//      val totalCountStep = SparkSqlStep(totalCountTableName, totalCountSql, emptyMap)
+//
+//      // 4. accuracy metric
+//      val accuracyTableName = name
+//      val matchedColName = details.getStringOrKey(AccuracyKeys._matched)
+//      val accuracyMetricSql = processType match {
+//        case BatchProcessType => {
+//          s"""
+//             |SELECT `${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
+//             |coalesce(`${missCountTableName}`.`${missColName}`, 0) AS `${missColName}`,
+//             |(`${totalColName}` - `${missColName}`) AS `${matchedColName}`
+//             |FROM `${totalCountTableName}` FULL JOIN `${missCountTableName}`
+//         """.stripMargin
+//        }
+//        case StreamingProcessType => {
+//          s"""
+//             |SELECT `${totalCountTableName}`.`${InternalColumns.tmst}` AS `${InternalColumns.tmst}`,
+//             |`${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
+//             |coalesce(`${missCountTableName}`.`${missColName}`, 0) AS `${missColName}`,
+//             |(`${totalColName}` - `${missColName}`) AS `${matchedColName}`
+//             |FROM `${totalCountTableName}` FULL JOIN `${missCountTableName}`
+//             |ON `${totalCountTableName}`.`${InternalColumns.tmst}` = `${missCountTableName}`.`${InternalColumns.tmst}`
+//         """.stripMargin
+//        }
+//      }
+//      val accuracyStep = SparkSqlStep(accuracyTableName, accuracyMetricSql, emptyMap, true)
+//      val accuracyExports = processType match {
+//        case BatchProcessType => {
+//          val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
+//          genMetricExport(metricParam, accuracyTableName, accuracyTableName) :: Nil
+//        }
+//        case StreamingProcessType => Nil
+//      }
+//
+//      // current accu plan
+//      val accuSteps = missRecordsStep :: missCountStep :: totalCountStep :: accuracyStep :: Nil
+//      val accuExports = missRecordsExports ++ accuracyExports
+//      val accuPlan = RulePlan(accuSteps, accuExports)
+//
+//      // streaming extra accu plan
+//      val streamingAccuPlan = processType match {
+//        case BatchProcessType => emptyRulePlan
+//        case StreamingProcessType => {
+//          // 5. global accuracy metric merge
+//          val globalAccuracyTableName = "__globalAccuracy"
+//          val globalAccuracySql = {
+//            s"""
+//               |SELECT coalesce(`${globalAccuracyTableName}`.`${InternalColumns.tmst}`, `${accuracyTableName}`.`${InternalColumns.tmst}`) AS `${InternalColumns.tmst}`,
+//               |coalesce(`${accuracyTableName}`.`${missColName}`, `${globalAccuracyTableName}`.`${missColName}`) AS `${missColName}`,
+//               |coalesce(`${globalAccuracyTableName}`.`${totalColName}`, `${accuracyTableName}`.`${totalColName}`) AS `${totalColName}`,
+//               |((`${accuracyTableName}`.`${missColName}` IS NOT NULL) AND ((`${globalAccuracyTableName}`.`${missColName}` IS NULL) OR (`${accuracyTableName}`.`${missColName}` < `${globalAccuracyTableName}`.`${missColName}`))) AS `${InternalColumns.metric}`
+//               |FROM `${globalAccuracyTableName}` FULL JOIN `${accuracyTableName}`
+//               |ON `${globalAccuracyTableName}`.`${InternalColumns.tmst}` = `${accuracyTableName}`.`${InternalColumns.tmst}`
+//            """.stripMargin
+//          }
+//          val globalAccuracyInitSql = {
+//            s"""
+//               |SELECT `${InternalColumns.tmst}`, `${totalColName}`, `${missColName}`,
+//               |(true) AS `${InternalColumns.metric}`
+//               |FROM `${accuracyTableName}`
+//             """.stripMargin
+//          }
+//          val globalAccuracyDetails = Map[String, Any](GlobalKeys._initRule -> globalAccuracyInitSql)
+//          val globalAccuracyStep = SparkSqlStep(globalAccuracyTableName,
+//            globalAccuracySql, globalAccuracyDetails, true, true)
+//
+//          // 6. collect accuracy metrics
+//          val accuracyMetricTableName = name
+//          val accuracyMetricSql = {
+//            s"""
+//               |SELECT `${InternalColumns.tmst}`, `${totalColName}`, `${missColName}`,
+//               |(`${totalColName}` - `${missColName}`) AS `${matchedColName}`
+//               |FROM `${globalAccuracyTableName}` WHERE `${InternalColumns.metric}`
+//             """.stripMargin
+//          }
+//          val accuracyMetricStep = SparkSqlStep(accuracyMetricTableName, accuracyMetricSql, emptyMap)
+//          val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
+//          val accuracyMetricExports = genMetricExport(metricParam, accuracyMetricTableName, accuracyMetricTableName) :: Nil
+//
+//          // 7. collect accuracy records
+//          val accuracyRecordTableName = "__accuracyRecords"
+//          val accuracyRecordSql = {
+//            s"""
+//               |SELECT `${InternalColumns.tmst}`
+//               |FROM `${accuracyMetricTableName}` WHERE `${matchedColName}` > 0
+//             """.stripMargin
+//          }
+//          val accuracyRecordStep = SparkSqlStep(accuracyRecordTableName, accuracyRecordSql, emptyMap)
+//          val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
+//          val accuracyRecordParam = recordParam.addIfNotExist(ExportParamKeys._dataSourceCache, sourceName)
+//            .addIfNotExist(ExportParamKeys._originDF, missRecordsTableName)
+//          val accuracyRecordExports = genRecordExport(
+//            accuracyRecordParam, missRecordsTableName, accuracyRecordTableName) :: Nil
+//
+//          // 8. update global accuracy metric
+//          val updateGlobalAccuracyTableName = globalAccuracyTableName
+//          val globalMetricKeepTime = details.getString(GlobalKeys._globalMetricKeep, "")
+//          val updateGlobalAccuracySql = TimeUtil.milliseconds(globalMetricKeepTime) match {
+//            case Some(kt) => {
+//              s"""
+//                 |SELECT * FROM `${globalAccuracyTableName}`
+//                 |WHERE (`${missColName}` > 0) AND (`${InternalColumns.tmst}` > ${timeInfo.calcTime - kt})
+//               """.stripMargin
+//            }
+//            case _ => {
+//              s"""
+//                 |SELECT * FROM `${globalAccuracyTableName}`
+//                 |WHERE (`${missColName}` > 0)
+//               """.stripMargin
+//            }
+//          }
+//          val updateGlobalAccuracyStep = SparkSqlStep(updateGlobalAccuracyTableName,
+//            updateGlobalAccuracySql, emptyMap, true, true)
+//
+//          // gen accu plan
+//          val extraSteps = globalAccuracyStep :: accuracyMetricStep :: accuracyRecordStep :: updateGlobalAccuracyStep :: Nil
+//          val extraExports = accuracyMetricExports ++ accuracyRecordExports
+//          val extraPlan = RulePlan(extraSteps, extraExports)
+//
+//          extraPlan
+//        }
+//      }
+//
+//      // return accu plan
+//      accuPlan.merge(streamingAccuPlan)
+//
+//    }
+//  }
 
   private def profilingRulePlan(timeInfo: TimeInfo, name: String, expr: Expr,
                                 param: Map[String, Any], processType: ProcessType

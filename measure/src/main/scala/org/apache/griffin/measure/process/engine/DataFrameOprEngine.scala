@@ -24,7 +24,7 @@ import org.apache.griffin.measure.cache.result.CacheResultProcesser
 import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source.{DataSource, DataSourceFactory}
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.result.AccuracyResult
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
@@ -43,14 +43,15 @@ case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   def runRuleStep(timeInfo: TimeInfo, ruleStep: RuleStep): Boolean = {
     ruleStep match {
-      case DfOprStep(name, rule, details) => {
+      case rs @ DfOprStep(name, rule, details, _, _) => {
         try {
           val df = rule match {
             case DataFrameOprs._fromJson => DataFrameOprs.fromJson(sqlContext, details)
+            case DataFrameOprs._accuracy => DataFrameOprs.accuracy(sqlContext, timeInfo, details)
             case DataFrameOprs._clear => DataFrameOprs.clear(sqlContext, details)
             case _ => throw new Exception(s"df opr [ ${rule} ] not supported")
           }
-          df.cache
+          if (rs.needCache) DataFrameCaches.cacheDataFrame(timeInfo.key, name, df)
           TableRegisters.registerRunTempTable(df, timeInfo.key, name)
           true
         } catch {
@@ -72,6 +73,13 @@ object DataFrameOprs {
   final val _accuracy = "accuracy"
   final val _clear = "clear"
 
+  object AccuracyOprKeys {
+    val _dfName = "df.name"
+    val _miss = "miss"
+    val _total = "total"
+    val _matched = "matched"
+  }
+
   def fromJson(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
     val _dfName = "df.name"
     val _colName = "col.name"
@@ -86,87 +94,69 @@ object DataFrameOprs {
     sqlContext.read.json(rdd) // slow process
   }
 
-//  def accuracy(sqlContext: SQLContext, timeInfo: TimeInfo, details: Map[String, Any]): DataFrame = {
-//    val _dfName = "df.name"
-//    val _miss = "miss"
-//    val _total = "total"
-//    val _matched = "matched"
-//
-//    val dfName = details.getStringOrKey(_dfName)
-//    val miss = details.getStringOrKey(_miss)
-//    val total = details.getStringOrKey(_total)
-//    val matched = details.getStringOrKey(_matched)
-//
+  def accuracy(sqlContext: SQLContext, timeInfo: TimeInfo, details: Map[String, Any]): DataFrame = {
+    import AccuracyOprKeys._
+
+    val dfName = details.getStringOrKey(_dfName)
+    val miss = details.getStringOrKey(_miss)
+    val total = details.getStringOrKey(_total)
+    val matched = details.getStringOrKey(_matched)
+
 //    val _enableIgnoreCache = "enable.ignore.cache"
 //    val enableIgnoreCache = details.getBoolean(_enableIgnoreCache, false)
-//
+
 //    val tmst = InternalColumns.tmst
-//
-//    val updateTime = new Date().getTime
-//
-//    def getLong(r: Row, k: String): Long = {
-//      try {
-//        r.getAs[Long](k)
-//      } catch {
-//        case e: Throwable => 0L
-//      }
-//    }
-//
-//    val df = sqlContext.table(s"`${dfName}`")
-//    df.show(10)
-//    val results = df.flatMap { row =>
-//      try {
-//        val missCount = getLong(row, miss)
-//        val totalCount = getLong(row, total)
-//        val ar = AccuracyResult(missCount, totalCount)
-//        if (ar.isLegal) Some((timeInfo.tmst, ar)) else None
-//      } catch {
-//        case e: Throwable => None
-//      }
-//    }.collect
-//
-//    val updateResults = results.flatMap { pair =>
-//      val (t, result) = pair
-//      val updatedCacheResultOpt = CacheResultProcesser.genUpdateCacheResult(t, updateTime, result)
-//      updatedCacheResultOpt
-//    }
-//
-//    // update results
-//    updateResults.foreach { r =>
-//      CacheResultProcesser.update(r)
-//    }
-//
-//    // generate metrics
-//    val schema = if (enableIgnoreCache) {
-//      StructType(Array(
-//        StructField(miss, LongType),
-//        StructField(total, LongType),
-//        StructField(matched, LongType),
-//        StructField(InternalColumns.ignoreCache, BooleanType)
-//      ))
-//    } else {
-//      StructType(Array(
-////        StructField(tmst, LongType),
-//        StructField(miss, LongType),
-//        StructField(total, LongType),
-//        StructField(matched, LongType)
-//      ))
-//    }
-//    val rows = if (enableIgnoreCache) {
-//      updateResults.map { r =>
-//        val ar = r.result.asInstanceOf[AccuracyResult]
-//        Row(ar.miss, ar.total, ar.getMatch, ar.initial)
-//      }
-//    } else {
-//      updateResults.map { r =>
-//        val ar = r.result.asInstanceOf[AccuracyResult]
-//        Row(ar.miss, ar.total, ar.getMatch)
-//      }
-//    }
-//    val rowRdd = sqlContext.sparkContext.parallelize(rows)
-//    sqlContext.createDataFrame(rowRdd, schema)
-//
-//  }
+
+    val updateTime = new Date().getTime
+
+    def getLong(r: Row, k: String): Option[Long] = {
+      try {
+        Some(r.getAs[Long](k))
+      } catch {
+        case e: Throwable => None
+      }
+    }
+
+    val df = sqlContext.table(s"`${dfName}`")
+    val results = df.flatMap { row =>
+      try {
+        val tmst = getLong(row, InternalColumns.tmst).getOrElse(timeInfo.calcTime)
+        val missCount = getLong(row, miss).getOrElse(0L)
+        val totalCount = getLong(row, total).getOrElse(0L)
+        val ar = AccuracyResult(missCount, totalCount)
+        if (ar.isLegal) Some((tmst, ar)) else None
+      } catch {
+        case e: Throwable => None
+      }
+    }.collect
+
+    val updateResults = results.flatMap { pair =>
+      val (t, result) = pair
+      val updatedCacheResultOpt = CacheResultProcesser.genUpdateCacheResult(t, updateTime, result)
+      updatedCacheResultOpt
+    }
+
+    // update results
+    updateResults.foreach { r =>
+      CacheResultProcesser.update(r)
+    }
+
+    // generate metrics
+    val schema = StructType(Array(
+      StructField(InternalColumns.tmst, LongType),
+      StructField(miss, LongType),
+      StructField(total, LongType),
+      StructField(matched, LongType),
+      StructField(InternalColumns.record, BooleanType)
+    ))
+    val rows = updateResults.map { r =>
+      val ar = r.result.asInstanceOf[AccuracyResult]
+      Row(r.timeGroup, ar.miss, ar.total, ar.getMatch, !ar.initial)
+    }
+    val rowRdd = sqlContext.sparkContext.parallelize(rows)
+    sqlContext.createDataFrame(rowRdd, schema)
+
+  }
 
   def clear(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
     val _dfName = "df.name"

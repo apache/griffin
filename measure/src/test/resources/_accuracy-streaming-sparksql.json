@@ -95,6 +95,7 @@
       {
         "dsl.type": "spark-sql",
         "name": "missRecords",
+        "cache": true,
         "rule": "SELECT source.* FROM source LEFT JOIN target ON coalesce(source.name, '') = coalesce(target.name, '') AND coalesce(source.age, '') = coalesce(target.age, '') WHERE (NOT (source.name IS NULL AND source.age IS NULL)) AND (target.name IS NULL AND target.age IS NULL)"
       },
       {
@@ -110,6 +111,7 @@
       {
         "dsl.type": "spark-sql",
         "name": "accu",
+        "cache": true,
         "rule": "SELECT `total_count`.`__tmst` AS `__tmst`, `total_count`.`total` AS `total`, coalesce(`miss_count`.`miss`, 0) AS `miss` FROM `total_count` FULL JOIN `miss_count` ON `total_count`.`__tmst` = `miss_count`.`__tmst`"
       },
       {

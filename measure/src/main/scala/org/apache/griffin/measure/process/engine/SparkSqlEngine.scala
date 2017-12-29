@@ -23,7 +23,7 @@ import java.util.Date
 import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.{GlobalKeys, InternalColumns}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
@@ -39,19 +39,20 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   def runRuleStep(timeInfo: TimeInfo, ruleStep: RuleStep): Boolean = {
     ruleStep match {
-      case SparkSqlStep(name, rule, details, global) => {
+      case rs @ SparkSqlStep(name, rule, details, _, _) => {
         try {
-          val rdf = if (global && !TableRegisters.existRunGlobalTable(name)) {
+          val rdf = if (rs.isGlobal && !TableRegisters.existRunGlobalTable(name)) {
             details.get(GlobalKeys._initRule) match {
               case Some(initRule: String) => sqlContext.sql(initRule)
               case _ => sqlContext.emptyDataFrame
             }
           } else sqlContext.sql(rule)
-          rdf.cache
 
-          if (global) {
+          if (rs.isGlobal) {
+            if (rs.needCache) DataFrameCaches.cacheGlobalDataFrame(name, rdf)
             TableRegisters.registerRunGlobalTable(rdf, name)
           } else {
+            if (rs.needCache) DataFrameCaches.cacheDataFrame(timeInfo.key, name, rdf)
             TableRegisters.registerRunTempTable(rdf, timeInfo.key, name)
           }
           true

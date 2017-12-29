@@ -25,7 +25,7 @@ import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.{BatchDqProcess, BatchProcessType}
 import org.apache.griffin.measure.process.engine._
-import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.{InternalColumns, PreProcPhase, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.preproc.PreProcRuleGenerator
@@ -63,12 +63,12 @@ trait DataConnector extends Loggable with Serializable {
   def preProcess(dfOpt: Option[DataFrame], ms: Long): Option[DataFrame] = {
     val timeInfo = CalcTimeInfo(ms, id)
     val thisTable = thisName(ms)
-    val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
-//    val names = PreProcRuleGenerator.getRuleNames(preProcRules).toSet + thisTable
 
     try {
       dfOpt.flatMap { df =>
-        // in data
+        val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
+
+        // init data
         TableRegisters.registerRunTempTable(df, timeInfo.key, thisTable)
 
 //        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
@@ -84,8 +84,6 @@ trait DataConnector extends Loggable with Serializable {
         // out data
         val outDf = sqlContext.table(s"`${thisTable}`")
 
-        // drop temp tables
-        TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)
 //        names.foreach { name =>
 //          try {
 //            TempTables.unregisterTempTable(sqlContext, ms, name)
@@ -107,6 +105,9 @@ trait DataConnector extends Loggable with Serializable {
         // tmst cache
         saveTmst(ms)
 
+        // drop temp tables
+        cleanData(timeInfo)
+
         Some(withTmstDf)
       }
     } catch {
@@ -116,6 +117,13 @@ trait DataConnector extends Loggable with Serializable {
       }
     }
 
+  }
+
+  private def cleanData(timeInfo: TimeInfo): Unit = {
+    TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)
+
+    DataFrameCaches.uncacheDataFrames(timeInfo.key)
+    DataFrameCaches.clearTrashDataFrames(timeInfo.key)
   }
 
 }

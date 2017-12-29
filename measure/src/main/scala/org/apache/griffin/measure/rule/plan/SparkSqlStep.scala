@@ -23,6 +23,7 @@ import org.apache.griffin.measure.rule.dsl._
 case class SparkSqlStep(name: String,
                         rule: String,
                         details: Map[String, Any],
+                        cache: Boolean = false,
                         global: Boolean = false
                        ) extends RuleStep {
 
