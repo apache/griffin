@@ -117,7 +117,6 @@ object DataFrameOprs {
     }
 
     val df = sqlContext.table(s"`${dfName}`")
-    df.cache()
 
     val results = df.flatMap { row =>
       try {
@@ -157,8 +156,6 @@ object DataFrameOprs {
     }
     val rowRdd = sqlContext.sparkContext.parallelize(rows)
     val retDf = sqlContext.createDataFrame(rowRdd, schema)
-
-    df.unpersist()
 
     retDf
   }
