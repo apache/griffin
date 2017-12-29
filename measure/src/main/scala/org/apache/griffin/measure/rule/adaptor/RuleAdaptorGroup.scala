@@ -23,8 +23,7 @@ import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.process.temp.TableRegisters
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.plan.{RulePlan, RuleStep}
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.rule.plan._
 import org.apache.spark.sql.SQLContext
 
 import scala.collection.mutable.{Map => MutableMap}

@@ -23,7 +23,7 @@ import org.apache.griffin.measure.config.params.user.UserParam
 import org.apache.griffin.measure.config.reader.ParamReaderFactory
 import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.process.temp._
-import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo, TmstTimeInfo}
+import org.apache.griffin.measure.rule.plan.CalcTimeInfo
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

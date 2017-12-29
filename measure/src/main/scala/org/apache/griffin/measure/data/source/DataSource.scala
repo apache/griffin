@@ -24,7 +24,7 @@ import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.temp.TableRegisters
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.plan.TimeInfo
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
@@ -51,41 +51,20 @@ case class DataSource(sqlContext: SQLContext,
 
   def loadData(timeInfo: TimeInfo): Set[Long] = {
     val calcTime = timeInfo.calcTime
-    val tmstName = TempName.tmstName(name, calcTime)
-    println(s"load data [${name}] (${tmstName})")
+    println(s"load data [${name}]")
     val (dfOpt, tmsts) = data(calcTime)
     dfOpt match {
       case Some(df) => {
         TableRegisters.registerRunTempTable(df, timeInfo.key, name)
-        TableRegisters.registerRunTempTable(df, timeInfo.key, tmstName)
       }
       case None => {
-//        val df = sqlContext.emptyDataFrame
-//        df.registerTempTable(name)
-//        warn(s"load data source [${name}] fails")
-        warn(s"load data source [${name}] (${tmstName}) fails")
-//        throw new Exception(s"load data source [${name}] fails")
+        warn(s"load data source [${name}] fails")
       }
     }
     tmsts
   }
 
-//  def dropTable(ms: Long): Unit = {
-//    val tmstName = TempName.tmstName(name, ms)
-//    try {
-//      sqlContext.dropTempTable(s"`${tmstName}`")
-//    } catch {
-//      case e: Throwable => warn(s"drop table [${name}] (${tmstName}) fails")
-//    }
-//  }
-
   private def data(ms: Long): (Option[DataFrame], Set[Long]) = {
-//    val batchPairs = batchDataConnectors.map(_.data(ms))
-//    println(batchPairs.size)
-//    val (batchDataFrameOpt, batchTmsts) = (None, Set.empty[Long])
-//    val (batchDataFrameOpt, batchTmsts) = batchDataConnectors.map(_.data(ms)).reduce( (a, b) =>
-//      (unionDfOpts(a._1, b._1), a._2 ++ b._2)
-//    )
     val batches = batchDataConnectors.flatMap { dc =>
       val (dfOpt, tmsts) = dc.data(ms)
       dfOpt match {
@@ -106,14 +85,6 @@ case class DataSource(sqlContext: SQLContext,
     } else {
       (None, Set.empty[Long])
     }
-
-//    val (cacheDataFrameOpt, cacheTmsts) = dataSourceCacheOpt match {
-//      case Some(dsc) => dsc.readData()
-//      case _ => (None, Set.empty[Long])
-//    }
-//    println("go")
-
-//    (unionDfOpts(batchDataFrameOpt, cacheDataFrameOpt), batchTmsts ++ cacheTmsts)
   }
 
   private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]

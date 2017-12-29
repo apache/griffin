@@ -20,7 +20,7 @@ package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.process.temp._
-import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo}
+import org.apache.griffin.measure.rule.plan.CalcTimeInfo
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

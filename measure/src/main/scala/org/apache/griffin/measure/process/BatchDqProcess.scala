@@ -30,7 +30,7 @@ import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
 import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.udf.GriffinUdfs
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.SQLContext

@@ -30,7 +30,7 @@ import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
 import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
-import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo}
+import org.apache.griffin.measure.rule.plan._
 import org.apache.spark.sql.SQLContext
 
 case class StreamingDqThread(sqlContext: SQLContext,

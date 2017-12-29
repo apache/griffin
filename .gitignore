@@ -37,4 +37,4 @@ ui/tmp
 derby.log
 metastore_db
 
-measure/src/test/scala/org/apache/griffin/measure/process/*ProcessTest.scala
+measure/src/test/test_scala/*

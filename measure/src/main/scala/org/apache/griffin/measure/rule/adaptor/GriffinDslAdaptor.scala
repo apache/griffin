@@ -26,8 +26,7 @@ import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.dsl.analyzer._
 import org.apache.griffin.measure.rule.dsl.expr._
 import org.apache.griffin.measure.rule.dsl.parser.GriffinDslParser
-import org.apache.griffin.measure.rule.plan._
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.griffin.measure.utils.TimeUtil
 

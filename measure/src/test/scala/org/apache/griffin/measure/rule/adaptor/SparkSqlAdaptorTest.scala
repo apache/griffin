@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.plan.TimeInfo
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

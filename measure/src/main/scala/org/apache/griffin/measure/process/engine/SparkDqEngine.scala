@@ -24,7 +24,6 @@ import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, Stream
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
-import org.apache.griffin.measure.rule.step._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}

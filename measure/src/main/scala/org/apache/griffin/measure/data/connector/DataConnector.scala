@@ -28,8 +28,8 @@ import org.apache.griffin.measure.process.engine._
 import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.{InternalColumns, PreProcPhase, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.dsl._
+import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.preproc.PreProcRuleGenerator
-import org.apache.griffin.measure.rule.step.{CalcTimeInfo, TimeInfo}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SQLContext}

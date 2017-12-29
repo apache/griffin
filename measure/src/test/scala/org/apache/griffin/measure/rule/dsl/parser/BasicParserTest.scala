@@ -81,7 +81,7 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val rule1 = """source"""
     val result1 = parser.parseAll(parser.selection, rule1)
     result1.successful should be (true)
-    result1.get.desc should be ("source")
+    result1.get.desc should be ("`source`")
 
     val rule2 = """source_not_registered"""
     val result2 = parser.parseAll(parser.selection, rule2)
@@ -90,13 +90,13 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val rule3 = """source[12].age"""
     val result3 = parser.parseAll(parser.selection, rule3)
     result3.successful should be (true)
-    result3.get.desc should be ("source[12].age")
+    result3.get.desc should be ("`source`[12].`age`")
     result3.get.alias should be (Some("12_age"))
 
     val rule4 = """source.name.func(target.name)"""
     val result4 = parser.parseAll(parser.selection, rule4)
     result4.successful should be (true)
-    result4.get.desc should be ("func(source.name, target.name)")
+    result4.get.desc should be ("func(`source`.`name`, `target`.`name`)")
   }
 
   test ("test math") {
@@ -113,24 +113,24 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val rule3 = "source.age + 2 * 5 + target.offset"
     val result3 = parser.parseAll(parser.mathExpression, rule3)
     result3.successful should be (true)
-    result3.get.desc should be ("source.age + 2 * 5 + target.offset")
+    result3.get.desc should be ("`source`.`age` + 2 * 5 + `target`.`offset`")
 
     val rule4 = "(source.age + 2) * (5 + target.offset)"
     val result4 = parser.parseAll(parser.mathExpression, rule4)
     result4.successful should be (true)
-    result4.get.desc should be ("(source.age + 2) * (5 + target.offset)")
+    result4.get.desc should be ("(`source`.`age` + 2) * (5 + `target`.`offset`)")
   }
 
   test ("test logical") {
     val rule1 = "source.age in (12 + 3, 23, 34)"
     val result1 = parser.parseAll(parser.logicalExpression, rule1)
     result1.successful should be (true)
-    result1.get.desc should be ("source.age IN (12 + 3, 23, 34)")
+    result1.get.desc should be ("`source`.`age` IN (12 + 3, 23, 34)")
 
     val rule2 = "source.age between (12 + 3, 23, 34)"
     val result2 = parser.parseAll(parser.logicalExpression, rule2)
     result2.successful should be (true)
-    result2.get.desc should be ("source.age BETWEEN 12 + 3 AND 23")
+    result2.get.desc should be ("`source`.`age` BETWEEN 12 + 3 AND 23")
 
     val rule3 = "source.age between (12 + 3)"
     assertThrows[Exception](parser.parseAll(parser.logicalExpression, rule3))
@@ -138,22 +138,22 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val rule4 = "source.name like '%tk'"
     val result4 = parser.parseAll(parser.logicalExpression, rule4)
     result4.successful should be (true)
-    result4.get.desc should be ("source.name LIKE '%tk'")
+    result4.get.desc should be ("`source`.`name` LIKE '%tk'")
 
     val rule5 = "source.desc is not null"
     val result5 = parser.parseAll(parser.logicalExpression, rule5)
     result5.successful should be (true)
-    result5.get.desc should be ("source.desc IS NOT NULL")
+    result5.get.desc should be ("`source`.`desc` IS NOT NULL")
 
     val rule6 = "source.desc is not nan"
     val result6 = parser.parseAll(parser.logicalExpression, rule6)
     result6.successful should be (true)
-    result6.get.desc should be ("NOT isnan(source.desc)")
+    result6.get.desc should be ("NOT isnan(`source`.`desc`)")
 
     val rule7 = "!source.ok and source.name = target.name && (source.age between 12 and 52) && target.desc is not null"
     val result7 = parser.parseAll(parser.logicalExpression, rule7)
     result7.successful should be (true)
-    result7.get.desc should be ("(NOT source.ok) AND source.name = target.name AND (source.age BETWEEN 12 AND 52) AND target.desc IS NOT NULL")
+    result7.get.desc should be ("(NOT `source`.`ok`) AND `source`.`name` = `target`.`name` AND (`source`.`age` BETWEEN 12 AND 52) AND `target`.`desc` IS NOT NULL")
 
     val rule8 = "!(10 != 30 and !(31 > 2) or (45 <= 8 and 33 <> 0))"
     val result8 = parser.parseAll(parser.logicalExpression, rule8)
@@ -167,18 +167,18 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val result3 = parser.parseAll(parser.expression, rule3)
     println(result3)
     result3.successful should be (true)
-    result3.get.desc should be ("source.age + 2 * 5 + target.offset")
+    result3.get.desc should be ("`source`.`age` + 2 * 5 + `target`.`offset`")
 
     val rule4 = "(source.age + 2) * (5 + target.offset)"
     val result4 = parser.parseAll(parser.expression, rule4)
     println(result4)
     result4.successful should be (true)
-    result4.get.desc should be ("(source.age + 2) * (5 + target.offset)")
+    result4.get.desc should be ("(`source`.`age` + 2) * (5 + `target`.`offset`)")
 
     val rule7 = "!source.ok and source.name = target.name && (source.age between 12 and 52) && target.desc is not null"
     val result7 = parser.parseAll(parser.expression, rule7)
     result7.successful should be (true)
-    result7.get.desc should be ("(NOT source.ok) AND source.name = target.name AND (source.age BETWEEN 12 AND 52) AND target.desc IS NOT NULL")
+    result7.get.desc should be ("(NOT `source`.`ok`) AND `source`.`name` = `target`.`name` AND (`source`.`age` BETWEEN 12 AND 52) AND `target`.`desc` IS NOT NULL")
 
     val rule8 = "!(10 != 30 and !(31 > 2) or (45 <= 8 and 33 <> 0))"
     val result8 = parser.parseAll(parser.expression, rule8)
@@ -188,14 +188,14 @@ class BasicParserTest extends FunSuite with Matchers with BeforeAndAfter {
     val rule1 = "source.user_id = target.user_id AND source.first_name = target.first_name AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code"
     val result1 = parser.parseAll(parser.expression, rule1)
     result1.successful should be (true)
-    result1.get.desc should be ("source.user_id = target.user_id AND source.first_name = target.first_name AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code")
+    result1.get.desc should be ("`source`.`user_id` = `target`.`user_id` AND `source`.`first_name` = `target`.`first_name` AND `source`.`last_name` = `target`.`last_name` AND `source`.`address` = `target`.`address` AND `source`.`email` = `target`.`email` AND `source`.`phone` = `target`.`phone` AND `source`.`post_code` = `target`.`post_code`")
   }
 
   test ("test function") {
     val rule3 = "source.age + 2 * 5 + target.offset * func('a', source.name)"
     val result3 = parser.parseAll(parser.expression, rule3)
     result3.successful should be (true)
-    result3.get.desc should be ("source.age + 2 * 5 + target.offset * func('a', source.name)")
+    result3.get.desc should be ("`source`.`age` + 2 * 5 + `target`.`offset` * func('a', `source`.`name`)")
   }
 
   test ("order by clause") {

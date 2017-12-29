@@ -26,9 +26,8 @@ import scala.collection.mutable.{Set => MutableSet}
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.ProcessType
-import org.apache.griffin.measure.rule.step.TimeInfo
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.plan._
+import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 
 //object RuleInfoKeys {
 //  val _name = "name"

@@ -21,8 +21,7 @@ package org.apache.griffin.measure.rule.adaptor
 import org.apache.griffin.measure.cache.tmst.TempName
 import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.rule.dsl.MetricPersistType
-import org.apache.griffin.measure.rule.plan._
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 case class SparkSqlAdaptor() extends RuleAdaptor {

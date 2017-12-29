@@ -24,8 +24,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.plan._
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row}
 

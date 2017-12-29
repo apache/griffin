@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.cache.tmst
 
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.rule.step.TimeInfo
+import org.apache.griffin.measure.rule.plan.TimeInfo
 
 object TempName extends Loggable {
 
@@ -29,19 +29,19 @@ object TempName extends Loggable {
 
   //-- temp df name --
 //  private val tmstNameRegex = """^(.*)\((\d*)\)\[(\d*)\]$""".r
-  private val tmstNameRegex = """^(.*)_(\d*)_(\d*)$""".r
-  def tmstName(name: String, timeInfo: TimeInfo) = {
-    val calcTime = timeInfo.calcTime
-    val tmst = timeInfo.tmst
-    s"${name}_${calcTime}_${tmst}"
-  }
-  def extractTmstName(tmstName: String): (String, Option[Long], Option[Long]) = {
-    tmstName match {
-      case tmstNameRegex(name, calcTime, tmst) => {
-        try { (name, Some(calcTime.toLong), Some(tmst.toLong)) } catch { case e: Throwable => (tmstName, None, None) }
-      }
-      case _ => (tmstName, None, None)
-    }
-  }
+//  private val tmstNameRegex = """^(.*)_(\d*)_(\d*)$""".r
+//  def tmstName(name: String, timeInfo: TimeInfo) = {
+//    val calcTime = timeInfo.calcTime
+//    val tmst = timeInfo.tmst
+//    s"${name}_${calcTime}_${tmst}"
+//  }
+//  def extractTmstName(tmstName: String): (String, Option[Long], Option[Long]) = {
+//    tmstName match {
+//      case tmstNameRegex(name, calcTime, tmst) => {
+//        try { (name, Some(calcTime.toLong), Some(tmst.toLong)) } catch { case e: Throwable => (tmstName, None, None) }
+//      }
+//      case _ => (tmstName, None, None)
+//    }
+//  }
 
 }
