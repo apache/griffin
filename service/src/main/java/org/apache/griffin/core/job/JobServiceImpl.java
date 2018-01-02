@@ -329,11 +329,22 @@ public class JobServiceImpl implements JobService {
     public boolean pauseJob(String group, String name) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
         JobKey jobKey = new JobKey(name, group);
-        if (!scheduler.checkExists(jobKey)) {
-            LOGGER.warn("Job({},{}) does not exist.", group, name);
+        if (scheduler.checkExists(jobKey)) {
+            LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
             return false;
         }
         scheduler.pauseJob(jobKey);
+        return true;
+    }
+
+    private boolean deleteJob(String group, String name) throws SchedulerException {
+        Scheduler scheduler = factory.getObject();
+        JobKey jobKey = new JobKey(name, group);
+        if (scheduler.checkExists(jobKey)) {
+            LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
+            return false;
+        }
+        scheduler.deleteJob(jobKey);
         return true;
     }
 
@@ -344,16 +355,15 @@ public class JobServiceImpl implements JobService {
     }
 
     private boolean deletePredicateJob(GriffinJob job) throws SchedulerException {
-        boolean isPauseSuccess = true;
+        boolean pauseStatus = true;
         List<JobInstanceBean> instances = job.getJobInstances();
         for (JobInstanceBean instance : instances) {
             if (!instance.getDeleted()) {
-                //TODO real delete predicate
-                isPauseSuccess = isPauseSuccess && pauseJob(instance.getPredicateGroupName(), instance.getPredicateJobName());
+                pauseStatus = pauseStatus && deleteJob(instance.getPredicateGroupName(), instance.getPredicateJobName());
                 instance.setDeleted(true);
             }
         }
-        return isPauseSuccess;
+        return pauseStatus;
     }
 
     /**
@@ -440,7 +450,6 @@ public class JobServiceImpl implements JobService {
     @Scheduled(fixedDelayString = "${jobInstance.expired.milliseconds}")
     public void deleteExpiredJobInstance() {
         List<JobInstanceBean> instances = jobInstanceRepo.findByExpireTmsLessThanEqualAndDeleted(System.currentTimeMillis(), false);
-        //TODO pause job not one time
         if (!pauseJob(instances)) {
             LOGGER.error("Pause job failure.");
             return;
