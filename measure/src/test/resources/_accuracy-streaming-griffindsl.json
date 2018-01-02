@@ -102,8 +102,7 @@
           "target": "target",
           "miss": "miss_count",
           "total": "total_count",
-          "matched": "matched_count",
-          "global.metric.keep": "3m"
+          "matched": "matched_count"
         },
         "metric": {
           "name": "accu"
