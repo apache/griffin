@@ -303,23 +303,26 @@ public class JobServiceImpl implements JobService {
         List<JobInstanceBean> deletedInstances = new ArrayList<>();
         boolean pauseStatus = true;
         for (JobInstanceBean instance : instances) {
-            try {
-                boolean status = pauseJob(instance.getPredicateGroupName(), instance.getPredicateJobName());
-                pauseStatus = pauseStatus && status;
-                if (status) {
-                    instance.setDeleted(true);
-                    deletedInstances.add(instance);
-                }
-            } catch (SchedulerException e) {
-                LOGGER.error("Pause predicate job failure.");
-                pauseStatus = false;
-            }
+            boolean status = pauseJob(instance, deletedInstances);
+            pauseStatus = pauseStatus && status;
         }
         jobInstanceRepo.save(deletedInstances);
-        if (!pauseStatus) {
-            jobInstanceRepo.save(deletedInstances);
-        }
         return pauseStatus;
+    }
+
+    private boolean pauseJob(JobInstanceBean instance, List<JobInstanceBean> deletedInstances) {
+        boolean status;
+        try {
+            status = pauseJob(instance.getPredicateGroupName(), instance.getPredicateJobName());
+            if (status) {
+                instance.setDeleted(true);
+                deletedInstances.add(instance);
+            }
+        } catch (SchedulerException e) {
+            LOGGER.error("Pause predicate job({},{}) failure.", instance.getId(), instance.getPredicateJobName());
+            status = false;
+        }
+        return status;
     }
 
     @Override
