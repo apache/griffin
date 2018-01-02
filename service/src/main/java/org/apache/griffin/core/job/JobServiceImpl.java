@@ -27,7 +27,6 @@ import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
-import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -232,14 +231,17 @@ public class JobServiceImpl implements JobService {
         return false;
     }
 
-    //TODO exclude repeat
     private List<String> getConnectorNames(GriffinMeasure measure) {
         List<String> names = new ArrayList<>();
+        Set<String> sets = new HashSet<>();
         List<DataSource> sources = measure.getDataSources();
         for (DataSource source : sources) {
-            for (DataConnector dc : source.getConnectors()) {
-                names.add(dc.getName());
-            }
+            source.getConnectors().forEach(dc -> {sets.add(dc.getName());});
+        }
+        names.addAll(sets);
+        if (names.size() < sets.size()) {
+            LOGGER.error("Connector name cannot be repeated");
+            throw new IllegalArgumentException();
         }
         return names;
     }
