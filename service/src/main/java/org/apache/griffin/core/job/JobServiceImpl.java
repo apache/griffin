@@ -244,7 +244,6 @@ public class JobServiceImpl implements JobService {
         return names;
     }
 
-    //TODO　deleted state
     private GriffinMeasure getMeasureIfValid(Long measureId) {
         GriffinMeasure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
@@ -350,6 +349,9 @@ public class JobServiceImpl implements JobService {
             if (!instance.getDeleted()) {
                 pauseStatus = pauseStatus && deleteJob(instance.getPredicateGroup(), instance.getPredicateName());
                 instance.setDeleted(true);
+                if (instance.getState().equals(LivySessionStates.State.finding)) {
+                    instance.setState(LivySessionStates.State.not_found);
+                }
             }
         }
         return pauseStatus;
