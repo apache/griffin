@@ -201,7 +201,6 @@ public class JobServiceImpl implements JobService {
         return true;
     }
 
-    //TODO get first baseline
     private boolean isBaseLineValid(List<JobDataSegment> segments) {
         for (JobDataSegment jds : segments) {
             if (jds.getBaseline()) {
@@ -240,7 +239,7 @@ public class JobServiceImpl implements JobService {
         }
         names.addAll(sets);
         if (names.size() < sets.size()) {
-            LOGGER.error("Connector name cannot be repeated");
+            LOGGER.error("Connector names cannot be repeated.");
             throw new IllegalArgumentException();
         }
         return names;

@@ -111,10 +111,12 @@ public class JobInstance implements Job {
 
 
     private void setSourcesPartitionsAndPredicates(List<DataSource> sources) throws Exception {
+        boolean isFirstBaseline = true;
         for (JobDataSegment jds : jobSchedule.getSegments()) {
-            if (jds.getBaseline()) {
+            if (jds.getBaseline() && isFirstBaseline) {
                 Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
                 measure.setTimestamp(jobStartTime + tsOffset);
+                isFirstBaseline = false;
             }
             for (DataSource ds : sources) {
                 setDataSourcePartitions(jds, ds);
