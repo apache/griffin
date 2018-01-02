@@ -97,9 +97,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
             val dataRdd: RDD[String] = df.toJSON
 
             // save data
-            val dumped = if (!dataRdd.isEmpty) {
+//            val dumped = if (!dataRdd.isEmpty) {
+//              HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
+//            } else false
+
+            if (!dataRdd.isEmpty) {
               HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
-            } else false
+            }
 
           } catch {
             case e: Throwable => error(s"save data error: ${e.getMessage}")
@@ -211,7 +215,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     }
   }
 
-  def updateData(rdd: Iterable[String], ms: Long): Unit = {
+  def updateData(arr: Iterable[String], ms: Long): Unit = {
     val ptns = getPartition(ms)
     val ptnsPath = genPartitionHdfsPath(ptns)
     val dirPath = s"${filePath}/${ptnsPath}"
@@ -219,7 +223,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
 
     try {
-      val needSave = !rdd.isEmpty
+      val needSave = !arr.isEmpty
 
       // remove out time old data
       HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
@@ -227,7 +231,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
 
       // save updated data
       if (needSave) {
-        HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
+        HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
         println(s"update file path: ${dataFilePath}")
       } else {
         clearTmst(ms)
