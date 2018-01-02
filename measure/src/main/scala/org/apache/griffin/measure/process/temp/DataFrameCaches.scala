@@ -38,12 +38,14 @@ object DataFrameCaches extends Loggable {
   }
 
   def cacheDataFrame(key: String, name: String, df: DataFrame): Unit = {
+    println(s"try to cache df ${name}")
     caches.get(key) match {
       case Some(mp) => {
         mp.get(name) match {
           case Some(odf) => {
             val suc = caches.replace(key, mp, mp + (name -> df))
             if (suc) {
+              println(s"cache after replace old df")
               df.cache
               trashDataFrame(key, odf)
             } else {
@@ -53,6 +55,7 @@ object DataFrameCaches extends Loggable {
           case _ => {
             val suc = caches.replace(key, mp, mp + (name -> df))
             if (suc) {
+              println(s"cache after replace no old df")
               df.cache
             } else {
               cacheDataFrame(key, name, df)
@@ -62,7 +65,12 @@ object DataFrameCaches extends Loggable {
       }
       case _ => {
         val oldOpt = caches.putIfAbsent(key, Map[String, DataFrame]((name -> df)))
-        if (oldOpt.nonEmpty) cacheDataFrame(key, name, df)
+        if (oldOpt.isEmpty) {
+          println(s"cache after put absent")
+          df.cache
+        } else {
+          cacheDataFrame(key, name, df)
+        }
       }
     }
   }

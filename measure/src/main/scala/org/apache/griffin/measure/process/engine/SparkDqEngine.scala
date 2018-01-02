@@ -155,41 +155,103 @@ trait SparkDqEngine extends DqEngine {
     getRecordDataFrame(recordExport).map(_.toJSON)
   }
 
-  def collectStreamingRecords(recordExport: RecordExport): Option[(RDD[(Long, Iterable[String])], Set[Long])] = {
+  def collectStreamingRecords(recordExport: RecordExport): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
     val RecordExport(_, _, _, originDFOpt) = recordExport
-    getRecordDataFrame(recordExport).flatMap { stepDf =>
-      originDFOpt match {
-        case Some(originName) => {
-          val tmsts = (stepDf.collect.flatMap { row =>
-            try {
+    getRecordDataFrame(recordExport) match {
+      case Some(stepDf) => {
+        originDFOpt match {
+          case Some(originName) => {
+            val tmsts = (stepDf.collect.flatMap { row =>
+              try {
+                val tmst = row.getAs[Long](InternalColumns.tmst)
+                val empty = row.getAs[Boolean](InternalColumns.empty)
+                Some((tmst, empty))
+              } catch {
+                case _: Throwable => None
+              }
+            })
+            val emptyTmsts = tmsts.filter(_._2).map(_._1).toSet
+            val recordTmsts = tmsts.filter(!_._2).map(_._1).toSet
+            if (recordTmsts.size > 0) {
+              val recordsDf = sqlContext.table(s"`${originName}`")
+              val records = recordsDf.flatMap { row =>
+                val tmst = row.getAs[Long](InternalColumns.tmst)
+                if (recordTmsts.contains(tmst)) {
+                  try {
+                    val map = SparkRowFormatter.formatRow(row)
+                    val str = JsonUtil.toJson(map)
+                    Some((tmst, str))
+                  } catch {
+                    case e: Throwable => None
+                  }
+                } else None
+              }
+              (Some(records.groupByKey), emptyTmsts)
+            } else (None, emptyTmsts)
+          }
+          case _ => {
+            val records = stepDf.flatMap { row =>
               val tmst = row.getAs[Long](InternalColumns.tmst)
-              val empty = row.getAs[Boolean](InternalColumns.empty)
-              Some((tmst, empty))
-            } catch {
-              case _: Throwable => None
+              try {
+                val map = SparkRowFormatter.formatRow(row)
+                val str = JsonUtil.toJson(map)
+                Some((tmst, str))
+              } catch {
+                case e: Throwable => None
+              }
             }
-          })
-          val emptyTmsts = tmsts.filter(_._2).map(_._1).toSet
-          val recordTmsts = tmsts.filter(!_._2).map(_._1).toSet
-          if (recordTmsts.size > 0) {
-            val recordsDf = sqlContext.table(s"`${originName}`")
-            val records = recordsDf.flatMap { row =>
-              val tmst = row.getAs[Long](InternalColumns.tmst)
-              if (recordTmsts.contains(tmst)) {
-                try {
-                  val map = SparkRowFormatter.formatRow(row)
-                  val str = JsonUtil.toJson(map)
-                  Some((tmst, str))
-                } catch {
-                  case e: Throwable => None
-                }
-              } else None
-            }
-            Some((records.groupByKey, emptyTmsts))
-          } else None
+            (Some(records.groupByKey), Set[Long]())
+          }
         }
       }
+      case _ => (None, Set[Long]())
     }
+//    val recordsOpt = getRecordDataFrame(recordExport).flatMap { stepDf =>
+//      originDFOpt match {
+//        case Some(originName) => {
+//          val tmsts = (stepDf.collect.flatMap { row =>
+//            try {
+//              val tmst = row.getAs[Long](InternalColumns.tmst)
+//              val empty = row.getAs[Boolean](InternalColumns.empty)
+//              Some((tmst, empty))
+//            } catch {
+//              case _: Throwable => None
+//            }
+//          })
+//          val emptyTmsts = tmsts.filter(_._2).map(_._1).toSet
+//          val recordTmsts = tmsts.filter(!_._2).map(_._1).toSet
+//          if (recordTmsts.size > 0) {
+//            val recordsDf = sqlContext.table(s"`${originName}`")
+//            val records = recordsDf.flatMap { row =>
+//              val tmst = row.getAs[Long](InternalColumns.tmst)
+//              if (recordTmsts.contains(tmst)) {
+//                try {
+//                  val map = SparkRowFormatter.formatRow(row)
+//                  val str = JsonUtil.toJson(map)
+//                  Some((tmst, str))
+//                } catch {
+//                  case e: Throwable => None
+//                }
+//              } else None
+//            }
+//            Some((Some(records.groupByKey), emptyTmsts))
+//          } else Some((None, emptyTmsts))
+//        }
+//        case _ => {
+//          val records = stepDf.flatMap { row =>
+//            val tmst = row.getAs[Long](InternalColumns.tmst)
+//            try {
+//              val map = SparkRowFormatter.formatRow(row)
+//              val str = JsonUtil.toJson(map)
+//              Some((tmst, str))
+//            } catch {
+//              case e: Throwable => None
+//            }
+//          }
+//          Some(records.groupByKey)
+//        }
+//      }
+//    }
   }
 
 //

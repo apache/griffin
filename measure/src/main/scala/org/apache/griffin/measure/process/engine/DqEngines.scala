@@ -131,9 +131,11 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
           }
         }
         case StreamingProcessType => {
-          collectStreamingRecords(recordExport).foreach { rddPair =>
-            persistCollectedStreamingRecords(recordExport, rddPair._1, rddPair._2, persistFactory, dataSources)
-          }
+          val (rddOpt, emptySet) = collectStreamingRecords(recordExport)
+          persistCollectedStreamingRecords(recordExport, rddOpt, emptySet, persistFactory, dataSources)
+//          collectStreamingRecords(recordExport).foreach { rddPair =>
+//            persistCollectedStreamingRecords(recordExport, rddPair._1, rddPair._2, persistFactory, dataSources)
+//          }
         }
       }
     }
@@ -145,9 +147,9 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     }
     ret
   }
-  def collectStreamingRecords(recordExport: RecordExport): Option[(RDD[(Long, Iterable[String])], Set[Long])] = {
-    val ret = engines.foldLeft(None: Option[(RDD[(Long, Iterable[String])], Set[Long])]) { (ret, engine) =>
-      if (ret.nonEmpty) ret else engine.collectStreamingRecords(recordExport)
+  def collectStreamingRecords(recordExport: RecordExport): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
+    val ret = engines.foldLeft((None: Option[RDD[(Long, Iterable[String])]], Set[Long]())) { (ret, engine) =>
+      if (ret._1.nonEmpty || ret._2.nonEmpty) ret else engine.collectStreamingRecords(recordExport)
     }
     ret
   }
@@ -159,7 +161,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     persist.persistRecords(records, recordExport.name)
   }
 
-  private def persistCollectedStreamingRecords(recordExport: RecordExport, records: RDD[(Long, Iterable[String])],
+  private def persistCollectedStreamingRecords(recordExport: RecordExport, recordsOpt: Option[RDD[(Long, Iterable[String])]],
                                                emtpyRecordKeys: Set[Long], persistFactory: PersistFactory,
                                                dataSources: Seq[DataSource]
                                               ): Unit = {
@@ -168,12 +170,14 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
       case _ => Nil
     }
 
-    records.foreach { pair =>
-      val (tmst, strs) = pair
-      val persist = persistFactory.getPersists(tmst)
+    recordsOpt.foreach { records =>
+      records.foreach { pair =>
+        val (tmst, strs) = pair
+        val persist = persistFactory.getPersists(tmst)
 
-      persist.persistRecords(strs, recordExport.name)
-      updateDsCaches.foreach(_.updateData(strs, tmst))
+        persist.persistRecords(strs, recordExport.name)
+        updateDsCaches.foreach(_.updateData(strs, tmst))
+      }
     }
 
     emtpyRecordKeys.foreach { t =>
@@ -182,6 +186,30 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
       updateDsCaches.foreach(_.updateData(Nil, t))
     }
   }
+
+//  private def persistCollectedStreamingRecords(recordExport: RecordExport, records: RDD[(Long, Iterable[String])],
+//                                               emtpyRecordKeys: Set[Long], persistFactory: PersistFactory,
+//                                               dataSources: Seq[DataSource]
+//                                              ): Unit = {
+//    val updateDsCaches = recordExport.dataSourceCacheOpt match {
+//      case Some(dsName) => dataSources.filter(_.name == dsName).flatMap(_.dataSourceCacheOpt)
+//      case _ => Nil
+//    }
+//
+//    records.foreach { pair =>
+//      val (tmst, strs) = pair
+//      val persist = persistFactory.getPersists(tmst)
+//
+//      persist.persistRecords(strs, recordExport.name)
+//      updateDsCaches.foreach(_.updateData(strs, tmst))
+//    }
+//
+//    emtpyRecordKeys.foreach { t =>
+//      val persist = persistFactory.getPersists(t)
+//      persist.persistRecords(Nil, recordExport.name)
+//      updateDsCaches.foreach(_.updateData(Nil, t))
+//    }
+//  }
 
 //  def persistAllRecords(ruleSteps: Seq[ConcreteRuleStep], persistFactory: PersistFactory,
 //                        timeGroups: Iterable[Long]): Unit = {
