@@ -99,12 +99,14 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val analyzer = AccuracyAnalyzer(expr.asInstanceOf[LogicalExpr], sourceName, targetName)
 
     if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
+      println(s"[${timeInfo.calcTime}] data source ${sourceName} not exists")
       emptyRulePlan
     } else {
       // 1. miss record
       val missRecordsTableName = "__missRecords"
       val selClause = s"`${sourceName}`.*"
       val missRecordsSql = if (!TableRegisters.existRunTempTable(timeInfo.key, targetName)) {
+        println(s"[${timeInfo.calcTime}] data source ${targetName} not exists")
         s"SELECT ${selClause} FROM `${sourceName}`"
       } else {
         val onClause = expr.coalesceDesc
