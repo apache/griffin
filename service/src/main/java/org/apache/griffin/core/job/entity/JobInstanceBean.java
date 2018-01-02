@@ -48,9 +48,11 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @Column(name = "expire_timestamp")
     private Long expireTms;
 
-    private String predicateGroupName;
+    @Column(name = "predicate_group_name")
+    private String predicateGroup;
 
-    private String predicateJobName;
+    @Column(name = "predicate_job_name")
+    private String predicateName;
 
     @Column(name = "job_deleted")
     private Boolean deleted = false;
@@ -103,20 +105,20 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.expireTms = expireTms;
     }
 
-    public String getPredicateGroupName() {
-        return predicateGroupName;
+    public String getPredicateGroup() {
+        return predicateGroup;
     }
 
-    public void setPredicateGroupName(String predicateGroupName) {
-        this.predicateGroupName = predicateGroupName;
+    public void setPredicateGroup(String predicateGroup) {
+        this.predicateGroup = predicateGroup;
     }
 
-    public String getPredicateJobName() {
-        return predicateJobName;
+    public String getPredicateName() {
+        return predicateName;
     }
 
-    public void setPredicateJobName(String predicateJobName) {
-        this.predicateJobName = predicateJobName;
+    public void setPredicateName(String predicateName) {
+        this.predicateName = predicateName;
     }
 
     public Boolean getDeleted() {
@@ -132,8 +134,8 @@ public class JobInstanceBean extends AbstractAuditableEntity {
 
     public JobInstanceBean(State state, String pJobName, String pGroupName, Long tms, Long expireTms) {
         this.state = state;
-        this.predicateJobName = pJobName;
-        this.predicateGroupName = pGroupName;
+        this.predicateName = pJobName;
+        this.predicateGroup = pGroupName;
         this.tms = tms;
         this.expireTms = expireTms;
     }

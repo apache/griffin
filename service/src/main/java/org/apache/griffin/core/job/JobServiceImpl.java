@@ -93,7 +93,7 @@ public class JobServiceImpl implements JobService {
         try {
             List<GriffinJob> jobs = jobRepo.findByDeleted(false);
             for (GriffinJob job : jobs) {
-                JobDataBean jobData = genJobData(scheduler, jobKey(job.getQuartzJobName(), job.getQuartzGroupName()), job);
+                JobDataBean jobData = genJobData(scheduler, jobKey(job.getQuartzName(), job.getQuartzGroup()), job);
                 if (jobData != null) {
                     dataList.add(jobData);
                 }
@@ -138,20 +138,20 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public GriffinOperationMessage addJob(JobSchedule jobSchedule) {
-        Long measureId = jobSchedule.getMeasureId();
+    public GriffinOperationMessage addJob(JobSchedule js) {
+        Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
         if (measure != null) {
-            return addJob(jobSchedule, measure);
+            return addJob(js, measure);
         }
         return CREATE_JOB_FAIL;
     }
 
     private GriffinOperationMessage addJob(JobSchedule js, GriffinMeasure measure) {
-        String qJobName = js.getJobName() + "_" + System.currentTimeMillis();
-        String qGroupName = getQuartzGroupName();
+        String qName = js.getJobName() + "_" + System.currentTimeMillis();
+        String qGroup = getQuartzGroupName();
         try {
-            if (addJob(js, measure, qJobName, qGroupName)) {
+            if (addJob(js, measure, qName, qGroup)) {
                 return CREATE_JOB_SUCCESS;
             }
         } catch (Exception e) {
@@ -178,15 +178,15 @@ public class JobServiceImpl implements JobService {
         return "BA";
     }
 
-    private boolean isJobScheduleParamValid(JobSchedule jobSchedule, GriffinMeasure measure) throws SchedulerException {
-        if (!isJobNameValid(jobSchedule.getJobName())) {
+    private boolean isJobScheduleParamValid(JobSchedule js, GriffinMeasure measure) throws SchedulerException {
+        if (!isJobNameValid(js.getJobName())) {
             return false;
         }
-        if (!isBaseLineValid(jobSchedule.getSegments())) {
+        if (!isBaseLineValid(js.getSegments())) {
             return false;
         }
         List<String> names = getConnectorNames(measure);
-        return isConnectorNamesValid(jobSchedule.getSegments(), names);
+        return isConnectorNamesValid(js.getSegments(), names);
     }
 
     private boolean isJobNameValid(String jobName) {
@@ -245,7 +245,7 @@ public class JobServiceImpl implements JobService {
     }
 
     //TODO　deleted state
-    private GriffinMeasure getMeasureIfValid(long measureId) {
+    private GriffinMeasure getMeasureIfValid(Long measureId) {
         GriffinMeasure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
             LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
@@ -253,30 +253,30 @@ public class JobServiceImpl implements JobService {
         return measure;
     }
 
-    private GriffinJob saveGriffinJob(Long measureId, String jobName, String quartzJobName, String quartzGroupName) {
-        GriffinJob job = new GriffinJob(measureId, jobName, quartzJobName, quartzGroupName, false);
+    private GriffinJob saveGriffinJob(Long measureId, String jobName, String qName, String qGroup) {
+        GriffinJob job = new GriffinJob(measureId, jobName, qName, qGroup, false);
         return jobRepo.save(job);
     }
 
-    private boolean saveAndAddQuartzJob(Scheduler scheduler, TriggerKey triggerKey, JobSchedule jobSchedule, GriffinJob job) throws SchedulerException, ParseException {
-        jobSchedule = jobScheduleRepo.save(jobSchedule);
-        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, jobSchedule, job);
-        scheduler.scheduleJob(genTriggerInstance(triggerKey, jobDetail, jobSchedule));
+    private boolean saveAndAddQuartzJob(Scheduler scheduler, TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws SchedulerException, ParseException {
+        js = jobScheduleRepo.save(js);
+        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, js, job);
+        scheduler.scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
         return true;
     }
 
 
-    private Trigger genTriggerInstance(TriggerKey triggerKey, JobDetail jobDetail, JobSchedule jobSchedule) throws ParseException {
+    private Trigger genTriggerInstance(TriggerKey triggerKey, JobDetail jd, JobSchedule js) throws ParseException {
         return newTrigger()
                 .withIdentity(triggerKey)
-                .forJob(jobDetail)
-                .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(jobSchedule.getCronExpression()))
-                        .inTimeZone(TimeZone.getTimeZone(jobSchedule.getTimeZone()))
+                .forJob(jd)
+                .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(js.getCronExpression()))
+                        .inTimeZone(TimeZone.getTimeZone(js.getTimeZone()))
                 )
                 .build();
     }
 
-    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey, JobSchedule jobSchedule, GriffinJob job) throws SchedulerException {
+    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws SchedulerException {
         JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);
@@ -285,15 +285,15 @@ public class JobServiceImpl implements JobService {
         } else {
             jobDetail = newJob(JobInstance.class).storeDurably().withIdentity(jobKey).build();
         }
-        setJobDataMap(jobDetail, jobSchedule, job);
+        setJobDataMap(jobDetail, js, job);
         scheduler.addJob(jobDetail, isJobKeyExist);
         return jobDetail;
     }
 
 
-    private void setJobDataMap(JobDetail jobDetail, JobSchedule jobSchedule, GriffinJob job) {
-        jobDetail.getJobDataMap().put(JOB_SCHEDULE_ID, jobSchedule.getId().toString());
-        jobDetail.getJobDataMap().put(GRIFFIN_JOB_ID, job.getId().toString());
+    private void setJobDataMap(JobDetail jd, JobSchedule js, GriffinJob job) {
+        jd.getJobDataMap().put(JOB_SCHEDULE_ID, js.getId().toString());
+        jd.getJobDataMap().put(GRIFFIN_JOB_ID, job.getId().toString());
     }
 
     private boolean pauseJob(List<JobInstanceBean> instances) {
@@ -313,13 +313,13 @@ public class JobServiceImpl implements JobService {
     private boolean pauseJob(JobInstanceBean instance, List<JobInstanceBean> deletedInstances) {
         boolean status;
         try {
-            status = pauseJob(instance.getPredicateGroupName(), instance.getPredicateJobName());
+            status = pauseJob(instance.getPredicateGroup(), instance.getPredicateName());
             if (status) {
                 instance.setDeleted(true);
                 deletedInstances.add(instance);
             }
         } catch (SchedulerException e) {
-            LOGGER.error("Pause predicate job({},{}) failure.", instance.getId(), instance.getPredicateJobName());
+            LOGGER.error("Pause predicate job({},{}) failure.", instance.getId(), instance.getPredicateName());
             status = false;
         }
         return status;
@@ -337,17 +337,6 @@ public class JobServiceImpl implements JobService {
         return true;
     }
 
-    private boolean deleteJob(String group, String name) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
-        JobKey jobKey = new JobKey(name, group);
-        if (scheduler.checkExists(jobKey)) {
-            LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
-            return false;
-        }
-        scheduler.deleteJob(jobKey);
-        return true;
-    }
-
     private boolean setJobDeleted(GriffinJob job) throws SchedulerException {
         job.setDeleted(true);
         jobRepo.save(job);
@@ -359,7 +348,7 @@ public class JobServiceImpl implements JobService {
         List<JobInstanceBean> instances = job.getJobInstances();
         for (JobInstanceBean instance : instances) {
             if (!instance.getDeleted()) {
-                pauseStatus = pauseStatus && deleteJob(instance.getPredicateGroupName(), instance.getPredicateJobName());
+                pauseStatus = pauseStatus && deleteJob(instance.getPredicateGroup(), instance.getPredicateName());
                 instance.setDeleted(true);
             }
         }
@@ -407,13 +396,24 @@ public class JobServiceImpl implements JobService {
             return false;
         }
         try {
-            if (pauseJob(job.getQuartzGroupName(), job.getQuartzJobName()) && deletePredicateJob(job) && setJobDeleted(job)) {
+            if (pauseJob(job.getQuartzGroup(), job.getQuartzName()) && deletePredicateJob(job) && setJobDeleted(job)) {
                 return true;
             }
         } catch (Exception e) {
             LOGGER.error("Delete job failure.", e);
         }
         return false;
+    }
+
+    private boolean deleteJob(String group, String name) throws SchedulerException {
+        Scheduler scheduler = factory.getObject();
+        JobKey jobKey = new JobKey(name, group);
+        if (scheduler.checkExists(jobKey)) {
+            LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
+            return false;
+        }
+        scheduler.deleteJob(jobKey);
+        return true;
     }
 
     /**
@@ -493,14 +493,16 @@ public class JobServiceImpl implements JobService {
     }
 
 
-    private void setJobInstanceIdAndUri(JobInstanceBean jobInstance, HashMap<String, Object> resultMap) {
+    private void setJobInstanceIdAndUri(JobInstanceBean instance, HashMap<String, Object> resultMap) {
         if (resultMap != null && resultMap.size() != 0 && resultMap.get("state") != null) {
-            jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
+            instance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
             if (resultMap.get("appId") != null) {
-                jobInstance.setAppId(resultMap.get("appId").toString());
-                jobInstance.setAppUri(livyConfProps.getProperty("spark.uri") + "/cluster/app/" + resultMap.get("appId").toString());
+                String appId = String.valueOf(resultMap.get("appId"));
+                String appUri = livyConfProps.getProperty("spark.uri") + "/cluster/app/" + appId;
+                instance.setAppId(appId);
+                instance.setAppUri(appUri);
             }
-            jobInstanceRepo.save(jobInstance);
+            jobInstanceRepo.save(instance);
         }
 
     }
@@ -538,7 +540,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private List<Trigger> getTriggers(GriffinJob job) {
-        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        JobKey jobKey = new JobKey(job.getQuartzName(), job.getQuartzGroup());
         List<Trigger> triggers;
         try {
             triggers = (List<Trigger>) factory.getObject().getTriggersOfJob(jobKey);

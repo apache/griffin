@@ -27,28 +27,30 @@ import java.util.List;
 @DiscriminatorValue("griffin_job")
 public class GriffinJob extends AbstractJob {
 
-    private String quartzJobName;
+    @Column(name = "quartz_job_name")
+    private String quartzName;
 
-    private String quartzGroupName;
+    @Column(name = "quartz_group_name")
+    private String quartzGroup;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
     @JoinColumn(name = "job_id")
     private List<JobInstanceBean> jobInstances = new ArrayList<>();
 
-    public String getQuartzJobName() {
-        return quartzJobName;
+    public String getQuartzName() {
+        return quartzName;
     }
 
-    public void setQuartzJobName(String quartzJobName) {
-        this.quartzJobName = quartzJobName;
+    public void setQuartzName(String quartzName) {
+        this.quartzName = quartzName;
     }
 
-    public String getQuartzGroupName() {
-        return quartzGroupName;
+    public String getQuartzGroup() {
+        return quartzGroup;
     }
 
-    public void setQuartzGroupName(String quartzGroupName) {
-        this.quartzGroupName = quartzGroupName;
+    public void setQuartzGroup(String quartzGroup) {
+        this.quartzGroup = quartzGroup;
     }
 
     public List<JobInstanceBean> getJobInstances() {
@@ -65,8 +67,8 @@ public class GriffinJob extends AbstractJob {
 
     public GriffinJob(Long measureId, String jobName, String qJobName, String qGroupName, boolean deleted) {
         super(measureId, jobName, deleted);
-        this.quartzJobName = qJobName;
-        this.quartzGroupName = qGroupName;
+        this.quartzName = qJobName;
+        this.quartzGroup = qGroupName;
     }
 
     public GriffinJob(Long jobId, Long measureId, String jobName, String qJobName, String qGroupName, boolean deleted) {
