@@ -19,8 +19,9 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("griffin_job")
@@ -30,9 +31,9 @@ public class GriffinJob extends AbstractJob {
 
     private String quartzGroupName;
 
-    private String predicateJobName;
-
-    private String predicateGroupName;
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
+    @JoinColumn(name = "job_id")
+    private List<JobInstanceBean> jobInstances = new ArrayList<>();
 
     public String getQuartzJobName() {
         return quartzJobName;
@@ -50,22 +51,13 @@ public class GriffinJob extends AbstractJob {
         this.quartzGroupName = quartzGroupName;
     }
 
-    public String getPredicateJobName() {
-        return predicateJobName;
+    public List<JobInstanceBean> getJobInstances() {
+        return jobInstances;
     }
 
-    public void setPredicateJobName(String predicateJobName) {
-        this.predicateJobName = predicateJobName;
+    public void setJobInstances(List<JobInstanceBean> jobInstances) {
+        this.jobInstances = jobInstances;
     }
-
-    public String getPredicateGroupName() {
-        return predicateGroupName;
-    }
-
-    public void setPredicateGroupName(String predicateGroupName) {
-        this.predicateGroupName = predicateGroupName;
-    }
-
 
     public GriffinJob() {
         super();
@@ -75,12 +67,6 @@ public class GriffinJob extends AbstractJob {
         super(measureId, jobName, deleted);
         this.quartzJobName = qJobName;
         this.quartzGroupName = qGroupName;
-    }
-
-    public GriffinJob(Long measureId, String jobName, String qJobName, String qGroupName, String pJobName,String pGroupName,boolean deleted) {
-        this(measureId, jobName, qJobName, qGroupName, deleted);
-        this.predicateJobName = pJobName;
-        this.predicateGroupName = pGroupName;
     }
 
     public GriffinJob(Long jobId, Long measureId, String jobName, String qJobName, String qGroupName, boolean deleted) {

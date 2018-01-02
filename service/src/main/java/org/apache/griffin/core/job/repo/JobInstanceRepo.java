@@ -19,12 +19,12 @@ under the License.
 package org.apache.griffin.core.job.repo;
 
 import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,16 +32,20 @@ import java.util.List;
 @Repository
 public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
 
-    @Query("select s from JobInstanceBean s where s.jobId = ?1")
-    List<JobInstanceBean> findByJobId(Long jobId, Pageable pageable);
-
     @Query("select DISTINCT s from JobInstanceBean s " +
             "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")
     List<JobInstanceBean> findByActiveState();
 
+    JobInstanceBean findByPredicateJobName(String name);
+
+    @Query("select s from JobInstanceBean s where job_id = ?1 and s.deleted = ?2")
+    List<JobInstanceBean> findByJobIdAndDeleted(Long jobId, Boolean deleted, Pageable pageable);
+
+    List<JobInstanceBean> findByExpireTmsLessThanEqualAndDeleted(Long expireTms, Boolean deleted);
+
+    @Transactional
     @Modifying
-    @Query("update JobInstanceBean s " +
-            "set s.state= ?2, s.appId= ?3, s.appUri= ?4 where s.id= ?1")
-    void update(Long id, LivySessionStates.State state, String appId, String appUri);
+    @Query("delete from JobInstanceBean j where j.expireTms <= ?1")
+    int deleteByExpireTimestamp(Long expireTms);
 
 }

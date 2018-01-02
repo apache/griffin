@@ -19,19 +19,18 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import org.apache.griffin.core.job.entity.JobDataBean;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.quartz.SchedulerException;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 public interface JobService {
 
-    List<Map<String, Object>> getAliveJobs();
+    List<JobDataBean> getAliveJobs();
 
     GriffinOperationMessage addJob(JobSchedule jobSchedule);
 
@@ -42,8 +41,6 @@ public interface JobService {
     GriffinOperationMessage deleteJob(String jobName);
 
     List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
-
-    Map<String, List<Map<String, Object>>> getJobDetailsGroupByMeasureId();
 
     JobHealth getHealthInfo();
 }

@@ -57,7 +57,7 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
         for (Measure measure : measures) {
             String orgName = measure.getOrganization();
             String measureName = measure.getName();
-            List<String> measureList = orgWithMetricsMap.getOrDefault(orgName, new ArrayList<String>());
+            List<String> measureList = orgWithMetricsMap.getOrDefault(orgName, new ArrayList<>());
             measureList.add(measureName);
             orgWithMetricsMap.put(orgName, measureList);
         }

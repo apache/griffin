@@ -38,7 +38,10 @@ public class LivySessionStates {
         error,
         dead,
         success,
-        unknown
+        unknown,
+        finding,
+        not_found,
+        found
     }
 
     private static SessionState toSessionState(State state) {
@@ -72,7 +75,7 @@ public class LivySessionStates {
     }
 
     public static boolean isActive(State state) {
-        if (State.unknown.equals(state)) {
+        if (State.unknown.equals(state) || State.finding.equals(state) || State.not_found.equals(state) || State.found.equals(state)) {
             // set unknown isActive() as false.
             return false;
         }
@@ -81,6 +84,8 @@ public class LivySessionStates {
     }
 
     public static boolean isHealthy(State state) {
-        return !(State.error.equals(state) || State.dead.equals(state) || State.shutting_down.equals(state));
+        return !(State.error.equals(state) || State.dead.equals(state) ||
+                State.shutting_down.equals(state) || State.finding.equals(state) ||
+                State.not_found.equals(state) || State.found.equals(state));
     }
 }

@@ -21,8 +21,6 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.job.JobServiceImpl;
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.DataConnectorRepo;
@@ -33,9 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,7 +43,9 @@ public class MeasureServiceImpl implements MeasureService {
     @Autowired
     private MeasureRepo<Measure> measureRepo;
     @Autowired
-    private DataConnectorRepo dataConnectorRepo;
+    private GriffinMeasureOperationImpl griffinOp;
+    @Autowired
+    private ExternalMeasureOperationImpl externalOp;
 
     @Override
     public Iterable<Measure> getAllAliveMeasures() {
@@ -60,13 +58,44 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
+    public List<Measure> getAliveMeasuresByOwner(String owner) {
+        return measureRepo.findByOwnerAndDeleted(owner, false);
+    }
+
+    @Override
+    public GriffinOperationMessage createMeasure(Measure measure) {
+        List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
+        if (!CollectionUtils.isEmpty(aliveMeasureList)) {
+            LOGGER.warn("Failed to create new measure {}, it already exists.", measure.getName());
+            return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
+        }
+        MeasureOperation op = getOperation(measure);
+        return op.create(measure);
+    }
+
+    @Override
+    public GriffinOperationMessage updateMeasure(Measure measure) {
+        Measure m = measureRepo.findByIdAndDeleted(measure.getId(), false);
+        if (m == null) {
+            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
+        }
+        if (!m.getType().equals(measure.getType())) {
+            LOGGER.error("Can't update measure to different type.");
+            return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
+        }
+        MeasureOperation op = getOperation(measure);
+        return op.update(measure);
+    }
+
+    @Override
     public GriffinOperationMessage deleteMeasureById(Long measureId) {
         Measure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
             return GriffinOperationMessage.RESOURCE_NOT_FOUND;
         }
         try {
-            if (jobService.deleteJobsRelateToMeasure(measureId)) {
+            MeasureOperation op = getOperation(measure);
+            if (op.delete(measureId)) {
                 measure.setDeleted(true);
                 measureRepo.save(measure);
                 return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
@@ -78,61 +107,11 @@ public class MeasureServiceImpl implements MeasureService {
         return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
     }
 
-    @Override
-    public GriffinOperationMessage createMeasure(Measure measure) {
-        List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
-        if (!CollectionUtils.isEmpty(aliveMeasureList)) {
-            LOGGER.warn("Failed to create new measure {}, it already exists.", measure.getName());
-            return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
+    private MeasureOperation getOperation(Measure measure) {
+        if (measure instanceof GriffinMeasure) {
+            return griffinOp;
         }
-        if (!isConnectorNamesValid((GriffinMeasure) measure)) {
-            LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
-            return GriffinOperationMessage.CREATE_MEASURE_FAIL;
-        }
-        try {
-            measureRepo.save(measure);
-            return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to create new measure {}.", measure.getName(), e);
-        }
-        return GriffinOperationMessage.CREATE_MEASURE_FAIL;
+        return externalOp;
     }
 
-    private boolean isConnectorNamesValid(GriffinMeasure measure) {
-        List<String> names = getConnectorNames(measure);
-        List<DataConnector> connectors = dataConnectorRepo.findByConnectorNames(names);
-        return names.size() != 0 && CollectionUtils.isEmpty(connectors);
-    }
-
-    private List<String> getConnectorNames(GriffinMeasure measure) {
-        List<String> names = new ArrayList<>();
-        for (DataSource source : measure.getDataSources()) {
-            for (DataConnector dc : source.getConnectors()) {
-                String name = dc.getName();
-                if (!StringUtils.isEmpty(name)) {
-                    names.add(name);
-                }
-            }
-        }
-        return names;
-    }
-
-    @Override
-    public List<Measure> getAliveMeasuresByOwner(String owner) {
-        return measureRepo.findByOwnerAndDeleted(owner, false);
-    }
-
-    @Override
-    public GriffinOperationMessage updateMeasure(Measure measure) {
-        if (measureRepo.findByIdAndDeleted(measure.getId(), false) == null) {
-            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
-        }
-        try {
-            measureRepo.save(measure);
-            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to update measure. ", e);
-        }
-        return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
-    }
 }

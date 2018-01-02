@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.config.jobConfig;
+package org.apache.griffin.core.config;
 
 import org.apache.griffin.core.util.PropertiesUtil;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +26,21 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Properties;
 
 @Configuration
-public class LivyConfig {
-    @Bean(name = "livyConfProps")
-    public Properties livyConfProperties() {
+public class PropertiesConfig {
+
+    //TODO propeties path
+    @Bean(name = "livyConf")
+    public Properties livyConf() {
         return PropertiesUtil.getProperties("/sparkJob.properties");
+    }
+
+    @Bean(name = "appConf")
+    public Properties appConf() {
+        return PropertiesUtil.getProperties("/application.properties");
+    }
+
+    @Bean(name = "quartzConf")
+    public Properties quartzConf() {
+        return PropertiesUtil.getProperties("/quartz.properties");
     }
 }

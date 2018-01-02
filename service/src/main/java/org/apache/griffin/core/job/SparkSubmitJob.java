@@ -33,6 +33,7 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -50,6 +51,7 @@ public class SparkSubmitJob implements Job {
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
+    @Qualifier("livyConfProps")
     private Properties livyConfProps;
     @Autowired
     private JobServiceImpl jobService;
@@ -57,25 +59,46 @@ public class SparkSubmitJob implements Job {
     private GriffinMeasure measure;
     private String livyUri;
     private List<SegmentPredicate> mPredicts;
+    private JobInstanceBean jobInstance;
     private RestTemplate restTemplate = new RestTemplate();
     private LivyConf livyConf = new LivyConf();
 
     @Override
     public void execute(JobExecutionContext context) {
-        JobDetail jobDetail = context.getJobDetail();
-        String result;
+        JobDetail jd = context.getJobDetail();
         try {
-            initParam(jobDetail);
+            initParam(jd);
             setLivyConf();
-            if (success(mPredicts)) {
-                result = restTemplate.postForObject(livyUri, livyConf, String.class);
-                LOGGER.info(result);
-                saveJobInstance(jobDetail.getJobDataMap().getLongFromString(JOB_ID), result);
-                jobService.pauseJob(jobDetail.getKey().getGroup(), jobDetail.getKey().getName());
+            if (!success(mPredicts)) {
+                updateJobInstanceState(context);
+                return;
             }
+            saveJobInstance(jd);
+
         } catch (Exception e) {
             LOGGER.error("Post spark task error.", e);
         }
+    }
+
+
+    private void updateJobInstanceState(JobExecutionContext context) throws IOException {
+        SimpleTrigger simpleTrigger = (SimpleTrigger) context.getTrigger();
+        int repeatCount = simpleTrigger.getRepeatCount();
+        int fireCount = simpleTrigger.getTimesTriggered();
+        if (fireCount > repeatCount) {
+            saveJobInstance(LivySessionStates.State.not_found, true);
+        }
+    }
+    private String post2Livy() {
+        String result;
+        try {
+            result = restTemplate.postForObject(livyUri, livyConf, String.class);
+            LOGGER.info(result);
+        } catch (Exception e) {
+            LOGGER.error("Post to livy error. {}", e.getMessage());
+            result = null;
+        }
+        return result;
     }
 
     private boolean success(List<SegmentPredicate> predicates) throws IOException {
@@ -83,20 +106,26 @@ public class SparkSubmitJob implements Job {
             return true;
         }
         for (SegmentPredicate segPredicate : predicates) {
-            Predicator predicate = PredicatorFactory.newPredicateInstance(segPredicate);
-            if (!predicate.predicate()) {
+            Predicator predicator = PredicatorFactory.newPredicateInstance(segPredicate);
+            try {
+                if (!predicator.predicate()) {
+                    return false;
+                }
+            } catch (Exception e) {
                 return false;
             }
+
         }
         return true;
     }
 
 
-    private void initParam(JobDetail jd) throws IOException, SchedulerException {
+    private void initParam(JobDetail jd) throws IOException {
         mPredicts = new ArrayList<>();
         livyUri = livyConfProps.getProperty("livy.uri");
+        jobInstance = jobInstanceRepo.findByPredicateJobName(jd.getJobDataMap().getString(PREDICATE_JOB_NAME));
         measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
-        setPredicts(jd.getJobDataMap().getString(PREDICTS_KEY));
+        setPredicts(jd.getJobDataMap().getString(PREDICATES_KEY));
         setMeasureInstanceName(measure, jd);
     }
 
@@ -168,36 +197,43 @@ public class SparkSubmitJob implements Job {
         livyConf.setConf(conf);
     }
 
-    private void saveJobInstance(Long jobId, String result) {
-        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
-        };
-        try {
-            Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
-            if (resultMap != null) {
-                JobInstanceBean jobInstance = genJobInstance(jobId, resultMap);
-                jobInstanceRepo.save(jobInstance);
-            }
-        } catch (IOException e) {
-            LOGGER.error("jobInstance jsonStr convert to map failed. {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            LOGGER.error("Livy status is illegal. {}", e.getMessage());
+    private void saveJobInstance(JobDetail jd) throws SchedulerException, IOException {
+        String result = post2Livy();
+        boolean pauseStatus = false;
+        if (result != null) {
+            pauseStatus = jobService.pauseJob(jd.getKey().getGroup(), jd.getKey().getName());
+            LOGGER.info("Delete predicate job {}.", pauseStatus);
         }
+        saveJobInstance(result, LivySessionStates.State.found, pauseStatus);
     }
 
-    private JobInstanceBean genJobInstance(Long jobId, Map<String, Object> resultMap) {
-        JobInstanceBean jobBean = new JobInstanceBean();
-        jobBean.setJobId(jobId);
-        jobBean.setTimestamp(System.currentTimeMillis());
+    private void saveJobInstance(String result, LivySessionStates.State state, Boolean pauseStatus) throws IOException {
+        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
+        };
+        Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
+        setJobInstance(resultMap, state, pauseStatus);
+        jobInstanceRepo.save(jobInstance);
+    }
+
+    private void saveJobInstance(LivySessionStates.State state, Boolean pauseStatus) throws IOException {
+        saveJobInstance(null, state, pauseStatus);
+    }
+
+    private void setJobInstance(Map<String, Object> resultMap, LivySessionStates.State state, Boolean pauseStatus) {
+        jobInstance.setState(state);
+        jobInstance.setDeleted(pauseStatus);
+        if (resultMap == null) {
+            return;
+        }
         if (resultMap.get("state") != null) {
-            jobBean.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
+            jobInstance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
         }
         if (resultMap.get("id") != null) {
-            jobBean.setSessionId(Long.parseLong(resultMap.get("id").toString()));
+            jobInstance.setSessionId(Long.parseLong(resultMap.get("id").toString()));
         }
         if (resultMap.get("appId") != null) {
-            jobBean.setAppId(resultMap.get("appId").toString());
+            jobInstance.setAppId(resultMap.get("appId").toString());
         }
-        return jobBean;
     }
 
 }

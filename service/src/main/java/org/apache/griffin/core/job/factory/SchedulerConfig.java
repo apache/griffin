@@ -17,11 +17,11 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.config.jobConfig;
+package org.apache.griffin.core.job.factory;
 
-import org.apache.griffin.core.util.JsonUtil;
-import org.apache.griffin.core.util.PropertiesUtil;
 import org.quartz.spi.JobFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,27 +33,28 @@ import java.util.Properties;
 @Configuration
 public class SchedulerConfig {
 
-	@Bean
-	public JobFactory jobFactory(ApplicationContext applicationContext) {
-		AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
-		jobFactory.setApplicationContext(applicationContext);
-		return jobFactory;
-	}
+    @Autowired
+    @Qualifier("quartzConf")
+    private Properties quartzConfProps;
 
-	@Bean
-	public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource, JobFactory jobFactory) {
-		SchedulerFactoryBean factory = new SchedulerFactoryBean();
-		factory.setOverwriteExistingJobs(true);
-		factory.setDataSource(dataSource);
-		factory.setJobFactory(jobFactory);
+    @Bean
+    public JobFactory jobFactory(ApplicationContext applicationContext) {
+        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
+        jobFactory.setApplicationContext(applicationContext);
+        return jobFactory;
+    }
 
-		factory.setQuartzProperties(quartzProperties());
+    @Bean
+    public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource, JobFactory jobFactory) {
+        SchedulerFactoryBean factory = new SchedulerFactoryBean();
+        factory.setOverwriteExistingJobs(true);
+        factory.setDataSource(dataSource);
+        factory.setJobFactory(jobFactory);
 
-		return factory;
-	}
+        factory.setQuartzProperties(quartzConfProps);
 
-	@Bean
-	public Properties quartzProperties() {
-		return PropertiesUtil.getProperties("/quartz.properties");
-	}
+        return factory;
+    }
+
+
 }

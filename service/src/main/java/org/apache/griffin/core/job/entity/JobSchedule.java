@@ -150,6 +150,7 @@ public class JobSchedule extends AbstractAuditableEntity {
      * @return set default predicate config
      * @throws JsonProcessingException json exception
      */
+    //TODO properties setting interval
     private Map<String, Object> defaultPredicatesConfig() throws JsonProcessingException {
         Map<String, Object> conf = new HashMap<>();
         Map<String, Object> scheduleConf = new HashMap<>();

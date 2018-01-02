@@ -55,13 +55,13 @@ public class JobInstanceBeanRepoTest {
         setEntityManager();
     }
 
-    @Test
-    public void testFindByJobIdWithPageable() {
-        Pageable pageRequest = new PageRequest(0, 10, Sort.Direction.DESC, "timestamp");
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(1L, pageRequest);
-        assertThat(instances.size()).isEqualTo(1);
-        assertEquals(instances.get(0).getAppId(), "appId1");
-    }
+//    @Test
+//    public void testFindByJobIdWithPageable() {
+//        Pageable pageRequest = new PageRequest(0, 10, Sort.Direction.DESC, "timestamp");
+//        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(1L, pageRequest);
+//        assertThat(instances.size()).isEqualTo(1);
+//        assertEquals(instances.get(0).getAppId(), "appId1");
+//    }
 
 
     @Test
@@ -71,24 +71,15 @@ public class JobInstanceBeanRepoTest {
     }
 
 
-    @Test
-    public void testUpdate() {
-        Iterable iterable = jobInstanceRepo.findAll();
-        JobInstanceBean instance = (JobInstanceBean) iterable.iterator().next();
-        jobInstanceRepo.update(instance.getId(), LivySessionStates.State.dead, "appIdChanged", "appUriChanged");
-        //you must refresh updated JobInstanceBean, otherwise there will not update.
-        entityManager.refresh(jobInstanceRepo.findOne(instance.getId()));
-        assertEquals(jobInstanceRepo.findOne(instance.getId()).getState(), LivySessionStates.State.dead);
-    }
 
 
     private void setEntityManager() {
-        JobInstanceBean instance1 = new JobInstanceBean(1L, 0L, LivySessionStates.State.success,
-                "appId1", "http://domain.com/uri1", System.currentTimeMillis());
-        JobInstanceBean instance2 = new JobInstanceBean(2L, 1L, LivySessionStates.State.error,
-                "appId2", "http://domain.com/uri2", System.currentTimeMillis());
-        JobInstanceBean instance3 = new JobInstanceBean(2L, 2L, LivySessionStates.State.starting,
-                "appId3", "http://domain.com/uri3", System.currentTimeMillis());
+        JobInstanceBean instance1 = new JobInstanceBean(1L,  LivySessionStates.State.success,
+                "appId1", "http://domain.com/uri1", System.currentTimeMillis(),System.currentTimeMillis());
+        JobInstanceBean instance2 = new JobInstanceBean(2L,  LivySessionStates.State.error,
+                "appId2", "http://domain.com/uri2", System.currentTimeMillis(),System.currentTimeMillis());
+        JobInstanceBean instance3 = new JobInstanceBean(2L,  LivySessionStates.State.starting,
+                "appId3", "http://domain.com/uri3", System.currentTimeMillis(),System.currentTimeMillis());
         entityManager.persistAndFlush(instance1);
         entityManager.persistAndFlush(instance2);
         entityManager.persistAndFlush(instance3);

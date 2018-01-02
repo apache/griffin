@@ -131,7 +131,7 @@ public class JobControllerTest {
     public void testFindInstancesOfJob() throws Exception {
         int page = 0;
         int size = 2;
-        JobInstanceBean jobInstance = new JobInstanceBean(1L, 1L, LivySessionStates.State.running, "", "", System.currentTimeMillis());
+        JobInstanceBean jobInstance = new JobInstanceBean(1L,  LivySessionStates.State.running, "", "", System.currentTimeMillis(),System.currentTimeMillis());
         given(service.findInstancesOfJob(1L, page, size)).willReturn(Arrays.asList(jobInstance));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param("jobId",String.valueOf(1L))

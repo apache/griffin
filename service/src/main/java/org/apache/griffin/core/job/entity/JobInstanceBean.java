@@ -26,32 +26,34 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.validation.constraints.NotNull;
 
 @Entity
 public class JobInstanceBean extends AbstractAuditableEntity {
 
     private static final long serialVersionUID = -4748881017029815874L;
 
-    @NotNull
-    private Long jobId;
-    @NotNull
     private Long sessionId;
+
     @Enumerated(EnumType.STRING)
     private State state;
+
     private String appId;
 
     @Column(length = 10 * 1024)
     private String appUri;
-    private long timestamp;
 
-    public Long getJobId() {
-        return jobId;
-    }
+    @Column(name = "timestamp")
+    private Long tms;
 
-    public void setJobId(Long jobId) {
-        this.jobId = jobId;
-    }
+    @Column(name = "expire_timestamp")
+    private Long expireTms;
+
+    private String predicateGroupName;
+
+    private String predicateJobName;
+
+    @Column(name = "job_deleted")
+    private Boolean deleted = false;
 
     public Long getSessionId() {
         return sessionId;
@@ -85,23 +87,63 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.appUri = appUri;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public Long getTms() {
+        return tms;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setTms(Long tms) {
+        this.tms = tms;
+    }
+
+    public Long getExpireTms() {
+        return expireTms;
+    }
+
+    public void setExpireTms(Long expireTms) {
+        this.expireTms = expireTms;
+    }
+
+    public String getPredicateGroupName() {
+        return predicateGroupName;
+    }
+
+    public void setPredicateGroupName(String predicateGroupName) {
+        this.predicateGroupName = predicateGroupName;
+    }
+
+    public String getPredicateJobName() {
+        return predicateJobName;
+    }
+
+    public void setPredicateJobName(String predicateJobName) {
+        this.predicateJobName = predicateJobName;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 
     public JobInstanceBean() {
     }
 
-    public JobInstanceBean(Long jobId, Long sessionId, State state, String appId, String appUri, long timestamp) {
-        this.jobId = jobId;
+    public JobInstanceBean(State state, String pJobName, String pGroupName, Long tms, Long expireTms) {
+        this.state = state;
+        this.predicateJobName = pJobName;
+        this.predicateGroupName = pGroupName;
+        this.tms = tms;
+        this.expireTms = expireTms;
+    }
+
+    public JobInstanceBean(Long sessionId, State state, String appId, String appUri, Long timestamp, Long expireTms) {
         this.sessionId = sessionId;
         this.state = state;
         this.appId = appId;
         this.appUri = appUri;
-        this.timestamp = timestamp;
+        this.tms = timestamp;
+        this.expireTms = expireTms;
     }
 }

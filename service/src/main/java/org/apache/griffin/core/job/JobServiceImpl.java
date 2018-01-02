@@ -65,6 +65,7 @@ public class JobServiceImpl implements JobService {
     static final String JOB_SCHEDULE_ID = "jobScheduleId";
     static final String GRIFFIN_JOB_ID = "griffinJobId";
     static final int MAX_PAGE_SIZE = 1024;
+    static final int DEFAULT_PAGE_SIZE = 10;
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -81,21 +82,20 @@ public class JobServiceImpl implements JobService {
 
     private RestTemplate restTemplate;
 
-
     public JobServiceImpl() {
         restTemplate = new RestTemplate();
     }
 
     @Override
-    public List<Map<String, Object>> getAliveJobs() {
+    public List<JobDataBean> getAliveJobs() {
         Scheduler scheduler = factory.getObject();
-        List<Map<String, Object>> dataList = new ArrayList<>();
+        List<JobDataBean> dataList = new ArrayList<>();
         try {
             List<GriffinJob> jobs = jobRepo.findByDeleted(false);
             for (GriffinJob job : jobs) {
-                Map<String, Object> jobDataMap = genJobDataMap(scheduler, jobKey(job.getQuartzJobName(), job.getQuartzGroupName()), job);
-                if (jobDataMap.size() != 0) {
-                    dataList.add(jobDataMap);
+                JobDataBean jobData = genJobData(scheduler, jobKey(job.getQuartzJobName(), job.getQuartzGroupName()), job);
+                if (jobData != null) {
+                    dataList.add(jobData);
                 }
             }
         } catch (Exception e) {
@@ -105,21 +105,20 @@ public class JobServiceImpl implements JobService {
         return dataList;
     }
 
-
-    private Map<String, Object> genJobDataMap(Scheduler scheduler, JobKey jobKey, GriffinJob job) throws SchedulerException {
+    private JobDataBean genJobData(Scheduler scheduler, JobKey jobKey, GriffinJob job) throws SchedulerException {
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
-        Map<String, Object> jobDataMap = new HashMap<>();
-        if (!CollectionUtils.isEmpty(triggers)) {
-            Trigger trigger = triggers.get(0);
-            Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
-            setTriggerTime(trigger, jobDataMap);
-            jobDataMap.put("jobId", job.getId());
-            jobDataMap.put("jobName", job.getJobName());
-            jobDataMap.put("measureId", job.getMeasureId());
-            jobDataMap.put("triggerState", triggerState);
-            jobDataMap.put("cronExpression", getCronExpression(triggers));
+        if (CollectionUtils.isEmpty(triggers)) {
+            return null;
         }
-        return jobDataMap;
+        JobDataBean jobData = new JobDataBean();
+        Trigger trigger = triggers.get(0);
+        setTriggerTime(trigger, jobData);
+        jobData.setJobId(job.getId());
+        jobData.setJobName(job.getJobName());
+        jobData.setMeasureId(job.getMeasureId());
+        jobData.setTriggerState(scheduler.getTriggerState(trigger.getKey()));
+        jobData.setCronExpression(getCronExpression(triggers));
+        return jobData;
     }
 
     private String getCronExpression(List<Trigger> triggers) {
@@ -131,34 +130,28 @@ public class JobServiceImpl implements JobService {
         return null;
     }
 
-    private void setTriggerTime(Trigger trigger, Map<String, Object> jobDataMap) throws SchedulerException {
+    private void setTriggerTime(Trigger trigger, JobDataBean jobBean) throws SchedulerException {
         Date nextFireTime = trigger.getNextFireTime();
         Date previousFireTime = trigger.getPreviousFireTime();
-        jobDataMap.put("nextFireTime", nextFireTime != null ? nextFireTime.getTime() : -1);
-        jobDataMap.put("previousFireTime", previousFireTime != null ? previousFireTime.getTime() : -1);
+        jobBean.setNextFireTime(nextFireTime != null ? nextFireTime.getTime() : -1);
+        jobBean.setPreviousFireTime(previousFireTime != null ? previousFireTime.getTime() : -1);
     }
 
     @Override
     public GriffinOperationMessage addJob(JobSchedule jobSchedule) {
         Long measureId = jobSchedule.getMeasureId();
-        GriffinMeasure measure = isMeasureIdValid(measureId);
+        GriffinMeasure measure = getMeasureIfValid(measureId);
         if (measure != null) {
             return addJob(jobSchedule, measure);
         }
         return CREATE_JOB_FAIL;
     }
 
-    private GriffinOperationMessage addJob(JobSchedule jobSchedule, GriffinMeasure measure) {
-        Scheduler scheduler = factory.getObject();
-        GriffinJob job;
-        String jobName = jobSchedule.getJobName();
-        String quartzJobName = jobName + "_" + System.currentTimeMillis();
-        String quartzGroupName = "BA";
-        TriggerKey triggerKey = triggerKey(quartzJobName, quartzGroupName);
+    private GriffinOperationMessage addJob(JobSchedule js, GriffinMeasure measure) {
+        String qJobName = js.getJobName() + "_" + System.currentTimeMillis();
+        String qGroupName = getQuartzGroupName();
         try {
-            if (isJobScheduleParamValid(jobSchedule, measure, triggerKey)
-                    && (job = saveGriffinJob(measure.getId(), jobName, quartzJobName, quartzGroupName)) != null
-                    && saveAndAddQuartzJob(scheduler, triggerKey, jobSchedule, job)) {
+            if (addJob(js, measure, qJobName, qGroupName)) {
                 return CREATE_JOB_SUCCESS;
             }
         } catch (Exception e) {
@@ -168,11 +161,32 @@ public class JobServiceImpl implements JobService {
         return CREATE_JOB_FAIL;
     }
 
-    private boolean isJobScheduleParamValid(JobSchedule jobSchedule, GriffinMeasure measure, TriggerKey triggerKey) throws SchedulerException {
-        return !(!isJobNameValid(jobSchedule.getJobName())
-                || !isBaseLineValid(jobSchedule.getSegments())
-                || !isConnectorNamesValid(jobSchedule.getSegments(), getConnectorNames(measure))
-                || factory.getObject().checkExists(triggerKey));
+    private boolean addJob(JobSchedule js, GriffinMeasure measure, String qName, String qGroup) throws SchedulerException, ParseException {
+        Scheduler scheduler = factory.getObject();
+        TriggerKey triggerKey = triggerKey(qName, qGroup);
+        if (!isJobScheduleParamValid(js, measure)) {
+            return false;
+        }
+        if (scheduler.checkExists(triggerKey)) {
+            return false;
+        }
+        GriffinJob job = saveGriffinJob(measure.getId(), js.getJobName(), qName, qGroup);
+        return job != null && !saveAndAddQuartzJob(scheduler, triggerKey, js, job);
+    }
+
+    private String getQuartzGroupName() {
+        return "BA";
+    }
+
+    private boolean isJobScheduleParamValid(JobSchedule jobSchedule, GriffinMeasure measure) throws SchedulerException {
+        if (!isJobNameValid(jobSchedule.getJobName())) {
+            return false;
+        }
+        if (!isBaseLineValid(jobSchedule.getSegments())) {
+            return false;
+        }
+        List<String> names = getConnectorNames(measure);
+        return isConnectorNamesValid(jobSchedule.getSegments(), names);
     }
 
     private boolean isJobNameValid(String jobName) {
@@ -180,14 +194,15 @@ public class JobServiceImpl implements JobService {
             LOGGER.warn("Job name cannot be empty.");
             return false;
         }
-        int size = jobRepo.countByJobName(jobName);
-        if (size != 0) {
+        int size = jobRepo.countByJobNameAndDeleted(jobName, false);
+        if (size > 0) {
             LOGGER.warn("Job name already exits.");
             return false;
         }
         return true;
     }
 
+    //TODO get first baseline
     private boolean isBaseLineValid(List<JobDataSegment> segments) {
         for (JobDataSegment jds : segments) {
             if (jds.getBaseline()) {
@@ -213,10 +228,11 @@ public class JobServiceImpl implements JobService {
                 return true;
             }
         }
-        LOGGER.warn("Param {} is a illegal string. Please input one of strings in {}", param, names);
+        LOGGER.warn("Param {} is a illegal string. Please input one of strings in {}.", param, names);
         return false;
     }
 
+    //TODO exclude repeat
     private List<String> getConnectorNames(GriffinMeasure measure) {
         List<String> names = new ArrayList<>();
         List<DataSource> sources = measure.getDataSources();
@@ -228,14 +244,13 @@ public class JobServiceImpl implements JobService {
         return names;
     }
 
-
-    private GriffinMeasure isMeasureIdValid(long measureId) {
-        GriffinMeasure measure = measureRepo.findOne(measureId);
-        if (measure != null && !measure.getDeleted()) {
-            return measure;
+    //TODO　deleted state
+    private GriffinMeasure getMeasureIfValid(long measureId) {
+        GriffinMeasure measure = measureRepo.findByIdAndDeleted(measureId, false);
+        if (measure == null) {
+            LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
         }
-        LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
-        return null;
+        return measure;
     }
 
     private GriffinJob saveGriffinJob(Long measureId, String jobName, String quartzJobName, String quartzGroupName) {
@@ -246,12 +261,12 @@ public class JobServiceImpl implements JobService {
     private boolean saveAndAddQuartzJob(Scheduler scheduler, TriggerKey triggerKey, JobSchedule jobSchedule, GriffinJob job) throws SchedulerException, ParseException {
         jobSchedule = jobScheduleRepo.save(jobSchedule);
         JobDetail jobDetail = addJobDetail(scheduler, triggerKey, jobSchedule, job);
-        scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, jobSchedule));
+        scheduler.scheduleJob(genTriggerInstance(triggerKey, jobDetail, jobSchedule));
         return true;
     }
 
 
-    private Trigger newTriggerInstance(TriggerKey triggerKey, JobDetail jobDetail, JobSchedule jobSchedule) throws ParseException {
+    private Trigger genTriggerInstance(TriggerKey triggerKey, JobDetail jobDetail, JobSchedule jobSchedule) throws ParseException {
         return newTrigger()
                 .withIdentity(triggerKey)
                 .forJob(jobDetail)
@@ -281,6 +296,32 @@ public class JobServiceImpl implements JobService {
         jobDetail.getJobDataMap().put(GRIFFIN_JOB_ID, job.getId().toString());
     }
 
+    private boolean pauseJob(List<JobInstanceBean> instances) {
+        if (CollectionUtils.isEmpty(instances)) {
+            return true;
+        }
+        List<JobInstanceBean> deletedInstances = new ArrayList<>();
+        boolean pauseStatus = true;
+        for (JobInstanceBean instance : instances) {
+            try {
+                boolean status = pauseJob(instance.getPredicateGroupName(), instance.getPredicateJobName());
+                pauseStatus = pauseStatus && status;
+                if (status) {
+                    instance.setDeleted(true);
+                    deletedInstances.add(instance);
+                }
+            } catch (SchedulerException e) {
+                LOGGER.error("Pause predicate job failure.");
+                pauseStatus = false;
+            }
+        }
+        jobInstanceRepo.save(deletedInstances);
+        if (!pauseStatus) {
+            jobInstanceRepo.save(deletedInstances);
+        }
+        return pauseStatus;
+    }
+
     @Override
     public boolean pauseJob(String group, String name) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
@@ -297,6 +338,19 @@ public class JobServiceImpl implements JobService {
         job.setDeleted(true);
         jobRepo.save(job);
         return true;
+    }
+
+    private boolean deletePredicateJob(GriffinJob job) throws SchedulerException {
+        boolean isPauseSuccess = true;
+        List<JobInstanceBean> instances = job.getJobInstances();
+        for (JobInstanceBean instance : instances) {
+            if (!instance.getDeleted()) {
+                //TODO real delete predicate
+                isPauseSuccess = isPauseSuccess && pauseJob(instance.getPredicateGroupName(), instance.getPredicateJobName());
+                instance.setDeleted(true);
+            }
+        }
+        return isPauseSuccess;
     }
 
     /**
@@ -316,14 +370,14 @@ public class JobServiceImpl implements JobService {
     /**
      * logically delete
      *
-     * @param jobName griffin job name which may not be unique.
+     * @param name griffin job name which may not be unique.
      * @return custom information
      */
     @Override
-    public GriffinOperationMessage deleteJob(String jobName) {
-        List<GriffinJob> jobs = jobRepo.findByJobNameAndDeleted(jobName, false);
+    public GriffinOperationMessage deleteJob(String name) {
+        List<GriffinJob> jobs = jobRepo.findByJobNameAndDeleted(name, false);
         if (CollectionUtils.isEmpty(jobs)) {
-            LOGGER.warn("There is no job with '{}' name.", jobName);
+            LOGGER.warn("There is no job with '{}' name.", name);
             return GriffinOperationMessage.DELETE_JOB_FAIL;
         }
         for (GriffinJob job : jobs) {
@@ -340,13 +394,7 @@ public class JobServiceImpl implements JobService {
             return false;
         }
         try {
-            boolean predicatePause = true;
-            String pGroup = job.getPredicateGroupName();
-            String pName = job.getPredicateJobName();
-            if (!StringUtils.isEmpty(pGroup) && !StringUtils.isEmpty(pName)) {
-                predicatePause = pauseJob(pGroup, pName);
-            }
-            if (predicatePause && pauseJob(job.getQuartzGroupName(), job.getQuartzJobName()) && setJobDeleted(job)) {
+            if (pauseJob(job.getQuartzGroupName(), job.getQuartzJobName()) && deletePredicateJob(job) && setJobDeleted(job)) {
                 return true;
             }
         } catch (Exception e) {
@@ -376,16 +424,26 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size) {
-        GriffinJob job = jobRepo.findByIdAndDeleted(jobId, false);
-        if (job == null) {
+        size = size > MAX_PAGE_SIZE ? MAX_PAGE_SIZE : size;
+        size = size <= 0 ? DEFAULT_PAGE_SIZE : size;
+        Pageable pageable = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
+        List<JobInstanceBean> instances = jobInstanceRepo.findByJobIdAndDeleted(jobId, false, pageable);
+        if (CollectionUtils.isEmpty(instances)) {
             LOGGER.warn("Job id {} does not exist.", jobId);
-            return new ArrayList<>();
         }
-        if (size > MAX_PAGE_SIZE) {
-            size = MAX_PAGE_SIZE;
+        return instances;
+    }
+
+    @Scheduled(fixedDelayString = "${jobInstance.expired.milliseconds}")
+    public void deleteExpiredJobInstance() {
+        List<JobInstanceBean> instances = jobInstanceRepo.findByExpireTmsLessThanEqualAndDeleted(System.currentTimeMillis(), false);
+        //TODO pause job not one time
+        if (!pauseJob(instances)) {
+            LOGGER.error("Pause job failure.");
+            return;
         }
-        Pageable pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
-        return jobInstanceRepo.findByJobId(jobId, pageRequest);
+        jobInstanceRepo.deleteByExpireTimestamp(System.currentTimeMillis());
+        LOGGER.info("Delete expired job instances success.");
     }
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
@@ -397,6 +455,7 @@ public class JobServiceImpl implements JobService {
             }
         }
     }
+
 
     /**
      * call livy to update part of job instance table data associated with group and jobName in mysql.
@@ -456,14 +515,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobHealth getHealthInfo(JobHealth jobHealth, GriffinJob job) {
-        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
-        List<Trigger> triggers;
-        try {
-            triggers = (List<Trigger>) factory.getObject().getTriggersOfJob(jobKey);
-        } catch (SchedulerException e) {
-            LOGGER.error("Job schedule exception. {}", e.getMessage());
-            throw new GetHealthInfoFailureException();
-        }
+        List<Trigger> triggers = getTriggers(job);
         if (!CollectionUtils.isEmpty(triggers)) {
             jobHealth.setJobCount(jobHealth.getJobCount() + 1);
             if (isJobHealthy(job.getId())) {
@@ -473,23 +525,23 @@ public class JobServiceImpl implements JobService {
         return jobHealth;
     }
 
+    private List<Trigger> getTriggers(GriffinJob job) {
+        JobKey jobKey = new JobKey(job.getQuartzJobName(), job.getQuartzGroupName());
+        List<Trigger> triggers;
+        try {
+            triggers = (List<Trigger>) factory.getObject().getTriggersOfJob(jobKey);
+        } catch (SchedulerException e) {
+            LOGGER.error("Job schedule exception. {}", e.getMessage());
+            throw new GetHealthInfoFailureException();
+        }
+        return triggers;
+    }
 
     private Boolean isJobHealthy(Long jobId) {
-        Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(jobId, pageRequest);
+        Pageable pageable = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
+        List<JobInstanceBean> instances = jobInstanceRepo.findByJobIdAndDeleted(jobId, false, pageable);
         return !CollectionUtils.isEmpty(instances) && LivySessionStates.isHealthy(instances.get(0).getState());
     }
 
-    @Override
-    public Map<String, List<Map<String, Object>>> getJobDetailsGroupByMeasureId() {
-        Map<String, List<Map<String, Object>>> jobDetailsMap = new HashMap<>();
-        List<Map<String, Object>> jobInfoList = getAliveJobs();
-        for (Map<String, Object> jobInfo : jobInfoList) {
-            String measureId = String.valueOf(jobInfo.get("measureId"));
-            List<Map<String, Object>> jobs = jobDetailsMap.getOrDefault(measureId, new ArrayList<>());
-            jobs.add(jobInfo);
-            jobDetailsMap.put(measureId, jobs);
-        }
-        return jobDetailsMap;
-    }
+
 }
