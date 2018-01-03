@@ -26,18 +26,22 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.util.JsonUtil;
+import org.apache.griffin.core.util.PropertiesUtil;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Configurable(preConstruction = true)
+@Component
 @Entity
 public class JobSchedule extends AbstractAuditableEntity {
 
@@ -141,7 +145,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("predicate.config")
-    public void setConfigMap(Map<String, Object> configMap) throws JsonProcessingException {
+    private void setConfigMap(Map<String, Object> configMap) throws JsonProcessingException {
         this.configMap = configMap;
         this.predicateConfig = JsonUtil.toJson(configMap);
     }
@@ -150,13 +154,13 @@ public class JobSchedule extends AbstractAuditableEntity {
      * @return set default predicate config
      * @throws JsonProcessingException json exception
      */
-    //TODO properties setting interval
     private Map<String, Object> defaultPredicatesConfig() throws JsonProcessingException {
+        Properties appConf = PropertiesUtil.getProperties("/application.properties");
         Map<String, Object> conf = new HashMap<>();
         Map<String, Object> scheduleConf = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
-        map.put("interval", "5m");
-        map.put("repeat", 12);
+        map.put("interval", appConf.getProperty("predicate.job.interval"));
+        map.put("repeat", appConf.getProperty("predicate.job.repeat.count"));
         scheduleConf.put("checkdonefile.schedule", map);
         conf.put("predicate.config", scheduleConf);
         setConfigMap(conf);
@@ -174,7 +178,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     public JobSchedule() throws JsonProcessingException {
     }
 
-    public JobSchedule(Long measureId, String jobName,String cronExpression, Map configMap, List<JobDataSegment> segments) throws JsonProcessingException {
+    public JobSchedule(Long measureId, String jobName, String cronExpression, Map configMap, List<JobDataSegment> segments) throws JsonProcessingException {
         this.measureId = measureId;
         this.jobName = jobName;
         this.cronExpression = cronExpression;

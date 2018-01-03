@@ -36,7 +36,7 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
             "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")
     List<JobInstanceBean> findByActiveState();
 
-    JobInstanceBean findByPredicateJobName(String name);
+    JobInstanceBean findByPredicateName(String name);
 
     @Query("select s from JobInstanceBean s where job_id = ?1 and s.deleted = ?2")
     List<JobInstanceBean> findByJobIdAndDeleted(Long jobId, Boolean deleted, Pageable pageable);

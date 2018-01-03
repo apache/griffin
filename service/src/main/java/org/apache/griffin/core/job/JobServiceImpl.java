@@ -36,6 +36,7 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -71,7 +72,8 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
-    private Properties livyConfProps;
+    @Qualifier("livyConf")
+    private Properties livyConf;
     @Autowired
     private MeasureRepo<GriffinMeasure> measureRepo;
     @Autowired
@@ -478,7 +480,7 @@ public class JobServiceImpl implements JobService {
      * @param jobInstance job instance livy info
      */
     private void syncInstancesOfJob(JobInstanceBean jobInstance) {
-        String uri = livyConfProps.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
+        String uri = livyConf.getProperty("livy.uri") + "/" + jobInstance.getSessionId();
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         try {
@@ -501,7 +503,7 @@ public class JobServiceImpl implements JobService {
             instance.setState(LivySessionStates.State.valueOf(resultMap.get("state").toString()));
             if (resultMap.get("appId") != null) {
                 String appId = String.valueOf(resultMap.get("appId"));
-                String appUri = livyConfProps.getProperty("spark.uri") + "/cluster/app/" + appId;
+                String appUri = livyConf.getProperty("spark.uri") + "/cluster/app/" + appId;
                 instance.setAppId(appId);
                 instance.setAppUri(appUri);
             }

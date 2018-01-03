@@ -19,10 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
-import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.URLHelper;
@@ -64,10 +61,9 @@ public class JobControllerTest {
 
     @Test
     public void testGetJobs() throws Exception {
-        Map<String, Object> map = new HashMap<>();
-        map.put("jobName", "job1");
-        map.put("groupName", "BA");
-        given(service.getAliveJobs()).willReturn(Arrays.asList(map));
+        JobDataBean jobBean = new JobDataBean();
+        jobBean.setJobName("job1");
+        given(service.getAliveJobs()).willReturn(Arrays.asList(jobBean));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

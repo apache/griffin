@@ -89,24 +89,4 @@ public class MeasureOrgControllerTest {
                 .andExpect(jsonPath("$.orgName", hasSize(1)));
     }
 
-    @Test
-    public void testGetMeasureWithJobsGroupByOrg() throws Exception {
-        Map<String, Object> jobDetail = createJobDetailMap();
-        List<Map<String, Object>> jobList = Arrays.asList(jobDetail);
-        Map<String, List<Map<String, Object>>> measuresById = new HashMap<>();
-        measuresById.put("1", jobList);
-        when(jobService.getJobDetailsGroupByMeasureId()).thenReturn(measuresById);
-
-        Map<String, List<Map<String, Object>>> measuresByName = new HashMap<>();
-        Map<String, Map<String, List<Map<String, Object>>>> map = new HashMap<>();
-        measuresByName.put("measureName", jobList);
-        map.put("orgName", measuresByName);
-        when(measureOrgService.getMeasureWithJobDetailsGroupByOrg(measuresById)).thenReturn(map);
-
-        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/measure/jobs"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.orgName", hasKey("measureName")));
-    }
-
 }

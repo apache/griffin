@@ -17,8 +17,9 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.job.factory;
+package org.apache.griffin.core.config;
 
+import org.apache.griffin.core.job.factory.AutowiringSpringBeanJobFactory;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +36,7 @@ public class SchedulerConfig {
 
     @Autowired
     @Qualifier("quartzConf")
-    private Properties quartzConfProps;
+    private Properties quartzConf;
 
     @Bean
     public JobFactory jobFactory(ApplicationContext applicationContext) {
@@ -50,9 +51,7 @@ public class SchedulerConfig {
         factory.setOverwriteExistingJobs(true);
         factory.setDataSource(dataSource);
         factory.setJobFactory(jobFactory);
-
-        factory.setQuartzProperties(quartzConfProps);
-
+        factory.setQuartzProperties(quartzConf);
         return factory;
     }
 
