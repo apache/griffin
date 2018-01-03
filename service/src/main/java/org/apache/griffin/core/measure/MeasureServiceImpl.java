@@ -158,7 +158,7 @@ public class MeasureServiceImpl implements MeasureService {
         if (measure instanceof GriffinMeasure) {
             return updateGriffinMeasure((GriffinMeasure) measure);
         }
-        return updateExternalMeasure((ExternalMeasure) originMeasure, (ExternalMeasure) measure);
+        return updateExternalMeasure((ExternalMeasure) measure);
     }
 
     private GriffinOperationMessage updateGriffinMeasure(GriffinMeasure measure) {
@@ -171,7 +171,7 @@ public class MeasureServiceImpl implements MeasureService {
         return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
     }
 
-    private GriffinOperationMessage updateExternalMeasure(ExternalMeasure originMeasure, ExternalMeasure newMeasure) {
+    private GriffinOperationMessage updateExternalMeasure(ExternalMeasure newMeasure) {
         try {
             if (jobSyncHelper.updateVirtualJob(newMeasure)) {
                 measureRepo.save(newMeasure);
@@ -180,7 +180,6 @@ public class MeasureServiceImpl implements MeasureService {
         } catch (Exception e) {
             LOGGER.error("Failed to update measure. {}", e.getMessage());
         }
-        jobSyncHelper.updateVirtualJob(originMeasure);
         return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
     }
 }

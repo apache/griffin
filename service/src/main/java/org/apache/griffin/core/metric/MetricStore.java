@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface MetricStore {
 
-    List<MetricValue> getMetricValues(String metricName, int size);
+    List<MetricValue> getMetricValues(String metricName, int from, int size) throws Exception;
 
-    String addMetricValues(List<MetricValue> metricValues);
+    void addMetricValue(MetricValue metricValue) throws Exception;
 
-    String deleteMetricValues(String metricName);
+    void deleteMetricValues(String metricName) throws Exception;
 }
