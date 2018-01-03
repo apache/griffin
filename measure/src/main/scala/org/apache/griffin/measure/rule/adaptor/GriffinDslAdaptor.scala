@@ -43,6 +43,12 @@ object ProfilingKeys {
   val _source = "source"
 }
 
+object DuplicateKeys {
+  val _source = "source"
+  val _target = "target"
+  val _count = "count"
+}
+
 object GlobalKeys {
   val _initRule = "init.rule"
 //  val _globalMetricKeep = "global.metric.keep"
@@ -74,6 +80,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         dqType match {
           case AccuracyType => accuracyRulePlan(timeInfo, name, expr, param, processType)
           case ProfilingType => profilingRulePlan(timeInfo, name, expr, param, processType)
+          case DuplicateType => duplicateRulePlan(timeInfo, name, expr, param, processType)
           case TimelinessType => emptyRulePlan
           case _ => emptyRulePlan
         }
@@ -461,13 +468,93 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val profilingName = name
       val profilingStep = SparkSqlStep(profilingName, profilingSql, details)
       val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
-      val profilingExports = genMetricExport(metricParam, profilingName, profilingName) :: Nil
+      val profilingExports = genMetricExport(metricParam, name, profilingName) :: Nil
 
       RulePlan(profilingStep :: Nil, profilingExports)
     }
   }
 
-//  override def genRuleInfos(param: Map[String, Any], timeInfo: TimeInfo): Seq[RuleInfo] = {
+  private def duplicateRulePlan(timeInfo: TimeInfo, name: String, expr: Expr,
+                                param: Map[String, Any], processType: ProcessType
+                               ): RulePlan = {
+    val details = getDetails(param)
+    val sourceName = details.getString(DuplicateKeys._source, dataSourceNames.head)
+    val targetName = details.getString(DuplicateKeys._target, dataSourceNames.tail.head)
+    val analyzer = DuplicateAnalyzer(expr.asInstanceOf[DuplicateClause], sourceName, targetName)
+
+    if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
+      println(s"[${timeInfo.calcTime}] data source ${sourceName} not exists")
+      emptyRulePlan
+    } else if (!TableRegisters.existRunTempTable(timeInfo.key, targetName)) {
+      println(s"[${timeInfo.calcTime}] data source ${targetName} not exists")
+      emptyRulePlan
+    } else {
+      val selItemsClause = analyzer.selectionPairs.map { pair =>
+        val (expr, alias) = pair
+        s"${expr.desc} AS `${alias}`"
+      }.mkString(", ")
+      val aliases = analyzer.selectionPairs.map(_._2)
+
+      val selClause = processType match {
+        case BatchProcessType => selItemsClause
+        case StreamingProcessType => s"`${InternalColumns.tmst}`, ${selItemsClause}"
+      }
+      val selAliases = processType match {
+        case BatchProcessType => aliases
+        case StreamingProcessType => InternalColumns.tmst +: aliases
+      }
+
+      // 1. source mapping
+      val sourceTableName = "__source"
+      val sourceSql = s"SELECT DISTINCT ${selClause} FROM ${sourceName}"
+      val sourceStep = SparkSqlStep(sourceTableName, sourceSql, emptyMap)
+
+      // 2. target mapping
+      val targetTableName = "__target"
+      val targetSql = s"SELECT ${selClause} FROM ${targetName}"
+      val targetStep = SparkSqlStep(targetTableName, targetSql, emptyMap)
+
+      // 3. joined
+      val joinedTableName = "__joined"
+      val joinedSelClause = selAliases.map { alias =>
+        s"`${sourceTableName}`.`${alias}` AS `${alias}`"
+      }.mkString(", ")
+      val onClause = aliases.map { alias =>
+        s"`${sourceTableName}`.`${alias}` = `${targetTableName}`.`${alias}`"
+      }.mkString(" AND ")
+      val joinedSql = {
+        s"SELECT ${joinedSelClause} FROM `${targetTableName}` RIGHT JOIN `${sourceTableName}` ON ${onClause}"
+      }
+      val joinedStep = SparkSqlStep(joinedTableName, joinedSql, emptyMap)
+
+      // 4. group
+      val groupTableName = "__group"
+      val groupSelClause = selAliases.map { alias =>
+        s"`${alias}`"
+      }.mkString(", ")
+      val countColName = details.getStringOrKey(DuplicateKeys._count)
+      val groupSql = {
+        s"SELECT ${groupSelClause}, (COUNT(*) - 1) AS `${countColName}` FROM `${joinedTableName}` GROUP BY ${groupSelClause}"
+      }
+      val groupStep = SparkSqlStep(groupTableName, groupSql, emptyMap)
+
+      // 5. duplicate metric
+      val dupMetricTableName = name
+      val dupMetricSql = {
+        s"""
+           |SELECT * FROM `${groupTableName}` WHERE `${countColName}` > 0
+         """.stripMargin
+      }
+      val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
+      val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
+        .addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
+      val dupMetricExports = genMetricExport(metricParam, name, dupMetricTableName) :: Nil
+
+      RulePlan(sourceStep :: targetStep :: joinedStep :: groupStep :: dupMetricStep :: Nil, dupMetricExports)
+    }
+  }
+
+  //  override def genRuleInfos(param: Map[String, Any], timeInfo: TimeInfo): Seq[RuleInfo] = {
 //    val ruleInfo = RuleInfoGen(param)
 //    val dqType = RuleInfoGen.dqType(param)
 //    try {

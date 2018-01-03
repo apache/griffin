@@ -18,7 +18,7 @@
               "auto.offset.reset": "smallest",
               "auto.commit.enable": "false"
             },
-            "topics": "sss",
+            "topics": "ttt",
             "key.type": "java.lang.String",
             "value.type": "java.lang.String"
           },
@@ -60,7 +60,7 @@
               "auto.offset.reset": "smallest",
               "auto.commit.enable": "false"
             },
-            "topics": "sss",
+            "topics": "ttt",
             "key.type": "java.lang.String",
             "value.type": "java.lang.String"
           },
@@ -94,21 +94,17 @@
   "evaluate.rule": {
     "rules": [
       {
-        "dsl.type": "spark-sql",
-        "name": "dist",
-        "rule": "SELECT DISTINCT * FROM new"
-      },
-      {
-        "dsl.type": "spark-sql",
-        "name": "joined",
-        "rule": "SELECT dist.* FROM old RIGHT JOIN dist ON coalesce(old.name, '') = coalesce(dist.name, '') AND coalesce(old.age, '') = coalesce(dist.age, '')"
-      },
-      {
-        "dsl.type": "spark-sql",
-        "name": "duplicate",
-        "rule": "SELECT `__tmst`, `name`, `age`, count(*) as `cnt` FROM joined GROUP BY `__tmst`, `name`, `age` WHERE `cnt` > 1",
+        "dsl.type": "griffin-dsl",
+        "dq.type": "duplicate",
+        "name": "dup",
+        "rule": "name, age",
+        "details": {
+          "source": "new",
+          "target": "old",
+          "count": "cnt"
+        },
         "metric": {
-          "name": "duplicate"
+          "name": "dup"
         }
       }
     ]

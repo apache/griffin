@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.dsl.analyzer
 
-import org.apache.griffin.measure.rule.dsl.expr._
+import org.apache.griffin.measure.rule.dsl.expr.{MathExpr, _}
 
 
 trait BasicAnalyzer extends Serializable {

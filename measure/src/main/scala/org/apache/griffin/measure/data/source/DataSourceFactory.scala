@@ -31,10 +31,6 @@ import scala.util.{Success, Try}
 
 object DataSourceFactory extends Loggable {
 
-  val HiveRegex = """^(?i)hive$""".r
-  val TextRegex = """^(?i)text$""".r
-  val AvroRegex = """^(?i)avro$""".r
-
   def genDataSources(sqlContext: SQLContext, ssc: StreamingContext, dqEngines: DqEngines,
                      dataSourceParams: Seq[DataSourceParam]) = {
     val filteredDsParams = trimDataSourceParams(dataSourceParams)

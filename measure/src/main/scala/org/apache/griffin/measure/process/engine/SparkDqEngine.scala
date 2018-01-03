@@ -74,29 +74,24 @@ trait SparkDqEngine extends DqEngine {
       val MetricExport(name, stepName, collectType) = metricExport
       try {
         val metricMaps = getMetricMaps(stepName)
-        if (metricMaps.size > 0) {
-          procType match {
-            case BatchProcessType => {
-              val metrics: Map[String, Any] = normalizeMetric(metricMaps, name, collectType)
-              emptyMetricMap + (timeInfo.calcTime -> metrics)
+        procType match {
+          case BatchProcessType => {
+            val metrics: Map[String, Any] = normalizeMetric(metricMaps, name, collectType)
+            emptyMetricMap + (timeInfo.calcTime -> metrics)
+          }
+          case StreamingProcessType => {
+            val tmstMetrics = metricMaps.map { metric =>
+              val tmst = metric.getLong(InternalColumns.tmst, timeInfo.calcTime)
+              val pureMetric = metric.removeKeys(InternalColumns.columns)
+              (tmst, pureMetric)
             }
-            case StreamingProcessType => {
-              val tmstMetrics = metricMaps.map { metric =>
-                val tmst = metric.getLong(InternalColumns.tmst, timeInfo.calcTime)
-                val pureMetric = metric.removeKeys(InternalColumns.columns)
-                (tmst, pureMetric)
-              }
-              tmstMetrics.groupBy(_._1).map { pair =>
-                val (k, v) = pair
-                val maps = v.map(_._2)
-                val mtc = normalizeMetric(maps, name, collectType)
-                (k, mtc)
-              }
+            tmstMetrics.groupBy(_._1).map { pair =>
+              val (k, v) = pair
+              val maps = v.map(_._2)
+              val mtc = normalizeMetric(maps, name, collectType)
+              (k, mtc)
             }
           }
-        } else {
-          info(s"empty metrics of [${name}], not persisted")
-          emptyMetricMap
         }
       } catch {
         case e: Throwable => {

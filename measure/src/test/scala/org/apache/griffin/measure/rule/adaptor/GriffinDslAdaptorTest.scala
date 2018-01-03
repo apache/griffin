@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.process._
-import org.apache.griffin.measure.process.temp._
+import org.apache.griffin.measure.process.temp.{TableRegisters, _}
 import org.apache.griffin.measure.rule.plan.CalcTimeInfo
 import org.apache.griffin.measure.utils.JsonUtil
 import org.junit.runner.RunWith
@@ -125,6 +125,37 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
 //    steps.foreach { step =>
 //      println(s"${step}, ${step.ruleInfo.persistType}")
 //    }
+  }
+
+  test ("duplicate") {
+    val adaptor = GriffinDslAdaptor("new" :: "old" :: Nil, "count" :: Nil)
+    val ruleJson =
+      """
+        |{
+        |  "dsl.type": "griffin-dsl",
+        |  "dq.type": "duplicate",
+        |  "name": "dup",
+        |  "rule": "name, count(age + 1) as ct",
+        |  "details": {
+        |    "count": "cnt"
+        |  },
+        |  "metric": {
+        |    "name": "dup"
+        |  }
+        |}
+      """.stripMargin
+    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
+    println(rule)
+
+    val timeInfo = CalcTimeInfo(123)
+    TableRegisters.registerCompileTempTable(timeInfo.key, "new")
+    TableRegisters.registerCompileTempTable(timeInfo.key, "old")
+
+    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
+    rp.ruleSteps.foreach(println)
+    rp.ruleExports.foreach(println)
+
+    TableRegisters.unregisterCompileTempTables(timeInfo.key)
   }
 
 }

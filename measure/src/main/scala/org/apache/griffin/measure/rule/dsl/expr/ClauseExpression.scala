@@ -218,3 +218,17 @@ case class ProfilingClause(selectClause: SelectClause,
     )
   }
 }
+
+case class DuplicateClause(exprs: Seq[Expr]) extends ClauseExpression {
+  addChildren(exprs)
+
+  def desc: String = {
+    exprs.map(_.desc).mkString(", ")
+  }
+  def coalesceDesc: String = {
+    exprs.map(_.coalesceDesc).mkString(", ")
+  }
+  override def map(func: (Expr) => Expr): DuplicateClause = {
+    DuplicateClause(exprs.map(func(_)))
+  }
+}

@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
+import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 
 object HdfsFileDumpUtil {
@@ -32,8 +33,15 @@ object HdfsFileDumpUtil {
   }
 
   def splitRdd[T](rdd: RDD[T])(implicit m: Manifest[T]): RDD[(Long, Iterable[T])] = {
-    val indexRdd = rdd.zipWithIndex // slow process
-    indexRdd.map(p => ((p._2 / sepCount), p._1)).groupByKey() // slow process
+//    val indexRdd = rdd.zipWithIndex // slow process
+//    indexRdd.map(p => ((p._2 / sepCount), p._1)).groupByKey() // slow process
+    val count = rdd.count
+    val splitCount = count / sepCount + 1
+    val splitRdd = rdd.mapPartitionsWithIndex { (n, itr) =>
+      val idx = n % splitCount
+      itr.map((idx, _))
+    }
+    splitRdd.groupByKey()
   }
   def splitIterable[T](datas: Iterable[T])(implicit m: Manifest[T]): Iterator[(Int, Iterable[T])] = {
     val groupedData = datas.grouped(sepCount).zipWithIndex
