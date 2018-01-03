@@ -42,10 +42,12 @@ public class MetricStoreImpl implements MetricStore {
         Response response = client.performRequest("GET", "/griffin/accuracy/_search?filter_path=hits.hits._source",
                 Collections.emptyMap(), entity, new BasicHeader("Content-Type", "application/json"));
         JsonNode jsonNode = mapper.readTree(EntityUtils.toString(response.getEntity()));
-        for (JsonNode node : jsonNode.get("hits").get("hits")) {
-            JsonNode sourceNode = node.get("_source");
-            metricValues.add(new MetricValue(sourceNode.get("name").asText(), Long.parseLong(sourceNode.get("tmst").asText()),
-                    JsonUtil.toEntity(sourceNode.get("value").toString(), Map.class)));
+        if (jsonNode.hasNonNull("hits") && jsonNode.get("hits").hasNonNull("hits")) {
+            for (JsonNode node : jsonNode.get("hits").get("hits")) {
+                JsonNode sourceNode = node.get("_source");
+                metricValues.add(new MetricValue(sourceNode.get("name").asText(), Long.parseLong(sourceNode.get("tmst").asText()),
+                        JsonUtil.toEntity(sourceNode.get("value").toString(), Map.class)));
+            }
         }
         return metricValues;
     }
