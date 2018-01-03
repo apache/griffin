@@ -75,5 +75,4 @@ public class GriffinJob extends AbstractJob {
         this(measureId, jobName, qJobName, qGroupName, deleted);
         setId(jobId);
     }
-
 }

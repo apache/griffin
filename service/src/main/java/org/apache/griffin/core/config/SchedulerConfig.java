@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.config;
 
 import org.apache.griffin.core.job.factory.AutowiringSpringBeanJobFactory;
+import org.apache.griffin.core.util.PropertiesUtil;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -37,6 +37,21 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
 
     private Boolean deleted = false;
 
+    AbstractJob() {
+    }
+
+    AbstractJob(Long measureId, String jobName, boolean deleted) {
+        this.measureId = measureId;
+        this.jobName = jobName;
+        this.deleted = deleted;
+    }
+
+    AbstractJob(String jobName, Long measureId, String metricName) {
+        this.jobName = jobName;
+        this.measureId = measureId;
+        this.metricName = metricName;
+    }
+
     public String getJobName() {
         return jobName;
     }
@@ -69,12 +84,4 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    AbstractJob() {
-    }
-
-    AbstractJob(Long measureId, String jobName, boolean deleted) {
-        this.measureId = measureId;
-        this.jobName = jobName;
-        this.deleted = deleted;
-    }
 }

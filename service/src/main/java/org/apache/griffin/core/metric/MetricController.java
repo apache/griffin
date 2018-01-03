@@ -22,6 +22,7 @@ package org.apache.griffin.core.metric;
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,18 +43,20 @@ public class MetricController {
         return metricService.getAllMetrics();
     }
 
-    @RequestMapping(value = "/metric/values", method = RequestMethod.GET)
-    public List<MetricValue> getMetricValues(@RequestParam("metricName") String metricName, @RequestParam("size") int size) {
-        return metricService.getMetricValues(metricName, size);
+    @RequestMapping(value = "/metrics/values", method = RequestMethod.GET)
+    public List<MetricValue> getMetricValues(@RequestParam("metricName") String metricName,
+                                             @RequestParam("size") int size,
+                                             @RequestParam(value = "offset", defaultValue = "0") int offset) {
+        return metricService.getMetricValues(metricName, offset, size);
     }
 
-    @RequestMapping(value = "/metric/values", method = RequestMethod.POST)
-    public String addMetricValues(@RequestBody List<MetricValue> values) {
+    @RequestMapping(value = "/metrics/values", method = RequestMethod.POST)
+    public ResponseEntity addMetricValues(@RequestBody List<MetricValue> values) {
         return metricService.addMetricValues(values);
     }
 
-    @RequestMapping(value = "/metric/values", method = RequestMethod.DELETE)
-    public String deleteMetricValues(@RequestParam("metricName") String metricName) {
+    @RequestMapping(value = "/metrics/values", method = RequestMethod.DELETE)
+    public ResponseEntity deleteMetricValues(@RequestParam("metricName") String metricName) {
         return metricService.deleteMetricValues(metricName);
     }
 }
