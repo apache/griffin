@@ -27,6 +27,7 @@ import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -39,12 +40,14 @@ public class MeasureServiceImpl implements MeasureService {
     @Autowired
     private MeasureRepo<Measure> measureRepo;
     @Autowired
-    private GriffinMeasureOperationImpl griffinOp;
+    @Qualifier("griffinOperation")
+    private MeasureOperation griffinOp;
     @Autowired
-    private ExternalMeasureOperationImpl externalOp;
+    @Qualifier("externalOperation")
+    private MeasureOperation externalOp;
 
     @Override
-    public Iterable<Measure> getAllAliveMeasures() {
+    public List<Measure> getAllAliveMeasures() {
         return measureRepo.findByDeleted(false);
     }
 

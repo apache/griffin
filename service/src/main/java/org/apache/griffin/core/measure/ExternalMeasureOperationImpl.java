@@ -21,26 +21,24 @@ package org.apache.griffin.core.measure;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.VirtualJob;
-import org.apache.griffin.core.job.repo.JobRepo;
+import org.apache.griffin.core.job.repo.VirtualJobRepo;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.measure.repo.ExternalMeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-@Component
+@Component("externalOperation")
 public class ExternalMeasureOperationImpl implements MeasureOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperationImpl.class);
 
     @Autowired
-    private MeasureRepo<ExternalMeasure> measureRepo;
+    private ExternalMeasureRepo measureRepo;
     @Autowired
-    private JobRepo<VirtualJob> jobRepo;
+    private VirtualJobRepo jobRepo;
 
     @Override
     public GriffinOperationMessage create(Measure measure) {

@@ -21,6 +21,7 @@ package org.apache.griffin.core.job.entity;
 
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -89,18 +90,22 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.appUri = appUri;
     }
 
+    @JsonProperty("timestamp")
     public Long getTms() {
         return tms;
     }
 
+    @JsonProperty("timestamp")
     public void setTms(Long tms) {
         this.tms = tms;
     }
 
+    @JsonProperty("expireTimestamp")
     public Long getExpireTms() {
         return expireTms;
     }
 
+    @JsonProperty("expireTimestamp")
     public void setExpireTms(Long expireTms) {
         this.expireTms = expireTms;
     }

@@ -21,9 +21,6 @@ package org.apache.griffin.core.job.repo;
 
 import org.apache.griffin.core.job.entity.JobSchedule;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface JobScheduleRepo extends CrudRepository<JobSchedule,Long>{
-
+public interface JobScheduleRepo extends CrudRepository<JobSchedule, Long> {
 }
