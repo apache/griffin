@@ -546,7 +546,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
            |SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0
          """.stripMargin
       }
-      val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap)
+      val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap, true)
       val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
       val dupRecordxports = genRecordExport(recordParam, dupRecordTableName, dupRecordTableName) :: Nil
 
@@ -569,6 +569,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       }
       val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
       val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
+        .addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
       val dupMetricExports = genMetricExport(metricParam, name, dupMetricTableName) :: Nil
 
       val dupSteps = sourceStep :: targetStep :: joinedStep :: groupStep :: dupRecordStep :: dupMetricStep :: Nil
