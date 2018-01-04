@@ -24,13 +24,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.error.exception.GriffinException.GetHealthInfoFailureException;
 import org.apache.griffin.core.error.exception.GriffinException.GetJobsFailureException;
 import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.job.repo.GriffinJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
-import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
@@ -76,9 +76,9 @@ public class JobServiceImpl implements JobService {
     @Qualifier("livyConf")
     private Properties livyConf;
     @Autowired
-    private MeasureRepo<GriffinMeasure> measureRepo;
+    private GriffinMeasureRepo measureRepo;
     @Autowired
-    private JobRepo<GriffinJob> jobRepo;
+    private GriffinJobRepo jobRepo;
     @Autowired
     private JobScheduleRepo jobScheduleRepo;
 
@@ -452,7 +452,7 @@ public class JobServiceImpl implements JobService {
     public List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size) {
         size = size > MAX_PAGE_SIZE ? MAX_PAGE_SIZE : size;
         size = size <= 0 ? DEFAULT_PAGE_SIZE : size;
-        Pageable pageable = new PageRequest(page, size, Sort.Direction.DESC, "timestamp");
+        Pageable pageable = new PageRequest(page, size, Sort.Direction.DESC, "tms");
         List<JobInstanceBean> instances = jobInstanceRepo.findByJobIdAndDeleted(jobId, false, pageable);
         if (CollectionUtils.isEmpty(instances)) {
             LOGGER.warn("Job id {} does not exist.", jobId);

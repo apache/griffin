@@ -21,9 +21,6 @@ package org.apache.griffin.core.job.repo;
 
 import org.apache.griffin.core.job.entity.JobDataSegment;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface JobDataSegmentRepo extends CrudRepository<JobDataSegment,Long>{
-
+public interface JobDataSegmentRepo extends CrudRepository<JobDataSegment, Long> {
 }

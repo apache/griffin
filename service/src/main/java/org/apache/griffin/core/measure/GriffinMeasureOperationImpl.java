@@ -37,7 +37,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Component("griffinOperation")
 public class GriffinMeasureOperationImpl implements MeasureOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(GriffinMeasureOperationImpl.class);
 

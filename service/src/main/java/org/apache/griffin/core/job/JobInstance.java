@@ -22,12 +22,12 @@ package org.apache.griffin.core.job;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.job.repo.JobRepo;
+import org.apache.griffin.core.job.repo.GriffinJobRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
-import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.TimeUtil;
 import org.quartz.*;
@@ -61,9 +61,9 @@ public class JobInstance implements Job {
     @Autowired
     private SchedulerFactoryBean factory;
     @Autowired
-    private MeasureRepo<GriffinMeasure> measureRepo;
+    private GriffinMeasureRepo measureRepo;
     @Autowired
-    private JobRepo<GriffinJob> jobRepo;
+    private GriffinJobRepo jobRepo;
     @Autowired
     private JobScheduleRepo jobScheduleRepo;
     @Autowired
@@ -214,10 +214,10 @@ public class JobInstance implements Job {
     }
 
     private boolean createJobInstance(Map<String, Object> confMap) throws Exception {
-        Map<String,Object> config = (Map<String, Object>) confMap.get("predicate.config");
-        Map<String, Object> scheduleConfig = (Map<String, Object>)config.get("checkdonefile.schedule");
+        Map<String, Object> config = (Map<String, Object>) confMap.get("predicate.config");
+        Map<String, Object> scheduleConfig = (Map<String, Object>) config.get("checkdonefile.schedule");
         Long interval = TimeUtil.str2Long((String) scheduleConfig.get("interval"));
-        Integer repeat = Integer.valueOf(scheduleConfig.get("repeat").toString()) ;
+        Integer repeat = Integer.valueOf(scheduleConfig.get("repeat").toString());
         String groupName = "PG";
         String jobName = griffinJob.getJobName() + "_predicate_" + System.currentTimeMillis();
         Scheduler scheduler = factory.getObject();

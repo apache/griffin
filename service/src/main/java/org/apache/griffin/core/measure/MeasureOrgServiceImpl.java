@@ -19,13 +19,12 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
-import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.Map;
 public class MeasureOrgServiceImpl implements MeasureOrgService {
 
     @Autowired
-    private MeasureRepo<GriffinMeasure> measureRepo;
+    private GriffinMeasureRepo measureRepo;
 
     @Override
     public List<String> getOrgs() {

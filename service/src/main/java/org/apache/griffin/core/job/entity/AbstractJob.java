@@ -19,8 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
 import javax.persistence.*;

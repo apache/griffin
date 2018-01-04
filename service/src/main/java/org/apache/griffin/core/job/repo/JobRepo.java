@@ -22,11 +22,9 @@ package org.apache.griffin.core.job.repo;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface JobRepo<T extends AbstractJob> extends CrudRepository<T, Long> {
 
     @Query("select count(j) from #{#entityName} j where j.jobName = ?1 and j.deleted = ?2")

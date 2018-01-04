@@ -23,11 +23,9 @@ package org.apache.griffin.core.measure.repo;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface MeasureRepo<T extends Measure> extends CrudRepository<T, Long> {
 
     List<T> findByNameAndDeleted(String name, Boolean deleted);
