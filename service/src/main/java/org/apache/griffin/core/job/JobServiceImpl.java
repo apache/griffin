@@ -29,6 +29,7 @@ import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
@@ -172,7 +173,7 @@ public class JobServiceImpl implements JobService {
             return false;
         }
         GriffinJob job = saveGriffinJob(measure.getId(), js.getJobName(), qName, qGroup);
-        return job != null && !saveAndAddQuartzJob(scheduler, triggerKey, js, job);
+        return job != null && saveAndAddQuartzJob(scheduler, triggerKey, js, job);
     }
 
     private String getQuartzGroupName() {
@@ -237,7 +238,9 @@ public class JobServiceImpl implements JobService {
         Set<String> sets = new HashSet<>();
         List<DataSource> sources = measure.getDataSources();
         for (DataSource source : sources) {
-            source.getConnectors().forEach(dc -> {sets.add(dc.getName());});
+            source.getConnectors().forEach(dc -> {
+                sets.add(dc.getName());
+            });
         }
         names.addAll(sets);
         if (names.size() < sets.size()) {
@@ -248,11 +251,16 @@ public class JobServiceImpl implements JobService {
     }
 
     private GriffinMeasure getMeasureIfValid(Long measureId) {
-        GriffinMeasure measure = measureRepo.findByIdAndDeleted(measureId, false);
+        Measure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
             LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
+            return null;
         }
-        return measure;
+        if (!(measure instanceof GriffinMeasure)) {
+            LOGGER.error("The measure id {} isn't valid. It doesn't belong to a Griffin Measure.", measureId);
+            return null;
+        }
+        return (GriffinMeasure) measure;
     }
 
     private GriffinJob saveGriffinJob(Long measureId, String jobName, String qName, String qGroup) {

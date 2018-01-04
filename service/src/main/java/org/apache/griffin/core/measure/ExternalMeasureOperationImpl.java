@@ -38,36 +38,40 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperationImpl.class);
 
     @Autowired
-    private MeasureRepo<Measure> measureRepo;
+    private MeasureRepo<ExternalMeasure> measureRepo;
     @Autowired
     private JobRepo<VirtualJob> jobRepo;
 
     @Override
     public GriffinOperationMessage create(Measure measure) {
-        String metricName = ((ExternalMeasure) measure).getMetricName();
-        if (StringUtils.isBlank(metricName)) {
-            LOGGER.error("Failed to create external measure {}. Its metric name is blank.", measure.getName());
+        ExternalMeasure em = castToExternalMeasure(measure);
+        if (em == null) {
             return GriffinOperationMessage.CREATE_MEASURE_FAIL;
         }
         try {
-            measure = measureRepo.save(measure);
-            if (createRelatedVirtualJob((ExternalMeasure) measure)) {
-                return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
-            }
-            measureRepo.delete(measure);
+            em.setVirtualJob(new VirtualJob());
+            em = measureRepo.save(em);
+            VirtualJob vj = getNewVirtualJob(em, em.getVirtualJob());
+            jobRepo.save(vj);
+            return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
         } catch (Exception e) {
-            LOGGER.error("Failed to create new measure {}.{}", measure.getName(), e.getMessage());
+            LOGGER.error("Failed to create new measure {}.{}", em.getName(), e.getMessage());
         }
         return GriffinOperationMessage.CREATE_MEASURE_FAIL;
     }
 
     @Override
     public GriffinOperationMessage update(Measure measure) {
+        ExternalMeasure em = castToExternalMeasure(measure);
+        if (em == null) {
+            return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
+        }
+
         try {
-            if (updateRelatedVirtualJob((ExternalMeasure) measure)) {
-                measureRepo.save(measure);
-                return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
-            }
+            VirtualJob vj = getNewVirtualJob(em, measureRepo.findOne(em.getId()).getVirtualJob());
+            em.setVirtualJob(vj);
+            measureRepo.save(em);
+            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
         } catch (Exception e) {
             LOGGER.error("Failed to update measure. {}", e.getMessage());
         }
@@ -76,59 +80,33 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
 
     @Override
     public Boolean delete(Long id) {
-        List<VirtualJob> jobList = jobRepo.findByMeasureIdAndDeleted(id, false);
-        switch (jobList.size()) {
-            case 1:
-                VirtualJob job = jobList.get(0);
-                job.setDeleted(true);
-                jobRepo.save(job);
-                LOGGER.info("Virtual job {} is logically deleted.", job.getJobName());
-                return true;
-            case 0:
-                LOGGER.error("Can't find the virtual job related to measure id {}.", id);
-                return false;
-            default:
-                LOGGER.error("More than one virtual job related to measure id {} found.", id);
-                return false;
-        }
-    }
-
-    private Boolean createRelatedVirtualJob(ExternalMeasure measure) {
-        if (jobRepo.findByMeasureIdAndDeleted(measure.getId(), false).size() != 0) {
-            LOGGER.error("Failed to create new virtual job related to measure {}, it already exists.", measure.getName());
-            return false;
-        }
-        if (jobRepo.findByJobNameAndDeleted(measure.getName(), false).size() != 0) {
-            LOGGER.error("Failed to create new virtual job {}, it already exists.", measure.getName());
-            return false;
-        }
-        VirtualJob job = new VirtualJob(measure.getName(), measure.getId(), measure.getMetricName());
         try {
-            jobRepo.save(job);
+            ExternalMeasure em = measureRepo.findOne(id);
+            VirtualJob vj = em.getVirtualJob();
+            vj.setDeleted(true);
+            em.setVirtualJob(vj);
+            measureRepo.save(em);
             return true;
         } catch (Exception e) {
-            LOGGER.error("Failed to save virtual job {}. {}", measure.getName(), e.getMessage());
+            LOGGER.error("Failed to delete measure. {}", e.getMessage());
         }
         return false;
+
     }
 
-    private Boolean updateRelatedVirtualJob(ExternalMeasure measure) {
-        List<VirtualJob> jobList = jobRepo.findByMeasureIdAndDeleted(measure.getId(), false);
-        switch (jobList.size()) {
-            case 1:
-                VirtualJob job = jobList.get(0);
-                job.setJobName(measure.getName());
-                job.setMetricName(measure.getMetricName());
-                jobRepo.save(job);
-                LOGGER.info("Virtual job {} is updated.", job.getJobName());
-                return true;
-            case 0:
-                LOGGER.error("Can't find the virtual job related to measure id {}.", measure.getId());
-                return false;
-            default:
-                LOGGER.error("More than one virtual job related to measure id {} found.", measure.getId());
-                return false;
-        }
+    private VirtualJob getNewVirtualJob(ExternalMeasure em, VirtualJob vj) {
+        vj.setMeasureId(em.getId());
+        vj.setJobName(em.getName());
+        vj.setMetricName(em.getMetricName());
+        return vj;
+    }
 
+    private ExternalMeasure castToExternalMeasure(Measure measure) {
+        ExternalMeasure em = (ExternalMeasure) measure;
+        if (StringUtils.isBlank(em.getMetricName())) {
+            LOGGER.error("Failed to create external measure {}. Its metric name is blank.", measure.getName());
+            return null;
+        }
+        return em;
     }
 }

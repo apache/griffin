@@ -67,7 +67,7 @@ public class JobInstance implements Job {
     @Autowired
     private JobScheduleRepo jobScheduleRepo;
     @Autowired
-    @Qualifier("appConfProps")
+    @Qualifier("appConf")
     private Properties appConfProps;
 
     private JobSchedule jobSchedule;
@@ -214,9 +214,10 @@ public class JobInstance implements Job {
     }
 
     private boolean createJobInstance(Map<String, Object> confMap) throws Exception {
-        Map<String, Object> scheduleConfig = (Map<String, Object>) confMap.get("checkdonefile.schedule");
+        Map<String,Object> config = (Map<String, Object>) confMap.get("predicate.config");
+        Map<String, Object> scheduleConfig = (Map<String, Object>)config.get("checkdonefile.schedule");
         Long interval = TimeUtil.str2Long((String) scheduleConfig.get("interval"));
-        Integer repeat = (Integer) scheduleConfig.get("repeat");
+        Integer repeat = Integer.valueOf(scheduleConfig.get("repeat").toString()) ;
         String groupName = "PG";
         String jobName = griffinJob.getJobName() + "_predicate_" + System.currentTimeMillis();
         Scheduler scheduler = factory.getObject();
