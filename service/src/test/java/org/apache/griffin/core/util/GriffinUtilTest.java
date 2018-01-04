@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -65,13 +66,15 @@ public class GriffinUtilTest {
 
     @Test
     public void testGetPropertiesForSuccess() {
-        Properties properties = PropertiesUtil.getProperties("/quartz.properties");
+        String path = "/quartz.properties";
+        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
         assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
     }
 
     @Test
     public void testGetPropertiesForFailWithWrongPath() {
-        Properties properties = PropertiesUtil.getProperties(".././quartz.properties");
+        String path = ".././quartz.properties";
+        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
         assertEquals(properties, null);
     }
 

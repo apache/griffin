@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -155,7 +156,8 @@ public class JobSchedule extends AbstractAuditableEntity {
      * @throws JsonProcessingException json exception
      */
     private Map<String, Object> defaultPredicatesConfig() throws JsonProcessingException {
-        Properties appConf = PropertiesUtil.getProperties("/application.properties");
+        String path = "/application.properties";
+        Properties appConf = PropertiesUtil.getProperties(path,new ClassPathResource(path));
         Map<String, Object> conf = new HashMap<>();
         Map<String, Object> scheduleConf = new HashMap<>();
         Map<String, Object> map = new HashMap<>();

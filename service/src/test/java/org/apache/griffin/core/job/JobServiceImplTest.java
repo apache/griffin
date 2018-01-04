@@ -42,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
@@ -268,8 +269,9 @@ public class JobServiceImplTest {
     public void testSyncInstancesOfJobForRestClientException() {
         JobInstanceBean instance = createJobInstance();
         instance.setSessionId(1234564L);
+        String path = "/sparkJob.properties";
         given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
-        given(sparkJobProps.getProperty("livy.uri")).willReturn(PropertiesUtil.getProperties("/sparkJob.properties").getProperty("livy.uri"));
+        given(sparkJobProps.getProperty("livy.uri")).willReturn(PropertiesUtil.getProperties(path,new ClassPathResource(path)).getProperty("livy.uri"));
         service.syncInstancesOfAllJobs();
     }
 
