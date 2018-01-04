@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
 import javax.persistence.*;
@@ -28,14 +30,15 @@ import javax.persistence.*;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type")
 public abstract class AbstractJob extends AbstractAuditableEntity {
+    private static final long serialVersionUID = 7569493377868453677L;
 
-    private Long measureId;
+    protected Long measureId;
 
     protected String jobName;
 
     protected String metricName;
 
-    private Boolean deleted = false;
+    protected Boolean deleted = false;
 
     AbstractJob() {
     }

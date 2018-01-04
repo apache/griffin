@@ -51,7 +51,7 @@ public class SparkSubmitJob implements Job {
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
-    @Qualifier("livyConfProps")
+    @Qualifier("livyConf")
     private Properties livyConfProps;
     @Autowired
     private JobServiceImpl jobService;

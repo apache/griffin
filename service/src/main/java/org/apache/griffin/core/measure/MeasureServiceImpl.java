@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
-import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -37,8 +36,6 @@ import java.util.List;
 public class MeasureServiceImpl implements MeasureService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MeasureServiceImpl.class);
 
-    @Autowired
-    private JobServiceImpl jobService;
     @Autowired
     private MeasureRepo<Measure> measureRepo;
     @Autowired
