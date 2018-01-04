@@ -46,7 +46,8 @@ object ProfilingKeys {
 object DuplicateKeys {
   val _source = "source"
   val _target = "target"
-  val _count = "count"
+  val _dup = "dup"
+  val _num = "num"
 }
 
 object GlobalKeys {
@@ -532,25 +533,48 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val groupSelClause = selAliases.map { alias =>
         s"`${alias}`"
       }.mkString(", ")
-      val countColName = details.getStringOrKey(DuplicateKeys._count)
+      val dupColName = details.getStringOrKey(DuplicateKeys._dup)
       val groupSql = {
-        s"SELECT ${groupSelClause}, (COUNT(*) - 1) AS `${countColName}` FROM `${joinedTableName}` GROUP BY ${groupSelClause}"
+        s"SELECT ${groupSelClause}, (COUNT(*) - 1) AS `${dupColName}` FROM `${joinedTableName}` GROUP BY ${groupSelClause}"
       }
       val groupStep = SparkSqlStep(groupTableName, groupSql, emptyMap)
 
-      // 5. duplicate metric
+      // 5. duplicate record
+      val dupRecordTableName = "__dupRecords"
+      val dupRecordSql = {
+        s"""
+           |SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0
+         """.stripMargin
+      }
+      val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap)
+      val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
+      val dupRecordxports = genRecordExport(recordParam, dupRecordTableName, dupRecordTableName) :: Nil
+
+      // 6. duplicate metric
       val dupMetricTableName = name
+      val numColName = details.getStringOrKey(DuplicateKeys._num)
+      val dupMetricSelClause = processType match {
+        case BatchProcessType => s"`${dupColName}`, COUNT(*) AS `${numColName}`"
+        case StreamingProcessType => s"`${InternalColumns.tmst}`, `${dupColName}`, COUNT(*) AS `${numColName}`"
+      }
+      val dupMetricGroupbyClause = processType match {
+        case BatchProcessType => s"`${dupColName}`"
+        case StreamingProcessType => s"`${InternalColumns.tmst}`, `${dupColName}`"
+      }
       val dupMetricSql = {
         s"""
-           |SELECT * FROM `${groupTableName}` WHERE `${countColName}` > 0
+           |SELECT ${dupMetricSelClause} FROM `${dupRecordTableName}`
+           |GROUP BY ${dupMetricGroupbyClause}
          """.stripMargin
       }
       val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
       val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
-        .addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
       val dupMetricExports = genMetricExport(metricParam, name, dupMetricTableName) :: Nil
 
-      RulePlan(sourceStep :: targetStep :: joinedStep :: groupStep :: dupMetricStep :: Nil, dupMetricExports)
+      val dupSteps = sourceStep :: targetStep :: joinedStep :: groupStep :: dupRecordStep :: dupMetricStep :: Nil
+      val dupExports = dupRecordxports ++ dupMetricExports
+
+      RulePlan(dupSteps, dupExports)
     }
   }
 

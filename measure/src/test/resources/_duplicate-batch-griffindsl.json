@@ -41,10 +41,14 @@
         "details": {
           "source": "source",
           "target": "target",
-          "count": "cnt"
+          "dup": "dup",
+          "num": "num"
         },
         "metric": {
-          "name": "duplicate"
+          "name": "dup"
+        },
+        "record": {
+          "name": "dupRecords"
         }
       }
     ]

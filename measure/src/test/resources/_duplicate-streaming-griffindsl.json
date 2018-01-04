@@ -101,10 +101,14 @@
         "details": {
           "source": "new",
           "target": "old",
-          "count": "cnt"
+          "dup": "dup",
+          "num": "num"
         },
         "metric": {
           "name": "dup"
+        },
+        "record": {
+          "name": "dupRecords"
         }
       }
     ]

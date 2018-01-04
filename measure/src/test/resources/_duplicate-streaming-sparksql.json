@@ -105,10 +105,24 @@
       },
       {
         "dsl.type": "spark-sql",
-        "name": "duplicate",
-        "rule": "SELECT `__tmst`, `name`, `age`, count(*) as `cnt` FROM joined GROUP BY `__tmst`, `name`, `age` WHERE `cnt` > 1",
+        "name": "grouped",
+        "rule": "SELECT `__tmst`, `name`, `age`, count(*) as `dup_cnt` FROM joined GROUP BY `__tmst`, `name`, `age`"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "dupRecs",
+        "cache": true,
+        "rule": "SELECT * FROM grouped WHERE `dup_cnt` > 1",
+        "record": {
+          "name": "dupRecords"
+        }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "dupMetric",
+        "rule": "SELECT `__tmst`, `dup_cnt`, count(*) as `item_cnt` FROM dupRecs GROUP BY `__tmst`, `dup_cnt`",
         "metric": {
-          "name": "duplicate"
+          "name": "dup"
         }
       }
     ]
