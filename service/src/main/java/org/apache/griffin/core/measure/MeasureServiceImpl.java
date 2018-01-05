@@ -94,9 +94,8 @@ public class MeasureServiceImpl implements MeasureService {
         }
         try {
             MeasureOperation op = getOperation(measure);
-            if (op.delete(measureId)) {
-                measure.setDeleted(true);
-                measureRepo.save(measure);
+            if (op.delete(measure)) {
+
                 return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
             }
 

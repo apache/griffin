@@ -75,8 +75,14 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
     }
 
     @Override
-    public Boolean delete(Long id) {
-        return jobService.deleteJobsRelateToMeasure(id);
+    public Boolean delete(Measure measure) {
+        boolean pauseStatus = jobService.deleteJobsRelateToMeasure(measure.getId());
+        if (!pauseStatus) {
+            return false;
+        }
+        measure.setDeleted(true);
+        measureRepo.save(measure);
+        return true;
     }
 
     private boolean isConnectorNamesValid(GriffinMeasure measure) {
@@ -85,7 +91,7 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
             LOGGER.warn("Connector names cannot be empty.");
             return false;
         }
-        List<DataConnector> connectors =dcRepo.findByConnectorNames(names);
+        List<DataConnector> connectors = dcRepo.findByConnectorNames(names);
         if (CollectionUtils.isEmpty(connectors)) {
             LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
             return false;
