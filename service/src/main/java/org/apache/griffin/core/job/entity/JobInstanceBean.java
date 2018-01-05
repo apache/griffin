@@ -19,9 +19,9 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

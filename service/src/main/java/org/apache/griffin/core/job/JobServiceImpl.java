@@ -256,10 +256,6 @@ public class JobServiceImpl implements JobService {
             LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
             return null;
         }
-        if (!(measure instanceof GriffinMeasure)) {
-            LOGGER.error("The measure id {} isn't valid. It doesn't belong to a Griffin Measure.", measureId);
-            return null;
-        }
         return (GriffinMeasure) measure;
     }
 
@@ -565,7 +561,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private Boolean isJobHealthy(Long jobId) {
-        Pageable pageable = new PageRequest(0, 1, Sort.Direction.DESC, "timestamp");
+        Pageable pageable = new PageRequest(0, 1, Sort.Direction.DESC, "tms");
         List<JobInstanceBean> instances = jobInstanceRepo.findByJobIdAndDeleted(jobId, false, pageable);
         return !CollectionUtils.isEmpty(instances) && LivySessionStates.isHealthy(instances.get(0).getState());
     }

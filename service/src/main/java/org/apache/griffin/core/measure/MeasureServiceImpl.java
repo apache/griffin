@@ -95,10 +95,8 @@ public class MeasureServiceImpl implements MeasureService {
         try {
             MeasureOperation op = getOperation(measure);
             if (op.delete(measure)) {
-
                 return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
             }
-
         } catch (Exception e) {
             LOGGER.error("Delete measure id: {} name: {} failure. {}", measure.getId(), measure.getName(), e.getMessage());
         }
