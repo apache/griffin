@@ -82,6 +82,7 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
     public Boolean delete(Measure measure) {
         try {
             ExternalMeasure em = (ExternalMeasure) measure;
+            em.setDeleted(true);
             em.getVirtualJob().setDeleted(true);
             measureRepo.save(em);
             return true;

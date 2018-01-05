@@ -92,7 +92,7 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
             return false;
         }
         List<DataConnector> connectors = dcRepo.findByConnectorNames(names);
-        if (CollectionUtils.isEmpty(connectors)) {
+        if (!CollectionUtils.isEmpty(connectors)) {
             LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
             return false;
         }
