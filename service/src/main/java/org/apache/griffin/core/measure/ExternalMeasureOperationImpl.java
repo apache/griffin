@@ -49,7 +49,7 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
         try {
             em.setVirtualJob(new VirtualJob());
             em = measureRepo.save(em);
-            VirtualJob vj = getNewVirtualJob(em, em.getVirtualJob());
+            VirtualJob vj = genVirtualJob(em, em.getVirtualJob());
             jobRepo.save(vj);
             return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
         }
 
         try {
-            VirtualJob vj = getNewVirtualJob(em, measureRepo.findOne(em.getId()).getVirtualJob());
+            VirtualJob vj = genVirtualJob(em, measureRepo.findOne(em.getId()).getVirtualJob());
             em.setVirtualJob(vj);
             measureRepo.save(em);
             return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
@@ -92,7 +92,7 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
 
     }
 
-    private VirtualJob getNewVirtualJob(ExternalMeasure em, VirtualJob vj) {
+    private VirtualJob genVirtualJob(ExternalMeasure em, VirtualJob vj) {
         vj.setMeasureId(em.getId());
         vj.setJobName(em.getName());
         vj.setMetricName(em.getMetricName());
