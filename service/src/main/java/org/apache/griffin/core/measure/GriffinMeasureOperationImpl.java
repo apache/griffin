@@ -52,7 +52,6 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
     @Override
     public GriffinOperationMessage create(Measure measure) {
         if (!isConnectorNamesValid((GriffinMeasure) measure)) {
-            LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
             return GriffinOperationMessage.CREATE_MEASURE_FAIL;
         }
         try {
@@ -82,8 +81,16 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
 
     private boolean isConnectorNamesValid(GriffinMeasure measure) {
         List<String> names = getConnectorNames(measure);
-        List<DataConnector> connectors = dcRepo.findByConnectorNames(names);
-        return names.size() != 0 && CollectionUtils.isEmpty(connectors);
+        if (names.size() == 0) {
+            LOGGER.warn("Connector names cannot be empty.");
+            return false;
+        }
+        List<DataConnector> connectors =dcRepo.findByConnectorNames(names);
+        if (CollectionUtils.isEmpty(connectors)) {
+            LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
+            return false;
+        }
+        return true;
     }
 
     private List<String> getConnectorNames(GriffinMeasure measure) {
