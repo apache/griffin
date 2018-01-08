@@ -141,7 +141,7 @@ public class SparkSubmitJob implements Job {
         measure.setName(jd.getJobDataMap().getString("jobName"));
     }
 
-    private void setAllDataConnectorPartitions(List<DataSource> sources, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
+    private void setAllDataConnectorPartitions(List<DataSource> sources, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) throws IOException {
         if (sources == null) {
             return;
         }
@@ -150,7 +150,7 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private void setDataSourcePartitions(DataSource dataSource, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) {
+    private void setDataSourcePartitions(DataSource dataSource, String[] patternItemSet, String[] partitionItems, String sourceName, long timestamp) throws IOException {
         String name = dataSource.getName();
         for (DataConnector dataConnector : dataSource.getConnectors()) {
             if (sourceName.equals(name)) {
@@ -159,16 +159,17 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItems, long timestamp) {
+    private void setDataConnectorPartitions(DataConnector dc, String[] patternItemSet, String[] partitionItems, long timestamp) throws IOException {
         Map<String, String> partitionItemMap = genPartitionMap(patternItemSet, partitionItems, timestamp);
         /**
          * partitions must be a string like: "dt=20170301, hour=12"
          * partitionItemMap.toString() is like "{dt=20170301, hour=12}"
          */
         String partitions = partitionItemMap.toString().substring(1, partitionItemMap.toString().length() - 1);
+        partitions = partitions.replaceAll(",", " AND ");
         Map<String, String> configMap = dc.getConfigInMaps();
         //config should not be null
-        configMap.put("partitions", partitions);
+        configMap.put("where", partitions);
         try {
             dc.setConfig(configMap);
         } catch (JsonProcessingException e) {
@@ -221,7 +222,7 @@ public class SparkSubmitJob implements Job {
         return currentBlockStartTimestamp;
     }
 
-    private String escapeCharactor(String str, String regex) {
+    private String escapeCharacter(String str, String regex) {
         String escapeCh = "\\" + regex;
         return str.replaceAll(regex, escapeCh);
     }
@@ -232,15 +233,11 @@ public class SparkSubmitJob implements Job {
 
         List<String> args = new ArrayList<>();
         args.add(sparkJobProps.getProperty("sparkJob.args_1"));
-        // measure
-        String measureJson;
         measure.setTriggerTimeStamp(System.currentTimeMillis());
-        measureJson = JsonUtil.toJsonWithFormat(measure);
-
+        String measureJson = JsonUtil.toJsonWithFormat(measure);
         // to fix livy bug: ` will be ignored by livy
-        String finalMeasureJson = escapeCharactor(measureJson, "\\`");
+        String finalMeasureJson = escapeCharacter(measureJson, "\\`");
         args.add(finalMeasureJson);
-
         args.add(sparkJobProps.getProperty("sparkJob.args_3"));
         sparkJobDO.setArgs(args);
 
@@ -266,7 +263,8 @@ public class SparkSubmitJob implements Job {
     }
 
     public void saveJobInstance(String groupName, String jobName, String result) {
-        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {};
+        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
+        };
         try {
             Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
             if (resultMap != null) {
@@ -280,7 +278,7 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private JobInstance genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException{
+    private JobInstance genJobInstance(String groupName, String jobName, Map<String, Object> resultMap) throws IllegalArgumentException {
         JobInstance jobInstance = new JobInstance();
         jobInstance.setGroupName(groupName);
         jobInstance.setJobName(jobName);

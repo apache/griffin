@@ -102,31 +102,32 @@ export class MetricComponent implements OnInit {
           'dq':0,
           'details':[]
         }
-        var array = [];
-        node.metrics = array;
+        node.metrics = [];
         for(let key in this.orgWithMeasure[orgName]){
           orgNode.measureMap.push(key);
           this.measureOptions.push(key);
           var jobs = this.orgWithMeasure[orgName][key];          
             for(let i = 0;i < jobs.length;i++){
-               orgNode.jobMap.push(jobs[i].jobName);
-               var job = jobs[i].jobName;
-               jobMap.set(job, orgNode.name);
-               this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( jobes=> { 
-                 this.originalData = jobes;
-                 if(this.originalData.hits){
-                   this.metricData = this.originalData.hits.hits;
-                   metricNode.details = this.metricData;                                
-                   metricNode.name = this.metricData[0]._source.name;
-                   metricNode.timestamp = this.metricData[0]._source.tmst;
-                   metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
-                   this.pushToNode(jobMap, metricNode);
-                 }
-               },
-               err => {
-                 // console.log(err);
-               console.log('Error occurs when connect to elasticsearh!');
-               });            
+              orgNode.jobMap.push(jobs[i].jobName);
+              var job = jobs[i].jobName;
+              jobMap.set(job, orgNode.name);
+              this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( jobes=> { 
+                this.originalData = jobes;
+                if(this.originalData.hits){
+                  this.metricData = this.originalData.hits.hits;
+                  if(this.metricData[0]._source.value.miss != undefined){
+                    metricNode.details = this.metricData;                                
+                    metricNode.name = this.metricData[0]._source.name;
+                    metricNode.timestamp = this.metricData[0]._source.tmst;
+                    metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
+                    this.pushToNode(jobMap, metricNode);
+                  }
+                }
+              },
+              err => {
+                // console.log(err);
+              console.log('Error occurs when connect to elasticsearh!');
+              });            
             }                          
         } 
         this.finalData.push(node); 
@@ -155,22 +156,22 @@ export class MetricComponent implements OnInit {
 
   getOption(parent,i){
    	return this.chartOption.get('thumbnail'+parent+'-'+i);
-   }
+  }
 
   redraw (data) {
     this.chartHeight = $('.chartItem:eq(0)').width()*0.8+'px';
-      for(let i = 0;i<data.length;i++){
-          var parentIndex = i;
-          for(let j = 0;j<data[i].metrics.length;j++){
-          	let index = j;
-          	let chartId = 'thumbnail' + parentIndex + '-' + index;
-            let _chartId = '#' + chartId;
-            var divs = $(_chartId);
-            divs.get(0).style.width = divs.parent().width()+'px';
-            divs.get(0).style.height = this.chartHeight;
-  			    this.chartOption.set(chartId,this.chartService.getOptionThum(data[i].metrics[j]));
-          }
+    for(let i = 0;i<data.length;i++){
+      var parentIndex = i;
+      for(let j = 0;j<data[i].metrics.length;j++){
+      	let index = j;
+      	let chartId = 'thumbnail' + parentIndex + '-' + index;
+        let _chartId = '#' + chartId;
+        var divs = $(_chartId);
+        divs.get(0).style.width = divs.parent().width()+'px';
+        divs.get(0).style.height = this.chartHeight;
+  	  this.chartOption.set(chartId,this.chartService.getOptionThum(data[i].metrics[j]));
       }
+    }
   }
 
   goTo(parent,i){
@@ -178,64 +179,64 @@ export class MetricComponent implements OnInit {
   }
 
   changeOrg() {
-      this.selectedMeasureIndex = undefined;
-      this.measureOptions = [];
-      this.oData = this.finalData.slice(0);
-      if(this.selectedOrgIndex == 0){
-        this.oData = this.finalData;
-      }
-      else {
-        var org = this.orgs[this.selectedOrgIndex-1];
-        this.measureOptions = org.measureMap;
-        for(let i = 0;i<this.oData.length;i++){
-          if(this.oData[i].name!=org.name){
-            for(var j = i; j < this.oData.length - 1; j++){
-              this.oData[j] = this.oData[j + 1];
-            }
-            this.oData.length--;
-            i--;
+    this.selectedMeasureIndex = undefined;
+    this.measureOptions = [];
+    this.oData = this.finalData.slice(0);
+    if(this.selectedOrgIndex == 0){
+      this.oData = this.finalData;
+    }
+    else {
+      var org = this.orgs[this.selectedOrgIndex-1];
+      this.measureOptions = org.measureMap;
+      for(let i = 0;i<this.oData.length;i++){
+        if(this.oData[i].name!=org.name){
+          for(var j = i; j < this.oData.length - 1; j++){
+            this.oData[j] = this.oData[j + 1];
           }
+          this.oData.length--;
+          i--;
         }
       }
-      this.mData = this.oData.slice(0);
-      var self = this;
-      setTimeout(function() {
-          self.redraw(self.oData);
-      }, 1000);
+    }
+    this.mData = this.oData.slice(0);
+    var self = this;
+    setTimeout(function() {
+      self.redraw(self.oData);
+    }, 1000);
   };
 
   changeMeasure() {
-      var jobdetail = [];  
-      this.fData = JSON.parse(JSON.stringify(this.mData));
-      this.oData = this.fData; 
-      if(this.selectedMeasureIndex != undefined && this.selectedMeasureIndex != 0){
-        var measure = this.measureOptions[this.selectedMeasureIndex-1];
-        for(let key in this.orgWithMeasure){
-          if(key == this.fData[0].name){
-            for(let measurename in this.orgWithMeasure[key]){
-              if(measurename == measure){
-                var jobname = this.orgWithMeasure[key][measurename];
-                for(let i=0;i< jobname.length;i++){
-                    jobdetail.push(jobname[i].jobName);
-                  }
-              }
+    var jobdetail = [];  
+    this.fData = JSON.parse(JSON.stringify(this.mData));
+    this.oData = this.fData; 
+    if(this.selectedMeasureIndex != undefined && this.selectedMeasureIndex != 0){
+      var measure = this.measureOptions[this.selectedMeasureIndex-1];
+      for(let key in this.orgWithMeasure){
+        if(key == this.fData[0].name){
+          for(let measurename in this.orgWithMeasure[key]){
+            if(measurename == measure){
+              var jobname = this.orgWithMeasure[key][measurename];
+              for(let i=0;i< jobname.length;i++){
+                  jobdetail.push(jobname[i].jobName);
+                }
             }
           }
         }
-        for(let i = 0;i<this.fData[0].metrics.length;i++){
-            if(jobdetail.indexOf(this.fData[0].metrics[i].name) === -1){
-              for(var j = i; j < this.fData[0].metrics.length - 1; j++){
-                 this.fData[0].metrics[j] = this.fData[0].metrics[j + 1];
-              }
-              this.fData[0].metrics.length--;
-              i--;
-          }          
-        }
       }
-      var self = this;
-      setTimeout(function() {
-          self.redraw(self.oData);
-      }, 0);
+      for(let i = 0;i<this.fData[0].metrics.length;i++){
+        if(jobdetail.indexOf(this.fData[0].metrics[i].name) === -1){
+          for(var j = i; j < this.fData[0].metrics.length - 1; j++){
+            this.fData[0].metrics[j] = this.fData[0].metrics[j + 1];
+          }
+          this.fData[0].metrics.length--;
+          i--;
+        }          
+      }
+    }
+    var self = this;
+    setTimeout(function() {
+      self.redraw(self.oData);
+    }, 0);
   }
 
 

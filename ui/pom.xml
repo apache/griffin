@@ -24,7 +24,7 @@ under the License.
     <parent>
         <groupId>org.apache.griffin</groupId>
         <artifactId>griffin</artifactId>
-        <version>0.1.6-incubating-SNAPSHOT</version>
+        <version>0.1.7-incubating-SNAPSHOT</version>
     </parent>
   <artifactId>ui</artifactId>
   <packaging>pom</packaging>
@@ -57,7 +57,7 @@ under the License.
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>1.6</version>
         <configuration>
           <workingDirectory>angular</workingDirectory>
           <installDirectory>.tmp</installDirectory>

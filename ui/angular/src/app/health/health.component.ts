@@ -59,8 +59,8 @@ export class HealthComponent implements OnInit {
   
   onChartClick($event){
     if($event.data.name){
-        this.router.navigate(['/detailed/'+$event.data.name]);
-        window.location.reload();
+      this.router.navigate(['/detailed/'+$event.data.name]);
+      window.location.reload();
     }
   }
 
@@ -72,40 +72,40 @@ export class HealthComponent implements OnInit {
     var sysId = 0;
     var metricId = 0;
     var result = [];
-    	for(let sys of data){
-        var item = {
-            'id':'',
-            'name':'',
-            children:[]
-        };
-        item.id = 'id_'+sysId;
-        item.name = sys.name;
-        if (sys.metrics != undefined) {
-            item.children = [];
-            	for(let metric of sys.metrics){
-                var itemChild = {
-                    id: 'id_' + sysId + '_' + metricId,
-                    name: metric.name,
-                    value: 1,
-                    dq: metric.dq,
-                    sysName: sys.name,
-                    itemStyle: {
-                        normal: {
-                            color: '#4c8c6f'
-                        }
-                    },
-                };
-                if (metric.dqfail == 1) {
-                    itemChild.itemStyle.normal.color = '#ae5732';
-                } else {
-                    itemChild.itemStyle.normal.color = '#005732';
-                }
-                item.children.push(itemChild);
-                metricId++;
-            }
+    for(let sys of data){
+      var item = {
+        'id':'',
+        'name':'',
+        children:[]
+      };
+      item.id = 'id_'+sysId;
+      item.name = sys.name;
+      if (sys.metrics != undefined) {
+        item.children = [];
+        for(let metric of sys.metrics){
+          var itemChild = {
+            id: 'id_' + sysId + '_' + metricId,
+            name: metric.name,
+            value: 1,
+            dq: metric.dq,
+            sysName: sys.name,
+            itemStyle: {
+              normal: {
+                color: '#4c8c6f'
+              }
+            },
+          };
+          if (metric.dqfail == 1) {
+            itemChild.itemStyle.normal.color = '#ae5732';
+          } else {
+            itemChild.itemStyle.normal.color = '#005732';
+          }
+          item.children.push(itemChild);
+          metricId++;
         }
-        result.push(item);
-        sysId ++;
+      }
+      result.push(item);
+      sysId ++;
     }
     return result;
    };
@@ -216,12 +216,14 @@ export class HealthComponent implements OnInit {
                this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( jobes=> { 
                  this.originalData = jobes;
                  if(this.originalData.hits){
-                   this.metricData = this.originalData.hits.hits;
-                   metricNode.details = this.metricData;                                
-                   metricNode.name = this.metricData[0]._source.name;
-                   metricNode.timestamp = this.metricData[0]._source.tmst;
-                   metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
-                   this.pushToNode(jobMap, metricNode);
+                    this.metricData = this.originalData.hits.hits;
+                    if(this.metricData[0]._source.value.miss != undefined){
+                      metricNode.details = this.metricData;                                
+                      metricNode.name = this.metricData[0]._source.name;
+                      metricNode.timestamp = this.metricData[0]._source.tmst;
+                      metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
+                      this.pushToNode(jobMap, metricNode);
+                  }
                  }
                },
                err => {

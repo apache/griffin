@@ -52,9 +52,9 @@ export class LoginComponent implements OnInit {
       .text('Login failed. Try again.');
   }
 
-  resizeMainWindow(){
-      $('#mainWindow').height(window.innerHeight-56-90);
-  }
+  // resizeMainWindow(){
+  //     $('#mainWindow').height(window.innerHeight-50);
+  // }
 
   submit(event){
       if(event.which == 13){//enter
