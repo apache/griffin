@@ -19,12 +19,14 @@ under the License.
 package org.apache.griffin.measure.config.validator
 
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.config.params.Param
+import org.apache.griffin.measure.config.params._
 
 import scala.util.Try
 
-trait ParamValidator extends Loggable with Serializable {
+object ParamValidator extends Loggable with Serializable {
 
-  def validate[T <: Param](param: Param): Try[Boolean]
+  def validate[T <: Param](param: Param): Try[Boolean] = Try {
+    param.validate
+  }
 
 }

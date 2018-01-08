@@ -16,16 +16,22 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rule.step
+package org.apache.griffin.measure.rule.plan
 
-import org.apache.griffin.measure.rule.dsl.{DslType, PersistType}
+trait TimeInfo extends Serializable {
+  val calcTime: Long
+//  val tmst: Long
+  val head: String
 
-trait RuleStep extends Serializable {
-
-  val dslType: DslType
-
-  val name: String
-  val rule: String
-  val details: Map[String, Any]
-
+  def key: String = if (head.nonEmpty) s"${head}_${calcTime}" else s"${calcTime}"
+  def setHead(h: String): TimeInfo
 }
+
+case class CalcTimeInfo(calcTime: Long, head: String = "") extends TimeInfo {
+//  val tmst: Long = calcTime
+  def setHead(h: String): TimeInfo = CalcTimeInfo(calcTime, h)
+}
+
+//case class TmstTimeInfo(calcTime: Long, tmst: Long, head: String = "") extends TimeInfo {
+//  def setHead(h: String): TimeInfo = TmstTimeInfo(calcTime, tmst, h)
+//}

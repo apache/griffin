@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.dsl.analyzer
 
-import org.apache.griffin.measure.rule.dsl.expr._
+import org.apache.griffin.measure.rule.dsl.expr.{MathExpr, _}
 
 
 trait BasicAnalyzer extends Serializable {
@@ -35,7 +35,7 @@ trait BasicAnalyzer extends Serializable {
 
   val seqSelectionExprs = (dsName: String) => (expr: Expr, v: Seq[SelectionExpr]) => {
     expr match {
-      case se @ SelectionExpr(head: DataSourceHeadExpr, _, _) if (head.desc == dsName) => v :+ se
+      case se @ SelectionExpr(head: DataSourceHeadExpr, _, _) if (head.name == dsName) => v :+ se
       case _ => v
     }
   }

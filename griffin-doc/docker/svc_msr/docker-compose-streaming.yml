@@ -42,6 +42,7 @@ es:
   hostname: es
   ports:
     - 39200:9200
+    - 39300:9300
   container_name: es
 
 zk:

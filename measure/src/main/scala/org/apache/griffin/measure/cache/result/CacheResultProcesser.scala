@@ -25,7 +25,7 @@ import scala.collection.mutable.{Map => MutableMap}
 
 object CacheResultProcesser extends Loggable {
 
-  val cacheGroup: MutableMap[Long, CacheResult] = MutableMap()
+  private val cacheGroup: MutableMap[Long, CacheResult] = MutableMap()
 
   def genUpdateCacheResult(timeGroup: Long, updateTime: Long, result: Result): Option[CacheResult] = {
     cacheGroup.get(timeGroup) match {

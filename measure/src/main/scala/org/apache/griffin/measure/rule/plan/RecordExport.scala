@@ -16,19 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.config.validator
+package org.apache.griffin.measure.rule.plan
 
-import org.apache.griffin.measure.config.params.Param
-
-import scala.util.Try
-
-// need to validate params
-case class AllParamValidator() extends ParamValidator {
-
-  def validate[T <: Param](param: Param): Try[Boolean] = {
-    Try {
-      param.validate
-    }
-  }
+case class RecordExport(name: String,
+                        stepName: String,
+                        dataSourceCacheOpt: Option[String],
+                        originDFOpt: Option[String]
+                       ) extends RuleExport {
 
 }

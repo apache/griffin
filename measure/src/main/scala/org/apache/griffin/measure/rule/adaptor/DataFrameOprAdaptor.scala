@@ -19,26 +19,37 @@ under the License.
 package org.apache.griffin.measure.rule.adaptor
 
 import org.apache.griffin.measure.process.ProcessType
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
+import org.apache.griffin.measure.utils.ParamUtil._
 
-case class DataFrameOprAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
+case class DataFrameOprAdaptor() extends RuleAdaptor {
 
-  def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
-    DfOprStep(getName(param), getRule(param), getDetails(param),
-      getPersistType(param), getUpdateDataSource(param)) :: Nil
-  }
-  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
-    ruleStep match {
-      case rs @ DfOprStep(_, _, _, _, _) => rs :: Nil
-      case _ => Nil
-    }
-  }
+//  def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep] = {
+//    val ruleInfo = RuleInfoGen(param, timeInfo)
+//    DfOprStep(timeInfo, ruleInfo) :: Nil
+////    DfOprStep(getName(param), getRule(param), getDetails(param),
+////      getPersistType(param), getUpdateDataSource(param)) :: Nil
+//  }
+//  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
+//    ruleStep match {
+//      case rs @ DfOprStep(_, _) => rs :: Nil
+//      case _ => Nil
+//    }
+//  }
 
-  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
-    param.get(_name) match {
-      case Some(name) => name.toString :: Nil
-      case _ => Nil
-    }
+//  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
+//    param.get(_name) match {
+//      case Some(name) => name.toString :: Nil
+//      case _ => Nil
+//    }
+//  }
+
+  import RuleParamKeys._
+
+  def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any], procType: ProcessType): RulePlan = {
+    val name = getRuleName(param)
+    val step = DfOprStep(name, getRule(param), getDetails(param), getCache(param), getGlobal(param))
+    RulePlan(step :: Nil, genRuleExports(param, name, name))
   }
 
 }

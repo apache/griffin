@@ -16,13 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rule.step
+package org.apache.griffin.measure.rule.plan
 
 import org.apache.griffin.measure.rule.dsl._
 
-case class GriffinDslStep(name: String, rule: String, dqType: DqType, details: Map[String, Any]
-                         ) extends RuleStep {
-
-  val dslType: DslType = GriffinDslType
+case class MetricExport(name: String,
+                        stepName: String,
+                        collectType: CollectType
+                       ) extends RuleExport {
 
 }

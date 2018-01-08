@@ -31,24 +31,22 @@ import scala.util.{Success, Try}
 
 object DataSourceFactory extends Loggable {
 
-  val HiveRegex = """^(?i)hive$""".r
-  val TextRegex = """^(?i)text$""".r
-  val AvroRegex = """^(?i)avro$""".r
-
   def genDataSources(sqlContext: SQLContext, ssc: StreamingContext, dqEngines: DqEngines,
-                     dataSourceParams: Seq[DataSourceParam], metricName: String): Seq[DataSource] = {
-    dataSourceParams.zipWithIndex.flatMap { pair =>
+                     dataSourceParams: Seq[DataSourceParam]) = {
+    val filteredDsParams = trimDataSourceParams(dataSourceParams)
+    filteredDsParams.zipWithIndex.flatMap { pair =>
       val (param, index) = pair
-      genDataSource(sqlContext, ssc, dqEngines, param, metricName, index)
+      genDataSource(sqlContext, ssc, dqEngines, param, index)
     }
   }
 
   private def genDataSource(sqlContext: SQLContext, ssc: StreamingContext,
                             dqEngines: DqEngines,
                             dataSourceParam: DataSourceParam,
-                            metricName: String, index: Int
+                            index: Int
                            ): Option[DataSource] = {
     val name = dataSourceParam.name
+    val baseline = dataSourceParam.isBaseLine
     val connectorParams = dataSourceParam.connectors
     val cacheParam = dataSourceParam.cache
     val dataConnectors = connectorParams.flatMap { connectorParam =>
@@ -57,17 +55,17 @@ object DataSourceFactory extends Loggable {
         case _ => None
       }
     }
-    val dataSourceCacheOpt = genDataSourceCache(sqlContext, cacheParam, metricName, index)
+    val dataSourceCacheOpt = genDataSourceCache(sqlContext, cacheParam, name, index)
 
-    Some(DataSource(sqlContext, name, dataConnectors, dataSourceCacheOpt))
+    Some(DataSource(sqlContext, name, baseline, dataConnectors, dataSourceCacheOpt))
   }
 
   private def genDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                                 metricName: String, index: Int
+                                 name: String, index: Int
                                 ) = {
     if (param != null) {
       try {
-        Some(DataSourceCache(sqlContext, param, metricName, index))
+        Some(DataSourceCache(sqlContext, param, name, index))
       } catch {
         case e: Throwable => {
           error(s"generate data source cache fails")
@@ -75,6 +73,25 @@ object DataSourceFactory extends Loggable {
         }
       }
     } else None
+  }
+
+
+  private def trimDataSourceParams(dataSourceParams: Seq[DataSourceParam]): Seq[DataSourceParam] = {
+    val (validDsParams, _) =
+      dataSourceParams.foldLeft((Nil: Seq[DataSourceParam], Set[String]())) { (ret, dsParam) =>
+        val (seq, names) = ret
+        if (dsParam.hasName && !names.contains(dsParam.name)) {
+          (seq :+ dsParam, names + dsParam.name)
+        } else ret
+      }
+    if (validDsParams.size > 0) {
+      val baselineDsParam = validDsParams.filter(_.isBaseLine).headOption.getOrElse(validDsParams.head)
+      validDsParams.map { dsParam =>
+        if (dsParam.name != baselineDsParam.name && dsParam.isBaseLine) {
+          dsParam.falseBaselineClone
+        } else dsParam
+      }
+    } else validDsParams
   }
 
 }

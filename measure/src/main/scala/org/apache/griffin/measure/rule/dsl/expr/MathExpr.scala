@@ -33,6 +33,10 @@ case class MathFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Option[S
     if (aliasOpt.nonEmpty) this
     else factor.extractSelf
   }
+
+  override def map(func: (Expr) => Expr): MathFactorExpr = {
+    MathFactorExpr(func(factor), withBracket, aliasOpt)
+  }
 }
 
 case class UnaryMathExpr(oprs: Seq[String], factor: MathExpr) extends MathExpr {
@@ -52,6 +56,10 @@ case class UnaryMathExpr(oprs: Seq[String], factor: MathExpr) extends MathExpr {
   override def extractSelf: Expr = {
     if (oprs.nonEmpty) this
     else factor.extractSelf
+  }
+
+  override def map(func: (Expr) => Expr): UnaryMathExpr = {
+    UnaryMathExpr(oprs, func(factor).asInstanceOf[MathExpr])
   }
 }
 
@@ -76,5 +84,11 @@ case class BinaryMathExpr(factor: MathExpr, tails: Seq[(String, MathExpr)]) exte
   override def extractSelf: Expr = {
     if (tails.nonEmpty) this
     else factor.extractSelf
+  }
+
+  override def map(func: (Expr) => Expr): BinaryMathExpr = {
+    BinaryMathExpr(func(factor).asInstanceOf[MathExpr], tails.map{ pair =>
+      (pair._1, func(pair._2).asInstanceOf[MathExpr])
+    })
   }
 }
