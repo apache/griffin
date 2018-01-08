@@ -31,65 +31,47 @@ import org.scalamock.scalatest.MockFactory
 class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter with MockFactory {
 
   test ("profiling groupby") {
-//    val adaptor = GriffinDslAdaptor("source" :: Nil, "count" :: Nil, BatchProcessType, RunPhase)
-    val adaptor = GriffinDslAdaptor("source" :: "target" :: Nil, "count" :: Nil)
-//    val adaptor = SparkSqlAdaptor()
-
+//    val adaptor = GriffinDslAdaptor("source" :: "target" :: Nil, "count" :: Nil)
+//
 //    val ruleJson =
 //      """
 //        |{
 //        |  "dsl.type": "griffin-dsl",
-//        |  "dq.type": "profiling",
-//        |  "name": "prof",
-//        |  "rule": "count(*)"
+//        |  "dq.type": "accuracy",
+//        |  "name": "accu",
+//        |  "rule": "source.user_id = target.user_id",
+//        |  "details": {
+//        |    "source": "source",
+//        |    "target": "target",
+//        |    "miss": "miss_count",
+//        |    "total": "total_count",
+//        |    "matched": "matched_count"
+//        |  },
+//        |  "metric": {
+//        |    "name": "accu"
+//        |  },
+//        |  "record": {
+//        |    "name": "missRecords"
+//        |  }
 //        |}
 //      """.stripMargin
-
-    val ruleJson =
-      """
-        |{
-        |  "dsl.type": "griffin-dsl",
-        |  "dq.type": "accuracy",
-        |  "name": "accu",
-        |  "rule": "source.user_id = target.user_id",
-        |  "details": {
-        |    "source": "source",
-        |    "target": "target",
-        |    "miss": "miss_count",
-        |    "total": "total_count",
-        |    "matched": "matched_count"
-        |  },
-        |  "metric": {
-        |    "name": "accu"
-        |  },
-        |  "record": {
-        |    "name": "missRecords"
-        |  }
-        |}
-      """.stripMargin
-
-    // rule: Map[String, Any]
-    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
-    println(rule)
-
-//    val dataCheckerMock = mock[DataChecker]
-//    dataCheckerMock.existDataSourceName _ expects ("source") returning (true)
-//    RuleAdaptorGroup.dataChecker = dataCheckerMock
-
-    val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
-//    val steps = adaptor.genConcreteRuleStep(TimeInfo(0, 0), rule, dsTmsts)
-//    val steps = adaptor.genConcreteRuleStep(TimeInfo(1, 2), rule)
-
-//    steps.foreach { step =>
-//      println(s"${step}")
-//    }
-
-    val timeInfo = CalcTimeInfo(123)
-    TableRegisters.registerCompileTempTable(timeInfo.key, "source")
-
-    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
-    rp.ruleSteps.foreach(println)
-    rp.ruleExports.foreach(println)
+//
+//    // rule: Map[String, Any]
+//    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
+//    println(rule)
+//
+////    val dataCheckerMock = mock[DataChecker]
+////    dataCheckerMock.existDataSourceName _ expects ("source") returning (true)
+////    RuleAdaptorGroup.dataChecker = dataCheckerMock
+//
+//    val dsTmsts = Map[String, Set[Long]](("source" -> Set[Long](1234)))
+//
+//    val timeInfo = CalcTimeInfo(123)
+//    TableRegisters.registerCompileTempTable(timeInfo.key, "source")
+//
+//    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
+//    rp.ruleSteps.foreach(println)
+//    rp.ruleExports.foreach(println)
   }
 
   test ("accuracy") {
@@ -128,69 +110,69 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
   }
 
   test ("duplicate") {
-    val adaptor = GriffinDslAdaptor("new" :: "old" :: Nil, "count" :: Nil)
-    val ruleJson =
-      """
-        |{
-        |  "dsl.type": "griffin-dsl",
-        |  "dq.type": "duplicate",
-        |  "name": "dup",
-        |  "rule": "name, count(age + 1) as ct",
-        |  "details": {
-        |    "count": "cnt"
-        |  },
-        |  "metric": {
-        |    "name": "dup"
-        |  }
-        |}
-      """.stripMargin
-    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
-    println(rule)
-
-    val timeInfo = CalcTimeInfo(123)
-    TableRegisters.registerCompileTempTable(timeInfo.key, "new")
-    TableRegisters.registerCompileTempTable(timeInfo.key, "old")
-
-    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
-    rp.ruleSteps.foreach(println)
-    rp.ruleExports.foreach(println)
-
-    TableRegisters.unregisterCompileTempTables(timeInfo.key)
+//    val adaptor = GriffinDslAdaptor("new" :: "old" :: Nil, "count" :: Nil)
+//    val ruleJson =
+//      """
+//        |{
+//        |  "dsl.type": "griffin-dsl",
+//        |  "dq.type": "duplicate",
+//        |  "name": "dup",
+//        |  "rule": "name, count(age + 1) as ct",
+//        |  "details": {
+//        |    "count": "cnt"
+//        |  },
+//        |  "metric": {
+//        |    "name": "dup"
+//        |  }
+//        |}
+//      """.stripMargin
+//    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
+//    println(rule)
+//
+//    val timeInfo = CalcTimeInfo(123)
+//    TableRegisters.registerCompileTempTable(timeInfo.key, "new")
+//    TableRegisters.registerCompileTempTable(timeInfo.key, "old")
+//
+//    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
+//    rp.ruleSteps.foreach(println)
+//    rp.ruleExports.foreach(println)
+//
+//    TableRegisters.unregisterCompileTempTables(timeInfo.key)
   }
 
   test ("timeliness") {
-    val adaptor = GriffinDslAdaptor("source" :: Nil, "length" :: Nil)
-    val ruleJson =
-      """
-        |{
-        |  "dsl.type": "griffin-dsl",
-        |  "dq.type": "timeliness",
-        |  "name": "timeliness",
-        |  "rule": "ts",
-        |  "details": {
-        |    "source": "source",
-        |    "latency": "latency",
-        |    "threshold": "1h"
-        |  },
-        |  "metric": {
-        |    "name": "timeliness"
-        |  },
-        |  "record": {
-        |    "name": "lateRecords"
-        |  }
-        |}
-      """.stripMargin
-    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
-    println(rule)
-
-    val timeInfo = CalcTimeInfo(123)
-    TableRegisters.registerCompileTempTable(timeInfo.key, "source")
-
-    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
-    rp.ruleSteps.foreach(println)
-    rp.ruleExports.foreach(println)
-
-    TableRegisters.unregisterCompileTempTables(timeInfo.key)
+//    val adaptor = GriffinDslAdaptor("source" :: Nil, "length" :: Nil)
+//    val ruleJson =
+//      """
+//        |{
+//        |  "dsl.type": "griffin-dsl",
+//        |  "dq.type": "timeliness",
+//        |  "name": "timeliness",
+//        |  "rule": "ts",
+//        |  "details": {
+//        |    "source": "source",
+//        |    "latency": "latency",
+//        |    "threshold": "1h"
+//        |  },
+//        |  "metric": {
+//        |    "name": "timeliness"
+//        |  },
+//        |  "record": {
+//        |    "name": "lateRecords"
+//        |  }
+//        |}
+//      """.stripMargin
+//    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
+//    println(rule)
+//
+//    val timeInfo = CalcTimeInfo(123)
+//    TableRegisters.registerCompileTempTable(timeInfo.key, "source")
+//
+//    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
+//    rp.ruleSteps.foreach(println)
+//    rp.ruleExports.foreach(println)
+//
+//    TableRegisters.unregisterCompileTempTables(timeInfo.key)
   }
 
 }
