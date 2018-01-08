@@ -41,17 +41,17 @@ public class JobController {
         return jobService.getAliveJobs();
     }
 
-    @RequestMapping(value = "/job", method = RequestMethod.POST)
+    @RequestMapping(value = "/jobs", method = RequestMethod.POST)
     public GriffinOperationMessage addJob(@RequestBody JobSchedule jobSchedule) {
         return jobService.addJob(jobSchedule);
     }
 
-    @RequestMapping(value = "/job", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteJob(@RequestParam("jobName") String jobName) {
         return jobService.deleteJob(jobName);
     }
 
-    @RequestMapping(value = "/job/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/jobs/{id}", method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteJob(@PathVariable("id") Long id) {
         return jobService.deleteJob(id);
     }
@@ -61,7 +61,7 @@ public class JobController {
         return jobService.findInstancesOfJob(id, page, size);
     }
 
-    @RequestMapping(value = "/job/health", method = RequestMethod.GET)
+    @RequestMapping(value = "/jobs/health", method = RequestMethod.GET)
     public JobHealth getHealthInfo() {
         return jobService.getHealthInfo();
     }

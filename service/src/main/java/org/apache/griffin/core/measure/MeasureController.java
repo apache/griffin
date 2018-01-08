@@ -37,17 +37,17 @@ public class MeasureController {
         return measureService.getAllAliveMeasures();
     }
 
-    @RequestMapping(value = "/measure/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/measures/{id}", method = RequestMethod.GET)
     public Measure getMeasureById(@PathVariable("id") long id) {
         return measureService.getMeasureById(id);
     }
 
-    @RequestMapping(value = "/measure/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/measures/{id}", method = RequestMethod.DELETE)
     public GriffinOperationMessage deleteMeasureById(@PathVariable("id") Long id) {
         return measureService.deleteMeasureById(id);
     }
 
-    @RequestMapping(value = "/measure", method = RequestMethod.PUT)
+    @RequestMapping(value = "/measures", method = RequestMethod.PUT)
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         return measureService.updateMeasure(measure);
     }
@@ -57,7 +57,7 @@ public class MeasureController {
         return measureService.getAliveMeasuresByOwner(owner);
     }
 
-    @RequestMapping(value = "/measure", method = RequestMethod.POST)
+    @RequestMapping(value = "/measures", method = RequestMethod.POST)
     public GriffinOperationMessage createMeasure(@RequestBody Measure measure) {
         return measureService.createMeasure(measure);
     }
