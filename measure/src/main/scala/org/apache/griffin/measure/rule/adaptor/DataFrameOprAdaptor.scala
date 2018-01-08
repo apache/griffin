@@ -48,7 +48,7 @@ case class DataFrameOprAdaptor() extends RuleAdaptor {
 
   def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any], procType: ProcessType): RulePlan = {
     val name = getRuleName(param)
-    val step = DfOprStep(name, getRule(param), getDetails(param))
+    val step = DfOprStep(name, getRule(param), getDetails(param), getCache(param), getGlobal(param))
     RulePlan(step :: Nil, genRuleExports(param, name, name))
   }
 

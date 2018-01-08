@@ -49,6 +49,7 @@ object RuleParamKeys {
   val _rule = "rule"
   val _dslType = "dsl.type"
   val _dqType = "dq.type"
+  val _cache = "cache"
   val _global = "global"
   val _details = "details"
 
@@ -58,6 +59,7 @@ object RuleParamKeys {
   def getName(param: Map[String, Any], defName: String): String = param.getString(_name, defName)
   def getRule(param: Map[String, Any]): String = param.getString(_rule, "")
   def getDqType(param: Map[String, Any]): DqType = DqType(param.getString(_dqType, ""))
+  def getCache(param: Map[String, Any]): Boolean = param.getBoolean(_cache, false)
   def getGlobal(param: Map[String, Any]): Boolean = param.getBoolean(_global, false)
   def getDetails(param: Map[String, Any]): Map[String, Any] = param.getParamMap(_details)
 

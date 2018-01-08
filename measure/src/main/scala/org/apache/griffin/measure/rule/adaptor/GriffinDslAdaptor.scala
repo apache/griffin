@@ -50,6 +50,12 @@ object DuplicateKeys {
   val _num = "num"
 }
 
+object TimelinessKeys {
+  val _source = "source"
+  val _latency = "latency"
+  val _threshold = "threshold"
+}
+
 object GlobalKeys {
   val _initRule = "init.rule"
 //  val _globalMetricKeep = "global.metric.keep"
@@ -82,7 +88,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           case AccuracyType => accuracyRulePlan(timeInfo, name, expr, param, processType)
           case ProfilingType => profilingRulePlan(timeInfo, name, expr, param, processType)
           case DuplicateType => duplicateRulePlan(timeInfo, name, expr, param, processType)
-          case TimelinessType => emptyRulePlan
+          case TimelinessType => timelinessRulePlan(timeInfo, name, expr, param, processType)
           case _ => emptyRulePlan
         }
       } else {
@@ -576,6 +582,102 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val dupExports = dupRecordxports ++ dupMetricExports
 
       RulePlan(dupSteps, dupExports)
+    }
+  }
+
+  private def timelinessRulePlan(timeInfo: TimeInfo, name: String, expr: Expr,
+                                 param: Map[String, Any], processType: ProcessType
+                                ): RulePlan = {
+    val details = getDetails(param)
+    val timelinessClause = expr.asInstanceOf[TimelinessClause]
+    val sourceName = details.getString(TimelinessKeys._source, dataSourceNames.head)
+
+    if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
+      emptyRulePlan
+    } else {
+      val analyzer = TimelinessAnalyzer(timelinessClause, sourceName)
+      val btsSel = analyzer.btsExpr
+      val etsSelOpt = analyzer.etsExprOpt
+
+      // 1. in time
+      val inTimeTableName = "__inTime"
+      val inTimeSql = etsSelOpt match {
+        case Some(etsSel) => {
+          s"""
+             |SELECT *, (${btsSel}) AS `${InternalColumns.beginTs}`,
+             |(${etsSel}) AS `${InternalColumns.endTs}`
+             |FROM ${sourceName} WHERE (${btsSel}) IS NOT NULL AND (${etsSel}) IS NOT NULL
+           """.stripMargin
+        }
+        case _ => {
+          s"""
+             |SELECT *, (${btsSel}) AS `${InternalColumns.beginTs}`
+             |FROM ${sourceName} WHERE (${btsSel}) IS NOT NULL
+           """.stripMargin
+        }
+      }
+      val inTimeStep = SparkSqlStep(inTimeTableName, inTimeSql, emptyMap)
+
+      // 2. latency
+      val latencyTableName = "__lat"
+      val latencyColName = details.getStringOrKey(TimelinessKeys._latency)
+      val etsColName = etsSelOpt match {
+        case Some(_) => InternalColumns.endTs
+        case _ => InternalColumns.tmst
+      }
+      val latencySql = {
+        s"SELECT *, (`${etsColName}` - `${InternalColumns.beginTs}`) AS `${latencyColName}` FROM `${inTimeTableName}`"
+      }
+      val latencyStep = SparkSqlStep(latencyTableName, latencySql, emptyMap, true)
+
+      // 3. timeliness metric
+      val metricTableName = name
+      val metricSql = processType match {
+        case BatchProcessType => {
+          s"""
+             |SELECT CAST(AVG(`${latencyColName}`) AS BIGINT) AS `avg`,
+             |MAX(`${latencyColName}`) AS `max`,
+             |MIN(`${latencyColName}`) AS `min`
+             |FROM `${latencyTableName}`
+           """.stripMargin
+        }
+        case StreamingProcessType => {
+          s"""
+             |SELECT `${InternalColumns.tmst}`,
+             |CAST(AVG(`${latencyColName}`) AS BIGINT) AS `avg`,
+             |MAX(`${latencyColName}`) AS `max`,
+             |MIN(`${latencyColName}`) AS `min`
+             |FROM `${latencyTableName}`
+             |GROUP BY `${InternalColumns.tmst}`
+           """.stripMargin
+        }
+      }
+      val metricStep = SparkSqlStep(metricTableName, metricSql, emptyMap)
+      val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
+      val metricExports = genMetricExport(metricParam, name, metricTableName) :: Nil
+
+      // current timeliness plan
+      val timeSteps = inTimeStep :: latencyStep :: metricStep :: Nil
+      val timeExports = metricExports
+      val timePlan = RulePlan(timeSteps, timeExports)
+
+      // 4. timeliness record
+      val recordPlan = TimeUtil.milliseconds(details.getString(TimelinessKeys._threshold, "")) match {
+        case Some(tsh) => {
+          val recordTableName = "__lateRecords"
+          val recordSql = {
+            s"SELECT * FROM `${latencyTableName}` WHERE `${latencyColName}` > ${tsh}"
+          }
+          val recordStep = SparkSqlStep(recordTableName, recordSql, emptyMap)
+          val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
+          val recordExports = genRecordExport(recordParam, recordTableName, recordTableName) :: Nil
+          RulePlan(recordStep :: Nil, recordExports)
+        }
+        case _ => emptyRulePlan
+      }
+
+      // return timeliness plan
+      timePlan.merge(recordPlan)
     }
   }
 

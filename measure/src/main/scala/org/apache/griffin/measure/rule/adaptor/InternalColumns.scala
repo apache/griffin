@@ -24,5 +24,8 @@ object InternalColumns {
   val record = "__record"
   val empty = "__empty"
 
-  val columns = List[String](tmst, metric, record, empty)
+  val beginTs = "__begin_ts"
+  val endTs = "__end_ts"
+
+  val columns = List[String](tmst, metric, record, empty, beginTs, endTs)
 }

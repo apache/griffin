@@ -158,4 +158,39 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
     TableRegisters.unregisterCompileTempTables(timeInfo.key)
   }
 
+  test ("timeliness") {
+    val adaptor = GriffinDslAdaptor("source" :: Nil, "length" :: Nil)
+    val ruleJson =
+      """
+        |{
+        |  "dsl.type": "griffin-dsl",
+        |  "dq.type": "timeliness",
+        |  "name": "timeliness",
+        |  "rule": "ts",
+        |  "details": {
+        |    "source": "source",
+        |    "latency": "latency",
+        |    "threshold": "1h"
+        |  },
+        |  "metric": {
+        |    "name": "timeliness"
+        |  },
+        |  "record": {
+        |    "name": "lateRecords"
+        |  }
+        |}
+      """.stripMargin
+    val rule: Map[String, Any] = JsonUtil.toAnyMap(ruleJson)
+    println(rule)
+
+    val timeInfo = CalcTimeInfo(123)
+    TableRegisters.registerCompileTempTable(timeInfo.key, "source")
+
+    val rp = adaptor.genRulePlan(timeInfo, rule, StreamingProcessType)
+    rp.ruleSteps.foreach(println)
+    rp.ruleExports.foreach(println)
+
+    TableRegisters.unregisterCompileTempTables(timeInfo.key)
+  }
+
 }

@@ -41,7 +41,7 @@ case class SparkSqlAdaptor() extends RuleAdaptor {
 
   def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any], procType: ProcessType): RulePlan = {
     val name = getRuleName(param)
-    val step = SparkSqlStep(name, getRule(param), getDetails(param), getGlobal(param))
+    val step = SparkSqlStep(name, getRule(param), getDetails(param), getCache(param), getGlobal(param))
     RulePlan(step :: Nil, genRuleExports(param, name, name))
   }
 

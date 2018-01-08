@@ -23,8 +23,6 @@ import org.apache.griffin.measure.rule.dsl.expr.{AliasableExpr, _}
 
 case class DuplicateAnalyzer(expr: DuplicateClause, sourceName: String, targetName: String) extends BasicAnalyzer {
 
-  val dataSourceNames = expr.preOrderTraverseDepthFirst(Set[String]())(seqDataSourceNames, combDataSourceNames)
-
   val seqAlias = (expr: Expr, v: Seq[String]) => {
     expr match {
       case apr: AliasableExpr => v ++ apr.alias
@@ -39,6 +37,10 @@ case class DuplicateAnalyzer(expr: DuplicateClause, sourceName: String, targetNa
     val (pr, idx) = pair
     val res = pr.preOrderTraverseDepthFirst(Seq[String]())(seqAlias, combAlias)
     (pr, res.headOption.getOrElse(genAlias(idx)))
+  }
+
+  if (selectionPairs.isEmpty) {
+    throw new Exception(s"duplicate analyzer error: empty selection")
   }
 
 }
