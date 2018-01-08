@@ -451,7 +451,7 @@ public class JobServiceImpl implements JobService {
         Pageable pageable = new PageRequest(page, size, Sort.Direction.DESC, "tms");
         List<JobInstanceBean> instances = jobInstanceRepo.findByJobIdAndDeleted(jobId, false, pageable);
         if (CollectionUtils.isEmpty(instances)) {
-            LOGGER.warn("Job id {} does not exist.", jobId);
+            LOGGER.warn("Job id {} may not exist or it's instances may not be saved before scheduled.", jobId);
         }
         return instances;
     }

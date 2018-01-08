@@ -84,7 +84,7 @@ public class SparkSubmitJob implements Job {
         int repeatCount = simpleTrigger.getRepeatCount();
         int fireCount = simpleTrigger.getTimesTriggered();
         if (fireCount > repeatCount) {
-            saveJobInstance(null,LivySessionStates.State.not_found,true);
+            saveJobInstance(null, LivySessionStates.State.not_found, true);
         }
     }
 
@@ -198,7 +198,7 @@ public class SparkSubmitJob implements Job {
         boolean pauseStatus = false;
         if (result != null) {
             pauseStatus = jobService.pauseJob(jd.getKey().getGroup(), jd.getKey().getName());
-            LOGGER.info("Delete predicate job {}.", pauseStatus);
+            LOGGER.info("Delete predicate job {}.", pauseStatus ? "success" : "failure");
         }
         saveJobInstance(result, LivySessionStates.State.found, pauseStatus);
     }
