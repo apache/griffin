@@ -138,7 +138,6 @@ public class SparkSubmitJob implements Job {
                 mPredicts.add(sp);
             }
         }
-
     }
 
     private void setMeasureInstanceName(GriffinMeasure measure, JobDetail jd) {

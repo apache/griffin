@@ -214,10 +214,9 @@ public class JobInstance implements Job {
     }
 
     private boolean createJobInstance(Map<String, Object> confMap) throws Exception {
-        Map<String, Object> config = (Map<String, Object>) confMap.get("predicate.config");
-        Map<String, Object> scheduleConfig = (Map<String, Object>) config.get("checkdonefile.schedule");
-        Long interval = TimeUtil.str2Long((String) scheduleConfig.get("interval"));
-        Integer repeat = Integer.valueOf(scheduleConfig.get("repeat").toString());
+        Map<String, Object> config = (Map<String, Object>) confMap.get("checkdonefile.schedule");
+        Long interval = TimeUtil.str2Long((String) config.get("interval"));
+        Integer repeat = Integer.valueOf(config.get("repeat").toString());
         String groupName = "PG";
         String jobName = griffinJob.getJobName() + "_predicate_" + System.currentTimeMillis();
         Scheduler scheduler = factory.getObject();
