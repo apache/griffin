@@ -37,7 +37,7 @@ trait DqProcess extends Loggable with Serializable {
 
   def retriable: Boolean
 
-  protected def getStartTime: Long = {
+  protected def getAppTime: Long = {
     if (userParam.timestamp != null && userParam.timestamp > 0) { userParam.timestamp }
     else { System.currentTimeMillis }
   }

@@ -93,7 +93,7 @@ object TimeInfoCache extends Loggable with Serializable {
     val map = InfoCacheInstance.readInfo(List(finalLastProcTime, finalReadyTime))
     val lastProcTime = getLong(map, finalLastProcTime)
     val curReadyTime = getLong(map, finalReadyTime)
-    (lastProcTime + 1, curReadyTime)
+    (lastProcTime, curReadyTime)
   }
 
   private def readCleanTime(): Long = {

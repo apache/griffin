@@ -58,7 +58,24 @@ case class MultiPersists(persists: Iterable[Persist]) extends Persist {
     }
   }
 
-//  def persistRecords(df: DataFrame, name: String): Unit = { persists.foreach(_.persistRecords(df, name)) }
+  def persistRecords(df: DataFrame, name: String): Unit = {
+    persists.foreach { persist =>
+      try {
+        persist.persistRecords(df, name)
+      } catch {
+        case e: Throwable => error(s"persist df error: ${e.getMessage}")
+      }
+    }
+  }
+  def persistRecords(records: RDD[String], name: String): Unit = {
+    persists.foreach { persist =>
+      try {
+        persist.persistRecords(records, name)
+      } catch {
+        case e: Throwable => error(s"persist records error: ${e.getMessage}")
+      }
+    }
+  }
   def persistRecords(records: Iterable[String], name: String): Unit = {
     persists.foreach { persist =>
       try {

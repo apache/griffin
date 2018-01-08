@@ -60,8 +60,8 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
 //    if (arr.size > 0) Some(arr) else None
 //  }
 
-  def data(ms: Long): Option[DataFrame] = {
-    try {
+  def data(ms: Long): (Option[DataFrame], Set[Long]) = {
+    val dfOpt = try {
       val dtSql = dataSql
       info(dtSql)
       val df = sqlContext.sql(dtSql)
@@ -74,6 +74,7 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
         None
       }
     }
+    (dfOpt, readTmst(ms))
   }
 
 //  def available(): Boolean = {

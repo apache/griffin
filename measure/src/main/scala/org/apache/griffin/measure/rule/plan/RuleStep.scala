@@ -16,14 +16,25 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.process.check
+package org.apache.griffin.measure.rule.plan
 
-import org.apache.spark.sql.SQLContext
+import org.apache.griffin.measure.rule.dsl.DslType
 
-case class DataChecker(sqlContext: SQLContext) {
+trait RuleStep extends Serializable {
 
-  def existDataSourceName(name: String): Boolean = {
-    sqlContext.tableNames.exists(_ == name)
-  }
+  val dslType: DslType
 
+  val name: String
+
+  val rule: String
+
+  val cache: Boolean
+
+  val global: Boolean
+
+  val details: Map[String, Any]
+
+  def needCache: Boolean = cache || global
+
+  def isGlobal: Boolean = global
 }

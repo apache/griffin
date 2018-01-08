@@ -46,8 +46,8 @@ case class TextDirBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngine
     HdfsUtil.existPath(dirPath)
   }
 
-  def data(ms: Long): Option[DataFrame] = {
-    try {
+  def data(ms: Long): (Option[DataFrame], Set[Long]) = {
+    val dfOpt = try {
       val dataDirs = listSubDirs(dirPath :: Nil, dataDirDepth, readable)
       // touch done file for read dirs
       dataDirs.foreach(dir => touchDone(dir))
@@ -68,6 +68,7 @@ case class TextDirBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngine
         None
       }
     }
+    (dfOpt, readTmst(ms))
   }
 
   private def listSubDirs(paths: Seq[String], depth: Int, filteFunc: (String) => Boolean): Seq[String] = {

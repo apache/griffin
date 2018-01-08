@@ -26,4 +26,7 @@ trait Expr extends TreeNode with Serializable {
 
   def extractSelf: Expr = this
 
+  // execution
+  def map(func: (Expr) => Expr): Expr = func(this)
+
 }

@@ -16,14 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rule.step
+package org.apache.griffin.measure.rule.adaptor
 
-import org.apache.griffin.measure.rule.dsl._
+object InternalColumns {
+  val tmst = "__tmst"
+  val metric = "__metric"
+  val record = "__record"
+  val empty = "__empty"
 
-case class DfOprStep(name: String, rule: String, details: Map[String, Any],
-                     persistType: PersistType, updateDataSource: Option[String]
-                    ) extends ConcreteRuleStep {
+  val beginTs = "__begin_ts"
+  val endTs = "__end_ts"
 
-  val dslType: DslType = DfOprType
-
+  val columns = List[String](tmst, metric, record, empty, beginTs, endTs)
 }
