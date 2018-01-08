@@ -79,15 +79,15 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-
     private void updateJobInstanceState(JobExecutionContext context) throws IOException {
         SimpleTrigger simpleTrigger = (SimpleTrigger) context.getTrigger();
         int repeatCount = simpleTrigger.getRepeatCount();
         int fireCount = simpleTrigger.getTimesTriggered();
         if (fireCount > repeatCount) {
-            saveJobInstance(LivySessionStates.State.not_found, true);
+            saveJobInstance(null,LivySessionStates.State.not_found,true);
         }
     }
+
     private String post2Livy() {
         String result;
         try {
@@ -118,7 +118,6 @@ public class SparkSubmitJob implements Job {
         return true;
     }
 
-
     private void initParam(JobDetail jd) throws IOException {
         mPredicts = new ArrayList<>();
         livyUri = livyConfProps.getProperty("livy.uri");
@@ -141,7 +140,6 @@ public class SparkSubmitJob implements Job {
         }
 
     }
-
 
     private void setMeasureInstanceName(GriffinMeasure measure, JobDetail jd) {
         // in order to keep metric name unique, we set job name as measure name at present
@@ -209,13 +207,12 @@ public class SparkSubmitJob implements Job {
     private void saveJobInstance(String result, LivySessionStates.State state, Boolean pauseStatus) throws IOException {
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
-        Map<String, Object> resultMap = JsonUtil.toEntity(result, type);
+        Map<String, Object> resultMap = null;
+        if (result != null) {
+            resultMap = JsonUtil.toEntity(result, type);
+        }
         setJobInstance(resultMap, state, pauseStatus);
         jobInstanceRepo.save(jobInstance);
-    }
-
-    private void saveJobInstance(LivySessionStates.State state, Boolean pauseStatus) throws IOException {
-        saveJobInstance(null, state, pauseStatus);
     }
 
     private void setJobInstance(Map<String, Object> resultMap, LivySessionStates.State state, Boolean pauseStatus) {
