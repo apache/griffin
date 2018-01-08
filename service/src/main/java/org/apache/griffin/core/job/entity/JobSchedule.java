@@ -158,15 +158,13 @@ public class JobSchedule extends AbstractAuditableEntity {
     private Map<String, Object> defaultPredicatesConfig() throws JsonProcessingException {
         String path = "/application.properties";
         Properties appConf = PropertiesUtil.getProperties(path,new ClassPathResource(path));
-        Map<String, Object> conf = new HashMap<>();
         Map<String, Object> scheduleConf = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
         map.put("interval", appConf.getProperty("predicate.job.interval"));
         map.put("repeat", appConf.getProperty("predicate.job.repeat.count"));
         scheduleConf.put("checkdonefile.schedule", map);
-        conf.put("predicate.config", scheduleConf);
-        setConfigMap(conf);
-        return conf;
+        setConfigMap(scheduleConf);
+        return scheduleConf;
     }
 
     private boolean isCronExpressionValid(String cronExpression) {
