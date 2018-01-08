@@ -446,19 +446,20 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size) {
+        AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
+        if (job == null) {
+            LOGGER.warn("Job id {} does not exist.", jobId);
+            return new ArrayList<>();
+        }
         size = size > MAX_PAGE_SIZE ? MAX_PAGE_SIZE : size;
         size = size <= 0 ? DEFAULT_PAGE_SIZE : size;
         Pageable pageable = new PageRequest(page, size, Sort.Direction.DESC, "tms");
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobIdAndDeleted(jobId, false, pageable);
-        if (CollectionUtils.isEmpty(instances)) {
-            LOGGER.warn("Job id {} may not exist or it's instances may not be saved before scheduled.", jobId);
-        }
-        return instances;
+        return jobInstanceRepo.findByJobId(jobId, pageable);
     }
 
     @Scheduled(fixedDelayString = "${jobInstance.expired.milliseconds}")
     public void deleteExpiredJobInstance() {
-        List<JobInstanceBean> instances = jobInstanceRepo.findByExpireTmsLessThanEqualAndDeleted(System.currentTimeMillis(), false);
+        List<JobInstanceBean> instances = jobInstanceRepo.findByExpireTmsLessThanEqual(System.currentTimeMillis());
         if (!pauseJob(instances)) {
             LOGGER.error("Pause job failure.");
             return;
@@ -562,7 +563,7 @@ public class JobServiceImpl implements JobService {
 
     private Boolean isJobHealthy(Long jobId) {
         Pageable pageable = new PageRequest(0, 1, Sort.Direction.DESC, "tms");
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobIdAndDeleted(jobId, false, pageable);
+        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(jobId,pageable);
         return !CollectionUtils.isEmpty(instances) && LivySessionStates.isHealthy(instances.get(0).getState());
     }
 

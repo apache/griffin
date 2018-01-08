@@ -35,10 +35,10 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
 
     JobInstanceBean findByPredicateName(String name);
 
-    @Query("select s from JobInstanceBean s where job_id = ?1 and s.deleted = ?2")
-    List<JobInstanceBean> findByJobIdAndDeleted(Long jobId, Boolean deleted, Pageable pageable);
+    @Query("select s from JobInstanceBean s where job_id = ?1")
+    List<JobInstanceBean> findByJobId(Long jobId, Pageable pageable);
 
-    List<JobInstanceBean> findByExpireTmsLessThanEqualAndDeleted(Long expireTms, Boolean deleted);
+    List<JobInstanceBean> findByExpireTmsLessThanEqual(Long expireTms);
 
     @Transactional
     @Modifying

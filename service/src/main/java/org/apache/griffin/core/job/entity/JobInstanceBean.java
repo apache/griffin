@@ -55,7 +55,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @Column(name = "predicate_job_name")
     private String predicateName;
 
-    @Column(name = "job_deleted")
+    @Column(name = "predicate_job_deleted")
     private Boolean deleted = false;
 
     public Long getSessionId() {
