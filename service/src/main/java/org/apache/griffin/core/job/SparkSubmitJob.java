@@ -74,7 +74,6 @@ public class SparkSubmitJob implements Job {
                 return;
             }
             saveJobInstance(jd);
-
         } catch (Exception e) {
             LOGGER.error("Post spark task error.", e);
         }

@@ -335,7 +335,7 @@ public class JobServiceImpl implements JobService {
     public boolean pauseJob(String group, String name) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
         JobKey jobKey = new JobKey(name, group);
-        if (scheduler.checkExists(jobKey)) {
+        if (!scheduler.checkExists(jobKey)) {
             LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
             return false;
         }
