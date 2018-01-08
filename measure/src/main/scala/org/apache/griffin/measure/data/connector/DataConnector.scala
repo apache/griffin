@@ -20,11 +20,15 @@ package org.apache.griffin.measure.data.connector
 
 import java.util.concurrent.atomic.AtomicLong
 
+import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.process.{BatchDqProcess, BatchProcessType}
 import org.apache.griffin.measure.process.engine._
-import org.apache.griffin.measure.rule.adaptor.{PreProcPhase, RuleAdaptorGroup, RunPhase}
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
+import org.apache.griffin.measure.rule.adaptor.{InternalColumns, PreProcPhase, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.dsl._
+import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.preproc.PreProcRuleGenerator
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
@@ -35,9 +39,13 @@ trait DataConnector extends Loggable with Serializable {
 
 //  def available(): Boolean
 
+  var tmstCache: TmstCache = _
+  protected def saveTmst(t: Long) = tmstCache.insert(t)
+  protected def readTmst(t: Long) = tmstCache.range(t, t + 1)
+
   def init(): Unit
 
-  def data(ms: Long): Option[DataFrame]
+  def data(ms: Long): (Option[DataFrame], Set[Long])
 
   val dqEngines: DqEngines
 
@@ -50,38 +58,55 @@ trait DataConnector extends Loggable with Serializable {
   protected def suffix(ms: Long): String = s"${id}_${ms}"
   protected def thisName(ms: Long): String = s"this_${suffix(ms)}"
 
-  final val tmstColName = GroupByColumn.tmst
+  final val tmstColName = InternalColumns.tmst
 
   def preProcess(dfOpt: Option[DataFrame], ms: Long): Option[DataFrame] = {
+    val timeInfo = CalcTimeInfo(ms, id)
     val thisTable = thisName(ms)
-    val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
-    val names = PreProcRuleGenerator.getRuleNames(preProcRules).toSet + thisTable
 
     try {
       dfOpt.flatMap { df =>
-        // in data
-        df.registerTempTable(thisTable)
+        val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
+
+        // init data
+        TableRegisters.registerRunTempTable(df, timeInfo.key, thisTable)
+
+//        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
+        val tmsts = Seq[Long](ms)
 
         // generate rule steps
-        val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(preProcRules, DslType("spark-sql"), PreProcPhase)
+        val rulePlan = RuleAdaptorGroup.genRulePlan(
+          timeInfo, preProcRules, SparkSqlType, BatchProcessType)
 
         // run rules
-        dqEngines.runRuleSteps(ruleSteps)
+        dqEngines.runRuleSteps(timeInfo, rulePlan.ruleSteps)
 
         // out data
-        val outDf = sqlContext.table(thisTable)
+        val outDf = sqlContext.table(s"`${thisTable}`")
 
-        // drop temp table
-        names.foreach { name =>
-          try {
-            sqlContext.dropTempTable(name)
-          } catch {
-            case e: Throwable => warn(s"drop temp table ${name} fails")
-          }
-        }
+//        names.foreach { name =>
+//          try {
+//            TempTables.unregisterTempTable(sqlContext, ms, name)
+//          } catch {
+//            case e: Throwable => warn(s"drop temp table ${name} fails")
+//          }
+//        }
 
-        // add tmst
+//        val range = if (id == "dc1") (0 until 20).toList else (0 until 1).toList
+//        val withTmstDfs = range.map { i =>
+//          saveTmst(ms + i)
+//          outDf.withColumn(tmstColName, lit(ms + i)).limit(49 - i)
+//        }
+//        Some(withTmstDfs.reduce(_ unionAll _))
+
+        // add tmst column
         val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
+
+        // tmst cache
+        saveTmst(ms)
+
+        // drop temp tables
+        cleanData(timeInfo)
 
         Some(withTmstDf)
       }
@@ -92,6 +117,13 @@ trait DataConnector extends Loggable with Serializable {
       }
     }
 
+  }
+
+  private def cleanData(timeInfo: TimeInfo): Unit = {
+    TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)
+
+    DataFrameCaches.uncacheDataFrames(timeInfo.key)
+    DataFrameCaches.clearTrashDataFrames(timeInfo.key)
   }
 
 }
@@ -109,6 +141,3 @@ object DataConnectorIdGenerator {
   }
 }
 
-object GroupByColumn {
-  val tmst = "__tmst"
-}

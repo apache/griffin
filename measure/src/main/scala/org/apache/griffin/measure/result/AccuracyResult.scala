@@ -23,8 +23,14 @@ case class AccuracyResult(miss: Long, total: Long) extends Result {
 
   type T = AccuracyResult
 
+  override def isLegal(): Boolean = getTotal > 0
+
   def update(delta: T): T = {
     AccuracyResult(delta.miss, total)
+  }
+
+  def initial(): Boolean = {
+    getMatch <= 0
   }
 
   def eventual(): Boolean = {

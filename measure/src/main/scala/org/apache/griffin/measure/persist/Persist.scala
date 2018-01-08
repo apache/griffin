@@ -43,7 +43,8 @@ trait Persist extends Loggable with Serializable {
 //  def records(recs: RDD[String], tp: String): Unit
 //  def records(recs: Iterable[String], tp: String): Unit
 
-//  def persistRecords(df: DataFrame, name: String): Unit
+  def persistRecords(df: DataFrame, name: String): Unit
+  def persistRecords(records: RDD[String], name: String): Unit
   def persistRecords(records: Iterable[String], name: String): Unit
 //  def persistMetrics(metrics: Seq[String], name: String): Unit
   def persistMetrics(metrics: Map[String, Any]): Unit

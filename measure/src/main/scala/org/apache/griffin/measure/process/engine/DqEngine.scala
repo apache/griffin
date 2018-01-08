@@ -22,22 +22,30 @@ import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row}
 
 trait DqEngine extends Loggable with Serializable {
 
-  def runRuleStep(ruleStep: ConcreteRuleStep): Boolean
+  def runRuleStep(timeInfo: TimeInfo, ruleStep: RuleStep): Boolean
 
   protected def collectable(): Boolean = false
 
-  def collectMetrics(ruleStep: ConcreteRuleStep): Map[Long, Map[String, Any]]
+  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport, procType: ProcessType
+                    ): Map[Long, Map[String, Any]]
 
-//  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
-//
-//  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
+  //  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
+  //
+  //  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
 
-  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
+//  def collectUpdateRDD(ruleStep: RuleStep): Option[DataFrame]
+  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport, procType: ProcessType
+                    ): Map[Long, DataFrame]
+
+
+  def collectBatchRecords(recordExport: RecordExport): Option[RDD[String]]
+  def collectStreamingRecords(recordExport: RecordExport): (Option[RDD[(Long, Iterable[String])]], Set[Long])
 }

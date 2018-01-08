@@ -27,12 +27,12 @@ sealed trait DslType {
 }
 
 object DslType {
-  private val dslTypes: List[DslType] = List(SparkSqlType, GriffinDslType, DfOprType, UnknownDslType)
+  private val dslTypes: List[DslType] = List(SparkSqlType, GriffinDslType, DfOprType)
   def apply(ptn: String): DslType = {
     dslTypes.filter(tp => ptn match {
       case tp.regex() => true
       case _ => false
-    }).headOption.getOrElse(UnknownDslType)
+    }).headOption.getOrElse(GriffinDslType)
   }
   def unapply(pt: DslType): Option[String] = Some(pt.desc)
 }
@@ -50,9 +50,4 @@ final case object DfOprType extends DslType {
 final case object GriffinDslType extends DslType {
   val regex = "^(?i)griffin-?dsl$".r
   val desc = "griffin-dsl"
-}
-
-final case object UnknownDslType extends DslType {
-  val regex = "".r
-  val desc = "unknown"
 }

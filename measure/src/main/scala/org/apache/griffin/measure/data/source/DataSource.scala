@@ -18,15 +18,19 @@ under the License.
 */
 package org.apache.griffin.measure.data.source
 
+import org.apache.griffin.measure.cache.tmst._
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
+import org.apache.griffin.measure.rule.plan.TimeInfo
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 case class DataSource(sqlContext: SQLContext,
                       name: String,
+                      baseline: Boolean,
                       dataConnectors: Seq[DataConnector],
                       dataSourceCacheOpt: Option[DataSourceCache]
                      ) extends Loggable with Serializable {
@@ -35,44 +39,61 @@ case class DataSource(sqlContext: SQLContext,
   val streamingDataConnectors = DataConnectorFactory.filterStreamingDataConnectors(dataConnectors)
   streamingDataConnectors.foreach(_.dataSourceCacheOpt = dataSourceCacheOpt)
 
+  val tmstCache: TmstCache = TmstCache()
+
   def init(): Unit = {
     dataSourceCacheOpt.foreach(_.init)
     dataConnectors.foreach(_.init)
+
+    dataSourceCacheOpt.map(_.tmstCache = tmstCache)
+    dataConnectors.map(_.tmstCache = tmstCache)
   }
 
-  def loadData(ms: Long): Unit = {
-    data(ms) match {
+  def loadData(timeInfo: TimeInfo): Set[Long] = {
+    val calcTime = timeInfo.calcTime
+    println(s"load data [${name}]")
+    val (dfOpt, tmsts) = data(calcTime)
+    dfOpt match {
       case Some(df) => {
-        df.registerTempTable(name)
+//        DataFrameCaches.cacheDataFrame(timeInfo.key, name, df)
+        TableRegisters.registerRunTempTable(df, timeInfo.key, name)
       }
       case None => {
-//        val df = sqlContext.emptyDataFrame
-//        df.registerTempTable(name)
         warn(s"load data source [${name}] fails")
-//        throw new Exception(s"load data source [${name}] fails")
       }
     }
+    tmsts
   }
 
-  def dropTable(): Unit = {
-    try {
-      sqlContext.dropTempTable(name)
-    } catch {
-      case e: Throwable => warn(s"drop table [${name}] fails")
+  private def data(ms: Long): (Option[DataFrame], Set[Long]) = {
+    val batches = batchDataConnectors.flatMap { dc =>
+      val (dfOpt, tmsts) = dc.data(ms)
+      dfOpt match {
+        case Some(df) => Some((dfOpt, tmsts))
+        case _ => None
+      }
+    }
+    val caches = dataSourceCacheOpt match {
+      case Some(dsc) => dsc.readData() :: Nil
+      case _ => Nil
+    }
+    val pairs = batches ++ caches
+
+    if (pairs.size > 0) {
+      pairs.reduce { (a, b) =>
+        (unionDfOpts(a._1, b._1), a._2 ++ b._2)
+      }
+    } else {
+      (None, Set.empty[Long])
     }
   }
 
-  private def data(ms: Long): Option[DataFrame] = {
-    val batchDataFrameOpt = batchDataConnectors.flatMap { dc =>
-      dc.data(ms)
-    }.reduceOption((a, b) => unionDataFrames(a, b))
-
-    val cacheDataFrameOpt = dataSourceCacheOpt.flatMap(_.readData())
-
-    (batchDataFrameOpt, cacheDataFrameOpt) match {
-      case (Some(bdf), Some(cdf)) => Some(unionDataFrames(bdf, cdf))
-      case (Some(bdf), _) => Some(bdf)
-      case (_, Some(cdf)) => Some(cdf)
+  private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
+                         ): Option[DataFrame] = {
+    (dfOpt1, dfOpt2) match {
+      case (Some(df1), Some(df2)) => Some(unionDataFrames(df1, df2))
+      case (Some(df1), _) => dfOpt1
+      case (_, Some(df2)) => dfOpt2
       case _ => None
     }
   }
@@ -88,7 +109,6 @@ case class DataSource(sqlContext: SQLContext,
       }
       val ndf2 = sqlContext.createDataFrame(rdd2, df1.schema)
       df1 unionAll ndf2
-//      df1 unionAll df2
     } catch {
       case e: Throwable => df1
     }
