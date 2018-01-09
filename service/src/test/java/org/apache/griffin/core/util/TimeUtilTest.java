@@ -17,18 +17,11 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.config.jobConfig;
+package org.apache.griffin.core.util;
 
-import org.apache.griffin.core.util.PropertiesUtil;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.junit.Test;
 
-import java.util.Properties;
+public class TimeUtilTest {
 
-@Configuration
-public class SparkJobConfig {
-    @Bean(name = "sparkJobProps")
-    public Properties sparkJobProperties() {
-        return PropertiesUtil.getProperties("/sparkJob.properties");
-    }
+
 }

@@ -25,7 +25,7 @@ under the License.
 
 ## 2 Procedures
 
-![bpmn](img/userguide/Capture.PNG)
+![bpmn](../img/userguide/Capture.PNG)
 
 After you log into the system, you may follow the steps:
 

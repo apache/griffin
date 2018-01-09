@@ -19,14 +19,12 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.griffin.core.job.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -36,9 +34,6 @@ public class MeasureOrgController {
 
     @Autowired
     private MeasureOrgService measureOrgService;
-
-    @Autowired
-    private JobService jobService;
 
     @RequestMapping(value = "/org", method = RequestMethod.GET)
     public List<String> getOrgs() {
@@ -58,10 +53,5 @@ public class MeasureOrgController {
     @RequestMapping(value = "/org/measure/names", method = RequestMethod.GET)
     public Map<String, List<String>> getMeasureNamesGroupByOrg() {
         return measureOrgService.getMeasureNamesGroupByOrg();
-    }
-
-    @RequestMapping(value = "/org/measure/jobs", method = RequestMethod.GET)
-    public Map<String, Map<String, List<Map<String, Serializable>>>> getMeasureWithJobsGroupByOrg() {
-        return measureOrgService.getMeasureWithJobDetailsGroupByOrg(jobService.getJobDetailsGroupByMeasureId());
     }
 }

@@ -19,28 +19,28 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import org.apache.griffin.core.job.entity.JobDataBean;
 import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.quartz.SchedulerException;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 public interface JobService {
 
-    List<Map<String, Serializable>> getAliveJobs();
+    List<JobDataBean> getAliveJobs();
 
-    GriffinOperationMessage addJob(String groupName, String jobName, Long measureId, JobRequestBody jobRequestBody);
+    GriffinOperationMessage addJob(JobSchedule jobSchedule);
 
-    GriffinOperationMessage pauseJob(String group, String name);
+    boolean pauseJob(String group, String name) throws SchedulerException;
 
-    GriffinOperationMessage deleteJob(String groupName, String jobName);
+    GriffinOperationMessage deleteJob(Long jobId);
 
-    List<JobInstance> findInstancesOfJob(String group, String name, int page, int size);
+    GriffinOperationMessage deleteJob(String jobName);
 
-    Map<String, List<Map<String, Serializable>>> getJobDetailsGroupByMeasureId();
+    List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
 
     JobHealth getHealthInfo();
 }

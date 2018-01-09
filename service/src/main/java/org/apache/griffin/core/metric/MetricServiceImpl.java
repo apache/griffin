@@ -20,17 +20,82 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.repo.JobRepo;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.metric.model.Metric;
+import org.apache.griffin.core.metric.model.MetricValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class MetricServiceImpl implements MetricService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricServiceImpl.class);
+
     @Autowired
-    private MeasureRepo measureRepo;
+    private MeasureRepo<Measure> measureRepo;
+    @Autowired
+    private JobRepo<AbstractJob> jobRepo;
+    @Autowired
+    private MetricStore metricStore;
 
     @Override
-    public String getOrgByMeasureName(String measureName) {
-        return measureRepo.findOrgByName(measureName);
+    public List<Metric> getAllMetrics() {
+        List<Metric> metrics = new ArrayList<>();
+        List<AbstractJob> jobs = jobRepo.findByDeleted(false);
+        List<Measure> measures = measureRepo.findByDeleted(false);
+        Map<Long, Measure> measureMap = measures.stream().collect(Collectors.toMap(Measure::getId, Function.identity()));
+        for (AbstractJob job : jobs) {
+            List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300);
+            Measure measure = measureMap.get(job.getMeasureId());
+            metrics.add(new Metric(job.getJobName(), measure.getDescription(), measure.getOrganization(), measure.getOwner(), metricValues));
+        }
+        return metrics;
+    }
+
+    @Override
+    public List<MetricValue> getMetricValues(String metricName, int offset, int size) {
+        try {
+            return metricStore.getMetricValues(metricName, offset, size);
+        } catch (Exception e) {
+            LOGGER.error("Failed to get metric values named {}. {}", metricName, e.getMessage());
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public ResponseEntity addMetricValues(List<MetricValue> values) {
+        try {
+            for (MetricValue value : values) {
+                metricStore.addMetricValue(value);
+            }
+            return new ResponseEntity("Add Metric Values Success", HttpStatus.CREATED);
+        } catch (Exception e) {
+            LOGGER.error("Failed to add metric values. {}", e.getMessage());
+            return new ResponseEntity("Add Metric Values Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity deleteMetricValues(String metricName) {
+        try {
+            metricStore.deleteMetricValues(metricName);
+            return ResponseEntity.ok("Delete Metric Values Success");
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
+            return new ResponseEntity("Delete Metric Values Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
