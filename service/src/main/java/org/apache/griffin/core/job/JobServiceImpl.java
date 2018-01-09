@@ -53,8 +53,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-import static org.apache.griffin.core.util.GriffinOperationMessage.CREATE_JOB_FAIL;
-import static org.apache.griffin.core.util.GriffinOperationMessage.CREATE_JOB_SUCCESS;
+import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -375,7 +374,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public GriffinOperationMessage deleteJob(Long jobId) {
         GriffinJob job = jobRepo.findByIdAndDeleted(jobId, false);
-        return deleteJob(job) ? GriffinOperationMessage.DELETE_JOB_SUCCESS : GriffinOperationMessage.DELETE_JOB_FAIL;
+        return deleteJob(job) ? DELETE_JOB_SUCCESS : DELETE_JOB_FAIL;
     }
 
     /**
@@ -389,14 +388,14 @@ public class JobServiceImpl implements JobService {
         List<GriffinJob> jobs = jobRepo.findByJobNameAndDeleted(name, false);
         if (CollectionUtils.isEmpty(jobs)) {
             LOGGER.warn("There is no job with '{}' name.", name);
-            return GriffinOperationMessage.DELETE_JOB_FAIL;
+            return DELETE_JOB_FAIL;
         }
         for (GriffinJob job : jobs) {
             if (!deleteJob(job)) {
-                return GriffinOperationMessage.DELETE_JOB_FAIL;
+                return DELETE_JOB_FAIL;
             }
         }
-        return GriffinOperationMessage.DELETE_JOB_SUCCESS;
+        return DELETE_JOB_SUCCESS;
     }
 
     private boolean deleteJob(GriffinJob job) {

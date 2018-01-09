@@ -26,6 +26,7 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
+import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 
 @Service
 public class MetricServiceImpl implements MetricService {
@@ -76,26 +79,26 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @Override
-    public ResponseEntity addMetricValues(List<MetricValue> values) {
+    public ResponseEntity<GriffinOperationMessage> addMetricValues(List<MetricValue> values) {
         try {
             for (MetricValue value : values) {
                 metricStore.addMetricValue(value);
             }
-            return new ResponseEntity("Add Metric Values Success", HttpStatus.CREATED);
+            return new ResponseEntity<>(ADD_METRIC_VALUES_SUCCESS, HttpStatus.CREATED);
         } catch (Exception e) {
             LOGGER.error("Failed to add metric values. {}", e.getMessage());
-            return new ResponseEntity("Add Metric Values Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(ADD_METRIC_VALUES_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public ResponseEntity deleteMetricValues(String metricName) {
+    public ResponseEntity<GriffinOperationMessage> deleteMetricValues(String metricName) {
         try {
             metricStore.deleteMetricValues(metricName);
-            return ResponseEntity.ok("Delete Metric Values Success");
+            return ResponseEntity.ok(DELETE_METRIC_VALUES_SUCCESS);
         } catch (Exception e) {
             LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
-            return new ResponseEntity("Delete Metric Values Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(DELETE_METRIC_VALUES_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
