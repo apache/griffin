@@ -38,10 +38,28 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
     }
   }
 
+  /**
+    * -- duplicate clauses --
+    * <duplicate-clauses> = <expr> [, <expr>]+
+    */
+  def duplicateClause: Parser[DuplicateClause] = rep1sep(expression, Operator.COMMA) ^^ {
+    case exprs => DuplicateClause(exprs)
+  }
+
+  /**
+    * -- timeliness clauses --
+    * <timeliness-clauses> = <expr> [, <expr>]+
+    */
+  def timelinessClause: Parser[TimelinessClause] = rep1sep(expression, Operator.COMMA) ^^ {
+    case exprs => TimelinessClause(exprs)
+  }
+
   def parseRule(rule: String, dqType: DqType): ParseResult[Expr] = {
     val rootExpr = dqType match {
       case AccuracyType => logicalExpression
       case ProfilingType => profilingClause
+      case DuplicateType => duplicateClause
+      case TimelinessType => timelinessClause
       case _ => expression
     }
     parseAll(rootExpr, rule)

@@ -29,6 +29,7 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
   val HTTP_REGEX = """^(?i)http$""".r
 //  val OLDHTTP_REGEX = """^(?i)oldhttp$""".r
   val LOG_REGEX = """^(?i)log$""".r
+  val MONGO_REGEX = """^(?i)mongo$""".r
 
   def getPersists(timeStamp: Long): MultiPersists = {
     MultiPersists(persistParams.flatMap(param => getPersist(timeStamp, param)))
@@ -42,6 +43,7 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
       case HTTP_REGEX() => Try(HttpPersist(config, metricName, timeStamp))
 //      case OLDHTTP_REGEX() => Try(OldHttpPersist(config, metricName, timeStamp))
       case LOG_REGEX() => Try(LoggerPersist(config, metricName, timeStamp))
+      case MONGO_REGEX() => Try(MongoPersist(config, metricName, timeStamp))
       case _ => throw new Exception("not supported persist type")
     }
     persistTry match {

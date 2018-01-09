@@ -16,22 +16,17 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rule.step
+package org.apache.griffin.measure.rule.plan
 
 import org.apache.griffin.measure.rule.dsl._
 
-trait ConcreteRuleStep extends RuleStep {
+case class SparkSqlStep(name: String,
+                        rule: String,
+                        details: Map[String, Any],
+                        cache: Boolean = false,
+                        global: Boolean = false
+                       ) extends RuleStep {
 
-  val persistType: PersistType
-
-  val updateDataSource: Option[String]
-
-//  def isGroupMetric: Boolean = {
-//    val _GroupMetric = "group.metric"
-//    details.get(_GroupMetric) match {
-//      case Some(b: Boolean) => b
-//      case _ => false
-//    }
-//  }
+  val dslType: DslType = SparkSqlType
 
 }

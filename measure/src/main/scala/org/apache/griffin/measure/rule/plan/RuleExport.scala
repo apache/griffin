@@ -16,15 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rule.step
+package org.apache.griffin.measure.rule.plan
 
-import org.apache.griffin.measure.persist._
-import org.apache.griffin.measure.rule.dsl._
+trait RuleExport extends Serializable {
 
-case class SparkSqlStep(name: String, rule: String, details: Map[String, Any],
-                        persistType: PersistType, updateDataSource: Option[String]
-                       ) extends ConcreteRuleStep {
+  val name: String    // export name
 
-  val dslType: DslType = SparkSqlType
+  val stepName: String    // the dependant step name
 
 }

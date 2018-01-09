@@ -18,37 +18,31 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
-import org.apache.griffin.measure.data.connector.GroupByColumn
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.cache.tmst.TempName
+import org.apache.griffin.measure.process.ProcessType
+import org.apache.griffin.measure.rule.dsl.MetricPersistType
+import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
+import org.apache.griffin.measure.utils.ParamUtil._
 
-case class SparkSqlAdaptor(adaptPhase: AdaptPhase) extends RuleAdaptor {
+case class SparkSqlAdaptor() extends RuleAdaptor {
 
-  def genRuleStep(param: Map[String, Any]): Seq[RuleStep] = {
-    SparkSqlStep(getName(param), getRule(param), getDetails(param),
-      getPersistType(param), getUpdateDataSource(param)) :: Nil
-  }
-  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
-    ruleStep match {
-      case rs @ SparkSqlStep(name, rule, details, persistType, udsOpt) => {
-        adaptPhase match {
-          case PreProcPhase => rs :: Nil
-          case RunPhase => {
-            val repSel = rule.replaceFirst("(?i)select", s"SELECT `${GroupByColumn.tmst}` AS `${GroupByColumn.tmst}`,")
-            val groupbyRule = repSel.concat(s" GROUP BY `${GroupByColumn.tmst}`")
-            val nrs = SparkSqlStep(name, groupbyRule, details, persistType, udsOpt)
-            nrs :: Nil
-          }
-        }
-      }
-      case _ => Nil
-    }
-  }
+//  def genRuleStep(timeInfo: TimeInfo, param: Map[String, Any]): Seq[RuleStep] = {
+//    val ruleInfo = RuleInfoGen(param, timeInfo)
+//    SparkSqlStep(timeInfo, ruleInfo) :: Nil
+//  }
+//  def adaptConcreteRuleStep(ruleStep: RuleStep): Seq[ConcreteRuleStep] = {
+//    ruleStep match {
+//      case rs @ SparkSqlStep(ti, ri) => rs :: Nil
+//      case _ => Nil
+//    }
+//  }
 
-  def getTempSourceNames(param: Map[String, Any]): Seq[String] = {
-    param.get(_name) match {
-      case Some(name) => name.toString :: Nil
-      case _ => Nil
-    }
+  import RuleParamKeys._
+
+  def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any], procType: ProcessType): RulePlan = {
+    val name = getRuleName(param)
+    val step = SparkSqlStep(name, getRule(param), getDetails(param), getCache(param), getGlobal(param))
+    RulePlan(step :: Nil, genRuleExports(param, name, name))
   }
 
 }

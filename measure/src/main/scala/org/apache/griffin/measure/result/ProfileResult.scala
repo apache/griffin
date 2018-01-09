@@ -27,6 +27,10 @@ case class ProfileResult(matchCount: Long, totalCount: Long) extends Result {
     ProfileResult(matchCount + delta.matchCount, totalCount)
   }
 
+  def initial(): Boolean = {
+    this.matchCount <= 0
+  }
+
   def eventual(): Boolean = {
     this.matchCount >= totalCount
   }

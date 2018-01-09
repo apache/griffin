@@ -22,7 +22,7 @@ import java.util.concurrent.{Executors, ThreadPoolExecutor, TimeUnit}
 
 object PersistThreadPool {
 
-  private val pool: ThreadPoolExecutor = Executors.newFixedThreadPool(10).asInstanceOf[ThreadPoolExecutor]
+  private val pool: ThreadPoolExecutor = Executors.newFixedThreadPool(5).asInstanceOf[ThreadPoolExecutor]
   val MAX_RETRY = 100
 
   def shutdown(): Unit = {

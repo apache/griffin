@@ -18,9 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
+import org.apache.griffin.measure.log.Loggable
+
 import scala.util.{Failure, Success, Try}
 
-object TimeUtil {
+object TimeUtil extends Loggable {
 
   final val TimeRegex = """^([+\-]?\d+)(ms|s|m|h|d)$""".r
   final val PureTimeRegex = """^([+\-]?\d+)$""".r
@@ -48,7 +50,7 @@ object TimeUtil {
         }
       } match {
         case Success(v) => Some(v)
-        case Failure(ex) => throw ex
+        case Failure(ex) => None
       }
     }
     value
