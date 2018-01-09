@@ -19,10 +19,12 @@ under the License.
 
 package org.apache.griffin.core.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ public class GriffinUtilTest {
     }
 
     @Test
-    public void testToJson() {
+    public void testToJson() throws JsonProcessingException {
         JobHealth jobHealth = new JobHealth(5, 10);
         String jobHealthStr = JsonUtil.toJson(jobHealth);
         System.out.println(jobHealthStr);
@@ -64,18 +66,20 @@ public class GriffinUtilTest {
 
     @Test
     public void testGetPropertiesForSuccess() {
-        Properties properties = PropertiesUtil.getProperties("/quartz.properties");
+        String path = "/quartz.properties";
+        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
         assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
     }
 
     @Test
     public void testGetPropertiesForFailWithWrongPath() {
-        Properties properties = PropertiesUtil.getProperties(".././quartz.properties");
+        String path = ".././quartz.properties";
+        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
         assertEquals(properties, null);
     }
 
     @Test
-    public void testToJsonWithFormat() {
+    public void testToJsonWithFormat() throws JsonProcessingException {
         JobHealth jobHealth = new JobHealth(5, 10);
         String jobHealthStr = JsonUtil.toJsonWithFormat(jobHealth);
         System.out.println(jobHealthStr);

@@ -20,16 +20,21 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -38,30 +43,84 @@ public class DataConnector extends AbstractAuditableEntity {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DataConnector.class);
 
+    @NotNull
+    private String name;
+
     private String type;
 
     private String version;
 
-    private String config;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String dataUnit;
 
     @JsonIgnore
     @Transient
-    private Map<String, String> configInMaps;
+    private String defaultDataUnit = "365000d";
 
-    public Map<String, String> getConfigInMaps() throws IOException {
-        if (this.configInMaps == null && !StringUtils.isEmpty(config)) {
-            this.configInMaps = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {});
+    @JsonIgnore
+    @Access(AccessType.PROPERTY)
+    private String config;
+
+    @Transient
+    private Map<String, String> configMap;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @JoinColumn(name = "data_connector_id")
+    private List<SegmentPredicate> predicates = new ArrayList<>();
+
+    public List<SegmentPredicate> getPredicates() {
+        return predicates;
+    }
+
+    public void setPredicates(List<SegmentPredicate> predicates) {
+        this.predicates = predicates;
+    }
+
+    @JsonProperty("config")
+    public Map<String, String> getConfigMap() throws IOException {
+        return configMap;
+    }
+
+    @JsonProperty("config")
+    public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
+        this.configMap = configMap;
+        this.config = JsonUtil.toJson(configMap);
+    }
+
+    public void setConfig(String config) throws IOException {
+        this.config = config;
+        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
+        });
+    }
+
+    public String getConfig() throws IOException {
+        return config;
+    }
+
+
+    @JsonProperty("data.unit")
+    public String getDataUnit() {
+        if (dataUnit != null) {
+            return dataUnit;
         }
-        return configInMaps;
+        return defaultDataUnit;
     }
 
-    public void setConfig(Map<String, String> configInMaps) throws JsonProcessingException {
-        this.configInMaps = configInMaps;
-        this.config = JsonUtil.toJson(configInMaps);
+    @JsonProperty("data.unit")
+    public void setDataUnit(String dataUnit) {
+        this.dataUnit = dataUnit;
     }
 
-    public Map<String, String> getConfig() throws IOException {
-        return getConfigInMaps();
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (StringUtils.isEmpty(name)) {
+            LOGGER.error("Connector name cannot be empty.");
+            throw new NullPointerException();
+        }
+        this.name = name;
     }
 
     public String getType() {
@@ -84,22 +143,19 @@ public class DataConnector extends AbstractAuditableEntity {
     public DataConnector() {
     }
 
-    public DataConnector(String type, String version, String config) {
+    public DataConnector(String name, String type, String version, String config) throws IOException {
+        this.name = name;
         this.type = type;
         this.version = version;
         this.config = config;
-        TypeReference<Map<String, String>> mapType = new TypeReference<Map<String, String>>() {
-        };
-        try {
-            this.configInMaps = JsonUtil.toEntity(config, mapType);
-        } catch (IOException e) {
-            LOGGER.error("Error in converting json to map. {}", e.getMessage());
-        }
+        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
+        });
     }
 
     @Override
     public String toString() {
         return "DataConnector{" +
+                "name=" + name +
                 "type=" + type +
                 ", version='" + version + '\'' +
                 ", config=" + config +

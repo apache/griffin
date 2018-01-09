@@ -19,27 +19,44 @@ under the License.
 
 package org.apache.griffin.core.metric;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.griffin.core.metric.model.Metric;
+import org.apache.griffin.core.metric.model.MetricValue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * In griffin, metricName usually equals to measureName, and we only save measureName in server.
  */
 
 @RestController
-@RequestMapping("/api/v1/metrics")
+@RequestMapping("/api/v1")
 public class MetricController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetricController.class);
+
     @Autowired
     private MetricService metricService;
 
-    @RequestMapping(value = "/org", method = RequestMethod.GET)
-    public String getOrgByMeasureName(@RequestParam("measureName") String measureName) {
-        return metricService.getOrgByMeasureName(measureName);
+    @RequestMapping(value = "/metrics", method = RequestMethod.GET)
+    public List<Metric> getAllMetrics() {
+        return metricService.getAllMetrics();
+    }
+
+    @RequestMapping(value = "/metrics/values", method = RequestMethod.GET)
+    public List<MetricValue> getMetricValues(@RequestParam("metricName") String metricName,
+                                             @RequestParam("size") int size,
+                                             @RequestParam(value = "offset", defaultValue = "0") int offset) {
+        return metricService.getMetricValues(metricName, offset, size);
+    }
+
+    @RequestMapping(value = "/metrics/values", method = RequestMethod.POST)
+    public ResponseEntity addMetricValues(@RequestBody List<MetricValue> values) {
+        return metricService.addMetricValues(values);
+    }
+
+    @RequestMapping(value = "/metrics/values", method = RequestMethod.DELETE)
+    public ResponseEntity deleteMetricValues(@RequestParam("metricName") String metricName) {
+        return metricService.deleteMetricValues(metricName);
     }
 }

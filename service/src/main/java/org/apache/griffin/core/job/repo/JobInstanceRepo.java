@@ -18,45 +18,31 @@ under the License.
 */
 package org.apache.griffin.core.job.repo;
 
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
 
-@Repository
-public interface JobInstanceRepo extends CrudRepository<JobInstance, Long> {
-    /**
-     * @param group    is group name
-     * @param name     is job name
-     * @param pageable page info
-     * @return all job instances scheduled at different time using the same prototype job,
-     * the prototype job is determined by SCHED_NAME, group name and job name in table QRTZ_JOB_DETAILS.
-     */
-    @Query("select s from JobInstance s " +
-            "where s.groupName= ?1 and s.jobName=?2 ")
-    List<JobInstance> findByGroupNameAndJobName(String group, String name, Pageable pageable);
+    @Query("select DISTINCT s from JobInstanceBean s " +
+            "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")
+    List<JobInstanceBean> findByActiveState();
 
-    @Query("select s from JobInstance s " +
-            "where s.groupName= ?1 and s.jobName=?2 ")
-    List<JobInstance> findByGroupNameAndJobName(String group, String name);
+    JobInstanceBean findByPredicateName(String name);
 
-    @Query("select DISTINCT s.groupName, s.jobName from JobInstance s")
-    List<Object> findGroupWithJobName();
+    @Query("select s from JobInstanceBean s where job_id = ?1")
+    List<JobInstanceBean> findByJobId(Long jobId, Pageable pageable);
 
+    List<JobInstanceBean> findByExpireTmsLessThanEqual(Long expireTms);
+
+    @Transactional
     @Modifying
-    @Query("delete from JobInstance s " +
-            "where s.groupName= ?1 and s.jobName=?2 ")
-    void deleteByGroupAndJobName(String groupName, String jobName);
-
-    @Modifying
-    @Query("update JobInstance s " +
-            "set s.state= ?2, s.appId= ?3, s.appUri= ?4 where s.id= ?1")
-    void update(Long id, LivySessionStates.State state, String appId, String appUri);
+    @Query("delete from JobInstanceBean j where j.expireTms <= ?1")
+    int deleteByExpireTimestamp(Long expireTms);
 
 }

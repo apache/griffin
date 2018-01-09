@@ -20,6 +20,19 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import org.apache.griffin.core.metric.model.Metric;
+import org.apache.griffin.core.metric.model.MetricValue;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+
 public interface MetricService {
-    String getOrgByMeasureName(String measureName);
+
+    List<Metric> getAllMetrics();
+
+    List<MetricValue> getMetricValues(String metricName, int offset, int size);
+
+    ResponseEntity addMetricValues(List<MetricValue> values);
+
+    ResponseEntity deleteMetricValues(String metricName);
 }
