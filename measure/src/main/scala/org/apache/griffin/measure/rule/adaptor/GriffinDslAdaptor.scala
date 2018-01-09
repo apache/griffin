@@ -527,7 +527,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         s"`${sourceTableName}`.`${alias}` AS `${alias}`"
       }.mkString(", ")
       val onClause = aliases.map { alias =>
-        s"`${sourceTableName}`.`${alias}` = `${targetTableName}`.`${alias}`"
+        s"coalesce(`${sourceTableName}`.`${alias}`, '') = coalesce(`${targetTableName}`.`${alias}`, '')"
       }.mkString(" AND ")
       val joinedSql = {
         s"SELECT ${joinedSelClause} FROM `${targetTableName}` RIGHT JOIN `${sourceTableName}` ON ${onClause}"
