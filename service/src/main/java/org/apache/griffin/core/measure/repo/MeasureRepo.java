@@ -23,28 +23,27 @@ package org.apache.griffin.core.measure.repo;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface MeasureRepo extends CrudRepository<Measure, Long> {
-    List<Measure> findByNameAndDeleted(String name, Boolean deleted);
+public interface MeasureRepo<T extends Measure> extends CrudRepository<T, Long> {
 
-    List<Measure> findByDeleted(Boolean deleted);
+    List<T> findByNameAndDeleted(String name, Boolean deleted);
 
-    List<Measure> findByOwnerAndDeleted(String owner, Boolean deleted);
+    List<T> findByDeleted(Boolean deleted);
 
-    Measure findByIdAndDeleted(Long id, Boolean deleted);
+    List<T> findByOwnerAndDeleted(String owner, Boolean deleted);
 
-    @Query("select DISTINCT m.organization from Measure m where m.deleted = ?1")
+    T findByIdAndDeleted(Long id, Boolean deleted);
+
+    @Query("select DISTINCT m.organization from #{#entityName} m where m.deleted = ?1")
     List<String> findOrganizations(Boolean deleted);
 
-    @Query("select m.name from Measure m " +
+    @Query("select m.name from #{#entityName} m " +
             "where m.organization= ?1 and m.deleted= ?2")
     List<String> findNameByOrganization(String organization, Boolean deleted);
 
-    @Query("select m.organization from Measure m " +
+    @Query("select m.organization from #{#entityName} m " +
             "where m.name= ?1")
     String findOrgByName(String measureName);
 

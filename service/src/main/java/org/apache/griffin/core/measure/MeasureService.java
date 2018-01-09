@@ -24,11 +24,10 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 
 import java.util.List;
-import java.util.Map;
 
 public interface MeasureService {
 
-    Iterable<Measure> getAllAliveMeasures();
+    List<Measure> getAllAliveMeasures();
 
     Measure getMeasureById(long id);
 

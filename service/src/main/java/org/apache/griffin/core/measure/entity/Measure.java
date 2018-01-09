@@ -19,39 +19,31 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.validation.constraints.NotNull;
 
 @Entity
-public class Measure extends AbstractAuditableEntity {
+@Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({@JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"), @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
+public abstract class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
 
-    private String name;
+    @NotNull
+    protected String name;
 
-    private String description;
+    protected String description;
 
-    private String organization;
+    protected String organization;
 
-    private String processType;
+    protected String owner;
 
-    /**
-     * record triggered time of measure
-     */
-    private Long triggerTimeStamp = -1L;
-
-
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "measure_id")
-    private List<DataSource> dataSources;
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "evaluateRule_id")
-    private EvaluateRule evaluateRule;
-
-    private String owner;
-    private Boolean deleted = false;
+    protected Boolean deleted = false;
 
     public String getName() {
         return name;
@@ -85,34 +77,6 @@ public class Measure extends AbstractAuditableEntity {
         this.owner = owner;
     }
 
-    @JsonProperty("process.type")
-    public String getProcessType() {
-        return processType;
-    }
-
-    @JsonProperty("process.type")
-    public void setProcessType(String processType) {
-        this.processType = processType;
-    }
-
-    @JsonProperty("data.sources")
-    public List<DataSource> getDataSources() {
-        return dataSources;
-    }
-
-    @JsonProperty("data.sources")
-    public void setDataSources(List<DataSource> dataSources) {
-        this.dataSources = dataSources;
-    }
-
-    public EvaluateRule getEvaluateRule() {
-        return evaluateRule;
-    }
-
-    public void setEvaluateRule(EvaluateRule evaluateRule) {
-        this.evaluateRule = evaluateRule;
-    }
-
     public Boolean getDeleted() {
         return this.deleted;
     }
@@ -121,26 +85,15 @@ public class Measure extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    @JsonProperty("timestamp")
-    public Long getTriggerTimeStamp() {
-        return triggerTimeStamp;
-    }
-
-    @JsonProperty("timestamp")
-    public void setTriggerTimeStamp(Long triggerTimeStamp) {
-        this.triggerTimeStamp = triggerTimeStamp;
-    }
-
     public Measure() {
     }
 
-    public Measure(String name, String description, String organization, String processType, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+    public Measure(String name, String description, String organization, String owner) {
         this.name = name;
         this.description = description;
         this.organization = organization;
-        this.processType = processType;
         this.owner = owner;
-        this.dataSources = dataSources;
-        this.evaluateRule = evaluateRule;
     }
+
+    public abstract String getType();
 }

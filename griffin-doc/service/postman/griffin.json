@@ -1093,17 +1093,10 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-<<<<<<< HEAD
-			"time": 1509333182624,
-			"name": "Update measure",
-			"description": "`PUT /api/v1/measure`\n\n#### Request Header\nkey | value\n--- | ---\nContent-Type | application/json\n\n#### Request Body\n\nname | description | type\n--- | --- | --- \nmeasure | measure entity | Measure\n\n#### Response Body Sample\n```\n{\n  \"code\": 204,\n  \"description\": \"Update Measure Succeed\"\n}\n```\n\nIt may return failed messages.Such as,\n\n```\n {\n  \"code\": 400,\n  \"description\": \"Resource Not Found\"\n}\n\n```\n\nThe reason for failure may be that measure id doesn't exist or the measure has been deleted by logically.You should check your measure.",
-			"collectionId": "689bb3f2-1c6a-b45e-5409-4df1ef07554c",
-=======
 			"time": 1509332871323,
 			"name": "Get  measure names group by org",
 			"description": "`GET /api/v1/org/measure/names`",
 			"collectionId": "871762c3-97f9-1ac0-f17c-d17bd3446b87",
->>>>>>> b82702e00868eefe216915ff3064fca176a2d18e
 			"responses": [
 				{
 					"status": "",

@@ -19,50 +19,49 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import org.apache.griffin.core.job.entity.JobDataBean;
 import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstance;
-import org.apache.griffin.core.job.entity.JobRequestBody;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/jobs")
+@RequestMapping("/api/v1")
 public class JobController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobController.class);
 
     @Autowired
     private JobService jobService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public List<Map<String, Serializable>> getJobs() {
+    @RequestMapping(value = "/jobs", method = RequestMethod.GET)
+    public List<JobDataBean> getJobs() {
         return jobService.getAliveJobs();
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public GriffinOperationMessage addJob(@RequestParam("group") String groupName, @RequestParam("jobName") String jobName,
-                                          @RequestParam("measureId") Long measureId, @RequestBody JobRequestBody jobRequestBody) {
-        return jobService.addJob(groupName, jobName, measureId, jobRequestBody);
+    @RequestMapping(value = "/jobs", method = RequestMethod.POST)
+    public GriffinOperationMessage addJob(@RequestBody JobSchedule jobSchedule) {
+        return jobService.addJob(jobSchedule);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName) {
-        return jobService.deleteJob(group, jobName);
+    @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
+    public GriffinOperationMessage deleteJob(@RequestParam("jobName") String jobName) {
+        return jobService.deleteJob(jobName);
     }
 
-    @RequestMapping(value = "/instances", method = RequestMethod.GET)
-    public List<JobInstance> findInstancesOfJob(@RequestParam("group") String group, @RequestParam("jobName") String jobName,
-                                                @RequestParam("page") int page, @RequestParam("size") int size) {
-        return jobService.findInstancesOfJob(group, jobName, page, size);
+    @RequestMapping(value = "/jobs/{id}", method = RequestMethod.DELETE)
+    public GriffinOperationMessage deleteJob(@PathVariable("id") Long id) {
+        return jobService.deleteJob(id);
     }
 
-    @RequestMapping(value = "/health", method = RequestMethod.GET)
+    @RequestMapping(value = "/jobs/instances", method = RequestMethod.GET)
+    public List<JobInstanceBean> findInstancesOfJob(@RequestParam("jobId") Long id, @RequestParam("page") int page, @RequestParam("size") int size) {
+        return jobService.findInstancesOfJob(id, page, size);
+    }
+
+    @RequestMapping(value = "/jobs/health", method = RequestMethod.GET)
     public JobHealth getHealthInfo() {
         return jobService.getHealthInfo();
     }
