@@ -29,7 +29,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +37,6 @@ import java.util.Map;
 import static org.apache.griffin.core.measure.MeasureTestHelper.createJobDetailMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
@@ -89,26 +87,6 @@ public class MeasureOrgControllerTest {
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/measure/names"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.orgName", hasSize(1)));
-    }
-
-    @Test
-    public void testGetMeasureWithJobsGroupByOrg() throws Exception {
-        Map<String, Serializable> jobDetail = createJobDetailMap();
-        List<Map<String, Serializable>> jobList = Arrays.asList(jobDetail);
-        Map<String, List<Map<String, Serializable>>> measuresById = new HashMap<>();
-        measuresById.put("1", jobList);
-        when(jobService.getJobDetailsGroupByMeasureId()).thenReturn(measuresById);
-
-        Map<String, List<Map<String, Serializable>>> measuresByName = new HashMap<>();
-        Map<String, Map<String, List<Map<String, Serializable>>>> map = new HashMap<>();
-        measuresByName.put("measureName", jobList);
-        map.put("orgName", measuresByName);
-        when(measureOrgService.getMeasureWithJobDetailsGroupByOrg(measuresById)).thenReturn(map);
-
-        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/measure/jobs"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.orgName", hasKey("measureName")));
     }
 
 }

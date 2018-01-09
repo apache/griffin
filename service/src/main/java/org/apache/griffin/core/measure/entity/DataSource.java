@@ -20,7 +20,11 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
+
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,8 +34,8 @@ public class DataSource extends AbstractAuditableEntity {
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "dataSource_id")
-    private List<DataConnector> connectors;
+    @JoinColumn(name = "data_source_id")
+    private List<DataConnector> connectors = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -46,6 +50,9 @@ public class DataSource extends AbstractAuditableEntity {
     }
 
     public void setConnectors(List<DataConnector> connectors) {
+        if (CollectionUtils.isEmpty(connectors)) {
+            throw new NullPointerException("Data connector can not be empty.");
+        }
         this.connectors = connectors;
     }
 

@@ -24,15 +24,16 @@ Griffin DSL is designed for DQ measurement, as a SQL-like language, trying to de
 Griffin DSL is SQL-like, case insensitive, and easy to learn.
 
 ### Supporting process
-- logical operation: not, and, or, in, between, like, is null, is nan, =, !=, <>, <=, >=, <, >
+- logical operation: not, and, or, in, between, like, is null, is nan, =, !=, <=, >=, <, >
 - mathematical operation: +, -, *, /, %
 - sql statement: as, where, group by, having, order by, limit
+
 
 ### Keywords
 - `null, nan, true, false`
 - `not, and, or`
 - `in, between, like, is`
-- `select, distinct, from, as, where, group, by, having, order, desc, asc, limit`
+- `select, from, as, where, group, by, having, order, desc, asc, limit`
 
 ### Operators
 - `!, &&, ||, =, !=, <, >, <=, >=, <>`
@@ -121,14 +122,6 @@ Accuracy rule expression in Griffin DSL is a logical expression, telling the map
 Profiling rule expression in Griffin DSL is a sql-like expression, with select clause ahead, following optional from clause, where clause, group-by clause, order-by clause, limit clause in order.  
 	e.g. `source.gender, source.id.count() where source.age > 20 group by source.gender`, `select country, max(age), min(age), count(*) as cnt from source group by country order by cnt desc limit 5`
 
-### Duplicate Rule
-Duplicate rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the duplicate columns to measure.  
-	e.g. `name, age`, `name, (age + 1) as next_age`
-
-### Timeliness Rule
-Timeliness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the input time and output time (calculate time as default if not set).  
-	e.g. `ts`, `ts, end_ts`
-
 ## Griffin DSL translation to SQL
 Griffin DSL is defined for DQ measurement, to describe DQ domain problem.  
 Actually, in Griffin, we get Griffin DSL rules, translate them into spark-sql rules for calculation in spark-sql engine.  
@@ -150,27 +143,6 @@ For example, the dsl rule is `source.cntry, source.id.count(), source.age.max() 
 - **profiling sql rule**: `SELECT source.cntry, count(source.id), max(source.age) FROM source GROUP BY source.cntry`, save as table `profiling`.  
 
 After the translation, the metrics will be persisted in table `profiling`.  
-
-### Duplicate
-For duplicate, or called uniqueness, is to find out the duplicate items of data, and rollup the items count group by duplicate times.  
-For example, the dsl rule is `name, age`, which represents the duplicate requests, in this case, source and target are the same data set. After the translation, the sql rule is as below:  
-- **get distinct items from source**: `SELECT name, age FROM source`, save as table `src`.  
-- **get all items from target**: `SELECT name, age FROM target`, save as table `tgt`.
-- **join two tables**: `SELECT src.name, src.age FROM tgt RIGHT JOIN src ON coalesce(src.name, '') = coalesce(tgt.name, '') AND coalesce(src.age, '') = coalesce(tgt.age, '')`, save as table `joined`.
-- **get duplicate items**: `SELECT name, age, (count(*) - 1) AS dup FROM joined GROUP BY name, age`, save as table `grouped`.
-- **get duplicate record**: `SELECT * FROM grouped WHERE dup > 0`, save as table `dup_record`.
-- **get duplicate metric**: `SELECT dup, count(*) AS num FROM dup_records GROUP BY dup`, save as table `dup_metric`.
-
-After the translation, the metrics will be persisted in table `dup_metric`.
-
-### Timeliness
-For timeliness, is to measure the latency of each item, and get the statistics of the latencies.  
-For example, the dsl rule is `ts, out_ts`, the first column means the input time of item, the second column means the output time of item, if not set, `__tmst` will be the default output time column. After the translation, the sql rule is as below:  
-- **get input and output time column**: `SELECT *, ts AS _bts, out_ts AS _ets FROM source`, save as table `origin_time`.  
-- **get latency**: `SELECT *, (_ets - _bts) AS latency FROM origin_time`, save as table `lat`.
-- **get timeliness metric**: `SELECT CAST(AVG(latency) AS BIGINT) AS avg, MAX(latency) AS max, MIN(latency) AS min FROM lat`, save as table `time_metric`.
-
-After the translation, the metrics will be persisted in table `time_metric`.
 
 ## Alternative Rules
 You can simply use Griffin DSL rule to describe your problem in DQ domain, for some complicate requirement, you can also use some alternative rules supported by Griffin.  
@@ -202,9 +174,8 @@ Griffin will do the operation to extract json strings.
 Actually, you can also extend the df-opr engine and df-opr adaptor in Griffin to support more types of data frame operations.  
 
 ## Tips
-Griffin engine runs on spark, it might work in two phases, pre-proc phase and run phase.  
+Griffin engine runs on spark, it might works in two phases, pre-proc phase and run phase.  
 - **Pre-proc phase**: Griffin calculates data source directly, to get appropriate data format, as a preparation for DQ calculation. In this phase, you can use df-opr and spark-sql rules.  
 After preparation, to support streaming DQ calculation, a timestamp column will be added in each row of data, so the data frame in run phase contains an extra column named "__tmst".  
 - **Run phase**: Griffin calculates with prepared data, to get the DQ metrics. In this phase, you can use griffin-dsl, spark-sql rules, and a part of df-opr rules.  
-For griffin-dsl rule, griffin translates it into spark-sql rule with a group-by condition for column "__tmst", it's useful for especially streaming DQ calculation.  
-But for spark-sql rule, griffin use it directly, you need to add the "__tmst" column in your spark-sql rule explicitly, or you can't get correct metrics result after calculation.
+For griffin-dsl rule, griffin translates it into spark-sql rule with a group-by condition for column "__tmst", it's useful for especially streaming DQ calculation. But for spark-sql rule, griffin use it directly, you need to add the "__tmst" column in your spark-sql rule explicitly, or you can't get correct metrics result after calculation.
