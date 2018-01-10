@@ -20,12 +20,16 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
+import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.elasticsearch.client.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,23 +83,40 @@ public class MetricServiceImpl implements MetricService {
     public ResponseEntity addMetricValues(List<MetricValue> values) {
         try {
             for (MetricValue value : values) {
+                if (!isMetricValueValid(value)) {
+                    return new ResponseEntity<>(GriffinOperationMessage.ADD_METRIC_VALUES_FAIL, HttpStatus.BAD_REQUEST);
+                }
+            }
+            for (MetricValue value : values) {
                 metricStore.addMetricValue(value);
             }
-            return new ResponseEntity("Add Metric Values Success", HttpStatus.CREATED);
+            return new ResponseEntity<>(GriffinOperationMessage.ADD_METRIC_VALUES_SUCCESS, HttpStatus.CREATED);
+        } catch (ResponseException e) {
+            LOGGER.error("Failed to add metric values. {}", e.getMessage());
+            HttpStatus status = HttpStatus.valueOf(e.getResponse().getStatusLine().getStatusCode());
+            return new ResponseEntity<>(GriffinOperationMessage.ADD_METRIC_VALUES_FAIL, status);
         } catch (Exception e) {
             LOGGER.error("Failed to add metric values. {}", e.getMessage());
-            return new ResponseEntity("Add Metric Values Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(GriffinOperationMessage.ADD_METRIC_VALUES_FAIL, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private boolean isMetricValueValid(MetricValue value) {
+        return StringUtils.isNotBlank(value.getName()) && value.getTmst() != null && MapUtils.isNotEmpty(value.getValue());
     }
 
     @Override
     public ResponseEntity deleteMetricValues(String metricName) {
         try {
             metricStore.deleteMetricValues(metricName);
-            return ResponseEntity.ok("Delete Metric Values Success");
+            return ResponseEntity.ok(GriffinOperationMessage.DELETE_METRIC_VALUES_SUCCESS);
+        } catch (ResponseException e) {
+            LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
+            HttpStatus status = HttpStatus.valueOf(e.getResponse().getStatusLine().getStatusCode());
+            return new ResponseEntity<>(GriffinOperationMessage.DELETE_METRIC_VALUES_FAIL, status);
         } catch (Exception e) {
             LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
-            return new ResponseEntity("Delete Metric Values Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(GriffinOperationMessage.DELETE_METRIC_VALUES_FAIL, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

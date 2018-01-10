@@ -34,6 +34,8 @@ public enum GriffinOperationMessage {
     SET_JOB_DELETED_STATUS_SUCCESS(207, "Set Job Deleted Status Succeed"),
     PAUSE_JOB_SUCCESS(208, "Pause Job Succeed"),
     UPDATE_JOB_INSTANCE_SUCCESS(209, "Update Job Instance Succeed"),
+    ADD_METRIC_VALUES_SUCCESS(210, "Add Metric Values Succeed"),
+    DELETE_METRIC_VALUES_SUCCESS(211, "Delete Metric Values Succeed"),
 
     //failed
     RESOURCE_NOT_FOUND(400, "Resource Not Found"),
@@ -47,7 +49,9 @@ public enum GriffinOperationMessage {
     PAUSE_JOB_FAIL(408, "Pause Job Failed"),
     UPDATE_JOB_INSTANCE_FAIL(409, "Update Job Instance Failed"),
     CREATE_MEASURE_FAIL_DUPLICATE(410, "Create Measure Failed, duplicate records"),
-    UNEXPECTED_RUNTIME_EXCEPTION(411, "Unexpected RuntimeException");
+    UNEXPECTED_RUNTIME_EXCEPTION(411, "Unexpected RuntimeException"),
+    ADD_METRIC_VALUES_FAIL(412, "Add Metric Values Failed"),
+    DELETE_METRIC_VALUES_FAIL(413, "Delete Metric Values Failed");
 
     private final int code;
     private final String description;
