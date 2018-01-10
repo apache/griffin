@@ -23,12 +23,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.util.JsonUtil;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.IOException;
 import java.util.Map;
 
@@ -43,10 +40,18 @@ public class Rule extends AbstractAuditableEntity {
 
     private String dqType;
 
-    @Column(length = 1024)
+    @Column(length = 10 * 1024)
     private String rule;
 
     @JsonIgnore
+    private String name;
+
+    @JsonIgnore
+    private String description;
+
+    @JsonIgnore
+    @Access(AccessType.PROPERTY)
+    @Column(length = 10 * 1024)
     private String details;
 
     @Transient
@@ -86,15 +91,14 @@ public class Rule extends AbstractAuditableEntity {
         return details;
     }
 
-    public void setDetails(String details) {
+    private void setDetails(String details) throws IOException {
         this.details = details;
+        detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
+        });
     }
 
     @JsonProperty("details")
-    public Map<String, Object> getDetailsMap() throws IOException {
-        if (detailsMap == null && !StringUtils.isEmpty(details)) {
-            detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {});
-        }
+    public Map<String, Object> getDetailsMap() {
         return detailsMap;
     }
 
@@ -102,6 +106,22 @@ public class Rule extends AbstractAuditableEntity {
     public void setDetailsMap(Map<String, Object> details) throws IOException {
         this.detailsMap = details;
         this.details = JsonUtil.toJson(details);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Rule() {

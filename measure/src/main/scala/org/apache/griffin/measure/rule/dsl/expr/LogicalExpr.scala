@@ -33,6 +33,10 @@ case class InExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends LogicalExpr
     val notStr = if (is) "" else " NOT"
     s"${head.coalesceDesc}${notStr} IN (${range.map(_.coalesceDesc).mkString(", ")})"
   }
+
+  override def map(func: (Expr) => Expr): InExpr = {
+    InExpr(func(head), is, range.map(func(_)))
+  }
 }
 
 case class BetweenExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends LogicalExpr {
@@ -58,6 +62,10 @@ case class BetweenExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends Logica
     }
     s"${head.coalesceDesc}${notStr} BETWEEN ${rangeStr}"
   }
+
+  override def map(func: (Expr) => Expr): BetweenExpr = {
+    BetweenExpr(func(head), is, range.map(func(_)))
+  }
 }
 
 case class LikeExpr(head: Expr, is: Boolean, value: Expr) extends LogicalExpr {
@@ -72,6 +80,10 @@ case class LikeExpr(head: Expr, is: Boolean, value: Expr) extends LogicalExpr {
     val notStr = if (is) "" else " NOT"
     s"${head.coalesceDesc}${notStr} LIKE ${value.coalesceDesc}"
   }
+
+  override def map(func: (Expr) => Expr): LikeExpr = {
+    LikeExpr(func(head), is, func(value))
+  }
 }
 
 case class IsNullExpr(head: Expr, is: Boolean) extends LogicalExpr {
@@ -83,6 +95,10 @@ case class IsNullExpr(head: Expr, is: Boolean) extends LogicalExpr {
     s"${head.desc} IS${notStr} NULL"
   }
   def coalesceDesc: String = desc
+
+  override def map(func: (Expr) => Expr): IsNullExpr = {
+    IsNullExpr(func(head), is)
+  }
 }
 
 case class IsNanExpr(head: Expr, is: Boolean) extends LogicalExpr {
@@ -94,6 +110,10 @@ case class IsNanExpr(head: Expr, is: Boolean) extends LogicalExpr {
     s"${notStr}isnan(${head.desc})"
   }
   def coalesceDesc: String = desc
+
+  override def map(func: (Expr) => Expr): IsNanExpr = {
+    IsNanExpr(func(head), is)
+  }
 }
 
 // -----------
@@ -109,6 +129,10 @@ case class LogicalFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Optio
   override def extractSelf: Expr = {
     if (aliasOpt.nonEmpty) this
     else factor.extractSelf
+  }
+
+  override def map(func: (Expr) => Expr): LogicalFactorExpr = {
+    LogicalFactorExpr(func(factor), withBracket, aliasOpt)
   }
 }
 
@@ -135,6 +159,10 @@ case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends Logi
   override def extractSelf: Expr = {
     if (oprs.nonEmpty) this
     else factor.extractSelf
+  }
+
+  override def map(func: (Expr) => Expr): UnaryLogicalExpr = {
+    UnaryLogicalExpr(oprs, func(factor).asInstanceOf[LogicalExpr])
   }
 }
 
@@ -166,5 +194,11 @@ case class BinaryLogicalExpr(factor: LogicalExpr, tails: Seq[(String, LogicalExp
   override def extractSelf: Expr = {
     if (tails.nonEmpty) this
     else factor.extractSelf
+  }
+
+  override def map(func: (Expr) => Expr): BinaryLogicalExpr = {
+    BinaryLogicalExpr(func(factor).asInstanceOf[LogicalExpr], tails.map{ pair =>
+      (pair._1, func(pair._2).asInstanceOf[LogicalExpr])
+    })
   }
 }

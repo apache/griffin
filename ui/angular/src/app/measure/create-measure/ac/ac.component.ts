@@ -29,7 +29,7 @@ import { ToasterModule, ToasterService} from 'angular2-toaster';
 import * as $ from 'jquery';
 import { HttpClient} from '@angular/common/http';
 import { Router} from "@angular/router";
-import { TagInputModule } from 'ngx-chips';
+// import { TagInputModule } from 'ngx-chips';
 
 
 class node {
@@ -68,7 +68,7 @@ class Col{
 })
 
 export class AcComponent implements OnInit , AfterViewChecked {
-  
+
   defaultValue:string;
   currentStep = 1;
   // grp = [];
@@ -142,7 +142,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     {
       "name": "source",
       "connectors": [
-        { 
+        {
           "name":"",
           "type": "HIVE",
           "version": "1.2",
@@ -237,7 +237,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     }
   }
 
-  addMapping(x,i){   
+  addMapping(x,i){
     this.mappings[i] = x;
   }
 
@@ -282,7 +282,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
       this.matches[i] = "=";
       // this.mappings[i] = this.currentDB + '.' + this.currentTable + '.' + row.name;
     }
-      
+
   };
 
   toggleAll () {
@@ -335,7 +335,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
 
     }
     return false;
-  } 
+  }
 
   prev (form) {
     this.currentStep--;
@@ -343,7 +343,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   goTo (i) {
     this.currentStep = i;
   }
-  submit (form) {              
+  submit (form) {
       // form.$setPristine();
       // this.finalgrp = [];
       if (!form.valid) {
@@ -412,7 +412,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
               }
             ]
           }
-        ],     
+        ],
         "evaluateRule":{
           "rules": [
             {
@@ -486,7 +486,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     idField: 'id',
     actionMapping: {
       mouse: {
-        click: (tree, node, $event) => {         
+        click: (tree, node, $event) => {
           if (node.hasChildren) {
             this.currentDB = node.data.name;
             this.currentDBstr = this.currentDB + '.';
@@ -558,18 +558,18 @@ export class AcComponent implements OnInit , AfterViewChecked {
   constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
-  
+
   onResize(event){
     this.resizeWindow();
   }
-  
+
   srcAttr(evt){
     this.srcdata = evt;
     this.currentDB = evt.database;
     this.currentTable = evt.table;
     this.selection = evt.selection;
   }
-  
+
   tgtAttr(evt){
     this.tgtdata = evt;
     this.currentDBTarget = evt.database;
@@ -590,7 +590,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     this.tgt_size = evt.num + evt.timetype;
     this.tgt_path = evt.path;
   }
-  
+
 
   resizeWindow(){
     var stepSelection = '.formStep[id=step-' + this.currentStep + ']';
@@ -603,7 +603,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
         'height': $('fieldset').height()
     });
   }
-    
+
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{

@@ -26,6 +26,7 @@ sealed trait PersistType {
 //  def temp: Boolean = false
 //  def persist: Boolean = false
 //  def collect: Boolean = false
+  def needPersist: Boolean = true
 }
 
 object PersistType {
@@ -42,6 +43,7 @@ object PersistType {
 final case object NonePersistType extends PersistType {
   val regex: Regex = "".r
   val desc: String = "none"
+  override def needPersist: Boolean = false
 }
 
 final case object RecordPersistType extends PersistType {

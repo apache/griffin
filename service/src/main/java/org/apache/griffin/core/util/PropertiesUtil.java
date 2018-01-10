@@ -22,23 +22,24 @@ package org.apache.griffin.core.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.util.Properties;
 
 public class PropertiesUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtil.class);
-    
-    public static Properties getProperties(String propertiesPath) {
-        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
-        propertiesFactoryBean.setLocation(new ClassPathResource(propertiesPath));
+
+    public static Properties getProperties(String path, Resource resource) {
+        PropertiesFactoryBean propFactoryBean = new PropertiesFactoryBean();
         Properties properties = null;
         try {
-            propertiesFactoryBean.afterPropertiesSet();
-            properties = propertiesFactoryBean.getObject();
+            propFactoryBean.setLocation(resource);
+            propFactoryBean.afterPropertiesSet();
+            properties = propFactoryBean.getObject();
+            LOGGER.info("Read properties successfully from {}.", path);
         } catch (IOException e) {
-            LOGGER.error("get properties from {} failed. {}", propertiesPath, e.getMessage());
+            LOGGER.error("Get properties from {} failed. {}", path, e);
         }
         return properties;
     }

@@ -145,6 +145,8 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val COMMA: Parser[String] = ","
 
     val SELECT: Parser[String] = """(?i)select\s""".r
+    val DISTINCT: Parser[String] = """(?i)distinct""".r
+//    val ALL: Parser[String] = """(?i)all""".r
     val FROM: Parser[String] = """(?i)from\s""".r
     val AS: Parser[String] = """(?i)as\s""".r
     val WHERE: Parser[String] = """(?i)where\s""".r
@@ -159,8 +161,6 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   import Operator._
 
   object Strings {
-    def innerString(s: String): String = s.substring(1, s.size - 1)
-
     def AnyString: Parser[String] = """"(?:\"|[^\"])*"""".r | """'(?:\'|[^'])*'""".r
     def SimpleTableFieldName: Parser[String] = """[a-zA-Z_]\w*""".r
     def UnQuoteTableFieldName: Parser[String] = """`(?:[\\][`]|[^`])*`""".r
@@ -209,23 +209,23 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     case head ~ sels ~ aliasOpt => SelectionExpr(head, sels, aliasOpt)
   }
   def selectionHead: Parser[HeadExpr] = DataSourceName ^^ {
-    DataSourceHeadExpr(_)
+    ds => DataSourceHeadExpr(trim(ds))
   } | function ^^ {
     OtherHeadExpr(_)
   } | SimpleTableFieldName ^^ {
     FieldNameHeadExpr(_)
   } | UnQuoteTableFieldName ^^ { s =>
-    FieldNameHeadExpr(innerString(s))
+    FieldNameHeadExpr(trim(s))
   } | ALLSL ^^ { _ =>
-    ALLSelectHeadExpr()
+    AllSelectHeadExpr()
   }
   def selector: Parser[SelectExpr] = functionSelect | allFieldsSelect | fieldSelect | indexSelect
   def allFieldsSelect: Parser[AllFieldsSelectExpr] = DOT ~> ALLSL ^^ { _ => AllFieldsSelectExpr() }
   def fieldSelect: Parser[FieldSelectExpr] = DOT ~> (
     SimpleTableFieldName ^^ {
       FieldSelectExpr(_)
-    } | UnQuoteTableFieldName ^^ {s =>
-      FieldSelectExpr(innerString(s))
+    } | UnQuoteTableFieldName ^^ { s =>
+      FieldSelectExpr(trim(s))
     })
   def indexSelect: Parser[IndexSelectExpr] = LSQBR ~> argument <~ RSQBR ^^ { IndexSelectExpr(_) }
   def functionSelect: Parser[FunctionSelectExpr] = DOT ~ FunctionName ~ LBR ~ repsep(argument, COMMA) ~ RBR ^^ {
@@ -236,7 +236,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * -- as alias --
     * <as-alias> ::= <as> <field-name>
     */
-  def asAlias: Parser[String] = AS ~> (SimpleTableFieldName | UnQuoteTableFieldName ^^ { innerString(_) })
+  def asAlias: Parser[String] = AS ~> (SimpleTableFieldName | UnQuoteTableFieldName ^^ { trim(_) })
 
   /**
     * -- math expr --
@@ -333,8 +333,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <arg> ::= <expr>
     */
 
-  def function: Parser[FunctionExpr] = FunctionName ~ LBR ~ repsep(argument, COMMA) ~ RBR ~ opt(asAlias) ^^ {
-    case name ~ _ ~ args ~ _ ~ aliasOpt => FunctionExpr(name, args, aliasOpt)
+  def function: Parser[FunctionExpr] = FunctionName ~ LBR ~ opt(DISTINCT) ~ repsep(argument, COMMA) ~ RBR ~ opt(asAlias) ^^ {
+    case name ~ _ ~ extraCdtnOpt ~ args ~ _ ~ aliasOpt =>
+      FunctionExpr(name, args, extraCdtnOpt.map(ExtraConditionExpr(_)), aliasOpt)
   }
   def argument: Parser[Expr] = expression
 
@@ -350,7 +351,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <limit-clause> = <limit> <expr>
     */
 
-  def selectClause: Parser[SelectClause] = opt(SELECT) ~> rep1sep(expression, COMMA) ^^ { SelectClause(_) }
+  def selectClause: Parser[SelectClause] = opt(SELECT) ~> opt(DISTINCT) ~ rep1sep(expression, COMMA) ^^ {
+    case extraCdtnOpt ~ exprs => SelectClause(exprs, extraCdtnOpt.map(ExtraConditionExpr(_)))
+  }
   def fromClause: Parser[FromClause] = FROM ~> DataSourceName ^^ { ds => FromClause(trim(ds)) }
   def whereClause: Parser[WhereClause] = WHERE ~> expression ^^ { WhereClause(_) }
   def havingClause: Parser[Expr] = HAVING ~> expression

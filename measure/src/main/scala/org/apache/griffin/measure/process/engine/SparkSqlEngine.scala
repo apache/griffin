@@ -21,11 +21,12 @@ package org.apache.griffin.measure.process.engine
 import java.util.Date
 
 import org.apache.griffin.measure.config.params.user.DataSourceParam
-import org.apache.griffin.measure.data.connector.GroupByColumn
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
+import org.apache.griffin.measure.rule.adaptor.{GlobalKeys, InternalColumns}
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.step._
+import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, GroupedData, SQLContext}
@@ -35,12 +36,24 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   override protected def collectable(): Boolean = true
 
-  def runRuleStep(ruleStep: ConcreteRuleStep): Boolean = {
+  def runRuleStep(timeInfo: TimeInfo, ruleStep: RuleStep): Boolean = {
     ruleStep match {
-      case SparkSqlStep(name, rule, _, _, _) => {
+      case rs @ SparkSqlStep(name, rule, details, _, _) => {
         try {
-          val rdf = sqlContext.sql(rule)
-          rdf.registerTempTable(name)
+          val rdf = if (rs.isGlobal && !TableRegisters.existRunGlobalTable(name)) {
+            details.get(GlobalKeys._initRule) match {
+              case Some(initRule: String) => sqlContext.sql(initRule)
+              case _ => sqlContext.emptyDataFrame
+            }
+          } else sqlContext.sql(rule)
+
+          if (rs.isGlobal) {
+            if (rs.needCache) DataFrameCaches.cacheGlobalDataFrame(name, rdf)
+            TableRegisters.registerRunGlobalTable(rdf, name)
+          } else {
+            if (rs.needCache) DataFrameCaches.cacheDataFrame(timeInfo.key, name, rdf)
+            TableRegisters.registerRunTempTable(rdf, timeInfo.key, name)
+          }
           true
         } catch {
           case e: Throwable => {

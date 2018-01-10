@@ -18,11 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
+import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 
 object HdfsFileDumpUtil {
 
-  val sepCount = 5000
+  val sepCount = 50000
 
   private def suffix(i: Long): String = {
     if (i == 0) "" else s".${i}"
@@ -32,8 +33,15 @@ object HdfsFileDumpUtil {
   }
 
   def splitRdd[T](rdd: RDD[T])(implicit m: Manifest[T]): RDD[(Long, Iterable[T])] = {
-    val indexRdd = rdd.zipWithIndex
-    indexRdd.map(p => ((p._2 / sepCount), p._1)).groupByKey()
+//    val indexRdd = rdd.zipWithIndex // slow process
+//    indexRdd.map(p => ((p._2 / sepCount), p._1)).groupByKey() // slow process
+    val count = rdd.count
+    val splitCount = count / sepCount + 1
+    val splitRdd = rdd.mapPartitionsWithIndex { (n, itr) =>
+      val idx = n % splitCount
+      itr.map((idx, _))
+    }
+    splitRdd.groupByKey()
   }
   def splitIterable[T](datas: Iterable[T])(implicit m: Manifest[T]): Iterator[(Int, Iterable[T])] = {
     val groupedData = datas.grouped(sepCount).zipWithIndex
@@ -47,23 +55,33 @@ object HdfsFileDumpUtil {
     HdfsUtil.writeContent(path, strRecords)
   }
 
-  def dump(path: String, recordsRdd: RDD[String], lineSep: String): Boolean = {
+  def dump(path: String, recordsRdd: RDD[String], lineSep: String): Unit = {
     val groupedRdd = splitRdd(recordsRdd)
-    groupedRdd.aggregate(true)({ (res, pair) =>
+    groupedRdd.foreach { pair =>
       val (idx, list) = pair
       val filePath = path + suffix(idx)
       directDump(filePath, list, lineSep)
-      true
-    }, _ && _)
+    }
+//    groupedRdd.aggregate(true)({ (res, pair) =>
+//      val (idx, list) = pair
+//      val filePath = path + suffix(idx)
+//      directDump(filePath, list, lineSep)
+//      true
+//    }, _ && _)
   }
-  def dump(path: String, records: Iterable[String], lineSep: String): Boolean = {
+  def dump(path: String, records: Iterable[String], lineSep: String): Unit = {
     val groupedRecords = splitIterable(records)
-    groupedRecords.aggregate(true)({ (res, pair) =>
+    groupedRecords.foreach { pair =>
       val (idx, list) = pair
       val filePath = path + suffix(idx)
       directDump(filePath, list, lineSep)
-      true
-    }, _ && _)
+    }
+//    groupedRecords.aggregate(true)({ (res, pair) =>
+//      val (idx, list) = pair
+//      val filePath = path + suffix(idx)
+//      directDump(filePath, list, lineSep)
+//      true
+//    }, _ && _)
   }
 
   def remove(path: String, filename: String, withSuffix: Boolean): Unit = {

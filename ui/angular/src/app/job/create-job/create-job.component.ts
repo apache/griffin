@@ -44,7 +44,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
-  
+
   @ViewChildren('sliderRef') sliderRefs;
   // someRange=[-20, 0];
   someKeyboard = [];
@@ -56,7 +56,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   currentStep = 1;
   Times = ['seconds','minutes','hours'];
   maskOpen = false;
-  
+
   keyupLabelOn = false;
   keydownLabelOn = false;
   periodTime :number;
@@ -126,7 +126,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
       this.hide();
     }
   }
-  
+
   showTime(evt){
     evt.target.nextElementSibling.style.display='';
   }
@@ -170,7 +170,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   //       this.toasterService.pop('error', 'Error!', 'Please complete the form!');
   //       return false;
   //     }
-      
+
   //     this.newJob={
   //       "sourcePattern":this.sourcePat,
   //       "targetPattern":this.targetPat,
@@ -205,7 +205,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     this.measureid = this.getMeasureId();
     this.newJob = {
       "cron.expression": this.cronExp,
-      // "cron.time.zone": "GMT+8:00", 
+      // "cron.time.zone": "GMT+8:00",
       // "predicate.config": {
       // "interval": "1m",
       // "repeat": 2
@@ -295,10 +295,10 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     for(let index in this.Measures){
       if(this.measure == this.Measures[index].name){
         return this.Measures[index].id;
-      }     
+      }
     }
   }
-  
+
   onChange(measure){
     this.dropdownList = [];
     for(let index in this.Measures){
@@ -318,7 +318,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
             }
           }
         }
-      }     
+      }
     }
     for(let i = 0;i < this.dropdownList.length;i++){
       this.someKeyboard[i] = [-1,0];
@@ -330,10 +330,10 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
             'max': 0
           }
         });
-      }   
-    }       
+      }
+    }
   }
-  
+
 
   changeRange(index,value,i){
     let newRange = [];
@@ -342,7 +342,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     this.updateSliderRange(value,i);
     this.someKeyboard[i] = newRange[i];
   }
-  
+
   rangeChange(evt,i){
     var oldmin = this.sliderRefs._results[i].config.range.min;
     if((evt[0] - oldmin)<=2){
@@ -351,7 +351,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
           'min': oldmin-10,
           'max': 0
         }
-      }); 
+      });
     }
     if((evt[0] - oldmin)>=13){
       this.sliderRefs._results[i].slider.updateOptions({
@@ -359,13 +359,13 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
           'min': oldmin+10,
           'max': 0
         }
-      }); 
+      });
     }
-    this.someKeyboard[i] = evt; 
+    this.someKeyboard[i] = evt;
   }
 
   updateSliderRange(value,i){
-    // setTimeout(() => { 
+    // setTimeout(() => {
     var oldmin = this.sliderRefs._results[i].config.range.min;
     var oldmax = this.sliderRefs._results[i].config.range.max
     var newmin = Math.floor(value/10);
@@ -400,29 +400,29 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
       this.Measures = data;
       console.log(this.Measures);
     });
-//     this.Measures = [{  
+//     this.Measures = [{
 //    "name":"demo_accu",
 //    "type":"griffin",
 //    "process.type":"batch",
 //    "owner":"test",
-//    "data.sources":[  
-//       {  
+//    "data.sources":[
+//       {
 //          "name":"source",
-//          "connectors":[  
-//             {  
+//          "connectors":[
+//             {
 //                "name":"source1513317492171",
 //                "type":"HIVE",
 //                "version":"1.2",
 //                "data.unit":"2day",
-//                "config":{  
+//                "config":{
 //                   "database":"default",
 //                   "table.name":"demo_src",
 //                   "where":"dt=#YYYYMMdd# AND hour=#HH#"
 //                },
-//                "predicates":[  
-//                   {  
+//                "predicates":[
+//                   {
 //                      "type":"file.exist",
-//                      "config":{  
+//                      "config":{
 //                         "root.path":"hdfs:///griffin/demo_src",
 //                         "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
 //                      }
@@ -431,23 +431,23 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
 //             }
 //          ]
 //       },
-//       {  
+//       {
 //          "name":"target",
-//          "connectors":[  
-//             {  
+//          "connectors":[
+//             {
 //                "name":"target1513317499033",
 //                "type":"HIVE",
 //                "version":"1.2",
 //                "data.unit":"1hour",
-//                "config":{  
+//                "config":{
 //                   "database":"default",
 //                   "table.name":"demo_tgt",
 //                   "where":"dt=#YYYYMMdd# AND hour=#HH#"
 //                },
-//                "predicates":[  
-//                   {  
+//                "predicates":[
+//                   {
 //                      "type":"file.exist",
-//                      "config":{  
+//                      "config":{
 //                         "root.path":"hdfs:///griffin/demo_src",
 //                         "path":""
 //                      }
@@ -457,9 +457,9 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
 //          ]
 //       }
 //    ],
-//    "evaluateRule":{  
-//       "rules":[  
-//          {  
+//    "evaluateRule":{
+//       "rules":[
+//          {
 //             "dsl.type":"griffin-dsl",
 //             "dq.type":"accuracy",
 //             "rule":"source.id=target.id"
@@ -487,7 +487,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  
+
   ngAfterViewChecked(){
     this.resizeWindow();
   }

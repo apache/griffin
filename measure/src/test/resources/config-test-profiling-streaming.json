@@ -54,11 +54,34 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "source.name.count(), source.age.avg(), source.age.max(), source.age.min() group by source.name",
+        "rule": "source.name, source.*.count() from source group by source.name",
         "details": {
           "source": "source",
           "profiling": {
             "name": "prof",
+            "persist.type": "metric"
+          }
+        }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "rule": "name.count(), source.age.min(), age.avg(), source.age.max()",
+        "details": {
+          "source": "source",
+          "profiling": {
+            "persist.type": "metric"
+          }
+        }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "rule": "name.count() as `name-null-count` where source.name IS NULL",
+        "details": {
+          "source": "source",
+          "profiling": {
+            "name": "null-count",
             "persist.type": "metric"
           }
         }

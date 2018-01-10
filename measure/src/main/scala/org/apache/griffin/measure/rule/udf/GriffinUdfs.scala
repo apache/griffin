@@ -24,10 +24,15 @@ object GriffinUdfs {
 
   def register(sqlContext: SQLContext): Unit = {
     sqlContext.udf.register("index_of", indexOf)
+    sqlContext.udf.register("matches", matches)
   }
 
   private val indexOf = (arr: Seq[String], v: String) => {
     arr.indexOf(v)
+  }
+
+  private val matches = (s: String, regex: String) => {
+    s.matches(regex)
   }
 
 }

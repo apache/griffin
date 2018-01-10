@@ -21,6 +21,7 @@ package org.apache.griffin.measure.data.source
 import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
+import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.data.connector.streaming.StreamingDataConnector
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.log.Loggable
@@ -32,10 +33,16 @@ import scala.util.{Failure, Success}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                           metricName: String, index: Int
+                           dsName: String, index: Int
                           ) extends DataCacheable with Loggable with Serializable {
 
-  val name = ""
+  var tmstCache: TmstCache = _
+  protected def rangeTmsts(from: Long, until: Long) = tmstCache.range(from, until)
+  protected def clearTmst(t: Long) = tmstCache.remove(t)
+  protected def clearTmstsUntil(until: Long) = {
+    val outDateTmsts = tmstCache.until(until)
+    tmstCache.remove(outDateTmsts)
+  }
 
   val _FilePath = "file.path"
   val _InfoPath = "info.path"
@@ -43,7 +50,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
   val _ReadyTimeDelay = "ready.time.delay"
   val _TimeRange = "time.range"
 
-  val defFilePath = s"hdfs:///griffin/cache/${metricName}/${index}"
+  val defFilePath = s"hdfs:///griffin/cache/${dsName}/${index}"
   val defInfoPath = s"${index}"
 
   val filePath: String = param.getString(_FilePath, defFilePath)
@@ -65,6 +72,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
 
   val rowSepLiteral = "\n"
   val partitionUnits: List[String] = List("hour", "min", "sec")
+  val minUnitTime: Long = TimeUtil.timeFromUnit(1, partitionUnits.last)
 
   val newCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.new")
   val oldCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.old")
@@ -89,9 +97,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
             val dataRdd: RDD[String] = df.toJSON
 
             // save data
-            val dumped = if (!dataRdd.isEmpty) {
+//            val dumped = if (!dataRdd.isEmpty) {
+//              HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
+//            } else false
+
+            if (!dataRdd.isEmpty) {
               HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
-            } else false
+            }
 
           } catch {
             case e: Throwable => error(s"save data error: ${e.getMessage}")
@@ -110,8 +122,9 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     submitReadyTime(ms)
   }
 
-  def readData(): Option[DataFrame] = {
-    val timeRange = TimeInfoCache.getTimeRange
+  def readData(): (Option[DataFrame], Set[Long]) = {
+    val tr = TimeInfoCache.getTimeRange
+    val timeRange = (tr._1 + minUnitTime, tr._2)
     submitLastProcTime(timeRange._2)
 
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
@@ -125,7 +138,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     // list partition paths
     val partitionPaths = listPathsBetweenRanges(filePath :: Nil, partitionRanges)
 
-    if (partitionPaths.isEmpty) {
+    val dfOpt = if (partitionPaths.isEmpty) {
       None
     } else {
       try {
@@ -137,9 +150,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         }
       }
     }
+
+    // from until tmst range
+    val (from, until) = (reviseTimeRange._1, reviseTimeRange._2 + 1)
+    val tmstSet = rangeTmsts(from, until)
+    (dfOpt, tmstSet)
   }
 
-  // -- deprecated --
   def updateData(df: DataFrame, ms: Long): Unit = {
     val ptns = getPartition(ms)
     val ptnsPath = genPartitionHdfsPath(ptns)
@@ -157,10 +174,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       println(s"remove file path: ${dirPath}/${dataFileName}")
 
       // save updated data
-      val dumped = if (needSave) {
+      if (needSave) {
         HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
         println(s"update file path: ${dataFilePath}")
-      } else false
+      } else {
+        clearTmst(ms)
+        println(s"data source [${dsName}] timestamp [${ms}] cleared")
+      }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
     }
@@ -181,10 +201,13 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
       println(s"remove file path: ${dirPath}/${dataFileName}")
 
       // save updated data
-      val dumped = if (cnt > 0) {
+      if (cnt > 0) {
         HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
         println(s"update file path: ${dataFilePath}")
-      } else false
+      } else {
+        clearTmst(ms)
+        println(s"data source [${dsName}] timestamp [${ms}] cleared")
+      }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
     } finally {
@@ -192,7 +215,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     }
   }
 
-  def updateData(rdd: Iterable[String], ms: Long): Unit = {
+  def updateData(arr: Iterable[String], ms: Long): Unit = {
     val ptns = getPartition(ms)
     val ptnsPath = genPartitionHdfsPath(ptns)
     val dirPath = s"${filePath}/${ptnsPath}"
@@ -200,17 +223,20 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
 
     try {
-      val needSave = !rdd.isEmpty
+      val needSave = !arr.isEmpty
 
       // remove out time old data
       HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
       println(s"remove file path: ${dirPath}/${dataFileName}")
 
       // save updated data
-      val dumped = if (needSave) {
-        HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
+      if (needSave) {
+        HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
         println(s"update file path: ${dataFilePath}")
-      } else false
+      } else {
+        clearTmst(ms)
+        println(s"data source [${dsName}] timestamp [${ms}] cleared")
+      }
     } catch {
       case e: Throwable => error(s"update data error: ${e.getMessage}")
     }
@@ -237,6 +263,11 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
         val cleanTime = readCleanTime()
         cleanTime match {
           case Some(ct) => {
+            println(s"data source [${dsName}] old timestamps clear until [${ct}]")
+
+            // clear out date tmsts
+            clearTmstsUntil(ct)
+
             // drop partitions
             val bounds = getPartition(ct)
 
@@ -292,7 +323,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
   }
 
 
-  // here the range means [min, max], but the best range should be (min, max]
+  // here the range means [min, max]
   private def listPathsBetweenRanges(paths: List[String],
                                      partitionRanges: List[(Long, Long)]
                                     ): List[String] = {

@@ -21,12 +21,22 @@ package org.apache.griffin.measure.rule.dsl.expr
 trait ClauseExpression extends Expr {
 }
 
-case class SelectClause(exprs: Seq[Expr]) extends ClauseExpression {
+case class SelectClause(exprs: Seq[Expr], extraConditionOpt: Option[ExtraConditionExpr]
+                       ) extends ClauseExpression {
 
   addChildren(exprs)
 
-  def desc: String = s"${exprs.map(_.desc).mkString(", ")}"
+  def desc: String = {
+    extraConditionOpt match {
+      case Some(cdtn) => s"${cdtn.desc} ${exprs.map(_.desc).mkString(", ")}"
+      case _ => s"${exprs.map(_.desc).mkString(", ")}"
+    }
+  }
   def coalesceDesc: String = desc
+
+  override def map(func: (Expr) => Expr): SelectClause = {
+    SelectClause(exprs.map(func(_)), extraConditionOpt.map(func(_).asInstanceOf[ExtraConditionExpr]))
+  }
 
 }
 
@@ -43,6 +53,10 @@ case class WhereClause(expr: Expr) extends ClauseExpression {
 
   def desc: String = s"WHERE ${expr.desc}"
   def coalesceDesc: String = s"WHERE ${expr.coalesceDesc}"
+
+  override def map(func: (Expr) => Expr): WhereClause = {
+    WhereClause(func(expr))
+  }
 
 }
 
@@ -79,6 +93,10 @@ case class GroupbyClause(exprs: Seq[Expr], havingClauseOpt: Option[Expr]) extend
     GroupbyClause(exprs ++ other.exprs, newHavingClauseOpt)
   }
 
+  override def map(func: (Expr) => Expr): GroupbyClause = {
+    GroupbyClause(exprs.map(func(_)), havingClauseOpt.map(func(_)))
+  }
+
 }
 
 case class OrderbyItem(expr: Expr, orderOpt: Option[String]) extends Expr {
@@ -90,6 +108,10 @@ case class OrderbyItem(expr: Expr, orderOpt: Option[String]) extends Expr {
     }
   }
   def coalesceDesc: String = desc
+
+  override def map(func: (Expr) => Expr): OrderbyItem = {
+    OrderbyItem(func(expr), orderOpt)
+  }
 }
 
 case class OrderbyClause(items: Seq[OrderbyItem]) extends ClauseExpression {
@@ -104,6 +126,10 @@ case class OrderbyClause(items: Seq[OrderbyItem]) extends ClauseExpression {
     val obs = items.map(_.desc).mkString(", ")
     s"ORDER BY ${obs}"
   }
+
+  override def map(func: (Expr) => Expr): OrderbyClause = {
+    OrderbyClause(items.map(func(_).asInstanceOf[OrderbyItem]))
+  }
 }
 
 case class LimitClause(expr: Expr) extends ClauseExpression {
@@ -112,6 +138,10 @@ case class LimitClause(expr: Expr) extends ClauseExpression {
 
   def desc: String = s"LIMIT ${expr.desc}"
   def coalesceDesc: String = s"LIMIT ${expr.coalesceDesc}"
+
+  override def map(func: (Expr) => Expr): LimitClause = {
+    LimitClause(func(expr))
+  }
 }
 
 case class CombinedClause(selectClause: SelectClause, fromClauseOpt: Option[FromClause],
@@ -138,6 +168,13 @@ case class CombinedClause(selectClause: SelectClause, fromClauseOpt: Option[From
     tails.foldLeft(headDesc) { (head, tail) =>
       s"${head} ${tail.coalesceDesc}"
     }
+  }
+
+  override def map(func: (Expr) => Expr): CombinedClause = {
+    CombinedClause(func(selectClause).asInstanceOf[SelectClause],
+      fromClauseOpt.map(func(_).asInstanceOf[FromClause]),
+      tails.map(func(_).asInstanceOf[ClauseExpression])
+    )
   }
 }
 
@@ -171,4 +208,29 @@ case class ProfilingClause(selectClause: SelectClause,
     val postDesc = postGroupbyClauses.map(_.coalesceDesc).mkString(" ")
     s"${selectDesc} ${fromDesc} ${preDesc} ${groupbyDesc} ${postDesc}"
   }
+
+  override def map(func: (Expr) => Expr): ProfilingClause = {
+    ProfilingClause(func(selectClause).asInstanceOf[SelectClause],
+      fromClauseOpt.map(func(_).asInstanceOf[FromClause]),
+      groupbyClauseOpt.map(func(_).asInstanceOf[GroupbyClause]),
+      preGroupbyClauses.map(func(_).asInstanceOf[ClauseExpression]),
+      postGroupbyClauses.map(func(_).asInstanceOf[ClauseExpression])
+    )
+  }
+}
+
+case class DuplicateClause(exprs: Seq[Expr]) extends ClauseExpression {
+  addChildren(exprs)
+
+  def desc: String = exprs.map(_.desc).mkString(", ")
+  def coalesceDesc: String = exprs.map(_.coalesceDesc).mkString(", ")
+  override def map(func: (Expr) => Expr): DuplicateClause = DuplicateClause(exprs.map(func(_)))
+}
+
+case class TimelinessClause(exprs: Seq[Expr]) extends ClauseExpression {
+  addChildren(exprs)
+
+  def desc: String = exprs.map(_.desc).mkString(", ")
+  def coalesceDesc: String = exprs.map(_.coalesceDesc).mkString(", ")
+  override def map(func: (Expr) => Expr): TimelinessClause = TimelinessClause(exprs.map(func(_)))
 }
