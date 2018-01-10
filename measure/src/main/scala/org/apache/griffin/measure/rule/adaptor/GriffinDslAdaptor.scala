@@ -50,6 +50,7 @@ object UniquenessKeys {
   val _total = "total"
   val _dup = "dup"
   val _num = "num"
+  val _duplicationArray = "duplication.array"
 }
 
 object TimelinessKeys {
@@ -611,43 +612,47 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 //        .addIfNotExist(ExportParamKeys._collectType, EntriesCollectType.desc)
 //      val countMetricExport = genMetricExport(countMetricParam, "", countMetricTableName)
 
-      // 8. duplicate record
-      val dupRecordTableName = "__dupRecords"
-      val dupRecordSql = {
-        s"SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0"
-      }
-      val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap, true)
-      val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
-      val dupRecordExport = genRecordExport(recordParam, dupRecordTableName, dupRecordTableName)
+      val uniqueSteps = sourceStep :: targetStep :: joinedStep :: groupStep ::
+        totalStep :: uniqueRecordStep :: uniqueStep :: Nil
+      val uniqueExports = totalMetricExport :: uniqueMetricExport :: Nil
+      val uniqueRulePlan = RulePlan(uniqueSteps, uniqueExports)
 
-      // 9. duplicate metric
-      val dupMetricTableName = "__dupMetric"
-      val numColName = details.getStringOrKey(UniquenessKeys._num)
-      val dupMetricSelClause = processType match {
-        case BatchProcessType => s"`${dupColName}`, COUNT(*) AS `${numColName}`"
-        case StreamingProcessType => s"`${InternalColumns.tmst}`, `${dupColName}`, COUNT(*) AS `${numColName}`"
-      }
-      val dupMetricGroupbyClause = processType match {
-        case BatchProcessType => s"`${dupColName}`"
-        case StreamingProcessType => s"`${InternalColumns.tmst}`, `${dupColName}`"
-      }
-      val dupMetricSql = {
-        s"""
-           |SELECT ${dupMetricSelClause} FROM `${dupRecordTableName}`
-           |GROUP BY ${dupMetricGroupbyClause}
-         """.stripMargin
-      }
-      val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
-      val dupMetricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
-        .addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
-      val dupMetricExport = genMetricExport(dupMetricParam, dupColName, dupMetricTableName)
+      val duplicationArrayName = details.getString(UniquenessKeys._duplicationArray, "")
+      val dupRulePlan = if (duplicationArrayName.nonEmpty) {
+        // 8. duplicate record
+        val dupRecordTableName = "__dupRecords"
+        val dupRecordSql = {
+          s"SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0"
+        }
+        val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap, true)
+        val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
+        val dupRecordExport = genRecordExport(recordParam, dupRecordTableName, dupRecordTableName)
 
-      val dupSteps = sourceStep :: targetStep :: joinedStep ::
-        groupStep :: totalStep :: uniqueRecordStep :: uniqueStep ::
-        dupRecordStep :: dupMetricStep :: Nil
-      val dupExports = totalMetricExport :: uniqueMetricExport :: dupRecordExport :: dupMetricExport :: Nil
+        // 9. duplicate metric
+        val dupMetricTableName = "__dupMetric"
+        val numColName = details.getStringOrKey(UniquenessKeys._num)
+        val dupMetricSelClause = processType match {
+          case BatchProcessType => s"`${dupColName}`, COUNT(*) AS `${numColName}`"
+          case StreamingProcessType => s"`${InternalColumns.tmst}`, `${dupColName}`, COUNT(*) AS `${numColName}`"
+        }
+        val dupMetricGroupbyClause = processType match {
+          case BatchProcessType => s"`${dupColName}`"
+          case StreamingProcessType => s"`${InternalColumns.tmst}`, `${dupColName}`"
+        }
+        val dupMetricSql = {
+          s"""
+             |SELECT ${dupMetricSelClause} FROM `${dupRecordTableName}`
+             |GROUP BY ${dupMetricGroupbyClause}
+          """.stripMargin
+        }
+        val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
+        val dupMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
+        val dupMetricExport = genMetricExport(dupMetricParam, duplicationArrayName, dupMetricTableName)
 
-      RulePlan(dupSteps, dupExports)
+        RulePlan(dupRecordStep :: dupMetricStep :: Nil, dupRecordExport :: dupMetricExport :: Nil)
+      } else emptyRulePlan
+
+      uniqueRulePlan.merge(dupRulePlan)
     }
   }
 

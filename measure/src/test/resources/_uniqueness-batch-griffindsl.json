@@ -47,7 +47,7 @@
           "num": "num"
         },
         "metric": {
-          "name": "dup"
+          "name": "unique"
         },
         "record": {
           "name": "dupRecords"

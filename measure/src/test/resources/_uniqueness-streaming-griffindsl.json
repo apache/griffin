@@ -101,11 +101,14 @@
         "details": {
           "source": "new",
           "target": "old",
+          "total": "total",
+          "unique": "unique",
           "dup": "dup",
-          "num": "num"
+          "num": "num",
+          "duplication.array": "dup"
         },
         "metric": {
-          "name": "dup"
+          "name": "unique"
         },
         "record": {
           "name": "dupRecords"
