@@ -434,8 +434,8 @@ public class JobServiceImpl implements JobService {
     public boolean deleteJobsRelateToMeasure(Long measureId) {
         List<GriffinJob> jobs = jobRepo.findByMeasureIdAndDeleted(measureId, false);
         if (CollectionUtils.isEmpty(jobs)) {
-            LOGGER.warn("Measure id {} has no related jobs.", measureId);
-            return false;
+            LOGGER.info("Measure id {} has no related jobs.", measureId);
+            return true;
         }
         for (GriffinJob job : jobs) {
             deleteJob(job);
