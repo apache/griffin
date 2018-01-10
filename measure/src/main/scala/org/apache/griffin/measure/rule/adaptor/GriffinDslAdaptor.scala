@@ -61,7 +61,6 @@ object TimelinessKeys {
 
 object GlobalKeys {
   val _initRule = "init.rule"
-//  val _globalMetricKeep = "global.metric.keep"
 }
 
 case class GriffinDslAdaptor(dataSourceNames: Seq[String],
