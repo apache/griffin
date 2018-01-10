@@ -121,8 +121,8 @@ Accuracy rule expression in Griffin DSL is a logical expression, telling the map
 Profiling rule expression in Griffin DSL is a sql-like expression, with select clause ahead, following optional from clause, where clause, group-by clause, order-by clause, limit clause in order.  
 	e.g. `source.gender, source.id.count() where source.age > 20 group by source.gender`, `select country, max(age), min(age), count(*) as cnt from source group by country order by cnt desc limit 5`
 
-### Duplicate Rule
-Duplicate rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the duplicate columns to measure.  
+### Uniqueness Rule
+Uniqueness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is unique.  
 	e.g. `name, age`, `name, (age + 1) as next_age`
 
 ### Timeliness Rule
@@ -151,13 +151,16 @@ For example, the dsl rule is `source.cntry, source.id.count(), source.age.max() 
 
 After the translation, the metrics will be persisted in table `profiling`.  
 
-### Duplicate
-For duplicate, or called uniqueness, is to find out the duplicate items of data, and rollup the items count group by duplicate times.  
+### Uniqueness
+For uniqueness, or called duplicate, is to find out the duplicate items of data, and rollup the items count group by duplicate times.  
 For example, the dsl rule is `name, age`, which represents the duplicate requests, in this case, source and target are the same data set. After the translation, the sql rule is as below:  
 - **get distinct items from source**: `SELECT name, age FROM source`, save as table `src`.  
 - **get all items from target**: `SELECT name, age FROM target`, save as table `tgt`.
 - **join two tables**: `SELECT src.name, src.age FROM tgt RIGHT JOIN src ON coalesce(src.name, '') = coalesce(tgt.name, '') AND coalesce(src.age, '') = coalesce(tgt.age, '')`, save as table `joined`.
-- **get duplicate items**: `SELECT name, age, (count(*) - 1) AS dup FROM joined GROUP BY name, age`, save as table `grouped`.
+- **get items duplication**: `SELECT name, age, (count(*) - 1) AS dup FROM joined GROUP BY name, age`, save as table `grouped`.
+- **get total metric**: `SELECT count(*) FROM source`, save as table `total_metric`.
+- **get unique record**: `SELECT * FROM grouped WHERE dup = 0`, save as table `unique_record`.
+- **get unique metric**: `SELECT count(*) FROM unique_record`, save as table `unique_metric`.
 - **get duplicate record**: `SELECT * FROM grouped WHERE dup > 0`, save as table `dup_record`.
 - **get duplicate metric**: `SELECT dup, count(*) AS num FROM dup_records GROUP BY dup`, save as table `dup_metric`.
 

@@ -109,13 +109,13 @@ class GriffinDslAdaptorTest extends FunSuite with Matchers with BeforeAndAfter w
 //    }
   }
 
-  test ("duplicate") {
+  test ("uniqueness") {
 //    val adaptor = GriffinDslAdaptor("new" :: "old" :: Nil, "count" :: Nil)
 //    val ruleJson =
 //      """
 //        |{
 //        |  "dsl.type": "griffin-dsl",
-//        |  "dq.type": "duplicate",
+//        |  "dq.type": "uniqueness",
 //        |  "name": "dup",
 //        |  "rule": "name, count(age + 1) as ct",
 //        |  "details": {
