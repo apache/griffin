@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { BrowserModule } from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import { NgModule} from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HttpClientModule} from '@angular/common/http';
 import { DataTableModule} from "angular2-datatable";
@@ -49,6 +49,7 @@ import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
 import { TruncatePipe} from './sidebar/truncate.pipe';
 import { ConfigurationComponent } from './measure/create-measure/configuration/configuration.component';
 import { NouisliderModule } from 'ng2-nouislider';
+import { TagInputModule } from 'ngx-chips';
 
 
 const appRoutes: Routes = [
@@ -154,9 +155,8 @@ const appRoutes: Routes = [
       {useHash: true},
     ),
     MatNativeDateModule,
-    MatDatepickerModule
-
-
+    MatDatepickerModule,
+    TagInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

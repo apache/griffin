@@ -83,6 +83,7 @@ export class MetricComponent implements OnInit {
     var url_organization = this.serviceService.config.uri.organization;
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_organization).subscribe(data => {
+      console.log(data);
       var jobMap = new Map();
       this.orgWithMeasure = data;
       var orgNode = null;

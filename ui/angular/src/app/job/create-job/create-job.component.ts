@@ -396,77 +396,77 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
 
   ngOnInit() {
     var allModels = this.serviceService.config.uri.allModels;
-    // this.http.get(allModels).subscribe(data =>{
-    //   this.Measures = data;
-    //   console.log(this.Measures);
-    // });
-    this.Measures = [{  
-   "name":"m1",
-   "type":"griffin",
-   "process.type":"batch",
-   "owner":"test",
-   "data.sources":[  
-      {  
-         "name":"source",
-         "connectors":[  
-            {  
-               "name":"source1513317492171",
-               "type":"HIVE",
-               "version":"1.2",
-               "data.unit":"2hour",
-               "config":{  
-                  "database":"default",
-                  "table.name":"demo_src",
-                  "where":"dt=#YYYYMMdd# AND hour=#HH#"
-               },
-               "predicates":[  
-                  {  
-                     "type":"file.exist",
-                     "config":{  
-                        "root.path":"hdfs:///griffin/demo_src",
-                        "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                     }
-                  }
-               ]
-            }
-         ]
-      },
-      {  
-         "name":"target",
-         "connectors":[  
-            {  
-               "name":"target1513317499033",
-               "type":"HIVE",
-               "version":"1.2",
-               "data.unit":"1day",
-               "config":{  
-                  "database":"default",
-                  "table.name":"demo_tgt",
-                  "where":"dt=#YYYYMMdd# AND hour=#HH#"
-               },
-               "predicates":[  
-                  {  
-                     "type":"file.exist",
-                     "config":{  
-                        "root.path":"hdfs:///griffin/demo_src",
-                        "path":""
-                     }
-                  }
-               ]
-            }
-         ]
-      }
-   ],
-   "evaluateRule":{  
-      "rules":[  
-         {  
-            "dsl.type":"griffin-dsl",
-            "dq.type":"accuracy",
-            "rule":"source.id=target.id"
-         }
-      ]
-   }
-}]
+    this.http.get(allModels).subscribe(data =>{
+      this.Measures = data;
+      console.log(this.Measures);
+    });
+//     this.Measures = [{  
+//    "name":"demo_accu",
+//    "type":"griffin",
+//    "process.type":"batch",
+//    "owner":"test",
+//    "data.sources":[  
+//       {  
+//          "name":"source",
+//          "connectors":[  
+//             {  
+//                "name":"source1513317492171",
+//                "type":"HIVE",
+//                "version":"1.2",
+//                "data.unit":"2day",
+//                "config":{  
+//                   "database":"default",
+//                   "table.name":"demo_src",
+//                   "where":"dt=#YYYYMMdd# AND hour=#HH#"
+//                },
+//                "predicates":[  
+//                   {  
+//                      "type":"file.exist",
+//                      "config":{  
+//                         "root.path":"hdfs:///griffin/demo_src",
+//                         "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+//                      }
+//                   }
+//                ]
+//             }
+//          ]
+//       },
+//       {  
+//          "name":"target",
+//          "connectors":[  
+//             {  
+//                "name":"target1513317499033",
+//                "type":"HIVE",
+//                "version":"1.2",
+//                "data.unit":"1hour",
+//                "config":{  
+//                   "database":"default",
+//                   "table.name":"demo_tgt",
+//                   "where":"dt=#YYYYMMdd# AND hour=#HH#"
+//                },
+//                "predicates":[  
+//                   {  
+//                      "type":"file.exist",
+//                      "config":{  
+//                         "root.path":"hdfs:///griffin/demo_src",
+//                         "path":""
+//                      }
+//                   }
+//                ]
+//             }
+//          ]
+//       }
+//    ],
+//    "evaluateRule":{  
+//       "rules":[  
+//          {  
+//             "dsl.type":"griffin-dsl",
+//             "dq.type":"accuracy",
+//             "rule":"source.id=target.id"
+//          }
+//       ]
+//    }
+// }]
     this.config={
       behaviour: 'drag',
       connect: true,

@@ -337,10 +337,10 @@ under the License.
                 <!-- <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Organization<span class="symbol required"></span>:
+                      Group:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" id="systemSelector" class="form-control" [(ngModel)]="org" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org">
+                      <tag-input class="form-control" style="height: 44px;padding: 0 6px;" id="systemSelector" required [(ngModel)]='grp' [editable]='true' name="grp"></tag-input>
                     </div>
                   </div>
                 </div> -->
@@ -434,10 +434,10 @@ under the License.
                       </div>
                       <!-- <div class="row">
                         <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                          Organization:
+                          Group:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{org}}
+                          {{showgrp}}
                         </div>
                       </div> -->
                       <div class="row">

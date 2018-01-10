@@ -29,6 +29,7 @@ import { ToasterModule, ToasterService} from 'angular2-toaster';
 import * as $ from 'jquery';
 import { HttpClient} from '@angular/common/http';
 import { Router} from "@angular/router";
+import { TagInputModule } from 'ngx-chips';
 
 
 class node {
@@ -70,7 +71,9 @@ export class AcComponent implements OnInit , AfterViewChecked {
   
   defaultValue:string;
   currentStep = 1;
-  org:string;
+  // grp = [];
+  // showgrp:string;
+  // finalgrp = [];
   desc:string;
   selection = [];
   selectedAll = false;
@@ -134,7 +137,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     "process.type": "batch",
     "owner":"",
     "description":"",
-    // "organization":"",
+    // "group":[],
     "data.sources": [
     {
       "name": "source",
@@ -215,7 +218,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   name:'';
   evaluateRule:any;
   // desc:'';
-  // org:'';
+  // grp:'';
   owner = 'test';
   createResult :any;
 
@@ -315,24 +318,23 @@ export class AcComponent implements OnInit , AfterViewChecked {
   }
 
   formValidation = function(step) {
-    return true;
-    // if (step == undefined) {
-    //   step = this.currentStep;
-    // }
-    // if (step == 1) {
-    //   return this.selection && this.selection.length > 0;
-    // } else if (step == 2) {
-    //   return (this.selectionTarget && this.selectionTarget.length > 0)//at least one target is selected
-    //   // && !((this.currentTable.name == this.currentTableTarget.name)&&(this.currentDB.name == this.currentDBTarget.name));//target and source should be different
-    // } else if (step == 3) {
-    //     return this.selectionTarget && this.selectionTarget.length == this.mappings.length
-    //       && this.mappings.indexOf('') == -1
-    // } else if (step == 4) {
-    //   return true;
-    // } else if(step == 5){
+    if (step == undefined) {
+      step = this.currentStep;
+    }
+    if (step == 1) {
+      return this.selection && this.selection.length > 0;
+    } else if (step == 2) {
+      return (this.selectionTarget && this.selectionTarget.length > 0)//at least one target is selected
+      // && !((this.currentTable.name == this.currentTableTarget.name)&&(this.currentDB.name == this.currentDBTarget.name));//target and source should be different
+    } else if (step == 3) {
+        return this.selectionTarget && this.selectionTarget.length == this.mappings.length
+          && this.mappings.indexOf('') == -1
+    } else if (step == 4) {
+      return true;
+    } else if(step == 5){
 
-    // }
-    // return false;
+    }
+    return false;
   } 
 
   prev (form) {
@@ -341,12 +343,17 @@ export class AcComponent implements OnInit , AfterViewChecked {
   goTo (i) {
     this.currentStep = i;
   }
-  submit (form) {                
+  submit (form) {              
       // form.$setPristine();
+      // this.finalgrp = [];
       if (!form.valid) {
         this.toasterService.pop('error', 'Error!', 'please complete the form in this step before proceeding');
         return false;
       }
+      // for(let i=0;i<this.grp.length;i++){
+      //   this.finalgrp.push(this.grp[i].value);
+      // }
+      // this.showgrp = this.finalgrp.join(",");
       var rule = '';
       this.newMeasure = {
         "name":this.name,
@@ -354,7 +361,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
         "process.type": "batch",
         "owner":this.owner,
         "description":this.desc,
-        // "organization":this.org,
+        // "group":this.finalgrp,
         "data.sources": [
           {
             "name": "source",
@@ -596,7 +603,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
         'height': $('fieldset').height()
     });
   }
-
+    
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{

@@ -30,7 +30,7 @@ under the License.
           <th st-ratio="15">Measure Name</th>
           <th st-ratio="15">Measure Type</th>
           <th st-ratio="20">Description</th>
-          <th st-ratio="5">Organization</th>
+          <!-- <th st-ratio="5">Group</th> -->
           <th st-ratio="5">Action</th>
         </tr>
       </thead>
@@ -45,7 +45,7 @@ under the License.
           <td><a routerLink="/measure/{{row.id}}">{{row.name}}</a></td>
           <td>{{row.type}}</td>
           <td>{{row.description}}</td>
-          <td>{{row.organization}}</td>
+          <!-- <td>{{row.group}}</td> -->
           <td>
             &nbsp;
             <!-- <a [ngClass]="(!adminAccess && ntAccount!=row.owner)?'disabled':''" href="" (click)="remove(row)" title="delete" style="text-decoration:none"> -->

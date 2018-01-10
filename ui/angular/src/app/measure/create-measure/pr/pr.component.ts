@@ -30,6 +30,7 @@ import { DataTableModule } from "angular2-datatable";
 import { AfterViewChecked, ElementRef } from '@angular/core';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import { ConfigurationComponent } from "../configuration/configuration.component";
+import { TagInputModule } from 'ngx-chips';
 
 
 
@@ -88,7 +89,9 @@ class Col{
 export class PrComponent implements  AfterViewChecked, OnInit{
   
   noderule = [];
-  org:string;
+  // grp = [];
+  // showgrp:string;
+  // finalgrp = [];
   transrule = [];
   transenumrule = [];
   transnullrule = [];
@@ -121,7 +124,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     "process.type": "batch",
     "owner":"",
     "description":"",
-    // "organization":"",
+    // "group":[],
     "data.sources": [
       {
         "name": "source",
@@ -350,17 +353,22 @@ export class PrComponent implements  AfterViewChecked, OnInit{
   }
   submit (form) {         
       // form.$setPristine();
+    // this.finalgrp = [];
     if (!form.valid) {
       this.toasterService.pop('error', 'Error!', 'please complete the form in this step before proceeding');
       return false;
     }
+    // for(let i=0;i<this.grp.length;i++){
+    //   this.finalgrp.push(this.grp[i].value);
+    // }
+    // this.showgrp = this.finalgrp.join(",");
     this.newMeasure = {
         "name": this.name,
         "type":"griffin",
         "process.type": "batch",
         "owner":this.owner,
         "description":this.desc,
-        // "organization":this.org,
+        // "group":this.finalgrp,
         "data.sources": [
           {
             "name": "source",
