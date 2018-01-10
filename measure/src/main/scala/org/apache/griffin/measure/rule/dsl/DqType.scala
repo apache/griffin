@@ -28,7 +28,7 @@ sealed trait DqType {
 
 object DqType {
   private val dqTypes: List[DqType] = List(
-    AccuracyType, ProfilingType, DuplicateType, TimelinessType, UnknownType
+    AccuracyType, ProfilingType, UniquenessType, TimelinessType, UnknownType
   )
   def apply(ptn: String): DqType = {
     dqTypes.filter(tp => ptn match {
@@ -49,9 +49,9 @@ final case object ProfilingType extends DqType {
   val desc = "profiling"
 }
 
-final case object DuplicateType extends DqType {
-  val regex = "^(?i)duplicate$".r
-  val desc = "duplicate"
+final case object UniquenessType extends DqType {
+  val regex = "^(?i)uniqueness|duplicate$".r
+  val desc = "uniqueness"
 }
 
 final case object TimelinessType extends DqType {
