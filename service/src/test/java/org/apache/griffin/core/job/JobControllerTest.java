@@ -85,7 +85,7 @@ public class JobControllerTest {
     }
 
     @Test
-    public void testAddJobForFail() throws Exception {
+    public void testAddJobForFailure() throws Exception {
         JobSchedule jobSchedule = new JobSchedule(1L, "jobName","0 0/4 * * * ?", null,null);
         given(service.addJob(jobSchedule)).willReturn(CREATE_JOB_FAIL);
 
@@ -98,7 +98,7 @@ public class JobControllerTest {
     }
 
     @Test
-    public void testDeleteJobForSuccess() throws Exception {
+    public void testDeleteJobByIdForSuccess() throws Exception {
         given(service.deleteJob(1L)).willReturn(DELETE_JOB_SUCCESS);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs/1"))
@@ -107,10 +107,30 @@ public class JobControllerTest {
     }
 
     @Test
-    public void testDeleteJobForFail() throws Exception {
+    public void testDeleteJobByIdForFailure() throws Exception {
         given(service.deleteJob(1L)).willReturn(DELETE_JOB_FAIL);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(406)));
+    }
+
+    @Test
+    public void testDeleteJobByNameForSuccess() throws Exception {
+        String jobName = "jobName";
+        given(service.deleteJob(jobName)).willReturn(DELETE_JOB_SUCCESS);
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("jobName",jobName))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", is(206)));
+    }
+
+    @Test
+    public void testDeleteJobByNameForFailure() throws Exception {
+        String jobName = "jobName";
+        given(service.deleteJob(jobName)).willReturn(DELETE_JOB_FAIL);
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("jobName",jobName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code", is(406)));
     }
