@@ -1,5 +1,5 @@
 {
-  "name": "dup_streaming",
+  "name": "unique_streaming",
 
   "process.type": "streaming",
 

@@ -1,5 +1,5 @@
 {
-  "name": "dup_streaming",
+  "name": "unique_streaming",
 
   "process.type": "streaming",
 
@@ -95,7 +95,7 @@
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "duplicate",
+        "dq.type": "uniqueness",
         "name": "dup",
         "rule": "name, age",
         "details": {

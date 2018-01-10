@@ -43,9 +43,11 @@ object ProfilingKeys {
   val _source = "source"
 }
 
-object DuplicateKeys {
+object UniquenessKeys {
   val _source = "source"
   val _target = "target"
+  val _unique = "unique"
+  val _total = "total"
   val _dup = "dup"
   val _num = "num"
 }
@@ -87,7 +89,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         dqType match {
           case AccuracyType => accuracyRulePlan(timeInfo, name, expr, param, processType)
           case ProfilingType => profilingRulePlan(timeInfo, name, expr, param, processType)
-          case DuplicateType => duplicateRulePlan(timeInfo, name, expr, param, processType)
+          case UniquenessType => uniquenessRulePlan(timeInfo, name, expr, param, processType)
           case TimelinessType => timelinessRulePlan(timeInfo, name, expr, param, processType)
           case _ => emptyRulePlan
         }
@@ -169,7 +171,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
              |SELECT `${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
              |coalesce(`${missCountTableName}`.`${missColName}`, 0) AS `${missColName}`,
              |(`${totalColName}` - `${missColName}`) AS `${matchedColName}`
-             |FROM `${totalCountTableName}` FULL JOIN `${missCountTableName}`
+             |FROM `${totalCountTableName}` LEFT JOIN `${missCountTableName}`
          """.stripMargin
         }
         case StreamingProcessType => {
@@ -178,7 +180,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
              |`${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
              |coalesce(`${missCountTableName}`.`${missColName}`, 0) AS `${missColName}`,
              |(`${totalColName}` - `${missColName}`) AS `${matchedColName}`
-             |FROM `${totalCountTableName}` FULL JOIN `${missCountTableName}`
+             |FROM `${totalCountTableName}` LEFT JOIN `${missCountTableName}`
              |ON `${totalCountTableName}`.`${InternalColumns.tmst}` = `${missCountTableName}`.`${InternalColumns.tmst}`
          """.stripMargin
         }
@@ -481,13 +483,13 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     }
   }
 
-  private def duplicateRulePlan(timeInfo: TimeInfo, name: String, expr: Expr,
-                                param: Map[String, Any], processType: ProcessType
-                               ): RulePlan = {
+  private def uniquenessRulePlan(timeInfo: TimeInfo, name: String, expr: Expr,
+                                 param: Map[String, Any], processType: ProcessType
+                                ): RulePlan = {
     val details = getDetails(param)
-    val sourceName = details.getString(DuplicateKeys._source, dataSourceNames.head)
-    val targetName = details.getString(DuplicateKeys._target, dataSourceNames.tail.head)
-    val analyzer = DuplicateAnalyzer(expr.asInstanceOf[DuplicateClause], sourceName, targetName)
+    val sourceName = details.getString(UniquenessKeys._source, dataSourceNames.head)
+    val targetName = details.getString(UniquenessKeys._target, dataSourceNames.tail.head)
+    val analyzer = UniquenessAnalyzer(expr.asInstanceOf[UniquenessClause], sourceName, targetName)
 
     if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
       println(s"[${timeInfo.calcTime}] data source ${sourceName} not exists")
@@ -539,26 +541,88 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val groupSelClause = selAliases.map { alias =>
         s"`${alias}`"
       }.mkString(", ")
-      val dupColName = details.getStringOrKey(DuplicateKeys._dup)
+      val dupColName = details.getStringOrKey(UniquenessKeys._dup)
       val groupSql = {
         s"SELECT ${groupSelClause}, (COUNT(*) - 1) AS `${dupColName}` FROM `${joinedTableName}` GROUP BY ${groupSelClause}"
       }
-      val groupStep = SparkSqlStep(groupTableName, groupSql, emptyMap)
+      val groupStep = SparkSqlStep(groupTableName, groupSql, emptyMap, true)
 
-      // 5. duplicate record
+      // 5. total metric
+      val totalTableName = "__totalMetric"
+      val totalColName = details.getStringOrKey(UniquenessKeys._total)
+      val totalSql = processType match {
+        case BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
+        case StreamingProcessType => {
+          s"""
+             |SELECT `${InternalColumns.tmst}`, COUNT(*) AS `${totalColName}`
+             |FROM `${sourceName}` GROUP BY `${InternalColumns.tmst}`
+           """.stripMargin
+        }
+      }
+      val totalStep = SparkSqlStep(totalTableName, totalSql, emptyMap)
+      val totalMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, EntriesCollectType.desc)
+      val totalMetricExport = genMetricExport(totalMetricParam, totalColName, totalTableName)
+
+      // 6. unique record
+      val uniqueRecordTableName = "__uniqueRecord"
+      val uniqueRecordSql = {
+        s"SELECT * FROM `${groupTableName}` WHERE `${dupColName}` = 0"
+      }
+      val uniqueRecordStep = SparkSqlStep(uniqueRecordTableName, uniqueRecordSql, emptyMap)
+
+      // 7. unique metric
+      val uniqueTableName = "__uniqueMetric"
+      val uniqueColName = details.getStringOrKey(UniquenessKeys._unique)
+      val uniqueSql = processType match {
+        case BatchProcessType => s"SELECT COUNT(*) AS `${uniqueColName}` FROM `${uniqueRecordTableName}`"
+        case StreamingProcessType => {
+          s"""
+             |SELECT `${InternalColumns.tmst}`, COUNT(*) AS `${uniqueColName}`
+             |FROM `${uniqueRecordTableName}` GROUP BY `${InternalColumns.tmst}`
+           """.stripMargin
+        }
+      }
+      val uniqueStep = SparkSqlStep(uniqueTableName, uniqueSql, emptyMap)
+      val uniqueMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, EntriesCollectType.desc)
+      val uniqueMetricExport = genMetricExport(uniqueMetricParam, uniqueColName, uniqueTableName)
+
+      // 8. count metric
+//      val countMetricTableName = "__countMetric"
+//      val countMetricSql = processType match {
+//        case BatchProcessType => {
+//          s"""
+//             |SELECT `${totalTableName}`.`${totalColName}` AS `${totalColName}`,
+//             |coalesce(`${uniqueTableName}`.`${uniqueColName}`, 0) AS `${uniqueColName}`
+//             |FROM `${totalTableName}` LEFT JOIN `${uniqueTableName}`
+//          """.stripMargin
+//        }
+//        case StreamingProcessType => {
+//          s"""
+//             |SELECT `${totalTableName}`.`${InternalColumns.tmst}` AS `${InternalColumns.tmst}`,
+//             |`${totalTableName}`.`${totalColName}` AS `${totalColName}`,
+//             |coalesce(`${uniqueTableName}`.`${uniqueColName}`, 0) AS `${uniqueColName}`
+//             |FROM `${totalTableName}` LEFT JOIN `${uniqueTableName}`
+//             |ON `${totalTableName}`.`${InternalColumns.tmst}` = `${uniqueTableName}`.`${InternalColumns.tmst}`
+//          """.stripMargin
+//        }
+//      }
+//      val countMetricStep = SparkSqlStep(countMetricTableName, countMetricSql, emptyMap)
+//      val countMetricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
+//        .addIfNotExist(ExportParamKeys._collectType, EntriesCollectType.desc)
+//      val countMetricExport = genMetricExport(countMetricParam, "", countMetricTableName)
+
+      // 8. duplicate record
       val dupRecordTableName = "__dupRecords"
       val dupRecordSql = {
-        s"""
-           |SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0
-         """.stripMargin
+        s"SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0"
       }
       val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap, true)
       val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
-      val dupRecordxports = genRecordExport(recordParam, dupRecordTableName, dupRecordTableName) :: Nil
+      val dupRecordExport = genRecordExport(recordParam, dupRecordTableName, dupRecordTableName)
 
-      // 6. duplicate metric
-      val dupMetricTableName = name
-      val numColName = details.getStringOrKey(DuplicateKeys._num)
+      // 9. duplicate metric
+      val dupMetricTableName = "__dupMetric"
+      val numColName = details.getStringOrKey(UniquenessKeys._num)
       val dupMetricSelClause = processType match {
         case BatchProcessType => s"`${dupColName}`, COUNT(*) AS `${numColName}`"
         case StreamingProcessType => s"`${InternalColumns.tmst}`, `${dupColName}`, COUNT(*) AS `${numColName}`"
@@ -574,12 +638,14 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
          """.stripMargin
       }
       val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
-      val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
+      val dupMetricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
         .addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
-      val dupMetricExports = genMetricExport(metricParam, name, dupMetricTableName) :: Nil
+      val dupMetricExport = genMetricExport(dupMetricParam, dupColName, dupMetricTableName)
 
-      val dupSteps = sourceStep :: targetStep :: joinedStep :: groupStep :: dupRecordStep :: dupMetricStep :: Nil
-      val dupExports = dupRecordxports ++ dupMetricExports
+      val dupSteps = sourceStep :: targetStep :: joinedStep ::
+        groupStep :: totalStep :: uniqueRecordStep :: uniqueStep ::
+        dupRecordStep :: dupMetricStep :: Nil
+      val dupExports = totalMetricExport :: uniqueMetricExport :: dupRecordExport :: dupMetricExport :: Nil
 
       RulePlan(dupSteps, dupExports)
     }
