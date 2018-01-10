@@ -26,10 +26,4 @@ import java.util.Map;
 public interface LoginService {
 
     ResponseEntity<Map<String, Object>> login(Map<String, String> map);
-
-    ResponseEntity<Map<String, Object>> loginDefault(Map<String, String> map);
-
-    ResponseEntity<Map<String, Object>> loginLDAP(Map<String, String> map);
-
-
 }

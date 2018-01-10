@@ -19,10 +19,7 @@ under the License.
 
 package org.apache.griffin.core.login;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,17 +31,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/login")
 public class LoginController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private LoginService loginService;
 
-    @Autowired
-    private Environment env;
-
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> login(
-            @RequestBody Map<String, String> map) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> map) {
         return loginService.login(map);
     }
 }
