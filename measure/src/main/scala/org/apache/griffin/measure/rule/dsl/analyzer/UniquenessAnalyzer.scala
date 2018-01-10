@@ -21,7 +21,7 @@ package org.apache.griffin.measure.rule.dsl.analyzer
 import org.apache.griffin.measure.rule.dsl.expr.{AliasableExpr, _}
 
 
-case class DuplicateAnalyzer(expr: DuplicateClause, sourceName: String, targetName: String) extends BasicAnalyzer {
+case class UniquenessAnalyzer(expr: UniquenessClause, sourceName: String, targetName: String) extends BasicAnalyzer {
 
   val seqAlias = (expr: Expr, v: Seq[String]) => {
     expr match {
@@ -40,7 +40,7 @@ case class DuplicateAnalyzer(expr: DuplicateClause, sourceName: String, targetNa
   }
 
   if (selectionPairs.isEmpty) {
-    throw new Exception(s"duplicate analyzer error: empty selection")
+    throw new Exception(s"uniqueness analyzer error: empty selection")
   }
 
 }
