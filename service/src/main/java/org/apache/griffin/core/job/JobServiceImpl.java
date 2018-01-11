@@ -336,7 +336,7 @@ public class JobServiceImpl implements JobService {
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
-            return false;
+            return true;
         }
         scheduler.pauseJob(jobKey);
         return true;
@@ -418,7 +418,7 @@ public class JobServiceImpl implements JobService {
         JobKey jobKey = new JobKey(name, group);
         if (scheduler.checkExists(jobKey)) {
             LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
-            return false;
+            return true;
         }
         scheduler.deleteJob(jobKey);
         return true;
