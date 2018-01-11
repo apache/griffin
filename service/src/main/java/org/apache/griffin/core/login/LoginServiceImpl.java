@@ -66,7 +66,7 @@ public class LoginServiceImpl implements LoginService {
             searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
             this.searchControls = searchControls;
         } else if (!strategy.equals("test")) {
-            throw new Exception("Missing login strategy configuration");
+            throw new Exception("Missing login strategy config.");
         }
     }
 
@@ -85,28 +85,29 @@ public class LoginServiceImpl implements LoginService {
         try {
             LdapContext ctx = getContextInstance(ntAccount, password);
             NamingEnumeration<SearchResult> results = ctx.search(searchBase, searchFilter, searchControls);
-            String fullName = getFullName(results);
-            if (fullName == null) {
-                fullName = ntAccount;
-            }
+            String fullName = getFullName(results, ntAccount);
             return getResponse(ntAccount, fullName);
         } catch (NamingException e) {
-            LOGGER.warn("Failed to login with LDAP auth. {}", e.getMessage());
+            LOGGER.warn("User {} failed to login with LDAP auth. {}", ntAccount, e.getMessage());
         }
-        return null;
+        return getResponse(ntAccount, null);
     }
 
-    private String getFullName(NamingEnumeration<SearchResult> results) throws NamingException {
-        String fullName = null;
-        while (results.hasMoreElements()) {
-            SearchResult searchResult = results.nextElement();
-            Attributes attrs = searchResult.getAttributes();
-            if (attrs != null && attrs.get("cn") != null) {
-                String cnName = (String) attrs.get("cn").get();
-                if (cnName.indexOf("(") > 0) {
-                    fullName = cnName.substring(0, cnName.indexOf("("));
+    private String getFullName(NamingEnumeration<SearchResult> results, String ntAccount) {
+        String fullName = ntAccount;
+        try {
+            while (results.hasMoreElements()) {
+                SearchResult searchResult = results.nextElement();
+                Attributes attrs = searchResult.getAttributes();
+                if (attrs != null && attrs.get("cn") != null) {
+                    String cnName = (String) attrs.get("cn").get();
+                    if (cnName.indexOf("(") > 0) {
+                        fullName = cnName.substring(0, cnName.indexOf("("));
+                    }
                 }
             }
+        } catch (NamingException e) {
+            LOGGER.warn("User {} successfully login with LDAP auth, but failed to get full name.", ntAccount);
         }
         return fullName;
     }
@@ -121,14 +122,13 @@ public class LoginServiceImpl implements LoginService {
     }
 
     private ResponseEntity<Map<String, Object>> getResponse(String ntAccount, String fullName) {
-        if (fullName != null) {
-            Map<String, Object> message = new HashMap<>();
-            message.put("ntAccount", ntAccount);
-            message.put("fullName", fullName);
-            message.put("status", 0);
-            return new ResponseEntity<>(message, HttpStatus.OK);
-        } else {
+        if (fullName == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        Map<String, Object> message = new HashMap<>();
+        message.put("ntAccount", ntAccount);
+        message.put("fullName", fullName);
+        message.put("status", 0);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }

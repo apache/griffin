@@ -81,12 +81,13 @@ public class MetricServiceImpl implements MetricService {
 
     @Override
     public ResponseEntity addMetricValues(List<MetricValue> values) {
-        try {
-            for (MetricValue value : values) {
-                if (!isMetricValueValid(value)) {
-                    return new ResponseEntity<>(GriffinOperationMessage.ADD_METRIC_VALUES_FAIL, HttpStatus.BAD_REQUEST);
-                }
+        for (MetricValue value : values) {
+            if (!isMetricValueValid(value)) {
+                LOGGER.error("Invalid metric value.");
+                return new ResponseEntity<>(GriffinOperationMessage.ADD_METRIC_VALUES_FAIL, HttpStatus.BAD_REQUEST);
             }
+        }
+        try {
             for (MetricValue value : values) {
                 metricStore.addMetricValue(value);
             }
