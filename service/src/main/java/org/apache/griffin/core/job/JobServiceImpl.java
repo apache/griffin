@@ -173,7 +173,7 @@ public class JobServiceImpl implements JobService {
         }
         GriffinJob job = saveGriffinJob(measure.getId(), js.getJobName(), qName, qGroup);
         return job != null && saveAndAddQuartzJob(scheduler, triggerKey, js, job);
-    }
+}
 
     private String getQuartzGroupName() {
         return "BA";

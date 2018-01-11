@@ -41,7 +41,7 @@ public class JobInstanceRepoTest {
     private TestEntityManager entityManager;
 
     @Autowired
-    private JobInstanceRepo jobRepo;
+    private JobInstanceRepo jobInstanceRepo;
 
     @Before
     public void setup() {
@@ -52,25 +52,25 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        List<JobInstanceBean> beans = jobRepo.findByActiveState();
+        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState();
         assertThat(beans.size()).isEqualTo(1);
     }
 
     @Test
     public void testFindByPredicateName() {
-        JobInstanceBean bean = jobRepo.findByPredicateName("pName1");
+        JobInstanceBean bean = jobInstanceRepo.findByPredicateName("pName1");
         assertThat(bean).isNotNull();
     }
 
     @Test
     public void testFindByExpireTmsLessThanEqual() {
-        List<JobInstanceBean> beans = jobRepo.findByExpireTmsLessThanEqual(1516004640092L);
+        List<JobInstanceBean> beans = jobInstanceRepo.findByExpireTmsLessThanEqual(1516004640092L);
         assertThat(beans.size()).isEqualTo(2);
     }
 
     @Test
     public void testDeleteByExpireTimestamp() {
-        int count = jobRepo.deleteByExpireTimestamp(1516004640092L);
+        int count = jobInstanceRepo.deleteByExpireTimestamp(1516004640092L);
         assertThat(count).isEqualTo(2);
     }
 
