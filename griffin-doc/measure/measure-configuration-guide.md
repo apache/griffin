@@ -136,26 +136,25 @@ Above lists environment parameters.
     }
   ],
 
-  "evaluateRule": {
+  "evaluate.rule": {
     "rules": [
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "accuracy",
-        "rule": "src.user_id = tgt.user_id AND upper(src.first_name) = upper(tgt.first_name) AND src.last_name = tgt.last_name",
+        "name": "accu",
+        "rule": "source.user_id = target.user_id AND upper(source.first_name) = upper(target.first_name) AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code",
         "details": {
-          "source": "src",
-          "target": "tgt",
-          "miss.records": {
-            "name": "miss.records",
-            "persist.type": "record"
-          },
-          "accuracy": {
-            "name": "accu",
-            "persist.type": "metric"
-          },
+          "source": "source",
+          "target": "target",
           "miss": "miss_count",
           "total": "total_count",
           "matched": "matched_count"
+        },
+        "metric": {
+          "name": "accu"
+        },
+        "record": {
+          "name": "missRecords"
         }
       }
     ]
@@ -193,19 +192,34 @@ Above lists DQ job configure parameters.
 
 ### <a name="rule"></a>Rule
 - **dsl.type**: Rule dsl type, "spark-sql", "df-opr" and "griffin-dsl".
-- **name** (step information): Result table name of this rule, optional for "griffin-dsl" type.
-- **persist.type** (step information): Persist type of result table, optional for "griffin-dsl" type. Supporting "metric", "record" and "none" type, "metric" type indicates the result will be persisted as metrics, "record" type indicates the result will be persisted as record only, "none" type indicates the result will not be persisted. Default is "none" type.
-- **update.data.source** (step information): If the result table needs to update the data source, this parameter is the data source name, for streaming accuracy case, optional.
 - **dq.type**: DQ type of this rule, only for "griffin-dsl" type, supporting "accuracy" and "profiling".
+- **name** (step information): Result table name of this rule, optional for "griffin-dsl" type.
+- **rule**: The rule string.
 - **details**: Details of this rule, optional.
-	+ accuracy dq type detail configuration
-		* source: the data source name which as source in accuracy, default is the name of first data source in "data.sources" if not configured.
-		* target: the data source name which as target in accuracy, default is the name of second data source in "data.sources" if not configured.
-		* miss.records: step information of miss records result table step in accuracy.
-		* accuracy: step information of accuracy result table step in accuracy.
-		* miss: alias of miss column in result table.
-		* total: alias of total column in result table.
-		* matched: alias of matched column in result table.
-	+ profiling dq type detail configuration
-		* source: the data source name which as source in profiling, default is the name of first data source in "data.sources" if not configured. If the griffin-dsl rule contains from clause, this parameter is ignored.
-		* profiling: step information of profiling result table step in profiling.
+  + accuracy dq type detail configuration
+    * source: the data source name which as source in accuracy, default is the name of first data source in "data.sources" if not configured.
+    * target: the data source name which as target in accuracy, default is the name of second data source in "data.sources" if not configured.
+    * miss: the miss count name in metric, optional.
+    * total: the total count name in metric, optional.
+    * matched: the matched count name in metric, optional.
+  + profiling dq type detail configuration
+    * source: the data source name which as source in profiling, default is the name of first data source in "data.sources" if not configured. If the griffin-dsl rule contains from clause, this parameter is ignored.
+  + uniqueness dq type detail configuration
+    * source: name of data source to measure uniqueness.
+    * target: name of data source to compare with. It is always the same as source, or more than source.
+    * unique: the unique count name in metric, optional.
+    * total: the total count name in metric, optional.
+    * dup: the duplicate count name in metric, optional.
+    * num: the duplicate number name in metric, optional.
+    * duplication.array: optional, if set as a non-empty string, the duplication metric will be computed, and the group metric name is this string.
+  + timeliness dq type detail configuration
+    * source: name of data source to measure timeliness.
+    * latency: the latency column name in metric, optional.
+    * threshold: optional, if set as a time string like "1h", the items with latency more than 1 hour will be record.
+- **metric**: Configuration of metric export.
+  + name: name of metric.
+  + collect.type: collect metric as the type set, including "default", "entries", "array", "map", optional.
+- **record**: Configuration of record export.
+  + name: name of record.
+  + data.source.cache: optional, if set as data source name, the cache of this data source will be updated by the records, always used in streaming accuracy case.
+  + origin.DF: avaiable only if "data.source.cache" is set, the origin data frame name of records.
