@@ -94,7 +94,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     // init data sources
     val dsTmsts = dqEngines.loadData(dataSources, calcTimeInfo)
 
-    debug(s"data source timestamps: ${dsTmsts}")
+    println(s"data source timestamps: ${dsTmsts}")
 
     // generate rule steps
 //    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(

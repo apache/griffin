@@ -57,8 +57,8 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
                         procType: ProcessType, persistFactory: PersistFactory
                        ): Unit = {
     val allMetrics: Map[Long, Map[String, Any]] = {
-      metricExports.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
-        val metrics = collectMetrics(timeInfo, step, procType)
+      metricExports.foldLeft(Map[Long, Map[String, Any]]()) { (ret, metricExport) =>
+        val metrics = collectMetrics(timeInfo, metricExport, procType)
         metrics.foldLeft(ret) { (total, pair) =>
           val (k, v) = pair
           total.get(k) match {

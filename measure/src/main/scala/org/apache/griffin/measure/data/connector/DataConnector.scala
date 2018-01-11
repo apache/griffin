@@ -72,7 +72,7 @@ trait DataConnector extends Loggable with Serializable {
         TableRegisters.registerRunTempTable(df, timeInfo.key, thisTable)
 
 //        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
-        val tmsts = Seq[Long](ms)
+//        val tmsts = Seq[Long](ms)
 
         // generate rule steps
         val rulePlan = RuleAdaptorGroup.genRulePlan(

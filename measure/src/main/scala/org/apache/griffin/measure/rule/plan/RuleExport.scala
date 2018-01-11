@@ -24,4 +24,8 @@ trait RuleExport extends Serializable {
 
   val stepName: String    // the dependant step name
 
+  val defTimestamp: Long    // the default timestamp if tmst not in value
+
+  def setDefTimestamp(t: Long): RuleExport
+
 }

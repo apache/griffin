@@ -22,7 +22,10 @@ import org.apache.griffin.measure.rule.dsl._
 
 case class MetricExport(name: String,
                         stepName: String,
-                        collectType: CollectType
+                        collectType: CollectType,
+                        defTimestamp: Long
                        ) extends RuleExport {
+
+  def setDefTimestamp(t: Long): RuleExport = MetricExport(name, stepName, collectType, t)
 
 }

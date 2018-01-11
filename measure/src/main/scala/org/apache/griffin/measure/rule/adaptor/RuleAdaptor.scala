@@ -115,30 +115,35 @@ trait RuleAdaptor extends Loggable with Serializable {
     RuleParamKeys.getName(param, RuleStepNameGenerator.genName)
   }
 
-  def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any], procType: ProcessType): RulePlan
+  def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any],
+                  procType: ProcessType): RulePlan
 
-  protected def genRuleExports(param: Map[String, Any], defName: String, stepName: String): Seq[RuleExport] = {
+  protected def genRuleExports(param: Map[String, Any], defName: String,
+                               stepName: String, defTimestamp: Long
+                              ): Seq[RuleExport] = {
     val metricOpt = RuleParamKeys.getMetricOpt(param)
-    val metricExportSeq = metricOpt.map(genMetricExport(_, defName, stepName)).toSeq
+    val metricExportSeq = metricOpt.map(genMetricExport(_, defName, stepName, defTimestamp)).toSeq
     val recordOpt = RuleParamKeys.getRecordOpt(param)
-    val recordExportSeq = recordOpt.map(genRecordExport(_, defName, stepName)).toSeq
+    val recordExportSeq = recordOpt.map(genRecordExport(_, defName, stepName, defTimestamp)).toSeq
     metricExportSeq ++ recordExportSeq
   }
-  protected def genMetricExport(param: Map[String, Any], name: String, stepName: String
+  protected def genMetricExport(param: Map[String, Any], name: String, stepName: String, defTimestamp: Long
                                ): MetricExport = {
     MetricExport(
       ExportParamKeys.getName(param, name),
       stepName,
-      ExportParamKeys.getCollectType(param)
+      ExportParamKeys.getCollectType(param),
+      defTimestamp
     )
   }
-  protected def genRecordExport(param: Map[String, Any], name: String, stepName: String
+  protected def genRecordExport(param: Map[String, Any], name: String, stepName: String, defTimestamp: Long
                                ): RecordExport = {
     RecordExport(
       ExportParamKeys.getName(param, name),
       stepName,
       ExportParamKeys.getDataSourceCacheOpt(param),
-      ExportParamKeys.getOriginDFOpt(param)
+      ExportParamKeys.getOriginDFOpt(param),
+      defTimestamp
     )
   }
 

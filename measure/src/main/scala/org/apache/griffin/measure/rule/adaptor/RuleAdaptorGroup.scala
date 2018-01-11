@@ -114,7 +114,8 @@ object RuleAdaptorGroup {
 //  }
 
   // -- gen rule plan --
-  def genRulePlan(timeInfo: TimeInfo, evaluateRuleParam: EvaluateRuleParam, procType: ProcessType
+  def genRulePlan(timeInfo: TimeInfo, evaluateRuleParam: EvaluateRuleParam,
+                  procType: ProcessType
                  ): RulePlan = {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
