@@ -19,7 +19,10 @@ under the License.
 
 package org.apache.griffin.core.login;
 
-public interface LoginService {
+public class LoginServiceDefaultImpl implements LoginService {
 
-    String login(String username, String password);
+    @Override
+    public String login(String username, String password) {
+        return username;
+    }
 }

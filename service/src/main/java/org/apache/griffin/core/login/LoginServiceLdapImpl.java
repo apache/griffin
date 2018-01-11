@@ -21,10 +21,6 @@ package org.apache.griffin.core.login;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -34,63 +30,40 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
 
-@Service
-public class LoginServiceImpl implements LoginService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginServiceImpl.class);
+public class LoginServiceLdapImpl implements LoginService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginServiceLdapImpl.class);
 
     private static final String LDAP_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
 
-    private String strategy;
     private String url;
     private String email;
     private String searchBase;
     private String searchPattern;
     private SearchControls searchControls;
 
-    public LoginServiceImpl(@Value("${login.strategy}") String strategy,
-                            @Value("${ldap.url}") String url,
-                            @Value("${ldap.email}") String email,
-                            @Value("${ldap.searchBase}") String searchBase,
-                            @Value("${ldap.searchPattern}") String searchPattern) throws Exception {
-        this.strategy = strategy;
-        if (strategy.equals("ldap")) {
-            this.url = url;
-            this.email = email;
-            this.searchBase = searchBase;
-            this.searchPattern = searchPattern;
-            SearchControls searchControls = new SearchControls();
-            searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            this.searchControls = searchControls;
-        } else if (!strategy.equals("test")) {
-            throw new Exception("Missing login strategy config.");
-        }
+    public LoginServiceLdapImpl(String url, String email, String searchBase, String searchPattern) {
+        this.url = url;
+        this.email = email;
+        this.searchBase = searchBase;
+        this.searchPattern = searchPattern;
+        SearchControls searchControls = new SearchControls();
+        searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        this.searchControls = searchControls;
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> login(Map<String, String> map) {
-        if (strategy.equals("test")) {
-            return getResponse("test", "test");
-        }
-        return loginLDAP(map);
-    }
-
-    private ResponseEntity<Map<String, Object>> loginLDAP(Map<String, String> map) {
-        String ntAccount = map.get("username");
-        String password = map.get("password");
+    public String login(String ntAccount, String password) {
         String searchFilter = searchPattern.replace("{0}", ntAccount);
         try {
             LdapContext ctx = getContextInstance(ntAccount, password);
             NamingEnumeration<SearchResult> results = ctx.search(searchBase, searchFilter, searchControls);
-            String fullName = getFullName(results, ntAccount);
-            return getResponse(ntAccount, fullName);
+            return getFullName(results, ntAccount);
         } catch (NamingException e) {
             LOGGER.warn("User {} failed to login with LDAP auth. {}", ntAccount, e.getMessage());
         }
-        return getResponse(ntAccount, null);
+        return null;
     }
 
     private String getFullName(NamingEnumeration<SearchResult> results, String ntAccount) {
@@ -119,16 +92,5 @@ public class LoginServiceImpl implements LoginService {
         ht.put(Context.SECURITY_PRINCIPAL, ntAccount + email);
         ht.put(Context.SECURITY_CREDENTIALS, password);
         return new InitialLdapContext(ht, null);
-    }
-
-    private ResponseEntity<Map<String, Object>> getResponse(String ntAccount, String fullName) {
-        if (fullName == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Map<String, Object> message = new HashMap<>();
-        message.put("ntAccount", ntAccount);
-        message.put("fullName", fullName);
-        message.put("status", 0);
-        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }
