@@ -35,7 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.*;
 
-import static org.apache.griffin.core.measure.MeasureTestHelper.createATestGriffinMeasure;
+import static org.apache.griffin.core.util.EntityHelper.createATestGriffinMeasure;
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;

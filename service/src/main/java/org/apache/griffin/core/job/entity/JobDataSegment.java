@@ -78,4 +78,9 @@ public class JobDataSegment extends AbstractAuditableEntity {
 
     public JobDataSegment() {
     }
+
+    public JobDataSegment(String dataConnectorName, boolean baseline) {
+        this.dataConnectorName =dataConnectorName;
+        this.baseline = baseline;
+    }
 }

@@ -73,7 +73,7 @@ public class JobControllerTest {
 
     @Test
     public void testAddJobForSuccess() throws Exception {
-        JobSchedule jobSchedule = new JobSchedule(1L, "jobName","0 0/4 * * * ?", null,null);
+        JobSchedule jobSchedule = new JobSchedule(1L, "jobName","0 0/4 * * * ?","GMT+8:00", null);
         given(service.addJob(jobSchedule)).willReturn(CREATE_JOB_SUCCESS);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
@@ -86,7 +86,7 @@ public class JobControllerTest {
 
     @Test
     public void testAddJobForFailure() throws Exception {
-        JobSchedule jobSchedule = new JobSchedule(1L, "jobName","0 0/4 * * * ?", null,null);
+        JobSchedule jobSchedule = new JobSchedule(1L, "jobName","0 0/4 * * * ?","GMT+8:00", null);
         given(service.addJob(jobSchedule)).willReturn(CREATE_JOB_FAIL);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
