@@ -48,7 +48,6 @@ public class MetricStoreImpl implements MetricStore {
 
     public MetricStoreImpl(@Value("${elasticsearch.host}") String host, @Value("${elasticsearch.port}") int port) throws IOException {
         client = RestClient.builder(new HttpHost(host, port, "http")).build();
-        client.performRequest("GET", "/");
     }
 
     @Override
