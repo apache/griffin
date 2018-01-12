@@ -26,6 +26,7 @@ import scala.collection.mutable.{Set => MutableSet}
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.ProcessType
+import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 
@@ -116,7 +117,7 @@ trait RuleAdaptor extends Loggable with Serializable {
   }
 
   def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any],
-                  procType: ProcessType, dsRanges: Map[String, (Long, Long)]): RulePlan
+                  procType: ProcessType, dsTimeRanges: Map[String, TimeRange]): RulePlan
 
   protected def genRuleExports(param: Map[String, Any], defName: String,
                                stepName: String, defTimestamp: Long

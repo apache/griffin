@@ -25,6 +25,7 @@ import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.data.connector.streaming.StreamingDataConnector
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.griffin.measure.utils.{HdfsFileDumpUtil, HdfsUtil, TimeUtil}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -70,6 +71,14 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     }
   }
 
+//  val _WriteInfoPath = "write.info.path"
+//  val _ReadInfoPath = "read.info.path"
+//  val writeCacheInfoPath = param.getString(_WriteInfoPath, defInfoPath)
+//  val readCacheInfoPath = param.getString(_ReadInfoPath, defInfoPath)
+
+  val _ReadOnly = "read.only"
+  val readOnly = param.getBoolean(_ReadOnly, false)
+
   val rowSepLiteral = "\n"
   val partitionUnits: List[String] = List("hour", "min", "sec")
   val minUnitTime: Long = TimeUtil.timeFromUnit(1, partitionUnits.last)
@@ -82,47 +91,50 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
   }
 
   def saveData(dfOpt: Option[DataFrame], ms: Long): Unit = {
-    dfOpt match {
-      case Some(df) => {
-        val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
-        if (newCacheLocked) {
-          try {
-            val ptns = getPartition(ms)
-            val ptnsPath = genPartitionHdfsPath(ptns)
-            val dirPath = s"${filePath}/${ptnsPath}"
-            val dataFileName = s"${ms}"
-            val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+    if (!readOnly) {
+      dfOpt match {
+        case Some(df) => {
+          val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
+          if (newCacheLocked) {
+            try {
+              val ptns = getPartition(ms)
+              val ptnsPath = genPartitionHdfsPath(ptns)
+              val dirPath = s"${filePath}/${ptnsPath}"
+              val dataFileName = s"${ms}"
+              val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
 
-            // transform data
-            val dataRdd: RDD[String] = df.toJSON
+              // transform data
+              val dataRdd: RDD[String] = df.toJSON
 
-            // save data
-//            val dumped = if (!dataRdd.isEmpty) {
-//              HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
-//            } else false
+              // save data
+              //            val dumped = if (!dataRdd.isEmpty) {
+              //              HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
+              //            } else false
 
-            if (!dataRdd.isEmpty) {
-              HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
+              if (!dataRdd.isEmpty) {
+                HdfsFileDumpUtil.dump(dataFilePath, dataRdd, rowSepLiteral)
+              }
+
+            } catch {
+              case e: Throwable => error(s"save data error: ${e.getMessage}")
+            } finally {
+              newCacheLock.unlock()
             }
-
-          } catch {
-            case e: Throwable => error(s"save data error: ${e.getMessage}")
-          } finally {
-            newCacheLock.unlock()
           }
         }
+        case _ => {
+          info(s"no data frame to save")
+        }
       }
-      case _ => {
-        info(s"no data frame to save")
-      }
-    }
 
-    // submit cache time and ready time
-    submitCacheTime(ms)
-    submitReadyTime(ms)
+      // submit cache time and ready time
+      submitCacheTime(ms)
+      submitReadyTime(ms)
+    }
   }
 
-  def readData(): (Option[DataFrame], Set[Long]) = {
+  // return: (data frame option, time range)
+  def readData(): (Option[DataFrame], TimeRange) = {
     val tr = TimeInfoCache.getTimeRange
     val timeRange = (tr._1 + minUnitTime, tr._2)
     submitLastProcTime(timeRange._2)
@@ -137,6 +149,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
 
     // list partition paths
     val partitionPaths = listPathsBetweenRanges(filePath :: Nil, partitionRanges)
+    println(partitionPaths)
 
     val dfOpt = if (partitionPaths.isEmpty) {
       None
@@ -154,140 +167,152 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
     // from until tmst range
     val (from, until) = (reviseTimeRange._1, reviseTimeRange._2 + 1)
     val tmstSet = rangeTmsts(from, until)
-    (dfOpt, tmstSet)
+
+    val retTimeRange = TimeRange(reviseTimeRange, tmstSet)
+    (dfOpt, retTimeRange)
   }
 
   def updateData(df: DataFrame, ms: Long): Unit = {
-    val ptns = getPartition(ms)
-    val ptnsPath = genPartitionHdfsPath(ptns)
-    val dirPath = s"${filePath}/${ptnsPath}"
-    val dataFileName = s"${ms}"
-    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+    if (!readOnly) {
+      val ptns = getPartition(ms)
+      val ptnsPath = genPartitionHdfsPath(ptns)
+      val dirPath = s"${filePath}/${ptnsPath}"
+      val dataFileName = s"${ms}"
+      val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
 
-    try {
-      val records = df.toJSON
-      val arr = records.collect
-      val needSave = !arr.isEmpty
+      try {
+        val records = df.toJSON
+        val arr = records.collect
+        val needSave = !arr.isEmpty
 
-      // remove out time old data
-      HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
-      println(s"remove file path: ${dirPath}/${dataFileName}")
+        // remove out time old data
+        HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
+        println(s"remove file path: ${dirPath}/${dataFileName}")
 
-      // save updated data
-      if (needSave) {
-        HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
-        println(s"update file path: ${dataFilePath}")
-      } else {
-        clearTmst(ms)
-        println(s"data source [${dsName}] timestamp [${ms}] cleared")
+        // save updated data
+        if (needSave) {
+          HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
+          println(s"update file path: ${dataFilePath}")
+        } else {
+          clearTmst(ms)
+          println(s"data source [${dsName}] timestamp [${ms}] cleared")
+        }
+      } catch {
+        case e: Throwable => error(s"update data error: ${e.getMessage}")
       }
-    } catch {
-      case e: Throwable => error(s"update data error: ${e.getMessage}")
     }
   }
 
   def updateData(rdd: RDD[String], ms: Long, cnt: Long): Unit = {
-    val ptns = getPartition(ms)
-    val ptnsPath = genPartitionHdfsPath(ptns)
-    val dirPath = s"${filePath}/${ptnsPath}"
-    val dataFileName = s"${ms}"
-    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+    if (!readOnly) {
+      val ptns = getPartition(ms)
+      val ptnsPath = genPartitionHdfsPath(ptns)
+      val dirPath = s"${filePath}/${ptnsPath}"
+      val dataFileName = s"${ms}"
+      val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
 
-    try {
-//      val needSave = !rdd.isEmpty
+      try {
+        //      val needSave = !rdd.isEmpty
 
-      // remove out time old data
-      HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
-      println(s"remove file path: ${dirPath}/${dataFileName}")
+        // remove out time old data
+        HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
+        println(s"remove file path: ${dirPath}/${dataFileName}")
 
-      // save updated data
-      if (cnt > 0) {
-        HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
-        println(s"update file path: ${dataFilePath}")
-      } else {
-        clearTmst(ms)
-        println(s"data source [${dsName}] timestamp [${ms}] cleared")
+        // save updated data
+        if (cnt > 0) {
+          HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
+          println(s"update file path: ${dataFilePath}")
+        } else {
+          clearTmst(ms)
+          println(s"data source [${dsName}] timestamp [${ms}] cleared")
+        }
+      } catch {
+        case e: Throwable => error(s"update data error: ${e.getMessage}")
+      } finally {
+        rdd.unpersist()
       }
-    } catch {
-      case e: Throwable => error(s"update data error: ${e.getMessage}")
-    } finally {
-      rdd.unpersist()
     }
   }
 
   def updateData(arr: Iterable[String], ms: Long): Unit = {
-    val ptns = getPartition(ms)
-    val ptnsPath = genPartitionHdfsPath(ptns)
-    val dirPath = s"${filePath}/${ptnsPath}"
-    val dataFileName = s"${ms}"
-    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
+    if (!readOnly) {
+      val ptns = getPartition(ms)
+      val ptnsPath = genPartitionHdfsPath(ptns)
+      val dirPath = s"${filePath}/${ptnsPath}"
+      val dataFileName = s"${ms}"
+      val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
 
-    try {
-      val needSave = !arr.isEmpty
+      try {
+        val needSave = !arr.isEmpty
 
-      // remove out time old data
-      HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
-      println(s"remove file path: ${dirPath}/${dataFileName}")
+        // remove out time old data
+        HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
+        println(s"remove file path: ${dirPath}/${dataFileName}")
 
-      // save updated data
-      if (needSave) {
-        HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
-        println(s"update file path: ${dataFilePath}")
-      } else {
-        clearTmst(ms)
-        println(s"data source [${dsName}] timestamp [${ms}] cleared")
+        // save updated data
+        if (needSave) {
+          HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
+          println(s"update file path: ${dataFilePath}")
+        } else {
+          clearTmst(ms)
+          println(s"data source [${dsName}] timestamp [${ms}] cleared")
+        }
+      } catch {
+        case e: Throwable => error(s"update data error: ${e.getMessage}")
       }
-    } catch {
-      case e: Throwable => error(s"update data error: ${e.getMessage}")
     }
   }
 
   def updateDataMap(dfMap: Map[Long, DataFrame]): Unit = {
-    val dataMap = dfMap.map { pair =>
-      val (t, recs) = pair
-      val rdd = recs.toJSON
-//      rdd.cache
-      (t, rdd, rdd.count)
-    }
+    if (!readOnly) {
+      val dataMap = dfMap.map { pair =>
+        val (t, recs) = pair
+        val rdd = recs.toJSON
+        //      rdd.cache
+        (t, rdd, rdd.count)
+      }
 
-    dataMap.foreach { pair =>
-      val (t, arr, cnt) = pair
-      updateData(arr, t, cnt)
+      dataMap.foreach { pair =>
+        val (t, arr, cnt) = pair
+        updateData(arr, t, cnt)
+      }
     }
   }
 
   def cleanOldData(): Unit = {
-    val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
-    if (oldCacheLocked) {
-      try {
-        val cleanTime = readCleanTime()
-        cleanTime match {
-          case Some(ct) => {
-            println(s"data source [${dsName}] old timestamps clear until [${ct}]")
+    if (!readOnly) {
+      val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
+      if (oldCacheLocked) {
+        try {
+          val cleanTime = readCleanTime()
+          cleanTime match {
+            case Some(ct) => {
+              println(s"data source [${dsName}] old timestamps clear until [${ct}]")
 
-            // clear out date tmsts
-            clearTmstsUntil(ct)
+              // clear out date tmsts
+              clearTmstsUntil(ct)
 
-            // drop partitions
-            val bounds = getPartition(ct)
+              // drop partitions
+              val bounds = getPartition(ct)
 
-            // list partition paths
-            val earlierPaths = listPathsEarlierThanBounds(filePath :: Nil, bounds)
+              // list partition paths
+              val earlierPaths = listPathsEarlierThanBounds(filePath :: Nil, bounds)
 
-            // delete out time data path
-            earlierPaths.foreach { path =>
-              println(s"delete hdfs path: ${path}")
-              HdfsUtil.deleteHdfsPath(path)
+              // delete out time data path
+              earlierPaths.foreach { path =>
+                println(s"delete hdfs path: ${path}")
+                HdfsUtil.deleteHdfsPath(path)
+              }
+            }
+            case _ => {
+              // do nothing
             }
           }
-          case _ => {
-            // do nothing
-          }
+        } catch {
+          case e: Throwable => error(s"clean old data error: ${e.getMessage}")
+        } finally {
+          oldCacheLock.unlock()
         }
-      } catch {
-        case e: Throwable => error(s"clean old data error: ${e.getMessage}")
-      } finally {
-        oldCacheLock.unlock()
       }
     }
   }

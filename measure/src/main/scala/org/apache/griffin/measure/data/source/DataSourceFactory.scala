@@ -47,7 +47,7 @@ object DataSourceFactory extends Loggable {
                            ): Option[DataSource] = {
     val name = dataSourceParam.name
     val baseline = dataSourceParam.isBaseLine
-    val connectorParams = dataSourceParam.connectors
+    val connectorParams = dataSourceParam.getConnectors
     val cacheParam = dataSourceParam.cache
     val dataConnectors = connectorParams.flatMap { connectorParam =>
       DataConnectorFactory.getDataConnector(sqlContext, ssc, dqEngines, connectorParam) match {

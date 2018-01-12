@@ -58,19 +58,19 @@ case class StreamingDqThread(sqlContext: SQLContext,
         TimeInfoCache.startTimeInfoCache
 
         // init data sources
-        val (dsTmsts, dsRanges) = dqEngines.loadData(dataSources, calcTimeInfo)
+        val dsTimeRanges = dqEngines.loadData(dataSources, calcTimeInfo)
 
-        println(s"data sources timestamps: ${dsTmsts}")
-        println(s"data sources ranges: ${dsRanges}")
+        println(s"data source timeRanges: ${dsTimeRanges}")
 
         // generate rule steps
 //        val ruleSteps = RuleAdaptorGroup.genRuleSteps(
 //          CalcTimeInfo(st), evaluateRuleParam, dsTmsts)
         val rulePlan = RuleAdaptorGroup.genRulePlan(
-          calcTimeInfo, evaluateRuleParam, StreamingProcessType, dsRanges)
+          calcTimeInfo, evaluateRuleParam, StreamingProcessType, dsTimeRanges)
 
         // optimize rule plan
-        val optRulePlan = optimizeRulePlan(rulePlan, dsTmsts)
+//        val optRulePlan = optimizeRulePlan(rulePlan, dsTmsts)
+        val optRulePlan = rulePlan
 
 //        ruleSteps.foreach(println)
 

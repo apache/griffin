@@ -25,7 +25,7 @@ import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.{BatchDqProcess, BatchProcessType}
 import org.apache.griffin.measure.process.engine._
-import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters, TimeRange}
 import org.apache.griffin.measure.rule.adaptor.{InternalColumns, PreProcPhase, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
@@ -45,7 +45,7 @@ trait DataConnector extends Loggable with Serializable {
 
   def init(): Unit
 
-  def data(ms: Long): (Option[DataFrame], Set[Long])
+  def data(ms: Long): (Option[DataFrame], TimeRange)
 
   val dqEngines: DqEngines
 
@@ -73,11 +73,11 @@ trait DataConnector extends Loggable with Serializable {
 
 //        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
 //        val tmsts = Seq[Long](ms)
-        val dsRanges = Map[String, (Long, Long)]((thisTable -> (ms, ms)))
+        val dsTimeRanges = Map[String, TimeRange]((thisTable -> TimeRange(ms)))
 
         // generate rule steps
         val rulePlan = RuleAdaptorGroup.genRulePlan(
-          timeInfo, preProcRules, SparkSqlType, BatchProcessType, dsRanges)
+          timeInfo, preProcRules, SparkSqlType, BatchProcessType, dsTimeRanges)
 
         // run rules
         dqEngines.runRuleSteps(timeInfo, rulePlan.ruleSteps)

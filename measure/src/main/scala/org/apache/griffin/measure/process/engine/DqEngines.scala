@@ -24,6 +24,7 @@ import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
+import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
@@ -41,19 +42,10 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
-  def loadData(dataSources: Seq[DataSource], timeInfo: TimeInfo
-              ): (Map[String, Set[Long]], Map[String, (Long, Long)]) = {
-    val dsTmsts = dataSources.map { ds =>
+  def loadData(dataSources: Seq[DataSource], timeInfo: TimeInfo): Map[String, TimeRange] = {
+    dataSources.map { ds =>
       (ds.name, ds.loadData(timeInfo))
     }.toMap
-    val dsRanges = dsTmsts.flatMap { pair =>
-      val (name, set) = pair
-      Try { (set.min, set.max) } match {
-        case Success(range) => Some((name, range))
-        case _ => None
-      }
-    }
-    (dsTmsts, dsRanges)
   }
 
   def runRuleSteps(timeInfo: TimeInfo, ruleSteps: Seq[RuleStep]): Unit = {
