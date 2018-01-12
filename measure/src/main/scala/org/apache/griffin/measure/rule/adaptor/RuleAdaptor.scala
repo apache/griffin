@@ -116,7 +116,7 @@ trait RuleAdaptor extends Loggable with Serializable {
   }
 
   def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any],
-                  procType: ProcessType): RulePlan
+                  procType: ProcessType, dsRanges: Map[String, (Long, Long)]): RulePlan
 
   protected def genRuleExports(param: Map[String, Any], defName: String,
                                stepName: String, defTimestamp: Long

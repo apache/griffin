@@ -92,9 +92,10 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dataSources.foreach(_.init)
 
     // init data sources
-    val dsTmsts = dqEngines.loadData(dataSources, calcTimeInfo)
+    val (dsTmsts, dsRanges) = dqEngines.loadData(dataSources, calcTimeInfo)
 
     println(s"data source timestamps: ${dsTmsts}")
+    println(s"data source ranges: ${dsRanges}")
 
     // generate rule steps
 //    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
@@ -103,7 +104,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //      CalcTimeInfo(appTime), userParam.evaluateRuleParam, dsTmsts)
 
     val rulePlan = RuleAdaptorGroup.genRulePlan(
-      calcTimeInfo, userParam.evaluateRuleParam, BatchProcessType)
+      calcTimeInfo, userParam.evaluateRuleParam, BatchProcessType, dsRanges)
 
 //    rulePlan.ruleSteps.foreach(println)
 //    println("====")

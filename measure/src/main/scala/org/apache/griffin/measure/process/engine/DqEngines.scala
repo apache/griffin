@@ -34,17 +34,26 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 import ExecutionContext.Implicits.global
 
 case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
-  def loadData(dataSources: Seq[DataSource], timeInfo: TimeInfo): Map[String, Set[Long]] = {
-    dataSources.map { ds =>
+  def loadData(dataSources: Seq[DataSource], timeInfo: TimeInfo
+              ): (Map[String, Set[Long]], Map[String, (Long, Long)]) = {
+    val dsTmsts = dataSources.map { ds =>
       (ds.name, ds.loadData(timeInfo))
     }.toMap
+    val dsRanges = dsTmsts.flatMap { pair =>
+      val (name, set) = pair
+      Try { (set.min, set.max) } match {
+        case Success(range) => Some((name, range))
+        case _ => None
+      }
+    }
+    (dsTmsts, dsRanges)
   }
 
   def runRuleSteps(timeInfo: TimeInfo, ruleSteps: Seq[RuleStep]): Unit = {

@@ -115,22 +115,23 @@ object RuleAdaptorGroup {
 
   // -- gen rule plan --
   def genRulePlan(timeInfo: TimeInfo, evaluateRuleParam: EvaluateRuleParam,
-                  procType: ProcessType
+                  procType: ProcessType, dsRanges: Map[String, (Long, Long)]
                  ): RulePlan = {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
-    genRulePlan(timeInfo, ruleParams, defaultDslType, procType)
+    genRulePlan(timeInfo, ruleParams, defaultDslType, procType, dsRanges)
   }
 
   def genRulePlan(timeInfo: TimeInfo, ruleParams: Seq[Map[String, Any]],
-                  defaultDslType: DslType, procType: ProcessType
+                  defaultDslType: DslType, procType: ProcessType,
+                  dsRanges: Map[String, (Long, Long)]
                  ): RulePlan = {
     val (rulePlan, dsNames) = ruleParams.foldLeft((emptyRulePlan, dataSourceNames)) { (res, param) =>
       val (plan, names) = res
       val dslType = getDslType(param, defaultDslType)
       val curPlan: RulePlan = genRuleAdaptor(dslType, names) match {
-        case Some(adaptor) => adaptor.genRulePlan(timeInfo, param, procType)
+        case Some(adaptor) => adaptor.genRulePlan(timeInfo, param, procType, dsRanges)
         case _ => emptyRulePlan
       }
       val globalNames = curPlan.globalRuleSteps.map(_.name)

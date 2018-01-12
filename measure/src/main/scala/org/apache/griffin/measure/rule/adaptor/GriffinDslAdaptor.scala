@@ -92,7 +92,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
   private val emptyMap = Map[String, Any]()
 
   override def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any],
-                           processType: ProcessType
+                           processType: ProcessType, dsRanges: Map[String, (Long, Long)]
                           ): RulePlan = {
     val name = getRuleName(param)
     val rule = getRule(param)
@@ -105,7 +105,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
           case AccuracyType => accuracyRulePlan(timeInfo, name, expr, param, processType)
           case ProfilingType => profilingRulePlan(timeInfo, name, expr, param, processType)
           case UniquenessType => uniquenessRulePlan(timeInfo, name, expr, param, processType)
-          case DistinctnessType => distinctRulePlan(timeInfo, name, expr, param, processType)
+          case DistinctnessType => distinctRulePlan(timeInfo, name, expr, param, processType, dsRanges)
           case TimelinessType => timelinessRulePlan(timeInfo, name, expr, param, processType)
           case _ => emptyRulePlan
         }
@@ -472,7 +472,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
   }
 
   private def distinctRulePlan(timeInfo: TimeInfo, name: String, expr: Expr,
-                               param: Map[String, Any], processType: ProcessType
+                               param: Map[String, Any], processType: ProcessType,
+                               dsRanges: Map[String, (Long, Long)]
                               ): RulePlan = {
     val details = getDetails(param)
     val sourceName = details.getString(DistinctnessKeys._source, dataSourceNames.head)
@@ -480,6 +481,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     val analyzer = DistinctnessAnalyzer(expr.asInstanceOf[DistinctnessClause], sourceName, targetName)
 
     val ct = timeInfo.calcTime
+
+    val sourceRangeOpt = dsRanges.get(sourceName)
 
     if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
       println(s"[${ct}] data source ${sourceName} not exists")
@@ -503,32 +506,51 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 
       // 2. target mapping
       val targetTableName = "__target"
-      val targetSql = s"SELECT ${selClause} FROM ${targetName}"
+      val targetSql = sourceRangeOpt match {
+        case Some((min, max)) => {
+          s"SELECT ${selClause} FROM ${targetName} WHERE `${InternalColumns.tmst}` < ${min}"
+//          s"SELECT ${selClause} FROM ${targetName}"
+        }
+        case _ => {
+          s"SELECT ${selClause} FROM ${targetName}"
+        }
+      }
       val targetStep = SparkSqlStep(targetTableName, targetSql, emptyMap)
 
       // 3. joined
       val joinedTableName = "__joined"
-      val joinedSelClause = aliases.map { alias =>
-        s"`${sourceTableName}`.`${alias}` AS `${alias}`"
-      }.mkString(", ")
+//      val joinedSelClause = aliases.map { alias =>
+//        s"`${sourceTableName}`.`${alias}` AS `${alias}`"
+//      }.mkString(", ")
+      val joinedSelClause = s"`${sourceTableName}`.*"
       val onClause = aliases.map { alias =>
         s"coalesce(`${sourceTableName}`.`${alias}`, '') = coalesce(`${targetTableName}`.`${alias}`, '')"
       }.mkString(" AND ")
+      val sourceIsNull = aliases.map { alias =>
+        s"`${sourceTableName}`.`${alias}` IS NULL"
+      }.mkString(" AND ")
+      val targetIsNull = aliases.map { alias =>
+        s"`${targetTableName}`.`${alias}` IS NULL"
+      }.mkString(" AND ")
+      val whereClause = s"(NOT (${sourceIsNull})) AND (${targetIsNull})"
       val joinedSql = {
-        s"SELECT ${joinedSelClause} FROM `${targetTableName}` RIGHT JOIN `${sourceTableName}` ON ${onClause}"
+        s"""
+           |SELECT ${joinedSelClause} FROM `${targetTableName}` RIGHT JOIN `${sourceTableName}`
+           |ON ${onClause} WHERE ${whereClause}
+         """.stripMargin
       }
       val joinedStep = SparkSqlStep(joinedTableName, joinedSql, emptyMap)
 
       // 4. group
-      val groupTableName = "__group"
-      val groupSelClause = aliases.map { alias =>
-        s"`${alias}`"
-      }.mkString(", ")
-      val dupColName = details.getStringOrKey(DistinctnessKeys._dup)
-      val groupSql = {
-        s"SELECT ${groupSelClause}, (COUNT(*) - 1) AS `${dupColName}` FROM `${joinedTableName}` GROUP BY ${groupSelClause}"
-      }
-      val groupStep = SparkSqlStep(groupTableName, groupSql, emptyMap, true)
+//      val groupTableName = "__group"
+//      val groupSelClause = aliases.map { alias =>
+//        s"`${alias}`"
+//      }.mkString(", ")
+//      val dupColName = details.getStringOrKey(DistinctnessKeys._dup)
+//      val groupSql = {
+//        s"SELECT ${groupSelClause}, COUNT(*) AS `${dupColName}` FROM `${joinedTableName}` GROUP BY ${groupSelClause}"
+//      }
+//      val groupStep = SparkSqlStep(groupTableName, groupSql, emptyMap, true)
 
       // 5. total metric
       val totalTableName = "__totalMetric"
@@ -544,45 +566,48 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       val distTableName = "__distMetric"
       val distColName = details.getStringOrKey(DistinctnessKeys._distinct)
       val distSql = {
-        s"SELECT COUNT(*) AS `${distColName}` FROM `${groupTableName}`"
+//        s"SELECT COUNT(*) AS `${distColName}` FROM `${groupTableName}`"
+        s"SELECT COUNT(*) AS `${distColName}` FROM `${joinedTableName}`"
       }
       val distStep = SparkSqlStep(distTableName, distSql, exportDetails)
       val distMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, EntriesCollectType.desc)
       val distMetricExport = genMetricExport(distMetricParam, distColName, distTableName, ct)
 
-      val distinctSteps = sourceStep :: targetStep :: joinedStep :: groupStep ::
+      val distinctSteps = sourceStep :: targetStep :: joinedStep ::
         totalStep :: distStep :: Nil
       val distinctExports = totalMetricExport :: distMetricExport :: Nil
       val distinctRulePlan = RulePlan(distinctSteps, distinctExports)
 
-      val duplicationArrayName = details.getString(UniquenessKeys._duplicationArray, "")
-      val dupRulePlan = if (duplicationArrayName.nonEmpty) {
-        // 7. duplicate record
-        val dupRecordTableName = "__dupRecords"
-        val dupRecordSql = {
-          s"SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0"
-        }
-        val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, exportDetails, true)
-        val dupRecordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
-        val dupRecordExport = genRecordExport(dupRecordParam, dupRecordTableName, dupRecordTableName, ct)
+      distinctRulePlan
 
-        // 8. duplicate metric
-        val dupMetricTableName = "__dupMetric"
-        val numColName = details.getStringOrKey(UniquenessKeys._num)
-        val dupMetricSql = {
-          s"""
-             |SELECT `${dupColName}`, COUNT(*) AS `${numColName}`
-             |FROM `${dupRecordTableName}` GROUP BY ${dupColName}
-          """.stripMargin
-        }
-        val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, exportDetails)
-        val dupMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
-        val dupMetricExport = genMetricExport(dupMetricParam, duplicationArrayName, dupMetricTableName, ct)
-
-        RulePlan(dupRecordStep :: dupMetricStep :: Nil, dupRecordExport :: dupMetricExport :: Nil)
-      } else emptyRulePlan
-
-      distinctRulePlan.merge(dupRulePlan)
+//      val duplicationArrayName = details.getString(UniquenessKeys._duplicationArray, "")
+//      val dupRulePlan = if (duplicationArrayName.nonEmpty) {
+//        // 7. duplicate record
+//        val dupRecordTableName = "__dupRecords"
+//        val dupRecordSql = {
+//          s"SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0"
+//        }
+//        val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, exportDetails, true)
+//        val dupRecordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
+//        val dupRecordExport = genRecordExport(dupRecordParam, dupRecordTableName, dupRecordTableName, ct)
+//
+//        // 8. duplicate metric
+//        val dupMetricTableName = "__dupMetric"
+//        val numColName = details.getStringOrKey(UniquenessKeys._num)
+//        val dupMetricSql = {
+//          s"""
+//             |SELECT `${dupColName}`, COUNT(*) AS `${numColName}`
+//             |FROM `${dupRecordTableName}` GROUP BY ${dupColName}
+//          """.stripMargin
+//        }
+//        val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, exportDetails)
+//        val dupMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
+//        val dupMetricExport = genMetricExport(dupMetricParam, duplicationArrayName, dupMetricTableName, ct)
+//
+//        RulePlan(dupRecordStep :: dupMetricStep :: Nil, dupRecordExport :: dupMetricExport :: Nil)
+//      } else emptyRulePlan
+//
+//      distinctRulePlan.merge(dupRulePlan)
     }
   }
 

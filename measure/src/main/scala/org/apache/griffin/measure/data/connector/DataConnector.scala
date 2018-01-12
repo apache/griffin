@@ -73,10 +73,11 @@ trait DataConnector extends Loggable with Serializable {
 
 //        val dsTmsts = Map[String, Set[Long]]((thisTable -> Set[Long](ms)))
 //        val tmsts = Seq[Long](ms)
+        val dsRanges = Map[String, (Long, Long)]((thisTable -> (ms, ms)))
 
         // generate rule steps
         val rulePlan = RuleAdaptorGroup.genRulePlan(
-          timeInfo, preProcRules, SparkSqlType, BatchProcessType)
+          timeInfo, preProcRules, SparkSqlType, BatchProcessType, dsRanges)
 
         // run rules
         dqEngines.runRuleSteps(timeInfo, rulePlan.ruleSteps)
