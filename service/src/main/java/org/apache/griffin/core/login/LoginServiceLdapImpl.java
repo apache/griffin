@@ -21,6 +21,8 @@ package org.apache.griffin.core.login;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -30,7 +32,9 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 public class LoginServiceLdapImpl implements LoginService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginServiceLdapImpl.class);
@@ -54,12 +58,19 @@ public class LoginServiceLdapImpl implements LoginService {
     }
 
     @Override
-    public String login(String ntAccount, String password) {
+    public ResponseEntity<Map<String, Object>> login(Map<String, String> map) {
+        String ntAccount = map.get("username");
+        String password = map.get("password");
         String searchFilter = searchPattern.replace("{0}", ntAccount);
         try {
             LdapContext ctx = getContextInstance(ntAccount, password);
             NamingEnumeration<SearchResult> results = ctx.search(searchBase, searchFilter, searchControls);
-            return getFullName(results, ntAccount);
+            String fullName = getFullName(results, ntAccount);
+            Map<String, Object> message = new HashMap<>();
+            message.put("ntAccount", ntAccount);
+            message.put("fullName", fullName);
+            message.put("status", 0);
+            return new ResponseEntity<>(message, HttpStatus.OK);
         } catch (NamingException e) {
             LOGGER.warn("User {} failed to login with LDAP auth. {}", ntAccount, e.getMessage());
         }

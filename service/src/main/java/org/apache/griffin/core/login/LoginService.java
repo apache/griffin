@@ -19,7 +19,11 @@ under the License.
 
 package org.apache.griffin.core.login;
 
+import org.springframework.http.ResponseEntity;
+
+import java.util.Map;
+
 public interface LoginService {
 
-    String login(String username, String password);
+    ResponseEntity<Map<String, Object>> login(Map<String, String> map);
 }

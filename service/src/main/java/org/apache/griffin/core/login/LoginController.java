@@ -19,16 +19,13 @@ under the License.
 
 package org.apache.griffin.core.login;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -39,21 +36,8 @@ public class LoginController {
     private LoginService loginService;
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> map) {
-        String username = map.get("username");
-        if (StringUtils.isBlank(username)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        String password = map.get("password");
-        String fullName = loginService.login(username, password);
-        if (fullName == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Map<String, Object> message = new HashMap<>();
-        message.put("ntAccount", username);
-        message.put("fullName", fullName);
-        message.put("status", 0);
-        return new ResponseEntity<>(message, HttpStatus.OK);
-
+    public ResponseEntity<Map<String, Object>> login(
+            @RequestBody Map<String, String> map) {
+        return loginService.login(map);
     }
 }

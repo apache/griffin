@@ -19,10 +19,26 @@ under the License.
 
 package org.apache.griffin.core.login;
 
+import org.apache.commons.lang.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class LoginServiceDefaultImpl implements LoginService {
 
     @Override
-    public String login(String username, String password) {
-        return username;
+    public ResponseEntity<Map<String, Object>> login(Map<String, String> map) {
+        String username = map.get("username");
+        if (StringUtils.isBlank(username)) {
+            username = "Anonymous";
+        }
+        String fullName = username;
+        Map<String, Object> message = new HashMap<>();
+        message.put("ntAccount", username);
+        message.put("fullName", fullName);
+        message.put("status", 0);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }
