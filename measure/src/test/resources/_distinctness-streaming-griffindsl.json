@@ -102,10 +102,7 @@
           "source": "new",
           "target": "old",
           "total": "total",
-          "distinct": "distinct",
-          "dup": "dup",
-          "num": "num",
-          "duplication.array": "dup"
+          "distinct": "distinct"
         },
         "metric": {
           "name": "distinct"
