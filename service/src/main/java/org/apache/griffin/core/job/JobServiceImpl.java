@@ -44,7 +44,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -139,41 +139,39 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public GriffinOperationMessage addJob(JobSchedule js) {
+    @Transactional(rollbackFor = Exception.class)
+    public GriffinOperationMessage addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
-        if (measure != null) {
-            return addJob(js, measure);
+        if (measure != null && addJob(js, measure)) {
+            return CREATE_JOB_SUCCESS;
         }
         return CREATE_JOB_FAIL;
     }
 
-    private GriffinOperationMessage addJob(JobSchedule js, GriffinMeasure measure) {
-        String qName = js.getJobName() + "_" + System.currentTimeMillis();
+    private boolean addJob(JobSchedule js, GriffinMeasure measure) throws Exception {
+        String qName = getQuartzName(js);
         String qGroup = getQuartzGroupName();
-        try {
-            if (addJob(js, measure, qName, qGroup)) {
-                return CREATE_JOB_SUCCESS;
-            }
-        } catch (Exception e) {
-            LOGGER.error("Add job exception happens.", e);
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        TriggerKey triggerKey = triggerKey(qName, qGroup);
+        if (!isJobScheduleParamValid(js, measure) || factory.getObject().checkExists(triggerKey)) {
+            return false;
         }
-        return CREATE_JOB_FAIL;
+        GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
+        jobRepo.save(job);
+        jobScheduleRepo.save(js);
+        addJob(triggerKey, js, job);
+        return true;
     }
 
-    private boolean addJob(JobSchedule js, GriffinMeasure measure, String qName, String qGroup) throws SchedulerException, ParseException {
+    private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
         Scheduler scheduler = factory.getObject();
-        TriggerKey triggerKey = triggerKey(qName, qGroup);
-        if (!isJobScheduleParamValid(js, measure)) {
-            return false;
-        }
-        if (scheduler.checkExists(triggerKey)) {
-            return false;
-        }
-        GriffinJob job = saveGriffinJob(measure.getId(), js.getJobName(), qName, qGroup);
-        return job != null && saveAndAddQuartzJob(scheduler, triggerKey, js, job);
-}
+        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, js, job);
+        scheduler.scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
+    }
+
+    private String getQuartzName(JobSchedule js) {
+        return js.getJobName() + "_" + System.currentTimeMillis();
+    }
 
     private String getQuartzGroupName() {
         return "BA";
@@ -252,22 +250,10 @@ public class JobServiceImpl implements JobService {
     private GriffinMeasure getMeasureIfValid(Long measureId) {
         Measure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
-            LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is deleted.", measureId);
+            LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is external measure type.", measureId);
             return null;
         }
         return (GriffinMeasure) measure;
-    }
-
-    private GriffinJob saveGriffinJob(Long measureId, String jobName, String qName, String qGroup) {
-        GriffinJob job = new GriffinJob(measureId, jobName, qName, qGroup, false);
-        return jobRepo.save(job);
-    }
-
-    private boolean saveAndAddQuartzJob(Scheduler scheduler, TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws SchedulerException, ParseException {
-        js = jobScheduleRepo.save(js);
-        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, js, job);
-        scheduler.scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
-        return true;
     }
 
 
@@ -562,7 +548,7 @@ public class JobServiceImpl implements JobService {
 
     private Boolean isJobHealthy(Long jobId) {
         Pageable pageable = new PageRequest(0, 1, Sort.Direction.DESC, "tms");
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(jobId,pageable);
+        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(jobId, pageable);
         return !CollectionUtils.isEmpty(instances) && LivySessionStates.isHealthy(instances.get(0).getState());
     }
 

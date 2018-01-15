@@ -89,10 +89,10 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     @JsonProperty("job.name")
     public void setJobName(String jobName) {
-        if (StringUtils.isEmpty(jobName)) {
-            LOGGER.error("Job name cannot be empty.");
-            throw new NullPointerException();
-        }
+//        if (StringUtils.isEmpty(jobName)) {
+//            LOGGER.error("Job name cannot be empty.");
+//            throw new NullPointerException();
+//        }
         this.jobName = jobName;
     }
 

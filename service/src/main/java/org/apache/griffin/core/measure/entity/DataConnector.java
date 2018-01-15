@@ -156,6 +156,13 @@ public class DataConnector extends AbstractAuditableEntity {
         });
     }
 
+    public DataConnector(String name, String dataUnit, Map configMap,List<SegmentPredicate> predicates) throws IOException {
+        this.name = name;
+        this.dataUnit = dataUnit;
+        this.configMap = configMap;
+        this.predicates = predicates;
+    }
+
     @Override
     public String toString() {
         return "DataConnector{" +
