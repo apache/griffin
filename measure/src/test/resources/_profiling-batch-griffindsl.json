@@ -26,7 +26,7 @@
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "name": "prof",
-        "rule": "select count(*) as `cnt`, count(distinct `post_code`) as `dis-cnt`, max(user_id) as `max` from source",
+        "rule": "count(*) from source",
         "metric": {
           "name": "prof"
         }
@@ -35,7 +35,7 @@
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "name": "grp",
-        "rule": "select post_code as `pc`, count(*) as `cnt` from source group by post_code",
+        "rule": "source.post_code, count(*) from source group by source.post_code",
         "metric": {
           "name": "post_group",
           "collect.type": "array"

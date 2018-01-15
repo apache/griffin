@@ -116,7 +116,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
   }
 
   def clearInfo(): Unit = {
-    delete("/")
+//    delete("/")
     println("clear info")
   }
 
