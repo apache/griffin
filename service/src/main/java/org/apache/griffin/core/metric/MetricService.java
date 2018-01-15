@@ -25,10 +25,11 @@ import org.apache.griffin.core.metric.model.MetricValue;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MetricService {
 
-    List<Metric> getAllMetrics();
+    Map<String, List<Metric>> getAllMetrics();
 
     List<MetricValue> getMetricValues(String metricName, int offset, int size);
 
