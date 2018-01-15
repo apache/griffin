@@ -30,53 +30,6 @@ import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.griffin.measure.utils.TimeUtil
 
-object AccuracyKeys {
-  val _source = "source"
-  val _target = "target"
-  val _miss = "miss"
-  val _total = "total"
-  val _matched = "matched"
-//  val _missRecords = "missRecords"
-}
-
-object ProfilingKeys {
-  val _source = "source"
-}
-
-object UniquenessKeys {
-  val _source = "source"
-  val _target = "target"
-  val _unique = "unique"
-  val _total = "total"
-  val _dup = "dup"
-  val _num = "num"
-  val _duplicationArray = "duplication.array"
-}
-
-object DistinctnessKeys {
-  val _source = "source"
-  val _target = "target"
-  val _distinct = "distinct"
-  val _total = "total"
-  val _dup = "dup"
-  val _num = "num"
-  val _duplicationArray = "duplication.array"
-}
-
-object TimelinessKeys {
-  val _source = "source"
-  val _latency = "latency"
-  val _threshold = "threshold"
-}
-
-object GlobalKeys {
-  val _initRule = "init.rule"
-}
-
-object ProcessDetailsKeys {
-  val _baselineDataSource = "baseline.data.source"
-}
-
 case class GriffinDslAdaptor(dataSourceNames: Seq[String],
                              functionNames: Seq[String]
                             ) extends RuleAdaptor {

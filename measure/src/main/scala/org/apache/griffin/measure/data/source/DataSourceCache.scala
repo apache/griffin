@@ -149,7 +149,7 @@ case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
 
     // list partition paths
     val partitionPaths = listPathsBetweenRanges(filePath :: Nil, partitionRanges)
-    println(partitionPaths)
+//    println(partitionPaths)
 
     val dfOpt = if (partitionPaths.isEmpty) {
       None
