@@ -42,7 +42,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
-    public GriffinOperationMessage addJob(@RequestBody JobSchedule jobSchedule) {
+    public GriffinOperationMessage addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
         return jobService.addJob(jobSchedule);
     }
 

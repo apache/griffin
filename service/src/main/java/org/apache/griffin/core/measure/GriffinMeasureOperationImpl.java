@@ -37,6 +37,8 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+
 @Component("griffinOperation")
 public class GriffinMeasureOperationImpl implements MeasureOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(GriffinMeasureOperationImpl.class);
@@ -52,26 +54,26 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
     @Override
     public GriffinOperationMessage create(Measure measure) {
         if (!isConnectorNamesValid((GriffinMeasure) measure)) {
-            return GriffinOperationMessage.CREATE_MEASURE_FAIL;
+            return CREATE_MEASURE_FAIL;
         }
         try {
             measureRepo.save(measure);
-            return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
+            return CREATE_MEASURE_SUCCESS;
         } catch (Exception e) {
             LOGGER.error("Failed to create new measure {}.", measure.getName(), e);
         }
-        return GriffinOperationMessage.CREATE_MEASURE_FAIL;
+        return CREATE_MEASURE_FAIL;
     }
 
     @Override
     public GriffinOperationMessage update(Measure measure) {
         try {
             measureRepo.save(measure);
-            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
+            return UPDATE_MEASURE_SUCCESS;
         } catch (Exception e) {
             LOGGER.error("Failed to update measure. {}", e.getMessage());
         }
-        return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
+        return UPDATE_MEASURE_FAIL;
     }
 
     @Override
