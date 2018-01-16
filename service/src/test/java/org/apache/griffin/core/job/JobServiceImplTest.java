@@ -22,10 +22,12 @@ package org.apache.griffin.core.job;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.griffin.core.error.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.job.repo.GriffinJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
-import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
-import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
+import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
+import org.apache.griffin.core.util.EntityHelper;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.PropertiesUtil;
 import org.junit.Before;
@@ -74,17 +76,18 @@ public class JobServiceImplTest {
     private JobScheduleRepo jobScheduleRepo;
 
     @MockBean
-    private MeasureRepo measureRepo;
+    private GriffinMeasureRepo measureRepo;
 
     @MockBean
-    private JobRepo<GriffinJob> jobRepo;
+    private GriffinJobRepo jobRepo;
+
     @MockBean
     private JobInstanceRepo jobInstanceRepo;
 
     @MockBean
     private SchedulerFactoryBean factory;
 
-    @MockBean
+    @MockBean(name = "livyConf")
     private Properties sparkJobProps;
 
     @MockBean
@@ -126,17 +129,16 @@ public class JobServiceImplTest {
     }
 
 
-//    @Test
-//    public void testAddJobForSuccess() throws Exception {
-//        JobSchedule js = createJobSchedule();
-//
-//        JobRequestBody jobRequestBody = new JobRequestBody("YYYYMMdd-HH", "YYYYMMdd-HH",
-//                String.valueOf(System.currentTimeMillis()), String.valueOf(System.currentTimeMillis()), "1000");
-//        Scheduler scheduler = Mockito.mock(Scheduler.class);
-//        given(factory.getObject()).willReturn(scheduler);
-//        given(measureRepo.findOne(1L)).willReturn(createATestGriffinMeasure("measureName","org"));
-//        assertEquals(service.addJob("BA", "jobName", 1L, jobRequestBody), GriffinOperationMessage.CREATE_JOB_SUCCESS);
-//    }
+    @Test
+    public void testAddJobForSuccess() throws Exception {
+        JobSchedule js = createJobSchedule();
+        GriffinMeasure measure = EntityHelper.createGriffinMeasure("measureName");
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
+        given(factory.getObject()).willReturn(scheduler);
+        given(measureRepo.findByIdAndDeleted(js.getMeasureId(), false)).willReturn(measure);
+        given(jobRepo.countByJobNameAndDeleted(js.getJobName(), false)).willReturn(0);
+        service.addJob(js);
+    }
 //
 //    @Test
 //    public void testAddJobForFailWithFormatError() {
@@ -374,8 +376,11 @@ public class JobServiceImplTest {
     }
 
     private JobSchedule createJobSchedule() throws JsonProcessingException {
-        JobDataSegment segment = new JobDataSegment("data_connector_name", true);
-        List<JobDataSegment> segments = Arrays.asList(segment);
+        JobDataSegment segment1 = new JobDataSegment("source_name", true);
+        JobDataSegment segment2 = new JobDataSegment("target_name", false);
+        List<JobDataSegment> segments =new ArrayList<>();
+        segments.add(segment1);
+        segments.add(segment2);
         return new JobSchedule(1L,"jobName","0 0/4 * * * ?","GMT+8:00",segments);
     }
 }

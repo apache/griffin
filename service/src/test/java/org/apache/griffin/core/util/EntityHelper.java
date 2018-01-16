@@ -20,29 +20,22 @@ under the License.
 package org.apache.griffin.core.util;
 
 
+import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.measure.entity.*;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.quartz.JobDataMap;
-import org.quartz.Trigger;
-import org.quartz.impl.JobDetailImpl;
 
-import java.io.Serializable;
+import java.io.IOException;
 import java.util.*;
 
 public class EntityHelper {
-    public static GriffinMeasure createATestGriffinMeasure(String name, String org) throws Exception {
-        HashMap<String, String> configMap1 = new HashMap<>();
-        configMap1.put("database", "default");
-        configMap1.put("table.name", "test_data_src");
-        HashMap<String, String> configMap2 = new HashMap<>();
-        configMap2.put("database", "default");
-        configMap2.put("table.name", "test_data_tgt");
-        String configJson1 = new ObjectMapper().writeValueAsString(configMap1);
-        String configJson2 = new ObjectMapper().writeValueAsString(configMap2);
+    public static GriffinMeasure createGriffinMeasure(String name) throws Exception {
+        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
+        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
+        return createGriffinMeasure(name, dcSource, dcTarget);
+    }
 
-        DataSource dataSource = new DataSource("source", Arrays.asList(new DataConnector("source_name", "HIVE", "1.2", configJson1)));
-        DataSource targetSource = new DataSource("target", Arrays.asList(new DataConnector("target-name", "HIVE", "1.2", configJson2)));
-
+    public static GriffinMeasure createGriffinMeasure(String name, DataConnector dcSource, DataConnector dcTarget) throws Exception {
+        DataSource dataSource = new DataSource("source", Arrays.asList(dcSource));
+        DataSource targetSource = new DataSource("target", Arrays.asList(dcTarget));
         List<DataSource> dataSources = new ArrayList<>();
         dataSources.add(dataSource);
         dataSources.add(targetSource);
@@ -51,39 +44,19 @@ public class EntityHelper {
         map.put("detail", "detail info");
         Rule rule = new Rule("griffin-dsl", "accuracy", rules, map);
         EvaluateRule evaluateRule = new EvaluateRule(Arrays.asList(rule));
-        return new GriffinMeasure(1L,name, "description", org, "batch", "test", dataSources, evaluateRule);
+        return new GriffinMeasure(name, "test", dataSources, evaluateRule);
     }
 
-    public static JobDetailImpl createJobDetail() {
-        JobDetailImpl jobDetail = new JobDetailImpl();
-        JobDataMap jobInfoMap = new JobDataMap();
-        jobInfoMap.put("triggerState", Trigger.TriggerState.NORMAL);
-        jobInfoMap.put("measureId", "1");
-        jobInfoMap.put("sourcePattern", "YYYYMMdd-HH");
-        jobInfoMap.put("targetPattern", "YYYYMMdd-HH");
-        jobInfoMap.put("jobStartTime", "1506356105876");
-        jobInfoMap.put("interval", "3000");
-        jobInfoMap.put("deleted", "false");
-        jobInfoMap.put("blockStartTimestamp", "1506634804254");
-        jobInfoMap.put("lastBlockStartTimestamp", "1506634804254");
-        jobInfoMap.put("groupName", "BA");
-        jobInfoMap.put("jobName", "jobName");
-        jobDetail.setJobDataMap(jobInfoMap);
-        return jobDetail;
+    public static DataConnector createDataConnector(String name, String database, String table, String where) throws IOException {
+        HashMap<String, String> config = new HashMap<>();
+        config.put("database", database);
+        config.put("table.name", table);
+        config.put("where", where);
+        return new DataConnector(name, "1h", config, null);
     }
 
-    public static Map<String, Object> createJobDetailMap() {
-        Map<String, Object> jobDetailMap = new HashMap<>();
-        jobDetailMap.put("jobName", "jobName");
-        jobDetailMap.put("measureId", "1");
-        jobDetailMap.put("groupName", "BA");
-        jobDetailMap.put("targetPattern", "YYYYMMdd-HH");
-        jobDetailMap.put("triggerState", Trigger.TriggerState.NORMAL);
-        jobDetailMap.put("nextFireTime", "1509613440000");
-        jobDetailMap.put("previousFireTime", "1509613410000");
-        jobDetailMap.put("interval", "3000");
-        jobDetailMap.put("sourcePattern", "YYYYMMdd-HH");
-        jobDetailMap.put("jobStartTime", "1506356105876");
-        return jobDetailMap;
+    public static ExternalMeasure createExternalMeasure(String name) {
+        return new ExternalMeasure(name, "description", "org", "test", "metricName", new VirtualJob());
     }
+
 }
