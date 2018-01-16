@@ -21,6 +21,7 @@ package org.apache.griffin.measure.data.connector.batch
 import org.apache.griffin.measure.config.params.user.DataConnectorParam
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.process.engine.DqEngines
+import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.utils.HdfsUtil
 import org.apache.spark.rdd.RDD
@@ -51,7 +52,7 @@ case class AvroBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
     HdfsUtil.existPath(concreteFileFullPath)
   }
 
-  def data(ms: Long): (Option[DataFrame], Set[Long]) = {
+  def data(ms: Long): (Option[DataFrame], TimeRange) = {
     val dfOpt = try {
       val df = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
       val dfOpt = Some(df)
@@ -63,7 +64,8 @@ case class AvroBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
         None
       }
     }
-    (dfOpt, readTmst(ms))
+    val tmsts = readTmst(ms)
+    (dfOpt, TimeRange(ms, tmsts))
   }
 
 //  def available(): Boolean = {

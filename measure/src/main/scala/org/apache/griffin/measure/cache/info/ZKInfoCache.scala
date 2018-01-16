@@ -117,7 +117,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
 
   def clearInfo(): Unit = {
 //    delete("/")
-    info("clear info")
+    println("clear info")
   }
 
   def listKeys(p: String): List[String] = {
@@ -138,7 +138,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
       client.getChildren().forPath(path).asScala.toList
     } catch {
       case e: Throwable => {
-        error(s"list ${path} error: ${e.getMessage}")
+        warn(s"list ${path} warn: ${e.getMessage}")
         Nil
       }
     }
@@ -182,7 +182,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
       Some(new String(client.getData().forPath(path), "utf-8"))
     } catch {
       case e: Throwable => {
-        error(s"read ${path} error: ${e.getMessage}")
+        warn(s"read ${path} warn: ${e.getMessage}")
         None
       }
     }
@@ -201,7 +201,7 @@ case class ZKInfoCache(config: Map[String, Any], metricName: String) extends Inf
       client.checkExists().forPath(path) != null
     } catch {
       case e: Throwable => {
-        error(s"check exists ${path} error: ${e.getMessage}")
+        warn(s"check exists ${path} warn: ${e.getMessage}")
         false
       }
     }

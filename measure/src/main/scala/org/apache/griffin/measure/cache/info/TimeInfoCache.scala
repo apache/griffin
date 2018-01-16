@@ -60,8 +60,8 @@ object TimeInfoCache extends Loggable with Serializable {
     val subPath = InfoCacheInstance.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${ReadyTime}" }
     val result = InfoCacheInstance.readInfo(keys)
-    val time = keys.map { k =>
-      getLong(result, k)
+    val time = keys.flatMap { k =>
+      getLongOpt(result, k)
     }.min
     val map = Map[String, String]((finalReadyTime -> time.toString))
     InfoCacheInstance.cacheInfo(map)
@@ -71,8 +71,8 @@ object TimeInfoCache extends Loggable with Serializable {
     val subPath = InfoCacheInstance.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${LastProcTime}" }
     val result = InfoCacheInstance.readInfo(keys)
-    val time = keys.map { k =>
-      getLong(result, k)
+    val time = keys.flatMap { k =>
+      getLongOpt(result, k)
     }.min
     val map = Map[String, String]((finalLastProcTime -> time.toString))
     InfoCacheInstance.cacheInfo(map)
@@ -82,8 +82,8 @@ object TimeInfoCache extends Loggable with Serializable {
     val subPath = InfoCacheInstance.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${CleanTime}" }
     val result = InfoCacheInstance.readInfo(keys)
-    val time = keys.map { k =>
-      getLong(result, k)
+    val time = keys.flatMap { k =>
+      getLongOpt(result, k)
     }.min
     val map = Map[String, String]((finalCleanTime -> time.toString))
     InfoCacheInstance.cacheInfo(map)
@@ -102,15 +102,15 @@ object TimeInfoCache extends Loggable with Serializable {
     cleanTime
   }
 
-  private def getLong(map: Map[String, String], key: String): Long = {
+  private def getLongOpt(map: Map[String, String], key: String): Option[Long] = {
     try {
-      map.get(key) match {
-        case Some(v) => v.toLong
-        case _ => -1
-      }
+      map.get(key).map(_.toLong)
     } catch {
-      case e: Throwable => -1
+      case e: Throwable => None
     }
+  }
+  private def getLong(map: Map[String, String], key: String) = {
+    getLongOpt(map, key).getOrElse(-1L)
   }
 
 }

@@ -47,6 +47,9 @@ case class SparkSqlEngine(sqlContext: SQLContext) extends SparkDqEngine {
             }
           } else sqlContext.sql(rule)
 
+//          println(name)
+//          rdf.show(10)
+
           if (rs.isGlobal) {
             if (rs.needCache) DataFrameCaches.cacheGlobalDataFrame(name, rdf)
             TableRegisters.registerRunGlobalTable(rdf, name)

@@ -18,7 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
-import org.apache.griffin.measure.process.ProcessType
+import org.apache.griffin.measure.process.{ExportMode, ProcessType}
+import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 import org.apache.griffin.measure.utils.ParamUtil._
 
@@ -46,10 +47,12 @@ case class DataFrameOprAdaptor() extends RuleAdaptor {
 
   import RuleParamKeys._
 
-  def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any], procType: ProcessType): RulePlan = {
+  def genRulePlan(timeInfo: TimeInfo, param: Map[String, Any],
+                  procType: ProcessType, dsTimeRanges: Map[String, TimeRange]): RulePlan = {
     val name = getRuleName(param)
     val step = DfOprStep(name, getRule(param), getDetails(param), getCache(param), getGlobal(param))
-    RulePlan(step :: Nil, genRuleExports(param, name, name))
+    val mode = ExportMode.defaultMode(procType)
+    RulePlan(step :: Nil, genRuleExports(param, name, name, timeInfo.calcTime, mode))
   }
 
 }
