@@ -16,19 +16,19 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rule.plan
+package org.apache.griffin.measure.process
 
-import org.apache.griffin.measure.process.ExportMode
+sealed trait ExportMode {}
 
-case class RecordExport(name: String,
-                        stepName: String,
-                        dataSourceCacheOpt: Option[String],
-                        originDFOpt: Option[String],
-                        defTimestamp: Long,
-                        mode: ExportMode
-                       ) extends RuleExport {
-
-  def setDefTimestamp(t: Long): RuleExport =
-    RecordExport(name, stepName, dataSourceCacheOpt, originDFOpt, t, mode)
-
+object ExportMode {
+  def defaultMode(procType: ProcessType): ExportMode = {
+    procType match {
+      case BatchProcessType => SimpleMode
+      case StreamingProcessType => TimestampMode
+    }
+  }
 }
+
+final case object SimpleMode extends ExportMode {}
+
+final case object TimestampMode extends ExportMode {}

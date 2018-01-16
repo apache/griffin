@@ -21,7 +21,7 @@ package org.apache.griffin.measure.rule.adaptor
 import org.apache.griffin.measure.cache.tmst.TempName
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.process.ProcessType
-import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.process.temp.{TableRegisters, TimeRange}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
 import org.apache.spark.sql.SQLContext
@@ -114,22 +114,24 @@ object RuleAdaptorGroup {
 //  }
 
   // -- gen rule plan --
-  def genRulePlan(timeInfo: TimeInfo, evaluateRuleParam: EvaluateRuleParam, procType: ProcessType
+  def genRulePlan(timeInfo: TimeInfo, evaluateRuleParam: EvaluateRuleParam,
+                  procType: ProcessType, dsTimeRanges: Map[String, TimeRange]
                  ): RulePlan = {
     val dslTypeStr = if (evaluateRuleParam.dslType == null) "" else evaluateRuleParam.dslType
     val defaultDslType = DslType(dslTypeStr)
     val ruleParams = evaluateRuleParam.rules
-    genRulePlan(timeInfo, ruleParams, defaultDslType, procType)
+    genRulePlan(timeInfo, ruleParams, defaultDslType, procType, dsTimeRanges)
   }
 
   def genRulePlan(timeInfo: TimeInfo, ruleParams: Seq[Map[String, Any]],
-                  defaultDslType: DslType, procType: ProcessType
+                  defaultDslType: DslType, procType: ProcessType,
+                  dsTimeRanges: Map[String, TimeRange]
                  ): RulePlan = {
     val (rulePlan, dsNames) = ruleParams.foldLeft((emptyRulePlan, dataSourceNames)) { (res, param) =>
       val (plan, names) = res
       val dslType = getDslType(param, defaultDslType)
       val curPlan: RulePlan = genRuleAdaptor(dslType, names) match {
-        case Some(adaptor) => adaptor.genRulePlan(timeInfo, param, procType)
+        case Some(adaptor) => adaptor.genRulePlan(timeInfo, param, procType, dsTimeRanges)
         case _ => emptyRulePlan
       }
       val globalNames = curPlan.globalRuleSteps.map(_.name)

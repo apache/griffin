@@ -24,7 +24,8 @@ import org.apache.griffin.measure.config.params.user.DataSourceParam
 import org.apache.griffin.measure.data.source._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
+import org.apache.griffin.measure.process.temp.TimeRange
+import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
@@ -34,14 +35,14 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 import ExecutionContext.Implicits.global
 
 case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 
   val persistOrder: List[PersistType] = List(MetricPersistType, RecordPersistType)
 
-  def loadData(dataSources: Seq[DataSource], timeInfo: TimeInfo): Map[String, Set[Long]] = {
+  def loadData(dataSources: Seq[DataSource], timeInfo: TimeInfo): Map[String, TimeRange] = {
     dataSources.map { ds =>
       (ds.name, ds.loadData(timeInfo))
     }.toMap
@@ -53,12 +54,11 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     }
   }
 
-  def persistAllMetrics(timeInfo: TimeInfo, metricExports: Seq[MetricExport],
-                        procType: ProcessType, persistFactory: PersistFactory
+  def persistAllMetrics(timeInfo: TimeInfo, metricExports: Seq[MetricExport], persistFactory: PersistFactory
                        ): Unit = {
     val allMetrics: Map[Long, Map[String, Any]] = {
-      metricExports.foldLeft(Map[Long, Map[String, Any]]()) { (ret, step) =>
-        val metrics = collectMetrics(timeInfo, step, procType)
+      metricExports.foldLeft(Map[Long, Map[String, Any]]()) { (ret, metricExport) =>
+        val metrics = collectMetrics(timeInfo, metricExport)
         metrics.foldLeft(ret) { (total, pair) =>
           val (k, v) = pair
           total.get(k) match {
@@ -112,7 +112,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     Await.result(pro.future, Duration.Inf)
   }
 
-  def persistAllRecords(timeInfo: TimeInfo, recordExports: Seq[RecordExport], procType: ProcessType,
+  def persistAllRecords(timeInfo: TimeInfo, recordExports: Seq[RecordExport],
                         persistFactory: PersistFactory, dataSources: Seq[DataSource]
                        ): Unit = {
     // method 1: multi thread persist multi data frame
@@ -124,13 +124,13 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     // method 2: multi thread persist multi iterable
     recordExports.foreach { recordExport =>
 //      val records = collectRecords(timeInfo, recordExport, procType)
-      procType match {
-        case BatchProcessType => {
+      recordExport.mode match {
+        case SimpleMode => {
           collectBatchRecords(recordExport).foreach { rdd =>
             persistCollectedBatchRecords(timeInfo, recordExport, rdd, persistFactory)
           }
         }
-        case StreamingProcessType => {
+        case TimestampMode => {
           val (rddOpt, emptySet) = collectStreamingRecords(recordExport)
           persistCollectedStreamingRecords(recordExport, rddOpt, emptySet, persistFactory, dataSources)
 //          collectStreamingRecords(recordExport).foreach { rddPair =>
@@ -282,21 +282,20 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 //      engine.collectUpdateCacheDatas(ruleStep, timeGroups)
 //    }.headOption
 //  }
-  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport, procType: ProcessType
+  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport
                     ): Map[Long, Map[String, Any]] = {
     val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
-      if (ret.nonEmpty) ret else engine.collectMetrics(timeInfo, metricExport, procType)
+      if (ret.nonEmpty) ret else engine.collectMetrics(timeInfo, metricExport)
     }
     ret
   }
 
-  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport, procType: ProcessType
-                    ): Map[Long, DataFrame] = {
-    val ret = engines.foldLeft(Map[Long, DataFrame]()) { (ret, engine) =>
-      if (ret.nonEmpty) ret else engine.collectRecords(timeInfo, recordExport, procType)
-    }
-    ret
-  }
+//  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport): Map[Long, DataFrame] = {
+//    val ret = engines.foldLeft(Map[Long, DataFrame]()) { (ret, engine) =>
+//      if (ret.nonEmpty) ret else engine.collectRecords(timeInfo, recordExport)
+//    }
+//    ret
+//  }
 
   def collectUpdateRDD(ruleStep: RuleStep): Option[DataFrame] = {
 //    engines.flatMap { engine =>

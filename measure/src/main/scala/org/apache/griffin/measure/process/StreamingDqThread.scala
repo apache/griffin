@@ -29,7 +29,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
 import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
-import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
+import org.apache.griffin.measure.rule.adaptor.{ProcessDetailsKeys, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.plan._
 import org.apache.spark.sql.SQLContext
 
@@ -58,21 +58,25 @@ case class StreamingDqThread(sqlContext: SQLContext,
         TimeInfoCache.startTimeInfoCache
 
         // init data sources
-        val dsTmsts = dqEngines.loadData(dataSources, calcTimeInfo)
+        val dsTimeRanges = dqEngines.loadData(dataSources, calcTimeInfo)
 
-        println(s"data sources timestamps: ${dsTmsts}")
+        println(s"data source timeRanges: ${dsTimeRanges}")
 
         // generate rule steps
 //        val ruleSteps = RuleAdaptorGroup.genRuleSteps(
 //          CalcTimeInfo(st), evaluateRuleParam, dsTmsts)
         val rulePlan = RuleAdaptorGroup.genRulePlan(
-          calcTimeInfo, evaluateRuleParam, StreamingProcessType)
+          calcTimeInfo, evaluateRuleParam, StreamingProcessType, dsTimeRanges)
+
+        // optimize rule plan
+//        val optRulePlan = optimizeRulePlan(rulePlan, dsTmsts)
+        val optRulePlan = rulePlan
 
 //        ruleSteps.foreach(println)
 
         // run rules
 //        dqEngines.runRuleSteps(ruleSteps)
-        dqEngines.runRuleSteps(calcTimeInfo, rulePlan.ruleSteps)
+        dqEngines.runRuleSteps(calcTimeInfo, optRulePlan.ruleSteps)
 
         val ct = new Date().getTime
         val calculationTimeStr = s"calculation using time: ${ct - st} ms"
@@ -81,8 +85,7 @@ case class StreamingDqThread(sqlContext: SQLContext,
 
         // persist results
 //        val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
-        dqEngines.persistAllMetrics(calcTimeInfo, rulePlan.metricExports,
-          StreamingProcessType, persistFactory)
+        dqEngines.persistAllMetrics(calcTimeInfo, optRulePlan.metricExports, persistFactory)
 //        println(s"--- timeGroups: ${timeGroups}")
 
         val rt = new Date().getTime
@@ -90,8 +93,7 @@ case class StreamingDqThread(sqlContext: SQLContext,
         appPersist.log(rt, persistResultTimeStr)
 
         // persist records
-        dqEngines.persistAllRecords(calcTimeInfo, rulePlan.recordExports,
-          StreamingProcessType, persistFactory, dataSources)
+        dqEngines.persistAllRecords(calcTimeInfo, optRulePlan.recordExports, persistFactory, dataSources)
 
         val et = new Date().getTime
         val persistTimeStr = s"persist records using time: ${et - rt} ms"
@@ -167,54 +169,29 @@ case class StreamingDqThread(sqlContext: SQLContext,
     }
   }
 
-//  // calculate accuracy between source data and target data
-//  private def accuracy(sourceData: RDD[(Product, (Map[String, Any], Map[String, Any]))],
-//               targetData: RDD[(Product, (Map[String, Any], Map[String, Any]))],
-//               ruleAnalyzer: RuleAnalyzer) = {
-//    // 1. cogroup
-//    val allKvs = sourceData.cogroup(targetData)
-//
-//    // 2. accuracy calculation
-//    val (accuResult, missingRdd, matchedRdd) = AccuracyCore.accuracy(allKvs, ruleAnalyzer)
-//
-//    (accuResult, missingRdd, matchedRdd)
-//  }
-//
-//  private def reorgByTimeGroup(rdd: RDD[(Product, (Map[String, Any], Map[String, Any]))]
-//                      ): RDD[(Long, (Product, (Map[String, Any], Map[String, Any])))] = {
-//    rdd.flatMap { row =>
-//      val (key, (value, info)) = row
-//      val b: Option[(Long, (Product, (Map[String, Any], Map[String, Any])))] = info.get(TimeStampInfo.key) match {
-//        case Some(t: Long) => Some((t, row))
-//        case _ => None
-//      }
-//      b
-//    }
-//  }
-//
-//  // convert data into a string
-//  def record2String(rec: (Product, (Map[String, Any], Map[String, Any])), dataPersist: Iterable[Expr], infoPersist: Iterable[Expr]): String = {
-//    val (key, (data, info)) = rec
-//    val persistData = getPersistMap(data, dataPersist)
-//    val persistInfo = info.mapValues { value =>
-//      value match {
-//        case vd: Map[String, Any] => getPersistMap(vd, infoPersist)
-//        case v => v
-//      }
-//    }.map(identity)
-//    s"${persistData} [${persistInfo}]"
-//  }
-//
-//  // get the expr value map of the persist expressions
-//  private def getPersistMap(data: Map[String, Any], persist: Iterable[Expr]): Map[String, Any] = {
-//    val persistMap = persist.map(e => (e._id, e.desc)).toMap
-//    data.flatMap { pair =>
-//      val (k, v) = pair
-//      persistMap.get(k) match {
-//        case Some(d) => Some((d -> v))
-//        case _ => None
-//      }
-//    }
-//  }
+  private def optimizeRulePlan(rulePlan: RulePlan, dsTmsts: Map[String, Set[Long]]): RulePlan = {
+    val steps = rulePlan.ruleSteps
+    val optExports = rulePlan.ruleExports.flatMap { export =>
+      findRuleStepByName(steps, export.stepName).map { rs =>
+        rs.details.get(ProcessDetailsKeys._baselineDataSource) match {
+          case Some(dsname: String) => {
+            val defTmstOpt = (dsTmsts.get(dsname)).flatMap { set =>
+              try { Some(set.max) } catch { case _: Throwable => None }
+            }
+            defTmstOpt match {
+              case Some(t) => export.setDefTimestamp(t)
+              case _ => export
+            }
+          }
+          case _ => export
+        }
+      }
+    }
+    RulePlan(steps, optExports)
+  }
+
+  private def findRuleStepByName(steps: Seq[RuleStep], name: String): Option[RuleStep] = {
+    steps.filter(_.name == name).headOption
+  }
 
 }

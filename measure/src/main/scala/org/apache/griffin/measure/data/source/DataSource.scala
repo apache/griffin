@@ -23,7 +23,7 @@ import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters, TimeRange}
 import org.apache.griffin.measure.rule.plan.TimeInfo
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
@@ -49,7 +49,7 @@ case class DataSource(sqlContext: SQLContext,
     dataConnectors.map(_.tmstCache = tmstCache)
   }
 
-  def loadData(timeInfo: TimeInfo): Set[Long] = {
+  def loadData(timeInfo: TimeInfo): TimeRange = {
     val calcTime = timeInfo.calcTime
     println(s"load data [${name}]")
     val (dfOpt, tmsts) = data(calcTime)
@@ -65,11 +65,11 @@ case class DataSource(sqlContext: SQLContext,
     tmsts
   }
 
-  private def data(ms: Long): (Option[DataFrame], Set[Long]) = {
+  private def data(ms: Long): (Option[DataFrame], TimeRange) = {
     val batches = batchDataConnectors.flatMap { dc =>
-      val (dfOpt, tmsts) = dc.data(ms)
+      val (dfOpt, timeRange) = dc.data(ms)
       dfOpt match {
-        case Some(df) => Some((dfOpt, tmsts))
+        case Some(df) => Some((dfOpt, timeRange))
         case _ => None
       }
     }
@@ -81,10 +81,10 @@ case class DataSource(sqlContext: SQLContext,
 
     if (pairs.size > 0) {
       pairs.reduce { (a, b) =>
-        (unionDfOpts(a._1, b._1), a._2 ++ b._2)
+        (unionDfOpts(a._1, b._1), a._2.merge(b._2))
       }
     } else {
-      (None, Set.empty[Long])
+      (None, TimeRange.emptyTimeRange)
     }
   }
 
