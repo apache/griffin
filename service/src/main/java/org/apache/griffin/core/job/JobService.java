@@ -32,7 +32,7 @@ public interface JobService {
 
     List<JobDataBean> getAliveJobs();
 
-    GriffinOperationMessage addJob(JobSchedule jobSchedule);
+    GriffinOperationMessage addJob(JobSchedule jobSchedule) throws Exception;
 
     boolean pauseJob(String group, String name) throws SchedulerException;
 
