@@ -54,11 +54,11 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     }
   }
 
-  def persistAllMetrics(timeInfo: TimeInfo, metricExports: Seq[MetricExport], persistFactory: PersistFactory
+  def persistAllMetrics(metricExports: Seq[MetricExport], persistFactory: PersistFactory
                        ): Unit = {
     val allMetrics: Map[Long, Map[String, Any]] = {
       metricExports.foldLeft(Map[Long, Map[String, Any]]()) { (ret, metricExport) =>
-        val metrics = collectMetrics(timeInfo, metricExport)
+        val metrics = collectMetrics(metricExport)
         metrics.foldLeft(ret) { (total, pair) =>
           val (k, v) = pair
           total.get(k) match {
@@ -112,7 +112,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     Await.result(pro.future, Duration.Inf)
   }
 
-  def persistAllRecords(timeInfo: TimeInfo, recordExports: Seq[RecordExport],
+  def persistAllRecords(recordExports: Seq[RecordExport],
                         persistFactory: PersistFactory, dataSources: Seq[DataSource]
                        ): Unit = {
     // method 1: multi thread persist multi data frame
@@ -127,7 +127,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
       recordExport.mode match {
         case SimpleMode => {
           collectBatchRecords(recordExport).foreach { rdd =>
-            persistCollectedBatchRecords(timeInfo, recordExport, rdd, persistFactory)
+            persistCollectedBatchRecords(recordExport, rdd, persistFactory)
           }
         }
         case TimestampMode => {
@@ -154,10 +154,10 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
     ret
   }
 
-  private def persistCollectedBatchRecords(timeInfo: TimeInfo, recordExport: RecordExport,
+  private def persistCollectedBatchRecords(recordExport: RecordExport,
                                            records: RDD[String], persistFactory: PersistFactory
                                           ): Unit = {
-    val persist = persistFactory.getPersists(timeInfo.calcTime)
+    val persist = persistFactory.getPersists(recordExport.defTimestamp)
     persist.persistRecords(records, recordExport.name)
   }
 
@@ -282,10 +282,10 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 //      engine.collectUpdateCacheDatas(ruleStep, timeGroups)
 //    }.headOption
 //  }
-  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport
+  def collectMetrics(metricExport: MetricExport
                     ): Map[Long, Map[String, Any]] = {
     val ret = engines.foldLeft(Map[Long, Map[String, Any]]()) { (ret, engine) =>
-      if (ret.nonEmpty) ret else engine.collectMetrics(timeInfo, metricExport)
+      if (ret.nonEmpty) ret else engine.collectMetrics(metricExport)
     }
     ret
   }

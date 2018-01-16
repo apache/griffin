@@ -68,8 +68,7 @@ trait SparkDqEngine extends DqEngine {
     }
   }
 
-  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport
-                    ): Map[Long, Map[String, Any]] = {
+  def collectMetrics(metricExport: MetricExport): Map[Long, Map[String, Any]] = {
     if (collectable) {
       val MetricExport(name, stepName, collectType, defTmst, mode) = metricExport
       try {
