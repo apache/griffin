@@ -150,7 +150,8 @@ public class JobInstance implements Job {
     private Long[] genSampleTs(SegmentRange segRange, DataConnector dc) throws IOException {
         Long offset = TimeUtil.str2Long(segRange.getBegin());
         Long range = TimeUtil.str2Long(segRange.getLength());
-        Long dataUnit = TimeUtil.str2Long(dc.getDataUnit());
+        String unit = dc.getDataUnit();
+        Long dataUnit = TimeUtil.str2Long(unit != null ? unit : dc.getDefaultDataUnit());
         //offset usually is negative
         Long dataStartTime = jobStartTime + offset;
         if (range < 0) {

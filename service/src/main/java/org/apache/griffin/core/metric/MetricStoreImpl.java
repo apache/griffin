@@ -46,7 +46,7 @@ public class MetricStoreImpl implements MetricStore {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public MetricStoreImpl(@Value("${elasticsearch.host}") String host, @Value("${elasticsearch.port}") int port) {
+    public MetricStoreImpl(@Value("${elasticsearch.host}") String host, @Value("${elasticsearch.port}") int port) throws IOException {
         client = RestClient.builder(new HttpHost(host, port, "http")).build();
     }
 

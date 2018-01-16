@@ -33,6 +33,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
+import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+
 @Service
 public class MeasureServiceImpl implements MeasureService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MeasureServiceImpl.class);
@@ -66,7 +68,7 @@ public class MeasureServiceImpl implements MeasureService {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
         if (!CollectionUtils.isEmpty(aliveMeasureList)) {
             LOGGER.warn("Failed to create new measure {}, it already exists.", measure.getName());
-            return GriffinOperationMessage.CREATE_MEASURE_FAIL_DUPLICATE;
+            return CREATE_MEASURE_FAIL_DUPLICATE;
         }
         MeasureOperation op = getOperation(measure);
         return op.create(measure);
@@ -76,11 +78,11 @@ public class MeasureServiceImpl implements MeasureService {
     public GriffinOperationMessage updateMeasure(Measure measure) {
         Measure m = measureRepo.findByIdAndDeleted(measure.getId(), false);
         if (m == null) {
-            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
+            return RESOURCE_NOT_FOUND;
         }
         if (!m.getType().equals(measure.getType())) {
             LOGGER.error("Can't update measure to different type.");
-            return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
+            return UPDATE_MEASURE_FAIL;
         }
         MeasureOperation op = getOperation(measure);
         return op.update(measure);
@@ -90,17 +92,17 @@ public class MeasureServiceImpl implements MeasureService {
     public GriffinOperationMessage deleteMeasureById(Long measureId) {
         Measure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
-            return GriffinOperationMessage.RESOURCE_NOT_FOUND;
+            return RESOURCE_NOT_FOUND;
         }
         try {
             MeasureOperation op = getOperation(measure);
             if (op.delete(measure)) {
-                return GriffinOperationMessage.DELETE_MEASURE_BY_ID_SUCCESS;
+                return DELETE_MEASURE_BY_ID_SUCCESS;
             }
         } catch (Exception e) {
             LOGGER.error("Delete measure id: {} name: {} failure. {}", measure.getId(), measure.getName(), e.getMessage());
         }
-        return GriffinOperationMessage.DELETE_MEASURE_BY_ID_FAIL;
+        return DELETE_MEASURE_BY_ID_FAIL;
     }
 
     private MeasureOperation getOperation(Measure measure) {
