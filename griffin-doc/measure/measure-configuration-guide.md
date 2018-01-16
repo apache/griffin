@@ -26,12 +26,18 @@ Griffin measure module needs two configuration files to define the parameters of
   "spark": {
     "log.level": "WARN",
     "checkpoint.dir": "hdfs:///griffin/streaming/cp",
-    "batch.interval": "5s",
-    "process.interval": "30s",
+    "batch.interval": "1m",
+    "process.interval": "5m",
     "config": {
+      "spark.default.parallelism": 5,
       "spark.task.maxFailures": 5,
       "spark.streaming.kafkaMaxRatePerPartition": 1000,
-      "spark.streaming.concurrentJobs": 4
+      "spark.streaming.concurrentJobs": 4,
+      "spark.yarn.maxAppAttempts": 5,
+      "spark.yarn.am.attemptFailuresValidityInterval": "1h",
+      "spark.yarn.max.executor.failures": 120,
+      "spark.yarn.executor.failuresValidityInterval": "1h",
+      "spark.hadoop.fs.hdfs.impl.disable.cache": true
     }
   },
 
@@ -45,7 +51,6 @@ Griffin measure module needs two configuration files to define the parameters of
       "type": "hdfs",
       "config": {
         "path": "hdfs:///griffin/streaming/persist",
-        "max.persist.lines": 10000,
         "max.lines.per.file": 10000
       }
     }
@@ -89,6 +94,10 @@ Above lists environment parameters.
 	+ http persist
 		* api: api to submit persist metrics.
 		* method: http method, "post" default.
+  + mongo persist
+    * url: url of mongo db.
+    * database: database name.
+    * collection: collection name. 
 
 ### <a name="info-cache"></a>Info Cache
 - **type**: Information cache type, "zk" for zookeeper cache.
@@ -212,6 +221,16 @@ Above lists DQ job configure parameters.
     * dup: the duplicate count name in metric, optional.
     * num: the duplicate number name in metric, optional.
     * duplication.array: optional, if set as a non-empty string, the duplication metric will be computed, and the group metric name is this string.
+  + distinctness dq type detail configuration
+    * source: name of data source to measure uniqueness.
+    * target: name of data source to compare with. It is always the same as source, or more than source.
+    * distinct: the unique count name in metric, optional.
+    * total: the total count name in metric, optional.
+    * dup: the duplicate count name in metric, optional.
+    * accu_dup: the accumulate duplicate count name in metric, optional, only in streaming mode and "with.accumulate" enabled.
+    * num: the duplicate number name in metric, optional.
+    * duplication.array: optional, if set as a non-empty string, the duplication metric will be computed, and the group metric name is this string.
+    * with.accumulate: optional, default is true, if set as false, in streaming mode, the data set will not compare with old data to check distinctness.
   + timeliness dq type detail configuration
     * source: name of data source to measure timeliness.
     * latency: the latency column name in metric, optional.
