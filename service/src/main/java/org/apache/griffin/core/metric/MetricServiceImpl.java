@@ -37,10 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,17 +55,25 @@ public class MetricServiceImpl implements MetricService {
     private MetricStore metricStore;
 
     @Override
-    public List<Metric> getAllMetrics() {
-        List<Metric> metrics = new ArrayList<>();
+    public Map<String, List<Metric>> getAllMetrics() {
+        Map<String, List<Metric>> metricMap = new HashMap<>();
         List<AbstractJob> jobs = jobRepo.findByDeleted(false);
         List<Measure> measures = measureRepo.findByDeleted(false);
         Map<Long, Measure> measureMap = measures.stream().collect(Collectors.toMap(Measure::getId, Function.identity()));
-        for (AbstractJob job : jobs) {
-            List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300);
-            Measure measure = measureMap.get(job.getMeasureId());
-            metrics.add(new Metric(job.getJobName(), measure.getDescription(), measure.getOrganization(), measure.getOwner(), metricValues));
+        Map<Long, List<AbstractJob>> jobMap = jobs.stream().collect(Collectors.groupingBy(AbstractJob::getMeasureId, Collectors.toList()));
+        for (Map.Entry<Long, List<AbstractJob>> entry : jobMap.entrySet()) {
+            Long measureId = entry.getKey();
+            Measure measure = measureMap.get(measureId);
+            List<AbstractJob> jobList = entry.getValue();
+            List<Metric> metrics = new ArrayList<>();
+            for (AbstractJob job : jobList) {
+                List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300);
+                metrics.add(new Metric(job.getMetricName(), measure.getOwner(), metricValues));
+            }
+            metricMap.put(measure.getName(), metrics);
+
         }
-        return metrics;
+        return metricMap;
     }
 
     @Override
@@ -82,13 +87,14 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @Override
-    public ResponseEntity<GriffinOperationMessage> addMetricValues(List<MetricValue> values) {
-        try {
-            for (MetricValue value : values) {
-                if (!isMetricValueValid(value)) {
-                    return new ResponseEntity<>(ADD_METRIC_VALUES_FAIL, HttpStatus.BAD_REQUEST);
-                }
+    public ResponseEntity addMetricValues(List<MetricValue> values) {
+        for (MetricValue value : values) {
+            if (!isMetricValueValid(value)) {
+                LOGGER.warn("Invalid metric value.");
+                return new ResponseEntity<>(ADD_METRIC_VALUES_FAIL, HttpStatus.BAD_REQUEST);
             }
+        }
+        try {
             for (MetricValue value : values) {
                 metricStore.addMetricValue(value);
             }

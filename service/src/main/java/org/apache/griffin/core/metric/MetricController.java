@@ -27,10 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-/**
- * In griffin, metricName usually equals to measureName, and we only save measureName in server.
- */
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -40,7 +37,7 @@ public class MetricController {
     private MetricService metricService;
 
     @RequestMapping(value = "/metrics", method = RequestMethod.GET)
-    public List<Metric> getAllMetrics() {
+    public Map<String, List<Metric>> getAllMetrics() {
         return metricService.getAllMetrics();
     }
 
