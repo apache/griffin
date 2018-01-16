@@ -47,6 +47,7 @@ object DistinctnessKeys {
   val _distinct = "distinct"
   val _total = "total"
   val _dup = "dup"
+  val _accu_dup = "accu_dup"
   val _num = "num"
   val _duplicationArray = "duplication.array"
 }

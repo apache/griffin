@@ -25,7 +25,7 @@ import org.apache.griffin.measure.cache.tmst.TempName
 import scala.collection.mutable.{Set => MutableSet}
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.process.ProcessType
+import org.apache.griffin.measure.process.{ExportMode, ProcessType}
 import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
@@ -120,31 +120,36 @@ trait RuleAdaptor extends Loggable with Serializable {
                   procType: ProcessType, dsTimeRanges: Map[String, TimeRange]): RulePlan
 
   protected def genRuleExports(param: Map[String, Any], defName: String,
-                               stepName: String, defTimestamp: Long
+                               stepName: String, defTimestamp: Long,
+                               mode: ExportMode
                               ): Seq[RuleExport] = {
     val metricOpt = RuleParamKeys.getMetricOpt(param)
-    val metricExportSeq = metricOpt.map(genMetricExport(_, defName, stepName, defTimestamp)).toSeq
+    val metricExportSeq = metricOpt.map(genMetricExport(_, defName, stepName, defTimestamp, mode)).toSeq
     val recordOpt = RuleParamKeys.getRecordOpt(param)
-    val recordExportSeq = recordOpt.map(genRecordExport(_, defName, stepName, defTimestamp)).toSeq
+    val recordExportSeq = recordOpt.map(genRecordExport(_, defName, stepName, defTimestamp, mode)).toSeq
     metricExportSeq ++ recordExportSeq
   }
-  protected def genMetricExport(param: Map[String, Any], name: String, stepName: String, defTimestamp: Long
+  protected def genMetricExport(param: Map[String, Any], name: String, stepName: String,
+                                defTimestamp: Long, mode: ExportMode
                                ): MetricExport = {
     MetricExport(
       ExportParamKeys.getName(param, name),
       stepName,
       ExportParamKeys.getCollectType(param),
-      defTimestamp
+      defTimestamp,
+      mode
     )
   }
-  protected def genRecordExport(param: Map[String, Any], name: String, stepName: String, defTimestamp: Long
+  protected def genRecordExport(param: Map[String, Any], name: String, stepName: String,
+                                defTimestamp: Long, mode: ExportMode
                                ): RecordExport = {
     RecordExport(
       ExportParamKeys.getName(param, name),
       stepName,
       ExportParamKeys.getDataSourceCacheOpt(param),
       ExportParamKeys.getOriginDFOpt(param),
-      defTimestamp
+      defTimestamp,
+      mode
     )
   }
 

@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.rule.plan
 
+import org.apache.griffin.measure.process.ExportMode
+
 trait RuleExport extends Serializable {
 
   val name: String    // export name
@@ -25,6 +27,8 @@ trait RuleExport extends Serializable {
   val stepName: String    // the dependant step name
 
   val defTimestamp: Long    // the default timestamp if tmst not in value
+
+  val mode: ExportMode   // export mode
 
   def setDefTimestamp(t: Long): RuleExport
 

@@ -85,8 +85,7 @@ case class StreamingDqThread(sqlContext: SQLContext,
 
         // persist results
 //        val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
-        dqEngines.persistAllMetrics(calcTimeInfo, optRulePlan.metricExports,
-          StreamingProcessType, persistFactory)
+        dqEngines.persistAllMetrics(calcTimeInfo, optRulePlan.metricExports, persistFactory)
 //        println(s"--- timeGroups: ${timeGroups}")
 
         val rt = new Date().getTime
@@ -94,8 +93,7 @@ case class StreamingDqThread(sqlContext: SQLContext,
         appPersist.log(rt, persistResultTimeStr)
 
         // persist records
-        dqEngines.persistAllRecords(calcTimeInfo, optRulePlan.recordExports,
-          StreamingProcessType, persistFactory, dataSources)
+        dqEngines.persistAllRecords(calcTimeInfo, optRulePlan.recordExports, persistFactory, dataSources)
 
         val et = new Date().getTime
         val persistTimeStr = s"persist records using time: ${et - rt} ms"

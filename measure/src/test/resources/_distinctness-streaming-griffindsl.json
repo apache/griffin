@@ -70,7 +70,11 @@
           "source": "new",
           "target": "old",
           "total": "total",
-          "distinct": "distinct"
+          "distinct": "distinct",
+          "dup": "dup",
+          "accu_dup": "accu_dup",
+          "num": "num",
+          "duplication.array": "dup"
         },
         "metric": {
           "name": "distinct"
