@@ -38,6 +38,7 @@ object UniquenessKeys {
   val _total = "total"
   val _dup = "dup"
   val _num = "num"
+
   val _duplicationArray = "duplication.array"
 }
 
@@ -49,7 +50,9 @@ object DistinctnessKeys {
   val _dup = "dup"
   val _accu_dup = "accu_dup"
   val _num = "num"
+
   val _duplicationArray = "duplication.array"
+  val _withAccumulate = "with.accumulate"
 }
 
 object TimelinessKeys {

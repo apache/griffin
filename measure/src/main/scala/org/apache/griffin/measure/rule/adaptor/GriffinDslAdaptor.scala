@@ -449,11 +449,11 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
     if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
       println(s"[${ct}] data source ${sourceName} not exists")
       emptyRulePlan
-    } else if (!TableRegisters.existRunTempTable(timeInfo.key, targetName)) {
-      println(s"[${ct}] data source ${targetName} not exists")
-      emptyRulePlan
     } else {
-      val withOlderTable = TableRegisters.existRunTempTable(timeInfo.key, targetName)
+      val withOlderTable = {
+        details.getBoolean(DistinctnessKeys._withAccumulate, true) &&
+          TableRegisters.existRunTempTable(timeInfo.key, targetName)
+      }
 
       val selClause = analyzer.selectionPairs.map { pair =>
         val (expr, alias) = pair
@@ -488,7 +488,7 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
            |SELECT ${aliasesClause}, (COUNT(*) - 1) AS `${dupColName}`,
            |TRUE AS `${InternalColumns.distinct}`
            |FROM `${sourceAliasTableName}` GROUP BY ${aliasesClause}
-             """.stripMargin
+          """.stripMargin
       }
       val selfGroupStep = SparkSqlStep(selfGroupTableName, selfGroupSql, emptyMap, true)
 
