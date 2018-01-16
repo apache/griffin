@@ -41,8 +41,6 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
 
-@Configurable(preConstruction = true)
-@Component
 @Entity
 public class JobSchedule extends AbstractAuditableEntity {
 
@@ -89,10 +87,10 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     @JsonProperty("job.name")
     public void setJobName(String jobName) {
-//        if (StringUtils.isEmpty(jobName)) {
-//            LOGGER.error("Job name cannot be empty.");
-//            throw new NullPointerException();
-//        }
+        if (StringUtils.isEmpty(jobName)) {
+            LOGGER.error("Job name cannot be empty.");
+            throw new NullPointerException();
+        }
         this.jobName = jobName;
     }
 
