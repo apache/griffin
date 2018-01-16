@@ -158,7 +158,7 @@ public class JobServiceImpl implements JobService {
         }
         GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
         jobRepo.save(job);
-        jobScheduleRepo.save(js);
+        js = jobScheduleRepo.save(js);
         addJob(triggerKey, js, job);
         return true;
     }
@@ -283,8 +283,9 @@ public class JobServiceImpl implements JobService {
 
 
     private void setJobDataMap(JobDetail jd, JobSchedule js, GriffinJob job) {
-        jd.getJobDataMap().put(JOB_SCHEDULE_ID, js.getId().toString());
-        jd.getJobDataMap().put(GRIFFIN_JOB_ID, job.getId().toString());
+        JobDataMap jobDataMap = jd.getJobDataMap();
+        jobDataMap.put(JOB_SCHEDULE_ID, js.getId().toString());
+        jobDataMap.put(GRIFFIN_JOB_ID, job.getId().toString());
     }
 
     private boolean pauseJob(List<JobInstanceBean> instances) {
