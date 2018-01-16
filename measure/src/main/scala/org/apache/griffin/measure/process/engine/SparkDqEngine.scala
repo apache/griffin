@@ -20,7 +20,7 @@ package org.apache.griffin.measure.process.engine
 
 import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
 import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.process.{BatchProcessType, ProcessType, StreamingProcessType}
+import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
@@ -68,20 +68,20 @@ trait SparkDqEngine extends DqEngine {
     }
   }
 
-  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport, procType: ProcessType
+  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport
                     ): Map[Long, Map[String, Any]] = {
     if (collectable) {
-      val MetricExport(name, stepName, collectType) = metricExport
+      val MetricExport(name, stepName, collectType, defTmst, mode) = metricExport
       try {
-        val metricMaps = getMetricMaps(stepName)
-        procType match {
-          case BatchProcessType => {
+        val metricMaps: Seq[Map[String, Any]] = getMetricMaps(stepName)
+        mode match {
+          case SimpleMode => {
             val metrics: Map[String, Any] = normalizeMetric(metricMaps, name, collectType)
-            emptyMetricMap + (timeInfo.calcTime -> metrics)
+            emptyMetricMap + (defTmst -> metrics)
           }
-          case StreamingProcessType => {
+          case TimestampMode => {
             val tmstMetrics = metricMaps.map { metric =>
-              val tmst = metric.getLong(InternalColumns.tmst, timeInfo.calcTime)
+              val tmst = metric.getLong(InternalColumns.tmst, defTmst)
               val pureMetric = metric.removeKeys(InternalColumns.columns)
               (tmst, pureMetric)
             }
@@ -103,44 +103,53 @@ trait SparkDqEngine extends DqEngine {
   }
 
 
-  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport, procType: ProcessType
-                    ): Map[Long, DataFrame] = {
-    if (collectable) {
-      val RecordExport(_, stepName, _, originDFOpt) = recordExport
-      val stepDf = sqlContext.table(s"`${stepName}`")
-      val recordsDf = originDFOpt match {
-        case Some(originName) => sqlContext.table(s"`${originName}`")
-        case _ => stepDf
-      }
-
-      procType match {
-        case BatchProcessType => {
-          val recordsDf = sqlContext.table(s"`${stepName}`")
-          emptyRecordMap + (timeInfo.calcTime -> recordsDf)
-        }
-        case StreamingProcessType => {
-          originDFOpt match {
-            case Some(originName) => {
-              val recordsDf = sqlContext.table(s"`${originName}`")
-              stepDf.collect.map { row =>
-                val tmst = row.getAs[Long](InternalColumns.tmst)
-                val trdf = recordsDf.filter(s"`${InternalColumns.tmst}` = ${tmst}")
-                (tmst, trdf)
-              }.toMap
-            }
-            case _ => {
-              val recordsDf = sqlContext.table(s"`${stepName}`")
-              emptyRecordMap + (timeInfo.calcTime -> recordsDf)
-            }
-          }
-        }
-      }
-    } else emptyRecordMap
+  private def getTmst(row: Row, defTmst: Long): Long = {
+    try {
+      row.getAs[Long](InternalColumns.tmst)
+    } catch {
+      case _: Throwable => defTmst
+    }
   }
+
+//  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport): Map[Long, DataFrame] = {
+//    if (collectable) {
+//      val RecordExport(_, stepName, _, originDFOpt, defTmst, procType) = recordExport
+//      val stepDf = sqlContext.table(s"`${stepName}`")
+//      val recordsDf = originDFOpt match {
+//        case Some(originName) => sqlContext.table(s"`${originName}`")
+//        case _ => stepDf
+//      }
+//
+//      procType match {
+//        case BatchProcessType => {
+//          val recordsDf = sqlContext.table(s"`${stepName}`")
+//          emptyRecordMap + (defTmst -> recordsDf)
+//        }
+//        case StreamingProcessType => {
+//          originDFOpt match {
+//            case Some(originName) => {
+//              val recordsDf = sqlContext.table(s"`${originName}`")
+//              stepDf.map { row =>
+//                val tmst = getTmst(row, defTmst)
+//                val trdf = if (recordsDf.columns.contains(InternalColumns.tmst)) {
+//                  recordsDf.filter(s"`${InternalColumns.tmst}` = ${tmst}")
+//                } else recordsDf
+//                (tmst, trdf)
+//              }.collect.toMap
+//            }
+//            case _ => {
+//              val recordsDf = stepDf
+//              emptyRecordMap + (defTmst -> recordsDf)
+//            }
+//          }
+//        }
+//      }
+//    } else emptyRecordMap
+//  }
 
   private def getRecordDataFrame(recordExport: RecordExport): Option[DataFrame] = {
     if (collectable) {
-      val RecordExport(_, stepName, _, _) = recordExport
+      val RecordExport(_, stepName, _, _, defTmst, procType) = recordExport
       val stepDf = sqlContext.table(s"`${stepName}`")
       Some(stepDf)
     } else None
@@ -151,14 +160,14 @@ trait SparkDqEngine extends DqEngine {
   }
 
   def collectStreamingRecords(recordExport: RecordExport): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
-    val RecordExport(_, _, _, originDFOpt) = recordExport
+    val RecordExport(_, _, _, originDFOpt, defTmst, procType) = recordExport
     getRecordDataFrame(recordExport) match {
       case Some(stepDf) => {
         originDFOpt match {
           case Some(originName) => {
             val tmsts = (stepDf.collect.flatMap { row =>
               try {
-                val tmst = row.getAs[Long](InternalColumns.tmst)
+                val tmst = getTmst(row, defTmst)
                 val empty = row.getAs[Boolean](InternalColumns.empty)
                 Some((tmst, empty))
               } catch {
@@ -170,7 +179,7 @@ trait SparkDqEngine extends DqEngine {
             if (recordTmsts.size > 0) {
               val recordsDf = sqlContext.table(s"`${originName}`")
               val records = recordsDf.flatMap { row =>
-                val tmst = row.getAs[Long](InternalColumns.tmst)
+                val tmst = getTmst(row, defTmst)
                 if (recordTmsts.contains(tmst)) {
                   try {
                     val map = SparkRowFormatter.formatRow(row)
@@ -186,7 +195,7 @@ trait SparkDqEngine extends DqEngine {
           }
           case _ => {
             val records = stepDf.flatMap { row =>
-              val tmst = row.getAs[Long](InternalColumns.tmst)
+              val tmst = getTmst(row, defTmst)
               try {
                 val map = SparkRowFormatter.formatRow(row)
                 val str = JsonUtil.toJson(map)

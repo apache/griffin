@@ -47,6 +47,14 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
   }
 
   /**
+    * -- distinctness clauses --
+    * <distinctness-clauses> = <expr> [, <expr>]+
+    */
+  def distinctnessClause: Parser[DistinctnessClause] = rep1sep(expression, Operator.COMMA) ^^ {
+    case exprs => DistinctnessClause(exprs)
+  }
+
+  /**
     * -- timeliness clauses --
     * <timeliness-clauses> = <expr> [, <expr>]+
     */
@@ -59,6 +67,7 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
       case AccuracyType => logicalExpression
       case ProfilingType => profilingClause
       case UniquenessType => uniquenessClause
+      case DistinctnessType => distinctnessClause
       case TimelinessType => timelinessClause
       case _ => expression
     }
