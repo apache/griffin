@@ -97,18 +97,22 @@ public class DataConnector extends AbstractAuditableEntity {
         return config;
     }
 
-
     @JsonProperty("data.unit")
     public String getDataUnit() {
-        if (dataUnit != null) {
-            return dataUnit;
-        }
-        return defaultDataUnit;
+        return dataUnit;
     }
 
     @JsonProperty("data.unit")
     public void setDataUnit(String dataUnit) {
         this.dataUnit = dataUnit;
+    }
+
+    public String getDefaultDataUnit() {
+        return defaultDataUnit;
+    }
+
+    public void setDefaultDataUnit(String defaultDataUnit) {
+        this.defaultDataUnit = defaultDataUnit;
     }
 
     public String getName() {
@@ -150,6 +154,13 @@ public class DataConnector extends AbstractAuditableEntity {
         this.config = config;
         this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
         });
+    }
+
+    public DataConnector(String name, String dataUnit, Map configMap,List<SegmentPredicate> predicates) throws IOException {
+        this.name = name;
+        this.dataUnit = dataUnit;
+        this.configMap = configMap;
+        this.predicates = predicates;
     }
 
     @Override

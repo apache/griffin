@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure;
+package org.apache.griffin.core.util;
 
 
 import org.apache.griffin.core.measure.entity.*;
@@ -29,7 +29,7 @@ import org.quartz.impl.JobDetailImpl;
 import java.io.Serializable;
 import java.util.*;
 
-public class MeasureTestHelper {
+public class EntityHelper {
     public static GriffinMeasure createATestGriffinMeasure(String name, String org) throws Exception {
         HashMap<String, String> configMap1 = new HashMap<>();
         configMap1.put("database", "default");

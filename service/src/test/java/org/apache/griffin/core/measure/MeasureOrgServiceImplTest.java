@@ -31,8 +31,8 @@
 //import java.io.Serializable;
 //import java.util.*;
 //
-//import static org.apache.griffin.core.measure.MeasureTestHelper.createATestGriffinMeasure;
-//import static org.apache.griffin.core.measure.MeasureTestHelper.createJobDetailMap;
+//import static org.apache.griffin.core.util.EntityHelper.createATestGriffinMeasure;
+//import static org.apache.griffin.core.util.EntityHelper.createJobDetailMap;
 //import static org.assertj.core.api.Assertions.assertThat;
 //import static org.mockito.BDDMockito.given;
 //import static org.mockito.Mockito.when;

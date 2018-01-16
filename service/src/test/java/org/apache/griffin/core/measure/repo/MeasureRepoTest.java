@@ -30,7 +30,7 @@
 //
 //import java.util.List;
 //
-//import static org.apache.griffin.core.measure.MeasureTestHelper.createATestGriffinMeasure;
+//import static org.apache.griffin.core.util.EntityHelper.createATestGriffinMeasure;
 //import static org.assertj.core.api.Assertions.assertThat;
 //
 //@RunWith(SpringRunner.class)
