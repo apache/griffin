@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+
 @Component("externalOperation")
 public class ExternalMeasureOperationImpl implements MeasureOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperationImpl.class);
@@ -45,18 +47,18 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
         ExternalMeasure em = (ExternalMeasure) measure;
         if (StringUtils.isBlank(em.getMetricName())) {
             LOGGER.error("Failed to create external measure {}. Its metric name is blank.", measure.getName());
-            return GriffinOperationMessage.CREATE_MEASURE_FAIL;
+            return CREATE_MEASURE_FAIL;
         }
         try {
             em.setVirtualJob(new VirtualJob());
             em = measureRepo.save(em);
             VirtualJob vj = genVirtualJob(em, em.getVirtualJob());
             jobRepo.save(vj);
-            return GriffinOperationMessage.CREATE_MEASURE_SUCCESS;
+            return CREATE_MEASURE_SUCCESS;
         } catch (Exception e) {
             LOGGER.error("Failed to create new measure {}.{}", em.getName(), e.getMessage());
         }
-        return GriffinOperationMessage.CREATE_MEASURE_FAIL;
+        return CREATE_MEASURE_FAIL;
     }
 
     @Override
@@ -64,18 +66,18 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
         ExternalMeasure latestMeasure = (ExternalMeasure) measure;
         if (StringUtils.isBlank(latestMeasure.getMetricName())) {
             LOGGER.error("Failed to create external measure {}. Its metric name is blank.", measure.getName());
-            return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
+            return UPDATE_MEASURE_FAIL;
         }
         try {
             ExternalMeasure originMeasure = measureRepo.findOne(latestMeasure.getId());
             VirtualJob vj = genVirtualJob(latestMeasure, originMeasure.getVirtualJob());
             latestMeasure.setVirtualJob(vj);
             measureRepo.save(latestMeasure);
-            return GriffinOperationMessage.UPDATE_MEASURE_SUCCESS;
+            return UPDATE_MEASURE_SUCCESS;
         } catch (Exception e) {
             LOGGER.error("Failed to update measure. {}", e.getMessage());
         }
-        return GriffinOperationMessage.UPDATE_MEASURE_FAIL;
+        return UPDATE_MEASURE_FAIL;
     }
 
     @Override
