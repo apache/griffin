@@ -116,9 +116,9 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dqEngines.runRuleSteps(calcTimeInfo, rulePlan.ruleSteps)
 
     // persist results
-    dqEngines.persistAllMetrics(calcTimeInfo, rulePlan.metricExports, persistFactory)
+    dqEngines.persistAllMetrics(rulePlan.metricExports, persistFactory)
 
-    dqEngines.persistAllRecords(calcTimeInfo, rulePlan.recordExports, persistFactory, dataSources)
+    dqEngines.persistAllRecords(rulePlan.recordExports, persistFactory, dataSources)
 //    dfs.foreach(_._2.cache())
 //
 //    dqEngines.persistAllRecords(dfs, persistFactory)
