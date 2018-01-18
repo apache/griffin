@@ -83,7 +83,7 @@ public class MeasureRepoTest {
 
     @Test
     public void testFindNameByOrganization() {
-        List<String> names = measureRepo.findNameByOrganization("org1",false);
+        List<String> names = measureRepo.findNameByOrganization("org1", false);
         assertThat(names.size()).isEqualTo(1);
     }
 

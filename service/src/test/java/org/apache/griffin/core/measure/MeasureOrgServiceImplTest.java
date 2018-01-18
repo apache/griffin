@@ -28,7 +28,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
 import static org.apache.griffin.core.util.EntityHelper.createJobDetailMap;
@@ -107,7 +110,5 @@ public class MeasureOrgServiceImplTest {
         Map map = service.getMeasureWithJobDetailsGroupByOrg(detail);
         assert map == null;
     }
-
-
 
 }

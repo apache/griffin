@@ -18,11 +18,17 @@ under the License.
 */
 package org.apache.griffin.measure.rule.plan
 
+import org.apache.griffin.measure.process.ExportMode
 import org.apache.griffin.measure.rule.dsl._
 
 case class MetricExport(name: String,
                         stepName: String,
-                        collectType: CollectType
+                        collectType: CollectType,
+                        defTimestamp: Long,
+                        mode: ExportMode
                        ) extends RuleExport {
+
+  def setDefTimestamp(t: Long): RuleExport =
+    MetricExport(name, stepName, collectType, t, mode)
 
 }

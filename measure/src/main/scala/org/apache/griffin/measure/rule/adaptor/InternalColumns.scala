@@ -27,5 +27,7 @@ object InternalColumns {
   val beginTs = "__begin_ts"
   val endTs = "__end_ts"
 
-  val columns = List[String](tmst, metric, record, empty, beginTs, endTs)
+  val distinct = "__distinct"
+
+  val columns = List[String](tmst, metric, record, empty, beginTs, endTs, distinct)
 }

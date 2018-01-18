@@ -29,50 +29,50 @@ Measures consists of batch measure and streaming measure. This document is for t
 
   "data.sources": [
     {
-      "name": "src",
+      "name": "source",
+      "baseline": true,
       "connectors": [
         {
           "type": "avro",
           "version": "1.7",
           "config": {
-            "file.name": "users_info_src.avro"
+            "file.name": "src/test/resources/users_info_src.avro"
           }
         }
       ]
     }, {
-      "name": "tgt",
+      "name": "target",
       "connectors": [
         {
           "type": "avro",
           "version": "1.7",
           "config": {
-            "file.name": "users_info_target.avro"
+            "file.name": "src/test/resources/users_info_target.avro"
           }
         }
       ]
     }
   ],
 
-  "evaluateRule": {
+  "evaluate.rule": {
     "rules": [
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "accuracy",
-        "rule": "src.user_id = tgt.user_id AND upper(src.first_name) = upper(tgt.first_name) AND src.last_name = tgt.last_name",
+        "name": "accu",
+        "rule": "source.user_id = target.user_id AND upper(source.first_name) = upper(target.first_name) AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code",
         "details": {
-          "source": "src",
-          "target": "tgt",
-          "miss.records": {
-            "name": "miss.records",
-            "persist.type": "record"
-          },
-          "accuracy": {
-            "name": "accu",
-            "persist.type": "metric"
-          },
+          "source": "source",
+          "target": "target",
           "miss": "miss_count",
           "total": "total_count",
           "matched": "matched_count"
+        },
+        "metric": {
+          "name": "accu"
+        },
+        "record": {
+          "name": "missRecords"
         }
       }
     ]
@@ -92,7 +92,7 @@ The miss records of source will be persisted as record.
 ## Batch Profiling Sample
 ```
 {
-  "name": "prof_batch_test",
+  "name": "prof_batch",
 
   "process.type": "batch",
 
@@ -101,29 +101,35 @@ The miss records of source will be persisted as record.
       "name": "source",
       "connectors": [
         {
-          "type": "hive",
-          "version": "1.2",
+          "type": "avro",
+          "version": "1.7",
           "config": {
-          	"database": "griffin",
-          	"table.name": "demo_src"
+            "file.name": "src/test/resources/users_info_src.avro"
           }
         }
       ]
     }
   ],
 
-  "evaluateRule": {
+  "evaluate.rule": {
     "rules": [
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "rule": "country, country.count() as cnt group by country order by cnt desc limit 3",
-        "details": {
-          "source": "source",
-          "profiling": {
-            "name": "cntry-group",
-            "persist.type": "metric"
-          }
+        "name": "prof",
+        "rule": "select count(*) as `cnt`, count(distinct `post_code`) as `dis-cnt`, max(user_id) as `max` from source",
+        "metric": {
+          "name": "prof"
+        }
+      },
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "name": "grp",
+        "rule": "select post_code as `pc`, count(*) as `cnt` from source group by post_code",
+        "metric": {
+          "name": "post_group",
+          "collect.type": "array"
         }
       }
     ]

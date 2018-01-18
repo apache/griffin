@@ -26,16 +26,13 @@ import org.apache.griffin.core.measure.entity.*;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
 import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 import java.io.IOException;
 import java.util.*;
 
-import static org.apache.griffin.core.job.JobInstance.MEASURE_KEY;
-import static org.apache.griffin.core.job.JobInstance.PREDICATES_KEY;
-import static org.apache.griffin.core.job.JobInstance.PREDICATE_JOB_NAME;
+import static org.apache.griffin.core.job.JobInstance.*;
 import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.griffin.core.job.JobServiceImpl.JOB_SCHEDULE_ID;
 import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_NAME;
@@ -47,9 +44,9 @@ public class EntityHelper {
         return createGriffinMeasure(name, dcSource, dcTarget);
     }
 
-    public static GriffinMeasure createGriffinMeasure(String name,SegmentPredicate srcPredicate,SegmentPredicate tgtPredicate) throws Exception {
-        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#",srcPredicate);
-        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#",tgtPredicate);
+    public static GriffinMeasure createGriffinMeasure(String name, SegmentPredicate srcPredicate, SegmentPredicate tgtPredicate) throws Exception {
+        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#", srcPredicate);
+        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#", tgtPredicate);
         return createGriffinMeasure(name, dcSource, dcTarget);
     }
 
@@ -74,7 +71,8 @@ public class EntityHelper {
         config.put("where", where);
         return new DataConnector(name, "1h", config, null);
     }
-    public static DataConnector createDataConnector(String name, String database, String table, String where,SegmentPredicate predicate) throws IOException {
+
+    public static DataConnector createDataConnector(String name, String database, String table, String where, SegmentPredicate predicate) throws IOException {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);
@@ -99,9 +97,9 @@ public class EntityHelper {
         return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
     }
 
-    public static JobSchedule createJobSchedule(String jobName,SegmentRange range) throws JsonProcessingException {
-        JobDataSegment segment1 = createJobDataSegment("source_name", true,range);
-        JobDataSegment segment2 = createJobDataSegment("target_name", false,range);
+    public static JobSchedule createJobSchedule(String jobName, SegmentRange range) throws JsonProcessingException {
+        JobDataSegment segment1 = createJobDataSegment("source_name", true, range);
+        JobDataSegment segment2 = createJobDataSegment("target_name", false, range);
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
@@ -115,9 +113,10 @@ public class EntityHelper {
         return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
     }
 
-    public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline,SegmentRange range) {
-        return new JobDataSegment(dataConnectorName, baseline,range);
+    public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline, SegmentRange range) {
+        return new JobDataSegment(dataConnectorName, baseline, range);
     }
+
     public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline) {
         return new JobDataSegment(dataConnectorName, baseline);
     }
@@ -131,7 +130,7 @@ public class EntityHelper {
         return jobBean;
     }
 
-    public static JobDetailImpl createJobDetail(String measureJson,String predicatesJson) {
+    public static JobDetailImpl createJobDetail(String measureJson, String predicatesJson) {
         JobDetailImpl jobDetail = new JobDetailImpl();
         JobKey jobKey = new JobKey("name", "group");
         jobDetail.setKey(jobKey);
@@ -162,7 +161,7 @@ public class EntityHelper {
         return detail;
     }
 
-    public static SimpleTrigger createSimpleTrigger(int repeatCount,int triggerCount) {
+    public static SimpleTrigger createSimpleTrigger(int repeatCount, int triggerCount) {
         SimpleTriggerImpl trigger = new SimpleTriggerImpl();
         trigger.setRepeatCount(repeatCount);
         trigger.setTimesTriggered(triggerCount);

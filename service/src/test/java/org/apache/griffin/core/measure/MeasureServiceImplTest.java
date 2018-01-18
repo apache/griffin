@@ -34,7 +34,6 @@ import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -47,12 +46,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.apache.griffin.core.util.EntityHelper.createDataConnector;
-import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityHelper.*;
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
-import static org.assertj.core.api.Assertions.anyOf;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 
@@ -107,8 +102,8 @@ public class MeasureServiceImplTest {
         Measure measure = createGriffinMeasure("view_item_hourly");
         given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
         List<Measure> measures = service.getAllAliveMeasures();
-        assertEquals(measures.size(),1);
-        assertEquals(measures.get(0).getName(),"view_item_hourly");
+        assertEquals(measures.size(), 1);
+        assertEquals(measures.get(0).getName(), "view_item_hourly");
     }
 
     @Test
@@ -181,7 +176,7 @@ public class MeasureServiceImplTest {
 
     @Test
     public void testDeleteMeasuresByIdForFailureWithNotFound() throws Exception {
-        given(measureRepo.findByIdAndDeleted(1L,false)).willReturn(null);
+        given(measureRepo.findByIdAndDeleted(1L, false)).willReturn(null);
         GriffinOperationMessage message = service.deleteMeasureById(1L);
         assertEquals(message, RESOURCE_NOT_FOUND);
     }
@@ -199,7 +194,7 @@ public class MeasureServiceImplTest {
     public void testCreateMeasureForGriffinFailureWithConnectorExist() throws Exception {
         String measureName = "view_item_hourly";
         GriffinMeasure measure = createGriffinMeasure(measureName);
-        DataConnector dc =new DataConnector("source_name", "1h", "1.2", null);
+        DataConnector dc = new DataConnector("source_name", "1h", "1.2", null);
         given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
         given(dataConnectorRepo.findByConnectorNames(Arrays.asList("source_name", "target_name"))).willReturn(Arrays.asList(dc));
         GriffinOperationMessage message = service.createMeasure(measure);
@@ -211,7 +206,7 @@ public class MeasureServiceImplTest {
         String measureName = "view_item_hourly";
         DataConnector dcSource = createDataConnector(null, "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
         DataConnector dcTarget = createDataConnector(null, "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
-        GriffinMeasure measure = createGriffinMeasure(measureName,dcSource,dcTarget);
+        GriffinMeasure measure = createGriffinMeasure(measureName, dcSource, dcTarget);
         given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
         GriffinOperationMessage message = service.createMeasure(measure);
         assertEquals(message, CREATE_MEASURE_FAIL);

@@ -111,4 +111,12 @@ public class GriffinMeasure extends Measure {
         this.evaluateRule = evaluateRule;
     }
 
+    public GriffinMeasure(Long measureId,String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+        this.setId(measureId);
+        this.name = name;
+        this.owner = owner;
+        this.dataSources = dataSources;
+        this.evaluateRule = evaluateRule;
+    }
+
 }

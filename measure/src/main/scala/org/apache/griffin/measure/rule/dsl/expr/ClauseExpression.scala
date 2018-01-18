@@ -227,6 +227,14 @@ case class UniquenessClause(exprs: Seq[Expr]) extends ClauseExpression {
   override def map(func: (Expr) => Expr): UniquenessClause = UniquenessClause(exprs.map(func(_)))
 }
 
+case class DistinctnessClause(exprs: Seq[Expr]) extends ClauseExpression {
+  addChildren(exprs)
+
+  def desc: String = exprs.map(_.desc).mkString(", ")
+  def coalesceDesc: String = exprs.map(_.coalesceDesc).mkString(", ")
+  override def map(func: (Expr) => Expr): DistinctnessClause = DistinctnessClause(exprs.map(func(_)))
+}
+
 case class TimelinessClause(exprs: Seq[Expr]) extends ClauseExpression {
   addChildren(exprs)
 
