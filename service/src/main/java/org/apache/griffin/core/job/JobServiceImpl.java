@@ -144,24 +144,20 @@ public class JobServiceImpl implements JobService {
     public GriffinOperationMessage addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
-        if (measure != null && addJob(js, measure)) {
+        if (measure != null) {
+            String qName = getQuartzName(js);
+            String qGroup = getQuartzGroupName();
+            TriggerKey triggerKey = triggerKey(qName, qGroup);
+            if (!isJobScheduleParamValid(js, measure) || factory.getObject().checkExists(triggerKey)) {
+                return CREATE_JOB_FAIL;
+            }
+            GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
+            job = jobRepo.save(job);
+            js = jobScheduleRepo.save(js);
+            addJob(triggerKey, js, job);
             return CREATE_JOB_SUCCESS;
         }
         return CREATE_JOB_FAIL;
-    }
-
-    private boolean addJob(JobSchedule js, GriffinMeasure measure) throws Exception {
-        String qName = getQuartzName(js);
-        String qGroup = getQuartzGroupName();
-        TriggerKey triggerKey = triggerKey(qName, qGroup);
-        if (!isJobScheduleParamValid(js, measure) || factory.getObject().checkExists(triggerKey)) {
-            return false;
-        }
-        GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
-        jobRepo.save(job);
-        js = jobScheduleRepo.save(js);
-        addJob(triggerKey, js, job);
-        return true;
     }
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
