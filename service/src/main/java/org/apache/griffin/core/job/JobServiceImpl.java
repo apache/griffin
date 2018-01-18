@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -62,8 +63,8 @@ import static org.quartz.TriggerKey.triggerKey;
 @Service
 public class JobServiceImpl implements JobService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
-    static final String JOB_SCHEDULE_ID = "jobScheduleId";
-    static final String GRIFFIN_JOB_ID = "griffinJobId";
+    public static final String JOB_SCHEDULE_ID = "jobScheduleId";
+    public static final String GRIFFIN_JOB_ID = "griffinJobId";
     static final int MAX_PAGE_SIZE = 1024;
     static final int DEFAULT_PAGE_SIZE = 10;
 
@@ -143,24 +144,20 @@ public class JobServiceImpl implements JobService {
     public GriffinOperationMessage addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
-        if (measure != null && addJob(js, measure)) {
+        if (measure != null) {
+            String qName = getQuartzName(js);
+            String qGroup = getQuartzGroupName();
+            TriggerKey triggerKey = triggerKey(qName, qGroup);
+            if (!isJobScheduleParamValid(js, measure) || factory.getObject().checkExists(triggerKey)) {
+                return CREATE_JOB_FAIL;
+            }
+            GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
+            job = jobRepo.save(job);
+            js = jobScheduleRepo.save(js);
+            addJob(triggerKey, js, job);
             return CREATE_JOB_SUCCESS;
         }
         return CREATE_JOB_FAIL;
-    }
-
-    private boolean addJob(JobSchedule js, GriffinMeasure measure) throws Exception {
-        String qName = getQuartzName(js);
-        String qGroup = getQuartzGroupName();
-        TriggerKey triggerKey = triggerKey(qName, qGroup);
-        if (!isJobScheduleParamValid(js, measure) || factory.getObject().checkExists(triggerKey)) {
-            return false;
-        }
-        GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
-        jobRepo.save(job);
-        jobScheduleRepo.save(js);
-        addJob(triggerKey, js, job);
-        return true;
     }
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
@@ -185,7 +182,7 @@ public class JobServiceImpl implements JobService {
             return false;
         }
         List<String> names = getConnectorNames(measure);
-        return isConnectorNamesValid(js.getSegments(), names);
+        return names != null && isConnectorNamesValid(js.getSegments(), names);
     }
 
     private boolean isJobNameValid(String jobName) {
@@ -212,10 +209,17 @@ public class JobServiceImpl implements JobService {
     }
 
     private boolean isConnectorNamesValid(List<JobDataSegment> segments, List<String> names) {
+        Set<String> dcSets = new HashSet<>();
         for (JobDataSegment segment : segments) {
-            if (!isConnectorNameValid(segment.getDataConnectorName(), names)) {
+            String dcName = segment.getDataConnectorName();
+            dcSets.add(dcName);
+            if (!isConnectorNameValid(dcName, names)) {
                 return false;
             }
+        }
+        if (dcSets.size() < segments.size()) {
+            LOGGER.warn("Connector names in job data segment cannot be repeated.");
+            return false;
         }
         return true;
     }
@@ -239,11 +243,11 @@ public class JobServiceImpl implements JobService {
                 sets.add(dc.getName());
             });
         }
-        names.addAll(sets);
-        if (names.size() < sets.size()) {
-            LOGGER.error("Connector names cannot be repeated.");
-            throw new IllegalArgumentException();
+        if (sets.size() < sources.size()) {
+            LOGGER.warn("Connector names cannot be repeated.");
+            return null;
         }
+        names.addAll(sets);
         return names;
     }
 
@@ -283,8 +287,9 @@ public class JobServiceImpl implements JobService {
 
 
     private void setJobDataMap(JobDetail jd, JobSchedule js, GriffinJob job) {
-        jd.getJobDataMap().put(JOB_SCHEDULE_ID, js.getId().toString());
-        jd.getJobDataMap().put(GRIFFIN_JOB_ID, job.getId().toString());
+        JobDataMap jobDataMap = jd.getJobDataMap();
+        jobDataMap.put(JOB_SCHEDULE_ID, js.getId().toString());
+        jobDataMap.put(GRIFFIN_JOB_ID, job.getId().toString());
     }
 
     private boolean pauseJob(List<JobInstanceBean> instances) {
@@ -402,7 +407,7 @@ public class JobServiceImpl implements JobService {
     private boolean deleteJob(String group, String name) throws SchedulerException {
         Scheduler scheduler = factory.getObject();
         JobKey jobKey = new JobKey(name, group);
-        if (scheduler.checkExists(jobKey)) {
+        if (!scheduler.checkExists(jobKey)) {
             LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
             return true;
         }
@@ -423,10 +428,11 @@ public class JobServiceImpl implements JobService {
             LOGGER.info("Measure id {} has no related jobs.", measureId);
             return true;
         }
+        boolean status = true;
         for (GriffinJob job : jobs) {
-            deleteJob(job);
+            status = status && deleteJob(job);
         }
-        return true;
+        return status;
     }
 
     @Override
@@ -444,12 +450,13 @@ public class JobServiceImpl implements JobService {
 
     @Scheduled(fixedDelayString = "${jobInstance.expired.milliseconds}")
     public void deleteExpiredJobInstance() {
-        List<JobInstanceBean> instances = jobInstanceRepo.findByExpireTmsLessThanEqual(System.currentTimeMillis());
+        Long timeMills = System.currentTimeMillis();
+        List<JobInstanceBean> instances = jobInstanceRepo.findByExpireTmsLessThanEqual(timeMills);
         if (!pauseJob(instances)) {
             LOGGER.error("Pause job failure.");
             return;
         }
-        jobInstanceRepo.deleteByExpireTimestamp(System.currentTimeMillis());
+        jobInstanceRepo.deleteByExpireTimestamp(timeMills);
         LOGGER.info("Delete expired job instances success.");
     }
 
@@ -484,6 +491,8 @@ public class JobServiceImpl implements JobService {
             LOGGER.error("Job instance json converts to map failed. {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             LOGGER.error("Livy status is illegal. {}", e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("Sync job instances failure. {}",e.getMessage());
         }
     }
 
@@ -498,6 +507,7 @@ public class JobServiceImpl implements JobService {
                 instance.setAppUri(appUri);
             }
             jobInstanceRepo.save(instance);
+
         }
 
     }
