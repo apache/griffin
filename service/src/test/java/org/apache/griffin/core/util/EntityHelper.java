@@ -20,29 +20,42 @@ under the License.
 package org.apache.griffin.core.util;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.measure.entity.*;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.quartz.JobDataMap;
+import org.quartz.JobKey;
+import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
-import java.io.Serializable;
+import java.io.IOException;
 import java.util.*;
 
+import static org.apache.griffin.core.job.JobInstance.MEASURE_KEY;
+import static org.apache.griffin.core.job.JobInstance.PREDICATES_KEY;
+import static org.apache.griffin.core.job.JobInstance.PREDICATE_JOB_NAME;
+import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
+import static org.apache.griffin.core.job.JobServiceImpl.JOB_SCHEDULE_ID;
+import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_NAME;
+
 public class EntityHelper {
-    public static GriffinMeasure createATestGriffinMeasure(String name, String org) throws Exception {
-        HashMap<String, String> configMap1 = new HashMap<>();
-        configMap1.put("database", "default");
-        configMap1.put("table.name", "test_data_src");
-        HashMap<String, String> configMap2 = new HashMap<>();
-        configMap2.put("database", "default");
-        configMap2.put("table.name", "test_data_tgt");
-        String configJson1 = new ObjectMapper().writeValueAsString(configMap1);
-        String configJson2 = new ObjectMapper().writeValueAsString(configMap2);
+    public static GriffinMeasure createGriffinMeasure(String name) throws Exception {
+        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
+        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
+        return createGriffinMeasure(name, dcSource, dcTarget);
+    }
 
-        DataSource dataSource = new DataSource("source", Arrays.asList(new DataConnector("source_name", "HIVE", "1.2", configJson1)));
-        DataSource targetSource = new DataSource("target", Arrays.asList(new DataConnector("target-name", "HIVE", "1.2", configJson2)));
+    public static GriffinMeasure createGriffinMeasure(String name,SegmentPredicate srcPredicate,SegmentPredicate tgtPredicate) throws Exception {
+        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#",srcPredicate);
+        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#",tgtPredicate);
+        return createGriffinMeasure(name, dcSource, dcTarget);
+    }
 
+    public static GriffinMeasure createGriffinMeasure(String name, DataConnector dcSource, DataConnector dcTarget) throws Exception {
+        DataSource dataSource = new DataSource("source", Arrays.asList(dcSource));
+        DataSource targetSource = new DataSource("target", Arrays.asList(dcTarget));
         List<DataSource> dataSources = new ArrayList<>();
         dataSources.add(dataSource);
         dataSources.add(targetSource);
@@ -51,39 +64,110 @@ public class EntityHelper {
         map.put("detail", "detail info");
         Rule rule = new Rule("griffin-dsl", "accuracy", rules, map);
         EvaluateRule evaluateRule = new EvaluateRule(Arrays.asList(rule));
-        return new GriffinMeasure(1L,name, "description", org, "batch", "test", dataSources, evaluateRule);
+        return new GriffinMeasure(name, "test", dataSources, evaluateRule);
     }
 
-    public static JobDetailImpl createJobDetail() {
+    public static DataConnector createDataConnector(String name, String database, String table, String where) throws IOException {
+        HashMap<String, String> config = new HashMap<>();
+        config.put("database", database);
+        config.put("table.name", table);
+        config.put("where", where);
+        return new DataConnector(name, "1h", config, null);
+    }
+    public static DataConnector createDataConnector(String name, String database, String table, String where,SegmentPredicate predicate) throws IOException {
+        HashMap<String, String> config = new HashMap<>();
+        config.put("database", database);
+        config.put("table.name", table);
+        config.put("where", where);
+        return new DataConnector(name, "1h", config, Arrays.asList(predicate));
+    }
+
+    public static ExternalMeasure createExternalMeasure(String name) {
+        return new ExternalMeasure(name, "description", "org", "test", "metricName", new VirtualJob());
+    }
+
+    public static JobSchedule createJobSchedule() throws JsonProcessingException {
+        return createJobSchedule("jobName");
+    }
+
+    public static JobSchedule createJobSchedule(String jobName) throws JsonProcessingException {
+        JobDataSegment segment1 = createJobDataSegment("source_name", true);
+        JobDataSegment segment2 = createJobDataSegment("target_name", false);
+        List<JobDataSegment> segments = new ArrayList<>();
+        segments.add(segment1);
+        segments.add(segment2);
+        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+    }
+
+    public static JobSchedule createJobSchedule(String jobName,SegmentRange range) throws JsonProcessingException {
+        JobDataSegment segment1 = createJobDataSegment("source_name", true,range);
+        JobDataSegment segment2 = createJobDataSegment("target_name", false,range);
+        List<JobDataSegment> segments = new ArrayList<>();
+        segments.add(segment1);
+        segments.add(segment2);
+        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+    }
+
+    public static JobSchedule createJobSchedule(String jobName, JobDataSegment source, JobDataSegment target) throws JsonProcessingException {
+        List<JobDataSegment> segments = new ArrayList<>();
+        segments.add(source);
+        segments.add(target);
+        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+    }
+
+    public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline,SegmentRange range) {
+        return new JobDataSegment(dataConnectorName, baseline,range);
+    }
+    public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline) {
+        return new JobDataSegment(dataConnectorName, baseline);
+    }
+
+    public static JobInstanceBean createJobInstance() {
+        JobInstanceBean jobBean = new JobInstanceBean();
+        jobBean.setSessionId(1L);
+        jobBean.setState(LivySessionStates.State.starting);
+        jobBean.setAppId("app_id");
+        jobBean.setTms(System.currentTimeMillis());
+        return jobBean;
+    }
+
+    public static JobDetailImpl createJobDetail(String measureJson,String predicatesJson) {
         JobDetailImpl jobDetail = new JobDetailImpl();
-        JobDataMap jobInfoMap = new JobDataMap();
-        jobInfoMap.put("triggerState", Trigger.TriggerState.NORMAL);
-        jobInfoMap.put("measureId", "1");
-        jobInfoMap.put("sourcePattern", "YYYYMMdd-HH");
-        jobInfoMap.put("targetPattern", "YYYYMMdd-HH");
-        jobInfoMap.put("jobStartTime", "1506356105876");
-        jobInfoMap.put("interval", "3000");
-        jobInfoMap.put("deleted", "false");
-        jobInfoMap.put("blockStartTimestamp", "1506634804254");
-        jobInfoMap.put("lastBlockStartTimestamp", "1506634804254");
-        jobInfoMap.put("groupName", "BA");
-        jobInfoMap.put("jobName", "jobName");
-        jobDetail.setJobDataMap(jobInfoMap);
+        JobKey jobKey = new JobKey("name", "group");
+        jobDetail.setKey(jobKey);
+        JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put(MEASURE_KEY, measureJson);
+        jobDataMap.put(PREDICATES_KEY, predicatesJson);
+        jobDataMap.put(JOB_NAME, "jobName");
+        jobDataMap.put(PREDICATE_JOB_NAME, "predicateJobName");
+        jobDataMap.put(JOB_SCHEDULE_ID, 1L);
+        jobDataMap.put(GRIFFIN_JOB_ID, 1L);
+        jobDetail.setJobDataMap(jobDataMap);
         return jobDetail;
     }
 
-    public static Map<String, Object> createJobDetailMap() {
-        Map<String, Object> jobDetailMap = new HashMap<>();
-        jobDetailMap.put("jobName", "jobName");
-        jobDetailMap.put("measureId", "1");
-        jobDetailMap.put("groupName", "BA");
-        jobDetailMap.put("targetPattern", "YYYYMMdd-HH");
-        jobDetailMap.put("triggerState", Trigger.TriggerState.NORMAL);
-        jobDetailMap.put("nextFireTime", "1509613440000");
-        jobDetailMap.put("previousFireTime", "1509613410000");
-        jobDetailMap.put("interval", "3000");
-        jobDetailMap.put("sourcePattern", "YYYYMMdd-HH");
-        jobDetailMap.put("jobStartTime", "1506356105876");
-        return jobDetailMap;
+    public static SegmentPredicate createFileExistPredicate() throws JsonProcessingException {
+        Map<String, String> config = new HashMap<>();
+        config.put("root.path", "hdfs:///griffin/demo_src");
+        config.put("path", "/dt=#YYYYMMdd#/hour=#HH#/_DONE");
+        return new SegmentPredicate("file.exist", config);
     }
+
+    public static Map<String, Object> createJobDetailMap() {
+        Map<String, Object> detail = new HashMap<>();
+        detail.put("jobId", 1L);
+        detail.put("jobName", "jobName");
+        detail.put("measureId", 1L);
+        detail.put("cronExpression", "0 0/4 * * * ?");
+        return detail;
+    }
+
+    public static SimpleTrigger createSimpleTrigger(int repeatCount,int triggerCount) {
+        SimpleTriggerImpl trigger = new SimpleTriggerImpl();
+        trigger.setRepeatCount(repeatCount);
+        trigger.setTimesTriggered(triggerCount);
+        trigger.setPreviousFireTime(new Date());
+        return trigger;
+    }
+
 }

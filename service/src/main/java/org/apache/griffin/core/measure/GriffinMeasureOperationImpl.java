@@ -77,14 +77,19 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
     }
 
     @Override
-    public Boolean delete(Measure measure) {
-        boolean pauseStatus = jobService.deleteJobsRelateToMeasure(measure.getId());
-        if (!pauseStatus) {
-            return false;
+    public GriffinOperationMessage delete(Measure measure) {
+        try {
+            boolean pauseStatus = jobService.deleteJobsRelateToMeasure(measure.getId());
+            if (!pauseStatus) {
+                return DELETE_MEASURE_BY_ID_FAIL;
+            }
+            measure.setDeleted(true);
+            measureRepo.save(measure);
+            return DELETE_MEASURE_BY_ID_SUCCESS;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
         }
-        measure.setDeleted(true);
-        measureRepo.save(measure);
-        return true;
+        return DELETE_MEASURE_BY_ID_FAIL;
     }
 
     private boolean isConnectorNamesValid(GriffinMeasure measure) {

@@ -35,7 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.*;
 
-import static org.apache.griffin.core.util.EntityHelper.createATestGriffinMeasure;
+import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
@@ -60,7 +60,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testGetAllMeasures() throws Exception {
-        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
+        Measure measure = createGriffinMeasure("view_item_hourly");
         given(service.getAllAliveMeasures()).willReturn(Arrays.asList(measure));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures"))
@@ -71,7 +71,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testGetMeasuresById() throws Exception {
-        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
+        Measure measure = createGriffinMeasure("view_item_hourly");
         given(service.getMeasureById(1L)).willReturn(measure);
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures/1"))
@@ -109,7 +109,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForSuccess() throws Exception {
-        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
+        Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
         given(service.updateMeasure(measure)).willReturn(UPDATE_MEASURE_SUCCESS);
 
@@ -121,7 +121,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForNotFound() throws Exception {
-        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
+        Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
         given(service.updateMeasure(measure)).willReturn(RESOURCE_NOT_FOUND);
 
@@ -134,7 +134,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testUpdateMeasureForFail() throws Exception {
-        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
+        Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
         given(service.updateMeasure(measure)).willReturn(UPDATE_MEASURE_FAIL);
 
@@ -148,7 +148,7 @@ public class MeasureControllerTest {
     public void testGetAllMeasuresByOwner() throws Exception {
         String owner = "test";
         List<Measure> measureList = new LinkedList<>();
-        Measure measure = createATestGriffinMeasure("view_item_hourly", owner);
+        Measure measure = createGriffinMeasure("view_item_hourly");
         measureList.add(measure);
         given(service.getAliveMeasuresByOwner(owner)).willReturn(measureList);
 
@@ -161,7 +161,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForSuccess() throws Exception {
-        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
+        Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
         given(service.createMeasure(measure)).willReturn(CREATE_MEASURE_SUCCESS);
 
@@ -173,7 +173,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
-        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
+        Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
         given(service.createMeasure(measure)).willReturn(CREATE_MEASURE_FAIL_DUPLICATE);
 
@@ -185,7 +185,7 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForFailWithSaveException() throws Exception {
-        Measure measure = createATestGriffinMeasure("view_item_hourly", "test");
+        Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
         given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL);
 

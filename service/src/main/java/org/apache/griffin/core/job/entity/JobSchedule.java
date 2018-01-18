@@ -30,11 +30,7 @@ import org.apache.griffin.core.util.PropertiesUtil;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -155,7 +151,7 @@ public class JobSchedule extends AbstractAuditableEntity {
      */
     private Map<String, Object> defaultPredicatesConfig() throws JsonProcessingException {
         String path = "/application.properties";
-        Properties appConf = PropertiesUtil.getProperties(path,new ClassPathResource(path));
+        Properties appConf = PropertiesUtil.getProperties(path, new ClassPathResource(path));
         Map<String, Object> scheduleConf = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
         map.put("interval", appConf.getProperty("predicate.job.interval"));
@@ -176,7 +172,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     public JobSchedule() throws JsonProcessingException {
     }
 
-    public JobSchedule(Long measureId, String jobName, String cronExpression,String timeZone, List<JobDataSegment> segments) throws JsonProcessingException {
+    public JobSchedule(Long measureId, String jobName, String cronExpression, String timeZone, List<JobDataSegment> segments) throws JsonProcessingException {
         this.measureId = measureId;
         this.jobName = jobName;
         this.cronExpression = cronExpression;

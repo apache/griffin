@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 

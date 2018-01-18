@@ -81,17 +81,17 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
     }
 
     @Override
-    public Boolean delete(Measure measure) {
+    public GriffinOperationMessage delete(Measure measure) {
         try {
             ExternalMeasure em = (ExternalMeasure) measure;
             em.setDeleted(true);
             em.getVirtualJob().setDeleted(true);
             measureRepo.save(em);
-            return true;
+            return DELETE_MEASURE_BY_ID_SUCCESS;
         } catch (Exception e) {
             LOGGER.error("Failed to delete measure. {}", e.getMessage());
         }
-        return false;
+        return DELETE_MEASURE_BY_ID_FAIL;
 
     }
 

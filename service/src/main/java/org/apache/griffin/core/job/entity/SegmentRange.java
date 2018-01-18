@@ -50,4 +50,12 @@ public class SegmentRange extends AbstractAuditableEntity {
         this.length = length;
     }
 
+    public SegmentRange(String begin, String length) {
+        this.begin = begin;
+        this.length = length;
+    }
+
+    SegmentRange() {
+    }
+
 }
