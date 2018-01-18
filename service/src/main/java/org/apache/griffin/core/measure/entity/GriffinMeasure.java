@@ -104,10 +104,9 @@ public class GriffinMeasure extends Measure {
         super();
     }
 
-    public GriffinMeasure(Long measureId,String name, String description, String organization, String processType, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
-        super(name, description, organization, owner);
-        this.setId(measureId);
-        this.processType = processType;
+    public GriffinMeasure(String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+        this.name = name;
+        this.owner = owner;
         this.dataSources = dataSources;
         this.evaluateRule = evaluateRule;
     }
