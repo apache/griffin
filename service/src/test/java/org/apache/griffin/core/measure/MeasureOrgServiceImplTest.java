@@ -20,8 +20,8 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
-import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
+import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -31,6 +31,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.*;
 
 import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityHelper.createJobDetailMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -42,7 +43,7 @@ public class MeasureOrgServiceImplTest {
     private MeasureOrgServiceImpl service;
 
     @Mock
-    private MeasureRepo measureRepo;
+    private GriffinMeasureRepo measureRepo;
 
     @Test
     public void testGetOrgs() {
@@ -65,32 +66,48 @@ public class MeasureOrgServiceImplTest {
 
     @Test
     public void testGetMeasureNamesGroupByOrg() throws Exception {
-        Measure measure = createGriffinMeasure("measure");
-        List<Measure> measures = new ArrayList<>();
-        measures.add(measure);
-
-        when(measureRepo.findByDeleted(false)).thenReturn(measures);
-
+        GriffinMeasure measure = createGriffinMeasure("measure");
+        when(measureRepo.findByDeleted(false)).thenReturn(Arrays.asList(measure));
         Map<String, List<String>> map = service.getMeasureNamesGroupByOrg();
         assertThat(map.size()).isEqualTo(1);
-
     }
 
-//    @Test
-//    public void testMeasureWithJobDetailsGroupByOrg() throws Exception {
-//        Measure measure = createGriffinMeasure("measure", "org");
-//        measure.setId(1L);
-//        given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
-//
-//        Map<String, Object> jobDetail = createGriffinMeasure();
-//        List<Map<String, Object>> jobList = Arrays.asList(jobDetail);
-//        Map<String, List<Map<String, Object>>> measuresById = new HashMap<>();
-//        measuresById.put("1", jobList);
-//
-//        Map<String, Map<String, List<Map<String, Object>>>> map = service.getMeasureWithJobDetailsGroupByOrg(measuresById);
-//        assertThat(map.size()).isEqualTo(1);
-//        assertThat(map).containsKey("org");
-//        assertThat(map.get("org").get("measure")).isEqualTo(jobList);
-//    }
+    @Test
+    public void testGetMeasureNamesGroupByOrgWithNull() throws Exception {
+        when(measureRepo.findByDeleted(false)).thenReturn(null);
+        Map<String, List<String>> map = service.getMeasureNamesGroupByOrg();
+        assert map == null;
+    }
+
+    @Test
+    public void testGetMeasureWithJobDetailsGroupByOrgForSuccess() throws Exception {
+        String measureName = "measureName";
+        String measureId = "1";
+        GriffinMeasure measure = createGriffinMeasure(measureName);
+        measure.setOrganization("org");
+        measure.setId(Long.valueOf(measureId));
+        given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
+
+        Map<String, Object> jobDetail = createJobDetailMap();
+
+        List<Map<String, Object>> jobList = Arrays.asList(jobDetail);
+        Map<String, List<Map<String, Object>>> measuresById = new HashMap<>();
+        measuresById.put(measureId, jobList);
+
+        Map<String, Map<String, List<Map<String, Object>>>> map = service.getMeasureWithJobDetailsGroupByOrg(measuresById);
+        assertThat(map.size()).isEqualTo(1);
+        assertThat(map).containsKey("org");
+        assertThat(map.get("org").get(measureName)).isEqualTo(jobList);
+    }
+
+    @Test
+    public void testGetMeasureWithJobDetailsGroupByOrgForFailure() throws Exception {
+        Map detail = new HashMap();
+        given(measureRepo.findByDeleted(false)).willReturn(null);
+        Map map = service.getMeasureWithJobDetailsGroupByOrg(detail);
+        assert map == null;
+    }
+
+
 
 }

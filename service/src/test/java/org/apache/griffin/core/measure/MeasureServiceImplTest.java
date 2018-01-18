@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,6 +51,7 @@ import static org.apache.griffin.core.util.EntityHelper.createDataConnector;
 import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
 import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -105,8 +107,8 @@ public class MeasureServiceImplTest {
         Measure measure = createGriffinMeasure("view_item_hourly");
         given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
         List<Measure> measures = service.getAllAliveMeasures();
-        assertThat(measures.size()).isEqualTo(1);
-        assertThat(measures.get(0).getName()).isEqualTo("view_item_hourly");
+        assertEquals(measures.size(),1);
+        assertEquals(measures.get(0).getName(),"view_item_hourly");
     }
 
     @Test
@@ -148,12 +150,33 @@ public class MeasureServiceImplTest {
     }
 
     @Test
+    public void testDeleteMeasuresByIdForGriffinFailureWithException() throws Exception {
+        GriffinMeasure measure = createGriffinMeasure("view_item_hourly");
+        measure.setId(1L);
+        given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
+        given(jobService.deleteJobsRelateToMeasure(measure.getId())).willReturn(true);
+        given(measureRepo.save(Matchers.any(Measure.class))).willThrow(Exception.class);
+        GriffinOperationMessage message = service.deleteMeasureById(measure.getId());
+        assertEquals(message, DELETE_MEASURE_BY_ID_FAIL);
+    }
+
+    @Test
     public void testDeleteMeasuresByIdForExternalSuccess() throws Exception {
         ExternalMeasure measure = createExternalMeasure("externalMeasure");
         measure.setId(1L);
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
         GriffinOperationMessage message = service.deleteMeasureById(measure.getId());
         assertEquals(message, DELETE_MEASURE_BY_ID_SUCCESS);
+    }
+
+    @Test
+    public void testDeleteMeasuresByIdForExternalFailureWithException() throws Exception {
+        ExternalMeasure measure = createExternalMeasure("externalMeasure");
+        measure.setId(1L);
+        given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
+        given(externalMeasureRepo.save(Matchers.any(ExternalMeasure.class))).willThrow(Exception.class);
+        GriffinOperationMessage message = service.deleteMeasureById(measure.getId());
+        assertEquals(message, DELETE_MEASURE_BY_ID_FAIL);
     }
 
     @Test
@@ -195,6 +218,16 @@ public class MeasureServiceImplTest {
     }
 
     @Test
+    public void testCreateMeasureForGriffinFailureWithException() throws Exception {
+        String measureName = "view_item_hourly";
+        GriffinMeasure measure = createGriffinMeasure(measureName);
+        given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new ArrayList<>());
+        given(measureRepo.save(Matchers.any(Measure.class))).willThrow(Exception.class);
+        GriffinOperationMessage message = service.createMeasure(measure);
+        assertEquals(message, CREATE_MEASURE_FAIL);
+    }
+
+    @Test
     public void testCreateMeasureForExternalSuccess() throws Exception {
         String measureName = "view_item_hourly";
         ExternalMeasure measure = createExternalMeasure(measureName);
@@ -215,6 +248,17 @@ public class MeasureServiceImplTest {
     }
 
     @Test
+    public void testCreateMeasureForExternalFailureWithException() throws Exception {
+        String measureName = "view_item_hourly";
+        ExternalMeasure measure = createExternalMeasure(measureName);
+        given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new ArrayList<>());
+        given(externalMeasureRepo.save(measure)).willReturn(measure);
+        given(externalMeasureRepo.save(Matchers.any(ExternalMeasure.class))).willThrow(Exception.class);
+        GriffinOperationMessage message = service.createMeasure(measure);
+        assertEquals(message, CREATE_MEASURE_FAIL);
+    }
+
+    @Test
     public void testCreateMeasureForFailureWithRepeat() throws Exception {
         String measureName = "view_item_hourly";
         GriffinMeasure measure = createGriffinMeasure(measureName);
@@ -222,16 +266,6 @@ public class MeasureServiceImplTest {
         GriffinOperationMessage message = service.createMeasure(measure);
         assertEquals(message, CREATE_MEASURE_FAIL_DUPLICATE);
     }
-
-//    @Test
-//    public void testCreateNewMeasureForFailWithSaveException() throws Exception {
-//        String measureName = "view_item_hourly";
-//        Measure measure = createGriffinMeasure(measureName, "test");
-//        given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
-//        given(measureRepo.save(measure)).willReturn(null);
-//        GriffinOperationMessage message = service.createMeasure(measure);
-//        assertEquals(message, GriffinOperationMessage.CREATE_MEASURE_FAIL);
-//    }
 
 
     @Test
@@ -243,7 +277,7 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testUpdateMeasureForFailureWithDiffType() throws Exception {
+    public void testUpdateMeasureForGriffinFailureWithDiffType() throws Exception {
         Measure griffinMeasure = createGriffinMeasure("view_item_hourly");
         Measure externalMeasure = createExternalMeasure("externalName");
         given(measureRepo.findByIdAndDeleted(griffinMeasure.getId(), false)).willReturn(externalMeasure);
@@ -252,11 +286,20 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testUpdateMeasureForFailureWithNotFound() throws Exception {
+    public void testUpdateMeasureForGriffinFailureWithNotFound() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(null);
         GriffinOperationMessage message = service.updateMeasure(measure);
         assertEquals(message, RESOURCE_NOT_FOUND);
+    }
+
+    @Test
+    public void testUpdateMeasureForGriffinFailureWithException() throws Exception {
+        Measure measure = createGriffinMeasure("view_item_hourly");
+        given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
+        given(measureRepo.save(Matchers.any(Measure.class))).willThrow(Exception.class);
+        GriffinOperationMessage message = service.updateMeasure(measure);
+        assertEquals(message, UPDATE_MEASURE_FAIL);
     }
 
     @Test
@@ -278,13 +321,14 @@ public class MeasureServiceImplTest {
         assertEquals(message, UPDATE_MEASURE_FAIL);
     }
 
-//    @Test
-//    public void testUpdateMeasureForFailWithSaveException() throws Exception {
-//        Measure measure = createGriffinMeasure("view_item_hourly", "test");
-//        given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(new GriffinMeasure());
-//        given(measureRepo.save(measure)).willThrow(Exception.class);
-//        GriffinOperationMessage message = service.updateMeasure(measure);
-//        assertEquals(message, GriffinOperationMessage.UPDATE_MEASURE_FAIL);
-//    }
+    @Test
+    public void testUpdateMeasureForExternalFailWithException() throws Exception {
+        ExternalMeasure measure = createExternalMeasure("external_view_item_hourly");
+        given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
+        given(externalMeasureRepo.findOne(measure.getId())).willReturn(measure);
+        given(externalMeasureRepo.save(Matchers.any(ExternalMeasure.class))).willThrow(Exception.class);
+        GriffinOperationMessage message = service.updateMeasure(measure);
+        assertEquals(message, GriffinOperationMessage.UPDATE_MEASURE_FAIL);
+    }
 
 }

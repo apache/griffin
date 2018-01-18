@@ -17,45 +17,29 @@ specific language governing permissions and limitations
 under the License.
 */
 
+package org.apache.griffin.core.util;
 
-package org.apache.griffin.core.job.entity;
+import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
-import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
+import java.util.Properties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import static org.junit.Assert.*;
 
-@Entity
-public class SegmentRange extends AbstractAuditableEntity {
+public class PropertiesUtilTest {
 
-    @Column(name = "data_begin")
-    private String begin = "1h";
-
-    private String length = "1h";
-
-
-    public String getBegin() {
-        return begin;
+    @Test
+    public void testGetPropertiesForSuccess() {
+        String path = "/quartz.properties";
+        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
+        assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
     }
 
-    public void setBegin(String begin) {
-        this.begin = begin;
-    }
-
-    public String getLength() {
-        return length;
-    }
-
-    public void setLength(String length) {
-        this.length = length;
-    }
-
-    public SegmentRange(String begin, String length) {
-        this.begin = begin;
-        this.length = length;
-    }
-
-    SegmentRange() {
+    @Test
+    public void testGetPropertiesForFailureWithWrongPath() {
+        String path = ".././quartz.properties";
+        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
+        assertEquals(properties, null);
     }
 
 }
