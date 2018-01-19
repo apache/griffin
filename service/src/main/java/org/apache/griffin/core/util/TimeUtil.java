@@ -23,10 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.IllegalFormatException;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,7 +84,7 @@ public class TimeUtil {
         return unit.toMillis(duration);
     }
 
-    public static String format(String timeFormat, long time) {
+    public static String format(String timeFormat, long time,String timeZone) {
         String timePattern = "#(?:\\\\#|[^#])*#";
         Date t = new Date(time);
         Pattern ptn = Pattern.compile(timePattern);
@@ -98,6 +95,7 @@ public class TimeUtil {
             String content = group.substring(1, group.length() - 1);
             String pattern = refreshEscapeHashTag(content);
             SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+            sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
             matcher.appendReplacement(sb, sdf.format(t));
         }
         matcher.appendTail(sb);

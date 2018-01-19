@@ -208,7 +208,7 @@ public class JobInstance implements Job {
             String value = entry.getValue();
             Set<String> set = new HashSet<>();
             for (Long timestamp : sampleTs) {
-                set.add(TimeUtil.format(value, timestamp));
+                set.add(TimeUtil.format(value, timestamp,jobSchedule.getTimeZone()));
             }
             conf.put(entry.getKey(), StringUtils.join(set, PATH_CONNECTOR_CHARACTER));
         }

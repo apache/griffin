@@ -87,28 +87,31 @@ public class TimeUtilTest {
     public void testFormat() throws Exception {
         String format = "dt=#YYYYMMdd#";
         Long time = 1516186620155L;
-        assertEquals(TimeUtil.format(format,time),"dt=20180117");
+        String timeZone = "GMT+8:00";
+        assertEquals(TimeUtil.format(format,time,timeZone),"dt=20180117");
     }
 
     @Test
     public void testFormatWithDiff() throws Exception {
         String format = "dt=#YYYYMMdd#/hour=#HH#";
         Long time = 1516186620155L;
-        assertEquals(TimeUtil.format(format,time),"dt=20180117/hour=18");
+        String timeZone = "GMT+8:00";
+        assertEquals(TimeUtil.format(format,time,timeZone),"dt=20180117/hour=18");
     }
 
     @Test
     public void testFormatWithIllegalException() throws Exception {
         String format = "\\#YYYYMMdd\\#";
         Long time = 1516186620155L;
-        IllegalArgumentException exception = formatException(format, time);
+        String timeZone = "GMT+8:00";
+        IllegalArgumentException exception = formatException(format, time,timeZone);
         assert exception != null;
     }
 
-    private IllegalArgumentException formatException(String format,Long time) {
+    private IllegalArgumentException formatException(String format,Long time,String timeZone) {
         IllegalArgumentException exception = null;
         try {
-            TimeUtil.format(format,time);
+            TimeUtil.format(format,time,timeZone);
         } catch (IllegalArgumentException e) {
             exception = e;
         }
