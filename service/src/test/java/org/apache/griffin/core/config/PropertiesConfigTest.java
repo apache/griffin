@@ -150,7 +150,7 @@ public class PropertiesConfigTest {
     private FileNotFoundException quartzFileNotFoundException() {
         FileNotFoundException exception = null;
         try {
-            livyNotFoundConfig.livyConf();
+            quartzNotFoundConfig.livyConf();
         } catch (FileNotFoundException e) {
             exception = e;
         }
