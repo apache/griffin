@@ -24,7 +24,7 @@ under the License.
   <!--//row-->
   <div class="row">
     <!-- <form name="Form" id="form" novalidate> -->
-    <form name="Form" id="form" novalidate>
+    <form name="jobForm" id="form" (ngSubmit)="submit(jobForm)" #jobForm="ngForm" novalidate>
       <div class="formStep">
         <label class="stepDesc info">Please setup the job required information</label>
         <div class="container-fluid">
@@ -35,6 +35,19 @@ under the License.
                 Required Information
               </legend>
               <div class="y-scrollable">
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group" [ngClass]="{'has-error':jobName.dirty&&jobName.invalid, 'has-success':jobName.valid}">
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Job Name<span class="symbol required"></span>:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10 ">
+                      <input type="text" class="form-control" [(ngModel)]="jobname" name="jobName" #jobName="ngModel" placeholder="Please input the job name" required pattern="^[a-zA-Z0-9_-]*$" id="jobName">
+                      <span class="error text-small block " *ngIf="jobName.dirty && (jobName.errors?.required)">
+                        Job Name is required</span>
+                      <span class="error text-small block " *ngIf="jobName.dirty && (jobName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
+                    </div>
+                  </div>
+                </div>
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
@@ -50,10 +63,10 @@ under the License.
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Cron Expression:
+                      Cron Expression<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input class="form-control" [(ngModel)]="cronExp" name="cronExp">
+                      <input class="form-control" ngControl="name" required [(ngModel)]="cronExp" name="cronExp">
                     </div>
                   </div>
                 </div>
@@ -80,20 +93,20 @@ under the License.
                     <i class="fa fa-info-circle"></i> One step means a partition size,and {{connector.name}} partition size = {{connector.size}}
                   </p>
                   <!-- <div class="col-md-12 col-lg-12 col-sm-12"> -->
-                  <div class="col-md-11 col-lg-11 col-sm-11 center">
-                    begin :
-                    <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}" [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}" (ngModelChange)="changeRange(index,someKeyboard[i][0],i)">
-                    end :
-                    <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}" [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
-                  </div>
-                  <!-- <div>                       -->
-                  <!-- <button class="btn-info col-md-1 col-lg-1 col-sm-1" style="margin-top: 6px;" (click)="updateSliderRange()">
-                    range
-                  </button> -->
-                  <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]" (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()" (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
-                  <!-- </div>                       -->
-                  <!-- <div class="range">Range: {{ someKeyboard[i] | json }}</div> -->
-
+                    <div class="col-md-11 col-lg-11 col-sm-11 center">
+                      begin :
+                      <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}" [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}" (ngModelChange)="changeRange(index,someKeyboard[i][0],i)">
+                      end :
+                      <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}" [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
+                    </div>
+                      <!-- <div>                       -->
+                      <!-- <button class="btn-info col-md-1 col-lg-1 col-sm-1" style="margin-top: 6px;" (click)="updateSliderRange()">
+                        range 
+                      </button> -->
+                      <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]" (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()" (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
+                      <!-- </div>                       -->
+                      <!-- <div class="range">Range: {{ someKeyboard[i] | json }}</div> -->
+                    
                   <!-- </div> -->
                 </div>
               </div>

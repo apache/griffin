@@ -49,7 +49,6 @@ import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
 import { TruncatePipe} from './sidebar/truncate.pipe';
 import { ConfigurationComponent } from './measure/create-measure/configuration/configuration.component';
 import { NouisliderModule } from 'ng2-nouislider';
-import { TagInputModule } from 'ngx-chips';
 
 
 const appRoutes: Routes = [
@@ -155,8 +154,7 @@ const appRoutes: Routes = [
       {useHash: true},
     ),
     MatNativeDateModule,
-    MatDatepickerModule,
-    TagInputModule
+    MatDatepickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

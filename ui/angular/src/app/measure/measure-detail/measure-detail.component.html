@@ -93,7 +93,7 @@ under the License.
   </div>
   <!--//row-->
   <br/>
-  <div>
+  <div *ngIf="ruleData.type!=='external'">
     <h5 class="row">Mapping rules</h5>
     <div class="">
       <p *ngFor="let index of currentrule">{{index.rule}}</p>

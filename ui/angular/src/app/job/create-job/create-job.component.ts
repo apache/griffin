@@ -44,7 +44,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
-
+  
   @ViewChildren('sliderRef') sliderRefs;
   // someRange=[-20, 0];
   someKeyboard = [];
@@ -56,7 +56,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   currentStep = 1;
   Times = ['seconds','minutes','hours'];
   maskOpen = false;
-
+  
   keyupLabelOn = false;
   keydownLabelOn = false;
   periodTime :number;
@@ -65,6 +65,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   targetPat :'';
   createResult = '';
   jobStartTime : any;
+  jobname : string;
 
   Measures:object;
   measureinfo:object;
@@ -82,6 +83,9 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
 
   newJob={
     "cron.expression": "",
+    "measure.id":"",
+    "job.name": "",
+    "cron.time.zone": "",
     // "cron.time.zone": "GMT+8:00",
     // "predicate.config": {
     //   "interval": "1m",
@@ -126,7 +130,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
       this.hide();
     }
   }
-
+  
   showTime(evt){
     evt.target.nextElementSibling.style.display='';
   }
@@ -170,7 +174,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   //       this.toasterService.pop('error', 'Error!', 'Please complete the form!');
   //       return false;
   //     }
-
+      
   //     this.newJob={
   //       "sourcePattern":this.sourcePat,
   //       "targetPattern":this.targetPat,
@@ -201,11 +205,20 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   //   });
   // }
 
-  submit (jobForm){
+  submit (form){
+    if (!form.valid) {
+      this.toasterService.pop('error', 'Error!', 'Please complete the form!');
+      return false;
+    }
     this.measureid = this.getMeasureId();
+    let time = new Date().getTimezoneOffset() / 60;
+    let timezone = 'GMT' + time + ':00'; 
     this.newJob = {
+      "job.name": this.jobname,
+      "measure.id": this.measureid,
       "cron.expression": this.cronExp,
-      // "cron.time.zone": "GMT+8:00",
+      "cron.time.zone": timezone,
+      // "cron.time.zone": "GMT+8:00", 
       // "predicate.config": {
       // "interval": "1m",
       // "repeat": 2
@@ -243,7 +256,6 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     if(this.dropdownList.length == 2){
       delete this.newJob['data.segments'][1]['as.baseline'];
     }
-    console.log(this.newJob);
     this.visible = true;
     setTimeout(() => this.visibleAnimate = true, 100);
   }
@@ -253,15 +265,20 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     var datastr = date.toString();
     // var month = date.getMonth()+1;
     var timestamp = Date.parse(datastr);
-    var jobName = this.measure + '-BA-' + this.ntAccount + '-' + timestamp;
+    // var jobName = this.measure + '-BA-' + this.ntAccount + '-' + timestamp;
     var addJobs = this.serviceService.config.uri.addJobs;
-    var newJob = addJobs + '?group=' + '-BA-' + '&jobName=' + jobName + '&measureId=' + this.measureid;
     this.http
-    .post(newJob, this.newJob)
+    .post(addJobs,this.newJob)
     .subscribe(data => {
-      this.createResult = data['results'];
-      this.hide();
-      this.router.navigate(['/jobs']);
+      console.log(data['code']);
+      if(data['code'] != 205){
+        this.toasterService.pop('error','Error!','Error when creating job');
+        return false;
+      }else{
+        this.createResult = data['results'];
+        this.hide();
+        this.router.navigate(['/jobs']);
+      }
     },
     err => {
       console.log('Error when creating job');
@@ -295,10 +312,10 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     for(let index in this.Measures){
       if(this.measure == this.Measures[index].name){
         return this.Measures[index].id;
-      }
+      }     
     }
   }
-
+  
   onChange(measure){
     this.dropdownList = [];
     for(let index in this.Measures){
@@ -309,6 +326,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
         for(let i = 0;i < source.length;i++){
           var details = source[i].connectors;
           for(let j = 0;j < details.length;j++){
+            console.log(details[j]['data.unit']);
             if(details[j]['data.unit']!=undefined){
               var table = details[j].config.database+'.'+details[j].config['table.name'];
               var size = details[j]['data.unit'];
@@ -318,7 +336,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
             }
           }
         }
-      }
+      }     
     }
     for(let i = 0;i < this.dropdownList.length;i++){
       this.someKeyboard[i] = [-1,0];
@@ -330,10 +348,10 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
             'max': 0
           }
         });
-      }
-    }
+      }   
+    }       
   }
-
+  
 
   changeRange(index,value,i){
     let newRange = [];
@@ -342,7 +360,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     this.updateSliderRange(value,i);
     this.someKeyboard[i] = newRange[i];
   }
-
+  
   rangeChange(evt,i){
     var oldmin = this.sliderRefs._results[i].config.range.min;
     if((evt[0] - oldmin)<=2){
@@ -351,7 +369,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
           'min': oldmin-10,
           'max': 0
         }
-      });
+      }); 
     }
     if((evt[0] - oldmin)>=13){
       this.sliderRefs._results[i].slider.updateOptions({
@@ -359,13 +377,13 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
           'min': oldmin+10,
           'max': 0
         }
-      });
+      }); 
     }
-    this.someKeyboard[i] = evt;
+    this.someKeyboard[i] = evt; 
   }
 
   updateSliderRange(value,i){
-    // setTimeout(() => {
+    // setTimeout(() => { 
     var oldmin = this.sliderRefs._results[i].config.range.min;
     var oldmax = this.sliderRefs._results[i].config.range.max
     var newmin = Math.floor(value/10);
@@ -398,31 +416,30 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     var allModels = this.serviceService.config.uri.allModels;
     this.http.get(allModels).subscribe(data =>{
       this.Measures = data;
-      console.log(this.Measures);
     });
-//     this.Measures = [{
+//     this.Measures = [{  
 //    "name":"demo_accu",
 //    "type":"griffin",
 //    "process.type":"batch",
 //    "owner":"test",
-//    "data.sources":[
-//       {
+//    "data.sources":[  
+//       {  
 //          "name":"source",
-//          "connectors":[
-//             {
+//          "connectors":[  
+//             {  
 //                "name":"source1513317492171",
 //                "type":"HIVE",
 //                "version":"1.2",
 //                "data.unit":"2day",
-//                "config":{
+//                "config":{  
 //                   "database":"default",
 //                   "table.name":"demo_src",
 //                   "where":"dt=#YYYYMMdd# AND hour=#HH#"
 //                },
-//                "predicates":[
-//                   {
+//                "predicates":[  
+//                   {  
 //                      "type":"file.exist",
-//                      "config":{
+//                      "config":{  
 //                         "root.path":"hdfs:///griffin/demo_src",
 //                         "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
 //                      }
@@ -431,23 +448,23 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
 //             }
 //          ]
 //       },
-//       {
+//       {  
 //          "name":"target",
-//          "connectors":[
-//             {
+//          "connectors":[  
+//             {  
 //                "name":"target1513317499033",
 //                "type":"HIVE",
 //                "version":"1.2",
 //                "data.unit":"1hour",
-//                "config":{
+//                "config":{  
 //                   "database":"default",
 //                   "table.name":"demo_tgt",
 //                   "where":"dt=#YYYYMMdd# AND hour=#HH#"
 //                },
-//                "predicates":[
-//                   {
+//                "predicates":[  
+//                   {  
 //                      "type":"file.exist",
-//                      "config":{
+//                      "config":{  
 //                         "root.path":"hdfs:///griffin/demo_src",
 //                         "path":""
 //                      }
@@ -457,9 +474,9 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
 //          ]
 //       }
 //    ],
-//    "evaluateRule":{
-//       "rules":[
-//          {
+//    "evaluateRule":{  
+//       "rules":[  
+//          {  
 //             "dsl.type":"griffin-dsl",
 //             "dq.type":"accuracy",
 //             "rule":"source.id=target.id"
@@ -487,7 +504,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     }
   }
 
-
+  
   ngAfterViewChecked(){
     this.resizeWindow();
   }

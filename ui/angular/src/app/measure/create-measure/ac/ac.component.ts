@@ -68,7 +68,7 @@ class Col{
 })
 
 export class AcComponent implements OnInit , AfterViewChecked {
-
+  
   defaultValue:string;
   currentStep = 1;
   // grp = [];
@@ -133,7 +133,8 @@ export class AcComponent implements OnInit , AfterViewChecked {
   type = "accuracy";
   newMeasure = {
     "name":'',
-    "type":"griffin",
+    "measure.type":"griffin",
+    "dq.type": "accuracy",
     "process.type": "batch",
     "owner":"",
     "description":"",
@@ -142,7 +143,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     {
       "name": "source",
       "connectors": [
-        {
+        { 
           "name":"",
           "type": "HIVE",
           "version": "1.2",
@@ -190,7 +191,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     }
     ],
 
-    "evaluateRule":{
+    "evaluate.rule":{
         "rules": [
           {
             "dsl.type": "griffin-dsl",
@@ -216,7 +217,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     }
   };
   name:'';
-  evaluateRule:any;
+  // evaluate.rule:any;
   // desc:'';
   // grp:'';
   owner = 'test';
@@ -237,7 +238,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     }
   }
 
-  addMapping(x,i){
+  addMapping(x,i){   
     this.mappings[i] = x;
   }
 
@@ -282,7 +283,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
       this.matches[i] = "=";
       // this.mappings[i] = this.currentDB + '.' + this.currentTable + '.' + row.name;
     }
-
+      
   };
 
   toggleAll () {
@@ -335,7 +336,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
 
     }
     return false;
-  }
+  } 
 
   prev (form) {
     this.currentStep--;
@@ -343,7 +344,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   goTo (i) {
     this.currentStep = i;
   }
-  submit (form) {
+  submit (form) {              
       // form.$setPristine();
       // this.finalgrp = [];
       if (!form.valid) {
@@ -357,7 +358,8 @@ export class AcComponent implements OnInit , AfterViewChecked {
       var rule = '';
       this.newMeasure = {
         "name":this.name,
-        "type":"griffin",
+        "measure.type":"griffin",
+        "dq.type": "accuracy",
         "process.type": "batch",
         "owner":this.owner,
         "description":this.desc,
@@ -412,8 +414,8 @@ export class AcComponent implements OnInit , AfterViewChecked {
               }
             ]
           }
-        ],
-        "evaluateRule":{
+        ],     
+        "evaluate.rule":{
           "rules": [
             {
               "dsl.type": "griffin-dsl",
@@ -456,7 +458,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
       });
       rule = rules.join(" AND ");
       this.rules = rule;
-      this.newMeasure.evaluateRule.rules[0].rule = rule;
+      this.newMeasure['evaluate.rule'].rules[0].rule = rule;
       this.visible = true;
       setTimeout(() => this.visibleAnimate = true, 100);
   }
@@ -486,7 +488,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     idField: 'id',
     actionMapping: {
       mouse: {
-        click: (tree, node, $event) => {
+        click: (tree, node, $event) => {         
           if (node.hasChildren) {
             this.currentDB = node.data.name;
             this.currentDBstr = this.currentDB + '.';
@@ -558,18 +560,18 @@ export class AcComponent implements OnInit , AfterViewChecked {
   constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
-
+  
   onResize(event){
     this.resizeWindow();
   }
-
+  
   srcAttr(evt){
     this.srcdata = evt;
     this.currentDB = evt.database;
     this.currentTable = evt.table;
     this.selection = evt.selection;
   }
-
+  
   tgtAttr(evt){
     this.tgtdata = evt;
     this.currentDBTarget = evt.database;
@@ -590,7 +592,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     this.tgt_size = evt.num + evt.timetype;
     this.tgt_path = evt.path;
   }
-
+  
 
   resizeWindow(){
     var stepSelection = '.formStep[id=step-' + this.currentStep + ']';
@@ -603,7 +605,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
         'height': $('fieldset').height()
     });
   }
-
+    
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{

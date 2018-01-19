@@ -43,18 +43,18 @@ under the License.
         </tr>
         <tr *ngFor="let row of mf.data">
           <td><a routerLink="/measure/{{row.id}}">{{row.name}}</a></td>
-          <td>{{row.type}}</td>
+          <td>{{row["dq.type"]}}</td>
           <td>{{row.description}}</td>
           <!-- <td>{{row.group}}</td> -->
           <td>
             &nbsp;
             <!-- <a [ngClass]="(!adminAccess && ntAccount!=row.owner)?'disabled':''" href="" (click)="remove(row)" title="delete" style="text-decoration:none"> -->
             <a (click)="remove(row)" title="delete" style="text-decoration:none">
-                        <i class="fa fa-trash-o po"></i>
-                    </a> &nbsp;
+              <i class="fa fa-trash-o po"></i>
+            </a> &nbsp;
             <a routerLink="/measure/{{row.id}}" title="subscribe">
-                        <i class="fa fa-eye"></i>
-                    </a>
+              <i class="fa fa-eye"></i>
+            </a>
           </td>
         </tr>
       </tbody>

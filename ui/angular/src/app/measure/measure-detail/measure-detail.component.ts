@@ -53,18 +53,20 @@ export class MeasureDetailComponent implements OnInit {
     getModelUrl = getModel+"/"+this.currentId;
     this.http.get(getModelUrl).subscribe(data=>{
       this.ruleData = data;
-      this.currentrule = this.ruleData.evaluateRule.rules;
-      this.ruleData.type = this.currentrule[0]["dq.type"];
-      var sourcedata = this.ruleData["data.sources"][0].connectors[0].config;          
-      this.sourceDB = sourcedata.database;
-      this.sourceTable = sourcedata["table.name"];
-      if(this.ruleData.type === "accuracy"){
-        var targetdata = this.ruleData["data.sources"][1].connectors[0].config;
-        this.targetDB = targetdata.database;
-        this.targetTable = targetdata["table.name"];
-      }else{
-        this.targetDB = '';
-        this.targetTable = '';
+      this.ruleData.type = this.ruleData["dq.type"];
+      if(this.ruleData.type !== 'external'){
+        this.currentrule = this.ruleData['evaluate.rule'].rules;
+        var sourcedata = this.ruleData["data.sources"][0].connectors[0].config;          
+        this.sourceDB = sourcedata.database;
+        this.sourceTable = sourcedata["table.name"];
+        if(this.ruleData.type === "accuracy"){
+          var targetdata = this.ruleData["data.sources"][1].connectors[0].config;
+          this.targetDB = targetdata.database;
+          this.targetTable = targetdata["table.name"];
+        }else{
+          this.targetDB = '';
+          this.targetTable = '';
+        }
       }          
      },err => {
      	console.log('error');
