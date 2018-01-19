@@ -92,9 +92,9 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dataSources.foreach(_.init)
 
     // init data sources
-    val dsTmsts = dqEngines.loadData(dataSources, calcTimeInfo)
+    val dsTimeRanges = dqEngines.loadData(dataSources, calcTimeInfo)
 
-    debug(s"data source timestamps: ${dsTmsts}")
+    println(s"data source timeRanges: ${dsTimeRanges}")
 
     // generate rule steps
 //    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
@@ -103,7 +103,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //      CalcTimeInfo(appTime), userParam.evaluateRuleParam, dsTmsts)
 
     val rulePlan = RuleAdaptorGroup.genRulePlan(
-      calcTimeInfo, userParam.evaluateRuleParam, BatchProcessType)
+      calcTimeInfo, userParam.evaluateRuleParam, BatchProcessType, dsTimeRanges)
 
 //    rulePlan.ruleSteps.foreach(println)
 //    println("====")
@@ -116,11 +116,9 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dqEngines.runRuleSteps(calcTimeInfo, rulePlan.ruleSteps)
 
     // persist results
-    dqEngines.persistAllMetrics(calcTimeInfo, rulePlan.metricExports,
-      BatchProcessType, persistFactory)
+    dqEngines.persistAllMetrics(rulePlan.metricExports, persistFactory)
 
-    dqEngines.persistAllRecords(calcTimeInfo, rulePlan.recordExports,
-      BatchProcessType, persistFactory, dataSources)
+    dqEngines.persistAllRecords(rulePlan.recordExports, persistFactory, dataSources)
 //    dfs.foreach(_._2.cache())
 //
 //    dqEngines.persistAllRecords(dfs, persistFactory)

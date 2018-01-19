@@ -16,27 +16,26 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+package org.apache.griffin.measure.process.temp
 
-package org.apache.griffin.core.login;
+import scala.math.{min, max}
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+case class TimeRange(begin: Long, end: Long, tmsts: Set[Long]) extends Serializable {
+  def merge(tr: TimeRange): TimeRange = {
+    TimeRange(min(begin, tr.begin), max(end, tr.end), tmsts ++ tr.tmsts)
+  }
+}
 
-import java.util.Map;
-
-@RestController
-@RequestMapping("/api/v1/login")
-public class LoginController {
-
-    @Autowired
-    private LoginService loginService;
-
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> map) {
-        return loginService.login(map);
+object TimeRange {
+  val emptyTimeRange = TimeRange(0, 0, Set[Long]())
+  def apply(range: (Long, Long), tmsts: Set[Long]): TimeRange = TimeRange(range._1, range._2, tmsts)
+  def apply(ts: Long, tmsts: Set[Long]): TimeRange = TimeRange(ts, ts, tmsts)
+  def apply(ts: Long): TimeRange = TimeRange(ts, ts, Set[Long](ts))
+  def apply(tmsts: Set[Long]): TimeRange = {
+    try {
+      TimeRange(tmsts.min, tmsts.max, tmsts)
+    } catch {
+      case _: Throwable => emptyTimeRange
     }
+  }
 }

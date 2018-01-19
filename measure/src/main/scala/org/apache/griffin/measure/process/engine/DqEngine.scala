@@ -34,16 +34,14 @@ trait DqEngine extends Loggable with Serializable {
 
   protected def collectable(): Boolean = false
 
-  def collectMetrics(timeInfo: TimeInfo, metricExport: MetricExport, procType: ProcessType
-                    ): Map[Long, Map[String, Any]]
+  def collectMetrics(metricExport: MetricExport): Map[Long, Map[String, Any]]
 
   //  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
   //
   //  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]]
 
 //  def collectUpdateRDD(ruleStep: RuleStep): Option[DataFrame]
-  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport, procType: ProcessType
-                    ): Map[Long, DataFrame]
+//  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport): Map[Long, DataFrame]
 
 
   def collectBatchRecords(recordExport: RecordExport): Option[RDD[String]]

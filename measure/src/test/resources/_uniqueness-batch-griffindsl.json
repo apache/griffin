@@ -1,5 +1,5 @@
 {
-  "name": "dup_batch",
+  "name": "unique_batch",
 
   "process.type": "batch",
 
@@ -35,17 +35,19 @@
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "duplicate",
+        "dq.type": "uniqueness",
         "name": "dup",
         "rule": "user_id",
         "details": {
           "source": "source",
           "target": "target",
+          "total": "total",
+          "unique": "unique",
           "dup": "dup",
           "num": "num"
         },
         "metric": {
-          "name": "dup"
+          "name": "unique"
         },
         "record": {
           "name": "dupRecords"

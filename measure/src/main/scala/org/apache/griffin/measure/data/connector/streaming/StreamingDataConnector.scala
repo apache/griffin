@@ -20,6 +20,7 @@ package org.apache.griffin.measure.data.connector.streaming
 
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.source.DataSourceCache
+import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.streaming.dstream.InputDStream
@@ -36,7 +37,7 @@ trait StreamingDataConnector extends DataConnector {
 
   def transform(rdd: RDD[(K, V)]): Option[DataFrame]
 
-  def data(ms: Long): (Option[DataFrame], Set[Long]) = (None, Set.empty[Long])
+  def data(ms: Long): (Option[DataFrame], TimeRange) = (None, TimeRange.emptyTimeRange)
 
   var dataSourceCacheOpt: Option[DataSourceCache] = None
 

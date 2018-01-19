@@ -19,24 +19,26 @@ under the License.
 
 package org.apache.griffin.core.login;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/api/v1/login")
-public class LoginController {
+public class LoginServiceDefaultImpl implements LoginService {
 
-    @Autowired
-    private LoginService loginService;
-
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> map) {
-        return loginService.login(map);
+    @Override
+    public ResponseEntity<Map<String, Object>> login(Map<String, String> map) {
+        String username = map.get("username");
+        if (StringUtils.isBlank(username)) {
+            username = "Anonymous";
+        }
+        String fullName = username;
+        Map<String, Object> message = new HashMap<>();
+        message.put("ntAccount", username);
+        message.put("fullName", fullName);
+        message.put("status", 0);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }

@@ -20,12 +20,16 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
+import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.elasticsearch.client.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +37,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 
 @Service
 public class MetricServiceImpl implements MetricService {
@@ -52,17 +55,25 @@ public class MetricServiceImpl implements MetricService {
     private MetricStore metricStore;
 
     @Override
-    public List<Metric> getAllMetrics() {
-        List<Metric> metrics = new ArrayList<>();
+    public Map<String, List<Metric>> getAllMetrics() {
+        Map<String, List<Metric>> metricMap = new HashMap<>();
         List<AbstractJob> jobs = jobRepo.findByDeleted(false);
         List<Measure> measures = measureRepo.findByDeleted(false);
         Map<Long, Measure> measureMap = measures.stream().collect(Collectors.toMap(Measure::getId, Function.identity()));
-        for (AbstractJob job : jobs) {
-            List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300);
-            Measure measure = measureMap.get(job.getMeasureId());
-            metrics.add(new Metric(job.getJobName(), measure.getDescription(), measure.getOrganization(), measure.getOwner(), metricValues));
+        Map<Long, List<AbstractJob>> jobMap = jobs.stream().collect(Collectors.groupingBy(AbstractJob::getMeasureId, Collectors.toList()));
+        for (Map.Entry<Long, List<AbstractJob>> entry : jobMap.entrySet()) {
+            Long measureId = entry.getKey();
+            Measure measure = measureMap.get(measureId);
+            List<AbstractJob> jobList = entry.getValue();
+            List<Metric> metrics = new ArrayList<>();
+            for (AbstractJob job : jobList) {
+                List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300);
+                metrics.add(new Metric(job.getMetricName(), measure.getOwner(), metricValues));
+            }
+            metricMap.put(measure.getName(), metrics);
+
         }
-        return metrics;
+        return metricMap;
     }
 
     @Override
@@ -77,25 +88,43 @@ public class MetricServiceImpl implements MetricService {
 
     @Override
     public ResponseEntity addMetricValues(List<MetricValue> values) {
+        for (MetricValue value : values) {
+            if (!isMetricValueValid(value)) {
+                LOGGER.warn("Invalid metric value.");
+                return new ResponseEntity<>(ADD_METRIC_VALUES_FAIL, HttpStatus.BAD_REQUEST);
+            }
+        }
         try {
             for (MetricValue value : values) {
                 metricStore.addMetricValue(value);
             }
-            return new ResponseEntity("Add Metric Values Success", HttpStatus.CREATED);
+            return new ResponseEntity<>(ADD_METRIC_VALUES_SUCCESS, HttpStatus.CREATED);
+        } catch (ResponseException e) {
+            LOGGER.error("Failed to add metric values. {}", e.getMessage());
+            HttpStatus status = HttpStatus.valueOf(e.getResponse().getStatusLine().getStatusCode());
+            return new ResponseEntity<>(ADD_METRIC_VALUES_FAIL, status);
         } catch (Exception e) {
             LOGGER.error("Failed to add metric values. {}", e.getMessage());
-            return new ResponseEntity("Add Metric Values Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(ADD_METRIC_VALUES_FAIL, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    private boolean isMetricValueValid(MetricValue value) {
+        return StringUtils.isNotBlank(value.getName()) && value.getTmst() != null && MapUtils.isNotEmpty(value.getValue());
+    }
+
     @Override
-    public ResponseEntity deleteMetricValues(String metricName) {
+    public ResponseEntity<GriffinOperationMessage> deleteMetricValues(String metricName) {
         try {
             metricStore.deleteMetricValues(metricName);
-            return ResponseEntity.ok("Delete Metric Values Success");
+            return ResponseEntity.ok(DELETE_METRIC_VALUES_SUCCESS);
+        } catch (ResponseException e) {
+            LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
+            HttpStatus status = HttpStatus.valueOf(e.getResponse().getStatusLine().getStatusCode());
+            return new ResponseEntity<>(DELETE_METRIC_VALUES_FAIL, status);
         } catch (Exception e) {
             LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
-            return new ResponseEntity("Delete Metric Values Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(DELETE_METRIC_VALUES_FAIL, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

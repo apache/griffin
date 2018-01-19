@@ -39,11 +39,19 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
   }
 
   /**
-    * -- duplicate clauses --
-    * <duplicate-clauses> = <expr> [, <expr>]+
+    * -- uniqueness clauses --
+    * <uniqueness-clauses> = <expr> [, <expr>]+
     */
-  def duplicateClause: Parser[DuplicateClause] = rep1sep(expression, Operator.COMMA) ^^ {
-    case exprs => DuplicateClause(exprs)
+  def uniquenessClause: Parser[UniquenessClause] = rep1sep(expression, Operator.COMMA) ^^ {
+    case exprs => UniquenessClause(exprs)
+  }
+
+  /**
+    * -- distinctness clauses --
+    * <distinctness-clauses> = <expr> [, <expr>]+
+    */
+  def distinctnessClause: Parser[DistinctnessClause] = rep1sep(expression, Operator.COMMA) ^^ {
+    case exprs => DistinctnessClause(exprs)
   }
 
   /**
@@ -58,7 +66,8 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
     val rootExpr = dqType match {
       case AccuracyType => logicalExpression
       case ProfilingType => profilingClause
-      case DuplicateType => duplicateClause
+      case UniquenessType => uniquenessClause
+      case DistinctnessType => distinctnessClause
       case TimelinessType => timelinessClause
       case _ => expression
     }

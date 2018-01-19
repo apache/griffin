@@ -22,17 +22,19 @@ package org.apache.griffin.core.metric;
 
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
+import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MetricService {
 
-    List<Metric> getAllMetrics();
+    Map<String, List<Metric>> getAllMetrics();
 
     List<MetricValue> getMetricValues(String metricName, int offset, int size);
 
-    ResponseEntity addMetricValues(List<MetricValue> values);
+    ResponseEntity<GriffinOperationMessage> addMetricValues(List<MetricValue> values);
 
-    ResponseEntity deleteMetricValues(String metricName);
+    ResponseEntity<GriffinOperationMessage> deleteMetricValues(String metricName);
 }

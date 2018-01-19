@@ -18,10 +18,17 @@ under the License.
 */
 package org.apache.griffin.measure.rule.plan
 
+import org.apache.griffin.measure.process.ExportMode
+
 case class RecordExport(name: String,
                         stepName: String,
                         dataSourceCacheOpt: Option[String],
-                        originDFOpt: Option[String]
+                        originDFOpt: Option[String],
+                        defTimestamp: Long,
+                        mode: ExportMode
                        ) extends RuleExport {
+
+  def setDefTimestamp(t: Long): RuleExport =
+    RecordExport(name, stepName, dataSourceCacheOpt, originDFOpt, t, mode)
 
 }

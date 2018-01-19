@@ -31,4 +31,5 @@ case class DataSourceParam( @JsonProperty("name") name: String,
   def hasName: Boolean = (name != null)
   def isBaseLine: Boolean = if (baseline == null) false else baseline
   def falseBaselineClone: DataSourceParam = DataSourceParam(name, false, connectors, cache)
+  def getConnectors: List[DataConnectorParam] = if (connectors != null) connectors else Nil
 }
