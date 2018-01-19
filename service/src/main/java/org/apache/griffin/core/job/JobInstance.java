@@ -52,10 +52,10 @@ import static org.quartz.TriggerKey.triggerKey;
 @DisallowConcurrentExecution
 public class JobInstance implements Job {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobInstance.class);
-    static final String MEASURE_KEY = "measure";
-    static final String PREDICATES_KEY = "predicts";
-    static final String PREDICATE_JOB_NAME = "predicateJobName";
-    static final String JOB_NAME = "jobName";
+    public static final String MEASURE_KEY = "measure";
+    public static final String PREDICATES_KEY = "predicts";
+    public static final String PREDICATE_JOB_NAME = "predicateJobName";
+    public static final String JOB_NAME = "jobName";
     static final String PATH_CONNECTOR_CHARACTER = ",";
 
     @Autowired
@@ -201,14 +201,14 @@ public class JobInstance implements Job {
      * @param conf     map with file predicate,data split and partitions info
      * @param sampleTs collection of data split start timestamp
      * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
-     * or like {"path": "/year=#2017/month=11/dt=15/hour=09/_DONE,/year=#2017/month=11/dt=15/hour=10/_DONE"}
+     * or like {"path": "/year=2017/month=11/dt=15/hour=09/_DONE,/year=2017/month=11/dt=15/hour=10/_DONE"}
      */
     private void genConfMap(Map<String, String> conf, Long[] sampleTs) {
         for (Map.Entry<String, String> entry : conf.entrySet()) {
             String value = entry.getValue();
             Set<String> set = new HashSet<>();
             for (Long timestamp : sampleTs) {
-                set.add(TimeUtil.format(value, timestamp));
+                set.add(TimeUtil.format(value, timestamp,jobSchedule.getTimeZone()));
             }
             conf.put(entry.getKey(), StringUtils.join(set, PATH_CONNECTOR_CHARACTER));
         }

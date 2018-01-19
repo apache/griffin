@@ -42,14 +42,4 @@ public interface MeasureRepo<T extends Measure> extends CrudRepository<T, Long> 
     @Query("select m.name from #{#entityName} m " +
             "where m.organization= ?1 and m.deleted= ?2")
     List<String> findNameByOrganization(String organization, Boolean deleted);
-
-    @Query("select m.organization from #{#entityName} m " +
-            "where m.name= ?1")
-    String findOrgByName(String measureName);
-
-//    @Modifying
-//    @Transactional
-//    @Query("update Measure m "+
-//            "set m.description= ?2,m.organization= ?3,m.source= ?4,m.target= ?5,m.evaluateRule= ?6 where m.id= ?1")
-//    void update(Long Id, String description, String organization, DataConnector source, DataConnector target, EvaluateRule evaluateRule);
 }

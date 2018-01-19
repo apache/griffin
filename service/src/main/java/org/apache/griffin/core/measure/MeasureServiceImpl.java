@@ -94,15 +94,8 @@ public class MeasureServiceImpl implements MeasureService {
         if (measure == null) {
             return RESOURCE_NOT_FOUND;
         }
-        try {
-            MeasureOperation op = getOperation(measure);
-            if (op.delete(measure)) {
-                return DELETE_MEASURE_BY_ID_SUCCESS;
-            }
-        } catch (Exception e) {
-            LOGGER.error("Delete measure id: {} name: {} failure. {}", measure.getId(), measure.getName(), e.getMessage());
-        }
-        return DELETE_MEASURE_BY_ID_FAIL;
+        MeasureOperation op = getOperation(measure);
+        return op.delete(measure);
     }
 
     private MeasureOperation getOperation(Measure measure) {

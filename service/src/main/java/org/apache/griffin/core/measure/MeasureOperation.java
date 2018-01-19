@@ -29,6 +29,6 @@ public interface MeasureOperation {
 
     GriffinOperationMessage update(Measure measure);
 
-    Boolean delete(Measure measure);
+    GriffinOperationMessage delete(Measure measure);
 
 }
