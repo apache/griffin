@@ -23,10 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.IllegalFormatException;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,8 +52,8 @@ public class TimeUtil {
             list.add(group.toLowerCase());
         }
         long time = 0;
-        for (int i = 0; i < list.size(); i++) {
-            long t = milliseconds(list.get(i).toLowerCase());
+        for (String aList : list) {
+            long t = milliseconds(aList.toLowerCase());
             if (positive) {
                 time += t;
             } else {
@@ -67,23 +64,18 @@ public class TimeUtil {
     }
 
     private static Long milliseconds(String str) {
-        try {
-            if (str.endsWith("ms")) {
-                return milliseconds(Long.parseLong(str.substring(0, str.length() - 2)), TimeUnit.MILLISECONDS);
-            } else if (str.endsWith("s")) {
-                return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.SECONDS);
-            } else if (str.endsWith("m")) {
-                return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.MINUTES);
-            } else if (str.endsWith("h")) {
-                return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.HOURS);
-            } else if (str.endsWith("d")) {
-                return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.DAYS);
-            } else {
-                LOGGER.error("Time string format error.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.)");
-                throw new IllegalArgumentException();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Parse exception occur. {}",e);
+        if (str.endsWith("ms")) {
+            return milliseconds(Long.parseLong(str.substring(0, str.length() - 2)), TimeUnit.MILLISECONDS);
+        } else if (str.endsWith("s")) {
+            return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.SECONDS);
+        } else if (str.endsWith("m")) {
+            return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.MINUTES);
+        } else if (str.endsWith("h")) {
+            return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.HOURS);
+        } else if (str.endsWith("d")) {
+            return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.DAYS);
+        } else {
+            LOGGER.error("Time string format error.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.)");
             return 0L;
         }
     }
@@ -92,7 +84,7 @@ public class TimeUtil {
         return unit.toMillis(duration);
     }
 
-    public static String format(String timeFormat, long time) {
+    public static String format(String timeFormat, long time,String timeZone) {
         String timePattern = "#(?:\\\\#|[^#])*#";
         Date t = new Date(time);
         Pattern ptn = Pattern.compile(timePattern);
@@ -103,11 +95,11 @@ public class TimeUtil {
             String content = group.substring(1, group.length() - 1);
             String pattern = refreshEscapeHashTag(content);
             SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+            sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
             matcher.appendReplacement(sb, sdf.format(t));
         }
         matcher.appendTail(sb);
-        String endString = refreshEscapeHashTag(sb.toString());
-        return endString;
+        return refreshEscapeHashTag(sb.toString());
     }
 
     private static String refreshEscapeHashTag(String str) {

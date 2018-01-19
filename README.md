@@ -18,7 +18,8 @@ under the License.
 -->
 
 
-## Apache Griffin
+## Apache Griffin  
+[![Build Status](https://travis-ci.org/apache/incubator-griffin.svg?branch=master)](https://travis-ci.org/apache/incubator-griffin) [![License: Apache 2.0](https://camo.githubusercontent.com/8cb994f6c4a156c623fe057fccd7fb7d7d2e8c9b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d417061636865253230322d3445423142412e737667)](https://www.apache.org/licenses/LICENSE-2.0.html)    
 
 Apache Griffin is a model driven data quality solution for modern data systems. 
 It provides a standard process to define data quality measures, execute, report, as well as an unified dashboard across multiple data systems. 
@@ -27,16 +28,7 @@ You can access our wiki page [here](https://cwiki.apache.org/confluence/display/
 You can access our issues jira page [here](https://issues.apache.org/jira/secure/Dashboard.jspa?selectPageId=12330914).
 
 ### Contact us
-[Dev List](mailto://dev@griffin.incubator.apache.org)
-
-
-### CI
-
-
-### Repository
-Snapshot:
-
-Release:
+Email: <a href="mailto:dev@griffin.incubator.apache.org">dev@griffin.incubator.apache.org</a>
 
 ### How to run in docker
 1. Install [docker](https://docs.docker.com/engine/installation/) and [docker compose](https://docs.docker.com/compose/install/).
@@ -59,10 +51,10 @@ Release:
     ```
     docker-compose -f docker-compose-batch.yml up -d
     ```
-6. Now you can try griffin APIs by using postman after importing the [json files](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/postman).
+6. Now you can try griffin APIs by using postman after importing the [json files](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/service/postman).
    In which you need to modify the environment `BASE_PATH` value into `<your local IP address>:38080`.
 
-More details about griffin docker [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/griffin-docker-guide.md).
+More details about griffin docker [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/docker/griffin-docker-guide.md).
 
 ### How to deploy and run at local
 1. Install jdk (1.8 or later versions).
@@ -124,12 +116,23 @@ More details about griffin docker [here](https://github.com/apache/incubator-gri
     ```
     http://<your IP>:8080
     ```
-11. Follow the steps using UI [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/dockerUIguide.md#webui-test-case-guide).
+11. Follow the steps using UI [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/ui/dockerUIguide.md#webui-test-case-guide).
 
 
 **Note**: The front-end UI is still under development, you can only access some basic features currently.
 
+### Document List
 
+- [Wiki](https://cwiki.apache.org/confluence/display/GRIFFIN/Apache+Griffin)
+- [Measure](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/measure)
+- [Service](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/service)
+- [UI](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/ui)
+- [Docker usage](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/docker)
+- [Postman API](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/service/postman)
 ### Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute code, documentation, etc.
+
+
+
+
