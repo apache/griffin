@@ -40,24 +40,22 @@ public class Rule extends AbstractAuditableEntity {
 
     private String dqType;
 
-    @Column(length = 10 * 1024)
+    @Column(length = 8 * 1024)
     private String rule;
 
-    @JsonIgnore
     private String name;
 
-    @JsonIgnore
+    @Column(length = 1024)
     private String description;
 
     @JsonIgnore
     @Access(AccessType.PROPERTY)
-    @Column(length = 10 * 1024)
+    @Column(length = 1024)
     private String details;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, Object> detailsMap;
-
 
     @JsonProperty("dsl.type")
     public String getDslType() {
