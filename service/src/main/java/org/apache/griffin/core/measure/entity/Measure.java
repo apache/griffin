@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -29,7 +30,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "measure.type")
 @JsonSubTypes({@JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"), @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
 public abstract class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
@@ -95,5 +96,6 @@ public abstract class Measure extends AbstractAuditableEntity {
         this.owner = owner;
     }
 
+    @JsonProperty("measure.type")
     public abstract String getType();
 }

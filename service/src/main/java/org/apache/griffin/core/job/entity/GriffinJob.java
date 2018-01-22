@@ -65,11 +65,11 @@ public class GriffinJob extends AbstractJob {
         super();
     }
 
-    public GriffinJob(Long measureId, String jobName, String qJobName, String qGroupName, boolean deleted) {
+    public GriffinJob(Long measureId, String jobName, String quartzName, String quartzGroup, boolean deleted) {
         super(measureId, jobName, deleted);
         this.metricName = jobName;
-        this.quartzName = qJobName;
-        this.quartzGroup = qGroupName;
+        this.quartzName = quartzName;
+        this.quartzGroup = quartzGroup;
     }
 
     public GriffinJob(Long jobId, Long measureId, String jobName, String qJobName, String qGroupName, boolean deleted) {

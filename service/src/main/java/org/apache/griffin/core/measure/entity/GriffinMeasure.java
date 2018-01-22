@@ -34,12 +34,13 @@ import java.util.List;
 @Entity
 public class GriffinMeasure extends Measure {
 
+    private String dqType;
+
     private String processType;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long timestamp;
-
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
@@ -50,6 +51,16 @@ public class GriffinMeasure extends Measure {
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluate_rule_id")
     private EvaluateRule evaluateRule;
+
+    @JsonProperty("dq.type")
+    public String getDqType() {
+        return dqType;
+    }
+
+    @JsonProperty("dq.type")
+    public void setDqType(String dqType) {
+        this.dqType = dqType;
+    }
 
     @JsonProperty("process.type")
     public String getProcessType() {
@@ -104,10 +115,9 @@ public class GriffinMeasure extends Measure {
         super();
     }
 
-    public GriffinMeasure(Long measureId,String name, String description, String organization, String processType, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
-        super(name, description, organization, owner);
-        this.setId(measureId);
-        this.processType = processType;
+    public GriffinMeasure(String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+        this.name = name;
+        this.owner = owner;
         this.dataSources = dataSources;
         this.evaluateRule = evaluateRule;
     }

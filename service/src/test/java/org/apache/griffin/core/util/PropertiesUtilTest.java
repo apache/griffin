@@ -19,12 +19,27 @@ under the License.
 
 package org.apache.griffin.core.util;
 
-import org.apache.avro.Schema;
+import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
-public class AvroUtil {
+import java.util.Properties;
 
-    public static Schema schemaOf(String schema) {
-        return new Schema.Parser().parse(schema);
+import static org.junit.Assert.*;
+
+public class PropertiesUtilTest {
+
+    @Test
+    public void testGetPropertiesForSuccess() {
+        String path = "/quartz.properties";
+        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
+        assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
+    }
+
+    @Test
+    public void testGetPropertiesForFailureWithWrongPath() {
+        String path = ".././quartz.properties";
+        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
+        assertEquals(properties, null);
     }
 
 }

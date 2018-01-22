@@ -22,22 +22,15 @@ package org.apache.griffin.core.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.job.entity.JobHealth;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-public class GriffinUtilTest {
-
-    @Before
-    public void setup() {
-    }
+public class JsonUtilTest {
 
     @Test
     public void testToJson() throws JsonProcessingException {
@@ -48,11 +41,25 @@ public class GriffinUtilTest {
     }
 
     @Test
+    public void testToJsonWithFormat() throws JsonProcessingException {
+        JobHealth jobHealth = new JobHealth(5, 10);
+        String jobHealthStr = JsonUtil.toJsonWithFormat(jobHealth);
+        System.out.println(jobHealthStr);
+    }
+
+    @Test
     public void testToEntityWithParamClass() throws IOException {
         String str = "{\"healthyJobCount\":5,\"jobCount\":10}";
         JobHealth jobHealth = JsonUtil.toEntity(str, JobHealth.class);
         assertEquals(jobHealth.getJobCount(), 10);
         assertEquals(jobHealth.getHealthyJobCount(), 5);
+    }
+
+    @Test
+    public void testToEntityWithNullParamClass() throws IOException {
+        String str = null;
+        JobHealth jobHealth = JsonUtil.toEntity(str, JobHealth.class);
+        assert jobHealth == null;
     }
 
     @Test
@@ -65,23 +72,13 @@ public class GriffinUtilTest {
     }
 
     @Test
-    public void testGetPropertiesForSuccess() {
-        String path = "/quartz.properties";
-        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
-        assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
+    public void testToEntityWithNullParamTypeReference() throws IOException {
+        String str = null;
+        TypeReference<HashMap<String, Integer>> type = new TypeReference<HashMap<String, Integer>>() {
+        };
+        Map map = JsonUtil.toEntity(str, type);
+        assert map == null;
     }
 
-    @Test
-    public void testGetPropertiesForFailWithWrongPath() {
-        String path = ".././quartz.properties";
-        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
-        assertEquals(properties, null);
-    }
 
-    @Test
-    public void testToJsonWithFormat() throws JsonProcessingException {
-        JobHealth jobHealth = new JobHealth(5, 10);
-        String jobHealthStr = JsonUtil.toJsonWithFormat(jobHealth);
-        System.out.println(jobHealthStr);
-    }
 }
