@@ -20,18 +20,16 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.error.exception.GriffinException;
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.job.repo.VirtualJobRepo;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.ExternalMeasureRepo;
-import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 
 @Component("externalOperation")
 public class ExternalMeasureOperationImpl implements MeasureOperation {
@@ -43,56 +41,38 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
     private VirtualJobRepo jobRepo;
 
     @Override
-    public GriffinOperationMessage create(Measure measure) {
+    public Measure create(Measure measure) {
         ExternalMeasure em = (ExternalMeasure) measure;
         if (StringUtils.isBlank(em.getMetricName())) {
-            LOGGER.error("Failed to create external measure {}. Its metric name is blank.", measure.getName());
-            return CREATE_MEASURE_FAIL;
+            LOGGER.warn("Failed to create external measure {}. Its metric name is blank.", measure.getName());
+            throw new GriffinException.BadRequestException("Missing valid metric name.");
         }
-        try {
-            em.setVirtualJob(new VirtualJob());
-            em = measureRepo.save(em);
-            VirtualJob vj = genVirtualJob(em, em.getVirtualJob());
-            jobRepo.save(vj);
-            return CREATE_MEASURE_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to create new measure {}.{}", em.getName(), e.getMessage());
-        }
-        return CREATE_MEASURE_FAIL;
+        em.setVirtualJob(new VirtualJob());
+        em = measureRepo.save(em);
+        VirtualJob vj = genVirtualJob(em, em.getVirtualJob());
+        jobRepo.save(vj);
+        return em;
     }
 
     @Override
-    public GriffinOperationMessage update(Measure measure) {
+    public void update(Measure measure) {
         ExternalMeasure latestMeasure = (ExternalMeasure) measure;
         if (StringUtils.isBlank(latestMeasure.getMetricName())) {
-            LOGGER.error("Failed to create external measure {}. Its metric name is blank.", measure.getName());
-            return UPDATE_MEASURE_FAIL;
+            LOGGER.warn("Failed to update external measure {}. Its metric name is blank.", measure.getName());
+            throw new GriffinException.BadRequestException("Missing valid metric name.");
         }
-        try {
-            ExternalMeasure originMeasure = measureRepo.findOne(latestMeasure.getId());
-            VirtualJob vj = genVirtualJob(latestMeasure, originMeasure.getVirtualJob());
-            latestMeasure.setVirtualJob(vj);
-            measureRepo.save(latestMeasure);
-            return UPDATE_MEASURE_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to update measure. {}", e.getMessage());
-        }
-        return UPDATE_MEASURE_FAIL;
+        ExternalMeasure originMeasure = measureRepo.findOne(latestMeasure.getId());
+        VirtualJob vj = genVirtualJob(latestMeasure, originMeasure.getVirtualJob());
+        latestMeasure.setVirtualJob(vj);
+        measureRepo.save(latestMeasure);
     }
 
     @Override
-    public GriffinOperationMessage delete(Measure measure) {
-        try {
-            ExternalMeasure em = (ExternalMeasure) measure;
-            em.setDeleted(true);
-            em.getVirtualJob().setDeleted(true);
-            measureRepo.save(em);
-            return DELETE_MEASURE_BY_ID_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to delete measure. {}", e.getMessage());
-        }
-        return DELETE_MEASURE_BY_ID_FAIL;
-
+    public void delete(Measure measure) {
+        ExternalMeasure em = (ExternalMeasure) measure;
+        em.setDeleted(true);
+        em.getVirtualJob().setDeleted(true);
+        measureRepo.save(em);
     }
 
     private VirtualJob genVirtualJob(ExternalMeasure em, VirtualJob vj) {

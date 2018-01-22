@@ -22,26 +22,24 @@ package org.apache.griffin.core.metric;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.error.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
-import org.apache.griffin.core.util.GriffinOperationMessage;
-import org.elasticsearch.client.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 
 @Service
 public class MetricServiceImpl implements MetricService {
@@ -78,34 +76,35 @@ public class MetricServiceImpl implements MetricService {
 
     @Override
     public List<MetricValue> getMetricValues(String metricName, int offset, int size) {
+        if (offset < 0) {
+            throw new GriffinException.BadRequestException("Offset must not be less than zero.");
+        }
+        if (size < 0) {
+            throw new GriffinException.BadRequestException("Size must not be less than zero.");
+        }
         try {
             return metricStore.getMetricValues(metricName, offset, size);
         } catch (Exception e) {
             LOGGER.error("Failed to get metric values named {}. {}", metricName, e.getMessage());
+            throw new GriffinException.ServiceException("Failed to get metric values", e);
         }
-        return Collections.emptyList();
     }
 
     @Override
-    public ResponseEntity addMetricValues(List<MetricValue> values) {
+    public void addMetricValues(List<MetricValue> values) {
         for (MetricValue value : values) {
             if (!isMetricValueValid(value)) {
                 LOGGER.warn("Invalid metric value.");
-                return new ResponseEntity<>(ADD_METRIC_VALUES_FAIL, HttpStatus.BAD_REQUEST);
+                throw new GriffinException.BadRequestException("Metric value is invalid.");
             }
         }
         try {
             for (MetricValue value : values) {
                 metricStore.addMetricValue(value);
             }
-            return new ResponseEntity<>(ADD_METRIC_VALUES_SUCCESS, HttpStatus.CREATED);
-        } catch (ResponseException e) {
-            LOGGER.error("Failed to add metric values. {}", e.getMessage());
-            HttpStatus status = HttpStatus.valueOf(e.getResponse().getStatusLine().getStatusCode());
-            return new ResponseEntity<>(ADD_METRIC_VALUES_FAIL, status);
         } catch (Exception e) {
             LOGGER.error("Failed to add metric values. {}", e.getMessage());
-            return new ResponseEntity<>(ADD_METRIC_VALUES_FAIL, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GriffinException.ServiceException("Failed to add metric values.", e);
         }
     }
 
@@ -114,17 +113,12 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @Override
-    public ResponseEntity<GriffinOperationMessage> deleteMetricValues(String metricName) {
+    public void deleteMetricValues(String metricName) {
         try {
             metricStore.deleteMetricValues(metricName);
-            return ResponseEntity.ok(DELETE_METRIC_VALUES_SUCCESS);
-        } catch (ResponseException e) {
-            LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
-            HttpStatus status = HttpStatus.valueOf(e.getResponse().getStatusLine().getStatusCode());
-            return new ResponseEntity<>(DELETE_METRIC_VALUES_FAIL, status);
         } catch (Exception e) {
             LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
-            return new ResponseEntity<>(DELETE_METRIC_VALUES_FAIL, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GriffinException.ServiceException("Failed to delete metric values.", e);
         }
     }
 }

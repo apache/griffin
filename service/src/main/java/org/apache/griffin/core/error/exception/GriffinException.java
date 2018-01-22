@@ -23,19 +23,41 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 public abstract class GriffinException extends RuntimeException {
-    @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT, reason = "Fail to Connect Kafka")
-    public static class KafkaConnectionException extends GriffinException {
+
+    GriffinException(String message) {
+        super(message);
     }
 
-    @ResponseStatus(value = HttpStatus.GATEWAY_TIMEOUT, reason = "Fail to Connect Hive")
-    public static class HiveConnectionException extends GriffinException {
+    GriffinException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Fail to Get HealthInfo")
-    public static class GetHealthInfoFailureException extends GriffinException {
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public static class NotFoundException extends GriffinException {
+        public NotFoundException(String message) {
+            super(message);
+        }
     }
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Fail to Get Jobs")
-    public static class GetJobsFailureException extends GriffinException {
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public static class ConflictException extends GriffinException {
+        public ConflictException(String message) {
+            super(message);
+        }
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class BadRequestException extends GriffinException {
+        public BadRequestException(String message) {
+            super(message);
+        }
+    }
+
+    public static class ServiceException extends GriffinException {
+        public ServiceException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+
 }
