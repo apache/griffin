@@ -78,4 +78,9 @@ public class SegmentPredicate extends AbstractAuditableEntity {
 
     public SegmentPredicate() {
     }
+
+    public SegmentPredicate(String type, Map configMap) throws JsonProcessingException {
+        this.type = type;
+        setConfigMap(configMap);
+    }
 }
