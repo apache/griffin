@@ -32,8 +32,8 @@ import static org.apache.griffin.core.job.JobInstance.PATH_CONNECTOR_CHARACTER;
 public class FileExistPredicator implements Predicator {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExistPredicator.class);
 
-    public static final String PREDICT_PATH = "path";
-    public static final String PREDICT_ROOT_PATH = "root.path";
+    private static final String PREDICT_PATH = "path";
+    private static final String PREDICT_ROOT_PATH = "root.path";
 
     private SegmentPredicate predicate;
 

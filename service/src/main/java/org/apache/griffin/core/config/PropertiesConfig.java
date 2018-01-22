@@ -47,14 +47,14 @@ public class PropertiesConfig {
         this.location = location;
     }
 
-    private String getPath(String defaultPath, String name) {
+    private String getPath(String defaultPath, String name) throws FileNotFoundException {
         String path = defaultPath;
         File file = new File(location);
         LOGGER.info("File absolute path:" + file.getAbsolutePath());
         File[] files = file.listFiles();
         if (files == null || files.length == 0) {
             LOGGER.error("The defaultPath {} does not exist.Please check your config in application.properties.", location);
-            throw new NullPointerException();
+            throw new FileNotFoundException();
         }
         for (File f : files) {
             if (f.getName().equals(name)) {
