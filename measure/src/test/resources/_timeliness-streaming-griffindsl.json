@@ -33,7 +33,7 @@
             {
               "dsl.type": "spark-sql",
               "name": "${this}",
-              "rule": "select ts, name, age from ${s1}"
+              "rule": "select ts, end_ts, name, age from ${s1}"
             }
           ]
         }
@@ -54,11 +54,16 @@
         "dsl.type": "griffin-dsl",
         "dq.type": "timeliness",
         "name": "timeliness",
-        "rule": "ts",
+        "rule": "ts, end_ts",
         "details": {
           "source": "source",
           "latency": "latency",
-          "threshold": "1h"
+          "total": "total",
+          "avg": "avg",
+          "threshold": "1h",
+          "step": "step",
+          "count": "cnt",
+          "step.size": "5m"
         },
         "metric": {
           "name": "timeliness"
