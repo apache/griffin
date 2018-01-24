@@ -58,7 +58,12 @@ object DistinctnessKeys {
 object TimelinessKeys {
   val _source = "source"
   val _latency = "latency"
+  val _total = "total"
+  val _avg = "avg"
   val _threshold = "threshold"
+  val _step = "step"
+  val _count = "count"
+  val _stepSize = "step.size"
 }
 
 object GlobalKeys {
