@@ -196,6 +196,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
           {
             "dsl.type": "griffin-dsl",
             "dq.type": "accuracy",
+            "name": "accuracy",
             "rule": ""
             // "details": {
             //   "source": "source",
@@ -420,6 +421,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
             {
               "dsl.type": "griffin-dsl",
               "dq.type": "accuracy",
+              "name": "accuracy",
               "rule": ""
                  // "details": {
                  //   "source": "source",
@@ -446,7 +448,6 @@ export class AcComponent implements OnInit , AfterViewChecked {
       if(this.tgt_size.indexOf('0')==0){
         delete this.newMeasure['data.sources'][1]['connectors'][0]['data.unit'];
       }
-      console.log(this.newMeasure);
       var mappingRule = function(src, tgt, matches) {
         var rules;
         rules = 'source.' + src  + matches + 'target.' + tgt

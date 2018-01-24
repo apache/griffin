@@ -22,13 +22,14 @@ import { Injectable } from '@angular/core';
 export class ServiceService {
 
   constructor() { }
-    // public this.BACKEND_SERVER = 'http://10.65.145.88:38080';
-    // public BACKEND_SERVER = 'http://localhost:8080';
-    public BACKEND_SERVER = '';
+    //public BACKEND_SERVER = 'http://10.65.145.88:38080';
+    public BACKEND_SERVER = 'http://localhost:8080';
+    // public BACKEND_SERVER = '';
     public API_ROOT_PATH = '/api/v1';
-    public ES_SERVER = "http://" + location.host.replace("8080", "9200");
-    //public ES_SERVER = "http://10.64.222.80:39200" ;
+    // public ES_SERVER = "http://" + location.host.replace("8080", "9200");
+    // public ES_SERVER = "http://10.64.222.80:39200" ;
     // public ES_SERVER = "http://10.65.145.88:39200" ;
+    // public ES_SERVER = "http://localhost:8080" ;
 
     public config = {
           // URI paths, always have a trailing /
@@ -71,19 +72,21 @@ export class ServiceService {
 //              dashboard:'/dashboard.json',
 
 
-              organization:this.BACKEND_SERVER + this.API_ROOT_PATH + '/org/measure/jobs',
+              // organization:this.BACKEND_SERVER + this.API_ROOT_PATH + '/org/measure/jobs',
+              dashboard:this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics',
+              metricdetail:this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/values',
 
 
-              dashboard:this.ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
+              // dashboard:this.ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
               metricsample: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/sample',
               metricdownload: this.BACKEND_SERVER + this.API_ROOT_PATH + '/metrics/download',
 
               //Models
 
               allModels: this.BACKEND_SERVER + this.API_ROOT_PATH + '/measures',
-              addModels: this.BACKEND_SERVER + this.API_ROOT_PATH + '/measure',
-              deleteModel:this.BACKEND_SERVER + this.API_ROOT_PATH + '/measure',
-              getModel: this.BACKEND_SERVER + this.API_ROOT_PATH + '/measure',
+              addModels: this.BACKEND_SERVER + this.API_ROOT_PATH + '/measures',
+              deleteModel:this.BACKEND_SERVER + this.API_ROOT_PATH + '/measures',
+              getModel: this.BACKEND_SERVER + this.API_ROOT_PATH + '/measures',
               enableModel: this.BACKEND_SERVER + this.API_ROOT_PATH + '/models/enableModel',
 
               //Jobs

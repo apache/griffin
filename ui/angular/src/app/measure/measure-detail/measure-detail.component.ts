@@ -42,6 +42,7 @@ export class MeasureDetailComponent implements OnInit {
   targetTable : string;
   type:string;
   currentrule:string;
+  prorule = '';
 
   ngOnInit() {
     this.ruleData = {
@@ -54,8 +55,13 @@ export class MeasureDetailComponent implements OnInit {
     this.http.get(getModelUrl).subscribe(data=>{
       this.ruleData = data;
       this.ruleData.type = this.ruleData["dq.type"];
-      if(this.ruleData.type !== 'external'){
+      if(this.ruleData['measure.type'] !== 'external'){
         this.currentrule = this.ruleData['evaluate.rule'].rules;
+        var currentprorule = this.ruleData['evaluate.rule'].rules;
+        for(let index in currentprorule){
+          this.prorule = this.prorule + currentprorule[index].description + ','
+        }
+        this.prorule = this.prorule.substring(0,this.prorule.lastIndexOf(','));
         var sourcedata = this.ruleData["data.sources"][0].connectors[0].config;          
         this.sourceDB = sourcedata.database;
         this.sourceTable = sourcedata["table.name"];

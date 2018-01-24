@@ -104,6 +104,9 @@ export class MeasureComponent implements OnInit {
       // }
   		this.results = Object.keys(data).map(function(index){
         let measure = data[index];
+        if(measure['measure.type'] === 'external'){
+          measure['dq.type'] = 'external';
+        }
         return measure;
       });
   	});

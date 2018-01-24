@@ -93,11 +93,11 @@ under the License.
   </div>
   <!--//row-->
   <br/>
-  <div *ngIf="ruleData.type!=='external'">
+  <div *ngIf="ruleData['measure.type']!=='external'">
     <h5 class="row">Mapping rules</h5>
-    <div class="">
+    <div *ngIf="ruleData.type=='accuracy'" class="">
       <p *ngFor="let index of currentrule">{{index.rule}}</p>
-      <div *ngIf="ruleData.type=='accuracy'">
+      <div>
         <p>
           <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
         </p>
@@ -118,6 +118,9 @@ under the License.
           </div>
         </div>
       </div>
+    </div>
+    <div *ngIf="ruleData.type=='profiling'" class="">
+      <p>{{this.prorule}}</p>
     </div>
   </div>
 </div>

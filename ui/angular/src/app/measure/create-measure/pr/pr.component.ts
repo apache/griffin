@@ -159,6 +159,8 @@ export class PrComponent implements  AfterViewChecked, OnInit{
           "dsl.type": "griffin-dsl",
           "dq.type": "profiling",
           "rule": "",
+          "description": "",
+          "name": "",
           "details": {
             // "profiling": {
             // "name": ""
@@ -413,56 +415,61 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     if(this.size.indexOf('0')==0){
         delete this.newMeasure['data.sources'][0]['connectors'][0]['data.unit'];
       }
-    console.log(this.newMeasure);
     this.visible = true;
     setTimeout(() => this.visibleAnimate = true, 100);
   }
   
-  getRule(trans){    
+  getRule(trans,otherinfo){    
     var rule = '';
     for(let i of trans){
        rule = rule + i + ',';
     }
     rule = rule.substring(0,rule.lastIndexOf(','));
-    this.pushRule(rule);    
+    this.pushRule(rule,otherinfo);    
   }
 
-  pushEnmRule(rule,grpname){
+  pushEnmRule(rule,grpname,originrule){
     var self = this;
     self.newMeasure['evaluate.rule'].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       "rule": rule,
+      "description": originrule,
+      "name": grpname,
       "details": {
-        "profiling": {
-          "name": grpname,
-          "persist.type": "metric"
-        }
+        // "profiling": {
+        //   "name": grpname,
+        //   "persist.type": "metric"
+        // }
       }
     });
   }
   
-  pushNullRule(rule,nullname){
+  pushNullRule(rule,nullname,originrule){
     var self = this;
     self.newMeasure['evaluate.rule'].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       "rule": rule,
+      "description": originrule,
+      "name": nullname,
       "details": {
-        "profiling": {
-          "name": nullname,
-          "persist.type": "metric"
-        }
+        // "profiling": {
+        //   "name": nullname,
+        //   "persist.type": "metric"
+        // }
       }
     });
   }
 
-  pushRule(rule){
+  pushRule(rule,otherinfo){
     var self = this;
     self.newMeasure['evaluate.rule'].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       "rule": rule,
+      "description": otherinfo,
+      "name": "profiling",
       "details": {}
     });
   }
@@ -539,6 +546,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     for(let key in this.selectedItems){
       selected.name = key;
       var info = '';
+      var otherinfo = '';
       for(let i = 0;i<this.selectedItems[key].length;i++){
         var originrule = this.selectedItems[key][i].itemName;        
         info = info + originrule + ',';
@@ -546,25 +554,27 @@ export class PrComponent implements  AfterViewChecked, OnInit{
           enmvalue = this.transferRule(originrule,selected);
           grpname = selected.name + '-grp';
           this.transenumrule.push(enmvalue);
-          this.pushEnmRule(enmvalue,grpname);
+          this.pushEnmRule(enmvalue,grpname,originrule);
         }else if(originrule == 'Null Count'){
           nullvalue = this.transferRule(originrule,selected);
           nullname = selected.name + '-nullct';
           this.transnullrule.push(nullvalue);
-          this.pushNullRule(nullvalue,nullname);
-        }else{ 
+          this.pushNullRule(nullvalue,nullname,originrule);
+        }else{
+          otherinfo = otherinfo + originrule + ',';
           value = this.transferRule(originrule,selected);      
           this.transrule.push(value);
         }
       }
       info = info.substring(0,info.lastIndexOf(','));
+      otherinfo = otherinfo.substring(0,otherinfo.lastIndexOf(','));
       this.noderule.push({
         "name":key,
         "infos":info
       });  
     }
     if(this.transrule.length != 0){
-      this.getRule(this.transrule);
+      this.getRule(this.transrule,otherinfo);
     }   
   }
 
