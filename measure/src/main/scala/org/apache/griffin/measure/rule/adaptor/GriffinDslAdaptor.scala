@@ -666,21 +666,21 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
 
       // 3. timeliness metric
       val metricTableName = name
+      val totalColName = details.getStringOrKey(TimelinessKeys._total)
+      val avgColName = details.getStringOrKey(TimelinessKeys._avg)
       val metricSql = procType match {
         case BatchProcessType => {
           s"""
-             |SELECT CAST(AVG(`${latencyColName}`) AS BIGINT) AS `avg`,
-             |MAX(`${latencyColName}`) AS `max`,
-             |MIN(`${latencyColName}`) AS `min`
+             |SELECT COUNT(*) AS `${totalColName}`,
+             |CAST(AVG(`${latencyColName}`) AS BIGINT) AS `${avgColName}`
              |FROM `${latencyTableName}`
            """.stripMargin
         }
         case StreamingProcessType => {
           s"""
              |SELECT `${InternalColumns.tmst}`,
-             |CAST(AVG(`${latencyColName}`) AS BIGINT) AS `avg`,
-             |MAX(`${latencyColName}`) AS `max`,
-             |MIN(`${latencyColName}`) AS `min`
+             |COUNT(*) AS `${totalColName}`,
+             |CAST(AVG(`${latencyColName}`) AS BIGINT) AS `${avgColName}`
              |FROM `${latencyTableName}`
              |GROUP BY `${InternalColumns.tmst}`
            """.stripMargin
@@ -710,9 +710,105 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         case _ => emptyRulePlan
       }
 
+      // 5. ranges
+//      val rangePlan = details.get(TimelinessKeys._rangeSplit) match {
+//        case Some(arr: Seq[String]) => {
+//          val ranges = splitTimeRanges(arr)
+//          if (ranges.size > 0) {
+//            try {
+//              // 5.1. range
+//              val rangeTableName = "__range"
+//              val rangeColName = details.getStringOrKey(TimelinessKeys._range)
+//              val caseClause = {
+//                val whenClause = ranges.map { range =>
+//                  s"WHEN `${latencyColName}` < ${range._1} THEN '<${range._2}'"
+//                }.mkString("\n")
+//                s"CASE ${whenClause} ELSE '>=${ranges.last._2}' END AS `${rangeColName}`"
+//              }
+//              val rangeSql = {
+//                s"SELECT *, ${caseClause} FROM `${latencyTableName}`"
+//              }
+//              val rangeStep = SparkSqlStep(rangeTableName, rangeSql, emptyMap)
+//
+//              // 5.2. range metric
+//              val rangeMetricTableName = "__rangeMetric"
+//              val countColName = details.getStringOrKey(TimelinessKeys._count)
+//              val rangeMetricSql = procType match {
+//                case BatchProcessType => {
+//                  s"""
+//                     |SELECT `${rangeColName}`, COUNT(*) AS `${countColName}`
+//                     |FROM `${rangeTableName}` GROUP BY `${rangeColName}`
+//                  """.stripMargin
+//                }
+//                case StreamingProcessType => {
+//                  s"""
+//                     |SELECT `${InternalColumns.tmst}`, `${rangeColName}`, COUNT(*) AS `${countColName}`
+//                     |FROM `${rangeTableName}` GROUP BY `${InternalColumns.tmst}`, `${rangeColName}`
+//                  """.stripMargin
+//                }
+//              }
+//              val rangeMetricStep = SparkSqlStep(rangeMetricTableName, rangeMetricSql, emptyMap)
+//              val rangeMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
+//              val rangeMetricExports = genMetricExport(rangeMetricParam, rangeColName, rangeMetricTableName, ct, mode) :: Nil
+//
+//              RulePlan(rangeStep :: rangeMetricStep :: Nil, rangeMetricExports)
+//            } catch {
+//              case _: Throwable => emptyRulePlan
+//            }
+//          } else emptyRulePlan
+//        }
+//        case _ => emptyRulePlan
+//      }
+
       // return timeliness plan
-      timePlan.merge(recordPlan)
+
+      // 5. ranges
+      val rangePlan = TimeUtil.milliseconds(details.getString(TimelinessKeys._stepSize, "")) match {
+        case Some(stepSize) => {
+          // 5.1 range
+          val rangeTableName = "__range"
+          val stepColName = details.getStringOrKey(TimelinessKeys._step)
+          val rangeSql = {
+            s"""
+               |SELECT *, CAST((`${latencyColName}` / ${stepSize}) AS BIGINT) AS `${stepColName}`
+               |FROM `${latencyTableName}`
+             """.stripMargin
+          }
+          val rangeStep = SparkSqlStep(rangeTableName, rangeSql, emptyMap)
+
+          // 5.2 range metric
+          val rangeMetricTableName = "__rangeMetric"
+          val countColName = details.getStringOrKey(TimelinessKeys._count)
+          val rangeMetricSql = procType match {
+            case BatchProcessType => {
+              s"""
+                 |SELECT `${stepColName}`, COUNT(*) AS `${countColName}`
+                 |FROM `${rangeTableName}` GROUP BY `${stepColName}`
+                """.stripMargin
+            }
+            case StreamingProcessType => {
+              s"""
+                 |SELECT `${InternalColumns.tmst}`, `${stepColName}`, COUNT(*) AS `${countColName}`
+                 |FROM `${rangeTableName}` GROUP BY `${InternalColumns.tmst}`, `${stepColName}`
+                """.stripMargin
+            }
+          }
+          val rangeMetricStep = SparkSqlStep(rangeMetricTableName, rangeMetricSql, emptyMap)
+          val rangeMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
+          val rangeMetricExports = genMetricExport(rangeMetricParam, stepColName, rangeMetricTableName, ct, mode) :: Nil
+
+          RulePlan(rangeStep :: rangeMetricStep :: Nil, rangeMetricExports)
+        }
+        case _ => emptyRulePlan
+      }
+
+      timePlan.merge(recordPlan).merge(rangePlan)
     }
+  }
+
+  private def splitTimeRanges(tstrs: Seq[String]): List[(Long, String)] = {
+    val ts = tstrs.flatMap(TimeUtil.milliseconds(_)).sorted.toList
+    ts.map { t => (t, TimeUtil.time2String(t)) }
   }
 
 }
