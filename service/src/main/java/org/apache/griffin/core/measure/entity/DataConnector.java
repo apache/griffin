@@ -77,7 +77,7 @@ public class DataConnector extends AbstractAuditableEntity {
     }
 
     @JsonProperty("config")
-    public Map<String, String> getConfigMap() throws IOException {
+    public Map<String, String> getConfigMap() {
         return configMap;
     }
 
@@ -93,7 +93,7 @@ public class DataConnector extends AbstractAuditableEntity {
         });
     }
 
-    public String getConfig() throws IOException {
+    public String getConfig() {
         return config;
     }
 
@@ -156,7 +156,7 @@ public class DataConnector extends AbstractAuditableEntity {
         });
     }
 
-    public DataConnector(String name, String dataUnit, Map configMap,List<SegmentPredicate> predicates) throws IOException {
+    public DataConnector(String name, String dataUnit, Map configMap, List<SegmentPredicate> predicates) throws IOException {
         this.name = name;
         this.dataUnit = dataUnit;
         this.configMap = configMap;

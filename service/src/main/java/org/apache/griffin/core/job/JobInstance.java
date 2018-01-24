@@ -35,10 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
 import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
@@ -55,7 +55,7 @@ public class JobInstance implements Job {
     public static final String MEASURE_KEY = "measure";
     public static final String PREDICATES_KEY = "predicts";
     public static final String PREDICATE_JOB_NAME = "predicateJobName";
-    public static final String JOB_NAME = "jobName";
+    static final String JOB_NAME = "jobName";
     static final String PATH_CONNECTOR_CHARACTER = ",";
 
     @Autowired
@@ -78,7 +78,7 @@ public class JobInstance implements Job {
 
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(JobExecutionContext context) {
         try {
             initParam(context);
             setSourcesPartitionsAndPredicates(measure.getDataSources());
@@ -147,7 +147,7 @@ public class JobInstance implements Job {
      * @param segRange config of data
      * @return split timestamps of data
      */
-    private Long[] genSampleTs(SegmentRange segRange, DataConnector dc) throws IOException {
+    private Long[] genSampleTs(SegmentRange segRange, DataConnector dc) {
         Long offset = TimeUtil.str2Long(segRange.getBegin());
         Long range = TimeUtil.str2Long(segRange.getLength());
         String unit = dc.getDataUnit();
@@ -208,7 +208,7 @@ public class JobInstance implements Job {
             String value = entry.getValue();
             Set<String> set = new HashSet<>();
             for (Long timestamp : sampleTs) {
-                set.add(TimeUtil.format(value, timestamp,jobSchedule.getTimeZone()));
+                set.add(TimeUtil.format(value, timestamp, jobSchedule.getTimeZone()));
             }
             conf.put(entry.getKey(), StringUtils.join(set, PATH_CONNECTOR_CHARACTER));
         }
@@ -243,7 +243,7 @@ public class JobInstance implements Job {
     }
 
 
-    private Trigger newTriggerInstance(TriggerKey triggerKey, JobDetail jd, Long interval, Integer repeatCount) throws ParseException {
+    private Trigger newTriggerInstance(TriggerKey triggerKey, JobDetail jd, Long interval, Integer repeatCount) {
         return newTrigger()
                 .withIdentity(triggerKey)
                 .forJob(jd)

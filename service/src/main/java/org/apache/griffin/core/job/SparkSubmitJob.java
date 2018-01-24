@@ -100,7 +100,7 @@ public class SparkSubmitJob implements Job {
         return result;
     }
 
-    private boolean success(List<SegmentPredicate> predicates) throws IOException {
+    private boolean success(List<SegmentPredicate> predicates) {
         if (CollectionUtils.isEmpty(predicates)) {
             return true;
         }

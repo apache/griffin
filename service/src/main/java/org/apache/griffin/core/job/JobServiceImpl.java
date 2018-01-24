@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -65,8 +64,8 @@ public class JobServiceImpl implements JobService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
     public static final String JOB_SCHEDULE_ID = "jobScheduleId";
     public static final String GRIFFIN_JOB_ID = "griffinJobId";
-    static final int MAX_PAGE_SIZE = 1024;
-    static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int MAX_PAGE_SIZE = 1024;
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -132,7 +131,7 @@ public class JobServiceImpl implements JobService {
         return null;
     }
 
-    private void setTriggerTime(Trigger trigger, JobDataBean jobBean) throws SchedulerException {
+    private void setTriggerTime(Trigger trigger, JobDataBean jobBean) {
         Date nextFireTime = trigger.getNextFireTime();
         Date previousFireTime = trigger.getPreviousFireTime();
         jobBean.setNextFireTime(nextFireTime != null ? nextFireTime.getTime() : -1);
@@ -174,7 +173,7 @@ public class JobServiceImpl implements JobService {
         return "BA";
     }
 
-    private boolean isJobScheduleParamValid(JobSchedule js, GriffinMeasure measure) throws SchedulerException {
+    private boolean isJobScheduleParamValid(JobSchedule js, GriffinMeasure measure) {
         if (!isJobNameValid(js.getJobName())) {
             return false;
         }
@@ -235,20 +234,16 @@ public class JobServiceImpl implements JobService {
     }
 
     private List<String> getConnectorNames(GriffinMeasure measure) {
-        List<String> names = new ArrayList<>();
         Set<String> sets = new HashSet<>();
         List<DataSource> sources = measure.getDataSources();
         for (DataSource source : sources) {
-            source.getConnectors().forEach(dc -> {
-                sets.add(dc.getName());
-            });
+            source.getConnectors().forEach(dc -> sets.add(dc.getName()));
         }
         if (sets.size() < sources.size()) {
             LOGGER.warn("Connector names cannot be repeated.");
             return null;
         }
-        names.addAll(sets);
-        return names;
+        return new ArrayList<>(sets);
     }
 
     private GriffinMeasure getMeasureIfValid(Long measureId) {
@@ -333,7 +328,7 @@ public class JobServiceImpl implements JobService {
         return true;
     }
 
-    private boolean setJobDeleted(GriffinJob job) throws SchedulerException {
+    private boolean setJobDeleted(GriffinJob job) {
         job.setDeleted(true);
         jobRepo.save(job);
         return true;
@@ -492,7 +487,7 @@ public class JobServiceImpl implements JobService {
         } catch (IllegalArgumentException e) {
             LOGGER.error("Livy status is illegal. {}", e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Sync job instances failure. {}",e.getMessage());
+            LOGGER.error("Sync job instances failure. {}", e.getMessage());
         }
     }
 

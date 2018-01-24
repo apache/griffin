@@ -66,7 +66,7 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     }
 
     @JsonProperty("config")
-    public Map<String, String> getConfigMap() throws IOException {
+    public Map<String, String> getConfigMap(){
         return configMap;
     }
 
