@@ -95,7 +95,7 @@ public class JobServiceImpl implements JobService {
                     dataList.add(jobData);
                 }
             }
-        } catch (Exception e) {
+        } catch (SchedulerException e) {
             LOGGER.error("Failed to get running jobs.", e);
             throw new GriffinException.ServiceException("Failed to get running jobs.", e);
         }
@@ -135,7 +135,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class, noRollbackFor = GriffinException.class)
+    @Transactional(rollbackFor = Exception.class)
     public GriffinJob addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
@@ -417,9 +417,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size) {
-        if (size < 1) {
-            throw new GriffinException.NotFoundException("Page size must not be less than one.");
-        }
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         if (job == null) {
             LOGGER.warn("Job id {} does not exist.", jobId);

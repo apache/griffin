@@ -19,34 +19,17 @@ under the License.
 
 package org.apache.griffin.core.error.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConversionException;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity handleRuntimeException(RuntimeException e, HttpServletRequest request) {
-        LOGGER.error("Unexpected RuntimeException. " + e);
-        ExceptionResponseBody body = new ExceptionResponseBody(HttpStatus.INTERNAL_SERVER_ERROR,
-                "Unexpected Runtime Exception", request.getRequestURI(), e.getClass().getName());
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+public class GlobalControllerExceptionHandler {
 
     @ExceptionHandler(GriffinException.ServiceException.class)
     public ResponseEntity handleServiceException(HttpServletRequest request, GriffinException.ServiceException e) {
@@ -64,12 +47,5 @@ public class GlobalExceptionHandler {
         String message = e.getMessage();
         ExceptionResponseBody body = new ExceptionResponseBody(status, message, request.getRequestURI());
         return new ResponseEntity<>(body, status);
-    }
-
-    @ExceptionHandler({ServletException.class, TypeMismatchException.class,
-            HttpMessageConversionException.class, MethodArgumentNotValidException.class,
-            AsyncRequestTimeoutException.class, BindException.class})
-    public void defaultResolver(Exception e) throws Exception {
-        throw e;
     }
 }

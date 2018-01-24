@@ -46,7 +46,7 @@ public abstract class GriffinException extends RuntimeException {
         }
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public static class BadRequestException extends GriffinException {
         public BadRequestException(String message) {
             super(message);

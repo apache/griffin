@@ -19,17 +19,21 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import org.apache.griffin.core.error.exception.GlobalControllerExceptionHandler;
+import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.URLHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -38,23 +42,30 @@ import java.util.List;
 import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = MeasureController.class, secure = false)
 public class MeasureControllerTest {
-    @Autowired
+
     private MockMvc mvc;
 
-    @MockBean
-    private MeasureService service;
+    @Mock
+    private MeasureServiceImpl service;
+
+    @InjectMocks
+    private MeasureController controller;
 
 
     @Before
     public void setup() {
-
+        mvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .setControllerAdvice(new GlobalControllerExceptionHandler())
+                .build();
     }
 
     @Test
@@ -79,69 +90,64 @@ public class MeasureControllerTest {
         ;
     }
 
-//    @Test
-//    public void testDeleteMeasuresByIdForSuccess() throws Exception {
-//        given(service.deleteMeasureById(1L)).willReturn(DELETE_MEASURE_BY_ID_SUCCESS);
-//
-//        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(202)));
-//    }
-//
-//    @Test
-//    public void testDeleteMeasuresByIdForNotFound() throws Exception {
-//        given(service.deleteMeasureById(1L)).willReturn(RESOURCE_NOT_FOUND);
-//
-//        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(400)));
-//    }
-//
-//    @Test
-//    public void testDeleteMeasuresByIdForFail() throws Exception {
-//        given(service.deleteMeasureById(1L)).willReturn(DELETE_MEASURE_BY_ID_FAIL);
-//
-//        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(402)));
-//    }
-//
-//    @Test
-//    public void testUpdateMeasureForSuccess() throws Exception {
-//        Measure measure = createGriffinMeasure("view_item_hourly");
-//        String measureJson = JsonUtil.toJson(measure);
-//        given(service.updateMeasure(measure)).willReturn(UPDATE_MEASURE_SUCCESS);
-//
-//        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
-//                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(204)));
-//    }
-//
-//    @Test
-//    public void testUpdateMeasureForNotFound() throws Exception {
-//        Measure measure = createGriffinMeasure("view_item_hourly");
-//        String measureJson = JsonUtil.toJson(measure);
-//        given(service.updateMeasure(measure)).willReturn(RESOURCE_NOT_FOUND);
-//
-//        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
-//                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(400)));
-//
-//    }
-//
-//    @Test
-//    public void testUpdateMeasureForFail() throws Exception {
-//        Measure measure = createGriffinMeasure("view_item_hourly");
-//        String measureJson = JsonUtil.toJson(measure);
-//        given(service.updateMeasure(measure)).willReturn(UPDATE_MEASURE_FAIL);
-//
-//        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
-//                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(404)));
-//    }
+    @Test
+    public void testDeleteMeasuresByIdForSuccess() throws Exception {
+        doNothing().when(service).deleteMeasureById(1L);
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testDeleteMeasuresByIdForNotFound() throws Exception {
+        doThrow(new GriffinException.NotFoundException("Measure id does not exist."))
+                .when(service).deleteMeasureById(1L);
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteMeasuresByIdForFail() throws Exception {
+        doThrow(new RuntimeException()).when(service).deleteMeasureById(1L);
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testUpdateMeasureForSuccess() throws Exception {
+        Measure measure = createGriffinMeasure("view_item_hourly");
+        String measureJson = JsonUtil.toJson(measure);
+        doNothing().when(service).updateMeasure(measure);
+
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
+                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testUpdateMeasureForNotFound() throws Exception {
+        Measure measure = createGriffinMeasure("view_item_hourly");
+        String measureJson = JsonUtil.toJson(measure);
+        doThrow(new GriffinException.NotFoundException("Measure id does not exist."))
+                .when(service).updateMeasure(measure);
+
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
+                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testUpdateMeasureForFail() throws Exception {
+        Measure measure = createGriffinMeasure("view_item_hourly");
+        String measureJson = JsonUtil.toJson(measure);
+        doThrow(new RuntimeException()).when(service).updateMeasure(measure);
+
+        mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
+                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isInternalServerError());
+    }
 
     @Test
     public void testGetAllMeasuresByOwner() throws Exception {
@@ -158,40 +164,52 @@ public class MeasureControllerTest {
         ;
     }
 
-//    @Test
-//    public void testCreateNewMeasureForSuccess() throws Exception {
-//        Measure measure = createGriffinMeasure("view_item_hourly");
-//        String measureJson = JsonUtil.toJson(measure);
-//        given(service.createMeasure(measure)).willReturn(CREATE_MEASURE_SUCCESS);
-//
-//        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
-//                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(201)));
-//    }
-//
-//    @Test
-//    public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
-//        Measure measure = createGriffinMeasure("view_item_hourly");
-//        String measureJson = JsonUtil.toJson(measure);
-//        given(service.createMeasure(measure)).willReturn(CREATE_MEASURE_FAIL_DUPLICATE);
-//
-//        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
-//                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(410)));
-//    }
-//
-//    @Test
-//    public void testCreateNewMeasureForFailWithSaveException() throws Exception {
-//        Measure measure = createGriffinMeasure("view_item_hourly");
-//        String measureJson = JsonUtil.toJson(measure);
-//        given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL);
-//
-//        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures").contentType(MediaType.APPLICATION_JSON).content(measureJson))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code", is(401)));
-//    }
+    @Test
+    public void testCreateNewMeasureForSuccess() throws Exception {
+        GriffinMeasure measure = createGriffinMeasure("view_item_hourly");
+        String measureJson = JsonUtil.toJson(measure);
+        given(service.createMeasure(measure)).willReturn(measure);
+
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
+                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is("view_item_hourly")));
+    }
+
+    @Test
+    public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
+        Measure measure = createGriffinMeasure("view_item_hourly");
+        String measureJson = JsonUtil.toJson(measure);
+        doThrow(new GriffinException.ConflictException("Measure name already exists."))
+                .when(service).createMeasure(measure);
+
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
+                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void testCreateNewMeasureForFailWithSaveException() throws Exception {
+        Measure measure = createGriffinMeasure("view_item_hourly");
+        String measureJson = JsonUtil.toJson(measure);
+        doThrow(new RuntimeException()).when(service).createMeasure(measure);
+
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
+                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testCreateNewMeasureForFailWithInvalidParams() throws Exception {
+        Measure measure = createGriffinMeasure("view_item_hourly");
+        String measureJson = JsonUtil.toJson(measure);
+        doThrow(new GriffinException.BadRequestException("Invalid Params."))
+                .when(service).createMeasure(measure);
+
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
+                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isBadRequest());
+    }
 
 
 }
