@@ -58,16 +58,33 @@ export class ChartService {
       return timestamp+TzOffset*60*60*1000;
   }
 
+  // getMetricData(metric) {
+  //   var data = [];
+  //   var chartData = metric.details;
+  //   for(var i = 0; i < chartData.length; i++){
+  //          if(chartData[i]._source.total!=0)
+  //            data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.value.matched/chartData[i]._source.value.total*100).toFixed(2))]);
+  //          else
+  //            data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((0).toFixed(2))]);
+  //     }
+
+  //   data.sort(function(a, b){
+  //     return a[0] - b[0];
+  //   });
+  //   return data;
+  // }
+
   getMetricData(metric) {
     var data = [];
-    var chartData = metric.details;
-    for(var i = 0; i < chartData.length; i++){
-           if(chartData[i]._source.total!=0)
-             data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.value.matched/chartData[i]._source.value.total*100).toFixed(2))]);
-           else
-             data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((0).toFixed(2))]);
+    if(metric.details){
+      var chartData = metric.details;
+      for(var i = 0; i < chartData.length; i++){
+        if(chartData[i].value.total!=0)
+          data.push([this.formatTimeStamp(chartData[i].tmst), parseFloat((chartData[i].value.matched/chartData[i].value.total*100).toFixed(2))]);
+        else
+          data.push([this.formatTimeStamp(chartData[i].tmst), parseFloat((0).toFixed(2))]);
       }
-
+    }
     data.sort(function(a, b){
       return a[0] - b[0];
     });

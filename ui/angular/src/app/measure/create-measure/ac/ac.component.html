@@ -53,6 +53,14 @@ under the License.
               <div class="stepNumber">
                 4
               </div>
+              <span class="stepDesc text-small"> Partition Configuration </span>
+            </a>
+          </li>
+          <li (click)="goTo(5)">
+            <a [ngClass]="{'selected' : currentStep >= 5, 'done' : currentStep > 5}">
+              <div class="stepNumber">
+                5
+              </div>
               <span class="stepDesc text-small"> Configuration </span>
             </a>
           </li>
@@ -247,6 +255,41 @@ under the License.
         </div>
       </div>
       <div id="step-4" *ngIf="currentStep == 4" class="formStep">
+        <label class="stepDesc">Please complete the partition configuration for {{currentTable}} and {{currentTableTarget}}</label>
+        <div class="container-fluid">
+          <div class="col-md-12 col-lg-12 col-sm-12">
+            <fieldset>
+              <legend>
+                Required Information
+              </legend>
+              <div class="y-scrollable">
+                <div class="col-md-6 col-lg-6 col-sm-6">
+                  <div class="form-group" style="text-align:center">
+                    {{currentDB}}.{{currentTable}}
+                  </div>
+                  <app-configuration [data]="srcconfig" [location]="src_location" (event)="getSrc($event)"></app-configuration>
+                </div>
+                <div class="col-md-6 col-lg-6 col-sm-6" id="target">
+                  <div class="form-group" style="text-align:center">
+                    {{currentDB}}.{{currentTableTarget}}
+                  </div>
+                  <app-configuration [data]="tgtconfig" [location]="tgt_location" (event)="getTgt($event)"></app-configuration>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="form-group btn-container">
+            <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev(Form)">
+              <i class="fa fa-arrow-circle-left"></i> Back
+            </button>
+            <toaster-container></toaster-container>
+            <button class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="next(Form)">
+              Next <i class="fa fa-arrow-circle-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="step-5" *ngIf="currentStep == 5" class="formStep">
         <label class="stepDesc">Please setup the measure required information</label>
         <div class="container-fluid">
           <div class="col-md-12 col-lg-12 col-sm-12">
@@ -291,23 +334,33 @@ under the License.
                     </div>
                   </div>
                 </div>
-                <div class="col-md-12 col-lg-12 col-sm-12">
+                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Organization<span class="symbol required"></span>:
+                      Group:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" id="systemSelector" class="form-control" [(ngModel)]="org" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org">
+                      <tag-input class="form-control" style="height: 44px;padding: 0 6px;" id="systemSelector" required [(ngModel)]='grp' [editable]='true' name="grp"></tag-input>
+                    </div>
+                  </div>
+                </div> -->
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group">
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Source:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10">
+                      <input type="text" class="form-control" name="DataAsset" value="{{currentTable}}" disabled>
                     </div>
                   </div>
                 </div>
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      DataAsset:
+                      Target:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10">
-                      <input type="text" class="form-control" name="DataAsset" value="{{currentTable}},{{currentTableTarget}}" disabled>
+                      <input type="text" class="form-control" name="DataAsset" value="{{currentTableTarget}}" disabled>
                     </div>
                   </div>
                 </div>
@@ -344,7 +397,7 @@ under the License.
         <div class="modal-dialog modal-xg modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <button type="button" class="close" (click)="hide()">&times;</button>
               <h4 class="modal-title">Save the measure with the below information?</h4>
             </div>
             <div class="modal-body">
@@ -379,19 +432,28 @@ under the License.
                           {{type}}
                         </div>
                       </div>
-                      <div class="row">
+                      <!-- <div class="row">
                         <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                          Organization:
+                          Group:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{org}}
+                          {{showgrp}}
+                        </div>
+                      </div> -->
+                      <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Source:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{currentDB}}.{{currentTable}}
                         </div>
                       </div>
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
-                          DataAsset:
+                          Target:
                         </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8">{{currentTable}},{{currentTableTarget}}
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{currentDB}}.{{currentTableTarget}}
                         </div>
                       </div>
                       <div class="row">
