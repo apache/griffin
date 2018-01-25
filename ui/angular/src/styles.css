@@ -22,7 +22,7 @@ under the License.
 @import url('../node_modules/font-awesome/css/font-awesome.css');
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import url('../node_modules/angular2-toaster/toaster.css');
-@import "~nouislider/distribute/nouislider.min.css";
+@import url('../node_modules/nouislider/distribute/nouislider.min.css');
 
 
 /*@import url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css');*/
