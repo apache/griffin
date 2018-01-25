@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FormsModule, Validator} from '@angular/forms';
 import {ServiceService} from '../../../service/service.service';
@@ -29,6 +29,7 @@ import { ToasterModule, ToasterService} from 'angular2-toaster';
 import * as $ from 'jquery';
 import { HttpClient} from '@angular/common/http';
 import { Router} from "@angular/router";
+// import { TagInputModule } from 'ngx-chips';
 
 
 class node {
@@ -38,6 +39,7 @@ class node {
   isExpanded:boolean;
   cols:Col[];
   parent:string;
+  location:string;
 };
 class Col{
   name:string;
@@ -66,9 +68,12 @@ class Col{
 })
 
 export class AcComponent implements OnInit , AfterViewChecked {
-
+  
+  defaultValue:string;
   currentStep = 1;
-  org:string;
+  // grp = [];
+  // showgrp:string;
+  // finalgrp = [];
   desc:string;
   selection = [];
   selectedAll = false;
@@ -88,49 +93,110 @@ export class AcComponent implements OnInit , AfterViewChecked {
   matchFunctions = ['=', '!=', '>', '>=','<',"<="];
   data:any;
   currentDBTargetStr: string;
-  currentDBstr: string; 
+  currentDBstr: string;
+  srcconfig = {
+    "where":'',
+    "num":1,
+    "timetype":'day',
+    "needpath":false,
+    "path":''
+  };
+  tgtconfig = {
+    "where":'',
+    "num":1,
+    "timetype":'day',
+    "needpath":false,
+    "path":''
+  };
+  srcdata = {
+    "database":'',
+    "table":'',
+    "selection":[]
+  }
+  tgtdata = {
+    "database":'',
+    "table":'',
+    "selection":[]
+  }
+  src_where: string;
+  tgt_where: string;
+  src_size: string;
+  tgt_size: string;
+  src_path: string;
+  tgt_path: string;
+  src_name: string;
+  tgt_name: string;
+  src_location: string;
+  tgt_location: string;
 
   measureTypes = ['accuracy','validity','anomaly detection','publish metrics'];
   type = "accuracy";
   newMeasure = {
     "name":'',
+    "measure.type":"griffin",
+    "dq.type": "accuracy",
     "process.type": "batch",
     "owner":"",
     "description":"",
-    "organization":"",
+    // "group":[],
     "data.sources": [
     {
       "name": "source",
       "connectors": [
-        {
+        { 
+          "name":"",
           "type": "HIVE",
           "version": "1.2",
+          "data.unit":"",
           "config":{
             "database":'',
             "table.name":'',
-          }
+            "where":''
+          },
+          "predicates":[
+            {
+              "type":"file.exist",
+              "config":{
+                "root.path":"hdfs:///griffin/demo_src",
+                "path":""
+              }
+            }
+          ]
         }
       ]
     }, {
       "name": "target",
       "connectors": [
         {
+          "name":"",
           "type": "HIVE",
           "version": "1.2",
+          "data.unit":"",
           "config":{
             "database":'',
             "table.name":'',
-          }
+            "where":''
+          },
+          "predicates":[
+            {
+              "type":"file.exist",
+              "config":{
+                "root.path":"hdfs:///griffin/demo_src",
+                "path":""
+              }
+            }
+          ]
         }
       ]
     }
     ],
 
-    "evaluateRule":{
+    "evaluate.rule":{
         "rules": [
           {
             "dsl.type": "griffin-dsl",
             "dq.type": "accuracy",
+            "name": "accuracy",
             "rule": ""
             // "details": {
             //   "source": "source",
@@ -152,9 +218,9 @@ export class AcComponent implements OnInit , AfterViewChecked {
     }
   };
   name:'';
-  evaluateRule:any;
+  // evaluate.rule:any;
   // desc:'';
-  // org:'';
+  // grp:'';
   owner = 'test';
   createResult :any;
 
@@ -214,8 +280,11 @@ export class AcComponent implements OnInit , AfterViewChecked {
       this.selectedAllTarget = false;
     }
     let l = this.selectionTarget.length;
-    for(let i =0;i<l;i++)
+    for(let i =0;i<l;i++){
       this.matches[i] = "=";
+      // this.mappings[i] = this.currentDB + '.' + this.currentTable + '.' + row.name;
+    }
+      
   };
 
   toggleAll () {
@@ -263,6 +332,9 @@ export class AcComponent implements OnInit , AfterViewChecked {
         return this.selectionTarget && this.selectionTarget.length == this.mappings.length
           && this.mappings.indexOf('') == -1
     } else if (step == 4) {
+      return true;
+    } else if(step == 5){
+
     }
     return false;
   } 
@@ -273,53 +345,84 @@ export class AcComponent implements OnInit , AfterViewChecked {
   goTo (i) {
     this.currentStep = i;
   }
-  submit (form) {                
+  submit (form) {              
       // form.$setPristine();
+      // this.finalgrp = [];
       if (!form.valid) {
         this.toasterService.pop('error', 'Error!', 'please complete the form in this step before proceeding');
         return false;
       }
+      // for(let i=0;i<this.grp.length;i++){
+      //   this.finalgrp.push(this.grp[i].value);
+      // }
+      // this.showgrp = this.finalgrp.join(",");
       var rule = '';
       this.newMeasure = {
-         "name":this.name,
-         "process.type": "batch",
-         "owner":this.owner,
-         "description":this.desc,
-         "organization":this.org,
-         "data.sources": [
-         {
-           "name": "source",
-           "connectors": [
-             {
-               "type": "HIVE",
-               "version": "1.2",
-               "config":{
-                 "database":this.currentDB,
-                 "table.name":this.currentTable,
-               }
-             }
-           ]
-         }, {
-           "name": "target",
-           "connectors": [
-             {
-               "type": "HIVE",
-               "version": "1.2",
-               "config":{
-                 "database":this.currentDBTarget,
-                 "table.name":this.currentTableTarget,
-               }
-             }
-           ]
-         }
-         ],
-     
-         "evaluateRule":{
-             "rules": [
-               {
-                 "dsl.type": "griffin-dsl",
-                 "dq.type": "accuracy",
-                 "rule": ""
+        "name":this.name,
+        "measure.type":"griffin",
+        "dq.type": "accuracy",
+        "process.type": "batch",
+        "owner":this.owner,
+        "description":this.desc,
+        // "group":this.finalgrp,
+        "data.sources": [
+          {
+            "name": "source",
+            "connectors": [
+              {
+                "name":this.src_name,
+                "type": "HIVE",
+                "version": "1.2",
+                "data.unit":this.src_size,
+                "config":{
+                  "database":this.currentDB,
+                  "table.name":this.currentTable,
+                  "where":this.src_where
+                },
+                "predicates":[
+                  {
+                    "type":"file.exist",
+                    "config":{
+                      "root.path":"hdfs:///griffin/demo_src",
+                      "path":this.src_path
+                    }
+                  }
+                ]
+              }
+            ]
+          }, {
+            "name": "target",
+            "connectors": [
+              {
+                "name":this.tgt_name,
+                "type": "HIVE",
+                "version": "1.2",
+                "data.unit":this.tgt_size,
+                "config":{
+                  "database":this.currentDBTarget,
+                  "table.name":this.currentTableTarget,
+                  "where":this.tgt_where
+                },
+                "predicates":[
+                  {
+                    "type":"file.exist",
+                    "config":{
+                      "root.path":"hdfs:///griffin/demo_src",
+                      "path":this.tgt_path
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],     
+        "evaluate.rule":{
+          "rules": [
+            {
+              "dsl.type": "griffin-dsl",
+              "dq.type": "accuracy",
+              "name": "accuracy",
+              "rule": ""
                  // "details": {
                  //   "source": "source",
                  //   "target": "target",
@@ -335,22 +438,28 @@ export class AcComponent implements OnInit , AfterViewChecked {
                  //   "total": "total",
                  //   "matched": "matched"
                  // }
-               }
-             ]
-         }
+            }
+          ]
+        }
       };
+      if(this.src_size.indexOf('0')==0){
+        delete this.newMeasure['data.sources'][0]['connectors'][0]['data.unit'];
+      }
+      if(this.tgt_size.indexOf('0')==0){
+        delete this.newMeasure['data.sources'][1]['connectors'][0]['data.unit'];
+      }
       var mappingRule = function(src, tgt, matches) {
-          var rules;
-          rules = 'source.' + src  + matches + 'target.' + tgt
-          return rules;
+        var rules;
+        rules = 'source.' + src  + matches + 'target.' + tgt
+        return rules;
       }
       var self = this;
       var rules = this.mappings.map(function(item, i) {
-          return mappingRule(item,self.selectionTarget[i], self.matches[i]);
+        return mappingRule(item,self.selectionTarget[i], self.matches[i]);
       });
       rule = rules.join(" AND ");
       this.rules = rule;
-      this.newMeasure.evaluateRule.rules[0].rule = rule;
+      this.newMeasure['evaluate.rule'].rules[0].rule = rule;
       this.visible = true;
       setTimeout(() => this.visibleAnimate = true, 100);
   }
@@ -394,6 +503,8 @@ export class AcComponent implements OnInit , AfterViewChecked {
             this.currentTable = node.data.name;
             this.currentDB = node.data.parent;
             this.schemaCollection = node.data.cols;
+            this.src_location = node.data.location;
+            this.src_name = 'source' + new Date().getTime();
             this.selectedAll = false;
             this.selection = [];
             for(let row of this.schemaCollection){
@@ -429,6 +540,8 @@ export class AcComponent implements OnInit , AfterViewChecked {
             this.currentTableTarget = node.data.name;
             this.currentDBTarget = node.data.parent;
             this.schemaCollectionTarget = node.data.cols;
+            this.tgt_location = node.data.location;
+            this.tgt_name = 'target' + new Date().getTime();
             this.selectedAllTarget = false;
             this.selectionTarget = [];
             for(let row of this.schemaCollectionTarget){
@@ -452,6 +565,35 @@ export class AcComponent implements OnInit , AfterViewChecked {
   onResize(event){
     this.resizeWindow();
   }
+  
+  srcAttr(evt){
+    this.srcdata = evt;
+    this.currentDB = evt.database;
+    this.currentTable = evt.table;
+    this.selection = evt.selection;
+  }
+  
+  tgtAttr(evt){
+    this.tgtdata = evt;
+    this.currentDBTarget = evt.database;
+    this.currentTableTarget = evt.table;
+    this.selectionTarget = evt.selection;
+  }
+
+  getSrc(evt){
+    this.srcconfig = evt;
+    this.src_where = evt.where;
+    this.src_size = evt.num + evt.timetype;
+    this.src_path = evt.path;
+  }
+
+  getTgt(evt){
+    this.tgtconfig = evt;
+    this.tgt_where = evt.where;
+    this.tgt_size = evt.num + evt.timetype;
+    this.tgt_path = evt.path;
+  }
+  
 
   resizeWindow(){
     var stepSelection = '.formStep[id=step-' + this.currentStep + ']';
@@ -464,7 +606,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
         'height': $('fieldset').height()
     });
   }
-
+    
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{
@@ -483,6 +625,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
           new_child.name = this.data[db][i]['tableName'];
           new_node.children.push(new_child);
           new_child.isExpanded = false;
+          new_child.location = this.data[db][i]['sd']['location'];
           new_child.parent = db;
           new_child.cols = Array<Col>();
           for(let j = 0;j<this.data[db][i]['sd']['cols'].length;j++){
@@ -495,7 +638,9 @@ export class AcComponent implements OnInit , AfterViewChecked {
         this.nodeList.push(new_node);
     }
     this.nodeListTarget = JSON.parse(JSON.stringify(this.nodeList));
-    });   
+    });
+    this.src_size = '1day';
+    this.tgt_size = '1day';
   };
 
   ngAfterViewChecked(){

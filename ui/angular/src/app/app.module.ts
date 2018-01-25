@@ -17,21 +17,17 @@ specific language governing permissions and limitations
 under the License.
 */
 import { BrowserModule } from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import { NgModule} from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HttpClientModule} from '@angular/common/http';
-
-import { Ng2SmartTableModule } from 'ng2-smart-table';
-import {DataTableModule} from "angular2-datatable";
+import { DataTableModule} from "angular2-datatable";
 import { TreeModule } from 'angular-tree-component';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { AngularEchartsModule } from 'ngx-echarts';
 // import { MdDatepickerModule, MdNativeDateModule} from '@angular/material';
 import { MatDatepickerModule, MatNativeDateModule} from '@angular/material';
 import { Location, LocationStrategy, HashLocationStrategy} from '@angular/common';
-
-
-import {ToasterModule, ToasterService} from 'angular2-toaster';
+import { ToasterModule, ToasterService} from 'angular2-toaster';
 import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { MeasureComponent } from './measure/measure.component';
@@ -50,8 +46,9 @@ import { PrComponent } from './measure/create-measure/pr/pr.component';
 import { LoginComponent } from './login/login.component';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
-import {TruncatePipe} from './sidebar/truncate.pipe';
-
+import { TruncatePipe} from './sidebar/truncate.pipe';
+import { ConfigurationComponent } from './measure/create-measure/configuration/configuration.component';
+import { NouisliderModule } from 'ng2-nouislider';
 
 
 const appRoutes: Routes = [
@@ -138,16 +135,17 @@ const appRoutes: Routes = [
     PrComponent,
     LoginComponent,
     RuleComponent,
-    TruncatePipe
+    TruncatePipe,
+    ConfigurationComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    Ng2SmartTableModule,
     TreeModule,
     BrowserAnimationsModule,
     ToasterModule,
     FormsModule,
+    NouisliderModule,
     AngularEchartsModule,
     DataTableModule,
     AngularMultiSelectModule,
@@ -157,8 +155,6 @@ const appRoutes: Routes = [
     ),
     MatNativeDateModule,
     MatDatepickerModule
-
-
   ],
   providers: [],
   bootstrap: [AppComponent]
