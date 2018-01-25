@@ -35,26 +35,13 @@ export class HealthComponent implements OnInit {
   constructor(private http: HttpClient,private router:Router,public serviceService:ServiceService) { };
   chartOption:object;
   // var formatUtil = echarts.format;
-  orgs = [];
   dataData = [];
   finalData = [];
   oData = [];
   // originalData = [];
   originalData:any;
-  metricName = [];
-  metricNameUnique = [];
-  myData = [];
-  measureOptions = [];
-  originalOrgs = [];
-  orgWithMeasure: any;
-
-
-  status:{
-    'health':number,
-    'invalid':number
-  };
+  mesWithJob:any;
   // var formatUtil = echarts.format;
-  metricData = [];
 
   
   onChartClick($event){
@@ -181,79 +168,40 @@ export class HealthComponent implements OnInit {
   
 
   renderData(){
-    var url_organization = this.serviceService.config.uri.organization;
     let url_dashboard = this.serviceService.config.uri.dashboard;
-    this.http.get(url_organization).subscribe(data => {
-      var jobMap = new Map();
-      this.orgWithMeasure = data;
-      var orgNode = null;
-      for(let orgName in this.orgWithMeasure){
-        orgNode = new Object();
-        orgNode.name = orgName;
-        orgNode.jobMap = [];
-        orgNode.measureMap = [];
+    this.http.get(url_dashboard).subscribe(data => {
+      this.mesWithJob = data;
+      var mesNode = null;
+      for(let mesName in this.mesWithJob){
+        mesNode = new Object();
+        mesNode.name = mesName;
         var node = null;
         node = new Object();
-        node.name = orgName;
+        node.name = mesName;
         node.dq = 0;
-        //node.metrics = new Array();
         var metricNode = {
           'name':'',
           'timestamp':'',
           'dq':0,
           'details':[]
         }
-        var array = [];
-        node.metrics = array;
-        for(let key in this.orgWithMeasure[orgName]){
-          orgNode.measureMap.push(key);
-          this.measureOptions.push(key);
-          var jobs = this.orgWithMeasure[orgName][key];          
-            for(let i = 0;i < jobs.length;i++){
-               orgNode.jobMap.push(jobs[i].jobName);
-               var job = jobs[i].jobName;
-               jobMap.set(job, orgNode.name);
-               this.http.post(url_dashboard, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": job }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":300}).subscribe( jobes=> { 
-                 this.originalData = jobes;
-                 if(this.originalData.hits){
-                    this.metricData = this.originalData.hits.hits;
-                    if(this.metricData[0]._source.value.miss != undefined){
-                      metricNode.details = this.metricData;                                
-                      metricNode.name = this.metricData[0]._source.name;
-                      metricNode.timestamp = this.metricData[0]._source.tmst;
-                      metricNode.dq = this.metricData[0]._source.value.matched/this.metricData[0]._source.value.total*100;
-                      this.pushToNode(jobMap, metricNode);
-                  }
-                 }
-               },
-               err => {
-                 // console.log(err);
-               console.log('Error occurs when connect to elasticsearh!');
-               });            
-            }                          
-        } 
-        this.finalData.push(node); 
-        this.orgs.push(orgNode);                 
+        node.metrics = [];
+        var metricData = this.mesWithJob[mesName][0];
+        if(metricData.metricValues[0] != undefined && metricData.metricValues[0].value.matched != undefined){
+          metricNode.details = JSON.parse(JSON.stringify(metricData.metricValues));
+          metricNode.name = metricData.name;
+          metricNode.timestamp = metricData.metricValues[0].value.tmst;
+          metricNode.dq = metricData.metricValues[0].value.matched/metricData.metricValues[0].value.total*100;
+          node.metrics.push(metricNode);
+        }
+        this.finalData.push(node);                 
       }
-      this.oData = this.finalData.slice(0);
       var self = this;
       setTimeout(function function_name(argument) {
-         self.renderTreeMap(self.oData);
-      },1000) 
+        self.renderTreeMap(self.finalData);
+      },1000)
     });
   };
-
-  pushToNode(jobMap, metricNode){
-    var jobName = metricNode.name;
-    var orgName = jobMap.get(jobName);
-    var org = null;
-    for(var i = 0; i < this.finalData.length; i ++){
-      org = this.finalData[i];
-      if(orgName == org.name){
-        org.metrics.push(Object.assign({}, metricNode));
-      }
-    }
-  }
 
   ngOnInit() {
     var self = this;

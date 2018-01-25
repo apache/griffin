@@ -18,7 +18,6 @@ under the License.
 */
 import { Component, OnInit } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import { Ng2SmartTableModule ,LocalDataSource} from 'ng2-smart-table';
 import * as $ from 'jquery';
 import {ServiceService} from '../service/service.service';
 
@@ -30,7 +29,6 @@ import {ServiceService} from '../service/service.service';
 })
 export class DataassetComponent implements OnInit {
   public results = [];
-  source:LocalDataSource;
   public visible = false;
   public visibleAnimate = false;
   sourceTable :string;
@@ -69,15 +67,13 @@ export class DataassetComponent implements OnInit {
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{
-        for (let db in data) {
-            for(let table of data[db]){           
-            table.location = table.sd.location;
-            this.results.push(table);
-            }       
-        }
-        this.source = new LocalDataSource(this.results);
-        this.source.load(this.results);
-        $('.icon').hide();
+      for (let db in data) {
+        for(let table of data[db]){           
+          table.location = table.sd.location;
+          this.results.push(table);
+        }       
+      }
+      $('.icon').hide();
     },err =>{
       
     });

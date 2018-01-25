@@ -48,20 +48,36 @@ under the License.
             {{ruleData.type}}
           </div>
         </div>
-        <div class="row">
+        <!-- <div class="row">
           <label for="systemSelector" class="col-xs-4">
             Organization:
           </label>
           <div class="col-xs-8 " style="color: #fff">
             {{ruleData.organization}}
           </div>
-        </div>
-        <div class="row">
+        </div> -->
+        <div class="row" *ngIf="ruleData.type=='accuracy'">
           <label class="col-xs-4">
-            DataAsset:
+            Source:
           </label>
           <div class="col-xs-8" style="color: #fff">
-            {{sourceTable}}&nbsp;&nbsp;{{targetTable}}
+            {{sourceTable}}
+          </div>
+        </div>
+        <div class="row" *ngIf="ruleData.type=='accuracy'">
+          <label class="col-xs-4">
+            Target:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{targetTable}}
+          </div>
+        </div>
+        <div class="row" *ngIf="ruleData.type=='profiling'">
+          <label class="col-xs-4">
+            DataSource:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{sourceTable}}
           </div>
         </div>
         <div class="row">
@@ -77,11 +93,11 @@ under the License.
   </div>
   <!--//row-->
   <br/>
-  <div>
+  <div *ngIf="ruleData['measure.type']!=='external'">
     <h5 class="row">Mapping rules</h5>
-    <div class="">
+    <div *ngIf="ruleData.type=='accuracy'" class="">
       <p *ngFor="let index of currentrule">{{index.rule}}</p>
-      <div *ngIf="ruleData.type=='accuracy'">
+      <div>
         <p>
           <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
         </p>
@@ -102,6 +118,9 @@ under the License.
           </div>
         </div>
       </div>
+    </div>
+    <div *ngIf="ruleData.type=='profiling'" class="">
+      <p>{{this.prorule}}</p>
     </div>
   </div>
 </div>

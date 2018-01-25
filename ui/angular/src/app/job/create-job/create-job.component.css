@@ -72,3 +72,19 @@ fieldset {
 #md-datepicker-0{
 	height:250px;
 }
+
+.center{
+    margin-left: 5%;
+}
+
+.range{
+    display:block;
+    width: 20%;
+    height: 10%;
+    margin-bottom: 5px;
+}
+.setborder{
+    border:2px solid;
+    border-radius: 5px;
+    width: 8%;
+}
