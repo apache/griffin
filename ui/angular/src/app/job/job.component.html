@@ -26,12 +26,10 @@ under the License.
       <thead>
         <tr style="background-color:#7D95CC">
           <th st-ratio="15">Job Name</th>
-          <th st-ratio="15">Source Pattern</th>
-          <th st-ratio="15">Target Pattern</th>
           <th st-ratio="15">Previous Fire Time</th>
           <th st-ratio="20">Next Fire Time</th>
           <th st-ratio="15">Trigger State</th>
-          <th st-ratio="5">Interval</th>
+          <th st-ratio="5">Cron Expression</th>
           <th st-ratio="5">Action</th>
         </tr>
       </thead>
@@ -52,8 +50,6 @@ under the License.
             <i *ngIf="row.showDetail" class="fa fa-chevron-circle-down blue"></i> {{row.jobName}}
             <!-- -{{(row.createTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }} -->
           </td>
-          <td>{{row.sourcePattern}}</td>
-          <td>{{row.targetPattern}}</td>
           <td [hidden]="row.previousFireTime!=-1">--/--/-- &nbsp;&nbsp;--:--</td>
           <td [hidden]="row.previousFireTime==-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
           <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
@@ -62,7 +58,7 @@ under the License.
                     </span>
             <span *ngIf='row.triggerState != "NORMAL"' class='unnormal'>{{row.triggerState}}</span>
           </td>
-          <td>{{row.interval}}</td>
+          <td>{{row.cronExpression}}</td>
           <td>
             &nbsp;
             <a (click)="remove(row)" title="delete" style="text-decoration:none">
