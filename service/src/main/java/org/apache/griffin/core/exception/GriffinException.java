@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.error.exception;
+package org.apache.griffin.core.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,22 +34,22 @@ public abstract class GriffinException extends RuntimeException {
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public static class NotFoundException extends GriffinException {
-        public NotFoundException(String message) {
-            super(message);
+        public NotFoundException(GriffinExceptionMessage message) {
+            super(message.toString());
         }
     }
 
     @ResponseStatus(value = HttpStatus.CONFLICT)
     public static class ConflictException extends GriffinException {
-        public ConflictException(String message) {
-            super(message);
+        public ConflictException(GriffinExceptionMessage message) {
+            super(message.toString());
         }
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public static class BadRequestException extends GriffinException {
-        public BadRequestException(String message) {
-            super(message);
+        public BadRequestException(GriffinExceptionMessage message) {
+            super(message.toString());
         }
     }
 
@@ -58,6 +58,5 @@ public abstract class GriffinException extends RuntimeException {
             super(message, cause);
         }
     }
-
 
 }

@@ -20,7 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
-import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 
 @Service
 public class MeasureServiceImpl implements MeasureService {
@@ -66,7 +68,7 @@ public class MeasureServiceImpl implements MeasureService {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
         if (!CollectionUtils.isEmpty(aliveMeasureList)) {
             LOGGER.warn("Failed to create new measure {}, it already exists.", measure.getName());
-            throw new GriffinException.ConflictException("Measure name already exists.");
+            throw new GriffinException.ConflictException(MEASURE_NAME_ALREADY_EXIST);
         }
         MeasureOperation op = getOperation(measure);
         return op.create(measure);
@@ -76,11 +78,11 @@ public class MeasureServiceImpl implements MeasureService {
     public void updateMeasure(Measure measure) {
         Measure m = measureRepo.findByIdAndDeleted(measure.getId(), false);
         if (m == null) {
-            throw new GriffinException.NotFoundException("Measure id does not exist.");
+            throw new GriffinException.NotFoundException(MEASURE_ID_DOES_NOT_EXIST);
         }
         if (!m.getType().equals(measure.getType())) {
             LOGGER.warn("Can't update measure to different type.");
-            throw new GriffinException.BadRequestException("Can't update measure to different type.");
+            throw new GriffinException.BadRequestException(MEASURE_TYPE_DOES_NOT_MATCH);
         }
         MeasureOperation op = getOperation(measure);
         op.update(measure);
@@ -90,7 +92,7 @@ public class MeasureServiceImpl implements MeasureService {
     public void deleteMeasureById(Long measureId) {
         Measure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
-            throw new GriffinException.NotFoundException("Measure id does not exist.");
+            throw new GriffinException.NotFoundException(MEASURE_ID_DOES_NOT_EXIST);
         }
         MeasureOperation op = getOperation(measure);
         op.delete(measure);

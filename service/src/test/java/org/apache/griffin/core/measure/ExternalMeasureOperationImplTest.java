@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.job.repo.VirtualJobRepo;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
@@ -34,7 +34,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -72,14 +71,6 @@ public class ExternalMeasureOperationImplTest {
         operation.create(measure);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testCreateForFailureWithException() {
-        ExternalMeasure measure = createExternalMeasure("view_item_hourly");
-        given(measureRepo.save(measure)).willThrow(new RuntimeException());
-
-        operation.create(measure);
-    }
-
     @Test
     public void testUpdateForSuccess() {
         ExternalMeasure measure = createExternalMeasure("view_item_hourly");
@@ -100,16 +91,6 @@ public class ExternalMeasureOperationImplTest {
         operation.update(measure);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testUpdateForFailureWithSave() {
-        ExternalMeasure measure = createExternalMeasure("view_item_hourly");
-        measure.setId(1L);
-        given(measureRepo.findOne(1L)).willReturn(measure);
-        given(measureRepo.save(Matchers.any(ExternalMeasure.class))).willThrow(new RuntimeException());
-
-        operation.update(measure);
-    }
-
     @Test
     public void testDeleteForSuccess() {
         ExternalMeasure measure = createExternalMeasure("view_item_hourly");
@@ -117,13 +98,5 @@ public class ExternalMeasureOperationImplTest {
 
         operation.delete(measure);
         verify(measureRepo, times(1)).save(measure);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testDeleteForFailureWithSave() {
-        ExternalMeasure measure = createExternalMeasure("view_item_hourly");
-        given(measureRepo.save(measure)).willThrow(new RuntimeException());
-
-        operation.delete(measure);
     }
 }

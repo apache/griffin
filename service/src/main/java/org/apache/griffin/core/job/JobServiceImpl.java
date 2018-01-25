@@ -21,7 +21,7 @@ package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.GriffinJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -144,7 +145,7 @@ public class JobServiceImpl implements JobService {
         String qGroup = getQuartzGroupName();
         TriggerKey triggerKey = triggerKey(qName, qGroup);
         if (factory.getObject().checkExists(triggerKey)) {
-            throw new GriffinException.ConflictException("Quartz job already exists.");
+            throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
         }
         GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
         job = jobRepo.save(job);
@@ -170,14 +171,14 @@ public class JobServiceImpl implements JobService {
 
     private void checkJobScheduleParams(JobSchedule js, GriffinMeasure measure) {
         if (!isJobNameValid(js.getJobName())) {
-            throw new GriffinException.BadRequestException("Job name is invalid.");
+            throw new GriffinException.BadRequestException(INVALID_JOB_NAME);
         }
         if (!isBaseLineValid(js.getSegments())) {
-            throw new GriffinException.BadRequestException("Baseline is invalid.");
+            throw new GriffinException.BadRequestException(MISSING_BASELINE_CONFIG);
         }
         List<String> names = getConnectorNames(measure);
         if (!isConnectorNamesValid(js.getSegments(), names)) {
-            throw new GriffinException.BadRequestException("Connector name is invalid.");
+            throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
         }
     }
 
@@ -239,7 +240,7 @@ public class JobServiceImpl implements JobService {
         }
         if (sets.size() < sources.size()) {
             LOGGER.warn("Connector names cannot be repeated.");
-            return null;
+            return Collections.emptyList();
         }
         names.addAll(sets);
         return names;
@@ -249,7 +250,7 @@ public class JobServiceImpl implements JobService {
         GriffinMeasure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
             LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is external measure type.", measureId);
-            throw new GriffinException.BadRequestException("Measure id is invalid.");
+            throw new GriffinException.BadRequestException(MISSING_METRIC_NAME);
         }
         return measure;
     }
@@ -354,7 +355,7 @@ public class JobServiceImpl implements JobService {
         GriffinJob job = jobRepo.findByIdAndDeleted(jobId, false);
         if (job == null) {
             LOGGER.warn("Griffin job does not exist.");
-            throw new GriffinException.NotFoundException("Job id does not exist.");
+            throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
         }
         deleteJob(job);
     }
@@ -369,7 +370,7 @@ public class JobServiceImpl implements JobService {
         List<GriffinJob> jobs = jobRepo.findByJobNameAndDeleted(name, false);
         if (CollectionUtils.isEmpty(jobs)) {
             LOGGER.warn("There is no job with '{}' name.", name);
-            throw new GriffinException.NotFoundException("Job name does not exist.");
+            throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
         }
         for (GriffinJob job : jobs) {
             deleteJob(job);
@@ -420,7 +421,7 @@ public class JobServiceImpl implements JobService {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         if (job == null) {
             LOGGER.warn("Job id {} does not exist.", jobId);
-            throw new GriffinException.BadRequestException("Job id does not exist.");
+            throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
         }
         size = size > MAX_PAGE_SIZE ? MAX_PAGE_SIZE : size;
         size = size <= 0 ? DEFAULT_PAGE_SIZE : size;

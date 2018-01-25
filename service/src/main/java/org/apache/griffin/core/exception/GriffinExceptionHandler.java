@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.error.exception;
+package org.apache.griffin.core.exception;
 
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
@@ -29,23 +29,24 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
-public class GlobalControllerExceptionHandler {
+public class GriffinExceptionHandler {
 
     @ExceptionHandler(GriffinException.ServiceException.class)
-    public ResponseEntity handleServiceException(HttpServletRequest request, GriffinException.ServiceException e) {
+    public ResponseEntity handleGriffinExceptionOfServer(HttpServletRequest request, GriffinException.ServiceException e) {
         String message = e.getMessage();
         Throwable cause = e.getCause();
-        ExceptionResponseBody body = new ExceptionResponseBody(HttpStatus.INTERNAL_SERVER_ERROR,
+        GriffinExceptionResponse body = new GriffinExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                 message, request.getRequestURI(), cause.getClass().getName());
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(GriffinException.class)
-    public ResponseEntity handleGriffinException(HttpServletRequest request, GriffinException e) {
+    public ResponseEntity handleGriffinExceptionOfClient(HttpServletRequest request, GriffinException e) {
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class);
         HttpStatus status = responseStatus.code();
-        String message = e.getMessage();
-        ExceptionResponseBody body = new ExceptionResponseBody(status, message, request.getRequestURI());
+        String code = e.getMessage();
+        GriffinExceptionMessage message = GriffinExceptionMessage.valueOf(Integer.valueOf(code));
+        GriffinExceptionResponse body = new GriffinExceptionResponse(status, message, request.getRequestURI());
         return new ResponseEntity<>(body, status);
     }
 }

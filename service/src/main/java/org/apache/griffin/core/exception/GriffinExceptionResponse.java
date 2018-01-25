@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.error.exception;
+package org.apache.griffin.core.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
@@ -25,24 +25,26 @@ import org.springframework.http.HttpStatus;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ExceptionResponseBody {
+public class GriffinExceptionResponse {
 
     private Date timestamp = new Date();
     private int status;
     private String error;
+    private int code;
     private String message;
     private String exception;
     private String path;
 
 
-    ExceptionResponseBody(HttpStatus status, String message, String path) {
+    GriffinExceptionResponse(HttpStatus status, GriffinExceptionMessage message, String path) {
         this.status = status.value();
         this.error = status.getReasonPhrase();
-        this.message = message;
+        this.code = message.getCode();
+        this.message = message.getMessage();
         this.path = path;
     }
 
-    ExceptionResponseBody(HttpStatus status, String message, String path, String exception) {
+    GriffinExceptionResponse(HttpStatus status, String message, String path, String exception) {
         this.status = status.value();
         this.error = status.getReasonPhrase();
         this.message = message;
@@ -60,6 +62,10 @@ public class ExceptionResponseBody {
 
     public String getError() {
         return error;
+    }
+
+    public int getCode() {
+        return code;
     }
 
     public String getMessage() {

@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
@@ -87,14 +87,6 @@ public class GriffinMeasureOperationImplTest {
         operation.create(measure);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testCreateForFailureWithException() throws Exception {
-        Measure measure = createGriffinMeasure("view_item_hourly");
-        given(measureRepo.save(measure)).willThrow(new RuntimeException());
-
-        operation.create(measure);
-    }
-
     @Test
     public void testUpdateForSuccess() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
@@ -102,14 +94,6 @@ public class GriffinMeasureOperationImplTest {
 
         operation.update(measure);
         verify(measureRepo, times(1)).save(measure);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testUpdateForFailureWithException() throws Exception {
-        Measure measure = createGriffinMeasure("view_item_hourly");
-        given(measureRepo.save(measure)).willThrow(new RuntimeException());
-
-        operation.update(measure);
     }
 
     @Test
@@ -129,16 +113,6 @@ public class GriffinMeasureOperationImplTest {
         measure.setId(1L);
         doThrow(new GriffinException.ServiceException("Service exception", new RuntimeException()))
                 .when(jobService).deleteJobsRelateToMeasure(1L);
-
-        operation.delete(measure);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testDeleteForFailureWithSave() throws Exception {
-        Measure measure = createGriffinMeasure("view_item_hourly");
-        measure.setId(1L);
-        doNothing().when(jobService).deleteJobsRelateToMeasure(1L);
-        given(measureRepo.save(measure)).willThrow(new RuntimeException());
 
         operation.delete(measure);
     }

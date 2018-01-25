@@ -42,12 +42,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 
 import static org.apache.griffin.core.util.EntityHelper.*;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)
@@ -71,10 +72,6 @@ public class SparkSubmitJobTest {
     @Autowired
     private SparkSubmitJob sparkSubmitJob;
 
-    @Autowired
-    @Qualifier("livyConf")
-    private Properties livyConfProps;
-
     @MockBean
     private RestTemplate restTemplate;
 
@@ -95,10 +92,11 @@ public class SparkSubmitJobTest {
         JobInstanceBean instance = createJobInstance();
         GriffinMeasure measure = createGriffinMeasure("measureName");
         SegmentPredicate predicate = createFileExistPredicate();
-        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), JsonUtil.toJson(Arrays.asList(predicate)));
+        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), JsonUtil.toJson(Collections.singletonList(predicate)));
         given(context.getJobDetail()).willReturn(jd);
         given(context.getTrigger()).willReturn(createSimpleTrigger(4, 5));
         given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
+
         sparkSubmitJob.execute(context);
         assertTrue(true);
     }
@@ -109,46 +107,50 @@ public class SparkSubmitJobTest {
         JobInstanceBean instance = createJobInstance();
         GriffinMeasure measure = createGriffinMeasure("measureName");
         SegmentPredicate predicate = createFileExistPredicate();
-        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), JsonUtil.toJson(Arrays.asList(predicate)));
+        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), JsonUtil.toJson(Collections.singletonList(predicate)));
         given(context.getJobDetail()).willReturn(jd);
         given(context.getTrigger()).willReturn(createSimpleTrigger(4, 4));
         given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
+
         sparkSubmitJob.execute(context);
         assertTrue(true);
     }
 
-//    @Test
-//    public void testExecuteWithNoPredicateSuccess() throws Exception {
-//        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
-//        JobExecutionContext context = mock(JobExecutionContext.class);
-//        JobInstanceBean instance = createJobInstance();
-//        GriffinMeasure measure = createGriffinMeasure("measureName");
-//        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
-//        given(context.getJobDetail()).willReturn(jd);
-//        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
-//        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
-//        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(), Matchers.any())).willReturn(result);
-//        given(jobService.pauseJob(Matchers.any(), Matchers.any())).willReturn(true);
-//        sparkSubmitJob.execute(context);
-//        assertTrue(true);
-//    }
-//
-//    @Test
-//    public void testExecuteWithPost2LivyException() throws Exception {
-//        JobExecutionContext context = mock(JobExecutionContext.class);
-//        JobInstanceBean instance = createJobInstance();
-//        GriffinMeasure measure = createGriffinMeasure("measureName");
-//        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
-//        given(context.getJobDetail()).willReturn(jd);
-//        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
-//        given(jobService.pauseJob(Matchers.any(), Matchers.any())).willReturn(true);
-//        sparkSubmitJob.execute(context);
-//        assertTrue(true);
-//    }
+    @Test
+    public void testExecuteWithNoPredicateSuccess() throws Exception {
+        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+        JobExecutionContext context = mock(JobExecutionContext.class);
+        JobInstanceBean instance = createJobInstance();
+        GriffinMeasure measure = createGriffinMeasure("measureName");
+        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
+        given(context.getJobDetail()).willReturn(jd);
+        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
+        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
+        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(), Matchers.any())).willReturn(result);
+        doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
+
+        sparkSubmitJob.execute(context);
+        assertTrue(true);
+    }
 
     @Test
-    public void testExecuteWithNullException() throws Exception {
+    public void testExecuteWithPost2LivyException() throws Exception {
         JobExecutionContext context = mock(JobExecutionContext.class);
+        JobInstanceBean instance = createJobInstance();
+        GriffinMeasure measure = createGriffinMeasure("measureName");
+        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
+        given(context.getJobDetail()).willReturn(jd);
+        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
+        doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
+
+        sparkSubmitJob.execute(context);
+        assertTrue(true);
+    }
+
+    @Test
+    public void testExecuteWithNullException() {
+        JobExecutionContext context = mock(JobExecutionContext.class);
+
         sparkSubmitJob.execute(context);
         assertTrue(true);
     }

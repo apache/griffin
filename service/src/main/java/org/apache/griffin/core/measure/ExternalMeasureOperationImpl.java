@@ -20,7 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.job.repo.VirtualJobRepo;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
@@ -30,6 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.MISSING_METRIC_NAME;
 
 @Component("externalOperation")
 public class ExternalMeasureOperationImpl implements MeasureOperation {
@@ -41,11 +44,13 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
     private VirtualJobRepo jobRepo;
 
     @Override
+    @Transactional
     public Measure create(Measure measure) {
         ExternalMeasure em = (ExternalMeasure) measure;
         if (StringUtils.isBlank(em.getMetricName())) {
             LOGGER.warn("Failed to create external measure {}. Its metric name is blank.", measure.getName());
-            throw new GriffinException.BadRequestException("Missing valid metric name.");
+            throw new GriffinException.BadRequestException(MISSING_METRIC_NAME);
+
         }
         em.setVirtualJob(new VirtualJob());
         em = measureRepo.save(em);
@@ -59,7 +64,7 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
         ExternalMeasure latestMeasure = (ExternalMeasure) measure;
         if (StringUtils.isBlank(latestMeasure.getMetricName())) {
             LOGGER.warn("Failed to update external measure {}. Its metric name is blank.", measure.getName());
-            throw new GriffinException.BadRequestException("Missing valid metric name.");
+            throw new GriffinException.BadRequestException(MISSING_METRIC_NAME);
         }
         ExternalMeasure originMeasure = measureRepo.findOne(latestMeasure.getId());
         VirtualJob vj = genVirtualJob(latestMeasure, originMeasure.getVirtualJob());

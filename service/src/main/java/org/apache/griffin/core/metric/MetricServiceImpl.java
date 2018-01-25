@@ -22,7 +22,7 @@ package org.apache.griffin.core.metric;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.measure.entity.Measure;
@@ -40,6 +40,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_OFFSET;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_SIZE;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
 
 @Service
 public class MetricServiceImpl implements MetricService {
@@ -77,10 +81,10 @@ public class MetricServiceImpl implements MetricService {
     @Override
     public List<MetricValue> getMetricValues(String metricName, int offset, int size) {
         if (offset < 0) {
-            throw new GriffinException.BadRequestException("Offset must not be less than zero.");
+            throw new GriffinException.BadRequestException(INVALID_METRIC_RECORDS_OFFSET);
         }
         if (size < 0) {
-            throw new GriffinException.BadRequestException("Size must not be less than zero.");
+            throw new GriffinException.BadRequestException(INVALID_METRIC_RECORDS_SIZE);
         }
         try {
             return metricStore.getMetricValues(metricName, offset, size);
@@ -95,7 +99,7 @@ public class MetricServiceImpl implements MetricService {
         for (MetricValue value : values) {
             if (!isMetricValueValid(value)) {
                 LOGGER.warn("Invalid metric value.");
-                throw new GriffinException.BadRequestException("Metric value is invalid.");
+                throw new GriffinException.BadRequestException(INVALID_METRIC_VALUE_FORMAT);
             }
         }
         try {

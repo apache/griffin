@@ -20,7 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
@@ -36,6 +36,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CONNECTOR_NAME;
 
 @Component("griffinOperation")
 public class GriffinMeasureOperationImpl implements MeasureOperation {
@@ -71,12 +73,12 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
         List<String> names = getConnectorNames(measure);
         if (names.size() == 0) {
             LOGGER.warn("Connector names cannot be empty.");
-            throw new GriffinException.BadRequestException("Connector names cannot be empty.");
+            throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
         }
         List<DataConnector> connectors = dcRepo.findByConnectorNames(names);
         if (!CollectionUtils.isEmpty(connectors)) {
             LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
-            throw new GriffinException.BadRequestException("Connector names already exist.");
+            throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
         }
     }
 

@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.error.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.GriffinJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
@@ -40,17 +40,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static org.apache.griffin.core.util.EntityHelper.*;
 import static org.junit.Assert.assertEquals;
@@ -216,7 +211,7 @@ public class JobServiceImplTest {
     }
 
     @Test(expected = GriffinException.BadRequestException.class)
-    public void testAddJobForFailureWithJobScheduleConnectorNameDuplicate() throws Exception {
+    public void testAddJobForFailureWithJobScheduleConnectorNameRepeat() throws Exception {
         GriffinMeasure measure = createGriffinMeasure("measureName");
         JobDataSegment source = createJobDataSegment("source_name", true);
         JobDataSegment target = createJobDataSegment("source_name", false);
@@ -250,9 +245,6 @@ public class JobServiceImplTest {
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
-        doNothing().when(scheduler).pauseJob(Matchers.any(JobKey.class));
-        given(scheduler.deleteJob(Matchers.any(JobKey.class))).willReturn(true);
-        given(jobRepo.save(job)).willReturn(job);
 
         service.deleteJob(jobId);
         verify(scheduler, times(2)).checkExists(Matchers.any(JobKey.class));
@@ -271,7 +263,6 @@ public class JobServiceImplTest {
         given(factory.getObject()).willReturn(scheduler);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
-        given(jobRepo.save(job)).willReturn(job);
 
         service.deleteJob(jobId);
         verify(scheduler, times(2)).checkExists(Matchers.any(JobKey.class));
@@ -311,7 +302,6 @@ public class JobServiceImplTest {
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doNothing().when(scheduler).pauseJob(Matchers.any(JobKey.class));
         given(scheduler.deleteJob(Matchers.any(JobKey.class))).willReturn(true);
-        given(jobRepo.save(job)).willReturn(job);
 
         service.deleteJob(job.getJobName());
         verify(scheduler, times(2)).checkExists(Matchers.any(JobKey.class));
@@ -330,7 +320,6 @@ public class JobServiceImplTest {
         given(factory.getObject()).willReturn(scheduler);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
-        given(jobRepo.save(job)).willReturn(job);
 
         service.deleteJob(job.getJobName());
         verify(scheduler, times(2)).checkExists(Matchers.any(JobKey.class));
@@ -349,7 +338,6 @@ public class JobServiceImplTest {
 
     @Test(expected = GriffinException.ServiceException.class)
     public void testDeleteJobByJobNameForFailureWithException() throws SchedulerException {
-        Long jobId = 1L;
         GriffinJob job = createGriffinJob();
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getObject()).willReturn(scheduler);
@@ -357,7 +345,7 @@ public class JobServiceImplTest {
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doThrow(SchedulerException.class).when(scheduler).pauseJob(Matchers.any(JobKey.class));
 
-        service.deleteJob(jobId);
+        service.deleteJob(job.getJobName());
     }
 
     @Test
@@ -369,10 +357,6 @@ public class JobServiceImplTest {
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
-        doNothing().when(scheduler).pauseJob(Matchers.any(JobKey.class));
-        given(scheduler.deleteJob(Matchers.any(JobKey.class))).willReturn(true);
-        given(jobRepo.save(job)).willReturn(job);
-
 
         service.deleteJobsRelateToMeasure(1L);
         verify(scheduler, times(2)).checkExists(Matchers.any(JobKey.class));
@@ -390,7 +374,6 @@ public class JobServiceImplTest {
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
-        given(jobRepo.save(job)).willReturn(job);
 
         service.deleteJobsRelateToMeasure(1L);
         verify(scheduler, times(2)).checkExists(Matchers.any(JobKey.class));
@@ -432,7 +415,7 @@ public class JobServiceImplTest {
         GriffinJob job = createGriffinJob();
         JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates.State.dead, "app_id", "app_uri", null, null);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
-        given(jobInstanceRepo.findByJobId(1L, Matchers.any(PageRequest.class))).willReturn(Arrays.asList(jobInstance));
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong(), Matchers.any(PageRequest.class))).willReturn(Arrays.asList(jobInstance));
 
         List<JobInstanceBean> jobInstanceBeans = service.findInstancesOfJob(1L, page, size);
         assertEquals(jobInstanceBeans.size(), 1);
@@ -453,7 +436,10 @@ public class JobServiceImplTest {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
+
         service.deleteExpiredJobInstance();
+        verify(scheduler, times(1)).pauseJob(Matchers.any(JobKey.class));
+        verify(jobInstanceRepo, times(1)).deleteByExpireTimestamp(Matchers.any());
     }
 
     @Test
@@ -465,12 +451,17 @@ public class JobServiceImplTest {
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
 
         service.deleteExpiredJobInstance();
+        verify(scheduler, times(0)).pauseJob(Matchers.any(JobKey.class));
+        verify(jobInstanceRepo, times(1)).deleteByExpireTimestamp(Matchers.any());
     }
 
     @Test
-    public void testDeleteExpiredJobInstanceForSuccessWithNull() throws SchedulerException {
+    public void testDeleteExpiredJobInstanceForSuccessWithNoInstance() {
         given(jobInstanceRepo.findByExpireTmsLessThanEqual(Matchers.any())).willReturn(null);
+
         service.deleteExpiredJobInstance();
+        verify(jobInstanceRepo, times(1)).deleteByExpireTimestamp(Matchers.any());
+
     }
 
     @Test
@@ -481,7 +472,9 @@ public class JobServiceImplTest {
         given(factory.getObject()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doThrow(SchedulerException.class).when(scheduler).pauseJob(Matchers.any(JobKey.class));
+
         service.deleteExpiredJobInstance();
+        verify(jobInstanceRepo, times(0)).deleteByExpireTimestamp(Matchers.any());
     }
 
     @Test
@@ -491,7 +484,9 @@ public class JobServiceImplTest {
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
+
         service.syncInstancesOfAllJobs();
+        verify(jobInstanceRepo, times(1)).save(instance);
     }
 
     @Test
@@ -501,52 +496,58 @@ public class JobServiceImplTest {
         given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willThrow(RestClientException.class);
+
         service.syncInstancesOfAllJobs();
+        verify(jobInstanceRepo, times(1)).save(instance);
     }
 
     @Test
-    public void testSyncInstancesOfJobForFailureWithIOException() throws Exception {
+    public void testSyncInstancesOfJobForFailureWithIOException() {
         JobInstanceBean instance = createJobInstance();
         given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("result");
+
         service.syncInstancesOfAllJobs();
+        verify(jobInstanceRepo, times(0)).save(instance);
     }
 
     @Test
-    public void testSyncInstancesOfJobForFailureWithIllegalArgumentException() throws Exception {
+    public void testSyncInstancesOfJobForFailureWithIllegalArgumentException() {
         JobInstanceBean instance = createJobInstance();
         given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("{\"state\":\"wrong\"}");
+
         service.syncInstancesOfAllJobs();
+        verify(jobInstanceRepo, times(0)).save(instance);
     }
 
     @Test
-    public void testSyncInstancesOfJobForFailureWithException() throws Exception {
+    public void testSyncInstancesOfJobForFailureWithException() {
         JobInstanceBean instance = createJobInstance();
         given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
         doThrow(Exception.class).when(jobInstanceRepo).save(Matchers.any(JobInstanceBean.class));
+
         service.syncInstancesOfAllJobs();
+        verify(restTemplate, times(1)).getForObject(Matchers.anyString(), Matchers.any());
+        verify(sparkJobProps, times(2)).getProperty(Matchers.anyString());
     }
 
     @Test
     public void testGetHealthInfoWithHealthy() throws SchedulerException {
-        Long jobId = 1L;
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        GriffinJob job = new GriffinJob(jobId, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
+        GriffinJob job = createGriffinJob();
         given(factory.getObject()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
-        SimpleTrigger trigger = new SimpleTriggerImpl();
-        List<Trigger> triggers = new ArrayList<>();
-        triggers.add(trigger);
+        List<Trigger> triggers = Collections.singletonList(new SimpleTriggerImpl());
         given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong(), Matchers.any(PageRequest.class)))
+                .willReturn(Collections.singletonList(createJobInstance()));
 
-        Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "tms");
-        given(jobInstanceRepo.findByJobId(jobId, pageRequest)).willReturn(Arrays.asList(createJobInstance()));
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 1);
 
     }
@@ -556,50 +557,28 @@ public class JobServiceImplTest {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         GriffinJob job = createGriffinJob();
         given(factory.getObject()).willReturn(scheduler);
-        given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
-        SimpleTrigger trigger = new SimpleTriggerImpl();
-        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(Arrays.asList(trigger));
-
-        Pageable pageRequest = new PageRequest(0, 1, Sort.Direction.DESC, "tms");
-        List<JobInstanceBean> scheduleStateList = new ArrayList<>();
+        given(jobRepo.findByDeleted(false)).willReturn(Collections.singletonList(job));
+        List<Trigger> triggers = Collections.singletonList(new SimpleTriggerImpl());
+        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         JobInstanceBean instance = createJobInstance();
         instance.setState(LivySessionStates.State.error);
-        scheduleStateList.add(instance);
-        given(jobInstanceRepo.findByJobId(1L, pageRequest)).willReturn(scheduleStateList);
+        List<JobInstanceBean> scheduleStateList = Collections.singletonList(instance);
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong(), Matchers.any(PageRequest.class)))
+                .willReturn(scheduleStateList);
+
         assertEquals(service.getHealthInfo().getHealthyJobCount(), 0);
     }
 
-//    @Test
-//    public void testGetHealthInfoWithException() throws SchedulerException {
-//        Scheduler scheduler = Mockito.mock(Scheduler.class);
-//        GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
-//        given(factory.getObject()).willReturn(scheduler);
-//        given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
-//        GriffinException.GetHealthInfoFailureException exception = getExceptionForHealthInfo(scheduler);
-//        assert exception != null;
-//    }
-//
-//
-//    private GriffinException.GetHealthInfoFailureException getExceptionForHealthInfo(Scheduler scheduler) throws SchedulerException {
-//        GriffinException.GetHealthInfoFailureException exception = null;
-//        try {
-//            given(scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willThrow(SchedulerException.class);
-//            service.getHealthInfo();
-//        } catch (GriffinException.GetHealthInfoFailureException e) {
-//            exception = e;
-//        }
-//        return exception;
-//    }
-//
-//    private GriffinException.GetJobsFailureException getExceptionForGetAliveJObs(Scheduler scheduler) throws SchedulerException {
-//        GriffinException.GetJobsFailureException exception = null;
-//        try {
-//            given(scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willThrow(new GriffinException.GetJobsFailureException());
-//            service.getAliveJobs();
-//        } catch (GriffinException.GetJobsFailureException e) {
-//            exception = e;
-//        }
-//        return exception;
-//    }
+    @Test(expected = GriffinException.ServiceException.class)
+    public void testGetHealthInfoWithException() throws SchedulerException {
+        Scheduler scheduler = Mockito.mock(Scheduler.class);
+        GriffinJob job = createGriffinJob();
+        given(factory.getObject()).willReturn(scheduler);
+        given(jobRepo.findByDeleted(false)).willReturn(Collections.singletonList(job));
+        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class)))
+                .willThrow(new SchedulerException());
+
+        service.getHealthInfo();
+    }
 
 }
