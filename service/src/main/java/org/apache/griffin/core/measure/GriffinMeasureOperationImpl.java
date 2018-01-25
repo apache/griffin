@@ -19,13 +19,10 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.JobServiceImpl;
-import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.repo.DataConnectorRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
@@ -34,8 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 
@@ -45,15 +43,14 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
 
     @Autowired
     private MeasureRepo<Measure> measureRepo;
-    @Autowired
-    private DataConnectorRepo dcRepo;
+
     @Autowired
     private JobServiceImpl jobService;
 
 
     @Override
     public GriffinOperationMessage create(Measure measure) {
-        if (!isConnectorNamesValid((GriffinMeasure) measure)) {
+        if (!isValid((GriffinMeasure) measure)) {
             return CREATE_MEASURE_FAIL;
         }
         try {
@@ -92,30 +89,23 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
         return DELETE_MEASURE_BY_ID_FAIL;
     }
 
-    private boolean isConnectorNamesValid(GriffinMeasure measure) {
-        List<String> names = getConnectorNames(measure);
-        if (names.size() == 0) {
-            LOGGER.warn("Connector names cannot be empty.");
-            return false;
-        }
-        List<DataConnector> connectors = dcRepo.findByConnectorNames(names);
-        if (!CollectionUtils.isEmpty(connectors)) {
-            LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
+    private boolean isValid(GriffinMeasure measure) {
+        if (!isConnectorNamesValid(measure)) {
             return false;
         }
         return true;
     }
 
-    private List<String> getConnectorNames(GriffinMeasure measure) {
-        List<String> names = new ArrayList<>();
-        for (DataSource source : measure.getDataSources()) {
-            for (DataConnector dc : source.getConnectors()) {
-                String name = dc.getName();
-                if (!StringUtils.isEmpty(name)) {
-                    names.add(name);
-                }
-            }
+    private boolean isConnectorNamesValid(GriffinMeasure measure) {
+        Set<String> sets = new HashSet<>();
+        List<DataSource> sources = measure.getDataSources();
+        for (DataSource source : sources) {
+            source.getConnectors().stream().filter(dc -> dc.getName() != null).forEach(dc -> sets.add(dc.getName()));
         }
-        return names;
+        if (sets.size() == 0 || sets.size() < sources.size()) {
+            LOGGER.warn("Connector names cannot be repeated or empty.");
+            return false;
+        }
+        return true;
     }
 }
