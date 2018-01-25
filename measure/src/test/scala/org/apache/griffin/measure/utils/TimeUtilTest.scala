@@ -16,32 +16,23 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-.icon{
-  color: #fff;
-  position: absolute;
-  left: 50%;
-  top: 20%;
-}
-.co{
-	border-collapse: separate;
-}
-.co > tbody > tr:nth-of-type(even) {
-     background-color: #1f1f1f;
-}
-.co > tbody > tr:nth-of-type(odd) {
-     background-color: #080808; 
-}
-.table-striped > tbody > tr{
-     background-color: #1f1f1f; 
-     border: 1px solid transparent;
-}
+package org.apache.griffin.measure.utils
 
-.table > tbody + tbody {
-    border: 1px solid transparent;
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
+
+@RunWith(classOf[JUnitRunner])
+class TimeUtilTest extends FunSuite with Matchers with BeforeAndAfter {
+
+  test ("milliseconds") {
+    val ts = "1h"
+    val res = TimeUtil.milliseconds(ts)
+    println(res)
+
+    val t = 1200000
+    val s = TimeUtil.time2String(t)
+    println(s)
+  }
+
 }
-
-.reco > tbody:nth-of-type(even) >tr {
-     background-color: #080808;
-}
-
-
