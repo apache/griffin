@@ -79,13 +79,13 @@ under the License.
                   <p style="margin-left:60px" class="setcolor">
                     <i class="fa fa-info-circle"></i> One step means a partition size,and {{connector.name}} partition size = {{connector.size}}
                   </p>
-                    <div class="col-md-11 col-lg-11 col-sm-11 center">
-                      begin :
-                      <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}" [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}" (ngModelChange)="changeRange(index,someKeyboard[i][0],i)">
-                      end :
-                      <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}" [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
-                    </div>
-                      <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]" (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()" (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
+                  <div class="col-md-11 col-lg-11 col-sm-11 center">
+                    begin :
+                    <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}" [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}" (ngModelChange)="changeRange(index,someKeyboard[i][0],i)">
+                    end :
+                    <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}" [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
+                  </div>
+                  <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]" (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()" (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
                 </div>
               </div>
               <div class="setcolor">

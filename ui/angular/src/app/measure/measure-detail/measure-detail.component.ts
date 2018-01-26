@@ -49,7 +49,7 @@ export class MeasureDetailComponent implements OnInit {
   type: string;
   currentrule: string;
   prorule = '';
-  
+
   fetchData(value,index){
     var data = this.ruleData["data.sources"][index].connectors[0];
     var size = value + "size";
@@ -61,7 +61,7 @@ export class MeasureDetailComponent implements OnInit {
     this[where] = data.config.where;
     if(data.predicates[0].config){
       this[path] = data.predicates[0].config.path;
-    }   
+    }
     this[database] = data.config.database;
     this[table] = data.config["table.name"];
   }
@@ -71,7 +71,7 @@ export class MeasureDetailComponent implements OnInit {
       'evaluateRule':''
     };
   	var getModelUrl;
-    var getModel = this.serviceService.config.uri.getModel; 
+    var getModel = this.serviceService.config.uri.getModel;
   	this.currentId = this.route.snapshot.paramMap.get('id');
     getModelUrl = getModel+"/"+this.currentId;
     this.http.get(getModelUrl).subscribe(data=>{
@@ -94,7 +94,7 @@ export class MeasureDetailComponent implements OnInit {
           this.targetDB = '';
           this.targetTable = '';
         }
-      }          
+      }
      },err => {
      	console.log('error');
       // toaster.pop('error', 'Error when geting record', response.message);
