@@ -19,21 +19,18 @@ under the License.
 
 package org.apache.griffin.core.config;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Properties;
+
+import static org.apache.griffin.core.util.PropertiesUtil.getConf;
+import static org.apache.griffin.core.util.PropertiesUtil.getProperties;
 
 @Configuration
 public class PropertiesConfig {
@@ -47,50 +44,24 @@ public class PropertiesConfig {
         this.location = location;
     }
 
-    private String getPath(String defaultPath, String name) throws FileNotFoundException {
-        String path = defaultPath;
-        File file = new File(location);
-        LOGGER.info("File absolute path:" + file.getAbsolutePath());
-        File[] files = file.listFiles();
-        if (files == null || files.length == 0) {
-            LOGGER.error("The defaultPath {} does not exist.Please check your config in application.properties.", location);
-            throw new FileNotFoundException();
-        }
-        for (File f : files) {
-            if (f.getName().equals(name)) {
-                path = location + File.separator + name;
-                LOGGER.info("config real path: {}", path);
-            }
-        }
-        return path;
-    }
-
 
     @Bean(name = "appConf")
     public Properties appConf() {
         String path = "/application.properties";
-        return PropertiesUtil.getProperties(path, new ClassPathResource(path));
+        return getProperties(path, new ClassPathResource(path));
     }
 
     @Bean(name = "livyConf")
     public Properties livyConf() throws FileNotFoundException {
-        String path = "/sparkJob.properties";
-        if (StringUtils.isEmpty(location)) {
-            return PropertiesUtil.getProperties(path, new ClassPathResource(path));
-        }
-        path = getPath(path, "sparkJob.properties");
-        Resource resource = new InputStreamResource(new FileInputStream(path));
-        return PropertiesUtil.getProperties(path, resource);
+        String name = "sparkJob.properties";
+        String defaultPath = "/" + name;
+        return getConf(name, defaultPath, location);
     }
 
     @Bean(name = "quartzConf")
     public Properties quartzConf() throws FileNotFoundException {
-        String path = "/quartz.properties";
-        if (StringUtils.isEmpty(location)) {
-            return PropertiesUtil.getProperties(path, new ClassPathResource(path));
-        }
-        path = getPath(path, "quartz.properties");
-        Resource resource = new InputStreamResource(new FileInputStream(path));
-        return PropertiesUtil.getProperties(path, resource);
+        String name = "quartz.properties";
+        String defaultPath = "/" + name;
+        return getConf(name, defaultPath, location);
     }
 }

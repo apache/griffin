@@ -191,17 +191,6 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testCreateMeasureForGriffinFailureWithConnectorExist() throws Exception {
-        String measureName = "view_item_hourly";
-        GriffinMeasure measure = createGriffinMeasure(measureName);
-        DataConnector dc = new DataConnector("source_name", "1h", "1.2", null);
-        given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(new LinkedList<>());
-        given(dataConnectorRepo.findByConnectorNames(Arrays.asList("source_name", "target_name"))).willReturn(Arrays.asList(dc));
-        GriffinOperationMessage message = service.createMeasure(measure);
-        assertEquals(message, CREATE_MEASURE_FAIL);
-    }
-
-    @Test
     public void testCreateMeasureForGriffinFailureWithConnectorNull() throws Exception {
         String measureName = "view_item_hourly";
         DataConnector dcSource = createDataConnector(null, "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
