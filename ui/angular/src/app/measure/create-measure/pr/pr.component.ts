@@ -414,7 +414,10 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     this.getGrouprule();
     if(this.size.indexOf('0')==0){
         delete this.newMeasure['data.sources'][0]['connectors'][0]['data.unit'];
-      }
+    }
+    if(this.path==''){
+        delete this.newMeasure['data.sources'][0]['connectors'][0]['predicates'];
+    }
     this.visible = true;
     setTimeout(() => this.visibleAnimate = true, 100);
   }

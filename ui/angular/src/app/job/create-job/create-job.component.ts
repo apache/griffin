@@ -46,7 +46,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   };
   
   @ViewChildren('sliderRef') sliderRefs;
-  // someRange=[-20, 0];
+
   someKeyboard = [];
   someKeyboardConfig = [];
   config:any;
@@ -54,32 +54,16 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   cronExp :string;
   dropdownList = [];
   currentStep = 1;
-  Times = ['seconds','minutes','hours'];
-  maskOpen = false;
-  
+  maskOpen = false;  
   keyupLabelOn = false;
   keydownLabelOn = false;
   periodTime :number;
-  StartTime = '';
-  sourcePat :'';
-  targetPat :'';
   createResult = '';
-  jobStartTime : any;
   jobname : string;
-
   Measures:object;
   measureinfo:object;
-
   measure:string;
   measureid:any;
-  ntAccount = 0;
-  // newJob={
-  //   "sourcePattern":'',
-  //   "targetPattern":'',
-  //   "jobStartTime":0,
-  //   "interval":'',
-  //   "groupName":'',
-  // }
 
   newJob={
     "cron.expression": "",
@@ -130,14 +114,6 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
       this.hide();
     }
   }
-  
-  showTime(evt){
-    evt.target.nextElementSibling.style.display='';
-  }
-
-  OnMouseleave(evt){
-    evt.target.style.display = 'none';
-  }
 
   close(){
     this.maskOpen = false;
@@ -146,64 +122,6 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   prev(){
   	history.back();
   }
-
-  // submit (jobForm) {
-  //     this.measureid = this.getMeasureId();
-  //     // jobForm.markAsPristine();
-  //     var period;
-  //     if(this.timeType=='minutes')
-  //         period = this.periodTime *60;
-  //     else if(this.timeType=='hours')
-  //         period = this.periodTime * 3600;
-  //     else period = this.periodTime;
-  //     var rule = '';
-  //     var time :number;
-  //     if(this.jobStartTime){
-  //       var year = this.jobStartTime.getFullYear();
-  //       var month = this.jobStartTime.getMonth() + 1;
-  //       var day = this.jobStartTime.getDate();
-  //       var startTime = year +'-'+ month + '-'+ day + ' '+ this.timeDetail;
-  //     }
-
-  //     time = Date.parse(startTime);
-  //     if(isNaN(time)){
-  //        this.toasterService.pop('error','Error!','Please input the right format of start time');
-  //         return false;
-  //     }
-  //     if (!jobForm.valid) {
-  //       this.toasterService.pop('error', 'Error!', 'Please complete the form!');
-  //       return false;
-  //     }
-      
-  //     this.newJob={
-  //       "sourcePattern":this.sourcePat,
-  //       "targetPattern":this.targetPat,
-  //       "jobStartTime":time,
-  //       "interval":period,
-  //       "groupName":'BA',
-  //     },
-  //     this.visible = true;
-  //     setTimeout(() => this.visibleAnimate = true, 100);
-  // }
-  // save() {
-  // 	var date = new Date();
-  // 	var datastr = date.toString();
-  //   var month = date.getMonth()+1;
-  //   var timestamp = Date.parse(datastr);
-  //   var jobName = this.measure + '-BA-' + this.ntAccount + '-' + timestamp;
-  //   var addJobs = this.serviceService.config.uri.addJobs;
-  //   var newJob = addJobs + '?group=' + this.newJob.groupName + '&jobName=' + jobName + '&measureId=' + this.measureid;
-  //   this.http
-  //   .post(newJob, this.newJob)
-  //   .subscribe(data => {
-  //     this.createResult = data['results'];
-  //     this.hide();
-  //     this.router.navigate(['/jobs']);
-  //   },
-  //   err => {
-  //     console.log('Error when creating job');
-  //   });
-  // }
 
   submit (form){
     if (!form.valid) {
@@ -261,11 +179,6 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   }
 
   save() {
-    var date = new Date();
-    var datastr = date.toString();
-    // var month = date.getMonth()+1;
-    var timestamp = Date.parse(datastr);
-    // var jobName = this.measure + '-BA-' + this.ntAccount + '-' + timestamp;
     var addJobs = this.serviceService.config.uri.addJobs;
     this.http
     .post(addJobs,this.newJob)
@@ -322,7 +235,6 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
       var map = this.Measures[index];
       if(measure == map.name){
         var source = map["data.sources"];
-        // this.baseline = (source.length == 2) ? 'target[0]' : 'source[0]';
         for(let i = 0;i < source.length;i++){
           var details = source[i].connectors;
           for(let j = 0;j < details.length;j++){
@@ -417,73 +329,6 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     this.http.get(allModels).subscribe(data =>{
       this.Measures = data;
     });
-//     this.Measures = [{  
-//    "name":"demo_accu",
-//    "type":"griffin",
-//    "process.type":"batch",
-//    "owner":"test",
-//    "data.sources":[  
-//       {  
-//          "name":"source",
-//          "connectors":[  
-//             {  
-//                "name":"source1513317492171",
-//                "type":"HIVE",
-//                "version":"1.2",
-//                "data.unit":"2day",
-//                "config":{  
-//                   "database":"default",
-//                   "table.name":"demo_src",
-//                   "where":"dt=#YYYYMMdd# AND hour=#HH#"
-//                },
-//                "predicates":[  
-//                   {  
-//                      "type":"file.exist",
-//                      "config":{  
-//                         "root.path":"hdfs:///griffin/demo_src",
-//                         "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-//                      }
-//                   }
-//                ]
-//             }
-//          ]
-//       },
-//       {  
-//          "name":"target",
-//          "connectors":[  
-//             {  
-//                "name":"target1513317499033",
-//                "type":"HIVE",
-//                "version":"1.2",
-//                "data.unit":"1hour",
-//                "config":{  
-//                   "database":"default",
-//                   "table.name":"demo_tgt",
-//                   "where":"dt=#YYYYMMdd# AND hour=#HH#"
-//                },
-//                "predicates":[  
-//                   {  
-//                      "type":"file.exist",
-//                      "config":{  
-//                         "root.path":"hdfs:///griffin/demo_src",
-//                         "path":""
-//                      }
-//                   }
-//                ]
-//             }
-//          ]
-//       }
-//    ],
-//    "evaluateRule":{  
-//       "rules":[  
-//          {  
-//             "dsl.type":"griffin-dsl",
-//             "dq.type":"accuracy",
-//             "rule":"source.id=target.id"
-//          }
-//       ]
-//    }
-// }]
     this.config={
       behaviour: 'drag',
       connect: true,

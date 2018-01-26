@@ -359,6 +359,30 @@ under the License.
                           {{currentDB}}.{{currentTable}}
                         </div>
                       </div>
+                      <div class="row" *ngIf="this.where">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Source Where:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.where}}
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="this.size">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Source Partition Size:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.size}}
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="this.path">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Source Path:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.path}}
+                        </div>
+                      </div>
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Owner:

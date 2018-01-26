@@ -448,6 +448,12 @@ export class AcComponent implements OnInit , AfterViewChecked {
       if(this.tgt_size.indexOf('0')==0){
         delete this.newMeasure['data.sources'][1]['connectors'][0]['data.unit'];
       }
+      if(this.src_path==''){
+        delete this.newMeasure['data.sources'][0]['connectors'][0]['predicates'];
+      }
+      if(this.tgt_path==''){
+        delete this.newMeasure['data.sources'][1]['connectors'][0]['predicates'];
+      }
       var mappingRule = function(src, tgt, matches) {
         var rules;
         rules = 'source.' + src  + matches + 'target.' + tgt

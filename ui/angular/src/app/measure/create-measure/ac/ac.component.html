@@ -448,12 +448,60 @@ under the License.
                           {{currentDB}}.{{currentTable}}
                         </div>
                       </div>
+                      <div class="row" *ngIf="this.src_size">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Source Partition Size:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.src_size}}
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="this.src_where">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Source Where:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.src_where}}
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="this.src_path">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Source Path:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.src_path}}
+                        </div>
+                      </div>
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Target:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8">
                           {{currentDB}}.{{currentTableTarget}}
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="this.tgt_size">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Target Partition Size:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.tgt_size}}
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="this.tgt_where">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Target Where:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.tgt_where}}
+                        </div>
+                      </div>
+                      <div class="row" *ngIf="this.tgt_path">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Target Path:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8">
+                          {{this.tgt_path}}
                         </div>
                       </div>
                       <div class="row">
