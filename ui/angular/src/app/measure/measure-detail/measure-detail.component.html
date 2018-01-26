@@ -64,6 +64,38 @@ under the License.
             {{sourceTable}}
           </div>
         </div>
+        <div class="row" *ngIf="ruleData.type=='profiling'">
+          <label class="col-xs-4">
+            DataSource:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{sourceTable}}
+          </div>
+        </div>
+        <div class="row" *ngIf="sourcesize">
+          <label class="col-xs-4">
+            Source Partition Size:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{sourcesize}}
+          </div>
+        </div>
+        <div class="row" *ngIf="sourcewhere">
+          <label class="col-xs-4">
+            Source Where:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{sourcewhere}}
+          </div>
+        </div>
+        <div class="row" *ngIf="sourcepath">
+          <label class="col-xs-4">
+            Source Path:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{sourcepath}}
+          </div>
+        </div>
         <div class="row" *ngIf="ruleData.type=='accuracy'">
           <label class="col-xs-4">
             Target:
@@ -72,12 +104,28 @@ under the License.
             {{targetTable}}
           </div>
         </div>
-        <div class="row" *ngIf="ruleData.type=='profiling'">
+        <div class="row" *ngIf="ruleData.type=='accuracy' && targetsize">
           <label class="col-xs-4">
-            DataSource:
+            Target Partition Size:
           </label>
           <div class="col-xs-8" style="color: #fff">
-            {{sourceTable}}
+            {{targetsize}}
+          </div>
+        </div>
+        <div class="row" *ngIf="ruleData.type=='accuracy' && targetwhere">
+          <label class="col-xs-4">
+            Target Where:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{targetwhere}}
+          </div>
+        </div>
+        <div class="row" *ngIf="ruleData.type=='accuracy' && targetpath">
+          <label class="col-xs-4">
+            Target Path:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{targetpath}}
           </div>
         </div>
         <div class="row">

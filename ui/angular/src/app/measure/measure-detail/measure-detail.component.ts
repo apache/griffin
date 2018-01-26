@@ -34,46 +34,67 @@ export class MeasureDetailComponent implements OnInit {
   currentId:string;
   constructor(private route: ActivatedRoute,
   private router: Router,private http:HttpClient,public serviceService:ServiceService) { };
-  ruleData : any;
-  sourceLength : number;
-  sourceDB : string;
-  targetDB : string;
-  sourceTable : string;
-  targetTable : string;
-  type:string;
-  currentrule:string;
+  ruleData: any;
+  sourceLength: number;
+  sourceDB: string;
+  targetDB: string;
+  sourceTable: string;
+  targetTable: string;
+  sourcesize: string;
+  targetsize: string;
+  sourcewhere: string;
+  targetwhere: string;
+  sourcepath: string;
+  targetpath: string;
+  type: string;
+  currentrule: string;
   prorule = '';
+
+  fetchData(value,index){
+    var data = this.ruleData["data.sources"][index].connectors[0];
+    var size = value + "size";
+    var where = value + "where";
+    var path = value + "path";
+    var database = value + "DB";
+    var table = value + "Table";
+    this[size] = data["data.unit"];
+    this[where] = data.config.where;
+    if(data.predicates[0].config){
+      this[path] = data.predicates[0].config.path;
+    }
+    this[database] = data.config.database;
+    this[table] = data.config["table.name"];
+  }
 
   ngOnInit() {
     this.ruleData = {
       'evaluateRule':''
     };
   	var getModelUrl;
-    var getModel = this.serviceService.config.uri.getModel; 
+    var getModel = this.serviceService.config.uri.getModel;
   	this.currentId = this.route.snapshot.paramMap.get('id');
     getModelUrl = getModel+"/"+this.currentId;
     this.http.get(getModelUrl).subscribe(data=>{
       this.ruleData = data;
-      this.ruleData.type = this.ruleData["dq.type"];
-      if(this.ruleData['measure.type'] !== 'external'){
-        this.currentrule = this.ruleData['evaluate.rule'].rules;
+      if(this.ruleData['measure.type'] === 'external'){
+        this.ruleData.type = this.ruleData["measure.type"];
+      }
+      else{
+        this.ruleData.type = this.ruleData["dq.type"];
         var currentprorule = this.ruleData['evaluate.rule'].rules;
+        this.currentrule = currentprorule;
         for(let index in currentprorule){
           this.prorule = this.prorule + currentprorule[index].description + ','
         }
         this.prorule = this.prorule.substring(0,this.prorule.lastIndexOf(','));
-        var sourcedata = this.ruleData["data.sources"][0].connectors[0].config;          
-        this.sourceDB = sourcedata.database;
-        this.sourceTable = sourcedata["table.name"];
+        this.fetchData("source",0);
         if(this.ruleData.type === "accuracy"){
-          var targetdata = this.ruleData["data.sources"][1].connectors[0].config;
-          this.targetDB = targetdata.database;
-          this.targetTable = targetdata["table.name"];
+          this.fetchData("target",1);
         }else{
           this.targetDB = '';
           this.targetTable = '';
         }
-      }          
+      }
      },err => {
      	console.log('error');
       // toaster.pop('error', 'Error when geting record', response.message);
