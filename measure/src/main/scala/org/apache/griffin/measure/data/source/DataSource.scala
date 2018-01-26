@@ -22,6 +22,7 @@ import org.apache.griffin.measure.cache.tmst._
 import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.data.connector.batch._
 import org.apache.griffin.measure.data.connector.streaming._
+import org.apache.griffin.measure.data.source.cache.OldDataSourceCache
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters, TimeRange}
 import org.apache.griffin.measure.rule.plan.TimeInfo
@@ -32,7 +33,7 @@ case class DataSource(sqlContext: SQLContext,
                       name: String,
                       baseline: Boolean,
                       dataConnectors: Seq[DataConnector],
-                      dataSourceCacheOpt: Option[DataSourceCache]
+                      dataSourceCacheOpt: Option[OldDataSourceCache]
                      ) extends Loggable with Serializable {
 
   val batchDataConnectors = DataConnectorFactory.filterBatchDataConnectors(dataConnectors)

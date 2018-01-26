@@ -16,26 +16,22 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.data.source
+package org.apache.griffin.measure.data.source.cache
 
 import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 import org.apache.griffin.measure.cache.tmst.TmstCache
-import org.apache.griffin.measure.data.connector.streaming.StreamingDataConnector
-import org.apache.griffin.measure.data.connector._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.temp.TimeRange
+import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.griffin.measure.utils.{HdfsFileDumpUtil, HdfsUtil, TimeUtil}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
-import scala.util.{Failure, Success}
-import org.apache.griffin.measure.utils.ParamUtil._
-
-case class DataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                           dsName: String, index: Int
-                          ) extends DataCacheable with Loggable with Serializable {
+case class OldDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
+                              dsName: String, index: Int
+                             ) extends DataCacheable with Loggable with Serializable {
 
   var tmstCache: TmstCache = _
   protected def rangeTmsts(from: Long, until: Long) = tmstCache.range(from, until)

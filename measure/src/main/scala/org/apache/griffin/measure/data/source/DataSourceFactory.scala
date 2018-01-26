@@ -22,6 +22,7 @@ import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.data.connector.batch.BatchDataConnector
 import org.apache.griffin.measure.data.connector.streaming.StreamingDataConnector
 import org.apache.griffin.measure.data.connector.{DataConnector, DataConnectorFactory}
+import org.apache.griffin.measure.data.source.cache.OldDataSourceCache
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.engine.{DqEngine, DqEngines}
 import org.apache.spark.sql.SQLContext
@@ -65,7 +66,7 @@ object DataSourceFactory extends Loggable {
                                 ) = {
     if (param != null) {
       try {
-        Some(DataSourceCache(sqlContext, param, name, index))
+        Some(OldDataSourceCache(sqlContext, param, name, index))
       } catch {
         case e: Throwable => {
           error(s"generate data source cache fails")
