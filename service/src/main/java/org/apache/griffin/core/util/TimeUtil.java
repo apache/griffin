@@ -23,13 +23,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TimeUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtil.class);
+
+    private static class TimeUnitPair {
+        private long t;
+        private String unit;
+
+        TimeUnitPair(long t, String unit) {
+            this.t = t;
+            this.unit = unit;
+        }
+    }
 
     public static Long str2Long(String timeStr) {
         if (timeStr == null) {
@@ -42,18 +55,14 @@ public class TimeUtil {
             trimTimeStr = trimTimeStr.substring(1);
             positive = false;
         }
+        List<TimeUnitPair> list = getTimeUnitPairs(trimTimeStr);
+        return str2Long(positive, list);
+    }
 
-        String timePattern = "(?i)\\d+(ms|s|m|h|d)";
-        Pattern pattern = Pattern.compile(timePattern);
-        Matcher matcher = pattern.matcher(trimTimeStr);
-        List<String> list = new ArrayList<>();
-        while (matcher.find()) {
-            String group = matcher.group();
-            list.add(group.toLowerCase());
-        }
+    private static Long str2Long(boolean positive, List<TimeUnitPair> list) {
         long time = 0;
-        for (String aList : list) {
-            long t = milliseconds(aList.toLowerCase());
+        for (TimeUnitPair tu : list) {
+            long t = milliseconds(tu);
             if (positive) {
                 time += t;
             } else {
@@ -63,19 +72,36 @@ public class TimeUtil {
         return time;
     }
 
-    private static Long milliseconds(String str) {
-        if (str.endsWith("ms")) {
-            return milliseconds(Long.parseLong(str.substring(0, str.length() - 2)), TimeUnit.MILLISECONDS);
-        } else if (str.endsWith("s")) {
-            return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.SECONDS);
-        } else if (str.endsWith("m")) {
-            return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.MINUTES);
-        } else if (str.endsWith("h")) {
-            return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.HOURS);
-        } else if (str.endsWith("d")) {
-            return milliseconds(Long.parseLong(str.substring(0, str.length() - 1)), TimeUnit.DAYS);
+    private static List<TimeUnitPair> getTimeUnitPairs(String timeStr) {
+        // "1d2h3m" -> "1d", "2h", "3m"
+        String timePattern = "(?i)(\\d+)([a-zA-Z]+)";
+        Pattern pattern = Pattern.compile(timePattern);
+        Matcher matcher = pattern.matcher(timeStr);
+        List<TimeUnitPair> list = new ArrayList<>();
+        while (matcher.find()) {
+            String num = matcher.group(1);
+            String unit = matcher.group(2);
+            TimeUnitPair tu = new TimeUnitPair(Long.valueOf(num), unit);
+            list.add(tu);
+        }
+        return list;
+    }
+
+    private static Long milliseconds(TimeUnitPair tu) {
+        long t = tu.t;
+        String unit = tu.unit;
+        if (unit.matches("(?i)m(illi)?s(ec(ond)?)?")) {
+            return milliseconds(t, TimeUnit.MILLISECONDS);
+        } else if (unit.matches("(?i)s(ec(ond)?)?")) {
+            return milliseconds(t, TimeUnit.SECONDS);
+        } else if (unit.matches("(?i)m(in(ute)?)?")) {
+            return milliseconds(t, TimeUnit.MINUTES);
+        } else if (unit.matches("(?i)h((ou)?r)?")) {
+            return milliseconds(t, TimeUnit.HOURS);
+        } else if (unit.matches("(?i)d(ay)?")) {
+            return milliseconds(t, TimeUnit.DAYS);
         } else {
-            LOGGER.error("Time string format error.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.)");
+            LOGGER.error("Time string format error.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.");
             return 0L;
         }
     }
@@ -84,7 +110,7 @@ public class TimeUtil {
         return unit.toMillis(duration);
     }
 
-    public static String format(String timeFormat, long time,String timeZone) {
+    public static String format(String timeFormat, long time, String timeZone) {
         String timePattern = "#(?:\\\\#|[^#])*#";
         Date t = new Date(time);
         Pattern ptn = Pattern.compile(timePattern);
