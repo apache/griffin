@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.io.IOException;
@@ -176,13 +175,11 @@ public class JobInstance implements Job {
      */
     private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) throws IOException {
         List<SegmentPredicate> predicates = dc.getPredicates();
-        if (predicates != null) {
-            for (SegmentPredicate predicate : predicates) {
-                genConfMap(predicate.getConfigMap(), sampleTs);
-                //Do not forget to update origin string config
-                predicate.setConfigMap(predicate.getConfigMap());
-                mPredicts.add(predicate);
-            }
+        for (SegmentPredicate predicate : predicates) {
+            genConfMap(predicate.getConfigMap(), sampleTs);
+            //Do not forget to update origin string config
+            predicate.setConfigMap(predicate.getConfigMap());
+            mPredicts.add(predicate);
         }
     }
 
@@ -204,9 +201,16 @@ public class JobInstance implements Job {
      * or like {"path": "/year=2017/month=11/dt=15/hour=09/_DONE,/year=2017/month=11/dt=15/hour=10/_DONE"}
      */
     private void genConfMap(Map<String, String> conf, Long[] sampleTs) {
+        if (conf == null) {
+            LOGGER.warn("Predicate config is null.");
+            return;
+        }
         for (Map.Entry<String, String> entry : conf.entrySet()) {
             String value = entry.getValue();
             Set<String> set = new HashSet<>();
+            if (StringUtils.isEmpty(value)) {
+                continue;
+            }
             for (Long timestamp : sampleTs) {
                 set.add(TimeUtil.format(value, timestamp, jobSchedule.getTimeZone()));
             }

@@ -107,7 +107,7 @@ public class SparkSubmitJob implements Job {
         for (SegmentPredicate segPredicate : predicates) {
             Predicator predicator = PredicatorFactory.newPredicateInstance(segPredicate);
             try {
-                if (!predicator.predicate()) {
+                if (predicator != null && !predicator.predicate()) {
                     return false;
                 }
             } catch (Exception e) {
