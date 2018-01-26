@@ -70,21 +70,8 @@ under the License.
                     </div>
                   </div>
                 </div>
-                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group">
-                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Time Baseline:
-                    </label>
-                    <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select id="baseline" class="form-control" ngControl="name" required name="baseline" [(ngModel)]="baseline" >
-                        <option *ngFor="let row of dropdownList" value="{{row.name}}">{{row.name}}</option>
-                      </select>
-                    </div>
-                  </div>
-                </div> -->
                 <div *ngFor="let connector of this.dropdownList; let i=index">
                   <div>
-                    <!-- <input style="margin-left:30px" type="checkbox" [checked]="needrange[i]" (change)="needrange[i]=!needrange[i];"> -->
                     <label style="padding-left: 30px;padding-top: 10px;">
                       please select data range for {{connector.name}}
                     </label>
@@ -92,22 +79,13 @@ under the License.
                   <p style="margin-left:60px" class="setcolor">
                     <i class="fa fa-info-circle"></i> One step means a partition size,and {{connector.name}} partition size = {{connector.size}}
                   </p>
-                  <!-- <div class="col-md-12 col-lg-12 col-sm-12"> -->
-                    <div class="col-md-11 col-lg-11 col-sm-11 center">
-                      begin :
-                      <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}" [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}" (ngModelChange)="changeRange(index,someKeyboard[i][0],i)">
-                      end :
-                      <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}" [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
-                    </div>
-                      <!-- <div>                       -->
-                      <!-- <button class="btn-info col-md-1 col-lg-1 col-sm-1" style="margin-top: 6px;" (click)="updateSliderRange()">
-                        range 
-                      </button> -->
-                      <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]" (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()" (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
-                      <!-- </div>                       -->
-                      <!-- <div class="range">Range: {{ someKeyboard[i] | json }}</div> -->
-                    
-                  <!-- </div> -->
+                  <div class="col-md-11 col-lg-11 col-sm-11 center">
+                    begin :
+                    <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}" [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}" (ngModelChange)="changeRange(index,someKeyboard[i][0],i)">
+                    end :
+                    <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}" [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
+                  </div>
+                  <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]" (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()" (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
                 </div>
               </div>
               <div class="setcolor">
@@ -122,10 +100,8 @@ under the License.
             <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev()">
               <i class="fa fa-arrow-circle-left"></i> Back
             </button>
-            <!-- <button class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="form.submit(Form)"> -->
             <toaster-container></toaster-container>
             <button type="submit" class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="submit(jobForm)">
-              <!-- <button class="btn btn-primary btn-o next-step btn-wide pull-right" data-toggle="modal" data-target="#confirm"> -->
               Submit
             </button>
           </div>
@@ -139,31 +115,13 @@ under the License.
               <h4 class="modal-title">Save the job with the below information?</h4>
             </div>
             <div class="modal-body">
-              <!-- <ng-include src="'/pages/jobs/confirmation-ac.html'"/> -->
               <div class="container-fluid" id="viewJobContent" style="overflow:auto;">
                 <div class="row">
                   <h5 class="over-title margin-bottom-15">Basic information</h5>
                 </div>
-                <!--//row-->
                 <div class="row">
                   <div class="col-lg-12 col-md-12 col-sm-12">
                     <div id="viewrule-definition" class="viewrule-content">
-                      <!-- <div class="row">
-                        <label class="col-md-4 col-lg-4 col-sm-4">
-                          Source Pattern:
-                        </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                          {{sourcePat}}
-                        </div>
-                      </div>
-                      <div class="row">
-                        <label class="col-md-4 col-lg-4 col-sm-4">
-                          Target Pattern:
-                        </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                          {{targetPat}}
-                        </div>
-                      </div> -->
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Measure Name:
@@ -204,25 +162,9 @@ under the License.
                           </div>
                         </div>
                       </div>
-                      <!-- <div class="row">
-                        <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                          Start at:
-                        </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff" *ngIf="jobStartTime">
-                          {{jobStartTime.toLocaleDateString("en-US")}}&nbsp; {{timeDetail}}
-                        </div>
-                      </div>
-                      <div class="row">
-                        <label class="col-md-4 col-lg-4 col-sm-4">
-                          Interval:
-                        </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8" style="color: #fff">{{periodTime}}&nbsp;{{timeType}}
-                        </div>
-                      </div> -->
                     </div>
                   </div>
                 </div>
-                <!--//row-->
                 <br/>
               </div>
             </div>
@@ -235,5 +177,4 @@ under the License.
       </div>
     </form>
   </div>
-  <!--//row-->
 </div>
