@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.job.JobServiceImpl;
-import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -29,13 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+import static org.apache.griffin.core.util.MeasureUtil.isValid;
 
 @Component("griffinOperation")
 public class GriffinMeasureOperationImpl implements MeasureOperation {
@@ -65,6 +60,10 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
     @Override
     public GriffinOperationMessage update(Measure measure) {
         try {
+            if (!isValid((GriffinMeasure) measure)) {
+                return CREATE_MEASURE_FAIL;
+            }
+            measure.setDeleted(false);
             measureRepo.save(measure);
             return UPDATE_MEASURE_SUCCESS;
         } catch (Exception e) {
@@ -87,25 +86,5 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
             LOGGER.error(e.getMessage());
         }
         return DELETE_MEASURE_BY_ID_FAIL;
-    }
-
-    private boolean isValid(GriffinMeasure measure) {
-        if (!isConnectorNamesValid(measure)) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isConnectorNamesValid(GriffinMeasure measure) {
-        Set<String> sets = new HashSet<>();
-        List<DataSource> sources = measure.getDataSources();
-        for (DataSource source : sources) {
-            source.getConnectors().stream().filter(dc -> dc.getName() != null).forEach(dc -> sets.add(dc.getName()));
-        }
-        if (sets.size() == 0 || sets.size() < sources.size()) {
-            LOGGER.warn("Connector names cannot be repeated or empty.");
-            return false;
-        }
-        return true;
     }
 }

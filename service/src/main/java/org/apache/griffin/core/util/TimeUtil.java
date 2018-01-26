@@ -33,6 +33,11 @@ import java.util.regex.Pattern;
 
 public class TimeUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtil.class);
+    private static final String MILLISECONDS_PATTERN = "(?i)m(illi)?s(ec(ond)?)?";
+    private static final String SECONDS_PATTERN = "(?i)s(ec(ond)?)?";
+    private static final String MINUTES_PATTERN = "(?i)m(in(ute)?)?";
+    private static final String HOURS_PATTERN = "(?i)h((ou)?r)?";
+    private static final String DAYS_PATTERN = "(?i)d(ay)?";
 
     private static class TimeUnitPair {
         private long t;
@@ -90,15 +95,15 @@ public class TimeUtil {
     private static Long milliseconds(TimeUnitPair tu) {
         long t = tu.t;
         String unit = tu.unit;
-        if (unit.matches("(?i)m(illi)?s(ec(ond)?)?")) {
+        if (unit.matches(MILLISECONDS_PATTERN)) {
             return milliseconds(t, TimeUnit.MILLISECONDS);
-        } else if (unit.matches("(?i)s(ec(ond)?)?")) {
+        } else if (unit.matches(SECONDS_PATTERN)) {
             return milliseconds(t, TimeUnit.SECONDS);
-        } else if (unit.matches("(?i)m(in(ute)?)?")) {
+        } else if (unit.matches(MINUTES_PATTERN)) {
             return milliseconds(t, TimeUnit.MINUTES);
-        } else if (unit.matches("(?i)h((ou)?r)?")) {
+        } else if (unit.matches(HOURS_PATTERN)) {
             return milliseconds(t, TimeUnit.HOURS);
-        } else if (unit.matches("(?i)d(ay)?")) {
+        } else if (unit.matches(DAYS_PATTERN)) {
             return milliseconds(t, TimeUnit.DAYS);
         } else {
             LOGGER.error("Time string format error.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.");

@@ -81,7 +81,7 @@ public class MeasureServiceImpl implements MeasureService {
             return RESOURCE_NOT_FOUND;
         }
         if (!m.getType().equals(measure.getType())) {
-            LOGGER.error("Can't update measure to different type.");
+            LOGGER.warn("Can't update measure to different type.");
             return UPDATE_MEASURE_FAIL;
         }
         MeasureOperation op = getOperation(measure);

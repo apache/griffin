@@ -27,7 +27,6 @@ import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.GriffinJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
-import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
@@ -54,6 +53,7 @@ import java.text.ParseException;
 import java.util.*;
 
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+import static org.apache.griffin.core.util.MeasureUtil.getConnectorNamesIfValid;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -180,7 +180,7 @@ public class JobServiceImpl implements JobService {
         if (!isBaseLineValid(js.getSegments())) {
             return false;
         }
-        List<String> names = getConnectorNames(measure);
+        List<String> names = getConnectorNamesIfValid(measure);
         return names != null && isConnectorNamesValid(js.getSegments(), names);
     }
 
@@ -208,42 +208,21 @@ public class JobServiceImpl implements JobService {
     }
 
     private boolean isConnectorNamesValid(List<JobDataSegment> segments, List<String> names) {
-        Set<String> dcSets = new HashSet<>();
+        Set<String> sets = new HashSet<>();
         for (JobDataSegment segment : segments) {
             String dcName = segment.getDataConnectorName();
-            dcSets.add(dcName);
-            if (!isConnectorNameValid(dcName, names)) {
+            sets.add(dcName);
+            boolean exist = names.stream().anyMatch(name -> name.equals(dcName));
+            if (!exist) {
+                LOGGER.warn("Param {} is a illegal string. Please input one of strings in {}.", dcName, names);
                 return false;
             }
         }
-        if (dcSets.size() < segments.size()) {
-            LOGGER.warn("Connector names in job data segment cannot be repeated.");
+        if (sets.size() < segments.size()) {
+            LOGGER.warn("Connector names in job data segment cannot duplicate.");
             return false;
         }
         return true;
-    }
-
-    private boolean isConnectorNameValid(String param, List<String> names) {
-        for (String name : names) {
-            if (name.equals(param)) {
-                return true;
-            }
-        }
-        LOGGER.warn("Param {} is a illegal string. Please input one of strings in {}.", param, names);
-        return false;
-    }
-
-    private List<String> getConnectorNames(GriffinMeasure measure) {
-        Set<String> sets = new HashSet<>();
-        List<DataSource> sources = measure.getDataSources();
-        for (DataSource source : sources) {
-            source.getConnectors().stream().filter(dc -> dc.getName() != null).forEach(dc -> sets.add(dc.getName()));
-        }
-        if (sets.size() < sources.size()) {
-            LOGGER.warn("Connector names cannot be repeated.");
-            return null;
-        }
-        return new ArrayList<>(sets);
     }
 
     private GriffinMeasure getMeasureIfValid(Long measureId) {
