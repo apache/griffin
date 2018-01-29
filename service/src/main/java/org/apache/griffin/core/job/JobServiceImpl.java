@@ -178,7 +178,7 @@ public class JobServiceImpl implements JobService {
         if (!isJobNameValid(js.getJobName())) {
             return false;
         }
-        if (isCronExpressionValid(js.getCronExpression())) {
+        if (!isCronExpressionValid(js.getCronExpression())) {
             return false;
         }
         if (!isBaseLineValid(js.getSegments())) {

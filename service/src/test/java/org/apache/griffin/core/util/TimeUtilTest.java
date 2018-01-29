@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.TimeZone;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
@@ -89,7 +91,7 @@ public class TimeUtilTest {
         String format = "dt=#YYYYMMdd#";
         Long time = 1516186620155L;
         String timeZone = "GMT+8:00";
-        assertEquals(TimeUtil.format(format, time, timeZone), "dt=20180117");
+        assertEquals(TimeUtil.format(format, time, TimeZone.getTimeZone(timeZone)), "dt=20180117");
     }
 
     @Test
@@ -97,26 +99,15 @@ public class TimeUtilTest {
         String format = "dt=#YYYYMMdd#/hour=#HH#";
         Long time = 1516186620155L;
         String timeZone = "GMT+8:00";
-        assertEquals(TimeUtil.format(format, time, timeZone), "dt=20180117/hour=18");
+        assertEquals(TimeUtil.format(format, time, TimeZone.getTimeZone(timeZone)), "dt=20180117/hour=18");
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testFormatWithIllegalException() {
         String format = "\\#YYYYMMdd\\#";
         Long time = 1516186620155L;
         String timeZone = "GMT+8:00";
-        IllegalArgumentException exception = formatException(format, time, timeZone);
-        assert exception != null;
-    }
-
-    private IllegalArgumentException formatException(String format, Long time, String timeZone) {
-        IllegalArgumentException exception = null;
-        try {
-            TimeUtil.format(format, time, timeZone);
-        } catch (IllegalArgumentException e) {
-            exception = e;
-        }
-        return exception;
+        TimeUtil.format(format, time, TimeZone.getTimeZone(timeZone));
     }
 
 }

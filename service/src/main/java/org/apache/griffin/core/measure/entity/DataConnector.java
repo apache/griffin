@@ -53,6 +53,9 @@ public class DataConnector extends AbstractAuditableEntity {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String dataUnit;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String dataTimeZone;
+
     @JsonIgnore
     @Transient
     private String defaultDataUnit = "365000d";
@@ -105,6 +108,16 @@ public class DataConnector extends AbstractAuditableEntity {
     @JsonProperty("data.unit")
     public void setDataUnit(String dataUnit) {
         this.dataUnit = dataUnit;
+    }
+
+    @JsonProperty("data.time.zone")
+    public String getDataTimeZone() {
+        return dataTimeZone;
+    }
+
+    @JsonProperty("data.time.zone")
+    public void setDataTimeZone(String dataTimeZone) {
+        this.dataTimeZone = dataTimeZone;
     }
 
     public String getDefaultDataUnit() {

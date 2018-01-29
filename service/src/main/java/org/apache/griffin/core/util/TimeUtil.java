@@ -115,7 +115,7 @@ public class TimeUtil {
         return unit.toMillis(duration);
     }
 
-    public static String format(String timeFormat, long time, String timeZone) {
+    public static String format(String timeFormat, long time, TimeZone timeZone) {
         String timePattern = "#(?:\\\\#|[^#])*#";
         Date t = new Date(time);
         Pattern ptn = Pattern.compile(timePattern);
@@ -126,7 +126,7 @@ public class TimeUtil {
             String content = group.substring(1, group.length() - 1);
             String pattern = refreshEscapeHashTag(content);
             SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-            sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+            sdf.setTimeZone(timeZone);
             matcher.appendReplacement(sb, sdf.format(t));
         }
         matcher.appendTail(sb);
