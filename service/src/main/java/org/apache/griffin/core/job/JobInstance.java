@@ -150,7 +150,7 @@ public class JobInstance implements Job {
         Long offset = TimeUtil.str2Long(segRange.getBegin());
         Long range = TimeUtil.str2Long(segRange.getLength());
         String unit = dc.getDataUnit();
-        Long dataUnit = TimeUtil.str2Long(unit != null ? unit : dc.getDefaultDataUnit());
+        Long dataUnit = TimeUtil.str2Long(StringUtils.isEmpty(unit) ? dc.getDefaultDataUnit() : unit);
         //offset usually is negative
         Long dataStartTime = jobStartTime + offset;
         if (range < 0) {
