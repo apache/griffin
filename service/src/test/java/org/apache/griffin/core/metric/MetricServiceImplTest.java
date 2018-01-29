@@ -115,7 +115,11 @@ public class MetricServiceImplTest {
 
     @Test
     public void testAddMetricValuesSuccess() throws IOException {
-        List<MetricValue> values = Collections.singletonList(new MetricValue("jobName", 1L, new HashMap<>()));
+        Map<String, Object> value = new HashMap<>();
+        value.put("total", 10000);
+        value.put("matched", 10000);
+        List<MetricValue> values = Collections.singletonList(
+                new MetricValue("jobName", 1L, value));
         given(metricStore.addMetricValues(values))
                 .willReturn(new ResponseEntity<>("{\"errors\": false, \"items\": []}", HttpStatus.OK));
 
@@ -126,9 +130,19 @@ public class MetricServiceImplTest {
         assertEquals(body.get("errors").toString(), "false");
     }
 
+    @Test(expected = GriffinException.BadRequestException.class)
+    public void testAddMetricValuesFailureWithInvalidFormat() {
+        List<MetricValue> values = Collections.singletonList(new MetricValue());
+
+        service.addMetricValues(values);
+    }
+
     @Test(expected = GriffinException.ServiceException.class)
     public void testAddMetricValuesFailureWithException() throws IOException {
-        List<MetricValue> values = Collections.singletonList(new MetricValue("jobName", 1L, new HashMap<>()));
+        Map<String, Object> value = new HashMap<>();
+        value.put("total", 10000);
+        value.put("matched", 10000);
+        List<MetricValue> values = Collections.singletonList(new MetricValue("jobName", 1L, value));
         given(metricStore.addMetricValues(values)).willThrow(new IOException());
 
         service.addMetricValues(values);
