@@ -49,11 +49,13 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
+import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 import static org.apache.griffin.core.util.MeasureUtil.getConnectorNamesIfValid;
+import static org.quartz.CronExpression.isValidExpression;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -89,12 +91,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobDataBean> getAliveJobs() {
-        Scheduler scheduler = factory.getObject();
         List<JobDataBean> dataList = new ArrayList<>();
         try {
             List<GriffinJob> jobs = jobRepo.findByDeleted(false);
             for (GriffinJob job : jobs) {
-                JobDataBean jobData = genJobData(scheduler, jobKey(job.getQuartzName(), job.getQuartzGroup()), job);
+                JobDataBean jobData = genJobData(jobKey(job.getQuartzName(), job.getQuartzGroup()), job);
                 if (jobData != null) {
                     dataList.add(jobData);
                 }
@@ -106,7 +107,8 @@ public class JobServiceImpl implements JobService {
         return dataList;
     }
 
-    private JobDataBean genJobData(Scheduler scheduler, JobKey jobKey, GriffinJob job) throws SchedulerException {
+    private JobDataBean genJobData(JobKey jobKey, GriffinJob job) throws SchedulerException {
+        Scheduler scheduler = factory.getObject();
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         if (CollectionUtils.isEmpty(triggers)) {
             return null;
@@ -160,9 +162,8 @@ public class JobServiceImpl implements JobService {
     }
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
-        Scheduler scheduler = factory.getObject();
-        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, js, job);
-        scheduler.scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
+        JobDetail jobDetail = addJobDetail(triggerKey, js, job);
+        factory.getObject().scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
     }
 
     private String getQuartzName(JobSchedule js) {
@@ -175,6 +176,9 @@ public class JobServiceImpl implements JobService {
 
     private boolean isJobScheduleParamValid(JobSchedule js, GriffinMeasure measure) {
         if (!isJobNameValid(js.getJobName())) {
+            return false;
+        }
+        if (isCronExpressionValid(js.getCronExpression())) {
             return false;
         }
         if (!isBaseLineValid(js.getSegments())) {
@@ -192,6 +196,18 @@ public class JobServiceImpl implements JobService {
         int size = jobRepo.countByJobNameAndDeleted(jobName, false);
         if (size > 0) {
             LOGGER.warn("Job name already exits.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isCronExpressionValid(String cronExpression) {
+        if (StringUtils.isEmpty(cronExpression)) {
+            LOGGER.warn("Cron Expression is empty.");
+            return false;
+        }
+        if (!isValidExpression(cronExpression)) {
+            LOGGER.warn("Cron Expression is invalid.");
             return false;
         }
         return true;
@@ -234,18 +250,18 @@ public class JobServiceImpl implements JobService {
         return (GriffinMeasure) measure;
     }
 
-
-    private Trigger genTriggerInstance(TriggerKey triggerKey, JobDetail jd, JobSchedule js) throws ParseException {
+    private Trigger genTriggerInstance(TriggerKey triggerKey, JobDetail jd, JobSchedule js) {
         return newTrigger()
                 .withIdentity(triggerKey)
                 .forJob(jd)
-                .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(js.getCronExpression()))
-                        .inTimeZone(TimeZone.getTimeZone(js.getTimeZone()))
+                .withSchedule(cronSchedule(js.getCronExpression())
+                        .inTimeZone(getTimeZone(js.getTimeZone()))
                 )
                 .build();
     }
 
-    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws SchedulerException {
+    private JobDetail addJobDetail(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws SchedulerException {
+        Scheduler scheduler = factory.getObject();
         JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);
