@@ -16,25 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.data.source.cache
+package org.apache.griffin.measure.rule.plan
 
-import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, SQLContext}
-
-case class ParquetDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                                  dsName: String, index: Int
-                                 ) extends DataSourceCache {
-
-  override def init(): Unit = {
-    sqlContext.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false");
-  }
-
-  def writeDataFrame(dfw: DataFrameWriter, path: String): Unit = {
-    println(s"write path: ${path}")
-    dfw.parquet(path)
-  }
-
-  def readDataFrame(dfr: DataFrameReader, path: String): DataFrame = {
-    dfr.parquet(path)
-  }
-
+case class DsUpdate(dsName: String,
+                    stepName: String
+                   ) extends Serializable {
 }

@@ -95,6 +95,9 @@ case class StreamingDqThread(sqlContext: SQLContext,
         // persist records
         dqEngines.persistAllRecords(optRulePlan.recordExports, persistFactory, dataSources)
 
+        // update data sources
+        dqEngines.updateDataSources(optRulePlan.dsUpdates, dataSources)
+
         val et = new Date().getTime
         val persistTimeStr = s"persist records using time: ${et - rt} ms"
         appPersist.log(et, persistTimeStr)

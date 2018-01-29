@@ -56,6 +56,7 @@ object RuleParamKeys {
 
   val _metric = "metric"
   val _record = "record"
+  val _dsUpdate = "ds.update"
 
   def getName(param: Map[String, Any], defName: String): String = param.getString(_name, defName)
   def getRule(param: Map[String, Any]): String = param.getString(_rule, "")
@@ -66,6 +67,7 @@ object RuleParamKeys {
 
   def getMetricOpt(param: Map[String, Any]): Option[Map[String, Any]] = param.getParamMapOpt(_metric)
   def getRecordOpt(param: Map[String, Any]): Option[Map[String, Any]] = param.getParamMapOpt(_record)
+  def getDsUpdateOpt(param: Map[String, Any]): Option[Map[String, Any]] = param.getParamMapOpt(_dsUpdate)
 }
 
 object ExportParamKeys {
@@ -78,6 +80,12 @@ object ExportParamKeys {
   def getCollectType(param: Map[String, Any]): CollectType = CollectType(param.getString(_collectType, ""))
   def getDataSourceCacheOpt(param: Map[String, Any]): Option[String] = param.get(_dataSourceCache).map(_.toString)
   def getOriginDFOpt(param: Map[String, Any]): Option[String] = param.get(_originDF).map(_.toString)
+}
+
+object UpdateParamKeys {
+  val _name = "name"
+
+  def getName(param: Map[String, Any], defName: String): String = param.getString(_name, defName)
 }
 
 trait RuleAdaptor extends Loggable with Serializable {
@@ -151,6 +159,17 @@ trait RuleAdaptor extends Loggable with Serializable {
       defTimestamp,
       mode
     )
+  }
+
+  protected def genDsUpdates(param: Map[String, Any], defDsName: String,
+                             stepName: String
+                            ): Seq[DsUpdate] = {
+    val dsUpdateOpt = RuleParamKeys.getDsUpdateOpt(param)
+    dsUpdateOpt.map(genDsUpdate(_, defDsName, stepName)).toSeq
+  }
+  protected def genDsUpdate(param: Map[String, Any], defDsName: String,
+                            stepName: String): DsUpdate = {
+    DsUpdate(UpdateParamKeys.getName(param, defDsName), stepName)
   }
 
 

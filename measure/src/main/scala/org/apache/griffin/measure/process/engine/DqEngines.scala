@@ -28,7 +28,7 @@ import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
-import org.apache.griffin.measure.rule.plan._
+import org.apache.griffin.measure.rule.plan.{DsUpdate, _}
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row}
@@ -361,24 +361,46 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
 //    }
 //  }
 
-  def updateDataSources(stepRdds: Seq[(RuleStep, DataFrame)],
-                        dataSources: Seq[DataSource]): Unit = {
-//    stepRdds.foreach { stepRdd =>
-//      val (step, df) = stepRdd
-//      if (step.ruleInfo.cacheDataSourceOpt.nonEmpty) {
-//        val udpateDsCaches = dataSources.filter { ds =>
-//          step.ruleInfo.cacheDataSourceOpt match {
-//            case Some(dsName) if (dsName == ds.name) => true
-//            case _ => false
-//          }
-//        }.flatMap(_.dataSourceCacheOpt)
-//        if (udpateDsCaches.size > 0) {
-//          val t = step.timeInfo.tmst
-//          udpateDsCaches.foreach(_.updateData(df, t))
-//        }
-//      }
-//    }
+  def collectUpdateDf(dsUpdate: DsUpdate): Option[DataFrame] = {
+    val ret = engines.foldLeft(None: Option[DataFrame]) { (ret, engine) =>
+      if (ret.nonEmpty) ret else engine.collectUpdateDf(dsUpdate)
+    }
+    ret
   }
+
+  def updateDataSources(dsUpdates: Seq[DsUpdate],
+                        dataSources: Seq[DataSource]): Unit = {
+    dsUpdates.foreach { dsUpdate =>
+      val dsName = dsUpdate.dsName
+      collectUpdateDf(dsUpdate) match {
+        case Some(df) => {
+          dataSources.filter(_.name == dsName).headOption.foreach(_.updateData(df))
+        }
+        case _ => {
+          // do nothing
+        }
+      }
+    }
+  }
+
+//  def updateDataSources(stepRdds: Seq[(RuleStep, DataFrame)],
+//                        dataSources: Seq[DataSource]): Unit = {
+////    stepRdds.foreach { stepRdd =>
+////      val (step, df) = stepRdd
+////      if (step.ruleInfo.cacheDataSourceOpt.nonEmpty) {
+////        val udpateDsCaches = dataSources.filter { ds =>
+////          step.ruleInfo.cacheDataSourceOpt match {
+////            case Some(dsName) if (dsName == ds.name) => true
+////            case _ => false
+////          }
+////        }.flatMap(_.dataSourceCacheOpt)
+////        if (udpateDsCaches.size > 0) {
+////          val t = step.timeInfo.tmst
+////          udpateDsCaches.foreach(_.updateData(df, t))
+////        }
+////      }
+////    }
+//  }
 
 //  def updateDataSources(stepRdds: Seq[(ConcreteRuleStep, RDD[(Long, Iterable[String])])],
 //                        dataSources: Seq[DataSource]): Unit = {

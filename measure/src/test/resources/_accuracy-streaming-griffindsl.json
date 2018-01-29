@@ -44,7 +44,8 @@
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"]
+        "time.range": ["-2m", "0"],
+        "updatable": true
       }
     }, {
       "name": "target",
@@ -108,8 +109,7 @@
           "name": "accu"
         },
         "record": {
-          "name": "missRecords",
-          "data.source.cache": "source"
+          "name": "missRecords"
         }
       }
     ]

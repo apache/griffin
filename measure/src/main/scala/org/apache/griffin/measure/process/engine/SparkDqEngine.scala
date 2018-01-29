@@ -19,6 +19,7 @@ under the License.
 package org.apache.griffin.measure.process.engine
 
 import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
+import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
@@ -255,6 +256,14 @@ trait SparkDqEngine extends DqEngine {
 //        }
 //      }
 //    }
+  }
+
+  def collectUpdateDf(dsUpdate: DsUpdate): Option[DataFrame] = {
+    if (collectable) {
+      val DsUpdate(_, stepName, _) = dsUpdate
+      val stepDf = sqlContext.table(s"`${stepName}`")
+      Some(stepDf)
+    } else None
   }
 
 //

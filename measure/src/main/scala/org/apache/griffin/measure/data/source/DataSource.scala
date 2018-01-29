@@ -115,9 +115,12 @@ case class DataSource(sqlContext: SQLContext,
     }
   }
 
+  def updateData(df: DataFrame): Unit = {
+    dataSourceCacheOpt.foreach(_.updateData(Some(df)))
+  }
+
   def updateData(df: DataFrame, ms: Long): Unit = {
 //    dataSourceCacheOpt.foreach(_.updateData(df, ms))
-    dataSourceCacheOpt.foreach(_.updateData(Some(df)))
   }
 
   def updateDataMap(dfMap: Map[Long, DataFrame]): Unit = {

@@ -116,6 +116,13 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         }
         case StreamingProcessType => Nil
       }
+      val missRecordsUpdates = procType match {
+        case BatchProcessType => Nil
+        case StreamingProcessType => {
+          val updateParam = emptyMap
+          genDsUpdate(updateParam, sourceName, missRecordsTableName) :: Nil
+        }
+      }
 
       // 2. miss count
       val missCountTableName = "__missCount"
@@ -170,7 +177,8 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
       // current accu plan
       val accuSteps = missRecordsStep :: missCountStep :: totalCountStep :: accuracyStep :: Nil
       val accuExports = missRecordsExports ++ accuracyExports
-      val accuPlan = RulePlan(accuSteps, accuExports)
+      val accuUpdates = missRecordsUpdates
+      val accuPlan = RulePlan(accuSteps, accuExports, accuUpdates)
 
       // streaming extra accu plan
       val streamingAccuPlan = procType match {

@@ -73,6 +73,9 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   val _ReadOnly = "read.only"
   val readOnly = param.getBoolean(_ReadOnly, false)
 
+  val _Updatable = "updatable"
+  val updatable = param.getBoolean(_Updatable, false)
+
 //  val rowSepLiteral = "\n"
 //  val partitionUnits: List[String] = List("hour", "min", "sec")
 //  val minUnitTime: Long = TimeUtil.timeFromUnit(1, partitionUnits.last)
@@ -88,9 +91,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   protected def writeDataFrame(dfw: DataFrameWriter, path: String): Unit
   protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame
 
-  def init(): Unit = {
-    ;
-  }
+  def init(): Unit = {}
 
   // save new cache data only
   def saveData(dfOpt: Option[DataFrame], ms: Long): Unit = {
@@ -192,8 +193,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   private def listEarlierPartitions(path: String, bound: Long, partitionOpt: Option[String]): Iterable[String] = {
     val names = HdfsUtil.listSubPathsByType(path, "dir")
     val regex = partitionOpt match {
-      case Some(partition) => s"""^${partition}=(\d+)$$""".r
-      case _ => s"""^(\d+)$$""".r
+      case Some(partition) => s"^${partition}=(\\d+)$$".r
+      case _ => "^(\\d+)$".r
     }
     names.filter { name =>
       name match {
@@ -219,14 +220,14 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   def cleanOutTimeData(): Unit = {
     if (!readOnly) {
       // new cache data
-      val lastProcTime = readLastProcTime()
-      lastProcTime match {
-        case Some(lpt) => {
+      val newCacheCleanTime = if (updatable) readLastProcTime else readCleanTime
+      newCacheCleanTime match {
+        case Some(nct) => {
           // clean calculated new cache data
           val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
           if (newCacheLocked) {
             try {
-              cleanOutTimePartitions(newFilePath, lpt, Some(InternalColumns.tmst))
+              cleanOutTimePartitions(newFilePath, nct, Some(InternalColumns.tmst))
             } catch {
               case e: Throwable => error(s"clean new cache data error: ${e.getMessage}")
             } finally {
@@ -240,9 +241,9 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
       }
 
       // old cache data
-      val cleanTime = readCleanTime()
-      cleanTime match {
-        case Some(ct) => {
+      val oldCacheCleanTime = readCleanTime
+      oldCacheCleanTime match {
+        case Some(oct) => {
           val oldCacheIndexOpt = readOldCacheIndex
           oldCacheIndexOpt.foreach { idx =>
             val oldDfPath = s"${oldFilePath}/${idx}"
@@ -252,7 +253,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
                 // clean calculated old cache data
                 cleanOutTimePartitions(oldFilePath, idx, None)
                 // clean out time old cache data not calculated
-                cleanOutTimePartitions(oldDfPath, ct, Some(InternalColumns.tmst))
+                cleanOutTimePartitions(oldDfPath, oct, Some(InternalColumns.tmst))
               } catch {
                 case e: Throwable => error(s"clean old cache data error: ${e.getMessage}")
               } finally {
@@ -288,7 +289,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
             } catch {
               case e: Throwable => error(s"update data error: ${e.getMessage}")
             } finally {
-              newCacheLock.unlock()
+              oldCacheLock.unlock()
             }
           }
         }
