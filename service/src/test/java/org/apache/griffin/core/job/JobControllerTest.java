@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.exception.GriffinExceptionHandler;
 import org.apache.griffin.core.exception.GriffinExceptionMessage;
@@ -42,14 +41,12 @@ import java.util.Collections;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
 import static org.apache.griffin.core.util.EntityHelper.createGriffinJob;
+import static org.apache.griffin.core.util.EntityHelper.createJobSchedule;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -86,7 +83,7 @@ public class JobControllerTest {
 
     @Test
     public void testAddJobForSuccess() throws Exception {
-        JobSchedule jobSchedule = getJobSchedule();
+        JobSchedule jobSchedule = createJobSchedule();
         GriffinJob job = createGriffinJob();
         given(service.addJob(jobSchedule)).willReturn(job);
 
@@ -99,7 +96,7 @@ public class JobControllerTest {
 
     @Test
     public void testAddJobForFailureWithBadRequest() throws Exception {
-        JobSchedule jobSchedule = getJobSchedule();
+        JobSchedule jobSchedule = createJobSchedule();
         given(service.addJob(jobSchedule))
                 .willThrow(new GriffinException.BadRequestException(GriffinExceptionMessage.MISSING_METRIC_NAME));
 
@@ -111,7 +108,7 @@ public class JobControllerTest {
 
     @Test
     public void testAddJobForFailureWithTriggerKeyExist() throws Exception {
-        JobSchedule jobSchedule = getJobSchedule();
+        JobSchedule jobSchedule = createJobSchedule();
         given(service.addJob(jobSchedule))
                 .willThrow(new GriffinException.ConflictException(GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST));
 
@@ -119,10 +116,6 @@ public class JobControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.toJson(jobSchedule)))
                 .andExpect(status().isConflict());
-    }
-
-    private JobSchedule getJobSchedule() throws JsonProcessingException {
-        return new JobSchedule(1L, "jobName", "0 0/4 * * * ?", "GMT+8:00", null);
     }
 
     @Test

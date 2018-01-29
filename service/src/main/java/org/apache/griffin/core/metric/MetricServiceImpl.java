@@ -20,8 +20,6 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.repo.JobRepo;
@@ -29,11 +27,14 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
+import org.codehaus.jackson.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +42,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_OFFSET;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_SIZE;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 
 @Service
 public class MetricServiceImpl implements MetricService {
@@ -88,39 +87,30 @@ public class MetricServiceImpl implements MetricService {
         }
         try {
             return metricStore.getMetricValues(metricName, offset, size);
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("Failed to get metric values named {}. {}", metricName, e.getMessage());
             throw new GriffinException.ServiceException("Failed to get metric values", e);
         }
     }
 
     @Override
-    public void addMetricValues(List<MetricValue> values) {
-        for (MetricValue value : values) {
-            if (!isMetricValueValid(value)) {
-                LOGGER.warn("Invalid metric value.");
-                throw new GriffinException.BadRequestException(INVALID_METRIC_VALUE_FORMAT);
-            }
-        }
+    public ResponseEntity addMetricValues(List<MetricValue> values) {
         try {
-            for (MetricValue value : values) {
-                metricStore.addMetricValue(value);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Failed to add metric values. {}", e.getMessage());
-            throw new GriffinException.ServiceException("Failed to add metric values.", e);
+            return metricStore.addMetricValues(values);
+        } catch (JsonProcessingException e) {
+            LOGGER.warn("Failed to parse metric value.", e.getMessage());
+            throw new GriffinException.BadRequestException(INVALID_METRIC_VALUE_FORMAT);
+        } catch (IOException e) {
+            LOGGER.error("Failed to add metric values", e);
+            throw new GriffinException.ServiceException("Failed to add metric values", e);
         }
-    }
-
-    private boolean isMetricValueValid(MetricValue value) {
-        return StringUtils.isNotBlank(value.getName()) && value.getTmst() != null && MapUtils.isNotEmpty(value.getValue());
     }
 
     @Override
-    public void deleteMetricValues(String metricName) {
+    public ResponseEntity deleteMetricValues(String metricName) {
         try {
-            metricStore.deleteMetricValues(metricName);
-        } catch (Exception e) {
+            return metricStore.deleteMetricValues(metricName);
+        } catch (IOException e) {
             LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
             throw new GriffinException.ServiceException("Failed to delete metric values.", e);
         }

@@ -22,6 +22,7 @@ package org.apache.griffin.core.metric;
 
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public interface MetricService {
 
     List<MetricValue> getMetricValues(String metricName, int offset, int size);
 
-    void addMetricValues(List<MetricValue> values);
+    ResponseEntity addMetricValues(List<MetricValue> values);
 
-    void deleteMetricValues(String metricName);
+    ResponseEntity deleteMetricValues(String metricName);
 }

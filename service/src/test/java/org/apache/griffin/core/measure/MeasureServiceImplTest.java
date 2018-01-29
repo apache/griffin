@@ -33,7 +33,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
@@ -64,7 +64,7 @@ public class MeasureServiceImplTest {
     @Test
     public void testGetAllMeasures() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
-        given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
+        given(measureRepo.findByDeleted(false)).willReturn(Collections.singletonList(measure));
 
         List<Measure> measures = service.getAllAliveMeasures();
         assertEquals(measures.size(), 1);
@@ -84,7 +84,7 @@ public class MeasureServiceImplTest {
     public void testGetAliveMeasuresByOwner() throws Exception {
         String owner = "test";
         Measure measure = createGriffinMeasure("view_item_hourly");
-        given(measureRepo.findByOwnerAndDeleted(owner, false)).willReturn(Arrays.asList(measure));
+        given(measureRepo.findByOwnerAndDeleted(owner, false)).willReturn(Collections.singletonList(measure));
 
         List<Measure> measures = service.getAliveMeasuresByOwner(owner);
         assertEquals(measures.get(0).getName(), measure.getName());
@@ -156,7 +156,7 @@ public class MeasureServiceImplTest {
     public void testCreateMeasureForFailureWithDuplicate() throws Exception {
         String measureName = "view_item_hourly";
         GriffinMeasure measure = createGriffinMeasure(measureName);
-        given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(Arrays.asList(measure));
+        given(measureRepo.findByNameAndDeleted(measureName, false)).willReturn(Collections.singletonList(measure));
 
         service.createMeasure(measure);
     }

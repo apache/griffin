@@ -23,6 +23,7 @@ import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,14 +49,13 @@ public class MetricController {
     }
 
     @RequestMapping(value = "/metrics/values", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addMetricValues(@RequestBody List<MetricValue> values) {
-        metricService.addMetricValues(values);
+    public ResponseEntity addMetricValues(@RequestBody List<MetricValue> values) {
+        return metricService.addMetricValues(values);
     }
 
     @RequestMapping(value = "/metrics/values", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMetricValues(@RequestParam("metricName") String metricName) {
-        metricService.deleteMetricValues(metricName);
+    public ResponseEntity deleteMetricValues(@RequestParam("metricName") String metricName) {
+        return metricService.deleteMetricValues(metricName);
     }
 }
