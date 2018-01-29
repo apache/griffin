@@ -47,6 +47,11 @@ public class MeasureController {
         return measureService.deleteMeasureById(id);
     }
 
+    @RequestMapping(value = "/measures", method = RequestMethod.DELETE)
+    public GriffinOperationMessage deleteMeasures() {
+        return measureService.deleteMeasures();
+    }
+
     @RequestMapping(value = "/measures", method = RequestMethod.PUT)
     public GriffinOperationMessage updateMeasure(@RequestBody Measure measure) {
         return measureService.updateMeasure(measure);

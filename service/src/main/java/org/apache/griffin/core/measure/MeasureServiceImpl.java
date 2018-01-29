@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -96,6 +97,19 @@ public class MeasureServiceImpl implements MeasureService {
         }
         MeasureOperation op = getOperation(measure);
         return op.delete(measure);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public GriffinOperationMessage deleteMeasures() {
+        List<Measure> measures = measureRepo.findByDeleted(false);
+        for (Measure m : measures) {
+            MeasureOperation op = getOperation(m);
+            if (op.delete(m).equals(DELETE_MEASURE_BY_ID_FAIL)) {
+                return DELETE_MEASURE_BY_ID_FAIL;
+            }
+        }
+        return DELETE_MEASURE_BY_ID_SUCCESS;
     }
 
     private MeasureOperation getOperation(Measure measure) {

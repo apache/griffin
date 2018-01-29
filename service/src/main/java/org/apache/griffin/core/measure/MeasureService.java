@@ -38,6 +38,8 @@ public interface MeasureService {
 
     GriffinOperationMessage deleteMeasureById(Long id);
 
+    GriffinOperationMessage deleteMeasures();
+
 
 /*
     GriffinOperationMessage deleteMeasureByName(String measureName) ;
