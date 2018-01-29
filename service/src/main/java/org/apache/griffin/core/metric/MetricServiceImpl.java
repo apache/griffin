@@ -20,6 +20,8 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.repo.JobRepo;
@@ -95,6 +97,9 @@ public class MetricServiceImpl implements MetricService {
 
     @Override
     public ResponseEntity addMetricValues(List<MetricValue> values) {
+        for (MetricValue value : values) {
+            checkFormat(value);
+        }
         try {
             return metricStore.addMetricValues(values);
         } catch (JsonProcessingException e) {
@@ -113,6 +118,12 @@ public class MetricServiceImpl implements MetricService {
         } catch (IOException e) {
             LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
             throw new GriffinException.ServiceException("Failed to delete metric values.", e);
+        }
+    }
+
+    private void checkFormat(MetricValue value) {
+        if (StringUtils.isBlank(value.getName()) || value.getTmst() == null || MapUtils.isEmpty(value.getValue())) {
+            throw new GriffinException.BadRequestException(INVALID_METRIC_VALUE_FORMAT);
         }
     }
 }
