@@ -71,7 +71,7 @@ class Col{
     this.rules = [];
     this.RE = '';
     this.newRules = [];
-    
+
     var patt = new RegExp('int|double|float/i');
     if(patt.test(this.type)){
       this.isNum = true;
@@ -87,7 +87,7 @@ class Col{
   styleUrls: ['./pr.component.css']
 })
 export class PrComponent implements  AfterViewChecked, OnInit{
-  
+
   noderule = [];
   // grp = [];
   // showgrp:string;
@@ -208,7 +208,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       this.hide();
     }
   }
-  
+
   onResize(event){
     this.resizeWindow();
   }
@@ -266,7 +266,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
           if(key === row.name){
             delete this.selectedItems[key];
           }
-        }             
+        }
         //this.selectedItems[row.name] = [];
     }
     // is newly selected
@@ -341,7 +341,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
         len = this.selectedItems[key].length;
         if(len == 0){
           return false;
-        }        
+        }
       }
       return (this.selection.length == selectedlen) ? true :false;
     } else if (step == 3) {
@@ -349,7 +349,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     } else if(step == 4){
     }
     return false;
-  } 
+  }
 
   prev (form) {
     this.currentStep--;
@@ -357,7 +357,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
   goTo (i) {
     this.currentStep = i;
   }
-  submit (form) {         
+  submit (form) {
       // form.$setPristine();
     // this.finalgrp = [];
     if (!form.valid) {
@@ -380,7 +380,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
           {
             "name": "source",
             "connectors": [
-              { 
+              {
                 "name":this.srcname,
                 "type": "hive",
                 "version": "1.2",
@@ -414,7 +414,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
             // }
           ]
         }
-    };   
+    };
     this.getGrouprule();
     if(this.size.indexOf('0')==0){
         delete this.newMeasure['data.sources'][0]['connectors'][0]['data.unit'];
@@ -425,14 +425,14 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     this.visible = true;
     setTimeout(() => this.visibleAnimate = true, 100);
   }
-  
-  getRule(trans,otherinfo){    
+
+  getRule(trans,otherinfo){
     var rule = '';
     for(let i of trans){
        rule = rule + i + ',';
     }
     rule = rule.substring(0,rule.lastIndexOf(','));
-    this.pushRule(rule,otherinfo);    
+    this.pushRule(rule,otherinfo);
   }
 
   pushEnmRule(rule,grpname,originrule){
@@ -451,7 +451,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       }
     });
   }
-  
+
   pushNullRule(rule,nullname,originrule){
     var self = this;
     self.newMeasure['evaluate.rule'].rules.push({
@@ -494,7 +494,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       console.log('Something went wrong!');
     });
   }
-  
+
   options: ITreeOptions = {
     displayField: 'name',
     isExpandedField: 'expanded',
@@ -538,11 +538,11 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     this.toasterService = toasterService;
     this.selection = [];
   };
-  
+
   // onItemSelect(item){
   //   this.getRule();
   // }
-  
+
   getGrouprule(){
     var selected = {name: ''};
     var value = '';
@@ -555,9 +555,9 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       var info = '';
       var otherinfo = '';
       for(let i = 0;i<this.selectedItems[key].length;i++){
-        var originrule = this.selectedItems[key][i].itemName;        
+        var originrule = this.selectedItems[key][i].itemName;
         info = info + originrule + ',';
-        if(originrule == 'Enum Detection Count'){          
+        if(originrule == 'Enum Detection Count'){
           enmvalue = this.transferRule(originrule,selected);
           grpname = selected.name + '-grp';
           this.transenumrule.push(enmvalue);
@@ -569,7 +569,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
           this.pushNullRule(nullvalue,nullname,originrule);
         }else{
           otherinfo = otherinfo + originrule + ',';
-          value = this.transferRule(originrule,selected);      
+          value = this.transferRule(originrule,selected);
           this.transrule.push(value);
         }
       }
@@ -578,11 +578,11 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       this.noderule.push({
         "name":key,
         "infos":info
-      });  
+      });
     }
     if(this.transrule.length != 0){
       this.getRule(this.transrule,otherinfo);
-    }   
+    }
   }
 
   // OnItemDeSelect(item){
@@ -602,7 +602,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     document.getElementById('showrule').style.display = 'none';
     document.getElementById('notshowrule').style.display = '';
   }
-  
+
   getData(evt){
     this.config = evt;
     this.timezone = evt.timezone;
@@ -644,8 +644,8 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       this.nodeListTarget = JSON.parse(JSON.stringify(this.nodeList));
 
     });
-    this.dropdownSettings = { 
-      singleSelection: false, 
+    this.dropdownSettings = {
+      singleSelection: false,
       text:"Select Rule",
       // selectAllText:'Select All',
       // unSelectAllText:'UnSelect All',
@@ -655,7 +655,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
       classes: "myclass",
       groupBy: "category"
     };
-    this.size = '1day';     
+    this.size = '1day';
   };
   ngAfterViewChecked(){
     this.resizeWindow();
