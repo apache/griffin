@@ -250,7 +250,7 @@ public class JobServiceImpl implements JobService {
         GriffinMeasure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
             LOGGER.warn("The measure id {} isn't valid. Maybe it doesn't exist or is external measure type.", measureId);
-            throw new GriffinException.BadRequestException(MISSING_METRIC_NAME);
+            throw new GriffinException.BadRequestException(INVALID_MEASURE_ID);
         }
         return measure;
     }

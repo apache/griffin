@@ -55,7 +55,11 @@ public class MeasureServiceImpl implements MeasureService {
 
     @Override
     public Measure getMeasureById(long id) {
-        return measureRepo.findByIdAndDeleted(id, false);
+        Measure measure = measureRepo.findByIdAndDeleted(id, false);
+        if (measure == null) {
+            throw new GriffinException.NotFoundException(MEASURE_ID_DOES_NOT_EXIST);
+        }
+        return measure;
     }
 
     @Override

@@ -30,7 +30,7 @@ public class GriffinExceptionResponse {
     private Date timestamp = new Date();
     private int status;
     private String error;
-    private int code;
+    private String code;
     private String message;
     private String exception;
     private String path;
@@ -39,7 +39,7 @@ public class GriffinExceptionResponse {
     GriffinExceptionResponse(HttpStatus status, GriffinExceptionMessage message, String path) {
         this.status = status.value();
         this.error = status.getReasonPhrase();
-        this.code = message.getCode();
+        this.code = Integer.toString(message.getCode());
         this.message = message.getMessage();
         this.path = path;
     }
@@ -64,7 +64,7 @@ public class GriffinExceptionResponse {
         return error;
     }
 
-    public int getCode() {
+    public String getCode() {
         return code;
     }
 

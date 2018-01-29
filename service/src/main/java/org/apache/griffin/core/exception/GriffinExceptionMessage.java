@@ -30,6 +30,7 @@ public enum GriffinExceptionMessage {
     INVALID_METRIC_RECORDS_OFFSET(40006, "Offset must not be less than zero"),
     INVALID_METRIC_RECORDS_SIZE(40007, "Size must not be less than zero"),
     INVALID_METRIC_VALUE_FORMAT(40008, "Metric value format is invalid"),
+    INVALID_MEASURE_ID(40009, "Property 'measure.id' is invalid"),
 
     //404, "Not Found"
     MEASURE_ID_DOES_NOT_EXIST(40401, "Measure id does not exist"),
