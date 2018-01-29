@@ -44,7 +44,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
-
+  
   @ViewChildren('sliderRef') sliderRefs;
 
   someKeyboard = [];
@@ -54,7 +54,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   cronExp :string;
   dropdownList = [];
   currentStep = 1;
-  maskOpen = false;
+  maskOpen = false;  
   keyupLabelOn = false;
   keydownLabelOn = false;
   periodTime :number;
@@ -130,13 +130,13 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     }
     this.measureid = this.getMeasureId();
     let time = new Date().getTimezoneOffset() / 60;
-    let timezone = 'GMT' + time + ':00';
+    let timezone = 'GMT' + time + ':00'; 
     this.newJob = {
       "job.name": this.jobname,
       "measure.id": this.measureid,
       "cron.expression": this.cronExp,
       "cron.time.zone": timezone,
-      // "cron.time.zone": "GMT+8:00",
+      // "cron.time.zone": "GMT+8:00", 
       // "predicate.config": {
       // "interval": "1m",
       // "repeat": 2
@@ -225,10 +225,10 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     for(let index in this.Measures){
       if(this.measure == this.Measures[index].name){
         return this.Measures[index].id;
-      }
+      }     
     }
   }
-
+  
   onChange(measure){
     this.dropdownList = [];
     for(let index in this.Measures){
@@ -248,7 +248,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
             }
           }
         }
-      }
+      }     
     }
     for(let i = 0;i < this.dropdownList.length;i++){
       this.someKeyboard[i] = [-1,0];
@@ -260,10 +260,10 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
             'max': 0
           }
         });
-      }
-    }
+      }   
+    }       
   }
-
+  
 
   changeRange(index,value,i){
     let newRange = [];
@@ -272,7 +272,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     this.updateSliderRange(value,i);
     this.someKeyboard[i] = newRange[i];
   }
-
+  
   rangeChange(evt,i){
     var oldmin = this.sliderRefs._results[i].config.range.min;
     if((evt[0] - oldmin)<=2){
@@ -281,7 +281,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
           'min': oldmin-10,
           'max': 0
         }
-      });
+      }); 
     }
     if((evt[0] - oldmin)>=13){
       this.sliderRefs._results[i].slider.updateOptions({
@@ -289,13 +289,13 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
           'min': oldmin+10,
           'max': 0
         }
-      });
+      }); 
     }
-    this.someKeyboard[i] = evt;
+    this.someKeyboard[i] = evt; 
   }
 
   updateSliderRange(value,i){
-    // setTimeout(() => {
+    // setTimeout(() => { 
     var oldmin = this.sliderRefs._results[i].config.range.min;
     var oldmax = this.sliderRefs._results[i].config.range.max
     var newmin = Math.floor(value/10);
@@ -349,7 +349,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     }
   }
 
-
+  
   ngAfterViewChecked(){
     this.resizeWindow();
   }

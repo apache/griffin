@@ -68,7 +68,7 @@ class Col{
 })
 
 export class AcComponent implements OnInit , AfterViewChecked {
-
+  
   defaultValue:string;
   currentStep = 1;
   // grp = [];
@@ -96,6 +96,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   currentDBstr: string;
   srcconfig = {
     "where":'',
+    "timezone":'',
     "num":1,
     "timetype":'day',
     "needpath":false,
@@ -103,6 +104,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   };
   tgtconfig = {
     "where":'',
+    "timezone":'',
     "num":1,
     "timetype":'day',
     "needpath":false,
@@ -128,6 +130,8 @@ export class AcComponent implements OnInit , AfterViewChecked {
   tgt_name: string;
   src_location: string;
   tgt_location: string;
+  src_timezone: string;
+  tgt_timezone: string;
 
   measureTypes = ['accuracy','validity','anomaly detection','publish metrics'];
   type = "accuracy";
@@ -143,11 +147,12 @@ export class AcComponent implements OnInit , AfterViewChecked {
     {
       "name": "source",
       "connectors": [
-        {
+        { 
           "name":"",
           "type": "HIVE",
           "version": "1.2",
           "data.unit":"",
+          "data.time.zone":"",
           "config":{
             "database":'',
             "table.name":'',
@@ -172,6 +177,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
           "type": "HIVE",
           "version": "1.2",
           "data.unit":"",
+          "data.time.zone":"",
           "config":{
             "database":'',
             "table.name":'',
@@ -239,7 +245,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     }
   }
 
-  addMapping(x,i){
+  addMapping(x,i){   
     this.mappings[i] = x;
   }
 
@@ -284,7 +290,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
       this.matches[i] = "=";
       // this.mappings[i] = this.currentDB + '.' + this.currentTable + '.' + row.name;
     }
-
+      
   };
 
   toggleAll () {
@@ -337,7 +343,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
 
     }
     return false;
-  }
+  } 
 
   prev (form) {
     this.currentStep--;
@@ -345,7 +351,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   goTo (i) {
     this.currentStep = i;
   }
-  submit (form) {
+  submit (form) {              
       // form.$setPristine();
       // this.finalgrp = [];
       if (!form.valid) {
@@ -374,6 +380,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
                 "type": "HIVE",
                 "version": "1.2",
                 "data.unit":this.src_size,
+                "data.time.zone":this.src_timezone,
                 "config":{
                   "database":this.currentDB,
                   "table.name":this.currentTable,
@@ -398,6 +405,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
                 "type": "HIVE",
                 "version": "1.2",
                 "data.unit":this.tgt_size,
+                "data.time.zone":this.tgt_timezone,
                 "config":{
                   "database":this.currentDBTarget,
                   "table.name":this.currentTableTarget,
@@ -415,7 +423,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
               }
             ]
           }
-        ],
+        ],     
         "evaluate.rule":{
           "rules": [
             {
@@ -466,6 +474,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
       rule = rules.join(" AND ");
       this.rules = rule;
       this.newMeasure['evaluate.rule'].rules[0].rule = rule;
+      console.log(this.newMeasure);
       this.visible = true;
       setTimeout(() => this.visibleAnimate = true, 100);
   }
@@ -495,7 +504,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
     idField: 'id',
     actionMapping: {
       mouse: {
-        click: (tree, node, $event) => {
+        click: (tree, node, $event) => {         
           if (node.hasChildren) {
             this.currentDB = node.data.name;
             this.currentDBstr = this.currentDB + '.';
@@ -567,18 +576,18 @@ export class AcComponent implements OnInit , AfterViewChecked {
   constructor(toasterService: ToasterService,private http: HttpClient,private router:Router,public serviceService:ServiceService) {
     this.toasterService = toasterService;
   };
-
+  
   onResize(event){
     this.resizeWindow();
   }
-
+  
   srcAttr(evt){
     this.srcdata = evt;
     this.currentDB = evt.database;
     this.currentTable = evt.table;
     this.selection = evt.selection;
   }
-
+  
   tgtAttr(evt){
     this.tgtdata = evt;
     this.currentDBTarget = evt.database;
@@ -588,6 +597,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
 
   getSrc(evt){
     this.srcconfig = evt;
+    this.src_timezone = evt.timezone;
     this.src_where = evt.where;
     this.src_size = evt.num + evt.timetype;
     this.src_path = evt.path;
@@ -595,11 +605,12 @@ export class AcComponent implements OnInit , AfterViewChecked {
 
   getTgt(evt){
     this.tgtconfig = evt;
+    this.tgt_timezone = evt.timezone;
     this.tgt_where = evt.where;
     this.tgt_size = evt.num + evt.timetype;
     this.tgt_path = evt.path;
   }
-
+  
 
   resizeWindow(){
     var stepSelection = '.formStep[id=step-' + this.currentStep + ']';
@@ -612,7 +623,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
         'height': $('fieldset').height()
     });
   }
-
+    
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data =>{
