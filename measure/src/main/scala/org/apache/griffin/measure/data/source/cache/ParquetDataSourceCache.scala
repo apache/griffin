@@ -18,10 +18,18 @@ under the License.
 */
 package org.apache.griffin.measure.data.source.cache
 
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, SQLContext}
 
 case class ParquetDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
                                   dsName: String, index: Int
                                  ) extends DataSourceCache {
+
+  def writeDataFrame(dfw: DataFrameWriter, path: String): Unit = {
+    dfw.parquet(path)
+  }
+
+  def readDataFrame(dfr: DataFrameReader, path: String): DataFrame = {
+    dfr.parquet(path)
+  }
 
 }

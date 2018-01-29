@@ -27,7 +27,7 @@ import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
+import org.apache.spark.sql._
 
 trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
@@ -85,6 +85,9 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
   val defOldCacheIndex = 0L
 
+  protected def writeDataFrame(dfw: DataFrameWriter, path: String): Unit
+  protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame
+
   def init(): Unit = {
     ;
   }
@@ -98,7 +101,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
           val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
           if (newCacheLocked) {
             try {
-              df.write.mode(SaveMode.Append).partitionBy(InternalColumns.tmst).parquet(newFilePath)
+              val dfw = df.write.mode(SaveMode.Append).partitionBy(InternalColumns.tmst)
+              writeDataFrame(dfw, newFilePath)
             } catch {
               case e: Throwable => error(s"save data error: ${e.getMessage}")
             } finally {
@@ -132,7 +136,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
     // new cache data
     val newDfOpt = try {
-      Some(sqlContext.read.parquet(newFilePath).filter(filterStr))
+      val dfr = sqlContext.read
+      Some(readDataFrame(dfr, newFilePath).filter(filterStr))
     } catch {
       case e: Throwable => {
         warn(s"read data source cache warn: ${e.getMessage}")
@@ -145,7 +150,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
     val oldDfOpt = oldCacheIndexOpt.flatMap { idx =>
       val oldDfPath = s"${oldFilePath}/${idx}"
       try {
-        Some(sqlContext.read.parquet(oldDfPath).filter(filterStr))
+        val dfr = sqlContext.read
+        Some(readDataFrame(dfr, oldDfPath).filter(filterStr))
       } catch {
         case e: Throwable => {
           warn(s"read old data source cache warn: ${e.getMessage}")
@@ -275,7 +281,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
               val nextOldCacheIndex = oldCacheIndexOpt.getOrElse(defOldCacheIndex) + 1
 
               val oldDfPath = s"${oldFilePath}/${nextOldCacheIndex}"
-              df.write.mode(SaveMode.Overwrite).partitionBy(InternalColumns.tmst).parquet(oldDfPath)
+              val dfw = df.write.mode(SaveMode.Overwrite).partitionBy(InternalColumns.tmst)
+              writeDataFrame(dfw, oldDfPath)
 
               submitOldCacheIndex(nextOldCacheIndex)
             } catch {

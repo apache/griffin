@@ -89,10 +89,9 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
           case _ => Nil
         }
         val future = Future {
-//        df.cache
           persist.persistRecords(df, recordExport.name)
-          updateDsCaches.foreach(_.updateData(df, tmst))
-//        df.unpersist
+//          updateDsCaches.foreach(_.updateData(df, tmst))
+          updateDsCaches.foreach(_.updateData(Some(df)))
           true
         }
         future.onComplete {
@@ -176,14 +175,14 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
         val persist = persistFactory.getPersists(tmst)
 
         persist.persistRecords(strs, recordExport.name)
-        updateDsCaches.foreach(_.updateData(strs, tmst))
+//        updateDsCaches.foreach(_.updateData(strs, tmst))
       }
     }
 
     emtpyRecordKeys.foreach { t =>
       val persist = persistFactory.getPersists(t)
       persist.persistRecords(Nil, recordExport.name)
-      updateDsCaches.foreach(_.updateData(Nil, t))
+//      updateDsCaches.foreach(_.updateData(Nil, t))
     }
   }
 
