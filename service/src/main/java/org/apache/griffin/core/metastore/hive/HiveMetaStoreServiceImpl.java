@@ -73,7 +73,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Iterable<String> results = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null.Please check your hive config.");
+                LOGGER.warn("Hive client is null. Please check your hive config.");
                 return new ArrayList<>();
             }
             results = client.getAllDatabases();
@@ -91,7 +91,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Iterable<String> results = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null.Please check your hive config.");
+                LOGGER.warn("Hive client is null. Please check your hive config.");
                 return new ArrayList<>();
             }
             results = client.getAllTables(getUseDbName(dbName));
@@ -117,7 +117,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Iterable<String> dbs;
         // if hive.metastore.uris in application.properties configs wrong, client will be injected failure and will be null.
         if (client == null) {
-            LOGGER.warn("Hive client is null.Please check your hive config.");
+            LOGGER.warn("Hive client is null. Please check your hive config.");
             return results;
         }
         dbs = getAllDatabases();
@@ -136,7 +136,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Table result = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null.Please check your hive config.");
+                LOGGER.warn("Hive client is null. Please check your hive config.");
                 return null;
             }
             result = client.getTable(getUseDbName(dbName), tableName);
@@ -153,7 +153,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         List<Table> allTables = new ArrayList<>();
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null.Please check your hive config.");
+                LOGGER.warn("Hive client is null. Please check your hive config.");
                 return allTables;
             }
             Iterable<String> tables = client.getAllTables(useDbName);

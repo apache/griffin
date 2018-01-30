@@ -28,12 +28,15 @@ import org.apache.griffin.core.util.JsonUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -42,23 +45,36 @@ import java.util.*;
 @Component
 public class MetricStoreImpl implements MetricStore {
 
+    private static final String INDEX = "griffin";
+    private static final String TYPE = "accuracy";
+    private static final String URL_BASE = "/griffin/accuracy";
+
     private RestClient client;
+    private HttpHeaders headers;
+    private String url_get;
+    private String url_delete;
+    private String url_post;
+    private ObjectMapper mapper;
 
-    private ObjectMapper mapper = new ObjectMapper();
-
-    public MetricStoreImpl(@Value("${elasticsearch.host}") String host, @Value("${elasticsearch.port}") int port) throws IOException {
+    public MetricStoreImpl(@Value("${elasticsearch.host}") String host, @Value("${elasticsearch.port}") int port) {
         client = RestClient.builder(new HttpHost(host, port, "http")).build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        this.headers = headers;
+        this.url_get = URL_BASE + "/_search?filter_path=hits.hits._source";
+        this.url_post = URL_BASE + "/_bulk";
+        this.url_delete = URL_BASE + "/_delete_by_query";
+        this.mapper = new ObjectMapper();
     }
 
     @Override
-    public List<MetricValue> getMetricValues(String metricName, int from, int size) throws Exception {
-        HttpEntity entity = getHttpEntity(metricName, from, size);
-        Response response = client.performRequest("GET", "/griffin/accuracy/_search?filter_path=hits.hits._source",
-                Collections.emptyMap(), entity, new BasicHeader("Content-Type", "application/json"));
-        return getMetricValues(response);
+    public List<MetricValue> getMetricValues(String metricName, int from, int size) throws IOException {
+        HttpEntity entity = getHttpEntityForSearch(metricName, from, size);
+        Response response = client.performRequest("GET", url_get, Collections.emptyMap(), entity);
+        return getMetricValuesFromResponse(response);
     }
 
-    private HttpEntity getHttpEntity(String metricName, int from, int size) throws JsonProcessingException {
+    private HttpEntity getHttpEntityForSearch(String metricName, int from, int size) throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> queryParam = Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName));
         Map<String, Object> sortParam = Collections.singletonMap("tmst", Collections.singletonMap("order", "desc"));
@@ -69,7 +85,7 @@ public class MetricStoreImpl implements MetricStore {
         return new NStringEntity(JsonUtil.toJson(map), ContentType.APPLICATION_JSON);
     }
 
-    private List<MetricValue> getMetricValues(Response response) throws IOException {
+    private List<MetricValue> getMetricValuesFromResponse(Response response) throws IOException {
         List<MetricValue> metricValues = new ArrayList<>();
         JsonNode jsonNode = mapper.readTree(EntityUtils.toString(response.getEntity()));
         if (jsonNode.hasNonNull("hits") && jsonNode.get("hits").hasNonNull("hits")) {
@@ -84,19 +100,38 @@ public class MetricStoreImpl implements MetricStore {
     }
 
     @Override
-    public void addMetricValue(MetricValue metricValue) throws Exception {
-        HttpEntity entity = new NStringEntity(JsonUtil.toJson(metricValue), ContentType.APPLICATION_JSON);
-        client.performRequest("POST", "/griffin/accuracy", Collections.emptyMap(), entity,
-                new BasicHeader("Content-Type", "application/json"));
+    public ResponseEntity addMetricValues(List<MetricValue> metricValues) throws IOException {
+        String bulkRequestBody = getBulkRequestBody(metricValues);
+        HttpEntity entity = new NStringEntity(bulkRequestBody, ContentType.APPLICATION_JSON);
+        Response response = client.performRequest("POST", url_post, Collections.emptyMap(), entity);
+        return getResponseEntityFromResponse(response);
 
     }
 
+    private String getBulkRequestBody(List<MetricValue> metricValues) throws JsonProcessingException {
+        String actionMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }\n", INDEX, TYPE);
+        StringBuilder bulkRequestBody = new StringBuilder();
+        for (MetricValue metricValue : metricValues) {
+            bulkRequestBody.append(actionMetaData);
+            bulkRequestBody.append(JsonUtil.toJson(metricValue));
+            bulkRequestBody.append("\n");
+        }
+        return bulkRequestBody.toString();
+    }
+
+
     @Override
-    public void deleteMetricValues(String metricName) throws Exception {
+    public ResponseEntity deleteMetricValues(String metricName) throws IOException {
         Map<String, Object> param = Collections.singletonMap("query",
                 Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
         HttpEntity entity = new NStringEntity(JsonUtil.toJson(param), ContentType.APPLICATION_JSON);
-        client.performRequest("POST", "/griffin/accuracy/_delete_by_query", Collections.emptyMap(),
-                entity, new BasicHeader("Content-Type", "application/json"));
+        Response response = client.performRequest("POST", url_delete, Collections.emptyMap(), entity);
+        return getResponseEntityFromResponse(response);
+    }
+
+    private ResponseEntity getResponseEntityFromResponse(Response response) throws IOException {
+        String body = EntityUtils.toString(response.getEntity());
+        HttpStatus status = HttpStatus.valueOf(response.getStatusLine().getStatusCode());
+        return new ResponseEntity<>(body, headers, status);
     }
 }
