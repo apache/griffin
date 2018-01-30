@@ -49,7 +49,14 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
     ds.foreachRDD((rdd, time) => {
       val ms = time.milliseconds
 
-      val dfOpt = transform(rdd)
+      // coalesce partition number
+      val prlCount = rdd.sparkContext.defaultParallelism
+      val ptnCount = rdd.getNumPartitions
+      val repartitionedRdd = if (prlCount < ptnCount) {
+        rdd.coalesce(prlCount)
+      } else rdd
+
+      val dfOpt = transform(repartitionedRdd)
 
       val preDfOpt = preProcess(dfOpt, ms)
 

@@ -260,7 +260,7 @@ trait SparkDqEngine extends DqEngine {
 
   def collectUpdateDf(dsUpdate: DsUpdate): Option[DataFrame] = {
     if (collectable) {
-      val DsUpdate(_, stepName, _) = dsUpdate
+      val DsUpdate(_, stepName) = dsUpdate
       val stepDf = sqlContext.table(s"`${stepName}`")
       Some(stepDf)
     } else None
