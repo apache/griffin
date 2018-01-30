@@ -150,7 +150,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
     }
 
     // old cache data
-    val oldCacheIndexOpt = readOldCacheIndex
+    val oldCacheIndexOpt = if (updatable) readOldCacheIndex else None
     val oldDfOpt = oldCacheIndexOpt.flatMap { idx =>
       val oldDfPath = s"${oldFilePath}/${idx}"
       try {
@@ -276,7 +276,6 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   // update old cache data
   def updateData(dfOpt: Option[DataFrame]): Unit = {
     if (!readOnly && updatable) {
-      val prlCount = sqlContext.sparkContext.defaultParallelism
       dfOpt match {
         case Some(df) => {
           // old cache lock
@@ -296,7 +295,14 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
                 }
                 case _ => df
               }
-              val dfw = updateDf.coalesce(prlCount).write.mode(SaveMode.Overwrite)
+
+              // coalesce partition number
+              val prlCount = sqlContext.sparkContext.defaultParallelism
+              val ptnCount = updateDf.rdd.getNumPartitions
+              val repartitionedDf = if (prlCount < ptnCount) {
+                updateDf.coalesce(prlCount)
+              } else updateDf
+              val dfw = repartitionedDf.write.mode(SaveMode.Overwrite)
               writeDataFrame(dfw, oldDfPath)
 
               submitOldCacheIndex(nextOldCacheIndex)

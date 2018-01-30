@@ -40,6 +40,7 @@
         }
       ],
       "cache": {
+        "type": "parquet",
         "file.path": "hdfs://localhost/griffin/streaming/dump/source",
         "info.path": "source",
         "ready.time.interval": "10s",
@@ -82,6 +83,7 @@
         }
       ],
       "cache": {
+        "type": "parquet",
         "file.path": "hdfs://localhost/griffin/streaming/dump/target",
         "info.path": "target",
         "ready.time.interval": "10s",
