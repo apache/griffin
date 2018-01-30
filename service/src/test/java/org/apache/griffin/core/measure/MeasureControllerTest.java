@@ -19,45 +19,54 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import org.apache.griffin.core.exception.GriffinException;
+import org.apache.griffin.core.exception.GriffinExceptionHandler;
+import org.apache.griffin.core.exception.GriffinExceptionMessage;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.URLHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
-import static org.apache.griffin.core.util.GriffinOperationMessage.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = MeasureController.class, secure = false)
 public class MeasureControllerTest {
-    @Autowired
+
     private MockMvc mvc;
 
-    @MockBean
-    private MeasureService service;
+    @Mock
+    private MeasureServiceImpl service;
+
+    @InjectMocks
+    private MeasureController controller;
 
 
     @Before
     public void setup() {
-
+        mvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .setControllerAdvice(new GriffinExceptionHandler())
+                .build();
     }
 
     @Test
@@ -84,66 +93,63 @@ public class MeasureControllerTest {
 
     @Test
     public void testDeleteMeasuresByIdForSuccess() throws Exception {
-        given(service.deleteMeasureById(1L)).willReturn(DELETE_MEASURE_BY_ID_SUCCESS);
+        doNothing().when(service).deleteMeasureById(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(202)));
+                .andExpect(status().isNoContent());
     }
 
     @Test
     public void testDeleteMeasuresByIdForNotFound() throws Exception {
-        given(service.deleteMeasureById(1L)).willReturn(RESOURCE_NOT_FOUND);
+        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.MEASURE_ID_DOES_NOT_EXIST))
+                .when(service).deleteMeasureById(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(400)));
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testDeleteMeasuresByIdForFail() throws Exception {
-        given(service.deleteMeasureById(1L)).willReturn(DELETE_MEASURE_BY_ID_FAIL);
+    public void testDeleteMeasuresByIdForGriffinFailureWithException() throws Exception {
+        doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
+                .when(service).deleteMeasureById(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(402)));
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void testUpdateMeasureForSuccess() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        given(service.updateMeasure(measure)).willReturn(UPDATE_MEASURE_SUCCESS);
+        doNothing().when(service).updateMeasure(measure);
 
         mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
                 .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(204)));
+                .andExpect(status().isNoContent());
     }
 
     @Test
     public void testUpdateMeasureForNotFound() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        given(service.updateMeasure(measure)).willReturn(RESOURCE_NOT_FOUND);
+        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.MEASURE_ID_DOES_NOT_EXIST))
+                .when(service).updateMeasure(measure);
 
         mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
                 .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(400)));
-
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testUpdateMeasureForFail() throws Exception {
+    public void testUpdateMeasureForTypeMismatch() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        given(service.updateMeasure(measure)).willReturn(UPDATE_MEASURE_FAIL);
+        doThrow(new GriffinException.BadRequestException(GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_MATCH))
+                .when(service).updateMeasure(measure);
 
         mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
                 .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(404)));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -163,37 +169,38 @@ public class MeasureControllerTest {
 
     @Test
     public void testCreateNewMeasureForSuccess() throws Exception {
-        Measure measure = createGriffinMeasure("view_item_hourly");
+        GriffinMeasure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        given(service.createMeasure(measure)).willReturn(CREATE_MEASURE_SUCCESS);
+        given(service.createMeasure(measure)).willReturn(measure);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
                 .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(201)));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is("view_item_hourly")));
     }
 
     @Test
     public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        given(service.createMeasure(measure)).willReturn(CREATE_MEASURE_FAIL_DUPLICATE);
+        doThrow(new GriffinException.ConflictException(GriffinExceptionMessage.MEASURE_NAME_ALREADY_EXIST))
+                .when(service).createMeasure(measure);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
                 .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(410)));
+                .andExpect(status().isConflict());
     }
 
     @Test
-    public void testCreateNewMeasureForFailWithSaveException() throws Exception {
+    public void testCreateNewMeasureForFailWithInvalidParams() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        given(service.createMeasure(measure)).willReturn(GriffinOperationMessage.CREATE_MEASURE_FAIL);
+        doThrow(new GriffinException.BadRequestException(GriffinExceptionMessage.MISSING_METRIC_NAME))
+                .when(service).createMeasure(measure);
 
-        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures").contentType(MediaType.APPLICATION_JSON).content(measureJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code", is(401)));
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
+                .contentType(MediaType.APPLICATION_JSON).content(measureJson))
+                .andExpect(status().isBadRequest());
     }
 
 

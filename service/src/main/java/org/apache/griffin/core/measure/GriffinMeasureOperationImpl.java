@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
@@ -27,7 +28,6 @@ import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.DataConnectorRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CONNECTOR_NAME;
 
 @Component("griffinOperation")
 public class GriffinMeasureOperationImpl implements MeasureOperation {
@@ -52,58 +52,34 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
 
 
     @Override
-    public GriffinOperationMessage create(Measure measure) {
-        if (!isConnectorNamesValid((GriffinMeasure) measure)) {
-            return CREATE_MEASURE_FAIL;
-        }
-        try {
-            measureRepo.save(measure);
-            return CREATE_MEASURE_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to create new measure {}.", measure.getName(), e);
-        }
-        return CREATE_MEASURE_FAIL;
+    public Measure create(Measure measure) {
+        checkConnectorNames((GriffinMeasure) measure);
+        return measureRepo.save(measure);
     }
 
     @Override
-    public GriffinOperationMessage update(Measure measure) {
-        try {
-            measureRepo.save(measure);
-            return UPDATE_MEASURE_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to update measure. {}", e.getMessage());
-        }
-        return UPDATE_MEASURE_FAIL;
+    public void update(Measure measure) {
+        measureRepo.save(measure);
     }
 
     @Override
-    public GriffinOperationMessage delete(Measure measure) {
-        try {
-            boolean pauseStatus = jobService.deleteJobsRelateToMeasure(measure.getId());
-            if (!pauseStatus) {
-                return DELETE_MEASURE_BY_ID_FAIL;
-            }
-            measure.setDeleted(true);
-            measureRepo.save(measure);
-            return DELETE_MEASURE_BY_ID_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-        }
-        return DELETE_MEASURE_BY_ID_FAIL;
+    public void delete(Measure measure) {
+        jobService.deleteJobsRelateToMeasure(measure.getId());
+        measure.setDeleted(true);
+        measureRepo.save(measure);
     }
 
-    private boolean isConnectorNamesValid(GriffinMeasure measure) {
+    private void checkConnectorNames(GriffinMeasure measure) {
         List<String> names = getConnectorNames(measure);
         if (names.size() == 0) {
             LOGGER.warn("Connector names cannot be empty.");
-            return false;
+            throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
         }
         List<DataConnector> connectors = dcRepo.findByConnectorNames(names);
         if (!CollectionUtils.isEmpty(connectors)) {
             LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
-            return false;
+            throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
         }
-        return true;
     }
 
     private List<String> getConnectorNames(GriffinMeasure measure) {

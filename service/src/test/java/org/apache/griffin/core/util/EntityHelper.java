@@ -169,4 +169,9 @@ public class EntityHelper {
         return trigger;
     }
 
+    public static GriffinJob createGriffinJob() {
+        return new GriffinJob(1L, 1L, "jobName",
+                "quartzJobName", "quartzGroupName", false);
+    }
+
 }
