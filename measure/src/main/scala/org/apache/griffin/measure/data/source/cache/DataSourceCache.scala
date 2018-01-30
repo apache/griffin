@@ -126,10 +126,13 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   def readData(): (Option[DataFrame], TimeRange) = {
     // time range: [a, b)
     val timeRange = TimeInfoCache.getTimeRange
-    submitLastProcTime(timeRange._2)
-
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-    submitCleanTime(reviseTimeRange._1)
+
+    // next last proc time
+    submitLastProcTime(timeRange._2)
+    // next clean time
+    val nextCleanTime = timeRange._2 + deltaTimeRange._1
+    submitCleanTime(nextCleanTime)
 
     // read partition info
     val filterStr = s"`${InternalColumns.tmst}` >= ${reviseTimeRange._1} AND `${InternalColumns.tmst}` < ${reviseTimeRange._2}"
@@ -253,7 +256,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
                 // clean calculated old cache data
                 cleanOutTimePartitions(oldFilePath, idx, None)
                 // clean out time old cache data not calculated
-                cleanOutTimePartitions(oldDfPath, oct, Some(InternalColumns.tmst))
+//                cleanOutTimePartitions(oldDfPath, oct, Some(InternalColumns.tmst))
               } catch {
                 case e: Throwable => error(s"clean old cache data error: ${e.getMessage}")
               } finally {
@@ -271,7 +274,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
   // update old cache data
   def updateData(dfOpt: Option[DataFrame]): Unit = {
-    if (!readOnly) {
+    if (!readOnly && updatable) {
       dfOpt match {
         case Some(df) => {
           // old cache lock
@@ -282,7 +285,16 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
               val nextOldCacheIndex = oldCacheIndexOpt.getOrElse(defOldCacheIndex) + 1
 
               val oldDfPath = s"${oldFilePath}/${nextOldCacheIndex}"
-              val dfw = df.write.mode(SaveMode.Overwrite).partitionBy(InternalColumns.tmst)
+//              val dfw = df.write.mode(SaveMode.Overwrite).partitionBy(InternalColumns.tmst)
+              val cleanTime = readCleanTime
+              val updateDf = cleanTime match {
+                case Some(ct) => {
+                  val filterStr = s"`${InternalColumns.tmst}` >= ${ct}"
+                  df.filter(filterStr)
+                }
+                case _ => df
+              }
+              val dfw = updateDf.write.mode(SaveMode.Overwrite)
               writeDataFrame(dfw, oldDfPath)
 
               submitOldCacheIndex(nextOldCacheIndex)

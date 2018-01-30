@@ -50,7 +50,7 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
       val ms = time.milliseconds
 
       // coalesce partition number
-      val prlCount = rdd.sparkContext.defaultParallelism
+      val prlCount = rdd.sparkContext.defaultParallelism / 2
       val ptnCount = rdd.getNumPartitions
       val repartitionedRdd = if (prlCount < ptnCount) {
         rdd.coalesce(prlCount)
