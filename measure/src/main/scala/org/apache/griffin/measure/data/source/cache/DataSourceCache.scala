@@ -155,7 +155,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
       val oldDfPath = s"${oldFilePath}/${idx}"
       try {
         val dfr = sqlContext.read
-        Some(readDataFrame(dfr, oldDfPath).filter(filterStr))
+//        Some(readDataFrame(dfr, oldDfPath).filter(filterStr))
+        Some(readDataFrame(dfr, oldDfPath))   // not need to filter, has filtered in update phase
       } catch {
         case e: Throwable => {
           warn(s"read old data source cache warn: ${e.getMessage}")
@@ -244,7 +245,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
       }
 
       // old cache data
-      val oldCacheCleanTime = readCleanTime
+      val oldCacheCleanTime = if (updatable) readCleanTime else None
       oldCacheCleanTime match {
         case Some(oct) => {
           val oldCacheIndexOpt = readOldCacheIndex
@@ -275,6 +276,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   // update old cache data
   def updateData(dfOpt: Option[DataFrame]): Unit = {
     if (!readOnly && updatable) {
+      val prlCount = sqlContext.sparkContext.defaultParallelism
       dfOpt match {
         case Some(df) => {
           // old cache lock
@@ -294,7 +296,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
                 }
                 case _ => df
               }
-              val dfw = updateDf.write.mode(SaveMode.Overwrite)
+              val dfw = updateDf.coalesce(prlCount).write.mode(SaveMode.Overwrite)
               writeDataFrame(dfw, oldDfPath)
 
               submitOldCacheIndex(nextOldCacheIndex)
