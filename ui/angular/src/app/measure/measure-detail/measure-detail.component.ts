@@ -42,6 +42,8 @@ export class MeasureDetailComponent implements OnInit {
   targetTable: string;
   sourcesize: string;
   targetsize: string;
+  sourcezone: string;
+  targetzone: string;
   sourcewhere: string;
   targetwhere: string;
   sourcepath: string;
@@ -53,13 +55,15 @@ export class MeasureDetailComponent implements OnInit {
   fetchData(value,index){
     var data = this.ruleData["data.sources"][index].connectors[0];
     var size = value + "size";
+    var zone = value + "zone";
     var where = value + "where";
     var path = value + "path";
     var database = value + "DB";
     var table = value + "Table";
     this[size] = data["data.unit"];
+    this[zone] = data["data.time.zone"];
     this[where] = data.config.where;
-    if(data.predicates[0].config){
+    if(data.predicates.length !== 0){
       this[path] = data.predicates[0].config.path;
     }
     this[database] = data.config.database;

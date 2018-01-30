@@ -96,6 +96,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   currentDBstr: string;
   srcconfig = {
     "where":'',
+    "timezone":'',
     "num":1,
     "timetype":'day',
     "needpath":false,
@@ -103,6 +104,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
   };
   tgtconfig = {
     "where":'',
+    "timezone":'',
     "num":1,
     "timetype":'day',
     "needpath":false,
@@ -128,6 +130,8 @@ export class AcComponent implements OnInit , AfterViewChecked {
   tgt_name: string;
   src_location: string;
   tgt_location: string;
+  src_timezone: string;
+  tgt_timezone: string;
 
   measureTypes = ['accuracy','validity','anomaly detection','publish metrics'];
   type = "accuracy";
@@ -148,6 +152,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
           "type": "HIVE",
           "version": "1.2",
           "data.unit":"",
+          "data.time.zone":"",
           "config":{
             "database":'',
             "table.name":'',
@@ -172,6 +177,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
           "type": "HIVE",
           "version": "1.2",
           "data.unit":"",
+          "data.time.zone":"",
           "config":{
             "database":'',
             "table.name":'',
@@ -374,6 +380,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
                 "type": "HIVE",
                 "version": "1.2",
                 "data.unit":this.src_size,
+                "data.time.zone":this.src_timezone,
                 "config":{
                   "database":this.currentDB,
                   "table.name":this.currentTable,
@@ -398,6 +405,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
                 "type": "HIVE",
                 "version": "1.2",
                 "data.unit":this.tgt_size,
+                "data.time.zone":this.tgt_timezone,
                 "config":{
                   "database":this.currentDBTarget,
                   "table.name":this.currentTableTarget,
@@ -466,6 +474,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
       rule = rules.join(" AND ");
       this.rules = rule;
       this.newMeasure['evaluate.rule'].rules[0].rule = rule;
+      console.log(this.newMeasure);
       this.visible = true;
       setTimeout(() => this.visibleAnimate = true, 100);
   }
@@ -588,6 +597,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
 
   getSrc(evt){
     this.srcconfig = evt;
+    this.src_timezone = evt.timezone;
     this.src_where = evt.where;
     this.src_size = evt.num + evt.timetype;
     this.src_path = evt.path;
@@ -595,6 +605,7 @@ export class AcComponent implements OnInit , AfterViewChecked {
 
   getTgt(evt){
     this.tgtconfig = evt;
+    this.tgt_timezone = evt.timezone;
     this.tgt_where = evt.where;
     this.tgt_size = evt.num + evt.timetype;
     this.tgt_path = evt.path;
