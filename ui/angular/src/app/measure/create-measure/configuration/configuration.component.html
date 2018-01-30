@@ -42,6 +42,19 @@ under the License.
     </div>
   </div>
 </div>
+<div class="col-md-12 col-lg-12 col-sm-12">
+  <div class="form-group">
+    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+      Time Zone:
+    </label>
+    <div class="col-md-10 col-lg-10 col-sm-10 scrollable">
+      <select id="timezone" class="form-control" name="zone" [(ngModel)]="timezone" required
+        (change)="upward()">
+        <option *ngFor="let item of timezones;let i = index" [value]="item">{{item}}</option>
+      </select>
+    </div>
+  </div>
+</div>
 <div class="col-md-12 col-lg-12 col-sm-12" style="height: 30px;">
   <div class="form-group">
     <input style="margin-left:15px" type="checkbox" [checked]="needpath" (change)="needpath=!needpath;upward()">

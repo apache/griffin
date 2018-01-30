@@ -80,6 +80,14 @@ under the License.
             {{sourcesize}}
           </div>
         </div>
+        <div class="row" *ngIf="sourcezone">
+          <label class="col-xs-4">
+            Source Time Zone:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{sourcezone}}
+          </div>
+        </div>
         <div class="row" *ngIf="sourcewhere">
           <label class="col-xs-4">
             Source Where:
@@ -110,6 +118,14 @@ under the License.
           </label>
           <div class="col-xs-8" style="color: #fff">
             {{targetsize}}
+          </div>
+        </div>
+        <div class="row" *ngIf="ruleData.type=='accuracy' && targetzone">
+          <label class="col-xs-4">
+            Target Time Zone:
+          </label>
+          <div class="col-xs-8" style="color: #fff">
+            {{targetzone}}
           </div>
         </div>
         <div class="row" *ngIf="ruleData.type=='accuracy' && targetwhere">
