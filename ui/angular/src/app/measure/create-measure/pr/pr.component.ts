@@ -118,6 +118,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
     "name": "",
     "noderules": ""
   };
+  timezone = '';
   newMeasure = {
     "name": "",
     "measure.type":"griffin",
@@ -135,6 +136,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
             "type": "hive",
             "version": "1.2",
             "data.unit":"",
+            "data.time.zone":"",
             "config": {
               "database": "",
               "table.name":"",
@@ -177,6 +179,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
   srcname: string;
   config = {
     "where":'',
+    "timezone":'',
     "num":1,
     "timetype":'day',
     "needpath":false,
@@ -382,6 +385,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
                 "type": "hive",
                 "version": "1.2",
                 "data.unit":this.size,
+                "data.time.zone":this.timezone,
                 "config": {
                   "database": this.currentDB,
                   "table.name":this.currentTable,
@@ -601,6 +605,7 @@ export class PrComponent implements  AfterViewChecked, OnInit{
 
   getData(evt){
     this.config = evt;
+    this.timezone = evt.timezone;
     this.where = evt.where;
     this.size = evt.num + evt.timetype;
     this.path = evt.path;
