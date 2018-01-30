@@ -44,6 +44,7 @@ import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.griffin.core.job.JobServiceImpl.JOB_SCHEDULE_ID;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
 
@@ -236,7 +237,7 @@ public class JobInstance implements Job {
         TriggerKey triggerKey = triggerKey(jobName, groupName);
         return !(scheduler.checkExists(triggerKey)
                 || !saveGriffinJob(jobName, groupName)
-                || !createJobInstance(scheduler, triggerKey, interval, repeat, jobName));
+                || !createJobInstance(triggerKey, interval, repeat, jobName));
     }
 
     private boolean saveGriffinJob(String pName, String pGroup) {
@@ -248,9 +249,9 @@ public class JobInstance implements Job {
         return true;
     }
 
-    private boolean createJobInstance(Scheduler scheduler, TriggerKey triggerKey, Long interval, Integer repeatCount, String pJobName) throws Exception {
-        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, pJobName);
-        scheduler.scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, repeatCount));
+    private boolean createJobInstance(TriggerKey triggerKey, Long interval, Integer repeatCount, String pJobName) throws Exception {
+        JobDetail jobDetail = addJobDetail(triggerKey, pJobName);
+        factory.getObject().scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, repeatCount));
         return true;
     }
 
@@ -260,14 +261,15 @@ public class JobInstance implements Job {
                 .withIdentity(triggerKey)
                 .forJob(jd)
                 .startNow()
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withSchedule(simpleSchedule()
                         .withIntervalInMilliseconds(interval)
                         .withRepeatCount(repeatCount)
                 )
                 .build();
     }
 
-    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey, String pJobName) throws SchedulerException, JsonProcessingException {
+    private JobDetail addJobDetail(TriggerKey triggerKey, String pJobName) throws SchedulerException, JsonProcessingException {
+        Scheduler scheduler = factory.getObject();
         JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);
