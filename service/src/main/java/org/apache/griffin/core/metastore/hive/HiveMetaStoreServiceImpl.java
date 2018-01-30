@@ -59,21 +59,13 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         LOGGER.info("HiveMetaStoreServiceImpl single thread pool created.");
     }
 
-    private String getUseDbName(String dbName) {
-        if (!StringUtils.hasText(dbName)) {
-            return defaultDbName;
-        } else {
-            return dbName;
-        }
-    }
-
     @Override
     @Cacheable
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null.Please check your hive config.");
+                LOGGER.warn("Hive client is null. Please check your hive config.");
                 return new ArrayList<>();
             }
             results = client.getAllDatabases();
@@ -91,7 +83,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Iterable<String> results = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null.Please check your hive config.");
+                LOGGER.warn("Hive client is null. Please check your hive config.");
                 return new ArrayList<>();
             }
             results = client.getAllTables(getUseDbName(dbName));
@@ -117,14 +109,15 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Iterable<String> dbs;
         // if hive.metastore.uris in application.properties configs wrong, client will be injected failure and will be null.
         if (client == null) {
-            LOGGER.warn("Hive client is null.Please check your hive config.");
+            LOGGER.warn("Hive client is null. Please check your hive config.");
             return results;
         }
         dbs = getAllDatabases();
-        if (dbs != null) {
-            for (String db : dbs) {
-                results.put(db, getTables(db));
-            }
+        if (dbs == null) {
+            return results;
+        }
+        for (String db : dbs) {
+            results.put(db, getTables(db));
         }
         return results;
     }
@@ -136,7 +129,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Table result = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null.Please check your hive config.");
+                LOGGER.warn("Hive client is null. Please check your hive config.");
                 return null;
             }
             result = client.getTable(getUseDbName(dbName), tableName);
@@ -153,7 +146,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         List<Table> allTables = new ArrayList<>();
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null.Please check your hive config.");
+                LOGGER.warn("Hive client is null. Please check your hive config.");
                 return allTables;
             }
             Iterable<String> tables = client.getAllTables(useDbName);
@@ -166,6 +159,14 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             LOGGER.error("Exception fetching tables info: {}", e.getMessage());
         }
         return allTables;
+    }
+
+    private String getUseDbName(String dbName) {
+        if (!StringUtils.hasText(dbName)) {
+            return defaultDbName;
+        } else {
+            return dbName;
+        }
     }
 
     private void reconnect() {

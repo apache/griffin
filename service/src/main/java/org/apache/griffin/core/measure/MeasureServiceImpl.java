@@ -20,21 +20,20 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-import static org.apache.griffin.core.util.GriffinOperationMessage.*;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 
 @Service
 public class MeasureServiceImpl implements MeasureService {
@@ -56,7 +55,11 @@ public class MeasureServiceImpl implements MeasureService {
 
     @Override
     public Measure getMeasureById(long id) {
-        return measureRepo.findByIdAndDeleted(id, false);
+        Measure measure = measureRepo.findByIdAndDeleted(id, false);
+        if (measure == null) {
+            throw new GriffinException.NotFoundException(MEASURE_ID_DOES_NOT_EXIST);
+        }
+        return measure;
     }
 
     @Override
@@ -65,51 +68,47 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public GriffinOperationMessage createMeasure(Measure measure) {
+    public Measure createMeasure(Measure measure) {
         List<Measure> aliveMeasureList = measureRepo.findByNameAndDeleted(measure.getName(), false);
         if (!CollectionUtils.isEmpty(aliveMeasureList)) {
             LOGGER.warn("Failed to create new measure {}, it already exists.", measure.getName());
-            return CREATE_MEASURE_FAIL_DUPLICATE;
+            throw new GriffinException.ConflictException(MEASURE_NAME_ALREADY_EXIST);
         }
         MeasureOperation op = getOperation(measure);
         return op.create(measure);
     }
 
     @Override
-    public GriffinOperationMessage updateMeasure(Measure measure) {
+    public void updateMeasure(Measure measure) {
         Measure m = measureRepo.findByIdAndDeleted(measure.getId(), false);
         if (m == null) {
-            return RESOURCE_NOT_FOUND;
+            throw new GriffinException.NotFoundException(MEASURE_ID_DOES_NOT_EXIST);
         }
         if (!m.getType().equals(measure.getType())) {
             LOGGER.warn("Can't update measure to different type.");
-            return UPDATE_MEASURE_FAIL;
+            throw new GriffinException.BadRequestException(MEASURE_TYPE_DOES_NOT_MATCH);
         }
         MeasureOperation op = getOperation(measure);
-        return op.update(measure);
+        op.update(measure);
     }
 
     @Override
-    public GriffinOperationMessage deleteMeasureById(Long measureId) {
+    public void deleteMeasureById(Long measureId) {
         Measure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
-            return RESOURCE_NOT_FOUND;
+            throw new GriffinException.NotFoundException(MEASURE_ID_DOES_NOT_EXIST);
         }
         MeasureOperation op = getOperation(measure);
-        return op.delete(measure);
+        op.delete(measure);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public GriffinOperationMessage deleteMeasures() {
+    public void deleteMeasures() {
         List<Measure> measures = measureRepo.findByDeleted(false);
         for (Measure m : measures) {
             MeasureOperation op = getOperation(m);
-            if (op.delete(m).equals(DELETE_MEASURE_BY_ID_FAIL)) {
-                return DELETE_MEASURE_BY_ID_FAIL;
-            }
+            op.delete(m);
         }
-        return DELETE_MEASURE_BY_ID_SUCCESS;
     }
 
     private MeasureOperation getOperation(Measure measure) {

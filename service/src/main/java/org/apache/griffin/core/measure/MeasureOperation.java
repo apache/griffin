@@ -21,14 +21,13 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.util.GriffinOperationMessage;
 
 public interface MeasureOperation {
 
-    GriffinOperationMessage create(Measure measure);
+    Measure create(Measure measure);
 
-    GriffinOperationMessage update(Measure measure);
+    void update(Measure measure);
 
-    GriffinOperationMessage delete(Measure measure);
+    void delete(Measure measure);
 
 }

@@ -19,11 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.JobDataBean;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
-import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.apache.griffin.core.job.entity.*;
 import org.quartz.SchedulerException;
 
 import java.util.List;
@@ -32,13 +28,13 @@ public interface JobService {
 
     List<JobDataBean> getAliveJobs();
 
-    GriffinOperationMessage addJob(JobSchedule jobSchedule) throws Exception;
+    GriffinJob addJob(JobSchedule jobSchedule) throws Exception;
 
-    boolean pauseJob(String group, String name) throws SchedulerException;
+    void pauseJob(String group, String name) throws SchedulerException;
 
-    GriffinOperationMessage deleteJob(Long jobId);
+    void deleteJob(Long jobId);
 
-    GriffinOperationMessage deleteJob(String jobName);
+    void deleteJob(String jobName);
 
     List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
 

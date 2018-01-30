@@ -20,71 +20,47 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.job.JobServiceImpl;
-import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
-import org.apache.griffin.core.util.GriffinOperationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static org.apache.griffin.core.util.GriffinOperationMessage.*;
-import static org.apache.griffin.core.util.MeasureUtil.isValid;
+import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("griffinOperation")
 public class GriffinMeasureOperationImpl implements MeasureOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(GriffinMeasureOperationImpl.class);
 
-    @Autowired
-    private MeasureRepo<Measure> measureRepo;
+    private final MeasureRepo<Measure> measureRepo;
+
+    private final JobServiceImpl jobService;
 
     @Autowired
-    private JobServiceImpl jobService;
+    public GriffinMeasureOperationImpl(MeasureRepo<Measure> measureRepo, JobServiceImpl jobService) {
+        this.measureRepo = measureRepo;
+        this.jobService = jobService;
+    }
 
 
     @Override
-    public GriffinOperationMessage create(Measure measure) {
-        if (!isValid((GriffinMeasure) measure)) {
-            return CREATE_MEASURE_FAIL;
-        }
-        try {
-            measureRepo.save(measure);
-            return CREATE_MEASURE_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to create new measure {}.", measure.getName(), e);
-        }
-        return CREATE_MEASURE_FAIL;
+    public Measure create(Measure measure) {
+        validateMeasure(measure);
+        return measureRepo.save(measure);
     }
 
     @Override
-    public GriffinOperationMessage update(Measure measure) {
-        try {
-            if (!isValid((GriffinMeasure) measure)) {
-                return CREATE_MEASURE_FAIL;
-            }
-            measure.setDeleted(false);
-            measureRepo.save(measure);
-            return UPDATE_MEASURE_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error("Failed to update measure. {}", e.getMessage());
-        }
-        return UPDATE_MEASURE_FAIL;
+    public void update(Measure measure) {
+        validateMeasure(measure);
+        measure.setDeleted(false);
+        measureRepo.save(measure);
     }
 
     @Override
-    public GriffinOperationMessage delete(Measure measure) {
-        try {
-            boolean pauseStatus = jobService.deleteJobsRelateToMeasure(measure.getId());
-            if (!pauseStatus) {
-                return DELETE_MEASURE_BY_ID_FAIL;
-            }
-            measure.setDeleted(true);
-            measureRepo.save(measure);
-            return DELETE_MEASURE_BY_ID_SUCCESS;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-        }
-        return DELETE_MEASURE_BY_ID_FAIL;
+    public void delete(Measure measure) {
+        jobService.deleteJobsRelateToMeasure(measure.getId());
+        measure.setDeleted(true);
+        measureRepo.save(measure);
     }
 }
