@@ -73,7 +73,7 @@ public class JobInstance implements Job {
     private JobSchedule jobSchedule;
     private GriffinMeasure measure;
     private GriffinJob griffinJob;
-    private List<SegmentPredicate> mPredicts;
+    private List<SegmentPredicate> mPredicates;
     private Long jobStartTime;
 
 
@@ -89,7 +89,7 @@ public class JobInstance implements Job {
     }
 
     private void initParam(JobExecutionContext context) throws SchedulerException {
-        mPredicts = new ArrayList<>();
+        mPredicates = new ArrayList<>();
         JobDetail jobDetail = context.getJobDetail();
         Long jobScheduleId = jobDetail.getJobDataMap().getLong(JOB_SCHEDULE_ID);
         Long griffinJobId = jobDetail.getJobDataMap().getLong(GRIFFIN_JOB_ID);
@@ -180,7 +180,7 @@ public class JobInstance implements Job {
             genConfMap(dc, sampleTs);
             //Do not forget to update origin string config
             predicate.setConfigMap(predicate.getConfigMap());
-            mPredicts.add(predicate);
+            mPredicates.add(predicate);
         }
     }
 
@@ -289,7 +289,7 @@ public class JobInstance implements Job {
     private void setJobDataMap(JobDetail jobDetail, String pJobName) throws JsonProcessingException {
         JobDataMap dataMap = jobDetail.getJobDataMap();
         dataMap.put(MEASURE_KEY, JsonUtil.toJson(measure));
-        dataMap.put(PREDICATES_KEY, JsonUtil.toJson(mPredicts));
+        dataMap.put(PREDICATES_KEY, JsonUtil.toJson(mPredicates));
         dataMap.put(JOB_NAME, griffinJob.getJobName());
         dataMap.put(PREDICATE_JOB_NAME, pJobName);
     }
