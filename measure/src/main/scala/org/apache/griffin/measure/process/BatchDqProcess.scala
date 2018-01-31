@@ -20,24 +20,20 @@ package org.apache.griffin.measure.process
 
 import java.util.Date
 
-import org.apache.griffin.measure.cache.info.TimeInfoCache
-import org.apache.griffin.measure.cache.result.CacheResultProcesser
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
 import org.apache.griffin.measure.config.params.user._
 import org.apache.griffin.measure.data.source.DataSourceFactory
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
-import org.apache.griffin.measure.process.engine.{DqEngineFactory, SparkSqlEngine}
-import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
-import org.apache.griffin.measure.rule.adaptor.{RuleAdaptorGroup, RunPhase}
+import org.apache.griffin.measure.process.engine._
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters, TimeRange}
+import org.apache.griffin.measure.rule.adaptor._
 import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.udf.GriffinUdfs
-import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}
 
-import scala.concurrent.Await
 import scala.util.Try
 
 case class BatchDqProcess(allParam: AllParam) extends DqProcess {
@@ -93,24 +89,10 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 
     // init data sources
     val dsTimeRanges = dqEngines.loadData(dataSources, calcTimeInfo)
-
-    println(s"data source timeRanges: ${dsTimeRanges}")
-
-    // generate rule steps
-//    val ruleSteps = RuleAdaptorGroup.genConcreteRuleSteps(
-//      TimeInfo(appTime, appTime), userParam.evaluateRuleParam, dsTmsts, BatchProcessType, RunPhase)
-//    val ruleSteps = RuleAdaptorGroup.genRuleSteps(
-//      CalcTimeInfo(appTime), userParam.evaluateRuleParam, dsTmsts)
+    printTimeRanges(dsTimeRanges)
 
     val rulePlan = RuleAdaptorGroup.genRulePlan(
       calcTimeInfo, userParam.evaluateRuleParam, BatchProcessType, dsTimeRanges)
-
-//    rulePlan.ruleSteps.foreach(println)
-//    println("====")
-//    rulePlan.metricExports.foreach(println)
-//    println("====")
-//    rulePlan.recordExports.foreach(println)
-//    println("====")
 
     // run rules
     dqEngines.runRuleSteps(calcTimeInfo, rulePlan.ruleSteps)
@@ -119,11 +101,6 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     dqEngines.persistAllMetrics(rulePlan.metricExports, persistFactory)
 
     dqEngines.persistAllRecords(rulePlan.recordExports, persistFactory, dataSources)
-//    dfs.foreach(_._2.cache())
-//
-//    dqEngines.persistAllRecords(dfs, persistFactory)
-
-//    dfs.foreach(_._2.unpersist())
 
     // end time
     val endTime = new Date().getTime
@@ -131,11 +108,6 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 
     // finish
     persist.finish()
-
-//    sqlContext.tables().show(50)
-//    println(sqlContext.tableNames().size)
-
-//    sqlContext.tables().show(50)
 
     // clean data
     cleanData(calcTimeInfo)
@@ -189,5 +161,13 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 //      case e: Throwable => error(s"clean data error: ${e.getMessage}")
 //    }
 //  }
+
+  private def printTimeRanges(timeRanges: Map[String, TimeRange]): Unit = {
+    val timeRangesStr = timeRanges.map { pair =>
+      val (name, timeRange) = pair
+      s"${name} -> [${timeRange.begin}, ${timeRange.end})"
+    }.mkString(", ")
+    println(s"data source timeRanges: ${timeRangesStr}")
+  }
 
 }

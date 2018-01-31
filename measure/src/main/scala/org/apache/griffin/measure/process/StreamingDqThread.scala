@@ -28,7 +28,7 @@ import org.apache.griffin.measure.data.source.DataSource
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngines
-import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
+import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters, TimeRange}
 import org.apache.griffin.measure.rule.adaptor.{ProcessDetailsKeys, RuleAdaptorGroup, RunPhase}
 import org.apache.griffin.measure.rule.plan._
 import org.apache.spark.sql.SQLContext
@@ -59,8 +59,7 @@ case class StreamingDqThread(sqlContext: SQLContext,
 
         // init data sources
         val dsTimeRanges = dqEngines.loadData(dataSources, calcTimeInfo)
-
-        println(s"data source timeRanges: ${dsTimeRanges}")
+        printTimeRanges(dsTimeRanges)
 
         // generate rule steps
         val rulePlan = RuleAdaptorGroup.genRulePlan(
@@ -126,6 +125,14 @@ case class StreamingDqThread(sqlContext: SQLContext,
     } catch {
       case e: Throwable => error(s"clean data error: ${e.getMessage}")
     }
+  }
+
+  private def printTimeRanges(timeRanges: Map[String, TimeRange]): Unit = {
+    val timeRangesStr = timeRanges.map { pair =>
+      val (name, timeRange) = pair
+      s"${name} -> [${timeRange.begin}, ${timeRange.end})"
+    }.mkString(", ")
+    println(s"data source timeRanges: ${timeRangesStr}")
   }
 
 }
