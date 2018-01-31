@@ -16,7 +16,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <div class="col-md-12 col-lg-12 col-sm-12" style="margin-top:20px;">
   <div class="form-group">
     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
@@ -48,8 +47,7 @@ under the License.
       Time Zone:
     </label>
     <div class="col-md-10 col-lg-10 col-sm-10 scrollable">
-      <select id="timezone" class="form-control" name="zone" [(ngModel)]="timezone" required
-        (change)="upward()">
+      <select id="timezone" class="form-control" name="zone" [(ngModel)]="timezone" required (change)="upward()">
         <option *ngFor="let item of timezones;let i = index" [value]="item">{{item}}</option>
       </select>
     </div>
@@ -59,16 +57,15 @@ under the License.
   <div class="form-group">
     <input style="margin-left:15px" type="checkbox" [checked]="needpath" (change)="needpath=!needpath;upward()">
     <label>
-      has Done file 
+      has Done file
     </label>
   </div>
 </div>
-<div  class="form-group" *ngIf="needpath">
+<div class="form-group" *ngIf="needpath">
   <div style="margin-left:45px;font-weight: bold;">
     please write the Done file path relative to {{location}}
   </div>
   <div style="margin-left:45px">
-      <input type="text" class="form-control" id="path" [(ngModel)]="path" name="filepath" (change)="upward()" placeholder="/dt=#YYYYMMdd#/hour=#HH#/_DONE">
-    </div>
+    <input type="text" class="form-control" id="path" [(ngModel)]="path" name="filepath" (change)="upward()" placeholder="/dt=#YYYYMMdd#/hour=#HH#/_DONE">
+  </div>
 </div>
-

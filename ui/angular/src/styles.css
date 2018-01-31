@@ -1172,12 +1172,12 @@ input{
     background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAApUlEQVQ4T8XULQ7CQBCG4fcTWBJuVodEcAEEBtcbcAU0Bq7ATQgKi0PQTAOhzdD0b7aC9fPs7O43K+AEbIArCUtmZpLepRdgFYU+QLXxFzoD2dhmfgAHFcABWA9BrUAE6gUa0BbYNzsaBTjoAeQeCgFtUBLgoPt/AEn1XYQ68IX1MXwSu0Ij6Qnsws8ozQp49SayI8oLg/kRbstQlJOHadI4T/1QSjKSYdGc5u4/AAAAAElFTkSuQmCC') !important;
  }
 
-/* .myclass {
+ .myclass {
     position: relative;
     z-index: 9999;
 }
 
-#mainWindow {
+/*#mainWindow {
     position: relative;
     z-index: 1;
 }*/

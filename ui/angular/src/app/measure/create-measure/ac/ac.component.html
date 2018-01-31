@@ -84,32 +84,32 @@ under the License.
                 <div style="margin-top:10px;">
                   <label>View schema:</label>
                   <i style="color:#fff;font-weight: bold;">{{currentDBstr}}{{currentTable}}
-                  </i>
+                    </i>
                 </div>
                 <div style="margin-top:5px;">
                   <table class="table table-striped">
                     <thead>
-                    <tr style="background-color:#7D95CC">
-                      <th>
-                        <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll" />
-                      </th>
-                      <th>Column Name</th>
-                      <th>Type</th>
-                      <th>Comment</th>
-                    </tr>
+                      <tr style="background-color:#7D95CC">
+                        <th>
+                          <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll" />
+                        </th>
+                        <th>Column Name</th>
+                        <th>Type</th>
+                        <th>Comment</th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr *ngIf="!schemaCollection || schemaCollection.length == 0">
-                      <td colspan="5" style="text-align:center"><span class="highlight">Please select a schema from the left tree first</span></td>
-                    </tr>
-                    <tr *ngFor="let row of schemaCollection">
-                      <td>
-                        <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}} />
-                      </td>
-                      <td>{{row.name}}</td>
-                      <td>{{row.type}}</td>
-                      <td>{{row.comment}}</td>
-                    </tr>
+                      <tr *ngIf="!schemaCollection || schemaCollection.length == 0">
+                        <td colspan="5" style="text-align:center"><span class="highlight">Please select a schema from the left tree first</span></td>
+                      </tr>
+                      <tr *ngFor="let row of schemaCollection">
+                        <td>
+                          <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}} />
+                        </td>
+                        <td>{{row.name}}</td>
+                        <td>{{row.type}}</td>
+                        <td>{{row.comment}}</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -146,27 +146,27 @@ under the License.
                 <div style="margin-top:5px;">
                   <table st-table="schemaCollectionTarget" class="table table-striped">
                     <thead>
-                    <tr style="background-color:#7D95CC">
-                      <th>
-                        <input type="checkbox" (click)="toggleAllTarget()" [checked]="selectedAllTarget" />
-                      </th>
-                      <th>Column Name</th>
-                      <th>Type</th>
-                      <th>Comment</th>
-                    </tr>
+                      <tr style="background-color:#7D95CC">
+                        <th>
+                          <input type="checkbox" (click)="toggleAllTarget()" [checked]="selectedAllTarget" />
+                        </th>
+                        <th>Column Name</th>
+                        <th>Type</th>
+                        <th>Comment</th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr *ngIf="!schemaCollectionTarget || schemaCollectionTarget.length == 0">
-                      <td colspan="5" style="text-align:center"><span class="highlight">Please select a schema from the left tree first</span></td>
-                    </tr>
-                    <tr *ngFor="let row of schemaCollectionTarget">
-                      <td>
-                        <input type="checkbox" (click)='toggleSelectionTarget(row)' [checked]="row.selected" />
-                      </td>
-                      <td>{{row.name}}</td>
-                      <td>{{row.type}}</td>
-                      <td>{{row.comment}}</td>
-                    </tr>
+                      <tr *ngIf="!schemaCollectionTarget || schemaCollectionTarget.length == 0">
+                        <td colspan="5" style="text-align:center"><span class="highlight">Please select a schema from the left tree first</span></td>
+                      </tr>
+                      <tr *ngFor="let row of schemaCollectionTarget">
+                        <td>
+                          <input type="checkbox" (click)='toggleSelectionTarget(row)' [checked]="row.selected" />
+                        </td>
+                        <td>{{row.name}}</td>
+                        <td>{{row.type}}</td>
+                        <td>{{row.comment}}</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -196,27 +196,27 @@ under the License.
                 <div class="container col-md-12 col-lg-12 col-sm-12">
                   <table class="table table-striped">
                     <thead>
-                    <tr style="background-color:#7D95CC;font-size:20px">
-                      <th style="width:40%;">Target Fields</th>
-                      <th style="width:10%;text-align:center">Map To</th>
-                      <th style="width:40%;text-align:center">Source Fields</th>
-                    </tr>
+                      <tr style="background-color:#7D95CC;font-size:20px">
+                        <th style="width:40%;">Target Fields</th>
+                        <th style="width:10%;text-align:center">Map To</th>
+                        <th style="width:40%;text-align:center">Source Fields</th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr *ngFor="let item of selectionTarget; let i=index">
-                      <td>{{currentDBTarget}}.{{currentTableTarget}}.{{item}}</td>
-                      <td style="text-align:center;">
-                        <select class="form-control" style="background:#00FFFF;font-weight:bold" id="mapRule" name='mapRule-{{i}}' [(ngModel)]="matches[i]" value="matches[i]">
-                          <option *ngFor="let func of matchFunctions">{{func}}</option>
-                        </select>
-                      </td>
-                      <td>
-                        <select class="form-control" [(ngModel)]='mappings[i]' name="mappings{{i}}" (ngModelChange)="addMapping($event,i)" value="mappings[i]">
-                          <option *ngFor="let itemSrc of selection" [ngValue]="itemSrc">
-                            {{currentDB}}.{{currentTable}}.{{itemSrc}}</option>
-                        </select>
-                      </td>
-                    </tr>
+                      <tr *ngFor="let item of selectionTarget; let i=index">
+                        <td>{{currentDBTarget}}.{{currentTableTarget}}.{{item}}</td>
+                        <td style="text-align:center;">
+                          <select class="form-control" style="background:#00FFFF;font-weight:bold" id="mapRule" name='mapRule-{{i}}' [(ngModel)]="matches[i]" value="matches[i]">
+                            <option *ngFor="let func of matchFunctions">{{func}}</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select class="form-control" [(ngModel)]='mappings[i]' name="mappings{{i}}" (ngModelChange)="addMapping($event,i)" value="mappings[i]">
+                            <option *ngFor="let itemSrc of selection" [ngValue]="itemSrc">
+                              {{currentDB}}.{{currentTable}}.{{itemSrc}}</option>
+                          </select>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                   <p>
