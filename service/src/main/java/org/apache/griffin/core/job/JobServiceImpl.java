@@ -137,7 +137,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public GriffinJob addJob(JobSchedule js) throws Exception {
+    public JobSchedule addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
         checkJobScheduleParams(js, measure);
@@ -151,7 +151,7 @@ public class JobServiceImpl implements JobService {
         job = jobRepo.save(job);
         js = jobScheduleRepo.save(js);
         addJob(triggerKey, js, job);
-        return job;
+        return js;
 
     }
 

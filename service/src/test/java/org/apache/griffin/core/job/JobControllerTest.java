@@ -85,7 +85,7 @@ public class JobControllerTest {
     public void testAddJobForSuccess() throws Exception {
         JobSchedule jobSchedule = createJobSchedule();
         GriffinJob job = createGriffinJob();
-        given(service.addJob(jobSchedule)).willReturn(job);
+        given(service.addJob(jobSchedule)).willReturn(jobSchedule);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
