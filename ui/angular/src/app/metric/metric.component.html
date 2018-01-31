@@ -20,13 +20,6 @@ under the License.
   <div class="container-fluid">
     <div class="row col-lg-12" style="margin-top: 15px;">
       <div class="form-group">
-        <!-- <span>
-	      <label>Group: </label>
-	        <select ng-disabled="orgSelectDisabled" class="form-control"  (change)="changeOrg()" id="orgSelector" [(ngModel)]="selectedOrgIndex">
-              <option value="0"> All </option>
-              <option *ngFor="let opt of orgs;let m = index" value="{{m+1}}"  >{{opt.name}}</option>
-	        </select>
-	      </span> -->
         <span style="padding-left:30px;">
 	      <label>Measure: </label>
 	        <select class="form-control"  (change)="changeMeasure()" [(ngModel)]="selectedMeasureIndex" id="measureSelector">

@@ -17,48 +17,45 @@ specific language governing permissions and limitations
 under the License.
 */
 
-#orgSelector{
-	padding: 4px 6px;
-	height: 30px;
-	width: 230px;
-	background-color: #d1d3d2;
-	display: inline-block;
-	margin-left: 10px;
+#orgSelector {
+  padding: 4px 6px;
+  height: 30px;
+  width: 230px;
+  background-color: #d1d3d2;
+  display: inline-block;
+  margin-left: 10px;
 }
 
-#measureSelector{
-	padding: 4px 6px;
-	height: 30px;
-	width: 230px;
-	background-color: #d1d3d2;
-	display: inline-block;
-	margin-left: 10px;
+#measureSelector {
+  padding: 4px 6px;
+  height: 30px;
+  width: 230px;
+  background-color: #d1d3d2;
+  display: inline-block;
+  margin-left: 10px;
 }
 
-#dashboard{
-    overflow-y:auto;
-    height:680px;
-    overflow-x: hidden;
-    padding-right: 10px;
+#dashboard {
+  overflow-y: auto;
+  height: 680px;
+  overflow-x: hidden;
+  padding-right: 10px;
 }
 
-#dashboard::-webkit-scrollbar-track
-{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 10px;
-    background-color: #F5F5F5;
+#dashboard::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #F5F5F5;
 }
 
-#dashboard::-webkit-scrollbar
-{
-    width: 7px;
-    border-radius: 10px;
-    background-color: #F5F5F5;
+#dashboard::-webkit-scrollbar {
+  width: 7px;
+  border-radius: 10px;
+  background-color: #F5F5F5;
 }
 
-#dashboard::-webkit-scrollbar-thumb
-{
-    border-radius: 2px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #ADADAD;
+#dashboard::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  background-color: #ADADAD;
 }

@@ -21,7 +21,7 @@ under the License.
     <h5 class="over-title margin-bottom-15">View Measure</h5>
   </div>
   <!--//row-->
-  <div class="row">
+  <div class="row y-scrollable" style="max-height: 150px;">
     <div class="col-sm-6 col-xs-12">
       <div id="viewruleDefinition" class="viewrule-content">
         <div class="row">
@@ -48,14 +48,6 @@ under the License.
             {{ruleData.type}}
           </div>
         </div>
-        <!-- <div class="row">
-          <label for="systemSelector" class="col-xs-4">
-            Organization:
-          </label>
-          <div class="col-xs-8 " style="color: #fff">
-            {{ruleData.organization}}
-          </div>
-        </div> -->
         <div class="row" *ngIf="ruleData.type=='accuracy'">
           <label class="col-xs-4">
             Source:

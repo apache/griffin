@@ -76,32 +76,32 @@ under the License.
                 <div style="margin-top:10px;">
                   <label>View schema:</label>
                   <i style="color:#fff;font-weight: bold;">{{currentDBstr}}{{currentTable}}
-                  </i>
+                    </i>
                 </div>
                 <div style="margin-top:5px;">
                   <table class="table table-striped no-border">
                     <thead>
-                    <tr style="background-color:#7D95CC">
-                      <th>
-                        <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll" />
-                      </th>
-                      <th>Column Name</th>
-                      <th>Type</th>
-                      <th>Comment</th>
-                    </tr>
+                      <tr style="background-color:#7D95CC">
+                        <th>
+                          <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll" />
+                        </th>
+                        <th>Column Name</th>
+                        <th>Type</th>
+                        <th>Comment</th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr *ngIf="!schemaCollection || schemaCollection.length == 0">
-                      <td colspan="5" style="text-align:center;"><span class="highlight">Please select a schema from the left tree first</span></td>
-                    </tr>
-                    <tr *ngFor="let row of schemaCollection">
-                      <td>
-                        <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}} />
-                      </td>
-                      <td>{{row.name}}</td>
-                      <td>{{row.type}}</td>
-                      <td>{{row.comment}}</td>
-                    </tr>
+                      <tr *ngIf="!schemaCollection || schemaCollection.length == 0">
+                        <td colspan="5" style="text-align:center;"><span class="highlight">Please select a schema from the left tree first</span></td>
+                      </tr>
+                      <tr *ngFor="let row of schemaCollection">
+                        <td>
+                          <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}} />
+                        </td>
+                        <td>{{row.name}}</td>
+                        <td>{{row.type}}</td>
+                        <td>{{row.comment}}</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -129,20 +129,20 @@ under the License.
                 <div class="col-md-12 col-lg-12 col-sm-12" style="z-index:100;margin-top:5px;">
                   <table class="table table-striped" [mfData]="results" #mf="mfDataTable">
                     <thead>
-                    <tr style="background-color:#7D95CC">
-                      <th>Column Name</th>
-                      <th>Data Type</th>
-                      <th>Rule&nbsp;&nbsp;&nbsp;&nbsp;<i style="color:#b2c831;" class="fa fa-question-circle fa-lg"></i><i style="font-family: 'Open Sans', sans-serif;">Click <a (click)="showRule()" class="bark-link po">here</a> to view the rule definition</i></th>
-                    </tr>
+                      <tr style="background-color:#7D95CC">
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        <th>Rule&nbsp;&nbsp;&nbsp;&nbsp;<i style="color:#b2c831;" class="fa fa-question-circle fa-lg"></i><i style="font-family: 'Open Sans', sans-serif;">Click <a (click)="showRule()" class="bark-link po">here</a> to view the rule definition</i></th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr *ngFor="let item of selection">
-                      <td class="middle">{{item.name}}</td>
-                      <td class="middle">{{item.type}}</td>
-                      <td class="col-md-5 middle">
-                        <angular2-multiselect [data]="dropdownList[item.name]" name="rules-{{item.name}}" [(ngModel)]="selectedItems[item.name]" [settings]="dropdownSettings"></angular2-multiselect>
-                      </td>
-                    </tr>
+                      <tr *ngFor="let item of selection">
+                        <td class="middle">{{item.name}}</td>
+                        <td class="middle">{{item.type}}</td>
+                        <td class="col-md-5 middle">
+                          <angular2-multiselect [data]="dropdownList[item.name]" name="rules-{{item.name}}" [(ngModel)]="selectedItems[item.name]" [settings]="dropdownSettings"></angular2-multiselect>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -343,14 +343,6 @@ under the License.
                           {{type}}
                         </div>
                       </div>
-                      <!-- <div class="row">
-                        <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                          Group:
-                        </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{showgrp}}
-                        </div>
-                      </div> -->
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           DataSource:
@@ -403,26 +395,9 @@ under the License.
                   </div>
                 </div>
                 <h5 class="row">Rules</h5>
-                <!-- <div *ngIf="selectedItems">
-                  <div class="row" *ngFor="let key of objectKeys(selectedItems)">
-                  &nbsp;&nbsp;&nbsp;&nbsp;{{key}}:
-                  <div style="display:inline-block" *ngFor="let index of objectKeys(selectedItems[key])" >
-                    {{selectedItems[key][index].itemName}}&nbsp;,
-                  </div>
-                  </div>
-                </div> -->
                 <div class="row" *ngFor="let index of noderule;">
                   &nbsp;&nbsp;&nbsp;&nbsp;{{index.name}}&nbsp;:&nbsp;{{index.infos}}
                 </div>
-                <!-- <div class="row" *ngFor="let index of transrule;">
-                  &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
-                </div>
-                <div class="row" *ngFor="let index of transnullrule;">
-                  &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
-                </div>
-                <div class="row" *ngFor="let index of transenumrule;">
-                  &nbsp;&nbsp;&nbsp;&nbsp;{{index}}
-                </div> -->
                 <br/>
               </div>
             </div>
