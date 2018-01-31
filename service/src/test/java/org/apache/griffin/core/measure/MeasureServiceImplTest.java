@@ -82,7 +82,7 @@ public class MeasureServiceImplTest {
         assertEquals(m.getName(), measure.getName());
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test(expected = GriffinException.NotFoundException.class)
     public void testGetMeasuresByIdWithFileNotFoundException(){
         given(measureRepo.findByIdAndDeleted(1L, false)).willReturn(null);
         service.getMeasureById(1);

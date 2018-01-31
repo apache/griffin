@@ -149,7 +149,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public GriffinJob addJob(JobSchedule js) throws Exception {
+    public JobSchedule addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
         validateJobScheduleParams(js, measure);
@@ -163,7 +163,7 @@ public class JobServiceImpl implements JobService {
         job = jobRepo.save(job);
         js = jobScheduleRepo.save(js);
         addJob(triggerKey, js, job);
-        return job;
+        return js;
     }
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
@@ -180,22 +180,22 @@ public class JobServiceImpl implements JobService {
     }
 
     private void validateJobScheduleParams(JobSchedule js, GriffinMeasure measure) {
-        if (!isJobNameValid(js.getJobName())) {
+        if (!isValidJobName(js.getJobName())) {
             throw new GriffinException.BadRequestException(INVALID_JOB_NAME);
         }
-        if (!isCronExpressionValid(js.getCronExpression())) {
+        if (!isValidCronExpression(js.getCronExpression())) {
             throw new GriffinException.BadRequestException(INVALID_CRON_EXPRESSION);
         }
-        if (!isBaseLineValid(js.getSegments())) {
+        if (!isValidBaseLine(js.getSegments())) {
             throw new GriffinException.BadRequestException(MISSING_BASELINE_CONFIG);
         }
         List<String> names = getConnectorNames(measure);
-        if (!isConnectorNamesValid(js.getSegments(), names)) {
+        if (!isValidConnectorNames(js.getSegments(), names)) {
             throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
         }
     }
 
-    private boolean isJobNameValid(String jobName) {
+    private boolean isValidJobName(String jobName) {
         if (StringUtils.isEmpty(jobName)) {
             LOGGER.warn("Job name cannot be empty.");
             return false;
@@ -208,7 +208,7 @@ public class JobServiceImpl implements JobService {
         return true;
     }
 
-    private boolean isCronExpressionValid(String cronExpression) {
+    private boolean isValidCronExpression(String cronExpression) {
         if (StringUtils.isEmpty(cronExpression)) {
             LOGGER.warn("Cron Expression is empty.");
             return false;
@@ -220,7 +220,7 @@ public class JobServiceImpl implements JobService {
         return true;
     }
 
-    private boolean isBaseLineValid(List<JobDataSegment> segments) {
+    private boolean isValidBaseLine(List<JobDataSegment> segments) {
         for (JobDataSegment jds : segments) {
             if (jds.getBaseline()) {
                 return true;
@@ -230,7 +230,7 @@ public class JobServiceImpl implements JobService {
         return false;
     }
 
-    private boolean isConnectorNamesValid(List<JobDataSegment> segments, List<String> names) {
+    private boolean isValidConnectorNames(List<JobDataSegment> segments, List<String> names) {
         Set<String> sets = new HashSet<>();
         for (JobDataSegment segment : segments) {
             String dcName = segment.getDataConnectorName();
@@ -466,7 +466,6 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-
     /**
      * call livy to update part of job instance table data associated with group and jobName in mysql.
      *
@@ -491,7 +490,6 @@ public class JobServiceImpl implements JobService {
             LOGGER.error("Sync job instances failure. {}", e.getMessage());
         }
     }
-
 
     private void setJobInstanceIdAndUri(JobInstanceBean instance, HashMap<String, Object> resultMap) {
         if (resultMap != null && resultMap.size() != 0 && resultMap.get("state") != null) {

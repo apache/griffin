@@ -40,7 +40,6 @@ import java.util.Collections;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
-import static org.apache.griffin.core.util.EntityHelper.createGriffinJob;
 import static org.apache.griffin.core.util.EntityHelper.createJobSchedule;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
@@ -84,14 +83,12 @@ public class JobControllerTest {
     @Test
     public void testAddJobForSuccess() throws Exception {
         JobSchedule jobSchedule = createJobSchedule();
-        GriffinJob job = createGriffinJob();
-        given(service.addJob(jobSchedule)).willReturn(job);
+        given(service.addJob(jobSchedule)).willReturn(jobSchedule);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.toJson(jobSchedule)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(status().isCreated());
     }
 
     @Test
