@@ -23,4 +23,6 @@ import org.apache.griffin.core.job.entity.JobSchedule;
 import org.springframework.data.repository.CrudRepository;
 
 public interface JobScheduleRepo extends CrudRepository<JobSchedule, Long> {
+
+    JobSchedule findByJobName(String jobName);
 }

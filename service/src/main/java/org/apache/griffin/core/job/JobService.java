@@ -28,6 +28,8 @@ public interface JobService {
 
     List<JobDataBean> getAliveJobs();
 
+    JobSchedule getJobSchedule(String jobName);
+
     GriffinJob addJob(JobSchedule jobSchedule) throws Exception;
 
     void pauseJob(String group, String name) throws SchedulerException;

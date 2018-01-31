@@ -138,13 +138,23 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public JobSchedule getJobSchedule(String jobName) {
+        JobSchedule jobSchedule = jobScheduleRepo.findByJobName(jobName);
+        if (jobSchedule == null) {
+            LOGGER.warn("Job name {} does not exist.", jobName);
+            throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
+        }
+        return jobSchedule;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public GriffinJob addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
-        checkJobScheduleParams(js, measure);
+        validateJobScheduleParams(js, measure);
         String qName = getQuartzName(js);
-        String qGroup = getQuartzGroupName();
+        String qGroup = getQuartzGroup();
         TriggerKey triggerKey = triggerKey(qName, qGroup);
         if (factory.getObject().checkExists(triggerKey)) {
             throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
@@ -154,7 +164,6 @@ public class JobServiceImpl implements JobService {
         js = jobScheduleRepo.save(js);
         addJob(triggerKey, js, job);
         return job;
-
     }
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
@@ -166,11 +175,11 @@ public class JobServiceImpl implements JobService {
         return js.getJobName() + "_" + System.currentTimeMillis();
     }
 
-    private String getQuartzGroupName() {
+    private String getQuartzGroup() {
         return "BA";
     }
 
-    private void checkJobScheduleParams(JobSchedule js, GriffinMeasure measure) {
+    private void validateJobScheduleParams(JobSchedule js, GriffinMeasure measure) {
         if (!isJobNameValid(js.getJobName())) {
             throw new GriffinException.BadRequestException(INVALID_JOB_NAME);
         }

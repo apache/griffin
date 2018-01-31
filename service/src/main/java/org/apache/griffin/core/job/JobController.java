@@ -38,6 +38,11 @@ public class JobController {
         return jobService.getAliveJobs();
     }
 
+    @RequestMapping(value = "/jobs/config/{jobName}")
+    public JobSchedule getJobSchedule(@PathVariable("jobName") String jobName) {
+        return jobService.getJobSchedule(jobName);
+    }
+
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public GriffinJob addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
