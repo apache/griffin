@@ -63,78 +63,34 @@ case class StreamingDqThread(sqlContext: SQLContext,
         println(s"data source timeRanges: ${dsTimeRanges}")
 
         // generate rule steps
-//        val ruleSteps = RuleAdaptorGroup.genRuleSteps(
-//          CalcTimeInfo(st), evaluateRuleParam, dsTmsts)
         val rulePlan = RuleAdaptorGroup.genRulePlan(
           calcTimeInfo, evaluateRuleParam, StreamingProcessType, dsTimeRanges)
 
-        // optimize rule plan
-//        val optRulePlan = optimizeRulePlan(rulePlan, dsTmsts)
-        val optRulePlan = rulePlan
-
-//        ruleSteps.foreach(println)
-
         // run rules
-//        dqEngines.runRuleSteps(ruleSteps)
-        dqEngines.runRuleSteps(calcTimeInfo, optRulePlan.ruleSteps)
+        dqEngines.runRuleSteps(calcTimeInfo, rulePlan.ruleSteps)
 
         val ct = new Date().getTime
         val calculationTimeStr = s"calculation using time: ${ct - st} ms"
-//        println(calculationTimeStr)
         appPersist.log(ct, calculationTimeStr)
 
         // persist results
-//        val timeGroups = dqEngines.persistAllMetrics(ruleSteps, persistFactory)
-        dqEngines.persistAllMetrics(optRulePlan.metricExports, persistFactory)
-//        println(s"--- timeGroups: ${timeGroups}")
+        dqEngines.persistAllMetrics(rulePlan.metricExports, persistFactory)
 
         val rt = new Date().getTime
         val persistResultTimeStr = s"persist result using time: ${rt - ct} ms"
         appPersist.log(rt, persistResultTimeStr)
 
         // persist records
-        dqEngines.persistAllRecords(optRulePlan.recordExports, persistFactory, dataSources)
+        dqEngines.persistAllRecords(rulePlan.recordExports, persistFactory, dataSources)
 
         // update data sources
-        dqEngines.updateDataSources(optRulePlan.dsUpdates, dataSources)
+        dqEngines.updateDataSources(rulePlan.dsUpdates, dataSources)
 
         val et = new Date().getTime
         val persistTimeStr = s"persist records using time: ${et - rt} ms"
         appPersist.log(et, persistTimeStr)
 
-//        val dfs = dqEngines.collectUpdateRDDs(ruleSteps, timeGroups.toSet)
-//        dfs.foreach(_._2.cache())
-//        dfs.foreach { pr =>
-//          val (step, df) = pr
-//          val cnt = df.count
-//          println(s"step [${step.name}] group count: ${cnt}")
-//        }
-//
-//        val lt = new Date().getTime
-//        val collectRddTimeStr = s"collect records using time: ${lt - rt} ms"
-////        println(collectRddTimeStr)
-//        appPersist.log(lt, collectRddTimeStr)
-//
-//        // persist records
-//        dqEngines.persistAllRecords(dfs, persistFactory)
-////        dqEngines.persistAllRecords(ruleSteps, persistFactory, timeGroups)
-//
-//        // update data source
-//        dqEngines.updateDataSources(dfs, dataSources)
-////        dqEngines.updateDataSources(ruleSteps, dataSources, timeGroups)
-//
-//        dfs.foreach(_._2.unpersist())
-
         TimeInfoCache.endTimeInfoCache
-
-//        sqlContext.tables().show(20)
-
-        // cache global data
-//        val globalTables = TableRegisters.getRunGlobalTables
-//        globalTables.foreach { gt =>
-//          val df = sqlContext.table(gt)
-//          df.cache
-//        }
 
         // clean old data
         cleanData(calcTimeInfo)
@@ -170,31 +126,6 @@ case class StreamingDqThread(sqlContext: SQLContext,
     } catch {
       case e: Throwable => error(s"clean data error: ${e.getMessage}")
     }
-  }
-
-  private def optimizeRulePlan(rulePlan: RulePlan, dsTmsts: Map[String, Set[Long]]): RulePlan = {
-    val steps = rulePlan.ruleSteps
-    val optExports = rulePlan.ruleExports.flatMap { export =>
-      findRuleStepByName(steps, export.stepName).map { rs =>
-        rs.details.get(ProcessDetailsKeys._baselineDataSource) match {
-          case Some(dsname: String) => {
-            val defTmstOpt = (dsTmsts.get(dsname)).flatMap { set =>
-              try { Some(set.max) } catch { case _: Throwable => None }
-            }
-            defTmstOpt match {
-              case Some(t) => export.setDefTimestamp(t)
-              case _ => export
-            }
-          }
-          case _ => export
-        }
-      }
-    }
-    RulePlan(steps, optExports)
-  }
-
-  private def findRuleStepByName(steps: Seq[RuleStep], name: String): Option[RuleStep] = {
-    steps.filter(_.name == name).headOption
   }
 
 }

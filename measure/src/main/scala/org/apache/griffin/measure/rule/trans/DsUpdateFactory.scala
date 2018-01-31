@@ -16,16 +16,22 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rule.plan
+package org.apache.griffin.measure.rule.trans
 
-import org.apache.griffin.measure.process.ExportMode
-import org.apache.griffin.measure.rule.dsl._
+import org.apache.griffin.measure.rule.plan._
+import org.apache.griffin.measure.utils.ParamUtil._
 
-case class MetricExport(name: String,
-                        stepName: String,
-                        collectType: CollectType,
-                        defTimestamp: Long,
-                        mode: ExportMode
-                       ) extends RuleExport {
+object DsUpdateFactory {
 
+  def genDsUpdate(param: Map[String, Any], defDsName: String,
+                  stepName: String): DsUpdate = {
+    DsUpdate(UpdateParamKeys.getName(param, defDsName), stepName)
+  }
+
+}
+
+object UpdateParamKeys {
+  val _name = "name"
+
+  def getName(param: Map[String, Any], defName: String): String = param.getString(_name, defName)
 }

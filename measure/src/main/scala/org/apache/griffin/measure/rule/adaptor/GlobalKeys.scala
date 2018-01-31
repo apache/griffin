@@ -18,54 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.rule.adaptor
 
-object AccuracyKeys {
-  val _source = "source"
-  val _target = "target"
-  val _miss = "miss"
-  val _total = "total"
-  val _matched = "matched"
-  //  val _missRecords = "missRecords"
-}
-
-object ProfilingKeys {
-  val _source = "source"
-}
-
-object UniquenessKeys {
-  val _source = "source"
-  val _target = "target"
-  val _unique = "unique"
-  val _total = "total"
-  val _dup = "dup"
-  val _num = "num"
-
-  val _duplicationArray = "duplication.array"
-}
-
-object DistinctnessKeys {
-  val _source = "source"
-  val _target = "target"
-  val _distinct = "distinct"
-  val _total = "total"
-  val _dup = "dup"
-  val _accu_dup = "accu_dup"
-  val _num = "num"
-
-  val _duplicationArray = "duplication.array"
-  val _withAccumulate = "with.accumulate"
-}
-
-object TimelinessKeys {
-  val _source = "source"
-  val _latency = "latency"
-  val _total = "total"
-  val _avg = "avg"
-  val _threshold = "threshold"
-  val _step = "step"
-  val _count = "count"
-  val _stepSize = "step.size"
-}
-
 object GlobalKeys {
   val _initRule = "init.rule"
 }
