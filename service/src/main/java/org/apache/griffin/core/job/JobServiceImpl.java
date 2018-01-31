@@ -105,7 +105,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobDataBean genJobData(JobKey jobKey, GriffinJob job) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         if (CollectionUtils.isEmpty(triggers)) {
             return null;
@@ -156,7 +156,7 @@ public class JobServiceImpl implements JobService {
         String qName = getQuartzName(js);
         String qGroup = getQuartzGroup();
         TriggerKey triggerKey = triggerKey(qName, qGroup);
-        if (factory.getObject().checkExists(triggerKey)) {
+        if (factory.getScheduler().checkExists(triggerKey)) {
             throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
         }
         GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
@@ -168,7 +168,7 @@ public class JobServiceImpl implements JobService {
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
         JobDetail jobDetail = addJobDetail(triggerKey, js, job);
-        factory.getObject().scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
+        factory.getScheduler().scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
     }
 
     private String getQuartzName(JobSchedule js) {
@@ -281,7 +281,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobDetail addJobDetail(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);
@@ -331,7 +331,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void pauseJob(String group, String name) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
@@ -404,7 +404,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private void deleteJob(String group, String name) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.info("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
@@ -542,7 +542,7 @@ public class JobServiceImpl implements JobService {
         JobKey jobKey = new JobKey(job.getQuartzName(), job.getQuartzGroup());
         List<Trigger> triggers;
         try {
-            triggers = (List<Trigger>) factory.getObject().getTriggersOfJob(jobKey);
+            triggers = (List<Trigger>) factory.getScheduler().getTriggersOfJob(jobKey);
         } catch (SchedulerException e) {
             LOGGER.error("Job schedule exception. {}", e.getMessage());
             throw new GriffinException.ServiceException("Fail to Get HealthInfo", e);

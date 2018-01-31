@@ -102,7 +102,7 @@ public class JobInstance implements Job {
     }
 
     private void setJobStartTime(JobDetail jobDetail) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobDetail.getKey();
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         Date triggerTime = triggers.get(0).getPreviousFireTime();
@@ -145,6 +145,7 @@ public class JobInstance implements Job {
      * split data into several part and get every part start timestamp
      *
      * @param segRange config of data
+     * @param dc data connector
      * @return split timestamps of data
      */
     private Long[] genSampleTs(SegmentRange segRange, DataConnector dc) {
@@ -172,6 +173,7 @@ public class JobInstance implements Job {
     /**
      * set data connector predicates
      *
+     * @param dc data connector
      * @param sampleTs collection of data split start timestamp
      */
     private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) throws IOException {
@@ -184,11 +186,6 @@ public class JobInstance implements Job {
         }
     }
 
-    /**
-     * set data connector configs
-     *
-     * @param sampleTs collection of data split start timestamp
-     */
     private void setConnectorConf(DataConnector dc, Long[] sampleTs) throws IOException {
         genConfMap(dc, sampleTs);
         dc.setConfigMap(dc.getConfigMap());
@@ -233,7 +230,7 @@ public class JobInstance implements Job {
         Integer repeat = Integer.valueOf(config.get("repeat").toString());
         String groupName = "PG";
         String jobName = griffinJob.getJobName() + "_predicate_" + System.currentTimeMillis();
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         TriggerKey triggerKey = triggerKey(jobName, groupName);
         return !(scheduler.checkExists(triggerKey)
                 || !saveGriffinJob(jobName, groupName)
@@ -251,7 +248,7 @@ public class JobInstance implements Job {
 
     private boolean createJobInstance(TriggerKey triggerKey, Long interval, Integer repeatCount, String pJobName) throws Exception {
         JobDetail jobDetail = addJobDetail(triggerKey, pJobName);
-        factory.getObject().scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, repeatCount));
+        factory.getScheduler().scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, repeatCount));
         return true;
     }
 
@@ -269,7 +266,7 @@ public class JobInstance implements Job {
     }
 
     private JobDetail addJobDetail(TriggerKey triggerKey, String pJobName) throws SchedulerException, JsonProcessingException {
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);

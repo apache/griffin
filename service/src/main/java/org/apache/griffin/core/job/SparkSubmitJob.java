@@ -58,7 +58,7 @@ public class SparkSubmitJob implements Job {
 
     private GriffinMeasure measure;
     private String livyUri;
-    private List<SegmentPredicate> mPredicts;
+    private List<SegmentPredicate> mPredicates;
     private JobInstanceBean jobInstance;
     private RestTemplate restTemplate = new RestTemplate();
     private LivyConf livyConf = new LivyConf();
@@ -69,7 +69,7 @@ public class SparkSubmitJob implements Job {
         try {
             initParam(jd);
             setLivyConf();
-            if (!success(mPredicts)) {
+            if (!success(mPredicates)) {
                 updateJobInstanceState(context);
                 return;
             }
@@ -119,7 +119,7 @@ public class SparkSubmitJob implements Job {
     }
 
     private void initParam(JobDetail jd) throws IOException {
-        mPredicts = new ArrayList<>();
+        mPredicates = new ArrayList<>();
         livyUri = livyConfProps.getProperty("livy.uri");
         jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap().getString(PREDICATE_JOB_NAME));
         measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
@@ -135,7 +135,7 @@ public class SparkSubmitJob implements Job {
                 SegmentPredicate sp = new SegmentPredicate();
                 sp.setType((String) map.get("type"));
                 sp.setConfigMap((Map<String, String>) map.get("config"));
-                mPredicts.add(sp);
+                mPredicates.add(sp);
             }
         }
     }
