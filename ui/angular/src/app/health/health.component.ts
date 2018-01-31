@@ -16,201 +16,213 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from '@angular/core';
-import  {HttpClient} from '@angular/common/http';
-import  {Router} from "@angular/router";
-// import {GetMetricService} from '../service/get-metric.service'
-import {ServiceService} from '../service/service.service';
-
-import * as $ from 'jquery';
+import { Component, OnInit } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
+import { ServiceService } from "../service/service.service";
+import * as $ from "jquery";
 
 @Component({
-  selector: 'app-health',
-  templateUrl: './health.component.html',
-  styleUrls: ['./health.component.css'],
-  // providers:[GetMetricService]
+  selector: "app-health",
+  templateUrl: "./health.component.html",
+  styleUrls: ["./health.component.css"]
 })
 export class HealthComponent implements OnInit {
-
-  constructor(private http: HttpClient,private router:Router,public serviceService:ServiceService) { };
-  chartOption:object;
-  // var formatUtil = echarts.format;
-  dataData = [];
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    public serviceService: ServiceService
+  ) {}
+  chartOption: object;
   finalData = [];
-  oData = [];
-  // originalData = [];
-  originalData:any;
-  mesWithJob:any;
-  // var formatUtil = echarts.format;
+  mesWithJob: any;
 
-  
-  onChartClick($event){
-    if($event.data.name){
-      this.router.navigate(['/detailed/'+$event.data.name]);
+  onChartClick($event) {
+    if ($event.data.name) {
+      this.router.navigate(["/detailed/" + $event.data.name]);
       window.location.reload();
     }
   }
 
   resizeTreeMap() {
-    $('#chart1').height( $('#mainWindow').height() - $('.bs-component').outerHeight() );
-  };
+    $("#chart1").height(
+      $("#mainWindow").height() - $(".bs-component").outerHeight()
+    );
+  }
 
   parseData(data) {
     var sysId = 0;
     var metricId = 0;
     var result = [];
-    for(let sys of data){
+    for (let sys of data) {
       var item = {
-        'id':'',
-        'name':'',
-        children:[]
+        id: "",
+        name: "",
+        children: []
       };
-      item.id = 'id_'+sysId;
+      item.id = "id_" + sysId;
       item.name = sys.name;
       if (sys.metrics != undefined) {
         item.children = [];
-        for(let metric of sys.metrics){
+        for (let metric of sys.metrics) {
           var itemChild = {
-            id: 'id_' + sysId + '_' + metricId,
+            id: "id_" + sysId + "_" + metricId,
             name: metric.name,
             value: 1,
             dq: metric.dq,
             sysName: sys.name,
             itemStyle: {
               normal: {
-                color: '#4c8c6f'
+                color: "#4c8c6f"
               }
-            },
+            }
           };
           if (metric.dqfail == 1) {
-            itemChild.itemStyle.normal.color = '#ae5732';
+            itemChild.itemStyle.normal.color = "#ae5732";
           } else {
-            itemChild.itemStyle.normal.color = '#005732';
+            itemChild.itemStyle.normal.color = "#005732";
           }
           item.children.push(itemChild);
           metricId++;
         }
       }
       result.push(item);
-      sysId ++;
+      sysId++;
     }
     return result;
-   };
+  }
 
-   getLevelOption() {
-       return [
-           {
-               itemStyle: {
-                   normal: {
-                       borderWidth: 0,
-                       gapWidth: 6,
-                       borderColor: '#000'
-                   }
-               }
-           },
-           {
-               itemStyle: {
-                   normal: {
-                       gapWidth: 1,
-                       borderColor: '#fff'
-                   }
-               }
-           }
-       ];
-   };
+  getLevelOption() {
+    return [
+      {
+        itemStyle: {
+          normal: {
+            borderWidth: 0,
+            gapWidth: 6,
+            borderColor: "#000"
+          }
+        }
+      },
+      {
+        itemStyle: {
+          normal: {
+            gapWidth: 1,
+            borderColor: "#fff"
+          }
+        }
+      }
+    ];
+  }
 
   renderTreeMap(res) {
     var data = this.parseData(res);
     var option = {
-        title: {
-            text: 'Data Quality Metrics Heatmap',
-            left: 'center',
-            textStyle:{
-                color:'white'
+      title: {
+        text: "Data Quality Metrics Heatmap",
+        left: "center",
+        textStyle: {
+          color: "white"
+        }
+      },
+      backgroundColor: "transparent",
+      tooltip: {
+        formatter: function(info) {
+          var dqFormat = info.data.dq > 100 ? "" : "%";
+          if (info.data.dq)
+            return [
+              '<span style="font-size:1.8em;">' +
+                info.data.sysName +
+                " &gt; </span>",
+              '<span style="font-size:1.5em;">' +
+                info.data.name +
+                "</span><br>",
+              '<span style="font-size:1.5em;">dq : ' +
+                info.data.dq.toFixed(2) +
+                dqFormat +
+                "</span>"
+            ].join("");
+        }
+      },
+      series: [
+        {
+          name: "System",
+          type: "treemap",
+          itemStyle: {
+            normal: {
+              borderColor: "#fff"
             }
-        },
-        backgroundColor: 'transparent',
-        tooltip: {
-            formatter: function(info) {
-                var dqFormat = info.data.dq>100?'':'%';
-                if(info.data.dq)
-                return [
-                    '<span style="font-size:1.8em;">' + info.data.sysName + ' &gt; </span>',
-                    '<span style="font-size:1.5em;">' + info.data.name+'</span><br>',
-                    '<span style="font-size:1.5em;">dq : ' + info.data.dq.toFixed(2) + dqFormat + '</span>'
-                ].join('');
-            }
-        },
-        series: [
-            {
-                name:'System',
-                type:'treemap',
-                itemStyle: {
-                    normal: {
-                        borderColor: '#fff'
-                    }
-                },
-                levels: this.getLevelOption(),
-                breadcrumb: {
-                    show: false
-                },
-                roam: false,
-                nodeClick: 'link',
-                data: data,
-                width: '95%',
-                bottom : 0
-            }
-        ]
+          },
+          levels: this.getLevelOption(),
+          breadcrumb: {
+            show: false
+          },
+          roam: false,
+          nodeClick: "link",
+          data: data,
+          width: "95%",
+          bottom: 0
+        }
+      ]
     };
     this.resizeTreeMap();
     this.chartOption = option;
-  };
-  
+  }
 
-  renderData(){
+  renderData() {
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_dashboard).subscribe(data => {
-      this.mesWithJob = data;
+      this.mesWithJob = JSON.parse(JSON.stringify(data));
       var mesNode = null;
-      for(let mesName in this.mesWithJob){
+      for (let mesName in this.mesWithJob) {
+        var jobs = this.mesWithJob[mesName];
         mesNode = new Object();
         mesNode.name = mesName;
         var node = null;
         node = new Object();
         node.name = mesName;
         node.dq = 0;
-        var metricNode = {
-          'name':'',
-          'timestamp':'',
-          'dq':0,
-          'details':[]
-        }
         node.metrics = [];
         var metricData = this.mesWithJob[mesName][0];
-        if(metricData.metricValues[0] != undefined && metricData.metricValues[0].value.matched != undefined){
-          metricNode.details = JSON.parse(JSON.stringify(metricData.metricValues));
-          metricNode.name = metricData.name;
-          metricNode.timestamp = metricData.metricValues[0].value.tmst;
-          metricNode.dq = metricData.metricValues[0].value.matched/metricData.metricValues[0].value.total*100;
-          node.metrics.push(metricNode);
+        if (
+          metricData.metricValues[0] != undefined &&
+          metricData.metricValues[0].value.matched != undefined
+        ) {
+          for(let i=0;i<jobs.length;i++){
+            var metricNode = {
+              name: "",
+              timestamp: "",
+              dq: 0,
+              details: []
+            };
+            metricNode.details = JSON.parse(
+              JSON.stringify(jobs[i].metricValues)
+            );
+            metricNode.name = jobs[i].name;
+            metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
+            metricNode.dq =
+              jobs[i].metricValues[0].value.matched /
+              jobs[i].metricValues[0].value.total *
+              100;
+            node.metrics.push(metricNode);
+          }
         }
-        this.finalData.push(node);                 
+        this.finalData.push(node);
       }
       var self = this;
       setTimeout(function function_name(argument) {
         self.renderTreeMap(self.finalData);
-      },1000)
+      }, 1000);
     });
-  };
+  }
 
   ngOnInit() {
     var self = this;
     this.renderData();
-       // this.renderTreeMap(this.getMetricService.renderData());
-       // setTimeout(function function_name(argument) {
-       //   // body...
-       //     self.renderTreeMap(self.renderData());
+    // this.renderTreeMap(this.getMetricService.renderData());
+    // setTimeout(function function_name(argument) {
+    //   // body...
+    //     self.renderTreeMap(self.renderData());
 
-       // })
-  };
+    // })
+  }
 }

@@ -16,84 +16,91 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit} from '@angular/core';
-import { HttpClient} from '@angular/common/http';
-import { DataTableModule} from "angular2-datatable";
-import { Router} from "@angular/router";
-import { FormControl } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
-import {ServiceService} from '../service/service.service';
-
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { ToasterModule, ToasterService} from 'angular2-toaster';
-import * as $ from 'jquery';
+import { Component, OnInit } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { DataTableModule } from "angular2-datatable";
+import { Router } from "@angular/router";
+import { FormControl } from "@angular/forms";
+import { FormsModule } from "@angular/forms";
+import { ServiceService } from "../service/service.service";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { ToasterModule, ToasterService } from "angular2-toaster";
+import * as $ from "jquery";
 
 @Component({
-  selector: 'app-measure',
-  templateUrl: './measure.component.html',
-  providers:[ServiceService],
-  styleUrls: ['./measure.component.css']
+  selector: "app-measure",
+  templateUrl: "./measure.component.html",
+  providers: [ServiceService],
+  styleUrls: ["./measure.component.css"]
 })
 export class MeasureComponent implements OnInit {
-  //results:object[];
-  results:any;
+  results: any;
   public visible = false;
   public visibleAnimate = false;
-  deletedRow : any;
-  sourceTable :string;
-  targetTable :string;
-  deleteId : number;
-  deleteIndex:number;
-  
+  deletedRow: any;
+  sourceTable: string;
+  targetTable: string;
+  deleteId: number;
+  deleteIndex: number;
+  private toasterService: ToasterService;
+
   public hide(): void {
     this.visibleAnimate = false;
-    setTimeout(() => this.visible = false, 300);
+    setTimeout(() => (this.visible = false), 300);
   }
 
   public onContainerClicked(event: MouseEvent): void {
-    if ((<HTMLElement>event.target).classList.contains('modal')) {
+    if ((<HTMLElement>event.target).classList.contains("modal")) {
       this.hide();
     }
   }
- 
-  constructor(private http:HttpClient,private router:Router,public serviceService:ServiceService) { 
-  };
 
-  remove(row){
+  constructor(
+    toasterService: ToasterService,
+    private http: HttpClient,
+    private router: Router,
+    public serviceService: ServiceService
+  ) {
+    this.toasterService = toasterService;
+  }
+
+  remove(row) {
     this.visible = true;
-    setTimeout(() => this.visibleAnimate = true, 100);
+    setTimeout(() => (this.visibleAnimate = true), 100);
     this.deleteId = row.id;
     this.deleteIndex = this.results.indexOf(row);
     this.deletedRow = row;
-    var sourcedata = this.deletedRow["data.sources"][0].connectors[0].config;          
+    var sourcedata = this.deletedRow["data.sources"][0].connectors[0].config;
     this.sourceTable = sourcedata["table.name"];
-    if(this.deletedRow.type === "accuracy"){
+    if (this.deletedRow.type === "accuracy") {
       var targetdata = this.deletedRow["data.sources"][1].connectors[0].config;
       this.targetTable = targetdata["table.name"];
-    }else{
-      this.targetTable = '';
-    }          
+    } else {
+      this.targetTable = "";
+    }
   }
 
-  confirmDelete(){
+  confirmDelete() {
     var deleteModel = this.serviceService.config.uri.deleteModel;
-    let deleteUrl = deleteModel + '/' + this.deleteId;
-    this.http.delete(deleteUrl).subscribe(data => {
-      let deleteResult:any = data;
-      if(deleteResult.code==202){
+    let deleteUrl = deleteModel + "/" + this.deleteId;
+    this.http.delete(deleteUrl).subscribe(
+      data => {
         var self = this;
-        setTimeout(function () {
-          self.results.splice(self.deleteIndex,1);
-          // self.source.load(self.results);
+        setTimeout(function() {
+          self.results.splice(self.deleteIndex, 1);
           self.hide();
-        },200);
+        }, 200);
+      },
+      err => {
+        this.toasterService.pop("error", "Error!", "Failed to delete measure!");
+        console.log("Error when deleting measure!");
       }
-    });
-  };
+    );
+  }
 
-  ngOnInit():void {
+  ngOnInit(): void {
     var allModels = this.serviceService.config.uri.allModels;
-  	this.http.get(allModels).subscribe(data =>{
+    this.http.get(allModels).subscribe(data => {
       // for(let measure in data){
       //   data[measure].trueName = data[measure].name;
       //   if(data[measure].type !== 'griffin'){
@@ -102,16 +109,13 @@ export class MeasureComponent implements OnInit {
       //     data[measure].type = '';
       //   }
       // }
-  		this.results = Object.keys(data).map(function(index){
+      this.results = Object.keys(data).map(function(index) {
         let measure = data[index];
-        if(measure['measure.type'] === 'external'){
-          measure['dq.type'] = 'external';
+        if (measure["measure.type"] === "external") {
+          measure["dq.type"] = "external";
         }
         return measure;
       });
-  	});
-  // };
-// }
-   // this.results = this.measureData;
+    });
   }
 }

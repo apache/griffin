@@ -19,9 +19,9 @@ under the License.
 <div>
   <p>
     <a routerLink="/createmeasure" style="background-color: #337ab7;" class="btn btn-primary  btn-wide">
-        <i class="fa fa-plus"></i> 
-        Create Measure
-        </a>
+      <i class="fa fa-plus"></i> 
+      Create Measure
+    </a>
   </p>
   <div id="modelContainer">
     <table class="table table-striped" [mfData]="results" #mf="mfDataTable" [mfRowsOnPage]="10">
@@ -45,10 +45,8 @@ under the License.
           <td><a routerLink="/measure/{{row.id}}">{{row.name}}</a></td>
           <td>{{row["dq.type"]}}</td>
           <td>{{row.description}}</td>
-          <!-- <td>{{row.group}}</td> -->
           <td>
             &nbsp;
-            <!-- <a [ngClass]="(!adminAccess && ntAccount!=row.owner)?'disabled':''" href="" (click)="remove(row)" title="delete" style="text-decoration:none"> -->
             <a (click)="remove(row)" title="delete" style="text-decoration:none">
               <i class="fa fa-trash-o po"></i>
             </a> &nbsp;
@@ -107,14 +105,6 @@ under the License.
                       {{deletedRow["dq.type"]}}
                     </div>
                   </div>
-                  <!-- <div class="row">
-                    <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                      Organization:
-                    </label>
-                    <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                      {{deletedRow.organization}}
-                    </div>
-                  </div> -->
                   <div class="row">
                     <label class="col-md-4 col-lg-4 col-sm-4">
                       DataAsset:
