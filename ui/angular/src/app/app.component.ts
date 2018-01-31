@@ -68,7 +68,7 @@ export class AppComponent implements AfterViewChecked, OnInit {
     });
     $("#side-bar-metrics").css({
       height:
-        $("#mainContent").height() - $("#side-bar-stats").outerHeight() + 70
+        $("#mainContent").height() - $("#side-bar-stats").outerHeight()
     });
   }
 }

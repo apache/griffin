@@ -171,37 +171,40 @@ export class HealthComponent implements OnInit {
   renderData() {
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_dashboard).subscribe(data => {
-      this.mesWithJob = data;
+      this.mesWithJob = JSON.parse(JSON.stringify(data));
       var mesNode = null;
       for (let mesName in this.mesWithJob) {
+        var jobs = this.mesWithJob[mesName];
         mesNode = new Object();
         mesNode.name = mesName;
         var node = null;
         node = new Object();
         node.name = mesName;
         node.dq = 0;
-        var metricNode = {
-          name: "",
-          timestamp: "",
-          dq: 0,
-          details: []
-        };
         node.metrics = [];
         var metricData = this.mesWithJob[mesName][0];
         if (
           metricData.metricValues[0] != undefined &&
           metricData.metricValues[0].value.matched != undefined
         ) {
-          metricNode.details = JSON.parse(
-            JSON.stringify(metricData.metricValues)
-          );
-          metricNode.name = metricData.name;
-          metricNode.timestamp = metricData.metricValues[0].value.tmst;
-          metricNode.dq =
-            metricData.metricValues[0].value.matched /
-            metricData.metricValues[0].value.total *
-            100;
-          node.metrics.push(metricNode);
+          for(let i=0;i<jobs.length;i++){
+            var metricNode = {
+              name: "",
+              timestamp: "",
+              dq: 0,
+              details: []
+            };
+            metricNode.details = JSON.parse(
+              JSON.stringify(jobs[i].metricValues)
+            );
+            metricNode.name = jobs[i].name;
+            metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
+            metricNode.dq =
+              jobs[i].metricValues[0].value.matched /
+              jobs[i].metricValues[0].value.total *
+              100;
+            node.metrics.push(metricNode);
+          }
         }
         this.finalData.push(node);
       }
