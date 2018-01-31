@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.data.connector.streaming
 
 import org.apache.griffin.measure.data.connector._
-import org.apache.griffin.measure.data.source.DataSourceCache
+import org.apache.griffin.measure.data.source.cache._
 import org.apache.griffin.measure.process.temp.TimeRange
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame

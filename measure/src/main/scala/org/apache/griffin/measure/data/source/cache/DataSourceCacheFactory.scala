@@ -18,7 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.data.source.cache
 
-import org.apache.griffin.measure.data.source.DataSourceFactory._
 import org.apache.griffin.measure.log.Loggable
 import org.apache.spark.sql.SQLContext
 import org.apache.griffin.measure.utils.ParamUtil._

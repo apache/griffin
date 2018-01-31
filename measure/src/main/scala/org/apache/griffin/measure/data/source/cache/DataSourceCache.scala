@@ -24,17 +24,17 @@ import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 import org.apache.griffin.measure.cache.tmst.TmstCache
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process.temp.TimeRange
-import org.apache.griffin.measure.utils.ParamUtil._
+import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.griffin.measure.utils.ParamUtil._
+import org.apache.spark.sql._
 
-abstract class DataSourceCache(param: Map[String, Any], dsName: String, index: Int
-                              ) extends DataCacheable with Loggable with Serializable {
+trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
-//  val param: Map[String, Any]
-//  val dsName: String
-//  val index: Int
+  val sqlContext: SQLContext
+  val param: Map[String, Any]
+  val dsName: String
+  val index: Int
 
   var tmstCache: TmstCache = _
   protected def rangeTmsts(from: Long, until: Long) = tmstCache.range(from, until)
@@ -50,7 +50,7 @@ abstract class DataSourceCache(param: Map[String, Any], dsName: String, index: I
   val _ReadyTimeDelay = "ready.time.delay"
   val _TimeRange = "time.range"
 
-  val defFilePath = s"/griffin/cache/${dsName}/${index}"
+  val defFilePath = s"hdfs:///griffin/cache/${dsName}/${index}"
   val defInfoPath = s"${index}"
 
   val filePath: String = param.getString(_FilePath, defFilePath)
@@ -73,37 +73,43 @@ abstract class DataSourceCache(param: Map[String, Any], dsName: String, index: I
   val _ReadOnly = "read.only"
   val readOnly = param.getBoolean(_ReadOnly, false)
 
+  val _Updatable = "updatable"
+  val updatable = param.getBoolean(_Updatable, false)
+
 //  val rowSepLiteral = "\n"
-  val partitionUnits: List[String] = List("hour", "min", "sec")
-  val minUnitTime: Long = TimeUtil.timeFromUnit(1, partitionUnits.last)
+//  val partitionUnits: List[String] = List("hour", "min", "sec")
+//  val minUnitTime: Long = TimeUtil.timeFromUnit(1, partitionUnits.last)
 
   val newCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.new")
   val oldCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.old")
 
-  protected def saveDataFrame(df: DataFrame, path: String): Unit
-  protected def saveDataList(arr: Iterable[String], path: String): Unit
-  protected def readDataFrame(paths: Seq[String]): Option[DataFrame]
-  protected def removeDataPath(path: String): Unit
+  val newFilePath = s"${filePath}/new"
+  val oldFilePath = s"${filePath}/old"
+
+  val defOldCacheIndex = 0L
+
+  protected def writeDataFrame(dfw: DataFrameWriter, path: String): Unit
+  protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame
 
   def init(): Unit = {}
 
+  // save new cache data only
   def saveData(dfOpt: Option[DataFrame], ms: Long): Unit = {
     if (!readOnly) {
       dfOpt match {
         case Some(df) => {
-//          val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
-//          if (newCacheLocked) {
+          // lock makes it safer when writing new cache data
+          val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
+          if (newCacheLocked) {
             try {
-              val dataFilePath = getDataFilePath(ms)
-
-              // save data
-              saveDataFrame(df, dataFilePath)
+              val dfw = df.write.mode(SaveMode.Append).partitionBy(InternalColumns.tmst)
+              writeDataFrame(dfw, newFilePath)
             } catch {
               case e: Throwable => error(s"save data error: ${e.getMessage}")
             } finally {
               newCacheLock.unlock()
             }
-//          }
+          }
         }
         case _ => {
           info(s"no data frame to save")
@@ -116,208 +122,95 @@ abstract class DataSourceCache(param: Map[String, Any], dsName: String, index: I
     }
   }
 
-  // return: (data frame option, time range)
+  // read new cache data and old cache data
   def readData(): (Option[DataFrame], TimeRange) = {
-    val tr = TimeInfoCache.getTimeRange
-    val timeRange = (tr._1 + minUnitTime, tr._2)
-    submitLastProcTime(timeRange._2)
-
+    // time range: [a, b)
+    val timeRange = TimeInfoCache.getTimeRange
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-    submitCleanTime(reviseTimeRange._1)
 
-    // read directly through partition info
-    val partitionRanges = getPartitionRange(reviseTimeRange._1, reviseTimeRange._2)
-    println(s"read time ranges: ${reviseTimeRange}")
-    println(s"read partition ranges: ${partitionRanges}")
+    // next last proc time
+    submitLastProcTime(timeRange._2)
+    // next clean time
+    val nextCleanTime = timeRange._2 + deltaTimeRange._1
+    submitCleanTime(nextCleanTime)
 
-    // list partition paths
-    val partitionPaths = listPathsBetweenRanges(filePath :: Nil, partitionRanges)
+    // read partition info
+    val filterStr = s"`${InternalColumns.tmst}` >= ${reviseTimeRange._1} AND `${InternalColumns.tmst}` < ${reviseTimeRange._2}"
+    println(s"read time range: [${reviseTimeRange._1}, ${reviseTimeRange._2})")
 
-    val dfOpt = if (partitionPaths.isEmpty) {
-      None
-    } else {
+    // new cache data
+    val newDfOpt = try {
+      val dfr = sqlContext.read
+      Some(readDataFrame(dfr, newFilePath).filter(filterStr))
+    } catch {
+      case e: Throwable => {
+        warn(s"read data source cache warn: ${e.getMessage}")
+        None
+      }
+    }
+
+    // old cache data
+    val oldCacheIndexOpt = if (updatable) readOldCacheIndex else None
+    val oldDfOpt = oldCacheIndexOpt.flatMap { idx =>
+      val oldDfPath = s"${oldFilePath}/${idx}"
       try {
-        readDataFrame(partitionPaths)
+        val dfr = sqlContext.read
+//        Some(readDataFrame(dfr, oldDfPath).filter(filterStr))
+        Some(readDataFrame(dfr, oldDfPath))   // not need to filter, has filtered in update phase
       } catch {
         case e: Throwable => {
-          warn(s"read data source cache warn: ${e.getMessage}")
+          warn(s"read old data source cache warn: ${e.getMessage}")
           None
         }
       }
     }
 
+    // whole cache data
+    val cacheDfOpt = unionDfOpts(newDfOpt, oldDfOpt)
+
     // from until tmst range
-    val (from, until) = (reviseTimeRange._1, reviseTimeRange._2 + 1)
+    val (from, until) = (reviseTimeRange._1, reviseTimeRange._2)
     val tmstSet = rangeTmsts(from, until)
 
     val retTimeRange = TimeRange(reviseTimeRange, tmstSet)
-    (dfOpt, retTimeRange)
+    (cacheDfOpt, retTimeRange)
   }
 
-  // not used actually
-  def updateData(df: DataFrame, ms: Long): Unit = {
-//    if (!readOnly) {
-//      val ptns = getPartition(ms)
-//      val ptnsPath = genPartitionHdfsPath(ptns)
-//      val dirPath = s"${filePath}/${ptnsPath}"
-//      val dataFileName = s"${ms}"
-//      val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
-//
-//      try {
-//        val records = df.toJSON
-//        val arr = records.collect
-//        val needSave = !arr.isEmpty
-//
-//        // remove out time old data
-//        HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
-//        println(s"remove file path: ${dirPath}/${dataFileName}")
-//
-//        // save updated data
-//        if (needSave) {
-//          HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
-//          println(s"update file path: ${dataFilePath}")
-//        } else {
-//          clearTmst(ms)
-//          println(s"data source [${dsName}] timestamp [${ms}] cleared")
-//        }
-//      } catch {
-//        case e: Throwable => error(s"update data error: ${e.getMessage}")
-//      }
-//    }
-  }
-
-  // in update data map (not using now)
-  def updateData(rdd: RDD[String], ms: Long, cnt: Long): Unit = {
-//    if (!readOnly) {
-//      val ptns = getPartition(ms)
-//      val ptnsPath = genPartitionHdfsPath(ptns)
-//      val dirPath = s"${filePath}/${ptnsPath}"
-//      val dataFileName = s"${ms}"
-//      val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
-//
-//      try {
-//        //      val needSave = !rdd.isEmpty
-//
-//        // remove out time old data
-//        removeDatPath(dataFilePath)
-////        HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
-//        println(s"remove file path: ${dataFilePath}")
-//
-//        // save updated data
-//        if (cnt > 0) {
-//          saveDataRdd(dataFilePath)
-////          HdfsFileDumpUtil.dump(dataFilePath, rdd, rowSepLiteral)
-//          println(s"update file path: ${dataFilePath}")
-//        } else {
-//          clearTmst(ms)
-//          println(s"data source [${dsName}] timestamp [${ms}] cleared")
-//        }
-//      } catch {
-//        case e: Throwable => error(s"update data error: ${e.getMessage}")
-//      } finally {
-//        rdd.unpersist()
-//      }
-//    }
-  }
-
-  // in streaming mode
-  def updateData(arr: Iterable[String], ms: Long): Unit = {
-    if (!readOnly) {
-      val dataFilePath = getDataFilePath(ms)
-
-      try {
-        val needSave = !arr.isEmpty
-
-        // remove out time old data
-        removeDataPath(dataFilePath)
-//        HdfsFileDumpUtil.remove(dirPath, dataFileName, true)
-        println(s"remove file path: ${dataFilePath}")
-
-        // save updated data
-        if (needSave) {
-          saveDataList(arr, dataFilePath)
-//          HdfsFileDumpUtil.dump(dataFilePath, arr, rowSepLiteral)
-          println(s"update file path: ${dataFilePath}")
-        } else {
-          clearTmst(ms)
-          println(s"data source [${dsName}] timestamp [${ms}] cleared")
-        }
-      } catch {
-        case e: Throwable => error(s"update data error: ${e.getMessage}")
-      }
+  private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
+                         ): Option[DataFrame] = {
+    (dfOpt1, dfOpt2) match {
+      case (Some(df1), Some(df2)) => Some(df1 unionAll df2)
+      case (Some(df1), _) => dfOpt1
+      case (_, Some(df2)) => dfOpt2
+      case _ => None
     }
   }
 
-  def updateDataMap(dfMap: Map[Long, DataFrame]): Unit = {
-//    if (!readOnly) {
-//      val dataMap = dfMap.map { pair =>
-//        val (t, recs) = pair
-//        val rdd = recs.toJSON
-//        //      rdd.cache
-//        (t, rdd, rdd.count)
-//      }
-//
-//      dataMap.foreach { pair =>
-//        val (t, arr, cnt) = pair
-//        updateData(arr, t, cnt)
-//      }
-//    }
+  private def cleanOutTimePartitions(path: String, outTime: Long, partitionOpt: Option[String]): Unit = {
+    val earlierPaths = listEarlierPartitions(path: String, outTime, partitionOpt)
+    // delete out time data path
+    earlierPaths.foreach { path =>
+      println(s"delete hdfs path: ${path}")
+      HdfsUtil.deleteHdfsPath(path)
+    }
   }
-
-  def cleanOldData(): Unit = {
-    if (!readOnly) {
-//      val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
-//      if (oldCacheLocked) {
-        try {
-          val cleanTime = readCleanTime()
-          cleanTime match {
-            case Some(ct) => {
-              println(s"data source [${dsName}] old timestamps clear until [${ct}]")
-
-              // clear out date tmsts
-              clearTmstsUntil(ct)
-
-              // drop partitions
-              val bounds = getPartition(ct)
-
-              // list partition paths
-              val earlierPaths = listPathsEarlierThanBounds(filePath :: Nil, bounds)
-
-              // delete out time data path
-              earlierPaths.foreach { path =>
-                removeDataPath(path)
-              }
-            }
-            case _ => {
-              // do nothing
-            }
+  private def listEarlierPartitions(path: String, bound: Long, partitionOpt: Option[String]): Iterable[String] = {
+    val names = HdfsUtil.listSubPathsByType(path, "dir")
+    val regex = partitionOpt match {
+      case Some(partition) => s"^${partition}=(\\d+)$$".r
+      case _ => "^(\\d+)$".r
+    }
+    names.filter { name =>
+      name match {
+        case regex(value) => {
+          str2Long(value) match {
+            case Some(t) => (t < bound)
+            case _ => false
           }
-        } catch {
-          case e: Throwable => error(s"clean old data error: ${e.getMessage}")
-        } finally {
-          oldCacheLock.unlock()
         }
-//      }
-    }
-  }
-
-  override protected def genCleanTime(ms: Long): Long = {
-    val minPartitionUnit = partitionUnits.last
-    val t1 = TimeUtil.timeToUnit(ms, minPartitionUnit)
-    val t2 = TimeUtil.timeFromUnit(t1, minPartitionUnit)
-    t2
-  }
-
-  private def getPartition(ms: Long): List[Long] = {
-    partitionUnits.map { unit =>
-      TimeUtil.timeToUnit(ms, unit)
-    }
-  }
-  private def getPartitionRange(ms1: Long, ms2: Long): List[(Long, Long)] = {
-    getPartition(ms1).zip(getPartition(ms2))
-  }
-  private def genPartitionHdfsPath(partition: List[Long]): String = {
-    partition.map(prtn => s"${prtn}").mkString("/")
+        case _ => false
+      }
+    }.map(name => s"${path}/${name}")
   }
   private def str2Long(str: String): Option[Long] = {
     try {
@@ -327,64 +220,101 @@ abstract class DataSourceCache(param: Map[String, Any], dsName: String, index: I
     }
   }
 
-  private def getDataFilePath(ms: Long): String = {
-    val ptns = getPartition(ms)
-    val ptnsPath = genPartitionHdfsPath(ptns)
-    val dirPath = s"${filePath}/${ptnsPath}"
-    val dataFileName = s"${ms}"
-    val dataFilePath = HdfsUtil.getHdfsFilePath(dirPath, dataFileName)
-    dataFilePath
-  }
-
-
-  // here the range means [min, max]
-  private def listPathsBetweenRanges(paths: List[String],
-                                     partitionRanges: List[(Long, Long)]
-                                    ): List[String] = {
-    partitionRanges match {
-      case Nil => paths
-      case head :: tail => {
-        val (lb, ub) = head
-        val curPaths = paths.flatMap { path =>
-          val names = HdfsUtil.listSubPathsByType(path, "dir").toList
-          names.filter { name =>
-            str2Long(name) match {
-              case Some(t) => (t >= lb) && (t <= ub)
-              case _ => false
+  // clean out time from new cache data and old cache data
+  def cleanOutTimeData(): Unit = {
+    if (!readOnly) {
+      // new cache data
+      val newCacheCleanTime = if (updatable) readLastProcTime else readCleanTime
+      newCacheCleanTime match {
+        case Some(nct) => {
+          // clean calculated new cache data
+          val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
+          if (newCacheLocked) {
+            try {
+              cleanOutTimePartitions(newFilePath, nct, Some(InternalColumns.tmst))
+            } catch {
+              case e: Throwable => error(s"clean new cache data error: ${e.getMessage}")
+            } finally {
+              newCacheLock.unlock()
             }
-          }.map(HdfsUtil.getHdfsFilePath(path, _))
+          }
         }
-        listPathsBetweenRanges(curPaths, tail)
+        case _ => {
+          // do nothing
+        }
+      }
+
+      // old cache data
+      val oldCacheCleanTime = if (updatable) readCleanTime else None
+      oldCacheCleanTime match {
+        case Some(oct) => {
+          val oldCacheIndexOpt = readOldCacheIndex
+          oldCacheIndexOpt.foreach { idx =>
+            val oldDfPath = s"${oldFilePath}/${idx}"
+            val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
+            if (oldCacheLocked) {
+              try {
+                // clean calculated old cache data
+                cleanOutTimePartitions(oldFilePath, idx, None)
+                // clean out time old cache data not calculated
+//                cleanOutTimePartitions(oldDfPath, oct, Some(InternalColumns.tmst))
+              } catch {
+                case e: Throwable => error(s"clean old cache data error: ${e.getMessage}")
+              } finally {
+                oldCacheLock.unlock()
+              }
+            }
+          }
+        }
+        case _ => {
+          // do nothing
+        }
       }
     }
   }
-  private def listPathsEarlierThanBounds(paths: List[String], bounds: List[Long]
-                                        ): List[String] = {
-    bounds match {
-      case Nil => paths
-      case head :: tail => {
-        val earlierPaths = paths.flatMap { path =>
-          val names = HdfsUtil.listSubPathsByType(path, "dir").toList
-          names.filter { name =>
-            str2Long(name) match {
-              case Some(t) => (t < head)
-              case _ => false
-            }
-          }.map(HdfsUtil.getHdfsFilePath(path, _))
-        }
-        val equalPaths = paths.flatMap { path =>
-          val names = HdfsUtil.listSubPathsByType(path, "dir").toList
-          names.filter { name =>
-            str2Long(name) match {
-              case Some(t) => (t == head)
-              case _ => false
-            }
-          }.map(HdfsUtil.getHdfsFilePath(path, _))
-        }
 
-        tail match {
-          case Nil => earlierPaths
-          case _ => earlierPaths ::: listPathsEarlierThanBounds(equalPaths, tail)
+  // update old cache data
+  def updateData(dfOpt: Option[DataFrame]): Unit = {
+    if (!readOnly && updatable) {
+      dfOpt match {
+        case Some(df) => {
+          // old cache lock
+          val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
+          if (oldCacheLocked) {
+            try {
+              val oldCacheIndexOpt = readOldCacheIndex
+              val nextOldCacheIndex = oldCacheIndexOpt.getOrElse(defOldCacheIndex) + 1
+
+              val oldDfPath = s"${oldFilePath}/${nextOldCacheIndex}"
+//              val dfw = df.write.mode(SaveMode.Overwrite).partitionBy(InternalColumns.tmst)
+              val cleanTime = readCleanTime
+              val updateDf = cleanTime match {
+                case Some(ct) => {
+                  val filterStr = s"`${InternalColumns.tmst}` >= ${ct}"
+                  df.filter(filterStr)
+                }
+                case _ => df
+              }
+
+              // coalesce partition number
+              val prlCount = sqlContext.sparkContext.defaultParallelism
+              val ptnCount = updateDf.rdd.getNumPartitions
+              val repartitionedDf = if (prlCount < ptnCount) {
+                updateDf.coalesce(prlCount)
+              } else updateDf
+              val dfw = repartitionedDf.write.mode(SaveMode.Overwrite)
+              writeDataFrame(dfw, oldDfPath)
+
+              submitOldCacheIndex(nextOldCacheIndex)
+            } catch {
+              case e: Throwable => error(s"update data error: ${e.getMessage}")
+            } finally {
+              oldCacheLock.unlock()
+            }
+          }
+        }
+        case _ => {
+          info(s"no data frame to update")
         }
       }
     }

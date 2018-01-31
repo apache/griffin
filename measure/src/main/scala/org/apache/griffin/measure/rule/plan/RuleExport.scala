@@ -30,6 +30,4 @@ trait RuleExport extends Serializable {
 
   val mode: ExportMode   // export mode
 
-  def setDefTimestamp(t: Long): RuleExport
-
 }
