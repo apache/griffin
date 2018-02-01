@@ -20,7 +20,7 @@ package org.apache.griffin.measure.process.temp
 
 import scala.math.{min, max}
 
-case class TimeRange(begin: Long, end: Long, tmsts: Set[Long]) extends Serializable {
+  case class TimeRange(begin: Long, end: Long, tmsts: Set[Long]) extends Serializable {
   def merge(tr: TimeRange): TimeRange = {
     TimeRange(min(begin, tr.begin), max(end, tr.end), tmsts ++ tr.tmsts)
   }

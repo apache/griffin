@@ -18,8 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.process
 
-import java.util.Date
-
 import org.apache.griffin.measure.cache.info.InfoCacheInstance
 import org.apache.griffin.measure.config.params._
 import org.apache.griffin.measure.config.params.env._
@@ -29,8 +27,7 @@ import org.apache.griffin.measure.persist.{Persist, PersistFactory}
 import org.apache.griffin.measure.process.engine.DqEngineFactory
 import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.RuleAdaptorGroup
-import org.apache.griffin.measure.rule.plan.TimeInfo
-import org.apache.griffin.measure.rule.udf.GriffinUdfs
+import org.apache.griffin.measure.rule.udf._
 import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
@@ -67,6 +64,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
 
     // register udf
     GriffinUdfs.register(sqlContext)
+    GriffinUdafs.register(sqlContext)
 
     // init adaptors
     val dataSourceNames = userParam.dataSources.map(_.name)
