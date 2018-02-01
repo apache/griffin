@@ -31,6 +31,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -47,31 +48,40 @@ public class MetricStoreImpl implements MetricStore {
 
     private static final String INDEX = "griffin";
     private static final String TYPE = "accuracy";
-    private static final String URL_BASE = "/griffin/accuracy";
 
     private RestClient client;
     private HttpHeaders headers;
+    private String url_base;
     private String url_get;
     private String url_delete;
     private String url_post;
     private ObjectMapper mapper;
 
-    public MetricStoreImpl(@Value("${elasticsearch.host}") String host, @Value("${elasticsearch.port}") int port) {
-        client = RestClient.builder(new HttpHost(host, port, "http")).build();
+    public MetricStoreImpl(@Value("${elasticsearch.host}") String host,
+                           @Value("${elasticsearch.port}") int port) {
+        this.client = RestClient.builder(new HttpHost(host, port, "http")).build();
+        this.url_base = "/" + INDEX + "/" + TYPE;
+        this.url_get = url_base + "/_search?filter_path=hits.hits._source";
+        this.url_post = url_base + "/_bulk";
+        this.url_delete = url_base + "/_delete_by_query";
+        this.mapper = new ObjectMapper();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         this.headers = headers;
-        this.url_get = URL_BASE + "/_search?filter_path=hits.hits._source";
-        this.url_post = URL_BASE + "/_bulk";
-        this.url_delete = URL_BASE + "/_delete_by_query";
-        this.mapper = new ObjectMapper();
     }
 
     @Override
     public List<MetricValue> getMetricValues(String metricName, int from, int size) throws IOException {
         HttpEntity entity = getHttpEntityForSearch(metricName, from, size);
-        Response response = client.performRequest("GET", url_get, Collections.emptyMap(), entity);
-        return getMetricValuesFromResponse(response);
+        try {
+            Response response = client.performRequest("GET", url_get, Collections.emptyMap(), entity);
+            return getMetricValuesFromResponse(response);
+        } catch (ResponseException e) {
+            if (e.getResponse().getStatusLine().getStatusCode() == 404) {
+                return Collections.emptyList();
+            }
+            throw e;
+        }
     }
 
     private HttpEntity getHttpEntityForSearch(String metricName, int from, int size) throws JsonProcessingException {
