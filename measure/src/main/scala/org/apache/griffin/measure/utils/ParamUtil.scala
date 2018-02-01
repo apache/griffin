@@ -185,6 +185,17 @@ object ParamUtil {
       }
     }
 
+    def getArr[T](key: String): Seq[T] = {
+      try {
+        params.get(key) match {
+          case Some(seq: Seq[T]) => seq
+          case _ => Nil
+        }
+      } catch {
+        case _: Throwable => Nil
+      }
+    }
+
     def addIfNotExist(key: String, value: Any): Map[String, Any] = {
       params.get(key) match {
         case Some(v) => params

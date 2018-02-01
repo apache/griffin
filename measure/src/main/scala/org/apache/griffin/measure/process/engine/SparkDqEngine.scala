@@ -18,8 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.process.engine
 
-import org.apache.griffin.measure.cache.tmst.{TempName, TmstCache}
-import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.process._
 import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.rule.dsl._
@@ -101,7 +99,6 @@ trait SparkDqEngine extends DqEngine {
     } else emptyMetricMap
   }
 
-
   private def getTmst(row: Row, defTmst: Long): Long = {
     try {
       row.getAs[Long](InternalColumns.tmst)
@@ -110,46 +107,9 @@ trait SparkDqEngine extends DqEngine {
     }
   }
 
-//  def collectRecords(timeInfo: TimeInfo, recordExport: RecordExport): Map[Long, DataFrame] = {
-//    if (collectable) {
-//      val RecordExport(_, stepName, _, originDFOpt, defTmst, procType) = recordExport
-//      val stepDf = sqlContext.table(s"`${stepName}`")
-//      val recordsDf = originDFOpt match {
-//        case Some(originName) => sqlContext.table(s"`${originName}`")
-//        case _ => stepDf
-//      }
-//
-//      procType match {
-//        case BatchProcessType => {
-//          val recordsDf = sqlContext.table(s"`${stepName}`")
-//          emptyRecordMap + (defTmst -> recordsDf)
-//        }
-//        case StreamingProcessType => {
-//          originDFOpt match {
-//            case Some(originName) => {
-//              val recordsDf = sqlContext.table(s"`${originName}`")
-//              stepDf.map { row =>
-//                val tmst = getTmst(row, defTmst)
-//                val trdf = if (recordsDf.columns.contains(InternalColumns.tmst)) {
-//                  recordsDf.filter(s"`${InternalColumns.tmst}` = ${tmst}")
-//                } else recordsDf
-//                (tmst, trdf)
-//              }.collect.toMap
-//            }
-//            case _ => {
-//              val recordsDf = stepDf
-//              emptyRecordMap + (defTmst -> recordsDf)
-//            }
-//          }
-//        }
-//      }
-//    } else emptyRecordMap
-//  }
-
   private def getRecordDataFrame(recordExport: RecordExport): Option[DataFrame] = {
     if (collectable) {
-      val RecordExport(_, stepName, _, _, defTmst, procType) = recordExport
-      val stepDf = sqlContext.table(s"`${stepName}`")
+      val stepDf = sqlContext.table(s"`${recordExport.stepName}`")
       Some(stepDf)
     } else None
   }
@@ -209,187 +169,14 @@ trait SparkDqEngine extends DqEngine {
       }
       case _ => (None, Set[Long]())
     }
-//    val recordsOpt = getRecordDataFrame(recordExport).flatMap { stepDf =>
-//      originDFOpt match {
-//        case Some(originName) => {
-//          val tmsts = (stepDf.collect.flatMap { row =>
-//            try {
-//              val tmst = row.getAs[Long](InternalColumns.tmst)
-//              val empty = row.getAs[Boolean](InternalColumns.empty)
-//              Some((tmst, empty))
-//            } catch {
-//              case _: Throwable => None
-//            }
-//          })
-//          val emptyTmsts = tmsts.filter(_._2).map(_._1).toSet
-//          val recordTmsts = tmsts.filter(!_._2).map(_._1).toSet
-//          if (recordTmsts.size > 0) {
-//            val recordsDf = sqlContext.table(s"`${originName}`")
-//            val records = recordsDf.flatMap { row =>
-//              val tmst = row.getAs[Long](InternalColumns.tmst)
-//              if (recordTmsts.contains(tmst)) {
-//                try {
-//                  val map = SparkRowFormatter.formatRow(row)
-//                  val str = JsonUtil.toJson(map)
-//                  Some((tmst, str))
-//                } catch {
-//                  case e: Throwable => None
-//                }
-//              } else None
-//            }
-//            Some((Some(records.groupByKey), emptyTmsts))
-//          } else Some((None, emptyTmsts))
-//        }
-//        case _ => {
-//          val records = stepDf.flatMap { row =>
-//            val tmst = row.getAs[Long](InternalColumns.tmst)
-//            try {
-//              val map = SparkRowFormatter.formatRow(row)
-//              val str = JsonUtil.toJson(map)
-//              Some((tmst, str))
-//            } catch {
-//              case e: Throwable => None
-//            }
-//          }
-//          Some(records.groupByKey)
-//        }
-//      }
-//    }
   }
 
-//
-//  def collectUpdateRDD(ruleStep: ConcreteRuleStep): Option[DataFrame] = {
-//    if (collectable) {
-//      ruleStep match {
-//        case step: ConcreteRuleStep if ((step.ruleInfo.persistType == RecordPersistType)
-//          || (step.ruleInfo.cacheDataSourceOpt.nonEmpty)) => {
-//          val tmst = step.timeInfo.tmst
-////          val metricName = step.ruleInfo.name
-//
-//          step.ruleInfo.tmstNameOpt match {
-//            case Some(metricTmstName) => {
-//              try {
-//                val pdf = sqlContext.table(s"`${metricTmstName}`")
-//                Some(pdf)
-//              } catch {
-//                case e: Throwable => {
-//                  error(s"collect records ${metricTmstName} error: ${e.getMessage}")
-//                  None
-//                }
-//              }
-//            }
-//            case _ => None
-//          }
-//        }
-//        case _ => None
-//      }
-//    } else None
-//  }
-
-
-
-
-
-//  def collectUpdateRDD(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]
-//                      ): Option[RDD[(Long, Iterable[String])]] = {
-//    if (collectable) {
-//      ruleStep match {
-//        case step: ConcreteRuleStep if ((step.ruleInfo.persistType == RecordPersistType)
-//          || (step.ruleInfo.cacheDataSourceOpt.nonEmpty)) => {
-//          val tmst = step.timeInfo.tmst
-//          val metricName = step.ruleInfo.name
-//
-//          step.ruleInfo.tmstNameOpt match {
-//            case Some(metricTmstName) => {
-//              try {
-//                val pdf = sqlContext.table(s"`${metricTmstName}`")
-//                val cols = pdf.columns
-//                val rdd = pdf.flatMap { row =>
-//                  val values = cols.flatMap { col =>
-//                    Some((col, row.getAs[Any](col)))
-//                  }.toMap
-//                  values.get(GroupByColumn.tmst) match {
-//                    case Some(t: Long) if (timeGroups.exists(_ == t)) => Some((t, JsonUtil.toJson(values)))
-//                    case _ => None
-//                  }
-//                }.groupByKey()
-//
-//                // find other keys in time groups, create empty records for those timestamps
-//                val existKeys = rdd.keys.collect
-//                val otherKeys = timeGroups.filter(t => !existKeys.exists(_ == t))
-//                val otherPairs = otherKeys.map((_, Iterable[String]())).toSeq
-//                val otherPairRdd = sqlContext.sparkContext.parallelize(otherPairs)
-//
-//                Some(rdd union otherPairRdd)
-//              } catch {
-//                case e: Throwable => {
-//                  error(s"collect records ${metricTmstName} error: ${e.getMessage}")
-//                  None
-//                }
-//              }
-//            }
-//            case _ => None
-//          }
-//        }
-//        case _ => None
-//      }
-//    } else None
-//  }
-
-//  def collectRecords(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]] = {
-//    ruleStep match {
-//      case step: ConcreteRuleStep if (step.persistType == RecordPersistType) => {
-//        val name = step.name
-//        try {
-//          val pdf = sqlContext.table(s"`${name}`")
-//          val cols = pdf.columns
-//          val rdd = pdf.flatMap { row =>
-//            val values = cols.flatMap { col =>
-//              Some((col, row.getAs[Any](col)))
-//            }.toMap
-//            values.get(GroupByColumn.tmst) match {
-//              case Some(t: Long) if (timeGroups.exists(_ == t)) => Some((t, JsonUtil.toJson(values)))
-//              case _ => None
-//            }
-//          }.groupByKey()
-//          Some(rdd)
-//        } catch {
-//          case e: Throwable => {
-//            error(s"collect records ${name} error: ${e.getMessage}")
-//            None
-//          }
-//        }
-//      }
-//      case _ => None
-//    }
-//  }
-//
-//  def collectUpdateCacheDatas(ruleStep: ConcreteRuleStep, timeGroups: Iterable[Long]): Option[RDD[(Long, Iterable[String])]] = {
-//    ruleStep match {
-//      case step: ConcreteRuleStep if (step.updateDataSource.nonEmpty) => {
-//        val name = step.name
-//        try {
-//          val pdf = sqlContext.table(s"`${name}`")
-//          val cols = pdf.columns
-//          val rdd = pdf.flatMap { row =>
-//            val values = cols.flatMap { col =>
-//              Some((col, row.getAs[Any](col)))
-//            }.toMap
-//            values.get(GroupByColumn.tmst) match {
-//              case Some(t: Long) if (timeGroups.exists(_ == t)) => Some((t, JsonUtil.toJson(values)))
-//              case _ => None
-//            }
-//          }.groupByKey()
-//          Some(rdd)
-//        } catch {
-//          case e: Throwable => {
-//            error(s"collect update cache datas ${name} error: ${e.getMessage}")
-//            None
-//          }
-//        }
-//      }
-//      case _ => None
-//    }
-//  }
+  def collectUpdateDf(dsUpdate: DsUpdate): Option[DataFrame] = {
+    if (collectable) {
+      val DsUpdate(_, stepName) = dsUpdate
+      val stepDf = sqlContext.table(s"`${stepName}`")
+      Some(stepDf)
+    } else None
+  }
 
 }
