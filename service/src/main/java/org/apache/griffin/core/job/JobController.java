@@ -19,12 +19,9 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.JobDataBean;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
-import org.apache.griffin.core.util.GriffinOperationMessage;
+import org.apache.griffin.core.job.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,18 +39,21 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
-    public GriffinOperationMessage addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
+    @ResponseStatus(HttpStatus.CREATED)
+    public GriffinJob addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
         return jobService.addJob(jobSchedule);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteJob(@RequestParam("jobName") String jobName) {
-        return jobService.deleteJob(jobName);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteJob(@RequestParam("jobName") String jobName) {
+        jobService.deleteJob(jobName);
     }
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.DELETE)
-    public GriffinOperationMessage deleteJob(@PathVariable("id") Long id) {
-        return jobService.deleteJob(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteJob(@PathVariable("id") Long id) {
+        jobService.deleteJob(id);
     }
 
     @RequestMapping(value = "/jobs/instances", method = RequestMethod.GET)

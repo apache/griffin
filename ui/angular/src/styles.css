@@ -22,6 +22,7 @@ under the License.
 @import url('../node_modules/font-awesome/css/font-awesome.css');
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import url('../node_modules/angular2-toaster/toaster.css');
+@import url('../node_modules/nouislider/distribute/nouislider.min.css');
 
 
 /*@import url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css');*/
@@ -1092,6 +1093,7 @@ tbody {
   text-align: center;
   border: 5px solid #c5c5c5;
   border-radius: 3px;
+  color: #999;
 }
 
 #hourSelector{
@@ -1108,7 +1110,7 @@ tbody {
 }
 
 
-#secondSelector{
+#daySelector{
   width:20%;
   height:100%;
   display: inline-block;
@@ -1170,12 +1172,12 @@ input{
     background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAApUlEQVQ4T8XULQ7CQBCG4fcTWBJuVodEcAEEBtcbcAU0Bq7ATQgKi0PQTAOhzdD0b7aC9fPs7O43K+AEbIArCUtmZpLepRdgFYU+QLXxFzoD2dhmfgAHFcABWA9BrUAE6gUa0BbYNzsaBTjoAeQeCgFtUBLgoPt/AEn1XYQ68IX1MXwSu0Ij6Qnsws8ozQp49SayI8oLg/kRbstQlJOHadI4T/1QSjKSYdGc5u4/AAAAAElFTkSuQmCC') !important;
  }
 
-/* .myclass {
+ .myclass {
     position: relative;
     z-index: 9999;
 }
 
-#mainWindow {
+/*#mainWindow {
     position: relative;
     z-index: 1;
 }*/

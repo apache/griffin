@@ -100,7 +100,7 @@ public class SparkSubmitJob implements Job {
         return result;
     }
 
-    private boolean success(List<SegmentPredicate> predicates) throws IOException {
+    private boolean success(List<SegmentPredicate> predicates) {
         if (CollectionUtils.isEmpty(predicates)) {
             return true;
         }
@@ -197,8 +197,9 @@ public class SparkSubmitJob implements Job {
         String result = post2Livy();
         boolean pauseStatus = false;
         if (result != null) {
-            pauseStatus = jobService.pauseJob(jd.getKey().getGroup(), jd.getKey().getName());
-            LOGGER.info("Delete predicate job {}.", pauseStatus ? "success" : "failure");
+            jobService.pauseJob(jd.getKey().getGroup(), jd.getKey().getName());
+            pauseStatus = true;
+            LOGGER.info("Delete predicate job {} success");
         }
         saveJobInstance(result, LivySessionStates.State.found, pauseStatus);
     }

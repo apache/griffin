@@ -16,82 +16,85 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit, OnChanges, SimpleChanges, OnDestroy,AfterViewInit,NgZone } from '@angular/core';
-import {ChartService} from '../../service/chart.service';
-import {ServiceService} from '../../service/service.service';
-
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import 'rxjs/add/operator/switchMap';
-import {HttpClient} from '@angular/common/http';
-import * as $ from 'jquery';
+import { Component, OnInit, OnChanges, SimpleChanges, OnDestroy, AfterViewInit, NgZone } from "@angular/core";
+import { ChartService } from "../../service/chart.service";
+import { ServiceService } from "../../service/service.service";
+import { Router, ActivatedRoute, ParamMap } from "@angular/router";
+import "rxjs/add/operator/switchMap";
+import { HttpClient } from "@angular/common/http";
+import * as $ from "jquery";
 
 @Component({
-  selector: 'app-detail-metric',
-  templateUrl: './detail-metric.component.html',
-  styleUrls: ['./detail-metric.component.css'],
-  providers:[ChartService,ServiceService]
+  selector: "app-detail-metric",
+  templateUrl: "./detail-metric.component.html",
+  styleUrls: ["./detail-metric.component.css"],
+  providers: [ChartService, ServiceService]
 })
 export class DetailMetricComponent implements OnInit {
-
-  constructor(public chartService:ChartService,private route: ActivatedRoute,
-  private router: Router,private http:HttpClient,private zone:NgZone,public serviceService:ServiceService
-) {
-    //     var self = this;
-    // setTimeout(function () {
-    //     self.currentMeasure = self.route.snapshot.paramMap.get('name');
-    //     self.chartOption = self.chartService.getOptionBig(self.getData(self.currentMeasure));
-    //     $('#bigChartDiv').height(window.innerHeight-120+'px');
-    //     $('#bigChartDiv').width(window.innerWidth-400+'px');
-    //     $('#bigChartContainer').show();
-    // },200);
-  };
-  selectedMeasure:string;
-  chartOption:{};
-  data:any;
-  currentMeasure:string;
-  finalData:any;
+  constructor(
+    public chartService: ChartService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private http: HttpClient,
+    private zone: NgZone,
+    public serviceService: ServiceService
+  ) {}
+  selectedMeasure: string;
+  chartOption: {};
+  data: any;
+  currentJob: string;
+  finalData: any;
+  metricName: string;
+  size = 300;
+  offset = 0;
 
   ngOnInit() {
-  	this.currentMeasure = this.route.snapshot.paramMap.get('name');
+    this.currentJob = this.route.snapshot.paramMap.get("name");
     var self = this;
-    var metricDetailUrl = this.serviceService.config.uri.dashboard;
-    this.http.post(metricDetailUrl, {"query": {  "bool":{"filter":[ {"term" : {"name.keyword": this.currentMeasure }}]}},  "sort": [{"tmst": {"order": "desc"}}],"size":10000}).subscribe( data=> {
-      var metric = {
-        'name':'',
-        'timestamp':0,
-        'dq':0,
-        'details':[]
-      };
-      this.data = data;
-      if(this.data){
-        metric.name = this.data.hits.hits[0]._source.name;
-        metric.timestamp =this.data.hits.hits[this.data.hits.hits.length-1]._source.tmst;
-        metric.dq = this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched/this.data.hits.hits[this.data.hits.hits.length-1]._source.value.matched*100;
-        metric.details = new Array();
-        for(let point of this.data.hits.hits){
-          metric.details.push(point);
+    var metricdetail = self.serviceService.config.uri.metricdetail;
+    var metricDetailUrl =
+      metricdetail +
+      "?metricName=" +
+      this.currentJob +
+      "&size=" +
+      this.size +
+      "&offset=" +
+      this.offset;
+    this.http.get(metricDetailUrl).subscribe(
+      data => {
+        var metric = {
+          name: "",
+          timestamp: 0,
+          dq: 0,
+          details: []
         };
+        this.data = data;
+        if (this.data) {
+          metric.name = this.data[0].name;
+          metric.timestamp = this.data[0].tmst;
+          metric.dq =
+            this.data[0].value.matched / this.data[0].value.total * 100;
+          metric.details = JSON.parse(JSON.stringify(this.data));
+        }
+        this.chartOption = this.chartService.getOptionBig(metric);
+        $("#bigChartDiv").height(window.innerHeight - 120 + "px");
+        $("#bigChartDiv").width(window.innerWidth - 400 + "px");
+        $("#bigChartContainer").show();
+      },
+      err => {
+        console.log("Error occurs when connect to elasticsearh!");
       }
-      this.chartOption = this.chartService.getOptionBig(metric);
-      $('#bigChartDiv').height(window.innerHeight-120+'px');
-      $('#bigChartDiv').width(window.innerWidth-400+'px');
-      $('#bigChartContainer').show();
-    },
-    err => {
-      console.log('Error occurs when connect to elasticsearh!');
-    });  
+    );
   }
 
-  onResize(event){
+  onResize(event) {
     this.resizeTreeMap();
   }
 
-  resizeTreeMap(){
-    $('#bigChartDiv').height( $('#mainWindow').height());
-    $('#bigChartDiv').width( $('#mainWindow').width());
+  resizeTreeMap() {
+    $("#bigChartDiv").height($("#mainWindow").height());
+    $("#bigChartDiv").width($("#mainWindow").width());
   }
 
-  getData(metricName){
-  	 
-  }
+  getData(metricName) {}
 }

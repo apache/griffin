@@ -21,7 +21,6 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.util.GriffinOperationMessage;
 
 import java.util.List;
 
@@ -36,16 +35,16 @@ public interface MeasureService {
 */
 
 
-    GriffinOperationMessage deleteMeasureById(Long id);
+    void deleteMeasureById(Long id);
 
 
 /*
     GriffinOperationMessage deleteMeasureByName(String measureName) ;
 */
 
-    GriffinOperationMessage updateMeasure(Measure measure);
+    void updateMeasure(Measure measure);
 
     List<Measure> getAliveMeasuresByOwner(String owner);
 
-    GriffinOperationMessage createMeasure(Measure measure);
+    Measure createMeasure(Measure measure);
 }

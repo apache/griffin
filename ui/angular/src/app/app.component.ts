@@ -14,65 +14,61 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component ,Directive,ViewContainerRef,OnInit,AfterViewChecked} from '@angular/core';
-// import { RouterModule, Routes } from '@angular/router';
-import { Router} from "@angular/router";
-import { HttpClient} from '@angular/common/http';
-import * as $ from 'jquery';
-import { ServiceService} from './service/service.service';
-import { UserService} from './service/user.service';
-import { Location, LocationStrategy, HashLocationStrategy} from '@angular/common';
-
-
-// import jQuery from 'jquery';
-
-// import  'bootstrap/dist/js/bootstrap.min.js';
-
+import { Component, Directive, ViewContainerRef, OnInit, AfterViewChecked } from "@angular/core";
+import { Router } from "@angular/router";
+import { HttpClient } from "@angular/common/http";
+import * as $ from "jquery";
+import { ServiceService } from "./service/service.service";
+import { UserService } from "./service/user.service";
+import { Location, LocationStrategy, HashLocationStrategy } from "@angular/common";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
-  providers:[ServiceService,UserService]
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"],
+  providers: [ServiceService, UserService]
 })
-export class AppComponent implements AfterViewChecked, OnInit{
-  title = 'app';
-  ntAccount : string;
-  timestamp:Date;
+export class AppComponent implements AfterViewChecked, OnInit {
+  title = "app";
+  ntAccount: string;
+  timestamp: Date;
   fullName: string;
-  onResize(event){
+  onResize(event) {
     this.resizeMainWindow();
-
   }
-  goback(){
+  goback() {
     this.location.back();
   }
-  ngOnInit(){
+  ngOnInit() {
     this.ntAccount = this.userService.getCookie("ntAccount");
     this.fullName = this.userService.getCookie("fullName");
   }
-  constructor(private router:Router,private http:HttpClient,private location: Location,public serviceService:ServiceService,public userService:UserService){
-
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private location: Location,
+    public serviceService: ServiceService,
+    public userService: UserService
+  ) {}
+  resizeMainWindow() {
+    $("#mainWindow").height(window.innerHeight - 56 - 20);
   }
-  resizeMainWindow(){
-    // $('#mainWindow').height(window.innerHeight-56-90);
-    $('#mainWindow').height(window.innerHeight-56-20);
-  }
-  logout(){
+  logout() {
     this.ntAccount = undefined;
-    this.userService.setCookie('ntAccount', undefined, -1);
-    this.userService.setCookie('fullName', undefined, -1);
-    this.router.navigate(['login']);
+    this.userService.setCookie("ntAccount", undefined, -1);
+    this.userService.setCookie("fullName", undefined, -1);
+    this.router.navigate(["login"]);
     window.location.reload();
     // window.location.replace ('login');
-   }
-  ngAfterViewChecked(){
+  }
+  ngAfterViewChecked() {
     this.resizeMainWindow();
-    $('#rightbar').css({
-      height: $('#mainWindow').height()+20
+    $("#rightbar").css({
+      height: $("#mainWindow").height() + 20
     });
-    $('#side-bar-metrics').css({
-      height: $('#mainContent').height()-$('#side-bar-stats').outerHeight()+70
+    $("#side-bar-metrics").css({
+      height:
+        $("#mainContent").height() - $("#side-bar-stats").outerHeight()
     });
-   }
+  }
 }

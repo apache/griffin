@@ -16,21 +16,21 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-.job{
-	font-size: 20px;
+.job {
+    font-size: 20px;
 }
 
-.info{
-	color: #b2c831;
+.info {
+    color: #b2c831;
 }
 
-.btn-o{
-  background:0 0!important;
+.btn-o {
+    background: 0 0 !important;
 }
 
-legend{
+legend {
     background-color: #000;
-    color: #007AFF; 
+    color: #007aff;
     left: 10px;
     padding: 0 10px;
     position: absolute;
@@ -39,8 +39,8 @@ legend{
     color: #fff;
     margin-bottom: 20px;
     font-size: 21px;
-    width: auto!important;
-    border: none!important;
+    width: auto !important;
+    border: none !important;
 }
 fieldset {
     border: 1px solid #e6e8e8;
@@ -53,22 +53,38 @@ fieldset {
     height: 320px;
 }
 
-.formStep{
+.formStep {
     background-color: #000;
 }
-.setcolor{
-	color: #b2c831;
+.setcolor {
+    color: #b2c831;
 }
-.setgrey{
-	color: #888888;
+.setgrey {
+    color: #888888;
 }
-.mat-calendar-table{
-	height: 400px;
+.mat-calendar-table {
+    height: 400px;
 }
-.mat-datepicker-content{
-	overflow-y: auto;
+.mat-datepicker-content {
+    overflow-y: auto;
 }
 
-#md-datepicker-0{
-	height:250px;
+#md-datepicker-0 {
+    height: 250px;
+}
+
+.center {
+    margin-left: 5%;
+}
+
+.range {
+    display: block;
+    width: 20%;
+    height: 10%;
+    margin-bottom: 5px;
+}
+.setborder {
+    border: 2px solid;
+    border-radius: 5px;
+    width: 8%;
 }

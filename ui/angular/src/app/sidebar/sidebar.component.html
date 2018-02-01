@@ -34,8 +34,9 @@ under the License.
       <div id="data-asset-pie"></div>
     </div>
   </div>
-  <div id="side-bar-metrics" class="row">
-    <div *ngFor="let outerItems of oData;let parent=index">
+  <!-- <div id="side-bar-metrics" class="row"> -->
+  <div id="side-bar-metrics" class="row y-scrollable">
+    <div *ngFor="let outerItems of finalData;let parent=index">
       <div class="well">
         <div class="col-sm-4 col-lg-4 col-md-4 ">
           <h4>
