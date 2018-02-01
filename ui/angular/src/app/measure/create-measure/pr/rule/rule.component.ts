@@ -31,5 +31,4 @@ export class RuleComponent implements OnInit {
   ngOnInit() {
   	this.vaType = '2';
   }
-
 }

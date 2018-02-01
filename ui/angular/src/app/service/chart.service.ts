@@ -16,76 +16,75 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
 @Injectable()
 export class ChartService {
-
-  constructor() { }
+  constructor() {}
 
   formatter_value(value, index) {
-      if (value < 1000) {
-          return value;
-      } else {
-          return value/1000;
-      }
+    if (value < 1000) {
+      return value;
+    } else {
+      return value / 1000;
+    }
   }
 
   formatter_yaxis_name(metric) {
-    return 'accuracy (%)';
+    return "accuracy (%)";
   }
 
   getUTCTimeStamp(timestamp) {
-    var TzOffset = new Date(timestamp).getTimezoneOffset()/60;
-    return timestamp-TzOffset*60*60*1000;
+    var TzOffset = new Date(timestamp).getTimezoneOffset() / 60;
+    return timestamp - TzOffset * 60 * 60 * 1000;
   }
 
   getTooltip(params) {
-    var result = '';
+    var result = "";
     if (params.length > 0) {
-          result = new Date(this.getUTCTimeStamp(params[0].data[0])).toUTCString().replace('GMT', '')+
-                      '<br /> Value : ' + params[0].data[1];
+      result =
+        new Date(this.getUTCTimeStamp(params[0].data[0]))
+          .toUTCString()
+          .replace("GMT", "") +
+        "<br /> Value : " +
+        params[0].data[1];
     }
     return result;
   }
 
   getTooltipPosition(point, params, dom) {
-      return [point[0]/2, point[1]/2];
+    return [point[0] / 2, point[1] / 2];
   }
 
   formatTimeStamp(timestamp) {
-      var TzOffset = new Date(timestamp).getTimezoneOffset()/60-7;
-      return timestamp+TzOffset*60*60*1000;
+    var TzOffset = new Date(timestamp).getTimezoneOffset() / 60 - 7;
+    return timestamp + TzOffset * 60 * 60 * 1000;
   }
-
-  // getMetricData(metric) {
-  //   var data = [];
-  //   var chartData = metric.details;
-  //   for(var i = 0; i < chartData.length; i++){
-  //          if(chartData[i]._source.total!=0)
-  //            data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((chartData[i]._source.value.matched/chartData[i]._source.value.total*100).toFixed(2))]);
-  //          else
-  //            data.push([this.formatTimeStamp(chartData[i]._source.tmst), parseFloat((0).toFixed(2))]);
-  //     }
-
-  //   data.sort(function(a, b){
-  //     return a[0] - b[0];
-  //   });
-  //   return data;
-  // }
 
   getMetricData(metric) {
     var data = [];
-    if(metric.details){
+    if (metric.details) {
       var chartData = metric.details;
-      for(var i = 0; i < chartData.length; i++){
-        if(chartData[i].value.total!=0)
-          data.push([this.formatTimeStamp(chartData[i].tmst), parseFloat((chartData[i].value.matched/chartData[i].value.total*100).toFixed(2))]);
+      for (var i = 0; i < chartData.length; i++) {
+        if (chartData[i].value.total != 0)
+          data.push([
+            this.formatTimeStamp(chartData[i].tmst),
+            parseFloat(
+              (
+                chartData[i].value.matched /
+                chartData[i].value.total *
+                100
+              ).toFixed(2)
+            )
+          ]);
         else
-          data.push([this.formatTimeStamp(chartData[i].tmst), parseFloat((0).toFixed(2))]);
+          data.push([
+            this.formatTimeStamp(chartData[i].tmst),
+            parseFloat((0).toFixed(2))
+          ]);
       }
     }
-    data.sort(function(a, b){
+    data.sort(function(a, b) {
       return a[0] - b[0];
     });
     return data;
@@ -98,65 +97,63 @@ export class ChartService {
       title: {
         show: false
       },
-      backgroundColor: 'transparent',
-      grid:{
-        right: '5%',
-        left: '5%',
-        bottom: '5%',
+      backgroundColor: "transparent",
+      grid: {
+        right: "5%",
+        left: "5%",
+        bottom: "5%",
         top: 30,
         containLabel: true
-
       },
-      tooltip : {
-          trigger: 'axis',
-          formatter : function(params) {
-            return self.getTooltip(params);
+      tooltip: {
+        trigger: "axis",
+        formatter: function(params) {
+          return self.getTooltip(params);
+        }
+      },
+      xAxis: {
+        type: "time",
+        splitLine: {
+          show: false
+        },
+        splitNumber: 2,
+        axisLine: {
+          lineStyle: {
+            color: "white"
           }
+        },
+        axisLabel: {
+          color: "white"
+        },
+        nameTextStyle: {
+          color: "white"
+        }
       },
-      xAxis : {
-              type : 'time',
-              splitLine: {
-                  show: false
-              },
-              splitNumber: 2,
-              axisLine:{
-              lineStyle:{
-                color:'white'
-              },
-            },
-            axisLabel:{
-              color:'white'
-            },
-            nameTextStyle:{
-              color:'white'
-            }
+      yAxis: {
+        type: "value",
+        scale: true,
+        splitNumber: 2,
+        name: "accuracy%",
+        axisLabel: {
+          formatter: this.formatter_value,
+          color: "white"
+        },
+        splitLine: {
+          lineStyle: {
+            type: "dashed"
+          }
+        },
+        axisLine: {
+          lineStyle: {
+            color: "white"
+          }
+        },
+        nameTextStyle: {
+          color: "white"
+        },
+        max: 100
       },
-      yAxis : {
-              type : 'value',
-              scale : true,
-              splitNumber: 2,
-              name: 'accuracy%',
-              axisLabel: {
-                  formatter: this.formatter_value,
-                  color:'white'
-              },
-              splitLine:{
-                lineStyle:{
-                  'type':'dashed'
-                }
-              },
-              axisLine:{
-              lineStyle:{
-                color:'white'
-              }
-            },
-              nameTextStyle:{
-                color:'white'
-              },
-              max:100
-              
-      },
-      series:{}
+      series: {}
     };
     option.series = this.getSeries(metric);
     return option;
@@ -166,21 +163,21 @@ export class ChartService {
     var series = [];
     var data = this.getMetricData(metric);
     series.push({
-          type: 'line',
-          data: data,
-          smooth:true,
-          lineStyle: {
-            normal: {
-                color: '#d48265'
-            }
-          },
-          itemStyle: {
-              normal: {
-                  color: '#d48265'
-              }
-          }
-      });
-      return series;
+      type: "line",
+      data: data,
+      smooth: true,
+      lineStyle: {
+        normal: {
+          color: "#d48265"
+        }
+      },
+      itemStyle: {
+        normal: {
+          color: "#d48265"
+        }
+      }
+    });
+    return series;
   }
 
   getSeries(metric) {
@@ -194,74 +191,74 @@ export class ChartService {
     var self = this;
     var option = {
       title: {
-        text:  metric.name,
-        left: 'center',
+        text: metric.name,
+        left: "center",
         textStyle: {
-            fontWeight: 'normal',
-            fontSize: 15,
-            color:'white'
+          fontWeight: "normal",
+          fontSize: 15,
+          color: "white"
         }
       },
-      backgroundColor: 'transparent',
-      grid:{
-        right: '7%',
-        left: '5%',
-        bottom: '5%',
+      backgroundColor: "transparent",
+      grid: {
+        right: "7%",
+        left: "5%",
+        bottom: "5%",
         containLabel: true
       },
-      tooltip : {
-          trigger: 'axis',
-          formatter : function(params) {
-            return self.getTooltip(params);
-          },
-          position: function(point, params, dom) {
-              return self.getTooltipPosition(point, params, dom);
+      tooltip: {
+        trigger: "axis",
+        formatter: function(params) {
+          return self.getTooltip(params);
+        },
+        position: function(point, params, dom) {
+          return self.getTooltipPosition(point, params, dom);
+        }
+      },
+      xAxis: {
+        axisLine: {
+          lineStyle: {
+            color: "white"
           }
+        },
+        type: "time",
+        splitLine: {
+          show: false
+        },
+        axisLabel: {
+          color: "white"
+        },
+        nameTextStyle: {
+          color: "white"
+        },
+        splitNumber: 2
       },
-      xAxis : {
-      		  axisLine:{
-      		  	lineStyle:{
-      		  		color:'white'
-      		  	}
-      		  },
-              type : 'time',
-              splitLine: {
-                  show: false
-              },
-              axisLabel:{
-              	color:'white'
-              },
-              nameTextStyle:{
-              	color:'white'
-              },
-              splitNumber: 2
+
+      yAxis: {
+        type: "value",
+        scale: true,
+        name: "accuracy%",
+        axisLabel: {
+          formatter: this.formatter_value,
+          color: "white"
+        },
+        splitLine: {
+          lineStyle: {
+            type: "dashed"
+          }
+        },
+        axisLine: {
+          lineStyle: {
+            color: "white"
+          }
+        },
+        nameTextStyle: {
+          color: "white"
+        },
+        splitNumber: 2,
+        max: 100
       },
-   
-      yAxis : {
-              type : 'value',
-              scale : true,
-              name: 'accuracy%',
-              axisLabel: {
-                  formatter: this.formatter_value,
-                  color:'white'
-              },
-              splitLine:{
-              	lineStyle:{
-              		'type':'dashed'
-              	}
-              },
-              axisLine:{
-      		  	lineStyle:{
-      		  		color:'white'
-      		  	}
-      		  },
-              nameTextStyle:{
-              	color:'white'
-              },
-              splitNumber: 2,
-              max:100
-      },
-      series:{}
+      series: {}
     };
     option.series = this.getSeries(metric);
     return option;
@@ -272,76 +269,79 @@ export class ChartService {
     var self = this;
     var option = {
       title: {
-        text:  metric.name,
-        link: '/measure/' + metric.name,
-        target: 'self',
-        left: 'center',
+        text: metric.name,
+        link: "/measure/" + metric.name,
+        target: "self",
+        left: "center",
         textStyle: {
-            fontSize: 25,
-            color:'white'
+          fontSize: 25,
+          color: "white"
         }
       },
       grid: {
-        right: '2%',
-        left: '2%',
+        right: "2%",
+        left: "2%",
         containLabel: true
       },
-      dataZoom: [{
-        type: 'inside',
-        start: 0,
-        throttle: 50
-      },{
-        show: true,
-        start: 0
-      }],
-      tooltip : {
-          trigger: 'axis',
-          formatter : function(params) {
-            return self.getTooltip(params);
+      dataZoom: [
+        {
+          type: "inside",
+          start: 0,
+          throttle: 50
+        },
+        {
+          show: true,
+          start: 0
+        }
+      ],
+      tooltip: {
+        trigger: "axis",
+        formatter: function(params) {
+          return self.getTooltip(params);
+        }
+      },
+      xAxis: {
+        axisLine: {
+          lineStyle: {
+            color: "white"
           }
+        },
+        type: "time",
+        splitLine: {
+          show: false
+        },
+        axisLabel: {
+          color: "white"
+        },
+        nameTextStyle: {
+          color: "white"
+        }
       },
-      xAxis : {
-      		  axisLine:{
-      		  	lineStyle:{
-      		  		color:'white'
-      		  	}
-      		  },
-              type : 'time',
-              splitLine: {
-                  show: false
-              },
-              axisLabel:{
-              	color:'white'
-              },
-              nameTextStyle:{
-              	color:'white'
-              }
-      },
-      yAxis : {
-              type : 'value',
-              scale : true,
-              splitLine:{
-              	lineStyle:{
-              		'type':'dashed'
-              	}
-              },
-              name: 'accuracy%',
-              axisLabel: {
-                  formatter: null,
-                  color:'white'
-              },
-              axisLine:{
-      		  	lineStyle:{
-      		  		color:'white'
-      		  	}
-      		  },
-              nameTextStyle:{
-              	color:'white'
-              },
-              max:100
+      yAxis: {
+        type: "value",
+        scale: true,
+        splitLine: {
+          lineStyle: {
+            type: "dashed"
+          }
+        },
+        name: "accuracy%",
+        axisLabel: {
+          formatter: null,
+          color: "white"
+        },
+        axisLine: {
+          lineStyle: {
+            color: "white"
+          }
+        },
+        nameTextStyle: {
+          color: "white"
+        },
+        max: 100
       },
       animation: true,
-      series:{}
+      series: {}
     };
     option.series = this.getSeries(metric);
     return option;
