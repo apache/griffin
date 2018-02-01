@@ -25,13 +25,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.util.JsonUtil;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,6 +43,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 
 @Component
@@ -50,17 +54,29 @@ public class MetricStoreImpl implements MetricStore {
     private static final String URL_BASE = "/griffin/accuracy";
 
     private RestClient client;
-    private HttpHeaders headers;
+    private HttpHeaders responseHeaders;
     private String url_get;
     private String url_delete;
     private String url_post;
     private ObjectMapper mapper;
 
-    public MetricStoreImpl(@Value("${elasticsearch.host}") String host, @Value("${elasticsearch.port}") int port) {
-        client = RestClient.builder(new HttpHost(host, port, "http")).build();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        this.headers = headers;
+    public MetricStoreImpl(@Value("${elasticsearch.host}") String host,
+                           @Value("${elasticsearch.port}") int port,
+                           @Value("${elasticsearch.scheme:http}") String scheme,
+                           @Value("${elasticsearch.user:}") String user,
+                           @Value("${elasticsearch.password:}") String password) {
+        HttpHost httpHost = new HttpHost(host, port, scheme);
+        RestClientBuilder builder = RestClient.builder(httpHost);
+        if (!user.isEmpty() && !password.isEmpty()) {
+            String encodedAuth = buildBasicAuthString(user, password);
+            Header[] requestHeaders = new Header[]{
+                    new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
+            builder.setDefaultHeaders(requestHeaders);
+        }
+        client = builder.build();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+        this.responseHeaders = responseHeaders;
         this.url_get = URL_BASE + "/_search?filter_path=hits.hits._source";
         this.url_post = URL_BASE + "/_bulk";
         this.url_delete = URL_BASE + "/_delete_by_query";
@@ -132,6 +148,12 @@ public class MetricStoreImpl implements MetricStore {
     private ResponseEntity getResponseEntityFromResponse(Response response) throws IOException {
         String body = EntityUtils.toString(response.getEntity());
         HttpStatus status = HttpStatus.valueOf(response.getStatusLine().getStatusCode());
-        return new ResponseEntity<>(body, headers, status);
+        return new ResponseEntity<>(body, responseHeaders, status);
+    }
+
+    private static String buildBasicAuthString (String user, String password) {
+        String auth = user + ":" + password;
+        String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
+        return encodedAuth;
     }
 }
