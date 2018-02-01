@@ -62,24 +62,24 @@ export class DetailMetricComponent implements OnInit {
       this.offset;
     this.http.get(metricDetailUrl).subscribe(
       data => {
-        var metric = {
-          name: "",
-          timestamp: 0,
-          dq: 0,
-          details: []
-        };
         this.data = data;
-        if (this.data) {
+        if(this.data && this.data[0].value.matched != undefined){
+          var metric = {
+            name: "",
+            timestamp: 0,
+            dq: 0,
+            details: []
+          };
           metric.name = this.data[0].name;
           metric.timestamp = this.data[0].tmst;
           metric.dq =
             this.data[0].value.matched / this.data[0].value.total * 100;
-          metric.details = JSON.parse(JSON.stringify(this.data));
+            metric.details = JSON.parse(JSON.stringify(this.data));
+          this.chartOption = this.chartService.getOptionBig(metric);
+          $("#bigChartDiv").height(window.innerHeight - 120 + "px");
+          $("#bigChartDiv").width(window.innerWidth - 400 + "px");
+          $("#bigChartContainer").show();
         }
-        this.chartOption = this.chartService.getOptionBig(metric);
-        $("#bigChartDiv").height(window.innerHeight - 120 + "px");
-        $("#bigChartDiv").width(window.innerWidth - 400 + "px");
-        $("#bigChartContainer").show();
       },
       err => {
         console.log("Error occurs when connect to elasticsearh!");
