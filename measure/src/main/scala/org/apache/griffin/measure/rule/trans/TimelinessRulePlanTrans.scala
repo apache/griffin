@@ -240,7 +240,8 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
         val percentileTableName = "__percentile"
         val percentileColName = details.getStringOrKey(_percentileColPrefix)
         val percentileCols = percentiles.map { pct =>
-          s"percentile_approx(${latencyColName}, ${pct}) AS `${percentileColName}_${pct}`"
+          val pctName = (pct * 100).toInt.toString
+          s"floor(percentile_approx(${latencyColName}, ${pct})) AS `${percentileColName}_${pctName}`"
         }.mkString(", ")
         val percentileSql = procType match {
           case BatchProcessType => {
@@ -251,7 +252,7 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
           }
           case StreamingProcessType => {
             s"""
-               |SELECT `${InternalColumns.tmst}`, `${percentileCols}`
+               |SELECT `${InternalColumns.tmst}`, ${percentileCols}
                |FROM `${latencyTableName}` GROUP BY `${InternalColumns.tmst}`
               """.stripMargin
           }
