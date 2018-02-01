@@ -26,11 +26,13 @@ object TimeInfoCache extends Loggable with Serializable {
   private val LastProcTime = "last.proc.time"
   private val ReadyTime = "ready.time"
   private val CleanTime = "clean.time"
+  private val OldCacheIndex = "old.cache.index"
 
   def cacheTime(path: String): String = s"${path}/${CacheTime}"
   def lastProcTime(path: String): String = s"${path}/${LastProcTime}"
   def readyTime(path: String): String = s"${path}/${ReadyTime}"
   def cleanTime(path: String): String = s"${path}/${CleanTime}"
+  def oldCacheIndex(path: String): String = s"${path}/${OldCacheIndex}"
 
   val infoPath = "info"
 

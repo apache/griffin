@@ -16,29 +16,22 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.data.connector.streaming
+package org.apache.griffin.measure.rule.trans
 
-import org.apache.griffin.measure.data.connector._
-import org.apache.griffin.measure.data.source.cache._
-import org.apache.griffin.measure.process.temp.TimeRange
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.streaming.dstream.InputDStream
+import org.apache.griffin.measure.rule.plan._
+import org.apache.griffin.measure.utils.ParamUtil._
 
-import scala.util.Try
+object DsUpdateFactory {
 
+  def genDsUpdate(param: Map[String, Any], defDsName: String,
+                  stepName: String): DsUpdate = {
+    DsUpdate(UpdateParamKeys.getName(param, defDsName), stepName)
+  }
 
-trait StreamingDataConnector extends DataConnector {
+}
 
-  type K
-  type V
+object UpdateParamKeys {
+  val _name = "name"
 
-  protected def stream(): Try[InputDStream[(K, V)]]
-
-  def transform(rdd: RDD[(K, V)]): Option[DataFrame]
-
-  def data(ms: Long): (Option[DataFrame], TimeRange) = (None, TimeRange.emptyTimeRange)
-
-  var dataSourceCacheOpt: Option[DataSourceCache] = None
-
+  def getName(param: Map[String, Any], defName: String): String = param.getString(_name, defName)
 }
