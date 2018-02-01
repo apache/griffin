@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.util.JsonUtil;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Map;
 
@@ -37,11 +38,14 @@ public class Rule extends AbstractAuditableEntity {
     /**
      * three type:1.griffin-dsl 2.df-opr 3.spark-sql
      */
+    @NotNull
     private String dslType;
 
+    @NotNull
     private String dqType;
 
     @Column(length = 8 * 1024)
+    @NotNull
     private String rule;
 
     private String name;
