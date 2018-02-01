@@ -29,7 +29,7 @@ import org.apache.griffin.measure.process.engine._
 import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters, TimeRange}
 import org.apache.griffin.measure.rule.adaptor._
 import org.apache.griffin.measure.rule.plan._
-import org.apache.griffin.measure.rule.udf.GriffinUdfs
+import org.apache.griffin.measure.rule.udf._
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}
@@ -60,6 +60,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
 
     // register udf
     GriffinUdfs.register(sqlContext)
+    GriffinUdafs.register(sqlContext)
 
     // init adaptors
     RuleAdaptorGroup.init(sqlContext, dataSourceNames, baselineDsName)

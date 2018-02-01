@@ -132,4 +132,8 @@ case class DataSource(sqlContext: SQLContext,
     dataSourceCacheOpt.foreach(_.cleanOutTimeData)
   }
 
+  def processFinish(): Unit = {
+    dataSourceCacheOpt.foreach(_.processFinish)
+  }
+
 }

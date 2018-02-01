@@ -44,6 +44,8 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
     val _step = "step"
     val _count = "count"
     val _stepSize = "step.size"
+    val _percentileColPrefix = "percentile"
+    val _percentileValues = "percentile.values"
   }
   import TimelinessKeys._
 
@@ -232,8 +234,45 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
         case _ => emptyRulePlan
       }
 
-      timePlan.merge(recordPlan).merge(rangePlan)
+      // 6. percentiles
+      val percentiles = getPercentiles(details)
+      val percentilePlan = if (percentiles.size > 0) {
+        val percentileTableName = "__percentile"
+        val percentileColName = details.getStringOrKey(_percentileColPrefix)
+        val percentileCols = percentiles.map { pct =>
+          s"percentile_approx(${latencyColName}, ${pct}) AS `${percentileColName}_${pct}`"
+        }.mkString(", ")
+        val percentileSql = procType match {
+          case BatchProcessType => {
+            s"""
+               |SELECT ${percentileCols}
+               |FROM `${latencyTableName}`
+              """.stripMargin
+          }
+          case StreamingProcessType => {
+            s"""
+               |SELECT `${InternalColumns.tmst}`, `${percentileCols}`
+               |FROM `${latencyTableName}` GROUP BY `${InternalColumns.tmst}`
+              """.stripMargin
+          }
+        }
+        val percentileStep = SparkSqlStep(percentileTableName, percentileSql, emptyMap)
+        val percentileParam = emptyMap
+        val percentielExports = genMetricExport(percentileParam, percentileTableName, percentileTableName, ct, mode) :: Nil
+
+        RulePlan(percentileStep :: Nil, percentielExports)
+      } else emptyRulePlan
+
+      timePlan.merge(recordPlan).merge(rangePlan).merge(percentilePlan)
     }
+  }
+
+  private def getPercentiles(details: Map[String, Any]): Seq[Double] = {
+//    details.get(_percentiles) match {
+//      case Some(seq: Seq[Double]) => seq
+//      case _ => Nil
+//    }
+    details.getArr[Double](_percentileValues).filter(d => (d >= 0 && d <= 1))
   }
 
 }

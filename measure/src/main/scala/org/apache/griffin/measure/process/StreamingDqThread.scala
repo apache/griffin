@@ -85,6 +85,9 @@ case class StreamingDqThread(sqlContext: SQLContext,
         // update data sources
         dqEngines.updateDataSources(rulePlan.dsUpdates, dataSources)
 
+        // finish calculation
+        finishCalculation()
+
         val et = new Date().getTime
         val persistTimeStr = s"persist records using time: ${et - rt} ms"
         appPersist.log(et, persistTimeStr)
@@ -106,6 +109,11 @@ case class StreamingDqThread(sqlContext: SQLContext,
     }
     val endTime = new Date().getTime
     println(s"===== [${updateTimeDate}] process ends, using ${endTime - updateTime} ms =====")
+  }
+
+  // finish calculation for this round
+  private def finishCalculation(): Unit = {
+    dataSources.foreach(_.processFinish)
   }
 
   // clean old data and old result cache

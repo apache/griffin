@@ -29,6 +29,9 @@ import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.spark.sql._
 
+// data source cache process steps
+// dump phase: save
+// process phase: read -> process -> update -> finish -> clean old data
 trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
   val sqlContext: SQLContext
@@ -127,12 +130,6 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
     // time range: [a, b)
     val timeRange = TimeInfoCache.getTimeRange
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
-
-    // next last proc time
-    submitLastProcTime(timeRange._2)
-    // next clean time
-    val nextCleanTime = timeRange._2 + deltaTimeRange._1
-    submitCleanTime(nextCleanTime)
 
     // read partition info
     val filterStr = s"`${InternalColumns.tmst}` >= ${reviseTimeRange._1} AND `${InternalColumns.tmst}` < ${reviseTimeRange._2}"
@@ -296,12 +293,14 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
                 case _ => df
               }
 
-              // coalesce partition number
               val prlCount = sqlContext.sparkContext.defaultParallelism
-              val ptnCount = updateDf.rdd.getNumPartitions
-              val repartitionedDf = if (prlCount < ptnCount) {
-                updateDf.coalesce(prlCount)
-              } else updateDf
+              // coalesce
+//              val ptnCount = updateDf.rdd.getNumPartitions
+//              val repartitionedDf = if (prlCount < ptnCount) {
+//                updateDf.coalesce(prlCount)
+//              } else updateDf
+              // repartition
+              val repartitionedDf = updateDf.repartition(prlCount)
               val dfw = repartitionedDf.write.mode(SaveMode.Overwrite)
               writeDataFrame(dfw, oldDfPath)
 
@@ -318,6 +317,17 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
         }
       }
     }
+  }
+
+  // process finish
+  def processFinish(): Unit = {
+    // next last proc time
+    val timeRange = TimeInfoCache.getTimeRange
+    submitLastProcTime(timeRange._2)
+
+    // next clean time
+    val nextCleanTime = timeRange._2 + deltaTimeRange._1
+    submitCleanTime(nextCleanTime)
   }
 
 }
