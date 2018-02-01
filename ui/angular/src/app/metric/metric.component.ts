@@ -70,24 +70,45 @@ export class MetricComponent implements OnInit {
           metricData.metricValues[0].value.matched != undefined
         ) {
           for(let i=0;i<jobs.length;i++){
-            var metricNode = {
-              name: "",
-              timestamp: "",
-              dq: 0,
-              details: []
-            };
-            metricNode.details = JSON.parse(
-              JSON.stringify(jobs[i].metricValues)
-            );
-            metricNode.name = jobs[i].name;
-            metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
-            metricNode.dq =
-              jobs[i].metricValues[0].value.matched /
-              jobs[i].metricValues[0].value.total *
-              100;
-            node.metrics.push(metricNode);
+            if(jobs[i].metricValues.length != 0){
+              var metricNode = {
+                name: "",
+                timestamp: "",
+                dq: 0,
+                details: []
+              };
+              metricNode.details = JSON.parse(
+                JSON.stringify(jobs[i].metricValues)
+              );
+              metricNode.name = jobs[i].name;
+              metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
+              metricNode.dq =
+                jobs[i].metricValues[0].value.matched /
+                jobs[i].metricValues[0].value.total *
+                100;
+              node.metrics.push(metricNode);
+            }
           }
         }
+        // }else{
+        //   for(let i=0;i<jobs.length;i++){
+        //     console.log(jobs[i]);
+        //     var metricNode = {
+        //         name: "",
+        //         timestamp: "",
+        //         dq: 0,
+        //         details: []
+        //     };
+        //     metricNode.details = JSON.parse(
+        //       JSON.stringify(jobs[i].metricValues)
+        //     );
+        //     metricNode.name = jobs[i].name;
+        //     metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
+        //     metricNode.dq = 0;
+        //     node.metrics.push(metricNode);
+        //     console.log(metricNode);
+        //   }
+        // }
         this.finalData.push(node);
       }
       this.originalData = JSON.parse(JSON.stringify(this.finalData));
