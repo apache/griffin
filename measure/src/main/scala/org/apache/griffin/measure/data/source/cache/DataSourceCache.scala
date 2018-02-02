@@ -40,12 +40,14 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   val index: Int
 
   var tmstCache: TmstCache = _
-  protected def rangeTmsts(from: Long, until: Long) = tmstCache.range(from, until)
+  protected def fromUntilRangeTmsts(from: Long, until: Long) = tmstCache.range(from, until)
   protected def clearTmst(t: Long) = tmstCache.remove(t)
   protected def clearTmstsUntil(until: Long) = {
     val outDateTmsts = tmstCache.until(until)
     tmstCache.remove(outDateTmsts)
   }
+  protected def afterTilRangeTmsts(after: Long, til: Long) = fromUntilRangeTmsts(after + 1, til + 1)
+  protected def clearTmstsTil(til: Long) = clearTmstsUntil(til + 1)
 
   val _FilePath = "file.path"
   val _InfoPath = "info.path"
@@ -127,13 +129,18 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
   // read new cache data and old cache data
   def readData(): (Option[DataFrame], TimeRange) = {
-    // time range: [a, b)
+    // time range: (a, b]
     val timeRange = TimeInfoCache.getTimeRange
-    val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2 + 1)
+    val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
 
     // read partition info
-    val filterStr = s"`${InternalColumns.tmst}` >= ${reviseTimeRange._1} AND `${InternalColumns.tmst}` < ${reviseTimeRange._2}"
-    println(s"read time range: [${reviseTimeRange._1}, ${reviseTimeRange._2})")
+    val filterStr = if (reviseTimeRange._1 == reviseTimeRange._2) {
+      println(s"read time range: [${reviseTimeRange._1}]")
+      s"`${InternalColumns.tmst}` = ${reviseTimeRange._1}"
+    } else {
+      println(s"read time range: (${reviseTimeRange._1}, ${reviseTimeRange._2}]")
+      s"`${InternalColumns.tmst}` > ${reviseTimeRange._1} AND `${InternalColumns.tmst}` <= ${reviseTimeRange._2}"
+    }
 
     // new cache data
     val newDfOpt = try {
@@ -167,7 +174,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
     // from until tmst range
     val (from, until) = (reviseTimeRange._1, reviseTimeRange._2)
-    val tmstSet = rangeTmsts(from, until)
+    val tmstSet = afterTilRangeTmsts(from, until)
 
     val retTimeRange = TimeRange(reviseTimeRange, tmstSet)
     (cacheDfOpt, retTimeRange)
@@ -184,14 +191,14 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   }
 
   private def cleanOutTimePartitions(path: String, outTime: Long, partitionOpt: Option[String]): Unit = {
-    val earlierPaths = listEarlierPartitions(path: String, outTime, partitionOpt)
+    val earlierOrEqPaths = listEarlierOrEqPartitions(path: String, outTime, partitionOpt)
     // delete out time data path
-    earlierPaths.foreach { path =>
+    earlierOrEqPaths.foreach { path =>
       println(s"delete hdfs path: ${path}")
       HdfsUtil.deleteHdfsPath(path)
     }
   }
-  private def listEarlierPartitions(path: String, bound: Long, partitionOpt: Option[String]): Iterable[String] = {
+  private def listEarlierOrEqPartitions(path: String, bound: Long, partitionOpt: Option[String]): Iterable[String] = {
     val names = HdfsUtil.listSubPathsByType(path, "dir")
     val regex = partitionOpt match {
       case Some(partition) => s"^${partition}=(\\d+)$$".r
@@ -201,7 +208,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
       name match {
         case regex(value) => {
           str2Long(value) match {
-            case Some(t) => (t < bound)
+            case Some(t) => (t <= bound)
             case _ => false
           }
         }
@@ -219,6 +226,10 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
   // clean out time from new cache data and old cache data
   def cleanOutTimeData(): Unit = {
+    // clean tmst
+    val cleanTime = readCleanTime
+    cleanTime.foreach(clearTmstsTil(_))
+
     if (!readOnly) {
       // new cache data
       val newCacheCleanTime = if (updatable) readLastProcTime else readCleanTime
@@ -287,7 +298,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
               val cleanTime = readCleanTime
               val updateDf = cleanTime match {
                 case Some(ct) => {
-                  val filterStr = s"`${InternalColumns.tmst}` >= ${ct}"
+                  val filterStr = s"`${InternalColumns.tmst}` > ${ct}"
                   df.filter(filterStr)
                 }
                 case _ => df
@@ -326,7 +337,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
     submitLastProcTime(timeRange._2)
 
     // next clean time
-    val nextCleanTime = timeRange._2 + deltaTimeRange._1 + 1
+    val nextCleanTime = timeRange._2 + deltaTimeRange._1
     submitCleanTime(nextCleanTime)
   }
 
