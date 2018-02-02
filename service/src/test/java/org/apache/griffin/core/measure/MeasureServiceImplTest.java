@@ -155,12 +155,6 @@ public class MeasureServiceImplTest {
         service.deleteMeasures();
     }
 
-    @Test(expected = GriffinException.NotFoundException.class)
-    public void testDeleteMeasuresFailureWithNotFound() {
-        given(measureRepo.findByDeleted(false)).willReturn(null);
-        service.deleteMeasures();
-    }
-
     @Test(expected = GriffinException.ServiceException.class)
     public void testDeleteMeasuresForGriffinFailureWithException() throws Exception {
         GriffinMeasure measure = createGriffinMeasure("externalMeasure");
