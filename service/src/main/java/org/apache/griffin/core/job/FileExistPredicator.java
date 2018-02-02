@@ -49,7 +49,7 @@ public class FileExistPredicator implements Predicator {
         Map<String, String> config = predicate.getConfigMap();
         String[] paths = null;
         String rootPath = null;
-        if (config != null && StringUtils.isEmpty(config.get(PREDICT_PATH))) {
+        if (config != null && !StringUtils.isEmpty(config.get(PREDICT_PATH))) {
             paths = config.get(PREDICT_PATH).split(PATH_CONNECTOR_CHARACTER);
             rootPath = config.get(PREDICT_ROOT_PATH);
         }
