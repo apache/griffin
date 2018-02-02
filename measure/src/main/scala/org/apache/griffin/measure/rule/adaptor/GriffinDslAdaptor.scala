@@ -24,6 +24,8 @@ import org.apache.griffin.measure.rule.dsl.parser.GriffinDslParser
 import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 import org.apache.griffin.measure.rule.trans._
 
+import scala.util.{Failure, Success}
+
 case class GriffinDslAdaptor(dataSourceNames: Seq[String],
                              functionNames: Seq[String]
                             ) extends RuleAdaptor {
@@ -49,7 +51,13 @@ case class GriffinDslAdaptor(dataSourceNames: Seq[String],
         val expr = result.get
         val rulePlanTrans = RulePlanTrans(dqType, dataSourceNames, timeInfo,
           name, expr, param, processType, dsTimeRanges)
-        rulePlanTrans.trans
+        rulePlanTrans.trans match {
+          case Success(rp) => rp
+          case Failure(ex) => {
+            warn(s"translate rule [ ${rule} ] fails: \n${ex.getMessage}")
+            emptyRulePlan
+          }
+        }
       } else {
         warn(s"parse rule [ ${rule} ] fails: \n${result}")
         emptyRulePlan

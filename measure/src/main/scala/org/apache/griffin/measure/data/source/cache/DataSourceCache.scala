@@ -129,7 +129,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   def readData(): (Option[DataFrame], TimeRange) = {
     // time range: [a, b)
     val timeRange = TimeInfoCache.getTimeRange
-    val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
+    val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2 + 1)
 
     // read partition info
     val filterStr = s"`${InternalColumns.tmst}` >= ${reviseTimeRange._1} AND `${InternalColumns.tmst}` < ${reviseTimeRange._2}"
@@ -326,7 +326,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
     submitLastProcTime(timeRange._2)
 
     // next clean time
-    val nextCleanTime = timeRange._2 + deltaTimeRange._1
+    val nextCleanTime = timeRange._2 + deltaTimeRange._1 + 1
     submitCleanTime(nextCleanTime)
   }
 

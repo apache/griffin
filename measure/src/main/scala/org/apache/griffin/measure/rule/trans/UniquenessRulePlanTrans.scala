@@ -29,6 +29,8 @@ import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.trans.RuleExportFactory._
 import org.apache.griffin.measure.utils.ParamUtil._
 
+import scala.util.Try
+
 case class UniquenessRulePlanTrans(dataSourceNames: Seq[String],
                                    timeInfo: TimeInfo, name: String, expr: Expr,
                                    param: Map[String, Any], procType: ProcessType
@@ -46,7 +48,7 @@ case class UniquenessRulePlanTrans(dataSourceNames: Seq[String],
   }
   import UniquenessKeys._
 
-  def trans(): RulePlan = {
+  def trans(): Try[RulePlan] = Try {
     val details = getDetails(param)
     val sourceName = details.getString(_source, dataSourceNames.head)
     val targetName = details.getString(_target, dataSourceNames.tail.head)

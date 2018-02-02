@@ -30,6 +30,8 @@ import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.griffin.measure.rule.trans.RuleExportFactory._
 import org.apache.griffin.measure.rule.trans.DsUpdateFactory._
 
+import scala.util.Try
+
 case class AccuracyRulePlanTrans(dataSourceNames: Seq[String],
                                  timeInfo: TimeInfo, name: String, expr: Expr,
                                  param: Map[String, Any], procType: ProcessType
@@ -44,7 +46,7 @@ case class AccuracyRulePlanTrans(dataSourceNames: Seq[String],
   }
   import AccuracyKeys._
 
-  def trans(): RulePlan = {
+  def trans(): Try[RulePlan] = Try {
     val details = getDetails(param)
     val sourceName = details.getString(_source, dataSourceNames.head)
     val targetName = details.getString(_target, dataSourceNames.tail.head)
