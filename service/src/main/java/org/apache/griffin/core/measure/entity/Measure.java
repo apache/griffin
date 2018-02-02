@@ -38,13 +38,15 @@ public abstract class Measure extends AbstractAuditableEntity {
     @NotNull
     protected String name;
 
-    protected String description;
-
-    protected String organization;
-
     protected String owner;
 
-    protected Boolean deleted = false;
+    private String dqType;
+
+    private String description;
+
+    private String organization;
+
+    private Boolean deleted = false;
 
     public String getName() {
         return name;
@@ -52,6 +54,16 @@ public abstract class Measure extends AbstractAuditableEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @JsonProperty("dq.type")
+    public String getDqType() {
+        return dqType;
+    }
+
+    @JsonProperty("dq.type")
+    public void setDqType(String dqType) {
+        this.dqType = dqType;
     }
 
     public String getDescription() {
