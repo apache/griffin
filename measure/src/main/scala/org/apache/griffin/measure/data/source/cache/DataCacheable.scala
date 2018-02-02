@@ -16,9 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.data.source
-
-import java.util.concurrent.atomic.AtomicLong
+package org.apache.griffin.measure.data.source.cache
 
 import org.apache.griffin.measure.cache.info.{InfoCacheInstance, TimeInfoCache}
 
@@ -34,6 +32,7 @@ trait DataCacheable {
   def selfLastProcTime = TimeInfoCache.lastProcTime(selfCacheInfoPath)
   def selfReadyTime = TimeInfoCache.readyTime(selfCacheInfoPath)
   def selfCleanTime = TimeInfoCache.cleanTime(selfCacheInfoPath)
+  def selfOldCacheIndex = TimeInfoCache.oldCacheIndex(selfCacheInfoPath)
 
   protected def submitCacheTime(ms: Long): Unit = {
     val map = Map[String, String]((selfCacheTime -> ms.toString))
@@ -53,6 +52,8 @@ trait DataCacheable {
     InfoCacheInstance.cacheInfo(map)
   }
 
+  protected def readLastProcTime(): Option[Long] = readSelfInfo(selfLastProcTime)
+
   protected def submitCleanTime(ms: Long): Unit = {
     val cleanTime = genCleanTime(ms)
     val map = Map[String, String]((selfCleanTime -> cleanTime.toString))
@@ -61,10 +62,17 @@ trait DataCacheable {
 
   protected def genCleanTime(ms: Long): Long = ms
 
-  protected def readCleanTime(): Option[Long] = {
-    val key = selfCleanTime
-    val keys = key :: Nil
-    InfoCacheInstance.readInfo(keys).get(key).flatMap { v =>
+  protected def readCleanTime(): Option[Long] = readSelfInfo(selfCleanTime)
+
+  protected def submitOldCacheIndex(index: Long): Unit = {
+    val map = Map[String, String]((selfOldCacheIndex -> index.toString))
+    InfoCacheInstance.cacheInfo(map)
+  }
+
+  protected def readOldCacheIndex(): Option[Long] = readSelfInfo(selfOldCacheIndex)
+
+  private def readSelfInfo(key: String): Option[Long] = {
+    InfoCacheInstance.readInfo(key :: Nil).get(key).flatMap { v =>
       try {
         Some(v.toLong)
       } catch {

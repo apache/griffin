@@ -28,7 +28,4 @@ case class RecordExport(name: String,
                         mode: ExportMode
                        ) extends RuleExport {
 
-  def setDefTimestamp(t: Long): RuleExport =
-    RecordExport(name, stepName, dataSourceCacheOpt, originDFOpt, t, mode)
-
 }

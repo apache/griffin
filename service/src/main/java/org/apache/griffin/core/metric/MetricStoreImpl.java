@@ -25,14 +25,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.util.JsonUtil;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -48,33 +51,43 @@ public class MetricStoreImpl implements MetricStore {
 
     private static final String INDEX = "griffin";
     private static final String TYPE = "accuracy";
+    private static final String URL_BASE = "/griffin/accuracy";
 
     private RestClient client;
-    private HttpHeaders headers;
-    private String url_base;
-    private String url_get;
-    private String url_delete;
-    private String url_post;
+    private HttpHeaders responseHeaders;
+    private String urlGet;
+    private String urlDelete;
+    private String urlPost;
     private ObjectMapper mapper;
 
     public MetricStoreImpl(@Value("${elasticsearch.host}") String host,
-                           @Value("${elasticsearch.port}") int port) {
-        this.client = RestClient.builder(new HttpHost(host, port, "http")).build();
-        this.url_base = "/" + INDEX + "/" + TYPE;
-        this.url_get = url_base + "/_search?filter_path=hits.hits._source";
-        this.url_post = url_base + "/_bulk";
-        this.url_delete = url_base + "/_delete_by_query";
+                           @Value("${elasticsearch.port}") int port,
+                           @Value("${elasticsearch.scheme:http}") String scheme,
+                           @Value("${elasticsearch.user:}") String user,
+                           @Value("${elasticsearch.password:}") String password) {
+        HttpHost httpHost = new HttpHost(host, port, scheme);
+        RestClientBuilder builder = RestClient.builder(httpHost);
+        if (!user.isEmpty() && !password.isEmpty()) {
+            String encodedAuth = buildBasicAuthString(user, password);
+            Header[] requestHeaders = new Header[]{
+                    new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
+            builder.setDefaultHeaders(requestHeaders);
+        }
+        client = builder.build();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+        this.responseHeaders = responseHeaders;
+        this.urlGet = URL_BASE + "/_search?filter_path=hits.hits._source";
+        this.urlPost = URL_BASE + "/_bulk";
+        this.urlDelete = URL_BASE + "/_delete_by_query";
         this.mapper = new ObjectMapper();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        this.headers = headers;
     }
 
     @Override
     public List<MetricValue> getMetricValues(String metricName, int from, int size) throws IOException {
         HttpEntity entity = getHttpEntityForSearch(metricName, from, size);
         try {
-            Response response = client.performRequest("GET", url_get, Collections.emptyMap(), entity);
+            Response response = client.performRequest("GET", urlGet, Collections.emptyMap(), entity);
             return getMetricValuesFromResponse(response);
         } catch (ResponseException e) {
             if (e.getResponse().getStatusLine().getStatusCode() == 404) {
@@ -113,7 +126,7 @@ public class MetricStoreImpl implements MetricStore {
     public ResponseEntity addMetricValues(List<MetricValue> metricValues) throws IOException {
         String bulkRequestBody = getBulkRequestBody(metricValues);
         HttpEntity entity = new NStringEntity(bulkRequestBody, ContentType.APPLICATION_JSON);
-        Response response = client.performRequest("POST", url_post, Collections.emptyMap(), entity);
+        Response response = client.performRequest("POST", urlPost, Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
 
     }
@@ -135,13 +148,19 @@ public class MetricStoreImpl implements MetricStore {
         Map<String, Object> param = Collections.singletonMap("query",
                 Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
         HttpEntity entity = new NStringEntity(JsonUtil.toJson(param), ContentType.APPLICATION_JSON);
-        Response response = client.performRequest("POST", url_delete, Collections.emptyMap(), entity);
+        Response response = client.performRequest("POST", urlDelete, Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
     }
 
     private ResponseEntity getResponseEntityFromResponse(Response response) throws IOException {
         String body = EntityUtils.toString(response.getEntity());
         HttpStatus status = HttpStatus.valueOf(response.getStatusLine().getStatusCode());
-        return new ResponseEntity<>(body, headers, status);
+        return new ResponseEntity<>(body, responseHeaders, status);
+    }
+
+    private static String buildBasicAuthString (String user, String password) {
+        String auth = user + ":" + password;
+        String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
+        return encodedAuth;
     }
 }

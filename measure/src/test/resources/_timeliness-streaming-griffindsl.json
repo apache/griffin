@@ -63,7 +63,9 @@
           "threshold": "1h",
           "step": "step",
           "count": "cnt",
-          "step.size": "5m"
+          "step.size": "5m",
+          "percentile": "percentile",
+          "percentile.values": [0.2, 0.5, 0.8]
         },
         "metric": {
           "name": "timeliness"
