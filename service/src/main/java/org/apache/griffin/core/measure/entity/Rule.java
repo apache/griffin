@@ -50,10 +50,6 @@ public class Rule extends AbstractAuditableEntity {
 
     private String name;
 
-    @Column(length = 1024)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String description;
-
     @JsonIgnore
     @Access(AccessType.PROPERTY)
     @Column(length = 1024)
@@ -176,14 +172,6 @@ public class Rule extends AbstractAuditableEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Rule() {
