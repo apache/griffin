@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.trans
 
-import org.apache.griffin.measure.process.temp.TableRegisters
+import org.apache.griffin.measure.process.temp.{TableRegisters, TimeRange}
 import org.apache.griffin.measure.process.{BatchProcessType, ExportMode, ProcessType, StreamingProcessType}
 import org.apache.griffin.measure.rule.adaptor.RuleParamKeys._
 import org.apache.griffin.measure.rule.adaptor._
@@ -32,7 +32,8 @@ import org.apache.griffin.measure.utils.TimeUtil
 
 case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
                                    timeInfo: TimeInfo, name: String, expr: Expr,
-                                   param: Map[String, Any], procType: ProcessType
+                                   param: Map[String, Any], procType: ProcessType,
+                                   dsTimeRanges: Map[String, TimeRange]
                                   ) extends RulePlanTrans {
 
   private object TimelinessKeys {
@@ -57,6 +58,9 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
     val mode = ExportMode.defaultMode(procType)
 
     val ct = timeInfo.calcTime
+
+    val sourceTimeRange = dsTimeRanges.get(sourceName).getOrElse(TimeRange(ct))
+    val beginTime = sourceTimeRange.begin
 
     if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
       emptyRulePlan
@@ -142,58 +146,6 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
         case _ => emptyRulePlan
       }
 
-// 5. ranges
-//      val rangePlan = details.get(_rangeSplit) match {
-//        case Some(arr: Seq[String]) => {
-//          val ranges = splitTimeRanges(arr)
-//          if (ranges.size > 0) {
-//            try {
-//              // 5.1. range
-//              val rangeTableName = "__range"
-//              val rangeColName = details.getStringOrKey(_range)
-//              val caseClause = {
-//                val whenClause = ranges.map { range =>
-//                  s"WHEN `${latencyColName}` < ${range._1} THEN '<${range._2}'"
-//                }.mkString("\n")
-//                s"CASE ${whenClause} ELSE '>=${ranges.last._2}' END AS `${rangeColName}`"
-//              }
-//              val rangeSql = {
-//                s"SELECT *, ${caseClause} FROM `${latencyTableName}`"
-//              }
-//              val rangeStep = SparkSqlStep(rangeTableName, rangeSql, emptyMap)
-//
-//              // 5.2. range metric
-//              val rangeMetricTableName = "__rangeMetric"
-//              val countColName = details.getStringOrKey(_count)
-//              val rangeMetricSql = procType match {
-//                case BatchProcessType => {
-//                  s"""
-//                     |SELECT `${rangeColName}`, COUNT(*) AS `${countColName}`
-//                     |FROM `${rangeTableName}` GROUP BY `${rangeColName}`
-//                  """.stripMargin
-//                }
-//                case StreamingProcessType => {
-//                  s"""
-//                     |SELECT `${InternalColumns.tmst}`, `${rangeColName}`, COUNT(*) AS `${countColName}`
-//                     |FROM `${rangeTableName}` GROUP BY `${InternalColumns.tmst}`, `${rangeColName}`
-//                  """.stripMargin
-//                }
-//              }
-//              val rangeMetricStep = SparkSqlStep(rangeMetricTableName, rangeMetricSql, emptyMap)
-//              val rangeMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
-//              val rangeMetricExports = genMetricExport(rangeMetricParam, rangeColName, rangeMetricTableName, ct, mode) :: Nil
-//
-//              RulePlan(rangeStep :: rangeMetricStep :: Nil, rangeMetricExports)
-//            } catch {
-//              case _: Throwable => emptyRulePlan
-//            }
-//          } else emptyRulePlan
-//        }
-//        case _ => emptyRulePlan
-//      }
-
-// return timeliness plan
-
       // 5. ranges
       val rangePlan = TimeUtil.milliseconds(details.getString(_stepSize, "")) match {
         case Some(stepSize) => {
@@ -243,23 +195,15 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
           val pctName = (pct * 100).toInt.toString
           s"floor(percentile_approx(${latencyColName}, ${pct})) AS `${percentileColName}_${pctName}`"
         }.mkString(", ")
-        val percentileSql = procType match {
-          case BatchProcessType => {
-            s"""
-               |SELECT ${percentileCols}
-               |FROM `${latencyTableName}`
-              """.stripMargin
-          }
-          case StreamingProcessType => {
-            s"""
-               |SELECT `${InternalColumns.tmst}`, ${percentileCols}
-               |FROM `${latencyTableName}` GROUP BY `${InternalColumns.tmst}`
-              """.stripMargin
-          }
+        val percentileSql = {
+          s"""
+             |SELECT ${percentileCols}
+             |FROM `${latencyTableName}`
+            """.stripMargin
         }
         val percentileStep = SparkSqlStep(percentileTableName, percentileSql, emptyMap)
         val percentileParam = emptyMap
-        val percentielExports = genMetricExport(percentileParam, percentileTableName, percentileTableName, ct, mode) :: Nil
+        val percentielExports = genMetricExport(percentileParam, percentileTableName, percentileTableName, beginTime, mode) :: Nil
 
         RulePlan(percentileStep :: Nil, percentielExports)
       } else emptyRulePlan
@@ -269,10 +213,6 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
   }
 
   private def getPercentiles(details: Map[String, Any]): Seq[Double] = {
-//    details.get(_percentiles) match {
-//      case Some(seq: Seq[Double]) => seq
-//      case _ => Nil
-//    }
     details.getArr[Double](_percentileValues).filter(d => (d >= 0 && d <= 1))
   }
 
