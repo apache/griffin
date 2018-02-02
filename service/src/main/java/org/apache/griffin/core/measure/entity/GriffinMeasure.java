@@ -42,6 +42,10 @@ public class GriffinMeasure extends Measure {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long timestamp;
 
+    @Column(length = 1024)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String ruleDescription;
+
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "measure_id")
@@ -96,6 +100,16 @@ public class GriffinMeasure extends Measure {
             throw new NullPointerException("Evaluate rule can not be empty.");
         }
         this.evaluateRule = evaluateRule;
+    }
+
+    @JsonProperty("rule.description")
+    public String getRuleDescription() {
+        return ruleDescription;
+    }
+
+    @JsonProperty("rule.description")
+    public void setRuleDescription(String ruleDescription) {
+        this.ruleDescription = ruleDescription;
     }
 
     public Long getTimestamp() {
