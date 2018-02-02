@@ -51,7 +51,6 @@ public class MetricStoreImpl implements MetricStore {
 
     private static final String INDEX = "griffin";
     private static final String TYPE = "accuracy";
-    private static final String URL_BASE = "/griffin/accuracy";
 
     private RestClient client;
     private HttpHeaders responseHeaders;
@@ -76,10 +75,11 @@ public class MetricStoreImpl implements MetricStore {
         client = builder.build();
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+        String urlBase = "/" + INDEX + "/" + TYPE;
         this.responseHeaders = responseHeaders;
-        this.urlGet = URL_BASE + "/_search?filter_path=hits.hits._source";
-        this.urlPost = URL_BASE + "/_bulk";
-        this.urlDelete = URL_BASE + "/_delete_by_query";
+        this.urlGet = urlBase + "/_search?filter_path=hits.hits._source";
+        this.urlPost = urlBase + "/_bulk";
+        this.urlDelete = urlBase + "/_delete_by_query";
         this.mapper = new ObjectMapper();
     }
 
@@ -158,9 +158,8 @@ public class MetricStoreImpl implements MetricStore {
         return new ResponseEntity<>(body, responseHeaders, status);
     }
 
-    private static String buildBasicAuthString (String user, String password) {
+    private static String buildBasicAuthString(String user, String password) {
         String auth = user + ":" + password;
-        String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
-        return encodedAuth;
+        return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
     }
 }
