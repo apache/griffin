@@ -83,6 +83,7 @@ public class JobControllerTest {
     @Test
     public void testAddJobForSuccess() throws Exception {
         JobSchedule jobSchedule = createJobSchedule();
+        jobSchedule.setId(1L);
         given(service.addJob(jobSchedule)).willReturn(jobSchedule);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")

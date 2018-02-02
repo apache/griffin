@@ -40,8 +40,6 @@ import java.util.Map;
 @Entity
 public class GriffinMeasure extends Measure {
 
-    private String dqType;
-
     private String processType;
 
     @Transient
@@ -66,16 +64,6 @@ public class GriffinMeasure extends Measure {
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluate_rule_id")
     private EvaluateRule evaluateRule;
-
-    @JsonProperty("dq.type")
-    public String getDqType() {
-        return dqType;
-    }
-
-    @JsonProperty("dq.type")
-    public void setDqType(String dqType) {
-        this.dqType = dqType;
-    }
 
     @JsonProperty("process.type")
     public String getProcessType() {

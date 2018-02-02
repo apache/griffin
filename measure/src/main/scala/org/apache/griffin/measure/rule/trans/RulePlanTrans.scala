@@ -25,18 +25,20 @@ import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.dsl.expr.Expr
 import org.apache.griffin.measure.rule.plan._
 
+import scala.util.Try
+
 trait RulePlanTrans extends Loggable with Serializable {
 
   protected val emptyRulePlan = RulePlan(Nil, Nil)
   protected val emptyMap = Map[String, Any]()
 
-  def trans(): RulePlan
+  def trans(): Try[RulePlan]
 
 }
 
 object RulePlanTrans {
   private val emptyRulePlanTrans = new RulePlanTrans {
-    def trans(): RulePlan = emptyRulePlan
+    def trans(): Try[RulePlan] = Try(emptyRulePlan)
   }
 
   def apply(dqType: DqType,
@@ -50,7 +52,7 @@ object RulePlanTrans {
       case ProfilingType => ProfilingRulePlanTrans(dsNames, ti, name, expr, param, procType)
       case UniquenessType => UniquenessRulePlanTrans(dsNames, ti, name, expr, param, procType)
       case DistinctnessType => DistinctnessRulePlanTrans(dsNames, ti, name, expr, param, procType, dsTimeRanges)
-      case TimelinessType => TimelinessRulePlanTrans(dsNames, ti, name, expr, param, procType)
+      case TimelinessType => TimelinessRulePlanTrans(dsNames, ti, name, expr, param, procType, dsTimeRanges)
       case _ => emptyRulePlanTrans
     }
   }

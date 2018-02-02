@@ -146,8 +146,8 @@ public class JobServiceImplTest {
         given(jobScheduleRepo.save(js)).willReturn(js);
         given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
 
-        JobSchedule jobSchedule = service.addJob(js);
-        assertEquals(jobSchedule.getJobName(), job.getJobName());
+        JobSchedule createdJs = service.addJob(js);
+        assertEquals(js.getJobName(), createdJs.getJobName());
     }
 
     @Test(expected = GriffinException.BadRequestException.class)

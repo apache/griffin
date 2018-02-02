@@ -28,6 +28,8 @@ import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.trans.RuleExportFactory._
 import org.apache.griffin.measure.utils.ParamUtil._
 
+import scala.util.Try
+
 case class ProfilingRulePlanTrans(dataSourceNames: Seq[String],
                                   timeInfo: TimeInfo, name: String, expr: Expr,
                                   param: Map[String, Any], procType: ProcessType
@@ -38,7 +40,7 @@ case class ProfilingRulePlanTrans(dataSourceNames: Seq[String],
   }
   import ProfilingKeys._
 
-  def trans(): RulePlan = {
+  def trans(): Try[RulePlan] = Try {
     val details = getDetails(param)
     val profilingClause = expr.asInstanceOf[ProfilingClause]
     val sourceName = profilingClause.fromClauseOpt match {

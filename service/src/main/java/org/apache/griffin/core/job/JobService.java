@@ -19,7 +19,10 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.job.entity.JobDataBean;
+import org.apache.griffin.core.job.entity.JobHealth;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.JobSchedule;
 import org.quartz.SchedulerException;
 
 import java.util.List;

@@ -58,6 +58,7 @@ public class MetricStoreImpl implements MetricStore {
     private String urlDelete;
     private String urlPost;
     private ObjectMapper mapper;
+    private String indexMetaData;
 
     public MetricStoreImpl(@Value("${elasticsearch.host}") String host,
                            @Value("${elasticsearch.port}") int port,
@@ -72,14 +73,15 @@ public class MetricStoreImpl implements MetricStore {
                     new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
             builder.setDefaultHeaders(requestHeaders);
         }
-        client = builder.build();
+        this.client = builder.build();
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-        String urlBase = "/" + INDEX + "/" + TYPE;
         this.responseHeaders = responseHeaders;
-        this.urlGet = urlBase + "/_search?filter_path=hits.hits._source";
-        this.urlPost = urlBase + "/_bulk";
-        this.urlDelete = urlBase + "/_delete_by_query";
+        String urlBase = String.format("/%s/%s", INDEX, TYPE);
+        this.urlGet = urlBase.concat("/_search?filter_path=hits.hits._source");
+        this.urlPost = urlBase.concat("/_bulk");
+        this.urlDelete = urlBase.concat("/_delete_by_query");
+        this.indexMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }\n", INDEX, TYPE);
         this.mapper = new ObjectMapper();
     }
 
@@ -133,10 +135,9 @@ public class MetricStoreImpl implements MetricStore {
     }
 
     private String getBulkRequestBody(List<MetricValue> metricValues) throws JsonProcessingException {
-        String actionMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }\n", INDEX, TYPE);
         StringBuilder bulkRequestBody = new StringBuilder();
         for (MetricValue metricValue : metricValues) {
-            bulkRequestBody.append(actionMetaData);
+            bulkRequestBody.append(indexMetaData);
             bulkRequestBody.append(JsonUtil.toJson(metricValue));
             bulkRequestBody.append("\n");
         }
