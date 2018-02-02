@@ -29,6 +29,8 @@ import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.trans.RuleExportFactory._
 import org.apache.griffin.measure.utils.ParamUtil._
 
+import scala.util.Try
+
 case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
                                      timeInfo: TimeInfo, name: String, expr: Expr,
                                      param: Map[String, Any], procType: ProcessType,
@@ -49,7 +51,7 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
   }
   import DistinctnessKeys._
 
-  def trans(): RulePlan = {
+  def trans(): Try[RulePlan] = Try {
     val details = getDetails(param)
     val sourceName = details.getString(_source, dataSourceNames.head)
     val targetName = details.getString(_target, dataSourceNames.tail.head)
@@ -61,6 +63,12 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
 
     val sourceTimeRange = dsTimeRanges.get(sourceName).getOrElse(TimeRange(ct))
     val beginTime = sourceTimeRange.begin
+
+    val beginTmstOpt = dsTimeRanges.get(sourceName).flatMap(_.beginTmstOpt)
+    val beginTmst = beginTmstOpt match {
+      case Some(t) => t
+      case _ => throw new Exception(s"empty begin tmst from ${sourceName}")
+    }
 
     if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
       println(s"[${ct}] data source ${sourceName} not exists")
@@ -93,7 +101,7 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
       }
       val totalStep = SparkSqlStep(totalTableName, totalSql, emptyMap)
       val totalMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, EntriesCollectType.desc)
-      val totalMetricExport = genMetricExport(totalMetricParam, totalColName, totalTableName, beginTime, mode)
+      val totalMetricExport = genMetricExport(totalMetricParam, totalColName, totalTableName, beginTmst, mode)
 
       // 3. group by self
       val selfGroupTableName = "__selfGroup"
@@ -188,7 +196,7 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
       }
       val distStep = SparkSqlStep(distTableName, distSql, emptyMap)
       val distMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, EntriesCollectType.desc)
-      val distMetricExport = genMetricExport(distMetricParam, distColName, distTableName, beginTime, mode)
+      val distMetricExport = genMetricExport(distMetricParam, distColName, distTableName, beginTmst, mode)
 
       val distMetricRulePlan = RulePlan(distStep :: Nil, distMetricExport :: Nil)
 
@@ -208,7 +216,7 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
         }
         val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap, true)
         val dupRecordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
-        val dupRecordExport = genRecordExport(dupRecordParam, dupRecordTableName, dupRecordTableName, beginTime, mode)
+        val dupRecordExport = genRecordExport(dupRecordParam, dupRecordTableName, dupRecordTableName, beginTmst, mode)
 
         // 10. duplicate metric
         val dupMetricTableName = "__dupMetric"
@@ -221,7 +229,7 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
         }
         val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
         val dupMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
-        val dupMetricExport = genMetricExport(dupMetricParam, duplicationArrayName, dupMetricTableName, beginTime, mode)
+        val dupMetricExport = genMetricExport(dupMetricParam, duplicationArrayName, dupMetricTableName, beginTmst, mode)
 
         RulePlan(dupRecordStep :: dupMetricStep :: Nil, dupRecordExport :: dupMetricExport :: Nil)
       } else emptyRulePlan

@@ -30,6 +30,8 @@ import org.apache.griffin.measure.rule.trans.RuleExportFactory._
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.griffin.measure.utils.TimeUtil
 
+import scala.util.Try
+
 case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
                                    timeInfo: TimeInfo, name: String, expr: Expr,
                                    param: Map[String, Any], procType: ProcessType,
@@ -50,17 +52,20 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
   }
   import TimelinessKeys._
 
-  def trans(): RulePlan = {
+  def trans(): Try[RulePlan] =  Try {
     val details = getDetails(param)
     val timelinessClause = expr.asInstanceOf[TimelinessClause]
     val sourceName = details.getString(_source, dataSourceNames.head)
 
     val mode = ExportMode.defaultMode(procType)
 
-    val ct = timeInfo.calcTime
+//    val ct = timeInfo.calcTime
 
-    val sourceTimeRange = dsTimeRanges.get(sourceName).getOrElse(TimeRange(ct))
-    val beginTime = sourceTimeRange.begin
+    val beginTmstOpt = dsTimeRanges.get(sourceName).flatMap(_.beginTmstOpt)
+    val beginTmst = beginTmstOpt match {
+      case Some(t) => t
+      case _ => throw new Exception(s"empty begin tmst from ${sourceName}")
+    }
 
     if (!TableRegisters.existRunTempTable(timeInfo.key, sourceName)) {
       emptyRulePlan
@@ -124,7 +129,7 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
       }
       val metricStep = SparkSqlStep(metricTableName, metricSql, emptyMap)
       val metricParam = RuleParamKeys.getMetricOpt(param).getOrElse(emptyMap)
-      val metricExports = genMetricExport(metricParam, name, metricTableName, ct, mode) :: Nil
+      val metricExports = genMetricExport(metricParam, name, metricTableName, beginTmst, mode) :: Nil
 
       // current timeliness plan
       val timeSteps = inTimeStep :: latencyStep :: metricStep :: Nil
@@ -140,7 +145,7 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
           }
           val recordStep = SparkSqlStep(recordTableName, recordSql, emptyMap)
           val recordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
-          val recordExports = genRecordExport(recordParam, recordTableName, recordTableName, ct, mode) :: Nil
+          val recordExports = genRecordExport(recordParam, recordTableName, recordTableName, beginTmst, mode) :: Nil
           RulePlan(recordStep :: Nil, recordExports)
         }
         case _ => emptyRulePlan
@@ -179,7 +184,7 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
           }
           val rangeMetricStep = SparkSqlStep(rangeMetricTableName, rangeMetricSql, emptyMap)
           val rangeMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
-          val rangeMetricExports = genMetricExport(rangeMetricParam, stepColName, rangeMetricTableName, ct, mode) :: Nil
+          val rangeMetricExports = genMetricExport(rangeMetricParam, stepColName, rangeMetricTableName, beginTmst, mode) :: Nil
 
           RulePlan(rangeStep :: rangeMetricStep :: Nil, rangeMetricExports)
         }
@@ -203,7 +208,7 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
         }
         val percentileStep = SparkSqlStep(percentileTableName, percentileSql, emptyMap)
         val percentileParam = emptyMap
-        val percentielExports = genMetricExport(percentileParam, percentileTableName, percentileTableName, beginTime, mode) :: Nil
+        val percentielExports = genMetricExport(percentileParam, percentileTableName, percentileTableName, beginTmst, mode) :: Nil
 
         RulePlan(percentileStep :: Nil, percentielExports)
       } else emptyRulePlan
