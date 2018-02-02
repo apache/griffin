@@ -113,10 +113,7 @@ public class GriffinMeasure extends Measure {
         this.evaluateRule = evaluateRule;
     }
 
-    public String getRuleDescription() {
-        return ruleDescription;
-    }
-
+    @JsonProperty("rule.description")
     public void setRuleDescription(String ruleDescription) throws IOException {
         this.ruleDescription = ruleDescription;
         this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription, new TypeReference<Map<String, Object>>() {
