@@ -24,14 +24,16 @@ import java.util.List;
 public class Metric {
 
     private String name;
+    private String type;
     private String owner;
     private List<MetricValue> metricValues;
 
     public Metric() {
     }
 
-    public Metric(String name, String owner, List<MetricValue> metricValues) {
+    public Metric(String name, String type, String owner, List<MetricValue> metricValues) {
         this.name = name;
+        this.type = type;
         this.owner = owner;
         this.metricValues = metricValues;
     }
@@ -42,6 +44,14 @@ public class Metric {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getOwner() {

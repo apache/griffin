@@ -33,6 +33,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.*;
 
 @Component
@@ -51,14 +51,14 @@ public class MetricStoreImpl implements MetricStore {
 
     private static final String INDEX = "griffin";
     private static final String TYPE = "accuracy";
-    private static final String URL_BASE = "/griffin/accuracy";
 
     private RestClient client;
     private HttpHeaders responseHeaders;
-    private String url_get;
-    private String url_delete;
-    private String url_post;
+    private String urlGet;
+    private String urlDelete;
+    private String urlPost;
     private ObjectMapper mapper;
+    private String indexMetaData;
 
     public MetricStoreImpl(@Value("${elasticsearch.host}") String host,
                            @Value("${elasticsearch.port}") int port,
@@ -73,21 +73,30 @@ public class MetricStoreImpl implements MetricStore {
                     new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
             builder.setDefaultHeaders(requestHeaders);
         }
-        client = builder.build();
+        this.client = builder.build();
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentType(MediaType.APPLICATION_JSON);
         this.responseHeaders = responseHeaders;
-        this.url_get = URL_BASE + "/_search?filter_path=hits.hits._source";
-        this.url_post = URL_BASE + "/_bulk";
-        this.url_delete = URL_BASE + "/_delete_by_query";
+        String urlBase = String.format("/%s/%s", INDEX, TYPE);
+        this.urlGet = urlBase.concat("/_search?filter_path=hits.hits._source");
+        this.urlPost = urlBase.concat("/_bulk");
+        this.urlDelete = urlBase.concat("/_delete_by_query");
+        this.indexMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }\n", INDEX, TYPE);
         this.mapper = new ObjectMapper();
     }
 
     @Override
     public List<MetricValue> getMetricValues(String metricName, int from, int size) throws IOException {
         HttpEntity entity = getHttpEntityForSearch(metricName, from, size);
-        Response response = client.performRequest("GET", url_get, Collections.emptyMap(), entity);
-        return getMetricValuesFromResponse(response);
+        try {
+            Response response = client.performRequest("GET", urlGet, Collections.emptyMap(), entity);
+            return getMetricValuesFromResponse(response);
+        } catch (ResponseException e) {
+            if (e.getResponse().getStatusLine().getStatusCode() == 404) {
+                return Collections.emptyList();
+            }
+            throw e;
+        }
     }
 
     private HttpEntity getHttpEntityForSearch(String metricName, int from, int size) throws JsonProcessingException {
@@ -119,16 +128,15 @@ public class MetricStoreImpl implements MetricStore {
     public ResponseEntity addMetricValues(List<MetricValue> metricValues) throws IOException {
         String bulkRequestBody = getBulkRequestBody(metricValues);
         HttpEntity entity = new NStringEntity(bulkRequestBody, ContentType.APPLICATION_JSON);
-        Response response = client.performRequest("POST", url_post, Collections.emptyMap(), entity);
+        Response response = client.performRequest("POST", urlPost, Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
 
     }
 
     private String getBulkRequestBody(List<MetricValue> metricValues) throws JsonProcessingException {
-        String actionMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }\n", INDEX, TYPE);
         StringBuilder bulkRequestBody = new StringBuilder();
         for (MetricValue metricValue : metricValues) {
-            bulkRequestBody.append(actionMetaData);
+            bulkRequestBody.append(indexMetaData);
             bulkRequestBody.append(JsonUtil.toJson(metricValue));
             bulkRequestBody.append("\n");
         }
@@ -141,7 +149,7 @@ public class MetricStoreImpl implements MetricStore {
         Map<String, Object> param = Collections.singletonMap("query",
                 Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
         HttpEntity entity = new NStringEntity(JsonUtil.toJson(param), ContentType.APPLICATION_JSON);
-        Response response = client.performRequest("POST", url_delete, Collections.emptyMap(), entity);
+        Response response = client.performRequest("POST", urlDelete, Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
     }
 
@@ -151,9 +159,8 @@ public class MetricStoreImpl implements MetricStore {
         return new ResponseEntity<>(body, responseHeaders, status);
     }
 
-    private static String buildBasicAuthString (String user, String password) {
+    private static String buildBasicAuthString(String user, String password) {
         String auth = user + ":" + password;
-        String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
-        return encodedAuth;
+        return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
     }
 }

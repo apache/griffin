@@ -73,7 +73,7 @@ public class MetricControllerTest {
 
     @Test
     public void testGetAllMetricsSuccess() throws Exception {
-        Metric metric = new Metric("metricName", "owner", Collections.emptyList());
+        Metric metric = new Metric("metricName", "accuracy", "owner", Collections.emptyList());
         given(service.getAllMetrics()).willReturn(
                 Collections.singletonMap("measureName", Collections.singletonList(metric)));
 
