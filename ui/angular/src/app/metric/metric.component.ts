@@ -43,6 +43,7 @@ export class MetricComponent implements OnInit {
   measureOptions = [];
   selectedMeasureIndex = 0;
   chartHeight: any;
+  proHeight: any;
   mesWithJob: any;
 
   ngOnInit() {
@@ -61,7 +62,7 @@ export class MetricComponent implements OnInit {
         var node = null;
         node = new Object();
         node.name = mesName;
-        node.dq = 0;
+        node.dq = 0;        
         node.metrics = [];
         this.measureOptions.push(mesName);
         var metricData = this.mesWithJob[mesName][0];
@@ -69,6 +70,7 @@ export class MetricComponent implements OnInit {
           metricData.metricValues[0] != undefined &&
           metricData.type == 'accuracy'
         ) {
+          node.type = "accuracy";
           for(let i=0;i<jobs.length;i++){
             if(jobs[i].metricValues.length != 0){
               var metricNode = {
@@ -91,6 +93,7 @@ export class MetricComponent implements OnInit {
           }
         }else if(metricData.metricValues[0] != undefined &&
           metricData.type == 'profiling'){
+          node.type = "profiling";
           for(let i=0;i<jobs.length;i++){
               if(jobs[i].metricValues.length != 0){
               var metricNode = {
@@ -124,7 +127,9 @@ export class MetricComponent implements OnInit {
   }
 
   redraw(data) {
+    console.log(data);
     this.chartHeight = $(".chartItem:eq(0)").width() * 0.8 + "px";
+    this.proHeight = $(".chartItem:eq(0)").width() * 0.2 + "px";
     for (let i = 0; i < data.length; i++) {
       var parentIndex = i;
       for (let j = 0; j < data[i].metrics.length; j++) {
@@ -133,7 +138,7 @@ export class MetricComponent implements OnInit {
         let _chartId = "#" + chartId;
         var divs = $(_chartId);
         divs.get(0).style.width = divs.parent().width() + "px";
-        divs.get(0).style.height = this.chartHeight;
+        divs.get(0).style.height = (data[i].type == "accuracy") ? this.chartHeight : this.proHeight;
         this.chartOption.set(
           chartId,
           this.chartService.getOptionThum(data[i].metrics[j],chartId)

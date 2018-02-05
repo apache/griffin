@@ -26,9 +26,9 @@ under the License.
   </div>
 </div>
 <div *ngIf="profiling" id="table-scroll" class="table-scroll">
-    <div class="title">
-      <b>{{this.prodata[0].name}}</b>
-    </div>
+    <!-- <div class="title"> -->
+      <b class="title">{{this.prodata[0].name}}</b>
+    <!-- </div> -->
     <div class="table-wrap">      
       <table class="main-table y-scrollable" [mfData]="prodata" #mf="mfDataTable" [mfRowsOnPage]="18">
      	<thead>
