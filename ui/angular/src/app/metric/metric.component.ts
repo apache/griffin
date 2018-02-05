@@ -54,25 +54,22 @@ export class MetricComponent implements OnInit {
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_dashboard).subscribe(data => {
       this.mesWithJob = JSON.parse(JSON.stringify(data));
-      var mesNode = null;
       for (let mesName in this.mesWithJob) {
-        var jobs = this.mesWithJob[mesName];
-        mesNode = new Object();
-        mesNode.name = mesName;
-        var node = null;
-        node = new Object();
-        node.name = mesName;
-        node.dq = 0;        
-        node.metrics = [];
-        this.measureOptions.push(mesName);
         var metricData = this.mesWithJob[mesName][0];
         if (
           metricData.metricValues[0] != undefined &&
-          metricData.type == 'accuracy'
+          metricData.type == "accuracy"
         ) {
+          var jobs = this.mesWithJob[mesName];
+          var node = null;
+          node = new Object();
+          node.name = mesName;
+          node.dq = 0;
+          node.metrics = [];
+          this.measureOptions.push(mesName);
           node.type = "accuracy";
-          for(let i=0;i<jobs.length;i++){
-            if(jobs[i].metricValues.length != 0){
+          for (let i = 0; i < jobs.length; i++) {
+            if (jobs[i].metricValues.length != 0) {
               var metricNode = {
                 name: "",
                 timestamp: "",
@@ -91,26 +88,8 @@ export class MetricComponent implements OnInit {
               node.metrics.push(metricNode);
             }
           }
-        }else if(metricData.metricValues[0] != undefined &&
-          metricData.type == 'profiling'){
-          node.type = "profiling";
-          for(let i=0;i<jobs.length;i++){
-              if(jobs[i].metricValues.length != 0){
-              var metricNode = {
-                  name: "",
-                  timestamp: "",
-                  dq: 0,
-                  details: []
-              };
-              metricNode.details = JSON.parse(
-                JSON.stringify(jobs[i].metricValues)
-              );
-              metricNode.name = jobs[i].name;
-              metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
-              metricNode.dq = 0;
-              node.metrics.push(metricNode);
-            }
-          }
+        } else {
+          break;
         }
         this.finalData.push(node);
       }
@@ -127,9 +106,8 @@ export class MetricComponent implements OnInit {
   }
 
   redraw(data) {
-    console.log(data);
     this.chartHeight = $(".chartItem:eq(0)").width() * 0.8 + "px";
-    this.proHeight = $(".chartItem:eq(0)").width() * 0.2 + "px";
+    // this.proHeight = $(".chartItem:eq(0)").width() * 0.2 + "px";
     for (let i = 0; i < data.length; i++) {
       var parentIndex = i;
       for (let j = 0; j < data[i].metrics.length; j++) {
@@ -138,11 +116,16 @@ export class MetricComponent implements OnInit {
         let _chartId = "#" + chartId;
         var divs = $(_chartId);
         divs.get(0).style.width = divs.parent().width() + "px";
-        divs.get(0).style.height = (data[i].type == "accuracy") ? this.chartHeight : this.proHeight;
+        divs.get(0).style.height = this.chartHeight;
         this.chartOption.set(
           chartId,
-          this.chartService.getOptionThum(data[i].metrics[j],chartId)
+          this.chartService.getOptionThum(data[i].metrics[j])
         );
+        // divs.get(0).style.height = (data[i].type == "accuracy") ? this.chartHeight : this.proHeight;
+        // this.chartOption.set(
+        //   chartId,
+        //   this.chartService.getOptionThum(data[i].metrics[j],chartId)
+        // );
       }
     }
   }

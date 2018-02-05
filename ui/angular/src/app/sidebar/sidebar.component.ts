@@ -102,23 +102,21 @@ export class SidebarComponent implements OnInit {
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_dashboard).subscribe(data => {
       this.mesWithJob = JSON.parse(JSON.stringify(data));
-      var mesNode = null;
       for (let mesName in this.mesWithJob) {
-        var jobs = this.mesWithJob[mesName];
-        mesNode = new Object();
-        mesNode.name = mesName;
-        var node = null;
-        node = new Object();
-        node.name = mesName;
-        node.dq = 0;
-        node.metrics = [];
         var metricData = this.mesWithJob[mesName][0];
         if (
           metricData.metricValues[0] != undefined &&
-          metricData.type == 'accuracy'
+          metricData.type == "accuracy"
         ) {
-          for(let i=0;i<jobs.length;i++){
-            if(jobs[i].metricValues.length != 0){
+          var jobs = this.mesWithJob[mesName];
+          var node = null;
+          node = new Object();
+          node.name = mesName;
+          node.dq = 0;
+          node.metrics = [];
+          node.type = "accuracy";
+          for (let i = 0; i < jobs.length; i++) {
+            if (jobs[i].metricValues.length != 0) {
               var metricNode = {
                 name: "",
                 timestamp: "",
@@ -137,6 +135,8 @@ export class SidebarComponent implements OnInit {
               node.metrics.push(metricNode);
             }
           }
+        } else {
+          break;
         }
         this.finalData.push(node);
       }
