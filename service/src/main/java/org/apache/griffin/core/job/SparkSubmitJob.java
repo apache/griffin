@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -128,15 +129,16 @@ public class SparkSubmitJob implements Job {
     }
 
     private void setPredicts(String json) throws IOException {
+        if (StringUtils.isEmpty(json)) {
+            return;
+        }
         List<Map<String, Object>> maps = JsonUtil.toEntity(json, new TypeReference<List<Map>>() {
         });
-        if (maps != null) {
-            for (Map<String, Object> map : maps) {
-                SegmentPredicate sp = new SegmentPredicate();
-                sp.setType((String) map.get("type"));
-                sp.setConfigMap((Map<String, String>) map.get("config"));
-                mPredicates.add(sp);
-            }
+        for (Map<String, Object> map : maps) {
+            SegmentPredicate sp = new SegmentPredicate();
+            sp.setType((String) map.get("type"));
+            sp.setConfigMap((Map<String, String>) map.get("config"));
+            mPredicates.add(sp);
         }
     }
 

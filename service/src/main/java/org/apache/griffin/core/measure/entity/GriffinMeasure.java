@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.griffin.core.util.JsonUtil;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -53,7 +54,7 @@ public class GriffinMeasure extends Measure {
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String,Object> ruleDescriptionMap;
+    private Map<String, Object> ruleDescriptionMap;
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
@@ -106,9 +107,11 @@ public class GriffinMeasure extends Measure {
     }
 
     public void setRuleDescription(String ruleDescription) throws IOException {
-        this.ruleDescription = ruleDescription;
-        this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription, new TypeReference<Map<String, Object>>() {
-        });
+        if (!StringUtils.isEmpty(ruleDescription)) {
+            this.ruleDescription = ruleDescription;
+            this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription, new TypeReference<Map<String, Object>>() {
+            });
+        }
     }
 
     @JsonProperty("rule.description")
@@ -146,7 +149,7 @@ public class GriffinMeasure extends Measure {
         this.evaluateRule = evaluateRule;
     }
 
-    public GriffinMeasure(Long measureId,String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+    public GriffinMeasure(Long measureId, String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
         this.setId(measureId);
         this.name = name;
         this.owner = owner;
