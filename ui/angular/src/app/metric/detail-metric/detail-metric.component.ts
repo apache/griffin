@@ -16,13 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit, OnChanges, SimpleChanges, OnDestroy, AfterViewInit, NgZone } from "@angular/core";
+import { Component, OnInit, OnChanges, SimpleChanges, OnDestroy, AfterViewInit, AfterViewChecked, NgZone } from "@angular/core";
 import { ChartService } from "../../service/chart.service";
 import { ServiceService } from "../../service/service.service";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import "rxjs/add/operator/switchMap";
 import { HttpClient } from "@angular/common/http";
 import * as $ from "jquery";
+import { DataTableModule } from "angular2-datatable";
 
 @Component({
   selector: "app-detail-metric",
@@ -30,7 +31,8 @@ import * as $ from "jquery";
   styleUrls: ["./detail-metric.component.css"],
   providers: [ChartService, ServiceService]
 })
-export class DetailMetricComponent implements OnInit {
+export class DetailMetricComponent implements AfterViewChecked, OnInit {
+  objectKeys = Object.keys;
   constructor(
     public chartService: ChartService,
     private route: ActivatedRoute,
@@ -44,9 +46,12 @@ export class DetailMetricComponent implements OnInit {
   data: any;
   currentJob: string;
   finalData: any;
+  prodata = [];
   metricName: string;
   size = 300;
   offset = 0;
+  profiling = false;
+  columnname = [];
 
   ngOnInit() {
     this.currentJob = this.route.snapshot.paramMap.get("name");
@@ -79,6 +84,17 @@ export class DetailMetricComponent implements OnInit {
           $("#bigChartDiv").height(window.innerHeight - 120 + "px");
           $("#bigChartDiv").width(window.innerWidth - 400 + "px");
           $("#bigChartContainer").show();
+        }else{
+          this.prodata = this.data;
+          this.profiling = true;
+          for(let key in this.data[0].value){
+            this.columnname.push(key);
+          }
+          for(let item of this.data){
+            for(let key in item.value){
+              item.value[key].toString();
+            }
+          }
         }
       },
       err => {
@@ -97,4 +113,8 @@ export class DetailMetricComponent implements OnInit {
   }
 
   getData(metricName) {}
+
+  ngAfterViewChecked() {
+    $(".main-table").addClass('clone');
+  }
 }

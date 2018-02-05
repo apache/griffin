@@ -176,7 +176,9 @@ under the License.
       </div>
     </div>
     <div *ngIf="ruleData.type=='profiling'" class="">
-      <p>{{this.prorule}}</p>
+      <div *ngFor="let index of ruleDes;" >
+        {{index.name}}&nbsp;:&nbsp;{{index.infos}}
+      </div>
     </div>
   </div>
 </div>
