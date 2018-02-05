@@ -37,6 +37,7 @@ export class MeasureDetailComponent implements OnInit {
     public serviceService: ServiceService
   ) {}
   ruleData: any;
+  ruleDes = [];
   sourceLength: number;
   sourceDB: string;
   targetDB: string;
@@ -52,7 +53,6 @@ export class MeasureDetailComponent implements OnInit {
   targetpath: string;
   type: string;
   currentrule: string;
-  prorule = "";
 
   fetchData(value, index) {
     var data = this.ruleData["data.sources"][index].connectors[0];
@@ -85,18 +85,12 @@ export class MeasureDetailComponent implements OnInit {
         this.ruleData = data;
         if (this.ruleData["measure.type"] === "external") {
           this.ruleData.type = this.ruleData["measure.type"];
-        } else {
+        } else{
           this.ruleData.type = this.ruleData["dq.type"];
-          var currentprorule = this.ruleData["evaluate.rule"].rules;
-          this.currentrule = currentprorule;
-          for (let index in currentprorule) {
-            this.prorule =
-              this.prorule + currentprorule[index].description + ",";
+          this.currentrule = this.ruleData["evaluate.rule"].rules;
+          if(this.ruleData["rule.description"]){
+            this.ruleDes = this.ruleData["rule.description"].details
           }
-          this.prorule = this.prorule.substring(
-            0,
-            this.prorule.lastIndexOf(",")
-          );
           this.fetchData("source", 0);
           if (this.ruleData.type === "accuracy") {
             this.fetchData("target", 1);
