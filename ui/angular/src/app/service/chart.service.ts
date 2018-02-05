@@ -186,8 +186,16 @@ export class ChartService {
     return series;
   }
 
-  getOptionThum(metric) {
+  getOptionThum(metric,chartId) {
     var data = this.getMetricData(metric);
+    if(isNaN(data[0][1])){
+      let _chartId = "#" + chartId;
+      var divs = $(_chartId);
+      var i = document.createElement('i');
+      var code = "<div><div style='margin-left:30%'>"+metric.name+
+        "</div><div style='margin-left:20%'>Click to see details</div><img src='/assets/img/table.png' style='margin-top:30px;margin-left:30%'/></div>";
+      $(divs).html(code);
+    }else{
     var self = this;
     var option = {
       title: {
@@ -262,6 +270,7 @@ export class ChartService {
     };
     option.series = this.getSeries(metric);
     return option;
+    }
   }
 
   getOptionBig(metric) {
