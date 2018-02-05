@@ -16,3 +16,87 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+
+.table-scroll {
+	position:relative;
+	/*max-width:800px;*/
+	margin:auto;
+	overflow:hidden;
+	/*border:1px solid #f5f5f5;*/
+}
+.table-wrap {
+	/*width:100%;*/
+	overflow:auto;
+}
+.table-scroll table {
+	/*width:100%;*/
+	margin:auto;
+	border-collapse:separate;
+	border-spacing:0;
+}
+.table-scroll th, .table-scroll td {
+	padding:5px 10px;
+	border:1px solid #000;
+	/*background:#fff;*/
+	white-space:nowrap;
+	vertical-align:top;
+}
+.table-scroll thead, .table-scroll tfoot {
+	/*background:#f9f9f9;*/
+}
+
+.main-table>tbody>tr:nth-of-type(even) {
+  background-color: #1f1f1f;
+}
+
+.main-table>tbody>tr:nth-of-type(odd) {
+  background-color: #080808;
+}
+
+.clone {
+	/*position:absolute;*/
+	top:0;
+	left:0;
+	/*pointer-events:none;*/
+}
+.clone th, .clone td {
+	/*visibility:hidden*/
+}
+.clone td, .clone th {
+	border-color:transparent
+}
+.clone tbody th {
+	visibility:visible;
+	color:#fff;
+}
+.clone .fixed-side {
+	position:absolute;
+	/*border:1px solid #000;*/
+	/*background:#1f1f1f;*/
+	visibility:visible;
+	width: 150px;
+}
+
+.clone tbody tr:nth-of-type(even) .fixed-side {
+	background: #1f1f1f;
+}
+.clone tbody tr:nth-of-type(odd) .fixed-side {
+	background: #080808;
+}
+
+.cover {
+	position: static;
+	width: 150px;
+}
+
+.title {
+	margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 50%;
+    font-size: 18px;
+}
+
+mfBootstrapPaginator {
+	position: fixed;
+}
+.clone thead, .clone tfoot{background:transparent;}

@@ -67,25 +67,46 @@ export class MetricComponent implements OnInit {
         var metricData = this.mesWithJob[mesName][0];
         if (
           metricData.metricValues[0] != undefined &&
-          metricData.metricValues[0].value.matched != undefined
+          metricData.type == 'accuracy'
         ) {
           for(let i=0;i<jobs.length;i++){
-            var metricNode = {
-              name: "",
-              timestamp: "",
-              dq: 0,
-              details: []
-            };
-            metricNode.details = JSON.parse(
-              JSON.stringify(jobs[i].metricValues)
-            );
-            metricNode.name = jobs[i].name;
-            metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
-            metricNode.dq =
-              jobs[i].metricValues[0].value.matched /
-              jobs[i].metricValues[0].value.total *
-              100;
-            node.metrics.push(metricNode);
+            if(jobs[i].metricValues.length != 0){
+              var metricNode = {
+                name: "",
+                timestamp: "",
+                dq: 0,
+                details: []
+              };
+              metricNode.details = JSON.parse(
+                JSON.stringify(jobs[i].metricValues)
+              );
+              metricNode.name = jobs[i].name;
+              metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
+              metricNode.dq =
+                jobs[i].metricValues[0].value.matched /
+                jobs[i].metricValues[0].value.total *
+                100;
+              node.metrics.push(metricNode);
+            }
+          }
+        }else if(metricData.metricValues[0] != undefined &&
+          metricData.type == 'profiling'){
+          for(let i=0;i<jobs.length;i++){
+              if(jobs[i].metricValues.length != 0){
+              var metricNode = {
+                  name: "",
+                  timestamp: "",
+                  dq: 0,
+                  details: []
+              };
+              metricNode.details = JSON.parse(
+                JSON.stringify(jobs[i].metricValues)
+              );
+              metricNode.name = jobs[i].name;
+              metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
+              metricNode.dq = 0;
+              node.metrics.push(metricNode);
+            }
           }
         }
         this.finalData.push(node);
@@ -115,7 +136,7 @@ export class MetricComponent implements OnInit {
         divs.get(0).style.height = this.chartHeight;
         this.chartOption.set(
           chartId,
-          this.chartService.getOptionThum(data[i].metrics[j])
+          this.chartService.getOptionThum(data[i].metrics[j],chartId)
         );
       }
     }
