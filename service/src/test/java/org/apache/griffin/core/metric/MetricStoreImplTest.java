@@ -16,29 +16,24 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.data.connector.streaming
 
-import org.apache.griffin.measure.data.connector._
-import org.apache.griffin.measure.data.source.cache._
-import org.apache.griffin.measure.process.temp.TimeRange
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.streaming.dstream.InputDStream
+package org.apache.griffin.core.metric;
 
-import scala.util.Try
+import org.junit.Test;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
+import static org.junit.Assert.*;
 
-trait StreamingDataConnector extends DataConnector {
+public class MetricStoreImplTest {
 
-  type K
-  type V
-
-  protected def stream(): Try[InputDStream[(K, V)]]
-
-  def transform(rdd: RDD[(K, V)]): Option[DataFrame]
-
-  def data(ms: Long): (Option[DataFrame], TimeRange) = (None, TimeRange.emptyTimeRange)
-
-  var dataSourceCacheOpt: Option[DataSourceCache] = None
+    @Test
+    public void testBuildBasicAuthString()
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method m = MetricStoreImpl.class.getDeclaredMethod("buildBasicAuthString", String.class, String.class);
+        m.setAccessible(true);
+        String authStr = (String) m.invoke(null, "user", "password");
+        assertTrue(authStr.equals("Basic dXNlcjpwYXNzd29yZA=="));
+    }
 
 }

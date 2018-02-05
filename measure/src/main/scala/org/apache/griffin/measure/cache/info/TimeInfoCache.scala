@@ -26,11 +26,13 @@ object TimeInfoCache extends Loggable with Serializable {
   private val LastProcTime = "last.proc.time"
   private val ReadyTime = "ready.time"
   private val CleanTime = "clean.time"
+  private val OldCacheIndex = "old.cache.index"
 
   def cacheTime(path: String): String = s"${path}/${CacheTime}"
   def lastProcTime(path: String): String = s"${path}/${LastProcTime}"
   def readyTime(path: String): String = s"${path}/${ReadyTime}"
   def cleanTime(path: String): String = s"${path}/${CleanTime}"
+  def oldCacheIndex(path: String): String = s"${path}/${OldCacheIndex}"
 
   val infoPath = "info"
 
@@ -60,33 +62,42 @@ object TimeInfoCache extends Loggable with Serializable {
     val subPath = InfoCacheInstance.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${ReadyTime}" }
     val result = InfoCacheInstance.readInfo(keys)
-    val time = keys.flatMap { k =>
+    val times = keys.flatMap { k =>
       getLongOpt(result, k)
-    }.min
-    val map = Map[String, String]((finalReadyTime -> time.toString))
-    InfoCacheInstance.cacheInfo(map)
+    }
+    if (times.nonEmpty) {
+      val time = times.min
+      val map = Map[String, String]((finalReadyTime -> time.toString))
+      InfoCacheInstance.cacheInfo(map)
+    }
   }
 
   private def genFinalLastProcTime(): Unit = {
     val subPath = InfoCacheInstance.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${LastProcTime}" }
     val result = InfoCacheInstance.readInfo(keys)
-    val time = keys.flatMap { k =>
+    val times = keys.flatMap { k =>
       getLongOpt(result, k)
-    }.min
-    val map = Map[String, String]((finalLastProcTime -> time.toString))
-    InfoCacheInstance.cacheInfo(map)
+    }
+    if (times.nonEmpty) {
+      val time = times.min
+      val map = Map[String, String]((finalLastProcTime -> time.toString))
+      InfoCacheInstance.cacheInfo(map)
+    }
   }
 
   private def genFinalCleanTime(): Unit = {
     val subPath = InfoCacheInstance.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${CleanTime}" }
     val result = InfoCacheInstance.readInfo(keys)
-    val time = keys.flatMap { k =>
+    val times = keys.flatMap { k =>
       getLongOpt(result, k)
-    }.min
-    val map = Map[String, String]((finalCleanTime -> time.toString))
-    InfoCacheInstance.cacheInfo(map)
+    }
+    if (times.nonEmpty) {
+      val time = times.min
+      val map = Map[String, String]((finalCleanTime -> time.toString))
+      InfoCacheInstance.cacheInfo(map)
+    }
   }
 
   private def readTimeRange(): (Long, Long) = {

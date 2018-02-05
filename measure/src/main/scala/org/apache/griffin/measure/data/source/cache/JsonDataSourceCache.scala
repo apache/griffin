@@ -16,29 +16,25 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.data.connector.streaming
+package org.apache.griffin.measure.data.source.cache
 
-import org.apache.griffin.measure.data.connector._
-import org.apache.griffin.measure.data.source.cache._
-import org.apache.griffin.measure.process.temp.TimeRange
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.streaming.dstream.InputDStream
+import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, SQLContext}
 
-import scala.util.Try
+case class JsonDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
+                               dsName: String, index: Int
+                              ) extends DataSourceCache {
 
+  override def init(): Unit = {
+//    sqlContext.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false");
+  }
 
-trait StreamingDataConnector extends DataConnector {
+  def writeDataFrame(dfw: DataFrameWriter, path: String): Unit = {
+    println(s"write path: ${path}")
+    dfw.json(path)
+  }
 
-  type K
-  type V
-
-  protected def stream(): Try[InputDStream[(K, V)]]
-
-  def transform(rdd: RDD[(K, V)]): Option[DataFrame]
-
-  def data(ms: Long): (Option[DataFrame], TimeRange) = (None, TimeRange.emptyTimeRange)
-
-  var dataSourceCacheOpt: Option[DataSourceCache] = None
+  def readDataFrame(dfr: DataFrameReader, path: String): DataFrame = {
+    dfr.json(path)
+  }
 
 }

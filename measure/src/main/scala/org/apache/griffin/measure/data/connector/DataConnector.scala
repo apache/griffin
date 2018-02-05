@@ -65,6 +65,8 @@ trait DataConnector extends Loggable with Serializable {
     val thisTable = thisName(ms)
 
     try {
+      saveTmst(ms)    // save tmst
+
       dfOpt.flatMap { df =>
         val preProcRules = PreProcRuleGenerator.genPreProcRules(dcParam.preProc, suffix(ms))
 
@@ -104,7 +106,7 @@ trait DataConnector extends Loggable with Serializable {
         val withTmstDf = outDf.withColumn(tmstColName, lit(ms))
 
         // tmst cache
-        saveTmst(ms)
+//        saveTmst(ms)
 
         // drop temp tables
         cleanData(timeInfo)

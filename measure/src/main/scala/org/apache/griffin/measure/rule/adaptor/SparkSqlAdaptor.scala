@@ -45,7 +45,11 @@ case class SparkSqlAdaptor() extends RuleAdaptor {
     val name = getRuleName(param)
     val step = SparkSqlStep(name, getRule(param), getDetails(param), getCache(param), getGlobal(param))
     val mode = ExportMode.defaultMode(procType)
-    RulePlan(step :: Nil, genRuleExports(param, name, name, timeInfo.calcTime, mode))
+    RulePlan(
+      step :: Nil,
+      genRuleExports(param, name, name, timeInfo.calcTime, mode),
+      genDsUpdates(param, "", name)
+    )
   }
 
 }

@@ -21,7 +21,8 @@ package org.apache.griffin.measure.rule.plan
 import scala.reflect.ClassTag
 
 case class RulePlan(ruleSteps: Seq[RuleStep],
-                    ruleExports: Seq[RuleExport]
+                    ruleExports: Seq[RuleExport],
+                    dsUpdates: Seq[DsUpdate] = Nil
                    ) extends Serializable {
 
   val globalRuleSteps = filterRuleSteps(_.global)
@@ -48,7 +49,11 @@ case class RulePlan(ruleSteps: Seq[RuleStep],
 //  }
 
   def merge(rp: RulePlan): RulePlan = {
-    RulePlan(this.ruleSteps ++ rp.ruleSteps, this.ruleExports ++ rp.ruleExports)
+    RulePlan(
+      this.ruleSteps ++ rp.ruleSteps,
+      this.ruleExports ++ rp.ruleExports,
+      this.dsUpdates ++ rp.dsUpdates
+    )
   }
 
 }

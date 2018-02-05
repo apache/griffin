@@ -28,7 +28,4 @@ case class MetricExport(name: String,
                         mode: ExportMode
                        ) extends RuleExport {
 
-  def setDefTimestamp(t: Long): RuleExport =
-    MetricExport(name, stepName, collectType, t, mode)
-
 }
