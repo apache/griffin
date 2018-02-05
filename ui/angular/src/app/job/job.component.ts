@@ -105,6 +105,7 @@ export class JobComponent implements OnInit {
     this.http.get(getInstanceUrl).subscribe(data => {
       row.showDetail = !row.showDetail;
       this.allInstances = data;
+      console.log(this.allInstances);
       setTimeout(function() {
         $(".pagination").css("marginBottom", "-10px");
       }, 0);
