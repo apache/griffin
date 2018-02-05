@@ -61,9 +61,6 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
 
     val ct = timeInfo.calcTime
 
-    val sourceTimeRange = dsTimeRanges.get(sourceName).getOrElse(TimeRange(ct))
-    val beginTime = sourceTimeRange.begin
-
     val beginTmstOpt = dsTimeRanges.get(sourceName).flatMap(_.beginTmstOpt)
     val beginTmst = beginTmstOpt match {
       case Some(t) => t
@@ -126,7 +123,7 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
           // 4. older alias
           val olderAliasTableName = "__older"
           val olderAliasSql = {
-            s"SELECT ${selClause} FROM `${targetName}` WHERE `${InternalColumns.tmst}` < ${beginTime}"
+            s"SELECT ${selClause} FROM `${targetName}` WHERE `${InternalColumns.tmst}` < ${beginTmst}"
           }
           val olderAliasStep = SparkSqlStep(olderAliasTableName, olderAliasSql, emptyMap)
 
