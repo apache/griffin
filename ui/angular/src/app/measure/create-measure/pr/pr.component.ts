@@ -107,11 +107,8 @@ export class PrComponent implements AfterViewChecked, OnInit {
   desc: string;
   owner = "test";
   currentDBstr: string;
-  rulenode = {
-    name: "",
-    noderules: ""
-  };
   timezone = "";
+  ruledesc = "";
   newMeasure = {
     name: "",
     "measure.type": "griffin",
@@ -119,6 +116,9 @@ export class PrComponent implements AfterViewChecked, OnInit {
     "process.type": "batch",
     owner: "",
     description: "",
+    "rule.description": {
+      details:[]
+      },
     // "group":[],
     "data.sources": [
       {
@@ -154,7 +154,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
           "dsl.type": "griffin-dsl",
           "dq.type": "profiling",
           rule: "",
-          description: "",
+          // description: "",
           name: "",
           details: {
             // "profiling": {
@@ -393,6 +393,9 @@ export class PrComponent implements AfterViewChecked, OnInit {
       name: this.name,
       "measure.type": "griffin",
       "dq.type": "profiling",
+      "rule.description": {
+        details:this.noderule
+      },
       "process.type": "batch",
       owner: this.owner,
       description: this.desc,
@@ -447,22 +450,21 @@ export class PrComponent implements AfterViewChecked, OnInit {
     setTimeout(() => (this.visibleAnimate = true), 100);
   }
 
-  getRule(trans, otherinfo) {
+  getRule(trans) {
     var rule = "";
     for (let i of trans) {
       rule = rule + i + ",";
     }
     rule = rule.substring(0, rule.lastIndexOf(","));
-    this.pushRule(rule, otherinfo);
+    this.pushRule(rule);
   }
 
-  pushEnmRule(rule, grpname, originrule) {
+  pushEnmRule(rule, grpname) {
     var self = this;
     self.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       rule: rule,
-      description: originrule,
       name: grpname,
       details: {
         // "profiling": {
@@ -473,13 +475,12 @@ export class PrComponent implements AfterViewChecked, OnInit {
     });
   }
 
-  pushNullRule(rule, nullname, originrule) {
+  pushNullRule(rule, nullname) {
     var self = this;
     self.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       rule: rule,
-      description: originrule,
       name: nullname,
       details: {
         // "profiling": {
@@ -490,13 +491,12 @@ export class PrComponent implements AfterViewChecked, OnInit {
     });
   }
 
-  pushRule(rule, otherinfo) {
+  pushRule(rule) {
     var self = this;
     self.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       rule: rule,
-      description: otherinfo,
       name: "profiling",
       details: {}
     });
@@ -588,12 +588,12 @@ export class PrComponent implements AfterViewChecked, OnInit {
           enmvalue = this.transferRule(originrule, selected);
           grpname = selected.name + "-grp";
           this.transenumrule.push(enmvalue);
-          this.pushEnmRule(enmvalue, grpname, originrule);
+          this.pushEnmRule(enmvalue, grpname);
         } else if (originrule == "Null Count") {
           nullvalue = this.transferRule(originrule, selected);
           nullname = selected.name + "-nullct";
           this.transnullrule.push(nullvalue);
-          this.pushNullRule(nullvalue, nullname, originrule);
+          this.pushNullRule(nullvalue, nullname);
         } else {
           otherinfo = otherinfo + originrule + ",";
           value = this.transferRule(originrule, selected);
@@ -608,8 +608,9 @@ export class PrComponent implements AfterViewChecked, OnInit {
       });
     }
     if (this.transrule.length != 0) {
-      this.getRule(this.transrule, otherinfo);
+      this.getRule(this.transrule);
     }
+    this.ruledesc = JSON.stringify(this.noderule);
   }
 
   confirmAdd() {
