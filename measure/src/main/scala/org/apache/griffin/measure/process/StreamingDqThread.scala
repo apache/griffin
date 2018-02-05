@@ -138,7 +138,7 @@ case class StreamingDqThread(sqlContext: SQLContext,
   private def printTimeRanges(timeRanges: Map[String, TimeRange]): Unit = {
     val timeRangesStr = timeRanges.map { pair =>
       val (name, timeRange) = pair
-      s"${name} -> [${timeRange.begin}, ${timeRange.end})"
+      s"${name} -> (${timeRange.begin}, ${timeRange.end}]"
     }.mkString(", ")
     println(s"data source timeRanges: ${timeRangesStr}")
   }
