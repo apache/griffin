@@ -105,7 +105,7 @@ public class JobInstanceTest {
         given(jobScheduleRepo.findOne(Matchers.anyLong())).willReturn(jobSchedule);
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
         given(jobRepo.findOne(Matchers.anyLong())).willReturn(job);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given((List<Trigger>)scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
         given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
@@ -126,7 +126,7 @@ public class JobInstanceTest {
         given(jobScheduleRepo.findOne(Matchers.anyLong())).willReturn(jobSchedule);
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
         given(jobRepo.findOne(Matchers.anyLong())).willReturn(job);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given((List<Trigger>)scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
         given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
@@ -147,7 +147,7 @@ public class JobInstanceTest {
         given(jobScheduleRepo.findOne(Matchers.anyLong())).willReturn(jobSchedule);
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
         given(jobRepo.findOne(Matchers.anyLong())).willReturn(job);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given((List<Trigger>)scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
         given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
@@ -168,7 +168,7 @@ public class JobInstanceTest {
         given(jobScheduleRepo.findOne(Matchers.anyLong())).willReturn(jobSchedule);
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
         given(jobRepo.findOne(Matchers.anyLong())).willReturn(job);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given((List<Trigger>)scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
         given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);

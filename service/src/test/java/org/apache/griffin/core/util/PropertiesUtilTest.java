@@ -22,9 +22,11 @@ package org.apache.griffin.core.util;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.FileNotFoundException;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.apache.griffin.core.util.PropertiesUtil.getConf;
+import static org.junit.Assert.assertEquals;
 
 public class PropertiesUtilTest {
 
@@ -40,6 +42,40 @@ public class PropertiesUtilTest {
         String path = ".././quartz.properties";
         Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
         assertEquals(properties, null);
+    }
+
+    @Test
+    public void testGetConfWithLocation() throws FileNotFoundException {
+        String name = "sparkJob.properties";
+        String defaultPath = "/" + name;
+        String location = "src/test/resources";
+        Properties properties = getConf(name, defaultPath, location);
+        assert properties != null;
+    }
+
+    @Test
+    public void testGetConfWithLocationEmpty() throws FileNotFoundException {
+        String name = "sparkJob.properties";
+        String defaultPath = "/" + name;
+        String location = "src/main";
+        Properties properties = getConf(name, defaultPath, location);
+        assert properties != null;
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void testGetConfWithLocationWrong() throws FileNotFoundException {
+        String name = "sparkJob.properties";
+        String defaultPath = "/" + name;
+        String location = "wrong/path";
+        getConf(name, defaultPath, location);
+    }
+
+    @Test
+    public void testGetConfWithNoLocation() throws FileNotFoundException {
+        String name = "sparkJob.properties";
+        String defaultPath = "/" + name;
+        Properties properties = getConf(name, defaultPath, null);
+        assert properties != null;
     }
 
 }

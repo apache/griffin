@@ -19,10 +19,13 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.FSUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -45,11 +48,12 @@ public class FileExistPredicator implements Predicator {
     public boolean predicate() throws IOException {
         Map<String, String> config = predicate.getConfigMap();
         String[] paths = null;
-        if (config.get(PREDICT_PATH) != null) {
+        String rootPath = null;
+        if (config != null && !StringUtils.isEmpty(config.get(PREDICT_PATH))) {
             paths = config.get(PREDICT_PATH).split(PATH_CONNECTOR_CHARACTER);
+            rootPath = config.get(PREDICT_ROOT_PATH);
         }
-        String rootPath = config.get(PREDICT_ROOT_PATH);
-        if (paths == null || rootPath == null) {
+        if (ArrayUtils.isEmpty(paths) || StringUtils.isEmpty(rootPath)) {
             LOGGER.error("Predicate path is null.Please check predicates config root.path and path.");
             throw new NullPointerException();
         }
