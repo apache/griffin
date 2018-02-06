@@ -16,7 +16,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<div id="bigChartContainer" class="big-chart-container" (window:resize)="onResize($event)" style="display:none;">
+<div *ngIf="noresults" style="text-align: center;font-size: 26px;margin-top: 20%">
+  <b>No content</b>
+</div>
+<div *ngIf="!noresults" id="bigChartContainer" class="big-chart-container" (window:resize)="onResize($event)" style="display:none;">
   <div id="bigChartShow" class="big-chart-content">
     <div class="container-fluid">
       <div class="row">
@@ -25,58 +28,31 @@ under the License.
     </div>
   </div>
 </div>
-<div *ngIf="profiling" id="table-scroll" class="table-scroll">
-    <div class="title">
-      <b>{{this.prodata[0].name}}</b>
-    </div>
-    <div class="table-wrap">      
-      <table class="main-table y-scrollable" [mfData]="prodata" #mf="mfDataTable" [mfRowsOnPage]="18">
-     	<thead>
-     	  <tr style="background-color:#7D95CC">    	  	
-          <th class="fixed-side" scope="col" style="background-color:#7D95CC">Time</th>
-          <th class="cover" scope="col">Time</th>
-    	  	<th scope="col" *ngFor="let name of this.columnname">{{name}}</th>
-     	  </tr>
-     	</thead>
-     	<tbody>
-     	  <tr *ngFor="let item of mf.data">          
-          <th class="fixed-side">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
-          <th class="cover">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
-          <td *ngFor="let key of objectKeys(item.value)">{{item.value[key]}}</td>
-        </tr>
-     	</tbody>
-     	<tfoot>
-        <tr>
-          <td class="text-center" colspan="8" style="background-color:#1f1f1f;" id="pagination">
-            <mfBootstrapPaginator></mfBootstrapPaginator>
-          </td>
-        </tr>
-        </tfoot>
-      </table>
-	</div>
+<div *ngIf="profiling && !noresults" id="table-scroll" class="table-scroll">
+  <b class="title">{{this.prodata[0].name}}</b>
+  <div class="table-wrap">
+    <table class="main-table y-scrollable" [mfData]="prodata" #mf="mfDataTable" [mfRowsOnPage]="18">
+      <thead>
+      <tr style="background-color:#7D95CC">
+        <th class="fixed-side" scope="col" style="background-color:#7D95CC">Time</th>
+        <th class="cover" scope="col">Time</th>
+        <th scope="col" *ngFor="let name of this.columnname">{{name}}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let item of mf.data">
+        <th class="fixed-side">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
+        <th class="cover">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
+        <td *ngFor="let key of objectKeys(item.value)">{{item.value[key]}}</td>
+      </tr>
+      </tbody>
+      <tfoot>
+      <tr>
+        <td class="text-center" colspan="8" style="background-color:#1f1f1f;" id="pagination">
+          <mfBootstrapPaginator></mfBootstrapPaginator>
+        </td>
+      </tr>
+      </tfoot>
+    </table>
+  </div>
 </div>
-<!-- <div *ngIf="profiling" id="table-scroll" class="table-scroll">
-    <div class="table-wrap">
-      <table class="main-table" #mf="mfDataTable" [mfData]="this.data" [mfRowsOnPage]="20">
-     	<thead>
-     	  <tr style="background-color:#7D95CC">
-    	  	<th class="fixed-side" scope="col">Time</th>
-    	  	<th scope="col" *ngFor="let name of this.columnname">{{name}}</th>
-     	  </tr>
-     	</thead>
-     	<tbody>
-     	  <tr *ngFor="let item of mf.data">
-            <th class="fixed-side">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
-            <td *ngFor="let key of objectKeys(item.value)">{{item.value[key]}}</td>
-          </tr>
-     	</tbody>
-     	<tfoot>
-        <tr>
-          <td class="text-center" colspan="8" style="background-color:#1f1f1f;" id="pagination">
-            <mfBootstrapPaginator></mfBootstrapPaginator>
-          </td>
-        </tr>
-        </tfoot>
-      </table>
-	</div>
-</div> -->
