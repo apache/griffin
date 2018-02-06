@@ -19,46 +19,41 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.JobServiceImpl;
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.apache.griffin.core.measure.entity.DataSource;
-import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.measure.repo.DataConnectorRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CONNECTOR_NAME;
+import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("griffinOperation")
 public class GriffinMeasureOperationImpl implements MeasureOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(GriffinMeasureOperationImpl.class);
 
+    private final MeasureRepo<Measure> measureRepo;
+
+    private final JobServiceImpl jobService;
+
     @Autowired
-    private MeasureRepo<Measure> measureRepo;
-    @Autowired
-    private DataConnectorRepo dcRepo;
-    @Autowired
-    private JobServiceImpl jobService;
+    public GriffinMeasureOperationImpl(MeasureRepo<Measure> measureRepo, JobServiceImpl jobService) {
+        this.measureRepo = measureRepo;
+        this.jobService = jobService;
+    }
 
 
     @Override
     public Measure create(Measure measure) {
-        checkConnectorNames((GriffinMeasure) measure);
+        validateMeasure(measure);
         return measureRepo.save(measure);
     }
 
     @Override
     public void update(Measure measure) {
+        validateMeasure(measure);
+        measure.setDeleted(false);
         measureRepo.save(measure);
     }
 
@@ -67,31 +62,5 @@ public class GriffinMeasureOperationImpl implements MeasureOperation {
         jobService.deleteJobsRelateToMeasure(measure.getId());
         measure.setDeleted(true);
         measureRepo.save(measure);
-    }
-
-    private void checkConnectorNames(GriffinMeasure measure) {
-        List<String> names = getConnectorNames(measure);
-        if (names.size() == 0) {
-            LOGGER.warn("Connector names cannot be empty.");
-            throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
-        }
-        List<DataConnector> connectors = dcRepo.findByConnectorNames(names);
-        if (!CollectionUtils.isEmpty(connectors)) {
-            LOGGER.warn("Failed to create new measure {}. It's connector names already exist. ", measure.getName());
-            throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
-        }
-    }
-
-    private List<String> getConnectorNames(GriffinMeasure measure) {
-        List<String> names = new ArrayList<>();
-        for (DataSource source : measure.getDataSources()) {
-            for (DataConnector dc : source.getConnectors()) {
-                String name = dc.getName();
-                if (!StringUtils.isEmpty(name)) {
-                    names.add(name);
-                }
-            }
-        }
-        return names;
     }
 }

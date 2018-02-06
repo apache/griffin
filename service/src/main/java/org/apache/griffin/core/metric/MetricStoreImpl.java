@@ -116,9 +116,10 @@ public class MetricStoreImpl implements MetricStore {
         if (jsonNode.hasNonNull("hits") && jsonNode.get("hits").hasNonNull("hits")) {
             for (JsonNode node : jsonNode.get("hits").get("hits")) {
                 JsonNode sourceNode = node.get("_source");
-                metricValues.add(new MetricValue(sourceNode.get("name").asText(), Long.parseLong(sourceNode.get("tmst").asText()),
-                        JsonUtil.toEntity(sourceNode.get("value").toString(), new TypeReference<Map<String, Object>>() {
-                        })));
+                Map<String, Object> value = JsonUtil.toEntity(sourceNode.get("value").toString(), new TypeReference<Map<String, Object>>() {
+                });
+                MetricValue metricValue = new MetricValue(sourceNode.get("name").asText(), Long.parseLong(sourceNode.get("tmst").asText()), value);
+                metricValues.add(metricValue);
             }
         }
         return metricValues;

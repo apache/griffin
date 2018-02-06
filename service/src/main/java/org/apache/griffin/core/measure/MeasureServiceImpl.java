@@ -102,6 +102,15 @@ public class MeasureServiceImpl implements MeasureService {
         op.delete(measure);
     }
 
+    @Override
+    public void deleteMeasures() {
+        List<Measure> measures = measureRepo.findByDeleted(false);
+        for (Measure m : measures) {
+            MeasureOperation op = getOperation(m);
+            op.delete(m);
+        }
+    }
+
     private MeasureOperation getOperation(Measure measure) {
         if (measure instanceof GriffinMeasure) {
             return griffinOp;

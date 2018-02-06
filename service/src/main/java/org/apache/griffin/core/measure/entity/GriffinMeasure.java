@@ -19,14 +19,21 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.griffin.core.util.JsonUtil;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Measures processed on Griffin
@@ -39,6 +46,15 @@ public class GriffinMeasure extends Measure {
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long timestamp;
+
+    @JsonIgnore
+    @Access(AccessType.PROPERTY)
+    @Column(length = 1024)
+    private String ruleDescription;
+
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, Object> ruleDescriptionMap;
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
@@ -86,6 +102,29 @@ public class GriffinMeasure extends Measure {
         this.evaluateRule = evaluateRule;
     }
 
+    public String getRuleDescription() {
+        return ruleDescription;
+    }
+
+    public void setRuleDescription(String ruleDescription) throws IOException {
+        if (!StringUtils.isEmpty(ruleDescription)) {
+            this.ruleDescription = ruleDescription;
+            this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription, new TypeReference<Map<String, Object>>() {
+            });
+        }
+    }
+
+    @JsonProperty("rule.description")
+    public Map<String, Object> getRuleDescriptionMap() {
+        return ruleDescriptionMap;
+    }
+
+    @JsonProperty("rule.description")
+    public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) throws JsonProcessingException {
+        this.ruleDescriptionMap = ruleDescriptionMap;
+        this.ruleDescription = JsonUtil.toJson(ruleDescriptionMap);
+    }
+
     public Long getTimestamp() {
         return timestamp;
     }
@@ -110,7 +149,7 @@ public class GriffinMeasure extends Measure {
         this.evaluateRule = evaluateRule;
     }
 
-    public GriffinMeasure(Long measureId,String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+    public GriffinMeasure(Long measureId, String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
         this.setId(measureId);
         this.name = name;
         this.owner = owner;

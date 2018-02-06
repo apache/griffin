@@ -22,8 +22,11 @@ package org.apache.griffin.core.job.factory;
 import org.apache.griffin.core.job.FileExistPredicator;
 import org.apache.griffin.core.job.Predicator;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PredicatorFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PredicatorFactory.class);
     public static Predicator newPredicateInstance(SegmentPredicate segPredicate) {
         Predicator predicate = null;
         switch (segPredicate.getType()) {
@@ -31,6 +34,7 @@ public class PredicatorFactory {
                 predicate = new FileExistPredicator(segPredicate);
                 break;
             default:
+                LOGGER.warn("There is no predicate type that you input.");
                 break;
         }
         return predicate;

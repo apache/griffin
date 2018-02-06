@@ -53,6 +53,9 @@ public class DataConnector extends AbstractAuditableEntity {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String dataUnit;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String dataTimeZone;
+
     @JsonIgnore
     @Transient
     private String defaultDataUnit = "365000d";
@@ -77,7 +80,7 @@ public class DataConnector extends AbstractAuditableEntity {
     }
 
     @JsonProperty("config")
-    public Map<String, String> getConfigMap() throws IOException {
+    public Map<String, String> getConfigMap() {
         return configMap;
     }
 
@@ -88,12 +91,14 @@ public class DataConnector extends AbstractAuditableEntity {
     }
 
     public void setConfig(String config) throws IOException {
-        this.config = config;
-        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
-        });
+        if (!StringUtils.isEmpty(config)) {
+            this.config = config;
+            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
+            });
+        }
     }
 
-    public String getConfig() throws IOException {
+    public String getConfig() {
         return config;
     }
 
@@ -105,6 +110,16 @@ public class DataConnector extends AbstractAuditableEntity {
     @JsonProperty("data.unit")
     public void setDataUnit(String dataUnit) {
         this.dataUnit = dataUnit;
+    }
+
+    @JsonProperty("data.time.zone")
+    public String getDataTimeZone() {
+        return dataTimeZone;
+    }
+
+    @JsonProperty("data.time.zone")
+    public void setDataTimeZone(String dataTimeZone) {
+        this.dataTimeZone = dataTimeZone;
     }
 
     public String getDefaultDataUnit() {
@@ -156,7 +171,7 @@ public class DataConnector extends AbstractAuditableEntity {
         });
     }
 
-    public DataConnector(String name, String dataUnit, Map configMap,List<SegmentPredicate> predicates) throws IOException {
+    public DataConnector(String name, String dataUnit, Map configMap, List<SegmentPredicate> predicates) throws IOException {
         this.name = name;
         this.dataUnit = dataUnit;
         this.configMap = configMap;

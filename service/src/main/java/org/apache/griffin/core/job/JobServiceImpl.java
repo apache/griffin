@@ -47,10 +47,12 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
+import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
+import static org.quartz.CronExpression.isValidExpression;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -61,8 +63,8 @@ public class JobServiceImpl implements JobService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
     public static final String JOB_SCHEDULE_ID = "jobScheduleId";
     public static final String GRIFFIN_JOB_ID = "griffinJobId";
-    static final int MAX_PAGE_SIZE = 1024;
-    static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int MAX_PAGE_SIZE = 1024;
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -86,12 +88,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobDataBean> getAliveJobs() {
-        Scheduler scheduler = factory.getObject();
         List<JobDataBean> dataList = new ArrayList<>();
         try {
             List<GriffinJob> jobs = jobRepo.findByDeleted(false);
             for (GriffinJob job : jobs) {
-                JobDataBean jobData = genJobData(scheduler, jobKey(job.getQuartzName(), job.getQuartzGroup()), job);
+                JobDataBean jobData = genJobData(jobKey(job.getQuartzName(), job.getQuartzGroup()), job);
                 if (jobData != null) {
                     dataList.add(jobData);
                 }
@@ -103,7 +104,8 @@ public class JobServiceImpl implements JobService {
         return dataList;
     }
 
-    private JobDataBean genJobData(Scheduler scheduler, JobKey jobKey, GriffinJob job) throws SchedulerException {
+    private JobDataBean genJobData(JobKey jobKey, GriffinJob job) throws SchedulerException {
+        Scheduler scheduler = factory.getScheduler();
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         if (CollectionUtils.isEmpty(triggers)) {
             return null;
@@ -136,15 +138,25 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public JobSchedule getJobSchedule(String jobName) {
+        JobSchedule jobSchedule = jobScheduleRepo.findByJobName(jobName);
+        if (jobSchedule == null) {
+            LOGGER.warn("Job name {} does not exist.", jobName);
+            throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
+        }
+        return jobSchedule;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public JobSchedule addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
-        checkJobScheduleParams(js, measure);
+        validateJobScheduleParams(js, measure);
         String qName = getQuartzName(js);
-        String qGroup = getQuartzGroupName();
+        String qGroup = getQuartzGroup();
         TriggerKey triggerKey = triggerKey(qName, qGroup);
-        if (factory.getObject().checkExists(triggerKey)) {
+        if (factory.getScheduler().checkExists(triggerKey)) {
             throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
         }
         GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
@@ -155,33 +167,35 @@ public class JobServiceImpl implements JobService {
     }
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
-        Scheduler scheduler = factory.getObject();
-        JobDetail jobDetail = addJobDetail(scheduler, triggerKey, js, job);
-        scheduler.scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
+        JobDetail jobDetail = addJobDetail(triggerKey, js, job);
+        factory.getScheduler().scheduleJob(genTriggerInstance(triggerKey, jobDetail, js));
     }
 
     private String getQuartzName(JobSchedule js) {
         return js.getJobName() + "_" + System.currentTimeMillis();
     }
 
-    private String getQuartzGroupName() {
+    private String getQuartzGroup() {
         return "BA";
     }
 
-    private void checkJobScheduleParams(JobSchedule js, GriffinMeasure measure) {
-        if (!isJobNameValid(js.getJobName())) {
+    private void validateJobScheduleParams(JobSchedule js, GriffinMeasure measure) {
+        if (!isValidJobName(js.getJobName())) {
             throw new GriffinException.BadRequestException(INVALID_JOB_NAME);
         }
-        if (!isBaseLineValid(js.getSegments())) {
+        if (!isValidCronExpression(js.getCronExpression())) {
+            throw new GriffinException.BadRequestException(INVALID_CRON_EXPRESSION);
+        }
+        if (!isValidBaseLine(js.getSegments())) {
             throw new GriffinException.BadRequestException(MISSING_BASELINE_CONFIG);
         }
         List<String> names = getConnectorNames(measure);
-        if (!isConnectorNamesValid(js.getSegments(), names)) {
+        if (!isValidConnectorNames(js.getSegments(), names)) {
             throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
         }
     }
 
-    private boolean isJobNameValid(String jobName) {
+    private boolean isValidJobName(String jobName) {
         if (StringUtils.isEmpty(jobName)) {
             LOGGER.warn("Job name cannot be empty.");
             return false;
@@ -194,7 +208,19 @@ public class JobServiceImpl implements JobService {
         return true;
     }
 
-    private boolean isBaseLineValid(List<JobDataSegment> segments) {
+    private boolean isValidCronExpression(String cronExpression) {
+        if (StringUtils.isEmpty(cronExpression)) {
+            LOGGER.warn("Cron Expression is empty.");
+            return false;
+        }
+        if (!isValidExpression(cronExpression)) {
+            LOGGER.warn("Cron Expression is invalid.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValidBaseLine(List<JobDataSegment> segments) {
         for (JobDataSegment jds : segments) {
             if (jds.getBaseline()) {
                 return true;
@@ -204,34 +230,25 @@ public class JobServiceImpl implements JobService {
         return false;
     }
 
-    private boolean isConnectorNamesValid(List<JobDataSegment> segments, List<String> names) {
-        Set<String> dcSets = new HashSet<>();
+    private boolean isValidConnectorNames(List<JobDataSegment> segments, List<String> names) {
+        Set<String> sets = new HashSet<>();
         for (JobDataSegment segment : segments) {
             String dcName = segment.getDataConnectorName();
-            dcSets.add(dcName);
-            if (!isConnectorNameValid(dcName, names)) {
+            sets.add(dcName);
+            boolean exist = names.stream().anyMatch(name -> name.equals(dcName));
+            if (!exist) {
+                LOGGER.warn("Param {} is a illegal string. Please input one of strings in {}.", dcName, names);
                 return false;
             }
         }
-        if (dcSets.size() < segments.size()) {
-            LOGGER.warn("Connector names in job data segment cannot be repeated.");
+        if (sets.size() < segments.size()) {
+            LOGGER.warn("Connector names in job data segment cannot duplicate.");
             return false;
         }
         return true;
     }
 
-    private boolean isConnectorNameValid(String param, List<String> names) {
-        for (String name : names) {
-            if (name.equals(param)) {
-                return true;
-            }
-        }
-        LOGGER.warn("Param {} is a illegal string. Please input one of strings in {}.", param, names);
-        return false;
-    }
-
     private List<String> getConnectorNames(GriffinMeasure measure) {
-        List<String> names = new ArrayList<>();
         Set<String> sets = new HashSet<>();
         List<DataSource> sources = measure.getDataSources();
         for (DataSource source : sources) {
@@ -241,8 +258,7 @@ public class JobServiceImpl implements JobService {
             LOGGER.warn("Connector names cannot be repeated.");
             return Collections.emptyList();
         }
-        names.addAll(sets);
-        return names;
+        return new ArrayList<>(sets);
     }
 
     private GriffinMeasure getMeasureIfValid(Long measureId) {
@@ -254,18 +270,18 @@ public class JobServiceImpl implements JobService {
         return measure;
     }
 
-
-    private Trigger genTriggerInstance(TriggerKey triggerKey, JobDetail jd, JobSchedule js) throws ParseException {
+    private Trigger genTriggerInstance(TriggerKey triggerKey, JobDetail jd, JobSchedule js) {
         return newTrigger()
                 .withIdentity(triggerKey)
                 .forJob(jd)
-                .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(js.getCronExpression()))
-                        .inTimeZone(TimeZone.getTimeZone(js.getTimeZone()))
+                .withSchedule(cronSchedule(js.getCronExpression())
+                        .inTimeZone(getTimeZone(js.getTimeZone()))
                 )
                 .build();
     }
 
-    private JobDetail addJobDetail(Scheduler scheduler, TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws SchedulerException {
+    private JobDetail addJobDetail(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws SchedulerException {
+        Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);
@@ -315,7 +331,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void pauseJob(String group, String name) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
@@ -388,7 +404,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private void deleteJob(String group, String name) throws SchedulerException {
-        Scheduler scheduler = factory.getObject();
+        Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.info("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
@@ -450,7 +466,6 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-
     /**
      * call livy to update part of job instance table data associated with group and jobName in mysql.
      *
@@ -475,7 +490,6 @@ public class JobServiceImpl implements JobService {
             LOGGER.error("Sync job instances failure. {}", e.getMessage());
         }
     }
-
 
     private void setJobInstanceIdAndUri(JobInstanceBean instance, HashMap<String, Object> resultMap) {
         if (resultMap != null && resultMap.size() != 0 && resultMap.get("state") != null) {
@@ -528,7 +542,7 @@ public class JobServiceImpl implements JobService {
         JobKey jobKey = new JobKey(job.getQuartzName(), job.getQuartzGroup());
         List<Trigger> triggers;
         try {
-            triggers = (List<Trigger>) factory.getObject().getTriggersOfJob(jobKey);
+            triggers = (List<Trigger>) factory.getScheduler().getTriggersOfJob(jobKey);
         } catch (SchedulerException e) {
             LOGGER.error("Job schedule exception. {}", e.getMessage());
             throw new GriffinException.ServiceException("Fail to Get HealthInfo", e);
