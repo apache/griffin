@@ -197,13 +197,13 @@ public class SparkSubmitJob implements Job {
 
     private void saveJobInstance(JobDetail jd) throws SchedulerException, IOException {
         String result = post2Livy();
-        boolean pauseStatus = false;
         if (result != null) {
-            jobService.pauseJob(jd.getKey().getGroup(), jd.getKey().getName());
-            pauseStatus = true;
-            LOGGER.info("Delete predicate job {} success");
+            String group = jd.getKey().getGroup();
+            String name = jd.getKey().getName();
+            jobService.pauseJob(group, name);
+            LOGGER.info("Delete predicate job({},{}) success.", group, name);
         }
-        saveJobInstance(result, LivySessionStates.State.found, pauseStatus);
+        saveJobInstance(result, LivySessionStates.State.found, true);
     }
 
     private void saveJobInstance(String result, LivySessionStates.State state, Boolean pauseStatus) throws IOException {
