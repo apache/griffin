@@ -33,6 +33,7 @@ under the License.
           <th st-ratio="15">Trigger State</th>
           <th st-ratio="5">Cron Expression</th>
           <th st-ratio="5">Action</th>
+          <th st-ratio="5">Metric</th>
         </tr>
       </thead>
       <tbody>
@@ -65,6 +66,12 @@ under the License.
             &nbsp;
             <a (click)="remove(row)" title="delete" style="text-decoration:none">
               <i class="fa fa-trash-o po"></i>
+            </a> &nbsp;
+          </td>
+          <td>
+            &nbsp;
+            <a (click)="show(row)">
+              <i class="fa fa-bar-chart po"></i>
             </a> &nbsp;
           </td>
         </tr>

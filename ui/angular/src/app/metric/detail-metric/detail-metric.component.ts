@@ -52,6 +52,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
   offset = 0;
   profiling = false;
   columnname = [];
+  noresults = false;
 
   ngOnInit() {
     this.currentJob = this.route.snapshot.paramMap.get("name");
@@ -68,7 +69,10 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
     this.http.get(metricDetailUrl).subscribe(
       data => {
         this.data = data;
-        if(this.data && this.data[0].value.matched != undefined){
+        if(this.data.length == 0){
+          this.noresults = true;
+        }
+        if(this.data.length != 0 && this.data[0].value.matched != undefined){
           var metric = {
             name: "",
             timestamp: 0,
@@ -84,7 +88,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
           $("#bigChartDiv").height(window.innerHeight - 120 + "px");
           $("#bigChartDiv").width(window.innerWidth - 400 + "px");
           $("#bigChartContainer").show();
-        }else{
+        }else if(this.data.length != 0){
           this.prodata = this.data;
           this.profiling = true;
           for(let key in this.data[0].value){
