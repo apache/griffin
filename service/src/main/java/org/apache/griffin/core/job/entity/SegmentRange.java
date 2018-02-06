@@ -29,7 +29,7 @@ import javax.persistence.Entity;
 public class SegmentRange extends AbstractAuditableEntity {
 
     @Column(name = "data_begin")
-    private String begin = "1h";
+    private String begin = "-1h";
 
     private String length = "1h";
 

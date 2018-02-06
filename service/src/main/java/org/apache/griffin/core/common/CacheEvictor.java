@@ -30,8 +30,12 @@ import org.springframework.stereotype.Component;
 public class CacheEvictor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheEvictor.class);
 
+    private final HiveMetaStoreService hiveMetaStoreService;
+
     @Autowired
-    private HiveMetaStoreService hiveMetaStoreService;
+    public CacheEvictor(HiveMetaStoreService hiveMetaStoreService) {
+        this.hiveMetaStoreService = hiveMetaStoreService;
+    }
 
     @Scheduled(fixedRateString = "${cache.evict.hive.fixedRate.in.milliseconds}")
     @CacheEvict(cacheNames = "hive", allEntries = true, beforeInvocation = true)

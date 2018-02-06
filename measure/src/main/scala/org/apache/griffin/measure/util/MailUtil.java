@@ -23,7 +23,10 @@ package org.apache.griffin.measure.util;
 import org.apache.griffin.measure.config.params.env.EmailParam;
 
 import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.util.Properties;
 
 /**
@@ -41,18 +44,17 @@ public class MailUtil {
         Message msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(emailParam.mail()));
         //msg.setRecipient(Message.RecipientType.TO, new InternetAddress(UserArr));
-        String[] arr=null;
-        if (UserArr.indexOf(",")==-1) {
-            arr=new String[]{UserArr};
-        }
-        else {
-            arr=UserArr.split(",");
+        String[] arr = null;
+        if (UserArr.indexOf(",") == -1) {
+            arr = new String[]{UserArr};
+        } else {
+            arr = UserArr.split(",");
         }
         Address[] tos = new InternetAddress[arr.length];
-        for (int i=0; i<arr.length; i++){
+        for (int i = 0; i < arr.length; i++) {
             tos[i] = new InternetAddress(arr[i]);
         }
-        msg.setRecipients(Message.RecipientType.TO,tos);
+        msg.setRecipients(Message.RecipientType.TO, tos);
         msg.setSubject(Title);
         Multipart mainPart = new MimeMultipart();
         BodyPart html = new MimeBodyPart();

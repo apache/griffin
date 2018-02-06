@@ -60,13 +60,15 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     }
 
     public void setConfig(String config) throws IOException {
-        this.config = config;
-        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
-        });
+        if (!StringUtils.isEmpty(config)) {
+            this.config = config;
+            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
+            });
+        }
     }
 
     @JsonProperty("config")
-    public Map<String, String> getConfigMap() throws IOException {
+    public Map<String, String> getConfigMap(){
         return configMap;
     }
 
