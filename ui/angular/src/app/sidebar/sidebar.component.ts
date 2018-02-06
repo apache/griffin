@@ -127,7 +127,7 @@ export class SidebarComponent implements OnInit {
                 JSON.stringify(jobs[i].metricValues)
               );
               metricNode.name = jobs[i].name;
-              metricNode.timestamp = jobs[i].metricValues[0].value.tmst;
+              metricNode.timestamp = jobs[i].metricValues[0].tmst;
               metricNode.dq =
                 jobs[i].metricValues[0].value.matched /
                 jobs[i].metricValues[0].value.total *
