@@ -22,10 +22,13 @@ package org.apache.griffin.core.measure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.util.JsonUtil;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Map;
 
@@ -36,17 +39,17 @@ public class Rule extends AbstractAuditableEntity {
     /**
      * three type:1.griffin-dsl 2.df-opr 3.spark-sql
      */
+    @NotNull
     private String dslType;
 
+    @NotNull
     private String dqType;
 
     @Column(length = 8 * 1024)
+    @NotNull
     private String rule;
 
     private String name;
-
-    @Column(length = 1024)
-    private String description;
 
     @JsonIgnore
     @Access(AccessType.PROPERTY)
@@ -56,6 +59,22 @@ public class Rule extends AbstractAuditableEntity {
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, Object> detailsMap;
+
+    @JsonIgnore
+    @Access(AccessType.PROPERTY)
+    private String metric;
+
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, Object> metricMap;
+
+    @JsonIgnore
+    @Access(AccessType.PROPERTY)
+    private String record;
+
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, Object> recordMap;
 
     @JsonProperty("dsl.type")
     public String getDslType() {
@@ -90,9 +109,11 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     private void setDetails(String details) throws IOException {
-        this.details = details;
-        detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
-        });
+        if (!StringUtils.isEmpty(details)) {
+            this.details = details;
+            this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
+            });
+        }
     }
 
     @JsonProperty("details")
@@ -106,20 +127,58 @@ public class Rule extends AbstractAuditableEntity {
         this.details = JsonUtil.toJson(details);
     }
 
+    public String getMetric() {
+        return metric;
+    }
+
+    public void setMetric(String metric) throws IOException {
+        if (!StringUtils.isEmpty(metric)) {
+            this.metric = metric;
+            this.metricMap = JsonUtil.toEntity(metric, new TypeReference<Map<String, Object>>() {
+            });
+        }
+    }
+
+    @JsonProperty("metric")
+    public Map<String, Object> getMetricMap() {
+        return metricMap;
+    }
+
+    @JsonProperty("metric")
+    public void setMetricMap(Map<String, Object> metricMap) throws JsonProcessingException {
+        this.metricMap = metricMap;
+        this.metric = JsonUtil.toJson(metricMap);
+    }
+
+    public String getRecord() {
+        return record;
+    }
+
+    public void setRecord(String record) throws IOException {
+        if (!StringUtils.isEmpty(record)) {
+            this.record = record;
+            this.recordMap = JsonUtil.toEntity(record, new TypeReference<Map<String, Object>>() {
+            });
+        }
+    }
+
+    @JsonProperty("record")
+    public Map<String, Object> getRecordMap() {
+        return recordMap;
+    }
+
+    @JsonProperty("record")
+    public void setRecordMap(Map<String, Object> recordMap) throws JsonProcessingException {
+        this.recordMap = recordMap;
+        this.record = JsonUtil.toJson(recordMap);
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Rule() {

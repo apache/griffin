@@ -30,17 +30,9 @@ public interface MeasureService {
 
     Measure getMeasureById(long id);
 
-/*
-    Measure getMeasureByName(String measureName);
-*/
-
-
     void deleteMeasureById(Long id);
 
-
-/*
-    GriffinOperationMessage deleteMeasureByName(String measureName) ;
-*/
+    void deleteMeasures();
 
     void updateMeasure(Measure measure);
 

@@ -129,13 +129,15 @@ public class JobSchedule extends AbstractAuditableEntity {
     }
 
     private void setPredicateConfig(String config) throws IOException {
-        this.predicateConfig = config;
-        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
-        });
+        if (!StringUtils.isEmpty(config)) {
+            this.predicateConfig = config;
+            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
+            });
+        }
     }
 
     @JsonProperty("predicate.config")
-    public Map<String, Object> getConfigMap() throws IOException {
+    public Map<String, Object> getConfigMap() {
         return configMap;
     }
 

@@ -59,14 +59,6 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         LOGGER.info("HiveMetaStoreServiceImpl single thread pool created.");
     }
 
-    private String getUseDbName(String dbName) {
-        if (!StringUtils.hasText(dbName)) {
-            return defaultDbName;
-        } else {
-            return dbName;
-        }
-    }
-
     @Override
     @Cacheable
     public Iterable<String> getAllDatabases() {
@@ -121,10 +113,11 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             return results;
         }
         dbs = getAllDatabases();
-        if (dbs != null) {
-            for (String db : dbs) {
-                results.put(db, getTables(db));
-            }
+        if (dbs == null) {
+            return results;
+        }
+        for (String db : dbs) {
+            results.put(db, getTables(db));
         }
         return results;
     }
@@ -166,6 +159,14 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             LOGGER.error("Exception fetching tables info: {}", e.getMessage());
         }
         return allTables;
+    }
+
+    private String getUseDbName(String dbName) {
+        if (!StringUtils.hasText(dbName)) {
+            return defaultDbName;
+        } else {
+            return dbName;
+        }
     }
 
     private void reconnect() {

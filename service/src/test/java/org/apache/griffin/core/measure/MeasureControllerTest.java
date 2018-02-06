@@ -92,7 +92,7 @@ public class MeasureControllerTest {
     }
 
     @Test
-    public void testDeleteMeasuresByIdForSuccess() throws Exception {
+    public void testDeleteMeasureByIdForSuccess() throws Exception {
         doNothing().when(service).deleteMeasureById(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
@@ -100,7 +100,7 @@ public class MeasureControllerTest {
     }
 
     @Test
-    public void testDeleteMeasuresByIdForNotFound() throws Exception {
+    public void testDeleteMeasureByIdForNotFound() throws Exception {
         doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.MEASURE_ID_DOES_NOT_EXIST))
                 .when(service).deleteMeasureById(1L);
 
@@ -109,11 +109,37 @@ public class MeasureControllerTest {
     }
 
     @Test
-    public void testDeleteMeasuresByIdForGriffinFailureWithException() throws Exception {
+    public void testDeleteMeasureByIdForGriffinFailureWithException() throws Exception {
         doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
                 .when(service).deleteMeasureById(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testDeleteMeasuresForSuccess() throws Exception {
+        doNothing().when(service).deleteMeasures();
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testDeleteMeasuresForNotFound() throws Exception {
+        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.MEASURE_ID_DOES_NOT_EXIST))
+                .when(service).deleteMeasures();
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteMeasuresForGriffinFailureWithException() throws Exception {
+        doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
+                .when(service).deleteMeasures();
+
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures"))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -202,6 +228,5 @@ public class MeasureControllerTest {
                 .contentType(MediaType.APPLICATION_JSON).content(measureJson))
                 .andExpect(status().isBadRequest());
     }
-
 
 }

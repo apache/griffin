@@ -32,7 +32,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,6 +82,12 @@ public class MeasureServiceImplTest {
         assertEquals(m.getName(), measure.getName());
     }
 
+    @Test(expected = GriffinException.NotFoundException.class)
+    public void testGetMeasuresByIdWithFileNotFoundException(){
+        given(measureRepo.findByIdAndDeleted(1L, false)).willReturn(null);
+        service.getMeasureById(1);
+    }
+
     @Test
     public void testGetAliveMeasuresByOwner() throws Exception {
         String owner = "test";
@@ -92,7 +100,7 @@ public class MeasureServiceImplTest {
 
 
     @Test
-    public void testDeleteMeasuresByIdForGriffinSuccess() throws Exception {
+    public void testDeleteMeasureByIdForGriffinSuccess() throws Exception {
         GriffinMeasure measure = createGriffinMeasure("view_item_hourly");
         measure.setId(1L);
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
@@ -103,7 +111,7 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testDeleteMeasuresByIdForExternalSuccess() {
+    public void testDeleteMeasureByIdForExternalSuccess() {
         ExternalMeasure measure = createExternalMeasure("externalMeasure");
         measure.setId(1L);
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
@@ -114,21 +122,47 @@ public class MeasureServiceImplTest {
     }
 
     @Test(expected = GriffinException.NotFoundException.class)
-    public void testDeleteMeasuresByIdFailureWithNotFound() {
+    public void testDeleteMeasureByIdFailureWithNotFound() {
         given(measureRepo.findByIdAndDeleted(1L, false)).willReturn(null);
-
         service.deleteMeasureById(1L);
     }
 
     @Test(expected = GriffinException.ServiceException.class)
-    public void testDeleteMeasuresByIdForGriffinFailureWithException() throws Exception {
+    public void testDeleteMeasureByIdForGriffinFailureWithException() throws Exception {
         GriffinMeasure measure = createGriffinMeasure("externalMeasure");
         measure.setId(1L);
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
         doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
                 .when(griffinOp).delete(measure);
-
         service.deleteMeasureById(1L);
+    }
+
+    @Test
+    public void testDeleteMeasuresForGriffinSuccess() throws Exception {
+        GriffinMeasure measure = createGriffinMeasure("view_item_hourly");
+        measure.setId(1L);
+        given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
+        doNothing().when(griffinOp).delete(measure);
+        service.deleteMeasures();
+    }
+
+    @Test
+    public void testDeleteMeasuresForExternalSuccess() {
+        ExternalMeasure measure = createExternalMeasure("externalMeasure");
+        measure.setId(1L);
+        given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
+        doNothing().when(externalOp).delete(measure);
+        service.deleteMeasures();
+    }
+
+    @Test(expected = GriffinException.ServiceException.class)
+    public void testDeleteMeasuresForGriffinFailureWithException() throws Exception {
+        GriffinMeasure measure = createGriffinMeasure("externalMeasure");
+        measure.setId(1L);
+        given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
+        doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
+                .when(griffinOp).delete(measure);
+        service.deleteMeasures();
     }
 
     @Test

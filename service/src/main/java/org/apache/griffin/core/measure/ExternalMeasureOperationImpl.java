@@ -19,8 +19,6 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.job.repo.VirtualJobRepo;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
@@ -32,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.MISSING_METRIC_NAME;
+import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("externalOperation")
 public class ExternalMeasureOperationImpl implements MeasureOperation {
@@ -47,11 +45,7 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
     @Transactional
     public Measure create(Measure measure) {
         ExternalMeasure em = (ExternalMeasure) measure;
-        if (StringUtils.isBlank(em.getMetricName())) {
-            LOGGER.warn("Failed to create external measure {}. Its metric name is blank.", measure.getName());
-            throw new GriffinException.BadRequestException(MISSING_METRIC_NAME);
-
-        }
+        validateMeasure(em);
         em.setVirtualJob(new VirtualJob());
         em = measureRepo.save(em);
         VirtualJob vj = genVirtualJob(em, em.getVirtualJob());
@@ -62,10 +56,7 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
     @Override
     public void update(Measure measure) {
         ExternalMeasure latestMeasure = (ExternalMeasure) measure;
-        if (StringUtils.isBlank(latestMeasure.getMetricName())) {
-            LOGGER.warn("Failed to update external measure {}. Its metric name is blank.", measure.getName());
-            throw new GriffinException.BadRequestException(MISSING_METRIC_NAME);
-        }
+        validateMeasure(latestMeasure);
         ExternalMeasure originMeasure = measureRepo.findOne(latestMeasure.getId());
         VirtualJob vj = genVirtualJob(latestMeasure, originMeasure.getVirtualJob());
         latestMeasure.setVirtualJob(vj);
