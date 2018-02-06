@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class SparkSubmitJob implements Job {
 
     private GriffinMeasure measure;
     private String livyUri;
-    private List<SegmentPredicate> mPredicts;
+    private List<SegmentPredicate> mPredicates;
     private JobInstanceBean jobInstance;
     private RestTemplate restTemplate = new RestTemplate();
     private LivyConf livyConf = new LivyConf();
@@ -69,7 +70,7 @@ public class SparkSubmitJob implements Job {
         try {
             initParam(jd);
             setLivyConf();
-            if (!success(mPredicts)) {
+            if (!success(mPredicates)) {
                 updateJobInstanceState(context);
                 return;
             }
@@ -107,7 +108,7 @@ public class SparkSubmitJob implements Job {
         for (SegmentPredicate segPredicate : predicates) {
             Predicator predicator = PredicatorFactory.newPredicateInstance(segPredicate);
             try {
-                if (!predicator.predicate()) {
+                if (predicator != null && !predicator.predicate()) {
                     return false;
                 }
             } catch (Exception e) {
@@ -119,7 +120,7 @@ public class SparkSubmitJob implements Job {
     }
 
     private void initParam(JobDetail jd) throws IOException {
-        mPredicts = new ArrayList<>();
+        mPredicates = new ArrayList<>();
         livyUri = livyConfProps.getProperty("livy.uri");
         jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap().getString(PREDICATE_JOB_NAME));
         measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
@@ -128,15 +129,16 @@ public class SparkSubmitJob implements Job {
     }
 
     private void setPredicts(String json) throws IOException {
+        if (StringUtils.isEmpty(json)) {
+            return;
+        }
         List<Map<String, Object>> maps = JsonUtil.toEntity(json, new TypeReference<List<Map>>() {
         });
-        if (maps != null) {
-            for (Map<String, Object> map : maps) {
-                SegmentPredicate sp = new SegmentPredicate();
-                sp.setType((String) map.get("type"));
-                sp.setConfigMap((Map<String, String>) map.get("config"));
-                mPredicts.add(sp);
-            }
+        for (Map<String, Object> map : maps) {
+            SegmentPredicate sp = new SegmentPredicate();
+            sp.setType((String) map.get("type"));
+            sp.setConfigMap((Map<String, String>) map.get("config"));
+            mPredicates.add(sp);
         }
     }
 

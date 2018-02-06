@@ -48,6 +48,12 @@ public class MeasureController {
         measureService.deleteMeasureById(id);
     }
 
+    @RequestMapping(value = "/measures", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMeasures() {
+        measureService.deleteMeasures();
+    }
+
     @RequestMapping(value = "/measures", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateMeasure(@RequestBody Measure measure) {

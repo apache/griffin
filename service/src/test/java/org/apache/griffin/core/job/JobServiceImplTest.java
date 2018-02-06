@@ -102,7 +102,7 @@ public class JobServiceImplTest {
     public void testGetAliveJobsForSuccess() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         GriffinJob job = createGriffinJob();
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
         SimpleTrigger trigger = new SimpleTriggerImpl();
         given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(Arrays.asList(trigger));
@@ -114,7 +114,7 @@ public class JobServiceImplTest {
     public void testGetAliveJobsForNoJobsWithTriggerEmpty() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         GriffinJob job = createGriffinJob();
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
         given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(new ArrayList<>());
 
@@ -125,7 +125,7 @@ public class JobServiceImplTest {
     public void testGetAliveJobsForNoJobsWithException() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         GriffinJob job = createGriffinJob();
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
         given(scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willThrow(new SchedulerException());
 
@@ -140,7 +140,7 @@ public class JobServiceImplTest {
         GriffinMeasure measure = createGriffinMeasure("measureName");
         GriffinJob job = createGriffinJob();
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(griffinMeasureRepo.findByIdAndDeleted(js.getMeasureId(), false)).willReturn(measure);
         given(jobRepo.countByJobNameAndDeleted(js.getJobName(), false)).willReturn(0);
         given(jobScheduleRepo.save(js)).willReturn(js);
@@ -228,7 +228,7 @@ public class JobServiceImplTest {
         JobDataSegment target = createJobDataSegment("target_name", false);
         JobSchedule js = createJobSchedule("jobName", source, target);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(griffinMeasureRepo.findByIdAndDeleted(js.getMeasureId(), false)).willReturn(measure);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(true);
 
@@ -243,7 +243,7 @@ public class JobServiceImplTest {
         job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
 
         service.deleteJob(jobId);
@@ -260,7 +260,7 @@ public class JobServiceImplTest {
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
         job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
 
@@ -283,7 +283,7 @@ public class JobServiceImplTest {
         Long jobId = 1L;
         GriffinJob job = createGriffinJob();
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doThrow(SchedulerException.class).when(scheduler).pauseJob(Matchers.any(JobKey.class));
@@ -298,7 +298,7 @@ public class JobServiceImplTest {
         job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doNothing().when(scheduler).pauseJob(Matchers.any(JobKey.class));
         given(scheduler.deleteJob(Matchers.any(JobKey.class))).willReturn(true);
@@ -317,7 +317,7 @@ public class JobServiceImplTest {
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
         job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
 
@@ -340,7 +340,7 @@ public class JobServiceImplTest {
     public void testDeleteJobByJobNameForFailureWithException() throws SchedulerException {
         GriffinJob job = createGriffinJob();
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doThrow(SchedulerException.class).when(scheduler).pauseJob(Matchers.any(JobKey.class));
@@ -355,7 +355,7 @@ public class JobServiceImplTest {
         job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
 
         service.deleteJobsRelateToMeasure(1L);
@@ -372,7 +372,7 @@ public class JobServiceImplTest {
         job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
 
         service.deleteJobsRelateToMeasure(1L);
@@ -389,7 +389,7 @@ public class JobServiceImplTest {
 
         service.deleteJobsRelateToMeasure(measureId);
         verify(jobRepo, times(1)).findByMeasureIdAndDeleted(measureId, false);
-        verify(factory, times(0)).getObject();
+        verify(factory, times(0)).getScheduler();
     }
 
     @Test(expected = GriffinException.ServiceException.class)
@@ -400,7 +400,7 @@ public class JobServiceImplTest {
         job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(measureId, false)).willReturn(Arrays.asList(job));
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doThrow(SchedulerException.class).when(scheduler).pauseJob(Matchers.any(JobKey.class));
 
@@ -434,7 +434,7 @@ public class JobServiceImplTest {
         JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.dead, "pName", "pGroup", null, null);
         given(jobInstanceRepo.findByExpireTmsLessThanEqual(Matchers.any())).willReturn(Arrays.asList(jobInstance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
 
         service.deleteExpiredJobInstance();
@@ -447,7 +447,7 @@ public class JobServiceImplTest {
         JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.dead, "pName", "pGroup", null, null);
         given(jobInstanceRepo.findByExpireTmsLessThanEqual(Matchers.any())).willReturn(Arrays.asList(jobInstance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
 
         service.deleteExpiredJobInstance();
@@ -469,7 +469,7 @@ public class JobServiceImplTest {
         JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.dead, "pName", "pGroup", null, null);
         given(jobInstanceRepo.findByExpireTmsLessThanEqual(Matchers.any())).willReturn(Arrays.asList(jobInstance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doThrow(SchedulerException.class).when(scheduler).pauseJob(Matchers.any(JobKey.class));
 
@@ -541,7 +541,7 @@ public class JobServiceImplTest {
     public void testGetHealthInfoWithHealthy() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         GriffinJob job = createGriffinJob();
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Arrays.asList(job));
         List<Trigger> triggers = Collections.singletonList(new SimpleTriggerImpl());
         given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
@@ -556,7 +556,7 @@ public class JobServiceImplTest {
     public void testGetHealthInfoWithUnhealthy() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         GriffinJob job = createGriffinJob();
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Collections.singletonList(job));
         List<Trigger> triggers = Collections.singletonList(new SimpleTriggerImpl());
         given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
@@ -573,7 +573,7 @@ public class JobServiceImplTest {
     public void testGetHealthInfoWithException() throws SchedulerException {
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         GriffinJob job = createGriffinJob();
-        given(factory.getObject()).willReturn(scheduler);
+        given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByDeleted(false)).willReturn(Collections.singletonList(job));
         given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class)))
                 .willThrow(new SchedulerException());

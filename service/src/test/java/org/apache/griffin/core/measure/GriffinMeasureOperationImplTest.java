@@ -33,8 +33,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
-
 import static org.apache.griffin.core.util.EntityHelper.createDataConnector;
 import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
 import static org.junit.Assert.assertEquals;
@@ -66,15 +64,6 @@ public class GriffinMeasureOperationImplTest {
 
         Measure m = operation.create(measure);
         assertEquals(m.getName(), measure.getName());
-    }
-
-    @Test(expected = GriffinException.BadRequestException.class)
-    public void testCreateForFailureWithConnectorExist() throws Exception {
-        Measure measure = createGriffinMeasure("view_item_hourly");
-        DataConnector dc = new DataConnector("source_name", "1h", "1.2", null);
-        given(dcRepo.findByConnectorNames(Arrays.asList("source_name", "target_name"))).willReturn(Arrays.asList(dc));
-
-        operation.create(measure);
     }
 
     @Test(expected = GriffinException.BadRequestException.class)

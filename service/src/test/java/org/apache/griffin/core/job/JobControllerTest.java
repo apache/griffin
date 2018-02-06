@@ -89,8 +89,7 @@ public class JobControllerTest {
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.toJson(jobSchedule)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(status().isCreated());
     }
 
     @Test

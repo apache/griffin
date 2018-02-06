@@ -35,9 +35,12 @@ import java.util.Properties;
 @Configuration
 public class SchedulerConfig {
 
+    private final Properties quartzConf;
+
     @Autowired
-    @Qualifier("quartzConf")
-    private Properties quartzConf;
+    public SchedulerConfig(@Qualifier("quartzConf") Properties quartzConf) {
+        this.quartzConf = quartzConf;
+    }
 
     @Bean
     public JobFactory jobFactory(ApplicationContext applicationContext) {

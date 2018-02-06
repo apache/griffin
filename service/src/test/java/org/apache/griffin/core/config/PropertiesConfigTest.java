@@ -30,7 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.FileNotFoundException;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 //@TestPropertySource("classpath")
@@ -96,65 +96,43 @@ public class PropertiesConfigTest {
     private PropertiesConfig quartzNotFoundConfig;
 
     @Test
-    public void appConf() throws Exception {
+    public void appConf() {
         Properties conf = noLivyConf.appConf();
-        assertEquals(conf.get("spring.datasource.username"),"test");
+        assertEquals(conf.get("spring.datasource.username"), "test");
     }
 
     @Test
     public void livyConfWithLocationNotNull() throws Exception {
         Properties conf = livyConf.livyConf();
-        assertEquals(conf.get("sparkJob.name"),"test");
+        assertEquals(conf.get("sparkJob.name"), "test");
     }
 
     @Test
     public void livyConfWithLocationNull() throws Exception {
         Properties conf = noLivyConf.livyConf();
-        assertEquals(conf.get("sparkJob.name"),"test");
+        assertEquals(conf.get("sparkJob.name"), "test");
     }
 
-    @Test
-    public void livyConfWithFileNotFoundException() throws Exception {
-        FileNotFoundException e = livyFileNotFoundException();
-        assert e != null;
+    @Test(expected = FileNotFoundException.class)
+    public void livyConfWithFileNotFoundException() throws FileNotFoundException {
+        livyNotFoundConfig.livyConf();
     }
 
     @Test
     public void quartzConfWithLocationNotNull() throws Exception {
         Properties conf = quartzConf.quartzConf();
-        assertEquals(conf.get("org.quartz.scheduler.instanceName"),"spring-boot-quartz-test");
+        assertEquals(conf.get("org.quartz.scheduler.instanceName"), "spring-boot-quartz-test");
     }
 
     @Test
     public void quartzConfWithLocationNull() throws Exception {
         Properties conf = noQuartzConf.quartzConf();
-        assertEquals(conf.get("org.quartz.scheduler.instanceName"),"spring-boot-quartz-test");
+        assertEquals(conf.get("org.quartz.scheduler.instanceName"), "spring-boot-quartz-test");
     }
 
-    @Test
-    public void quartzConfWithFileNotFoundException() throws Exception {
-        FileNotFoundException e = quartzFileNotFoundException();
-        assert e != null;
-    }
-
-    private FileNotFoundException livyFileNotFoundException() {
-        FileNotFoundException exception = null;
-        try {
-            livyNotFoundConfig.livyConf();
-        } catch (FileNotFoundException e) {
-            exception = e;
-        }
-        return exception;
-    }
-
-    private FileNotFoundException quartzFileNotFoundException() {
-        FileNotFoundException exception = null;
-        try {
-            quartzNotFoundConfig.livyConf();
-        } catch (FileNotFoundException e) {
-            exception = e;
-        }
-        return exception;
+    @Test(expected = FileNotFoundException.class)
+    public void quartzConfWithFileNotFoundException() throws FileNotFoundException {
+        quartzNotFoundConfig.livyConf();
     }
 
 }
