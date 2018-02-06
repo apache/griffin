@@ -73,6 +73,11 @@ export class JobComponent implements OnInit {
     this.deleteId = row.jobId;
   }
 
+  show(row) {
+    var curjob = row.jobName;
+    this.router.navigate(['/detailed/'+curjob]);
+  }
+
   confirmDelete() {
     let deleteJob = this.serviceService.config.uri.deleteJob;
     let deleteUrl = deleteJob + "/" + this.deleteId;

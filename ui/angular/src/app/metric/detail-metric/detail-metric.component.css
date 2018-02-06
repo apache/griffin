@@ -22,6 +22,7 @@ under the License.
 	/*max-width:800px;*/
 	margin:auto;
 	overflow:hidden;
+	text-align: center;
 	/*border:1px solid #f5f5f5;*/
 }
 .table-wrap {
@@ -92,7 +93,6 @@ under the License.
 .title {
 	margin-top: 10px;
     margin-bottom: 10px;
-    margin-left: 50%;
     font-size: 18px;
 }
 
