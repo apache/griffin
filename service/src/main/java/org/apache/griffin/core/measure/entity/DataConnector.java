@@ -136,7 +136,7 @@ public class DataConnector extends AbstractAuditableEntity {
 
     public void setName(String name) {
         if (StringUtils.isEmpty(name)) {
-            LOGGER.error("Connector name cannot be empty.");
+            LOGGER.warn("Connector name cannot be empty.");
             throw new NullPointerException();
         }
         this.name = name;

@@ -51,7 +51,7 @@ public class TimeUtil {
 
     public static Long str2Long(String timeStr) {
         if (timeStr == null) {
-            LOGGER.error("Time string can not be empty.");
+            LOGGER.warn("Time string can not be empty.");
             return 0L;
         }
         String trimTimeStr = timeStr.trim();
@@ -106,7 +106,7 @@ public class TimeUtil {
         } else if (unit.matches(DAYS_PATTERN)) {
             return milliseconds(t, TimeUnit.DAYS);
         } else {
-            LOGGER.error("Time string format error.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.");
+            LOGGER.warn("Time string format error.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.");
             return 0L;
         }
     }

@@ -124,11 +124,11 @@ public class SparkSubmitJob implements Job {
         livyUri = livyConfProps.getProperty("livy.uri");
         jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap().getString(PREDICATE_JOB_NAME));
         measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
-        setPredicts(jd.getJobDataMap().getString(PREDICATES_KEY));
+        setPredicates(jd.getJobDataMap().getString(PREDICATES_KEY));
         setMeasureInstanceName(measure, jd);
     }
 
-    private void setPredicts(String json) throws IOException {
+    private void setPredicates(String json) throws IOException {
         if (StringUtils.isEmpty(json)) {
             return;
         }
@@ -197,13 +197,13 @@ public class SparkSubmitJob implements Job {
 
     private void saveJobInstance(JobDetail jd) throws SchedulerException, IOException {
         String result = post2Livy();
-        boolean pauseStatus = false;
         if (result != null) {
-            jobService.pauseJob(jd.getKey().getGroup(), jd.getKey().getName());
-            pauseStatus = true;
-            LOGGER.info("Delete predicate job {} success");
+            String group = jd.getKey().getGroup();
+            String name = jd.getKey().getName();
+            jobService.pauseJob(group, name);
+            LOGGER.info("Delete predicate job({},{}) success.", group, name);
         }
-        saveJobInstance(result, LivySessionStates.State.found, pauseStatus);
+        saveJobInstance(result, LivySessionStates.State.found, true);
     }
 
     private void saveJobInstance(String result, LivySessionStates.State state, Boolean pauseStatus) throws IOException {

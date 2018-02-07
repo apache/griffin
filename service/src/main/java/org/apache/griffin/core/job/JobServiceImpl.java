@@ -480,7 +480,7 @@ public class JobServiceImpl implements JobService {
             HashMap<String, Object> resultMap = JsonUtil.toEntity(resultStr, type);
             setJobInstanceIdAndUri(jobInstance, resultMap);
         } catch (RestClientException e) {
-            LOGGER.error("Spark session {} has overdue, set state as unknown!\n {}", jobInstance.getSessionId(), e.getMessage());
+            LOGGER.warn("Spark session {} has overdue, set state as unknown!\n {}", jobInstance.getSessionId(), e.getMessage());
             setJobInstanceUnknownStatus(jobInstance);
         } catch (IOException e) {
             LOGGER.error("Job instance json converts to map failed. {}", e.getMessage());

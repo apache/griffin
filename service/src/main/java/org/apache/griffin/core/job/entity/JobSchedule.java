@@ -84,7 +84,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     @JsonProperty("job.name")
     public void setJobName(String jobName) {
         if (StringUtils.isEmpty(jobName)) {
-            LOGGER.error("Job name cannot be empty.");
+            LOGGER.warn("Job name cannot be empty.");
             throw new NullPointerException();
         }
         this.jobName = jobName;
@@ -98,7 +98,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     @JsonProperty("cron.expression")
     public void setCronExpression(String cronExpression) {
         if (StringUtils.isEmpty(cronExpression) || !isCronExpressionValid(cronExpression)) {
-            LOGGER.error("Cron expression is invalid.Please check your cron expression.");
+            LOGGER.warn("Cron expression is invalid.Please check your cron expression.");
             throw new IllegalArgumentException();
         }
         this.cronExpression = cronExpression;
@@ -165,7 +165,7 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     private boolean isCronExpressionValid(String cronExpression) {
         if (!CronExpression.isValidExpression(cronExpression)) {
-            LOGGER.error("Cron expression {} is invalid.", cronExpression);
+            LOGGER.warn("Cron expression {} is invalid.", cronExpression);
             return false;
         }
         return true;

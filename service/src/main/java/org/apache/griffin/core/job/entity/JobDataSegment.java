@@ -70,7 +70,7 @@ public class JobDataSegment extends AbstractAuditableEntity {
     @JsonProperty("data.connector.name")
     public void setDataConnectorName(String dataConnectorName) {
         if (StringUtils.isEmpty(dataConnectorName)) {
-            LOGGER.error(" Data connector name is invalid. Please check your connector name.");
+            LOGGER.warn(" Data connector name is invalid. Please check your connector name.");
             throw new NullPointerException();
         }
         this.dataConnectorName = dataConnectorName;
