@@ -23,16 +23,20 @@ import org.apache.spark.sql.SQLContext
 object GriffinUdfs {
 
   def register(sqlContext: SQLContext): Unit = {
-    sqlContext.udf.register("index_of", indexOf)
-    sqlContext.udf.register("matches", matches)
+    sqlContext.udf.register("index_of", indexOf _)
+    sqlContext.udf.register("matches", matches _)
   }
 
-  private val indexOf = (arr: Seq[String], v: String) => {
+  private def indexOf(arr: Seq[String], v: String) = {
     arr.indexOf(v)
   }
 
-  private val matches = (s: String, regex: String) => {
+  private def matches(s: String, regex: String) = {
     s.matches(regex)
+  }
+
+  private def regexSubstr(s: String, regex: String, replacement: String) = {
+    s.replaceAll(regex, replacement)
   }
 
 }
