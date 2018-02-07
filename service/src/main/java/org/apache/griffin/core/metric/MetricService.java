@@ -31,7 +31,7 @@ public interface MetricService {
 
     Map<String, List<Metric>> getAllMetrics();
 
-    List<MetricValue> getMetricValues(String metricName, int offset, int size);
+    List<MetricValue> getMetricValues(String metricName, int offset, int size, long tmst);
 
     ResponseEntity addMetricValues(List<MetricValue> values);
 
