@@ -74,7 +74,7 @@ public class MetricServiceImplTest {
         MetricValue value = new MetricValue("jobName", 1L, new HashMap<>());
         given(jobRepo.findByDeleted(false)).willReturn(Collections.singletonList(job));
         given(measureRepo.findByDeleted(false)).willReturn(Collections.singletonList(measure));
-        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt()))
+        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
                 .willReturn(Collections.singletonList(value));
 
         Map<String, List<Metric>> metricMap = service.getAllMetrics();
@@ -88,7 +88,7 @@ public class MetricServiceImplTest {
         AbstractJob job = createGriffinJob();
         given(jobRepo.findByDeleted(false)).willReturn(Collections.singletonList(job));
         given(measureRepo.findByDeleted(false)).willReturn(Collections.singletonList(measure));
-        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt()))
+        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
                 .willThrow(new IOException());
 
         service.getAllMetrics();
@@ -97,20 +97,20 @@ public class MetricServiceImplTest {
     @Test
     public void testGetMetricValuesSuccess() throws IOException {
         MetricValue value = new MetricValue("jobName", 1L, new HashMap<>());
-        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt()))
+        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
                 .willReturn(Collections.singletonList(value));
 
-        List<MetricValue> values = service.getMetricValues("jobName", 0, 300);
+        List<MetricValue> values = service.getMetricValues("jobName", 0, 300, 0);
         assertEquals(values.size(), 1);
         assertEquals(values.get(0).getName(), "jobName");
     }
 
     @Test(expected = GriffinException.ServiceException.class)
     public void testGetMetricValuesFailureWithException() throws IOException {
-        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt()))
+        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
                 .willThrow(new IOException());
 
-        service.getMetricValues("jobName", 0, 300);
+        service.getMetricValues("jobName", 0, 300, 0);
     }
 
     @Test

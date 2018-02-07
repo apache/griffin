@@ -70,7 +70,7 @@ public class MetricServiceImpl implements MetricService {
             List<AbstractJob> jobList = entry.getValue();
             List<Metric> metrics = new ArrayList<>();
             for (AbstractJob job : jobList) {
-                List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300);
+                List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300, job.getCreatedDate().getTime());
                 metrics.add(new Metric(job.getMetricName(), measure.getDqType(), measure.getOwner(), metricValues));
             }
             metricMap.put(measure.getName(), metrics);
@@ -80,7 +80,7 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @Override
-    public List<MetricValue> getMetricValues(String metricName, int offset, int size) {
+    public List<MetricValue> getMetricValues(String metricName, int offset, int size, long tmst) {
         if (offset < 0) {
             throw new GriffinException.BadRequestException(INVALID_METRIC_RECORDS_OFFSET);
         }
@@ -88,7 +88,7 @@ public class MetricServiceImpl implements MetricService {
             throw new GriffinException.BadRequestException(INVALID_METRIC_RECORDS_SIZE);
         }
         try {
-            return metricStore.getMetricValues(metricName, offset, size);
+            return metricStore.getMetricValues(metricName, offset, size, tmst);
         } catch (IOException e) {
             LOGGER.error("Failed to get metric values named {}. {}", metricName, e.getMessage());
             throw new GriffinException.ServiceException("Failed to get metric values", e);
