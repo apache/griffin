@@ -345,7 +345,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit() {
-    var allModels = this.serviceService.config.uri.allModels;
+    var allModels = this.serviceService.config.uri.allModels + '?type=griffin';
     this.http.get(allModels).subscribe(data => {
       this.Measures = data;
     });

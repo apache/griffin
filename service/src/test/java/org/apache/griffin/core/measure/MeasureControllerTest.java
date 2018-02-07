@@ -31,12 +31,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,6 +47,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,7 +75,7 @@ public class MeasureControllerTest {
     @Test
     public void testGetAllMeasures() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
-        given(service.getAllAliveMeasures()).willReturn(Arrays.asList(measure));
+        Mockito.<List<? extends Measure>>when(service.getAllAliveMeasures("")).thenReturn(Collections.singletonList(measure));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures"))
                 .andExpect(status().isOk())
@@ -87,8 +90,7 @@ public class MeasureControllerTest {
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("view_item_hourly")))
-        ;
+                .andExpect(jsonPath("$.name", is("view_item_hourly")));
     }
 
     @Test

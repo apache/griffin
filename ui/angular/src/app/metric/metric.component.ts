@@ -89,7 +89,7 @@ export class MetricComponent implements OnInit {
             }
           }
         } else {
-          break;
+          continue;
         }
         this.finalData.push(node);
       }
