@@ -472,7 +472,7 @@ under the License.
                           {{this.src_where}}
                         </div>
                       </div>
-                      <div class="row" *ngIf="this.src_path">
+                      <div class="row" *ngIf="this.src_needpath && this.src_path">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Source Path:
                         </label>
@@ -512,7 +512,7 @@ under the License.
                           {{this.tgt_where}}
                         </div>
                       </div>
-                      <div class="row" *ngIf="this.tgt_path">
+                      <div class="row" *ngIf="this.tgt_needpath &&this.tgt_path">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Target Path:
                         </label>
