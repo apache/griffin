@@ -86,8 +86,8 @@ public class MetricStoreImpl implements MetricStore {
     }
 
     @Override
-    public List<MetricValue> getMetricValues(String metricName, int from, int size) throws IOException {
-        HttpEntity entity = getHttpEntityForSearch(metricName, from, size);
+    public List<MetricValue> getMetricValues(String metricName, int from, int size, long tmst) throws IOException {
+        HttpEntity entity = getHttpEntityForSearch(metricName, from, size, tmst);
         try {
             Response response = client.performRequest("GET", urlGet, Collections.emptyMap(), entity);
             return getMetricValuesFromResponse(response);
@@ -99,11 +99,17 @@ public class MetricStoreImpl implements MetricStore {
         }
     }
 
-    private HttpEntity getHttpEntityForSearch(String metricName, int from, int size) throws JsonProcessingException {
+    private HttpEntity getHttpEntityForSearch(String metricName, int from, int size, long tmst) throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
-        Map<String, Object> queryParam = Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName));
+        Map<String, Object> queryParam = new HashMap<>();
+        if (tmst != 0) {
+            Map<String, Object> rangeQuery = Collections.singletonMap("tmst", Collections.singletonMap("gte", tmst));
+            queryParam.put("must", Collections.singletonMap("range", rangeQuery));
+        }
+        Map<String, Object> termQuery = Collections.singletonMap("name.keyword", metricName);
+        queryParam.put("filter", Collections.singletonMap("term", termQuery));
         Map<String, Object> sortParam = Collections.singletonMap("tmst", Collections.singletonMap("order", "desc"));
-        map.put("query", queryParam);
+        map.put("query", Collections.singletonMap("bool", queryParam));
         map.put("sort", sortParam);
         map.put("from", from);
         map.put("size", size);

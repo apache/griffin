@@ -23,6 +23,8 @@ package org.apache.griffin.core.measure;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.repo.ExternalMeasureRepo;
+import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,10 @@ public class MeasureServiceImpl implements MeasureService {
     @Autowired
     private MeasureRepo<Measure> measureRepo;
     @Autowired
+    private GriffinMeasureRepo griffinMeasureRepo;
+    @Autowired
+    private ExternalMeasureRepo externalMeasureRepo;
+    @Autowired
     @Qualifier("griffinOperation")
     private MeasureOperation griffinOp;
     @Autowired
@@ -49,7 +55,12 @@ public class MeasureServiceImpl implements MeasureService {
     private MeasureOperation externalOp;
 
     @Override
-    public List<Measure> getAllAliveMeasures() {
+    public List<? extends Measure> getAllAliveMeasures(String type) {
+        if (type.equals("griffin")) {
+            return griffinMeasureRepo.findByDeleted(false);
+        } else if (type.equals("external")) {
+            return externalMeasureRepo.findByDeleted(false);
+        }
         return measureRepo.findByDeleted(false);
     }
 

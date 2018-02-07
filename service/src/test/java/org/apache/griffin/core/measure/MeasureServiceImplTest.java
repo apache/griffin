@@ -32,7 +32,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -68,7 +67,7 @@ public class MeasureServiceImplTest {
         Measure measure = createGriffinMeasure("view_item_hourly");
         given(measureRepo.findByDeleted(false)).willReturn(Collections.singletonList(measure));
 
-        List<Measure> measures = service.getAllAliveMeasures();
+        List<? extends Measure> measures = service.getAllAliveMeasures("");
         assertEquals(measures.size(), 1);
         assertEquals(measures.get(0).getName(), "view_item_hourly");
     }
@@ -83,7 +82,7 @@ public class MeasureServiceImplTest {
     }
 
     @Test(expected = GriffinException.NotFoundException.class)
-    public void testGetMeasuresByIdWithFileNotFoundException(){
+    public void testGetMeasuresByIdWithFileNotFoundException() {
         given(measureRepo.findByIdAndDeleted(1L, false)).willReturn(null);
         service.getMeasureById(1);
     }

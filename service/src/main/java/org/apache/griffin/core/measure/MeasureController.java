@@ -33,8 +33,8 @@ public class MeasureController {
     private MeasureService measureService;
 
     @RequestMapping(value = "/measures", method = RequestMethod.GET)
-    public Iterable<Measure> getAllAliveMeasures() {
-        return measureService.getAllAliveMeasures();
+    public List<? extends Measure> getAllAliveMeasures(@RequestParam(value = "type", defaultValue = "") String type) {
+        return measureService.getAllAliveMeasures(type);
     }
 
     @RequestMapping(value = "/measures/{id}", method = RequestMethod.GET)
