@@ -27,7 +27,6 @@ export class UserService {
     if (days) {
       var date = new Date();
       date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-      console.log(date);
       expires = "; expires=" + date.toUTCString();
     } else {
       expires = "";

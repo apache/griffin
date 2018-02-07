@@ -106,7 +106,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
       }
     );
   }
-
+  
   onResize(event) {
     this.resizeTreeMap();
   }

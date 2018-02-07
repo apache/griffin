@@ -136,7 +136,7 @@ export class SidebarComponent implements OnInit {
             }
           }
         } else {
-          break;
+          continue;
         }
         this.finalData.push(node);
       }
