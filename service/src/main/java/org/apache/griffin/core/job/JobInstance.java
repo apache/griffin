@@ -179,7 +179,7 @@ public class JobInstance implements Job {
     private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) throws IOException {
         List<SegmentPredicate> predicates = dc.getPredicates();
         for (SegmentPredicate predicate : predicates) {
-            genConfMap(dc, sampleTs);
+            genConfMap(predicate.getConfigMap(), sampleTs,dc.getDataTimeZone());
             //Do not forget to update origin string config
             predicate.setConfigMap(predicate.getConfigMap());
             mPredicates.add(predicate);
@@ -187,19 +187,18 @@ public class JobInstance implements Job {
     }
 
     private void setConnectorConf(DataConnector dc, Long[] sampleTs) throws IOException {
-        genConfMap(dc, sampleTs);
+        genConfMap(dc.getConfigMap(), sampleTs,dc.getDataTimeZone());
         dc.setConfigMap(dc.getConfigMap());
     }
 
 
     /**
-     * @param dc     data connector
+     * @param conf    config map
      * @param sampleTs collection of data split start timestamp
      * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
      * or like {"path": "/year=2017/month=11/dt=15/hour=09/_DONE,/year=2017/month=11/dt=15/hour=10/_DONE"}
      */
-    private void genConfMap(DataConnector dc,  Long[] sampleTs) {
-        Map<String, String> conf = dc.getConfigMap();
+    private void genConfMap(Map<String, String> conf,  Long[] sampleTs,String timezone) {
         if (conf == null) {
             LOGGER.warn("Predicate config is null.");
             return;
@@ -211,17 +210,17 @@ public class JobInstance implements Job {
                 continue;
             }
             for (Long timestamp : sampleTs) {
-                set.add(TimeUtil.format(value, timestamp, getTimeZone(dc)));
+                set.add(TimeUtil.format(value, timestamp, getTimeZone(timezone)));
             }
             conf.put(entry.getKey(), StringUtils.join(set, PATH_CONNECTOR_CHARACTER));
         }
     }
 
-    private TimeZone getTimeZone(DataConnector dc) {
-        if (StringUtils.isEmpty(dc.getDataTimeZone())) {
+    private TimeZone getTimeZone(String timezone) {
+        if (StringUtils.isEmpty(timezone)) {
             return TimeZone.getDefault();
         }
-        return TimeZone.getTimeZone(dc.getDataTimeZone());
+        return TimeZone.getTimeZone(timezone);
     }
 
     private boolean createJobInstance(Map<String, Object> confMap) throws Exception {
