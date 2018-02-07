@@ -122,6 +122,8 @@ export class AcComponent implements OnInit, AfterViewChecked {
   tgt_location: string;
   src_timezone: string;
   tgt_timezone: string;
+  src_needpath: boolean;
+  tgt_needpath: boolean;
 
   measureTypes = [
     "accuracy",
@@ -460,10 +462,10 @@ export class AcComponent implements OnInit, AfterViewChecked {
     if (this.tgt_size.indexOf("0") == 0) {
       this.deleteUnit(1);
     }
-    if (this.src_path == "") {
+    if (!this.src_needpath || this.src_path == "") {
       this.deletePredicates(0);
     }
-    if (this.tgt_path == "") {
+    if (!this.tgt_needpath || this.tgt_path == "") {
       this.deletePredicates(1);
     }
     var mappingRule = function(src, tgt, matches) {
@@ -613,6 +615,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
     this.src_timezone = evt.timezone;
     this.src_where = evt.where;
     this.src_size = evt.num + evt.timetype;
+    this.src_needpath = evt.needpath;
     this.src_path = evt.path;
   }
 
@@ -621,6 +624,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
     this.tgt_timezone = evt.timezone;
     this.tgt_where = evt.where;
     this.tgt_size = evt.num + evt.timetype;
+    this.tgt_needpath = evt.needpath;
     this.tgt_path = evt.path;
   }
 
