@@ -124,11 +124,11 @@ public class SparkSubmitJob implements Job {
         livyUri = livyConfProps.getProperty("livy.uri");
         jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap().getString(PREDICATE_JOB_NAME));
         measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
-        setPredicts(jd.getJobDataMap().getString(PREDICATES_KEY));
+        setPredicates(jd.getJobDataMap().getString(PREDICATES_KEY));
         setMeasureInstanceName(measure, jd);
     }
 
-    private void setPredicts(String json) throws IOException {
+    private void setPredicates(String json) throws IOException {
         if (StringUtils.isEmpty(json)) {
             return;
         }
