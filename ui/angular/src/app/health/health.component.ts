@@ -206,7 +206,7 @@ export class HealthComponent implements OnInit {
             }
           }
         } else {
-          break;
+          continue;
         }
         this.finalData.push(node);
       }
