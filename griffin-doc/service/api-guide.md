@@ -61,44 +61,89 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 | ------- | -------------- | ------- |
 | measure | measure entity | Measure |
 
-There are two different measures that are griffin measure and external measure.
-If you want to create an external measure,you can use following example json in request body.
-```
-{
-    "type": "external",
-    "name": "external_name",
-    "description": " test measure",
-    "organization": "orgName",
-    "owner": "test",
-    "metricName": "metricName"
-}
-```
-Here gives a griffin measure example in request body and response body. 
 #### Request Body example 
+
+There are two kind of different measures, griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
+
+Here is a request body example to create a griffin measure of  profiling:
 ```
 {
-    "name":"measure_name",
-	"type":"griffin",
-    "description":"create a measure",
-    "evaluate.rule":{
-        "rules":[
+    "name":"profiling_measure",
+    "measure.type":"griffin",
+    "dq.type":"profiling",
+    "rule.description":{
+        "details":[
             {
-                "rule":"source.desc=target.desc",
-                "dsl.type":"griffin-dsl",
-                "dq.type":"accuracy",
-                "details":{}
+                "name":"age",
+                "infos":"Total Count,Average"
             }
         ]
     },
+    "process.type":"batch",
+    "owner":"test",
+    "description":"measure description",
     "data.sources":[
         {
             "name":"source",
             "connectors":[
                 {
-					"name":"connector_name_source",
+                    "name":"connector_name",
+                    "type":"hive",
+                    "version":"1.2",
+                    "data.unit":"1hour",
+                    "data.time.zone":"UTC(WET,GMT)",
+                    "config":{
+                        "database":"default",
+                        "table.name":"demo_src",
+                        "where":"dt=#YYYYMMdd# AND hour=#HH#"
+                    },
+                    "predicates":[
+                        {
+                            "type":"file.exist",
+                            "config":{
+                                "root.path":"hdfs:///griffin/demo_src",
+                                "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "evaluate.rule":{
+        "rules":[
+            {
+                "dsl.type":"griffin-dsl",
+                "dq.type":"profiling",
+                "rule":"count(source.`age`) AS `age-count`,avg(source.`age`) AS `age-average`",
+                "name":"profiling",
+                "details":{
+
+                }
+            }
+        ]
+    }
+}
+```
+And for griffin measure of accuracy:
+```
+{
+    "name":"accuracy_measure",
+    "measure.type":"griffin",
+    "dq.type":"accuracy",
+    "process.type":"batch",
+    "owner":"test",
+    "description":"measure description",
+    "data.sources":[
+        {
+            "name":"source",
+            "connectors":[
+                {
+                    "name":"connector_name_source",
                     "type":"HIVE",
                     "version":"1.2",
-					"data.unit":"1h",
+                    "data.unit":"1hour",
+                    "data.time.zone":"UTC(WET,GMT)",
                     "config":{
                         "database":"default",
                         "table.name":"demo_src",
@@ -120,13 +165,14 @@ Here gives a griffin measure example in request body and response body.
             "name":"target",
             "connectors":[
                 {
-					"name":"connector_name_target",
+                    "name":"connector_name_target",
                     "type":"HIVE",
                     "version":"1.2",
-					"data.unit":"1h",
+                    "data.unit":"1hour",
+                    "data.time.zone":"UTC(WET,GMT)",
                     "config":{
                         "database":"default",
-                        "table.name":"demo_src",
+                        "table.name":"demo_tgt",
                         "where":"dt=#YYYYMMdd# AND hour=#HH#"
                     },
                     "predicates":[
@@ -141,26 +187,119 @@ Here gives a griffin measure example in request body and response body.
                 }
             ]
         }
-    ]
+    ],
+    "evaluate.rule":{
+        "rules":[
+            {
+                "dsl.type":"griffin-dsl",
+                "dq.type":"accuracy",
+                "name":"accuracy",
+                "rule":"source.desc=target.desc"
+            }
+        ]
+    }
+}
+```
+Example of request body to create external measure:
+```
+{
+    "name": "external_name",
+    "measure.type": "external",
+    "dq.type": "accuracy",
+    "description": "measure description",
+    "organization": "orgName",
+    "owner": "test",
+    "metricName": "metricName"
 }
 ```
 #### Response Body Sample
+
+The response body should be the created measure if success. For example:
 ```
 {
-  "code": 201,
-  "description": "Create Measure Succeed"
+    "measure.type": "griffin",
+    "id": 1,
+    "name": "measureName",
+    "description": "measure description",
+    "organization": "orgName",
+    "owner": "test",
+    "deleted": false,
+    "dq.type": "accuracy",
+    "process.type": "batch",
+    "data.sources": [
+        {
+            "id": 1,
+            "name": "source",
+            "connectors": [
+                {
+                    "id": 1,
+                    "name": "connector_name_source",
+                    "type": "HIVE",
+                    "version": "1.2",
+                    "predicates": [
+                        {
+                            "id": 1,
+                            "type": "file.exist",
+                            "config": {
+                                "root.path": "hdfs:///griffin/demo_src",
+                                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+                            }
+                        }
+                    ],
+                    "data.unit": "1h",
+                    "config": {
+                        "database": "default",
+                        "table.name": "demo_src",
+                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "target",
+            "connectors": [
+                {
+                    "id": 2,
+                    "name": "connector_name_target",
+                    "type": "HIVE",
+                    "version": "1.2",
+                    "predicates": [
+                        {
+                            "id": 2,
+                            "type": "file.exist",
+                            "config": {
+                                "root.path": "hdfs:///griffin/demo_src",
+                                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+                            }
+                        }
+                    ],
+                    "data.unit": "1h",
+                    "config": {
+                        "database": "default",
+                        "table.name": "demo_src",
+                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
+                    }
+                }
+            ]
+        }
+    ],
+    "evaluate.rule": {
+        "id": 1,
+        "rules": [
+            {
+                "id": 1,
+                "rule": "source.desc=target.desc",
+                "name": "rule_name",
+                "description": "Total count",
+                "dsl.type": "griffin-dsl",
+                "dq.type": "accuracy",
+                "details": {}
+            }
+        ]
+    }
 }
 ```
-It may return failed messages.Such as,
-```
-{
-  "code": 410,
-  "description": "Create Measure Failed, duplicate records"
-}
-
-```
-The reason for failure may be that connector names already exist or connector names are empty.
-
 
 ### Get measures
 `GET /api/v1/measures`
@@ -168,55 +307,69 @@ The reason for failure may be that connector names already exist or connector na
 ```
 [
     {
-        "id": 1,
-        "name": "measurename",
-        "description": "This is measure test.",
+        "measure.type": "griffin",
+        "id": 4,
+        "name": "measure_no_predicate_day",
         "owner": "test",
+        "description": null,
+        "organization": null,
         "deleted": false,
+        "dq.type": "accuracy",
         "process.type": "batch",
-        "evaluateRule": {
-            "id": 1,
-            "rules": [
-                {
-                    "id": 1,
-                    "rule": "source.id=target.id AND source.age=target.age",
-                    "dsl.type": "griffin-dsl",
-                    "dq.type": "accuracy"
-                }
-            ]
-        },
         "data.sources": [
             {
-                "id": 1,
+                "id": 6,
                 "name": "source",
                 "connectors": [
                     {
-                        "id": 1,
+                        "id": 6,
+                        "name": "source1517994133405",
                         "type": "HIVE",
                         "version": "1.2",
+                        "predicates": [],
+                        "data.unit": "1day",
+                        "data.time.zone": "UTC(WET,GMT)",
                         "config": {
                             "database": "default",
-                            "table.name": "demo_src"
+                            "table.name": "demo_src",
+                            "where": "dt=#YYYYMMdd# AND hour=#HH#"
                         }
                     }
                 ]
             },
             {
-                "id": 2,
+                "id": 7,
                 "name": "target",
                 "connectors": [
                     {
-                        "id": 2,
+                        "id": 7,
+                        "name": "target1517994142573",
                         "type": "HIVE",
                         "version": "1.2",
+                        "predicates": [],
+                        "data.unit": "1day",
+                        "data.time.zone": "UTC(WET,GMT)",
                         "config": {
                             "database": "default",
-                            "table.name": "demo_tgt"
+                            "table.name": "demo_tgt",
+                            "where": "dt=#YYYYMMdd# AND hour=#HH#"
                         }
                     }
                 ]
             }
-        ]
+        ],
+        "evaluate.rule": {
+            "id": 4,
+            "rules": [
+                {
+                    "id": 4,
+                    "rule": "source.age=target.age AND source.desc=target.desc",
+                    "name": "accuracy",
+                    "dsl.type": "griffin-dsl",
+                    "dq.type": "accuracy"
+                }
+            ]
+        }
     }
 ]
 ```
@@ -233,12 +386,102 @@ The reason for failure may be that connector names already exist or connector na
 | name    | description    | type    |
 | ------- | -------------- | ------- |
 | measure | measure entity | Measure |
-There are two different measures that are griffin measure and external measure.
-If you want to update an external measure,you can use following example json in request body.
+
+#### Request Body example 
+There are two kind of different measures, griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
+
+Here is a request body example to update a griffin measure of accuracy:
+```
+{
+    "id": 1,
+    "name": "measureName_edit",
+    "description": "measure description",
+    "organization": "orgName",
+    "owner": "test",
+    "deleted": false,
+    "dq.type": "accuracy",
+    "process.type": "batch",
+    "data.sources": [
+        {
+            "id": 1,
+            "name": "source",
+            "connectors": [
+                {
+                    "id": 1,
+                    "name": "connector_name_source",
+                    "type": "HIVE",
+                    "version": "1.2",
+                    "predicates": [
+                        {
+                            "id": 1,
+                            "type": "file.exist",
+                            "config": {
+                                "root.path": "hdfs:///griffin/demo_src",
+                                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+                            }
+                        }
+                    ],
+                    "data.unit": "1h",
+                    "config": {
+                        "database": "default",
+                        "table.name": "demo_src",
+                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "target",
+            "connectors": [
+                {
+                    "id": 2,
+                    "name": "connector_name_target",
+                    "type": "HIVE",
+                    "version": "1.2",
+                    "predicates": [
+                        {
+                            "id": 2,
+                            "type": "file.exist",
+                            "config": {
+                                "root.path": "hdfs:///griffin/demo_src",
+                                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+                            }
+                        }
+                    ],
+                    "data.unit": "1h",
+                    "config": {
+                        "database": "default",
+                        "table.name": "demo_src",
+                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
+                    }
+                }
+            ]
+        }
+    ],
+    "evaluate.rule": {
+        "id": 1,
+        "rules": [
+            {
+                "id": 1,
+                "rule": "source.desc=target.desc",
+                "name": "rule_name",
+                "description": "Total count",
+                "dsl.type": "griffin-dsl",
+                "dq.type": "accuracy",
+                "details": {}
+            }
+        ]
+    },
+    "measure.type": "griffin"
+}
+```
+If you want to update an external measure, you can use following example json in request body.
 ```
 {
 	"id":1,
-    "type": "external",
+    "measure.type": "external",
+    "dq.type": "accuracy",
     "name": "external_name",
     "description": " update test measure",
     "organization": "orgName",
@@ -246,88 +489,8 @@ If you want to update an external measure,you can use following example json in 
     "metricName": "metricName"
 }
 ```
-Here gives a griffin measure example in request body and response body. 
-#### Request Body example 
-```
-{
-        "id": 1,
-        "name": "measure_official_update",
-        "description": "create a measure",
-        "owner": "test",
-        "deleted": false,
-        "type": "griffin",
-        "process.type": "batch",
-        "data.sources": [
-            {
-                "id": 1,
-                "name": "source",
-                "connectors": [
-                    {
-                        "id": 1,
-                        "name": "connector_name_source",
-                        "type": "HIVE",
-                        "version": "1.2",
-                        "predicates": [],
-                        "data.unit": "1h",
-                        "config": {
-                            "database": "default",
-                            "table.name": "demo_src",
-                            "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": 2,
-                "name": "target",
-                "connectors": [
-                    {
-                        "id": 2,
-                        "name": "connector_name_target",
-                        "type": "HIVE",
-                        "version": "1.2",
-                        "predicates": [],
-                        "data.unit": "1h",
-                        "config": {
-                            "database": "default",
-                            "table.name": "demo_src",
-                            "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                        }
-                    }
-                ]
-            }
-        ],
-        "evaluate.rule": {
-            "id": 1,
-            "rules": [
-                {
-                    "id": 1,
-                    "rule": "source.desc=target.desc",
-                    "dsl.type": "griffin-dsl",
-                    "dq.type": "accuracy",
-                    "details": {}
-                }
-            ]
-        }
-    }
-```
 #### Response Body Sample
-```
-{
-  "code": 204,
-  "description": "Update Measure Succeed"
-}
-```
-It may return failed messages.Such as,
-```
-{
-  "code": 400,
-  "description": "Resource Not Found"
-}
-
-```
-
-The reason for failure may be that measure id doesn't exist.
+The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
 
 ### Delete measure
 `DELETE /api/v1/measures/{id}`
@@ -340,25 +503,8 @@ When deleting a measure,api will also delete related jobs.
 `/api/v1/measures/1`
 
 #### Response Body Sample
-```
-{
-  "code": 202,
-  "description": "Delete Measures By Id Succeed"
-}
-```
 
-It may return failed messages.Such as,
-
-```
-{
-  "code": 400,
-  "description": "Resource Not Found"
-}
-
-```
-
-The reason for failure may be that measure id doesn't exist.
-
+The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
 
 ### Get measure by id
 `GET /api/v1/measures/{id}`
@@ -372,59 +518,71 @@ The reason for failure may be that measure id doesn't exist.
 #### Response Body Sample
 ```
 {
-    "id": 1,
-    "name": "measureName",
-    "description": "This is a test measure",
-    "organization": "orgName",
-    "evaluateRule": {
-        "id": 1,
-        "rules": [
-            {
-                "id": 1,
-                "rule": "source.id = target.id and source.age = target.age and source.desc = target.desc",
-                "dsl.type": "griffin-dsl",
-                "dq.type": "accuracy"
-            }
-        ]
-    },
+    "measure.type": "griffin",
+    "id": 4,
+    "name": "measure_no_predicate_day",
     "owner": "test",
+    "description": null,
+    "organization": null,
     "deleted": false,
+    "dq.type": "accuracy",
     "process.type": "batch",
     "data.sources": [
         {
-            "id": 39,
+            "id": 6,
             "name": "source",
             "connectors": [
                 {
-                    "id": 1,
+                    "id": 6,
+                    "name": "source1517994133405",
                     "type": "HIVE",
                     "version": "1.2",
+                    "predicates": [],
+                    "data.unit": "1day",
+                    "data.time.zone": "UTC(WET,GMT)",
                     "config": {
                         "database": "default",
-                        "table.name": "demo_src"
+                        "table.name": "demo_src",
+                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
                     }
                 }
             ]
         },
         {
-            "id": 2,
+            "id": 7,
             "name": "target",
             "connectors": [
                 {
-                    "id": 2,
+                    "id": 7,
+                    "name": "target1517994142573",
                     "type": "HIVE",
                     "version": "1.2",
+                    "predicates": [],
+                    "data.unit": "1day",
+                    "data.time.zone": "UTC(WET,GMT)",
                     "config": {
                         "database": "default",
-                        "table.name": "demo_tgt"
+                        "table.name": "demo_tgt",
+                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
                     }
                 }
             ]
         }
-    ]
+    ],
+    "evaluate.rule": {
+        "id": 4,
+        "rules": [
+            {
+                "id": 4,
+                "rule": "source.age=target.age AND source.desc=target.desc",
+                "name": "accuracy",
+                "dsl.type": "griffin-dsl",
+                "dq.type": "accuracy"
+            }
+        ]
+    }
 }
 ```
-It may return no content.That's because your measure id doesn't exist.
 
 <h2 id = "3"></h2>
 ## Jobs
@@ -443,19 +601,19 @@ It may return no content.That's because your measure id doesn't exist.
 #### Request Body Sample
 ```
 {
-    "measure.id": 1,
+    "measure.id": 5,
 	"job.name":"job_name",
     "cron.expression": "0 0/4 * * * ?",
     "cron.time.zone": "GMT+8:00",
     "predicate.config": {
 		"checkdonefile.schedule":{
-			"interval": "5m",
-			"repeat": 12
+			"interval": "1m",
+			"repeat": 2
 		}
     },
     "data.segments": [
         {
-            "data.connector.name": "connector_name_source_test",
+            "data.connector.name": "connector_name_source",
 			"as.baseline":true, 
             "segment.range": {
                 "begin": "-1h",
@@ -463,7 +621,7 @@ It may return no content.That's because your measure id doesn't exist.
             }
         },
         {
-            "data.connector.name": "connector_name_target_test",
+            "data.connector.name": "connector_name_target",
             "segment.range": {
                 "begin": "-1h",
                 "length": "1h"
@@ -473,28 +631,44 @@ It may return no content.That's because your measure id doesn't exist.
 }
 ```
 #### Response Body Sample
+he response body should be the created job schedule if success. For example:
 ```
 {
-  "code": 205,
-  "description": "Create Job Succeed"
+    "id": 3,
+    "measure.id": 5,
+    "job.name": "job_name",
+    "cron.expression": "0 0/4 * * * ?",
+    "cron.time.zone": "GMT+8:00",
+    "predicate.config": {
+        "checkdonefile.schedule": {
+            "interval": "1m",
+            "repeat": 2
+        }
+    },
+    "data.segments": [
+        {
+            "id": 5,
+            "data.connector.name": "connector_name_source",
+            "as.baseline": true,
+            "segment.range": {
+                "id": 5,
+                "begin": "-1h",
+                "length": "1h"
+            }
+        },
+        {
+            "id": 6,
+            "data.connector.name": "connector_name_target",
+            "as.baseline": false,
+            "segment.range": {
+                "id": 6,
+                "begin": "-1h",
+                "length": "1h"
+            }
+        }
+    ]
 }
 ```
-It may return failed messages.Such as,
-
-```
-{
-  "code": 405,
-  "description": "Create Job Failed"
-}
-```
-
-There are several reasons to create job failure.
-
-- Measure id does not exist.
-- Job name already exits.
-- Param as.baselines aren't set or are all false.
-- Connector name doesn't exist in your measure.
-- The trigger key already exists.
 
 ### Get jobs
 `GET /api/v1/jobs`
@@ -521,21 +695,8 @@ There are several reasons to create job failure.
 - id -`required` `Long` job id
 
 #### Response Body Sample
-```
-{
-  "code": 206,
-  "description": "Delete Job Succeed"
-}
 
-```
-It may return failed messages.Such as,
-```
-{
-    "code": 406,
-    "description": "Delete Job Failed"
-}
-```
-The reason for failure may be that job id does not exist.
+The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
 
 ### Delete job by name
 #### `DELETE /api/v1/jobs`
@@ -544,21 +705,8 @@ The reason for failure may be that job id does not exist.
 | jobName | job name    | String | job_name      |
 
 #### Response Body Sample
-```
-{
-  "code": 206,
-  "description": "Delete Job Succeed"
-}
 
-```
-It may return failed messages.Such as,
-```
-{
-    "code": 406,
-    "description": "Delete Job Failed"
-}
-```
-The reason for failure may that job name does not exist.
+The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
 
 
 ### Get job instances
@@ -616,27 +764,45 @@ The reason for failure may that job name does not exist.
 ### Get metrics
 `GET /api/v1/metrics`
 #### Response Example
+The response is a map of metrics group by measure name. For example:
 ```
-[
-    {
-        "name": "external_name",
-        "description": " test measure",
-        "organization": "orgName",
-        "owner": "test",
-        "metricValues": [
-            {
-                "name": "metricName",
-                "tmst": 1509599811123,
-                "value": {
-                    "__tmst": 1509599811123,
-                    "miss": 11,
-                    "total": 125000,
-                    "matched": 124989
+{
+    "measure_no_predicate_day": [
+        {
+            "name": "job_no_predicate_day",
+            "type": "accuracy",
+            "owner": "test",
+            "metricValues": [
+                {
+                    "name": "job_no_predicate_day",
+                    "tmst": 1517994480000,
+                    "value": {
+                        "total": 125000,
+                        "miss": 0,
+                        "matched": 125000
+                    }
+                },
+                {
+                    "name": "job_no_predicate_day",
+                    "tmst": 1517994240000,
+                    "value": {
+                        "total": 125000,
+                        "miss": 0,
+                        "matched": 125000
+                    }
                 }
-            }
-        ]
-    }
-]
+            ]
+        }
+    ],
+    "measre_predicate_hour": [
+        {
+            "name": "job_predicate_hour",
+            "type": "accuracy",
+            "owner": "test",
+            "metricValues": []
+        }
+    ]
+}
 ```
 
 ### Add metric values
@@ -665,44 +831,73 @@ The reason for failure may that job name does not exist.
 ]
 ```
 #### Response Body Sample
-```
-{
-    "code": 210,
-    "description": "Add Metric Values Success"
-}
-```
-
-It may return failed message
+The response body should have 'errors' field as 'false' if success, for example
 
 ```
 {
-	"code": 412,
-    "description": "Add Metric Values Failed"
+    "took": 32,
+    "errors": false,
+    "items": [
+        {
+            "index": {
+                "_index": "griffin",
+                "_type": "accuracy",
+                "_id": "AWFAs5pOJwYEbKWP7mhq",
+                "_version": 1,
+                "result": "created",
+                "_shards": {
+                    "total": 2,
+                    "successful": 1,
+                    "failed": 0
+                },
+                "created": true,
+                "status": 201
+            }
+        }
+    ]
 }
 ```
-The returned HTTP status code identifies the reason for failure.
+
 ### Get metric values by name 
 `GET /api/v1/metrics/values`
 
 #### Request Parameter
-| name       | description                              | type   | example value |
-| ---------- | ---------------------------------------- | ------ | ------------- |
-| metricName | name of the metric values                | String | metricName    |
-| size       | max amount of return values              | int    | 5             |
-| offset     | the amount of records to skip by timestamp in descending order | int    | 0             |
+name | description | type | example value
+--- | --- | --- | ---
+metricName | name of the metric values | String | job_no_predicate_day
+size | max amount of return records | int | 5
+offset | the amount of records to skip by timestamp in descending order | int | 0
+tmst | the start timestamp of records you want to get | long | 0
 
-Parameter offset is optional, it has default value as 0.
+Parameter offset and tmst are optional.
 #### Response Body Sample
 ```
 [
     {
-        "name": "metricName",
-        "tmst": 1509599811123,
+        "name": "job_no_predicate_day",
+        "tmst": 1517994720000,
         "value": {
-            "__tmst": 1509599811123,
-            "miss": 11,
             "total": 125000,
-            "matched": 124989
+            "miss": 0,
+            "matched": 125000
+        }
+    },
+    {
+        "name": "job_no_predicate_day",
+        "tmst": 1517994480000,
+        "value": {
+            "total": 125000,
+            "miss": 0,
+            "matched": 125000
+        }
+    },
+    {
+        "name": "job_no_predicate_day",
+        "tmst": 1517994240000,
+        "value": {
+            "total": 125000,
+            "miss": 0,
+            "matched": 125000
         }
     }
 ]
@@ -715,20 +910,26 @@ Parameter offset is optional, it has default value as 0.
 | ---------- | ------------------------- | ------ | ------------- |
 | metricName | name of the metric values | String | metricName    |
 #### Response Body Sample
+The response body should have 'failures' field as empty if success, for example
 ```
 {
-    "code": 211,
-    "description": "Delete Metric Values Success"
+    "took": 363,
+    "timed_out": false,
+    "total": 5,
+    "deleted": 5,
+    "batches": 1,
+    "version_conflicts": 0,
+    "noops": 0,
+    "retries": {
+        "bulk": 0,
+        "search": 0
+    },
+    "throttled_millis": 0,
+    "requests_per_second": -1,
+    "throttled_until_millis": 0,
+    "failures": []
 }
 ```
-It may return failed messages
-```
-{
-    "code": 413,
-    "description": "Delete Metric Values Failed"
-}
-```
-The returned HTTP status code identifies the reason for failure.
 
 <h2 id = "5"></h2>
 ### Hive MetaStore
