@@ -27,7 +27,7 @@ import java.util.List;
 
 public interface MetricStore {
 
-    List<MetricValue> getMetricValues(String metricName, int from, int size) throws IOException;
+    List<MetricValue> getMetricValues(String metricName, int from, int size, long tmst) throws IOException;
 
     ResponseEntity addMetricValues(List<MetricValue> metricValues) throws IOException;
 

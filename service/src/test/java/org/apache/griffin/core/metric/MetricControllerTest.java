@@ -95,7 +95,7 @@ public class MetricControllerTest {
     @Test
     public void testGetMetricValuesSuccess() throws Exception {
         MetricValue value = new MetricValue("jobName", 1L, new HashMap<>());
-        given(service.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt()))
+        given(service.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
                 .willReturn(Collections.singletonList(value));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/metrics/values")
@@ -106,7 +106,7 @@ public class MetricControllerTest {
 
     @Test
     public void testGetMetricValuesFailureWithException() throws Exception {
-        given(service.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt()))
+        given(service.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
                 .willThrow(new GriffinException.ServiceException("Failed to get metric values", new IOException()));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/metrics/values")

@@ -26,7 +26,7 @@ import java.util.List;
 
 public interface MeasureService {
 
-    List<Measure> getAllAliveMeasures();
+    List<? extends Measure> getAllAliveMeasures(String type);
 
     Measure getMeasureById(long id);
 
