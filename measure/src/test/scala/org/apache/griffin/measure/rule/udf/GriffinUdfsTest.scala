@@ -40,11 +40,11 @@ class GriffinUdfsTest extends FunSuite with Matchers with BeforeAndAfter with Pr
   }
 
   test ("test regexSubstr") {
-    val str = "https://www.abc.com/test/dp/AAA/ref=sr_1_1/123-456?id=123"
-    val regexStr = """^([^/]+://[^/]+)(?:/[^/]+)?(/dp/[^/]+)(?:/.*)?$"""
+    val str = "https://www.abc.com/test/dp/B023/ref=sr_1_1/123-456?id=123"
+    val regexStr = """^([^/]+://[^/]+)(?:/[^/]+)?(/dp/[A-Z0-9]+)(?:/.*)?$"""
     val replacement = "$1$2"
-    val inv = new Invocation[String]('regexSubstr, str, regexStr, replacement)
-    GriffinUdfs.invokePrivate(inv) should be ("https://www.abc.com/dp/AAA")
+    val inv = new Invocation[String]('regReplace, str, regexStr, replacement)
+    GriffinUdfs.invokePrivate(inv) should be ("https://www.abc.com/dp/B023")
   }
 
 }

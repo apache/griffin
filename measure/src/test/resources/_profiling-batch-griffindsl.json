@@ -14,7 +14,14 @@
           "version": "1.7",
           "config": {
             "file.name": "src/test/resources/users_info_src.avro"
-          }
+          },
+          "pre.proc": [
+            {
+              "dsl.type": "spark-sql",
+              "name": "${this}",
+              "rule": "select reg_replace(email, '^([^@0-9]+)([0-9]+)@(dc)(?:\\\\.[^@]+)$', '$1@$3') as email, post_code from ${this}"
+            }
+          ]
         }
       ]
     }
@@ -26,9 +33,10 @@
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "name": "prof",
-        "rule": "count(*) from source where matches(first_name, '^Tom0\\\\d+$')",
+        "rule": "email, count(*) from source group by email",
         "metric": {
-          "name": "prof"
+          "name": "prof",
+          "collect.type": "array"
         }
       },
       {

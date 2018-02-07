@@ -25,6 +25,7 @@ object GriffinUdfs {
   def register(sqlContext: SQLContext): Unit = {
     sqlContext.udf.register("index_of", indexOf _)
     sqlContext.udf.register("matches", matches _)
+    sqlContext.udf.register("reg_replace", regReplace _)
   }
 
   private def indexOf(arr: Seq[String], v: String) = {
@@ -35,7 +36,7 @@ object GriffinUdfs {
     s.matches(regex)
   }
 
-  private def regexSubstr(s: String, regex: String, replacement: String) = {
+  private def regReplace(s: String, regex: String, replacement: String) = {
     s.replaceAll(regex, replacement)
   }
 
