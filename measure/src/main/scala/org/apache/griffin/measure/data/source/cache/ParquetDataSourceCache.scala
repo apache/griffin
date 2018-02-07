@@ -25,7 +25,7 @@ case class ParquetDataSourceCache(sqlContext: SQLContext, param: Map[String, Any
                                  ) extends DataSourceCache {
 
   override def init(): Unit = {
-    sqlContext.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false");
+    sqlContext.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false")
   }
 
   def writeDataFrame(dfw: DataFrameWriter, path: String): Unit = {
