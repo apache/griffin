@@ -44,8 +44,9 @@ public class MetricController {
     @RequestMapping(value = "/metrics/values", method = RequestMethod.GET)
     public List<MetricValue> getMetricValues(@RequestParam("metricName") String metricName,
                                              @RequestParam("size") int size,
-                                             @RequestParam(value = "offset", defaultValue = "0") int offset) {
-        return metricService.getMetricValues(metricName, offset, size);
+                                             @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                             @RequestParam(value = "tmst", defaultValue = "0") long tmst) {
+        return metricService.getMetricValues(metricName, offset, size, tmst);
     }
 
     @RequestMapping(value = "/metrics/values", method = RequestMethod.POST)
