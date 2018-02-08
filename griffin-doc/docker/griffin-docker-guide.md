@@ -54,7 +54,7 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     ```
     docker-compose -f docker-compose-batch.yml up -d
     ```
-3. Now you can try griffin APIs by using postman after importing the [json files](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/postman).
+3. Now you can try griffin APIs by using postman after importing the [json files](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/service/postman).
     In which you need to modify the environment `BASE_PATH` value into `<your local IP address>:38080`.
 4. You can try the api `Basic -> Get griffin version`, to make sure griffin service has started up.
 5. Add an accuracy measure through api `Measures -> Add measure`, to create a measure in griffin.

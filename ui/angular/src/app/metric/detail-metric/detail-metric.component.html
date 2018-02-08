@@ -33,25 +33,25 @@ under the License.
   <div class="table-wrap">
     <table class="main-table y-scrollable" [mfData]="prodata" #mf="mfDataTable" [mfRowsOnPage]="18">
       <thead>
-        <tr style="background-color:#7D95CC">
-          <th class="fixed-side" scope="col" style="background-color:#7D95CC">Time</th>
-          <th class="cover" scope="col">Time</th>
-          <th scope="col" *ngFor="let name of this.columnname" style="text-align: center;">{{name}}</th>
-        </tr>
+      <tr style="background-color:#7D95CC">
+        <th class="fixed-side" scope="col" style="background-color:#7D95CC">Time</th>
+        <th class="cover" scope="col">Time</th>
+        <th scope="col" *ngFor="let name of this.columnname" style="text-align: center;">{{name}}</th>
+      </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of mf.data">
-          <th class="fixed-side">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
-          <th class="cover">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
-          <td *ngFor="let key of objectKeys(item.value)">{{item.value[key]}}</td>
-        </tr>
+      <tr *ngFor="let item of mf.data">
+        <th class="fixed-side">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
+        <th class="cover">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
+        <td *ngFor="let key of objectKeys(item.value)">{{item.value[key]}}</td>
+      </tr>
       </tbody>
       <tfoot>
-        <tr>
-          <td class="text-center" colspan="8" style="background-color:#1f1f1f;position: fixed;margin-left: 30%;" id="pagination">
-            <mfBootstrapPaginator></mfBootstrapPaginator>
-          </td>
-        </tr>
+      <tr>
+        <td class="text-center" colspan="8" style="background-color:#1f1f1f;position: fixed;margin-left: 30%;" id="pagination">
+          <mfBootstrapPaginator></mfBootstrapPaginator>
+        </td>
+      </tr>
       </tfoot>
     </table>
   </div>
