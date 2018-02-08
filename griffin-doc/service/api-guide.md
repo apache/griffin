@@ -23,6 +23,8 @@ This page lists the major RESTful APIs provided by Griffin.
 
 Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`. 
 
+- [HTTP Response Design](#0)
+
 - [Griffin Basic](#1)
 
 - [Measures](#2)
@@ -35,6 +37,55 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 
 - [Auth](#6)
 
+
+<h2 id = "0"></h2>
+## HTTP Response Desigin
+### Normal Response
+The normal HTTP response is designed as follow:
+
+| Action | HTTP Status | Response Body |
+| ---- | ------------------ | ------ |
+| POST | 201, "Created" | created item |
+| GET | 200, "OK" | requested items |
+| PUT | 204, "No Content" | no content |
+| DELETE | 204, "No Content" | no content |
+
+Note that metric module is implemented with elasticsearch bulk api, so the responses do not follow rules above.
+
+### Exception Response
+The response for exception is designed as follow :
+
+```
+{
+    "timestamp": 1517208444322,
+    "status": 400,
+    "error": "Bad Request",
+    "code": 40009,
+    "message": "Property 'measure.id' is invalid",
+    "path": "/api/v1/jobs"
+}
+```
+```
+{
+    "timestamp": 1517209428969,
+    "status": 500,
+    "error": "Internal Server Error",
+    "message": "Failed to add metric values",
+    "exception": "java.net.ConnectException",
+    "path": "/api/v1/metrics/values"
+}
+```
+Description:
+
+- timestamp: the timestamp of response created
+- status : the HTTP status code
+- error : reason phrase of the HTTP status
+- code: customized error code
+- message : customized error message
+- exception: fully qualified name of cause exception
+- path: the requested api
+
+Note that 'exception' field may not exist if it is caused by client error, and 'code' field may not exist for server error.
 
 <h2 id = "1"></h2>
 ## Griffin Basic
@@ -631,7 +682,7 @@ The response body should be empty if no error happens, and the HTTP status is (2
 }
 ```
 #### Response Body Sample
-he response body should be the created job schedule if success. For example:
+The response body should be the created job schedule if success. For example:
 ```
 {
     "id": 3,
@@ -690,7 +741,7 @@ he response body should be the created job schedule if success. For example:
 ```
 
 ### Delete job by id
-#### `DELETE /api/v1/jobs/{id}`
+`DELETE /api/v1/jobs/{id}`
 #### Path Variable
 - id -`required` `Long` job id
 
@@ -698,8 +749,60 @@ he response body should be the created job schedule if success. For example:
 
 The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
 
+### Get job schedule by job name
+`GET /api/v1/jobs/config/{jobName}`
+
+#### Path Variable
+- jobName -`required` `String` job name
+
+#### Request Sample
+
+`/api/v1/jobs/config/job_no_predicate_day`
+
+#### Response Sample
+```
+{
+    "id": 2,
+    "measure.id": 4,
+    "job.name": "job_no_predicate_day",
+    "cron.expression": "0 0/4 * * * ?",
+    "cron.time.zone": "GMT-8:00",
+    "predicate.config": {
+        "checkdonefile.schedule": {
+            "repeat": "12",
+            "interval": "5m"
+        }
+    },
+    "data.segments": [
+        {
+            "id": 3,
+            "data.connector.name": "source1517994133405",
+            "as.baseline": true,
+            "segment.range": {
+                "id": 3,
+                "begin": "-2",
+                "length": "2"
+            }
+        },
+        {
+            "id": 4,
+            "data.connector.name": "target1517994142573",
+            "as.baseline": false,
+            "segment.range": {
+                "id": 4,
+                "begin": "-5",
+                "length": "2"
+            }
+        }
+    ]
+}
+```
+
 ### Delete job by name
-#### `DELETE /api/v1/jobs`
+`DELETE /api/v1/jobs`
+
+#### Request Parameter
+
 | name    | description | type   | example value |
 | ------- | ----------- | ------ | ------------- |
 | jobName | job name    | String | job_name      |
@@ -711,6 +814,8 @@ The response body should be empty if no error happens, and the HTTP status is (2
 
 ### Get job instances
 `GET /api/v1/jobs/instances`
+
+#### Request Parameter
 
 | name  | description                         | type | example value |
 | ----- | ----------------------------------- | ---- | ------------- |

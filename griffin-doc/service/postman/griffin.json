@@ -47,10 +47,11 @@
 			"collectionId": "b7b709f1-e966-c33c-6bc6-4164f2faf0e5",
 			"order": [
 				"0d61dc14-c9de-aa3d-5454-3be191a8450e",
-				"3f4a8ed3-3976-92c7-c16e-0562858c975f",
+				"89867ae6-c3f3-175c-5097-15e77e61d8e7",
 				"6e764461-fb2b-ad66-b37a-04d831c4dbad",
-				"384315b5-b8dc-a708-cf22-289093c2f363",
+				"3f4a8ed3-3976-92c7-c16e-0562858c975f",
 				"77ed2f51-37a6-4672-de17-7fe1de169c6d",
+				"384315b5-b8dc-a708-cf22-289093c2f363",
 				"5388bdf6-51ed-111e-938c-0eb569dde237"
 			],
 			"owner": "2830994",
@@ -81,8 +82,8 @@
 			"collectionId": "b7b709f1-e966-c33c-6bc6-4164f2faf0e5",
 			"order": [
 				"7e38446b-184c-938f-0686-502d2821cd27",
-				"6db2c20d-06b1-7fdc-568c-c3c1768f1d78",
 				"b0f63207-b27b-fdf0-0001-6498ff7ac2c2",
+				"6db2c20d-06b1-7fdc-568c-c3c1768f1d78",
 				"0f9ca692-28eb-e79d-f2b0-ee28932afe37"
 			],
 			"owner": "2830994",
@@ -119,7 +120,6 @@
 	"events": [],
 	"variables": [],
 	"auth": null,
-	"hasRequests": true,
 	"requests": [
 		{
 			"id": "04663618-688f-6beb-78f7-9561ed131a87",
@@ -1946,6 +1946,127 @@
 			"collection_id": "b7b709f1-e966-c33c-6bc6-4164f2faf0e5",
 			"folder": "e75bc373-05d5-a00e-14f6-9aae1ba1d0e0",
 			"auth": null,
+			"currentHelper": null,
+			"helperAttributes": null
+		},
+		{
+			"id": "89867ae6-c3f3-175c-5097-15e77e61d8e7",
+			"headers": "",
+			"headerData": [],
+			"url": "{{BASE_PATH}}/api/v1/jobs/config/:jobName",
+			"queryParams": [],
+			"events": [],
+			"pathVariables": {
+				"jobName": "job_no_predicate_day"
+			},
+			"pathVariableData": [
+				{
+					"key": "jobName",
+					"value": "job_no_predicate_day"
+				}
+			],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"auth": null,
+			"time": 1518067924357,
+			"name": "Get job schedule by job name",
+			"description": "`GET /api/v1/jobs/config/{jobName}`\n\n#### Path Variable\n- jobName -`required` `String` job name\n\n#### Request Sample\n\n`/api/v1/jobs/config/job_no_predicate_day`",
+			"collectionId": "b7b709f1-e966-c33c-6bc6-4164f2faf0e5",
+			"responses": [
+				{
+					"status": "",
+					"responseCode": {
+						"code": 200,
+						"name": "OK",
+						"detail": "Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request the response will contain an entity describing or containing the result of the action."
+					},
+					"time": 418,
+					"headers": [
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+							"name": "Access-Control-Allow-Headers",
+							"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "POST, GET, OPTIONS, DELETE,PUT",
+							"name": "Access-Control-Allow-Methods",
+							"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*",
+							"name": "Access-Control-Allow-Origin",
+							"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+						},
+						{
+							"key": "Access-Control-Max-Age",
+							"value": "3600",
+							"name": "Access-Control-Max-Age",
+							"description": "Indicates how long the results of a preflight request can be cached in seconds."
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 08 Feb 2018 05:32:02 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						}
+					],
+					"cookies": [],
+					"mime": "",
+					"text": "{\"id\":2,\"measure.id\":4,\"job.name\":\"job_no_predicate_day\",\"cron.expression\":\"0 0/4 * * * ?\",\"cron.time.zone\":\"GMT-8:00\",\"predicate.config\":{\"checkdonefile.schedule\":{\"repeat\":\"12\",\"interval\":\"5m\"}},\"data.segments\":[{\"id\":3,\"data.connector.name\":\"source1517994133405\",\"as.baseline\":true,\"segment.range\":{\"id\":3,\"begin\":\"-2\",\"length\":\"2\"}},{\"id\":4,\"data.connector.name\":\"target1517994142573\",\"as.baseline\":false,\"segment.range\":{\"id\":4,\"begin\":\"-5\",\"length\":\"2\"}}]}",
+					"language": "json",
+					"previewType": "text",
+					"searchResultScrolledTo": -1,
+					"forceNoPretty": false,
+					"write": true,
+					"empty": false,
+					"failed": false,
+					"code": 200,
+					"responseSize": {
+						"body": 462,
+						"header": 345,
+						"total": 807
+					},
+					"mimeType": "text",
+					"fileName": "response.json",
+					"dataURI": "data:application/json;base64, eyJpZCI6MiwibWVhc3VyZS5pZCI6NCwiam9iLm5hbWUiOiJqb2Jfbm9fcHJlZGljYXRlX2RheSIsImNyb24uZXhwcmVzc2lvbiI6IjAgMC80ICogKiAqID8iLCJjcm9uLnRpbWUuem9uZSI6IkdNVC04OjAwIiwicHJlZGljYXRlLmNvbmZpZyI6eyJjaGVja2RvbmVmaWxlLnNjaGVkdWxlIjp7InJlcGVhdCI6IjEyIiwiaW50ZXJ2YWwiOiI1bSJ9fSwiZGF0YS5zZWdtZW50cyI6W3siaWQiOjMsImRhdGEuY29ubmVjdG9yLm5hbWUiOiJzb3VyY2UxNTE3OTk0MTMzNDA1IiwiYXMuYmFzZWxpbmUiOnRydWUsInNlZ21lbnQucmFuZ2UiOnsiaWQiOjMsImJlZ2luIjoiLTIiLCJsZW5ndGgiOiIyIn19LHsiaWQiOjQsImRhdGEuY29ubmVjdG9yLm5hbWUiOiJ0YXJnZXQxNTE3OTk0MTQyNTczIiwiYXMuYmFzZWxpbmUiOmZhbHNlLCJzZWdtZW50LnJhbmdlIjp7ImlkIjo0LCJiZWdpbiI6Ii01IiwibGVuZ3RoIjoiMiJ9fV19",
+					"name": "Get job schedule by job name example",
+					"id": "16caadb2-60c9-3f97-97f6-8447d71f0c27",
+					"request": {
+						"url": "{{BASE_PATH}}/api/v1/jobs/config/:jobName",
+						"pathVariables": {
+							"jobName": "job_no_predicate_day"
+						},
+						"pathVariableData": [
+							{
+								"key": "jobName",
+								"value": "job_no_predicate_day"
+							}
+						],
+						"queryParams": [],
+						"headerData": [],
+						"headers": "",
+						"data": null,
+						"method": "GET",
+						"dataMode": "params"
+					}
+				}
+			],
 			"currentHelper": null,
 			"helperAttributes": null
 		},
