@@ -85,7 +85,7 @@ public class SparkSubmitJob implements Job {
         int repeatCount = simpleTrigger.getRepeatCount();
         int fireCount = simpleTrigger.getTimesTriggered();
         if (fireCount > repeatCount) {
-            saveJobInstance(null, LivySessionStates.State.not_found, true);
+            saveJobInstance(null, LivySessionStates.State.not_found);
         }
     }
 
@@ -204,23 +204,23 @@ public class SparkSubmitJob implements Job {
             jobService.pauseJob(group, name);
             LOGGER.info("Delete predicate job({},{}) success.", group, name);
         }
-        saveJobInstance(result, LivySessionStates.State.found, true);
+        saveJobInstance(result, LivySessionStates.State.found);
     }
 
-    private void saveJobInstance(String result, LivySessionStates.State state, Boolean pauseStatus) throws IOException {
+    private void saveJobInstance(String result, LivySessionStates.State state) throws IOException {
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         Map<String, Object> resultMap = null;
         if (result != null) {
             resultMap = JsonUtil.toEntity(result, type);
         }
-        setJobInstance(resultMap, state, pauseStatus);
+        setJobInstance(resultMap, state);
         jobInstanceRepo.save(jobInstance);
     }
 
-    private void setJobInstance(Map<String, Object> resultMap, LivySessionStates.State state, Boolean pauseStatus) {
+    private void setJobInstance(Map<String, Object> resultMap, LivySessionStates.State state) {
         jobInstance.setState(state);
-        jobInstance.setDeleted(pauseStatus);
+        jobInstance.setDeleted(true);
         if (resultMap == null) {
             return;
         }
