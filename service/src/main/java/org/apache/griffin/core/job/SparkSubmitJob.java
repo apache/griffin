@@ -128,6 +128,7 @@ public class SparkSubmitJob implements Job {
         setMeasureInstanceName(measure, jd);
     }
 
+    @SuppressWarnings("unchecked")
     private void setPredicates(String json) throws IOException {
         if (StringUtils.isEmpty(json)) {
             return;
