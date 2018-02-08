@@ -150,18 +150,12 @@ export class PrComponent implements AfterViewChecked, OnInit {
     ],
     "evaluate.rule": {
       rules: [
-        {
-          "dsl.type": "griffin-dsl",
-          "dq.type": "profiling",
-          rule: "",
-          // description: "",
-          name: "",
-          details: {
-            // "profiling": {
-            // "name": ""
-            // }
-          }
-        }
+        // {
+        //   "dsl.type": "griffin-dsl",
+        //   "dq.type": "profiling",
+        //   rule: "",
+        //   name: "",
+        // }
       ]
     }
   };
@@ -329,10 +323,9 @@ export class PrComponent implements AfterViewChecked, OnInit {
           "source.`" +
           col.name +
           "`,count(*) AS `" +
+          "count` GROUP BY source.`" +
           col.name +
-          "-grp` GROUP BY source.`" +
-          col.name +
-          "`"
+          "` ORDER BY `count` DESC LIMIT 5"
         );
     }
   }
@@ -466,11 +459,8 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "dq.type": "profiling",
       rule: rule,
       name: grpname,
-      details: {
-        // "profiling": {
-        //   "name": grpname,
-        //   "persist.type": "metric"
-        // }
+      metric: {
+        "collect.type": "array"
       }
     });
   }
@@ -481,13 +471,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       rule: rule,
-      name: nullname,
-      details: {
-        // "profiling": {
-        //   "name": nullname,
-        //   "persist.type": "metric"
-        // }
-      }
+      name: nullname
     });
   }
 
@@ -497,8 +481,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "dsl.type": "griffin-dsl",
       "dq.type": "profiling",
       rule: rule,
-      name: "profiling",
-      details: {}
+      name: "profiling"
     });
   }
 
