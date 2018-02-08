@@ -61,7 +61,12 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
 
     val ct = timeInfo.calcTime
 
-    val beginTmstOpt = dsTimeRanges.get(sourceName).flatMap(_.beginTmstOpt)
+//    val beginTmstOpt = dsTimeRanges.get(sourceName).flatMap(_.beginTmstOpt)
+//    val beginTmst = beginTmstOpt match {
+//      case Some(t) => t
+//      case _ => throw new Exception(s"empty begin tmst from ${sourceName}")
+//    }
+    val beginTmstOpt = dsTimeRanges.get(sourceName).map(_.end)
     val beginTmst = beginTmstOpt match {
       case Some(t) => t
       case _ => throw new Exception(s"empty begin tmst from ${sourceName}")
