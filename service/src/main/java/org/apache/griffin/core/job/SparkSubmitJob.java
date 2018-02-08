@@ -135,6 +135,7 @@ public class SparkSubmitJob implements Job {
         }
         List<Map<String, Object>> maps = JsonUtil.toEntity(json, new TypeReference<List<Map>>() {
         });
+        assert maps != null;
         for (Map<String, Object> map : maps) {
             SegmentPredicate sp = new SegmentPredicate();
             sp.setType((String) map.get("type"));
