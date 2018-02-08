@@ -36,7 +36,7 @@ under the License.
         <tr style="background-color:#7D95CC">
           <th class="fixed-side" scope="col" style="background-color:#7D95CC">Time</th>
           <th class="cover" scope="col">Time</th>
-          <th scope="col" *ngFor="let name of this.columnname">{{name}}</th>
+          <th scope="col" *ngFor="let name of this.columnname" style="text-align: center;">{{name}}</th>
         </tr>
       </thead>
       <tbody>
@@ -48,7 +48,7 @@ under the License.
       </tbody>
       <tfoot>
         <tr>
-          <td class="text-center" colspan="8" style="background-color:#1f1f1f;" id="pagination">
+          <td class="text-center" colspan="8" style="background-color:#1f1f1f;position: fixed;margin-left: 30%;" id="pagination">
             <mfBootstrapPaginator></mfBootstrapPaginator>
           </td>
         </tr>
