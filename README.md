@@ -33,6 +33,7 @@ You can try Griffin in docker following the [docker guide](https://github.com/ap
 To run Griffin at local, you can follow instructions below.
 
 ### Prerequisites
+You need to install following items 
 - jdk (1.8 or later versions).
 - mysql.
 - npm (version 6.0.0+).
@@ -42,7 +43,7 @@ To run Griffin at local, you can follow instructions below.
     You need to make sure that your spark cluster could access your HiveContext.
 - [Livy](http://archive.cloudera.com/beta/livy/livy-server-0.3.0.zip), you can get some help [here](http://livy.io/quickstart.html).
     Griffin need to schedule spark jobs by server, we use livy to submit our jobs.
-    For some issues of Livy for HiveContext, we need to download 3 files, and put them into Hdfs.
+    For some issues of Livy for HiveContext, we need to download 3 files, and put them into HDFS.
     ```
     datanucleus-api-jdo-3.2.6.jar
     datanucleus-core-3.2.10.jar
@@ -51,16 +52,19 @@ To run Griffin at local, you can follow instructions below.
 - ElasticSearch. 
 	ElasticSearch works as a metrics collector, Griffin produces metrics to it, and our default UI get metrics from it, you can use your own way as well.
 
+### Configuration
 
-After prerequisites installation, you can download this repository
-
+Create a griffin working directory in HDFS
 ```
-git clone https://github.com/apache/incubator-griffin.git
+hdfs dfs -mkdir -p <griffin working dir>
+```
+Init quartz tables in mysql by service/src/main/resources/Init_quartz.sql
+```
+mysql -u username -p quartz < service/src/main/resources/Init_quartz.sql
 ```
 
-### Advanced Settings
 
-You should modify some configurations for your environment.
+You should also modify some configurations of Griffin for your environment.
 
 - <b>service/src/main/resources/application.properties</b>
 
@@ -101,13 +105,18 @@ You should modify some configurations for your environment.
     sparkJob.file = hdfs://<griffin measure path>/griffin-measure.jar
     sparkJob.args_1 = hdfs://<griffin env path>/env.json
     
-    sparkJob.jars = hdfs://<datanucleus path>/datanucleus-api-jdo-3.2.6.jar\
+    sparkJob.jars = hdfs://<datanucleus path>/spark-avro_2.11-2.0.1.jar\
+	    hdfs://<datanucleus path>/datanucleus-api-jdo-3.2.6.jar\
 	    hdfs://<datanucleus path>/datanucleus-core-3.2.10.jar\
 	    hdfs://<datanucleus path>/datanucleus-rdbms-3.2.9.jar
 	    
+	spark.yarn.dist.files = hdfs:///<spark conf path>/hive-site.xml
+	
     livy.uri = http://<your IP>:8998/batches
     spark.uri = http://<your IP>:8088
     ```
+    You should put these files into the same path as you set above in HDFS
+
 - <b>measure/src/main/resources/env.json</b> 
 	```
 	"persist": [
@@ -121,23 +130,22 @@ You should modify some configurations for your environment.
 		}
 	]
 	```
-	After modify this env.json file, you should put it to your HDFS at \<griffin env path>/
-
-### Deployment
+	Put this env.json file of measure module into \<griffin env path> in HDFS.
+	
+### Build and Run
 
 Build the whole project and deploy. (NPM should be installed)
 
   ```
   mvn install
   ```
-    
-Create a directory in HDFS, and put our measure package into it.
+ 
+Put jar file of measure module into \<griffin measure path> in HDFS
+```
+cp measure/target/measure-<version>-incubating-SNAPSHOT.jar /measure/target/griffin-measure.jar
+hdfs dfs -put /measure/target/griffin-measure.jar <griffin measure path>/
+  ```
 
-  ```
-  cp /measure/target/measure-0.1.3-incubating-SNAPSHOT.jar /measure/target/griffin-measure.jar
-  hdfs dfs -put /measure/target/griffin-measure.jar <griffin measure path>/
-  ```
-    
 After all environment services startup, we can start our server.
 
   ```
@@ -150,25 +158,30 @@ After a few seconds, we can visit our default UI of Griffin (by default the port
   http://<your IP>:8080
   ```
 
-You can use UI following the steps  [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/ui/dockerUIguide.md#webui-test-case-guide).
+You can use UI following the steps  [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/ui/user-guide.md).
 
 **Note**: The front-end UI is still under development, you can only access some basic features currently.
+
+## Community
+
+You can contact us via email: <a href="mailto:dev@griffin.incubator.apache.org">dev@griffin.incubator.apache.org</a>
+
+You can also subscribe this mail by sending a email to [here](mailto:dev-subscribe@griffin.incubator.apache.org). 
+
+You can access our issues jira page [here](https://issues.apache.org/jira/browse/GRIFFIN)
+
+
+
+## Contributing
+
+See [Contributing Guide](./CONTRIBUTING.md) for details on how to contribute code, documentation, etc.
 
 ## References
 - [Home Page](http://griffin.incubator.apache.org/)
 - [Wiki](https://cwiki.apache.org/confluence/display/GRIFFIN/Apache+Griffin)
-- [JIRA](https://issues.apache.org/jira/projects/GRIFFIN)
 - Documents:
 	- [Measure](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/measure)
 	- [Service](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/service)
 	- [UI](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/ui)
 	- [Docker usage](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/docker)
 	- [Postman API](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/service/postman)
-
-## Contact us
-
-Email: <a href="mailto:dev@griffin.incubator.apache.org">dev@griffin.incubator.apache.org</a>
-
-## Contributing
-
-See [Griffin Contributing Guide](./CONTRIBUTING.md) for details on how to contribute code, documentation, etc.
