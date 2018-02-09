@@ -159,8 +159,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
       val oldDfPath = s"${oldFilePath}/${idx}"
       try {
         val dfr = sqlContext.read
-//        Some(readDataFrame(dfr, oldDfPath).filter(filterStr))
-        Some(readDataFrame(dfr, oldDfPath))   // not need to filter, has filtered in update phase
+        Some(readDataFrame(dfr, oldDfPath).filter(filterStr))
       } catch {
         case e: Throwable => {
           warn(s"read old data source cache warn: ${e.getMessage}")
@@ -190,15 +189,19 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
     }
   }
 
-  private def cleanOutTimePartitions(path: String, outTime: Long, partitionOpt: Option[String]): Unit = {
-    val earlierOrEqPaths = listEarlierOrEqPartitions(path: String, outTime, partitionOpt)
+  private def cleanOutTimePartitions(path: String, outTime: Long, partitionOpt: Option[String],
+                                     func: (Long, Long) => Boolean
+                                    ): Unit = {
+    val earlierOrEqPaths = listPartitionsByFunc(path: String, outTime, partitionOpt, func)
     // delete out time data path
     earlierOrEqPaths.foreach { path =>
       println(s"delete hdfs path: ${path}")
       HdfsUtil.deleteHdfsPath(path)
     }
   }
-  private def listEarlierOrEqPartitions(path: String, bound: Long, partitionOpt: Option[String]): Iterable[String] = {
+  private def listPartitionsByFunc(path: String, bound: Long, partitionOpt: Option[String],
+                                        func: (Long, Long) => Boolean
+                                       ): Iterable[String] = {
     val names = HdfsUtil.listSubPathsByType(path, "dir")
     val regex = partitionOpt match {
       case Some(partition) => s"^${partition}=(\\d+)$$".r
@@ -208,7 +211,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
       name match {
         case regex(value) => {
           str2Long(value) match {
-            case Some(t) => (t <= bound)
+            case Some(t) => func(t, bound)
             case _ => false
           }
         }
@@ -239,7 +242,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
           val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
           if (newCacheLocked) {
             try {
-              cleanOutTimePartitions(newFilePath, nct, Some(InternalColumns.tmst))
+              cleanOutTimePartitions(newFilePath, nct, Some(InternalColumns.tmst),
+                (a: Long, b: Long) => (a <= b))
             } catch {
               case e: Throwable => error(s"clean new cache data error: ${e.getMessage}")
             } finally {
@@ -263,7 +267,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
             if (oldCacheLocked) {
               try {
                 // clean calculated old cache data
-                cleanOutTimePartitions(oldFilePath, idx, None)
+                cleanOutTimePartitions(oldFilePath, idx, None, (a: Long, b: Long) => (a < b))
                 // clean out time old cache data not calculated
 //                cleanOutTimePartitions(oldDfPath, oct, Some(InternalColumns.tmst))
               } catch {
@@ -294,15 +298,17 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
               val nextOldCacheIndex = oldCacheIndexOpt.getOrElse(defOldCacheIndex) + 1
 
               val oldDfPath = s"${oldFilePath}/${nextOldCacheIndex}"
-//              val dfw = df.write.mode(SaveMode.Overwrite).partitionBy(InternalColumns.tmst)
-              val cleanTime = readCleanTime
-              val updateDf = cleanTime match {
-                case Some(ct) => {
-                  val filterStr = s"`${InternalColumns.tmst}` > ${ct}"
-                  df.filter(filterStr)
-                }
-                case _ => df
-              }
+//              val cleanTime = readCleanTime
+//              val updateDf = cleanTime match {
+//                case Some(ct) => {
+//                  val filterStr = s"`${InternalColumns.tmst}` > ${ct}"
+//                  df.filter(filterStr)
+//                }
+//                case _ => df
+//              }
+              val cleanTime = getNextCleanTime
+              val filterStr = s"`${InternalColumns.tmst}` > ${cleanTime}"
+              val updateDf = df.filter(filterStr)
 
               val prlCount = sqlContext.sparkContext.defaultParallelism
               // coalesce
@@ -339,6 +345,13 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
     // next clean time
     val nextCleanTime = timeRange._2 + deltaTimeRange._1
     submitCleanTime(nextCleanTime)
+  }
+
+  // read next clean time
+  private def getNextCleanTime(): Long = {
+    val timeRange = TimeInfoCache.getTimeRange
+    val nextCleanTime = timeRange._2 + deltaTimeRange._1
+    nextCleanTime
   }
 
 }
