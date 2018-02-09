@@ -27,6 +27,7 @@ import org.apache.griffin.measure.rule.dsl.analyzer.DistinctnessAnalyzer
 import org.apache.griffin.measure.rule.dsl.expr._
 import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.trans.RuleExportFactory._
+import org.apache.griffin.measure.rule.trans.DsUpdateFactory._
 import org.apache.griffin.measure.utils.ParamUtil._
 
 import scala.util.Try
@@ -125,6 +126,14 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
 
       val (distRulePlan, dupCountTableName) = procType match {
         case StreamingProcessType if (withOlderTable) => {
+          // 4.0 update old data
+//          val updateOldTableName = "__updateOld"
+//          val updateOldSql = {
+//            s"SELECT * FROM `${targetName}`"
+//          }
+          val updateParam = emptyMap
+          val targetDsUpdate = genDsUpdate(updateParam, targetName, targetName)
+
           // 4. older alias
           val olderAliasTableName = "__older"
           val olderAliasSql = {
@@ -179,7 +188,11 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
           }
           val finalDupCountStep = SparkSqlStep(finalDupCountTableName, finalDupCountSql, emptyMap, true)
 
-          val rulePlan = RulePlan(olderAliasStep :: joinedStep :: groupStep :: finalDupCountStep :: Nil, Nil)
+          val rulePlan = RulePlan(
+            olderAliasStep :: joinedStep :: groupStep :: finalDupCountStep :: Nil,
+            Nil,
+            targetDsUpdate :: Nil
+          )
           (rulePlan, finalDupCountTableName)
         }
         case _ => {
