@@ -30,14 +30,14 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     ```
 3. Pull griffin pre-built docker images.
     ```
-    docker pull bhlx3lyx7/svc_msr:0.1.6
+    docker pull bhlx3lyx7/svc_msr:0.2.0
     docker pull bhlx3lyx7/elasticsearch
     docker pull bhlx3lyx7/kafka
     docker pull zookeeper:3.5
     ```
    Or you can pull the images faster through mirror acceleration if you are in China.
     ```
-    docker pull registry.docker-cn.com/bhlx3lyx7/svc_msr:0.1.6
+    docker pull registry.docker-cn.com/bhlx3lyx7/svc_msr:0.2.0
     docker pull registry.docker-cn.com/bhlx3lyx7/elasticsearch
     docker pull registry.docker-cn.com/bhlx3lyx7/kafka
     docker pull registry.docker-cn.com/zookeeper:3.5

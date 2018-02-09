@@ -33,7 +33,7 @@
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "name": "prof",
-        "rule": "email, count(*) from source group by email",
+        "rule": "email, count(*) as cnt from source group by email",
         "metric": {
           "name": "prof",
           "collect.type": "array"
@@ -43,7 +43,7 @@
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "name": "grp",
-        "rule": "source.post_code, count(*) from source group by source.post_code",
+        "rule": "source.post_code, count(*) as cnt from source group by source.post_code order by cnt desc",
         "metric": {
           "name": "post_group",
           "collect.type": "array"
