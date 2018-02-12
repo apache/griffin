@@ -102,8 +102,8 @@ public class MetricStoreImpl implements MetricStore {
     private HttpEntity getHttpEntityForSearch(String metricName, int from, int size, long tmst) throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> queryParam = new HashMap<>();
-        Map<String, Object> rangeQuery = Collections.singletonMap("tmst", Collections.singletonMap("gte", tmst));
-        queryParam.put("must", Collections.singletonMap("range", rangeQuery));
+//        Map<String, Object> rangeQuery = Collections.singletonMap("tmst", Collections.singletonMap("gte", tmst));
+//        queryParam.put("must", Collections.singletonMap("range", rangeQuery));
         Map<String, Object> termQuery = Collections.singletonMap("name.keyword", metricName);
         queryParam.put("filter", Collections.singletonMap("term", termQuery));
         Map<String, Object> sortParam = Collections.singletonMap("tmst", Collections.singletonMap("order", "desc"));
