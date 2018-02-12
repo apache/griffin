@@ -139,7 +139,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
               {
                 type: "file.exist",
                 config: {
-                  "root.path": "hdfs:///griffin/demo_src",
+                  "root.path": '',
                   path: ""
                 }
               }
@@ -176,6 +176,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
   size: string;
   path: string;
   location: string;
+  needpath: boolean;
 
   private toasterService: ToasterService;
   public visible = false;
@@ -412,7 +413,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
                 {
                   type: "file.exist",
                   config: {
-                    "root.path": "hdfs:///griffin/demo_src",
+                    "root.path": this.location,
                     path: this.path
                   }
                 }
@@ -436,7 +437,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
     if (this.size.indexOf("0") == 0) {
       delete this.newMeasure["data.sources"][0]["connectors"][0]["data.unit"];
     }
-    if (this.path == "") {
+    if (!this.needpath || this.path == "") {
       delete this.newMeasure["data.sources"][0]["connectors"][0]["predicates"];
     }
     this.visible = true;
@@ -615,6 +616,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
     this.timezone = evt.timezone;
     this.where = evt.where;
     this.size = evt.num + evt.timetype;
+    this.needpath = evt.needpath;
     this.path = evt.path;
   }
 
