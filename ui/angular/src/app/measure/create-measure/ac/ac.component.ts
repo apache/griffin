@@ -159,7 +159,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
               {
                 type: "file.exist",
                 config: {
-                  "root.path": "hdfs:///griffin/demo_src",
+                  "root.path": '',
                   path: ""
                 }
               }
@@ -185,7 +185,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
               {
                 type: "file.exist",
                 config: {
-                  "root.path": "hdfs:///griffin/demo_src",
+                  "root.path": '',
                   path: ""
                 }
               }
@@ -395,7 +395,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
                 {
                   type: "file.exist",
                   config: {
-                    "root.path": "hdfs:///griffin/demo_src",
+                    "root.path": this.src_location,
                     path: this.src_path
                   }
                 }
@@ -421,7 +421,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
                 {
                   type: "file.exist",
                   config: {
-                    "root.path": "hdfs:///griffin/demo_src",
+                    "root.path": this.tgt_location,
                     path: this.tgt_path
                   }
                 }
