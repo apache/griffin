@@ -174,8 +174,8 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
           length: lengthStr
         }
       });
-      this.originBegin.push(this.someKeyboard[i][0]);
-      this.originLength.push(length);
+      this.originBegin.push(beginStr);
+      this.originLength.push(lengthStr);
     }
     if (this.dropdownList.length == 2) {
       delete this.newJob["data.segments"][1]["as.baseline"];
