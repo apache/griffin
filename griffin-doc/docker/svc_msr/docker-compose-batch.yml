@@ -16,7 +16,7 @@
 #under the License.
 
 griffin:
-  image: bhlx3lyx7/svc_msr:0.1.6
+  image: bhlx3lyx7/svc_msr:0.2.0
   hostname: griffin
   links:
     - es

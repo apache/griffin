@@ -124,6 +124,7 @@ trait DataConnector extends Loggable with Serializable {
 
   private def cleanData(timeInfo: TimeInfo): Unit = {
     TableRegisters.unregisterRunTempTables(sqlContext, timeInfo.key)
+    TableRegisters.unregisterCompileTempTables(timeInfo.key)
 
     DataFrameCaches.uncacheDataFrames(timeInfo.key)
     DataFrameCaches.clearTrashDataFrames(timeInfo.key)
