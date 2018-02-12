@@ -413,7 +413,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
                 {
                   type: "file.exist",
                   config: {
-                    "root.path": this.location,
+                    "root.path": this.srclocation,
                     path: this.path
                   }
                 }
