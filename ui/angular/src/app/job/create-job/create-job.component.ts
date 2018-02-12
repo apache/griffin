@@ -161,17 +161,21 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
       ]
     };
     for (let i = 0; i < this.dropdownList.length; i++) {
+      var connector = this.dropdownList[i];
+      var begin = this.someKeyboard[i][0];
       var length = this.someKeyboard[i][1] - this.someKeyboard[i][0];
+      var beginStr = this.getTimeByUnit(begin, connector.size);
+      var lengthStr = this.getTimeByUnit(length, connector.size);
       this.newJob["data.segments"].push({
-        "data.connector.name": this.dropdownList[i].connectorname,
+        "data.connector.name": connector.connectorname,
         "as.baseline": true,
         "segment.range": {
-          begin: this.someKeyboard[i][0],
-          length: length
+          begin: beginStr,
+          length: lengthStr
         }
       });
-      this.originBegin.push(this.someKeyboard[i][0]);
-      this.originLength.push(length);
+      this.originBegin.push(beginStr);
+      this.originLength.push(lengthStr);
     }
     if (this.dropdownList.length == 2) {
       delete this.newJob["data.segments"][1]["as.baseline"];
@@ -233,6 +237,18 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
 
   setHeight() {
     $("#md-datepicker-0").height(250);
+  }
+
+  getTimeByUnit(multiplier, unit) {
+    var regex = /^(\d+)([a-zA-Z]+)$/g;
+    var arr = regex.exec(unit);
+    if (arr.length > 2) {
+      var n = parseInt(arr[1]);
+      var unitStr = arr[2];
+      return ((n * multiplier).toString() + arr[2]);
+    } else {
+      return multiplier.toString();
+    }
   }
 
   getMeasureId() {
