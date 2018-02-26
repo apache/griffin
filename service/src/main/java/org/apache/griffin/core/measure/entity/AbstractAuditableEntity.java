@@ -38,7 +38,7 @@ public abstract class AbstractAuditableEntity implements Serializable {
     private Long id;
 
     @JsonIgnore
-    private Timestamp createdDate = new Timestamp(System.currentTimeMillis());
+    private Long createdDate = System.currentTimeMillis();
 
     @JsonIgnore
     private Timestamp modifiedDate;
@@ -51,11 +51,11 @@ public abstract class AbstractAuditableEntity implements Serializable {
         this.id = id;
     }
 
-    public Timestamp getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Timestamp createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -88,13 +88,10 @@ public abstract class AbstractAuditableEntity implements Serializable {
         }
         AbstractAuditableEntity other = (AbstractAuditableEntity) obj;
         if (id == null) {
-            if (other.id != null) {
-                return false;
-            }
-        } else if (!id.equals(other.id)) {
-            return false;
+            return other.id == null;
+        } else {
+            return id.equals(other.id);
         }
-        return true;
     }
 
 }
