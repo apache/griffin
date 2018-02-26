@@ -1,0 +1,59 @@
+{
+  "name": "dist_batch",
+
+  "process.type": "batch",
+
+  "timestamp": 123456,
+
+  "data.sources": [
+    {
+      "name": "source",
+      "baseline": true,
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/rst.avro"
+          }
+        }
+      ]
+    },
+    {
+      "name": "target",
+      "baseline": true,
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/rst.avro"
+          }
+        }
+      ]
+    }
+  ],
+
+  "evaluate.rule": {
+    "rules": [
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "distinct",
+        "name": "dist",
+        "rule": "url",
+        "details": {
+          "source": "source",
+          "target": "target",
+          "total": "total",
+          "distinct": "distinct",
+          "dup": "dup",
+          "num": "num",
+          "duplication.array": "dup"
+        },
+        "metric": {
+          "name": "distinct"
+        }
+      }
+    ]
+  }
+}
