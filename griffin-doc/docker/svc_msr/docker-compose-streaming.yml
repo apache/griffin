@@ -26,6 +26,8 @@ griffin:
     ES_HOSTNAME: es
     ZK_HOSTNAME: zk
     KAFKA_HOSTNAME: kafka
+  volumes:
+    - /var/lib/mysql
   ports:
     - 32122:2122
     - 38088:8088
