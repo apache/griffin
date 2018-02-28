@@ -22,6 +22,8 @@ griffin:
     - es
   environment:
     ES_HOSTNAME: es
+  volumes:
+    - /var/lib/mysql
   ports:
     - 32122:2122
     - 38088:8088
