@@ -29,6 +29,6 @@ public class GriffinInfoController {
 
     @RequestMapping(value = "/version", method = RequestMethod.GET)
     public String greeting() {
-        return "0.1.0";
+        return "0.2.0";
     }
 }
