@@ -70,7 +70,7 @@ Measured by how the values agree with an identified source of truth.
 
 Select the source dataset and fields which will be used for comparision.
 
-<img src="../img/userguide/source.png">
+<img src="../img/userguide/source.PNG">
 
 For example, we choose 3 columns here.
 
@@ -78,7 +78,7 @@ For example, we choose 3 columns here.
 
 Select the target dataset and fields which will be used for comparision.
 
-<img src="../img/userguide/target.png">
+<img src="../img/userguide/target.PNG">
 
 3) Mapping source and target
 
