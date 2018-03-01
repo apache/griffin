@@ -104,6 +104,7 @@ public class JobServiceImpl implements JobService {
         return dataList;
     }
 
+    @SuppressWarnings("unchecked")
     private JobDataBean genJobData(JobKey jobKey, GriffinJob job) throws SchedulerException {
         Scheduler scheduler = factory.getScheduler();
         List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
@@ -538,6 +539,7 @@ public class JobServiceImpl implements JobService {
         return jobHealth;
     }
 
+    @SuppressWarnings("unchecked")
     private List<Trigger> getTriggers(GriffinJob job) {
         JobKey jobKey = new JobKey(job.getQuartzName(), job.getQuartzGroup());
         List<Trigger> triggers;

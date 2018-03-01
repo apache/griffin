@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import org.apache.griffin.core.interceptor.Token;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,6 +68,7 @@ public class MeasureController {
 
     @RequestMapping(value = "/measures", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
+    @Token
     public Measure createMeasure(@RequestBody Measure measure) {
         return measureService.createMeasure(measure);
     }

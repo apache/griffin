@@ -17,18 +17,12 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.info;
+package org.apache.griffin.core.interceptor;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import java.lang.annotation.*;
 
-@RestController
-@RequestMapping("/api/v1")
-public class GriffinInfoController {
-
-    @RequestMapping(value = "/version", method = RequestMethod.GET)
-    public String greeting() {
-        return "0.2.0";
-    }
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Token {
 }
