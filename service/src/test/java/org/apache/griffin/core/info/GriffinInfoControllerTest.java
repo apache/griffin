@@ -43,6 +43,6 @@ public class GriffinInfoControllerTest {
     public void testGreeting() throws Exception {
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/version"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", is("0.1.0")));
+                .andExpect(jsonPath("$", is("0.2.0")));
     }
 }
