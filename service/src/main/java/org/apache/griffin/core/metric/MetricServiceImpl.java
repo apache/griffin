@@ -70,7 +70,7 @@ public class MetricServiceImpl implements MetricService {
             List<AbstractJob> jobList = entry.getValue();
             List<Metric> metrics = new ArrayList<>();
             for (AbstractJob job : jobList) {
-                List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300, job.getCreatedDate().getTime());
+                List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300, job.getCreatedDate());
                 metrics.add(new Metric(job.getMetricName(), measure.getDqType(), measure.getOwner(), metricValues));
             }
             metricMap.put(measure.getName(), metrics);
