@@ -35,7 +35,6 @@ under the License.
           <th st-ratio="10">DB Name</th>
           <th st-ratio="20">Owner</th>
           <th st-ratio="10">Creation Time</th>
-          <th st-ratio="20">Last Access Time</th>
           <th st-ratio="20">Location</th>
         </tr>
       </thead>
@@ -58,7 +57,6 @@ under the License.
           <td>{{row.dbName || 'N/A'}}</td>
           <td>{{row.owner || 'N/A'}}</td>
           <td>{{(row.createTime * 1000 | date: 'short') || 'N/A'}}</td>
-          <td>{{(row.lastAccessTime * 1000 | date: 'short') || 'N/A' }}</td>
           <td>{{row.sd.location || 'N/A'}}</td>
         </tr>
         <tr *ngIf="row.showDetail">

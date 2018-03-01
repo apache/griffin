@@ -117,6 +117,10 @@ export class SidebarComponent implements OnInit {
           node.type = "accuracy";
           for (let i = 0; i < jobs.length; i++) {
             if (jobs[i].metricValues.length != 0) {
+              var someMetrics = jobs[i].metricValues.slice(0,30);
+              jobs[i].metricValues = JSON.parse(
+                JSON.stringify(someMetrics)
+              );
               var metricNode = {
                 name: "",
                 timestamp: "",
