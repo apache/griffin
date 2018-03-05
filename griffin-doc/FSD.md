@@ -139,17 +139,17 @@ confirmation   :
 <img src="img/fsd/image2018-2-6 10-10-15.png" >
 
 <p style="color: rgb(51,102,255);">#12 List all metrics values</p>
-<img src="img/fsd/image2018-2-6 10-48-10.png" style="height:400px;">
+<img src="img/fsd/image2018-2-6 10-48-10.png" style="height:500px;">
 
 
 
 <p style="color: rgb(51,102,255);">#13 Show My Dashboard</p>
 chart list -> Max chart display     
 
-<img src="img/fsd/image2018-2-6 10-50-10.png" style="height:400px;" >
+<img src="img/fsd/image2018-2-6 10-50-10.png" height="400px" >
 
 <p style="color: rgb(51,102,255);">#14 Show metric detail</p>
-<img src="img/fsd/image2018-2-6 10-51-16.png" style="height:400px;" >
+<img src="img/fsd/image2018-2-6 10-51-16.png" height="400px" >
 
 <p style="color: rgb(51,102,255);">#15 Scheduler job</p>
 Same UI as #7
