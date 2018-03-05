@@ -155,11 +155,11 @@ After the processing work has done, here are 3 ways to show the data diagram.
 
    You can see the diagrams of metrics.
 
-   <img src="../img/userguide/metrics dashboard.png" >
+   <img src="../img/userguide/metrics dashboard.png" style="height:400px;" >
 
    By clicking on the diagram, you can get the zoom-in picture of it, and know the metrics at the selected time window.  
 
-   <img src="../img/userguide/dashboard big.png" >
+   <img src="../img/userguide/dashboard big.png" style="height:400px;" >
 
 3. The metrics is shown on the right side of the page. By clicking on the measure, you can get the diagram and details about the measure result.   
 
