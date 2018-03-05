@@ -109,13 +109,14 @@ export class MeasureComponent implements OnInit {
       //     data[measure].type = '';
       //   }
       // }
-      this.results = Object.keys(data).map(function(index) {
+      let trans = Object.keys(data).map(function(index) {
         let measure = data[index];
         if (measure["measure.type"] === "external") {
           measure["dq.type"] = "external";
         }
         return measure;
       });
+      this.results = Object.assign([],trans).reverse();
     });
   }
 }
