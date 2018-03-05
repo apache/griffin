@@ -101,6 +101,7 @@ public class JobInstance implements Job {
 
     }
 
+    @SuppressWarnings("unchecked")
     private void setJobStartTime(JobDetail jobDetail) throws SchedulerException {
         Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobDetail.getKey();
@@ -223,6 +224,7 @@ public class JobInstance implements Job {
         return TimeZone.getTimeZone(timezone);
     }
 
+    @SuppressWarnings("unchecked")
     private boolean createJobInstance(Map<String, Object> confMap) throws Exception {
         Map<String, Object> config = (Map<String, Object>) confMap.get("checkdonefile.schedule");
         Long interval = TimeUtil.str2Long((String) config.get("interval"));

@@ -17,18 +17,17 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.info;
+package org.apache.griffin.core.interceptor;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-@RestController
-@RequestMapping("/api/v1")
-public class GriffinInfoController {
-
-    @RequestMapping(value = "/version", method = RequestMethod.GET)
-    public String greeting() {
-        return "0.2.0";
+@Configuration
+public class WebAppConfigurer extends WebMvcConfigurerAdapter {
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new TokenInterceptor()).addPathPatterns("/api/v1/measures").addPathPatterns("/api/v1/jobs");
+        super.addInterceptors(registry);
     }
 }
