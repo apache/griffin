@@ -232,7 +232,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
             { id: 6, itemName: "Average", category: "Summary Statistics" },
             // {"id":7,"itemName":"Median","category": "Summary Statistics"},
             // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
-            { id: 9, itemName: "Enum Detection Count", category: "Advanced Statistics" }
+            { id: 9, itemName: "Enum Detection Top5 Count", category: "Advanced Statistics" }
           ];
         } else {
           this.dropdownList[item.name] = [
@@ -240,7 +240,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
             { id: 2, itemName: "Distinct Count", category: "Simple Statistics" },
             { id: 3, itemName: "Total Count", category: "Summary Statistics" },
             // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
-            { id: 9, itemName: "Enum Detection Count", category: "Advanced Statistics" }
+            { id: 9, itemName: "Enum Detection Top5 Count", category: "Advanced Statistics" }
             // {"id":10,"itemName":"Regular Expression Detection Count","category": "Advanced Statistics"}
           ];
         }
@@ -319,7 +319,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       //   return 'median(source.`'+col.name+'`) ';
       case "Average":
         return "avg(source.`" + col.name + "`) AS `" + col.name + "-average`";
-      case "Enum Detection Count":
+      case "Enum Detection Top5 Count":
         return (
           "source.`" +
           col.name +
@@ -568,7 +568,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       for (let i = 0; i < this.selectedItems[key].length; i++) {
         var originrule = this.selectedItems[key][i].itemName;
         info = info + originrule + ",";
-        if (originrule == "Enum Detection Count") {
+        if (originrule == "Enum Detection Top5 Count") {
           enmvalue = this.transferRule(originrule, selected);
           grpname = selected.name + "-grp";
           this.transenumrule.push(enmvalue);
