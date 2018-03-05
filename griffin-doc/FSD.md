@@ -139,7 +139,7 @@ confirmation   :
 <img src="img/fsd/image2018-2-6 10-10-15.png" >
 
 <p style="color: rgb(51,102,255);">#12 List all metrics values</p>
-<img src="img/fsd/image2018-2-6 10-48-10.png" style="height:500px;">
+<img src="img/fsd/image2018-2-6 10-48-10.png" height="500px">
 
 
 
