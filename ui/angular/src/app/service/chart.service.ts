@@ -57,8 +57,7 @@ export class ChartService {
   }
 
   formatTimeStamp(timestamp) {
-    var TzOffset = new Date(timestamp).getTimezoneOffset() / 60 - 7;
-    return timestamp + TzOffset * 60 * 60 * 1000;
+    return timestamp;
   }
 
   getMetricData(metric) {
