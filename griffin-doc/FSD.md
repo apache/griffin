@@ -32,9 +32,9 @@ Apache Griffin is a model driven open source Data Quality solution for distribut
 
 ## Background and strategic fit
 
-At eBay, when people play with big data in Hadoop (or other streaming data), data quality often becomes one big challenge. Different teams have built customized data quality tools to detect and analyze data quality issues within their own domain. We are thinking to take a platform approach to provide shared Infrastructure and generic features to solve common data quality pain points. This would enable us to build trusted data assets.
+When people play with big data in Hadoop (or other streaming data), data quality often becomes one big challenge. Different teams have built customized data quality tools to detect and analyze data quality issues within their own domain. We are thinking to take a platform approach to provide shared Infrastructure and generic features to solve common data quality pain points. This would enable us to build trusted data assets.
 
-Currently it’s very difficult and costly to do data quality validation when we have big data flow across multi-platforms at eBay (e.g. Oracle, Hadoop, Couchbase, Cassandra, Kafka, Mongodb). Take eBay real time personalization platform as a sample, everyday we have to validate data quality status for ~600M records ( imaging we have 150M active users for our website).  Data quality often becomes one big challenge both in its streaming and batch pipelines.
+Currently it’s very difficult and costly to do data quality validation when we have big data flow across multi-platforms  (e.g. Oracle, Hadoop, Couchbase, Cassandra, Kafka, Mongodb). Take eBay real time personalization platform as a sample, everyday we have to validate data quality status for ~600M records ( imaging we have 150M active users for our website).  Data quality often becomes one big challenge both in its streaming and batch pipelines.
 
 So we conclude 3 data quality problems at eBay:
 
