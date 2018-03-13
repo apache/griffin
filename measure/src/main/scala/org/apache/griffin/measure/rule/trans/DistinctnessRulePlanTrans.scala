@@ -174,6 +174,17 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
 
           // 7. final duplicate count
           val finalDupCountTableName = "__finalDupCount"
+          // dupColName:      the duplicate count of duplicated items only occurs in new data,
+          //                  which means the distinct one in new data is also duplicate
+          // accuDupColName:  the count of duplicated items accumulated in new data and old data,
+          //                  which means the accumulated distinct count in all data
+          // e.g.:  new data [A, A, B, B, C, D], old data [A, A, B, C]
+          //        selfGroupTable will be (A, 1, F), (B, 1, F), (C, 0, T), (D, 0, T)
+          //        joinedTable will be (A, 1, F), (A, 1, F), (B, 1, F), (C, 0, F), (D, 0, T)
+          //        groupTable will be (A, 1, F, 2), (B, 1, F, 1), (C, 0, F, 1), (D, 0, T, 1)
+          //        finalDupCountTable will be (A, F, 2, 3), (B, F, 2, 2), (C, F, 1, 1), (D, T, 0, 0)
+          //        The distinct result of new data only should be: (A, 2), (B, 2), (C, 1), (D, 0),
+          //        which means in new data [A, A, B, B, C, D], [A, A, B, B, C] are all duplicated, only [D] is distinct
           val finalDupCountSql = {
             s"""
                |SELECT ${aliasesClause}, `${InternalColumns.distinct}`,
