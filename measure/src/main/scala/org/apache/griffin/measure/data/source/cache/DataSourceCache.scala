@@ -29,10 +29,12 @@ import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.spark.sql._
 
+import scala.util.Random
+
 // data source cache process steps
 // dump phase: save
 // process phase: read -> process -> update -> finish -> clean old data
-trait DataSourceCache extends DataCacheable with Loggable with Serializable {
+trait DataSourceCache extends DataCacheable with WithFanIn[Long] with Loggable with Serializable {
 
   val sqlContext: SQLContext
   val param: Map[String, Any]
@@ -55,7 +57,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   val _ReadyTimeDelay = "ready.time.delay"
   val _TimeRange = "time.range"
 
-  val defFilePath = s"hdfs:///griffin/cache/${dsName}/${index}"
+  val rdmStr = Random.alphanumeric.take(10).mkString
+  val defFilePath = s"hdfs:///griffin/cache/${dsName}_${rdmStr}"
   val defInfoPath = s"${index}"
 
   val filePath: String = param.getString(_FilePath, defFilePath)
@@ -98,7 +101,7 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
   def init(): Unit = {}
 
-  // save new cache data only
+  // save new cache data only, need index for multiple streaming data connectors
   def saveData(dfOpt: Option[DataFrame], ms: Long): Unit = {
     if (!readOnly) {
       dfOpt match {
@@ -122,8 +125,11 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
       }
 
       // submit cache time and ready time
-      submitCacheTime(ms)
-      submitReadyTime(ms)
+      if (fanIncrement(ms)) {
+        submitCacheTime(ms)
+        submitReadyTime(ms)
+      }
+
     }
   }
 

@@ -42,6 +42,9 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
   }
 
   def init(): Unit = {
+    // register fan in
+    dataSourceCacheOpt.foreach(_.registerFanIn)
+
     val ds = stream match {
       case Success(dstream) => dstream
       case Failure(ex) => throw ex
