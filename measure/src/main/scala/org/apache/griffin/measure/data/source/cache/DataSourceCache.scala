@@ -126,6 +126,7 @@ trait DataSourceCache extends DataCacheable with WithFanIn[Long] with Loggable w
 
       // submit cache time and ready time
       if (fanIncrement(ms)) {
+        println(s"save data [${ms}] finish")
         submitCacheTime(ms)
         submitReadyTime(ms)
       }
