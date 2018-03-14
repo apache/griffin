@@ -32,6 +32,21 @@ under the License.
   <name>Apache Griffin :: Measures</name>
   <url>http://maven.apache.org</url>
 
+  <repositories>
+    <repository>
+      <id>ebaycentral.releases</id>
+      <url>http://ebaycentral.corp.ebay.com/content/repositories/releases</url>
+    </repository>
+    <repository>
+      <id>ebaycentral.3rd</id>
+      <url>http://ebaycentral.corp.ebay.com/content/repositories/thirdparty</url>
+    </repository>
+    <repository>
+      <id>ebaycentral.snapshot</id>
+      <url>http://ebaycentral.corp.ebay.com/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -153,6 +168,35 @@ under the License.
       <groupId>org.apache.curator</groupId>
       <artifactId>curator-recipes</artifactId>
       <version>${curator.version}</version>
+    </dependency>
+
+    <!-- rheos -->
+    <dependency>
+      <groupId>io.ebay.rheos</groupId>
+      <artifactId>rheos-client</artifactId>
+      <version>0.0.6-SNAPSHOT</version>
+    </dependency>
+    <!--<dependency>-->
+    <!--<groupId>org.apache.kafka</groupId>-->
+    <!--<artifactId>kafka_2.10</artifactId>-->
+    <!--<version>0.10.0.0</version>-->
+    <!--<exclusions>-->
+    <!--<exclusion>-->
+    <!--<groupId>org.apache.kafka</groupId>-->
+    <!--<artifactId>kafka-clients</artifactId>-->
+    <!--</exclusion>-->
+    <!--</exclusions>-->
+    <!--</dependency>-->
+
+    <dependency>
+      <groupId>com.ebay.crawler.streaming.rheos</groupId>
+      <artifactId>rheos-streaming-beans</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ebay.crawler.streaming.rheos</groupId>
+      <artifactId>rheos-streaming-common</artifactId>
+      <version>0.0.1</version>
     </dependency>
 
     <!--junit-->
