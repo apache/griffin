@@ -49,6 +49,8 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
 
     val _duplicationArray = "duplication.array"
     val _withAccumulate = "with.accumulate"
+
+    val _recordEnable = "record.enable"
   }
   import DistinctnessKeys._
 
@@ -81,11 +83,15 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
       }
 
       val selClause = analyzer.selectionPairs.map { pair =>
-        val (expr, alias) = pair
+        val (expr, alias, _) = pair
         s"${expr.desc} AS `${alias}`"
       }.mkString(", ")
-      val aliases = analyzer.selectionPairs.map(_._2)
-      val aliasesClause = aliases.map( a => s"`${a}`" ).mkString(", ")
+      val distAliases = analyzer.selectionPairs.filter(_._3).map(_._2)
+      val distAliasesClause = distAliases.map( a => s"`${a}`" ).mkString(", ")
+      val allAliases = analyzer.selectionPairs.map(_._2)
+      val allAliasesClause = allAliases.map( a => s"`${a}`" ).mkString(", ")
+      val groupAliases = analyzer.selectionPairs.filter(!_._3).map(_._2)
+      val groupAliasesClause = groupAliases.map( a => s"`${a}`" ).mkString(", ")
 
       // 1. source alias
       val sourceAliasTableName = "__sourceAlias"
@@ -110,9 +116,9 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
       val accuDupColName = details.getStringOrKey(_accu_dup)
       val selfGroupSql = {
         s"""
-           |SELECT ${aliasesClause}, (COUNT(*) - 1) AS `${dupColName}`,
+           |SELECT ${distAliasesClause}, (COUNT(*) - 1) AS `${dupColName}`,
            |TRUE AS `${InternalColumns.distinct}`
-           |FROM `${sourceAliasTableName}` GROUP BY ${aliasesClause}
+           |FROM `${sourceAliasTableName}` GROUP BY ${distAliasesClause}
           """.stripMargin
       }
       val selfGroupStep = SparkSqlStep(selfGroupTableName, selfGroupSql, emptyMap, true)
@@ -141,13 +147,13 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
 
           // 5. join with older data
           val joinedTableName = "__joined"
-          val selfSelClause = (aliases :+ dupColName).map { alias =>
+          val selfSelClause = (distAliases :+ dupColName).map { alias =>
             s"`${selfGroupTableName}`.`${alias}`"
           }.mkString(", ")
-          val onClause = aliases.map { alias =>
+          val onClause = distAliases.map { alias =>
             s"coalesce(`${selfGroupTableName}`.`${alias}`, '') = coalesce(`${olderAliasTableName}`.`${alias}`, '')"
           }.mkString(" AND ")
-          val olderIsNull = aliases.map { alias =>
+          val olderIsNull = distAliases.map { alias =>
             s"`${olderAliasTableName}`.`${alias}` IS NULL"
           }.mkString(" AND ")
           val joinedSql = {
@@ -164,10 +170,10 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
           val moreDupColName = "_more_dup"
           val groupSql = {
             s"""
-               |SELECT ${aliasesClause}, `${dupColName}`, `${InternalColumns.distinct}`,
+               |SELECT ${distAliasesClause}, `${dupColName}`, `${InternalColumns.distinct}`,
                |COUNT(*) AS `${moreDupColName}`
                |FROM `${joinedTableName}`
-               |GROUP BY ${aliasesClause}, `${dupColName}`, `${InternalColumns.distinct}`
+               |GROUP BY ${distAliasesClause}, `${dupColName}`, `${InternalColumns.distinct}`
              """.stripMargin
           }
           val groupStep = SparkSqlStep(groupTableName, groupSql, emptyMap)
@@ -187,7 +193,7 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
           //        which means in new data [A, A, B, B, C, D], [A, A, B, B, C] are all duplicated, only [D] is distinct
           val finalDupCountSql = {
             s"""
-               |SELECT ${aliasesClause}, `${InternalColumns.distinct}`,
+               |SELECT ${distAliasesClause}, `${InternalColumns.distinct}`,
                |CASE WHEN `${InternalColumns.distinct}` THEN `${dupColName}`
                |ELSE (`${dupColName}` + 1) END AS `${dupColName}`,
                |CASE WHEN `${InternalColumns.distinct}` THEN `${dupColName}`
@@ -226,36 +232,112 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
 
       val duplicationArrayName = details.getString(_duplicationArray, "")
       val dupRulePlan = if (duplicationArrayName.nonEmpty) {
-        // 9. duplicate record
-        val dupRecordTableName = "__dupRecords"
-        val dupRecordSelClause = procType match {
-          case StreamingProcessType if (withOlderTable) => s"${aliasesClause}, `${dupColName}`, `${accuDupColName}`"
-          case _ => s"${aliasesClause}, `${dupColName}`"
-        }
-        val dupRecordSql = {
-          s"""
-             |SELECT ${dupRecordSelClause}
-             |FROM `${dupCountTableName}` WHERE `${dupColName}` > 0
-           """.stripMargin
-        }
-        val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap, true)
-        val dupRecordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
-        val dupRecordExport = genRecordExport(dupRecordParam, dupRecordTableName, dupRecordTableName, endTmst, mode)
+        val recordEnable = details.getBoolean(_recordEnable, false)
+        if (groupAliases.size > 0) {
+          // with some group by requirement
+          // 9. origin data join with distinct information
+          val informedTableName = "__informed"
+          val onClause = distAliases.map { alias =>
+            s"coalesce(`${sourceAliasTableName}`.`${alias}`, '') = coalesce(`${dupCountTableName}`.`${alias}`, '')"
+          }.mkString(" AND ")
+          val informedSql = {
+            s"""
+               |SELECT `${sourceAliasTableName}`.*,
+               |`${dupCountTableName}`.`${dupColName}` AS `${dupColName}`,
+               |`${dupCountTableName}`.`${InternalColumns.distinct}` AS `${InternalColumns.distinct}`
+               |FROM `${sourceAliasTableName}` LEFT JOIN `${dupCountTableName}`
+               |ON ${onClause}
+               """.stripMargin
+          }
+          val informedStep = SparkSqlStep(informedTableName, informedSql, emptyMap)
 
-        // 10. duplicate metric
-        val dupMetricTableName = "__dupMetric"
-        val numColName = details.getStringOrKey(_num)
-        val dupMetricSql = {
-          s"""
-             |SELECT `${dupColName}`, COUNT(*) AS `${numColName}`
-             |FROM `${dupRecordTableName}` GROUP BY `${dupColName}`
-         """.stripMargin
-        }
-        val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
-        val dupMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
-        val dupMetricExport = genMetricExport(dupMetricParam, duplicationArrayName, dupMetricTableName, endTmst, mode)
+          // 10. add row number
+          val rnTableName = "__rowNumber"
+          val rnDistClause = distAliasesClause
+          val rnSortClause = s"SORT BY `${InternalColumns.distinct}`"
+          val rnSql = {
+            s"""
+               |SELECT *,
+               |ROW_NUMBER() OVER (DISTRIBUTE BY ${rnDistClause} ${rnSortClause}) `${InternalColumns.rowNumber}`
+               |FROM `${informedTableName}`
+               """.stripMargin
+          }
+          val rnStep = SparkSqlStep(rnTableName, rnSql, emptyMap)
 
-        RulePlan(dupRecordStep :: dupMetricStep :: Nil, dupRecordExport :: dupMetricExport :: Nil)
+          // 11. recognize duplicate items
+          val dupItemsTableName = "__dupItems"
+          val dupItemsSql = {
+            s"""
+               |SELECT ${allAliasesClause}, `${dupColName}` FROM `${rnTableName}`
+               |WHERE NOT `${InternalColumns.distinct}` OR `${InternalColumns.rowNumber}` > 1
+               """.stripMargin
+          }
+          val dupItemsStep = SparkSqlStep(dupItemsTableName, dupItemsSql, emptyMap)
+          val dupItemsParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
+          val dupItemsExport = genRecordExport(dupItemsParam, dupItemsTableName, dupItemsTableName, endTmst, mode)
+
+          // 12. group by dup Record metric
+          val groupDupMetricTableName = "__groupDupMetric"
+          val numColName = details.getStringOrKey(_num)
+          val groupSelClause = groupAliasesClause
+          val groupDupMetricSql = {
+            s"""
+               |SELECT ${groupSelClause}, `${dupColName}`, COUNT(*) AS `${numColName}`
+               |FROM `${dupItemsTableName}` GROUP BY ${groupSelClause}, `${dupColName}`
+             """.stripMargin
+          }
+          val groupDupMetricStep = SparkSqlStep(groupDupMetricTableName, groupDupMetricSql, emptyMap)
+          val groupDupMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
+          val groupDupMetricExport = genMetricExport(groupDupMetricParam, duplicationArrayName, groupDupMetricTableName, endTmst, mode)
+
+          val exports = if (recordEnable) {
+            dupItemsExport :: groupDupMetricExport :: Nil
+          } else {
+            groupDupMetricExport :: Nil
+          }
+          RulePlan(
+            informedStep :: rnStep :: dupItemsStep :: groupDupMetricStep :: Nil,
+            exports
+          )
+
+        } else {
+          // no group by requirement
+          // 9. duplicate record
+          val dupRecordTableName = "__dupRecords"
+          val dupRecordSelClause = procType match {
+            case StreamingProcessType if (withOlderTable) => s"${distAliasesClause}, `${dupColName}`, `${accuDupColName}`"
+            case _ => s"${distAliasesClause}, `${dupColName}`"
+          }
+          val dupRecordSql = {
+            s"""
+               |SELECT ${dupRecordSelClause}
+               |FROM `${dupCountTableName}` WHERE `${dupColName}` > 0
+              """.stripMargin
+          }
+          val dupRecordStep = SparkSqlStep(dupRecordTableName, dupRecordSql, emptyMap, true)
+          val dupRecordParam = RuleParamKeys.getRecordOpt(param).getOrElse(emptyMap)
+          val dupRecordExport = genRecordExport(dupRecordParam, dupRecordTableName, dupRecordTableName, endTmst, mode)
+
+          // 10. duplicate metric
+          val dupMetricTableName = "__dupMetric"
+          val numColName = details.getStringOrKey(_num)
+          val dupMetricSql = {
+            s"""
+               |SELECT `${dupColName}`, COUNT(*) AS `${numColName}`
+               |FROM `${dupRecordTableName}` GROUP BY `${dupColName}`
+              """.stripMargin
+          }
+          val dupMetricStep = SparkSqlStep(dupMetricTableName, dupMetricSql, emptyMap)
+          val dupMetricParam = emptyMap.addIfNotExist(ExportParamKeys._collectType, ArrayCollectType.desc)
+          val dupMetricExport = genMetricExport(dupMetricParam, duplicationArrayName, dupMetricTableName, endTmst, mode)
+
+          val exports = if (recordEnable) {
+            dupRecordExport :: dupMetricExport :: Nil
+          } else {
+            dupMetricExport :: Nil
+          }
+          RulePlan(dupRecordStep :: dupMetricStep :: Nil, exports)
+        }
       } else emptyRulePlan
 
       selfDistRulePlan.merge(distRulePlan).merge(distMetricRulePlan).merge(dupRulePlan)
