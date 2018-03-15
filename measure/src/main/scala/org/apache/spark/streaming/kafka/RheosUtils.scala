@@ -38,7 +38,7 @@ import scala.collection.JavaConverters._
  * object for constructing Kafka streams and RDDs
  */
 @Experimental
-object KafkaUtils extends Logging {
+object RheosUtils extends Logging {
   /**
    * :: Experimental ::
    * Scala constructor for a batch-oriented interface for consuming from Kafka.
@@ -66,7 +66,7 @@ object KafkaUtils extends Logging {
       case PreferBrokers =>
         throw new AssertionError(
           "If you want to prefer brokers, you must provide a mapping using PreferFixed " +
-          "A single KafkaRDD does not have a driver consumer and cannot look up brokers for you.")
+          "A single RheosRDD does not have a driver consumer and cannot look up brokers for you.")
       case PreferConsistent => ju.Collections.emptyMap[TopicPartition, String]()
       case PreferFixed(hostMap) => hostMap
     }
@@ -74,7 +74,7 @@ object KafkaUtils extends Logging {
     fixKafkaParams(kp)
     val osr = offsetRanges.clone()
 
-    new KafkaRDD[K, V](sc, kp, osr, preferredHosts, true)
+    new RheosRDD[K, V](sc, kp, osr, preferredHosts, true)
   }
 
   /**
@@ -125,7 +125,7 @@ object KafkaUtils extends Logging {
       locationStrategy: LocationStrategy,
       consumerStrategy: ConsumerStrategy[K, V]
     ): InputDStream[ConsumerRecord[K, V]] = {
-    new DirectKafkaInputDStream[K, V](ssc, locationStrategy, consumerStrategy)
+    new DirectRheosInputDStream[K, V](ssc, locationStrategy, consumerStrategy)
   }
 
   private def fixKafkaParamsForRheos(
@@ -189,7 +189,7 @@ object KafkaUtils extends Logging {
       .map({ pi =>
         new TopicPartition(pi.topic(), pi.partition())
       })
-    new DirectKafkaInputDStream[Array[Byte], RheosEvent](ssc, LocationStrategies.PreferConsistent,
+    new DirectRheosInputDStream[Array[Byte], RheosEvent](ssc, LocationStrategies.PreferConsistent,
       ConsumerStrategies.Assign(assignedTps, kafkaParams.asScala))
   }
 

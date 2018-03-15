@@ -30,7 +30,7 @@ import org.apache.spark.Logging
  * but processing the same topicpartition and group id in multiple threads is usually bad anyway.
  */
 private[kafka]
-class CachedKafkaConsumer[K, V] private(
+class CachedRheosConsumer[K, V] private(
   val groupId: String,
   val topic: String,
   val partition: Int,
@@ -103,24 +103,24 @@ class CachedKafkaConsumer[K, V] private(
 }
 
 private[kafka]
-object CachedKafkaConsumer extends Logging {
+object CachedRheosConsumer extends Logging {
 
   private case class CacheKey(groupId: String, topic: String, partition: Int)
 
   // Don't want to depend on guava, don't want a cleanup thread, use a simple LinkedHashMap
-  private var cache: ju.LinkedHashMap[CacheKey, CachedKafkaConsumer[_, _]] = null
+  private var cache: ju.LinkedHashMap[CacheKey, CachedRheosConsumer[_, _]] = null
 
   /** Must be called before get, once per JVM, to configure the cache. Further calls are ignored */
   def init(
       initialCapacity: Int,
       maxCapacity: Int,
-      loadFactor: Float): Unit = CachedKafkaConsumer.synchronized {
+      loadFactor: Float): Unit = CachedRheosConsumer.synchronized {
     if (null == cache) {
       logInfo(s"Initializing cache $initialCapacity $maxCapacity $loadFactor")
-      cache = new ju.LinkedHashMap[CacheKey, CachedKafkaConsumer[_, _]](
+      cache = new ju.LinkedHashMap[CacheKey, CachedRheosConsumer[_, _]](
         initialCapacity, loadFactor, true) {
         override def removeEldestEntry(
-          entry: ju.Map.Entry[CacheKey, CachedKafkaConsumer[_, _]]): Boolean = {
+          entry: ju.Map.Entry[CacheKey, CachedRheosConsumer[_, _]]): Boolean = {
           if (this.size > maxCapacity) {
             try {
               entry.getValue.consumer.close()
@@ -145,19 +145,19 @@ object CachedKafkaConsumer extends Logging {
       groupId: String,
       topic: String,
       partition: Int,
-      kafkaParams: ju.Map[String, Object]): CachedKafkaConsumer[K, V] =
-    CachedKafkaConsumer.synchronized {
+      kafkaParams: ju.Map[String, Object]): CachedRheosConsumer[K, V] =
+    CachedRheosConsumer.synchronized {
       val k = CacheKey(groupId, topic, partition)
       val v = cache.get(k)
       if (null == v) {
         logInfo(s"Cache miss for $k")
         logDebug(cache.keySet.toString)
-        val c = new CachedKafkaConsumer[K, V](groupId, topic, partition, kafkaParams)
+        val c = new CachedRheosConsumer[K, V](groupId, topic, partition, kafkaParams)
         cache.put(k, c)
         c
       } else {
         // any given topicpartition should have a consistent key and value type
-        v.asInstanceOf[CachedKafkaConsumer[K, V]]
+        v.asInstanceOf[CachedRheosConsumer[K, V]]
       }
     }
 
@@ -169,14 +169,14 @@ object CachedKafkaConsumer extends Logging {
       groupId: String,
       topic: String,
       partition: Int,
-      kafkaParams: ju.Map[String, Object]): CachedKafkaConsumer[K, V] =
-    new CachedKafkaConsumer[K, V](groupId, topic, partition, kafkaParams)
+      kafkaParams: ju.Map[String, Object]): CachedRheosConsumer[K, V] =
+    new CachedRheosConsumer[K, V](groupId, topic, partition, kafkaParams)
 
   /** remove consumer for given groupId, topic, and partition, if it exists */
   def remove(groupId: String, topic: String, partition: Int): Unit = {
     val k = CacheKey(groupId, topic, partition)
     logInfo(s"Removing $k from cache")
-    val v = CachedKafkaConsumer.synchronized {
+    val v = CachedRheosConsumer.synchronized {
       cache.remove(k)
     }
     if (null != v) {

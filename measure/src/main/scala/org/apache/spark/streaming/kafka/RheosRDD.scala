@@ -45,7 +45,7 @@ import scala.collection.mutable.ArrayBuffer
  * @tparam K type of Kafka message key
  * @tparam V type of Kafka message value
  */
-private[spark] class KafkaRDD[K, V](
+private[spark] class RheosRDD[K, V](
     sc: SparkContext,
     val kafkaParams: ju.Map[String, Object],
     val offsetRanges: Array[OffsetRange],
@@ -80,7 +80,7 @@ private[spark] class KafkaRDD[K, V](
 
   override def getPartitions: Array[Partition] = {
     offsetRanges.zipWithIndex.map { case (o, i) =>
-        new KafkaRDDPartition(i, o.topic, o.partition, o.fromOffset, o.untilOffset)
+        new RheosRDDPartition(i, o.topic, o.partition, o.fromOffset, o.untilOffset)
     }.toArray
   }
 
@@ -98,7 +98,7 @@ private[spark] class KafkaRDD[K, V](
 
   override def take(num: Int): Array[ConsumerRecord[K, V]] = {
     val nonEmptyPartitions = this.partitions
-      .map(_.asInstanceOf[KafkaRDDPartition])
+      .map(_.asInstanceOf[RheosRDDPartition])
       .filter(_.count > 0)
 
     if (num < 1 || nonEmptyPartitions.isEmpty) {
@@ -151,7 +151,7 @@ private[spark] class KafkaRDD[K, V](
     // The intention is best-effort consistent executor for a given topicpartition,
     // so that caching consumers can be effective.
     // TODO what about hosts specified by ip vs name
-    val part = thePart.asInstanceOf[KafkaRDDPartition]
+    val part = thePart.asInstanceOf[RheosRDDPartition]
     val allExecs = executors()
     val tp = part.topicPartition
     val prefHost = preferredHosts.get(tp)
@@ -167,20 +167,20 @@ private[spark] class KafkaRDD[K, V](
     }
   }
 
-  private def errBeginAfterEnd(part: KafkaRDDPartition): String =
+  private def errBeginAfterEnd(part: RheosRDDPartition): String =
     s"Beginning offset ${part.fromOffset} is after the ending offset ${part.untilOffset} " +
       s"for topic ${part.topic} partition ${part.partition}. " +
       "You either provided an invalid fromOffset, or the Kafka topic has been damaged"
 
   override def compute(thePart: Partition, context: TaskContext): Iterator[ConsumerRecord[K, V]] = {
-    val part = thePart.asInstanceOf[KafkaRDDPartition]
+    val part = thePart.asInstanceOf[RheosRDDPartition]
     assert(part.fromOffset <= part.untilOffset, errBeginAfterEnd(part))
     if (part.fromOffset == part.untilOffset) {
       logInfo(s"Beginning offset ${part.fromOffset} is the same as ending offset " +
         s"skipping ${part.topic} ${part.partition}")
       Iterator.empty
     } else {
-      new KafkaRDDIterator(part, context)
+      new RheosRDDIterator(part, context)
     }
   }
 
@@ -188,8 +188,8 @@ private[spark] class KafkaRDD[K, V](
    * An iterator that fetches messages directly from Kafka for the offsets in partition.
    * Uses a cached consumer where possible to take advantage of prefetching
    */
-  private class KafkaRDDIterator(
-      part: KafkaRDDPartition,
+  private class RheosRDDIterator(
+      part: RheosRDDPartition,
       context: TaskContext) extends Iterator[ConsumerRecord[K, V]] {
 
     logInfo(s"Computing topic ${part.topic}, partition ${part.partition} " +
@@ -200,14 +200,14 @@ private[spark] class KafkaRDD[K, V](
     context.addTaskCompletionListener{ context => closeIfNeeded() }
 
     val consumer = if (useConsumerCache) {
-      CachedKafkaConsumer.init(cacheInitialCapacity, cacheMaxCapacity, cacheLoadFactor)
+      CachedRheosConsumer.init(cacheInitialCapacity, cacheMaxCapacity, cacheLoadFactor)
       if (context.attemptNumber > 1) {
         // just in case the prior attempt failures were cache related
-        CachedKafkaConsumer.remove(groupId, part.topic, part.partition)
+        CachedRheosConsumer.remove(groupId, part.topic, part.partition)
       }
-      CachedKafkaConsumer.get[K, V](groupId, part.topic, part.partition, kafkaParams)
+      CachedRheosConsumer.get[K, V](groupId, part.topic, part.partition, kafkaParams)
     } else {
-      CachedKafkaConsumer.getUncached[K, V](groupId, part.topic, part.partition, kafkaParams)
+      CachedRheosConsumer.getUncached[K, V](groupId, part.topic, part.partition, kafkaParams)
     }
 
     var requestOffset = part.fromOffset

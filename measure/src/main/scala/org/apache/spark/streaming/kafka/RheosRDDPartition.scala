@@ -28,7 +28,7 @@ import org.apache.spark.Partition
  * @param untilOffset exclusive ending offset
  */
 private[kafka]
-class KafkaRDDPartition(
+class RheosRDDPartition(
   val index: Int,
   val topic: String,
   val partition: Int,

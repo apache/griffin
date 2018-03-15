@@ -46,7 +46,7 @@ import scala.collection.mutable
  * @tparam K type of Kafka message key
  * @tparam V type of Kafka message value
  */
-class DirectKafkaInputDStream[K, V](
+class DirectRheosInputDStream[K, V](
     _ssc: StreamingContext,
     locationStrategy: LocationStrategy,
     consumerStrategy: ConsumerStrategy[K, V]
@@ -54,7 +54,7 @@ class DirectKafkaInputDStream[K, V](
 
   val executorKafkaParams = {
     val ekp = new ju.HashMap[String, Object](consumerStrategy.executorKafkaParams)
-    KafkaUtils.fixKafkaParams(ekp)
+    RheosUtils.fixKafkaParams(ekp)
     ekp
   }
 
@@ -184,13 +184,13 @@ class DirectKafkaInputDStream[K, V](
     }.getOrElse(offsets)
   }
 
-  override def compute(validTime: Time): Option[KafkaRDD[K, V]] = {
+  override def compute(validTime: Time): Option[RheosRDD[K, V]] = {
     val untilOffsets = clamp(latestOffsets())
     val offsetRanges = untilOffsets.map { case (tp, uo) =>
       val fo = currentOffsets(tp)
       OffsetRange(tp.topic, tp.partition, fo, uo)
     }
-    val rdd = new KafkaRDD[K, V](
+    val rdd = new RheosRDD[K, V](
       context.sparkContext, executorKafkaParams, offsetRanges.toArray, getPreferredHosts, true)
 
     // Report the record number and metadata of this batch interval to InputInfoTracker.
@@ -277,7 +277,7 @@ class DirectKafkaInputDStream[K, V](
     override def update(time: Time): Unit = {
       batchForTime.clear()
       generatedRDDs.foreach { kv =>
-        val a = kv._2.asInstanceOf[KafkaRDD[K, V]].offsetRanges.map(_.toTuple).toArray
+        val a = kv._2.asInstanceOf[RheosRDD[K, V]].offsetRanges.map(_.toTuple).toArray
         batchForTime += kv._1 -> a
       }
     }
@@ -286,8 +286,8 @@ class DirectKafkaInputDStream[K, V](
 
     override def restore(): Unit = {
       batchForTime.toSeq.sortBy(_._1)(Time.ordering).foreach { case (t, b) =>
-         logInfo(s"Restoring KafkaRDD for time $t ${b.mkString("[", ", ", "]")}")
-         generatedRDDs += t -> new KafkaRDD[K, V](
+         logInfo(s"Restoring RheosRDD for time $t ${b.mkString("[", ", ", "]")}")
+         generatedRDDs += t -> new RheosRDD[K, V](
            context.sparkContext,
            executorKafkaParams,
            b.map(OffsetRange(_)),
