@@ -140,9 +140,9 @@ case class RheosStreamingDataConnector(sqlContext: SQLContext,
 
   def transform(rdd: RDD[OUT]): Option[DataFrame] = {
     // to reduce rdd partitions from rheos, to ignore multiple codec http request, which brings lots of exceptions.
-    val calcRdd = rdd.repartition(4)
+//    val calcRdd = rdd.repartition(4)
 
-    val rowRdd: RDD[Row] = calcRdd.mapPartitions { items =>
+    val rowRdd: RDD[Row] = rdd.mapPartitions { items =>
       val codec: RheosEventCodec = new RheosEventCodec(properties)
       val schema: Schema = ReflectData.get.getSchema(dataClass)
       items.flatMap { out =>
