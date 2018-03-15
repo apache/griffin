@@ -20,7 +20,7 @@ package org.apache.griffin.measure.data.connector
 
 import kafka.serializer.StringDecoder
 import org.apache.griffin.measure.config.params.user._
-import org.apache.griffin.measure.data.connector.streaming.{KafkaStreamingDataConnector, KafkaStreamingStringDataConnector, StreamingDataConnector}
+import org.apache.griffin.measure.data.connector.streaming.{KafkaStreamingDataConnector, KafkaStreamingStringDataConnector, RheosStreamingDataConnector, StreamingDataConnector}
 import org.apache.griffin.measure.process.engine.{DqEngine, DqEngines}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
@@ -44,6 +44,7 @@ object DataConnectorFactory {
   val TextDirRegex = """^(?i)text-dir$""".r
 
   val KafkaRegex = """^(?i)kafka$""".r
+  val RheosRegex = """^(?i)rheos$""".r
 
   val TextRegex = """^(?i)text$""".r
 
@@ -81,6 +82,7 @@ object DataConnectorFactory {
     val version = dataConnectorParam.version
     conType match {
       case KafkaRegex() => genKafkaDataConnector(sqlContext, ssc, dqEngines, dataConnectorParam)
+      case RheosRegex() => genRheosDataConnector(sqlContext, ssc, dqEngines, dataConnectorParam)
       case _ => throw new Exception("streaming connector creation error!")
     }
   }
@@ -119,6 +121,27 @@ object DataConnectorFactory {
         throw new Exception("not supported type kafka data connector")
       }
     }
+  }
+
+  private def genRheosDataConnector(sqlContext: SQLContext,
+                                    @transient ssc: StreamingContext,
+                                    dqEngines: DqEngines,
+                                    dataConnectorParam: DataConnectorParam
+                                   ) = {
+    RheosStreamingDataConnector(sqlContext, ssc, dqEngines, dataConnectorParam)
+//    val config = dataConnectorParam.config
+//    val KeyType = "key.type"
+//    val ValueType = "value.type"
+//    val keyType = config.getOrElse(KeyType, "java.lang.String").toString
+//    val valueType = config.getOrElse(ValueType, "java.lang.String").toString
+//    (getClassTag(keyType), getClassTag(valueType)) match {
+//      case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
+//        RheosStreamingDataConnector(sqlContext, ssc, dqEngines, dataConnectorParam)
+//      }
+//      case _ => {
+//        throw new Exception("not supported type kafka data connector")
+//      }
+//    }
   }
 
   private def getClassTag(tp: String): ClassTag[_] = {

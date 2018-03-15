@@ -28,6 +28,7 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
 
   type KD <: Decoder[K]
   type VD <: Decoder[V]
+  type OUT = (K, V)
 
   val config = dcParam.config
 
@@ -74,12 +75,12 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
     })
   }
 
-  def stream(): Try[InputDStream[(K, V)]] = Try {
+  def stream(): Try[InputDStream[OUT]] = Try {
     val topicSet = topics.split(",").toSet
     createDStream(topicSet)
   }
 
-  protected def createDStream(topicSet: Set[String]): InputDStream[(K, V)]
+  protected def createDStream(topicSet: Set[String]): InputDStream[OUT]
 }
 
 

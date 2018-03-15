@@ -48,7 +48,7 @@ case class KafkaStreamingStringDataConnector(sqlContext: SQLContext,
     KafkaUtils.createDirectStream[K, V, KD, VD](ssc, kafkaConfig, topicSet)
   }
 
-  def transform(rdd: RDD[(K, V)]): Option[DataFrame] = {
+  def transform(rdd: RDD[OUT]): Option[DataFrame] = {
     if (rdd.isEmpty) None else {
       try {
         val rowRdd = rdd.map(d => Row(d._2))
