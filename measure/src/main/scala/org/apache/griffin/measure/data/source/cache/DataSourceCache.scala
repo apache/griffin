@@ -106,6 +106,12 @@ trait DataSourceCache extends DataCacheable with WithFanIn[Long] with Loggable w
     if (!readOnly) {
       dfOpt match {
         case Some(df) => {
+          df.cache
+
+          // cache df
+          val cnt = df.count
+          println(s"save ${dsName} data count: ${cnt}")
+
           // lock makes it safer when writing new cache data
           val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
           if (newCacheLocked) {
@@ -118,6 +124,9 @@ trait DataSourceCache extends DataCacheable with WithFanIn[Long] with Loggable w
               newCacheLock.unlock()
             }
           }
+
+          // uncache
+          df.unpersist
         }
         case _ => {
           info(s"no data frame to save")

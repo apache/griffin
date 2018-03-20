@@ -30,7 +30,7 @@ import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka.RheosUtils
 
 import scala.util.{Failure, Success, Try}
-import java.util.Properties
+import java.util.{Date, Properties}
 import java.io.ByteArrayOutputStream
 
 import com.ebay.crawler.streaming.rheos.utils.RheosEventCodec
@@ -105,13 +105,21 @@ case class RheosStreamingDataConnector(sqlContext: SQLContext,
     }
     ds.foreachRDD((rdd, time) => {
       val ms = time.milliseconds
+
+      val t1 = new Date().getTime
+
       val saveDfOpt = try {
         // coalesce partition number
         val prlCount = rdd.sparkContext.defaultParallelism
-        val ptnCount = rdd.getNumPartitions
-        val repartitionedRdd = if (prlCount < ptnCount) {
-          rdd.coalesce(prlCount)
-        } else rdd
+//        val ptnCount = rdd.getNumPartitions
+//        val repartitionedRdd = if (prlCount < ptnCount) {
+////          rdd.coalesce(prlCount)
+//          rdd.repartition(prlCount)
+//        } else rdd
+        val repartitionedRdd = rdd.repartition(prlCount)
+
+        val cnt = rdd.count
+        println(s"rheos receive data [${ms}] count: ${cnt}")
 
         val dfOpt = transform(repartitionedRdd)
 
@@ -123,8 +131,14 @@ case class RheosStreamingDataConnector(sqlContext: SQLContext,
         }
       }
 
+      val t2 = new Date().getTime
+      println(s"rheos transform time: ${t2 - t1} ms")
+
       // save data frame
       dataSourceCacheOpt.foreach(_.saveData(saveDfOpt, ms))
+
+      val t3 = new Date().getTime
+      println(s"rheos save time: ${t3 - t2} ms")
     })
   }
 
@@ -157,7 +171,9 @@ case class RheosStreamingDataConnector(sqlContext: SQLContext,
       }
     }
 
-    if (rowRdd.isEmpty) None else {
+    rowRdd.cache
+
+    val retDfOpt = if (rowRdd.isEmpty) None else {
       try {
         val df = sqlContext.createDataFrame(rowRdd, schema)
         Some(df)
@@ -168,6 +184,10 @@ case class RheosStreamingDataConnector(sqlContext: SQLContext,
         }
       }
     }
+
+    rowRdd.unpersist()
+
+    retDfOpt
   }
 
   private def stringifyGenericRecord[T](record: T, schema: Schema): String = {
