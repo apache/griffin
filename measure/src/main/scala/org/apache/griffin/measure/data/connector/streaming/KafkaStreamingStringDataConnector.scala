@@ -44,7 +44,7 @@ case class KafkaStreamingStringDataConnector(sqlContext: SQLContext,
     StructField(valueColName, StringType)
   ))
 
-  def createDStream(topicSet: Set[String]): InputDStream[(K, V)] = {
+  def createDStream(topicSet: Set[String]): InputDStream[OUT] = {
     KafkaUtils.createDirectStream[K, V, KD, VD](ssc, kafkaConfig, topicSet)
   }
 

@@ -156,24 +156,22 @@ case class RheosStreamingDataConnector(sqlContext: SQLContext,
     // to reduce rdd partitions from rheos, to ignore multiple codec http request, which brings lots of exceptions.
 //    val calcRdd = rdd.repartition(4)
 
-    val rowRdd: RDD[Row] = rdd.mapPartitions { items =>
-      val codec: RheosEventCodec = new RheosEventCodec(properties)
-      val schema: Schema = ReflectData.get.getSchema(dataClass)
-      items.flatMap { out =>
-        try {
-          val v = out.value
-          val value = codec.decodeFromRheosEvent(v, dataClass)
-          val msg = stringifyGenericRecord(value, schema)
-          Some(Row(msg))
-        } catch {
-          case e: Throwable => None
+    if (rdd.isEmpty) None else {
+      val rowRdd: RDD[Row] = rdd.mapPartitions { items =>
+        val codec: RheosEventCodec = new RheosEventCodec(properties)
+        val schema: Schema = ReflectData.get.getSchema(dataClass)
+        items.flatMap { out =>
+          try {
+            val v = out.value
+            val value = codec.decodeFromRheosEvent(v, dataClass)
+            val msg = stringifyGenericRecord(value, schema)
+            Some(Row(msg))
+          } catch {
+            case e: Throwable => None
+          }
         }
       }
-    }
 
-    rowRdd.cache
-
-    val retDfOpt = if (rowRdd.isEmpty) None else {
       try {
         val df = sqlContext.createDataFrame(rowRdd, schema)
         Some(df)
@@ -184,10 +182,6 @@ case class RheosStreamingDataConnector(sqlContext: SQLContext,
         }
       }
     }
-
-    rowRdd.unpersist()
-
-    retDfOpt
   }
 
   private def stringifyGenericRecord[T](record: T, schema: Schema): String = {

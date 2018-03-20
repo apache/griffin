@@ -28,6 +28,7 @@ import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions.col
 
 import scala.util.Random
 
@@ -198,11 +199,16 @@ trait DataSourceCache extends DataCacheable with WithFanIn[Long] with Loggable w
   private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
                          ): Option[DataFrame] = {
     (dfOpt1, dfOpt2) match {
-      case (Some(df1), Some(df2)) => Some(df1 unionAll df2)
+      case (Some(df1), Some(df2)) => Some(unionByName(df1, df2))
       case (Some(df1), _) => dfOpt1
       case (_, Some(df2)) => dfOpt2
       case _ => None
     }
+  }
+
+  private def unionByName(a: DataFrame, b: DataFrame): DataFrame = {
+    val columns = a.columns.toSet.intersect(b.columns.toSet).map(col).toSeq
+    a.select(columns: _*).unionAll(b.select(columns: _*))
   }
 
   private def cleanOutTimePartitions(path: String, outTime: Long, partitionOpt: Option[String],
