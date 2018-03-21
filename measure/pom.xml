@@ -32,21 +32,6 @@ under the License.
   <name>Apache Griffin :: Measures</name>
   <url>http://maven.apache.org</url>
 
-  <repositories>
-    <repository>
-      <id>ebaycentral.releases</id>
-      <url>http://ebaycentral.corp.ebay.com/content/repositories/releases</url>
-    </repository>
-    <repository>
-      <id>ebaycentral.3rd</id>
-      <url>http://ebaycentral.corp.ebay.com/content/repositories/thirdparty</url>
-    </repository>
-    <repository>
-      <id>ebaycentral.snapshot</id>
-      <url>http://ebaycentral.corp.ebay.com/content/repositories/snapshots</url>
-    </repository>
-  </repositories>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
