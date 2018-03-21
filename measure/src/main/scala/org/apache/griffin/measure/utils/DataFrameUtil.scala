@@ -16,17 +16,26 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.rule.dsl.expr
+package org.apache.griffin.measure.utils
 
-trait Expr extends TreeNode with ExprTag with Serializable {
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
-  def desc: String
+object DataFrameUtil {
 
-  def coalesceDesc: String
+  def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
+                 ): Option[DataFrame] = {
+    (dfOpt1, dfOpt2) match {
+      case (Some(df1), Some(df2)) => Some(unionByName(df1, df2))
+      case (Some(df1), _) => dfOpt1
+      case (_, Some(df2)) => dfOpt2
+      case _ => None
+    }
+  }
 
-  def extractSelf: Expr = this
-
-  // execution
-  def map(func: (Expr) => Expr): Expr = func(this)
+  def unionByName(a: DataFrame, b: DataFrame): DataFrame = {
+    val columns = a.columns.toSet.intersect(b.columns.toSet).map(col).toSeq
+    a.select(columns: _*).unionAll(b.select(columns: _*))
+  }
 
 }
