@@ -28,6 +28,7 @@ import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters,
 import org.apache.griffin.measure.rule.plan.TimeInfo
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.apache.griffin.measure.utils.DataFrameUtil._
 
 case class DataSource(sqlContext: SQLContext,
                       name: String,
@@ -89,31 +90,31 @@ case class DataSource(sqlContext: SQLContext,
     }
   }
 
-  private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
-                         ): Option[DataFrame] = {
-    (dfOpt1, dfOpt2) match {
-      case (Some(df1), Some(df2)) => Some(unionDataFrames(df1, df2))
-      case (Some(df1), _) => dfOpt1
-      case (_, Some(df2)) => dfOpt2
-      case _ => None
-    }
-  }
-
-  private def unionDataFrames(df1: DataFrame, df2: DataFrame): DataFrame = {
-    try {
-      val cols = df1.columns
-      val rdd2 = df2.map{ row =>
-        val values = cols.map { col =>
-          row.getAs[Any](col)
-        }
-        Row(values: _*)
-      }
-      val ndf2 = sqlContext.createDataFrame(rdd2, df1.schema)
-      df1 unionAll ndf2
-    } catch {
-      case e: Throwable => df1
-    }
-  }
+//  private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
+//                         ): Option[DataFrame] = {
+//    (dfOpt1, dfOpt2) match {
+//      case (Some(df1), Some(df2)) => Some(unionDataFrames(df1, df2))
+//      case (Some(df1), _) => dfOpt1
+//      case (_, Some(df2)) => dfOpt2
+//      case _ => None
+//    }
+//  }
+//
+//  private def unionDataFrames(df1: DataFrame, df2: DataFrame): DataFrame = {
+//    try {
+//      val cols = df1.columns
+//      val rdd2 = df2.map{ row =>
+//        val values = cols.map { col =>
+//          row.getAs[Any](col)
+//        }
+//        Row(values: _*)
+//      }
+//      val ndf2 = sqlContext.createDataFrame(rdd2, df1.schema)
+//      df1 unionAll ndf2
+//    } catch {
+//      case e: Throwable => df1
+//    }
+//  }
 
   def updateData(df: DataFrame): Unit = {
     dataSourceCacheOpt.foreach(_.updateData(Some(df)))
