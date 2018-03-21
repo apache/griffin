@@ -170,35 +170,6 @@ under the License.
       <version>${curator.version}</version>
     </dependency>
 
-    <!-- rheos -->
-    <dependency>
-      <groupId>io.ebay.rheos</groupId>
-      <artifactId>rheos-client</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
-    </dependency>
-    <!--<dependency>-->
-    <!--<groupId>org.apache.kafka</groupId>-->
-    <!--<artifactId>kafka_2.10</artifactId>-->
-    <!--<version>0.10.0.0</version>-->
-    <!--<exclusions>-->
-    <!--<exclusion>-->
-    <!--<groupId>org.apache.kafka</groupId>-->
-    <!--<artifactId>kafka-clients</artifactId>-->
-    <!--</exclusion>-->
-    <!--</exclusions>-->
-    <!--</dependency>-->
-
-    <dependency>
-      <groupId>com.ebay.crawler.streaming.rheos</groupId>
-      <artifactId>rheos-streaming-beans</artifactId>
-      <version>0.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.ebay.crawler.streaming.rheos</groupId>
-      <artifactId>rheos-streaming-common</artifactId>
-      <version>0.0.1</version>
-    </dependency>
-
     <!--junit-->
     <dependency>
       <groupId>junit</groupId>
