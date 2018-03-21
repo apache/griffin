@@ -37,7 +37,7 @@ case class DistinctnessAnalyzer(expr: DistinctnessClause, sourceName: String) ex
   val selectionPairs = exprs.zipWithIndex.map { pair =>
     val (pr, idx) = pair
     val res = pr.preOrderTraverseDepthFirst(Seq[String]())(seqAlias, combAlias)
-    (pr, res.headOption.getOrElse(genAlias(idx)))
+    (pr, res.headOption.getOrElse(genAlias(idx)), pr.tag.isEmpty)
   }
 
   if (selectionPairs.isEmpty) {
