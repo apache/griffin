@@ -32,10 +32,11 @@ trait StreamingDataConnector extends DataConnector {
 
   type K
   type V
+  type OUT
 
-  protected def stream(): Try[InputDStream[(K, V)]]
+  protected def stream(): Try[InputDStream[OUT]]
 
-  def transform(rdd: RDD[(K, V)]): Option[DataFrame]
+  def transform(rdd: RDD[OUT]): Option[DataFrame]
 
   def data(ms: Long): (Option[DataFrame], TimeRange) = (None, TimeRange.emptyTimeRange)
 

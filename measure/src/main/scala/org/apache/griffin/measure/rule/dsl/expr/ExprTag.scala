@@ -18,15 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.rule.dsl.expr
 
-trait Expr extends TreeNode with ExprTag with Serializable {
-
-  def desc: String
-
-  def coalesceDesc: String
-
-  def extractSelf: Expr = this
-
-  // execution
-  def map(func: (Expr) => Expr): Expr = func(this)
-
+trait ExprTag { this: Expr =>
+  var tag: String = ""
 }

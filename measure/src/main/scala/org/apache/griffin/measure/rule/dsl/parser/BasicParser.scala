@@ -152,6 +152,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val WHERE: Parser[String] = """(?i)where\s""".r
     val GROUP: Parser[String] = """(?i)group\s""".r
     val ORDER: Parser[String] = """(?i)order\s""".r
+    val SORT: Parser[String] = """(?i)sort\s""".r
     val BY: Parser[String] = """(?i)by\s""".r
     val DESC: Parser[String] = """(?i)desc""".r
     val ASC: Parser[String] = """(?i)asc""".r
@@ -360,11 +361,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   def groupbyClause: Parser[GroupbyClause] = GROUP ~ BY ~ rep1sep(expression, COMMA) ~ opt(havingClause) ^^ {
     case _ ~ _ ~ cols ~ havingOpt => GroupbyClause(cols, havingOpt)
   }
-  def orderbyItem: Parser[OrderbyItem] = expression ~ opt(DESC | ASC) ^^ {
-    case expr ~ orderOpt => OrderbyItem(expr, orderOpt)
+  def orderItem: Parser[OrderItem] = expression ~ opt(DESC | ASC) ^^ {
+    case expr ~ orderOpt => OrderItem(expr, orderOpt)
   }
-  def orderbyClause: Parser[OrderbyClause] = ORDER ~ BY ~ rep1sep(orderbyItem, COMMA) ^^ {
+  def orderbyClause: Parser[OrderbyClause] = ORDER ~ BY ~ rep1sep(orderItem, COMMA) ^^ {
     case _ ~ _ ~ cols => OrderbyClause(cols)
+  }
+  def sortbyClause: Parser[SortbyClause] = SORT ~ BY ~ rep1sep(orderItem, COMMA) ^^ {
+    case _ ~ _ ~ cols => SortbyClause(cols)
   }
   def limitClause: Parser[LimitClause] = LIMIT ~> expression ^^ { LimitClause(_) }
 
