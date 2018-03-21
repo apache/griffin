@@ -28,11 +28,15 @@ import org.apache.griffin.measure.rule.adaptor.InternalColumns
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions.col
+import org.apache.griffin.measure.utils.DataFrameUtil._
+
+import scala.util.Random
 
 // data source cache process steps
 // dump phase: save
 // process phase: read -> process -> update -> finish -> clean old data
-trait DataSourceCache extends DataCacheable with Loggable with Serializable {
+trait DataSourceCache extends DataCacheable with WithFanIn[Long] with Loggable with Serializable {
 
   val sqlContext: SQLContext
   val param: Map[String, Any]
@@ -55,7 +59,8 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
   val _ReadyTimeDelay = "ready.time.delay"
   val _TimeRange = "time.range"
 
-  val defFilePath = s"hdfs:///griffin/cache/${dsName}/${index}"
+  val rdmStr = Random.alphanumeric.take(10).mkString
+  val defFilePath = s"hdfs:///griffin/cache/${dsName}_${rdmStr}"
   val defInfoPath = s"${index}"
 
   val filePath: String = param.getString(_FilePath, defFilePath)
@@ -98,11 +103,17 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
 
   def init(): Unit = {}
 
-  // save new cache data only
+  // save new cache data only, need index for multiple streaming data connectors
   def saveData(dfOpt: Option[DataFrame], ms: Long): Unit = {
     if (!readOnly) {
       dfOpt match {
         case Some(df) => {
+          df.cache
+
+          // cache df
+          val cnt = df.count
+          println(s"save ${dsName} data count: ${cnt}")
+
           // lock makes it safer when writing new cache data
           val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
           if (newCacheLocked) {
@@ -115,6 +126,9 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
               newCacheLock.unlock()
             }
           }
+
+          // uncache
+          df.unpersist
         }
         case _ => {
           info(s"no data frame to save")
@@ -122,8 +136,12 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
       }
 
       // submit cache time and ready time
-      submitCacheTime(ms)
-      submitReadyTime(ms)
+      if (fanIncrement(ms)) {
+        println(s"save data [${ms}] finish")
+        submitCacheTime(ms)
+        submitReadyTime(ms)
+      }
+
     }
   }
 
@@ -179,15 +197,20 @@ trait DataSourceCache extends DataCacheable with Loggable with Serializable {
     (cacheDfOpt, retTimeRange)
   }
 
-  private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
-                         ): Option[DataFrame] = {
-    (dfOpt1, dfOpt2) match {
-      case (Some(df1), Some(df2)) => Some(df1 unionAll df2)
-      case (Some(df1), _) => dfOpt1
-      case (_, Some(df2)) => dfOpt2
-      case _ => None
-    }
-  }
+//  private def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
+//                         ): Option[DataFrame] = {
+//    (dfOpt1, dfOpt2) match {
+//      case (Some(df1), Some(df2)) => Some(unionByName(df1, df2))
+//      case (Some(df1), _) => dfOpt1
+//      case (_, Some(df2)) => dfOpt2
+//      case _ => None
+//    }
+//  }
+//
+//  private def unionByName(a: DataFrame, b: DataFrame): DataFrame = {
+//    val columns = a.columns.toSet.intersect(b.columns.toSet).map(col).toSeq
+//    a.select(columns: _*).unionAll(b.select(columns: _*))
+//  }
 
   private def cleanOutTimePartitions(path: String, outTime: Long, partitionOpt: Option[String],
                                      func: (Long, Long) => Boolean

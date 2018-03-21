@@ -28,6 +28,7 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
 
   type KD <: Decoder[K]
   type VD <: Decoder[V]
+  type OUT = (K, V)
 
   val config = dcParam.config
 
@@ -42,35 +43,44 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
   }
 
   def init(): Unit = {
+    // register fan in
+    dataSourceCacheOpt.foreach(_.registerFanIn)
+
     val ds = stream match {
       case Success(dstream) => dstream
       case Failure(ex) => throw ex
     }
     ds.foreachRDD((rdd, time) => {
       val ms = time.milliseconds
+      val saveDfOpt = try {
+        // coalesce partition number
+        val prlCount = rdd.sparkContext.defaultParallelism
+        val ptnCount = rdd.getNumPartitions
+        val repartitionedRdd = if (prlCount < ptnCount) {
+          rdd.coalesce(prlCount)
+        } else rdd
 
-      // coalesce partition number
-      val prlCount = rdd.sparkContext.defaultParallelism
-      val ptnCount = rdd.getNumPartitions
-      val repartitionedRdd = if (prlCount < ptnCount) {
-        rdd.coalesce(prlCount)
-      } else rdd
+        val dfOpt = transform(repartitionedRdd)
 
-      val dfOpt = transform(repartitionedRdd)
-
-      val preDfOpt = preProcess(dfOpt, ms)
+        preProcess(dfOpt, ms)
+      } catch {
+        case e: Throwable => {
+          error(s"streaming data connector error: ${e.getMessage}")
+          None
+        }
+      }
 
       // save data frame
-      dataSourceCacheOpt.foreach(_.saveData(preDfOpt, ms))
+      dataSourceCacheOpt.foreach(_.saveData(saveDfOpt, ms))
     })
   }
 
-  def stream(): Try[InputDStream[(K, V)]] = Try {
+  def stream(): Try[InputDStream[OUT]] = Try {
     val topicSet = topics.split(",").toSet
     createDStream(topicSet)
   }
 
-  protected def createDStream(topicSet: Set[String]): InputDStream[(K, V)]
+  protected def createDStream(topicSet: Set[String]): InputDStream[OUT]
 }
 
 
