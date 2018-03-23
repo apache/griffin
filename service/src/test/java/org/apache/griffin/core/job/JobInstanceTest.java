@@ -39,7 +39,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.validation.constraints.AssertTrue;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -99,7 +98,7 @@ public class JobInstanceTest {
         GriffinMeasure measure = createGriffinMeasure("measureName");
         JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
         JobSchedule jobSchedule = createJobSchedule();
-        GriffinJob job = new GriffinJob(1L, "jobName", "qName", "qGroup", false);
+        BatchJob job = new BatchJob(1L, "jobName", "qName", "qGroup", false);
         List<Trigger> triggers = Arrays.asList(createSimpleTrigger(2, 0));
         given(context.getJobDetail()).willReturn(jd);
         given(jobScheduleRepo.findOne(Matchers.anyLong())).willReturn(jobSchedule);
@@ -108,7 +107,7 @@ public class JobInstanceTest {
         given(factory.getScheduler()).willReturn(scheduler);
         given((List<Trigger>)scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
-        given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
+        given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
         jobInstance.execute(context);
     }
@@ -120,7 +119,7 @@ public class JobInstanceTest {
         GriffinMeasure measure = createGriffinMeasure("measureName");
         JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
         JobSchedule jobSchedule = createJobSchedule("jobName",new SegmentRange("-1h","-1h"));
-        GriffinJob job = new GriffinJob(1L, "jobName", "qName", "qGroup", false);
+        BatchJob job = new BatchJob(1L, "jobName", "qName", "qGroup", false);
         List<Trigger> triggers = Arrays.asList(createSimpleTrigger(2, 0));
         given(context.getJobDetail()).willReturn(jd);
         given(jobScheduleRepo.findOne(Matchers.anyLong())).willReturn(jobSchedule);
@@ -129,7 +128,7 @@ public class JobInstanceTest {
         given(factory.getScheduler()).willReturn(scheduler);
         given((List<Trigger>)scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
-        given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
+        given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
         jobInstance.execute(context);
     }
@@ -141,7 +140,7 @@ public class JobInstanceTest {
         GriffinMeasure measure = createGriffinMeasure("measureName");
         JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
         JobSchedule jobSchedule = createJobSchedule("jobName",new SegmentRange("-1h","5h"));
-        GriffinJob job = new GriffinJob(1L, "jobName", "qName", "qGroup", false);
+        BatchJob job = new BatchJob(1L, "jobName", "qName", "qGroup", false);
         List<Trigger> triggers = Arrays.asList(createSimpleTrigger(2, 0));
         given(context.getJobDetail()).willReturn(jd);
         given(jobScheduleRepo.findOne(Matchers.anyLong())).willReturn(jobSchedule);
@@ -150,7 +149,7 @@ public class JobInstanceTest {
         given(factory.getScheduler()).willReturn(scheduler);
         given((List<Trigger>)scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
-        given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
+        given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
         jobInstance.execute(context);
     }
@@ -162,7 +161,7 @@ public class JobInstanceTest {
         GriffinMeasure measure = createGriffinMeasure("measureName",createFileExistPredicate(),createFileExistPredicate());
         JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
         JobSchedule jobSchedule = createJobSchedule("jobName");
-        GriffinJob job = new GriffinJob(1L, "jobName", "qName", "qGroup", false);
+        BatchJob job = new BatchJob(1L, "jobName", "qName", "qGroup", false);
         List<Trigger> triggers = Arrays.asList(createSimpleTrigger(2, 0));
         given(context.getJobDetail()).willReturn(jd);
         given(jobScheduleRepo.findOne(Matchers.anyLong())).willReturn(jobSchedule);
@@ -171,7 +170,7 @@ public class JobInstanceTest {
         given(factory.getScheduler()).willReturn(scheduler);
         given((List<Trigger>)scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
-        given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
+        given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
         jobInstance.execute(context);
     }

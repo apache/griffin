@@ -21,6 +21,7 @@ package org.apache.griffin.core.metric;
 
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.exception.GriffinExceptionHandler;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.util.JsonUtil;
@@ -50,6 +51,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.apache.griffin.core.measure.entity.Measure.DqType.accuracy;
 
 @RunWith(SpringRunner.class)
 public class MetricControllerTest {
@@ -73,7 +75,7 @@ public class MetricControllerTest {
 
     @Test
     public void testGetAllMetricsSuccess() throws Exception {
-        Metric metric = new Metric("metricName", "accuracy", "owner", Collections.emptyList());
+        Metric metric = new Metric("metricName", accuracy, "owner", Collections.emptyList());
         given(service.getAllMetrics()).willReturn(
                 Collections.singletonMap("measureName", Collections.singletonList(metric)));
 

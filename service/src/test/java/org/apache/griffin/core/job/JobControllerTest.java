@@ -73,7 +73,7 @@ public class JobControllerTest {
     public void testGetJobs() throws Exception {
         JobDataBean jobBean = new JobDataBean();
         jobBean.setJobName("job_name");
-        given(service.getAliveJobs()).willReturn(Collections.singletonList(jobBean));
+        given(service.getAliveJobs("batch")).willReturn(Collections.singletonList(jobBean));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -84,7 +84,7 @@ public class JobControllerTest {
     public void testAddJobForSuccess() throws Exception {
         JobSchedule jobSchedule = createJobSchedule();
         jobSchedule.setId(1L);
-        given(service.addJob(jobSchedule)).willReturn(jobSchedule);
+//        given(service.addJob(jobSchedule)).willReturn(jobSchedule);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -20,6 +20,10 @@ under the License.
 package org.apache.griffin.core.job.entity;
 
 import com.cloudera.livy.sessions.SessionState;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
 
 public class LivySessionStates {
 
@@ -39,6 +43,7 @@ public class LivySessionStates {
         dead,
         success,
         unknown,
+        stopped,
         finding,
         not_found,
         found
@@ -74,8 +79,45 @@ public class LivySessionStates {
         }
     }
 
+    public static State toLivyState(JsonObject object) {
+        if (object != null) {
+            JsonElement state = object.get("state");
+            JsonElement finalStatus = object.get("finalStatus");
+            State finalState = parseState(state);
+            return finalState != null ? finalState : parseState(finalStatus);
+        }
+        return unknown;
+    }
+
+    private static State parseState(JsonElement state) {
+        if (state == null) {
+            return null;
+        }
+        switch (state.getAsString()) {
+            case "NEW":
+            case "NEW_SAVING":
+            case "SUBMITTED":
+                return not_started;
+            case "ACCEPTED":
+                return starting;
+            case "RUNNING":
+                return running;
+            case "SUCCEEDED":
+                return success;
+            case "FAILED":
+                return dead;
+            case "KILLED":
+                return shutting_down;
+            case "FINISHED":
+                return null;
+            default:
+                return unknown;
+        }
+    }
+
     public static boolean isActive(State state) {
-        if (State.unknown.equals(state) || State.finding.equals(state) || State.not_found.equals(state) || State.found.equals(state)) {
+        if (State.unknown.equals(state) || State.stopped.equals(state) || State.finding.equals(state)
+                || State.not_found.equals(state) || State.found.equals(state)) {
             // set unknown isActive() as false.
             return false;
         }

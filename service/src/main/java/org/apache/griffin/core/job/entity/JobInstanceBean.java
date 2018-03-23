@@ -19,14 +19,16 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
+import  org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
+
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.batch;
 
 @Entity
 public class JobInstanceBean extends AbstractAuditableEntity {
@@ -38,9 +40,15 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @Enumerated(EnumType.STRING)
     private State state;
 
+    @Enumerated(EnumType.STRING)
+    private ProcessType type = batch;
+
+    /** The application id of this session **/
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String appId;
 
-    @Column(length = 10 * 1024)
+    @Column(length = 4 * 1024)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String appUri;
 
     @Column(name = "timestamp")
@@ -50,12 +58,18 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     private Long expireTms;
 
     @Column(name = "predicate_group_name")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String predicateGroup;
 
     @Column(name = "predicate_job_name")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String predicateName;
 
     @Column(name = "predicate_job_deleted")
+    @JsonIgnore
+    private Boolean predicateDeleted = false;
+
+    @JsonIgnore
     private Boolean deleted = false;
 
     public Long getSessionId() {
@@ -72,6 +86,14 @@ public class JobInstanceBean extends AbstractAuditableEntity {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public ProcessType getType() {
+        return type;
+    }
+
+    public void setType(ProcessType type) {
+        this.type = type;
     }
 
     public String getAppId() {
@@ -126,6 +148,14 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.predicateName = predicateName;
     }
 
+    public Boolean getPredicateDeleted() {
+        return predicateDeleted;
+    }
+
+    public void setPredicateDeleted(Boolean predicateDeleted) {
+        this.predicateDeleted = predicateDeleted;
+    }
+
     public Boolean getDeleted() {
         return deleted;
     }
@@ -137,12 +167,23 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     public JobInstanceBean() {
     }
 
+    public JobInstanceBean(State state, Long tms, Long expireTms) {
+        this.state = state;
+        this.tms = tms;
+        this.expireTms = expireTms;
+    }
+
     public JobInstanceBean(State state, String pName, String pGroup, Long tms, Long expireTms) {
         this.state = state;
         this.predicateName = pName;
         this.predicateGroup = pGroup;
         this.tms = tms;
         this.expireTms = expireTms;
+    }
+
+    public JobInstanceBean(State state, String pName, String pGroup, Long tms, Long expireTms, ProcessType type) {
+        this(state, pName, pGroup, tms, expireTms);
+        this.type = type;
     }
 
     public JobInstanceBean(Long sessionId, State state, String appId, String appUri, Long timestamp, Long expireTms) {

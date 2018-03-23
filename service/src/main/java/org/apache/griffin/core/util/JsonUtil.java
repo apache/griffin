@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -54,6 +55,11 @@ public class JsonUtil {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper.readValue(jsonStr, type);
+    }
+
+    public static <T> T toEntity(File file, Class<T> type) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(file, type);
     }
 
     public static <T> T toEntity(String jsonStr, TypeReference type) throws IOException {

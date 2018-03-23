@@ -127,7 +127,7 @@ public class SparkSubmitJobTest {
         given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
         Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
         given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(), Matchers.any())).willReturn(result);
-        doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
+//        doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
 
         sparkSubmitJob.execute(context);
         assertTrue(true);
@@ -141,7 +141,7 @@ public class SparkSubmitJobTest {
         JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
         given(context.getJobDetail()).willReturn(jd);
         given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
-        doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
+//        doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
 
         sparkSubmitJob.execute(context);
         assertTrue(true);

@@ -20,12 +20,19 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.griffin.core.util.JsonUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 public class DataSource extends AbstractAuditableEntity {
@@ -36,6 +43,16 @@ public class DataSource extends AbstractAuditableEntity {
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "data_source_id")
     private List<DataConnector> connectors = new ArrayList<>();
+
+    @JsonIgnore
+    @Access(AccessType.PROPERTY)
+    @Column(length = 1024)
+    private String cache;
+
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, Object> cacheMap;
+
 
     public String getName() {
         return name;
@@ -54,6 +71,29 @@ public class DataSource extends AbstractAuditableEntity {
             throw new NullPointerException("Data connector can not be empty.");
         }
         this.connectors = connectors;
+    }
+
+    public String getCache() {
+        return cache;
+    }
+
+    private void setCache(String details) throws IOException {
+        if (!StringUtils.isEmpty(details)) {
+            this.cache = details;
+            this.cacheMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
+            });
+        }
+    }
+
+    @JsonProperty("cache")
+    public Map<String, Object> getCacheMap() {
+        return cacheMap;
+    }
+
+    @JsonProperty("cache")
+    public void setCacheMap(Map<String, Object> cacheMap) throws IOException {
+        this.cacheMap = cacheMap;
+        this.cache = JsonUtil.toJson(cacheMap);
     }
 
     public DataSource() {

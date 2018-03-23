@@ -32,6 +32,13 @@ public enum GriffinExceptionMessage {
     INVALID_METRIC_VALUE_FORMAT(40008, "Metric value format is invalid"),
     INVALID_MEASURE_ID(40009, "Property 'measure.id' is invalid"),
     INVALID_CRON_EXPRESSION(40010, "Property 'cron.expression' is invalid"),
+    MEASURE_TYPE_DOES_NOT_SUPPORT(40011, "We don't support such measure type."),
+    JOB_TYPE_DOES_NOT_SUPPORT(40011, "We don't support such job type."),
+    STREAMING_JOB_IS_RUNNING(40012, "There is no need to start again as job is running."),
+    STREAMING_JOB_IS_STOPPED(40012, "There is no need to stop again as job is stopped."),
+    JOB_IS_NOT_SCHEDULED(40013, "The job isn't scheduled."),
+    JOB_IS_NOT_IN_PAUSED_STATUS(40014, "The job isn't in paused status."),
+    JOB_IS_IN_PAUSED_STATUS(40015, "The job is already in paused status."),
 
     //404, "Not Found"
     MEASURE_ID_DOES_NOT_EXIST(40401, "Measure id does not exist"),

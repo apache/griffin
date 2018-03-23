@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
 import javax.persistence.*;
@@ -36,6 +37,7 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
 
     protected String metricName;
 
+    @JsonIgnore
     protected Boolean deleted = false;
 
     AbstractJob() {

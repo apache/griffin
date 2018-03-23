@@ -34,7 +34,6 @@ import java.util.*;
 
 import static org.apache.griffin.core.job.JobInstance.*;
 import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
-import static org.apache.griffin.core.job.JobServiceImpl.JOB_SCHEDULE_ID;
 import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_NAME;
 
 public class EntityHelper {
@@ -139,7 +138,6 @@ public class EntityHelper {
         jobDataMap.put(PREDICATES_KEY, predicatesJson);
         jobDataMap.put(JOB_NAME, "jobName");
         jobDataMap.put(PREDICATE_JOB_NAME, "predicateJobName");
-        jobDataMap.put(JOB_SCHEDULE_ID, 1L);
         jobDataMap.put(GRIFFIN_JOB_ID, 1L);
         jobDetail.setJobDataMap(jobDataMap);
         return jobDetail;
@@ -169,8 +167,8 @@ public class EntityHelper {
         return trigger;
     }
 
-    public static GriffinJob createGriffinJob() {
-        return new GriffinJob(1L, 1L, "jobName",
+    public static BatchJob createGriffinJob() {
+        return new BatchJob(1L, 1L, "jobName",
                 "quartzJobName", "quartzGroupName", false);
     }
 

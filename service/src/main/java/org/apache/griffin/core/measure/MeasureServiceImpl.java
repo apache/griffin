@@ -21,6 +21,7 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.exception.GriffinException;
+import org.apache.griffin.core.measure.entity.ExternalMeasure;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.ExternalMeasureRepo;
@@ -125,8 +126,10 @@ public class MeasureServiceImpl implements MeasureService {
     private MeasureOperation getOperation(Measure measure) {
         if (measure instanceof GriffinMeasure) {
             return griffinOp;
+        } else if (measure instanceof ExternalMeasure) {
+            return externalOp;
         }
-        return externalOp;
+        throw new GriffinException.BadRequestException(MEASURE_TYPE_DOES_NOT_SUPPORT);
     }
 
 }

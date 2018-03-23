@@ -42,7 +42,7 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
 
     @Transactional(rollbackFor = Exception.class)
     @Modifying
-    @Query("delete from JobInstanceBean j where j.expireTms <= ?1")
+    @Query("delete from JobInstanceBean j where j.expireTms <= ?1 and j.deleted = false ")
     int deleteByExpireTimestamp(Long expireTms);
 
 }

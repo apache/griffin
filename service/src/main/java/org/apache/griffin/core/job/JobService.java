@@ -19,23 +19,22 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.JobDataBean;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
-import org.quartz.SchedulerException;
+import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 
 import java.util.List;
 
 public interface JobService {
 
-    List<JobDataBean> getAliveJobs();
+    List<JobDataBean> getAliveJobs(String type);
 
     JobSchedule getJobSchedule(String jobName);
 
-    JobSchedule addJob(JobSchedule jobSchedule) throws Exception;
+    AbstractJob addJob(JobSchedule js) throws Exception;
 
-    void pauseJob(String group, String name) throws SchedulerException;
+    void startJob(Long jobId);
+
+    void stopJob(Long jobId);
 
     void deleteJob(Long jobId);
 

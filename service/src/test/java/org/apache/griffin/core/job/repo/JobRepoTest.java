@@ -20,7 +20,7 @@ under the License.
 package org.apache.griffin.core.job.repo;
 
 import org.apache.griffin.core.job.entity.AbstractJob;
-import org.apache.griffin.core.job.entity.GriffinJob;
+import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,8 +82,8 @@ public class JobRepoTest {
     }
 
     public void setEntityManager() throws Exception {
-        AbstractJob job1 = new GriffinJob(1L, "griffinJobName1", "qName1", "qGroup1", false);
-        AbstractJob job2 = new GriffinJob(1L, "griffinJobName2", "qName2", "qGroup2", false);
+        AbstractJob job1 = new BatchJob(1L, "griffinJobName1", "qName1", "qGroup1", false);
+        AbstractJob job2 = new BatchJob(1L, "griffinJobName2", "qName2", "qGroup2", false);
         AbstractJob job3 = new VirtualJob("virtualJobName1", 1L, "metricName1");
         AbstractJob job4 = new VirtualJob("virtualJobName2", 1L, "metricName2");
         entityManager.persistAndFlush(job1);

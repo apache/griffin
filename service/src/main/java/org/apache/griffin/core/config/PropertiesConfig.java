@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.config;
 
+import org.apache.griffin.core.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import javax.annotation.PostConstruct;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Properties;
 
 import static org.apache.griffin.core.util.PropertiesUtil.getConf;
@@ -42,6 +45,16 @@ public class PropertiesConfig {
     public PropertiesConfig(@Value("${external.config.location}") String location) {
         LOGGER.info("external.config.location : {}", location);
         this.location = location;
+    }
+
+    @PostConstruct
+    public void init() throws IOException {
+        String batchName = "env_batch.json";
+        String batchPath = "env/" + batchName;
+        String streamingName = "env_streaming.json";
+        String streamingPath = "env/" + streamingName;
+        FileUtil.readBatchEnv(batchPath, batchName);
+        FileUtil.readStreamingEnv(streamingPath, streamingName);
     }
 
 
