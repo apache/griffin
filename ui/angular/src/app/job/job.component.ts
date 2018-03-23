@@ -121,11 +121,12 @@ export class JobComponent implements OnInit {
     var self = this;
     let allJobs = this.serviceService.config.uri.allJobs;
     this.http.get(allJobs).subscribe(data => {
-      this.results = Object.keys(data).map(function(index) {
+      let trans = Object.keys(data).map(function(index) {
         let job = data[index];
         job.showDetail = false;
         return job;
       });
-    });
+      this.results = Object.assign([],trans).reverse();
+    });   
   }
 }

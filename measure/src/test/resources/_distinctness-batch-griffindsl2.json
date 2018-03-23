@@ -54,7 +54,7 @@
         "dsl.type": "griffin-dsl",
         "dq.type": "distinct",
         "name": "dist",
-        "rule": "name",
+        "rule": "name, [age]",
         "details": {
           "source": "source",
           "target": "target",
@@ -62,7 +62,8 @@
           "distinct": "distinct",
           "dup": "dup",
           "num": "num",
-          "duplication.array": "dup"
+          "duplication.array": "dup",
+          "record.enable": true
         },
         "metric": {
           "name": "distinct"

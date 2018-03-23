@@ -29,5 +29,7 @@ object InternalColumns {
 
   val distinct = "__distinct"
 
-  val columns = List[String](tmst, metric, record, empty, beginTs, endTs, distinct)
+  val rowNumber = "__rn"
+
+  val columns = List[String](tmst, metric, record, empty, beginTs, endTs, distinct, rowNumber)
 }
