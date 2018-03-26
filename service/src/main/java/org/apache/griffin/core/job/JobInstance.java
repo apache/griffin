@@ -114,7 +114,7 @@ public class JobInstance implements Job {
     private void setSourcesPartitionsAndPredicates(List<DataSource> sources) throws Exception {
         boolean isFirstBaseline = true;
         for (JobDataSegment jds : jobSchedule.getSegments()) {
-            if (jds.getBaseline() && isFirstBaseline) {
+            if (jds.isBaseline() && isFirstBaseline) {
                 Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
                 measure.setTimestamp(jobStartTime + tsOffset);
                 isFirstBaseline = false;
@@ -146,7 +146,7 @@ public class JobInstance implements Job {
      * split data into several part and get every part start timestamp
      *
      * @param segRange config of data
-     * @param dc data connector
+     * @param dc       data connector
      * @return split timestamps of data
      */
     private Long[] genSampleTs(SegmentRange segRange, DataConnector dc) {
@@ -174,13 +174,13 @@ public class JobInstance implements Job {
     /**
      * set data connector predicates
      *
-     * @param dc data connector
+     * @param dc       data connector
      * @param sampleTs collection of data split start timestamp
      */
     private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) throws IOException {
         List<SegmentPredicate> predicates = dc.getPredicates();
         for (SegmentPredicate predicate : predicates) {
-            genConfMap(predicate.getConfigMap(), sampleTs,dc.getDataTimeZone());
+            genConfMap(predicate.getConfigMap(), sampleTs, dc.getDataTimeZone());
             //Do not forget to update origin string config
             predicate.setConfigMap(predicate.getConfigMap());
             mPredicates.add(predicate);
@@ -188,18 +188,18 @@ public class JobInstance implements Job {
     }
 
     private void setConnectorConf(DataConnector dc, Long[] sampleTs) throws IOException {
-        genConfMap(dc.getConfigMap(), sampleTs,dc.getDataTimeZone());
+        genConfMap(dc.getConfigMap(), sampleTs, dc.getDataTimeZone());
         dc.setConfigMap(dc.getConfigMap());
     }
 
 
     /**
-     * @param conf    config map
+     * @param conf     config map
      * @param sampleTs collection of data split start timestamp
      * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
      * or like {"path": "/year=2017/month=11/dt=15/hour=09/_DONE,/year=2017/month=11/dt=15/hour=10/_DONE"}
      */
-    private void genConfMap(Map<String, String> conf,  Long[] sampleTs,String timezone) {
+    private void genConfMap(Map<String, String> conf, Long[] sampleTs, String timezone) {
         if (conf == null) {
             LOGGER.warn("Predicate config is null.");
             return;

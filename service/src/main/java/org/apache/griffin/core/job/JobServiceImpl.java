@@ -223,7 +223,7 @@ public class JobServiceImpl implements JobService {
 
     private boolean isValidBaseLine(List<JobDataSegment> segments) {
         for (JobDataSegment jds : segments) {
-            if (jds.getBaseline()) {
+            if (jds.isBaseline()) {
                 return true;
             }
         }
@@ -349,7 +349,7 @@ public class JobServiceImpl implements JobService {
     private void deletePredicateJob(GriffinJob job) throws SchedulerException {
         List<JobInstanceBean> instances = job.getJobInstances();
         for (JobInstanceBean instance : instances) {
-            if (!instance.getDeleted()) {
+            if (!instance.isDeleted()) {
                 deleteJob(instance.getPredicateGroup(), instance.getPredicateName());
                 instance.setDeleted(true);
                 if (instance.getState().equals(LivySessionStates.State.finding)) {

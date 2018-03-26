@@ -56,7 +56,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     private String predicateName;
 
     @Column(name = "predicate_job_deleted")
-    private Boolean deleted = false;
+    private boolean deleted = false;
 
     public Long getSessionId() {
         return sessionId;
@@ -126,11 +126,11 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.predicateName = predicateName;
     }
 
-    public Boolean getDeleted() {
+    public boolean isDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Boolean deleted) {
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 
