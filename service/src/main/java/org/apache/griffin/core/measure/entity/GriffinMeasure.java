@@ -48,7 +48,7 @@ public class GriffinMeasure extends Measure {
     private Long timestamp;
 
     @JsonIgnore
-    @Access(AccessType.PROPERTY)
+//    @Access(AccessType.PROPERTY)
     @Column(length = 1024)
     private String ruleDescription;
 

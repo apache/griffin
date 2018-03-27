@@ -55,7 +55,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     private String timeZone;
 
     @JsonIgnore
-    @Access(AccessType.PROPERTY)
+//    @Access(AccessType.PROPERTY)
     private String predicateConfig;
 
     @Transient

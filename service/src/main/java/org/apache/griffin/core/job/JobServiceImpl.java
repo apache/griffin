@@ -51,12 +51,19 @@ import java.util.*;
 
 import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.starting;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.not_started;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.recovering;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.running;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.idle;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.busy;
 import static org.quartz.CronExpression.isValidExpression;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -459,12 +466,13 @@ public class JobServiceImpl implements JobService {
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void syncInstancesOfAllJobs() {
-        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState();
-        if (!CollectionUtils.isEmpty(beans)) {
-            for (JobInstanceBean jobInstance : beans) {
-                syncInstancesOfJob(jobInstance);
-            }
-        }
+//        State[] states = {starting, not_started, recovering, idle, running, busy};
+//        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
+//        if (!CollectionUtils.isEmpty(beans)) {
+//            for (JobInstanceBean jobInstance : beans) {
+//                syncInstancesOfJob(jobInstance);
+//            }
+//        }
     }
 
     /**

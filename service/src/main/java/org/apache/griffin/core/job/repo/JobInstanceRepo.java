@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+
 public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
 
     @Query("select DISTINCT s from JobInstanceBean s " +
@@ -45,4 +47,7 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
     @Query("delete from JobInstanceBean j where j.expireTms <= ?1")
     int deleteByExpireTimestamp(Long expireTms);
 
+    @Query("select DISTINCT s from JobInstanceBean s " +
+            "where s.state in ?1")
+    List<JobInstanceBean> findByActiveState(State[] states);
 }

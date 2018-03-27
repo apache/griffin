@@ -29,12 +29,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.starting;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
+//@ContextConfiguration(classes = {EclipseLinkJpaConfig.class})
 public class JobInstanceRepoTest {
 
     @Autowired
@@ -52,7 +55,10 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState();
+//        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        List<LivySessionStates.State> states = new ArrayList<>();
+        states.add(starting);
+        List<JobInstanceBean> beans = (List<JobInstanceBean>) jobInstanceRepo.findAll();
         assertThat(beans.size()).isEqualTo(1);
     }
 
@@ -75,10 +81,10 @@ public class JobInstanceRepoTest {
     }
 
     private void setEntityManager() {
-        JobInstanceBean bean1 = new JobInstanceBean( LivySessionStates.State.finding, "pName1", "pGroup1", null, 1516004640092L);
-        JobInstanceBean bean2 = new JobInstanceBean( LivySessionStates.State.not_found, "pName2", "pGroup2", null, 1516004640093L);
-        JobInstanceBean bean3 = new JobInstanceBean( LivySessionStates.State.running, "pName3", "pGroup3", null, 1516004640082L);
-        JobInstanceBean bean4 = new JobInstanceBean( LivySessionStates.State.success, "pName4", "pGroup4", null, 1516004640094L);
+        JobInstanceBean bean1 = new JobInstanceBean(LivySessionStates.State.finding, "pName1", "pGroup1", null, 1516004640092L);
+        JobInstanceBean bean2 = new JobInstanceBean(LivySessionStates.State.not_found, "pName2", "pGroup2", null, 1516004640093L);
+        JobInstanceBean bean3 = new JobInstanceBean(LivySessionStates.State.running, "pName3", "pGroup3", null, 1516004640082L);
+        JobInstanceBean bean4 = new JobInstanceBean(LivySessionStates.State.success, "pName4", "pGroup4", null, 1516004640094L);
         entityManager.persistAndFlush(bean1);
         entityManager.persistAndFlush(bean2);
         entityManager.persistAndFlush(bean3);

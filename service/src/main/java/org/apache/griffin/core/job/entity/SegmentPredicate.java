@@ -41,7 +41,7 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     private String type;
 
     @JsonIgnore
-    @Access(AccessType.PROPERTY)
+//    @Access(AccessType.PROPERTY)
     private String config;
 
     @Transient

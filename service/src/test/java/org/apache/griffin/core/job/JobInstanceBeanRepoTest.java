@@ -36,6 +36,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.busy;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.running;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -66,7 +69,8 @@ public class JobInstanceBeanRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        List<JobInstanceBean> list = jobInstanceRepo.findByActiveState();
+        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        List<JobInstanceBean> list = jobInstanceRepo.findByActiveState(states);
         assertThat(list.size()).isEqualTo(1);
     }
 

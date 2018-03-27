@@ -52,7 +52,7 @@ public class Rule extends AbstractAuditableEntity {
     private String name;
 
     @JsonIgnore
-    @Access(AccessType.PROPERTY)
+//    @Access(AccessType.PROPERTY)
     @Column(length = 1024)
     private String details;
 
@@ -61,7 +61,7 @@ public class Rule extends AbstractAuditableEntity {
     private Map<String, Object> detailsMap;
 
     @JsonIgnore
-    @Access(AccessType.PROPERTY)
+//    @Access(AccessType.PROPERTY)
     private String metric;
 
     @Transient
@@ -69,7 +69,7 @@ public class Rule extends AbstractAuditableEntity {
     private Map<String, Object> metricMap;
 
     @JsonIgnore
-    @Access(AccessType.PROPERTY)
+//    @Access(AccessType.PROPERTY)
     private String record;
 
     @Transient

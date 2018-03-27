@@ -47,6 +47,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.busy;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.running;
 import static org.apache.griffin.core.util.EntityHelper.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -480,7 +483,7 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForSuccess() {
         JobInstanceBean instance = createJobInstance();
-        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
+//        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
@@ -493,7 +496,7 @@ public class JobServiceImplTest {
     public void testSyncInstancesOfJobForFailureWithRestClientException() {
         JobInstanceBean instance = createJobInstance();
         instance.setSessionId(1234564L);
-        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
+//        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willThrow(RestClientException.class);
 
@@ -504,7 +507,8 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForFailureWithIOException() {
         JobInstanceBean instance = createJobInstance();
-        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
+        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("result");
 
@@ -515,7 +519,8 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForFailureWithIllegalArgumentException() {
         JobInstanceBean instance = createJobInstance();
-        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
+        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("{\"state\":\"wrong\"}");
 
@@ -526,7 +531,8 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForFailureWithException() {
         JobInstanceBean instance = createJobInstance();
-        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
+        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);

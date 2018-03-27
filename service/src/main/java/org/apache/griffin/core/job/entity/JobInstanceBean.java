@@ -58,6 +58,10 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @Column(name = "predicate_job_deleted")
     private boolean deleted = false;
 
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "job_id",nullable = false)
+//    private GriffinJob griffinJob;
+
     public Long getSessionId() {
         return sessionId;
     }
@@ -133,6 +137,14 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+
+//    public GriffinJob getGriffinJob() {
+//        return griffinJob;
+//    }
+//
+//    public void setGriffinJob(GriffinJob griffinJob) {
+//        this.griffinJob = griffinJob;
+//    }
 
     public JobInstanceBean() {
     }

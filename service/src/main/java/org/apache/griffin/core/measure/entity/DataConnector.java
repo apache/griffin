@@ -61,7 +61,7 @@ public class DataConnector extends AbstractAuditableEntity {
     private String defaultDataUnit = "365000d";
 
     @JsonIgnore
-    @Access(AccessType.PROPERTY)
+//    @Access(AccessType.PROPERTY)
     private String config;
 
     @Transient
