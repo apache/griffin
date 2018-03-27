@@ -61,9 +61,6 @@ object DataConnectorFactory {
         case AvroRegex() => AvroBatchDataConnector(sqlContext, dqEngines, dataConnectorParam)
         case TextDirRegex() => TextDirBatchDataConnector(sqlContext, dqEngines, dataConnectorParam)
         case KafkaRegex() => {
-//          val ksdcTry = getStreamingDataConnector(ssc, dataConnectorParam)
-//          val cdcTry = getCacheDataConnector(sqlContext, dataConnectorParam.cache)
-//          KafkaCacheDirectDataConnector(ksdcTry, cdcTry, dataConnectorParam)
           getStreamingDataConnector(sqlContext, ssc, dqEngines, dataConnectorParam)
         }
         case _ => throw new Exception("connector creation error!")

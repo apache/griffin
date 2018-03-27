@@ -6,7 +6,8 @@
     "process.interval": "10m",
     "config": {
       "spark.master": "local[*]"
-    }
+    },
+    "init.clear": true
   },
 
   "persist": [
