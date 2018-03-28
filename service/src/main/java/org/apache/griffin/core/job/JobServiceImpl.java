@@ -147,12 +147,12 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobSchedule getJobSchedule(String jobName) {
-        JobSchedule jobSchedule = jobScheduleRepo.findByJobName(jobName);
-        if (jobSchedule == null) {
+        List<GriffinJob> jobs = jobRepo.findByJobNameAndDeleted(jobName, false);
+        if (jobs.size() == 0) {
             LOGGER.warn("Job name {} does not exist.", jobName);
             throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
         }
-        return jobSchedule;
+        return jobs.get(0).getJobSchedule();
     }
 
     @Override
@@ -167,11 +167,10 @@ public class JobServiceImpl implements JobService {
         if (factory.getScheduler().checkExists(triggerKey)) {
             throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
         }
-        GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
+        GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, js,false);
         job = jobRepo.save(job);
-        js = jobScheduleRepo.save(js);
         addJob(triggerKey, js, job);
-        return js;
+        return job.getJobSchedule();
     }
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
