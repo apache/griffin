@@ -20,9 +20,6 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +31,6 @@ public class EvaluateRule extends AbstractAuditableEntity {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluateRule_id")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Rule> rules = new ArrayList<>();
 
     public List<Rule> getRules() {
