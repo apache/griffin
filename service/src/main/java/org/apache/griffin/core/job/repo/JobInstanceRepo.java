@@ -27,16 +27,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+
 public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
 
-    @Query("select DISTINCT s from JobInstanceBean s " +
-            "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")
-    List<JobInstanceBean> findByActiveState();
+//    @Query("select DISTINCT s from JobInstanceBean s " +
+//            "where s.state in ('starting', 'not_started', 'recovering', 'idle', 'running', 'busy')")
+//    List<JobInstanceBean> findByActiveState();
 
     JobInstanceBean findByPredicateName(String name);
 
-    @Query("select s from JobInstanceBean s where job_id = ?1")
+    @Query("select s from JobInstanceBean s where s.griffinJob.id = ?1")
     List<JobInstanceBean> findByJobId(Long jobId, Pageable pageable);
+
+    @Query("select s from JobInstanceBean s where s.griffinJob.id = ?1")
+    List<JobInstanceBean> findByJobId(Long jobId);
 
     List<JobInstanceBean> findByExpireTmsLessThanEqual(Long expireTms);
 
@@ -45,4 +50,7 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
     @Query("delete from JobInstanceBean j where j.expireTms <= ?1")
     int deleteByExpireTimestamp(Long expireTms);
 
+    @Query("select DISTINCT s from JobInstanceBean s " +
+            "where s.state in ?1")
+    List<JobInstanceBean> findByActiveState(State[] states);
 }

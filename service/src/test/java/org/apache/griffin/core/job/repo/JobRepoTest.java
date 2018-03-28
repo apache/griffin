@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job.repo;
 
+import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.GriffinJob;
 import org.apache.griffin.core.job.entity.VirtualJob;
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -36,6 +38,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
+@ContextConfiguration(classes = {EclipseLinkJpaConfigForTest.class})
 public class JobRepoTest {
 
     @Autowired
@@ -45,43 +48,43 @@ public class JobRepoTest {
     private JobRepo jobRepo;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         entityManager.clear();
         entityManager.flush();
         setEntityManager();
     }
 
     @Test
-    public void testCountByJobNameAndDeleted() throws Exception {
+    public void testCountByJobNameAndDeleted() {
         int count = jobRepo.countByJobNameAndDeleted("griffinJobName1", false);
         assertEquals(count, 1);
     }
 
     @Test
-    public void testFindByDeleted() throws Exception {
+    public void testFindByDeleted() {
         List<AbstractJob> jobs = jobRepo.findByDeleted(false);
         assertEquals(jobs.size(), 4);
     }
 
     @Test
-    public void findByJobNameAndDeleted() throws Exception {
+    public void findByJobNameAndDeleted() {
         List<AbstractJob> jobs = jobRepo.findByJobNameAndDeleted("griffinJobName1", false);
         assertEquals(jobs.size(), 1);
     }
 
     @Test
-    public void findByMeasureIdAndDeleted() throws Exception {
+    public void findByMeasureIdAndDeleted() {
         List<AbstractJob> jobs = jobRepo.findByMeasureIdAndDeleted(1L, false);
         assertEquals(jobs.size(), 4);
     }
 
     @Test
-    public void findByIdAndDeleted() throws Exception {
+    public void findByIdAndDeleted() {
         AbstractJob job = jobRepo.findByIdAndDeleted(1L, true);
         assert job == null;
     }
 
-    public void setEntityManager() throws Exception {
+    public void setEntityManager() {
         AbstractJob job1 = new GriffinJob(1L, "griffinJobName1", "qName1", "qGroup1", false);
         AbstractJob job2 = new GriffinJob(1L, "griffinJobName2", "qName2", "qGroup2", false);
         AbstractJob job3 = new VirtualJob("virtualJobName1", 1L, "metricName1");
