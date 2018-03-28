@@ -35,7 +35,7 @@ public abstract class AbstractAuditableEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    protected Long id;
 
     @JsonIgnore
     private Long createdDate = System.currentTimeMillis();

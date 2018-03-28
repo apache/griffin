@@ -33,7 +33,6 @@ import java.util.Properties;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-//@TestPropertySource("classpath")
 public class PropertiesConfigTest {
 
     @TestConfiguration

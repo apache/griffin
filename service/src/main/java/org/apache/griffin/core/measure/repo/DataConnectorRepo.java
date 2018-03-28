@@ -27,6 +27,6 @@ import java.util.List;
 
 public interface DataConnectorRepo extends CrudRepository<DataConnector, Long> {
 
-    @Query("select dc from DataConnector dc where name in ?1")
+    @Query("select dc from DataConnector dc where dc.name in ?1")
     List<DataConnector> findByConnectorNames(List<String> names);
 }

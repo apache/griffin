@@ -39,9 +39,12 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
             Method method = ((HandlerMethod) handler).getMethod();
             Token annotation = method.getAnnotation(Token.class);
             if (annotation != null) {
+                LOGGER.info("enter interceptor");
                 if (isRepeatSubmit(request)) {
                     LOGGER.warn("Please don't repeat submit url {}.", request.getServletPath());
                     return false;
+                } else {
+                    LOGGER.info("not repeat submit");
                 }
                 return true;
             }
@@ -53,22 +56,23 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
     }
 
     private boolean isRepeatSubmit(HttpServletRequest request) {
-        String curToken = request.getHeader(TOKEN);
-        HttpSession session = request.getSession();
-        Object preToken = session.getAttribute(TOKEN);
-        //if http header has no token,we ignore to deal with repeated submission.
-        if (curToken == null) {
-            return false;
-        } else if (preToken == null) {
-            session.setAttribute(TOKEN, curToken);
-            return false;
-        } else {
-            if (preToken.toString().equals(curToken)) {
-                return true;
-            } else {
-                session.setAttribute(TOKEN, curToken);
-                return false;
-            }
-        }
+//        String curToken = request.getHeader(TOKEN);
+//        HttpSession session = request.getSession(true);
+//        Object preToken = session.getAttribute(TOKEN);
+//        //if http header has no token,we ignore to deal with repeated submission.
+//        if (curToken == null) {
+//            return false;
+//        } else if (preToken == null) {
+//            session.setAttribute(TOKEN, curToken);
+//            return false;
+//        } else {
+//            if (preToken.toString().equals(curToken)) {
+//                return true;
+//            } else {
+//                session.setAttribute(TOKEN, curToken);
+//                return false;
+//            }
+//        }
+        return false;
     }
 }
