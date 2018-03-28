@@ -21,6 +21,7 @@ package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.GriffinJobRepo;
+import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
@@ -29,6 +30,7 @@ import org.apache.griffin.core.util.PropertiesUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,7 +67,7 @@ public class JobInstanceTest {
             return PropertiesUtil.getProperties(path, new ClassPathResource(path));
         }
 
-        @Bean
+        @Bean(name = "schedulerFactoryBean")
         public SchedulerFactoryBean factoryBean() {
             return new SchedulerFactoryBean();
         }
@@ -77,6 +79,9 @@ public class JobInstanceTest {
     @Autowired
     @Qualifier("appConf")
     private Properties appConfProps;
+
+    @MockBean
+    private JobInstanceRepo instanceRepo;
 
     @MockBean
     private SchedulerFactoryBean factory;

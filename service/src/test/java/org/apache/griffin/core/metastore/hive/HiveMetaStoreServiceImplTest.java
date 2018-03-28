@@ -46,7 +46,7 @@ public class HiveMetaStoreServiceImplTest {
 
     @TestConfiguration
     public static class HiveMetaStoreServiceConfiguration {
-        @Bean
+        @Bean("hiveMetaStoreServiceImpl")
         public HiveMetaStoreService service() {
             return new HiveMetaStoreServiceImpl();
         }
