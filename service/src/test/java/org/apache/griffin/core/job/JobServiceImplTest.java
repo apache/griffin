@@ -47,9 +47,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.busy;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.running;
 import static org.apache.griffin.core.util.EntityHelper.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -60,12 +59,12 @@ public class JobServiceImplTest {
 
     @TestConfiguration
     public static class SchedulerServiceConfiguration {
-        @Bean
+        @Bean("jobServiceImpl")
         public JobServiceImpl service() {
             return new JobServiceImpl();
         }
 
-        @Bean
+        @Bean(name = "schedulerFactoryBean")
         public SchedulerFactoryBean factoryBean() {
             return new SchedulerFactoryBean();
         }
@@ -243,10 +242,11 @@ public class JobServiceImplTest {
         Long jobId = 1L;
         GriffinJob job = new GriffinJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+        instance.setGriffinJob(job);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
         given(factory.getScheduler()).willReturn(scheduler);
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong())).willReturn(Arrays.asList(instance));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
 
         service.deleteJob(jobId);
@@ -261,10 +261,11 @@ public class JobServiceImplTest {
         Long jobId = 1L;
         GriffinJob job = new GriffinJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+        instance.setGriffinJob(job);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong())).willReturn(Arrays.asList(instance));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
 
         service.deleteJob(jobId);
@@ -298,10 +299,11 @@ public class JobServiceImplTest {
     public void testDeleteJobByNameForSuccessWithTriggerKeyExist() throws SchedulerException {
         GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+        instance.setGriffinJob(job);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
         given(factory.getScheduler()).willReturn(scheduler);
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong())).willReturn(Arrays.asList(instance));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
         doNothing().when(scheduler).pauseJob(Matchers.any(JobKey.class));
         given(scheduler.deleteJob(Matchers.any(JobKey.class))).willReturn(true);
@@ -318,10 +320,11 @@ public class JobServiceImplTest {
     public void testDeleteJobByNameForSuccessWithTriggerKeyNotExist() throws SchedulerException {
         GriffinJob job = new GriffinJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+        instance.setGriffinJob(job);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong())).willReturn(Arrays.asList(instance));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
 
         service.deleteJob(job.getJobName());
@@ -355,10 +358,11 @@ public class JobServiceImplTest {
     public void testDeleteJobsRelateToMeasureForSuccessWithTriggerKeyExist() throws SchedulerException {
         GriffinJob job = createGriffinJob();
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+        instance.setGriffinJob(job);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
         given(factory.getScheduler()).willReturn(scheduler);
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong())).willReturn(Arrays.asList(instance));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(true);
 
         service.deleteJobsRelateToMeasure(1L);
@@ -372,10 +376,11 @@ public class JobServiceImplTest {
     public void testDeleteJobsRelateToMeasureForSuccessWithTriggerKeyNotExist() throws SchedulerException {
         GriffinJob job = createGriffinJob();
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+        instance.setGriffinJob(job);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
         given(factory.getScheduler()).willReturn(scheduler);
+        given(jobInstanceRepo.findByJobId(Matchers.anyLong())).willReturn(Arrays.asList(instance));
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
 
         service.deleteJobsRelateToMeasure(1L);
@@ -400,7 +405,7 @@ public class JobServiceImplTest {
         Long measureId = 1L;
         GriffinJob job = createGriffinJob();
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+        instance.setGriffinJob(job);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(measureId, false)).willReturn(Arrays.asList(job));
         given(factory.getScheduler()).willReturn(scheduler);
@@ -483,7 +488,8 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForSuccess() {
         JobInstanceBean instance = createJobInstance();
-//        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
+        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
@@ -496,7 +502,8 @@ public class JobServiceImplTest {
     public void testSyncInstancesOfJobForFailureWithRestClientException() {
         JobInstanceBean instance = createJobInstance();
         instance.setSessionId(1234564L);
-//        given(jobInstanceRepo.findByActiveState()).willReturn(Arrays.asList(instance));
+        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willThrow(RestClientException.class);
 
