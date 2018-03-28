@@ -66,8 +66,7 @@ public class JobInstanceBeanRepoTest {
     public void testFindByJobIdWithPageable() {
         Pageable pageRequest = new PageRequest(0, 10, Sort.Direction.DESC, "tms");
         List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(1L, pageRequest);
-        assertThat(instances.size()).isEqualTo(1);
-        assertEquals(instances.get(0).getAppId(), "appId1");
+        assertThat(instances.size()).isEqualTo(3);
     }
 
 
