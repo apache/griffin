@@ -107,7 +107,62 @@ under the License.
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
                     </configuration>
-
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.rat</groupId>
+                    <artifactId>apache-rat-plugin</artifactId>
+                    <version>${maven-apache-rat.version}</version>
+                    <configuration>
+                        <!-- Exclude files/folders for apache release -->
+                        <excludes>
+                            <!-- Git specific files -->
+                            <exclude>.git/</exclude>
+                            <exclude>.gitignore</exclude>
+                            <!-- IDE specific files-->
+                            <exclude>**/.idea/</exclude>
+                            <exclude>**/.scalastyle/</exclude>
+                            <exclude>**/*.iml</exclude>
+                            <exclude>**/.classpath</exclude>
+                            <exclude>**/.settings/**</exclude>
+                            <exclude>**/.project</exclude>
+                            <!-- Maven working directory -->
+                            <exclude>**/target/**</exclude>
+                            <!-- Patch files which can be lying around -->
+                            <exclude>**/*.patch</exclude>
+                            <exclude>**/*.rej</exclude>
+                            <!-- README and test data with exact format -->
+                            <exclude>README*</exclude>
+                            <exclude>DEPENDENCIES</exclude>
+                            <exclude>**/licenses/*</exclude>
+                            <exclude>**/*.log</exclude>
+                            <exclude>**/*.out</exclude>
+                            <exclude>**/*.db</exclude>
+                            <exclude>**/velocity.log*</exclude>
+                            <exclude>**/*.json</exclude>
+                            <exclude>**/*.avro</exclude>
+                            <exclude>**/*.dat</exclude>
+                            <exclude>**/banner.txt</exclude>
+                            <exclude>**/bower_components/**</exclude>
+                            <exclude>**/node_modules/**</exclude>
+                            <exclude>**/.tmp/**</exclude>
+                            <exclude>**/angular/src/assets/.gitkeep</exclude>
+                            <exclude>**/angular/.editorconfig</exclude>
+                            <exclude>**/dist/**</exclude>
+                            <exclude>**/.bowerrc</exclude>
+                            <exclude>**/src/main/resources/public/**</exclude>
+                            <exclude>**/pom.xml.releaseBackup</exclude>
+                            <exclude>**/pom.xml.tag</exclude>
+                        </excludes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>rat-check</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -120,64 +175,4 @@ under the License.
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>apache-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.rat</groupId>
-                        <artifactId>apache-rat-plugin</artifactId>
-                        <version>${maven-apache-rat.version}</version>
-                        <configuration>
-                            <!-- Exclude files/folders for apache release -->
-                            <excludes>
-                                <!-- Git specific files -->
-                                <exclude>.git/</exclude>
-                                <exclude>.gitignore</exclude>
-                                <!-- IDE specific files-->
-                                <exclude>**/.idea/</exclude>
-                                <exclude>**/.scalastyle/</exclude>
-                                <exclude>**/*.iml</exclude>
-                                <exclude>**/.classpath</exclude>
-                                <exclude>**/.settings/**</exclude>
-                                <exclude>**/.project</exclude>
-                                <!-- Maven working directory -->
-                                <exclude>**/target/**</exclude>
-                                <!-- Patch files which can be lying around -->
-                                <exclude>**/*.patch</exclude>
-                                <exclude>**/*.rej</exclude>
-                                <!-- README and test data with exact format -->
-                                <exclude>README*</exclude>
-                                <exclude>**/*.log</exclude>
-                                <exclude>**/*.out</exclude>
-                                <exclude>**/*.db</exclude>
-                                <exclude>**/velocity.log*</exclude>
-                                <exclude>**/*.json</exclude>
-                                <exclude>**/bower_components/**</exclude>
-                                <exclude>**/node_modules/**</exclude>
-                                <exclude>**/.tmp/**</exclude>
-                                <exclude>**/angular/src/assets/.gitkeep</exclude>
-                                <exclude>**/angular/.editorconfig</exclude>
-                                <exclude>**/dist/**</exclude>
-                                <exclude>**/.bowerrc</exclude>
-                                <exclude>**/src/main/resources/public/**</exclude>
-                                <exclude>**/pom.xml.releaseBackup</exclude>
-                                <exclude>**/pom.xml.tag</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>rat-check</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
