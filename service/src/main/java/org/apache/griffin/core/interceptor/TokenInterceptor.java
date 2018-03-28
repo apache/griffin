@@ -39,9 +39,12 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
             Method method = ((HandlerMethod) handler).getMethod();
             Token annotation = method.getAnnotation(Token.class);
             if (annotation != null) {
+                LOGGER.info("enter interceptor");
                 if (isRepeatSubmit(request)) {
                     LOGGER.warn("Please don't repeat submit url {}.", request.getServletPath());
                     return false;
+                } else {
+                    LOGGER.info("not repeat submit");
                 }
                 return true;
             }
@@ -58,14 +61,18 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
         Object preToken = session.getAttribute(TOKEN);
         //if http header has no token,we ignore to deal with repeated submission.
         if (curToken == null) {
+            LOGGER.info("current token null");
             return false;
         } else if (preToken == null) {
+            LOGGER.info("previous token null");
             session.setAttribute(TOKEN, curToken);
             return false;
         } else {
             if (preToken.toString().equals(curToken)) {
+                LOGGER.info("current token equals previous token");
                 return true;
             } else {
+                LOGGER.info("current token different from previous token");
                 session.setAttribute(TOKEN, curToken);
                 return false;
             }
