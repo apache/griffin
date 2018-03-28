@@ -173,113 +173,13 @@
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
+
 ---------------------------------------------------
 
-The Apache Griffin contains subcomponents in the source code
+The Apache Griffin UI module contains subcomponents in the source code
 release with separate copyright notices and license terms. Your use of
 the source code for the these subcomponents is subject to the terms and
 conditions of their respective licenses.
-
-----------------------------------------------
-Public Domain
-----------------------------------------------
-The following components are provided in Public Domain. See project link for details.
-
-     (Public Domain) XZ for Java (org.tukaani:xz:1.0 - http://tukaani.org/xz/java.html)
-     (Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)
-     (Public Domain) XZ for Java (org.tukaani:xz:1.0 - http://tukaani.org/xz/java.html)
-
-----------------------------------------------
-JSON license
-----------------------------------------------
-The following components are provided under a JSON license. See project link for details.
-The text of each license is also included at licenses/JSON.
-
-     (The JSON License) JSON in Java (org.json:json:20140107 - https://github.com/douglascrockford/JSON-java)
-
-----------------------------------------------
-The PostgreSQL License
-----------------------------------------------
-The following components are provided under a PostgreSQL license. See project link for details.
-The text of each license is also included at licenses/PostgreSQL.
-
-     (The PostgreSQL License) PostgreSQL JDBC Driver - JDBC 4.1 (org.postgresql:postgresql:9.4.1212.jre7 - https://github.com/pgjdbc/pgjdbc-parent-poms/pgjdbc-core-parent/pgjdbc-core-prevjre/postgresql)
-
-----------------------------------------------
-EPL license
-----------------------------------------------
-The following components are provided under a EPL license. See project link for details.
-The text of each license is also included at licenses/EPL.
-
-     (Eclipse Distribution License v. 1.0) (Eclipse Public License v1.0) Javax Persistence (org.eclipse.persistence:javax.persistence:2.1.0 - http://www.eclipse.org/eclipselink)
-     (Eclipse Distribution License v. 1.0) (Eclipse Public License v1.0) EclipseLink ANTLR (org.eclipse.persistence:org.eclipse.persistence.antlr:2.6.0 - http://www.eclipse.org/eclipselink)
-     (Eclipse Distribution License v. 1.0) (Eclipse Public License v1.0) EclipseLink ASM (org.eclipse.persistence:org.eclipse.persistence.asm:2.6.0 - http://www.eclipse.org/eclipselink)
-     (Eclipse Distribution License v. 1.0) (Eclipse Public License v1.0) EclipseLink Core (org.eclipse.persistence:org.eclipse.persistence.core:2.6.0 - http://www.eclipse.org/eclipselink)
-     (Eclipse Distribution License v. 1.0) (Eclipse Public License v1.0) EclipseLink JPA (org.eclipse.persistence:org.eclipse.persistence.jpa:2.6.0 - http://www.eclipse.org/eclipselink)
-     (Eclipse Distribution License v. 1.0) (Eclipse Public License v1.0) EclipseLink Hermes JPQL Parser (org.eclipse.persistence:org.eclipse.persistence.jpa.jpql:2.6.0 - http://www.eclipse.org/eclipselink)
-     (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.1.9 - http://logback.qos.ch/logback-classic)
-     (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.1.9 - http://logback.qos.ch/logback-core)
-     (MPL 2.0 or EPL 1.0) H2 Database Engine (com.h2database:h2:1.4.193 - http://www.h2database.com)
-     (Eclipse Public License - v 1.0) AspectJ weaver (org.aspectj:aspectjweaver:1.8.9 - http://www.aspectj.org)
-     (GNU LESSER GENERAL PUBLIC LICENSE)(Eclipse Public License) c3p0:JDBC DataSources/Resource Pools (c3p0:c3p0:0.9.1.1 - http://c3p0.sourceforge.net)
-
-----------------------------------------------
-CDDL licenses
-----------------------------------------------
-The following components are provided under a CDDL license. See project link for details.
-The text of each license is also included at licenses/CDDL-1.0 and licenses/CDDL-1.1.
-
-     (CDDL) (GPLv2+CE) JavaMail API (com.sun.mail:javax.mail:1.4.4 - http://kenai.com/projects/javamail/javax.mail)
-     (Common Development and Distribution License (CDDL) v1.0) JavaBeans Activation Framework (JAF) (javax.activation:activation:1.1 - http://java.sun.com/products/javabeans/jaf/index.jsp)
-     (CDDL license) jsp-api (javax.servlet.jsp:jsp-api:2.1 - no url defined)
-     (CDDL-1.0 license) Java Transaction API (javax.transaction:jta:1.1 - http://java.sun.com/products/jta)
-     (CDDL 1.1) (GPL2 w/ CPE) jersey-client (com.sun.jersey:jersey-client:1.9 - https://jersey.java.net/jersey-client/)
-     (CDDL 1.1) (GPL2 w/ CPE) jersey-core (com.sun.jersey:jersey-core:1.9 - https://jersey.java.net/jersey-core/)
-     (CDDL 1.1) (GPL2 w/ CPE) jersey-json (com.sun.jersey:jersey-json:1.9 - https://jersey.java.net/jersey-json/)
-     (CDDL 1.1) (GPL2 w/ CPE) jersey-server (com.sun.jersey:jersey-server:1.9 - https://jersey.java.net/jersey-server/)
-     (CDDL 1.1) (GPL2 w/ CPE) jersey-guice (com.sun.jersey.contribs:jersey-guice:1.9 - https://jersey.java.net/jersey-contribs/jersey-guice/)
-     (CDDL 1.1) (GPL2 w/ CPE) JAXB RI (com.sun.xml.bind:jaxb-impl:2.2.3-1 - http://jaxb.java.net/)
-     (Common Development and Distribution License (CDDL) v1.0) JavaBeans Activation Framework (JAF) (javax.activation:activation:1.1 - http://java.sun.com/products/javabeans/jaf/index.jsp)
-     (CDDL + GPLv2 with classpath exception) javax.transaction API (javax.transaction:javax.transaction-api:1.2 - http://jta-spec.java.net)
-     (CDDL 1.1) (GPL2 w/ CPE) JAXB API bundle for GlassFish V3 (javax.xml.bind:jaxb-api:2.2.2 - https://jaxb.dev.java.net/)
-     (COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0) (GNU General Public Library) Streaming API for XML (javax.xml.stream:stax-api:1.0-2 - no url defined)
-
-----------------------------------------------
-BSD-style licenses
-----------------------------------------------
-The following components are provided under a BSD-style license. See project link for details.
-The text of each license is also included at licenses/BSD-3-Clause and licenses/BSD-2-Clause.
-
-     (BSD) ParaNamer Core (com.thoughtworks.paranamer:paranamer:2.3 - http://paranamer.codehaus.org/paranamer)
-     (BSD-like) Scala Library (org.scala-lang:scala-library:2.10.6 - http://www.scala-lang.org/)
-     (BSD-like) Scala Compiler (org.scala-lang:scala-reflect:2.10.6 - http://www.scala-lang.org/)
-     (BSD license) ASM Core (asm:asm:3.1 - http://asm.objectweb.org/asm/)
-     (BSD license) dom4j (dom4j:dom4j:1.6.1 - http://dom4j.org)
-     (BSD license) Antlr 3.4 Runtime (org.antlr:antlr-runtime:3.4 - http://www.antlr.org)
-     (BSD License) AntLR Parser Generator (antlr:antlr:2.7.7 - http://www.antlr.org/)
-     (New BSD License) Kryo (com.esotericsoftware.kryo:kryo:2.22 - http://code.google.com/p/kryo/)
-     (New BSD license) Protocol Buffer Java API (com.google.protobuf:protobuf-java:2.5.0 - http://code.google.com/p/protobuf)
-     (BSD) ParaNamer Core (com.thoughtworks.paranamer:paranamer:2.3 - http://paranamer.codehaus.org/paranamer)
-     (BSD licence) ANTLR StringTemplate (org.antlr:stringtemplate:3.2.1 - http://www.stringtemplate.org)
-     (The BSD 3-Clause License) leveldbjni-all (org.fusesource.leveldbjni:leveldbjni-all:1.8 - http://leveldbjni.fusesource.org/leveldbjni-all)
-     (BSD-like) Scala Library (org.scala-lang:scala-library:2.10.4 - http://www.scala-lang.org/)
-     (The BSD License) xmlenc Library (xmlenc:xmlenc:0.52 - http://xmlenc.sourceforge.net)
-
-----------------------------------------------
-MIT licenses
-----------------------------------------------
-The following components are provided under a MIT license. See project link for details.
-The text of each license is also included at licenses/MIT.
-
-     (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.21 - http://www.slf4j.org)
-     (MIT License) SLF4J LOG4J-12 Binding (org.slf4j:slf4j-log4j12:1.7.21 - http://www.slf4j.org)
-     (MIT License) JCL 1.1.1 implemented over SLF4J (org.slf4j:jcl-over-slf4j:1.7.22 - http://www.slf4j.org)
-     (MIT License) JUL to SLF4J bridge (org.slf4j:jul-to-slf4j:1.7.22 - http://www.slf4j.org)
-     (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.22 - http://www.slf4j.org)
-     (MIT License) SLF4J LOG4J-12 Binding (org.slf4j:slf4j-log4j12:1.7.22 - http://www.slf4j.org)
-
-
----------------------------------------------------
 
 This project includes the software: angular
   Available at: https://angular.io
@@ -408,7 +308,3 @@ This project includes the software: tslib
   Version used: 0.13.2
   Used under the following license: Apache License, version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
   Copyright (c) Twitter, Inc. (2012)
-
----------------------------------------------------
-
-All the dependent components licenses are listed in licenses/ directory.
