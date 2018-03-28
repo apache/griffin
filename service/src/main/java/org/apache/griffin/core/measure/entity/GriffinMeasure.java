@@ -102,27 +102,23 @@ public class GriffinMeasure extends Measure {
         this.evaluateRule = evaluateRule;
     }
 
-    public String getRuleDescription() {
-        return ruleDescription;
-    }
-
-    public void setRuleDescription(String ruleDescription) throws IOException {
-        if (!StringUtils.isEmpty(ruleDescription)) {
-            this.ruleDescription = ruleDescription;
-            this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription, new TypeReference<Map<String, Object>>() {
-            });
-        }
-    }
-
     @JsonProperty("rule.description")
     public Map<String, Object> getRuleDescriptionMap() {
         return ruleDescriptionMap;
     }
 
     @JsonProperty("rule.description")
-    public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) throws JsonProcessingException {
+    public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) {
         this.ruleDescriptionMap = ruleDescriptionMap;
-        this.ruleDescription = JsonUtil.toJson(ruleDescriptionMap);
+    }
+
+
+    public String getRuleDescription() {
+        return ruleDescription;
+    }
+
+    public void setRuleDescription(String ruleDescription) {
+        this.ruleDescription = ruleDescription;
     }
 
     public Long getTimestamp() {
@@ -157,4 +153,18 @@ public class GriffinMeasure extends Measure {
         this.evaluateRule = evaluateRule;
     }
 
+    @PrePersist
+    @PreUpdate
+    public void save() throws JsonProcessingException {
+        if (ruleDescriptionMap != null) {
+            this.ruleDescription = JsonUtil.toJson(ruleDescriptionMap);
+        }
+    }
+    @PostLoad
+    public void load() throws IOException {
+        if (!StringUtils.isEmpty(ruleDescription)) {
+            this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription, new TypeReference<Map<String, Object>>() {
+            });
+        }
+    }
 }

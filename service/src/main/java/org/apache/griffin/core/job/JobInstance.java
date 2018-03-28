@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.GriffinJobRepo;
+import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
@@ -66,6 +67,8 @@ public class JobInstance implements Job {
     private GriffinJobRepo jobRepo;
     @Autowired
     private JobScheduleRepo jobScheduleRepo;
+    @Autowired
+    private JobInstanceRepo instanceRepo;
     @Autowired
     @Qualifier("appConf")
     private Properties appConfProps;
@@ -177,7 +180,7 @@ public class JobInstance implements Job {
      * @param dc       data connector
      * @param sampleTs collection of data split start timestamp
      */
-    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) throws IOException {
+    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs){
         List<SegmentPredicate> predicates = dc.getPredicates();
         for (SegmentPredicate predicate : predicates) {
             genConfMap(predicate.getConfigMap(), sampleTs, dc.getDataTimeZone());
@@ -187,7 +190,7 @@ public class JobInstance implements Job {
         }
     }
 
-    private void setConnectorConf(DataConnector dc, Long[] sampleTs) throws IOException {
+    private void setConnectorConf(DataConnector dc, Long[] sampleTs) {
         genConfMap(dc.getConfigMap(), sampleTs, dc.getDataTimeZone());
         dc.setConfigMap(dc.getConfigMap());
     }
@@ -234,16 +237,16 @@ public class JobInstance implements Job {
         Scheduler scheduler = factory.getScheduler();
         TriggerKey triggerKey = triggerKey(jobName, groupName);
         return !(scheduler.checkExists(triggerKey)
-                || !saveGriffinJob(jobName, groupName)
+                || !saveJobInstance(jobName, groupName)
                 || !createJobInstance(triggerKey, interval, repeat, jobName));
     }
 
-    private boolean saveGriffinJob(String pName, String pGroup) {
-        List<JobInstanceBean> instances = griffinJob.getJobInstances();
+    private boolean saveJobInstance(String pName, String pGroup) {
         Long tms = System.currentTimeMillis();
         Long expireTms = Long.valueOf(appConfProps.getProperty("jobInstance.expired.milliseconds")) + tms;
-        instances.add(new JobInstanceBean(LivySessionStates.State.finding, pName, pGroup, tms, expireTms));
-        griffinJob = jobRepo.save(griffinJob);
+        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, pName, pGroup, tms, expireTms);
+        instance.setGriffinJob(griffinJob);
+        instanceRepo.save(instance);
         return true;
     }
 

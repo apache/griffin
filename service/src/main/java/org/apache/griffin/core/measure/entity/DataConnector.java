@@ -85,17 +85,12 @@ public class DataConnector extends AbstractAuditableEntity {
     }
 
     @JsonProperty("config")
-    public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
+    public void setConfigMap(Map<String, String> configMap) {
         this.configMap = configMap;
-        this.config = JsonUtil.toJson(configMap);
     }
 
-    public void setConfig(String config) throws IOException {
-        if (!StringUtils.isEmpty(config)) {
-            this.config = config;
-            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
-            });
-        }
+    public void setConfig(String config) {
+        this.config = config;
     }
 
     public String getConfig() {
@@ -158,6 +153,22 @@ public class DataConnector extends AbstractAuditableEntity {
         this.version = version;
     }
 
+    @PrePersist
+    @PreUpdate
+    public void save() throws JsonProcessingException {
+        if (configMap != null) {
+            this.config = JsonUtil.toJson(configMap);
+        }
+    }
+
+    @PostLoad
+    public void load() throws IOException {
+        if (!org.springframework.util.StringUtils.isEmpty(config)) {
+            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
+            });
+        }
+    }
+
 
     public DataConnector() {
     }
@@ -171,7 +182,7 @@ public class DataConnector extends AbstractAuditableEntity {
         });
     }
 
-    public DataConnector(String name, String dataUnit, Map configMap, List<SegmentPredicate> predicates) throws IOException {
+    public DataConnector(String name, String dataUnit, Map<String,String> configMap, List<SegmentPredicate> predicates) {
         this.name = name;
         this.dataUnit = dataUnit;
         this.configMap = configMap;

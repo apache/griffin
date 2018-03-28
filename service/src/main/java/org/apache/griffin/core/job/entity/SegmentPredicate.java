@@ -28,10 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.util.JsonUtil;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.IOException;
 import java.util.Map;
 
@@ -55,27 +52,38 @@ public class SegmentPredicate extends AbstractAuditableEntity {
         this.type = type;
     }
 
-    public String getConfig() {
-        return config;
-    }
-
-    public void setConfig(String config) throws IOException {
-        if (!StringUtils.isEmpty(config)) {
-            this.config = config;
-            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
-            });
-        }
-    }
-
     @JsonProperty("config")
-    public Map<String, String> getConfigMap(){
+    public Map<String, String> getConfigMap() {
         return configMap;
     }
 
     @JsonProperty("config")
-    public void setConfigMap(Map<String, String> configMap) throws JsonProcessingException {
+    public void setConfigMap(Map<String, String> configMap) {
         this.configMap = configMap;
-        this.config = JsonUtil.toJson(configMap);
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void save() throws JsonProcessingException {
+        if (configMap != null) {
+            this.config = JsonUtil.toJson(configMap);
+        }
+    }
+
+    @PostLoad
+    public void load() throws IOException {
+        if (!StringUtils.isEmpty(config)) {
+            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
+            });
+        }
     }
 
     public SegmentPredicate() {
@@ -83,6 +91,6 @@ public class SegmentPredicate extends AbstractAuditableEntity {
 
     public SegmentPredicate(String type, Map configMap) throws JsonProcessingException {
         this.type = type;
-        setConfigMap(configMap);
+        this.config = JsonUtil.toJson(configMap);
     }
 }

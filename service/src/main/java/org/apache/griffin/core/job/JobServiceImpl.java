@@ -354,7 +354,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private void deletePredicateJob(GriffinJob job) throws SchedulerException {
-        List<JobInstanceBean> instances = job.getJobInstances();
+        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(job.getId());
         for (JobInstanceBean instance : instances) {
             if (!instance.isDeleted()) {
                 deleteJob(instance.getPredicateGroup(), instance.getPredicateName());
@@ -466,13 +466,13 @@ public class JobServiceImpl implements JobService {
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void syncInstancesOfAllJobs() {
-//        State[] states = {starting, not_started, recovering, idle, running, busy};
-//        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
-//        if (!CollectionUtils.isEmpty(beans)) {
-//            for (JobInstanceBean jobInstance : beans) {
-//                syncInstancesOfJob(jobInstance);
-//            }
-//        }
+        State[] states = {starting, not_started, recovering, idle, running, busy};
+        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
+        if (!CollectionUtils.isEmpty(beans)) {
+            for (JobInstanceBean jobInstance : beans) {
+                syncInstancesOfJob(jobInstance);
+            }
+        }
     }
 
     /**

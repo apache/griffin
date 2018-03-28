@@ -33,9 +33,6 @@ public class GriffinJob extends AbstractJob {
     @Column(name = "quartz_group_name")
     private String quartzGroup;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
-    @JoinColumn(name = "job_id")
-    private List<JobInstanceBean> jobInstances = new ArrayList<>();
 
     public String getQuartzName() {
         return quartzName;
@@ -53,13 +50,6 @@ public class GriffinJob extends AbstractJob {
         this.quartzGroup = quartzGroup;
     }
 
-    public List<JobInstanceBean> getJobInstances() {
-        return jobInstances;
-    }
-
-    public void setJobInstances(List<JobInstanceBean> jobInstances) {
-        this.jobInstances = jobInstances;
-    }
 
     public GriffinJob() {
         super();

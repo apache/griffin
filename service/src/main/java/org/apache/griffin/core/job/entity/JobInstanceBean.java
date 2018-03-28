@@ -23,10 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 @Entity
 public class JobInstanceBean extends AbstractAuditableEntity {
@@ -40,7 +37,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
 
     private String appId;
 
-    @Column(length = 10 * 1024)
+    @Column(length = 2 * 1024)
     private String appUri;
 
     @Column(name = "timestamp")
@@ -58,9 +55,9 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @Column(name = "predicate_job_deleted")
     private boolean deleted = false;
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "job_id",nullable = false)
-//    private GriffinJob griffinJob;
+    @ManyToOne
+    @JoinColumn(name = "job_id",nullable = false)
+    private GriffinJob griffinJob;
 
     public Long getSessionId() {
         return sessionId;
@@ -138,13 +135,13 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-//    public GriffinJob getGriffinJob() {
-//        return griffinJob;
-//    }
-//
-//    public void setGriffinJob(GriffinJob griffinJob) {
-//        this.griffinJob = griffinJob;
-//    }
+    public GriffinJob getGriffinJob() {
+        return griffinJob;
+    }
+
+    public void setGriffinJob(GriffinJob griffinJob) {
+        this.griffinJob = griffinJob;
+    }
 
     public JobInstanceBean() {
     }
