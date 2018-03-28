@@ -141,11 +141,11 @@ public class JobServiceImplTest {
         js.setId(1L);
         GriffinMeasure measure = createGriffinMeasure("measureName");
         GriffinJob job = createGriffinJob();
+        job.setJobSchedule(js);
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
         given(griffinMeasureRepo.findByIdAndDeleted(js.getMeasureId(), false)).willReturn(measure);
         given(jobRepo.countByJobNameAndDeleted(js.getJobName(), false)).willReturn(0);
-        given(jobScheduleRepo.save(js)).willReturn(js);
         given(jobRepo.save(Matchers.any(GriffinJob.class))).willReturn(job);
 
         JobSchedule createdJs = service.addJob(js);
