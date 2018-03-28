@@ -1,19 +1,3 @@
-
-This software is distributed under the Apache License, version 2.0. See (1) below.
-This software is copyright (c) The Apache Software Foundation and contributors.
-
-Contents:
-
-  (1) This software license: Apache License, version 2.0
-  (2) Notices for third-party software
-  (3) Licenses for third-party software
-
-
----------------------------------------------------
-
-(1) This software license: Apache License, version 2.0
-
-
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -189,172 +173,242 @@ Contents:
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
-
 ---------------------------------------------------
 
-(2) Notices for third-party software
-
-The Apache Griffin project contains subcomponents in the source code
+The Apache Griffin contains subcomponents in the source code
 release with separate copyright notices and license terms. Your use of
 the source code for the these subcomponents is subject to the terms and
 conditions of their respective licenses.
 
+----------------------------------------------
+Public Domain
+----------------------------------------------
+The following components are provided in Public Domain. See project link for details.
+
+     (Public Domain) XZ for Java (org.tukaani:xz:1.0 - http://tukaani.org/xz/java.html)
+     (Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)
+     (Public Domain) XZ for Java (org.tukaani:xz:1.0 - http://tukaani.org/xz/java.html)
+
+----------------------------------------------
+JSON license
+----------------------------------------------
+The following components are provided under a JSON license. See project link for details.
+The text of each license is also included at licenses/JSON.
+
+     (The JSON License) JSON in Java (org.json:json:20140107 - https://github.com/douglascrockford/JSON-java)
+
+----------------------------------------------
+EPL license
+----------------------------------------------
+The following components are provided under a EPL license. See project link for details.
+The text of each license is also included at licenses/EPL.
+
+     (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.1.9 - http://logback.qos.ch/logback-classic)
+     (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.1.9 - http://logback.qos.ch/logback-core)
+     (MPL 2.0 or EPL 1.0) H2 Database Engine (com.h2database:h2:1.4.193 - http://www.h2database.com)
+     (Eclipse Public License - v 1.0) AspectJ weaver (org.aspectj:aspectjweaver:1.8.9 - http://www.aspectj.org)
+     (Eclipse Distribution License (EDL), Version 1.0) (Eclipse Public License (EPL), Version 1.0) Java Persistence API, Version 2.1 (org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final - http://hibernate.org)
+     (GNU LESSER GENERAL PUBLIC LICENSE)(Eclipse Public License) c3p0:JDBC DataSources/Resource Pools (c3p0:c3p0:0.9.1.1 - http://c3p0.sourceforge.net)
+
+----------------------------------------------
+CDDL licenses
+----------------------------------------------
+The following components are provided under a CDDL license. See project link for details.
+The text of each license is also included at licenses/CDDL-1.0 and licenses/CDDL-1.1.
+
+     (CDDL) (GPLv2+CE) JavaMail API (com.sun.mail:javax.mail:1.4.4 - http://kenai.com/projects/javamail/javax.mail)
+     (Common Development and Distribution License (CDDL) v1.0) JavaBeans Activation Framework (JAF) (javax.activation:activation:1.1 - http://java.sun.com/products/javabeans/jaf/index.jsp)
+     (CDDL license) jsp-api (javax.servlet.jsp:jsp-api:2.1 - no url defined)
+     (CDDL-1.0 license) Java Transaction API (javax.transaction:jta:1.1 - http://java.sun.com/products/jta)
+     (CDDL 1.1) (GPL2 w/ CPE) jersey-client (com.sun.jersey:jersey-client:1.9 - https://jersey.java.net/jersey-client/)
+     (CDDL 1.1) (GPL2 w/ CPE) jersey-core (com.sun.jersey:jersey-core:1.9 - https://jersey.java.net/jersey-core/)
+     (CDDL 1.1) (GPL2 w/ CPE) jersey-json (com.sun.jersey:jersey-json:1.9 - https://jersey.java.net/jersey-json/)
+     (CDDL 1.1) (GPL2 w/ CPE) jersey-server (com.sun.jersey:jersey-server:1.9 - https://jersey.java.net/jersey-server/)
+     (CDDL 1.1) (GPL2 w/ CPE) jersey-guice (com.sun.jersey.contribs:jersey-guice:1.9 - https://jersey.java.net/jersey-contribs/jersey-guice/)
+     (CDDL 1.1) (GPL2 w/ CPE) JAXB RI (com.sun.xml.bind:jaxb-impl:2.2.3-1 - http://jaxb.java.net/)
+     (Common Development and Distribution License (CDDL) v1.0) JavaBeans Activation Framework (JAF) (javax.activation:activation:1.1 - http://java.sun.com/products/javabeans/jaf/index.jsp)
+     (CDDL + GPLv2 with classpath exception) javax.transaction API (javax.transaction:javax.transaction-api:1.2 - http://jta-spec.java.net)
+     (CDDL 1.1) (GPL2 w/ CPE) JAXB API bundle for GlassFish V3 (javax.xml.bind:jaxb-api:2.2.2 - https://jaxb.dev.java.net/)
+     (COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0) (GNU General Public Library) Streaming API for XML (javax.xml.stream:stax-api:1.0-2 - no url defined)
+
+----------------------------------------------
+BSD-style licenses
+----------------------------------------------
+The following components are provided under a BSD-style license. See project link for details.
+The text of each license is also included at licenses/BSD-3-Clause and licenses/BSD-2-Clause.
+
+     (BSD) ParaNamer Core (com.thoughtworks.paranamer:paranamer:2.3 - http://paranamer.codehaus.org/paranamer)
+     (BSD-like) Scala Library (org.scala-lang:scala-library:2.10.6 - http://www.scala-lang.org/)
+     (BSD-like) Scala Compiler (org.scala-lang:scala-reflect:2.10.6 - http://www.scala-lang.org/)
+     (BSD license) ASM Core (asm:asm:3.1 - http://asm.objectweb.org/asm/)
+     (BSD license) dom4j (dom4j:dom4j:1.6.1 - http://dom4j.org)
+     (BSD license) Antlr 3.4 Runtime (org.antlr:antlr-runtime:3.4 - http://www.antlr.org)
+     (BSD License) AntLR Parser Generator (antlr:antlr:2.7.7 - http://www.antlr.org/)
+     (New BSD License) Kryo (com.esotericsoftware.kryo:kryo:2.22 - http://code.google.com/p/kryo/)
+     (New BSD license) Protocol Buffer Java API (com.google.protobuf:protobuf-java:2.5.0 - http://code.google.com/p/protobuf)
+     (BSD) ParaNamer Core (com.thoughtworks.paranamer:paranamer:2.3 - http://paranamer.codehaus.org/paranamer)
+     (BSD licence) ANTLR StringTemplate (org.antlr:stringtemplate:3.2.1 - http://www.stringtemplate.org)
+     (The BSD 3-Clause License) leveldbjni-all (org.fusesource.leveldbjni:leveldbjni-all:1.8 - http://leveldbjni.fusesource.org/leveldbjni-all)
+     (BSD-like) Scala Library (org.scala-lang:scala-library:2.10.4 - http://www.scala-lang.org/)
+     (The BSD License) xmlenc Library (xmlenc:xmlenc:0.52 - http://xmlenc.sourceforge.net)
+
+----------------------------------------------
+MIT licenses
+----------------------------------------------
+The following components are provided under a MIT license. See project link for details.
+The text of each license is also included at licenses/MIT.
+
+     (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.21 - http://www.slf4j.org)
+     (MIT License) SLF4J LOG4J-12 Binding (org.slf4j:slf4j-log4j12:1.7.21 - http://www.slf4j.org)
+     (MIT License) JCL 1.1.1 implemented over SLF4J (org.slf4j:jcl-over-slf4j:1.7.22 - http://www.slf4j.org)
+     (MIT License) JUL to SLF4J bridge (org.slf4j:jul-to-slf4j:1.7.22 - http://www.slf4j.org)
+     (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.22 - http://www.slf4j.org)
+     (MIT License) SLF4J LOG4J-12 Binding (org.slf4j:slf4j-log4j12:1.7.22 - http://www.slf4j.org)
+
+
+
+----------------------------------------------
+LGPL license
+----------------------------------------------
+The following components are provided under a LGPL license. See project link for details.
+The text of each license is also included at licenses/LGPL-2.0, licenses/LGPL-2.1.
+
+     (The GNU General Public License, Version 2) MySQL Connector/J (mysql:mysql-connector-java:5.1.40 - http://dev.mysql.com/doc/connector-j/en/)
+     (GNU Lesser General Public License) Core Hibernate O/RM functionality (org.hibernate:hibernate-core:5.0.11.Final - http://hibernate.org)
+     (GNU Lesser General Public License) Hibernate JPA Support (org.hibernate:hibernate-entitymanager:5.0.11.Final - http://hibernate.org)
+     (GNU Lesser General Public License) Hibernate Commons Annotations (org.hibernate.common:hibernate-commons-annotations:5.0.1.Final - http://hibernate.org)
+
+
+---------------------------------------------------
 
 This project includes the software: angular
-  Available at: https://github.com/angular/angular.js/blob/v1.6.4/LICENSE
-  Version used: 1.6.4
+  Available at: https://angular.io
+  Version used: 4.4.4
   Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
-  Copyright (c) 2010-2017 Google, Inc. http://angularjs.org
-
-This project includes the software: angular-route
-  Available at: https://github.com/angular/bower-angular-route/blob/v1.6.4/LICENSE.md
-  Version used: 1.6.4
-  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
-  Copyright (c) 2016 Angular
-
-This project includes the software: angular-smart-table
-  Available at: https://github.com/lorenzofox3/Smart-Table
-  Version used: 2.1.7
-  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
-  Copyright (C) 2016 Laurent Renard.
-
-This project includes the software: angular-cookies.js
-  Available at: https://github.com/angular/bower-angular-cookies/blob/v1.6.4/LICENSE.md
-  Version used: 1.6.4
-  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
-  Copyright (c) 2016 Angular
-
-This project includes the software: angular-spinner
-  Available at: https://github.com/urish/angular-spinner/tree/0.8.0
-  Version used: 0.8.0
-  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
-  Copyright (C) 2013, 2014, 2015, Uri Shaked uri@urish.org. 
-
-This project includes the software: AngularJS-Toaster
-  Available at: https://github.com/jirikavi/AngularJS-Toaster/blob/1.2.0/LICENSE
-  Version used: 1.2.0
-  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
-  Copyright (c) 2013 jirikavi
-
-This project includes the software: bootswatch
-  Available at: https://github.com/thomaspark/bootswatch/blob/v3.3.6/LICENSE
-  Version used: 3.3.6
-  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
-  Copyright (c) 2013 Thomas Park
-
-This project includes the software: domReady
-  Available at: https://github.com/requirejs/domReady/blob/2.0.1/LICENSE
-  Version used: 2.0.1
-  Used under the following license: The BSD 3-Clause (New BSD) License (http://opensource.org/licenses/BSD-3-Clause)
-  Copyright (c) 2010-2011, The Dojo Foundation
+  Copyright (c) 2014-2016 Google, Inc.
 
 This project includes the software: echarts
-  Available at: https://github.com/ecomfe/echarts/blob/3.2.2/LICENSE
-  Version used: 3.2.2
+  Available at: http://echarts.baidu.com
+  Version used: 3.7.0
   Used under the following license: The BSD 3-Clause (New BSD) License (http://opensource.org/licenses/BSD-3-Clause)
   Copyright (c) 2013, Baidu Inc.
 
 This project includes the software: Font Awesome (code)
-  Available at: http://fontawesome.io/
+  Available at: http://fontawesome.io
   Inclusive of: font-awesome/{css,scss,less}/*
   Version used: 4.7.0
   Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
   Copyright (c) Dave Gandy (2016)
 
 This project includes the software: Font Awesome (fonts)
-  Available at: http://fontawesome.io/
+  Available at: http://fontawesome.io
   Inclusive of: font-awesome/fonts/*
   Version used: 4.7.0
   Used under the following license: SIL OFL 1.1 (http://scripts.sil.org/OFL)
+  See details in licenses/SIL-OFL-1.1
   Copyright (c) Dave Gandy (2016)
 
 This project includes the software: requirejs
-  Available at: https://github.com/requirejs/requirejs/blob/2.1.22/LICENSE
-  Version used: 2.1.22
+  Available at: http://requirejs.org
+  Version used: 2.2.0
   Used under the following license: The BSD 3-Clause (New BSD) License (http://opensource.org/licenses/BSD-3-Clause)
   Copyright (c) 2010-2015, The Dojo Foundation
 
+This project includes the software: jQuery JavaScript Library
+  Available at: http://jquery.com
+  Developed by: The jQuery Foundation (http://jquery.org/)
+  Inclusive of: jquery.js
+  Version used: 3.2.1
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+  Copyright 2018 The jQuery Foundation
+
+This project includes the software: angular2-multiselect-dropdown
+  Available at: http://cuppalabs.github.io/components/multiselectDropdown
+  Version used: 1.3.4
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+  Copyright (c) 2009-2017, Cuppa Labs. All rights reserved and copyrighted to Pradeep Kumar Terli.
+
+This project includes the software: angular2-toaster
+  Available at: https://github.com/Stabzs/Angular2-Toaster
+  Version used: 4.0.1
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+  Copyright (c) 2016-2017 Stabzs.
+
+This project includes the software: Twitter Bootstrap
+  Available at: https://getbootstrap.com
+  Version used: 3.3.7
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+  Copyright (c) 2011-2014 Twitter, Inc
+
+This project includes the software: Glyphicons Halflings(glyphicons-halflings-regular.*)
+  Available at: http://glyphicons.com
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+  Copyright (c) 2010 - 2016 Jan Kovarik
+
+This project includes the software: nouislider
+  Available at: https://refreshless.com/nouislider
+  Version used: 11.0.3
+  Used under the following license: WTFPL
+  See details in licenses/WTFPL
+
+This project includes the software: ng2-nouislider
+  Available at: http://tb.github.io/ng2-nouislider
+  Version used: 1.7.6
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+
+This project includes the software: angular-tree-component
+  Available at: https://angular2-tree.readme.io/docs
+  Version used: 4.1.0
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+
+This project includes the software: angular2-datatable
+  Available at: https://github.com/mariuszfoltak/angular2-datatable
+  Version used: 0.6.0
+  Used under the following license: Apache License, version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+  Copyright (c) Twitter, Inc. (2012)
+
+This project includes the software: rxjs
+  Available at: http://reactivex.io/rxjs
+  Version used: 5.4.2
+  Used under the following license: Apache License, version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+  Copyright (c) Twitter, Inc. (2012)
+
+This project includes the software: webpack
+  Available at: https://webpack.js.org
+  Version used: 3.5.4
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+
+This project includes the software: css-loader
+  Available at:  https://github.com/webpack-contrib/css-loader
+  Version used: 0.28.7
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+
+This project includes the software: lodash
+  Available at:  https://github.com/lodash/lodash
+  Version used: 4.17.4
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+
+This project includes the software: mobx-angular
+  Available at:  https://github.com/mobxjs/mobx-angular
+  Version used: 1.5.0
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+
+This project includes the software: mobx
+  Available at:  https://mobx.js.org/
+  Version used: 3.1.11
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+
+This project includes the software: style-loader
+  Available at:  https://github.com/webpack-contrib/style-loader
+  Version used: 0.13.2
+  Used under the following license: The MIT License (http://opensource.org/licenses/MIT)
+
+This project includes the software: tslib
+  Available at:  http://www.tslib.org/
+  Version used: 0.13.2
+  Used under the following license: Apache License, version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+  Copyright (c) Twitter, Inc. (2012)
 
 ---------------------------------------------------
 
-(3) Licenses for third-party software
-
-Contents:
-
-  The BSD 2-Clause License
-  The BSD 3-Clause License ("New BSD")
-  The MIT License ("MIT")
-
-
-The BSD 2-Clause License
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-  
-  1. Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-  
-  2. Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-  
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  
-
-The BSD 3-Clause License ("New BSD")
-
-  Redistribution and use in source and binary forms, with or without modification,
-  are permitted provided that the following conditions are met:
-  
-  1. Redistributions of source code must retain the above copyright notice, 
-  this list of conditions and the following disclaimer.
-  
-  2. Redistributions in binary form must reproduce the above copyright notice, 
-  this list of conditions and the following disclaimer in the documentation 
-  and/or other materials provided with the distribution.
-  
-  3. Neither the name of the copyright holder nor the names of its contributors 
-  may be used to endorse or promote products derived from this software without 
-  specific prior written permission.
-  
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-  POSSIBILITY OF SUCH DAMAGE.
-  
-
-The MIT License ("MIT")
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-  
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-  
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  THE SOFTWARE.
-  
+All the dependent components licenses are listed in licenses/ directory.
