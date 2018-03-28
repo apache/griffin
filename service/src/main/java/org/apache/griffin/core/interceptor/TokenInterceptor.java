@@ -56,30 +56,23 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
     }
 
     private boolean isRepeatSubmit(HttpServletRequest request) {
-        LOGGER.info("enter isRepeatSubmit1");
-        String curToken = request.getHeader(TOKEN);
-        LOGGER.info("enter isRepeatSubmit2");
-        HttpSession session = request.getSession();
-        LOGGER.info("enter isRepeatSubmit3");
-        Object preToken = session.getAttribute(TOKEN);
-        LOGGER.info("enter isRepeatSubmit4");
-        //if http header has no token,we ignore to deal with repeated submission.
-        if (curToken == null) {
-            LOGGER.info("current token null");
-            return false;
-        } else if (preToken == null) {
-            LOGGER.info("previous token null");
-            session.setAttribute(TOKEN, curToken);
-            return false;
-        } else {
-            if (preToken.toString().equals(curToken)) {
-                LOGGER.info("current token equals previous token");
-                return true;
-            } else {
-                LOGGER.info("current token different from previous token");
-                session.setAttribute(TOKEN, curToken);
-                return false;
-            }
-        }
+//        String curToken = request.getHeader(TOKEN);
+//        HttpSession session = request.getSession(true);
+//        Object preToken = session.getAttribute(TOKEN);
+//        //if http header has no token,we ignore to deal with repeated submission.
+//        if (curToken == null) {
+//            return false;
+//        } else if (preToken == null) {
+//            session.setAttribute(TOKEN, curToken);
+//            return false;
+//        } else {
+//            if (preToken.toString().equals(curToken)) {
+//                return true;
+//            } else {
+//                session.setAttribute(TOKEN, curToken);
+//                return false;
+//            }
+//        }
+        return false;
     }
 }
