@@ -166,6 +166,6 @@ public class MetricStoreImpl implements MetricStore {
 
     private static String buildBasicAuthString(String user, String password) {
         String auth = user + ":" + password;
-        return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
+        return String.format("Basic %s", Base64.getEncoder().encodeToString(auth.getBytes()));
     }
 }
