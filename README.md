@@ -36,6 +36,7 @@ To run Griffin at local, you can follow instructions below.
 You need to install following items 
 - jdk (1.8 or later versions).
 - mysql.
+- Postgresql.
 - npm (version 6.0.0+).
 - [Hadoop](http://apache.claz.org/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz) (2.6.0 or later), you can get some help [here](https://hadoop.apache.org/docs/r2.7.2/hadoop-project-dist/hadoop-common/SingleCluster.html).
 -  [Spark](http://spark.apache.org/downloads.html) (version 1.6.x, griffin does not support 2.0.x at current), if you want to install Pseudo Distributed/Single Node Cluster, you can get some help [here](http://why-not-learn-something.blogspot.com/2015/06/spark-installation-pseudo.html).
@@ -69,12 +70,15 @@ You should also modify some configurations of Griffin for your environment.
 - <b>service/src/main/resources/application.properties</b>
 
     ```
-    # mysql
-    spring.datasource.url = jdbc:mysql://<your IP>:3306/quartz?autoReconnect=true&useSSL=false
+    # jpa
+    spring.datasource.url = jdbc:postgresql://<your IP>:5432/quartz?autoReconnect=true&useSSL=false
     spring.datasource.username = <user name>
     spring.datasource.password = <password>
+    spring.jpa.generate-ddl=true
+    spring.datasource.driverClassName = org.postgresql.Driver
+    spring.jpa.show-sql = true
     
-    # hive
+    # hive metastore
     hive.metastore.uris = thrift://<your IP>:9083
     hive.metastore.dbname = <hive database name>    # default is "default"
     
@@ -166,6 +170,12 @@ After a few seconds, we can visit our default UI of Griffin (by default the port
 You can use UI following the steps  [here](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/ui/user-guide.md).
 
 **Note**: The front-end UI is still under development, you can only access some basic features currently.
+
+
+### Build and Debug
+
+If you want to develop Griffin, please follow [this document](griffin-doc/dev/dev-env-build.md), to skip complex environment building work.
+
 
 ## Community
 
