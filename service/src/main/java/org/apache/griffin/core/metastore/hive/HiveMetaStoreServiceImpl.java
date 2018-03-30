@@ -27,7 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -138,6 +140,14 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             LOGGER.error("Exception fetching table info : {}. {}", tableName, e.getMessage());
         }
         return result;
+    }
+
+    @Scheduled(fixedRateString = "${cache.evict.hive.fixedRate.in.milliseconds}")
+    @CacheEvict(cacheNames = "hive", allEntries = true, beforeInvocation = true)
+    public void evictHiveCache() {
+        LOGGER.info("Evict hive cache");
+        getAllTable();
+        LOGGER.info("After evict hive cache,automatically refresh hive tables cache.");
     }
 
 
