@@ -24,7 +24,7 @@ under the License.
     <form name="Form" id="form" #prForm="ngForm" novalidate>
       <div id="wizard" class="swMain">
         <ul> 
-          <li (click)="goTo(4)">
+          <li>
             <a class="selected">
               <div class="stepNumber">
                 1
@@ -34,8 +34,6 @@ under the License.
           </li>
         </ul>
       </div>  
-     
-     
       <div id="step-4"  class="formStep">
         <label class="stepDesc">Please setup the measure required information</label>
         <div class="container-fluid">
@@ -90,17 +88,7 @@ under the License.
                       </select>
                     </div>
                   </div>
-                </div>                
-                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group">
-                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      DataSource:
-                    </label>
-                    <div class="col-md-10 col-lg-10 col-sm-10">
-                      <input type="text" class="form-control" name="DataAsset" value="{{currentTable}}" disabled>
-                    </div>
-                  </div>
-                </div> -->
+                </div> 
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
