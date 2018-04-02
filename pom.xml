@@ -30,7 +30,7 @@ under the License.
 
     <groupId>org.apache.griffin</groupId>
     <artifactId>griffin</artifactId>
-    <version>0.2.0-incubating</version>
+    <version>0.2.1-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
     <url>http://griffin.incubator.apache.org</url>
@@ -82,7 +82,7 @@ under the License.
         <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</connection>
         <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</developerConnection>
         <url>https://git-wip-us.apache.org/repos/asf?p=incubator-griffin.git;a=summary</url>
-        <tag>griffin-0.2.0-incubating</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
