@@ -20,7 +20,7 @@
             {
               "dsl.type": "spark-sql",
               "name": "${this}",
-              "rule": "select DISTINCT name, age from ${this}"
+              "rule": "select name, age from ${this}"
             }
           ]
         }

@@ -99,7 +99,7 @@ case class GroupbyClause(exprs: Seq[Expr], havingClauseOpt: Option[Expr]) extend
 
 }
 
-case class OrderbyItem(expr: Expr, orderOpt: Option[String]) extends Expr {
+case class OrderItem(expr: Expr, orderOpt: Option[String]) extends Expr {
   addChild(expr)
   def desc: String = {
     orderOpt match {
@@ -109,12 +109,12 @@ case class OrderbyItem(expr: Expr, orderOpt: Option[String]) extends Expr {
   }
   def coalesceDesc: String = desc
 
-  override def map(func: (Expr) => Expr): OrderbyItem = {
-    OrderbyItem(func(expr), orderOpt)
+  override def map(func: (Expr) => Expr): OrderItem = {
+    OrderItem(func(expr), orderOpt)
   }
 }
 
-case class OrderbyClause(items: Seq[OrderbyItem]) extends ClauseExpression {
+case class OrderbyClause(items: Seq[OrderItem]) extends ClauseExpression {
 
   addChildren(items.map(_.expr))
 
@@ -128,7 +128,25 @@ case class OrderbyClause(items: Seq[OrderbyItem]) extends ClauseExpression {
   }
 
   override def map(func: (Expr) => Expr): OrderbyClause = {
-    OrderbyClause(items.map(func(_).asInstanceOf[OrderbyItem]))
+    OrderbyClause(items.map(func(_).asInstanceOf[OrderItem]))
+  }
+}
+
+case class SortbyClause(items: Seq[OrderItem]) extends ClauseExpression {
+
+  addChildren(items.map(_.expr))
+
+  def desc: String = {
+    val obs = items.map(_.desc).mkString(", ")
+    s"SORT BY ${obs}"
+  }
+  def coalesceDesc: String = {
+    val obs = items.map(_.desc).mkString(", ")
+    s"SORT BY ${obs}"
+  }
+
+  override def map(func: (Expr) => Expr): SortbyClause = {
+    SortbyClause(items.map(func(_).asInstanceOf[OrderItem]))
   }
 }
 

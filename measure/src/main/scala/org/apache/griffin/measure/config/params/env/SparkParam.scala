@@ -27,7 +27,10 @@ case class SparkParam( @JsonProperty("log.level") logLevel: String,
                        @JsonProperty("checkpoint.dir") cpDir: String,
                        @JsonProperty("batch.interval") batchInterval: String,
                        @JsonProperty("process.interval") processInterval: String,
-                       @JsonProperty("config") config: Map[String, String]
+                       @JsonProperty("config") config: Map[String, String],
+                       @JsonProperty("init.clear") initClear: Boolean
                      ) extends Param {
+
+  def needInitClear: Boolean = if (initClear != null) initClear else false
 
 }

@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.rule.dsl.expr
 
-trait Expr extends TreeNode with Serializable {
+trait Expr extends TreeNode with ExprTag with Serializable {
 
   def desc: String
 

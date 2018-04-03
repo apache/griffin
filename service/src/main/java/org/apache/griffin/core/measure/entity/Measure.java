@@ -46,7 +46,7 @@ public abstract class Measure extends AbstractAuditableEntity {
 
     private String organization;
 
-    private Boolean deleted = false;
+    private boolean deleted = false;
 
     public String getName() {
         return name;
@@ -90,11 +90,11 @@ public abstract class Measure extends AbstractAuditableEntity {
         this.owner = owner;
     }
 
-    public Boolean getDeleted() {
-        return this.deleted;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setDeleted(Boolean deleted) {
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 
