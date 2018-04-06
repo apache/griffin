@@ -105,8 +105,9 @@ export class SidebarComponent implements OnInit {
       for (let mesName in this.mesWithJob) {
         var metricData = this.mesWithJob[mesName][0];
         if (
-          metricData.metricValues[0] != undefined &&
-          metricData.type == "accuracy"
+         metricData.metricValues[0] != undefined &&
+          (metricData.type == "accuracy"||
+          ((metricData.type == "external") && (metricData.visualType=="accuracy")))
         ) {
           var jobs = this.mesWithJob[mesName];
           var node = null;

@@ -49,7 +49,7 @@ under the License.
                       Measure Name<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="name" #prName="ngModel" name="prName" placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$">
+                      <input type="text" class="form-control" [(ngModel)]="newMeasure.name" #prName="ngModel" name="prName" placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$">
                       <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.required)">Measure Name is required</span>
                       <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
                     </div>
@@ -61,9 +61,22 @@ under the License.
                       Metric Name<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="metricName" #mName="ngModel" name="mName" placeholder="Please input the metric name" required pattern="^[a-zA-Z0-9_-]*$">
+                      <input type="text" class="form-control" [(ngModel)]="newMeasure.metricName" #mName="ngModel" name="mName" placeholder="Please input the metric name" required pattern="^[a-zA-Z0-9_-]*$">
                       <span class="error text-small block " *ngIf="mName.dirty && (mName.errors?.required)">Metric Name is required</span>
                       <span class="error text-small block " *ngIf="mName.dirty && (mName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12" >
+                  <div class="form-group" [ngClass]="{'has-error':mName.dirty&&mName.invalid, 'has-success':mName.valid}">
+                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                      Visual Type<span class="symbol required"></span>:
+                    </label>
+                    <div class="col-md-10 col-lg-10 col-sm-10 ">
+                      <select [(ngModel)]="newMeasure.visualType" name="visualTypeOptions[{{i}}]"  class="form-control input-sm" placeholder="Visual Type" required>
+                       <option *ngFor="let t of visualTypeOptions" value="{{t}}">{{t}}</option>
+                      </select>  
+                      <span class="error text-small block " *ngIf="mName.dirty && (mName.errors?.required)">Metric Name is required</span>                     
                     </div>
                   </div>
                 </div>
@@ -73,7 +86,7 @@ under the License.
                       Measure Description:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="desc" placeholder="Please input detailed description of your measure" name="desc">
+                      <input type="text" class="form-control" [(ngModel)]="newMeasure.description" placeholder="Please input detailed description of your measure" name="desc">
                     </div>
                   </div>
                 </div>
@@ -83,8 +96,8 @@ under the License.
                       Measure Type:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select id="typeSelector" class="form-control" [(ngModel)]="type" disabled required name="type">
-                        <option>{{type}}</option>
+                      <select id="typeSelector" class="form-control" [(ngModel)]="newMeasure.measureType" disabled required name="type">
+                        <option>{{newMeasure.measureType}}</option>
                       </select>
                     </div>
                   </div>
@@ -95,7 +108,7 @@ under the License.
                       Owner:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10">
-                      <input type="text" class="form-control" name="owner" disabled [(ngModel)]="owner">
+                      <input type="text" class="form-control" name="owner" disabled [(ngModel)]="newMeasure.owner">
                     </div>
                   </div>
                 </div>
@@ -138,7 +151,7 @@ under the License.
                           Measure Name:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{name}}
+                          {{newMeasure.name}}
                         </div>
                       </div>
                       <div class="row">
@@ -146,7 +159,15 @@ under the License.
                           Metric Name:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{metricName}}
+                          {{newMeasure.metricName}}
+                        </div>
+                      </div>
+                      <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Visual Type:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8 ">
+                          {{newMeasure.visualType}}
                         </div>
                       </div>
                       <div class="row">
@@ -154,7 +175,7 @@ under the License.
                           Measure Description:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{desc}}
+                          {{newMeasure.description}}
                         </div>
                       </div>
                       <div class="row">
@@ -162,7 +183,7 @@ under the License.
                           Measure Type:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{type}}
+                          {{newMeasure.measureType}}
                         </div>
                       </div> 
                       <div class="row">
@@ -170,7 +191,7 @@ under the License.
                           Owner:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8">
-                          {{owner}}
+                          {{newMeasure.owner}}
                         </div>
                       </div>
                     </div>

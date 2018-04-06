@@ -31,31 +31,43 @@ import { AfterViewChecked, ElementRef } from "@angular/core";
 import { AngularMultiSelectModule } from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
 import { ConfigurationComponent } from "../configuration/configuration.component";
 
+interface pubMeasure {
+  name: string;
+  metricName: string;
+  visualType: string;
+  description: string;
+  measureType: string;
+  dqType: string;
+  owner: string
+}
+export function createPubMeasure(name: string,
+  metricName: string,
+  visualType: string,
+  description: string,
+  measureType: string,
+  dqType: string,
+  owner: string) {
+  return {
+    name,
+    metricName,
+    visualType,
+    description,
+    measureType,
+    dqType,
+    owner
+  }
+}
 @Component({
   selector: "app-pub",
   templateUrl: "./pub.component.html",
   providers: [ServiceService],
   styleUrls: ["./pub.component.css"]
 })
-export class PubComponent implements AfterViewChecked, OnInit {  
-  name ="";
-  type = "external";
-  metricName="";
-  owner = "test";
-  desc="";
-  newMeasure = {
-    name: this.name,
-    metricName:this.metricName,
-    description: this.desc, 
-    "measure.type": this.type,
-    "dq.type": "external",
-    owner: this.owner,    
-  };
+export class PubComponent implements AfterViewChecked, OnInit {    
+  visualTypeOptions=["accuracy"];
+  newMeasure = createPubMeasure("", "", "accuracy","","external","external","test"); 
 
-  
   createResult: any;
- 
-
   private toasterService: ToasterService;
   public visible = false;
   public visibleAnimate = false;
@@ -131,17 +143,18 @@ export class PubComponent implements AfterViewChecked, OnInit {
 
   
 
-  save() {
-    this.newMeasure = {
-      name: this.name,
-      metricName:this.metricName,
-      description: this.desc, 
-      "measure.type": this.type,
-      "dq.type": "external",
-      owner: this.owner,    
-    };
+  save() {     
+    var measure2Save ={
+      name:this.newMeasure.name,
+      metricName: this.newMeasure.metricName,
+      visualType:this.newMeasure.visualType,
+      "measure.type":this.newMeasure.measureType,
+      description:this.newMeasure.description,
+      "dq.type":this.newMeasure.dqType,
+      owner:this.newMeasure.owner
+    }
     var addModels = this.serviceService.config.uri.addModels;
-    this.http.post(addModels, this.newMeasure).subscribe(
+    this.http.post(addModels, measure2Save).subscribe(
       data => {
         this.createResult = data;
         this.hide();

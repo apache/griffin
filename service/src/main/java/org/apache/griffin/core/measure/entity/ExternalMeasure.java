@@ -34,6 +34,7 @@ import javax.persistence.OneToOne;
 public class ExternalMeasure extends Measure {
 
     private String metricName;
+    private String visualType;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -43,9 +44,10 @@ public class ExternalMeasure extends Measure {
         super();
     }
 
-    public ExternalMeasure(String name, String description, String organization, String owner, String metricName,VirtualJob vj) {
+    public ExternalMeasure(String name, String description, String organization, String owner, String metricName,String visualType, VirtualJob vj) {
         super(name, description, organization, owner);
         this.metricName = metricName;
+        this.visualType = visualType;
         this.virtualJob = vj;
     }
 
@@ -56,6 +58,10 @@ public class ExternalMeasure extends Measure {
     public void setMetricName(String metricName) {
         this.metricName = metricName;
     }
+
+    public String getVisualType() { return visualType;}
+
+    public void setVisualType(String visualType) { this.visualType = visualType; }
 
     public VirtualJob getVirtualJob() {
         return virtualJob;

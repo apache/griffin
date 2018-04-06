@@ -48,6 +48,14 @@ under the License.
             {{ruleData.type}}
           </div>
         </div>
+        <div class="row" *ngIf="ruleData.visualType">
+          <label class="col-xs-4">
+            Visual Type:
+          </label>
+          <div class="col-xs-8 " style="color: #fff">
+            {{ruleData.visualType}}
+          </div>
+        </div>
         <div class="row" *ngIf="ruleData.type=='accuracy'">
           <label class="col-xs-4">
             Source:

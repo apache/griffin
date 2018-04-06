@@ -176,7 +176,8 @@ export class HealthComponent implements OnInit {
         var metricData = this.mesWithJob[mesName][0];
         if (
           metricData.metricValues[0] != undefined &&
-          metricData.type == "accuracy"
+          (metricData.type == "accuracy"||
+          ((metricData.type == "external") && (metricData.visualType=="accuracy")))
         ) {
           var jobs = this.mesWithJob[mesName];
           var node = null;
