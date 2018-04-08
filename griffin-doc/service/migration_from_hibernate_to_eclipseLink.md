@@ -107,4 +107,4 @@ Also, we have to define some vendor-specific properties which will be used by Ec
 #### Configure properties
 You need to configure properties according to the database you use in Griffin.
 
-Please see [Mysql and PostgreSQL switch in EclipseLink](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/migration_from_eclipselink_to_hibernate.md) to configure.
+Please see [Mysql and PostgreSQL switch in EclipseLink](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/mysql_postgresql_switch_in_eclipselink.md) to configure.
