@@ -48,6 +48,11 @@ import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
 import { TruncatePipe} from './sidebar/truncate.pipe';
 import { ConfigurationComponent } from './measure/create-measure/configuration/configuration.component';
 import { NouisliderModule } from 'ng2-nouislider';
+import {HttpModule, Http, XHRBackend, RequestOptions} from '@angular/http';
+import { HttpService } from './service/http.service';
+import {httpFactory} from './service/http.factory';
+import { LoaderService } from './loader/loader.service';
+import { LoaderComponent } from './loader/loader.component';
 
 
 const appRoutes: Routes = [
@@ -135,7 +140,8 @@ const appRoutes: Routes = [
     LoginComponent,
     RuleComponent,
     TruncatePipe,
-    ConfigurationComponent
+    ConfigurationComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,
@@ -153,9 +159,18 @@ const appRoutes: Routes = [
       {useHash: true},
     ),
     MatNativeDateModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    HttpModule
   ],
-  providers: [],
+  exports: [
+    LoaderComponent
+],
+  providers: [ LoaderService,
+    {
+        provide: HttpService,
+        useFactory: httpFactory,
+        deps: [XHRBackend, RequestOptions,LoaderService]
+    }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

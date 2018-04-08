@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpService } from './../service/http.service';
 import { Router } from "@angular/router";
 import { ServiceService } from "../service/service.service";
 import * as $ from "jquery";
@@ -29,7 +29,7 @@ import * as $ from "jquery";
 })
 export class HealthComponent implements OnInit {
   constructor(
-    private http: HttpClient,
+    private http:HttpService,
     private router: Router,
     public serviceService: ServiceService
   ) {}
@@ -171,7 +171,7 @@ export class HealthComponent implements OnInit {
   renderData() {
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_dashboard).subscribe(data => {
-      this.mesWithJob = JSON.parse(JSON.stringify(data));
+      this.mesWithJob = JSON.parse(JSON.stringify(data.json()));
       for (let mesName in this.mesWithJob) {
         var metricData = this.mesWithJob[mesName][0];
         if (

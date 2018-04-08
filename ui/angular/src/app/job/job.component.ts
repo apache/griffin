@@ -18,6 +18,7 @@ under the License.
 */
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { HttpService } from './../service/http.service';
 import { DataTableModule } from "angular2-datatable";
 import { ServiceService } from "../service/service.service";
 import { DatePipe } from "@angular/common";
@@ -47,7 +48,7 @@ export class JobComponent implements OnInit {
 
   constructor(
     toasterService: ToasterService,
-    private http: HttpClient,
+    private http: HttpService,
     private router: Router,
     public serviceService: ServiceService
   ) {

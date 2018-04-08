@@ -28,9 +28,10 @@ import { AngularMultiSelectModule } from "angular2-multiselect-dropdown/angular2
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ToasterModule, ToasterService, ToasterConfig } from "angular2-toaster";
 import * as $ from "jquery";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpParams } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { NouisliderModule } from "ng2-nouislider";
+import { HttpService } from '../../service/http.service';
 
 @Component({
   selector: "app-create-job",
@@ -41,7 +42,7 @@ import { NouisliderModule } from "ng2-nouislider";
 export class CreateJobComponent implements OnInit, AfterViewChecked {
   constructor(
     toasterService: ToasterService,
-    private http: HttpClient,
+    private http: HttpService,
     private router: Router,
     public serviceService: ServiceService
   ) {
