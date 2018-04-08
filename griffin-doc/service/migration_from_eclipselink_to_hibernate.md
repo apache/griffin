@@ -9,6 +9,7 @@ In this document, we'll go through steps necessary to migrate applications from 
 - [configure properties](#3)
 
 <h2 id = "1"></h2>
+
 ### Add hibernate dependency
 By default, Spring Data uses Hibernate as the default JPA implementation provider.So we just add **spring-boot-starter-data-jpa** dependency.If you have already added it, skip this step.
 
@@ -18,6 +19,7 @@ By default, Spring Data uses Hibernate as the default JPA implementation provide
     </dependency>
 
 <h2 id = "2"></h2>
+
 ### Remove EclipseLink dependency
 If you don't want to remove EclipseLink,you can skip this step.
 
@@ -57,7 +59,8 @@ If you don't want to remove EclipseLink,you can skip this step.
 remove EclipseLinkJpaConfig class in org.apache.griffin.core.config package.  
 
 <h2 id = "3"></h2>
+
 #### Configure properties
 You need to configure properties according to the database you use in Griffin.
 
-Please see [Mysql and PostgreSQL switch in EclipseLink](https://github.com/apache/incubator-griffin/tree/master/griffin-doc/service/mysql_postgresql_switch_in_eclipselink.md) to configure.
+Please see [Mysql and PostgreSQL switch in EclipseLink](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/migration_from_eclipselink_to_hibernate.md) to configure.

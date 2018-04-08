@@ -12,22 +12,17 @@
 ### Configure properties
 - configure application.properties
 
-    spring.datasource.url = jdbc:postgresql://localhost:5432/quartz?autoReconnect=true&useSSL=false
-    
-    spring.datasource.username = griffin
-    
-    spring.datasource.password = 123456
-    
-    spring.jpa.generate-ddl=true
-    
-    spring.datasource.driver-class-name = org.postgresql.Driver
-    
-    spring.jpa.show-sql = true
-    
+      spring.datasource.url = jdbc:postgresql://localhost:5432/quartz?autoReconnect=true&useSSL=false
+      spring.datasource.username = griffin
+      spring.datasource.password = 123456
+      spring.jpa.generate-ddl=true
+      spring.datasource.driver-class-name = org.postgresql.Driver
+      spring.jpa.show-sql = true
+
 - configure quartz.properties
 
-      org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
-      
+      org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.PostgreSQLDelegate 
+
 ## Use mysql database 
 ### Add mysql dependency
 
