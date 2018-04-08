@@ -24,8 +24,8 @@ import { TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from "angular-tree-c
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ToasterModule, ToasterService } from "angular2-toaster";
 import * as $ from "jquery";
-import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
+import { HttpService } from '../../../service/http.service';
 
 class node {
   name: string;
@@ -585,7 +585,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
   nodeListTarget: object[];
   constructor(
     toasterService: ToasterService,
-    private http: HttpClient,
+    private http: HttpService,
     private router: Router,
     public serviceService: ServiceService
   ) {

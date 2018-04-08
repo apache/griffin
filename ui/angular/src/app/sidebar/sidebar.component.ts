@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpService } from './../service/http.service';
 import { Router } from "@angular/router";
 import { ChartService } from "../service/chart.service";
 import { DatePipe } from "@angular/common";
@@ -33,7 +33,7 @@ import * as $ from "jquery";
 })
 export class SidebarComponent implements OnInit {
   constructor(
-    private http: HttpClient,
+    private http: HttpService,
     private router: Router,
     public serviceService: ServiceService,
     public chartService: ChartService

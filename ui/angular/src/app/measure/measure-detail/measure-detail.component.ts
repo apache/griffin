@@ -19,7 +19,7 @@ under the License.
 import { Component, OnInit } from "@angular/core";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import "rxjs/add/operator/switchMap";
-import { HttpClient } from "@angular/common/http";
+import { HttpService } from '../../service/http.service';
 import { ServiceService } from "../../service/service.service";
 
 @Component({
@@ -33,7 +33,7 @@ export class MeasureDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient,
+    private http: HttpService,
     public serviceService: ServiceService
   ) {}
   ruleData: any;

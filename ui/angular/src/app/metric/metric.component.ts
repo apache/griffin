@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpService } from './../service/http.service';
 import { Router } from "@angular/router";
 import { ChartService } from "../service/chart.service";
 import { ServiceService } from "../service/service.service";
@@ -33,7 +33,7 @@ export class MetricComponent implements OnInit {
   constructor(
     public chartService: ChartService,
     public serviceService: ServiceService,
-    private http: HttpClient,
+    private http: HttpService,
     private router: Router
   ) {}
   data: any;

@@ -1,3 +1,21 @@
+/*
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+*/
 import {Injectable} from "@angular/core";
 import { XHRBackend, RequestOptions, Request, RequestOptionsArgs, Response, Http, Headers} from "@angular/http";
 import {Observable} from "rxjs/Rx";
@@ -17,11 +35,11 @@ export class HttpService extends Http {
         return this.intercept(super.get(url,options));
     }
 
-    post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
+    post(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
         return this.intercept(super.post(url, body, this.getRequestOptionArgs(options)));
     }
 
-    put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
+    put(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
         return this.intercept(super.put(url, body, this.getRequestOptionArgs(options)));
     }
 
@@ -36,12 +54,12 @@ export class HttpService extends Http {
         if (options.headers == null) {
             options.headers = new Headers();
         }
-        // options.headers.append('Content-Type', 'application/json');
+        options.headers.append('Content-Type', 'application/json');
         return options;
     }
 
     intercept(observable: Observable<Response>): Observable<Response> {
-        this.showLoader();
+        this.showLoading();
         console.log("In the intercept routine..");      
         return observable
           .catch(e => { console.log(e); return Observable.of(e); 
@@ -58,17 +76,16 @@ export class HttpService extends Http {
             var timer = Observable.timer(1000);
             timer.subscribe(t => { 
                 console.log("YYYYEnd... " );   
-                this.hideLoader();              
+                this.hideLoading();              
             });
           });
         }
 
-        private showLoader(): void {
-            console.log("In-showLoader: showLoader");  
+        private showLoading(): void {
             this.loaderService.show();
         }
     
-        private hideLoader(): void {
+        private hideLoading(): void {
             this.loaderService.hide();
         }
 

@@ -171,7 +171,7 @@ export class HealthComponent implements OnInit {
   renderData() {
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_dashboard).subscribe(data => {
-      this.mesWithJob = JSON.parse(JSON.stringify(data.json()));
+      this.mesWithJob = JSON.parse(JSON.stringify(data));
       for (let mesName in this.mesWithJob) {
         var metricData = this.mesWithJob[mesName][0];
         if (
