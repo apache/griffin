@@ -70,11 +70,11 @@ under the License.
                 <div class="col-md-12 col-lg-12 col-sm-12" >
                   <div class="form-group" [ngClass]="{'has-error':mName.dirty&&mName.invalid, 'has-success':mName.valid}">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Visual Type<span class="symbol required"></span>:
+                      Dq Type<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select [(ngModel)]="newMeasure.visualType" name="visualTypeOptions[{{i}}]"  class="form-control input-sm" placeholder="Visual Type" required>
-                       <option *ngFor="let t of visualTypeOptions" value="{{t}}">{{t}}</option>
+                      <select [(ngModel)]="newMeasure.dqType" name="dqTypeOptions[{{i}}]"  class="form-control input-sm" placeholder="Visual Type" required>
+                       <option *ngFor="let t of dqTypeOptions" value="{{t}}">{{t}}</option>
                       </select>  
                       <span class="error text-small block " *ngIf="mName.dirty && (mName.errors?.required)">Metric Name is required</span>                     
                     </div>
@@ -164,10 +164,10 @@ under the License.
                       </div>
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
-                          Visual Type:
+                          Dq Type:
                         </label>
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{newMeasure.visualType}}
+                          {{newMeasure.dqType}}
                         </div>
                       </div>
                       <div class="row">

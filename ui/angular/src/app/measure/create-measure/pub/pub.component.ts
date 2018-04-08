@@ -34,7 +34,6 @@ import { ConfigurationComponent } from "../configuration/configuration.component
 interface pubMeasure {
   name: string;
   metricName: string;
-  visualType: string;
   description: string;
   measureType: string;
   dqType: string;
@@ -42,7 +41,6 @@ interface pubMeasure {
 }
 export function createPubMeasure(name: string,
   metricName: string,
-  visualType: string,
   description: string,
   measureType: string,
   dqType: string,
@@ -50,7 +48,6 @@ export function createPubMeasure(name: string,
   return {
     name,
     metricName,
-    visualType,
     description,
     measureType,
     dqType,
@@ -64,9 +61,8 @@ export function createPubMeasure(name: string,
   styleUrls: ["./pub.component.css"]
 })
 export class PubComponent implements AfterViewChecked, OnInit {    
-  visualTypeOptions=["accuracy"];
-  newMeasure = createPubMeasure("", "", "accuracy","","external","external","test"); 
-
+  newMeasure = createPubMeasure("", "", "","external","accuracy","test"); 
+  dqTypeOptions =["accuracy"];
   createResult: any;
   private toasterService: ToasterService;
   public visible = false;
@@ -147,7 +143,6 @@ export class PubComponent implements AfterViewChecked, OnInit {
     var measure2Save ={
       name:this.newMeasure.name,
       metricName: this.newMeasure.metricName,
-      visualType:this.newMeasure.visualType,
       "measure.type":this.newMeasure.measureType,
       description:this.newMeasure.description,
       "dq.type":this.newMeasure.dqType,

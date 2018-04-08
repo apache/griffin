@@ -81,7 +81,7 @@ public class EntityHelper {
     }
 
     public static ExternalMeasure createExternalMeasure(String name) {
-        return new ExternalMeasure(name, "description", "org", "test", "metricName", "accuracy", new VirtualJob());
+        return new ExternalMeasure(name, "description", "org", "test", "metricName", new VirtualJob());
     }
 
     public static JobSchedule createJobSchedule() throws JsonProcessingException {
