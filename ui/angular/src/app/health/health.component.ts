@@ -29,7 +29,7 @@ import * as $ from "jquery";
 })
 export class HealthComponent implements OnInit {
   constructor(
-    private http: HttpClient,
+    private http:HttpClient,
     private router: Router,
     public serviceService: ServiceService
   ) {}
