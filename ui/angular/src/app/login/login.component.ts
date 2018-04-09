@@ -21,7 +21,7 @@ import { ServiceService } from "../service/service.service";
 import { UserService } from "../service/user.service";
 import { Router } from "@angular/router";
 import { LocationStrategy, HashLocationStrategy } from "@angular/common";
-import { HttpService } from './../service/http.service';
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-login",
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
   results: any;
   constructor(
     private router: Router,
-    private http: HttpService,
+    private http: HttpClient,
     public serviceService: ServiceService,
     public userService: UserService
   ) {}

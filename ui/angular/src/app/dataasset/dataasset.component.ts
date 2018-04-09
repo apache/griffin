@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from '@angular/core';
-import { HttpService } from './../service/http.service';
+import { HttpClient } from "@angular/common/http";
 import * as $ from 'jquery';
 import {ServiceService} from '../service/service.service';
 
@@ -45,7 +45,7 @@ export class DataassetComponent implements OnInit {
       this.hide();
     }
   }
-  constructor(private http:HttpService,public serviceService:ServiceService) { }
+  constructor(private http:HttpClient,public serviceService:ServiceService) { }
 
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;

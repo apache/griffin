@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from "@angular/core";
-import { HttpService } from './../service/http.service';
+import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { ServiceService } from "../service/service.service";
 import * as $ from "jquery";
@@ -29,7 +29,7 @@ import * as $ from "jquery";
 })
 export class HealthComponent implements OnInit {
   constructor(
-    private http:HttpService,
+    private http:HttpClient,
     private router: Router,
     public serviceService: ServiceService
   ) {}

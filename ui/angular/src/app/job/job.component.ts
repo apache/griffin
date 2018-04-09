@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from "@angular/core";
-import { HttpService } from './../service/http.service';
+import { HttpClient } from "@angular/common/http";
 import { DataTableModule } from "angular2-datatable";
 import { ServiceService } from "../service/service.service";
 import { DatePipe } from "@angular/common";
@@ -47,7 +47,7 @@ export class JobComponent implements OnInit {
 
   constructor(
     toasterService: ToasterService,
-    private http: HttpService,
+    private http: HttpClient,
     private router: Router,
     public serviceService: ServiceService
   ) {

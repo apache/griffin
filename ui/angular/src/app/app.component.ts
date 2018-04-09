@@ -21,7 +21,7 @@ import * as $ from "jquery";
 import { ServiceService } from "./service/service.service";
 import { UserService } from "./service/user.service";
 import { Location, LocationStrategy, HashLocationStrategy } from "@angular/common";
-import { HttpService } from './service/http.service';
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-root",
@@ -46,7 +46,7 @@ export class AppComponent implements AfterViewChecked, OnInit {
   }
   constructor(
     private router: Router,
-    private http:HttpService,
+    private http:HttpClient,
     private location: Location,
     public serviceService: ServiceService,
     public userService: UserService

@@ -16,77 +16,35 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import {Injectable} from "@angular/core";
-import { XHRBackend, RequestOptions, Request, RequestOptionsArgs, Response, Http, Headers} from "@angular/http";
-import {Observable} from "rxjs/Rx";
+import { Injectable } from '@angular/core';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from "@angular/common/http";
+import { Observable } from "rxjs/Observable";
+import 'rxjs/add/operator/do';
 import { LoaderService } from "./../loader/loader.service";
 
 @Injectable()
-export class HttpService extends Http {    
-    constructor( backend: XHRBackend, options: RequestOptions,
-        private loaderService: LoaderService) {
-        super(backend, options);
-    }
-    request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.request(url, options));
+export class HttpService implements HttpInterceptor {
+
+    constructor(private loaderService: LoaderService) {
     }
 
-    get(url: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.get(url,options));
-    }
-
-    post(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.post(url, body, this.getRequestOptionArgs(options)));
-    }
-
-    put(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.put(url, body, this.getRequestOptionArgs(options)));
-    }
-
-    delete(url: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.intercept(super.delete(url, this.getRequestOptionArgs(options)));
-    }
-
-    private getRequestOptionArgs(options?: RequestOptionsArgs) : RequestOptionsArgs {
-        if (options == null) {
-            options = new RequestOptions();
-        }
-        if (options.headers == null) {
-            options.headers = new Headers();
-        }
-        options.headers.append('Content-Type', 'application/json');
-        return options;
-    }
-
-    intercept(observable: Observable<Response>): Observable<Response> {
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {  
         this.showLoading();
-        console.log("In the intercept routine..");      
-        return observable
-          .catch(e => { console.log(e); return Observable.of(e); 
-          })
-          .do((res: Response) => {
-            console.log("Response: " + res);  
-            console.log("XXXXBegin... " + res);         
-          }, (err: any) => {           
-            console.log("Caught error: " + err);
-            console.log("YYYYEnd... " );     
-          })
-          .finally(() => {
-            console.log("Finally.. delaying, though.")
-            var timer = Observable.timer(1000);
-            timer.subscribe(t => { 
-                console.log("YYYYEnd... " );   
-                this.hideLoading();              
-            });
-          });
-        }
+        return next.handle(req).do((event: HttpEvent<any>) => {           
+            if (event instanceof HttpResponse) {               
+                this.hideLoading();
+            }
+        }, (err: any) => {            
+            this.hideLoading();
+        });
+    }
 
-        private showLoading(): void {
-            this.loaderService.show();
-        }
-    
-        private hideLoading(): void {
-            this.loaderService.hide();
-        }
+    private showLoading(): void {
+        this.loaderService.show();
+    }
+
+    private hideLoading(): void {
+        this.loaderService.hide();
+    }
 
 }

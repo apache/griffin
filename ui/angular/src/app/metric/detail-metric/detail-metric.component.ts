@@ -21,7 +21,7 @@ import { ChartService } from "../../service/chart.service";
 import { ServiceService } from "../../service/service.service";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import "rxjs/add/operator/switchMap";
-import { HttpService } from '../../service/http.service';
+import { HttpClient } from "@angular/common/http";
 import * as $ from "jquery";
 import { DataTableModule } from "angular2-datatable";
 
@@ -37,7 +37,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
     public chartService: ChartService,
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpService,
+    private http: HttpClient,
     private zone: NgZone,
     public serviceService: ServiceService
   ) {}

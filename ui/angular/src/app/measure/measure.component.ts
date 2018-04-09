@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from "@angular/core";
-import { HttpService } from './../service/http.service';
+import { HttpClient } from "@angular/common/http";
 import { DataTableModule } from "angular2-datatable";
 import { Router } from "@angular/router";
 import { FormControl } from "@angular/forms";
@@ -57,7 +57,7 @@ export class MeasureComponent implements OnInit {
 
   constructor(
     toasterService: ToasterService,
-    private http: HttpService,
+    private http: HttpClient,
     private router: Router,
     public serviceService: ServiceService
   ) {

@@ -31,7 +31,7 @@ import * as $ from "jquery";
 import { HttpParams } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { NouisliderModule } from "ng2-nouislider";
-import { HttpService } from '../../service/http.service';
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-create-job",
@@ -42,7 +42,7 @@ import { HttpService } from '../../service/http.service';
 export class CreateJobComponent implements OnInit, AfterViewChecked {
   constructor(
     toasterService: ToasterService,
-    private http: HttpService,
+    private http: HttpClient,
     private router: Router,
     public serviceService: ServiceService
   ) {

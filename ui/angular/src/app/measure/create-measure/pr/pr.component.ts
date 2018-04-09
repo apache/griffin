@@ -24,7 +24,7 @@ import { TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from "angular-tree-c
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ToasterModule, ToasterService, ToasterContainerComponent } from "angular2-toaster";
 import * as $ from "jquery";
-import { HttpService } from '../../../service/http.service';
+import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { DataTableModule } from "angular2-datatable";
 import { AfterViewChecked, ElementRef } from "@angular/core";
@@ -546,7 +546,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
   constructor(
     private elementRef: ElementRef,
     toasterService: ToasterService,
-    private http: HttpService,
+    private http: HttpClient,
     private router: Router,
     public serviceService: ServiceService
   ) {
