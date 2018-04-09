@@ -42,6 +42,7 @@ import { DataassetComponent } from './dataasset/dataasset.component';
 import { CreateJobComponent } from './job/create-job/create-job.component';
 import { AcComponent} from './measure/create-measure/ac/ac.component';
 import { PrComponent } from './measure/create-measure/pr/pr.component';
+import { PubComponent } from './measure/create-measure/pub/pub.component';
 import { LoginComponent } from './login/login.component';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
@@ -89,6 +90,10 @@ const appRoutes: Routes = [
     component:PrComponent
   },
   {
+    path: 'createmeasurepub',
+    component:PubComponent
+  },
+  {
     path: 'detailed/:name',
     component:DetailMetricComponent
   },
@@ -132,6 +137,7 @@ const appRoutes: Routes = [
     CreateJobComponent,
     AcComponent,
     PrComponent,
+    PubComponent,
     LoginComponent,
     RuleComponent,
     TruncatePipe,
