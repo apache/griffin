@@ -63,6 +63,7 @@ under the License.
       <button type="button" class="btn btn-primary btn-circle" style="position: absolute; top: 0px; right: 30px; z-index:99" (click)="goback();"><span style="margin-bottom:20px;">Back</span></button>
       <!-- main content goes here-->
       <div id="mainWindow" (window:resize)="onResize($event)" class="row y-scrollable" ng-view style="padding-right: 10px;">
+        <app-loader></app-loader>
         <router-outlet></router-outlet>
       </div>
     </div>
