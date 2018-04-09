@@ -32,7 +32,7 @@ For [Batch mode](../docker/griffin-docker-guide.md#how-to-use-griffin-docker-ima
 ## Run or Debug at local
 ### For service module
 If you need to develop the service module, you need to modify some configuration in the following files.
-Docker host is your machine running the docker containers, which means if you install docker and run docker containers on 1.2.3.4, the <docker host ip> is 1.2.3.4.
+Docker host is your machine running the docker containers, which means if you install docker and run docker containers on 192.168.100.100, then the `<docker host ip>` is 192.168.100.100.
 
 In service/src/main/resources/application.properties
 ```
@@ -92,7 +92,7 @@ cd ~/service
 ps -ef | grep service.jar
 kill -9 <pid of service.jar>
 ```
-2. Service and ui module are both packaged in service/target/service-<version>.jar, copy it into your docker container.
+2. Service and ui module are both packaged in `service/target/service-<version>.jar`, copy it into your docker container.
 ```
 docker cp service-<version>.jar <griffin docker container id>:/root/service/service.jar
 ```
@@ -104,7 +104,7 @@ nohup java -jar service.jar > service.log &
 Now you can follow the service log by `tail -f service.log`.
 
 ### For measure module
-1. Measure module is packaged in measure/target/measure-<version>.jar, copy it into your docker container.
+1. Measure module is packaged in `measure/target/measure-<version>.jar`, copy it into your docker container.
 ```
 docker cp measure-<version>.jar <griffin docker container id>:/root/measure/griffin-measure.jar
 ```
