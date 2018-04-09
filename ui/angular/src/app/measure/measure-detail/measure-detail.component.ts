@@ -85,6 +85,7 @@ export class MeasureDetailComponent implements OnInit {
         this.ruleData = data;
         if (this.ruleData["measure.type"] === "external") {
           this.ruleData.type = this.ruleData["measure.type"];
+          this.ruleData.dqType = this.ruleData["dq.type"];
         } else{
           this.ruleData.type = this.ruleData["dq.type"];
           this.currentrule = this.ruleData["evaluate.rule"].rules;
