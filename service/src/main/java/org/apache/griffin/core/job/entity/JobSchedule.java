@@ -55,7 +55,7 @@ public class JobSchedule extends AbstractAuditableEntity {
     private String timeZone;
 
     @JsonIgnore
-    @Access(AccessType.PROPERTY)
+//    @Access(AccessType.PROPERTY)
     private String predicateConfig;
 
     @Transient
@@ -124,27 +124,38 @@ public class JobSchedule extends AbstractAuditableEntity {
         this.segments = segments;
     }
 
-    private String getPredicateConfig() {
-        return predicateConfig;
-    }
-
-    private void setPredicateConfig(String config) throws IOException {
-        if (!StringUtils.isEmpty(config)) {
-            this.predicateConfig = config;
-            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
-            });
-        }
-    }
-
     @JsonProperty("predicate.config")
     public Map<String, Object> getConfigMap() {
         return configMap;
     }
 
     @JsonProperty("predicate.config")
-    private void setConfigMap(Map<String, Object> configMap) throws JsonProcessingException {
+    public void setConfigMap(Map<String, Object> configMap) {
         this.configMap = configMap;
-        this.predicateConfig = JsonUtil.toJson(configMap);
+    }
+
+    private String getPredicateConfig() {
+        return predicateConfig;
+    }
+
+    private void setPredicateConfig(String config) {
+        this.predicateConfig = config;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void save() throws JsonProcessingException {
+        if (configMap != null) {
+            this.predicateConfig = JsonUtil.toJson(configMap);
+        }
+    }
+
+    @PostLoad
+    public void load() throws IOException {
+        if (!StringUtils.isEmpty(predicateConfig)) {
+            this.configMap = JsonUtil.toEntity(predicateConfig, new TypeReference<Map<String, Object>>() {
+            });
+        }
     }
 
     /**
@@ -159,7 +170,7 @@ public class JobSchedule extends AbstractAuditableEntity {
         map.put("interval", appConf.getProperty("predicate.job.interval"));
         map.put("repeat", appConf.getProperty("predicate.job.repeat.count"));
         scheduleConf.put("checkdonefile.schedule", map);
-        setConfigMap(scheduleConf);
+        this.predicateConfig = JsonUtil.toJson(scheduleConf);
         return scheduleConf;
     }
 

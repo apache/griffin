@@ -36,7 +36,7 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
 
     protected String metricName;
 
-    protected Boolean deleted = false;
+    protected boolean deleted = false;
 
     AbstractJob() {
     }
@@ -77,11 +77,11 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.measureId = measureId;
     }
 
-    public Boolean getDeleted() {
+    public boolean isDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Boolean deleted) {
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 

@@ -64,15 +64,15 @@ public class EntityHelper {
         return new GriffinMeasure(name, "test", dataSources, evaluateRule);
     }
 
-    public static DataConnector createDataConnector(String name, String database, String table, String where) throws IOException {
+    public static DataConnector createDataConnector(String name, String database, String table, String where) {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);
         config.put("where", where);
-        return new DataConnector(name, "1h", config, null);
+        return new DataConnector(name, "1h", config, new ArrayList<>());
     }
 
-    public static DataConnector createDataConnector(String name, String database, String table, String where, SegmentPredicate predicate) throws IOException {
+    public static DataConnector createDataConnector(String name, String database, String table, String where, SegmentPredicate predicate)  {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);

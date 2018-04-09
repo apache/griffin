@@ -51,12 +51,19 @@ import java.util.*;
 
 import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.starting;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.not_started;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.recovering;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.running;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.idle;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.busy;
 import static org.quartz.CronExpression.isValidExpression;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -140,12 +147,12 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobSchedule getJobSchedule(String jobName) {
-        JobSchedule jobSchedule = jobScheduleRepo.findByJobName(jobName);
-        if (jobSchedule == null) {
+        List<GriffinJob> jobs = jobRepo.findByJobNameAndDeleted(jobName, false);
+        if (jobs.size() == 0) {
             LOGGER.warn("Job name {} does not exist.", jobName);
             throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
         }
-        return jobSchedule;
+        return jobs.get(0).getJobSchedule();
     }
 
     @Override
@@ -160,11 +167,10 @@ public class JobServiceImpl implements JobService {
         if (factory.getScheduler().checkExists(triggerKey)) {
             throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
         }
-        GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, false);
+        GriffinJob job = new GriffinJob(measure.getId(), js.getJobName(), qName, qGroup, js,false);
         job = jobRepo.save(job);
-        js = jobScheduleRepo.save(js);
         addJob(triggerKey, js, job);
-        return js;
+        return job.getJobSchedule();
     }
 
     private void addJob(TriggerKey triggerKey, JobSchedule js, GriffinJob job) throws Exception {
@@ -223,7 +229,7 @@ public class JobServiceImpl implements JobService {
 
     private boolean isValidBaseLine(List<JobDataSegment> segments) {
         for (JobDataSegment jds : segments) {
-            if (jds.getBaseline()) {
+            if (jds.isBaseline()) {
                 return true;
             }
         }
@@ -347,9 +353,9 @@ public class JobServiceImpl implements JobService {
     }
 
     private void deletePredicateJob(GriffinJob job) throws SchedulerException {
-        List<JobInstanceBean> instances = job.getJobInstances();
+        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(job.getId());
         for (JobInstanceBean instance : instances) {
-            if (!instance.getDeleted()) {
+            if (!instance.isDeleted()) {
                 deleteJob(instance.getPredicateGroup(), instance.getPredicateName());
                 instance.setDeleted(true);
                 if (instance.getState().equals(LivySessionStates.State.finding)) {
@@ -459,7 +465,8 @@ public class JobServiceImpl implements JobService {
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void syncInstancesOfAllJobs() {
-        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState();
+        State[] states = {starting, not_started, recovering, idle, running, busy};
+        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
         if (!CollectionUtils.isEmpty(beans)) {
             for (JobInstanceBean jobInstance : beans) {
                 syncInstancesOfJob(jobInstance);
