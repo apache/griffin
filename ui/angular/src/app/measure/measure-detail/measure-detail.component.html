@@ -48,6 +48,14 @@ under the License.
             {{ruleData.type}}
           </div>
         </div>
+        <div class="row" *ngIf="ruleData.dqType">
+          <label class="col-xs-4">
+            Dq Type:
+          </label>
+          <div class="col-xs-8 " style="color: #fff">
+            {{ruleData.dqType}}
+          </div>
+        </div>
         <div class="row" *ngIf="ruleData.type=='accuracy'">
           <label class="col-xs-4">
             Source:
