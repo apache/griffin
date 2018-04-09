@@ -49,7 +49,7 @@ import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
 import { TruncatePipe} from './sidebar/truncate.pipe';
 import { ConfigurationComponent } from './measure/create-measure/configuration/configuration.component';
 import { NouisliderModule } from 'ng2-nouislider';
-
+import {CreateDataassetComponent} from './dataasset/create-dataasset/create-dataasset.component';
 
 const appRoutes: Routes = [
   {
@@ -102,6 +102,10 @@ const appRoutes: Routes = [
     component:DataassetComponent
   },
   {
+    path: 'addDataAsset',
+    component:CreateDataassetComponent
+  },
+  {
     path: 'metrics',
     component:MetricComponent
   },
@@ -141,7 +145,8 @@ const appRoutes: Routes = [
     LoginComponent,
     RuleComponent,
     TruncatePipe,
-    ConfigurationComponent
+    ConfigurationComponent,
+    CreateDataassetComponent
   ],
   imports: [
     BrowserModule,

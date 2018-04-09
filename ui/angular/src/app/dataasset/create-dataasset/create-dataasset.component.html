@@ -1,0 +1,451 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<div class="mask" *ngIf='maskOpen' (click)="close()"></div>
+<div class="container-fluid">
+  <div class="row">
+    <h5 class="over-title margin-bottom-15 job">Create a Data Asset</h5>
+  </div>
+  <br/>
+  <!--//row-->
+  <div class="row">
+    <!-- <form name="Form" id="form" novalidate> -->
+    <form name="assetForm" id="form" (ngSubmit)="submit(assetForm)" #assetForm="ngForm" novalidate>
+      <div class="formStep">
+        <label class="stepDesc info">Please setup the required data asset information</label>
+        <div class="container-fluid">
+          <!-- schema definition list -->          
+          <div class="col-md-12 col-lg-12 col-sm-12">
+            <fieldset (window:resize)="onResize($event)">
+              <legend>
+                Required Information
+              </legend>
+              <div class="y-scrollable">
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                      <div class="form-group">
+                        <label for="measureSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
+                          Data Asset Type
+                          <span class="symbol required"></span>:
+                        </label>
+                        <div class="col-md-10 col-lg-10 col-sm-10 ">
+                          <label class="radio-inline">
+                            <input [(ngModel)]="dataAsset.AssetType" name="assetType" value="kafka" id="radioKafka" type="radio" (ngModelChange)="typeChange($event)" > KAFKA </label>
+                          <label class="radio-inline">
+                            <input [(ngModel)]="dataAsset.AssetType"  name="assetType" value="hdfs" id="radioHdfs" type="radio" (ngModelChange)="typeChange($event)"> HDFS </label>                        
+                        </div>                                  
+                      </div>
+                  </div>
+                  <br/><br/>                   
+                  
+                  <!--for KAFKA part *ngIf='isKafka'-->
+                  <div id="kafkaPart" *ngIf='isKafka'>
+                      <div class="col-md-12 col-lg-12 col-sm-12" >
+                          <div class="form-group" [ngClass]="{'has-error':bsServers.dirty && bsServers.invalid, 'has-success':bsServers.valid}">
+                            <label class="col-md-2 col-lg-2 col-sm-2 control-label" >
+                              Bootstrap Servers
+                              <span class="symbol required"></span>:
+                            </label>                            
+                            <div class="col-md-10 col-lg-10 col-sm-10 ">
+                              <input type="text" class="form-control" [(ngModel)]="dataAsset.Kafka.BootstrapServers" name="bsServers" #bsServers="ngModel" placeholder="server1:9092,server2:9092"
+                                required id="bsServers">                       
+                              <span class="error text-small block " [hidden]="bsServers.valid || bsServers.pristine">
+                                Bootstrap Servers are required</span>                               
+                            </div>
+                          </div>
+                      </div>
+                      <br/><br/>
+                      <div class="col-md-12 col-lg-12 col-sm-12" >
+                          <div class="form-group" [ngClass]="{'has-error':GroupId.dirty && GroupId.invalid, 'has-success':GroupId.valid}">
+                            <label class="col-md-2 col-lg-2 col-sm-2 control-label" >
+                              Group Id
+                              <span class="symbol required"></span>:
+                            </label>                            
+                            <div class="col-md-10 col-lg-10 col-sm-10 ">
+                              <input type="text" class="form-control" [(ngModel)]="dataAsset.Kafka.GroupId" name="GroupId" #GroupId="ngModel" placeholder="cnt5812input"
+                                required pattern="^[a-zA-Z0-9_-]*$" id="GroupId">                       
+                              <span class="error text-small block " *ngIf="GroupId.dirty &&(GroupId.errors?.pattern)">
+                                  Group Id is required</span> 
+                              <span class="error text-small block " *ngIf="GroupId.dirty && (GroupId.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
+                            </div>
+                          </div>
+                      </div>
+                      <br/><br/>
+                      <div class="col-md-12 col-lg-12 col-sm-12" >
+                          <div class="form-group" [ngClass]="{'has-error':AutoOffsetReset.dirty && AutoOffsetReset.invalid, 'has-success':AutoOffsetReset.valid}">
+                            <label class="col-md-2 col-lg-2 col-sm-2 control-label" >
+                              AutoOffsetReset
+                              <span class="symbol required"></span>:
+                            </label>                            
+                            <div class="col-md-10 col-lg-10 col-sm-10 ">
+                              <select [(ngModel)]="dataAsset.Kafka.AutoOffsetReset" name="AutoOffsetReset" #AutoOffsetReset="ngModel" required class="form-control input-sm" placeholder="Type">
+                                            <option value="0">Select Option</option>
+                                            <option *ngFor="let t of AutoOffsetResetOptions" value="{{t}}">{{t}}</option>
+                                          </select>                      
+                              <span class="error text-small block " [hidden]="AutoOffsetReset.valid || AutoOffsetReset.pristine">
+                                  AutoOffsetReset is required</span>                               
+                            </div>
+                          </div>
+                      </div>
+                      <br/><br/>
+
+                      <div class="col-md-12 col-lg-12 col-sm-12" >
+                          <div class="form-group" [ngClass]="{'has-error':AutoCommitEnable.dirty && AutoCommitEnable.invalid, 'has-success':AutoCommitEnable.valid}">
+                            <label class="col-md-2 col-lg-2 col-sm-2 control-label" >
+                              AutoCommitEnable
+                              <span class="symbol required"></span>:
+                            </label>                            
+                            <div class="col-md-10 col-lg-10 col-sm-10 ">
+                              <select [(ngModel)]="dataAsset.Kafka.AutoCommitEnable" name="AutoCommitEnable" #AutoCommitEnable="ngModel" required class="form-control input-sm" placeholder="Type">
+                                            <option value="0">Select Option</option>
+                                            <option *ngFor="let t of BooleanOptions" value="{{t}}">{{t}}</option>
+                                          </select>                      
+                              <span class="error text-small block " [hidden]="AutoCommitEnable.valid || AutoCommitEnable.pristine">
+                                  AutoCommitEnable is required</span>                              
+                            </div>
+                          </div>
+                      </div>
+                      <br/><br/>
+
+                      <div class="col-md-12 col-lg-12 col-sm-12" >
+                          <div class="form-group" [ngClass]="{'has-success':dataAsset.Kafka.PreProcs.valid }">
+                            <label class="col-md-2 col-lg-2 col-sm-2 control-label" >
+                              Pre Proc 
+                              <!-- <span class="symbol required"></span>: -->
+                            </label>                            
+                            <div class="col-md-10 col-lg-10 col-sm-10 ">
+                                <table class="table table-bordered table-striped table-condensed b-t">
+                                    <thead>
+                                      <tr>
+                                        <th>
+                                          <a (click)="addRow()" class="btn btn-xs btn-info">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                          </a>
+                                        </th>
+                                        <th>DSL Type</th>
+                                        <th>Name</th>
+                                        <th>Rule</th>
+                                        <th>Spark SQL</th>
+                                        <th>FromJson-df.name</th>  
+                                        <th>FromJson-ColumnName</th>                                               
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr *ngFor="let col of dataAsset.Kafka.PreProcs;let i=index" (click)="setClickedRowInPreProc(i)">
+                                        <td>
+                                          <a *ngIf="i!=0" (click)="removeRow(i)" class="btn btn-xs btn-danger">
+                                            <i class="glyphicon glyphicon-remove"></i>
+                                          </a>
+                                        </td>
+                                        <td>
+                                          <select [(ngModel)]="col.DslType" name="DslType"  #DslType="ngModel" class="form-control input-sm" placeholder="Dsl Type">
+                                            <option value="0">Select Option</option>
+                                            <option *ngFor="let t of DslTypeOptions" value="{{t}}">{{t}}</option>
+                                          </select>            
+                                        </td>
+                                        <td>
+                                          <input [(ngModel)]="col.Name"  name="Name" #Name="ngModel" requireds pattern="^[a-zA-Z0-9_-]*$" class="form-control input-sm" placeholder="Name" />            
+                                          <span class="text-danger" *ngIf="(!Name && Name.errors != null && Name.errors?.pattern)">Name required, Only letter, number, "-" and "_" are allowed                                           
+                                          </span>
+                                        </td>
+                                        <td>
+                                          <select [(ngModel)]="col.Rule" name="Rule"  #Rule="ngModel" class="form-control input-sm" placeholder="Rule">
+                                            <option value="0">Select Option</option>
+                                            <option *ngFor="let t of PreProcRuleOptions" value="{{t}}">{{t}}</option>
+                                          </select>            
+                                        </td> 
+
+                                        <td > <!--SQL-->
+                                          <input [disabled]="(dataAsset.Kafka.PreProcs[i].Rule=='from_json')&& i == selectedRow" [(ngModel)]="col.SparkSql"  name="SparkSql" #SparkSql="ngModel" class="form-control input-sm" placeholder="Spark SQL" />            
+                                          <span class="text-danger" *ngIf="(!SparkSql && SparkSql.errors != null)">SQL is required                                          
+                                          </span>
+                                        </td>
+
+                                        <td > <!--from json details-->
+                                          <input [disabled]="(dataAsset.Kafka.PreProcs[i].Rule=='spark_sql')&& i == selectedRow" [(ngModel)]="col.Details.DfName"  name="DfName" #DfName="ngModel" required pattern="^[a-zA-Z0-9_-]*$" class="form-control input-sm" placeholder="Details DfName" />            
+                                          <span class="text-danger" *ngIf="(!DfName && DfName.errors != null && DfName.errors?.pattern)">DfName required, Only letter, number, "-" and "_" are allowed                                           
+                                          </span>
+                                        </td>
+                                        <td > <!--from json details-->
+                                          <input [disabled]="(dataAsset.Kafka.PreProcs[i].Rule=='spark_sql')&& i == selectedRow" [(ngModel)]="col.Details.ColName"  name="ColName" #ColName="ngModel" required pattern="^[a-zA-Z0-9_-]*$" class="form-control input-sm" placeholder="Details ColName" />            
+                                          <span class="text-danger" *ngIf="(!ColName && ColName.errors != null && ColName.errors?.pattern)">ColName required, Only letter, number, "-" and "_" are allowed                                           
+                                          </span>
+                                        </td>
+
+                                      </tr>
+                                    </tbody>
+                                </table>                    
+                            </div>
+                          </div>
+                      </div>
+                      <br/><br/>
+
+                      <div class="col-md-12 col-lg-12 col-sm-12" >
+                          <div class="form-group" [ngClass]="{'has-error':Updatable.dirty && Updatable.invalid, 'has-success':Updatable.valid}">
+                            <label class="col-md-2 col-lg-2 col-sm-2 control-label" >
+                              Updatable
+                              <span class="symbol required"></span>:
+                            </label>                            
+                            <div class="col-md-10 col-lg-10 col-sm-10 ">
+                              <select [(ngModel)]="dataAsset.Kafka.Updatable" name="Updatable" #Updatable="ngModel" required class="form-control input-sm" placeholder="Type">
+                                            <option value="0">Select Option</option>
+                                            <option *ngFor="let t of BooleanOptions" value="{{t}}">{{t}}</option>
+                                          </select>                      
+                              <span class="error text-small block " [hidden]="AutoCommitEnable.valid || AutoCommitEnable.pristine">>
+                                  Updatable is required</span>                              
+                            </div>
+                          </div>
+                      </div>
+                      <br/><br/>
+
+
+                      <div class="col-md-12 col-lg-12 col-sm-12" >
+                          <div class="form-group" [ngClass]="{'has-error':Location.dirty && Location.invalid, 'has-success':Location.valid}">
+                            <label class="col-md-2 col-lg-2 col-sm-2 control-label" >
+                              KAFKA Topic
+                              <span class="symbol required"></span>:
+                            </label>                            
+                            <div class="col-md-10 col-lg-10 col-sm-10 ">
+                              <input type="text" class="form-control" [(ngModel)]="c" name="Location" #Location="ngModel" placeholder="strmInput_1xxx"
+                                required pattern="^[a-zA-Z0-9_-]*$" id="location">                       
+                              <span class="error text-small block " *ngIf="Location.dirty &&(Location.errors?.pattern)">
+                                  KAFKA Topic is required</span> 
+                              <span class="error text-small block " *ngIf="Location.dirty && (Location.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
+                            </div>
+                          </div>
+                      </div>
+                      <br/><br/>    
+
+
+                  </div>  
+
+                  <!--for HDFS part -*ngIf='!isKafka'-->
+                  <div name="hdfsPart" *ngIf="!isKafka">
+                      <div class="col-md-12 col-lg-12 col-sm-12" >
+                          <div class="form-group" [ngClass]="{'has-error':Location.dirty && Location.invalid, 'has-success':Location.valid}">
+                            <label class="col-md-2 col-lg-2 col-sm-2 control-label" >
+                              HDFS location
+                              <span class="symbol required"></span>:
+                            </label>                            
+                            <div class="col-md-10 col-lg-10 col-sm-10 ">
+                              <input type="text" class="form-control" [(ngModel)]="dataAsset.Hdfs.location" name="Location" #Location="ngModel" placeholder="hdfs:///griffin/streaming/tt5812/dump/source"
+                                required id="Location">                       
+                              <span class="error text-small block " [hidden]="Location.valid || Location.pristine">
+                                HDFS location is required</span>                               
+                            </div>
+                          </div>
+                        </div>
+                        <br/><br/>
+                        <div class="col-md-12 col-lg-12 col-sm-12">
+                            <div class="form-group" [ngClass]="{'has-error':dbName.dirty&&dbName.invalid, 'has-success':dbName.valid}">
+                              <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                                Database  Name
+                                <span class="symbol required"></span>:
+                              </label>
+                              <div class="col-md-10 col-lg-10 col-sm-10 ">
+                                <input type="text" class="form-control" [(ngModel)]="dataAsset.Hdfs.dbName" name="dbName" #dbName="ngModel" placeholder="Please input the data base name"
+                                  required pattern="^[a-zA-Z0-9_-]*$" id="dbName">
+                                <span class="error text-small block " *ngIf="dbName.dirty && (dbName.errors?.required)">
+                                    Database is required</span>
+                                <span class="error text-small block " *ngIf="dbName.dirty && (dbName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
+                              </div>
+                            </div>
+                          </div>
+                          <br/><br/>
+                          <div class="col-md-12 col-lg-12 col-sm-12">
+                              <div class="form-group" [ngClass]="{'has-error':tableName.dirty&&tableName.invalid, 'has-success':tableName.valid}">
+                                <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                                  Table  Name
+                                  <span class="symbol required"></span>:
+                                </label>
+                                <div class="col-md-10 col-lg-10 col-sm-10 ">
+                                  <input type="text" class="form-control" [(ngModel)]="dataAsset.Hdfs.tableName" name="tableName" #tableName="ngModel" placeholder="Please input the table name"
+                                    required pattern="^[a-zA-Z0-9_-]*$" id="tableName">
+                                  <span class="error text-small block " *ngIf="tableName.dirty && (tableName.errors?.required)">
+                                      Table is required</span>
+                                  <span class="error text-small block " *ngIf="tableName.dirty && (tableName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
+                                </div>
+                              </div>
+                          </div>
+                          <br/><br/>
+                  </div> 
+              </div>
+              <div class="setcolor">
+                <p>
+                  <i class="fa fa-info-circle"></i> After submitted, please go to "
+                  <a class="bark-link" href="/dataassets">DataAssets</a>" to check the data asset status
+                </p>
+              </div>
+            </fieldset>
+          </div>
+          <div class="form-group btn-container">
+            <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev()">
+              <i class="fa fa-arrow-circle-left"></i> Back
+            </button>
+            <toaster-container></toaster-container>
+            <button type="submit" class="btn btn-primary btn-o next-step btn-wide pull-right" (click)="submit(assetForm)"
+            [disabled]="!assetForm.form.valid">
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="confirm-job" role="dialog" [ngClass]="{'in': visibleAnimate}" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
+        (click)="onContainerClicked($event)">
+        <div class="modal-dialog modal-xg modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="hide()">&times;</button>
+              <h4 class="modal-title">Save the data asset with below information?</h4>
+            </div>
+            <div class="modal-body">
+              <div class="container-fluid" id="viewJobContent" style="overflow:auto;">
+                <div class="row">
+                  <h5 class="over-title margin-bottom-15">Basic information</h5>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div id="viewrule-definition" class="viewrule-content">
+                      <div class="row">
+                        <label class="col-md-4 col-lg-4 col-sm-4">
+                          Data Asset Type:
+                        </label>
+                        <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                          {{dataAsset.AssetType}}                        
+                        </div>
+                      </div> 
+                      <div class="row" *ngIf="dataAsset.Hdfs.location">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                            HDFS Location:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Hdfs.location}}
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="dataAsset.Hdfs.dbName">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                            Database Name:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Hdfs.dbName}}
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="dataAsset.Hdfs.tableName">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                            Table Name:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Hdfs.tableName}}
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="dataAsset.Kafka.BootstrapServers">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                            Bootstrap Servers:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Kafka.BootstrapServers}}
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="dataAsset.Kafka.GroupId">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                           Group Id:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Kafka.GroupId}}
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="dataAsset.Kafka.AutoOffsetReset">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                           AutoOffsetReset:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Kafka.AutoOffsetReset}}
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="dataAsset.Kafka.AutoCommitEnable">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                           AutoCommitEnable:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Kafka.AutoCommitEnable}}
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="isKafka && (dataAsset.Kafka.PreProcs?.length > 0)">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                            Pre Procs:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                              <table class="table table-bordered table-striped table-condensed b-t">
+                                  <thead>
+                                    <tr style="background-color:#7D95CC">         
+                                     <th>DSL Type</th>
+                                        <th>Name</th>
+                                        <th>Rule</th>
+                                        <th>Spark SQL</th>
+                                        <th>FromJson-df.name</th>  
+                                        <th>FromJson-ColumnName</th>        
+                                    </tr>
+                                  </thead>
+                                  <tbody >
+                                    <tr *ngFor="let col of dataAsset.Kafka.PreProcs">          
+                                      <td> {{col.DslType}} </td>
+                                      <td> {{col.Name}}</td>
+                                      <td> {{col.Rule}} </td>
+                                      <td> {{col.SparkSql}}</td>
+                                      <td> {{col.Details.DfName}} </td>
+                                      <td> {{col.Details.ColName}}</td>           
+                                    </tr>
+                                  </tbody>
+                                </table>
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="dataAsset.Kafka.Updatable">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                           Updatable:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Kafka.Updatable}}
+                          </div>
+                      </div>
+                      <div class="row" *ngIf="dataAsset.Kafka.Topics">
+                          <label class="col-md-4 col-lg-4 col-sm-4">
+                           Topics:
+                          </label>
+                          <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
+                            {{dataAsset.Kafka.Topics}}
+                          </div>
+                      </div>
+                      
+
+                      
+                      
+                    </div>
+                  </div>
+                </div>
+                <br/>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal" (click)="hide()">Cancel</button>
+              <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
