@@ -45,9 +45,9 @@ You can access [griffin home page](http://griffin.apache.org).
 
 You can contact us via email:
 - dev-list: <a href="mailto:dev@griffin.incubator.apache.org">dev@griffin.incubator.apache.org</a>
-- user-list: <a href="mailto:user@griffin.incubator.apache.org">user@griffin.incubator.apache.org</a>
+- user-list: <a href="mailto:users@griffin.incubator.apache.org">users@griffin.incubator.apache.org</a>
 
-You can also subscribe this mail by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.incubator.apache.org) and [subscribe user-list](mailto:user-subscribe@griffin.incubator.apache.org).
+You can also subscribe this mail by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.incubator.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.incubator.apache.org).
 
 You can access our issues on [JIRA page](https://issues.apache.org/jira/browse/GRIFFIN)
 
