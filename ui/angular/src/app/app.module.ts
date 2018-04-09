@@ -19,7 +19,7 @@ under the License.
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule} from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HttpClientModule} from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DataTableModule} from "angular2-datatable";
 import { TreeModule } from 'angular-tree-component';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -49,6 +49,9 @@ import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
 import { TruncatePipe} from './sidebar/truncate.pipe';
 import { ConfigurationComponent } from './measure/create-measure/configuration/configuration.component';
 import { NouisliderModule } from 'ng2-nouislider';
+import { HttpService } from './service/http.service';
+import {LoaderService} from './loader/loader.service';
+import { LoaderComponent } from './loader/loader.component';
 
 
 const appRoutes: Routes = [
@@ -141,7 +144,8 @@ const appRoutes: Routes = [
     LoginComponent,
     RuleComponent,
     TruncatePipe,
-    ConfigurationComponent
+    ConfigurationComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,
@@ -161,7 +165,15 @@ const appRoutes: Routes = [
     MatNativeDateModule,
     MatDatepickerModule
   ],
-  providers: [],
+  exports: [
+    LoaderComponent
+],
+  providers: [ LoaderService,
+    {
+    provide: HTTP_INTERCEPTORS,
+    useClass: HttpService,
+    multi: true,
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
