@@ -20,8 +20,8 @@ import { Component, OnInit } from "@angular/core";
 import { ServiceService } from "../service/service.service";
 import { UserService } from "../service/user.service";
 import { Router } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
 import { LocationStrategy, HashLocationStrategy } from "@angular/common";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-login",
