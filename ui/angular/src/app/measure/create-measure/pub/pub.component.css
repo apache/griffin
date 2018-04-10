@@ -201,6 +201,7 @@ under the License.
   background-color: #000000;
   border-radius: 5px;
   padding: 10px;
+  max-height: 600px;
   /*height:800px;*/
 }
 

@@ -65,14 +65,17 @@ export class MeasureComponent implements OnInit {
   }
 
   remove(row) {
+    console.log(row);
     this.visible = true;
     setTimeout(() => (this.visibleAnimate = true), 100);
     this.deleteId = row.id;
     this.deleteIndex = this.results.indexOf(row);
     this.deletedRow = row;
-    var sourcedata = this.deletedRow["data.sources"][0].connectors[0].config;
-    this.sourceTable = sourcedata["table.name"];
-    if (this.deletedRow.type === "accuracy") {
+    if(this.deletedRow["measure.type"]!=="external"){
+      var sourcedata = this.deletedRow["data.sources"][0].connectors[0].config;
+      this.sourceTable = sourcedata["table.name"];
+    }
+    if (this.deletedRow["dq.type"] === "accuracy") {
       var targetdata = this.deletedRow["data.sources"][1].connectors[0].config;
       this.targetTable = targetdata["table.name"];
     } else {
@@ -116,7 +119,10 @@ export class MeasureComponent implements OnInit {
         }
         return measure;
       });
-      this.results = Object.assign([],trans).reverse();
+      // this.results = Object.assign([],trans).reverse();
+      this.results = Object.assign([],trans).sort(function(a,b){
+        return b.id - a.id;
+      });
     });
   }
 }
