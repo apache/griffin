@@ -89,11 +89,11 @@ case class CompletenessRulePlanTrans(dataSourceNames: Seq[String],
       val incompleteRecordExport = genRecordExport(recordParam, incompleteRecordsTableName, incompleteRecordsTableName, ct, mode)
 
       // 3. incomplete count
-      val incompleteCountTableName = "__missCount"
+      val incompleteCountTableName = "__incompleteCount"
       val incompleteColName = details.getStringOrKey(_incomplete)
       val incompleteCountSql = procType match {
         case BatchProcessType => s"SELECT COUNT(*) AS `${incompleteColName}` FROM `${incompleteRecordsTableName}`"
-        case StreamingProcessType => s"SELECT `${InternalColumns.tmst}`, COUNT(*) AS `${incompleteCountTableName}` FROM `${incompleteRecordsTableName}` GROUP BY `${InternalColumns.tmst}`"
+        case StreamingProcessType => s"SELECT `${InternalColumns.tmst}`, COUNT(*) AS `${incompleteColName}` FROM `${incompleteRecordsTableName}` GROUP BY `${InternalColumns.tmst}`"
       }
       val incompleteCountStep = SparkSqlStep(incompleteCountTableName, incompleteCountSql, emptyMap)
 
@@ -114,7 +114,7 @@ case class CompletenessRulePlanTrans(dataSourceNames: Seq[String],
           s"""
              |SELECT `${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
              |coalesce(`${incompleteCountTableName}`.`${incompleteColName}`, 0) AS `${incompleteColName}`,
-             |(`${totalColName}` - `${incompleteColName}`) AS `${completeColName}`
+             |(`${totalCountTableName}`.`${totalColName}` - coalesce(`${incompleteCountTableName}`.`${incompleteColName}`, 0)) AS `${completeColName}`
              |FROM `${totalCountTableName}` LEFT JOIN `${incompleteCountTableName}`
          """.stripMargin
         }
@@ -123,7 +123,7 @@ case class CompletenessRulePlanTrans(dataSourceNames: Seq[String],
              |SELECT `${totalCountTableName}`.`${InternalColumns.tmst}` AS `${InternalColumns.tmst}`,
              |`${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
              |coalesce(`${incompleteCountTableName}`.`${incompleteColName}`, 0) AS `${incompleteColName}`,
-             |(`${totalColName}` - `${incompleteColName}`) AS `${completeColName}`
+             |(`${totalCountTableName}`.`${totalColName}` - coalesce(`${incompleteCountTableName}`.`${incompleteColName}`, 0)) AS `${completeColName}`
              |FROM `${totalCountTableName}` LEFT JOIN `${incompleteCountTableName}`
              |ON `${totalCountTableName}`.`${InternalColumns.tmst}` = `${incompleteCountTableName}`.`${InternalColumns.tmst}`
          """.stripMargin
