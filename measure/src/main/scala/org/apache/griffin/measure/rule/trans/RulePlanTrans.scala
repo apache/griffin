@@ -53,6 +53,7 @@ object RulePlanTrans {
       case UniquenessType => UniquenessRulePlanTrans(dsNames, ti, name, expr, param, procType)
       case DistinctnessType => DistinctnessRulePlanTrans(dsNames, ti, name, expr, param, procType, dsTimeRanges)
       case TimelinessType => TimelinessRulePlanTrans(dsNames, ti, name, expr, param, procType, dsTimeRanges)
+      case CompletenessType => CompletenessRulePlanTrans(dsNames, ti, name, expr, param, procType)
       case _ => emptyRulePlanTrans
     }
   }
