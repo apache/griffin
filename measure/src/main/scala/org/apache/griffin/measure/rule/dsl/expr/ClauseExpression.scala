@@ -260,3 +260,11 @@ case class TimelinessClause(exprs: Seq[Expr]) extends ClauseExpression {
   def coalesceDesc: String = exprs.map(_.coalesceDesc).mkString(", ")
   override def map(func: (Expr) => Expr): TimelinessClause = TimelinessClause(exprs.map(func(_)))
 }
+
+case class CompletenessClause(exprs: Seq[Expr]) extends ClauseExpression {
+  addChildren(exprs)
+
+  def desc: String = exprs.map(_.desc).mkString(", ")
+  def coalesceDesc: String = exprs.map(_.coalesceDesc).mkString(", ")
+  override def map(func: (Expr) => Expr): CompletenessClause = CompletenessClause(exprs.map(func(_)))
+}
