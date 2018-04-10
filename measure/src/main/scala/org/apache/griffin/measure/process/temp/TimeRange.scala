@@ -24,7 +24,7 @@ case class TimeRange(begin: Long, end: Long, tmsts: Set[Long]) extends Serializa
   def merge(tr: TimeRange): TimeRange = {
     TimeRange(min(begin, tr.begin), max(end, tr.end), tmsts ++ tr.tmsts)
   }
-  def beginTmstOpt: Option[Long] = {
+  def minTmstOpt: Option[Long] = {
     try {
       if (tmsts.nonEmpty) Some(tmsts.min) else None
     } catch {
