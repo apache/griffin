@@ -418,7 +418,7 @@ public class JobServiceImpl implements JobService {
 
     private void setStateByYarn(JobInstanceBean instance) {
         LOGGER.warn("Spark session {} may be overdue, set state as unknown!\n ", instance.getSessionId());
-        String yarnUrl = livyConf.getProperty("yarn.uri");
+        String yarnUrl = livyConf.getProperty("spark.uri");
         boolean success = YarnNetUtil.update(yarnUrl, instance);
         if (!success) {
             if (instance.getState() == unknown) {
