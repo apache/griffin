@@ -120,6 +120,9 @@ Please see [Mysql and postgresql switch](https://github.com/apache/incubator-gri
 ## Migration from EclipseLink to Hibernate
 Here we'll go through steps necessary to migrate applications from using EclipseLink JPA to using Hibernate JPA.The migration will not need to convert any EclipseLink annotations to Hibernate annotations in application code. 
 
+## Quick use
+In Griffin, we provide **hibernate_mysql_pom.xml** file for hibernate and mysql. If you want to quick use hibernate and mysql with jar, firstly you should [configure properties](#2.3) and then use command `mvn clean package -f pom_hibernate.xml` to package jar.
+
 ## Migration main steps
 - [add hibernate dependency](#2.1)
 - [remove EclipseLink](#2.2)
@@ -128,7 +131,7 @@ Here we'll go through steps necessary to migrate applications from using Eclipse
 <h2 id = "2.1"></h2>
 
 ### Add hibernate dependency
-By default, Spring Data uses Hibernate as the default JPA implementation provider.So we just add **spring-boot-starter-data-jpa** dependency.If you have already added it, skip this step.
+By default, Spring Data uses Hibernate as the default JPA implementation provider.So we just add **spring-boot-starter-data-jpa** dependency.**If you have already added it, skip this step.**
 
     <dependency>
         <groupId>org.springframework.boot</groupId>
