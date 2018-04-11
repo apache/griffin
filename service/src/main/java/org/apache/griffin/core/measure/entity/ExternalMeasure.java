@@ -43,7 +43,7 @@ public class ExternalMeasure extends Measure {
         super();
     }
 
-    public ExternalMeasure(String name, String description, String organization, String owner, String metricName,VirtualJob vj) {
+    public ExternalMeasure(String name, String description, String organization, String owner, String metricName, VirtualJob vj) {
         super(name, description, organization, owner);
         this.metricName = metricName;
         this.virtualJob = vj;

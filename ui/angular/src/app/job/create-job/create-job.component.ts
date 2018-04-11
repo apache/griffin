@@ -28,9 +28,10 @@ import { AngularMultiSelectModule } from "angular2-multiselect-dropdown/angular2
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ToasterModule, ToasterService, ToasterConfig } from "angular2-toaster";
 import * as $ from "jquery";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpParams } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { NouisliderModule } from "ng2-nouislider";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-create-job",
