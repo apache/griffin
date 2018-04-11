@@ -39,6 +39,7 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 
 
 <h2 id = "0"></h2>
+
 ## HTTP Response Desigin
 ### Normal Response
 The normal HTTP response is designed as follow:
@@ -88,6 +89,7 @@ Description:
 Note that 'exception' field may not exist if it is caused by client error, and 'code' field may not exist for server error.
 
 <h2 id = "1"></h2>
+
 ## Griffin Basic
 
 ### Get griffin version
@@ -636,6 +638,7 @@ The response body should be empty if no error happens, and the HTTP status is (2
 ```
 
 <h2 id = "3"></h2>
+
 ## Jobs
 ### Add job
 `POST /api/v1/jobs`
@@ -865,6 +868,7 @@ The response body should be empty if no error happens, and the HTTP status is (2
 ```
 
 <h2 id = "4"></h2>
+
 ## Metrics
 ### Get metrics
 `GET /api/v1/metrics`
@@ -1037,6 +1041,7 @@ The response body should have 'failures' field as empty if success, for example
 ```
 
 <h2 id = "5"></h2>
+
 ### Hive MetaStore
 ### Get table metadata
 `GET /api/v1/metadata/hive/table`
@@ -1371,6 +1376,7 @@ The response body should have 'failures' field as empty if success, for example
 
 
 <h2 id = "6"></h2>
+
 ## Auth
 ### User authentication
 `POST /api/v1/login/authenticate`
