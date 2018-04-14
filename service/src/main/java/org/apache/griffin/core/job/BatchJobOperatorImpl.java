@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.batch;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 import static org.quartz.CronExpression.isValidExpression;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.Trigger.TriggerState.PAUSED;
@@ -49,7 +49,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         BatchJob batchJob = new BatchJob(js.getMeasureId(), js.getJobName(), qName, qGroup, false);
         batchJob.setJobSchedule(js);
         batchJobRepo.save(batchJob);
-        jobService.addJob(triggerKey, js, batchJob, batch);
+        jobService.addJob(triggerKey, js, batchJob, BATCH);
         return batchJob;
     }
 

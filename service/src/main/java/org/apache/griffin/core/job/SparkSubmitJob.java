@@ -45,7 +45,7 @@ import java.util.*;
 
 import static org.apache.griffin.core.job.JobInstance.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.batch;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
@@ -176,7 +176,7 @@ public class SparkSubmitJob implements Job {
     private void setLivyArgs() throws IOException {
         List<String> args = new ArrayList<>();
         ProcessType type = measure.getProcessType();
-        args.add(type == batch ? FileUtil.readEnv("env/env_batch.json") : FileUtil.readEnv("env/env_streaming.json"));
+        args.add(type == BATCH ? FileUtil.readEnv("env/env_batch.json") : FileUtil.readEnv("env/env_streaming.json"));
         String measureJson = JsonUtil.toJsonWithFormat(measure);
         // to fix livy bug: character ` will be ignored by livy
         String finalMeasureJson = escapeCharacter(measureJson, "\\`");

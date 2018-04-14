@@ -28,7 +28,7 @@ import  org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 
 import javax.persistence.*;
 
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.batch;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 
 @Entity
 public class JobInstanceBean extends AbstractAuditableEntity {
@@ -41,7 +41,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     private State state;
 
     @Enumerated(EnumType.STRING)
-    private ProcessType type = batch;
+    private ProcessType type = BATCH;
 
     /** The application id of this session **/
     @JsonInclude(JsonInclude.Include.NON_NULL)

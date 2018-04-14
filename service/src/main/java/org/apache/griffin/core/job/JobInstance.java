@@ -44,8 +44,8 @@ import java.util.*;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
 import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.batch;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.streaming;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -246,7 +246,7 @@ public class JobInstance implements Job {
     }
 
     private void saveJobInstance(String pName, String pGroup) {
-        ProcessType type = measure.getProcessType() == batch ? batch : streaming;
+        ProcessType type = measure.getProcessType() == BATCH ? BATCH : STREAMING;
         Long tms = System.currentTimeMillis();
         Long expireTms = Long.valueOf(appConfProps.getProperty("jobInstance.expired.milliseconds")) + tms;
         JobInstanceBean instance = new JobInstanceBean(FINDING, pName, pGroup, tms, expireTms, type);

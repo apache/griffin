@@ -54,8 +54,6 @@ import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.batch;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.streaming;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
@@ -281,9 +279,9 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobOperator getJobOperator(ProcessType type) {
-        if (type == batch) {
+        if (type == ProcessType.BATCH) {
             return batchJobOp;
-        } else if (type == streaming) {
+        } else if (type == ProcessType.STREAMING) {
             return streamingJobOp;
         }
         throw new GriffinException.BadRequestException(MEASURE_TYPE_DOES_NOT_SUPPORT);
@@ -315,7 +313,7 @@ public class JobServiceImpl implements JobService {
         jobData.setJobName(job.getJobName());
         jobData.setMeasureId(job.getMeasureId());
         jobData.setCronExpression(getCronExpression(triggers));
-        jobData.setType(job instanceof BatchJob ? batch : streaming);
+        jobData.setType(job instanceof BatchJob ? ProcessType.BATCH : ProcessType.STREAMING);
         return jobData;
     }
 
@@ -392,10 +390,10 @@ public class JobServiceImpl implements JobService {
 
     private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, JobSchedule js, ProcessType type) {
         TriggerBuilder builder = newTrigger().withIdentity(tk).forJob(jd);
-        if (type == batch) {
+        if (type == ProcessType.BATCH) {
             TimeZone timeZone = getTimeZone(js.getTimeZone());
             return builder.withSchedule(cronSchedule(js.getCronExpression()).inTimeZone(timeZone)).build();
-        } else if (type == streaming) {
+        } else if (type == ProcessType.STREAMING) {
             return builder.startNow().withSchedule(simpleSchedule().withRepeatCount(0)).build();
         }
         throw new GriffinException.BadRequestException(JOB_TYPE_DOES_NOT_SUPPORT);

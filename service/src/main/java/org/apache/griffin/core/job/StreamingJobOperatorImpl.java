@@ -43,7 +43,7 @@ import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_RUNNING;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
 import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.streaming;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
 import static org.quartz.TriggerKey.triggerKey;
 
 @Service
@@ -80,7 +80,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
         StreamingJob streamingJob = new StreamingJob(js.getJobName(), js.getMeasureId(), js.getJobName());
         streamingJob.setJobSchedule(js);
         streamingJobRepo.save(streamingJob);
-        jobService.addJob(triggerKey, js, streamingJob, streaming);
+        jobService.addJob(triggerKey, js, streamingJob, STREAMING);
         return streamingJob;
     }
 
@@ -101,7 +101,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = triggerKey(qName, qGroup);
         try {
-            jobService.addJob(triggerKey, js, streamingJob, streaming);
+            jobService.addJob(triggerKey, js, streamingJob, STREAMING);
         } catch (Exception e) {
             LOGGER.error("Failed to start job", e);
             throw new GriffinException.ServiceException("Failed to start job", e);

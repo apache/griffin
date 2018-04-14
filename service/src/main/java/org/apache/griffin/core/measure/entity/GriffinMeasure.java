@@ -42,10 +42,10 @@ import java.util.Map;
 public class GriffinMeasure extends Measure {
     public enum ProcessType{
         /**
-         * Currently we just support batch and streaming type
+         * Currently we just support BATCH and STREAMING type
          */
-        batch,
-        streaming
+        BATCH,
+        STREAMING
     }
 
     @Enumerated(EnumType.STRING)
