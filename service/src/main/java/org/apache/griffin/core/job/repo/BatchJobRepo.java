@@ -17,17 +17,9 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure;
+package org.apache.griffin.core.job.repo;
 
+import org.apache.griffin.core.job.entity.BatchJob;
 
-import org.apache.griffin.core.measure.entity.Measure;
-
-public interface MeasureOperation {
-
-    Measure create(Measure measure);
-
-    void update(Measure measure);
-
-    void delete(Measure measure);
-
+public interface BatchJobRepo extends JobRepo<BatchJob> {
 }

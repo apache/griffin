@@ -19,37 +19,12 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("griffinStreamingJob")
 public class StreamingJob extends AbstractJob {
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "job_schedule_id")
-    private JobSchedule jobSchedule;
-
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
-    @JoinColumn(name = "job_id")
-    private List<JobInstanceBean> jobInstances = new ArrayList<>();
-
-    public JobSchedule getJobSchedule() {
-        return jobSchedule;
-    }
-
-    public void setJobSchedule(JobSchedule jobSchedule) {
-        this.jobSchedule = jobSchedule;
-    }
-
-    public List<JobInstanceBean> getJobInstances() {
-        return jobInstances;
-    }
-
-    public void setJobInstances(List<JobInstanceBean> jobInstances) {
-        this.jobInstances = jobInstances;
-    }
 
     public StreamingJob() {
     }

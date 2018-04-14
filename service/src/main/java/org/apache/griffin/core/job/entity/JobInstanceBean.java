@@ -67,10 +67,22 @@ public class JobInstanceBean extends AbstractAuditableEntity {
 
     @Column(name = "predicate_job_deleted")
     @JsonIgnore
-    private Boolean predicateDeleted = false;
+    private boolean predicateDeleted = false;
 
     @JsonIgnore
-    private Boolean deleted = false;
+    private boolean deleted = false;
+
+    @ManyToOne
+    @JoinColumn(name = "job_id",nullable = false)
+    private AbstractJob job;
+
+    public AbstractJob getJob() {
+        return job;
+    }
+
+    public void setJob(AbstractJob job) {
+        this.job = job;
+    }
 
     public Long getSessionId() {
         return sessionId;
@@ -148,19 +160,19 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.predicateName = predicateName;
     }
 
-    public Boolean getPredicateDeleted() {
+    public boolean isPredicateDeleted() {
         return predicateDeleted;
     }
 
-    public void setPredicateDeleted(Boolean predicateDeleted) {
+    public void setPredicateDeleted(boolean predicateDeleted) {
         this.predicateDeleted = predicateDeleted;
     }
 
-    public Boolean getDeleted() {
+    public boolean isDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Boolean deleted) {
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 

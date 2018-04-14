@@ -33,8 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("externalOperation")
-public class ExternalMeasureOperationImpl implements MeasureOperation {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperationImpl.class);
+public class ExternalMeasureOperatorImpl implements MeasureOperator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperatorImpl.class);
 
     @Autowired
     private ExternalMeasureRepo measureRepo;

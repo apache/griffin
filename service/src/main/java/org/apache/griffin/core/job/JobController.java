@@ -21,7 +21,6 @@ package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.interceptor.Token;
 import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -52,18 +51,11 @@ public class JobController {
         return jobService.addJob(jobSchedule);
     }
 
-    @RequestMapping(value = "/jobs/up/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Token
-    public void startJob(@PathVariable("id") Long jobId) {
-        jobService.startJob(jobId);
-    }
-
-    @RequestMapping(value = "/jobs/down/{id}", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Token
-    public void stopJob(@PathVariable("id") Long jobId) {
-        jobService.stopJob(jobId);
+    public void onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
+        jobService.onAction(jobId,action);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)

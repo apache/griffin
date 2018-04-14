@@ -19,73 +19,25 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("griffinBatchJob")
 public class BatchJob extends AbstractJob {
-
-    @Column(name = "quartz_job_name")
-    private String quartzName;
-
-    @Column(name = "quartz_group_name")
-    private String quartzGroup;
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "job_schedule_id")
-    private JobSchedule jobSchedule;
-
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
-    @JoinColumn(name = "job_id")
-    private List<JobInstanceBean> jobInstances = new ArrayList<>();
-
-    public String getQuartzName() {
-        return quartzName;
-    }
-
-    public void setQuartzName(String quartzName) {
-        this.quartzName = quartzName;
-    }
-
-    public String getQuartzGroup() {
-        return quartzGroup;
-    }
-
-    public void setQuartzGroup(String quartzGroup) {
-        this.quartzGroup = quartzGroup;
-    }
-
-    public JobSchedule getJobSchedule() {
-        return jobSchedule;
-    }
-
-    public void setJobSchedule(JobSchedule jobSchedule) {
-        this.jobSchedule = jobSchedule;
-    }
-
-    public List<JobInstanceBean> getJobInstances() {
-        return jobInstances;
-    }
-
-    public void setJobInstances(List<JobInstanceBean> jobInstances) {
-        this.jobInstances = jobInstances;
-    }
-
     public BatchJob() {
         super();
     }
 
-    public BatchJob(Long measureId, String jobName, String quartzName, String quartzGroup, boolean deleted) {
-        super(measureId, jobName, deleted);
+    public BatchJob(Long measureId, String jobName, String name, String group, boolean deleted) {
+        super(measureId, jobName, name, group, deleted);
         this.metricName = jobName;
-        this.quartzName = quartzName;
-        this.quartzGroup = quartzGroup;
     }
 
     public BatchJob(Long jobId, Long measureId, String jobName, String qJobName, String qGroupName, boolean deleted) {
         this(measureId, jobName, qJobName, qGroupName, deleted);
         setId(jobId);
     }
+
+
 }

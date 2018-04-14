@@ -23,8 +23,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobRepo;
-import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
@@ -70,7 +70,7 @@ public class JobInstance implements Job {
     @Autowired
     private JobRepo<AbstractJob> jobRepo;
     @Autowired
-    private JobScheduleRepo jobScheduleRepo;
+    private JobInstanceRepo instanceRepo;
     @Autowired
     @Qualifier("appConf")
     private Properties appConfProps;
@@ -98,7 +98,7 @@ public class JobInstance implements Job {
         JobDetail jobDetail = context.getJobDetail();
         Long jobId = jobDetail.getJobDataMap().getLong(GRIFFIN_JOB_ID);
         job = jobRepo.findOne(jobId);
-        jobSchedule = getJobSchedule();
+        jobSchedule = job.getJobSchedule();
         Long measureId = jobSchedule.getMeasureId();
         measure = measureRepo.findOne(measureId);
         setJobStartTime(jobDetail);
@@ -208,6 +208,7 @@ public class JobInstance implements Job {
             return;
         }
         for (Map.Entry<String, Object> entry : conf.entrySet()) {
+            // in case entry value is a json object instead of a string
             if (entry.getValue() instanceof String) {
                 String value = (String) entry.getValue();
                 Set<String> set = new HashSet<>();
@@ -240,39 +241,19 @@ public class JobInstance implements Job {
         if (factory.getScheduler().checkExists(tk)) {
             throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
         }
-        saveJob(jobName, groupName);
+        saveJobInstance(jobName, groupName);
         createJobInstance(tk, interval, repeat, jobName);
     }
 
-    private void saveJob(String pName, String pGroup) {
+    private void saveJobInstance(String pName, String pGroup) {
         ProcessType type = measure.getProcessType() == batch ? batch : streaming;
         Long tms = System.currentTimeMillis();
         Long expireTms = Long.valueOf(appConfProps.getProperty("jobInstance.expired.milliseconds")) + tms;
         JobInstanceBean instance = new JobInstanceBean(finding, pName, pGroup, tms, expireTms, type);
-        List<JobInstanceBean> instances = getInstances();
-        instances.add(instance);
-        job = jobRepo.save(job);
+        instance.setJob(job);
+        instanceRepo.save(instance);
     }
 
-    private JobSchedule getJobSchedule() {
-        if (job instanceof BatchJob) {
-            return ((BatchJob) job).getJobSchedule();
-        } else if (job instanceof StreamingJob) {
-            return ((StreamingJob) job).getJobSchedule();
-        }
-        LOGGER.warn("Don't support this job({},{}) type.", job.getId(), job.getJobName());
-        throw new IllegalArgumentException();
-    }
-
-    private List<JobInstanceBean> getInstances() {
-        if (job instanceof BatchJob) {
-            return ((BatchJob) job).getJobInstances();
-        } else if (job instanceof StreamingJob) {
-            return ((StreamingJob) job).getJobInstances();
-        }
-        LOGGER.warn("Don't support this job({},{}) type.", job.getId(), job.getJobName());
-        throw new IllegalArgumentException();
-    }
 
     private void createJobInstance(TriggerKey tk, Long interval, Integer repeatCount, String pJobName) throws Exception {
         JobDetail jobDetail = addJobDetail(tk, pJobName);

@@ -23,10 +23,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.job.repo.GriffinJobRepo;
-import org.apache.griffin.core.job.repo.GriffinStreamingJobRepo;
+import org.apache.griffin.core.job.repo.BatchJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobRepo;
+import org.apache.griffin.core.job.repo.StreamingJobRepo;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
@@ -69,26 +69,30 @@ public class JobServiceImpl implements JobService {
     public static final String GRIFFIN_JOB_ID = "griffinJobId";
     private static final int MAX_PAGE_SIZE = 1024;
     private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final String START = "start";
+    private static final String STOP = "stop";
+    private static final String BATCH = "batch";
+    private static final String STREAMING = "streaming";
 
     @Autowired
     private SchedulerFactoryBean factory;
     @Autowired
-    private JobInstanceRepo jobInstanceRepo;
+    private JobInstanceRepo instanceRepo;
     @Autowired
     @Qualifier("livyConf")
     private Properties livyConf;
     @Autowired
     private GriffinMeasureRepo measureRepo;
     @Autowired
-    private GriffinJobRepo batchJobRepo;
+    private BatchJobRepo batchJobRepo;
     @Autowired
-    private GriffinStreamingJobRepo streamingJobRepo;
+    private StreamingJobRepo streamingJobRepo;
     @Autowired
     private JobRepo<AbstractJob> jobRepo;
     @Autowired
-    private BatchJobOperationImpl batchJobOp;
+    private BatchJobOperatorImpl batchJobOp;
     @Autowired
-    private StreamingJobOperationImpl streamingJobOp;
+    private StreamingJobOperatorImpl streamingJobOp;
 
     private RestTemplate restTemplate;
 
@@ -99,14 +103,30 @@ public class JobServiceImpl implements JobService {
     @Override
     public List<JobDataBean> getAliveJobs(String type) {
         List<? extends AbstractJob> jobs;
-        if ("batch".equals(type)) {
+        if (BATCH.equals(type)) {
             jobs = batchJobRepo.findByDeleted(false);
-        } else if ("streaming".equals(type)) {
+        } else if (STREAMING.equals(type)) {
             jobs = streamingJobRepo.findByDeleted(false);
         } else {
             jobs = jobRepo.findByDeleted(false);
         }
         return getJobDataBeans(jobs);
+    }
+
+    private List<JobDataBean> getJobDataBeans(List<? extends AbstractJob> jobs) {
+        List<JobDataBean> dataList = new ArrayList<>();
+        try {
+            for (AbstractJob job : jobs) {
+                JobDataBean jobData = genJobDataBean(job);
+                if (jobData != null) {
+                    dataList.add(jobData);
+                }
+            }
+        } catch (SchedulerException e) {
+            LOGGER.error("Failed to get running jobs.", e);
+            throw new GriffinException.ServiceException("Failed to get running jobs.", e);
+        }
+        return dataList;
     }
 
     @Override
@@ -116,39 +136,40 @@ public class JobServiceImpl implements JobService {
             LOGGER.warn("Job name {} does not exist.", jobName);
             throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
         }
-        AbstractJob job = jobs.get(0);
-        if (job instanceof BatchJob) {
-            return ((BatchJob) job).getJobSchedule();
-        } else if (job instanceof StreamingJob) {
-            return ((StreamingJob) job).getJobSchedule();
-        }
-        throw new GriffinException.BadRequestException(JOB_TYPE_DOES_NOT_SUPPORT);
+        return jobs.get(0).getJobSchedule();
     }
-
-    //TODO return data contains some unnecessary fields like instance,you should ignore them.
 
     @Override
     public AbstractJob addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
-        JobOperation op = getJobOperation(measure.getProcessType());
+        JobOperator op = getJobOperator(measure.getProcessType());
         return op.add(js, measure);
     }
 
+    /**
+     * @param jobId  job id
+     * @param action job operation: start job, stop job
+     */
     @Override
-    public void startJob(Long jobId) {
+    public void onAction(Long jobId, String action) {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
-        JobOperation op = getJobOperation(job);
-        op.start(job);
+        JobOperator op = getJobOperator(job);
+        doAction(action, job, op);
     }
 
-    @Override
-    public void stopJob(Long jobId) {
-        AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
-        validateJobExist(job);
-        JobOperation op = getJobOperation(job);
-        op.stop(job);
+    private void doAction(String action, AbstractJob job, JobOperator op) {
+        switch (action) {
+            case START:
+                op.start(job);
+                break;
+            case STOP:
+                op.stop(job);
+                break;
+            default:
+                throw new GriffinException.NotFoundException(NO_SUCH_JOB_ACTION);
+        }
     }
 
 
@@ -163,7 +184,7 @@ public class JobServiceImpl implements JobService {
     public void deleteJob(Long jobId) {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
-        JobOperation op = getJobOperation(job);
+        JobOperator op = getJobOperator(job);
         op.delete(job);
     }
 
@@ -180,7 +201,7 @@ public class JobServiceImpl implements JobService {
             throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
         }
         for (AbstractJob job : jobs) {
-            JobOperation op = getJobOperation(job);
+            JobOperator op = getJobOperator(job);
             op.delete(job);
         }
     }
@@ -195,7 +216,7 @@ public class JobServiceImpl implements JobService {
         size = size > MAX_PAGE_SIZE ? MAX_PAGE_SIZE : size;
         size = size <= 0 ? DEFAULT_PAGE_SIZE : size;
         Pageable pageable = new PageRequest(page, size, Sort.Direction.DESC, "tms");
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(jobId, pageable);
+        List<JobInstanceBean> instances = instanceRepo.findByJobId(jobId, pageable);
         return updateState(instances);
     }
 
@@ -219,8 +240,14 @@ public class JobServiceImpl implements JobService {
         JobHealth jobHealth = new JobHealth();
         List<AbstractJob> jobs = jobRepo.findByDeleted(false);
         for (AbstractJob job : jobs) {
-            JobOperation op = getJobOperation(job);
-            jobHealth = op.getHealthInfo(jobHealth, job);
+            JobOperator op = getJobOperator(job);
+            try {
+                jobHealth = op.getHealth(jobHealth, job);
+            } catch (SchedulerException e) {
+                LOGGER.error("Job schedule exception. {}", e.getMessage());
+                throw new GriffinException.ServiceException("Fail to Get HealthInfo", e);
+            }
+
         }
         return jobHealth;
     }
@@ -228,30 +255,13 @@ public class JobServiceImpl implements JobService {
     @Scheduled(fixedDelayString = "${jobInstance.expired.milliseconds}")
     public void deleteExpiredJobInstance() {
         Long timeMills = System.currentTimeMillis();
-        List<JobInstanceBean> instances = jobInstanceRepo.findByExpireTmsLessThanEqual(timeMills);
+        List<JobInstanceBean> instances = instanceRepo.findByExpireTmsLessThanEqual(timeMills);
         if (!batchJobOp.pauseJobInstances(instances)) {
             LOGGER.error("Pause job failure.");
             return;
         }
-        int count = jobInstanceRepo.deleteByExpireTimestamp(timeMills);
+        int count = instanceRepo.deleteByExpireTimestamp(timeMills);
         LOGGER.info("Delete {} expired job instances.", count);
-    }
-
-    private List<JobDataBean> getJobDataBeans(List<? extends AbstractJob> jobs) {
-        List<JobDataBean> dataList = new ArrayList<>();
-        try {
-            for (AbstractJob job : jobs) {
-                JobOperation op = getJobOperation(job);
-                JobDataBean jobData = op.getJobData(job);
-                if (jobData != null) {
-                    dataList.add(jobData);
-                }
-            }
-        } catch (SchedulerException e) {
-            LOGGER.error("Failed to get running jobs.", e);
-            throw new GriffinException.ServiceException("Failed to get running jobs.", e);
-        }
-        return dataList;
     }
 
     private void validateJobExist(AbstractJob job) {
@@ -261,7 +271,7 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    private JobOperation getJobOperation(AbstractJob job) {
+    private JobOperator getJobOperator(AbstractJob job) {
         if (job instanceof BatchJob) {
             return batchJobOp;
         } else if (job instanceof StreamingJob) {
@@ -270,7 +280,7 @@ public class JobServiceImpl implements JobService {
         throw new GriffinException.BadRequestException(JOB_TYPE_DOES_NOT_SUPPORT);
     }
 
-    private JobOperation getJobOperation(ProcessType type) {
+    private JobOperator getJobOperator(ProcessType type) {
         if (type == batch) {
             return batchJobOp;
         } else if (type == streaming) {
@@ -285,6 +295,62 @@ public class JobServiceImpl implements JobService {
             throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
         }
         return triggerKey;
+    }
+
+    public List<? extends Trigger> getTriggers(String name, String group) throws SchedulerException {
+        JobKey jobKey = new JobKey(name, group);
+        Scheduler scheduler = factory.getScheduler();
+        return scheduler.getTriggersOfJob(jobKey);
+    }
+
+    private JobDataBean genJobDataBean(AbstractJob job) throws SchedulerException {
+        JobDataBean jobData = new JobDataBean();
+        List<? extends Trigger> triggers = getTriggers(job.getName(), job.getGroup());
+        if (!CollectionUtils.isEmpty(triggers)) {
+            Trigger trigger = triggers.get(0);
+            setTriggerTime(trigger, jobData);
+            setState(job, jobData, trigger);
+        }
+        jobData.setJobId(job.getId());
+        jobData.setJobName(job.getJobName());
+        jobData.setMeasureId(job.getMeasureId());
+        jobData.setCronExpression(getCronExpression(triggers));
+        jobData.setType(job instanceof BatchJob ? batch : streaming);
+        return jobData;
+    }
+
+    private void setState(AbstractJob job, JobDataBean data, Trigger trigger) throws SchedulerException {
+        if (job instanceof BatchJob) {
+            Scheduler scheduler = factory.getScheduler();
+            String state = scheduler.getTriggerState(trigger.getKey()).toString();
+            data.setState(state);
+        } else if (job instanceof StreamingJob) {
+            List<JobInstanceBean> instances = instanceRepo.findByJobId(job.getId());
+            for (JobInstanceBean instance : instances) {
+                if (!instance.isDeleted() && instance.getState() != null) {
+                    String state = instance.getState().toString();
+                    data.setState(state);
+                    break;
+                }
+            }
+        }
+
+    }
+
+    private void setTriggerTime(Trigger trigger, JobDataBean jobBean) {
+        Date nextFireTime = trigger.getNextFireTime();
+        Date previousFireTime = trigger.getPreviousFireTime();
+        jobBean.setNextFireTime(nextFireTime != null ? nextFireTime.getTime() : -1);
+        jobBean.setPreviousFireTime(previousFireTime != null ? previousFireTime.getTime() : -1);
+    }
+
+    private String getCronExpression(List<? extends Trigger> triggers) {
+        for (Trigger trigger : triggers) {
+            if (trigger instanceof CronTrigger) {
+                return ((CronTrigger) trigger).getCronExpression();
+            }
+        }
+        return null;
     }
 
     public void addJob(TriggerKey tk, JobSchedule js, AbstractJob job, ProcessType type) throws Exception {
@@ -329,9 +395,10 @@ public class JobServiceImpl implements JobService {
         if (type == batch) {
             TimeZone timeZone = getTimeZone(js.getTimeZone());
             return builder.withSchedule(cronSchedule(js.getCronExpression()).inTimeZone(timeZone)).build();
-        } else {
+        } else if (type == streaming) {
             return builder.startNow().withSchedule(simpleSchedule().withRepeatCount(0)).build();
         }
+        throw new GriffinException.BadRequestException(JOB_TYPE_DOES_NOT_SUPPORT);
 
     }
 
@@ -370,14 +437,14 @@ public class JobServiceImpl implements JobService {
             return;
         }
         for (AbstractJob job : jobs) {
-            JobOperation op = getJobOperation(job);
+            JobOperator op = getJobOperator(job);
             op.delete(job);
         }
     }
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void syncInstancesOfAllJobs() {
-        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState();
+        List<JobInstanceBean> beans = instanceRepo.findByActiveState();
         for (JobInstanceBean jobInstance : beans) {
             syncInstancesOfJob(jobInstance);
         }
@@ -426,7 +493,7 @@ public class JobServiceImpl implements JobService {
             }
             instance.setState(unknown);
         }
-        jobInstanceRepo.save(instance);
+        instanceRepo.save(instance);
     }
 
 
@@ -437,15 +504,13 @@ public class JobServiceImpl implements JobService {
             instance.setState(state == null ? null : LivySessionStates.State.valueOf(state.toString()));
             instance.setAppId(appId == null ? null : appId.toString());
             instance.setAppUri(appId == null ? null : livyConf.getProperty("spark.uri") + "/cluster/app/" + appId);
-            jobInstanceRepo.save(instance);
+            instanceRepo.save(instance);
         }
-
     }
-
 
     public Boolean isJobHealthy(Long jobId) {
         Pageable pageable = new PageRequest(0, 1, Sort.Direction.DESC, "tms");
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(jobId, pageable);
+        List<JobInstanceBean> instances = instanceRepo.findByJobId(jobId, pageable);
         return !CollectionUtils.isEmpty(instances) && LivySessionStates.isHealthy(instances.get(0).getState());
     }
 }

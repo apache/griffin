@@ -73,7 +73,7 @@ public class JobServiceImplTest {
     private GriffinMeasureRepo griffinMeasureRepo;
 
     @MockBean
-    private GriffinJobRepo jobRepo;
+    private BatchJobRepo jobRepo;
 
     @MockBean
     private JobInstanceRepo jobInstanceRepo;
@@ -94,11 +94,11 @@ public class JobServiceImplTest {
     private JobRepo<AbstractJob> repo;
 
     @MockBean
-    private GriffinStreamingJobRepo streamingJobRepo;
+    private StreamingJobRepo streamingJobRepo;
     @MockBean
-    private BatchJobOperationImpl batchJobOp;
+    private BatchJobOperatorImpl batchJobOp;
     @MockBean
-    private StreamingJobOperationImpl streamingJobOp;
+    private StreamingJobOperatorImpl streamingJobOp;
 
 
     @Before
@@ -248,7 +248,7 @@ public class JobServiceImplTest {
         Long jobId = 1L;
         BatchJob job = new BatchJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+//        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
         given(factory.getScheduler()).willReturn(scheduler);
@@ -266,7 +266,7 @@ public class JobServiceImplTest {
         Long jobId = 1L;
         BatchJob job = new BatchJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+//        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
@@ -303,7 +303,7 @@ public class JobServiceImplTest {
     public void testDeleteJobByNameForSuccessWithTriggerKeyExist() throws SchedulerException {
         BatchJob job = new BatchJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+//        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
         given(factory.getScheduler()).willReturn(scheduler);
@@ -323,7 +323,7 @@ public class JobServiceImplTest {
     public void testDeleteJobByNameForSuccessWithTriggerKeyNotExist() throws SchedulerException {
         BatchJob job = new BatchJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+//        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
@@ -360,7 +360,7 @@ public class JobServiceImplTest {
     public void testDeleteJobsRelateToMeasureForSuccessWithTriggerKeyExist() throws SchedulerException {
         BatchJob job = createGriffinJob();
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+//        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
         given(factory.getScheduler()).willReturn(scheduler);
@@ -377,7 +377,7 @@ public class JobServiceImplTest {
     public void testDeleteJobsRelateToMeasureForSuccessWithTriggerKeyNotExist() throws SchedulerException {
         BatchJob job = createGriffinJob();
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+//        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
         given(factory.getScheduler()).willReturn(scheduler);
@@ -405,7 +405,7 @@ public class JobServiceImplTest {
         Long measureId = 1L;
         BatchJob job = createGriffinJob();
         JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
-        job.setJobInstances(Arrays.asList(instance));
+//        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(measureId, false)).willReturn(Arrays.asList(job));
         given(factory.getScheduler()).willReturn(scheduler);

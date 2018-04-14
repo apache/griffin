@@ -20,7 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.job.repo.GriffinJobRepo;
+import org.apache.griffin.core.job.repo.BatchJobRepo;
 import org.apache.griffin.core.job.repo.JobScheduleRepo;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
@@ -39,6 +39,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.jdo.annotations.Value;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -70,6 +72,7 @@ public class JobInstanceTest {
         }
     }
 
+
     @Autowired
     private JobInstance jobInstance;
 
@@ -84,7 +87,7 @@ public class JobInstanceTest {
     private GriffinMeasureRepo measureRepo;
 
     @MockBean
-    private GriffinJobRepo jobRepo;
+    private BatchJobRepo jobRepo;
 
     @MockBean
     private JobScheduleRepo jobScheduleRepo;

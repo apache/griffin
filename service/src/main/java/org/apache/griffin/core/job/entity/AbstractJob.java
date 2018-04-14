@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "job")
@@ -37,15 +39,27 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
 
     protected String metricName;
 
+    @Column(name = "quartz_job_name")
+    private String name;
+
+    @Column(name = "quartz_group_name")
+    private String group;
+
     @JsonIgnore
     protected Boolean deleted = false;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "job_schedule_id")
+    private JobSchedule jobSchedule;
 
     AbstractJob() {
     }
 
-    AbstractJob(Long measureId, String jobName, boolean deleted) {
+    AbstractJob(Long measureId, String jobName, String name, String group,boolean deleted) {
         this.measureId = measureId;
         this.jobName = jobName;
+        this.name = name;
+        this.group = group;
         this.deleted = deleted;
     }
 
@@ -87,4 +101,27 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
+    public JobSchedule getJobSchedule() {
+        return jobSchedule;
+    }
+
+    public void setJobSchedule(JobSchedule jobSchedule) {
+        this.jobSchedule = jobSchedule;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String quartzName) {
+        this.name = quartzName;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String quartzGroup) {
+        this.group = quartzGroup;
+    }
 }

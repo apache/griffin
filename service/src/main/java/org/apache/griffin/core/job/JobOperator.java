@@ -17,9 +17,23 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.job.repo;
+package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.BatchJob;
+import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobDataBean;
+import org.apache.griffin.core.job.entity.JobHealth;
+import org.apache.griffin.core.job.entity.JobSchedule;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
+import org.quartz.SchedulerException;
 
-public interface GriffinJobRepo extends JobRepo<BatchJob> {
+public interface JobOperator {
+    AbstractJob add(JobSchedule js, GriffinMeasure measure) throws Exception;
+
+    void start(AbstractJob job);
+
+    void stop(AbstractJob job);
+
+    void delete(AbstractJob job);
+
+    JobHealth getHealth(JobHealth jobHealth, AbstractJob job) throws SchedulerException;
 }

@@ -60,7 +60,7 @@ public class SparkSubmitJob implements Job {
     @Qualifier("livyConf")
     private Properties livyConfProps;
     @Autowired
-    private BatchJobOperationImpl batchJobOp;
+    private BatchJobOperatorImpl batchJobOp;
 
     private GriffinMeasure measure;
     private String livyUri;
@@ -130,7 +130,8 @@ public class SparkSubmitJob implements Job {
         measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
         livyUri = livyConfProps.getProperty("livy.uri");
         setPredicates(jd.getJobDataMap().getString(PREDICATES_KEY));
-        setMeasureInstanceName(measure, jd);
+        // in order to keep metric name unique, we set job name as measure name at present
+        measure.setName(jd.getJobDataMap().getString(JOB_NAME));
     }
 
     @SuppressWarnings("unchecked")
@@ -146,11 +147,6 @@ public class SparkSubmitJob implements Job {
             sp.setConfigMap((Map<String, Object>) map.get("config"));
             mPredicates.add(sp);
         }
-    }
-
-    private void setMeasureInstanceName(GriffinMeasure measure, JobDetail jd) {
-        // in order to keep metric name unique, we set job name as measure name at present
-        measure.setName(jd.getJobDataMap().getString(JOB_NAME));
     }
 
     private String escapeCharacter(String str, String regex) {

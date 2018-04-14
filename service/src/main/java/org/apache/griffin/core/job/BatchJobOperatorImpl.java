@@ -2,7 +2,7 @@ package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.job.repo.GriffinJobRepo;
+import org.apache.griffin.core.job.repo.BatchJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
@@ -25,15 +25,15 @@ import static org.quartz.JobKey.jobKey;
 import static org.quartz.Trigger.TriggerState.PAUSED;
 
 @Service
-public class BatchJobOperationImpl implements JobOperation {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BatchJobOperationImpl.class);
+public class BatchJobOperatorImpl implements JobOperator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BatchJobOperatorImpl.class);
 
     @Autowired
     private SchedulerFactoryBean factory;
     @Autowired
-    private JobInstanceRepo jobInstanceRepo;
+    private JobInstanceRepo instanceRepo;
     @Autowired
-    private GriffinJobRepo batchJobRepo;
+    private BatchJobRepo batchJobRepo;
     @Autowired
     private JobServiceImpl jobService;
 
@@ -55,13 +55,17 @@ public class BatchJobOperationImpl implements JobOperation {
 
     @Override
     public void start(AbstractJob job) {
-        BatchJob batchJob = (BatchJob) job;
-        Trigger.TriggerState state = getTriggerStateIfValid(batchJob);
+        String name = job.getName();
+        String group = job.getGroup();
+        Trigger.TriggerState state = getTriggerState(name, group);
+        if (state == null) {
+            throw new GriffinException.BadRequestException(JOB_IS_NOT_SCHEDULED);
+        }
         //If job is not in paused state,we can't start it as it may be running.
         if (state != PAUSED) {
             throw new GriffinException.BadRequestException(JOB_IS_NOT_IN_PAUSED_STATUS);
         }
-        JobKey jobKey = jobKey(batchJob.getQuartzName(), batchJob.getQuartzGroup());
+        JobKey jobKey = jobKey(name, group);
         try {
             factory.getScheduler().resumeJob(jobKey);
         } catch (SchedulerException e) {
@@ -79,22 +83,10 @@ public class BatchJobOperationImpl implements JobOperation {
         pauseJob((BatchJob) job, true);
     }
 
-    @Override
-    public JobDataBean getJobData(AbstractJob job) throws SchedulerException {
-        BatchJob batchJob = (BatchJob) job;
-        Scheduler scheduler = factory.getScheduler();
-        JobKey jobKey = jobKey(batchJob.getQuartzName(), batchJob.getQuartzGroup());
-        List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
-        if (CollectionUtils.isEmpty(triggers)) {
-            LOGGER.info("Job({},{}) isn't scheduled.", job.getId(), job.getJobName());
-            return null;
-        }
-        return gebJobDataBean(job, scheduler, triggers);
-    }
 
     @Override
-    public JobHealth getHealthInfo(JobHealth jobHealth, AbstractJob job) {
-        List<? extends Trigger> triggers = getTriggers((BatchJob) job);
+    public JobHealth getHealth(JobHealth jobHealth, AbstractJob job) throws SchedulerException {
+        List<? extends Trigger> triggers = jobService.getTriggers(job.getName(), job.getGroup());
         if (!CollectionUtils.isEmpty(triggers)) {
             jobHealth.setJobCount(jobHealth.getJobCount() + 1);
             if (jobService.isJobHealthy(job.getId())) {
@@ -104,57 +96,15 @@ public class BatchJobOperationImpl implements JobOperation {
         return jobHealth;
     }
 
-    private List<? extends Trigger> getTriggers(BatchJob job) {
-        JobKey jobKey = new JobKey(job.getQuartzName(), job.getQuartzGroup());
-        List<? extends Trigger> triggers;
+
+    private Trigger.TriggerState getTriggerState(String name, String group) {
         try {
-            triggers = factory.getScheduler().getTriggersOfJob(jobKey);
-        } catch (SchedulerException e) {
-            LOGGER.error("Job schedule exception. {}", e.getMessage());
-            throw new GriffinException.ServiceException("Fail to Get HealthInfo", e);
-        }
-        return triggers;
-    }
-
-    private JobDataBean gebJobDataBean(AbstractJob job, Scheduler scheduler, List<? extends Trigger> triggers) throws SchedulerException {
-        JobDataBean jobData = new JobDataBean();
-        Trigger trigger = triggers.get(0);
-        setTriggerTime(trigger, jobData);
-        jobData.setJobId(job.getId());
-        jobData.setJobName(job.getJobName());
-        jobData.setMeasureId(job.getMeasureId());
-        jobData.setState(scheduler.getTriggerState(trigger.getKey()).toString());
-        jobData.setCronExpression(getCronExpression(triggers));
-        jobData.setType(batch);
-        return jobData;
-    }
-
-    private void setTriggerTime(Trigger trigger, JobDataBean jobBean) {
-        Date nextFireTime = trigger.getNextFireTime();
-        Date previousFireTime = trigger.getPreviousFireTime();
-        jobBean.setNextFireTime(nextFireTime != null ? nextFireTime.getTime() : -1);
-        jobBean.setPreviousFireTime(previousFireTime != null ? previousFireTime.getTime() : -1);
-    }
-
-    private String getCronExpression(List<? extends Trigger> triggers) {
-        for (Trigger trigger : triggers) {
-            if (trigger instanceof CronTrigger) {
-                return ((CronTrigger) trigger).getCronExpression();
-            }
-        }
-        return null;
-    }
-
-    private Trigger.TriggerState getTriggerStateIfValid(BatchJob batchJob) {
-        Scheduler scheduler = factory.getScheduler();
-        JobKey jobKey = jobKey(batchJob.getQuartzName(), batchJob.getQuartzGroup());
-        List<? extends Trigger> triggers;
-        try {
-            triggers = scheduler.getTriggersOfJob(jobKey);
+            List<? extends Trigger> triggers = jobService.getTriggers(name, group);
             if (CollectionUtils.isEmpty(triggers)) {
-                throw new GriffinException.BadRequestException(JOB_IS_NOT_SCHEDULED);
+                return null;
             }
-            return scheduler.getTriggerState(triggers.get(0).getKey());
+            TriggerKey key = triggers.get(0).getKey();
+            return factory.getScheduler().getTriggerState(key);
         } catch (SchedulerException e) {
             LOGGER.error("Failed to delete job", e);
             throw new GriffinException.ServiceException("Failed to delete job", e);
@@ -164,16 +114,14 @@ public class BatchJobOperationImpl implements JobOperation {
 
 
     /**
-     * @param job          griffin job
-     * @param isNeedDelete if job needs to be deleted,set isNeedDelete true,otherwise it just will be paused.
+     * @param job    griffin job
+     * @param delete if job needs to be deleted,set isNeedDelete true,otherwise it just will be paused.
      */
-    private void pauseJob(BatchJob job, boolean isNeedDelete) {
+    private void pauseJob(BatchJob job, boolean delete) {
         try {
-            pauseJob(job.getQuartzGroup(), job.getQuartzName());
+            pauseJob(job.getGroup(), job.getName());
             pausePredicateJob(job);
-            if (isNeedDelete) {
-                job.setDeleted(true);
-            }
+            job.setDeleted(delete);
             batchJobRepo.save(job);
         } catch (Exception e) {
             LOGGER.error("Job schedule happens exception.", e);
@@ -182,9 +130,9 @@ public class BatchJobOperationImpl implements JobOperation {
     }
 
     private void pausePredicateJob(BatchJob job) throws SchedulerException {
-        List<JobInstanceBean> instances = job.getJobInstances();
+        List<JobInstanceBean> instances = instanceRepo.findByJobId(job.getId());
         for (JobInstanceBean instance : instances) {
-            if (!instance.getPredicateDeleted()) {
+            if (!instance.isPredicateDeleted()) {
                 deleteJob(instance.getPredicateGroup(), instance.getPredicateName());
                 instance.setPredicateDeleted(true);
                 if (instance.getState().equals(LivySessionStates.State.finding)) {
@@ -228,7 +176,7 @@ public class BatchJobOperationImpl implements JobOperation {
             boolean status = pauseJobInstance(instance, deletedInstances);
             pauseStatus = pauseStatus && status;
         }
-        jobInstanceRepo.save(deletedInstances);
+        instanceRepo.save(deletedInstances);
         return pauseStatus;
     }
 
@@ -237,7 +185,7 @@ public class BatchJobOperationImpl implements JobOperation {
         String pGroup = instance.getPredicateGroup();
         String pName = instance.getPredicateName();
         try {
-            if (!instance.getPredicateDeleted()) {
+            if (!instance.isPredicateDeleted()) {
                 deleteJob(pGroup, pName);
                 instance.setPredicateDeleted(true);
                 deletedInstances.add(instance);
@@ -266,7 +214,7 @@ public class BatchJobOperationImpl implements JobOperation {
     }
 
     private boolean isValidCronExpression(String cronExpression) {
-        if (org.apache.commons.lang.StringUtils.isEmpty(cronExpression)) {
+        if (StringUtils.isEmpty(cronExpression)) {
             LOGGER.warn("Cron Expression is empty.");
             return false;
         }

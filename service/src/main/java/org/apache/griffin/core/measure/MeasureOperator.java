@@ -17,28 +17,17 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.job;
+package org.apache.griffin.core.measure;
 
-import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 
-import java.util.List;
+import org.apache.griffin.core.measure.entity.Measure;
 
-public interface JobService {
+public interface MeasureOperator {
 
-    List<JobDataBean> getAliveJobs(String type);
+    Measure create(Measure measure);
 
-    JobSchedule getJobSchedule(String jobName);
+    void update(Measure measure);
 
-    AbstractJob addJob(JobSchedule js) throws Exception;
+    void delete(Measure measure);
 
-    void onAction(Long jobId,String action);
-
-    void deleteJob(Long jobId);
-
-    void deleteJob(String jobName);
-
-    List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
-
-    JobHealth getHealthInfo();
 }
