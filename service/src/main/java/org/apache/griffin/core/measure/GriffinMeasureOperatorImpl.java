@@ -30,15 +30,15 @@ import org.springframework.stereotype.Component;
 import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("griffinOperation")
-public class GriffinMeasureOperationImpl implements MeasureOperation {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GriffinMeasureOperationImpl.class);
+public class GriffinMeasureOperatorImpl implements MeasureOperator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GriffinMeasureOperatorImpl.class);
 
     private final MeasureRepo<Measure> measureRepo;
 
     private final JobServiceImpl jobService;
 
     @Autowired
-    public GriffinMeasureOperationImpl(MeasureRepo<Measure> measureRepo, JobServiceImpl jobService) {
+    public GriffinMeasureOperatorImpl(MeasureRepo<Measure> measureRepo, JobServiceImpl jobService) {
         this.measureRepo = measureRepo;
         this.jobService = jobService;
     }

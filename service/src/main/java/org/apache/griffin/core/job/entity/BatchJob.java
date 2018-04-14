@@ -17,17 +17,27 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure;
+package org.apache.griffin.core.job.entity;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
-import org.apache.griffin.core.measure.entity.Measure;
+@Entity
+@DiscriminatorValue("griffinBatchJob")
+public class BatchJob extends AbstractJob {
+    public BatchJob() {
+        super();
+    }
 
-public interface MeasureOperation {
+    public BatchJob(Long measureId, String jobName, String name, String group, boolean deleted) {
+        super(measureId, jobName, name, group, deleted);
+        this.metricName = jobName;
+    }
 
-    Measure create(Measure measure);
+    public BatchJob(Long jobId, Long measureId, String jobName, String qJobName, String qGroupName, boolean deleted) {
+        this(measureId, jobName, qJobName, qGroupName, deleted);
+        setId(jobId);
+    }
 
-    void update(Measure measure);
-
-    void delete(Measure measure);
 
 }

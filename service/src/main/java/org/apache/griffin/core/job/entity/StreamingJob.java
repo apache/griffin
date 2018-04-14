@@ -17,28 +17,19 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.job;
+package org.apache.griffin.core.job.entity;
 
-import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
-import java.util.List;
+@Entity
+@DiscriminatorValue("griffinStreamingJob")
+public class StreamingJob extends AbstractJob {
 
-public interface JobService {
+    public StreamingJob() {
+    }
 
-    List<JobDataBean> getAliveJobs(String type);
-
-    JobSchedule getJobSchedule(String jobName);
-
-    AbstractJob addJob(JobSchedule js) throws Exception;
-
-    void onAction(Long jobId,String action);
-
-    void deleteJob(Long jobId);
-
-    void deleteJob(String jobName);
-
-    List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
-
-    JobHealth getHealthInfo();
+    public StreamingJob(String jobName, Long measureId, String metricName) {
+        super(jobName, measureId, metricName);
+    }
 }

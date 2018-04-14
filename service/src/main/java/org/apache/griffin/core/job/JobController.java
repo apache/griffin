@@ -20,10 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.interceptor.Token;
-import org.apache.griffin.core.job.entity.JobDataBean;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
+import org.apache.griffin.core.job.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +35,8 @@ public class JobController {
     private JobService jobService;
 
     @RequestMapping(value = "/jobs", method = RequestMethod.GET)
-    public List<JobDataBean> getJobs() {
-        return jobService.getAliveJobs();
+    public List<JobDataBean> getJobs(@RequestParam(value = "type", defaultValue = "") String type) {
+        return jobService.getAliveJobs(type);
     }
 
     @RequestMapping(value = "/jobs/config/{jobName}")
@@ -50,8 +47,15 @@ public class JobController {
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @Token
-    public JobSchedule addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
+    public AbstractJob addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
         return jobService.addJob(jobSchedule);
+    }
+
+    @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Token
+    public void onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
+        jobService.onAction(jobId,action);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)

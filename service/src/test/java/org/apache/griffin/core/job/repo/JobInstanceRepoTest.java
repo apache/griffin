@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.job.repo;
 
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
-import org.apache.griffin.core.job.entity.GriffinJob;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.junit.Before;
@@ -34,8 +33,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -82,16 +81,10 @@ public class JobInstanceRepoTest {
     }
 
     private void setEntityManager() {
-        GriffinJob job = new GriffinJob(1L, "jobName", "qName", "qGroup", false);
-        entityManager.persistAndFlush(job);
         JobInstanceBean bean1 = new JobInstanceBean(LivySessionStates.State.finding, "pName1", "pGroup1", null, 1516004640092L);
         JobInstanceBean bean2 = new JobInstanceBean(LivySessionStates.State.not_found, "pName2", "pGroup2", null, 1516004640093L);
         JobInstanceBean bean3 = new JobInstanceBean(LivySessionStates.State.running, "pName3", "pGroup3", null, 1516004640082L);
         JobInstanceBean bean4 = new JobInstanceBean(LivySessionStates.State.success, "pName4", "pGroup4", null, 1516004640094L);
-        bean1.setGriffinJob(job);
-        bean2.setGriffinJob(job);
-        bean3.setGriffinJob(job);
-        bean4.setGriffinJob(job);
         entityManager.persistAndFlush(bean1);
         entityManager.persistAndFlush(bean2);
         entityManager.persistAndFlush(bean3);

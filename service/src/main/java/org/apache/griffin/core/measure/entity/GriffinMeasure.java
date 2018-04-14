@@ -40,8 +40,16 @@ import java.util.Map;
  */
 @Entity
 public class GriffinMeasure extends Measure {
+    public enum ProcessType{
+        /**
+         * Currently we just support batch and streaming type
+         */
+        batch,
+        streaming
+    }
 
-    private String processType;
+    @Enumerated(EnumType.STRING)
+    private ProcessType processType;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -67,12 +75,12 @@ public class GriffinMeasure extends Measure {
     private EvaluateRule evaluateRule;
 
     @JsonProperty("process.type")
-    public String getProcessType() {
+    public ProcessType getProcessType() {
         return processType;
     }
 
     @JsonProperty("process.type")
-    public void setProcessType(String processType) {
+    public void setProcessType(ProcessType processType) {
         this.processType = processType;
     }
 

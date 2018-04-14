@@ -38,11 +38,10 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     private String type;
 
     @JsonIgnore
-//    @Access(AccessType.PROPERTY)
     private String config;
 
     @Transient
-    private Map<String, String> configMap;
+    private Map<String, Object> configMap;
 
     public String getType() {
         return type;
@@ -53,12 +52,12 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     }
 
     @JsonProperty("config")
-    public Map<String, String> getConfigMap() {
+    public Map<String, Object> getConfigMap() {
         return configMap;
     }
 
     @JsonProperty("config")
-    public void setConfigMap(Map<String, String> configMap) {
+    public void setConfigMap(Map<String, Object> configMap) {
         this.configMap = configMap;
     }
 
@@ -85,6 +84,7 @@ public class SegmentPredicate extends AbstractAuditableEntity {
             });
         }
     }
+
 
     public SegmentPredicate() {
     }

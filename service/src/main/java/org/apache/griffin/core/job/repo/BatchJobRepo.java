@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job.repo;
 
-import org.apache.griffin.core.job.entity.GriffinJob;
+import org.apache.griffin.core.job.entity.BatchJob;
 
-public interface GriffinJobRepo extends JobRepo<GriffinJob> {
+public interface BatchJobRepo extends JobRepo<BatchJob> {
 }
