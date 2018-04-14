@@ -45,7 +45,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
 import static org.apache.griffin.core.util.EntityHelper.*;
 import static org.junit.Assert.assertEquals;
@@ -249,7 +248,7 @@ public class JobServiceImplTest {
     public void testDeleteJobByIdForSuccessWithTriggerKeyExist() throws SchedulerException {
         Long jobId = 1L;
         BatchJob job = new BatchJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
-        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
+        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.FINDING, "pName", "pGroup", null, null);
 //        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
@@ -268,7 +267,7 @@ public class JobServiceImplTest {
     public void testDeleteJobByIdForSuccessWithTriggerKeyNotExist() throws SchedulerException {
         Long jobId = 1L;
         BatchJob job = new BatchJob(1L, "jobName", "quartzJobName", "quartzGroupName", false);
-        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
+        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.FINDING, "pName", "pGroup", null, null);
 //        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
@@ -306,7 +305,7 @@ public class JobServiceImplTest {
     @Test
     public void testDeleteJobByNameForSuccessWithTriggerKeyExist() throws SchedulerException {
         BatchJob job = new BatchJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
-        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
+        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.FINDING, "pName", "pGroup", null, null);
 //        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByJobNameAndDeleted(job.getJobName(), false)).willReturn(Arrays.asList(job));
@@ -327,7 +326,7 @@ public class JobServiceImplTest {
     @Test
     public void testDeleteJobByNameForSuccessWithTriggerKeyNotExist() throws SchedulerException {
         BatchJob job = new BatchJob(1L, 1L, "jobName", "quartzJobName", "quartzGroupName", false);
-        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
+        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.FINDING, "pName", "pGroup", null, null);
 //        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
@@ -365,7 +364,7 @@ public class JobServiceImplTest {
     @Test
     public void testDeleteJobsRelateToMeasureForSuccessWithTriggerKeyExist() throws SchedulerException {
         BatchJob job = createGriffinJob();
-        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
+        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.FINDING, "pName", "pGroup", null, null);
 //        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
@@ -383,7 +382,7 @@ public class JobServiceImplTest {
     @Test
     public void testDeleteJobsRelateToMeasureForSuccessWithTriggerKeyNotExist() throws SchedulerException {
         BatchJob job = createGriffinJob();
-        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
+        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.FINDING, "pName", "pGroup", null, null);
 //        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(1L, false)).willReturn(Arrays.asList(job));
@@ -412,7 +411,7 @@ public class JobServiceImplTest {
     public void testDeleteJobsRelateToMeasureForFailureWithException() throws SchedulerException {
         Long measureId = 1L;
         BatchJob job = createGriffinJob();
-        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, "pName", "pGroup", null, null);
+        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.FINDING, "pName", "pGroup", null, null);
 //        job.setJobInstances(Arrays.asList(instance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(jobRepo.findByMeasureIdAndDeleted(measureId, false)).willReturn(Arrays.asList(job));
@@ -429,7 +428,7 @@ public class JobServiceImplTest {
         int page = 0;
         int size = 2;
         BatchJob job = createGriffinJob();
-        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates.State.dead, "app_id", "app_uri", null, null);
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates.State.DEAD, "app_id", "app_uri", null, null);
         given(jobRepo.findByIdAndDeleted(jobId, false)).willReturn(job);
         given(jobInstanceRepo.findByJobId(Matchers.anyLong(), Matchers.any(PageRequest.class))).willReturn(Arrays.asList(jobInstance));
 
@@ -447,7 +446,7 @@ public class JobServiceImplTest {
 
     @Test
     public void testDeleteExpiredJobInstanceForSuccessWithTriggerKeyExist() throws SchedulerException {
-        JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.dead, "pName", "pGroup", null, null);
+        JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.DEAD, "pName", "pGroup", null, null);
         given(jobInstanceRepo.findByExpireTmsLessThanEqual(Matchers.any())).willReturn(Arrays.asList(jobInstance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
@@ -460,7 +459,7 @@ public class JobServiceImplTest {
 
     @Test
     public void testDeleteExpiredJobInstanceForSuccessWithTriggerKeyNotExist() throws SchedulerException {
-        JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.dead, "pName", "pGroup", null, null);
+        JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.DEAD, "pName", "pGroup", null, null);
         given(jobInstanceRepo.findByExpireTmsLessThanEqual(Matchers.any())).willReturn(Arrays.asList(jobInstance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
@@ -482,7 +481,7 @@ public class JobServiceImplTest {
 
     @Test
     public void testDeleteExpiredJobInstanceForFailureWithException() throws SchedulerException {
-        JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.dead, "pName", "pGroup", null, null);
+        JobInstanceBean jobInstance = new JobInstanceBean(LivySessionStates.State.DEAD, "pName", "pGroup", null, null);
         given(jobInstanceRepo.findByExpireTmsLessThanEqual(Matchers.any())).willReturn(Arrays.asList(jobInstance));
         Scheduler scheduler = Mockito.mock(Scheduler.class);
         given(factory.getScheduler()).willReturn(scheduler);
@@ -496,10 +495,10 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForSuccess() {
         JobInstanceBean instance = createJobInstance();
-        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
-        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+        String result = "{\"id\":1,\"state\":\"STARTING\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
 //        given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
 
         service.syncInstancesOfAllJobs();
@@ -510,7 +509,7 @@ public class JobServiceImplTest {
     public void testSyncInstancesOfJobForFailureWithRestClientException() {
         JobInstanceBean instance = createJobInstance();
         instance.setSessionId(1234564L);
-        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willThrow(RestClientException.class);
@@ -522,7 +521,7 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForFailureWithIOException() {
         JobInstanceBean instance = createJobInstance();
-        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("result");
@@ -534,7 +533,7 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForFailureWithIllegalArgumentException() {
         JobInstanceBean instance = createJobInstance();
-        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn("{\"state\":\"wrong\"}");
@@ -546,10 +545,10 @@ public class JobServiceImplTest {
     @Test
     public void testSyncInstancesOfJobForFailureWithException() {
         JobInstanceBean instance = createJobInstance();
-        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         given(jobInstanceRepo.findByActiveState(states)).willReturn(Arrays.asList(instance));
         Whitebox.setInternalState(service, "restTemplate", restTemplate);
-        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+        String result = "{\"id\":1,\"state\":\"STARTING\",\"appId\":123,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         given(restTemplate.getForObject(Matchers.anyString(), Matchers.any())).willReturn(result);
         doThrow(Exception.class).when(jobInstanceRepo).save(Matchers.any(JobInstanceBean.class));
 
@@ -582,7 +581,7 @@ public class JobServiceImplTest {
         List<Trigger> triggers = Collections.singletonList(new SimpleTriggerImpl());
         given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
         JobInstanceBean instance = createJobInstance();
-        instance.setState(LivySessionStates.State.error);
+        instance.setState(LivySessionStates.State.ERROR);
         List<JobInstanceBean> scheduleStateList = Collections.singletonList(instance);
         given(jobInstanceRepo.findByJobId(Matchers.anyLong(), Matchers.any(PageRequest.class)))
                 .willReturn(scheduleStateList);

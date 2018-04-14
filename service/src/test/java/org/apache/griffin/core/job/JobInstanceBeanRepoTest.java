@@ -68,18 +68,18 @@ public class JobInstanceBeanRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         List<JobInstanceBean> list = jobInstanceRepo.findByActiveState(states);
         assertThat(list.size()).isEqualTo(1);
     }
 
 
     private void setEntityManager() {
-        JobInstanceBean instance1 = new JobInstanceBean(1L, LivySessionStates.State.success,
+        JobInstanceBean instance1 = new JobInstanceBean(1L, LivySessionStates.State.SUCCESS,
                 "appId1", "http://domain.com/uri1", System.currentTimeMillis(), System.currentTimeMillis());
-        JobInstanceBean instance2 = new JobInstanceBean(2L, LivySessionStates.State.error,
+        JobInstanceBean instance2 = new JobInstanceBean(2L, LivySessionStates.State.ERROR,
                 "appId2", "http://domain.com/uri2", System.currentTimeMillis(), System.currentTimeMillis());
-        JobInstanceBean instance3 = new JobInstanceBean(2L, LivySessionStates.State.starting,
+        JobInstanceBean instance3 = new JobInstanceBean(2L, LivySessionStates.State.STARTING,
                 "appId3", "http://domain.com/uri3", System.currentTimeMillis(), System.currentTimeMillis());
         entityManager.persistAndFlush(instance1);
         entityManager.persistAndFlush(instance2);

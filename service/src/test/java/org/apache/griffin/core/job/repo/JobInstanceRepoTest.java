@@ -57,7 +57,7 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        State[] states = {starting, not_started, recovering, idle, running, busy};
+        State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
         assertThat(beans.size()).isEqualTo(1);
     }
@@ -81,10 +81,10 @@ public class JobInstanceRepoTest {
     }
 
     private void setEntityManager() {
-        JobInstanceBean bean1 = new JobInstanceBean(LivySessionStates.State.finding, "pName1", "pGroup1", null, 1516004640092L);
-        JobInstanceBean bean2 = new JobInstanceBean(LivySessionStates.State.not_found, "pName2", "pGroup2", null, 1516004640093L);
-        JobInstanceBean bean3 = new JobInstanceBean(LivySessionStates.State.running, "pName3", "pGroup3", null, 1516004640082L);
-        JobInstanceBean bean4 = new JobInstanceBean(LivySessionStates.State.success, "pName4", "pGroup4", null, 1516004640094L);
+        JobInstanceBean bean1 = new JobInstanceBean(LivySessionStates.State.FINDING, "pName1", "pGroup1", null, 1516004640092L);
+        JobInstanceBean bean2 = new JobInstanceBean(LivySessionStates.State.NOT_FOUND, "pName2", "pGroup2", null, 1516004640093L);
+        JobInstanceBean bean3 = new JobInstanceBean(LivySessionStates.State.RUNNING, "pName3", "pGroup3", null, 1516004640082L);
+        JobInstanceBean bean4 = new JobInstanceBean(LivySessionStates.State.SUCCESS, "pName4", "pGroup4", null, 1516004640094L);
         entityManager.persistAndFlush(bean1);
         entityManager.persistAndFlush(bean2);
         entityManager.persistAndFlush(bean3);

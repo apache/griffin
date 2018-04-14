@@ -118,7 +118,7 @@ public class SparkSubmitJobTest {
 
     @Test
     public void testExecuteWithNoPredicateSuccess() throws Exception {
-        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+        String result = "{\"id\":1,\"state\":\"STARTING\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
         JobExecutionContext context = mock(JobExecutionContext.class);
         JobInstanceBean instance = createJobInstance();
         GriffinMeasure measure = createGriffinMeasure("measureName");

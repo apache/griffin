@@ -28,25 +28,25 @@ import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
 public class LivySessionStates {
 
     /**
-     * unknown is used to represent the state that server get null from Livy.
+     * UNKNOWN is used to represent the state that server get null from Livy.
      * the other state is just same as com.cloudera.livy.sessions.SessionState.
      */
     public enum State {
-        not_started,
-        starting,
-        recovering,
-        idle,
-        running,
-        busy,
-        shutting_down,
-        error,
-        dead,
-        success,
-        unknown,
-        stopped,
-        finding,
-        not_found,
-        found
+        NOT_STARTED,
+        STARTING,
+        RECOVERING,
+        IDLE,
+        RUNNING,
+        BUSY,
+        SHUTTING_DOWN,
+        ERROR,
+        DEAD,
+        SUCCESS,
+        UNKNOWN,
+        STOPPED,
+        FINDING,
+        NOT_FOUND,
+        FOUND
     }
 
     private static SessionState toSessionState(State state) {
@@ -54,25 +54,25 @@ public class LivySessionStates {
             return null;
         }
         switch (state) {
-            case not_started:
+            case NOT_STARTED:
                 return new SessionState.NotStarted();
-            case starting:
+            case STARTING:
                 return new SessionState.Starting();
-            case recovering:
+            case RECOVERING:
                 return new SessionState.Recovering();
-            case idle:
+            case IDLE:
                 return new SessionState.Idle();
-            case running:
+            case RUNNING:
                 return new SessionState.Running();
-            case busy:
+            case BUSY:
                 return new SessionState.Busy();
-            case shutting_down:
+            case SHUTTING_DOWN:
                 return new SessionState.ShuttingDown();
-            case error:
+            case ERROR:
                 return new SessionState.Error(System.nanoTime());
-            case dead:
+            case DEAD:
                 return new SessionState.Dead(System.nanoTime());
-            case success:
+            case SUCCESS:
                 return new SessionState.Success(System.nanoTime());
             default:
                 return null;
@@ -86,7 +86,7 @@ public class LivySessionStates {
             State finalState = parseState(state);
             return finalState != null ? finalState : parseState(finalStatus);
         }
-        return unknown;
+        return UNKNOWN;
     }
 
     private static State parseState(JsonElement state) {
@@ -97,29 +97,29 @@ public class LivySessionStates {
             case "NEW":
             case "NEW_SAVING":
             case "SUBMITTED":
-                return not_started;
+                return NOT_STARTED;
             case "ACCEPTED":
-                return starting;
+                return STARTING;
             case "RUNNING":
-                return running;
+                return RUNNING;
             case "SUCCEEDED":
-                return success;
+                return SUCCESS;
             case "FAILED":
-                return dead;
+                return DEAD;
             case "KILLED":
-                return shutting_down;
+                return SHUTTING_DOWN;
             case "FINISHED":
                 return null;
             default:
-                return unknown;
+                return UNKNOWN;
         }
     }
 
     public static boolean isActive(State state) {
-        if (State.unknown.equals(state) || State.stopped.equals(state)) {
-            // set unknown isActive() as false.
+        if (State.UNKNOWN.equals(state) || State.STOPPED.equals(state)) {
+            // set UNKNOWN isActive() as false.
             return false;
-        } else if (State.finding.equals(state) || State.not_found.equals(state) || State.found.equals(state)) {
+        } else if (State.FINDING.equals(state) || State.NOT_FOUND.equals(state) || State.FOUND.equals(state)) {
             return true;
         }
         SessionState sessionState = toSessionState(state);
@@ -127,8 +127,8 @@ public class LivySessionStates {
     }
 
     public static boolean isHealthy(State state) {
-        return !(State.error.equals(state) || State.dead.equals(state) ||
-                State.shutting_down.equals(state) || State.finding.equals(state) ||
-                State.not_found.equals(state) || State.found.equals(state));
+        return !(State.ERROR.equals(state) || State.DEAD.equals(state) ||
+                State.SHUTTING_DOWN.equals(state) || State.FINDING.equals(state) ||
+                State.NOT_FOUND.equals(state) || State.FOUND.equals(state));
     }
 }

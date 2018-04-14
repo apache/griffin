@@ -61,7 +61,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         if (state == null) {
             throw new GriffinException.BadRequestException(JOB_IS_NOT_SCHEDULED);
         }
-        //If job is not in paused state,we can't start it as it may be running.
+        //If job is not in paused state,we can't start it as it may be RUNNING.
         if (state != PAUSED) {
             throw new GriffinException.BadRequestException(JOB_IS_NOT_IN_PAUSED_STATUS);
         }
@@ -135,8 +135,8 @@ public class BatchJobOperatorImpl implements JobOperator {
             if (!instance.isPredicateDeleted()) {
                 deleteJob(instance.getPredicateGroup(), instance.getPredicateName());
                 instance.setPredicateDeleted(true);
-                if (instance.getState().equals(LivySessionStates.State.finding)) {
-                    instance.setState(LivySessionStates.State.not_found);
+                if (instance.getState().equals(LivySessionStates.State.FINDING)) {
+                    instance.setState(LivySessionStates.State.NOT_FOUND);
                 }
             }
         }

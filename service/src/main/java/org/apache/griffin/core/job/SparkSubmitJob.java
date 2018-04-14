@@ -44,7 +44,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.apache.griffin.core.job.JobInstance.*;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.found;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.batch;
 
 @PersistJobDataAfterExecution
@@ -81,7 +81,7 @@ public class SparkSubmitJob implements Job {
             }
             saveJobInstance(jd);
         } catch (Exception e) {
-            LOGGER.error("Post spark task error.", e);
+            LOGGER.error("Post spark task ERROR.", e);
         }
     }
 
@@ -90,7 +90,7 @@ public class SparkSubmitJob implements Job {
         int repeatCount = simpleTrigger.getRepeatCount();
         int fireCount = simpleTrigger.getTimesTriggered();
         if (fireCount > repeatCount) {
-            saveJobInstance(null, LivySessionStates.State.not_found);
+            saveJobInstance(null, LivySessionStates.State.NOT_FOUND);
         }
     }
 
@@ -100,7 +100,7 @@ public class SparkSubmitJob implements Job {
             result = restTemplate.postForObject(livyUri, livyConf, String.class);
             LOGGER.info(result);
         } catch (Exception e) {
-            LOGGER.error("Post to livy error. {}", e.getMessage());
+            LOGGER.error("Post to livy ERROR. {}", e.getMessage());
             result = null;
         }
         return result;
@@ -203,8 +203,8 @@ public class SparkSubmitJob implements Job {
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();
         batchJobOp.deleteJob(group, name);
-        LOGGER.info("Delete predicate job({},{}) success.", group, name);
-        saveJobInstance(result, found);
+        LOGGER.info("Delete predicate job({},{}) SUCCESS.", group, name);
+        saveJobInstance(result, FOUND);
     }
 
     private void saveJobInstance(String result, LivySessionStates.State state) throws IOException {

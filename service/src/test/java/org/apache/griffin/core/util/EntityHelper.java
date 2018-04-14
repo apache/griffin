@@ -123,7 +123,7 @@ public class EntityHelper {
     public static JobInstanceBean createJobInstance() {
         JobInstanceBean jobBean = new JobInstanceBean();
         jobBean.setSessionId(1L);
-        jobBean.setState(LivySessionStates.State.starting);
+        jobBean.setState(LivySessionStates.State.STARTING);
         jobBean.setAppId("app_id");
         jobBean.setTms(System.currentTimeMillis());
         return jobBean;

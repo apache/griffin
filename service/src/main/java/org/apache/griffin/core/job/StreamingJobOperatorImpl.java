@@ -41,7 +41,7 @@ import java.util.Properties;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_RUNNING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.stopped;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
 import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.streaming;
 import static org.quartz.TriggerKey.triggerKey;
@@ -85,8 +85,8 @@ public class StreamingJobOperatorImpl implements JobOperator {
     }
 
     /**
-     * active state: not_started, starting, recovering, idle, running, busy
-     * inactive state: shutting_down, error, dead, success
+     * active state: NOT_STARTED, STARTING, RECOVERING, IDLE, RUNNING, BUSY
+     * inactive state: SHUTTING_DOWN, ERROR, DEAD, SUCCESS
      *
      * @param job streaming job
      */
@@ -156,7 +156,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
         instances.stream().filter(instance -> !instance.isDeleted()).forEach(instance -> {
             if (isActive(instance.getState())) {
                 deleteByLivy(instance);
-                instance.setState(stopped);
+                instance.setState(STOPPED);
             }
             instance.setDeleted(true);
         });

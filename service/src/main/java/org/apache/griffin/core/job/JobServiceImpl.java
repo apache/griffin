@@ -123,8 +123,8 @@ public class JobServiceImpl implements JobService {
                 }
             }
         } catch (SchedulerException e) {
-            LOGGER.error("Failed to get running jobs.", e);
-            throw new GriffinException.ServiceException("Failed to get running jobs.", e);
+            LOGGER.error("Failed to get RUNNING jobs.", e);
+            throw new GriffinException.ServiceException("Failed to get RUNNING jobs.", e);
         }
         return dataList;
     }
@@ -223,7 +223,7 @@ public class JobServiceImpl implements JobService {
     private List<JobInstanceBean> updateState(List<JobInstanceBean> instances) {
         for (JobInstanceBean instance : instances) {
             State state = instance.getState();
-            if (state == unknown || LivySessionStates.isActive(state)) {
+            if (state == UNKNOWN || LivySessionStates.isActive(state)) {
                 syncInstancesOfJob(instance);
             }
         }
@@ -444,7 +444,7 @@ public class JobServiceImpl implements JobService {
 
     @Scheduled(fixedDelayString = "${jobInstance.fixedDelay.in.milliseconds}")
     public void syncInstancesOfAllJobs() {
-        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         List<JobInstanceBean> beans = instanceRepo.findByActiveState(states);
         for (JobInstanceBean jobInstance : beans) {
             syncInstancesOfJob(jobInstance);
@@ -485,14 +485,14 @@ public class JobServiceImpl implements JobService {
     }
 
     private void setStateByYarn(JobInstanceBean instance) {
-        LOGGER.warn("Spark session {} may be overdue, set state as unknown!\n ", instance.getSessionId());
+        LOGGER.warn("Spark session {} may be overdue, set state as UNKNOWN!\n ", instance.getSessionId());
         String yarnUrl = livyConf.getProperty("spark.uri");
         boolean success = YarnNetUtil.update(yarnUrl, instance);
         if (!success) {
-            if (instance.getState() == unknown) {
+            if (instance.getState() == UNKNOWN) {
                 return;
             }
-            instance.setState(unknown);
+            instance.setState(UNKNOWN);
         }
         instanceRepo.save(instance);
     }

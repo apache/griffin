@@ -844,7 +844,7 @@ The response body should be empty if no error happens, and the HTTP status is (2
     {
         "id": 2,
         "sessionId": null,
-        "state": "not_found",
+        "state": "NOT_FOUND",
         "appId": null,
         "appUri": null,
         "predicateGroup": "PG",
