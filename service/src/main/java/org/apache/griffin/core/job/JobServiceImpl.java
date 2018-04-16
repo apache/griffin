@@ -455,6 +455,9 @@ public class JobServiceImpl implements JobService {
      * @param instance job instance livy info
      */
     private void syncInstancesOfJob(JobInstanceBean instance) {
+        if (instance.getSessionId() == null) {
+            return;
+        }
         String uri = livyConf.getProperty("livy.uri") + "/" + instance.getSessionId();
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
