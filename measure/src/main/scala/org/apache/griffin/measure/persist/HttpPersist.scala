@@ -65,7 +65,7 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
       val data = JsonUtil.toJson(dataMap)
       // post
       val params = Map[String, Object]()
-      val header = Map[String, Object]()
+      val header = Map[String, Object](("Content-Type","application/json"))
 
       def func(): Boolean = {
         HttpUtil.httpRequest(api, method, params, header, data)
