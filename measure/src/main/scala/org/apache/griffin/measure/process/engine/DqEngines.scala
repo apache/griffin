@@ -31,7 +31,7 @@ import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan.{DsUpdate, _}
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 //import scala.concurrent._
 //import scala.concurrent.duration.Duration

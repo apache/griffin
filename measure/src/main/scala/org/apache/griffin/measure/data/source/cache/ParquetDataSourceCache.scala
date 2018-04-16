@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.data.source.cache
 
-import org.apache.spark.sql.{DataFrame, DataFrameReader, DataFrameWriter, SQLContext}
+import org.apache.spark.sql._
 
 case class ParquetDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
                                   dsName: String, index: Int
@@ -28,7 +28,7 @@ case class ParquetDataSourceCache(sqlContext: SQLContext, param: Map[String, Any
     sqlContext.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false")
   }
 
-  def writeDataFrame(dfw: DataFrameWriter, path: String): Unit = {
+  def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit = {
     println(s"write path: ${path}")
     dfw.parquet(path)
   }

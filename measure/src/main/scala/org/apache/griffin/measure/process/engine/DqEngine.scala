@@ -26,7 +26,7 @@ import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan.{TimeInfo, _}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 trait DqEngine extends Loggable with Serializable {
 
