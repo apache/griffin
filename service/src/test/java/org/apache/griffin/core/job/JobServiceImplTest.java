@@ -340,6 +340,7 @@ public class JobServiceImplTest {
         given(jobRepo.findByJobNameAndDeleted(jobName, false)).willReturn(new ArrayList<>());
 
         service.deleteJob(jobName);
+        verify(jobRepo, times(1)).findByJobNameAndDeleted(jobName, false);
     }
 
     @Test(expected = GriffinException.ServiceException.class)
@@ -352,6 +353,9 @@ public class JobServiceImplTest {
         doThrow(SchedulerException.class).when(scheduler).pauseJob(Matchers.any(JobKey.class));
 
         service.deleteJob(job.getJobName());
+        verify(factory, times(1)).getScheduler();
+        verify(jobRepo, times(1)).findByJobNameAndDeleted(job.getJobName(), false);
+        verify(scheduler, times(1)).checkExists(Matchers.any(JobKey.class));
     }
 
     @Test
