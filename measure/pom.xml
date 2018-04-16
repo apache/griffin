@@ -39,7 +39,7 @@ under the License.
     <maven.compiler.target>1.8</maven.compiler.target>
 
     <scala.version>2.10.6</scala.version>
-    <spark.version>1.6.0</spark.version>
+    <spark.version>2.2.1</spark.version>
     <scala.binary.version>2.10</scala.binary.version>
 
     <avro.version>1.7.7</avro.version>
@@ -83,7 +83,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-streaming-kafka_${scala.binary.version}</artifactId>
+      <artifactId>spark-streaming-kafka-0-8_${scala.binary.version}</artifactId>
       <version>${spark.version}</version>
     </dependency>
 
