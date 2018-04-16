@@ -221,7 +221,7 @@ public class JobServiceImpl implements JobService {
     private List<JobInstanceBean> updateState(List<JobInstanceBean> instances) {
         for (JobInstanceBean instance : instances) {
             State state = instance.getState();
-            if (state == UNKNOWN || LivySessionStates.isActive(state)) {
+            if (state.equals(UNKNOWN) || LivySessionStates.isActive(state)) {
                 syncInstancesOfJob(instance);
             }
         }
@@ -465,7 +465,7 @@ public class JobServiceImpl implements JobService {
         } catch (ResourceAccessException e) {
             LOGGER.error("Your url may be wrong. Please check {}.\n {}", uri, e.getMessage());
         } catch (HttpClientErrorException e) {
-            LOGGER.warn("sessionId({}) appId({})  {}.It'll use yarn to update.", instance.getSessionId(), instance.getAppId(), e.getMessage());
+            LOGGER.warn("sessionId({}) appId({}) {}.", instance.getSessionId(), instance.getAppId(), e.getMessage());
             setStateByYarn(instance, e);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -483,11 +483,11 @@ public class JobServiceImpl implements JobService {
     }
 
     private void setStateByYarn(JobInstanceBean instance) {
-        LOGGER.warn("Spark session {} may be overdue, set state as UNKNOWN!\n ", instance.getSessionId());
+        LOGGER.warn("Spark session {} may be overdue! Now we use yarn to update state.", instance.getSessionId());
         String yarnUrl = livyConf.getProperty("spark.uri");
         boolean success = YarnNetUtil.update(yarnUrl, instance);
         if (!success) {
-            if (instance.getState() == UNKNOWN) {
+            if (instance.getState().equals(UNKNOWN)) {
                 return;
             }
             instance.setState(UNKNOWN);
@@ -500,7 +500,7 @@ public class JobServiceImpl implements JobService {
         if (resultMap != null) {
             Object state = resultMap.get("state");
             Object appId = resultMap.get("appId");
-            instance.setState(state == null ? null : LivySessionStates.State.valueOf(state.toString()));
+            instance.setState(state == null ? null : LivySessionStates.State.valueOf(state.toString().toUpperCase()));
             instance.setAppId(appId == null ? null : appId.toString());
             instance.setAppUri(appId == null ? null : livyConf.getProperty("spark.uri") + "/cluster/app/" + appId);
             instanceRepo.save(instance);

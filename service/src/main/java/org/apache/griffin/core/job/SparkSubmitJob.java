@@ -225,7 +225,7 @@ public class SparkSubmitJob implements Job {
             Object status = resultMap.get("state");
             Object id = resultMap.get("id");
             Object appId = resultMap.get("appId");
-            jobInstance.setState(status == null ? null : LivySessionStates.State.valueOf(status.toString()));
+            jobInstance.setState(status == null ? null : LivySessionStates.State.valueOf(status.toString().toUpperCase()));
             jobInstance.setSessionId(id == null ? null : Long.parseLong(id.toString()));
             jobInstance.setAppId(appId == null ? null : appId.toString());
         }
