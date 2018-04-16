@@ -42,4 +42,4 @@ INSERT INTO `evaluate_rule` VALUES (5,'2017-08-15 17:30:32',NULL,'$source[''id''
 INSERT INTO `job_instance` VALUES (103,'2017-08-15 17:31:21',NULL,'application_1500359928600_0025','BA','measure-test-BA-test-1502789449000',24,'SUCCESS',1502789480660,'http://10.149.247.156:28088/cluster/app/application_1500359928600_0025');
 
 
-INSERT INTO `measure` VALUES (5,'2017-08-15 17:30:32',NULL,'Description of measure-test','measure-test','eBay','test','accuracy',5,9,10);
+INSERT INTO `measure` VALUES (5,'2017-08-15 17:30:32',NULL,'Description of measure-test','measure-test','eBay','test','ACCURACY',5,9,10);

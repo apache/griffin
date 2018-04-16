@@ -40,12 +40,12 @@ public abstract class Measure extends AbstractAuditableEntity {
         /**
          * Currently we support six dimensions of measure.
          */
-        accuracy,
-        profiling,
-        timeliness,
-        uniqueness,
-        completeness,
-        consistency
+        ACCURACY,
+        PROFILING,
+        TIMELINESS,
+        UNIQUENESS,
+        COMPLETENESS,
+        CONSISTENCY
     }
 
     @NotNull

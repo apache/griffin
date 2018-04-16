@@ -58,7 +58,7 @@ public class EntityHelper {
         String rules = "source.id=target.id AND source.name=target.name AND source.age=target.age";
         Map<String, Object> map = new HashMap<>();
         map.put("detail", "detail info");
-        Rule rule = new Rule("griffin-dsl", "accuracy", rules, map);
+        Rule rule = new Rule("griffin-dsl", "ACCURACY", rules, map);
         EvaluateRule evaluateRule = new EvaluateRule(Arrays.asList(rule));
         return new GriffinMeasure(name, "test", dataSources, evaluateRule);
     }
