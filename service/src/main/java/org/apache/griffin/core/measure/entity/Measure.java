@@ -24,9 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -36,24 +34,13 @@ import javax.validation.constraints.NotNull;
 public abstract class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
 
-    public enum DqType{
-        /**
-         * Currently we support six dimensions of measure.
-         */
-        ACCURACY,
-        PROFILING,
-        TIMELINESS,
-        UNIQUENESS,
-        COMPLETENESS,
-        CONSISTENCY
-    }
-
     @NotNull
     protected String name;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     protected String owner;
 
+    @Enumerated(EnumType.STRING)
     private DqType dqType;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

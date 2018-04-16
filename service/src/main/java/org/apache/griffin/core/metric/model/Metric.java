@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.metric.model;
 
+import org.apache.griffin.core.measure.entity.DqType;
 import org.apache.griffin.core.measure.entity.Measure;
 
 import java.util.List;
@@ -26,14 +27,14 @@ import java.util.List;
 public class Metric {
 
     private String name;
-    private Measure.DqType type;
+    private DqType type;
     private String owner;
     private List<MetricValue> metricValues;
 
     public Metric() {
     }
 
-    public Metric(String name, Measure.DqType type, String owner, List<MetricValue> metricValues) {
+    public Metric(String name, DqType type, String owner, List<MetricValue> metricValues) {
         this.name = name;
         this.type = type;
         this.owner = owner;
@@ -48,11 +49,11 @@ public class Metric {
         this.name = name;
     }
 
-    public Measure.DqType getType() {
+    public DqType getType() {
         return type;
     }
 
-    public void setType(Measure.DqType type) {
+    public void setType(DqType type) {
         this.type = type;
     }
 

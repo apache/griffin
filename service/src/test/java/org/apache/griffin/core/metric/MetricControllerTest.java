@@ -44,13 +44,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
+import static org.apache.griffin.core.measure.entity.DqType.ACCURACY;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.apache.griffin.core.measure.entity.Measure.DqType.ACCURACY;
 
 @RunWith(SpringRunner.class)
 public class MetricControllerTest {
