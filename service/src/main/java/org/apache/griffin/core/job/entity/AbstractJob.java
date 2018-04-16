@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 
 import javax.persistence.*;
@@ -67,26 +68,32 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.metricName = metricName;
     }
 
+    @JsonProperty("job.name")
     public String getJobName() {
         return jobName;
     }
 
+    @JsonProperty("job.name")
     public void setJobName(String jobName) {
         this.jobName = jobName;
     }
 
+    @JsonProperty("metric.name")
     public String getMetricName() {
         return metricName;
     }
 
+    @JsonProperty("metric.name")
     public void setMetricName(String metricName) {
         this.metricName = metricName;
     }
 
+    @JsonProperty("measure.id")
     public Long getMeasureId() {
         return measureId;
     }
 
+    @JsonProperty("measure.id")
     public void setMeasureId(Long measureId) {
         this.measureId = measureId;
     }
@@ -99,26 +106,32 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
+    @JsonProperty("job.config")
     public JobSchedule getJobSchedule() {
         return jobSchedule;
     }
 
+    @JsonProperty("job.config")
     public void setJobSchedule(JobSchedule jobSchedule) {
         this.jobSchedule = jobSchedule;
     }
 
+    @JsonProperty("quartz.name")
     public String getName() {
         return name;
     }
 
+    @JsonProperty("quartz.name")
     public void setName(String quartzName) {
         this.name = quartzName;
     }
 
+    @JsonProperty("quartz.group")
     public String getGroup() {
         return group;
     }
 
+    @JsonProperty("quartz.group")
     public void setGroup(String quartzGroup) {
         this.group = quartzGroup;
     }

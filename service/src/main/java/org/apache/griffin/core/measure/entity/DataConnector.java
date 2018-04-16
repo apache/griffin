@@ -28,6 +28,7 @@ import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -95,7 +96,7 @@ public class DataConnector extends AbstractAuditableEntity {
 
     @JsonProperty("pre.proc")
     public List<StreamingPreProcess> getPreProcess() {
-        return preProcess;
+        return CollectionUtils.isEmpty(preProcess) ? null : preProcess;
     }
 
     @JsonProperty("pre.proc")
