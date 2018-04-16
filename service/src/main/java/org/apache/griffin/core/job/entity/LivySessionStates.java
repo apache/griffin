@@ -116,10 +116,10 @@ public class LivySessionStates {
     }
 
     public static boolean isActive(State state) {
-        if (State.UNKNOWN.equals(state) || State.STOPPED.equals(state)) {
+        if (State.UNKNOWN.equals(state) || State.STOPPED.equals(state) || State.NOT_FOUND.equals(state) || State.FOUND.equals(state)) {
             // set UNKNOWN isActive() as false.
             return false;
-        } else if (State.FINDING.equals(state) || State.NOT_FOUND.equals(state) || State.FOUND.equals(state)) {
+        } else if (State.FINDING.equals(state)) {
             return true;
         }
         SessionState sessionState = toSessionState(state);
