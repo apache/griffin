@@ -36,9 +36,9 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
 
   val config = dcParam.config
 
-  if (!sqlContext.isInstanceOf[HiveContext]) {
-    throw new Exception("hive context not prepared!")
-  }
+//  if (!sqlContext.isInstanceOf[HiveContext]) {
+//    throw new Exception("hive context not prepared!")
+//  }
 
   val Database = "database"
   val TableName = "table.name"
