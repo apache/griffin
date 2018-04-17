@@ -67,8 +67,8 @@ object DataSourceFactory extends Loggable {
           (seq :+ dsParam, names + dsParam.name)
         } else ret
       }
-    if (validDsParams.size > 0) {
-      val baselineDsParam = validDsParams.filter(_.isBaseLine).headOption.getOrElse(validDsParams.head)
+    if (validDsParams.nonEmpty) {
+      val baselineDsParam = validDsParams.find(_.isBaseLine).getOrElse(validDsParams.head)
       validDsParams.map { dsParam =>
         if (dsParam.name != baselineDsParam.name && dsParam.isBaseLine) {
           dsParam.falseBaselineClone
