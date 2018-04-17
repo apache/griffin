@@ -56,11 +56,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     val conf = new SparkConf().setAppName(metricName)
     conf.setAll(sparkParam.config)
     conf.set("spark.sql.crossJoin.enabled", "true")
-    sparkSession = if (conf.contains("hive.metastore.uris")) {
-      SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
-    } else {
-      SparkSession.builder().config(conf).getOrCreate()
-    }
+    sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
     sparkSession.sparkContext.setLogLevel(sparkParam.logLevel)
     sqlContext = sparkSession.sqlContext
 

@@ -5,8 +5,7 @@
     "batch.interval": "10s",
     "process.interval": "10m",
     "config": {
-      "spark.master": "local[*]",
-      "hive.metastore.uris": "thrift://localhost:9083"
+      "spark.master": "local[*]"
     },
     "init.clear": true
   },
