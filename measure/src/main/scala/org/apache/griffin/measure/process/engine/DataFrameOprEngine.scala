@@ -120,11 +120,9 @@ object DataFrameOprs {
       }
     }
 
-    implicit val encoder = Encoders.tuple(Encoders.scalaLong, Encoders.bean(classOf[AccuracyResult]))
-
     val df = sqlContext.table(s"`${dfName}`")
 
-    val results = df.flatMap { row =>
+    val results = df.rdd.flatMap { row =>
       try {
         val tmst = getLong(row, InternalColumns.tmst).getOrElse(timeInfo.calcTime)
         val missCount = getLong(row, miss).getOrElse(0L)
