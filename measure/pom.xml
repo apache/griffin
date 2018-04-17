@@ -119,12 +119,6 @@ under the License.
       <artifactId>spark-avro_${scala.binary.version}</artifactId>
       <version>4.0.0</version>
     </dependency>
-    <!--csv-->
-    <dependency>
-      <groupId>com.databricks</groupId>
-      <artifactId>spark-csv_${scala.binary.version}</artifactId>
-      <version>1.5.0</version>
-    </dependency>
 
     <!--log4j-->
     <dependency>
