@@ -1,5 +1,3 @@
-
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -27,7 +25,7 @@ Apache Griffin is a model driven data quality solution for modern data systems. 
 
 ## Getting Started
 
-### First Try of Griffin
+### First Taste of Griffin
 
 You can try Griffin in docker following the [docker guide](griffin-doc/docker/griffin-docker-guide.md).
 
