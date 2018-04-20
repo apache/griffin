@@ -21,6 +21,9 @@ class MeanUdafTest extends FunSuite  {
 
 
   test("test the udf"){
+
+    sqlContext.udf.register("my_mean", new MeanUdaf)
+
     // the udf will not work with nulls.
     val data1 = Seq[(Integer, Integer)](
       (1, 10),
@@ -53,9 +56,7 @@ class MeanUdafTest extends FunSuite  {
       (3, 10),
       (3, 10)).toDF("key", "value")
     data2.registerTempTable("agg2")
-    //your unit test assert here like below
-    assert("True".toLowerCase == "true")
-    sqlContext.udf.register("my_mean", new MeanUdaf)
+
 
     val nullFreeDf = sqlContext.sql(
 
