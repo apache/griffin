@@ -79,7 +79,8 @@ class MeanUdafTest extends FunSuite  {
 
       """
         |SELECT
-        | SUM(IF(udfVal=defaultVal, 0, 1)) equalCols, SUM(IF(udfVal=totalSum/totalCount, 0, 1)) avgCols
+        | SUM(IF(udfVal=defaultVal, 0, 1)) equalCols,
+        | SUM(IF(udfVal=totalSum/totalCount, 0, 1)) avgCols
         |FROM agg0
       """.stripMargin).toDF()
 
