@@ -125,6 +125,10 @@ Profiling rule expression in Griffin DSL is a sql-like expression, with select c
 Uniqueness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is unique.  
 	e.g. `name, age`, `name, (age + 1) as next_age`
 
+### Distinctness Rule
+Distinctness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is distinct.
+    e.g. `name, age`, `name, (age + 1) as next_age`
+
 ### Timeliness Rule
 Timeliness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the input time and output time (calculate time as default if not set).  
 	e.g. `ts`, `ts, end_ts`
@@ -149,12 +153,12 @@ For profiling, the request is always the aggregation function of data, the rule 
 For example, the dsl rule is `source.cntry, source.id.count(), source.age.max() group by source.cntry`, which represents the profiling requests. After the translation, the sql rule is as below:  
 - **profiling sql rule**: `SELECT source.cntry, count(source.id), max(source.age) FROM source GROUP BY source.cntry`, save as table `profiling`.  
 
-After the translation, the metrics will be persisted in table `profiling`.  
+After the translation, the metrics will be persisted in table `profiling`.
 
 ### Uniqueness
-For uniqueness, or called duplicate, is to find out the duplicate items of data, and rollup the items count group by duplicate times.  
-For example, the dsl rule is `name, age`, which represents the duplicate requests, in this case, source and target are the same data set. After the translation, the sql rule is as below:  
-- **get distinct items from source**: `SELECT name, age FROM source`, save as table `src`.  
+For uniqueness, or called duplicate, is to find out the duplicate items of data, and rollup the items count group by duplicate times.
+For example, the dsl rule is `name, age`, which represents the duplicate requests, in this case, source and target are the same data set. After the translation, the sql rule is as below:
+- **get distinct items from source**: `SELECT name, age FROM source`, save as table `src`.
 - **get all items from target**: `SELECT name, age FROM target`, save as table `tgt`.
 - **join two tables**: `SELECT src.name, src.age FROM tgt RIGHT JOIN src ON coalesce(src.name, '') = coalesce(tgt.name, '') AND coalesce(src.age, '') = coalesce(tgt.age, '')`, save as table `joined`.
 - **get items duplication**: `SELECT name, age, (count(*) - 1) AS dup FROM joined GROUP BY name, age`, save as table `grouped`.
@@ -165,6 +169,20 @@ For example, the dsl rule is `name, age`, which represents the duplicate request
 - **get duplicate metric**: `SELECT dup, count(*) AS num FROM dup_records GROUP BY dup`, save as table `dup_metric`.
 
 After the translation, the metrics will be persisted in table `dup_metric`.
+
+### Distinctness
+For distinctness, is to find out the duplicate items of data, the same as uniqueness in batch mode, but with some differences in streaming mode.
+In most time, you need distinctness other than uniqueness.
+For example, the dsl rule is `name, age`, which represents the distinct requests, in this case, source and target are the same data set. After the translation, the sql rule is as below:
+- **total count of source**: `SELECT COUNT(*) AS total FROM source`, save as table `total_count`.
+- **group by fields**: `SELECT name, age, (COUNT(*) - 1) AS dup, TRUE AS dist FROM source GROUP BY name, age`, save as table `dup_count`.
+- **distinct metric**: `SELECT COUNT(*) AS dist_count FROM dup_count WHERE dist`, save as table `distinct_metric`.
+- **source join distinct metric**: `SELECT source.*, dup_count.dup AS dup, dup_count.dist AS dist FROM source LEFT JOIN dup_count ON source.name = dup_count.name AND source.age = dup_count.age`, save as table `dist_joined`.
+- **add row number**: `SELECT *, ROW_NUMBER() OVER (DISTRIBUTE BY name, age SORT BY dist) row_num FROM dist_joined`, save as table `row_numbered`.
+- **duplicate records**: `SELECT name, age, dup FROM row_numbered WHERE NOT dist OR row_num > 1`, save as table `dup_records`.
+- **duplicate metric**: `SELECT name, age, dup, COUNT(*) AS num FROM dup_records GROUP BY name, age, dup`, save as table `dup_metric`.
+
+After the translation, the metrics will be persisted in table `distinct_metric` and `dup_metric`.
 
 ### Timeliness
 For timeliness, is to measure the latency of each item, and get the statistics of the latencies.  
