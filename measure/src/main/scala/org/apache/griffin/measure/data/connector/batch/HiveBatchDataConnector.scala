@@ -147,7 +147,7 @@ case class HiveBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngines, 
 
   private def dataSql(): String = {
     val tableClause = s"SELECT * FROM ${concreteTableName}"
-    if (wheres.size > 0) {
+    if (wheres.length > 0) {
       val clauses = wheres.map { w =>
         s"${tableClause} WHERE ${w}"
       }
