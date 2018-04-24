@@ -215,7 +215,7 @@ case class DqEngines(engines: Seq[DqEngine]) extends DqEngine {
       val dsName = dsUpdate.dsName
       collectUpdateDf(dsUpdate) match {
         case Some(df) => {
-          dataSources.filter(_.name == dsName).headOption.foreach(_.updateData(df))
+          dataSources.find(_.name == dsName).foreach(_.updateData(df))
         }
         case _ => {
           // do nothing
