@@ -32,10 +32,10 @@ sealed trait PersistType {
 object PersistType {
   private val persistTypes: List[PersistType] = List(RecordPersistType, MetricPersistType, NonePersistType)
   def apply(ptn: String): PersistType = {
-    persistTypes.filter(tp => ptn match {
+    persistTypes.find(tp => ptn match {
       case tp.regex() => true
       case _ => false
-    }).headOption.getOrElse(NonePersistType)
+    }).getOrElse(NonePersistType)
   }
   def unapply(pt: PersistType): Option[String] = Some(pt.desc)
 }

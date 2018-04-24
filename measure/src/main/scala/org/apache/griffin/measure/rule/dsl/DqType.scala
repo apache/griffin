@@ -31,10 +31,10 @@ object DqType {
     AccuracyType, ProfilingType, UniquenessType, DistinctnessType, TimelinessType, CompletenessType, UnknownType
   )
   def apply(ptn: String): DqType = {
-    dqTypes.filter(tp => ptn match {
+    dqTypes.find(tp => ptn match {
       case tp.regex() => true
       case _ => false
-    }).headOption.getOrElse(UnknownType)
+    }).getOrElse(UnknownType)
   }
   def unapply(pt: DqType): Option[String] = Some(pt.desc)
 }
