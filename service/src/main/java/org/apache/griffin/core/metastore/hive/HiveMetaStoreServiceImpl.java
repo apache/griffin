@@ -51,9 +51,6 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     @Autowired
     private HiveMetaStoreClient client = null;
 
-    @Autowired
-    private HiveMetaStoreProxy proxy;
-
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;
 
