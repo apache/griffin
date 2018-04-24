@@ -28,10 +28,10 @@ sealed trait ProcessType {
 object ProcessType {
   private val procTypes: List[ProcessType] = List(BatchProcessType, StreamingProcessType)
   def apply(ptn: String): ProcessType = {
-    procTypes.filter(tp => ptn match {
+    procTypes.find(tp => ptn match {
       case tp.regex() => true
       case _ => false
-    }).headOption.getOrElse(BatchProcessType)
+    }).getOrElse(BatchProcessType)
   }
   def unapply(pt: ProcessType): Option[String] = Some(pt.desc)
 }

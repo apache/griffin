@@ -55,7 +55,7 @@ case class TextDirBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngine
 
       val validDataDirs = dataDirs.filter(dir => !emptyDir(dir))
 
-      if (validDataDirs.size > 0) {
+      if (validDataDirs.nonEmpty) {
         val df = sqlContext.read.text(validDataDirs:  _*)
         val dfOpt = Some(df)
         val preDfOpt = preProcess(dfOpt, ms)

@@ -45,7 +45,7 @@ public class MailUtil {
         msg.setFrom(new InternetAddress(emailParam.mail()));
         //msg.setRecipient(Message.RecipientType.TO, new InternetAddress(UserArr));
         String[] arr = null;
-        if (UserArr.indexOf(",") == -1) {
+        if (!UserArr.contains(",")) {
             arr = new String[]{UserArr};
         } else {
             arr = UserArr.split(",");
