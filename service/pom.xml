@@ -36,7 +36,7 @@ under the License.
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hadoop.version>2.7.1</hadoop.version>
-        <hive.version>2.3.3</hive.version>
+        <hive.version>2.2.0</hive.version>
         <scala.version>2.10</scala.version>
         <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
         <confluent.version>3.2.0</confluent.version>
