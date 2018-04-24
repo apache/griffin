@@ -28,10 +28,10 @@ sealed trait CollectType {
 object CollectType {
   private val collectTypes: List[CollectType] = List(DefaultCollectType, EntriesCollectType, ArrayCollectType, MapCollectType)
   def apply(ptn: String): CollectType = {
-    collectTypes.filter(tp => ptn match {
+    collectTypes.find(tp => ptn match {
       case tp.regex() => true
       case _ => false
-    }).headOption.getOrElse(DefaultCollectType)
+    }).getOrElse(DefaultCollectType)
   }
   def unapply(pt: CollectType): Option[String] = Some(pt.desc)
 }
