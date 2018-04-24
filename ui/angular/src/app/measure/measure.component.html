@@ -37,9 +37,9 @@ under the License.
       <tbody>
         <tr *ngIf="!results">
           <td colspan="7" style="text-align:center;display:none">No content!</td>
-          <td class="icon" style="border-top-style:none">
+          <!-- <td class="icon" style="border-top-style:none">
             <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
-          </td>
+          </td> -->
         </tr>
         <tr *ngFor="let row of mf.data">
           <td><a routerLink="/measure/{{row.id}}">{{row.name}}</a></td>

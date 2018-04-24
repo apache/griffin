@@ -38,3 +38,5 @@ derby.log
 metastore_db
 
 measure/src/test/test_scala/*
+
+.vscode

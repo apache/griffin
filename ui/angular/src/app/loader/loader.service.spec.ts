@@ -16,13 +16,28 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-package org.apache.griffin.core.interceptor;
+import { LoaderService } from './loader.service';
 
-import java.lang.annotation.*;
+describe('CreateMeasureComponent', () => {
+  let component: LoaderService;
+  let fixture: ComponentFixture<LoaderService>;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface Token {
-}
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ LoaderService ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LoaderService);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should be created', () => {
+    expect(component).toBeTruthy();
+  });
+});

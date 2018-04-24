@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import { HttpClient } from "@angular/common/http";
 import * as $ from 'jquery';
 import {ServiceService} from '../service/service.service';
 
