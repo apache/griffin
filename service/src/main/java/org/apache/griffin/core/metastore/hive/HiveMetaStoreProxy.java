@@ -29,6 +29,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.security.CodeSource;
 
 @Component
 public class HiveMetaStoreProxy {
@@ -49,19 +53,101 @@ public class HiveMetaStoreProxy {
     @Value("${hive.hmshandler.retry.interval}")
     private String interval;
 
-    private HiveMetaStoreClient client = null;
+//    private HiveMetaStoreClient client = null;
+    private ThriftMetastoreClient client = null;
 
-    @Bean
-    public HiveMetaStoreClient initHiveMetastoreClient() {
+    private static final Logger l4j = LoggerFactory.getLogger(HiveConf.class);
+
+    private static URL checkConfigFile(File f) {
+        try {
+            return (f.exists() && f.isFile()) ? f.toURI().toURL() : null;
+        } catch (Throwable e) {
+            if (l4j.isInfoEnabled()) {
+                l4j.info("Error looking for config " + f, e);
+            }
+            System.err.println("Error looking for config " + f + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    private static URL findConfigFile(ClassLoader classLoader, String name, boolean doLog) {
+        URL result = classLoader.getResource(name);
+        LOGGER.warn("result: {}", result);
+        if (result == null) {
+            String confPath = System.getenv("HIVE_CONF_DIR");
+            LOGGER.warn("confPath: {}", confPath);
+            result = checkConfigFile(new File(confPath, name));
+            LOGGER.warn("result: {}", result);
+            if (result == null) {
+                String homePath = System.getenv("HIVE_HOME");
+                LOGGER.warn("homePath: {}", homePath);
+                String nameInConf = "conf" + File.pathSeparator + name;
+                LOGGER.warn("nameInConf: {}", nameInConf);
+                result = checkConfigFile(new File(homePath, nameInConf));
+                LOGGER.warn("result: {}", result);
+                if (result == null) {
+                    URI jarUri = null;
+                    try {
+                        java.security.ProtectionDomain domain = HiveConf.class.getProtectionDomain();
+                        LOGGER.warn("domain: {}", domain);
+                        CodeSource codeSource = domain.getCodeSource();
+                        LOGGER.warn("codeSource: {}", codeSource);
+                        URL location = codeSource.getLocation();
+                        LOGGER.warn("location: {}", location);
+                        jarUri = location.toURI();
+
+//                        jarUri = HiveConf.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+                        LOGGER.warn("jarUri: {}", jarUri);
+                    } catch (Throwable e) {
+                        if (l4j.isInfoEnabled()) {
+                            l4j.info("Cannot get jar URI", e);
+                        }
+                        System.err.println("Cannot get jar URI: " + e.getMessage());
+                    }
+                    File f1 = new File(jarUri);
+                    LOGGER.warn("f1: {}", f1);
+                    File f2 = f1.getParentFile();
+                    LOGGER.warn("f2: {}", f2);
+                    File f3 = new File(f2, nameInConf);
+                    LOGGER.warn("f3: {}", f3);
+                    result = checkConfigFile(f3);
+                }
+            }
+        }
+        if (doLog && l4j.isInfoEnabled()) {
+            l4j.info("Found configuration file " + result);
+        }
+        return result;
+    }
+
+//    @Bean
+    public ThriftMetastoreClient initHiveMetastoreClient() {
+        LOGGER.warn("begin client");
+        LOGGER.warn(File.pathSeparator);
+        LOGGER.warn(uris);
+
+//        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader classLoader = HiveConf.class.getClassLoader();
+        LOGGER.warn("classLoader: {}", classLoader);
+        if (classLoader == null) {
+            classLoader = HiveConf.class.getClassLoader();
+            LOGGER.warn("classLoader: {}", classLoader);
+        }
+        URL url = findConfigFile(classLoader, "hive-site.xml", true);
+        LOGGER.warn("url: {}", url);
+
         HiveConf hiveConf = new HiveConf();
+        LOGGER.warn("hive conf success");
         hiveConf.set("hive.metastore.local", "false");
         hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
         hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
         hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);
         try {
-            client = new HiveMetaStoreClient(hiveConf);
-        } catch (MetaException e) {
+            LOGGER.warn("begin hive ms client");
+            client = new ThriftMetastoreClient(hiveConf);
+            LOGGER.warn("hive ms client success");
+        } catch (Exception e) {
             LOGGER.error("Failed to connect hive metastore. {}", e.getMessage());
             client = null;
         }
