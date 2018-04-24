@@ -29,10 +29,10 @@ sealed trait DslType {
 object DslType {
   private val dslTypes: List[DslType] = List(SparkSqlType, GriffinDslType, DfOprType)
   def apply(ptn: String): DslType = {
-    dslTypes.filter(tp => ptn match {
+    dslTypes.find(tp => ptn match {
       case tp.regex() => true
       case _ => false
-    }).headOption.getOrElse(GriffinDslType)
+    }).getOrElse(GriffinDslType)
   }
   def unapply(pt: DslType): Option[String] = Some(pt.desc)
 }
