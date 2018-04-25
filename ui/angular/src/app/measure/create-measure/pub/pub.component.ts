@@ -71,6 +71,7 @@ export class PubComponent implements AfterViewChecked, OnInit {
   public hide(): void {
     this.visibleAnimate = false;
     setTimeout(() => (this.visible = false), 300);
+    $("#save").removeAttr("disabled");
   }
 
   public onContainerClicked(event: MouseEvent): void {
@@ -149,6 +150,7 @@ export class PubComponent implements AfterViewChecked, OnInit {
       owner:this.newMeasure.owner
     }
     var addModels = this.serviceService.config.uri.addModels;
+    $("#save").attr("disabled", "true");
     this.http.post(addModels, measure2Save).subscribe(
       data => {
         this.createResult = data;
