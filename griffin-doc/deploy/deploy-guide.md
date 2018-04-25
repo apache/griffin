@@ -18,7 +18,7 @@ under the License.
 -->
 
 # Apache Griffin Deployment Guide
-For Griffin users, you can deploy it with some dependencies in your environment, you can follow instructions below.
+For Griffin users, please follow the instructions below to deploy Griffin in your environment. Note that there are some dependencies should be installed first.
 
 ### Prerequisites
 You need to install following items
