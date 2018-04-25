@@ -20,33 +20,35 @@ under the License.
 # Apache Griffin Docker Guide
 Griffin docker images are pre-built on docker hub, users can pull them to try griffin in docker.
 
-## Preparation
-
-### Environment preparation
+## Environment preparation
 1. Install [docker](https://docs.docker.com/engine/installation/) and [docker compose](https://docs.docker.com/compose/install/).
 2. Increase vm.max_map_count of your local machine, to use elasticsearch.
     ```
     sysctl -w vm.max_map_count=262144
     ```
-3. Pull griffin pre-built docker images.
-    ```
+## Pull the Docker Images
+   Here lists the griffin and dependent environment docker images:
+   - `bhlx3lyx7/svc_msr`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
+   - `bhlx3lyx7/elasticsearch`: This image is based on official elasticsearch, adding some configurations to enable cors requests, to provide elasticsearch service for metrics persist.
+   - `bhlx3lyx7/kafka`: This image contains kafka 0.8, and some demo streaming data, to provide streaming data source in streaming mode.
+   - `zookeeper:3.5`: This image is official zookeeper, to provide zookeeper service in streaming mode.
+	
+   Pull the images by the following commands.
+   ```
     docker pull bhlx3lyx7/svc_msr:0.2.0
     docker pull bhlx3lyx7/elasticsearch
     docker pull bhlx3lyx7/kafka
     docker pull zookeeper:3.5
-    ```
+   ```
    Or you can pull the images faster through mirror acceleration if you are in China.
-    ```
+   ```
     docker pull registry.docker-cn.com/bhlx3lyx7/svc_msr:0.2.0
     docker pull registry.docker-cn.com/bhlx3lyx7/elasticsearch
     docker pull registry.docker-cn.com/bhlx3lyx7/kafka
-    docker pull registry.docker-cn.com/zookeeper:3.5
-    ```
-   The docker images are the griffin environment images.
-    - `bhlx3lyx7/svc_msr`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
-    - `bhlx3lyx7/elasticsearch`: This image is based on official elasticsearch, adding some configurations to enable cors requests, to provide elasticsearch service for metrics persist.
-    - `bhlx3lyx7/kafka`: This image contains kafka 0.8, and some demo streaming data, to provide streaming data source in streaming mode.
-    - `zookeeper:3.5`: This image is official zookeeper, to provide zookeeper service in streaming mode.
+    docker pull registry.docker-cn.com/zookeeper:3.
+   ```
+## Start the Containers
+After pulling the images, you can run the docker image in [Batch mode](#how-to-use-griffin-docker-images-in-batch-mode)(always the first choice) or [Streaming mode](#how-to-use-griffin-docker-images-in-streaming-mode)(only if you need a streaming environment like kafka data source). Choose one mode and follow step1&2 to start the docker container.
 
 ### How to use griffin docker images in batch mode
 1. Copy [docker-compose-batch.yml](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/docker/svc_msr/docker-compose-batch.yml) to your work path.
