@@ -17,17 +17,11 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# Apache Griffin Develop Environment Build Guide
-For Griffin developers, you need to build an entire environment for development, it wastes time.
-You can directly use the Griffin docker image, to the functional test during your development.
-Please follow this [griffin docker guide](../docker/griffin-docker-guide.md).
+# Apache Griffin Development Environment Build Guide
+We have pre-built Griffin docker images for Griffin developers. You can use the images directly, which should be much faster than building the environment locally.
 
-## Preparation
-Follow this [griffin docker guide](../docker/griffin-docker-guide.md#environment-preparation).
-
-## Start in batch mode or streaming mode
-Usually, you can run the docker image in batch mode(always the first choice) or streaming mode(only if you need a streaming environment like kafka data source), choose a mode to start.
-For [Batch mode](../docker/griffin-docker-guide.md#how-to-use-griffin-docker-images-in-batch-mode) and [Streaming mode](../docker/griffin-docker-guide.md#how-to-use-griffin-docker-images-in-streaming-mode), follow step 1 and 2, you can start the docker container.
+## Set Up with Docker Images
+Here are step-by-step instructions on how to [pull Docker images](../docker/griffin-docker-guide.md#environment-preparation) from the repository and run containers using the images.
 
 ## Run or Debug at local
 ### For service module
