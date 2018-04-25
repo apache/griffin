@@ -155,6 +155,10 @@ under the License.
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>de.ruedigermoeller</groupId>
+                    <artifactId>fst</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
