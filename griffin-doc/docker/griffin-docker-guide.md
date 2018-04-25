@@ -45,7 +45,7 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     docker pull registry.docker-cn.com/bhlx3lyx7/svc_msr:0.2.0
     docker pull registry.docker-cn.com/bhlx3lyx7/elasticsearch
     docker pull registry.docker-cn.com/bhlx3lyx7/kafka
-    docker pull registry.docker-cn.com/zookeeper:3.
+    docker pull registry.docker-cn.com/zookeeper:3.5
    ```
 ## Start the Containers
 After pulling the images, you can run the docker image in [Batch mode](#how-to-use-griffin-docker-images-in-batch-mode)(always the first choice) or [Streaming mode](#how-to-use-griffin-docker-images-in-streaming-mode)(only if you need a streaming environment like kafka data source). Choose one mode and follow step1&2 to start the docker container.
