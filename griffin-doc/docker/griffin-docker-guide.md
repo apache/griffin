@@ -27,7 +27,7 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     sysctl -w vm.max_map_count=262144
     ```
 ## Pull the Docker Images
-   There are four pre-built griffin environment images:
+   Here lists the griffin and dependent environment docker images:
    - `bhlx3lyx7/svc_msr`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
    - `bhlx3lyx7/elasticsearch`: This image is based on official elasticsearch, adding some configurations to enable cors requests, to provide elasticsearch service for metrics persist.
    - `bhlx3lyx7/kafka`: This image contains kafka 0.8, and some demo streaming data, to provide streaming data source in streaming mode.
