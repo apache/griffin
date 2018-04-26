@@ -195,7 +195,7 @@ export class HealthComponent implements OnInit {
               metricNode.details = JSON.parse(
                 JSON.stringify(jobs[i].metricValues)
               );
-              metricNode.name = mesName; //jobs[i].name;// to avoid same metricName
+              metricNode.name = jobs[i].name;
               metricNode.timestamp = jobs[i].metricValues[0].tmst;
               metricNode.dq =
                 jobs[i].metricValues[0].value.matched /
