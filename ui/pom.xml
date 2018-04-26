@@ -24,7 +24,7 @@ under the License.
     <parent>
         <groupId>org.apache.griffin</groupId>
         <artifactId>griffin</artifactId>
-        <version>0.2.0-incubating-SNAPSHOT</version>
+        <version>0.2.0-incubating</version>
     </parent>
   <artifactId>ui</artifactId>
   <packaging>pom</packaging>
