@@ -16,12 +16,16 @@
 #under the License.
 
 griffin:
-  image: bhlx3lyx7/svc_msr:0.2.0
+  image: bhlx3lyx7/griffin_spark2:0.2.0
   hostname: griffin
   links:
     - es
+    - zk
+    - kafka
   environment:
     ES_HOSTNAME: es
+    ZK_HOSTNAME: zk
+    KAFKA_HOSTNAME: kafka
   volumes:
     - /var/lib/mysql
   ports:
@@ -43,3 +47,19 @@ es:
     - 39200:9200
     - 39300:9300
   container_name: es
+
+zk:
+  image: zookeeper:3.5
+  hostname: zk
+  ports:
+    - 32181:2181
+  container_name: zk
+  restart: always
+
+kafka:
+  image: bhlx3lyx7/kafka
+  hostname: kafka
+  ports:
+    - 39092:9092
+  container_name: kafka
+  tty: true
