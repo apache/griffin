@@ -97,6 +97,7 @@ export class MetricComponent implements OnInit {
         this.finalData.push(node);
       }
       this.originalData = JSON.parse(JSON.stringify(this.finalData));
+      console.log(this.originalData);
       var self = this;
       setTimeout(function function_name(argument) {
         self.redraw(self.finalData);
