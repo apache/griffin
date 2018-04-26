@@ -29,20 +29,21 @@ under the License.
 	    </span>
       </div>
     </div>
-    <div class="col-sm-5 chartItem"  *ngFor="let outerItems of finalData;let parent=index" style="margin-bottom:30px;margin-right:15px;">
-      <div class="row">      
+    <!-- <div class="col-sm-5 chartItem"  *ngFor="let outerItems of finalData;let parent=index" style="margin-bottom:30px;margin-right:15px;"> -->
+    <div *ngFor="let outerItems of finalData;let parent=index">
+      <!-- <div class="row">      
         <div style="text-align: center;" >
           <h4>{{outerItems.name}}</h4>
         </div>
-      </div>
-      <div class="row">
-        <!-- <div class="col-sm-6 col-md-4 col-xs-12 col-lg-3 chartItem" *ngFor="let items of outerItems.metrics;let i=index;" style="margin-bottom:30px;"> -->
-          <div *ngFor="let items of outerItems.metrics;let i=index;">
+      </div> -->
+      <!-- <div class="row"> -->
+        <div class="col-sm-6 col-md-4 col-xs-12 col-lg-3 chartItem" *ngFor="let items of outerItems.metrics;let i=index;" style="margin-bottom:30px;">
+          <!-- <div *ngFor="let items of outerItems.metrics;let i=index;"> -->
           <div class="row-fluid" style="cursor: pointer;">
             <div id="thumbnail{{parent}}-{{i}}" class="thumb-chart" style="border: 2px solid;" echarts [options]="getOption(parent,i)" (click)="goTo(parent,i)"></div>
           </div>
         </div>
-      </div>
+      <!-- </div> -->
     </div>
   </div>
 </div>
