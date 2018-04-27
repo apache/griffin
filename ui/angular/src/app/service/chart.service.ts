@@ -195,10 +195,11 @@ export class ChartService {
     //     "</div><div style='text-align:center;'>Click to see details</div></div>";
     //   $(divs).html(code);
     // }else{
+    var trail = '...';
     var self = this;
     var option = {
       title: {
-        text: metric.name,
+        text: metric.name.length > 10 ? metric.name.substring(0, 10) + trail : metric.name,
         left: "center",
         textStyle: {
           fontWeight: "normal",

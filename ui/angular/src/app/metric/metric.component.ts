@@ -65,10 +65,9 @@ export class MetricComponent implements OnInit {
       }
       for (let mesName in this.mesWithJob) {
         var jobs = this.mesWithJob[mesName];
-        var metricData = this.mesWithJob[mesName];
         if (
-          metricData.length > 0 && metricData[0].type == "accuracy"
-        ) {         
+          jobs.length > 0 && jobs[0].type == "accuracy"
+        ) {  
           var node = null;
           node = new Object();
           node.name = mesName;
