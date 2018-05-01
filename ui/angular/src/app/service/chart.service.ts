@@ -187,18 +187,11 @@ export class ChartService {
 
   getOptionThum(metric) {
     var data = this.getMetricData(metric);
-    // if(isNaN(data[0][1])){
-    //   let _chartId = "#" + chartId;
-    //   var divs = $(_chartId);
-    //   var i = document.createElement('i');
-    //   var code = "<div><div style='text-align:center;'>"+metric.name+
-    //     "</div><div style='text-align:center;'>Click to see details</div></div>";
-    //   $(divs).html(code);
-    // }else{
+    var trail = '...';
     var self = this;
     var option = {
       title: {
-        text: metric.name,
+        text: metric.name.length > 10 ? metric.name.substring(0, 10) + trail : metric.name,
         left: "center",
         textStyle: {
           fontWeight: "normal",
