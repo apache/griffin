@@ -167,15 +167,24 @@ export class HealthComponent implements OnInit {
     this.resizeTreeMap();
     this.chartOption = option;
   }
+  
+  checkvalue(job){
+    return job.metricValues.length === 0;
+  }
 
   renderData() {
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_dashboard).subscribe(data => {
       this.mesWithJob = JSON.parse(JSON.stringify(data));
+      for(let i=0;i<this.mesWithJob.length;i++) {
+        if(this.mesWithJob[i].some(this.checkvalue)){
+          this.mesWithJob[i].splice(i,1);
+        }
+      }
       for (let mesName in this.mesWithJob) {
-        var metricData = this.mesWithJob[mesName][0];
+        var jobs = this.mesWithJob[mesName];
         if (
-          metricData.metricValues[0] != undefined && metricData.type == "accuracy"
+          jobs.length > 0 && jobs[0].type == "accuracy"
         ) {
           var jobs = this.mesWithJob[mesName];
           var node = null;
