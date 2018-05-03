@@ -40,7 +40,7 @@ public class HiveMetaStoreProxy {
     /**
      * Set attempts and interval for HiveMetastoreClient to retry.
      *
-     * @hive.hmshandler.retry.attempts: The number of times to retry a HMSHandler call if there were a connection ERROR.
+     * @hive.hmshandler.retry.attempts: The number of times to retry a HMSHandler call if there were a connection error.
      * @hive.hmshandler.retry.interval: The time between HMSHandler retry attempts on failure.
      */
     @Value("${hive.hmshandler.retry.attempts}")
@@ -64,7 +64,6 @@ public class HiveMetaStoreProxy {
         } catch (MetaException e) {
             LOGGER.error("Failed to connect hive metastore. {}", e.getMessage());
         }
-
         return client;
     }
 

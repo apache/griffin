@@ -21,9 +21,9 @@ import { Injectable } from "@angular/core";
 @Injectable()
 export class ServiceService {
   constructor() {}
-  public BACKEND_SERVER = 'http://10.149.247.90:38080';
+  // public BACKEND_SERVER = 'http://10.149.247.90:38080';
   // public BACKEND_SERVER = 'http://localhost:8080';
-  //public BACKEND_SERVER = "";
+  public BACKEND_SERVER = "";
   public API_ROOT_PATH = "/api/v1";
 
   public config = {

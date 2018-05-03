@@ -98,7 +98,7 @@ trait DataSourceCache extends DataCacheable with WithFanIn[Long] with Loggable w
 
   val defOldCacheIndex = 0L
 
-  protected def writeDataFrame(dfw: DataFrameWriter, path: String): Unit
+  protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit
   protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame
 
   def init(): Unit = {}

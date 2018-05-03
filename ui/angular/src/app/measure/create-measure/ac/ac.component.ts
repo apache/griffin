@@ -235,6 +235,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
   public hide(): void {
     this.visibleAnimate = false;
     setTimeout(() => (this.visible = false), 300);
+    $("#save").removeAttr("disabled");
   }
 
   public onContainerClicked(event: MouseEvent): void {
@@ -483,7 +484,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
     this.visible = true;
     setTimeout(() => (this.visibleAnimate = true), 100);
   }
-  
+
   deleteUnit(index){
     delete this.newMeasure["data.sources"][index]["connectors"][0]["data.unit"];
   }
@@ -494,6 +495,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
 
   save() {
     var addModels = this.serviceService.config.uri.addModels;
+    $("#save").attr("disabled", "true");
     this.http.post(addModels, this.newMeasure).subscribe(
       data => {
         this.createResult = data;

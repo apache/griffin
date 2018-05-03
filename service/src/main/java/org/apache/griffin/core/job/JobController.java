@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.interceptor.Token;
 import org.apache.griffin.core.job.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,14 +45,12 @@ public class JobController {
 
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    @Token
     public AbstractJob addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
         return jobService.addJob(jobSchedule);
     }
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Token
     public void onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
         jobService.onAction(jobId,action);
     }

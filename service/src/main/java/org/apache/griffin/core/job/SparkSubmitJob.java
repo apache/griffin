@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.griffin.core.job.BatchJobOperatorImpl;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivyConf;
 import org.apache.griffin.core.job.entity.LivySessionStates;
@@ -42,6 +43,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.apache.griffin.core.job.JobInstance.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;

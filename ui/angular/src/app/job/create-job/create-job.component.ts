@@ -110,6 +110,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     setTimeout(() => (this.visible = false), 300);
     this.originBegin = [];
     this.originLength = [];
+    $("#save").removeAttr("disabled");
   }
 
   public onContainerClicked(event: MouseEvent): void {
@@ -187,6 +188,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
 
   save() {
     var addJobs = this.serviceService.config.uri.addJobs;
+    $("#save").attr("disabled", "true");
     this.http.post(addJobs, this.newJob).subscribe(
       data => {
         this.createResult = data["results"];

@@ -38,6 +38,8 @@ import org.apache.griffin.measure.utils.ParamUtil._
 
 import scala.util.Try
 
+import org.apache.spark.sql._
+
 case class DataFrameOprEngine(sqlContext: SQLContext) extends SparkDqEngine {
 
   def runRuleStep(timeInfo: TimeInfo, ruleStep: RuleStep): Boolean = {
@@ -85,9 +87,11 @@ object DataFrameOprs {
     val dfName = details.getOrElse(_dfName, "").toString
     val colNameOpt = details.get(_colName).map(_.toString)
 
-    val df = sqlContext.table(s"`${dfName}`")
+    implicit val encoder = Encoders.STRING
+
+    val df: DataFrame = sqlContext.table(s"`${dfName}`")
     val rdd = colNameOpt match {
-      case Some(colName: String) => df.map(_.getAs[String](colName))
+      case Some(colName: String) => df.map(r => r.getAs[String](colName))
       case _ => df.map(_.getAs[String](0))
     }
     sqlContext.read.json(rdd) // slow process
@@ -118,7 +122,7 @@ object DataFrameOprs {
 
     val df = sqlContext.table(s"`${dfName}`")
 
-    val results = df.flatMap { row =>
+    val results = df.rdd.flatMap { row =>
       try {
         val tmst = getLong(row, InternalColumns.tmst).getOrElse(timeInfo.calcTime)
         val missCount = getLong(row, miss).getOrElse(0L)
