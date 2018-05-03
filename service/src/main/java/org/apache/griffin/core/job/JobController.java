@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.interceptor.Token;
 import org.apache.griffin.core.job.entity.JobDataBean;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
@@ -49,7 +48,6 @@ public class JobController {
 
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    @Token
     public JobSchedule addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
         return jobService.addJob(jobSchedule);
     }

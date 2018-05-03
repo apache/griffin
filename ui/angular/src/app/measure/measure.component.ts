@@ -65,12 +65,12 @@ export class MeasureComponent implements OnInit {
   }
 
   remove(row) {
-    console.log(row);
     this.visible = true;
     setTimeout(() => (this.visibleAnimate = true), 100);
     this.deleteId = row.id;
     this.deleteIndex = this.results.indexOf(row);
     this.deletedRow = row;
+    $("#save").removeAttr("disabled");
     if(this.deletedRow["measure.type"]!=="external"){
       var sourcedata = this.deletedRow["data.sources"][0].connectors[0].config;
       this.sourceTable = sourcedata["table.name"];
@@ -86,6 +86,7 @@ export class MeasureComponent implements OnInit {
   confirmDelete() {
     var deleteModel = this.serviceService.config.uri.deleteModel;
     let deleteUrl = deleteModel + "/" + this.deleteId;
+    $("#save").attr("disabled", "true");
     this.http.delete(deleteUrl).subscribe(
       data => {
         var self = this;

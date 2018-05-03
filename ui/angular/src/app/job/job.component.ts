@@ -66,6 +66,7 @@ export class JobComponent implements OnInit {
   }
 
   remove(row) {
+    $("#save").removeAttr("disabled");
     this.visible = true;
     setTimeout(() => (this.visibleAnimate = true), 100);
     this.deletedRow = row;
@@ -81,6 +82,7 @@ export class JobComponent implements OnInit {
   confirmDelete() {
     let deleteJob = this.serviceService.config.uri.deleteJob;
     let deleteUrl = deleteJob + "/" + this.deleteId;
+    $("#save").attr("disabled", "true");
     this.http.delete(deleteUrl).subscribe(
       data => {
         let self = this;

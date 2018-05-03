@@ -189,6 +189,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
     this.transenumrule = [];
     this.transnullrule = [];
     this.noderule = [];
+    $("#save").removeAttr("disabled");
   }
 
   public onContainerClicked(event: MouseEvent): void {
@@ -488,6 +489,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
 
   save() {
     var addModels = this.serviceService.config.uri.addModels;
+    $("#save").attr("disabled", "true");
     this.http.post(addModels, this.newMeasure).subscribe(
       data => {
         this.createResult = data;

@@ -41,7 +41,7 @@ case class UserParam( @JsonProperty("name") name: String,
   }
   private val baselineDsOpt = {
     val baselines = validDs.filter(_.isBaseLine)
-    if (baselines.size > 0) baselines.headOption
+    if (baselines.nonEmpty) baselines.headOption
     else validDs.headOption
   }
 
@@ -58,7 +58,7 @@ case class UserParam( @JsonProperty("name") name: String,
   }
 
   override def validate(): Boolean = {
-    dataSources.size > 0
+    dataSources.nonEmpty
   }
 
 }

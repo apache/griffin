@@ -27,27 +27,27 @@ Apache Griffin is a model driven data quality solution for modern data systems. 
 
 ## Getting Started
 
-### First Try of Griffin
+### Quick Start
 
 You can try Griffin in docker following the [docker guide](griffin-doc/docker/griffin-docker-guide.md).
 
 ### Environment for Dev
 
-If you want to develop Griffin, please follow [this document](griffin-doc/dev/dev-env-build.md), to skip complex environment building work.
+Follow [Apache Griffin Development Environment Build Guide](griffin-doc/dev/dev-env-build.md) to set up development environment.
 
 ### Deployment at Local
 
-If you want to deploy Griffin in your local environment, please follow [this document](griffin-doc/deploy/deploy-guide.md).
+If you want to deploy Griffin in your local environment, please follow [Apache Griffin Deployment Guide](griffin-doc/deploy/deploy-guide.md).
 
 ## Community
 
-You can access [griffin home page](http://griffin.apache.org).
+For more information about Griffin, please visit our website at: [griffin home page](http://griffin.apache.org).
 
 You can contact us via email:
 - dev-list: <a href="mailto:dev@griffin.incubator.apache.org">dev@griffin.incubator.apache.org</a>
 - user-list: <a href="mailto:users@griffin.incubator.apache.org">users@griffin.incubator.apache.org</a>
 
-You can also subscribe this mail by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.incubator.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.incubator.apache.org).
+You can also subscribe the latest information by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.incubator.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.incubator.apache.org).
 
 You can access our issues on [JIRA page](https://issues.apache.org/jira/browse/GRIFFIN)
 
