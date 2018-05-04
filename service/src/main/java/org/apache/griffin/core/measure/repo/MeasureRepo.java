@@ -36,7 +36,7 @@ public interface MeasureRepo<T extends Measure> extends CrudRepository<T, Long> 
 
     T findByIdAndDeleted(Long id, Boolean deleted);
 
-    @Query("select DISTINCT m.organization from #{#entityName} m where m.deleted = ?1")
+    @Query("select DISTINCT m.organization from #{#entityName} m where m.deleted = ?1 and m.organization is not null")
     List<String> findOrganizations(Boolean deleted);
 
     @Query("select m.name from #{#entityName} m " +
