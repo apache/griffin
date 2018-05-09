@@ -23,6 +23,7 @@ package org.apache.griffin.core.measure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.util.JsonUtil;
 import org.springframework.util.CollectionUtils;
@@ -90,9 +91,24 @@ public class DataSource extends AbstractAuditableEntity {
     }
 
     @JsonProperty("cache")
-    public void setCacheMap(Map<String, Object> cacheMap) throws IOException {
+    public void setCacheMap(Map<String, Object> cacheMap){
         this.cacheMap = cacheMap;
-        this.cache = JsonUtil.toJson(cacheMap);
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void save() throws JsonProcessingException {
+        if (cache != null) {
+            this.cache = JsonUtil.toJson(cacheMap);
+        }
+    }
+
+    @PostLoad
+    public void load() throws IOException {
+        if (!StringUtils.isEmpty(cache)) {
+            this.cacheMap = JsonUtil.toEntity(cache, new TypeReference<Map<String, Object>>() {
+            });
+        }
     }
 
     public DataSource() {

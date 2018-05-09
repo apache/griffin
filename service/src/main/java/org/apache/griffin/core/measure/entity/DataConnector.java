@@ -188,7 +188,7 @@ public class DataConnector extends AbstractAuditableEntity {
 
     @PostLoad
     public void load() throws IOException {
-        if (!org.springframework.util.StringUtils.isEmpty(config)) {
+        if (!StringUtils.isEmpty(config)) {
             this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
             });
         }
