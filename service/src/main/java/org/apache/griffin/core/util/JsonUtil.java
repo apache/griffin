@@ -38,11 +38,19 @@ public class JsonUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtil.class);
 
     public static String toJson(Object obj) throws JsonProcessingException {
+        if (obj == null) {
+            LOGGER.warn("Object cannot be empty!");
+            return null;
+        }
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(obj);
     }
 
     public static String toJsonWithFormat(Object obj) throws JsonProcessingException {
+        if (obj == null) {
+            LOGGER.warn("Object to be formatted cannot be empty!");
+            return null;
+        }
         ObjectWriter mapper = new ObjectMapper().writer().withDefaultPrettyPrinter();
         return mapper.writeValueAsString(obj);
     }
@@ -57,7 +65,11 @@ public class JsonUtil {
         return mapper.readValue(jsonStr, type);
     }
 
-    public static <T> T toEntity(File file, Class<T> type) throws IOException {
+    public static <T> T toEntity(File file, TypeReference type) throws IOException {
+        if (file == null) {
+            LOGGER.warn("File cannot be empty!");
+            return null;
+        }
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(file, type);
     }

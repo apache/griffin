@@ -19,11 +19,15 @@ under the License.
 
 package org.apache.griffin.core.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+
+import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
 public class FileUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
@@ -33,9 +37,8 @@ public class FileUtil {
     public static String readEnv(String path) throws IOException {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         File file = new File(classLoader.getResource(path).getFile());
-        String env = JsonUtil.toJsonWithFormat(JsonUtil.toEntity(file, Object.class));
-        LOGGER.info(env);
-        return env;
+        return toJsonWithFormat(JsonUtil.toEntity(file, new TypeReference<Object>() {
+        }));
     }
 
     public static String readBatchEnv(String path,String name) throws IOException {
