@@ -43,19 +43,19 @@ public class PropertiesConfig {
     private String location;
 
     public PropertiesConfig(@Value("${external.config.location}") String location) {
-        LOGGER.info("external.config.location : {}", location);
+        LOGGER.info("external.config.location : {}", location != null ? location : "null");
         this.location = location;
     }
 
-    @PostConstruct
-    public void init() throws IOException {
-        String batchName = "env_batch.json";
-        String batchPath = "env/" + batchName;
-        String streamingName = "env_streaming.json";
-        String streamingPath = "env/" + streamingName;
-        FileUtil.readBatchEnv(batchPath, batchName);
-        FileUtil.readStreamingEnv(streamingPath, streamingName);
-    }
+//    @PostConstruct
+//    public void init() throws IOException {
+//        String batchName = "env_batch.json";
+//        String batchPath = "env/" + batchName;
+//        String streamingName = "env_streaming.json";
+//        String streamingPath = "env/" + streamingName;
+//        FileUtil.readBatchEnv(batchPath, batchName);
+//        FileUtil.readStreamingEnv(streamingPath, streamingName);
+//    }
 
 
     @Bean(name = "appConf")
