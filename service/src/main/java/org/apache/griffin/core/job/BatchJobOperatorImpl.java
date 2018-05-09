@@ -41,7 +41,7 @@ public class BatchJobOperatorImpl implements JobOperator {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public AbstractJob add(JobSchedule js, GriffinMeasure measure) throws Exception {
+    public JobSchedule add(JobSchedule js, GriffinMeasure measure) throws Exception {
         validateParams(js, measure);
         String qName = jobService.getQuartzName(js);
         String qGroup = jobService.getQuartzGroup();
@@ -50,7 +50,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         batchJob.setJobSchedule(js);
         batchJobRepo.save(batchJob);
         jobService.addJob(triggerKey, js, batchJob, BATCH);
-        return batchJob;
+        return batchJob.getJobSchedule();
     }
 
     @Override

@@ -45,7 +45,7 @@ public class JobController {
 
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public AbstractJob addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
+    public JobSchedule addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
         return jobService.addJob(jobSchedule);
     }
 

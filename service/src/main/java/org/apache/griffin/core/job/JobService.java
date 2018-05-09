@@ -30,7 +30,7 @@ public interface JobService {
 
     JobSchedule getJobSchedule(String jobName);
 
-    AbstractJob addJob(JobSchedule js) throws Exception;
+    JobSchedule addJob(JobSchedule js) throws Exception;
 
     void onAction(Long jobId,String action);
 

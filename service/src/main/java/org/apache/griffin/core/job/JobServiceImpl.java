@@ -138,7 +138,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public AbstractJob addJob(JobSchedule js) throws Exception {
+    public JobSchedule addJob(JobSchedule js) throws Exception {
         Long measureId = js.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
         JobOperator op = getJobOperator(measure.getProcessType());

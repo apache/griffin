@@ -27,7 +27,7 @@ import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.quartz.SchedulerException;
 
 public interface JobOperator {
-    AbstractJob add(JobSchedule js, GriffinMeasure measure) throws Exception;
+    JobSchedule add(JobSchedule js, GriffinMeasure measure) throws Exception;
 
     void start(AbstractJob job);
 

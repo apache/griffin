@@ -72,7 +72,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public AbstractJob add(JobSchedule js, GriffinMeasure measure) throws Exception {
+    public JobSchedule add(JobSchedule js, GriffinMeasure measure) throws Exception {
         validateParams(js);
         String qName = jobService.getQuartzName(js);
         String qGroup = jobService.getQuartzGroup();
@@ -81,7 +81,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
         streamingJob.setJobSchedule(js);
         streamingJob = streamingJobRepo.save(streamingJob);
         jobService.addJob(triggerKey, js, streamingJob, STREAMING);
-        return streamingJob;
+        return streamingJob.getJobSchedule();
     }
 
     /**
