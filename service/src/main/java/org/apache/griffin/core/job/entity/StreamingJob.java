@@ -29,7 +29,8 @@ public class StreamingJob extends AbstractJob {
     public StreamingJob() {
     }
 
-    public StreamingJob(String jobName, Long measureId, String metricName) {
-        super(jobName, measureId, metricName);
+    public StreamingJob(Long measureId, String jobName, String name, String group, boolean deleted) {
+        super(measureId, jobName, name, group, deleted);
+        this.metricName = jobName;
     }
 }

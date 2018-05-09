@@ -302,6 +302,9 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobDataBean genJobDataBean(AbstractJob job) throws SchedulerException {
+        if (job.getName() == null || job.getGroup() == null) {
+            return null;
+        }
         JobDataBean jobData = new JobDataBean();
         List<? extends Trigger> triggers = getTriggers(job.getName(), job.getGroup());
         if (!CollectionUtils.isEmpty(triggers)) {

@@ -77,9 +77,9 @@ public class StreamingJobOperatorImpl implements JobOperator {
         String qName = jobService.getQuartzName(js);
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = jobService.getTriggerKeyIfValid(qName, qGroup);
-        StreamingJob streamingJob = new StreamingJob(js.getJobName(), js.getMeasureId(), js.getJobName());
+        StreamingJob streamingJob = new StreamingJob(js.getMeasureId(),js.getJobName(), qName, qGroup,false);
         streamingJob.setJobSchedule(js);
-        streamingJobRepo.save(streamingJob);
+        streamingJob = streamingJobRepo.save(streamingJob);
         jobService.addJob(triggerKey, js, streamingJob, STREAMING);
         return streamingJob;
     }
