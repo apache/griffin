@@ -50,13 +50,13 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
-        jobService.onAction(jobId,action);
+    @ResponseStatus(HttpStatus.OK)
+    public JobSchedule onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
+        return jobService.onAction(jobId,action);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     public void deleteJob(@RequestParam("jobName") String jobName) {
         jobService.deleteJob(jobName);
     }

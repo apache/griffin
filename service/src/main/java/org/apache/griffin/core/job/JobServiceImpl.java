@@ -150,11 +150,12 @@ public class JobServiceImpl implements JobService {
      * @param action job operation: start job, stop job
      */
     @Override
-    public void onAction(Long jobId, String action) {
+    public JobSchedule onAction(Long jobId, String action) {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
         doAction(action, job, op);
+        return job.getJobSchedule();
     }
 
     private void doAction(String action, AbstractJob job, JobOperator op) {

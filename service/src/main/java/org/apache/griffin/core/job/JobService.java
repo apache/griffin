@@ -32,7 +32,7 @@ public interface JobService {
 
     JobSchedule addJob(JobSchedule js) throws Exception;
 
-    void onAction(Long jobId,String action);
+    JobSchedule onAction(Long jobId,String action);
 
     void deleteJob(Long jobId);
 
