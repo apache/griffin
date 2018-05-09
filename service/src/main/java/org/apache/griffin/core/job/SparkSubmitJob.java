@@ -156,6 +156,12 @@ public class SparkSubmitJob implements Job {
         return str.replaceAll(regex, escapeCh);
     }
 
+    private String genEnv() throws IOException {
+        ProcessType type = measure.getProcessType();
+        String env = type == BATCH ? FileUtil.readEnv("env/env_batch.json") : FileUtil.readEnv("env/env_streaming.json");
+        return env.replaceAll("\\$\\{JOB_NAME}", measure.getName());
+    }
+
     private void setLivyConf() throws IOException {
         setLivyParams();
         setLivyArgs();
@@ -177,8 +183,7 @@ public class SparkSubmitJob implements Job {
 
     private void setLivyArgs() throws IOException {
         List<String> args = new ArrayList<>();
-        ProcessType type = measure.getProcessType();
-        args.add(type == BATCH ? FileUtil.readEnv("env/env_batch.json") : FileUtil.readEnv("env/env_streaming.json"));
+        args.add(genEnv());
         String measureJson = JsonUtil.toJsonWithFormat(measure);
         // to fix livy bug: character ` will be ignored by livy
         String finalMeasureJson = escapeCharacter(measureJson, "\\`");
