@@ -74,6 +74,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
 
     @ManyToOne
     @JoinColumn(name = "job_id",nullable = false)
+    @JsonIgnore
     private AbstractJob job;
 
     public AbstractJob getJob() {
