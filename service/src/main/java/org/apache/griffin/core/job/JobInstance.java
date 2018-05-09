@@ -30,7 +30,6 @@ import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
-import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.TimeUtil;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -39,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
@@ -46,6 +46,7 @@ import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
+import static org.apache.griffin.core.util.JsonUtil.toJson;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -179,7 +180,7 @@ public class JobInstance implements Job {
      * @param dc       data connector
      * @param sampleTs collection of data split start timestamp
      */
-    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) {
+    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) throws JsonProcessingException {
         List<SegmentPredicate> predicates = dc.getPredicates();
         for (SegmentPredicate predicate : predicates) {
             genConfMap(predicate.getConfigMap(), sampleTs, dc.getDataTimeZone());
@@ -189,7 +190,7 @@ public class JobInstance implements Job {
         }
     }
 
-    private void setConnectorConf(DataConnector dc, Long[] sampleTs) {
+    private void setConnectorConf(DataConnector dc, Long[] sampleTs) throws JsonProcessingException {
         genConfMap(dc.getConfigMap(), sampleTs, dc.getDataTimeZone());
         dc.setConfigMap(dc.getConfigMap());
     }
@@ -268,7 +269,7 @@ public class JobInstance implements Job {
                 .build();
     }
 
-    private JobDetail addJobDetail(TriggerKey tk, String pJobName) throws SchedulerException, JsonProcessingException {
+    private JobDetail addJobDetail(TriggerKey tk, String pJobName) throws SchedulerException, IOException {
         Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobKey(tk.getName(), tk.getGroup());
         JobDetail jobDetail;
@@ -286,12 +287,23 @@ public class JobInstance implements Job {
         return jobDetail;
     }
 
-    private void setJobDataMap(JobDetail jobDetail, String pJobName) throws JsonProcessingException {
+    private void setJobDataMap(JobDetail jobDetail, String pJobName) throws IOException {
         JobDataMap dataMap = jobDetail.getJobDataMap();
-        dataMap.put(MEASURE_KEY, JsonUtil.toJson(measure));
-        dataMap.put(PREDICATES_KEY, JsonUtil.toJson(mPredicates));
+        preProcessMeasure();
+        dataMap.put(MEASURE_KEY, toJson(measure));
+        dataMap.put(PREDICATES_KEY, toJson(mPredicates));
         dataMap.put(JOB_NAME, job.getJobName());
         dataMap.put(PREDICATE_JOB_NAME, pJobName);
+    }
+
+    private void preProcessMeasure() throws IOException {
+        for (DataSource source : measure.getDataSources()) {
+            String cache = source.getCache();
+            cache = cache.replaceAll("\\$\\{JOB_NAME}", job.getName());
+            cache = cache.replaceAll("\\$\\{SOURCE_NAME}", source.getName());
+            cache = cache.replaceAll("\\$\\{TARGET_NAME}", source.getName());
+            source.setCache(cache);
+        }
     }
 
 }
