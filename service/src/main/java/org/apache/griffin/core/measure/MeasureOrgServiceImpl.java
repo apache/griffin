@@ -54,11 +54,9 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
     public Map<String, List<String>> getMeasureNamesGroupByOrg() {
         Map<String, List<String>> orgWithMetricsMap = new HashMap<>();
         List<GriffinMeasure> measures = measureRepo.findByDeleted(false);
-        if (measures == null) {
-            return null;
-        }
         for (Measure measure : measures) {
             String orgName = measure.getOrganization();
+            orgName = orgName == null ? "null" : orgName;
             String measureName = measure.getName();
             List<String> measureList = orgWithMetricsMap.getOrDefault(orgName, new ArrayList<>());
             measureList.add(measureName);
