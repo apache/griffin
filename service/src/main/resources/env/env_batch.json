@@ -1,7 +1,7 @@
 {
   "spark": {
     "log.level": "WARN",
-    "checkpoint.dir": "hdfs:///griffin/checkpoint",
+    "checkpoint.dir": "hdfs:///griffin/checkpoint/${JOB_NAME}",
     "batch.interval": "20s",
     "process.interval": "1m",
     "config": {
@@ -43,11 +43,11 @@
     {
       "type": "zk",
       "config": {
-        "hosts": ":2181",
+        "hosts": "zk:2181",
         "namespace": "griffin/infocache",
         "lock.path": "lock",
         "mode": "persist",
-        "init.clear": true,
+        "init.clear": false,
         "close.clear": false
       }
     }
