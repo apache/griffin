@@ -77,7 +77,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
         String qName = jobService.getQuartzName(js);
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = jobService.getTriggerKeyIfValid(qName, qGroup);
-        StreamingJob streamingJob = new StreamingJob(js.getMeasureId(),js.getJobName(), qName, qGroup,false);
+        StreamingJob streamingJob = new StreamingJob(js.getMeasureId(), js.getJobName(), qName, qGroup, false);
         streamingJob.setJobSchedule(js);
         streamingJob = streamingJobRepo.save(streamingJob);
         jobService.addJob(triggerKey, js, streamingJob, STREAMING);
@@ -135,6 +135,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
         String url = livyUri + "/" + instance.getSessionId();
         try {
             restTemplate.delete(url);
+            LOGGER.info("Job instance({}) has been deleted. {}", instance.getSessionId(), url);
         } catch (RestClientException ex) {
             LOGGER.error("url:{} happens exception by livy. {}", url, ex.getMessage());
             YarnNetUtil.delete(livyUri, instance.getAppId());
