@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.util.JsonUtil;
 
 import javax.persistence.*;
@@ -109,8 +110,11 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("details")
-    public void setDetailsMap(Map<String, Object> detailsMap) {
-        this.detailsMap = detailsMap;
+    public void setDetailsMap(Map<String, Object> detailsMap) throws JsonProcessingException {
+        if (detailsMap != null) {
+            this.details = JsonUtil.toJson(detailsMap);
+            this.detailsMap = detailsMap;
+        }
     }
 
     @JsonProperty("metric")
@@ -119,8 +123,11 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("metric")
-    public void setMetricMap(Map<String, Object> metricMap) {
-        this.metricMap = metricMap;
+    public void setMetricMap(Map<String, Object> metricMap) throws JsonProcessingException {
+        if (metricMap != null) {
+            this.metric = JsonUtil.toJson(metricMap);
+            this.metricMap = metricMap;
+        }
     }
 
     @JsonProperty("record")
@@ -129,8 +136,11 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("record")
-    public void setRecordMap(Map<String, Object> recordMap) {
-        this.recordMap = recordMap;
+    public void setRecordMap(Map<String, Object> recordMap) throws JsonProcessingException {
+        if (recordMap != null) {
+            this.record = JsonUtil.toJson(recordMap);
+            this.recordMap = recordMap;
+        }
     }
 
     public String getDetails() {
@@ -145,7 +155,7 @@ public class Rule extends AbstractAuditableEntity {
         return metric;
     }
 
-    public void setMetric(String metric) {
+    private void setMetric(String metric) {
         this.metric = metric;
     }
 
@@ -153,7 +163,7 @@ public class Rule extends AbstractAuditableEntity {
         return record;
     }
 
-    public void setRecord(String record) {
+    private void setRecord(String record) {
         this.record = record;
     }
 
@@ -182,15 +192,15 @@ public class Rule extends AbstractAuditableEntity {
 
     @PostLoad
     public void load() throws IOException {
-        if (!org.springframework.util.StringUtils.isEmpty(details)) {
+        if (!StringUtils.isEmpty(details)) {
             this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
             });
         }
-        if (!org.springframework.util.StringUtils.isEmpty(metric)) {
+        if (!StringUtils.isEmpty(metric)) {
             this.metricMap = JsonUtil.toEntity(metric, new TypeReference<Map<String, Object>>() {
             });
         }
-        if (!org.springframework.util.StringUtils.isEmpty(record)) {
+        if (!StringUtils.isEmpty(record)) {
             this.recordMap = JsonUtil.toEntity(record, new TypeReference<Map<String, Object>>() {
             });
         }

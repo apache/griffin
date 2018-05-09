@@ -116,8 +116,11 @@ public class GriffinMeasure extends Measure {
     }
 
     @JsonProperty("rule.description")
-    public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) {
-        this.ruleDescriptionMap = ruleDescriptionMap;
+    public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) throws JsonProcessingException {
+        if (ruleDescriptionMap != null) {
+            this.ruleDescription = JsonUtil.toJson(ruleDescriptionMap);
+            this.ruleDescriptionMap = ruleDescriptionMap;
+        }
     }
 
 
@@ -125,7 +128,7 @@ public class GriffinMeasure extends Measure {
         return ruleDescription;
     }
 
-    public void setRuleDescription(String ruleDescription) {
+    private void setRuleDescription(String ruleDescription) {
         this.ruleDescription = ruleDescription;
     }
 

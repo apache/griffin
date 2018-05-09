@@ -127,8 +127,11 @@ public class JobSchedule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("predicate.config")
-    public void setConfigMap(Map<String, Object> configMap) {
-        this.configMap = configMap;
+    public void setConfigMap(Map<String, Object> configMap) throws JsonProcessingException {
+        if (configMap != null) {
+            this.predicateConfig = JsonUtil.toJson(configMap);
+            this.configMap = configMap;
+        }
     }
 
     private String getPredicateConfig() {
