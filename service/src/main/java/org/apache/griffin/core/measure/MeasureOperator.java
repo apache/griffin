@@ -26,7 +26,7 @@ public interface MeasureOperator {
 
     Measure create(Measure measure);
 
-    void update(Measure measure);
+    Measure update(Measure measure);
 
     void delete(Measure measure);
 

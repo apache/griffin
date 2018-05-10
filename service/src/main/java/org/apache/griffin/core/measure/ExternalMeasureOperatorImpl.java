@@ -54,13 +54,14 @@ public class ExternalMeasureOperatorImpl implements MeasureOperator {
     }
 
     @Override
-    public void update(Measure measure) {
+    public Measure update(Measure measure) {
         ExternalMeasure latestMeasure = (ExternalMeasure) measure;
         validateMeasure(latestMeasure);
         ExternalMeasure originMeasure = measureRepo.findOne(latestMeasure.getId());
         VirtualJob vj = genVirtualJob(latestMeasure, originMeasure.getVirtualJob());
         latestMeasure.setVirtualJob(vj);
-        measureRepo.save(latestMeasure);
+        measure = measureRepo.save(latestMeasure);
+        return measure;
     }
 
     @Override

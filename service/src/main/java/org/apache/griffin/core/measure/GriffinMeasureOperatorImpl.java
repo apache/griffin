@@ -51,10 +51,11 @@ public class GriffinMeasureOperatorImpl implements MeasureOperator {
     }
 
     @Override
-    public void update(Measure measure) {
+    public Measure update(Measure measure) {
         validateMeasure(measure);
         measure.setDeleted(false);
-        measureRepo.save(measure);
+        measure = measureRepo.save(measure);
+        return measure;
     }
 
     @Override

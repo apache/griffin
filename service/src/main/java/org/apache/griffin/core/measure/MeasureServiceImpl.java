@@ -93,7 +93,7 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public void updateMeasure(Measure measure) {
+    public Measure updateMeasure(Measure measure) {
         Measure m = measureRepo.findByIdAndDeleted(measure.getId(), false);
         if (m == null) {
             throw new GriffinException.NotFoundException(MEASURE_ID_DOES_NOT_EXIST);
@@ -103,7 +103,7 @@ public class MeasureServiceImpl implements MeasureService {
             throw new GriffinException.BadRequestException(MEASURE_TYPE_DOES_NOT_MATCH);
         }
         MeasureOperator op = getOperation(measure);
-        op.update(measure);
+        return op.update(measure);
     }
 
     @Override

@@ -34,7 +34,7 @@ public interface MeasureService {
 
     void deleteMeasures();
 
-    void updateMeasure(Measure measure);
+    Measure updateMeasure(Measure measure);
 
     List<Measure> getAliveMeasuresByOwner(String owner);
 

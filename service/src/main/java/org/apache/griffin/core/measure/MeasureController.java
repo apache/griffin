@@ -56,9 +56,9 @@ public class MeasureController {
     }
 
     @RequestMapping(value = "/measures", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateMeasure(@RequestBody Measure measure) {
-        measureService.updateMeasure(measure);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Measure updateMeasure(@RequestBody Measure measure) {
+        return measureService.updateMeasure(measure);
     }
 
     @RequestMapping(value = "/measures/owner/{owner}", method = RequestMethod.GET)
