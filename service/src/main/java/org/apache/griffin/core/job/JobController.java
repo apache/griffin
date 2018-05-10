@@ -80,11 +80,12 @@ public class JobController {
         return jobService.getHealthInfo();
     }
 
-    @RequestMapping(path = "/download", method = RequestMethod.GET)
+    @RequestMapping(path = "/jobs/download", method = RequestMethod.GET)
     public ResponseEntity<Resource> download(@RequestParam("hdfsPath") String hdfsPath) throws IOException {
-        InputStreamResource resource = new InputStreamResource(FSUtil.getInputStream(hdfsPath));
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        InputStreamResource resource = new InputStreamResource(FSUtil.getSampleInputStream(hdfsPath));
+        return ResponseEntity.ok().
+                header("content-disposition", "attachment; filename = sampleMissingData.json")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 }
-
-

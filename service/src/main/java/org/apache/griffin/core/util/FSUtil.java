@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.util;
 
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.hadoop.conf.Configuration;
@@ -28,7 +30,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +43,7 @@ import static org.apache.griffin.core.exception.GriffinExceptionMessage.HDFS_FIL
 public class FSUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FSUtil.class);
+    private static final int SAMPLE_ROW_COUNT = 100;
 
     private static String fsDefaultName;
 
@@ -149,17 +155,31 @@ public class FSUtil {
         return fileSystem.isFile(hdfsPath) || fileSystem.isDirectory(hdfsPath);
     }
 
-    public static FSDataInputStream getInputStream(String path) throws IOException {
+    public static InputStream getSampleInputStream(String path) throws IOException {
         checkHDFSConf();
         if (isFileExist(path)) {
-            return fileSystem.open(new Path(path));
+            FSDataInputStream missingData = fileSystem.open(new Path(path));
+            BufferedReader bufReader = new BufferedReader(new InputStreamReader(missingData, Charsets.UTF_8));
+            String line = null;
+            int rowCnt = 0;
+            StringBuilder output = new StringBuilder(1024);
+
+            while ((line = bufReader.readLine()) != null) {
+                if (rowCnt < SAMPLE_ROW_COUNT) {
+                    output.append(line);
+                    output.append("\n");
+                }
+                rowCnt++;
+            }
+
+            return IOUtils.toInputStream(output, Charsets.UTF_8);
         } else {
             LOGGER.warn("HDFS file does not exist.", path);
             throw new GriffinException.NotFoundException(HDFS_FILE_NOT_EXIST);
         }
     }
 
-    private static void checkHDFSConf(){
+    private static void checkHDFSConf() {
         if (getFileSystem() == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
