@@ -98,6 +98,7 @@ Note that 'exception' field may not exist if it is caused by client error, and '
 
 <h2 id = "2"></h2>
 ## Measures
+
 ### Add measure
 `POST /api/v1/measures`
 
