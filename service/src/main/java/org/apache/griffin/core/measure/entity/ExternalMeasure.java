@@ -34,7 +34,9 @@ import javax.persistence.OneToOne;
 @Entity
 public class ExternalMeasure extends Measure {
 
-    private String metricName;
+	private static final long serialVersionUID = -7551493544224747244L;
+
+	private String metricName;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

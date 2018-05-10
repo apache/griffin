@@ -26,7 +26,9 @@ import javax.persistence.Entity;
 @DiscriminatorValue("virtualJob")
 public class VirtualJob extends AbstractJob {
 
-    public VirtualJob() {
+	private static final long serialVersionUID = 1130038058433818835L;
+
+	public VirtualJob() {
         super();
     }
 
