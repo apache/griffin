@@ -43,7 +43,11 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
 
     @Override
     public List<String> getMetricNameListByOrg(String org) {
-        return measureRepo.findNameByOrganization(org, false);
+        List<String> orgs =  measureRepo.findNameByOrganization(org, false);
+        if (CollectionUtils.isEmpty(orgs)) {
+            throw new GriffinException.NotFoundException(ORGANIZATION_NAME_DOES_NOT_EXIST);
+        }
+        return orgs;
     }
 
     @Override
