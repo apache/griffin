@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
@@ -46,6 +47,7 @@ import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
 import static org.apache.griffin.core.util.JsonUtil.toJson;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
@@ -290,7 +292,8 @@ public class JobInstance implements Job {
     private void setJobDataMap(JobDetail jobDetail, String pJobName) throws IOException {
         JobDataMap dataMap = jobDetail.getJobDataMap();
         preProcessMeasure();
-        dataMap.put(MEASURE_KEY, toJson(measure));
+        String result =toJson(measure);
+        dataMap.put(MEASURE_KEY, result);
         dataMap.put(PREDICATES_KEY, toJson(mPredicates));
         dataMap.put(JOB_NAME, job.getJobName());
         dataMap.put(PREDICATE_JOB_NAME, pJobName);
@@ -298,11 +301,13 @@ public class JobInstance implements Job {
 
     private void preProcessMeasure() throws IOException {
         for (DataSource source : measure.getDataSources()) {
-            String cache = source.getCache();
+            Map cacheMap = source.getCacheMap();
+            String cache = toJson(cacheMap);
             cache = cache.replaceAll("\\$\\{JOB_NAME}", job.getName());
             cache = cache.replaceAll("\\$\\{SOURCE_NAME}", source.getName());
             cache = cache.replaceAll("\\$\\{TARGET_NAME}", source.getName());
-            source.setCache(cache);
+            cacheMap = toEntity(cache,Map.class);
+            source.setCacheMap(cacheMap);
         }
     }
 
