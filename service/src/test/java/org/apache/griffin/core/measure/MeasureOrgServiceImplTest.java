@@ -28,10 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
 import static org.apache.griffin.core.util.EntityHelper.createJobDetailMap;
@@ -76,10 +73,10 @@ public class MeasureOrgServiceImplTest {
     }
 
     @Test
-    public void testGetMeasureNamesGroupByOrgWithNull() throws Exception {
-        when(measureRepo.findByDeleted(false)).thenReturn(null);
+    public void testGetMeasureNamesGroupByOrgWithEmpty(){
+        when(measureRepo.findByDeleted(false)).thenReturn(new ArrayList<>());
         Map<String, List<String>> map = service.getMeasureNamesGroupByOrg();
-        assert map == null;
+        assert map.size() == 0;
     }
 
     @Test
