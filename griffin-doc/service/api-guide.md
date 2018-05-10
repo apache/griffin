@@ -99,8 +99,11 @@ Note that 'exception' field may not exist if it is caused by client error, and '
 `0.1.0`
 
 <h2 id = "2"></h2>
+
 ## Measures
+
 ### Add measure
+
 `POST /api/v1/measures`
 
 #### Request Header
@@ -640,8 +643,11 @@ The response body should be empty if no error happens, and the HTTP status is (2
 <h2 id = "3"></h2>
 
 ## Jobs
+
 ### Add job
+
 `POST /api/v1/jobs`
+
 #### Request Header
 | key          | value            |
 | ------------ | ---------------- |
@@ -867,11 +873,24 @@ The response body should be empty if no error happens, and the HTTP status is (2
 }
 ```
 
+### Download sample missing/mismatched records
+`GET /api/v1/jobs/download?hdfsPath={missingDataFilePath}`
+
+#### Response
+```
+If successful, this method returns missing records in the response body, 
+maximum record count is 100.
+
+```
+
 <h2 id = "4"></h2>
 
 ## Metrics
+
 ### Get metrics
+
 `GET /api/v1/metrics`
+
 #### Response Example
 The response is a map of metrics group by measure name. For example:
 ```
@@ -1043,8 +1062,11 @@ The response body should have 'failures' field as empty if success, for example
 <h2 id = "5"></h2>
 
 ### Hive MetaStore
+
 ### Get table metadata
+
 `GET /api/v1/metadata/hive/table`
+
 #### Request Parameters
 | name  | description        | type   | example value |
 | ----- | ------------------ | ------ | ------------- |
@@ -1378,6 +1400,7 @@ The response body should have 'failures' field as empty if success, for example
 <h2 id = "6"></h2>
 
 ## Auth
+
 ### User authentication
 `POST /api/v1/login/authenticate`
 
