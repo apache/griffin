@@ -5,7 +5,7 @@
     {
       "enabled": true,
       "key": "BASE_PATH",
-      "value": "http://localhost:8080",
+      "value": "http://localhost:38080",
       "type": "text"
     }
   ],
