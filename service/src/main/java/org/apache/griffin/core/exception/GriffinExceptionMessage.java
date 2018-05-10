@@ -38,6 +38,7 @@ public enum GriffinExceptionMessage {
     JOB_ID_DOES_NOT_EXIST(40402, "Job id does not exist"),
     JOB_NAME_DOES_NOT_EXIST(40403, "Job name does not exist"),
     ORGANIZATION_NAME_DOES_NOT_EXIST(40404, "Organization name does not exist"),
+    HDFS_FILE_NOT_EXIST(40405, "Hadoop data file not exist"),
 
     //409, "Conflict"
     MEASURE_NAME_ALREADY_EXIST(40901, "Measure name already exists"),

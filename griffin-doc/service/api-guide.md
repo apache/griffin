@@ -865,6 +865,16 @@ The response body should be empty if no error happens, and the HTTP status is (2
 }
 ```
 
+### Download sample missing/mismatched records
+`GET /api/v1/jobs/download?hdfsPath={missingDataFilePath}`
+
+#### Response
+```
+If successful, this method returns missing records in the response body, 
+maximum record count is 100.
+
+```
+
 <h2 id = "4"></h2>
 ## Metrics
 ### Get metrics
