@@ -48,9 +48,11 @@ public class BatchJobOperatorImpl implements JobOperator {
         TriggerKey triggerKey = jobService.getTriggerKeyIfValid(qName, qGroup);
         BatchJob batchJob = new BatchJob(js.getMeasureId(), js.getJobName(), qName, qGroup, false);
         batchJob.setJobSchedule(js);
-        batchJobRepo.save(batchJob);
+        batchJob = batchJobRepo.save(batchJob);
         jobService.addJob(triggerKey, js, batchJob, BATCH);
-        return batchJob.getJobSchedule();
+        JobSchedule jobSchedule = batchJob.getJobSchedule();
+        jobSchedule.setId(batchJob.getId());
+        return jobSchedule;
     }
 
     @Override

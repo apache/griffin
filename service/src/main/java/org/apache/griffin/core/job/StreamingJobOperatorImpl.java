@@ -81,7 +81,9 @@ public class StreamingJobOperatorImpl implements JobOperator {
         streamingJob.setJobSchedule(js);
         streamingJob = streamingJobRepo.save(streamingJob);
         jobService.addJob(triggerKey, js, streamingJob, STREAMING);
-        return streamingJob.getJobSchedule();
+        JobSchedule jobSchedule = streamingJob.getJobSchedule();
+        jobSchedule.setId(streamingJob.getId());
+        return jobSchedule;
     }
 
     /**
@@ -95,7 +97,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
     public void start(AbstractJob job) {
         StreamingJob streamingJob = (StreamingJob) job;
         setJobInstanceDeleted(streamingJob);
-        streamingJobRepo.save(streamingJob);
+        streamingJob = streamingJobRepo.save(streamingJob);
         JobSchedule js = streamingJob.getJobSchedule();
         String qName = jobService.getQuartzName(js);
         String qGroup = jobService.getQuartzGroup();

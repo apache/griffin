@@ -155,7 +155,9 @@ public class JobServiceImpl implements JobService {
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
         doAction(action, job, op);
-        return job.getJobSchedule();
+        JobSchedule jobSchedule = job.getJobSchedule();
+        jobSchedule.setId(job.getId());
+        return jobSchedule;
     }
 
     private void doAction(String action, AbstractJob job, JobOperator op) {
