@@ -22,6 +22,7 @@ package org.apache.griffin.core.measure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.util.JsonUtil;
 import org.springframework.util.StringUtils;
@@ -31,7 +32,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @Entity
-public class StreamingPreProcess extends AbstractAuditableEntity{
+public class StreamingPreProcess extends AbstractAuditableEntity {
 
     private String dslType;
 
@@ -73,16 +74,12 @@ public class StreamingPreProcess extends AbstractAuditableEntity{
         this.rule = rule;
     }
 
-    public String getDetails() {
+    private String getDetails() {
         return details;
     }
 
-    private void setDetails(String details) throws IOException {
-        if (!StringUtils.isEmpty(details)) {
-            this.details = details;
-            this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
-            });
-        }
+    private void setDetails(String details) {
+        this.details = details;
     }
 
     @JsonProperty("details")
@@ -91,9 +88,24 @@ public class StreamingPreProcess extends AbstractAuditableEntity{
     }
 
     @JsonProperty("details")
-    public void setDetailsMap(Map<String, Object> details) throws IOException {
+    public void setDetailsMap(Map<String, Object> details) {
         this.detailsMap = details;
-        this.details = JsonUtil.toJson(details);
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void save() throws JsonProcessingException {
+        if (detailsMap != null) {
+            this.details = JsonUtil.toJson(detailsMap);
+        }
+    }
+
+    @PostLoad
+    public void load() throws IOException {
+        if (!StringUtils.isEmpty(details)) {
+            this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
+            });
+        }
     }
 
 }

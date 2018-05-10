@@ -57,14 +57,11 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     }
 
     @JsonProperty("config")
-    public void setConfigMap(Map<String, Object> configMap) throws JsonProcessingException {
-        if (configMap != null) {
-            this.config = JsonUtil.toJson(configMap);
-            this.configMap = configMap;
-        }
+    public void setConfigMap(Map<String, Object> configMap) {
+        this.configMap = configMap;
     }
 
-    public String getConfig() {
+    private String getConfig() {
         return config;
     }
 

@@ -110,18 +110,15 @@ public class DataConnector extends AbstractAuditableEntity {
     }
 
     @JsonProperty("config")
-    public void setConfigMap(Map<String, Object> configMap) throws JsonProcessingException {
-        if (configMap != null) {
-            this.config = JsonUtil.toJson(configMap);
-            this.configMap = configMap;
-        }
+    public void setConfigMap(Map<String, Object> configMap) {
+        this.configMap = configMap;
     }
 
     private void setConfig(String config) {
         this.config = config;
     }
 
-    public String getConfig() {
+    private String getConfig() {
         return config;
     }
 

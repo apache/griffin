@@ -110,11 +110,8 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("details")
-    public void setDetailsMap(Map<String, Object> detailsMap) throws JsonProcessingException {
-        if (detailsMap != null) {
-            this.details = JsonUtil.toJson(detailsMap);
-            this.detailsMap = detailsMap;
-        }
+    public void setDetailsMap(Map<String, Object> detailsMap) {
+        this.detailsMap = detailsMap;
     }
 
     @JsonProperty("metric")
@@ -123,11 +120,8 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("metric")
-    public void setMetricMap(Map<String, Object> metricMap) throws JsonProcessingException {
-        if (metricMap != null) {
-            this.metric = JsonUtil.toJson(metricMap);
-            this.metricMap = metricMap;
-        }
+    public void setMetricMap(Map<String, Object> metricMap) {
+        this.metricMap = metricMap;
     }
 
     @JsonProperty("record")
@@ -136,14 +130,11 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("record")
-    public void setRecordMap(Map<String, Object> recordMap) throws JsonProcessingException {
-        if (recordMap != null) {
-            this.record = JsonUtil.toJson(recordMap);
-            this.recordMap = recordMap;
-        }
+    public void setRecordMap(Map<String, Object> recordMap) {
+        this.recordMap = recordMap;
     }
 
-    public String getDetails() {
+    private String getDetails() {
         return details;
     }
 
@@ -151,7 +142,7 @@ public class Rule extends AbstractAuditableEntity {
         this.details = details;
     }
 
-    public String getMetric() {
+    private String getMetric() {
         return metric;
     }
 
@@ -159,7 +150,7 @@ public class Rule extends AbstractAuditableEntity {
         this.metric = metric;
     }
 
-    public String getRecord() {
+    private String getRecord() {
         return record;
     }
 

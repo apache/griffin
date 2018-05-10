@@ -40,7 +40,7 @@ import java.util.Map;
  */
 @Entity
 public class GriffinMeasure extends Measure {
-    public enum ProcessType{
+    public enum ProcessType {
         /**
          * Currently we just support BATCH and STREAMING type
          */
@@ -116,15 +116,12 @@ public class GriffinMeasure extends Measure {
     }
 
     @JsonProperty("rule.description")
-    public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) throws JsonProcessingException {
-        if (ruleDescriptionMap != null) {
-            this.ruleDescription = JsonUtil.toJson(ruleDescriptionMap);
-            this.ruleDescriptionMap = ruleDescriptionMap;
-        }
+    public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) {
+        this.ruleDescriptionMap = ruleDescriptionMap;
     }
 
 
-    public String getRuleDescription() {
+    private String getRuleDescription() {
         return ruleDescription;
     }
 
@@ -171,6 +168,7 @@ public class GriffinMeasure extends Measure {
             this.ruleDescription = JsonUtil.toJson(ruleDescriptionMap);
         }
     }
+
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(ruleDescription)) {

@@ -73,16 +73,12 @@ public class DataSource extends AbstractAuditableEntity {
         this.connectors = connectors;
     }
 
-    public String getCache() {
+    private String getCache() {
         return cache;
     }
 
-    public void setCache(String cache) throws IOException {
-        if (!StringUtils.isEmpty(cache)) {
-            this.cacheMap = JsonUtil.toEntity(cache, new TypeReference<Map<String, Object>>() {
-            });
-            this.cache = cache;
-        }
+    private void setCache(String cache) {
+        this.cache = cache;
 
     }
 
@@ -92,11 +88,8 @@ public class DataSource extends AbstractAuditableEntity {
     }
 
     @JsonProperty("cache")
-    public void setCacheMap(Map<String, Object> cacheMap) throws JsonProcessingException {
-        if (cacheMap != null) {
-            this.cache = JsonUtil.toJson(cacheMap);
-            this.cacheMap = cacheMap;
-        }
+    public void setCacheMap(Map<String, Object> cacheMap) {
+        this.cacheMap = cacheMap;
     }
 
     @PrePersist
