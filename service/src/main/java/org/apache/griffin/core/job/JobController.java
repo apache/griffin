@@ -43,6 +43,11 @@ public class JobController {
         return jobService.getJobSchedule(jobName);
     }
 
+    @RequestMapping(value = "/jobs/config", method = RequestMethod.GET)
+    public JobSchedule getJobSchedule(@RequestParam("jobId") Long jobId) {
+        return jobService.getJobSchedule(jobId);
+    }
+
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public JobSchedule addJob(@RequestBody JobSchedule jobSchedule) throws Exception {

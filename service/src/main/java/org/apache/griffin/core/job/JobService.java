@@ -30,6 +30,8 @@ public interface JobService {
 
     JobSchedule getJobSchedule(String jobName);
 
+    JobSchedule getJobSchedule(Long jobId);
+
     JobSchedule addJob(JobSchedule js) throws Exception;
 
     JobSchedule onAction(Long jobId,String action);

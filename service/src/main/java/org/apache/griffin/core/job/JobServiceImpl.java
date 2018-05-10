@@ -134,7 +134,24 @@ public class JobServiceImpl implements JobService {
             LOGGER.warn("Job name {} does not exist.", jobName);
             throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
         }
-        return jobs.get(0).getJobSchedule();
+        AbstractJob job = jobs.get(0);
+        return getJobSchedule(job);
+    }
+
+    @Override
+    public JobSchedule getJobSchedule(Long jobId) {
+        AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
+        if (job == null) {
+            LOGGER.warn("Job id {} does not exist.", jobId);
+            throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
+        }
+        return getJobSchedule(job);
+    }
+
+    private JobSchedule getJobSchedule(AbstractJob job) {
+        JobSchedule jobSchedule = job.getJobSchedule();
+        jobSchedule.setId(job.getId());
+        return jobSchedule;
     }
 
     @Override
@@ -155,9 +172,7 @@ public class JobServiceImpl implements JobService {
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
         doAction(action, job, op);
-        JobSchedule jobSchedule = job.getJobSchedule();
-        jobSchedule.setId(job.getId());
-        return jobSchedule;
+        return getJobSchedule(job);
     }
 
     private void doAction(String action, AbstractJob job, JobOperator op) {
