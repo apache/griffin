@@ -50,7 +50,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public JobSchedule onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
         return jobService.onAction(jobId,action);
     }
