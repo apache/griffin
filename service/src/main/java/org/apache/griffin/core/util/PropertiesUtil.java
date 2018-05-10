@@ -51,9 +51,9 @@ public class PropertiesUtil {
     }
 
     /**
-     * @param name properties name like sparkJob.properties
+     * @param name        properties name like sparkJob.properties
      * @param defaultPath properties classpath like /application.properties
-     * @param location custom properties path
+     * @param location    custom properties path
      * @return Properties
      * @throws FileNotFoundException location setting is wrong that there is no target file.
      */
@@ -66,10 +66,10 @@ public class PropertiesUtil {
         } else {
             resource = new InputStreamResource(new FileInputStream(path));
         }
-        return PropertiesUtil.getProperties(path, resource);
+        return getProperties(path, resource);
     }
 
-    private static String getConfPath(String name, String location) throws FileNotFoundException {
+    private static String getConfPath(String name, String location) {
         if (StringUtils.isEmpty(location)) {
             LOGGER.info("Config location is empty. Read from default path.");
             return null;
@@ -78,8 +78,8 @@ public class PropertiesUtil {
         LOGGER.info("File absolute path:" + file.getAbsolutePath());
         File[] files = file.listFiles();
         if (files == null) {
-            LOGGER.warn("The defaultPath {} does not exist.Please check your config in application.properties.", location);
-            throw new FileNotFoundException();
+            LOGGER.warn("The external.config.location '{}' does not exist.Read from default path.", location);
+            return null;
         }
         return getConfPath(name, files, location);
     }
