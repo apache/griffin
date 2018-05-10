@@ -51,7 +51,7 @@ import java.util.Properties;
 import static org.apache.griffin.core.util.EntityHelper.*;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 public class JobInstanceTest {
@@ -101,9 +101,8 @@ public class JobInstanceTest {
     @MockBean
     private JobRepo<AbstractJob> repo;
 
-
-
     @Test
+    @SuppressWarnings("unchecked")
     public void testExecute() throws Exception {
         JobExecutionContext context = mock(JobExecutionContext.class);
         Scheduler scheduler = mock(Scheduler.class);
@@ -124,9 +123,17 @@ public class JobInstanceTest {
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
         jobInstance.execute(context);
+        
+        verify(jobScheduleRepo, times(1)).findOne(Matchers.anyLong());
+        verify(measureRepo, times(1)).findOne(Matchers.anyLong());
+        verify(factory, times(4)).getScheduler();
+        verify(scheduler, times(1)).getTriggersOfJob(Matchers.any(JobKey.class));
+        verify(scheduler, times(1)).checkExists(Matchers.any(TriggerKey.class));
+        verify(scheduler, times(1)).checkExists(Matchers.any(JobKey.class));
     }
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void testExecuteWithRangeLessThanZero() throws Exception {
         JobExecutionContext context = mock(JobExecutionContext.class);
         Scheduler scheduler = mock(Scheduler.class);
@@ -145,9 +152,17 @@ public class JobInstanceTest {
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
         jobInstance.execute(context);
+        
+        verify(jobScheduleRepo, times(1)).findOne(Matchers.anyLong());
+        verify(measureRepo, times(1)).findOne(Matchers.anyLong());
+        verify(factory, times(4)).getScheduler();
+        verify(scheduler, times(1)).getTriggersOfJob(Matchers.any(JobKey.class));
+        verify(scheduler, times(1)).checkExists(Matchers.any(TriggerKey.class));
+        verify(scheduler, times(1)).checkExists(Matchers.any(JobKey.class));
     }
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void testExecuteWithRangeGreaterThanDataUnit() throws Exception {
         JobExecutionContext context = mock(JobExecutionContext.class);
         Scheduler scheduler = mock(Scheduler.class);
@@ -166,9 +181,18 @@ public class JobInstanceTest {
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
         jobInstance.execute(context);
+        
+        verify(context, times(1)).getJobDetail();
+        verify(jobScheduleRepo, times(1)).findOne(Matchers.anyLong());
+        verify(measureRepo, times(1)).findOne(Matchers.anyLong());
+        verify(factory, times(4)).getScheduler();
+        verify(scheduler, times(1)).getTriggersOfJob(Matchers.any(JobKey.class));
+        verify(scheduler, times(1)).checkExists(Matchers.any(TriggerKey.class));
+        verify(scheduler, times(1)).checkExists(Matchers.any(JobKey.class));
     }
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void testExecuteWithPredicate() throws Exception {
         JobExecutionContext context = mock(JobExecutionContext.class);
         Scheduler scheduler = mock(Scheduler.class);
@@ -187,6 +211,14 @@ public class JobInstanceTest {
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
         jobInstance.execute(context);
+        
+        verify(context, times(1)).getJobDetail();
+        verify(jobScheduleRepo, times(1)).findOne(Matchers.anyLong());
+        verify(measureRepo, times(1)).findOne(Matchers.anyLong());
+        verify(factory, times(4)).getScheduler();
+        verify(scheduler, times(1)).getTriggersOfJob(Matchers.any(JobKey.class));
+        verify(scheduler, times(1)).checkExists(Matchers.any(TriggerKey.class));
+        verify(scheduler, times(1)).checkExists(Matchers.any(JobKey.class));
     }
 
     @Test
