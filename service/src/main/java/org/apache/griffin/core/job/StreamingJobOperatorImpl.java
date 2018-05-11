@@ -134,6 +134,11 @@ public class StreamingJobOperatorImpl implements JobOperator {
     }
 
     private void deleteByLivy(JobInstanceBean instance) {
+        Long sessionId = instance.getSessionId();
+        if (sessionId == null) {
+            LOGGER.warn("Session id of instance({},{}) is null.",instance.getPredicateGroup(),instance.getPredicateName());
+            return;
+        }
         String url = livyUri + "/" + instance.getSessionId();
         try {
             restTemplate.delete(url);
