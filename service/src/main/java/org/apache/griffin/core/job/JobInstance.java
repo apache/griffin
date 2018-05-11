@@ -303,7 +303,7 @@ public class JobInstance implements Job {
         for (DataSource source : measure.getDataSources()) {
             Map cacheMap = source.getCacheMap();
             String cache = toJson(cacheMap);
-            cache = cache.replaceAll("\\$\\{JOB_NAME}", job.getName());
+            cache = cache.replaceAll("\\$\\{JOB_NAME}", job.getJobName());
             cache = cache.replaceAll("\\$\\{SOURCE_NAME}", source.getName());
             cache = cache.replaceAll("\\$\\{TARGET_NAME}", source.getName());
             cacheMap = toEntity(cache,Map.class);
