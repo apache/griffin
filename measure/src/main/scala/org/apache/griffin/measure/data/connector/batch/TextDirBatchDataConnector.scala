@@ -89,7 +89,7 @@ case class TextDirBatchDataConnector(sqlContext: SQLContext, dqEngines: DqEngine
   private def touchDone(dir: String): Unit = HdfsUtil.createEmptyFile(HdfsUtil.getHdfsFilePath(dir, doneFile))
 
   private def emptyDir(dir: String): Boolean = {
-    HdfsUtil.listSubPathsByType(dir, "file").filter(!_.startsWith(ignoreFilePrefix)).size == 0
+    !HdfsUtil.listSubPathsByType(dir, "file").exists(!_.startsWith(ignoreFilePrefix))
   }
 
 //  def available(): Boolean = {
