@@ -19,8 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
@@ -182,7 +180,7 @@ public class JobInstance implements Job {
      * @param dc       data connector
      * @param sampleTs collection of data split start timestamp
      */
-    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) throws JsonProcessingException {
+    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) {
         List<SegmentPredicate> predicates = dc.getPredicates();
         for (SegmentPredicate predicate : predicates) {
             genConfMap(predicate.getConfigMap(), sampleTs, dc.getDataTimeZone());
@@ -192,7 +190,7 @@ public class JobInstance implements Job {
         }
     }
 
-    private void setConnectorConf(DataConnector dc, Long[] sampleTs) throws JsonProcessingException {
+    private void setConnectorConf(DataConnector dc, Long[] sampleTs) {
         genConfMap(dc.getConfigMap(), sampleTs, dc.getDataTimeZone());
         dc.setConfigMap(dc.getConfigMap());
     }
@@ -302,6 +300,10 @@ public class JobInstance implements Job {
     private void preProcessMeasure() throws IOException {
         for (DataSource source : measure.getDataSources()) {
             Map cacheMap = source.getCacheMap();
+            //to skip batch job
+            if (cacheMap == null) {
+                return;
+            }
             String cache = toJson(cacheMap);
             cache = cache.replaceAll("\\$\\{JOB_NAME}", job.getJobName());
             cache = cache.replaceAll("\\$\\{SOURCE_NAME}", source.getName());
