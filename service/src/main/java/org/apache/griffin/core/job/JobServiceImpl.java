@@ -167,12 +167,17 @@ public class JobServiceImpl implements JobService {
      * @param action job operation: start job, stop job
      */
     @Override
-    public JobSchedule onAction(Long jobId, String action) {
+    public JobDataBean onAction(Long jobId, String action){
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
         doAction(action, job, op);
-        return getJobSchedule(job);
+        try {
+            return genJobDataBean(job);
+        } catch (SchedulerException e) {
+            LOGGER.error("Failed to get RUNNING jobs.", e);
+            throw new GriffinException.ServiceException("Failed to get RUNNING jobs.", e);
+        }
     }
 
     private void doAction(String action, AbstractJob job, JobOperator op) {

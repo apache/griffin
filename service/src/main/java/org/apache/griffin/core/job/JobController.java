@@ -56,7 +56,7 @@ public class JobController {
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public JobSchedule onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
+    public JobDataBean onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
         return jobService.onAction(jobId,action);
     }
 

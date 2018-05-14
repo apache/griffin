@@ -21,6 +21,7 @@ package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
+import org.quartz.SchedulerException;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public interface JobService {
 
     JobSchedule addJob(JobSchedule js) throws Exception;
 
-    JobSchedule onAction(Long jobId,String action);
+    JobDataBean onAction(Long jobId,String action);
 
     void deleteJob(Long jobId);
 
