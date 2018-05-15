@@ -341,7 +341,7 @@ public class JobServiceImpl implements JobService {
         jobData.setJobName(job.getJobName());
         jobData.setMeasureId(job.getMeasureId());
         jobData.setCronExpression(getCronExpression(triggers));
-        jobData.setType(job instanceof BatchJob ? ProcessType.BATCH : ProcessType.STREAMING);
+        jobData.setProcessType(job instanceof BatchJob ? ProcessType.BATCH : ProcessType.STREAMING);
         return jobData;
     }
 

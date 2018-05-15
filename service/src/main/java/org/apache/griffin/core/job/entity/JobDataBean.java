@@ -43,7 +43,7 @@ public class JobDataBean {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String cronExpression;
 
-    private ProcessType type;
+    private ProcessType processType;
 
     public Long getJobId() {
         return jobId;
@@ -101,11 +101,11 @@ public class JobDataBean {
         this.cronExpression = cronExpression;
     }
 
-    public ProcessType getType() {
-        return type;
+    public ProcessType getProcessType() {
+        return processType;
     }
 
-    public void setType(ProcessType type) {
-        this.type = type;
+    public void setProcessType(ProcessType processType) {
+        this.processType = processType;
     }
 }
