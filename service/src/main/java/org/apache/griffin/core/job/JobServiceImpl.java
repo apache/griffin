@@ -167,7 +167,7 @@ public class JobServiceImpl implements JobService {
      * @param action job operation: start job, stop job
      */
     @Override
-    public JobDataBean onAction(Long jobId, String action){
+    public JobDataBean onAction(Long jobId, String action) {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
@@ -330,11 +330,13 @@ public class JobServiceImpl implements JobService {
         }
         JobDataBean jobData = new JobDataBean();
         List<? extends Trigger> triggers = getTriggers(job.getName(), job.getGroup());
-        if (!CollectionUtils.isEmpty(triggers)) {
-            Trigger trigger = triggers.get(0);
-            setTriggerTime(trigger, jobData);
-            setState(job, jobData, trigger);
+        /* If triggers are empty, in Griffin it means job is completed whose trigger state is NONE. */
+        if (CollectionUtils.isEmpty(triggers)) {
+            return null;
         }
+        Trigger trigger = triggers.get(0);
+        setTriggerTime(trigger, jobData);
+        setState(job, jobData, trigger);
         jobData.setJobId(job.getId());
         jobData.setJobName(job.getJobName());
         jobData.setMeasureId(job.getMeasureId());
