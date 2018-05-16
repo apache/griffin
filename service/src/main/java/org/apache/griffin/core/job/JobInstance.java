@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
@@ -83,6 +84,7 @@ public class JobInstance implements Job {
 
 
     @Override
+    @Transactional
     public void execute(JobExecutionContext context) {
         try {
             initParam(context);

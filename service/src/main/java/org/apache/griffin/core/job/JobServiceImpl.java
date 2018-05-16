@@ -54,6 +54,9 @@ import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
@@ -67,10 +70,10 @@ public class JobServiceImpl implements JobService {
     public static final String GRIFFIN_JOB_ID = "griffinJobId";
     private static final int MAX_PAGE_SIZE = 1024;
     private static final int DEFAULT_PAGE_SIZE = 10;
-    private static final String START = "start";
-    private static final String STOP = "stop";
-    private static final String BATCH = "batch";
-    private static final String STREAMING = "streaming";
+    static final String START = "start";
+    static final String STOP = "stop";
+    private static final String BATCH_TYPE = "batch";
+    private static final String STREAMING_TYPE = "streaming";
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -101,9 +104,9 @@ public class JobServiceImpl implements JobService {
     @Override
     public List<JobDataBean> getAliveJobs(String type) {
         List<? extends AbstractJob> jobs;
-        if (BATCH.equals(type)) {
+        if (BATCH_TYPE.equals(type)) {
             jobs = batchJobRepo.findByDeleted(false);
-        } else if (STREAMING.equals(type)) {
+        } else if (STREAMING_TYPE.equals(type)) {
             jobs = streamingJobRepo.findByDeleted(false);
         } else {
             jobs = jobRepo.findByDeleted(false);
@@ -167,20 +170,15 @@ public class JobServiceImpl implements JobService {
      * @param action job operation: start job, stop job
      */
     @Override
-    public JobDataBean onAction(Long jobId, String action) {
+    public JobDataBean onAction(Long jobId, String action) throws Exception {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
         doAction(action, job, op);
-        try {
-            return genJobDataBean(job);
-        } catch (SchedulerException e) {
-            LOGGER.error("Failed to get RUNNING jobs.", e);
-            throw new GriffinException.ServiceException("Failed to get RUNNING jobs.", e);
-        }
+        return genJobDataBean(job,action);
     }
 
-    private void doAction(String action, AbstractJob job, JobOperator op) {
+    private void doAction(String action, AbstractJob job, JobOperator op) throws Exception {
         switch (action) {
             case START:
                 op.start(job);
@@ -202,7 +200,7 @@ public class JobServiceImpl implements JobService {
      * @param jobId griffin job id
      */
     @Override
-    public void deleteJob(Long jobId) {
+    public void deleteJob(Long jobId) throws SchedulerException {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
@@ -215,7 +213,7 @@ public class JobServiceImpl implements JobService {
      * @param name griffin job name which may not be unique.
      */
     @Override
-    public void deleteJob(String name) {
+    public void deleteJob(String name) throws SchedulerException {
         List<AbstractJob> jobs = jobRepo.findByJobNameAndDeleted(name, false);
         if (CollectionUtils.isEmpty(jobs)) {
             LOGGER.warn("There is no job with '{}' name.", name);
@@ -244,7 +242,7 @@ public class JobServiceImpl implements JobService {
     private List<JobInstanceBean> updateState(List<JobInstanceBean> instances) {
         for (JobInstanceBean instance : instances) {
             State state = instance.getState();
-            if (state.equals(UNKNOWN) || LivySessionStates.isActive(state)) {
+            if (state.equals(UNKNOWN) || isActive(state)) {
                 syncInstancesOfJob(instance);
             }
         }
@@ -302,15 +300,15 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobOperator getJobOperator(ProcessType type) {
-        if (type == ProcessType.BATCH) {
+        if (type == BATCH) {
             return batchJobOp;
-        } else if (type == ProcessType.STREAMING) {
+        } else if (type == STREAMING) {
             return streamingJobOp;
         }
         throw new GriffinException.BadRequestException(MEASURE_TYPE_DOES_NOT_SUPPORT);
     }
 
-    public TriggerKey getTriggerKeyIfValid(String qName, String qGroup) throws SchedulerException {
+    TriggerKey getTriggerKeyIfValid(String qName, String qGroup) throws SchedulerException {
         TriggerKey triggerKey = triggerKey(qName, qGroup);
         if (factory.getScheduler().checkExists(triggerKey)) {
             throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
@@ -318,52 +316,43 @@ public class JobServiceImpl implements JobService {
         return triggerKey;
     }
 
-    public List<? extends Trigger> getTriggers(String name, String group) throws SchedulerException {
+    List<? extends Trigger> getTriggers(String name, String group) throws SchedulerException {
         JobKey jobKey = new JobKey(name, group);
         Scheduler scheduler = factory.getScheduler();
         return scheduler.getTriggersOfJob(jobKey);
     }
 
-    private JobDataBean genJobDataBean(AbstractJob job) throws SchedulerException {
+    private JobDataBean genJobDataBean(AbstractJob job, String action) throws SchedulerException {
         if (job.getName() == null || job.getGroup() == null) {
             return null;
         }
         JobDataBean jobData = new JobDataBean();
         List<? extends Trigger> triggers = getTriggers(job.getName(), job.getGroup());
-        /* If triggers are empty, in Griffin it means job is completed whose trigger state is NONE. */
-        if (CollectionUtils.isEmpty(triggers)) {
+        /* If triggers are empty, in Griffin it means job is not scheduled or completed whose trigger state is NONE. */
+        if (CollectionUtils.isEmpty(triggers) && job instanceof BatchJob) {
             return null;
         }
-        Trigger trigger = triggers.get(0);
-        setTriggerTime(trigger, jobData);
-        setState(job, jobData, trigger);
+        setTriggerTime(triggers, jobData);
+        JobOperator op = getJobOperator(job);
+        JobState state = op.getState(job, jobData, action);
+        jobData.setState(state);
         jobData.setJobId(job.getId());
         jobData.setJobName(job.getJobName());
         jobData.setMeasureId(job.getMeasureId());
         jobData.setCronExpression(getCronExpression(triggers));
-        jobData.setProcessType(job instanceof BatchJob ? ProcessType.BATCH : ProcessType.STREAMING);
+        jobData.setProcessType(job instanceof BatchJob ? BATCH : STREAMING);
         return jobData;
     }
 
-    private void setState(AbstractJob job, JobDataBean data, Trigger trigger) throws SchedulerException {
-        if (job instanceof BatchJob) {
-            Scheduler scheduler = factory.getScheduler();
-            String state = scheduler.getTriggerState(trigger.getKey()).toString();
-            data.setState(state);
-        } else if (job instanceof StreamingJob) {
-            List<JobInstanceBean> instances = instanceRepo.findByJobId(job.getId());
-            for (JobInstanceBean instance : instances) {
-                if (!instance.isDeleted() && instance.getState() != null) {
-                    String state = instance.getState().toString();
-                    data.setState(state);
-                    break;
-                }
-            }
-        }
-
+    private JobDataBean genJobDataBean(AbstractJob job) throws SchedulerException {
+        return genJobDataBean(job,null);
     }
 
-    private void setTriggerTime(Trigger trigger, JobDataBean jobBean) {
+    private void setTriggerTime(List<? extends Trigger> triggers, JobDataBean jobBean) {
+        if (CollectionUtils.isEmpty(triggers)) {
+            return;
+        }
+        Trigger trigger = triggers.get(0);
         Date nextFireTime = trigger.getNextFireTime();
         Date previousFireTime = trigger.getPreviousFireTime();
         jobBean.setNextFireTime(nextFireTime != null ? nextFireTime.getTime() : -1);
@@ -379,21 +368,21 @@ public class JobServiceImpl implements JobService {
         return null;
     }
 
-    public void addJob(TriggerKey tk, JobSchedule js, AbstractJob job, ProcessType type) throws Exception {
+    void addJob(TriggerKey tk, JobSchedule js, AbstractJob job, ProcessType type) throws Exception {
         JobDetail jobDetail = addJobDetail(tk, job);
         Trigger trigger = genTriggerInstance(tk, jobDetail, js, type);
         factory.getScheduler().scheduleJob(trigger);
     }
 
-    public String getQuartzName(JobSchedule js) {
+    String getQuartzName(JobSchedule js) {
         return js.getJobName() + "_" + System.currentTimeMillis();
     }
 
-    public String getQuartzGroup() {
+    String getQuartzGroup() {
         return "BA";
     }
 
-    public boolean isValidJobName(String jobName) {
+    boolean isValidJobName(String jobName) {
         if (StringUtils.isEmpty(jobName)) {
             LOGGER.warn("Job name cannot be empty.");
             return false;
@@ -418,10 +407,10 @@ public class JobServiceImpl implements JobService {
 
     private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, JobSchedule js, ProcessType type) {
         TriggerBuilder builder = newTrigger().withIdentity(tk).forJob(jd);
-        if (type == ProcessType.BATCH) {
+        if (type == BATCH) {
             TimeZone timeZone = getTimeZone(js.getTimeZone());
             return builder.withSchedule(cronSchedule(js.getCronExpression()).inTimeZone(timeZone)).build();
-        } else if (type == ProcessType.STREAMING) {
+        } else if (type == STREAMING) {
             return builder.startNow().withSchedule(simpleSchedule().withRepeatCount(0)).build();
         }
         throw new GriffinException.BadRequestException(JOB_TYPE_DOES_NOT_SUPPORT);
@@ -456,7 +445,7 @@ public class JobServiceImpl implements JobService {
      *
      * @param measureId measure id
      */
-    public void deleteJobsRelateToMeasure(Long measureId) {
+    public void deleteJobsRelateToMeasure(Long measureId) throws SchedulerException {
         List<AbstractJob> jobs = jobRepo.findByMeasureIdAndDeleted(measureId, false);
         if (CollectionUtils.isEmpty(jobs)) {
             LOGGER.info("Measure id {} has no related jobs.", measureId);

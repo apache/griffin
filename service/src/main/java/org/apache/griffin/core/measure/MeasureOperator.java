@@ -21,6 +21,7 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.measure.entity.Measure;
+import org.quartz.SchedulerException;
 
 public interface MeasureOperator {
 
@@ -28,6 +29,6 @@ public interface MeasureOperator {
 
     Measure update(Measure measure);
 
-    void delete(Measure measure);
+    void delete(Measure measure) throws SchedulerException;
 
 }

@@ -35,11 +35,11 @@ public interface JobService {
 
     JobSchedule addJob(JobSchedule js) throws Exception;
 
-    JobDataBean onAction(Long jobId,String action);
+    JobDataBean onAction(Long jobId,String action) throws Exception;
 
-    void deleteJob(Long jobId);
+    void deleteJob(Long jobId) throws SchedulerException;
 
-    void deleteJob(String jobName);
+    void deleteJob(String jobName) throws SchedulerException;
 
     List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
 

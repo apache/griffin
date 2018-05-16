@@ -27,6 +27,7 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.ExternalMeasureRepo;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +108,7 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public void deleteMeasureById(Long measureId) {
+    public void deleteMeasureById(Long measureId) throws SchedulerException {
         Measure measure = measureRepo.findByIdAndDeleted(measureId, false);
         if (measure == null) {
             throw new GriffinException.NotFoundException(MEASURE_ID_DOES_NOT_EXIST);
@@ -117,7 +118,7 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     @Override
-    public void deleteMeasures() {
+    public void deleteMeasures() throws SchedulerException {
         List<Measure> measures = measureRepo.findByDeleted(false);
         for (Measure m : measures) {
             MeasureOperator op = getOperation(m);

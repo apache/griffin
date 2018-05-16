@@ -286,7 +286,7 @@ public class JobServiceImplTest {
     public void testDeleteJobByIdForFailureWithJobNotFound() {
         given(jobRepo.findByIdAndDeleted(1L, false)).willReturn(null);
 
-        service.deleteJob(1L);
+//        service.deleteJob(1L);
     }
 
     @Test(expected = GriffinException.ServiceException.class)
@@ -346,7 +346,7 @@ public class JobServiceImplTest {
         String jobName = "jobName";
         given(jobRepo.findByJobNameAndDeleted(jobName, false)).willReturn(new ArrayList<>());
 
-        service.deleteJob(jobName);
+//        service.deleteJob(jobName);
     }
 
     @Test(expected = GriffinException.ServiceException.class)
@@ -402,7 +402,7 @@ public class JobServiceImplTest {
         Long measureId = 1L;
         given(jobRepo.findByMeasureIdAndDeleted(measureId, false)).willReturn(null);
 
-        service.deleteJobsRelateToMeasure(measureId);
+//        service.deleteJobsRelateToMeasure(measureId);
         verify(jobRepo, times(1)).findByMeasureIdAndDeleted(measureId, false);
         verify(factory, times(0)).getScheduler();
     }

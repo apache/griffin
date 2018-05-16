@@ -20,10 +20,8 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.griffin.core.job.BatchJobOperatorImpl;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivyConf;
-import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.factory.PredicatorFactory;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
@@ -43,10 +41,11 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.apache.griffin.core.job.JobInstance.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 
 @PersistJobDataAfterExecution
@@ -92,7 +91,7 @@ public class SparkSubmitJob implements Job {
         int repeatCount = simpleTrigger.getRepeatCount();
         int fireCount = simpleTrigger.getTimesTriggered();
         if (fireCount > repeatCount) {
-            saveJobInstance(null, LivySessionStates.State.NOT_FOUND);
+            saveJobInstance(null, NOT_FOUND);
         }
     }
 
@@ -214,7 +213,7 @@ public class SparkSubmitJob implements Job {
         saveJobInstance(result, FOUND);
     }
 
-    private void saveJobInstance(String result, LivySessionStates.State state) throws IOException {
+    private void saveJobInstance(String result,State state) throws IOException {
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         Map<String, Object> resultMap = null;
@@ -225,14 +224,14 @@ public class SparkSubmitJob implements Job {
         jobInstanceRepo.save(jobInstance);
     }
 
-    private void setJobInstance(Map<String, Object> resultMap, LivySessionStates.State state) {
+    private void setJobInstance(Map<String, Object> resultMap, State state) {
         jobInstance.setState(state);
         jobInstance.setPredicateDeleted(true);
         if (resultMap != null) {
             Object status = resultMap.get("state");
             Object id = resultMap.get("id");
             Object appId = resultMap.get("appId");
-            jobInstance.setState(status == null ? null : LivySessionStates.State.valueOf(status.toString().toUpperCase()));
+            jobInstance.setState(status == null ? null : State.valueOf(status.toString().toUpperCase()));
             jobInstance.setSessionId(id == null ? null : Long.parseLong(id.toString()));
             jobInstance.setAppId(appId == null ? null : appId.toString());
         }

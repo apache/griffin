@@ -22,8 +22,10 @@ package org.apache.griffin.core.job.entity;
 import com.cloudera.livy.sessions.SessionState;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.quartz.Trigger;
 
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
+import static org.quartz.Trigger.TriggerState;
 
 public class LivySessionStates {
 
@@ -116,14 +118,29 @@ public class LivySessionStates {
     }
 
     public static boolean isActive(State state) {
-        if (State.UNKNOWN.equals(state) || State.STOPPED.equals(state) || State.NOT_FOUND.equals(state) || State.FOUND.equals(state)) {
+        if (UNKNOWN.equals(state) || STOPPED.equals(state) || NOT_FOUND.equals(state) || FOUND.equals(state)) {
             // set UNKNOWN isActive() as false.
             return false;
-        } else if (State.FINDING.equals(state)) {
+        } else if (FINDING.equals(state)) {
             return true;
         }
         SessionState sessionState = toSessionState(state);
         return sessionState != null && sessionState.isActive();
+    }
+
+    public static String convert2QuartzState(State state) {
+        SessionState sessionState = toSessionState(state);
+        if (STOPPED.equals(state) || SUCCESS.equals(state)) {
+            return "COMPLETE";
+        }
+        if (STARTING.equals(state) || NOT_STARTED.equals(state)) {
+            return "BLOCKED";
+        }
+        if (UNKNOWN.equals(state) || NOT_FOUND.equals(state) || FOUND.equals(state) || sessionState == null || !sessionState.isActive()) {
+            return "ERROR";
+        }
+        return "NORMAL";
+
     }
 
     public static boolean isHealthy(State state) {

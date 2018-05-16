@@ -19,21 +19,20 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.AbstractJob;
-import org.apache.griffin.core.job.entity.JobDataBean;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobSchedule;
+import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.quartz.SchedulerException;
 
 public interface JobOperator {
     JobSchedule add(JobSchedule js, GriffinMeasure measure) throws Exception;
 
-    void start(AbstractJob job);
+    void start(AbstractJob job) throws Exception;
 
-    void stop(AbstractJob job);
+    void stop(AbstractJob job) throws SchedulerException;
 
-    void delete(AbstractJob job);
+    void delete(AbstractJob job) throws SchedulerException;
 
     JobHealth getHealth(JobHealth jobHealth, AbstractJob job) throws SchedulerException;
+
+    JobState getState(AbstractJob job, JobDataBean bean, String action) throws SchedulerException;
 }

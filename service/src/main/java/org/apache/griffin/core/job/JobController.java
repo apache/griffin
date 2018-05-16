@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.job.entity.*;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -56,19 +57,19 @@ public class JobController {
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public JobDataBean onActions(@PathVariable("id") Long jobId, @RequestParam String action) {
+    public JobDataBean onActions(@PathVariable("id") Long jobId, @RequestParam String action) throws Exception {
         return jobService.onAction(jobId,action);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void deleteJob(@RequestParam("jobName") String jobName) {
+    public void deleteJob(@RequestParam("jobName") String jobName) throws SchedulerException {
         jobService.deleteJob(jobName);
     }
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable("id") Long id) {
+    public void deleteJob(@PathVariable("id") Long id) throws SchedulerException {
         jobService.deleteJob(id);
     }
 

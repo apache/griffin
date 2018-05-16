@@ -22,7 +22,9 @@ import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 import static org.quartz.CronExpression.isValidExpression;
 import static org.quartz.JobKey.jobKey;
-import static org.quartz.Trigger.TriggerState.PAUSED;
+import static org.quartz.Trigger.TriggerState;
+import static org.quartz.Trigger.TriggerState.*;
+import static org.quartz.TriggerKey.triggerKey;
 
 @Service
 public class BatchJobOperatorImpl implements JobOperator {
@@ -36,8 +38,6 @@ public class BatchJobOperatorImpl implements JobOperator {
     private BatchJobRepo batchJobRepo;
     @Autowired
     private JobServiceImpl jobService;
-
-    //TODO finally you should validate transactional whether working
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -55,11 +55,18 @@ public class BatchJobOperatorImpl implements JobOperator {
         return jobSchedule;
     }
 
+    /**
+     * all states: BLOCKED  COMPLETE ERROR NONE  NORMAL   PAUSED
+     * to start states: PAUSED
+     * to stop states: BLOCKED   NORMAL
+     *
+     * @param job streaming job
+     */
     @Override
     public void start(AbstractJob job) {
         String name = job.getName();
         String group = job.getGroup();
-        Trigger.TriggerState state = getTriggerState(name, group);
+        TriggerState state = getTriggerState(name, group);
         if (state == null) {
             throw new GriffinException.BadRequestException(JOB_IS_NOT_SCHEDULED);
         }
@@ -81,6 +88,7 @@ public class BatchJobOperatorImpl implements JobOperator {
     }
 
     @Override
+    @Transactional
     public void delete(AbstractJob job) {
         pauseJob((BatchJob) job, true);
     }
@@ -98,8 +106,38 @@ public class BatchJobOperatorImpl implements JobOperator {
         return jobHealth;
     }
 
+    @Override
+    public JobState getState(AbstractJob job, JobDataBean bean, String action) throws SchedulerException {
+        JobState jobState = new JobState();
+        Scheduler scheduler = factory.getScheduler();
+        TriggerKey triggerKey = triggerKey(job.getName(), job.getGroup());
+        TriggerState triggerState = scheduler.getTriggerState(triggerKey);
+        jobState.setState(triggerState.toString());
+        jobState.setToStart(getStartStatus(triggerState));
+        jobState.setToStop(getStopStatus(triggerState));
+        return jobState;
+    }
 
-    private Trigger.TriggerState getTriggerState(String name, String group) {
+    /**
+     * only PAUSED state of job can be started
+     * @param state job state
+     * @return true: job can be started, false: job is running which cannot be started
+     */
+    private boolean getStartStatus(TriggerState state) {
+        return state == PAUSED;
+    }
+
+    /**
+     * only NORMAL or  BLOCKED state of job can be started
+     * @param state job state
+     * @return true: job can be stopped, false: job is running which cannot be stopped
+     */
+    private boolean getStopStatus(TriggerState state) {
+        return state == NORMAL || state == BLOCKED;
+    }
+
+
+    private TriggerState getTriggerState(String name, String group) {
         try {
             List<? extends Trigger> triggers = jobService.getTriggers(name, group);
             if (CollectionUtils.isEmpty(triggers)) {
@@ -149,7 +187,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.info("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
-            return;
+            throw new GriffinException.NotFoundException(JOB_KEY_DOES_NOT_EXIST);
         }
         scheduler.deleteJob(jobKey);
 
@@ -163,7 +201,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
-            return;
+            throw new GriffinException.NotFoundException(JOB_KEY_DOES_NOT_EXIST);
         }
         scheduler.pauseJob(jobKey);
     }

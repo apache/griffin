@@ -45,6 +45,7 @@ public enum GriffinExceptionMessage {
     JOB_ID_DOES_NOT_EXIST(40402, "Job id does not exist"),
     JOB_NAME_DOES_NOT_EXIST(40403, "Job name does not exist"),
     NO_SUCH_JOB_ACTION(40404, "No such job action"),
+    JOB_KEY_DOES_NOT_EXIST(40405, "Job key which consists of group and name does not exist."),
 
     //409, "Conflict"
     MEASURE_NAME_ALREADY_EXIST(40901, "Measure name already exists"),

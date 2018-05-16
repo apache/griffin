@@ -53,6 +53,10 @@ public class JobSchedule extends AbstractAuditableEntity {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String cronExpression;
 
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private JobState state;
+
     @NotNull
     private String timeZone;
 
@@ -99,6 +103,14 @@ public class JobSchedule extends AbstractAuditableEntity {
     @JsonProperty("cron.expression")
     public void setCronExpression(String cronExpression) {
         this.cronExpression = cronExpression;
+    }
+
+    public JobState getState() {
+        return state;
+    }
+
+    public void setState(JobState state) {
+        this.state = state;
     }
 
     @JsonProperty("cron.time.zone")

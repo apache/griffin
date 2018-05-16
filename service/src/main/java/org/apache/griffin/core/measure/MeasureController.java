@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.measure.entity.Measure;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -45,13 +46,13 @@ public class MeasureController {
 
     @RequestMapping(value = "/measures/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMeasureById(@PathVariable("id") Long id) {
+    public void deleteMeasureById(@PathVariable("id") Long id) throws SchedulerException {
         measureService.deleteMeasureById(id);
     }
 
     @RequestMapping(value = "/measures", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMeasures() {
+    public void deleteMeasures() throws SchedulerException {
         measureService.deleteMeasures();
     }
 

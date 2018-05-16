@@ -22,6 +22,7 @@ package org.apache.griffin.core.measure;
 import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class GriffinMeasureOperatorImpl implements MeasureOperator {
     }
 
     @Override
-    public void delete(Measure measure) {
+    public void delete(Measure measure) throws SchedulerException {
         jobService.deleteJobsRelateToMeasure(measure.getId());
         measure.setDeleted(true);
         measureRepo.save(measure);
