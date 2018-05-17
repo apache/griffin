@@ -335,7 +335,7 @@ public class JobServiceImpl implements JobService {
         setTriggerTime(triggers, jobData);
         JobOperator op = getJobOperator(job);
         JobState state = op.getState(job, jobData, action);
-        jobData.setState(state);
+        jobData.setJobState(state);
         jobData.setJobId(job.getId());
         jobData.setJobName(job.getJobName());
         jobData.setMeasureId(job.getMeasureId());

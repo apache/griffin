@@ -31,7 +31,7 @@ public class JobDataBean {
 
     private Long measureId;
 
-    private JobState state;
+    private JobState jobState;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long nextFireTime;
@@ -68,12 +68,12 @@ public class JobDataBean {
         this.measureId = measureId;
     }
 
-    public JobState getState() {
-        return state;
+    public JobState getJobState() {
+        return jobState;
     }
 
-    public void setState(JobState state) {
-        this.state = state;
+    public void setJobState(JobState jobState) {
+        this.jobState = jobState;
     }
 
     public Long getNextFireTime() {
