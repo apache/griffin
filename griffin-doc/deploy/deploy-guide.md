@@ -128,8 +128,8 @@ You should also modify some configurations of Griffin for your environment.
     # other dependent jars
     sparkJob.jars =
 
-    # hive-site.xml location, as configured in spark conf if ignored here
-	spark.yarn.dist.files =
+    # hive-site.xml location
+    spark.yarn.dist.files = hdfs://<path to>/hive-site.xml
 
     livy.uri = http://<your IP>:8998/batches
     spark.uri = http://<your IP>:8088
