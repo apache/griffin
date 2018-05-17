@@ -115,7 +115,7 @@ case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: O
     selectors.lastOption match {
       case None => desc
       case Some(sel: FunctionSelectExpr) => desc
-      case _ => s"coalesce(${desc}, 'null')"
+      case _ => s"coalesce(${desc}, '')"
     }
   }
   def alias: Option[String] = {
