@@ -133,9 +133,6 @@ public class LivySessionStates {
         if (STOPPED.equals(state) || SUCCESS.equals(state)) {
             return "COMPLETE";
         }
-        if (STARTING.equals(state) || NOT_STARTED.equals(state)) {
-            return "BLOCKED";
-        }
         if (UNKNOWN.equals(state) || NOT_FOUND.equals(state) || FOUND.equals(state) || sessionState == null || !sessionState.isActive()) {
             return "ERROR";
         }
