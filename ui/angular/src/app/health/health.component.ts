@@ -29,7 +29,7 @@ import * as $ from "jquery";
 })
 export class HealthComponent implements OnInit {
   constructor(
-    private http: HttpClient,
+    private http:HttpClient,
     private router: Router,
     public serviceService: ServiceService
   ) {}
@@ -175,8 +175,7 @@ export class HealthComponent implements OnInit {
       for (let mesName in this.mesWithJob) {
         var metricData = this.mesWithJob[mesName][0];
         if (
-          metricData.metricValues[0] != undefined &&
-          metricData.type == "accuracy"
+          metricData.metricValues[0] != undefined && metricData.type == "accuracy"
         ) {
           var jobs = this.mesWithJob[mesName];
           var node = null;
@@ -196,7 +195,7 @@ export class HealthComponent implements OnInit {
               metricNode.details = JSON.parse(
                 JSON.stringify(jobs[i].metricValues)
               );
-              metricNode.name = jobs[i].name;
+              metricNode.name = mesName; //jobs[i].name;// to avoid same metricName
               metricNode.timestamp = jobs[i].metricValues[0].tmst;
               metricNode.dq =
                 jobs[i].metricValues[0].value.matched /

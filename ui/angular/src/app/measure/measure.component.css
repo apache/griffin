@@ -67,6 +67,7 @@ under the License.
   background-color: #000000;
   border-radius: 5px;
   padding: 10px;
+  max-height: 600px;
   /*height:800px;*/
 }
 
@@ -384,4 +385,16 @@ fieldset legend {
 
 a {
   color: white;
+}
+
+.swMain li>div.done .stepDesc,
+.swMain>ul li>div.selected1child .stepDesc {
+  color: #007AFF
+}
+.swMain li>div.done:before,
+.swMain>ul li>div.selected1child:before {
+  border-color: #007AFF
+}
+.swMain>ul li>div.selected1child .stepNumber {
+  border-color: #007AFF
 }

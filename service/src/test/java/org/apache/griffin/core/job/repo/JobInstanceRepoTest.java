@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.job.repo;
 
+import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
+import org.apache.griffin.core.job.entity.GriffinJob;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.junit.Before;
@@ -27,14 +29,18 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
+@ContextConfiguration(classes = {EclipseLinkJpaConfigForTest.class})
 public class JobInstanceRepoTest {
 
     @Autowired
@@ -52,7 +58,8 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState();
+        State[] states = {starting, not_started, recovering, idle, running, busy};
+        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
         assertThat(beans.size()).isEqualTo(1);
     }
 
@@ -75,10 +82,16 @@ public class JobInstanceRepoTest {
     }
 
     private void setEntityManager() {
-        JobInstanceBean bean1 = new JobInstanceBean( LivySessionStates.State.finding, "pName1", "pGroup1", null, 1516004640092L);
-        JobInstanceBean bean2 = new JobInstanceBean( LivySessionStates.State.not_found, "pName2", "pGroup2", null, 1516004640093L);
-        JobInstanceBean bean3 = new JobInstanceBean( LivySessionStates.State.running, "pName3", "pGroup3", null, 1516004640082L);
-        JobInstanceBean bean4 = new JobInstanceBean( LivySessionStates.State.success, "pName4", "pGroup4", null, 1516004640094L);
+        GriffinJob job = new GriffinJob(1L, "jobName", "qName", "qGroup", false);
+        entityManager.persistAndFlush(job);
+        JobInstanceBean bean1 = new JobInstanceBean(LivySessionStates.State.finding, "pName1", "pGroup1", null, 1516004640092L);
+        JobInstanceBean bean2 = new JobInstanceBean(LivySessionStates.State.not_found, "pName2", "pGroup2", null, 1516004640093L);
+        JobInstanceBean bean3 = new JobInstanceBean(LivySessionStates.State.running, "pName3", "pGroup3", null, 1516004640082L);
+        JobInstanceBean bean4 = new JobInstanceBean(LivySessionStates.State.success, "pName4", "pGroup4", null, 1516004640094L);
+        bean1.setGriffinJob(job);
+        bean2.setGriffinJob(job);
+        bean3.setGriffinJob(job);
+        bean4.setGriffinJob(job);
         entityManager.persistAndFlush(bean1);
         entityManager.persistAndFlush(bean2);
         entityManager.persistAndFlush(bean3);

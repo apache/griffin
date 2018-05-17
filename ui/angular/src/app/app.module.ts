@@ -19,7 +19,7 @@ under the License.
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule} from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HttpClientModule} from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DataTableModule} from "angular2-datatable";
 import { TreeModule } from 'angular-tree-component';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -42,6 +42,7 @@ import { DataassetComponent } from './dataasset/dataasset.component';
 import { CreateJobComponent } from './job/create-job/create-job.component';
 import { AcComponent} from './measure/create-measure/ac/ac.component';
 import { PrComponent } from './measure/create-measure/pr/pr.component';
+import { PubComponent } from './measure/create-measure/pub/pub.component';
 import { LoginComponent } from './login/login.component';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
 import { RuleComponent } from './measure/create-measure/pr/rule/rule.component';
@@ -49,6 +50,10 @@ import { TruncatePipe} from './sidebar/truncate.pipe';
 import { ConfigurationComponent } from './measure/create-measure/configuration/configuration.component';
 import { NouisliderModule } from 'ng2-nouislider';
 import {CreateDataassetComponent} from './dataasset/create-dataasset/create-dataasset.component';
+import { HttpService } from './service/http.service';
+import {LoaderService} from './loader/loader.service';
+import { LoaderComponent } from './loader/loader.component';
+
 
 const appRoutes: Routes = [
   {
@@ -87,6 +92,10 @@ const appRoutes: Routes = [
     {
     path: 'createmeasurepr',
     component:PrComponent
+  },
+  {
+    path: 'createmeasurepub',
+    component:PubComponent
   },
   {
     path: 'detailed/:name',
@@ -136,11 +145,13 @@ const appRoutes: Routes = [
     CreateJobComponent,
     AcComponent,
     PrComponent,
+    PubComponent,
     LoginComponent,
     RuleComponent,
     TruncatePipe,
     ConfigurationComponent,
-    CreateDataassetComponent
+    CreateDataassetComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,
@@ -160,7 +171,15 @@ const appRoutes: Routes = [
     MatNativeDateModule,
     MatDatepickerModule
   ],
-  providers: [],
+  exports: [
+    LoaderComponent
+],
+  providers: [ LoaderService,
+    {
+    provide: HTTP_INTERCEPTORS,
+    useClass: HttpService,
+    multi: true,
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

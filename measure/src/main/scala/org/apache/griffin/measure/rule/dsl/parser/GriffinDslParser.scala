@@ -24,6 +24,8 @@ import org.apache.griffin.measure.rule.dsl.expr._
 case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[String]
                            ) extends BasicParser {
 
+  import Operator._
+
   /**
     * -- profiling clauses --
     * <profiling-clauses> = <select-clause> [ <from-clause> ]+ [ <where-clause> ]+ [ <groupby-clause> ]+ [ <orderby-clause> ]+ [ <limit-clause> ]+
@@ -48,9 +50,15 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
 
   /**
     * -- distinctness clauses --
-    * <distinctness-clauses> = <expr> [, <expr>]+
+    * <sqbr-expr> = "[" <expr> "]"
+    * <dist-expr> = <sqbr-expr> | <expr>
+    * <distinctness-clauses> = <distExpr> [, <distExpr>]+
     */
-  def distinctnessClause: Parser[DistinctnessClause] = rep1sep(expression, Operator.COMMA) ^^ {
+  def sqbrExpr: Parser[Expr] = LSQBR ~> expression <~ RSQBR ^^ {
+    case expr => { expr.tag = "[]"; expr}
+  }
+  def distExpr: Parser[Expr] = expression | sqbrExpr
+  def distinctnessClause: Parser[DistinctnessClause] = rep1sep(distExpr, Operator.COMMA) ^^ {
     case exprs => DistinctnessClause(exprs)
   }
 
@@ -62,6 +70,14 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
     case exprs => TimelinessClause(exprs)
   }
 
+  /**
+    * -- completeness clauses --
+    * <completeness-clauses> = <expr> [, <expr>]+
+    */
+  def completenessClause: Parser[CompletenessClause] = rep1sep(expression, Operator.COMMA) ^^ {
+    case exprs => CompletenessClause(exprs)
+  }
+
   def parseRule(rule: String, dqType: DqType): ParseResult[Expr] = {
     val rootExpr = dqType match {
       case AccuracyType => logicalExpression
@@ -69,6 +85,7 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
       case UniquenessType => uniquenessClause
       case DistinctnessType => distinctnessClause
       case TimelinessType => timelinessClause
+      case CompletenessType => completenessClause
       case _ => expression
     }
     parseAll(rootExpr, rule)

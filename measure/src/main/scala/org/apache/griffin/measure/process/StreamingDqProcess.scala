@@ -28,7 +28,7 @@ import org.apache.griffin.measure.process.engine.DqEngineFactory
 import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.RuleAdaptorGroup
 import org.apache.griffin.measure.rule.udf._
-import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
@@ -57,6 +57,9 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     sparkContext = new SparkContext(conf)
     sparkContext.setLogLevel(sparkParam.logLevel)
     sqlContext = new HiveContext(sparkContext)
+
+    // clear checkpoint directory
+    clearCpDir
 
     // init info cache instance
     InfoCacheInstance.initInstance(envParam.infoCacheParams, metricName)
@@ -159,9 +162,15 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     val ssc = new StreamingContext(sparkContext, batchInterval)
     ssc.checkpoint(sparkParam.cpDir)
 
-
-
     ssc
+  }
+
+  private def clearCpDir: Unit = {
+    if (sparkParam.needInitClear) {
+      val cpDir = sparkParam.cpDir
+      println(s"clear checkpoint directory ${cpDir}")
+      HdfsUtil.deleteHdfsPath(cpDir)
+    }
   }
 
 }

@@ -29,9 +29,9 @@ under the License.
         <td colspan="7" style="text-align:center;display: none" id="message">
           No content.
         </td>
-        <td class="icon">
+        <!-- <td class="icon">
           <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
-        </td>
+        </td> -->
       </tr>
     </table>
     <table class="table table-striped reco" [mfData]="results" #mf="mfDataTable" [mfRowsOnPage]="5">
@@ -49,9 +49,9 @@ under the License.
           <td *ngIf="!results" colspan="7" style="text-align:center">
             No content.
           </td>
-          <td class="icon">
+          <!-- <td class="icon">
             <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
-          </td>
+          </td> -->
         </tr>
       </tbody>
       <tbody *ngFor="let row of mf.data" style="word-break:break-all;">
