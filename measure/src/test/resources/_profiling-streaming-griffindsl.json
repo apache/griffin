@@ -12,12 +12,12 @@
           "version": "0.8",
           "config": {
             "kafka.config": {
-              "bootstrap.servers": "10.149.247.156:9092",
+              "bootstrap.servers": "10.147.177.107:9092",
               "group.id": "group1",
               "auto.offset.reset": "smallest",
               "auto.commit.enable": "false"
             },
-            "topics": "sss",
+            "topics": "test",
             "key.type": "java.lang.String",
             "value.type": "java.lang.String"
           },
@@ -43,7 +43,8 @@
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["0", "0"]
+        "time.range": ["0", "0"],
+        "init.clear": true
       }
     }
   ],

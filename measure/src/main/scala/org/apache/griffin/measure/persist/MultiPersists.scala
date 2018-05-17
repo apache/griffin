@@ -21,7 +21,7 @@ package org.apache.griffin.measure.persist
 import org.apache.griffin.measure.result._
 import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Dataset}
 
 import scala.util.Try
 

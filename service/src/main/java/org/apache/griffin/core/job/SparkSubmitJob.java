@@ -193,8 +193,11 @@ public class SparkSubmitJob implements Job {
 
     private void setPropConf() {
         Map<String, String> conf = new HashMap<>();
-        conf.put("spark.yarn.dist.files", livyConfProps.getProperty("spark.yarn.dist.files"));
-        livyConf.setConf(conf);
+        String v = livyConfProps.getProperty("spark.yarn.dist.files");
+        if (!StringUtils.isEmpty(v)) {
+            conf.put("spark.yarn.dist.files", v);
+            livyConf.setConf(conf);
+        }
     }
 
     private void saveJobInstance(JobDetail jd) throws SchedulerException, IOException {

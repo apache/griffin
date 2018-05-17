@@ -49,7 +49,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetaStoreService.class);
 
     @Autowired
-    private HiveMetaStoreClient client;
+    private HiveMetaStoreClient client = null;
 
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;
@@ -71,7 +71,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
                 return new ArrayList<>();
             }
             results = client.getAllDatabases();
-        } catch (MetaException e) {
+        } catch (Exception e) {
             reconnect();
             LOGGER.error("Can not get databases : {}", e.getMessage());
         }
@@ -185,7 +185,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             singleThreadExecutor.execute(() -> {
                 try {
                     client.reconnect();
-                } catch (MetaException e) {
+                } catch (Exception e) {
                     LOGGER.error("reconnect to hive failed.");
                 }
             });

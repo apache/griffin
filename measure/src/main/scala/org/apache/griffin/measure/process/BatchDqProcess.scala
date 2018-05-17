@@ -30,9 +30,8 @@ import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters,
 import org.apache.griffin.measure.rule.adaptor._
 import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.rule.udf._
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.{SQLContext, SparkSession}
+import org.apache.spark.SparkConf
 
 import scala.util.Try
 
@@ -46,24 +45,27 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
   val dataSourceNames = userParam.dataSources.map(_.name)
   val baselineDsName = userParam.baselineDsName
 
-  var sparkContext: SparkContext = _
+//  var sparkContext: SparkContext = _
   var sqlContext: SQLContext = _
+
+  var sparkSession: SparkSession = _
 
   def retriable: Boolean = false
 
   def init: Try[_] = Try {
     val conf = new SparkConf().setAppName(metricName)
     conf.setAll(sparkParam.config)
-    sparkContext = new SparkContext(conf)
-    sparkContext.setLogLevel(sparkParam.logLevel)
-    sqlContext = new HiveContext(sparkContext)
+    conf.set("spark.sql.crossJoin.enabled", "true")
+    sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
+    sparkSession.sparkContext.setLogLevel(sparkParam.logLevel)
+    sqlContext = sparkSession.sqlContext
 
     // register udf
     GriffinUdfs.register(sqlContext)
     GriffinUdafs.register(sqlContext)
 
     // init adaptors
-    RuleAdaptorGroup.init(sqlContext, dataSourceNames, baselineDsName)
+    RuleAdaptorGroup.init(sparkSession, dataSourceNames, baselineDsName)
   }
 
   def run: Try[_] = Try {
@@ -78,7 +80,7 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     val persist: Persist = persistFactory.getPersists(appTime)
 
     // persist start id
-    val applicationId = sparkContext.applicationId
+    val applicationId = sparkSession.sparkContext.applicationId
     persist.start(applicationId)
 
     // get dq engines
@@ -146,7 +148,8 @@ case class BatchDqProcess(allParam: AllParam) extends DqProcess {
     DataFrameCaches.uncacheGlobalDataFrames()
     DataFrameCaches.clearGlobalTrashDataFrames()
 
-    sparkContext.stop
+    sparkSession.close()
+    sparkSession.stop()
   }
 
 //  private def cleanData(t: Long): Unit = {
