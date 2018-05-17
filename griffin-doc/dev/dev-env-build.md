@@ -116,15 +116,15 @@ For end2end test, you will need to build a new griffin docker image, for more co
 ```
 git clone https://github.com/bhlx3lyx7/griffin-docker.git
 ```
-2. Copy your measure and service JAR into svc_msr_new directory.
+2. Copy your measure and service JAR into griffin_spark2 directory.
 ```
-cp service-<version>.jar <path to>/griffin-docker/svc_msr_new/prep/service/service.jar
-cp measure-<version>.jar <path to>/griffin-docker/svc_msr_new/prep/measure/griffin-measure.jar
+cp service-<version>.jar <path to>/griffin-docker/griffin_spark2/prep/service/service.jar
+cp measure-<version>.jar <path to>/griffin-docker/griffin_spark2/prep/measure/griffin-measure.jar
 ```
 3. Build your new griffin docker image.
-In svc_msr_new directory.
+In griffin_spark2 directory.
 ```
-cd <path to>/griffin-docker/svc_msr_new
+cd <path to>/griffin-docker/griffin_spark2
 docker build -t <image name>[:<image version>] .
 ```
 4. If you are using another image name (or version), you need also modify the docker-compose file you're using.
