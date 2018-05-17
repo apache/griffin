@@ -39,11 +39,12 @@
         }
       ],
       "cache": {
-        "file.path": "hdfs://localhost/griffin/streaming/dump/old",
-        "info.path": "old",
+        "file.path": "hdfs://localhost/griffin/streaming/dump/source",
+        "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["0", "0"]
+        "time.range": ["0", "0"],
+        "init.clear": true
       }
     }
   ],

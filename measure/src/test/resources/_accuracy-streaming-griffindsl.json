@@ -13,7 +13,7 @@
           "version": "0.8",
           "config": {
             "kafka.config": {
-              "bootstrap.servers": "10.149.247.156:9092",
+              "bootstrap.servers": "10.147.177.107:9092",
               "group.id": "group1",
               "auto.offset.reset": "smallest",
               "auto.commit.enable": "false"
@@ -46,6 +46,7 @@
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
         "time.range": ["-2m", "0"],
+        "init.clear": true,
         "updatable": true
       }
     }, {
@@ -56,7 +57,7 @@
           "version": "0.8",
           "config": {
             "kafka.config": {
-              "bootstrap.servers": "10.149.247.156:9092",
+              "bootstrap.servers": "10.147.177.107:9092",
               "group.id": "group1",
               "auto.offset.reset": "smallest",
               "auto.commit.enable": "false"
@@ -88,7 +89,8 @@
         "info.path": "target",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"]
+        "time.range": ["-2m", "0"],
+        "init.clear": true
       }
     }
   ],

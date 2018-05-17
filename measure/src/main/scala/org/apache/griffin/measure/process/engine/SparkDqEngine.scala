@@ -24,7 +24,7 @@ import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row, SQLContext}
+import org.apache.spark.sql._
 import org.apache.griffin.measure.utils.ParamUtil._
 
 trait SparkDqEngine extends DqEngine {
@@ -115,10 +115,11 @@ trait SparkDqEngine extends DqEngine {
   }
 
   def collectBatchRecords(recordExport: RecordExport): Option[RDD[String]] = {
-    getRecordDataFrame(recordExport).map(_.toJSON)
+    getRecordDataFrame(recordExport).map(_.toJSON.rdd)
   }
 
   def collectStreamingRecords(recordExport: RecordExport): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
+    implicit val encoder = Encoders.tuple(Encoders.scalaLong, Encoders.STRING)
     val RecordExport(_, _, _, originDFOpt, defTmst, procType) = recordExport
     getRecordDataFrame(recordExport) match {
       case Some(stepDf) => {
@@ -149,7 +150,7 @@ trait SparkDqEngine extends DqEngine {
                   }
                 } else None
               }
-              (Some(records.groupByKey), emptyTmsts)
+              (Some(records.rdd.groupByKey), emptyTmsts)
             } else (None, emptyTmsts)
           }
           case _ => {
@@ -163,7 +164,7 @@ trait SparkDqEngine extends DqEngine {
                 case e: Throwable => None
               }
             }
-            (Some(records.groupByKey), Set[Long]())
+            (Some(records.rdd.groupByKey), Set[Long]())
           }
         }
       }
