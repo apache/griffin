@@ -29,7 +29,7 @@ import org.apache.griffin.measure.process.temp.{DataFrameCaches, TableRegisters}
 import org.apache.griffin.measure.rule.adaptor.RuleAdaptorGroup
 import org.apache.griffin.measure.rule.udf._
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{SQLContext, SparkSession}
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -46,17 +46,20 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
   val dataSourceNames = userParam.dataSources.map(_.name)
   val baselineDsName = userParam.baselineDsName
 
-  var sparkContext: SparkContext = _
+//  var sparkContext: SparkContext = _
   var sqlContext: SQLContext = _
+
+  var sparkSession: SparkSession = _
 
   def retriable: Boolean = true
 
   def init: Try[_] = Try {
     val conf = new SparkConf().setAppName(metricName)
     conf.setAll(sparkParam.config)
-    sparkContext = new SparkContext(conf)
-    sparkContext.setLogLevel(sparkParam.logLevel)
-    sqlContext = new HiveContext(sparkContext)
+    conf.set("spark.sql.crossJoin.enabled", "true")
+    sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
+    sparkSession.sparkContext.setLogLevel(sparkParam.logLevel)
+    sqlContext = sparkSession.sqlContext
 
     // clear checkpoint directory
     clearCpDir
@@ -71,7 +74,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
 
     // init adaptors
     val dataSourceNames = userParam.dataSources.map(_.name)
-    RuleAdaptorGroup.init(sqlContext, dataSourceNames, baselineDsName)
+    RuleAdaptorGroup.init(sparkSession, dataSourceNames, baselineDsName)
   }
 
   def run: Try[_] = Try {
@@ -94,7 +97,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     val persist: Persist = persistFactory.getPersists(appTime)
 
     // persist start id
-    val applicationId = sparkContext.applicationId
+    val applicationId = sparkSession.sparkContext.applicationId
     persist.start(applicationId)
 
     // get dq engines
@@ -149,7 +152,8 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
     DataFrameCaches.uncacheGlobalDataFrames()
     DataFrameCaches.clearGlobalTrashDataFrames()
 
-    sparkContext.stop
+    sparkSession.close()
+    sparkSession.stop()
 
     InfoCacheInstance.close
   }
@@ -159,7 +163,7 @@ case class StreamingDqProcess(allParam: AllParam) extends DqProcess {
       case Some(interval) => Milliseconds(interval)
       case _ => throw new Exception("invalid batch interval")
     }
-    val ssc = new StreamingContext(sparkContext, batchInterval)
+    val ssc = new StreamingContext(sparkSession.sparkContext, batchInterval)
     ssc.checkpoint(sparkParam.cpDir)
 
     ssc

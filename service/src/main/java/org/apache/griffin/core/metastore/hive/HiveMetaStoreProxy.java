@@ -29,6 +29,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.security.CodeSource;
 
 @Component
 public class HiveMetaStoreProxy {
@@ -61,7 +65,7 @@ public class HiveMetaStoreProxy {
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);
         try {
             client = new HiveMetaStoreClient(hiveConf);
-        } catch (MetaException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to connect hive metastore. {}", e.getMessage());
             client = null;
         }
