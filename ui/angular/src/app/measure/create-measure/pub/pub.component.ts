@@ -60,8 +60,8 @@ export function createPubMeasure(name: string,
   providers: [ServiceService],
   styleUrls: ["./pub.component.css"]
 })
-export class PubComponent implements AfterViewChecked, OnInit {    
-  newMeasure = createPubMeasure("", "", "","external","accuracy","test"); 
+export class PubComponent implements AfterViewChecked, OnInit {
+  newMeasure = createPubMeasure("", "", "","external","accuracy","test");
   dqTypeOptions =["accuracy"];
   createResult: any;
   private toasterService: ToasterService;
@@ -138,9 +138,9 @@ export class PubComponent implements AfterViewChecked, OnInit {
     setTimeout(() => (this.visibleAnimate = true), 100);
   }
 
-  
 
-  save() {     
+
+  save() {
     var measure2Save ={
       name:this.newMeasure.name,
       metricName: this.newMeasure.metricName,
@@ -177,11 +177,11 @@ export class PubComponent implements AfterViewChecked, OnInit {
       mouse: {
         click: (tree, node, $event) => {
           if (node.hasChildren) {
-            
+
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
           } else if (node.data.cols) {
-           
-            
+
+
           }
         }
       }
@@ -208,9 +208,9 @@ export class PubComponent implements AfterViewChecked, OnInit {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data => {
       this.nodeList = new Array();
-      
+
     });
-    
+
   }
   ngAfterViewChecked() {
     this.resizeWindow();

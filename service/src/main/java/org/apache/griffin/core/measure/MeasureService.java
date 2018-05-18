@@ -21,6 +21,7 @@ package org.apache.griffin.core.measure;
 
 
 import org.apache.griffin.core.measure.entity.Measure;
+import org.quartz.SchedulerException;
 
 import java.util.List;
 
@@ -30,11 +31,11 @@ public interface MeasureService {
 
     Measure getMeasureById(long id);
 
-    void deleteMeasureById(Long id);
+    void deleteMeasureById(Long id) throws SchedulerException;
 
-    void deleteMeasures();
+    void deleteMeasures() throws SchedulerException;
 
-    void updateMeasure(Measure measure);
+    Measure updateMeasure(Measure measure);
 
     List<Measure> getAliveMeasuresByOwner(String owner);
 

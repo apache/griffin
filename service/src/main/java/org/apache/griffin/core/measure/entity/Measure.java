@@ -19,13 +19,12 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -38,12 +37,16 @@ public abstract class Measure extends AbstractAuditableEntity {
     @NotNull
     protected String name;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     protected String owner;
 
-    private String dqType;
+    @Enumerated(EnumType.STRING)
+    private DqType dqType;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String organization;
 
     private boolean deleted = false;
@@ -57,12 +60,12 @@ public abstract class Measure extends AbstractAuditableEntity {
     }
 
     @JsonProperty("dq.type")
-    public String getDqType() {
+    public DqType getDqType() {
         return dqType;
     }
 
     @JsonProperty("dq.type")
-    public void setDqType(String dqType) {
+    public void setDqType(DqType dqType) {
         this.dqType = dqType;
     }
 

@@ -20,7 +20,6 @@ under the License.
 package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
-import org.apache.griffin.core.job.entity.GriffinJob;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
@@ -40,10 +39,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.busy;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.running;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @PropertySource("classpath:application.properties")
@@ -72,26 +68,19 @@ public class JobInstanceBeanRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        LivySessionStates.State[] states = {starting, not_started, recovering, idle, running, busy};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         List<JobInstanceBean> list = jobInstanceRepo.findByActiveState(states);
         assertThat(list.size()).isEqualTo(1);
     }
 
 
-
-
     private void setEntityManager() {
-        GriffinJob job = new GriffinJob(1L, "jobName", "qName", "qGroup", false);
-        entityManager.persistAndFlush(job);
-        JobInstanceBean instance1 = new JobInstanceBean(1L,  LivySessionStates.State.success,
-                "appId1", "http://domain.com/uri1", System.currentTimeMillis(),System.currentTimeMillis());
-        JobInstanceBean instance2 = new JobInstanceBean(2L,  LivySessionStates.State.error,
-                "appId2", "http://domain.com/uri2", System.currentTimeMillis(),System.currentTimeMillis());
-        JobInstanceBean instance3 = new JobInstanceBean(2L,  LivySessionStates.State.starting,
-                "appId3", "http://domain.com/uri3", System.currentTimeMillis(),System.currentTimeMillis());
-        instance1.setGriffinJob(job);
-        instance2.setGriffinJob(job);
-        instance3.setGriffinJob(job);
+        JobInstanceBean instance1 = new JobInstanceBean(1L, LivySessionStates.State.SUCCESS,
+                "appId1", "http://domain.com/uri1", System.currentTimeMillis(), System.currentTimeMillis());
+        JobInstanceBean instance2 = new JobInstanceBean(2L, LivySessionStates.State.ERROR,
+                "appId2", "http://domain.com/uri2", System.currentTimeMillis(), System.currentTimeMillis());
+        JobInstanceBean instance3 = new JobInstanceBean(2L, LivySessionStates.State.STARTING,
+                "appId3", "http://domain.com/uri3", System.currentTimeMillis(), System.currentTimeMillis());
         entityManager.persistAndFlush(instance1);
         entityManager.persistAndFlush(instance2);
         entityManager.persistAndFlush(instance3);

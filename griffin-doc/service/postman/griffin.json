@@ -1565,7 +1565,7 @@
 					],
 					"cookies": [],
 					"mime": "",
-					"text": "[\n    {\n        \"id\": 1,\n        \"sessionId\": null,\n        \"state\": \"success\",\n        \"appId\": null,\n        \"appUri\": null,\n        \"predicateGroup\": \"PG\",\n        \"predicateName\": \"job_name_predicate_1515399840077\",\n        \"deleted\": true,\n        \"timestamp\": 1515399840092,\n        \"expireTimestamp\": 1516004640092\n    },\n    {\n        \"id\": 2,\n        \"sessionId\": null,\n        \"state\": \"not_found\",\n        \"appId\": null,\n        \"appUri\": null,\n        \"predicateGroup\": \"PG\",\n        \"predicateName\": \"job_name_predicate_1515399840066\",\n        \"deleted\": true,\n        \"timestamp\": 1515399840067,\n        \"expireTimestamp\": 1516004640067\n    }\n]",
+					"text": "[\n    {\n        \"id\": 1,\n        \"sessionId\": null,\n        \"state\": \"success\",\n        \"appId\": null,\n        \"appUri\": null,\n        \"predicateGroup\": \"PG\",\n        \"predicateName\": \"job_name_predicate_1515399840077\",\n        \"deleted\": true,\n        \"timestamp\": 1515399840092,\n        \"expireTimestamp\": 1516004640092\n    },\n    {\n        \"id\": 2,\n        \"sessionId\": null,\n        \"state\": \"NOT_FOUND\",\n        \"appId\": null,\n        \"appUri\": null,\n        \"predicateGroup\": \"PG\",\n        \"predicateName\": \"job_name_predicate_1515399840066\",\n        \"deleted\": true,\n        \"timestamp\": 1515399840067,\n        \"expireTimestamp\": 1516004640067\n    }\n]",
 					"language": "json",
 					"rawDataType": "text",
 					"previewType": "text",

@@ -46,12 +46,12 @@ public class FileExistPredicator implements Predicator {
 
     @Override
     public boolean predicate() throws IOException {
-        Map<String, String> config = predicate.getConfigMap();
+        Map<String, Object> config = predicate.getConfigMap();
         String[] paths = null;
         String rootPath = null;
-        if (config != null && !StringUtils.isEmpty(config.get(PREDICT_PATH))) {
-            paths = config.get(PREDICT_PATH).split(PATH_CONNECTOR_CHARACTER);
-            rootPath = config.get(PREDICT_ROOT_PATH);
+        if (config != null && !StringUtils.isEmpty((String) config.get(PREDICT_PATH))) {
+            paths = ((String)config.get(PREDICT_PATH)).split(PATH_CONNECTOR_CHARACTER);
+            rootPath = (String) config.get(PREDICT_ROOT_PATH);
         }
         if (ArrayUtils.isEmpty(paths) || StringUtils.isEmpty(rootPath)) {
             LOGGER.error("Predicate path is null.Please check predicates config root.path and path.");
