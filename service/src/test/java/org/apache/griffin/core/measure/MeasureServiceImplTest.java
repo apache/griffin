@@ -217,7 +217,7 @@ public class MeasureServiceImplTest {
     public void testUpdateMeasureForGriffinSuccess() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
-        doNothing().when(griffinOp).update(measure);
+        doReturn(measure).when(externalOp).update(measure);
 
         service.updateMeasure(measure);
         verify(griffinOp, times(1)).update(measure);
@@ -244,7 +244,7 @@ public class MeasureServiceImplTest {
     public void testUpdateMeasureForExternal() {
         ExternalMeasure measure = createExternalMeasure("external_view_item_hourly");
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
-        doNothing().when(externalOp).update(measure);
+        doReturn(measure).when(externalOp).update(measure);
 
         service.updateMeasure(measure);
         verify(externalOp, times(1)).update(measure);

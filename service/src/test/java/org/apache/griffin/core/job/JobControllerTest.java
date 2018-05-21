@@ -46,6 +46,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,7 +74,7 @@ public class JobControllerTest {
     public void testGetJobs() throws Exception {
         JobDataBean jobBean = new JobDataBean();
         jobBean.setJobName("job_name");
-        given(service.getAliveJobs("batch")).willReturn(Collections.singletonList(jobBean));
+        given(service.getAliveJobs("")).willReturn(Collections.singletonList(jobBean));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
