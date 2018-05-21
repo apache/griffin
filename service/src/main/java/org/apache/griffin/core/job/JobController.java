@@ -62,7 +62,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteJob(@RequestParam("jobName") String jobName) throws SchedulerException {
         jobService.deleteJob(jobName);
     }
