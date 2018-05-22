@@ -484,7 +484,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
     this.visible = true;
     setTimeout(() => (this.visibleAnimate = true), 100);
   }
-  
+
   deleteUnit(index){
     delete this.newMeasure["data.sources"][index]["connectors"][0]["data.unit"];
   }

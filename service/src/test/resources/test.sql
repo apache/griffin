@@ -40,5 +40,5 @@ INSERT INTO `evaluate_rule` VALUES ('2', '2017-07-12 17:40:30', null, '$source['
 -- ----------------------------
 -- Records of measure
 -- ----------------------------
-INSERT INTO `measure` VALUES ('1', '2017-07-12 11:06:47', null, '0', 'desc1', 'buy_rates_hourly', 'eBay', 'test', 'batch', 'accuracy', '1', '1', '2');
-INSERT INTO `measure` VALUES ('2', '2017-07-12 17:40:30', null, '0', 'desc2', 'griffin_aver', 'eBay', 'test', 'batch', 'accuracy', '2', '3', '4');
+INSERT INTO `measure` VALUES ('1', '2017-07-12 11:06:47', null, '0', 'desc1', 'buy_rates_hourly', 'eBay', 'test', 'BATCH', 'ACCURACY', '1', '1', '2');
+INSERT INTO `measure` VALUES ('2', '2017-07-12 17:40:30', null, '0', 'desc2', 'griffin_aver', 'eBay', 'test', 'BATCH', 'ACCURACY', '2', '3', '4');

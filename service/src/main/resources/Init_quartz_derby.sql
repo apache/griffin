@@ -29,7 +29,7 @@
 --    derby.connection.requireAuthentication = true
 --    derby.authentication.provider = BUILTIN
 --    derby.user.quartz2=quartz2123
--- 2. Start the DB server by running bin/startNetworkServer script.
+-- 2. Start the DB server by RUNNING bin/startNetworkServer script.
 -- 3. On a new terminal, run bin/ij tool to bring up an SQL prompt, then run:
 --    connect 'jdbc:derby://localhost:1527/quartz2;user=quartz2;password=quartz2123;create=true';
 --    run 'quartz/docs/dbTables/tables_derby.sql';

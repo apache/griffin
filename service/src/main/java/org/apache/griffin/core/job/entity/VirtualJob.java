@@ -19,9 +19,11 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
+@DiscriminatorValue("virtualJob")
 public class VirtualJob extends AbstractJob {
 
     public VirtualJob() {

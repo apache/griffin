@@ -129,6 +129,6 @@ export class JobComponent implements OnInit {
         return job;
       });
       this.results = Object.assign([],trans).reverse();
-    });   
+    });
   }
 }

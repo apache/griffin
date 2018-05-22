@@ -66,7 +66,7 @@ case class TableRegs() {
 
   def existTable(key: String, table: String): Boolean = {
     tables.get(key) match {
-      case Some(set) => set.contains(table)
+      case Some(set) => set.exists(_ == table)
       case _ => false
     }
   }

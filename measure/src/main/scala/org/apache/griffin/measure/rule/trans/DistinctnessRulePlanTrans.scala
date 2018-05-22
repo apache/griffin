@@ -233,7 +233,7 @@ case class DistinctnessRulePlanTrans(dataSourceNames: Seq[String],
       val duplicationArrayName = details.getString(_duplicationArray, "")
       val dupRulePlan = if (duplicationArrayName.nonEmpty) {
         val recordEnable = details.getBoolean(_recordEnable, false)
-        if (groupAliases.nonEmpty) {
+        if (groupAliases.size > 0) {
           // with some group by requirement
           // 9. origin data join with distinct information
           val informedTableName = "__informed"

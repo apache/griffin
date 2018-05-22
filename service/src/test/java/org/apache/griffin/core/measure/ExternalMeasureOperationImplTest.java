@@ -41,7 +41,7 @@ import static org.mockito.Mockito.verify;
 public class ExternalMeasureOperationImplTest {
 
     @InjectMocks
-    private ExternalMeasureOperationImpl operation;
+    private ExternalMeasureOperatorImpl operation;
 
     @Mock
     private ExternalMeasureRepo measureRepo;

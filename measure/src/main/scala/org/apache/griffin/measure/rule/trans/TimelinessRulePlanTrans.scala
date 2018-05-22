@@ -193,7 +193,7 @@ case class TimelinessRulePlanTrans(dataSourceNames: Seq[String],
 
       // 6. percentiles
       val percentiles = getPercentiles(details)
-      val percentilePlan = if (percentiles.nonEmpty) {
+      val percentilePlan = if (percentiles.size > 0) {
         val percentileTableName = "__percentile"
         val percentileColName = details.getStringOrKey(_percentileColPrefix)
         val percentileCols = percentiles.map { pct =>

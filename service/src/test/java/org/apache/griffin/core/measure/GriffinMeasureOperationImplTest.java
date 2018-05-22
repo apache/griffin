@@ -43,7 +43,7 @@ import static org.mockito.Mockito.*;
 public class GriffinMeasureOperationImplTest {
 
     @InjectMocks
-    private GriffinMeasureOperationImpl operation;
+    private GriffinMeasureOperatorImpl operation;
 
     @Mock
     private MeasureRepo<Measure> measureRepo;

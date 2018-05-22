@@ -20,7 +20,8 @@ under the License.
 package org.apache.griffin.core.job.entity;
 
 
-import org.quartz.Trigger;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 
 public class JobDataBean {
 
@@ -30,13 +31,18 @@ public class JobDataBean {
 
     private Long measureId;
 
-    private Trigger.TriggerState triggerState;
+    private JobState jobState;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long nextFireTime;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long previousFireTime;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String cronExpression;
+
+    private ProcessType processType;
 
     public Long getJobId() {
         return jobId;
@@ -62,12 +68,12 @@ public class JobDataBean {
         this.measureId = measureId;
     }
 
-    public Trigger.TriggerState getTriggerState() {
-        return triggerState;
+    public JobState getJobState() {
+        return jobState;
     }
 
-    public void setTriggerState(Trigger.TriggerState triggerState) {
-        this.triggerState = triggerState;
+    public void setJobState(JobState jobState) {
+        this.jobState = jobState;
     }
 
     public Long getNextFireTime() {
@@ -94,5 +100,11 @@ public class JobDataBean {
         this.cronExpression = cronExpression;
     }
 
+    public ProcessType getProcessType() {
+        return processType;
+    }
 
+    public void setProcessType(ProcessType processType) {
+        this.processType = processType;
+    }
 }

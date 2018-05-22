@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.griffin.core.job.entity.VirtualJob;
 
 import javax.persistence.CascadeType;
@@ -49,10 +50,12 @@ public class ExternalMeasure extends Measure {
         this.virtualJob = vj;
     }
 
+    @JsonProperty("metric.name")
     public String getMetricName() {
         return metricName;
     }
 
+    @JsonProperty("metric.name")
     public void setMetricName(String metricName) {
         this.metricName = metricName;
     }

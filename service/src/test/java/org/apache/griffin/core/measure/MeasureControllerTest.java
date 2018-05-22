@@ -45,10 +45,9 @@ import java.util.List;
 import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -149,11 +148,12 @@ public class MeasureControllerTest {
     public void testUpdateMeasureForSuccess() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        doNothing().when(service).updateMeasure(measure);
+        doReturn(measure).when(service).updateMeasure(measure);
 
         mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
                 .contentType(MediaType.APPLICATION_JSON).content(measureJson))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("view_item_hourly")));
     }
 
     @Test

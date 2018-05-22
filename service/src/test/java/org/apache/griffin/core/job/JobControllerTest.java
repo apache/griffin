@@ -46,6 +46,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,7 +74,7 @@ public class JobControllerTest {
     public void testGetJobs() throws Exception {
         JobDataBean jobBean = new JobDataBean();
         jobBean.setJobName("job_name");
-        given(service.getAliveJobs()).willReturn(Collections.singletonList(jobBean));
+        given(service.getAliveJobs("")).willReturn(Collections.singletonList(jobBean));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -84,7 +85,7 @@ public class JobControllerTest {
     public void testAddJobForSuccess() throws Exception {
         JobSchedule jobSchedule = createJobSchedule();
         jobSchedule.setId(1L);
-        given(service.addJob(jobSchedule)).willReturn(jobSchedule);
+//        given(service.addJob(jobSchedule)).willReturn(jobSchedule);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -173,13 +174,13 @@ public class JobControllerTest {
     public void testFindInstancesOfJob() throws Exception {
         int page = 0;
         int size = 2;
-        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates.State.running, "", "", null, null);
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates.State.RUNNING, "", "", null, null);
         given(service.findInstancesOfJob(1L, page, size)).willReturn(Arrays.asList(jobInstance));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param("jobId", String.valueOf(1L))
                 .param("page", String.valueOf(page)).param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].state", is("running")));
+                .andExpect(jsonPath("$.[0].state", is("RUNNING")));
     }
 
     @Test

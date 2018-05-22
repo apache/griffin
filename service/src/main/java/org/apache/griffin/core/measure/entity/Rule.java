@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.util.JsonUtil;
 
 import javax.persistence.*;
@@ -133,7 +134,7 @@ public class Rule extends AbstractAuditableEntity {
         this.recordMap = recordMap;
     }
 
-    public String getDetails() {
+    private String getDetails() {
         return details;
     }
 
@@ -141,19 +142,19 @@ public class Rule extends AbstractAuditableEntity {
         this.details = details;
     }
 
-    public String getMetric() {
+    private String getMetric() {
         return metric;
     }
 
-    public void setMetric(String metric) {
+    private void setMetric(String metric) {
         this.metric = metric;
     }
 
-    public String getRecord() {
+    private String getRecord() {
         return record;
     }
 
-    public void setRecord(String record) {
+    private void setRecord(String record) {
         this.record = record;
     }
 
@@ -182,15 +183,15 @@ public class Rule extends AbstractAuditableEntity {
 
     @PostLoad
     public void load() throws IOException {
-        if (!org.springframework.util.StringUtils.isEmpty(details)) {
+        if (!StringUtils.isEmpty(details)) {
             this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
             });
         }
-        if (!org.springframework.util.StringUtils.isEmpty(metric)) {
+        if (!StringUtils.isEmpty(metric)) {
             this.metricMap = JsonUtil.toEntity(metric, new TypeReference<Map<String, Object>>() {
             });
         }
-        if (!org.springframework.util.StringUtils.isEmpty(record)) {
+        if (!StringUtils.isEmpty(record)) {
             this.recordMap = JsonUtil.toEntity(record, new TypeReference<Map<String, Object>>() {
             });
         }

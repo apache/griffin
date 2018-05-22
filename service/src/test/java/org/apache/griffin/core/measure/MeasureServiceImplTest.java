@@ -30,6 +30,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.quartz.SchedulerException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.test.context.TestComponent;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -44,19 +52,30 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
+@Component
 public class MeasureServiceImplTest {
 
     @InjectMocks
     private MeasureServiceImpl service;
 
     @Mock
-    private MeasureOperation externalOp;
+    private MeasureOperator externalOp;
 
     @Mock
-    private MeasureOperation griffinOp;
+    private MeasureOperator griffinOp;
 
     @Mock
     private MeasureRepo<Measure> measureRepo;
+
+    @Value("${hive.hmshandler.retry.attempts}")
+    private String attempts;
+
+
+    @Test
+    public void test() {
+        System.out.println(attempts);
+    }
+
 
     @Before
     public void setup() {
@@ -110,7 +129,7 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testDeleteMeasureByIdForExternalSuccess() {
+    public void testDeleteMeasureByIdForExternalSuccess() throws SchedulerException {
         ExternalMeasure measure = createExternalMeasure("externalMeasure");
         measure.setId(1L);
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
@@ -121,7 +140,7 @@ public class MeasureServiceImplTest {
     }
 
     @Test(expected = GriffinException.NotFoundException.class)
-    public void testDeleteMeasureByIdFailureWithNotFound() {
+    public void testDeleteMeasureByIdFailureWithNotFound() throws SchedulerException {
         given(measureRepo.findByIdAndDeleted(1L, false)).willReturn(null);
         service.deleteMeasureById(1L);
     }
@@ -146,7 +165,7 @@ public class MeasureServiceImplTest {
     }
 
     @Test
-    public void testDeleteMeasuresForExternalSuccess() {
+    public void testDeleteMeasuresForExternalSuccess() throws SchedulerException {
         ExternalMeasure measure = createExternalMeasure("externalMeasure");
         measure.setId(1L);
         given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
@@ -198,7 +217,7 @@ public class MeasureServiceImplTest {
     public void testUpdateMeasureForGriffinSuccess() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
-        doNothing().when(griffinOp).update(measure);
+        doReturn(measure).when(externalOp).update(measure);
 
         service.updateMeasure(measure);
         verify(griffinOp, times(1)).update(measure);
@@ -225,7 +244,7 @@ public class MeasureServiceImplTest {
     public void testUpdateMeasureForExternal() {
         ExternalMeasure measure = createExternalMeasure("external_view_item_hourly");
         given(measureRepo.findByIdAndDeleted(measure.getId(), false)).willReturn(measure);
-        doNothing().when(externalOp).update(measure);
+        doReturn(measure).when(externalOp).update(measure);
 
         service.updateMeasure(measure);
         verify(externalOp, times(1)).update(measure);
