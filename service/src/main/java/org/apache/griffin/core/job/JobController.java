@@ -48,13 +48,13 @@ public class JobController {
         return jobService.getAliveJobs(type);
     }
 
-    @RequestMapping(value = "/jobs/config/{jobName}")
-    public JobSchedule getJobSchedule(@PathVariable("jobName") String jobName) {
+    @RequestMapping(value = "/jobs/config", method = RequestMethod.GET)
+    public JobSchedule getJobSchedule(@RequestParam("jobName") String jobName) {
         return jobService.getJobSchedule(jobName);
     }
 
-    @RequestMapping(value = "/jobs/config", method = RequestMethod.GET)
-    public JobSchedule getJobSchedule(@RequestParam("jobId") Long jobId) {
+    @RequestMapping(value = "/jobs/config/{jobId}")
+    public JobSchedule getJobSchedule(@PathVariable("jobId") Long jobId) {
         return jobService.getJobSchedule(jobId);
     }
 
