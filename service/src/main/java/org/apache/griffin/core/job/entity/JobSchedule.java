@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,7 +28,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.PropertiesUtil;
-import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -48,14 +48,17 @@ public class JobSchedule extends AbstractAuditableEntity {
     @NotNull
     private String jobName;
 
-    @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String cronExpression;
+
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private JobState jobState;
 
     @NotNull
     private String timeZone;
 
     @JsonIgnore
-//    @Access(AccessType.PROPERTY)
     private String predicateConfig;
 
     @Transient
@@ -97,11 +100,15 @@ public class JobSchedule extends AbstractAuditableEntity {
 
     @JsonProperty("cron.expression")
     public void setCronExpression(String cronExpression) {
-        if (StringUtils.isEmpty(cronExpression) || !isCronExpressionValid(cronExpression)) {
-            LOGGER.warn("Cron expression is invalid.Please check your cron expression.");
-            throw new IllegalArgumentException();
-        }
         this.cronExpression = cronExpression;
+    }
+
+    public JobState getJobState() {
+        return jobState;
+    }
+
+    public void setJobState(JobState jobState) {
+        this.jobState = jobState;
     }
 
     @JsonProperty("cron.time.zone")
@@ -172,14 +179,6 @@ public class JobSchedule extends AbstractAuditableEntity {
         scheduleConf.put("checkdonefile.schedule", map);
         this.predicateConfig = JsonUtil.toJson(scheduleConf);
         return scheduleConf;
-    }
-
-    private boolean isCronExpressionValid(String cronExpression) {
-        if (!CronExpression.isValidExpression(cronExpression)) {
-            LOGGER.warn("Cron expression {} is invalid.", cronExpression);
-            return false;
-        }
-        return true;
     }
 
     public JobSchedule() throws JsonProcessingException {

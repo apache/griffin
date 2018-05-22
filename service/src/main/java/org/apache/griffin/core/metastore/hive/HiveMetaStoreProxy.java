@@ -67,9 +67,7 @@ public class HiveMetaStoreProxy {
             client = new HiveMetaStoreClient(hiveConf);
         } catch (Exception e) {
             LOGGER.error("Failed to connect hive metastore. {}", e.getMessage());
-            client = null;
         }
-
         return client;
     }
 

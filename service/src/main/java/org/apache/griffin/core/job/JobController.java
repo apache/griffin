@@ -24,6 +24,7 @@ import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.FSUtil;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -43,13 +44,18 @@ public class JobController {
     private JobService jobService;
 
     @RequestMapping(value = "/jobs", method = RequestMethod.GET)
-    public List<JobDataBean> getJobs() {
-        return jobService.getAliveJobs();
+    public List<JobDataBean> getJobs(@RequestParam(value = "type", defaultValue = "") String type) {
+        return jobService.getAliveJobs(type);
     }
 
     @RequestMapping(value = "/jobs/config/{jobName}")
     public JobSchedule getJobSchedule(@PathVariable("jobName") String jobName) {
         return jobService.getJobSchedule(jobName);
+    }
+
+    @RequestMapping(value = "/jobs/config", method = RequestMethod.GET)
+    public JobSchedule getJobSchedule(@RequestParam("jobId") Long jobId) {
+        return jobService.getJobSchedule(jobId);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
@@ -58,15 +64,21 @@ public class JobController {
         return jobService.addJob(jobSchedule);
     }
 
+    @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public JobDataBean onActions(@PathVariable("id") Long jobId, @RequestParam String action) throws Exception {
+        return jobService.onAction(jobId,action);
+    }
+
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@RequestParam("jobName") String jobName) {
+    public void deleteJob(@RequestParam("jobName") String jobName) throws SchedulerException {
         jobService.deleteJob(jobName);
     }
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable("id") Long id) {
+    public void deleteJob(@PathVariable("id") Long id) throws SchedulerException {
         jobService.deleteJob(id);
     }
 

@@ -19,18 +19,47 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+/**
+ * Encapsulating job scheduler state to reduce job startup and stop logical processing
+ */
+public class JobState {
 
-@Entity
-@DiscriminatorValue("virtualJob")
-public class VirtualJob extends AbstractJob {
+    /**
+     * job scheduler state
+     */
+    private String state;
 
-    public VirtualJob() {
-        super();
+    /**
+     * whether job can be started
+     */
+    private boolean toStart = false;
+
+    /**
+     * whether job can be stopped
+     */
+    private boolean toStop = false;
+
+    public String getState() {
+        return state;
     }
 
-    public VirtualJob(String jobName, Long measureId, String metricName) {
-        super(jobName, measureId, metricName);
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public boolean isToStart() {
+        return toStart;
+    }
+
+    public void setToStart(boolean toStart) {
+        this.toStart = toStart;
+    }
+
+    public boolean isToStop() {
+        return toStop;
+    }
+
+    public void setToStop(boolean toStop) {
+        this.toStop = toStop;
     }
 }

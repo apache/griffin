@@ -17,17 +17,16 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure;
+package org.apache.griffin.core.measure.entity;
 
-
-import org.apache.griffin.core.measure.entity.Measure;
-
-public interface MeasureOperation {
-
-    Measure create(Measure measure);
-
-    void update(Measure measure);
-
-    void delete(Measure measure);
-
+public enum DqType {
+    /**
+     * Currently we support six dimensions of measure.
+     */
+    ACCURACY,
+    PROFILING,
+    TIMELINESS,
+    UNIQUENESS,
+    COMPLETENESS,
+    CONSISTENCY
 }
