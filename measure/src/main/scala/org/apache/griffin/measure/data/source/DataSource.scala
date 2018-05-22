@@ -47,8 +47,8 @@ case class DataSource(sqlContext: SQLContext,
     dataSourceCacheOpt.foreach(_.init)
     dataConnectors.foreach(_.init)
 
-    dataSourceCacheOpt.map(_.tmstCache = tmstCache)
-    dataConnectors.map(_.tmstCache = tmstCache)
+    dataSourceCacheOpt.foreach(_.tmstCache = tmstCache)
+    dataConnectors.foreach(_.tmstCache = tmstCache)
   }
 
   def loadData(timeInfo: TimeInfo): TimeRange = {
@@ -81,7 +81,7 @@ case class DataSource(sqlContext: SQLContext,
     }
     val pairs = batches ++ caches
 
-    if (pairs.size > 0) {
+    if (pairs.nonEmpty) {
       pairs.reduce { (a, b) =>
         (unionDfOpts(a._1, b._1), a._2.merge(b._2))
       }
