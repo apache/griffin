@@ -80,5 +80,8 @@ public class JsonUtilTest {
         assert map == null;
     }
 
-
+    @Test
+    public void test() throws IOException {
+        System.out.println(FileUtil.readEnv("env/env_batch.json"));
+    }
 }
