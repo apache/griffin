@@ -121,7 +121,7 @@ case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: O
   def alias: Option[String] = {
     if (aliasOpt.isEmpty) {
       val aliasSeq = (head +: selectors).flatMap(_.alias)
-      if (aliasSeq.size > 0) Some(aliasSeq.mkString("_")) else None
+      if (aliasSeq.nonEmpty) Some(aliasSeq.mkString("_")) else None
     } else aliasOpt
   }
 
