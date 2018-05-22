@@ -45,7 +45,7 @@ object InfoCacheInstance extends InfoCache {
 
   def listKeys(path: String): List[String] = {
     infoCaches.foldLeft(Nil: List[String]) { (res, infoCache) =>
-      if (res.size > 0) res else infoCache.listKeys(path)
+      if (res.nonEmpty) res else infoCache.listKeys(path)
     }
   }
 
