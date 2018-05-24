@@ -39,7 +39,8 @@ object Application extends Loggable {
     }
 
     val envParamFile = args(0)
-    val userParamFile = args(1)
+    // to fix livy bug: character ` will be ignored by livy
+    val userParamFile = args(1).replaceAll("\\\\`", "`")
     val (envFsType, userFsType) = if (args.length > 2) {
       val fsTypes = args(2).trim.split(",")
       if (fsTypes.length == 1) (fsTypes(0).trim, fsTypes(0).trim)
