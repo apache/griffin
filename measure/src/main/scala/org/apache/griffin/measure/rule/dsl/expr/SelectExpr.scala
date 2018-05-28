@@ -115,13 +115,13 @@ case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: O
     selectors.lastOption match {
       case None => desc
       case Some(sel: FunctionSelectExpr) => desc
-      case _ => s"coalesce(${desc}, 'null')"
+      case _ => s"coalesce(${desc}, '')"
     }
   }
   def alias: Option[String] = {
     if (aliasOpt.isEmpty) {
       val aliasSeq = (head +: selectors).flatMap(_.alias)
-      if (aliasSeq.size > 0) Some(aliasSeq.mkString("_")) else None
+      if (aliasSeq.nonEmpty) Some(aliasSeq.mkString("_")) else None
     } else aliasOpt
   }
 

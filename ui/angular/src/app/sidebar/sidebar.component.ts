@@ -97,7 +97,7 @@ export class SidebarComponent implements OnInit {
   getOption(parent, i) {
     return this.chartOption.get("chart" + parent + "-" + i);
   }
-  
+
   checkvalue(job){
     return job.metricValues.length === 0;
   }

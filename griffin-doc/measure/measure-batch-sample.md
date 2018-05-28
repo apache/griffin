@@ -101,10 +101,11 @@ The miss records of source will be persisted as record.
       "name": "source",
       "connectors": [
         {
-          "type": "avro",
-          "version": "1.7",
+          "type": "hive",
+          "version": "1.2",
           "config": {
-            "file.name": "src/test/resources/users_info_src.avro"
+            "database": "default",
+            "table.name": "src"
           }
         }
       ]
@@ -117,7 +118,7 @@ The miss records of source will be persisted as record.
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "name": "prof",
-        "rule": "select count(*) as `cnt`, count(distinct `post_code`) as `dis-cnt`, max(user_id) as `max` from source",
+        "rule": "select max(age) as `max_age`, min(age) as `min_age` from source",
         "metric": {
           "name": "prof"
         }
@@ -125,10 +126,10 @@ The miss records of source will be persisted as record.
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "grp",
-        "rule": "select post_code as `pc`, count(*) as `cnt` from source group by post_code",
+        "name": "name_grp",
+        "rule": "select name, count(*) as cnt from source group by name",
         "metric": {
-          "name": "post_group",
+          "name": "name_grp",
           "collect.type": "array"
         }
       }
@@ -142,5 +143,5 @@ Above is the configure file of batch profiling job.
 In this sample, we use hive table as source.  
 
 ### Evaluate rule
-In this profiling sample, the rule describes the profiling request: `country, country.count() as cnt group by country order by cnt desc limit 3`.  
-The profiling metrics will be persisted as metric, listing the most 3 groups of items in same country.  
+In this profiling sample, the rule describes the profiling request: `select max(age) as max_age, min(age) as min_age from source` and `select name, count(*) as cnt from source group by name`.
+The profiling metrics will be persisted as metric, with the max and min value of age, and count group by name, like this: `{"max_age": 53, "min_age": 11, "name_grp": [{"name": "Adam", "cnt": 13}, {"name": "Fred", "cnt": 2}]}`.

@@ -62,14 +62,6 @@ public class PropertiesUtilTest {
         assert properties != null;
     }
 
-    @Test(expected = FileNotFoundException.class)
-    public void testGetConfWithLocationWrong() throws FileNotFoundException {
-        String name = "sparkJob.properties";
-        String defaultPath = "/" + name;
-        String location = "wrong/path";
-        getConf(name, defaultPath, location);
-    }
-
     @Test
     public void testGetConfWithNoLocation() throws FileNotFoundException {
         String name = "sparkJob.properties";

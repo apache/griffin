@@ -24,7 +24,7 @@ import org.apache.griffin.measure.process.ProcessType
 import org.apache.griffin.measure.process.temp.{TableRegisters, TimeRange}
 import org.apache.griffin.measure.rule.dsl._
 import org.apache.griffin.measure.rule.plan._
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{Encoders, SQLContext, SparkSession}
 
 import scala.collection.mutable.{Map => MutableMap}
 
@@ -46,13 +46,22 @@ object RuleAdaptorGroup {
     functionNames = funcNames
   }
 
-  def init(sqlContext: SQLContext, dsNames: Seq[String], blDsName: String): Unit = {
-    val functions = sqlContext.sql("show functions")
-    functionNames = functions.map(_.getString(0)).collect.toSeq
+  def init(sparkSession: SparkSession, dsNames: Seq[String], blDsName: String): Unit = {
+    implicit val encoder = Encoders.STRING
+    val functions = sparkSession.catalog.listFunctions
+    functionNames = functions.map(_.name).collect.toSeq
     dataSourceNames = dsNames
 
     baselineDsName = blDsName
   }
+
+//  def init(sqlContext: SQLContext, dsNames: Seq[String], blDsName: String): Unit = {
+  //    val functions = sqlContext.sql("show functions")
+  //    functionNames = functions.map(_.getString(0)).collect.toSeq
+  //    dataSourceNames = dsNames
+  //
+  //    baselineDsName = blDsName
+  //  }
 
   private def getDslType(param: Map[String, Any], defDslType: DslType) = {
     DslType(param.getOrElse(_dslType, defDslType.desc).toString)

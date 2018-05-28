@@ -19,25 +19,31 @@ under the License.
 
 package org.apache.griffin.core.util;
 
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.HDFS_FILE_NOT_EXIST;
 
 @Component
 public class FSUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FSUtil.class);
+    private static final int SAMPLE_ROW_COUNT = 100;
 
     private static String fsDefaultName;
 
@@ -82,9 +88,7 @@ public class FSUtil {
      * list all sub dir of a dir
      */
     public static List<String> listSubDir(String dir) throws IOException {
-        if (getFileSystem() == null) {
-            throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
-        }
+        checkHDFSConf();
         List<String> fileList = new ArrayList<>();
         Path path = new Path(dir);
         if (fileSystem.isFile(path)) {
@@ -104,9 +108,7 @@ public class FSUtil {
      * get all file status of a dir.
      */
     public static List<FileStatus> listFileStatus(String dir) throws IOException {
-        if (getFileSystem() == null) {
-            throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
-        }
+        checkHDFSConf();
         List<FileStatus> fileStatusList = new ArrayList<>();
         Path path = new Path(dir);
         if (fileSystem.isFile(path)) {
@@ -125,9 +127,7 @@ public class FSUtil {
      * touch file
      */
     public static void touch(String filePath) throws IOException {
-        if (getFileSystem() == null) {
-            throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
-        }
+        checkHDFSConf();
         Path path = new Path(filePath);
         FileStatus st;
         if (fileSystem.exists(path)) {
@@ -149,13 +149,40 @@ public class FSUtil {
 
     }
 
-
     public static boolean isFileExist(String path) throws IOException {
+        checkHDFSConf();
+        Path hdfsPath = new Path(path);
+        return fileSystem.isFile(hdfsPath) || fileSystem.isDirectory(hdfsPath);
+    }
+
+    public static InputStream getSampleInputStream(String path) throws IOException {
+        checkHDFSConf();
+        if (isFileExist(path)) {
+            FSDataInputStream missingData = fileSystem.open(new Path(path));
+            BufferedReader bufReader = new BufferedReader(new InputStreamReader(missingData, Charsets.UTF_8));
+            String line = null;
+            int rowCnt = 0;
+            StringBuilder output = new StringBuilder(1024);
+
+            while ((line = bufReader.readLine()) != null) {
+                if (rowCnt < SAMPLE_ROW_COUNT) {
+                    output.append(line);
+                    output.append("\n");
+                }
+                rowCnt++;
+            }
+
+            return IOUtils.toInputStream(output, Charsets.UTF_8);
+        } else {
+            LOGGER.warn("HDFS file does not exist.", path);
+            throw new GriffinException.NotFoundException(HDFS_FILE_NOT_EXIST);
+        }
+    }
+
+    private static void checkHDFSConf() {
         if (getFileSystem() == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
-        Path hdfsPath = new Path(path);
-        return fileSystem.isFile(hdfsPath) || fileSystem.isDirectory(hdfsPath);
     }
 
 }

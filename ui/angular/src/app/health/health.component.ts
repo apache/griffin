@@ -167,7 +167,7 @@ export class HealthComponent implements OnInit {
     this.resizeTreeMap();
     this.chartOption = option;
   }
-  
+
   checkvalue(job){
     return job.metricValues.length === 0;
   }

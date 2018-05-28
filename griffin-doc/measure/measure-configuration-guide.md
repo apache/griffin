@@ -191,8 +191,8 @@ Above lists DQ job configure parameters.
 	+ hive data connector
 		* database: data base name, optional, "default" as default.
 		* table.name: table name.
-		* partitions: partition conditions string, split by ";" and ",", optional. 
-			e.g. `dt=20170410, hour=15; dt=20170411, hour=15; dt=20170412, hour=15`
+		* where: where conditions string, split by ",", optional.
+			e.g. `dt=20170410 AND hour=15, dt=20170411 AND hour=15, dt=20170412 AND hour=15`
 	+ text dir data connector
 		* dir.path: parent directory path.
 		* data.dir.depth: integer, depth of data directories, 0 as default.

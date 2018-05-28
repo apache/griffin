@@ -67,7 +67,7 @@ export class MetricComponent implements OnInit {
         var jobs = this.mesWithJob[mesName];
         if (
           jobs.length > 0 && jobs[0].type == "ACCURACY"
-        ) {  
+        ) {
           var node = null;
           node = new Object();
           node.name = mesName;
