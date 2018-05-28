@@ -135,8 +135,8 @@ export class AcComponent implements OnInit, AfterViewChecked {
   newMeasure = {
     name: "",
     "measure.type": "griffin",
-    "dq.type": "accuracy",
-    "process.type": "batch",
+    "dq.type": "ACCURACY",
+    "process.type": "BATCH",
     owner: "",
     description: "",
     // "group":[],
@@ -199,7 +199,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
       rules: [
         {
           "dsl.type": "griffin-dsl",
-          "dq.type": "accuracy",
+          "dq.type": "ACCURACY",
           name: "accuracy",
           rule: ""
           // "details": {
@@ -372,8 +372,8 @@ export class AcComponent implements OnInit, AfterViewChecked {
     this.newMeasure = {
       name: this.name,
       "measure.type": "griffin",
-      "dq.type": "accuracy",
-      "process.type": "batch",
+      "dq.type": "ACCURACY",
+      "process.type": "BATCH",
       owner: this.owner,
       description: this.desc,
       // "group":this.finalgrp,
@@ -435,7 +435,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
         rules: [
           {
             "dsl.type": "griffin-dsl",
-            "dq.type": "accuracy",
+            "dq.type": "ACCURACY",
             name: "accuracy",
             rule: ""
             // "details": {

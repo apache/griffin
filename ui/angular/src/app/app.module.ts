@@ -52,6 +52,7 @@ import { NouisliderModule } from 'ng2-nouislider';
 import { HttpService } from './service/http.service';
 import {LoaderService} from './loader/loader.service';
 import { LoaderComponent } from './loader/loader.component';
+import { JobDetailComponent } from './job/job-detail/job-detail.component';
 
 
 const appRoutes: Routes = [
@@ -73,11 +74,15 @@ const appRoutes: Routes = [
   },
   {
     path: 'jobs',
-    component: JobComponent,
+    component: JobComponent
+  },
+  {
+    path: 'job/:id',
+    component: JobDetailComponent
   },
   {
     path: 'createjob',
-    component: CreateJobComponent,
+    component: CreateJobComponent
 
   },
   {
@@ -145,7 +150,8 @@ const appRoutes: Routes = [
     RuleComponent,
     TruncatePipe,
     ConfigurationComponent,
-    LoaderComponent
+    LoaderComponent,
+    JobDetailComponent
   ],
   imports: [
     BrowserModule,

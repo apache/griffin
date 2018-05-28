@@ -21,9 +21,9 @@ import { Injectable } from "@angular/core";
 @Injectable()
 export class ServiceService {
   constructor() {}
-  // public BACKEND_SERVER = 'http://10.149.247.90:38080';
-  // public BACKEND_SERVER = 'http://localhost:8080';
-  public BACKEND_SERVER = "";
+  // public BACKEND_SERVER = 'http://10.64.222.80:38080';
+  public BACKEND_SERVER = 'http://localhost:8080';
+  // public BACKEND_SERVER = "";
   public API_ROOT_PATH = "/api/v1";
 
   public config = {
@@ -84,6 +84,8 @@ export class ServiceService {
       //Jobs
       allJobs: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
       addJobs: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
+      modifyJobs: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
+      getJobById: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs/config",
       getMeasuresByOwner:
         this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures/owner/",
       deleteJob: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",

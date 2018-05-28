@@ -114,7 +114,7 @@ export class SidebarComponent implements OnInit {
       for (let mesName in this.mesWithJob) {
         var jobs = this.mesWithJob[mesName];
         if (
-          jobs.length > 0 && jobs[0].type == "accuracy"
+          jobs.length > 0 && jobs[0].type == "ACCURACY"
         ) {
           var jobs = this.mesWithJob[mesName];
           var node = null;
@@ -122,7 +122,7 @@ export class SidebarComponent implements OnInit {
           node.name = mesName;
           node.dq = 0;
           node.metrics = [];
-          node.type = "accuracy";
+          node.type = "ACCURACY";
           for (let i = 0; i < jobs.length; i++) {
             if (jobs[i].metricValues.length != 0) {
               var someMetrics = jobs[i].metricValues.slice(0,30);

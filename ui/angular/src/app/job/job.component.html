@@ -30,10 +30,11 @@ under the License.
           <th st-ratio="15">Job Name</th>
           <th st-ratio="15">Previous Fire Time</th>
           <th st-ratio="20">Next Fire Time</th>
-          <th st-ratio="15">Trigger State</th>
+          <th st-ratio="15">Job State</th>
           <th st-ratio="5">Cron Expression</th>
           <th st-ratio="5">Action</th>
           <th st-ratio="5">Metric</th>
+          <th st-ratio="20">State Management</th>
         </tr>
       </thead>
       <tbody>
@@ -57,9 +58,9 @@ under the License.
           <td [hidden]="row.previousFireTime==-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
           <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
           <td>
-            <span *ngIf='row.triggerState == "NORMAL"' class="normal">{{row.triggerState}}
+            <span *ngIf='row.jobState.state == "NORMAL"' class="normal">{{row.jobState.state}}
                     </span>
-            <span *ngIf='row.triggerState != "NORMAL"' class='unnormal'>{{row.triggerState}}</span>
+            <span *ngIf='row.jobState.state != "NORMAL"' class='unnormal'>{{row.jobState.state}}</span>
           </td>
           <td>{{row.cronExpression}}</td>
           <td>
@@ -67,12 +68,25 @@ under the License.
             <a (click)="remove(row)" title="delete" style="text-decoration:none">
               <i class="fa fa-trash-o po"></i>
             </a> &nbsp;
+            <a routerLink="/job/{{row.jobId}}" title="subscribe">
+              <i class="fa fa-eye"></i>
+            </a>
           </td>
           <td>
             &nbsp;
             <a (click)="show(row)">
               <i class="fa fa-bar-chart po"></i>
             </a> &nbsp;
+          </td>
+          <!-- <td>
+            <input type="button" [ngClass]="row.action==='START' ? 'btn btn-success':'btn btn-danger'" class="" (click)="stateMag(row)" value="{{row.action}}">
+          </td> -->
+          <!-- <button type="button" class="btn btn-primary" (click)="stateMag(row)" value="{{row.action}}"></button> -->
+          <td>
+            <a class="btn btn-primary btn-o btn-wide" style="width:85px" (click)="stateMag(row)">
+              <i [ngClass]="row.action==='START' ? 'fa fa-play':'fa fa-stop'"></i>
+               {{row.action}}
+            </a>
           </td>
         </tr>
         <tr *ngIf="row.showDetail">
