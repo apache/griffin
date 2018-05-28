@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.config;
 
-import org.apache.griffin.core.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +31,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import static org.apache.griffin.core.config.EnvConfig.getBatchEnv;
+import static org.apache.griffin.core.config.EnvConfig.getStreamingEnv;
 import static org.apache.griffin.core.util.PropertiesUtil.getConf;
 import static org.apache.griffin.core.util.PropertiesUtil.getProperties;
 
@@ -40,22 +41,26 @@ public class PropertiesConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesConfig.class);
 
-    private String location;
+    private String configLocation;
 
-    public PropertiesConfig(@Value("${external.config.location}") String location) {
-        LOGGER.info("external.config.location : {}", location != null ? location : "null");
-        this.location = location;
+    private String envLocation;
+
+    public PropertiesConfig(@Value("${external.config.location}") String configLocation, @Value("${external.env.location}") String envLocation) {
+        LOGGER.info("external.config.location : {}", configLocation != null ? configLocation : "null");
+        LOGGER.info("external.env.location : {}", envLocation != null ? envLocation : "null");
+        this.configLocation = configLocation;
+        this.envLocation = envLocation;
     }
 
-//    @PostConstruct
-//    public void init() throws IOException {
-//        String batchName = "env_batch.json";
-//        String batchPath = "env/" + batchName;
-//        String streamingName = "env_streaming.json";
-//        String streamingPath = "env/" + streamingName;
-//        FileUtil.readBatchEnv(batchPath, batchName);
-//        FileUtil.readStreamingEnv(streamingPath, streamingName);
-//    }
+    @PostConstruct
+    public void init() throws IOException {
+        String batchName = "env_batch.json";
+        String batchPath = "env/" + batchName;
+        String streamingName = "env_streaming.json";
+        String streamingPath = "env/" + streamingName;
+        getBatchEnv(batchName,batchPath,envLocation);
+        getStreamingEnv(streamingName, streamingPath, envLocation);
+    }
 
 
     @Bean(name = "appConf")
@@ -68,13 +73,13 @@ public class PropertiesConfig {
     public Properties livyConf() throws FileNotFoundException {
         String name = "sparkJob.properties";
         String defaultPath = "/" + name;
-        return getConf(name, defaultPath, location);
+        return getConf(name, defaultPath, configLocation);
     }
 
     @Bean(name = "quartzConf")
     public Properties quartzConf() throws FileNotFoundException {
         String name = "quartz.properties";
         String defaultPath = "/" + name;
-        return getConf(name, defaultPath, location);
+        return getConf(name, defaultPath, configLocation);
     }
 }

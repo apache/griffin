@@ -27,7 +27,6 @@ import org.apache.griffin.core.job.factory.PredicatorFactory;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
-import org.apache.griffin.core.util.FileUtil;
 import org.apache.griffin.core.util.JsonUtil;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -42,6 +41,8 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.*;
 
+import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
+import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
 import static org.apache.griffin.core.job.JobInstance.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
@@ -155,9 +156,9 @@ public class SparkSubmitJob implements Job {
         return str.replaceAll(regex, escapeCh);
     }
 
-    private String genEnv() throws IOException {
+    private String genEnv(){
         ProcessType type = measure.getProcessType();
-        String env = type == BATCH ? FileUtil.readEnv("env/env_batch.json") : FileUtil.readEnv("env/env_streaming.json");
+        String env = type == BATCH ? ENV_BATCH : ENV_STREAMING;
         return env.replaceAll("\\$\\{JOB_NAME}", measure.getName());
     }
 
