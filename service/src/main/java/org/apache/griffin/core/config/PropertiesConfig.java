@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,19 +28,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.PostConstruct;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 import static org.apache.griffin.core.config.EnvConfig.getBatchEnv;
 import static org.apache.griffin.core.config.EnvConfig.getStreamingEnv;
-import static org.apache.griffin.core.util.PropertiesUtil.getConf;
-import static org.apache.griffin.core.util.PropertiesUtil.getProperties;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
+import static org.apache.griffin.core.util.PropertiesUtil.*;
 
 @Configuration
 public class PropertiesConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesConfig.class);
+
+    public static Map<String,Object> livyConfMap;
 
     private String configLocation;
 
@@ -58,28 +64,55 @@ public class PropertiesConfig {
         String batchPath = "env/" + batchName;
         String streamingName = "env_streaming.json";
         String streamingPath = "env/" + streamingName;
-        getBatchEnv(batchName,batchPath,envLocation);
+        String livyConfName = "sparkProperties.json";
+        getBatchEnv(batchName, batchPath, envLocation);
         getStreamingEnv(streamingName, streamingPath, envLocation);
+        genLivyConf(livyConfName, livyConfName, configLocation);
     }
 
-
-    @Bean(name = "appConf")
-    public Properties appConf() {
-        String path = "/application.properties";
-        return getProperties(path, new ClassPathResource(path));
-    }
-
-    @Bean(name = "livyConf")
-    public Properties livyConf() throws FileNotFoundException {
-        String name = "sparkJob.properties";
-        String defaultPath = "/" + name;
-        return getConf(name, defaultPath, configLocation);
-    }
-
+    /**
+     * Config quartz.properties will be replaced if it's found in external.config.location setting.
+     *
+     * @return Properties
+     * @throws FileNotFoundException It'll throw FileNotFoundException when path is wrong.
+     */
     @Bean(name = "quartzConf")
     public Properties quartzConf() throws FileNotFoundException {
         String name = "quartz.properties";
         String defaultPath = "/" + name;
         return getConf(name, defaultPath, configLocation);
+    }
+
+    private static void genLivyConf(String name, String defaultPath, String location) throws IOException {
+        if (livyConfMap != null) {
+            return;
+        }
+        String path = getConfPath(name, location);
+        if (path == null) {
+            livyConfMap = readPropertiesFromResource(defaultPath);
+        } else {
+            FileInputStream in = new FileInputStream(path);
+            livyConfMap = toEntity(in, new TypeReference<Map>() {
+            });
+        }
+    }
+
+    /**
+     * read env config from resource
+     *
+     * @param path resource path
+     * @return Map
+     * @throws IOException io exception
+     */
+    private static Map<String,Object>  readPropertiesFromResource(String path) throws IOException {
+        if (path == null) {
+            LOGGER.warn("Parameter path is null.");
+            return null;
+        }
+        // Be careful, here we use getInputStream() to convert path file to stream.
+        // It'll cause FileNotFoundException if you use  getFile() to convert path file to File Object
+        InputStream in = new ClassPathResource(path).getInputStream();
+        return toEntity(in, new TypeReference<Map<String,Object> >() {
+        });
     }
 }
