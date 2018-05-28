@@ -51,8 +51,8 @@ public class PropertiesUtil {
     }
 
     /**
-     * @param name        properties name like sparkJob.properties
-     * @param defaultPath properties classpath like /application.properties
+     * @param name        properties name like quartz.properties
+     * @param defaultPath properties classpath like /quartz.properties
      * @param location    custom properties path
      * @return Properties
      * @throws FileNotFoundException location setting is wrong that there is no target file.
@@ -69,7 +69,7 @@ public class PropertiesUtil {
         return getProperties(path, resource);
     }
 
-    static String getConfPath(String name, String location) {
+    public static String getConfPath(String name, String location) {
         return getFilePath(name, location);
     }
 

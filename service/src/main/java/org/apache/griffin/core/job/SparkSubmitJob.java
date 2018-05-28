@@ -21,7 +21,6 @@ package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.LivyConf;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.factory.PredicatorFactory;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
@@ -32,17 +31,21 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
 import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
+import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
 import static org.apache.griffin.core.job.JobInstance.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
@@ -54,22 +57,19 @@ import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.
 @Component
 public class SparkSubmitJob implements Job {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparkSubmitJob.class);
-    private static final String SPARK_JOB_JARS_SPLIT = ";";
 
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
-    @Qualifier("livyConf")
-    private Properties livyConfProps;
-    @Autowired
     private BatchJobOperatorImpl batchJobOp;
+    @Autowired
+    private Environment env;
 
     private GriffinMeasure measure;
     private String livyUri;
     private List<SegmentPredicate> mPredicates;
     private JobInstanceBean jobInstance;
     private RestTemplate restTemplate = new RestTemplate();
-    private LivyConf livyConf = new LivyConf();
 
     @Override
     public void execute(JobExecutionContext context) {
@@ -99,7 +99,7 @@ public class SparkSubmitJob implements Job {
     private String post2Livy() {
         String result;
         try {
-            result = restTemplate.postForObject(livyUri, livyConf, String.class);
+            result = restTemplate.postForObject(livyUri, livyConfMap, String.class);
             LOGGER.info(result);
         } catch (Exception e) {
             LOGGER.error("Post to livy ERROR. {}", e.getMessage());
@@ -130,7 +130,7 @@ public class SparkSubmitJob implements Job {
         mPredicates = new ArrayList<>();
         jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap().getString(PREDICATE_JOB_NAME));
         measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
-        livyUri = livyConfProps.getProperty("livy.uri");
+        livyUri = env.getProperty("livy.uri");
         setPredicates(jd.getJobDataMap().getString(PREDICATES_KEY));
         // in order to keep metric name unique, we set job name as measure name at present
         measure.setName(jd.getJobDataMap().getString(JOB_NAME));
@@ -152,6 +152,9 @@ public class SparkSubmitJob implements Job {
     }
 
     private String escapeCharacter(String str, String regex) {
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
         String escapeCh = "\\" + regex;
         return str.replaceAll(regex, escapeCh);
     }
@@ -163,22 +166,7 @@ public class SparkSubmitJob implements Job {
     }
 
     private void setLivyConf() throws IOException {
-        setLivyParams();
         setLivyArgs();
-        setLivyJars();
-        setPropConf();
-    }
-
-    private void setLivyParams() {
-        livyConf.setFile(livyConfProps.getProperty("sparkJob.file"));
-        livyConf.setClassName(livyConfProps.getProperty("sparkJob.className"));
-        livyConf.setName(livyConfProps.getProperty("sparkJob.name"));
-        livyConf.setQueue(livyConfProps.getProperty("sparkJob.queue"));
-        livyConf.setNumExecutors(Long.parseLong(livyConfProps.getProperty("sparkJob.numExecutors")));
-        livyConf.setExecutorCores(Long.parseLong(livyConfProps.getProperty("sparkJob.executorCores")));
-        livyConf.setDriverMemory(livyConfProps.getProperty("sparkJob.driverMemory"));
-        livyConf.setExecutorMemory(livyConfProps.getProperty("sparkJob.executorMemory"));
-        livyConf.setFiles(new ArrayList<>());
     }
 
     private void setLivyArgs() throws IOException {
@@ -190,23 +178,9 @@ public class SparkSubmitJob implements Job {
         LOGGER.info(finalMeasureJson);
         args.add(finalMeasureJson);
         args.add("raw,raw");
-        livyConf.setArgs(args);
+        livyConfMap.put("args", args);
     }
 
-    private void setLivyJars() {
-        String jarProp = livyConfProps.getProperty("sparkJob.jars");
-        List<String> jars = Arrays.asList(jarProp.split(SPARK_JOB_JARS_SPLIT));
-        livyConf.setJars(jars);
-    }
-
-    private void setPropConf() {
-        Map<String, String> conf = new HashMap<>();
-        String v = livyConfProps.getProperty("spark.yarn.dist.files");
-        if (!StringUtils.isEmpty(v)) {
-            conf.put("spark.yarn.dist.files", v);
-            livyConf.setConf(conf);
-        }
-    }
 
     private void saveJobInstance(JobDetail jd) throws SchedulerException, IOException {
         String result = post2Livy();
