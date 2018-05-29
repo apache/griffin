@@ -34,7 +34,12 @@ export class JobDetailComponent implements OnInit {
   measureData: any;
   jobName: string;
   cronExp: string;
+  cronTimeZone: string;
   measureName: string;
+  measureType: string;
+  processType: string;
+  rangeConfig = [];
+  tableInfo = [];
   constructor(
   	private route: ActivatedRoute,
   	private router: Router,
@@ -45,10 +50,15 @@ export class JobDetailComponent implements OnInit {
     let url = this.serviceService.config.uri.getModel + "/" + measureId;
     this.http.get(url).subscribe(
       data => {
-      	// console.log(data);
-       //  this.measureData = data;
-       //  console.log(this.measureData.name);
-       //  return this.measureData.name;
+        this.measureData = data;
+        this.measureName = this.measureData.name;
+        this.measureType = this.measureData["dq.type"].toLowerCase();
+        this.processType = this.measureData["process.type"].toLowerCase();
+        for(let item of this.measureData["data.sources"]){
+          let config = item.connectors[0].config;
+          let tableName = config.database + "." + config["table.name"];
+          this.tableInfo.push(tableName);
+        }
       },
       err => {
         console.log("error");
@@ -61,13 +71,15 @@ export class JobDetailComponent implements OnInit {
     var getJobById = this.serviceService.config.uri.getJobById + "?jobId=" + this.currentId;
     this.http.get(getJobById).subscribe(
       data => {
-      	console.log(data);
         this.jobData = data;
         this.jobName = this.jobData["job.name"];
         this.cronExp = this.jobData["cron.expression"];
+        this.cronTimeZone = this.jobData["cron.time.zone"];
         let mesureId = this.jobData["measure.id"];
-        // this.measureName = this.getMeasureById(measureId);
-        
+        this.getMeasureById(mesureId);
+        for(let item of this.jobData["data.segments"]){
+          this.rangeConfig.push(item["segment.range"]);
+        }
       },
       err => {
         console.log("error");

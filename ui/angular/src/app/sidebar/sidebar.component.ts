@@ -39,7 +39,6 @@ export class SidebarComponent implements OnInit {
     public chartService: ChartService
   ) {}
 
-  // finalData = [];
   finalData = [];
   chartOption = new Map();
   orgWithMeasure: any;

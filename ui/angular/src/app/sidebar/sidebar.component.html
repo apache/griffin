@@ -37,7 +37,7 @@ under the License.
   <!-- <div id="side-bar-metrics" class="row"> -->
   <div id="side-bar-metrics" class="row y-scrollable">
     <div *ngFor="let outerItems of finalData;let parent=index">
-      <div class="well">
+      <div class="well" *ngIf="outerItems.metrics.length != 0">
         <div class="col-sm-4 col-lg-4 col-md-4 ">
           <h4>
                 <!-- <a routerLink="/metrics/{{outerItems.name}}"> {{outerItems.name}}</a> -->

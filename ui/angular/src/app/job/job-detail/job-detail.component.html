@@ -36,7 +36,23 @@ under the License.
             Measure Name:
           </label>
           <div class="col-xs-8 " style="color: #fff">
-            {{jobName}}
+            {{measureName}}
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-xs-4">
+            Measure Type:
+          </label>
+          <div class="col-xs-8 " style="color: #fff">
+            {{measureType}}
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-xs-4">
+            Process Type:
+          </label>
+          <div class="col-xs-8 " style="color: #fff">
+            {{processType}}
           </div>
         </div>
         <div class="row">
@@ -45,6 +61,39 @@ under the License.
           </label>
           <div class="col-xs-8 " style="color: #fff">
             {{cronExp}}
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-xs-4">
+            Cron Time Zone:
+          </label>
+          <div class="col-xs-8 " style="color: #fff">
+            {{cronTimeZone}}
+          </div>
+        </div>
+        <div *ngIf="this.rangeConfig.length != 0">      
+          <div class="row" style="margin-left: 0px" *ngFor="let item of this.tableInfo;let i = index">
+            <div class="row">
+              <label class="col-xs-12">
+                {{item}}:
+              </label>
+            </div>
+            <div class="row">
+              <label class="col-xs-4">
+                Begin:
+              </label>
+              <div class="col-xs-8 " style="color: #fff">
+                {{this.rangeConfig[i].begin}}
+              </div>
+            </div>
+            <div class="row">
+              <label class="col-xs-4">
+                Length:
+              </label>
+              <div class="col-xs-8 " style="color: #fff">
+                {{this.rangeConfig[i].length}}
+              </div>
+            </div>
           </div>
         </div>
       </div>
