@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.Gson;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.factory.PredicatorFactory;
@@ -35,6 +36,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -51,6 +53,7 @@ import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
@@ -97,13 +100,14 @@ public class SparkSubmitJob implements Job {
     }
 
     private String post2Livy() {
-        String result;
+        String result = null;
         try {
             result = restTemplate.postForObject(livyUri, livyConfMap, String.class);
             LOGGER.info(result);
+        } catch (HttpClientErrorException e) {
+            LOGGER.error("Post to livy ERROR. \n {} {}", e.getMessage(), e.getResponseBodyAsString());
         } catch (Exception e) {
             LOGGER.error("Post to livy ERROR. {}", e.getMessage());
-            result = null;
         }
         return result;
     }
@@ -129,7 +133,7 @@ public class SparkSubmitJob implements Job {
     private void initParam(JobDetail jd) throws IOException {
         mPredicates = new ArrayList<>();
         jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap().getString(PREDICATE_JOB_NAME));
-        measure = JsonUtil.toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
+        measure = toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
         livyUri = env.getProperty("livy.uri");
         setPredicates(jd.getJobDataMap().getString(PREDICATES_KEY));
         // in order to keep metric name unique, we set job name as measure name at present
@@ -141,7 +145,7 @@ public class SparkSubmitJob implements Job {
         if (StringUtils.isEmpty(json)) {
             return;
         }
-        List<Map<String, Object>> maps = JsonUtil.toEntity(json, new TypeReference<List<Map>>() {
+        List<Map<String, Object>> maps = toEntity(json, new TypeReference<List<Map>>() {
         });
         for (Map<String, Object> map : maps) {
             SegmentPredicate sp = new SegmentPredicate();
@@ -159,7 +163,7 @@ public class SparkSubmitJob implements Job {
         return str.replaceAll(regex, escapeCh);
     }
 
-    private String genEnv(){
+    private String genEnv() {
         ProcessType type = measure.getProcessType();
         String env = type == BATCH ? ENV_BATCH : ENV_STREAMING;
         return env.replaceAll("\\$\\{JOB_NAME}", measure.getName());
@@ -183,6 +187,7 @@ public class SparkSubmitJob implements Job {
 
 
     private void saveJobInstance(JobDetail jd) throws SchedulerException, IOException {
+        // If result is null, it may livy uri is wrong or livy parameter is wrong.
         String result = post2Livy();
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();
@@ -191,12 +196,12 @@ public class SparkSubmitJob implements Job {
         saveJobInstance(result, FOUND);
     }
 
-    private void saveJobInstance(String result,State state) throws IOException {
+    private void saveJobInstance(String result, State state) throws IOException {
         TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
         };
         Map<String, Object> resultMap = null;
         if (result != null) {
-            resultMap = JsonUtil.toEntity(result, type);
+            resultMap = toEntity(result, type);
         }
         setJobInstance(resultMap, state);
         jobInstanceRepo.save(jobInstance);
