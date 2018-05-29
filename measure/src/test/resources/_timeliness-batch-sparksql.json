@@ -1,0 +1,52 @@
+{
+  "name": "timeliness_batch",
+
+  "process.type": "batch",
+
+  "data.sources": [
+    {
+      "name": "source",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/timeliness_data.avro"
+          }
+        }
+      ]
+    }
+  ],
+
+  "evaluate.rule": {
+    "rules": [
+      {
+        "dsl.type": "spark-sql",
+        "name": "in_time",
+        "rule": "select *, (ts) as `_in_ts`, (end_ts) as `_out_ts` from source where (ts) IS NOT NULL"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "lat",
+        "cache": true,
+        "rule": "select *, (`_out_ts` - `_in_ts`) as `latency` from `in_time`"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "metric",
+        "rule": "select cast(avg(`latency`) as bigint) as `avg`, max(`latency`) as `max`, min(`latency`) as `min` from `lat`",
+        "metric": {
+          "name": "timeliness"
+        }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "slows",
+        "rule": "select * from `lat` where `latency` > 60000",
+        "record": {
+          "name": "lateRecords"
+        }
+      }
+    ]
+  }
+}

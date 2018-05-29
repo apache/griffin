@@ -27,6 +27,8 @@ import org.apache.spark.rdd.RDD
   */
 case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
+  val block: Boolean = true
+
   val MaxLogLines = "max.log.lines"
 
   val maxLogLines = config.getInt(MaxLogLines, 100)

@@ -1,0 +1,38 @@
+{
+  "spark": {
+    "log.level": "WARN",
+    "config": {
+      "spark.master": "local[*]"
+    }
+  },
+
+  "persist": [
+    {
+      "type": "log",
+      "config": {
+        "max.log.lines": 10
+      }
+    },
+    {
+      "type": "hdfs",
+      "config": {
+        "path": "hdfs://localhost/griffin/batch/persist",
+        "max.persist.lines": 10000,
+        "max.lines.per.file": 10000
+      }
+    },
+    {
+      "type": "http",
+      "config": {
+        "method": "post",
+        "api": "http://10.148.181.248:39200/griffin/accuracy",
+        "over.time": "1m",
+        "retry": 10
+      }
+    }
+  ],
+
+  "info.cache": [],
+
+  "cleaner": {}
+}
