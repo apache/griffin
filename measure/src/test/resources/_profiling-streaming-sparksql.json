@@ -12,7 +12,7 @@
           "version": "0.8",
           "config": {
             "kafka.config": {
-              "bootstrap.servers": "10.147.177.107:9092",
+              "bootstrap.servers": "10.149.247.156:9092",
               "group.id": "group1",
               "auto.offset.reset": "smallest",
               "auto.commit.enable": "false"
@@ -43,8 +43,7 @@
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["0", "0"],
-        "init.clear": true
+        "time.range": ["0", "0"]
       }
     }
   ],
@@ -52,8 +51,7 @@
   "evaluate.rule": {
     "rules": [
       {
-        "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
+        "dsl.type": "spark-sql",
         "name": "prof",
         "rule": "select count(name) as `cnt`, max(age) as `max`, min(age) as `min` from source",
         "metric": {
@@ -61,13 +59,20 @@
         }
       },
       {
-        "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
+        "dsl.type": "spark-sql",
         "name": "grp",
         "rule": "select name, count(*) as `cnt` from source group by name",
         "metric": {
           "name": "name_group",
           "collect.type": "array"
+        }
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "tmst_grp",
+        "rule": "select `__tmst`, count(*) as `cnt` from source group by `__tmst`",
+        "metric": {
+          "name": "tmst_group"
         }
       }
     ]
