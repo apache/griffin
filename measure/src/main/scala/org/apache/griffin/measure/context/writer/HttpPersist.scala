@@ -18,22 +18,29 @@ under the License.
 */
 package org.apache.griffin.measure.context.writer
 
-import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil}
+import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.spark.rdd.RDD
 
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * persist metric and record through http request
   */
-case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
+case class HttpPersist(config: Map[String, Any], metricName: String,
+                       timeStamp: Long, block: Boolean
+                      ) extends Persist {
 
   val Api = "api"
   val Method = "method"
+  val OverTime = "over.time"
+  val Retry = "retry"
 
   val api = config.getString(Api, "")
   val method = config.getString(Method, "post")
+  val overTime = TimeUtil.milliseconds(config.getString(OverTime, "")).getOrElse(-1L)
+  val retry = config.getInt(Retry, 10)
 
   val _Value = "value"
 
@@ -55,7 +62,8 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
         import scala.concurrent.ExecutionContext.Implicits.global
         (timeStamp, Future(HttpUtil.httpRequest(api, method, params, header, data)))
       }
-      PersistThreadPool.addTask(func _, 10)
+      if (block) PersistTaskRunner.addBlockTask(func _, retry, overTime)
+      else PersistTaskRunner.addNonBlockTask(func _, retry)
     } catch {
       case e: Throwable => error(e.getMessage)
     }
@@ -68,9 +76,7 @@ case class HttpPersist(config: Map[String, Any], metricName: String, timeStamp: 
   def persistRecords(records: Iterable[String], name: String): Unit = {}
 
   def persistMetrics(metrics: Map[String, Any]): Unit = {
-    val head = Map[String, Any](("name" -> metricName), ("tmst" -> timeStamp))
-    val result = head + (_Value -> metrics)
-    httpResult(result)
+    httpResult(metrics)
   }
 
 }
