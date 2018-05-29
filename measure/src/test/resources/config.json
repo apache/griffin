@@ -1,27 +1,71 @@
 {
-  "name": "accu1",
-  "type": "accuracy",
+  "name": "accu_batch",
 
   "process.type": "batch",
 
-  "source": {
-    "type": "avro",
-    "version": "1.7",
-    "config": {
-      "file.name": "src/test/resources/users_info_src.avro"
+  "data.sources": [
+    {
+      "name": "source",
+      "baseline": true,
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/users_info_src.avro"
+          },
+          "pre.proc": [
+            {
+              "dsl.type": "spark-sql",
+              "name": "${this}",
+              "rule": "select * from ${this} where user_id >= 10044"
+            }
+          ]
+        }
+      ]
+    }, {
+      "name": "target",
+      "connectors": [
+        {
+          "type": "avro",
+          "version": "1.7",
+          "config": {
+            "file.name": "src/test/resources/users_info_target.avro"
+          }
+        }
+      ]
     }
-  },
+  ],
 
-  "target": {
-    "type": "avro",
-    "version": "1.7",
-    "config": {
-      "file.name": "src/test/resources/users_info_target.avro"
-    }
-  },
-
-  "evaluateRule": {
-    "sampleRatio": 1,
-    "rules": "$source.user_id = $target.user_id AND $source.first_name = $target.first_name AND $source.last_name = $target.last_name AND $source.address = $target.address AND $source.email = $target.email AND $source.phone = $target.phone AND $source.post_code = $target.post_code"
+  "evaluate.rule": {
+    "rules": [
+      {
+        "dsl.type": "spark-sql",
+        "name": "missRecords",
+        "rule": "SELECT source.* FROM source LEFT JOIN target ON coalesce(source.user_id, '') = coalesce(target.user_id, '') AND coalesce(source.first_name, '') = coalesce(target.first_name, '') AND coalesce(source.post_code, '') = coalesce(target.post_code, '') WHERE (NOT (source.user_id IS NULL AND source.first_name IS NULL AND source.post_code IS NULL)) AND (target.user_id IS NULL AND target.first_name IS NULL AND target.post_code IS NULL)",
+        "record": {
+          "name": "miss"
+        },
+        "cache": true
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "miss_count",
+        "rule": "SELECT count(*) as miss FROM `missRecords`"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "total_count",
+        "rule": "SELECT count(*) as total FROM source"
+      },
+      {
+        "dsl.type": "spark-sql",
+        "name": "accu",
+        "rule": "SELECT `total_count`.`total` AS `total`, coalesce(`miss_count`.`miss`, 0) AS `miss`, (`total` - `miss`) AS `matched` FROM `total_count` FULL JOIN `miss_count`",
+        "metric": {
+          "name": "accu"
+        }
+      }
+    ]
   }
 }
