@@ -47,6 +47,18 @@ object ParamUtil {
       }
     }
 
+    def getLazyString(key: String, defValue: () => String): String = {
+      try {
+        params.get(key) match {
+          case Some(v: String) => v.toString
+          case Some(v) => v.toString
+          case _ => defValue()
+        }
+      } catch {
+        case _: Throwable => defValue()
+      }
+    }
+
     def getStringOrKey(key: String): String = getString(key, key)
 
     def getByte(key: String, defValue: Byte): Byte = {

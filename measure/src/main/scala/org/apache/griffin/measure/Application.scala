@@ -18,54 +18,51 @@ under the License.
 */
 package org.apache.griffin.measure
 
-import org.apache.griffin.measure.config.params._
-import org.apache.griffin.measure.config.params.env._
-import org.apache.griffin.measure.config.params.user._
-import org.apache.griffin.measure.config.reader._
-import org.apache.griffin.measure.config.validator._
-import org.apache.griffin.measure.log.Loggable
-import org.apache.griffin.measure.persist.PersistThreadPool
-import org.apache.griffin.measure.process._
+import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.json.ParamReaderFactory
+import org.apache.griffin.measure.configuration.params.{AllParam, DQParam, EnvParam, Param}
+import org.apache.griffin.measure.configuration.validator.ParamValidator
+import org.apache.griffin.measure.context.writer.PersistThreadPool
+import org.apache.griffin.measure.launch.DQApp
+import org.apache.griffin.measure.launch.batch.BatchDQApp
+import org.apache.griffin.measure.launch.streaming.StreamingDQApp
 
 import scala.util.{Failure, Success, Try}
 
+/**
+  * application entrance
+  */
 object Application extends Loggable {
 
   def main(args: Array[String]): Unit = {
     info(args.toString)
     if (args.length < 2) {
-      error("Usage: class <env-param> <user-param> [List of String split by comma: raw | local | hdfs(default)]")
+      error("Usage: class <env-param> <dq-param>")
       sys.exit(-1)
     }
 
     val envParamFile = args(0)
-    val userParamFile = args(1)
-    val (envFsType, userFsType) = if (args.length > 2) {
-      val fsTypes = args(2).trim.split(",")
-      if (fsTypes.length == 1) (fsTypes(0).trim, fsTypes(0).trim)
-      else if (fsTypes.length >= 2) (fsTypes(0).trim, fsTypes(1).trim)
-      else ("hdfs", "hdfs")
-    } else ("hdfs", "hdfs")
+    val dqParamFile = args(1)
 
     info(envParamFile)
-    info(userParamFile)
+    info(dqParamFile)
 
     // read param files
-    val envParam = readParamFile[EnvParam](envParamFile, envFsType) match {
+    val envParam = readParamFile[EnvParam](envParamFile) match {
       case Success(p) => p
       case Failure(ex) => {
         error(ex.getMessage)
         sys.exit(-2)
       }
     }
-    val userParam = readParamFile[UserParam](userParamFile, userFsType) match {
+    val dqParam = readParamFile[DQParam](dqParamFile) match {
       case Success(p) => p
       case Failure(ex) => {
         error(ex.getMessage)
         sys.exit(-2)
       }
     }
-    val allParam: AllParam = AllParam(envParam, userParam)
+    val allParam: AllParam = AllParam(envParam, dqParam)
 
     // validate param files
     ParamValidator.validate(allParam) match {
@@ -78,17 +75,18 @@ object Application extends Loggable {
       }
     }
 
-    // choose algorithm
-//    val dqType = allParam.userParam.dqType
-    val procType = ProcessType(allParam.userParam.procType)
-    val proc: DqProcess = procType match {
-      case BatchProcessType => BatchDqProcess(allParam)
-      case StreamingProcessType => StreamingDqProcess(allParam)
+    // choose process
+    val procType = ProcessType(allParam.dqParam.procType)
+    val proc: DQApp = procType match {
+      case BatchProcessType => BatchDQApp(allParam)
+      case StreamingProcessType => StreamingDQApp(allParam)
       case _ => {
         error(s"${procType} is unsupported process type!")
         sys.exit(-4)
       }
     }
+
+    startup
 
     // process init
     proc.init match {
@@ -110,7 +108,7 @@ object Application extends Loggable {
       case Failure(ex) => {
         error(s"process run error: ${ex.getMessage}")
 
-        if (proc.retriable) {
+        if (proc.retryable) {
           throw ex
         } else {
           shutdown
@@ -120,7 +118,7 @@ object Application extends Loggable {
     }
 
     // process end
-    proc.end match {
+    proc.close match {
       case Success(_) => {
         info("process end success")
       }
@@ -132,43 +130,15 @@ object Application extends Loggable {
     }
 
     shutdown
-
-//    val algo: Algo = (dqType, procType) match {
-//      case (MeasureType.accuracy(), ProcessType.batch()) => BatchAccuracyAlgo(allParam)
-//      case (MeasureType.profile(), ProcessType.batch()) => BatchProfileAlgo(allParam)
-//      case (MeasureType.accuracy(), ProcessType.streaming()) => StreamingAccuracyAlgo(allParam)
-////      case (MeasureType.profile(), ProcessType.streaming()) => StreamingProfileAlgo(allParam)
-//      case _ => {
-//        error(s"${dqType} with ${procType} is unsupported dq type!")
-//        sys.exit(-4)
-//      }
-//    }
-
-    // algorithm run
-//    algo.run match {
-//      case Failure(ex) => {
-//        error(s"app error: ${ex.getMessage}")
-//
-//        procType match {
-//          case ProcessType.streaming() => {
-//            // streaming need to attempt more times by spark streaming itself
-//            throw ex
-//          }
-//          case _ => {
-//            shutdown
-//            sys.exit(-5)
-//          }
-//        }
-//      }
-//      case _ => {
-//        info("app finished and success")
-//      }
-//    }
   }
 
-  private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {
-    val paramReader = ParamReaderFactory.getParamReader(file, fsType)
+  private def readParamFile[T <: Param](file: String)(implicit m : Manifest[T]): Try[T] = {
+    val paramReader = ParamReaderFactory.getParamReader(file)
     paramReader.readConfig[T]
+  }
+
+  private def startup(): Unit = {
+    PersistThreadPool.start
   }
 
   private def shutdown(): Unit = {
