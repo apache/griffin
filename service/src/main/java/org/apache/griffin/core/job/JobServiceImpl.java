@@ -175,7 +175,7 @@ public class JobServiceImpl implements JobService {
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
         doAction(action, job, op);
-        return genJobDataBean(job,action);
+        return genJobDataBean(job, action);
     }
 
     private void doAction(String action, AbstractJob job, JobOperator op) throws Exception {
@@ -345,7 +345,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobDataBean genJobDataBean(AbstractJob job) throws SchedulerException {
-        return genJobDataBean(job,null);
+        return genJobDataBean(job, null);
     }
 
     private void setTriggerTime(List<? extends Trigger> triggers, JobDataBean jobBean) {
@@ -494,12 +494,38 @@ public class JobServiceImpl implements JobService {
     }
 
     private void setStateByYarn(JobInstanceBean instance, HttpClientErrorException e) {
-        int code = e.getStatusCode().value();
-        boolean match = (code == 400 || code == 404) && instance.getAppId() != null;
-        //this means your url is correct,but your param is wrong or livy session may be overdue.
-        if (match) {
-            setStateByYarn(instance);
+        if (!checkStatus(instance, e)) {
+            int code = e.getStatusCode().value();
+            boolean match = (code == 400 || code == 404) && instance.getAppId() != null;
+            //this means your url is correct,but your param is wrong or livy session may be overdue.
+            if (match) {
+                setStateByYarn(instance);
+            }
         }
+
+    }
+
+    /**
+     * Check instance status in case that session id is overdue and app id is null and so we cannot update instance state.
+     * @param instance job instance bean
+     * @param e HttpClientErrorException
+     * @return boolean
+     */
+    private boolean checkStatus(JobInstanceBean instance, HttpClientErrorException e) {
+        int code = e.getStatusCode().value();
+        String appId = instance.getAppId();
+        String responseBody = e.getResponseBodyAsString();
+        Long sessionId = instance.getSessionId();
+        sessionId = sessionId != null ? sessionId : -1;
+        // If code is 404 and appId is null and response body is like 'Session {id} not found',
+        // this means instance may not be scheduled for a long time by spark for too many tasks. It may be dead.
+        if (code == 404 && appId == null && (responseBody != null && responseBody.contains(sessionId.toString()))) {
+            instance.setState(DEAD);
+            instance.setDeleted(true);
+            instanceRepo.save(instance);
+            return true;
+        }
+        return false;
     }
 
     private void setStateByYarn(JobInstanceBean instance) {
