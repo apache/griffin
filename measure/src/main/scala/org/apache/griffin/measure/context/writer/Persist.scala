@@ -30,6 +30,8 @@ trait Persist extends Loggable with Serializable {
 
   val config: Map[String, Any]
 
+  val block: Boolean
+
   def available(): Boolean
 
   def start(msg: String): Unit

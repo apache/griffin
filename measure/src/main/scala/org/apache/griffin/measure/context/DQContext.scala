@@ -62,12 +62,18 @@ case class DQContext(contextId: ContextId,
   }
 
   private val persistFactory = PersistFactory(persistParams, name)
-  private val defaultPersist: Persist = persistFactory.getPersists(contextId.timestamp)
+  private val defaultPersist: Persist = createPersist(contextId.timestamp)
   def getPersist(timestamp: Long): Persist = {
     if (timestamp == contextId.timestamp) getPersist()
-    else persistFactory.getPersists(timestamp)
+    else createPersist(timestamp)
   }
   def getPersist(): Persist = defaultPersist
+  private def createPersist(t: Long): Persist = {
+    procType match {
+      case BatchProcessType => persistFactory.getPersists(t, true)
+      case StreamingProcessType => persistFactory.getPersists(t, false)
+    }
+  }
 
   def cloneDQContext(newContextId: ContextId): DQContext = {
     DQContext(newContextId, name, dataSources, persistParams, procType)(sparkSession)

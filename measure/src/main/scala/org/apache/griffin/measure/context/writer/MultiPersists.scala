@@ -25,6 +25,8 @@ import org.apache.spark.rdd.RDD
   */
 case class MultiPersists(persists: Iterable[Persist]) extends Persist {
 
+  val block: Boolean = false
+
   val metricName: String = persists match {
     case Nil => ""
     case _ => persists.head.metricName
