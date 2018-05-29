@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
-import org.apache.griffin.measure.log.Loggable
+import org.apache.griffin.measure.Loggable
 
 import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
