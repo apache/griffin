@@ -29,6 +29,8 @@ import org.apache.spark.rdd.RDD
   */
 case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
 
+  val block: Boolean = true
+
   val Path = "path"
   val MaxPersistLines = "max.persist.lines"
   val MaxLinesPerFile = "max.lines.per.file"
@@ -42,10 +44,6 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   val MetricsFile = filePath("_METRICS")
 
   val LogFile = filePath("_LOG")
-
-  val _MetricName = "metricName"
-  val _Timestamp = "timestamp"
-  val _Value = "value"
 
   var _init = true
 
@@ -168,10 +166,8 @@ case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
   def persistMetrics(metrics: Map[String, Any]): Unit = {
-    val head = Map[String, Any]((_MetricName -> metricName), (_Timestamp -> timeStamp))
-    val result = head + (_Value -> metrics)
     try {
-      val json = JsonUtil.toJson(result)
+      val json = JsonUtil.toJson(metrics)
       persistRecords2Hdfs(MetricsFile, json :: Nil)
     } catch {
       case e: Throwable => error(e.getMessage)

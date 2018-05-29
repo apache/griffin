@@ -22,7 +22,7 @@ import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.json.ParamReaderFactory
 import org.apache.griffin.measure.configuration.params.{AllParam, DQParam, EnvParam, Param}
 import org.apache.griffin.measure.configuration.validator.ParamValidator
-import org.apache.griffin.measure.context.writer.PersistThreadPool
+import org.apache.griffin.measure.context.writer.PersistTaskRunner
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
@@ -138,11 +138,9 @@ object Application extends Loggable {
   }
 
   private def startup(): Unit = {
-    PersistThreadPool.start
   }
 
   private def shutdown(): Unit = {
-    PersistThreadPool.shutdown
   }
 
 }

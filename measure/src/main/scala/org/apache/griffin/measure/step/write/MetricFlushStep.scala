@@ -36,7 +36,10 @@ case class MetricFlushStep() extends WriteStep {
         context.getPersist(t).persistMetrics(metric)
         true
       } catch {
-        case e: Throwable => false
+        case e: Throwable => {
+          error(s"flush metrics error: ${e.getMessage}")
+          false
+        }
       }
       ret && pr
     }
