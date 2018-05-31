@@ -28,6 +28,7 @@ import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -43,10 +44,20 @@ public class DataConnector extends AbstractAuditableEntity {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DataConnector.class);
 
+    public enum DataType {
+        /**
+         * There are three data source type which we support now.
+         */
+        HIVE,
+        KAFKA,
+        AVRO
+    }
+
     @NotNull
     private String name;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private DataType type;
 
     private String version;
 
@@ -61,15 +72,19 @@ public class DataConnector extends AbstractAuditableEntity {
     private String defaultDataUnit = "365000d";
 
     @JsonIgnore
-//    @Access(AccessType.PROPERTY)
     private String config;
 
     @Transient
-    private Map<String, String> configMap;
+    private Map<String, Object> configMap;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "data_connector_id")
     private List<SegmentPredicate> predicates = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @JoinColumn(name = "pre_process_id")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<StreamingPreProcess> preProcess;
 
     public List<SegmentPredicate> getPredicates() {
         return predicates;
@@ -79,21 +94,31 @@ public class DataConnector extends AbstractAuditableEntity {
         this.predicates = predicates;
     }
 
+    @JsonProperty("pre.proc")
+    public List<StreamingPreProcess> getPreProcess() {
+        return CollectionUtils.isEmpty(preProcess) ? null : preProcess;
+    }
+
+    @JsonProperty("pre.proc")
+    public void setPreProcess(List<StreamingPreProcess> preProcess) {
+        this.preProcess = preProcess;
+    }
+
     @JsonProperty("config")
-    public Map<String, String> getConfigMap() {
+    public Map<String, Object> getConfigMap() {
         return configMap;
     }
 
     @JsonProperty("config")
-    public void setConfigMap(Map<String, String> configMap) {
+    public void setConfigMap(Map<String, Object> configMap) {
         this.configMap = configMap;
     }
 
-    public void setConfig(String config) {
+    private void setConfig(String config) {
         this.config = config;
     }
 
-    public String getConfig() {
+    private String getConfig() {
         return config;
     }
 
@@ -137,11 +162,11 @@ public class DataConnector extends AbstractAuditableEntity {
         this.name = name;
     }
 
-    public String getType() {
+    public DataType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(DataType type) {
         this.type = type;
     }
 
@@ -163,7 +188,7 @@ public class DataConnector extends AbstractAuditableEntity {
 
     @PostLoad
     public void load() throws IOException {
-        if (!org.springframework.util.StringUtils.isEmpty(config)) {
+        if (!StringUtils.isEmpty(config)) {
             this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
             });
         }
@@ -173,16 +198,16 @@ public class DataConnector extends AbstractAuditableEntity {
     public DataConnector() {
     }
 
-    public DataConnector(String name, String type, String version, String config) throws IOException {
+    public DataConnector(String name, DataType type, String version, String config) throws IOException {
         this.name = name;
         this.type = type;
         this.version = version;
         this.config = config;
-        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, String>>() {
+        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
         });
     }
 
-    public DataConnector(String name, String dataUnit, Map<String,String> configMap, List<SegmentPredicate> predicates) {
+    public DataConnector(String name, String dataUnit, Map configMap, List<SegmentPredicate> predicates) {
         this.name = name;
         this.dataUnit = dataUnit;
         this.configMap = configMap;
