@@ -48,6 +48,11 @@ You can contact us via email:
 - user-list: <a href="mailto:users@griffin.incubator.apache.org">users@griffin.incubator.apache.org</a>
 
 You can also subscribe the latest information by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.incubator.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.incubator.apache.org).
+You can also subscribe the latest information by sending a email to subscribe dev-list and user-list:
+```
+dev-subscribe@griffin.incubator.apache.org
+users-subscribe@griffin.incubator.apache.org
+```
 
 You can access our issues on [JIRA page](https://issues.apache.org/jira/browse/GRIFFIN)
 
