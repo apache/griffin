@@ -20,10 +20,12 @@ under the License.
 package org.apache.griffin.core.measure;
 
 import org.apache.griffin.core.measure.entity.Measure;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -44,24 +46,24 @@ public class MeasureController {
 
     @RequestMapping(value = "/measures/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMeasureById(@PathVariable("id") Long id) {
+    public void deleteMeasureById(@PathVariable("id") Long id) throws SchedulerException {
         measureService.deleteMeasureById(id);
     }
 
     @RequestMapping(value = "/measures", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMeasures() {
+    public void deleteMeasures() throws SchedulerException {
         measureService.deleteMeasures();
     }
 
     @RequestMapping(value = "/measures", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateMeasure(@RequestBody Measure measure) {
-        measureService.updateMeasure(measure);
+    @ResponseStatus(HttpStatus.OK)
+    public Measure updateMeasure(@RequestBody Measure measure) {
+        return measureService.updateMeasure(measure);
     }
 
     @RequestMapping(value = "/measures/owner/{owner}", method = RequestMethod.GET)
-    public List<Measure> getAliveMeasuresByOwner(@PathVariable("owner") String owner) {
+    public List<Measure> getAliveMeasuresByOwner(@PathVariable("owner")  @Valid String owner) {
         return measureService.getAliveMeasuresByOwner(owner);
     }
 
