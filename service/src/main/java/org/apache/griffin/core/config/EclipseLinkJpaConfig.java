@@ -52,8 +52,6 @@ public class EclipseLinkJpaConfig extends JpaBaseConfiguration {
         Map<String, Object> map = new HashMap<>();
         map.put(PersistenceUnitProperties.WEAVING, "false");
         map.put(PersistenceUnitProperties.DDL_GENERATION, "create-or-extend-tables");
-//        map.put("eclipselink.logging.level", "FINEST");
-//        map.put("eclipselink.logging.parameters", "true");
         return map;
     }
 }

@@ -19,40 +19,44 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.griffin.core.util.JsonUtil;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Entity
-public class DataSource extends AbstractAuditableEntity {
-    private static final long serialVersionUID = -4748881017079815794L;
+public class StreamingPreProcess extends AbstractAuditableEntity {
+
+    private String dslType;
 
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "data_source_id")
-    private List<DataConnector> connectors = new ArrayList<>();
+    private String rule;
 
     @JsonIgnore
     @Column(length = 1024)
-    private String cache;
+    private String details;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, Object> cacheMap;
+    private Map<String, Object> detailsMap;
 
+    @JsonProperty(("dsl.type"))
+    public String getDslType() {
+        return dslType;
+    }
+
+    @JsonProperty(("dsl.type"))
+    public void setDslType(String dslType) {
+        this.dslType = dslType;
+    }
 
     public String getName() {
         return name;
@@ -62,57 +66,46 @@ public class DataSource extends AbstractAuditableEntity {
         this.name = name;
     }
 
-    public List<DataConnector> getConnectors() {
-        return connectors;
+    public String getRule() {
+        return rule;
     }
 
-    public void setConnectors(List<DataConnector> connectors) {
-        if (CollectionUtils.isEmpty(connectors)) {
-            throw new NullPointerException("Data connector can not be empty.");
-        }
-        this.connectors = connectors;
+    public void setRule(String rule) {
+        this.rule = rule;
     }
 
-    private String getCache() {
-        return cache;
+    private String getDetails() {
+        return details;
     }
 
-    private void setCache(String cache) {
-        this.cache = cache;
-
+    private void setDetails(String details) {
+        this.details = details;
     }
 
-    @JsonProperty("cache")
-    public Map<String, Object> getCacheMap() {
-        return cacheMap;
+    @JsonProperty("details")
+    public Map<String, Object> getDetailsMap() {
+        return detailsMap;
     }
 
-    @JsonProperty("cache")
-    public void setCacheMap(Map<String, Object> cacheMap) {
-        this.cacheMap = cacheMap;
+    @JsonProperty("details")
+    public void setDetailsMap(Map<String, Object> details) {
+        this.detailsMap = details;
     }
 
     @PrePersist
     @PreUpdate
     public void save() throws JsonProcessingException {
-        if (cacheMap != null) {
-            this.cache = JsonUtil.toJson(cacheMap);
+        if (detailsMap != null) {
+            this.details = JsonUtil.toJson(detailsMap);
         }
     }
 
     @PostLoad
     public void load() throws IOException {
-        if (!StringUtils.isEmpty(cache)) {
-            this.cacheMap = JsonUtil.toEntity(cache, new TypeReference<Map<String, Object>>() {
+        if (!StringUtils.isEmpty(details)) {
+            this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
             });
         }
     }
 
-    public DataSource() {
-    }
-
-    public DataSource(String name, List<DataConnector> connectors) {
-        this.name = name;
-        this.connectors = connectors;
-    }
 }
