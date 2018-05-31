@@ -117,7 +117,7 @@ public class HiveMetaStoreServiceImplTest {
         String tableName = "table";
         List<String> databases = Arrays.asList(useDbName);
         given(client.getAllDatabases()).willReturn(databases);
-        given(client.getAllTables(databases.iterator().next())).willReturn(Arrays.asList(tableName));
+        given(client.getAllTables(databases.get(0))).willReturn(Arrays.asList(tableName));
         given(client.getTable(useDbName, tableName)).willReturn(new Table());
         assertEquals(service.getAllTable().size(), 1);
     }

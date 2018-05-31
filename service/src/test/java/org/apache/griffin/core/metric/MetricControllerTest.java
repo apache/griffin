@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
+import static org.apache.griffin.core.measure.entity.DqType.ACCURACY;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -73,7 +74,7 @@ public class MetricControllerTest {
 
     @Test
     public void testGetAllMetricsSuccess() throws Exception {
-        Metric metric = new Metric("metricName", "accuracy", "owner", Collections.emptyList());
+        Metric metric = new Metric("metricName", ACCURACY, "owner", Collections.emptyList());
         given(service.getAllMetrics()).willReturn(
                 Collections.singletonMap("measureName", Collections.singletonList(metric)));
 
