@@ -19,10 +19,9 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.JobDataBean;
+import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
 import org.apache.griffin.core.util.FSUtil;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,29 +43,19 @@ public class JobController {
     private JobService jobService;
 
     @RequestMapping(value = "/jobs", method = RequestMethod.GET)
-    public List<JobDataBean> getJobs(@RequestParam(value = "type", defaultValue = "") String type) {
+    public List<AbstractJob> getJobs(@RequestParam(value = "type", defaultValue = "") String type) {
         return jobService.getAliveJobs(type);
-    }
-
-    @RequestMapping(value = "/jobs/config", method = RequestMethod.GET)
-    public JobSchedule getJobSchedule(@RequestParam("jobName") String jobName) {
-        return jobService.getJobSchedule(jobName);
-    }
-
-    @RequestMapping(value = "/jobs/config/{jobId}")
-    public JobSchedule getJobSchedule(@PathVariable("jobId") Long jobId) {
-        return jobService.getJobSchedule(jobId);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public JobSchedule addJob(@RequestBody JobSchedule jobSchedule) throws Exception {
-        return jobService.addJob(jobSchedule);
+    public AbstractJob addJob(@RequestBody AbstractJob job) throws Exception {
+        return jobService.addJob(job);
     }
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public JobDataBean onActions(@PathVariable("id") Long jobId, @RequestParam String action) throws Exception {
+    public AbstractJob onActions(@PathVariable("id") Long jobId, @RequestParam String action) throws Exception {
         return jobService.onAction(jobId,action);
     }
 

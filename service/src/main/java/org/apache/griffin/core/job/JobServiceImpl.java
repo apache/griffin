@@ -102,7 +102,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobDataBean> getAliveJobs(String type) {
+    public List<AbstractJob> getAliveJobs(String type) {
         List<? extends AbstractJob> jobs;
         if (BATCH_TYPE.equals(type)) {
             jobs = batchJobRepo.findByDeleted(false);
@@ -114,14 +114,13 @@ public class JobServiceImpl implements JobService {
         return getJobDataBeans(jobs);
     }
 
-    private List<JobDataBean> getJobDataBeans(List<? extends AbstractJob> jobs) {
-        List<JobDataBean> dataList = new ArrayList<>();
+    private List<AbstractJob> getJobDataBeans(List<? extends AbstractJob> jobs) {
+        List<AbstractJob> dataList = new ArrayList<>();
         try {
             for (AbstractJob job : jobs) {
-                JobDataBean jobData = genJobDataBean(job);
-                if (jobData != null) {
-                    dataList.add(jobData);
-                }
+                JobState jobState = genJobState(job);
+                job.setJobState(jobState);
+                dataList.add(job);
             }
         } catch (SchedulerException e) {
             LOGGER.error("Failed to get RUNNING jobs.", e);
@@ -131,38 +130,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public JobSchedule getJobSchedule(String jobName) {
-        List<AbstractJob> jobs = jobRepo.findByJobNameAndDeleted(jobName, false);
-        if (jobs.size() == 0) {
-            LOGGER.warn("Job name {} does not exist.", jobName);
-            throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
-        }
-        AbstractJob job = jobs.get(0);
-        return getJobSchedule(job);
-    }
-
-    @Override
-    public JobSchedule getJobSchedule(Long jobId) {
-        AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
-        if (job == null) {
-            LOGGER.warn("Job id {} does not exist.", jobId);
-            throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
-        }
-        return getJobSchedule(job);
-    }
-
-    private JobSchedule getJobSchedule(AbstractJob job) {
-        JobSchedule jobSchedule = job.getJobSchedule();
-        jobSchedule.setId(job.getId());
-        return jobSchedule;
-    }
-
-    @Override
-    public JobSchedule addJob(JobSchedule js) throws Exception {
-        Long measureId = js.getMeasureId();
+    public AbstractJob addJob(AbstractJob job) throws Exception {
+        Long measureId = job.getMeasureId();
         GriffinMeasure measure = getMeasureIfValid(measureId);
         JobOperator op = getJobOperator(measure.getProcessType());
-        return op.add(js, measure);
+        return op.add(job, measure);
     }
 
     /**
@@ -170,12 +142,14 @@ public class JobServiceImpl implements JobService {
      * @param action job operation: start job, stop job
      */
     @Override
-    public JobDataBean onAction(Long jobId, String action) throws Exception {
+    public AbstractJob onAction(Long jobId, String action) throws Exception {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
         doAction(action, job, op);
-        return genJobDataBean(job,action);
+        JobState jobState = genJobState(job, action);
+        job.setJobState(jobState);
+        return job;
     }
 
     private void doAction(String action, AbstractJob job, JobOperator op) throws Exception {
@@ -317,65 +291,34 @@ public class JobServiceImpl implements JobService {
     }
 
     List<? extends Trigger> getTriggers(String name, String group) throws SchedulerException {
+        if (name == null || group == null) {
+            return null;
+        }
         JobKey jobKey = new JobKey(name, group);
         Scheduler scheduler = factory.getScheduler();
         return scheduler.getTriggersOfJob(jobKey);
     }
 
-    private JobDataBean genJobDataBean(AbstractJob job, String action) throws SchedulerException {
-        if (job.getName() == null || job.getGroup() == null) {
-            return null;
-        }
-        JobDataBean jobData = new JobDataBean();
-        List<? extends Trigger> triggers = getTriggers(job.getName(), job.getGroup());
-        /* If triggers are empty, in Griffin it means job is not scheduled or completed whose trigger state is NONE. */
-        if (CollectionUtils.isEmpty(triggers) && job instanceof BatchJob) {
-            return null;
-        }
-        setTriggerTime(triggers, jobData);
+    private JobState genJobState(AbstractJob job, String action) throws SchedulerException {
         JobOperator op = getJobOperator(job);
-        JobState state = op.getState(job, jobData, action);
-        jobData.setJobState(state);
-        jobData.setJobId(job.getId());
-        jobData.setJobName(job.getJobName());
-        jobData.setMeasureId(job.getMeasureId());
-        jobData.setCronExpression(getCronExpression(triggers));
-        jobData.setProcessType(job instanceof BatchJob ? BATCH : STREAMING);
-        return jobData;
+        JobState state = op.getState(job, action);
+        job.setProcessType(job instanceof BatchJob ? BATCH : STREAMING);
+        job.setJobState(state);
+        return state;
     }
 
-    private JobDataBean genJobDataBean(AbstractJob job) throws SchedulerException {
-        return genJobDataBean(job,null);
+    private JobState genJobState(AbstractJob job) throws SchedulerException {
+        return genJobState(job,null);
     }
 
-    private void setTriggerTime(List<? extends Trigger> triggers, JobDataBean jobBean) {
-        if (CollectionUtils.isEmpty(triggers)) {
-            return;
-        }
-        Trigger trigger = triggers.get(0);
-        Date nextFireTime = trigger.getNextFireTime();
-        Date previousFireTime = trigger.getPreviousFireTime();
-        jobBean.setNextFireTime(nextFireTime != null ? nextFireTime.getTime() : -1);
-        jobBean.setPreviousFireTime(previousFireTime != null ? previousFireTime.getTime() : -1);
-    }
-
-    private String getCronExpression(List<? extends Trigger> triggers) {
-        for (Trigger trigger : triggers) {
-            if (trigger instanceof CronTrigger) {
-                return ((CronTrigger) trigger).getCronExpression();
-            }
-        }
-        return null;
-    }
-
-    void addJob(TriggerKey tk, JobSchedule js, AbstractJob job, ProcessType type) throws Exception {
+    void addJob(TriggerKey tk, AbstractJob job, ProcessType type) throws Exception {
         JobDetail jobDetail = addJobDetail(tk, job);
-        Trigger trigger = genTriggerInstance(tk, jobDetail, js, type);
+        Trigger trigger = genTriggerInstance(tk, jobDetail, job, type);
         factory.getScheduler().scheduleJob(trigger);
     }
 
-    String getQuartzName(JobSchedule js) {
-        return js.getJobName() + "_" + System.currentTimeMillis();
+    String getQuartzName(AbstractJob job) {
+        return job.getJobName() + "_" + System.currentTimeMillis();
     }
 
     String getQuartzGroup() {
@@ -405,11 +348,11 @@ public class JobServiceImpl implements JobService {
         return measure;
     }
 
-    private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, JobSchedule js, ProcessType type) {
+    private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, AbstractJob job, ProcessType type) {
         TriggerBuilder builder = newTrigger().withIdentity(tk).forJob(jd);
         if (type == BATCH) {
-            TimeZone timeZone = getTimeZone(js.getTimeZone());
-            return builder.withSchedule(cronSchedule(js.getCronExpression()).inTimeZone(timeZone)).build();
+            TimeZone timeZone = getTimeZone(job.getTimeZone());
+            return builder.withSchedule(cronSchedule(job.getCronExpression()).inTimeZone(timeZone)).build();
         } else if (type == STREAMING) {
             return builder.startNow().withSchedule(simpleSchedule().withRepeatCount(0)).build();
         }
