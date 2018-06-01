@@ -21,6 +21,7 @@ package org.apache.griffin.core.job.entity;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("griffinBatchJob")
@@ -45,8 +46,8 @@ public class BatchJob extends AbstractJob {
         setId(jobId);
     }
 
-   public BatchJob(Long measureId, String jobName, String cronExpression, boolean deleted) {
-       super(measureId, jobName, cronExpression, deleted);
+    public BatchJob(Long measureId, String jobName, String cronExpression, String timeZone, List<JobDataSegment> segments, boolean deleted) {
+        super(measureId, jobName, cronExpression, timeZone,segments, deleted);
     }
 
 }

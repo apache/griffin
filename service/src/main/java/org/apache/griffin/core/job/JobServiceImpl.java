@@ -302,7 +302,6 @@ public class JobServiceImpl implements JobService {
     private JobState genJobState(AbstractJob job, String action) throws SchedulerException {
         JobOperator op = getJobOperator(job);
         JobState state = op.getState(job, action);
-        job.setProcessType(job instanceof BatchJob ? BATCH : STREAMING);
         job.setJobState(state);
         return state;
     }

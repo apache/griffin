@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
-import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -235,11 +234,13 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    AbstractJob(Long measureId, String jobName, String cronExpression, boolean deleted) {
+    AbstractJob(Long measureId, String jobName, String cronExpression, String timeZone,List<JobDataSegment> segments, boolean deleted) {
         this.measureId = measureId;
         this.jobName = jobName;
         this.metricName = jobName;
         this.cronExpression = cronExpression;
+        this.timeZone = timeZone;
+        this.segments = segments;
         this.deleted = deleted;
     }
 
