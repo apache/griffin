@@ -251,7 +251,7 @@ public class JobInstance implements Job {
 
     @SuppressWarnings("unchecked")
     Map<String, Object> checkConfMap(Map<String, Object> confMap) {
-        Map<String, String> config = (Map<String, String>) confMap.get(CHECK_DONEFILE_SCHEDULE);
+        Map<String, Object> config = (Map<String, Object>) confMap.get(CHECK_DONEFILE_SCHEDULE);
         String interval = env.getProperty("predicate.job.interval");
         interval = interval != null ? interval : "5m";
         String repeat = env.getProperty("predicate.job.repeat.count");
@@ -262,8 +262,8 @@ public class JobInstance implements Job {
             map.put(REPEAT, repeat);
             confMap.put(CHECK_DONEFILE_SCHEDULE, map);
         } else { // replace if interval or repeat is not null
-            String confRepeat = config.get(REPEAT);
-            String confInterval = config.get(INTERVAL);
+            String confRepeat = config.get(REPEAT).toString();
+            String confInterval = config.get(INTERVAL).toString();
             interval = confInterval != null ? confInterval : interval;
             repeat = confRepeat != null ? confRepeat : repeat;
             config.put(INTERVAL, interval);
