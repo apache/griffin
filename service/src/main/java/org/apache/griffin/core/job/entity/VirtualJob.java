@@ -26,6 +26,11 @@ import javax.persistence.Entity;
 @DiscriminatorValue("virtualJob")
 public class VirtualJob extends AbstractJob {
 
+    @Override
+    public String getType() {
+        return "virtual";
+    }
+
     public VirtualJob() {
         super();
     }

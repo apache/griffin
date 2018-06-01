@@ -19,9 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
@@ -37,9 +35,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 @Entity
 @Table(name = "job")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "job.type")
+@JsonSubTypes({@JsonSubTypes.Type(value = BatchJob.class, name = "batch"), @JsonSubTypes.Type(value = StreamingJob.class, name = "streaming"), @JsonSubTypes.Type(value = VirtualJob.class, name = "virtual")})
 @DiscriminatorColumn(name = "type")
 public abstract class AbstractJob extends AbstractAuditableEntity {
     private static final long serialVersionUID = 7569493377868453677L;
@@ -67,9 +68,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
     private String cronExpression;
 
     @Transient
-    private ProcessType processType;
-
-    @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private JobState jobState;
 
@@ -84,7 +82,7 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
-    @JoinColumn(name = "job_schedule_id")
+    @JoinColumn(name = "job_id")
     private List<JobDataSegment> segments = new ArrayList<>();
 
     @JsonProperty("measure.id")
@@ -129,16 +127,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
     @JsonProperty("job.state")
     public void setJobState(JobState jobState) {
         this.jobState = jobState;
-    }
-
-    @JsonProperty("process.type")
-    public ProcessType getProcessType() {
-        return processType;
-    }
-
-    @JsonProperty("process.type")
-    public void setProcessType(ProcessType processType) {
-        this.processType = processType;
     }
 
     @JsonProperty("cron.time.zone")
@@ -217,6 +205,9 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.group = quartzGroup;
     }
 
+    @JsonProperty("job.type")
+    public abstract String getType();
+
     @PrePersist
     @PreUpdate
     public void save() throws JsonProcessingException {
@@ -243,6 +234,15 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.group = group;
         this.deleted = deleted;
     }
+
+    AbstractJob(Long measureId, String jobName, String cronExpression, boolean deleted) {
+        this.measureId = measureId;
+        this.jobName = jobName;
+        this.metricName = jobName;
+        this.cronExpression = cronExpression;
+        this.deleted = deleted;
+    }
+
 
     AbstractJob(String jobName, Long measureId, String metricName) {
         this.jobName = jobName;

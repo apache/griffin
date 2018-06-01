@@ -25,6 +25,12 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("griffinBatchJob")
 public class BatchJob extends AbstractJob {
+
+    @Override
+    public String getType() {
+        return "batch";
+    }
+
     public BatchJob() {
         super();
     }
@@ -39,5 +45,8 @@ public class BatchJob extends AbstractJob {
         setId(jobId);
     }
 
+   public BatchJob(Long measureId, String jobName, String cronExpression, boolean deleted) {
+       super(measureId, jobName, cronExpression, deleted);
+    }
 
 }
