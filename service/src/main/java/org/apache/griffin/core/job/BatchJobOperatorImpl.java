@@ -46,10 +46,18 @@ public class BatchJobOperatorImpl implements JobOperator {
         String qName = jobService.getQuartzName(job);
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = jobService.getTriggerKeyIfValid(qName, qGroup);
-        BatchJob batchJob = (BatchJob)job;
+        BatchJob batchJob = genBatchJobBean(job, qName, qGroup);
         batchJob = batchJobRepo.save(batchJob);
         jobService.addJob(triggerKey, batchJob, BATCH);
         return job;
+    }
+
+    private BatchJob genBatchJobBean(AbstractJob job, String qName, String qGroup) {
+        BatchJob batchJob = (BatchJob)job;
+        batchJob.setMetricName(job.getJobName());
+        batchJob.setGroup(qGroup);
+        batchJob.setName(qName);
+        return batchJob;
     }
 
     /**
@@ -107,6 +115,9 @@ public class BatchJobOperatorImpl implements JobOperator {
     public JobState getState(AbstractJob job, String action) throws SchedulerException {
         JobState jobState = new JobState();
         Scheduler scheduler = factory.getScheduler();
+        if (job.getGroup() != null || job.getName() != null) {
+            return null;
+        }
         TriggerKey triggerKey = triggerKey(job.getName(), job.getGroup());
         TriggerState triggerState = scheduler.getTriggerState(triggerKey);
         jobState.setState(triggerState.toString());

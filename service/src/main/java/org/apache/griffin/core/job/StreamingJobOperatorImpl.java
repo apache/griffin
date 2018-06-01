@@ -86,9 +86,17 @@ public class StreamingJobOperatorImpl implements JobOperator {
         String qName = jobService.getQuartzName(job);
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = jobService.getTriggerKeyIfValid(qName, qGroup);
-        StreamingJob streamingJob = (StreamingJob)job;
+        StreamingJob streamingJob = genStreamingJobBean(job, qName, qGroup);
         streamingJob = streamingJobRepo.save(streamingJob);
         jobService.addJob(triggerKey,streamingJob, STREAMING);
+        return streamingJob;
+    }
+
+    private StreamingJob genStreamingJobBean(AbstractJob job, String qName, String qGroup) {
+        StreamingJob streamingJob = (StreamingJob)job;
+        streamingJob.setMetricName(job.getJobName());
+        streamingJob.setGroup(qGroup);
+        streamingJob.setName(qName);
         return streamingJob;
     }
 
