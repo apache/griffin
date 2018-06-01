@@ -19,41 +19,40 @@ under the License.
 
 package org.apache.griffin.core.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Map;
 
-import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
-
+@Component
 public class FileUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
-    public static String env_batch;
-    public static String env_streaming;
 
-    public static String readEnv(String path) throws IOException {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File file = new File(classLoader.getResource(path).getFile());
-        return toJsonWithFormat(JsonUtil.toEntity(file, new TypeReference<Object>() {
-        }));
+    public static String getFilePath(String name, String location) {
+        if (StringUtils.isEmpty(location)) {
+            LOGGER.info("Location is empty. Read from default path.");
+            return null;
+        }
+        File file = new File(location);
+        LOGGER.info("File absolute path:" + file.getAbsolutePath());
+        File[] files = file.listFiles();
+        if (files == null) {
+            LOGGER.warn("The external location '{}' does not exist.Read from default path.", location);
+            return null;
+        }
+        return getFilePath(name, files, location);
     }
 
-    public static String readBatchEnv(String path, String name) throws IOException {
-        if (env_batch != null) {
-            return env_batch;
+    private static String getFilePath(String name, File[] files, String location) {
+        String path = null;
+        for (File f : files) {
+            if (f.getName().equals(name)) {
+                path = location + File.separator + name;
+                LOGGER.info("config real path: {}", path);
+            }
         }
-        env_batch = readEnv(path);
-        return env_batch;
-    }
-
-    public static String readStreamingEnv(String path, String name) throws IOException {
-        if (env_streaming != null) {
-            return env_streaming;
-        }
-        env_streaming = readEnv(path);
-        return env_streaming;
+        return path;
     }
 }
