@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.util;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
@@ -27,11 +26,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
+
+import static org.apache.griffin.core.util.FileUtil.getFilePath;
 
 public class PropertiesUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtil.class);
@@ -51,8 +51,8 @@ public class PropertiesUtil {
     }
 
     /**
-     * @param name        properties name like sparkJob.properties
-     * @param defaultPath properties classpath like /application.properties
+     * @param name        properties name like quartz.properties
+     * @param defaultPath properties classpath like /quartz.properties
      * @param location    custom properties path
      * @return Properties
      * @throws FileNotFoundException location setting is wrong that there is no target file.
@@ -69,30 +69,9 @@ public class PropertiesUtil {
         return getProperties(path, resource);
     }
 
-    private static String getConfPath(String name, String location) {
-        if (StringUtils.isEmpty(location)) {
-            LOGGER.info("Config location is empty. Read from default path.");
-            return null;
-        }
-        File file = new File(location);
-        LOGGER.info("File absolute path:" + file.getAbsolutePath());
-        File[] files = file.listFiles();
-        if (files == null) {
-            LOGGER.warn("The external.config.location '{}' does not exist.Read from default path.", location);
-            return null;
-        }
-        return getConfPath(name, files, location);
+    public static String getConfPath(String name, String location) {
+        return getFilePath(name, location);
     }
 
-    private static String getConfPath(String name, File[] files, String location) {
-        String path = null;
-        for (File f : files) {
-            if (f.getName().equals(name)) {
-                path = location + File.separator + name;
-                LOGGER.info("config real path: {}", path);
-            }
-        }
-        return path;
-    }
 
 }
