@@ -34,7 +34,7 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,8 +73,7 @@ public class JobInstance implements Job {
     @Autowired
     private JobInstanceRepo instanceRepo;
     @Autowired
-    @Qualifier("appConf")
-    private Properties appConfProps;
+    private Environment env;
 
     private JobSchedule jobSchedule;
     private GriffinMeasure measure;
@@ -251,7 +250,8 @@ public class JobInstance implements Job {
     private void saveJobInstance(String pName, String pGroup) {
         ProcessType type = measure.getProcessType() == BATCH ? BATCH : STREAMING;
         Long tms = System.currentTimeMillis();
-        Long expireTms = Long.valueOf(appConfProps.getProperty("jobInstance.expired.milliseconds")) + tms;
+        String expired = env.getProperty("jobInstance.expired.milliseconds");
+        Long expireTms = Long.valueOf(expired != null ? expired : "604800000") + tms;
         JobInstanceBean instance = new JobInstanceBean(FINDING, pName, pGroup, tms, expireTms, type);
         instance.setJob(job);
         instanceRepo.save(instance);
@@ -292,7 +292,7 @@ public class JobInstance implements Job {
     private void setJobDataMap(JobDetail jobDetail, String pJobName) throws IOException {
         JobDataMap dataMap = jobDetail.getJobDataMap();
         preProcessMeasure();
-        String result =toJson(measure);
+        String result = toJson(measure);
         dataMap.put(MEASURE_KEY, result);
         dataMap.put(PREDICATES_KEY, toJson(mPredicates));
         dataMap.put(JOB_NAME, job.getJobName());
@@ -310,7 +310,7 @@ public class JobInstance implements Job {
             cache = cache.replaceAll("\\$\\{JOB_NAME}", job.getJobName());
             cache = cache.replaceAll("\\$\\{SOURCE_NAME}", source.getName());
             cache = cache.replaceAll("\\$\\{TARGET_NAME}", source.getName());
-            cacheMap = toEntity(cache,Map.class);
+            cacheMap = toEntity(cache, Map.class);
             source.setCacheMap(cacheMap);
         }
     }
