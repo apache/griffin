@@ -187,7 +187,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.info("Job({},{}) does not exist.", jobKey.getGroup(), jobKey.getName());
-            throw new GriffinException.NotFoundException(JOB_KEY_DOES_NOT_EXIST);
+            return;
         }
         scheduler.deleteJob(jobKey);
 

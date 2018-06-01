@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,8 +62,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
     @Autowired
     private StreamingJobRepo streamingJobRepo;
     @Autowired
-    @Qualifier("livyConf")
-    private Properties livyConfProps;
+    private Environment env;
     @Autowired
     private JobServiceImpl jobService;
     @Autowired
@@ -76,7 +76,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
     @PostConstruct
     public void init() {
         restTemplate = new RestTemplate();
-        livyUri = livyConfProps.getProperty("livy.uri");
+        livyUri = env.getProperty("livy.uri");
     }
 
     @Override
