@@ -33,6 +33,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -62,8 +64,17 @@ public class MetricServiceImplTest {
     @Mock
     private MetricStoreImpl metricStore;
 
+    @Autowired
+    private Environment env;
+
     @Before
     public void setup() {
+    }
+
+    @Test
+    public void test() {
+        Environment e = env;
+        System.out.println(env.getProperty("spring.datasource.driver-class-name"));
     }
 
     @Test

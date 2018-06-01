@@ -32,6 +32,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class JsonUtil {
@@ -72,6 +73,14 @@ public class JsonUtil {
         }
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(file, type);
+    }
+
+    public static <T> T toEntity(InputStream in, TypeReference type) throws IOException {
+        if (in == null) {
+            throw new NullPointerException("Input stream cannot be null.");
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(in, type);
     }
 
     public static <T> T toEntity(String jsonStr, TypeReference type) throws IOException {
