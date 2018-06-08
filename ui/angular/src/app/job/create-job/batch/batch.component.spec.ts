@@ -18,21 +18,21 @@ under the License.
 */
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateJobComponent } from './create-job.component';
+import { BatchComponent } from './batch.component';
 
-describe('CreateJobComponent', () => {
-  let component: CreateJobComponent;
-  let fixture: ComponentFixture<CreateJobComponent>;
+describe('BatchComponent', () => {
+  let component: BatchComponent;
+  let fixture: ComponentFixture<BatchComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreateJobComponent ]
+      declarations: [ BatchComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateJobComponent);
+    fixture = TestBed.createComponent(BatchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

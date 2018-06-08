@@ -17,12 +17,20 @@ specific language governing permissions and limitations
 under the License.
 -->
 <div>
-  <p>
-    <a routerLink="/createjob" class="btn btn-primary btn-o btn-wide">
+  <div class="btn-group">
+    <!-- <a routerLink="/createjob" class="btn btn-primary btn-o btn-wide">
       <i class="fa fa-plus"></i>
        Create Job
+    </a> -->
+    <a role="button" routerLink="/createjob/batch" class="btn btn-primary btn-o btn-wide dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <i class="fa fa-plus"></i>
+      Create Job
     </a>
-  </p>
+    <ul class="dropdown-menu">
+      <!-- <li><a class="dropdown-item" routerLink="/createjob/batch">Batch Job</a></li> -->
+      <!-- <li><a class="dropdown-item" routerLink="/createjob/streaming">Streaming Job</a></li> -->
+    </ul>
+  </div>
   <div id="modelContainer">
     <table class="table table-striped reco" [mfData]="results" #mf="mfDataTable" [mfRowsOnPage]="10">
       <thead>
@@ -70,9 +78,12 @@ under the License.
             <a routerLink="/job/{{row.jobId}}" title="subscribe">
               <i class="fa fa-eye"></i>
             </a>&nbsp;
-            <a (click)="stateMag(row)" title="delete" style="text-decoration:none">
-              <i [ngClass]="row.action==='START' ? 'fa fa-play':'fa fa-stop'"></i>
-            </a> 
+            <a *ngIf="row.action==='START'" (click)="stateMag(row)" title="Start" style="text-decoration:none">
+              <i class="fa fa-play"></i>
+            </a>
+            <a *ngIf="row.action!=='START'" (click)="stateMag(row)" title="Stop" style="text-decoration:none">
+              <i class="fa fa-stop"></i>
+            </a>
           </td>
           <td>
             &nbsp;
