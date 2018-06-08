@@ -43,7 +43,7 @@ under the License.
         </tr>
         <tr *ngFor="let row of mf.data">
           <td><a routerLink="/measure/{{row.id}}">{{row.name}}</a></td>
-          <td>{{row["dq.type"]}}</td>
+          <td>{{row["dq.type"].toLowerCase()}}</td>
           <td>{{row.description}}</td>
           <td>
             &nbsp;
@@ -102,7 +102,7 @@ under the License.
                       Measure Type:
                     </label>
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                      {{deletedRow["dq.type"]}}
+                      {{deletedRow["dq.type"].toLowerCase()}}
                     </div>
                   </div>
                   <div class="row" *ngIf="sourceTable">

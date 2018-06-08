@@ -23,23 +23,21 @@ import { MaxLengthValidator } from "@angular/forms";
 import { NgControlStatus, Validators } from "@angular/forms";
 import { PatternValidator } from "@angular/forms";
 import { MatDatepickerModule } from "@angular/material";
-import { ServiceService } from "../../service/service.service";
-import { AngularMultiSelectModule } from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
+import { ServiceService } from "../../../service/service.service";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ToasterModule, ToasterService, ToasterConfig } from "angular2-toaster";
 import * as $ from "jquery";
 import { HttpParams } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { NouisliderModule } from "ng2-nouislider";
 import { HttpClient } from "@angular/common/http";
 
 @Component({
-  selector: "app-create-job",
-  templateUrl: "./create-job.component.html",
-  providers: [ServiceService],
-  styleUrls: ["./create-job.component.css"]
+  selector: 'app-streaming',
+  templateUrl: './streaming.component.html',
+  styleUrls: ['./streaming.component.css']
 })
-export class CreateJobComponent implements OnInit, AfterViewChecked {
+export class StreamingComponent implements OnInit {
+
   constructor(
     toasterService: ToasterService,
     private http: HttpClient,
@@ -63,7 +61,7 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
   keydownLabelOn = false;
   createResult = "";
   jobname: string;
-  Measures: object;
+  Measures = [];
   measure: string;
   measureid: any;
 
@@ -162,26 +160,6 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
         // }
       ]
     };
-    for (let i = 0; i < this.dropdownList.length; i++) {
-      var connector = this.dropdownList[i];
-      var begin = this.someKeyboard[i][0];
-      var length = this.someKeyboard[i][1] - this.someKeyboard[i][0];
-      var beginStr = this.getTimeByUnit(begin, connector.size);
-      var lengthStr = this.getTimeByUnit(length, connector.size);
-      this.newJob["data.segments"].push({
-        "data.connector.name": connector.connectorname,
-        "as.baseline": true,
-        "segment.range": {
-          begin: beginStr,
-          length: lengthStr
-        }
-      });
-      this.originBegin.push(beginStr);
-      this.originLength.push(lengthStr);
-    }
-    if (this.dropdownList.length == 2) {
-      delete this.newJob["data.segments"][1]["as.baseline"];
-    }
     this.visible = true;
     setTimeout(() => (this.visibleAnimate = true), 100);
   }
@@ -238,22 +216,6 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  setHeight() {
-    $("#md-datepicker-0").height(250);
-  }
-
-  getTimeByUnit(multiplier, unit) {
-    var regex = /^(\d+)([a-zA-Z]+)$/g;
-    var arr = regex.exec(unit);
-    if (arr.length > 2) {
-      var n = parseInt(arr[1]);
-      var unitStr = arr[2];
-      return ((n * multiplier).toString() + arr[2]);
-    } else {
-      return multiplier.toString();
-    }
-  }
-
   getMeasureId() {
     for (let index in this.Measures) {
       if (this.measure == this.Measures[index].name) {
@@ -290,105 +252,22 @@ export class CreateJobComponent implements OnInit, AfterViewChecked {
         }
       }
     }
-    for (let i = 0; i < this.dropdownList.length; i++) {
-      this.someKeyboard[i] = [-1, 0];
-      this.someKeyboardConfig[i] = JSON.parse(JSON.stringify(this.config));
-      if (this.sliderRefs._results[i]) {
-        this.sliderRefs._results[i].slider.updateOptions({
-          range: {
-            min: -10,
-            max: 0
-          }
-        });
-      }
-    }
-  }
-
-  changeRange(index, value, i) {
-    let newRange = [];
-    newRange[i] = [this.someKeyboard[i][0], this.someKeyboard[i][1]];
-    newRange[i][index] = value;
-    this.updateSliderRange(value, i);
-    this.someKeyboard[i] = newRange[i];
-  }
-
-  rangeChange(evt, i) {
-    var oldmin = this.sliderRefs._results[i].config.range.min;
-    if (evt[0] - oldmin <= 2) {
-      this.sliderRefs._results[i].slider.updateOptions({
-        range: {
-          min: oldmin - 10,
-          max: 0
-        }
-      });
-    }
-    if (evt[0] - oldmin >= 13) {
-      this.sliderRefs._results[i].slider.updateOptions({
-        range: {
-          min: oldmin + 10,
-          max: 0
-        }
-      });
-    }
-    this.someKeyboard[i] = evt;
-  }
-
-  updateSliderRange(value, i) {
-    // setTimeout(() => {
-    var oldmin = this.sliderRefs._results[i].config.range.min;
-    var oldmax = this.sliderRefs._results[i].config.range.max;
-    var newmin = Math.floor(value / 10);
-    if (value - oldmin <= 3) {
-      this.sliderRefs._results[i].slider.updateOptions({
-        range: {
-          min: newmin * 10,
-          max: 0
-        }
-      });
-    }
-    // }, 100)
-  }
-
-  blinkKeyupLabel() {
-    this.keyupLabelOn = true;
-    setTimeout(() => {
-      this.keyupLabelOn = false;
-    }, 450);
-  }
-
-  blinkKeydownLabel() {
-    this.keydownLabelOn = true;
-    setTimeout(() => {
-      this.keydownLabelOn = false;
-    }, 450);
   }
 
   ngOnInit() {
     var allModels = this.serviceService.config.uri.allModels + '?type=griffin';
     this.http.get(allModels).subscribe(data => {
-      this.Measures = data;
-    });
-    this.config = {
-      behaviour: "drag",
-      connect: true,
-      start: [-10, 0],
-      keyboard: true, // same as [keyboard]="true"
-      step: 1,
-      pageSteps: 0, // number of page steps, defaults to 10
-      range: {
-        min: -10,
-        max: 0
-      },
-      pips: {
-        mode: "steps",
-        density: 10,
-        // values: 1,
-        stepped: true
+      let originData = data;
+      for(let i in originData){
+        if(originData[i]["process.type"] === "STREAING"){
+          this.Measures.push(originData[i]);
+        }
       }
-    };
+    });
   }
 
   ngAfterViewChecked() {
     this.resizeWindow();
   }
+
 }
