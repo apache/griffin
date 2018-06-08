@@ -112,8 +112,8 @@ export class PrComponent implements AfterViewChecked, OnInit {
   newMeasure = {
     name: "",
     "measure.type": "griffin",
-    "dq.type": "profiling",
-    "process.type": "batch",
+    "dq.type": "PROFILING",
+    "process.type": "BATCH",
     owner: "",
     description: "",
     "rule.description": {
@@ -126,7 +126,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
         connectors: [
           {
             name: "",
-            type: "hive",
+            type: "HIVE",
             version: "1.2",
             "data.unit": "",
             "data.time.zone": "",
@@ -387,11 +387,11 @@ export class PrComponent implements AfterViewChecked, OnInit {
     this.newMeasure = {
       name: this.name,
       "measure.type": "griffin",
-      "dq.type": "profiling",
+      "dq.type": "PROFILING",
       "rule.description": {
         details:this.noderule
       },
-      "process.type": "batch",
+      "process.type": "BATCH",
       owner: this.owner,
       description: this.desc,
       // "group":this.finalgrp,
@@ -401,7 +401,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
           connectors: [
             {
               name: this.srcname,
-              type: "hive",
+              type: "HIVE",
               version: "1.2",
               "data.unit": this.size,
               "data.time.zone": this.timezone,
@@ -458,7 +458,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
     var self = this;
     self.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
-      "dq.type": "profiling",
+      "dq.type": "PROFILING",
       rule: rule,
       name: grpname,
       metric: {
@@ -471,7 +471,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
     var self = this;
     self.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
-      "dq.type": "profiling",
+      "dq.type": "PROFILING",
       rule: rule,
       name: nullname
     });
@@ -481,7 +481,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
     var self = this;
     self.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
-      "dq.type": "profiling",
+      "dq.type": "PROFILING",
       rule: rule,
       name: "profiling"
     });

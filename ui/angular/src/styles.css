@@ -1076,12 +1076,18 @@ tbody {
   background-color: #00C853;
   border-radius: 5px; 
   padding:3px 4px;
+  display: inline-block;
+  width: 70px;
+  text-align: center;
 }
 
 .unnormal{
   background-color: #EF5350;
   border-radius: 5px; 
   padding:3px 4px;
+  display: inline-block;
+  width: 70px;
+  text-align: center;
 }
 
 #timePopup{

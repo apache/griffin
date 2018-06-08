@@ -61,7 +61,7 @@ export function createPubMeasure(name: string,
   styleUrls: ["./pub.component.css"]
 })
 export class PubComponent implements AfterViewChecked, OnInit {    
-  newMeasure = createPubMeasure("", "", "","external","accuracy","test"); 
+  newMeasure = createPubMeasure("", "", "","external","ACCURACY","test"); 
   dqTypeOptions =["accuracy"];
   createResult: any;
   private toasterService: ToasterService;
@@ -143,12 +143,13 @@ export class PubComponent implements AfterViewChecked, OnInit {
   save() {     
     var measure2Save ={
       name:this.newMeasure.name,
-      metricName: this.newMeasure.metricName,
+      "metric.name": this.newMeasure.metricName,
       "measure.type":this.newMeasure.measureType,
       description:this.newMeasure.description,
-      "dq.type":this.newMeasure.dqType,
+      "dq.type":this.newMeasure.dqType.toUpperCase(),
       owner:this.newMeasure.owner
     }
+    console.log(measure2Save);
     var addModels = this.serviceService.config.uri.addModels;
     $("#save").attr("disabled", "true");
     this.http.post(addModels, measure2Save).subscribe(
