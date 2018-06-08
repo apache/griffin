@@ -73,7 +73,7 @@ public class MeasureOrgServiceImplTest {
     }
 
     @Test
-    public void testGetMeasureNamesGroupByOrgWithEmpty(){
+    public void testGetMeasureNamesGroupByOrgWithNull(){
         when(measureRepo.findByDeleted(false)).thenReturn(new ArrayList<>());
         Map<String, List<String>> map = service.getMeasureNamesGroupByOrg();
         assert map.size() == 0;

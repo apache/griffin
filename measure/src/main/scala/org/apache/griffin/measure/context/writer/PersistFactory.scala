@@ -30,20 +30,23 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
   val LOG_REGEX = """^(?i)log$""".r
   val MONGO_REGEX = """^(?i)mongo$""".r
 
-  def getPersists(timeStamp: Long): MultiPersists = {
-    MultiPersists(persistParams.flatMap(param => getPersist(timeStamp, param)))
+  /**
+    * create persist
+    * @param timeStamp    the timestamp of persist
+    * @param block        persist write metric in block or non-block way
+    * @return   persist
+    */
+  def getPersists(timeStamp: Long, block: Boolean): MultiPersists = {
+    MultiPersists(persistParams.flatMap(param => getPersist(timeStamp, param, block)))
   }
 
-  /**
-    * create persist by param
-    */
-  private def getPersist(timeStamp: Long, persistParam: PersistParam): Option[Persist] = {
+  private def getPersist(timeStamp: Long, persistParam: PersistParam, block: Boolean): Option[Persist] = {
     val config = persistParam.config
     val persistTry = persistParam.persistType match {
-      case HDFS_REGEX() => Try(HdfsPersist(config, metricName, timeStamp))
-      case HTTP_REGEX() => Try(HttpPersist(config, metricName, timeStamp))
       case LOG_REGEX() => Try(LoggerPersist(config, metricName, timeStamp))
-      case MONGO_REGEX() => Try(MongoPersist(config, metricName, timeStamp))
+      case HDFS_REGEX() => Try(HdfsPersist(config, metricName, timeStamp))
+      case HTTP_REGEX() => Try(HttpPersist(config, metricName, timeStamp, block))
+      case MONGO_REGEX() => Try(MongoPersist(config, metricName, timeStamp, block))
       case _ => throw new Exception("not supported persist type")
     }
     persistTry match {

@@ -25,6 +25,10 @@ import scala.collection.mutable.{Map => MutableMap}
   */
 case class MetricWrapper(name: String) extends Serializable {
 
+  val _Name = "name"
+  val _Timestamp = "tmst"
+  val _Value = "value"
+
   val metrics: MutableMap[Long, Map[String, Any]] = MutableMap()
 
   def insertMetric(timestamp: Long, value: Map[String, Any]): Unit = {
@@ -39,9 +43,9 @@ case class MetricWrapper(name: String) extends Serializable {
     metrics.toMap.map { pair =>
       val (timestamp, value) = pair
       (timestamp, Map[String, Any](
-        ("name" -> name),
-        ("timestamp" -> timestamp),
-        ("value" -> value)
+        (_Name -> name),
+        (_Timestamp -> timestamp),
+        (_Value -> value)
       ))
     }
   }

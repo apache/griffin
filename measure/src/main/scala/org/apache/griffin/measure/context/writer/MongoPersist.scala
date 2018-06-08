@@ -19,6 +19,7 @@ under the License.
 package org.apache.griffin.measure.context.writer
 
 import org.apache.griffin.measure.utils.ParamUtil._
+import org.apache.griffin.measure.utils.TimeUtil
 import org.apache.spark.rdd.RDD
 import org.mongodb.scala._
 import org.mongodb.scala.model.{Filters, UpdateOptions, Updates}
@@ -29,9 +30,17 @@ import scala.concurrent.Future
 /**
   * persist metric and record to mongo
   */
-case class MongoPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
+case class MongoPersist(config: Map[String, Any], metricName: String,
+                        timeStamp: Long, block: Boolean
+                       ) extends Persist {
 
   MongoConnection.init(config)
+
+  val OverTime = "over.time"
+  val Retry = "retry"
+
+  val overTime = TimeUtil.milliseconds(config.getString(OverTime, "")).getOrElse(-1L)
+  val retry = config.getInt(Retry, 10)
 
   val _MetricName = "metricName"
   val _Timestamp = "timestamp"
@@ -63,7 +72,8 @@ case class MongoPersist(config: Map[String, Any], metricName: String, timeStamp:
         (timeStamp, MongoConnection.getDataCollection.updateOne(
           filter, update, UpdateOptions().upsert(true)).toFuture)
       }
-      PersistThreadPool.addTask(func _, 10)
+      if (block) PersistTaskRunner.addBlockTask(func _, retry, overTime)
+      else PersistTaskRunner.addNonBlockTask(func _, retry)
     } catch {
       case e: Throwable => error(e.getMessage)
     }

@@ -79,6 +79,4 @@ public class JsonUtilTest {
         Map map = JsonUtil.toEntity(str, type);
         assert map == null;
     }
-
-
 }

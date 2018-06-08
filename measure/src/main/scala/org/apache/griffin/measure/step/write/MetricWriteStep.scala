@@ -46,7 +46,6 @@ case class MetricWriteStep(name: String,
     val writeMode = writeTimestampOpt.map(_ => SimpleMode).getOrElse(context.writeMode)
     val timestampMetricMap: Map[Long, Map[String, Any]] = writeMode match {
       case SimpleMode => {
-        println(metricMaps)
         val metrics: Map[String, Any] = normalizeMetric(metricMaps, name, collectType)
         emptyMetricMap + (timestamp -> metrics)
       }

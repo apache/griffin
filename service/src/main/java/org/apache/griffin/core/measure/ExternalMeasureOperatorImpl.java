@@ -33,8 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("externalOperation")
-public class ExternalMeasureOperationImpl implements MeasureOperation {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperationImpl.class);
+public class ExternalMeasureOperatorImpl implements MeasureOperator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperatorImpl.class);
 
     @Autowired
     private ExternalMeasureRepo measureRepo;
@@ -54,13 +54,14 @@ public class ExternalMeasureOperationImpl implements MeasureOperation {
     }
 
     @Override
-    public void update(Measure measure) {
+    public Measure update(Measure measure) {
         ExternalMeasure latestMeasure = (ExternalMeasure) measure;
         validateMeasure(latestMeasure);
         ExternalMeasure originMeasure = measureRepo.findOne(latestMeasure.getId());
         VirtualJob vj = genVirtualJob(latestMeasure, originMeasure.getVirtualJob());
         latestMeasure.setVirtualJob(vj);
-        measureRepo.save(latestMeasure);
+        measure = measureRepo.save(latestMeasure);
+        return measure;
     }
 
     @Override
