@@ -43,6 +43,7 @@ export class JobComponent implements OnInit {
   targetTable: string;
   deleteId: string;
   deleteIndex: number;
+  action: string;
   private toasterService: ToasterService;
 
   constructor(
@@ -98,6 +99,19 @@ export class JobComponent implements OnInit {
     );
   }
 
+  stateMag(row){
+    let actionUrl = this.serviceService.config.uri.modifyJobs + "/" + row.jobId + "?action=" + row.action.toLowerCase();
+    this.http.put(actionUrl, {}).subscribe(data => {
+      var result = JSON.parse(JSON.stringify(data));
+      row.action = (row.action === 'STOP' ? 'START' : 'STOP');
+      row.jobState.state = result.jobState.state;
+    },
+    err => {
+      this.toasterService.pop("error", "Error!", "Failed to manage job state!");
+      console.log("Error when manage job state");
+    });
+  }
+
   showInstances(row) {
     if (row.showDetail) {
       row.showDetail = !row.showDetail;
@@ -126,6 +140,7 @@ export class JobComponent implements OnInit {
       let trans = Object.keys(data).map(function(index) {
         let job = data[index];
         job.showDetail = false;
+        job.action = (job.jobState.toStart === true) ? 'START' : 'STOP';
         return job;
       });
       this.results = Object.assign([],trans).reverse();

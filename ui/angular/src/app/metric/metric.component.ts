@@ -66,15 +66,15 @@ export class MetricComponent implements OnInit {
       for (let mesName in this.mesWithJob) {
         var jobs = this.mesWithJob[mesName];
         if (
-          jobs.length > 0 && jobs[0].type == "accuracy"
-        ) {  
+          jobs.length > 0 && jobs[0].type == "ACCURACY"
+        ) {
           var node = null;
           node = new Object();
           node.name = mesName;
           node.dq = 0;
           node.metrics = [];
           this.measureOptions.push(mesName);
-          node.type = "accuracy";
+          node.type = "ACCURACY";
           for (let i = 0; i < jobs.length; i++) {
             if (jobs[i].metricValues.length != 0) {
               var someMetrics = jobs[i].metricValues.slice(0,30);
