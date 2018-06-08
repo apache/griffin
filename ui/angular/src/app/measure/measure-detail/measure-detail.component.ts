@@ -84,16 +84,16 @@ export class MeasureDetailComponent implements OnInit {
       data => {
         this.ruleData = data;
         if (this.ruleData["measure.type"] === "external") {
-          this.ruleData.type = this.ruleData["measure.type"];
-          this.ruleData.dqType = this.ruleData["dq.type"];
+          this.ruleData.type = this.ruleData["measure.type"].toLowerCase();
+          this.ruleData.dqType = this.ruleData["dq.type"].toLowerCase();
         } else{
-          this.ruleData.type = this.ruleData["dq.type"];
+          this.ruleData.type = this.ruleData["dq.type"].toLowerCase();
           this.currentrule = this.ruleData["evaluate.rule"].rules;
           if(this.ruleData["rule.description"]){
             this.ruleDes = this.ruleData["rule.description"].details
           }
           this.fetchData("source", 0);
-          if (this.ruleData.type === "accuracy") {
+          if (this.ruleData.type === "ACCURACY") {
             this.fetchData("target", 1);
           } else {
             this.targetDB = "";

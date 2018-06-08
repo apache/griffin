@@ -16,55 +16,28 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-.table-striped>tbody>tr:nth-of-type(even) {
-  background-color: #1f1f1f;
-}
+import { BatchComponent } from './batch.component';
 
-.table-striped>tbody>tr:nth-of-type(odd) {
-  background-color: #080808;
-}
+describe('BatchComponent', () => {
+  let component: BatchComponent;
+  let fixture: ComponentFixture<BatchComponent>;
 
-.reco>tbody:nth-of-type(odd)>tr {
-  background-color: #1f1f1f;
-}
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ BatchComponent ]
+    })
+    .compileComponents();
+  }));
 
-.co {
-  border-collapse: separate;
-}
+  beforeEach(() => {
+    fixture = TestBed.createComponent(BatchComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-.table>tbody+tbody {
-  border-top: 1px solid transparent;
-}
-
-.table > tbody > tr > td {
-  vertical-align: middle;
-}
-
-a {
-  color: white;
-}
-
-.icon {
-  color: #fff;
-  position: absolute;
-  left: 50%;
-  top: 20%;
-}
-
-.po {
-  cursor: pointer;
-}
-
-#pagination .pagination {
-  margin: 20px 0 0 0;
-}
-
-.dropdown-menu {
-  top: 0;
-  left: 100%;
-}
-
-.btn-group {
-  margin: 0 0 10px;
-}
+  it('should be created', () => {
+    expect(component).toBeTruthy();
+  });
+});
