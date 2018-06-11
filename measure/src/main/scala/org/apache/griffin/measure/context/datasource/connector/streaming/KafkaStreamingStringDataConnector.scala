@@ -20,7 +20,7 @@ package org.apache.griffin.measure.context.datasource.connector.streaming
 
 import kafka.serializer.StringDecoder
 import org.apache.griffin.measure.configuration.params.DataConnectorParam
-import org.apache.griffin.measure.context.datasource.cache.DataSourceCache
+import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.context.datasource.info.TmstCache
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
@@ -36,7 +36,7 @@ case class KafkaStreamingStringDataConnector(@transient sparkSession: SparkSessi
                                              @transient ssc: StreamingContext,
                                              dcParam: DataConnectorParam,
                                              tmstCache: TmstCache,
-                                             dataSourceCacheOpt: Option[DataSourceCache]
+                                             streamingCacheClientOpt: Option[StreamingCacheClient]
                                             ) extends KafkaStreamingDataConnector {
 
   type K = String

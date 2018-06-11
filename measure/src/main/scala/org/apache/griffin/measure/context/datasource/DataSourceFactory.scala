@@ -20,7 +20,7 @@ package org.apache.griffin.measure.context.datasource
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.params.DataSourceParam
-import org.apache.griffin.measure.context.datasource.cache.DataSourceCacheFactory
+import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClientFactory
 import org.apache.griffin.measure.context.datasource.connector.{DataConnector, DataConnectorFactory}
 import org.apache.griffin.measure.context.datasource.info.TmstCache
 import org.apache.spark.sql.SparkSession
@@ -49,18 +49,19 @@ object DataSourceFactory extends Loggable {
     val connectorParams = dataSourceParam.getConnectors
     val tmstCache = TmstCache()
 
-    val dataSourceCacheOpt = DataSourceCacheFactory.getDataSourceCacheOpt(
+    // for streaming data cache
+    val streamingCacheClientOpt = StreamingCacheClientFactory.getClientOpt(
       sparkSession.sqlContext, dataSourceParam.cache, name, index, tmstCache)
 
     val dataConnectors: Seq[DataConnector] = connectorParams.flatMap { connectorParam =>
       DataConnectorFactory.getDataConnector(sparkSession, ssc, connectorParam,
-        tmstCache, dataSourceCacheOpt) match {
+        tmstCache, streamingCacheClientOpt) match {
           case Success(connector) => Some(connector)
           case _ => None
         }
     }
 
-    Some(DataSource(name, dataSourceParam, dataConnectors, dataSourceCacheOpt))
+    Some(DataSource(name, dataSourceParam, dataConnectors, streamingCacheClientOpt))
   }
 
 }

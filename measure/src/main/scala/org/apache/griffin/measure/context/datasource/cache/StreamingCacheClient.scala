@@ -38,7 +38,7 @@ import scala.util.Random
   * read data frame from hdfs in calculate phase
   * with update and clean actions for the cache data
   */
-trait DataSourceCache extends DataSourceCacheable with WithFanIn[Long] with Loggable with Serializable {
+trait StreamingCacheClient extends DataSourceCacheable with WithFanIn[Long] with Loggable with Serializable {
 
   val sqlContext: SQLContext
   val param: Map[String, Any]

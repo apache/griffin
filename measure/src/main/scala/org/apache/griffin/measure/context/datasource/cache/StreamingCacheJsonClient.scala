@@ -24,9 +24,9 @@ import org.apache.spark.sql._
 /**
   * data source cache in json format
   */
-case class JsonDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                               dsName: String, index: Int, tmstCache: TmstCache
-                              ) extends DataSourceCache {
+case class StreamingCacheJsonClient(sqlContext: SQLContext, param: Map[String, Any],
+                                    dsName: String, index: Int, tmstCache: TmstCache
+                              ) extends StreamingCacheClient {
 
   protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit = {
     info(s"write path: ${path}")

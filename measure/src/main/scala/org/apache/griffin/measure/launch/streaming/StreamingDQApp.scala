@@ -18,14 +18,17 @@ under the License.
 */
 package org.apache.griffin.measure.launch.streaming
 
-import java.util.{Timer, TimerTask}
+import java.util.{Date, Timer, TimerTask}
 import java.util.concurrent.{Executors, ThreadPoolExecutor, TimeUnit}
 
+import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.params._
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.context.datasource.DataSourceFactory
-import org.apache.griffin.measure.context.streaming.info.InfoCacheInstance
+import org.apache.griffin.measure.context.streaming.info.{InfoCacheInstance, TimeInfoCache}
+import org.apache.griffin.measure.context.streaming.metric.CacheResults
+import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
@@ -87,8 +90,8 @@ case class StreamingDQApp(allParam: AllParam) extends DQApp {
     })
 
     // start time
-    val appTime = getAppTime
-    val contextId = ContextId(appTime)
+    val measureTime = getMeasureTime
+    val contextId = ContextId(measureTime)
 
     // generate data sources
     val dataSources = DataSourceFactory.getDataSources(sparkSession, ssc, dqParam.dataSources)
@@ -104,13 +107,13 @@ case class StreamingDQApp(allParam: AllParam) extends DQApp {
     globalContext.getPersist().start(applicationId)
 
     // process thread
-    val dqThread = StreamingDQApp2(globalContext, dqParam.evaluateRule)
+    val dqCalculator = StreamingDQCalculator(globalContext, dqParam.evaluateRule)
 
     val processInterval = TimeUtil.milliseconds(sparkParam.processInterval) match {
       case Some(interval) => interval
       case _ => throw new Exception("invalid batch interval")
     }
-    val process = TimingProcess(processInterval, dqThread)
+    val process = Scheduler(processInterval, dqCalculator)
     process.startup()
 
     ssc.start()
@@ -150,7 +153,94 @@ case class StreamingDQApp(allParam: AllParam) extends DQApp {
     }
   }
 
-  case class TimingProcess(interval: Long, runnable: Runnable) {
+
+  /**
+    *
+    * @param globalContext
+    * @param evaluateRuleParam
+    */
+  case class StreamingDQCalculator(globalContext: DQContext,
+                                   evaluateRuleParam: EvaluateRuleParam
+                                  ) extends Runnable with Loggable {
+
+    val lock = InfoCacheInstance.genLock("process")
+    val appPersist = globalContext.getPersist()
+
+    def run(): Unit = {
+      val updateTimeDate = new Date()
+      val updateTime = updateTimeDate.getTime
+      println(s"===== [${updateTimeDate}] process begins =====")
+      val locked = lock.lock(5, TimeUnit.SECONDS)
+      if (locked) {
+        try {
+
+          TimeInfoCache.startTimeInfoCache
+
+          val startTime = new Date().getTime
+          appPersist.log(startTime, s"starting process ...")
+          val contextId = ContextId(startTime)
+
+          // create dq context
+          val dqContext: DQContext = globalContext.cloneDQContext(contextId)
+
+          // build job
+          val dqJob = DQJobBuilder.buildDQJob(dqContext, evaluateRuleParam)
+
+          // dq job execute
+          dqJob.execute(dqContext)
+
+          // finish calculation
+          finishCalculation(dqContext)
+
+          // end time
+          val endTime = new Date().getTime
+          appPersist.log(endTime, s"process using time: ${endTime - startTime} ms")
+
+          TimeInfoCache.endTimeInfoCache
+
+          // clean old data
+          cleanData(dqContext)
+
+        } catch {
+          case e: Throwable => error(s"process error: ${e.getMessage}")
+        } finally {
+          lock.unlock()
+        }
+      } else {
+        println(s"===== [${updateTimeDate}] process ignores =====")
+      }
+      val endTime = new Date().getTime
+      println(s"===== [${updateTimeDate}] process ends, using ${endTime - updateTime} ms =====")
+    }
+
+    // finish calculation for this round
+    private def finishCalculation(context: DQContext): Unit = {
+      context.dataSources.foreach(_.processFinish)
+    }
+
+    // clean old data and old result cache
+    private def cleanData(context: DQContext): Unit = {
+      try {
+        context.dataSources.foreach(_.cleanOldData)
+
+        context.clean()
+
+        val cleanTime = TimeInfoCache.getCleanTime
+        CacheResults.refresh(cleanTime)
+      } catch {
+        case e: Throwable => error(s"clean data error: ${e.getMessage}")
+      }
+    }
+
+  }
+
+
+  /**
+    *
+    * @param interval
+    * @param runnable
+    */
+  case class Scheduler(interval: Long, runnable: Runnable) {
 
     val pool: ThreadPoolExecutor = Executors.newFixedThreadPool(5).asInstanceOf[ThreadPoolExecutor]
 

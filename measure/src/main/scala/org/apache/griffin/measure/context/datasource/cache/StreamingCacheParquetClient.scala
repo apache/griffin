@@ -24,9 +24,9 @@ import org.apache.spark.sql._
 /**
   * data source cache in parquet format
   */
-case class ParquetDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                                  dsName: String, index: Int, tmstCache: TmstCache
-                                 ) extends DataSourceCache {
+case class StreamingCacheParquetClient(sqlContext: SQLContext, param: Map[String, Any],
+                                       dsName: String, index: Int, tmstCache: TmstCache
+                                 ) extends StreamingCacheClient {
 
   sqlContext.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false")
 

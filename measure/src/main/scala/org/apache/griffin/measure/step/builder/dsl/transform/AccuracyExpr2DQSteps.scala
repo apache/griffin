@@ -27,7 +27,7 @@ import org.apache.griffin.measure.step.builder.dsl.expr._
 import org.apache.griffin.measure.step.builder.dsl.transform.analyzer.AccuracyAnalyzer
 import org.apache.griffin.measure.step.transform.DataFrameOps.AccuracyOprKeys
 import org.apache.griffin.measure.step.transform.{DataFrameOps, DataFrameOpsTransformStep, SparkSqlTransformStep}
-import org.apache.griffin.measure.step.write.{DsCacheUpdateWriteStep, MetricWriteStep, RecordWriteStep}
+import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -91,7 +91,7 @@ case class AccuracyExpr2DQSteps(context: DQContext,
         case BatchProcessType => Nil
         case StreamingProcessType => {
           val dsName = ruleParam.dsCacheUpdateOpt.map(_.dsName).getOrElse(sourceName)
-          DsCacheUpdateWriteStep(dsName, missRecordsTableName) :: Nil
+          DataSourceUpdateWriteStep(dsName, missRecordsTableName) :: Nil
         }
       }
 

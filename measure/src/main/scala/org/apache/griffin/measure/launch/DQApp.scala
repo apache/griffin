@@ -44,7 +44,10 @@ trait DQApp extends Loggable with Serializable {
     */
   def retryable: Boolean
 
-  protected def getAppTime: Long = {
+  /**
+    * timestamp as a key for metrics
+    */
+  protected def getMeasureTime: Long = {
     if (dqParam.timestamp != null && dqParam.timestamp > 0) { dqParam.timestamp }
     else { System.currentTimeMillis }
   }
