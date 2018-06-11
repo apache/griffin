@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.context.datasource.connector.streaming
 
 import org.apache.griffin.measure.context.TimeRange
-import org.apache.griffin.measure.context.datasource.cache.DataSourceCache
+import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.context.datasource.connector.DataConnector
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
@@ -41,6 +41,6 @@ trait StreamingDataConnector extends DataConnector {
   // streaming data connector cannot directly read data frame
   def data(ms: Long): (Option[DataFrame], TimeRange) = (None, TimeRange.emptyTimeRange)
 
-  val dataSourceCacheOpt: Option[DataSourceCache]
+  val streamingCacheClientOpt: Option[StreamingCacheClient]
 
 }

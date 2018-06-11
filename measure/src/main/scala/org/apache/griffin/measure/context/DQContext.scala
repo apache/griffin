@@ -26,6 +26,8 @@ import org.apache.spark.sql.{Encoders, SQLContext, SparkSession}
 
 /**
   * dq context: the context of each calculation
+  * unique context id in each calculation
+  * access the same spark session this app created
   */
 case class DQContext(contextId: ContextId,
                      name: String,

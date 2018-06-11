@@ -43,7 +43,7 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
 
   def init(): Unit = {
     // register fan in
-    dataSourceCacheOpt.foreach(_.registerFanIn)
+    streamingCacheClientOpt.foreach(_.registerFanIn)
 
     val ds = stream match {
       case Success(dstream) => dstream
@@ -71,7 +71,7 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
       }
 
       // save data frame
-      dataSourceCacheOpt.foreach(_.saveData(saveDfOpt, ms))
+      streamingCacheClientOpt.foreach(_.saveData(saveDfOpt, ms))
     })
   }
 

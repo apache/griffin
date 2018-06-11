@@ -20,7 +20,7 @@ package org.apache.griffin.measure.context.datasource
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.params.DataSourceParam
-import org.apache.griffin.measure.context.datasource.cache.DataSourceCache
+import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
 import org.apache.griffin.measure.context.datasource.connector.DataConnector
 import org.apache.griffin.measure.context.datasource.info.TmstCache
@@ -32,12 +32,12 @@ import org.apache.spark.sql._
   * @param name     name of data source
   * @param dsParam  param of this data source
   * @param dataConnectors       list of data connectors
-  * @param dataSourceCacheOpt   data source cache option in streaming mode
+  * @param streamingCacheClientOpt   streaming data cache client option
   */
 case class DataSource(name: String,
                       dsParam: DataSourceParam,
                       dataConnectors: Seq[DataConnector],
-                      dataSourceCacheOpt: Option[DataSourceCache]
+                      streamingCacheClientOpt: Option[StreamingCacheClient]
                      ) extends Loggable with Serializable {
 
   def init(): Unit = {
@@ -67,7 +67,7 @@ case class DataSource(name: String,
         case _ => None
       }
     }
-    val caches = dataSourceCacheOpt match {
+    val caches = streamingCacheClientOpt match {
       case Some(dsc) => dsc.readData() :: Nil
       case _ => Nil
     }
@@ -83,15 +83,15 @@ case class DataSource(name: String,
   }
 
   def updateData(df: DataFrame): Unit = {
-    dataSourceCacheOpt.foreach(_.updateData(Some(df)))
+    streamingCacheClientOpt.foreach(_.updateData(Some(df)))
   }
 
   def cleanOldData(): Unit = {
-    dataSourceCacheOpt.foreach(_.cleanOutTimeData)
+    streamingCacheClientOpt.foreach(_.cleanOutTimeData)
   }
 
   def processFinish(): Unit = {
-    dataSourceCacheOpt.foreach(_.processFinish)
+    streamingCacheClientOpt.foreach(_.processFinish)
   }
 
 }
