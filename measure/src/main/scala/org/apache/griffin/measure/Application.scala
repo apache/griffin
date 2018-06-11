@@ -77,7 +77,7 @@ object Application extends Loggable {
 
     // choose process
     val procType = ProcessType(allParam.dqParam.procType)
-    val proc: DQApp = procType match {
+    val dqApp: DQApp = procType match {
       case BatchProcessType => BatchDQApp(allParam)
       case StreamingProcessType => StreamingDQApp(allParam)
       case _ => {
@@ -88,8 +88,8 @@ object Application extends Loggable {
 
     startup
 
-    // process init
-    proc.init match {
+    // dq app init
+    dqApp.init match {
       case Success(_) => {
         info("process init success")
       }
@@ -100,15 +100,15 @@ object Application extends Loggable {
       }
     }
 
-    // process run
-    proc.run match {
+    // dq app run
+    dqApp.run match {
       case Success(_) => {
         info("process run success")
       }
       case Failure(ex) => {
         error(s"process run error: ${ex.getMessage}")
 
-        if (proc.retryable) {
+        if (dqApp.retryable) {
           throw ex
         } else {
           shutdown
@@ -117,8 +117,8 @@ object Application extends Loggable {
       }
     }
 
-    // process end
-    proc.close match {
+    // dq app end
+    dqApp.close match {
       case Success(_) => {
         info("process end success")
       }

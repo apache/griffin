@@ -66,10 +66,10 @@ case class BatchDQApp(allParam: AllParam) extends DQApp {
     // start time
     val startTime = new Date().getTime
 
-    val appTime = getAppTime
-    val contextId = ContextId(appTime)
+    val measureTime = getMeasureTime
+    val contextId = ContextId(measureTime)
 
-    // generate data sources
+    // get data sources
     val dataSources = DataSourceFactory.getDataSources(sparkSession, null, dqParam.dataSources)
     dataSources.foreach(_.init)
 
