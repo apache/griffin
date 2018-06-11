@@ -42,7 +42,7 @@ object ProcessType {
 /**
   * process in batch mode
   */
-final case object BatchProcessType extends ProcessType {
+ case object BatchProcessType extends ProcessType {
   val regex = """^(?i)batch$""".r
   val desc = "batch"
 }
@@ -50,7 +50,7 @@ final case object BatchProcessType extends ProcessType {
 /**
   * process in streaming mode
   */
-final case object StreamingProcessType extends ProcessType {
+ case object StreamingProcessType extends ProcessType {
   val regex = """^(?i)streaming$""".r
   val desc = "streaming"
 }

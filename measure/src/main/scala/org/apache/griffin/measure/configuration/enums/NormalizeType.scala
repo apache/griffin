@@ -47,7 +47,7 @@ object NormalizeType {
   * n > 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
   * all rows
   */
-final case object DefaultNormalizeType extends NormalizeType {
+ case object DefaultNormalizeType extends NormalizeType {
   val regex: Regex = "".r
   val desc: String = "default"
 }
@@ -58,7 +58,7 @@ final case object DefaultNormalizeType extends NormalizeType {
   * n >= 1: { "col1": "value1", "col2": "value2", ... }
   * the first row only
   */
-final case object EntriesNormalizeType extends NormalizeType {
+ case object EntriesNormalizeType extends NormalizeType {
   val regex: Regex = "^(?i)entries$".r
   val desc: String = "entries"
 }
@@ -69,7 +69,7 @@ final case object EntriesNormalizeType extends NormalizeType {
   * n >= 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
   * all rows
   */
-final case object ArrayNormalizeType extends NormalizeType {
+ case object ArrayNormalizeType extends NormalizeType {
   val regex: Regex = "^(?i)array|list$".r
   val desc: String = "array"
 }
@@ -80,7 +80,7 @@ final case object ArrayNormalizeType extends NormalizeType {
   * n >= 1: { "map-name": { "col1": "value1", "col2": "value2", ... } }
   * the first row only
   */
-final case object MapNormalizeType extends NormalizeType {
+ case object MapNormalizeType extends NormalizeType {
   val regex: Regex = "^(?i)map$".r
   val desc: String = "map"
 }

@@ -26,7 +26,7 @@ import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.step.builder.dsl.expr.{DistinctnessClause, _}
 import org.apache.griffin.measure.step.builder.dsl.transform.analyzer.DistinctnessAnalyzer
 import org.apache.griffin.measure.step.transform.SparkSqlTransformStep
-import org.apache.griffin.measure.step.write.{DsCacheUpdateWriteStep, MetricWriteStep, RecordWriteStep}
+import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -133,7 +133,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
       val ((transSteps2, writeSteps2), dupCountTableName) = procType match {
         case StreamingProcessType if (withOlderTable) => {
           // 4.0 update old data
-          val targetDsUpdateWriteStep = DsCacheUpdateWriteStep(targetName, targetName)
+          val targetDsUpdateWriteStep = DataSourceUpdateWriteStep(targetName, targetName)
 
           // 4. older alias
           val olderAliasTableName = "__older"

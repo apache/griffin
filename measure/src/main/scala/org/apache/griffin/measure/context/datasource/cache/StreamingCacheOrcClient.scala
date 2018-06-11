@@ -24,9 +24,9 @@ import org.apache.spark.sql._
 /**
   * data source cache in orc format
   */
-case class OrcDataSourceCache(sqlContext: SQLContext, param: Map[String, Any],
-                              dsName: String, index: Int, tmstCache: TmstCache
-                             ) extends DataSourceCache {
+case class StreamingCacheOrcClient(sqlContext: SQLContext, param: Map[String, Any],
+                                   dsName: String, index: Int, tmstCache: TmstCache
+                             ) extends StreamingCacheClient {
 
   protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit = {
     info(s"write path: ${path}")

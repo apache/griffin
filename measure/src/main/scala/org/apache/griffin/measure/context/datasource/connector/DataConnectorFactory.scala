@@ -20,7 +20,7 @@ package org.apache.griffin.measure.context.datasource.connector
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.params.DataConnectorParam
-import org.apache.griffin.measure.context.datasource.cache.DataSourceCache
+import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.context.datasource.connector.batch._
 import org.apache.griffin.measure.context.datasource.connector.streaming._
 import org.apache.griffin.measure.context.datasource.info.TmstCache
@@ -44,14 +44,14 @@ object DataConnectorFactory extends Loggable {
     * @param ssc              spark streaming env
     * @param dcParam          data connector param
     * @param tmstCache        same tmst cache in one data source
-    * @param dataSourceCacheOpt   for streaming data connector
+    * @param streamingCacheClientOpt   for streaming cache
     * @return   data connector
     */
   def getDataConnector(sparkSession: SparkSession,
                        ssc: StreamingContext,
                        dcParam: DataConnectorParam,
                        tmstCache: TmstCache,
-                       dataSourceCacheOpt: Option[DataSourceCache]
+                       streamingCacheClientOpt: Option[StreamingCacheClient]
                       ): Try[DataConnector] = {
     val conType = dcParam.conType
     val version = dcParam.version
@@ -61,7 +61,7 @@ object DataConnectorFactory extends Loggable {
         case AvroRegex() => AvroBatchDataConnector(sparkSession, dcParam, tmstCache)
         case TextDirRegex() => TextDirBatchDataConnector(sparkSession, dcParam, tmstCache)
         case KafkaRegex() => {
-          getStreamingDataConnector(sparkSession, ssc, dcParam, tmstCache, dataSourceCacheOpt)
+          getStreamingDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
         }
         case _ => throw new Exception("connector creation error!")
       }
@@ -72,13 +72,13 @@ object DataConnectorFactory extends Loggable {
                                         ssc: StreamingContext,
                                         dcParam: DataConnectorParam,
                                         tmstCache: TmstCache,
-                                        dataSourceCacheOpt: Option[DataSourceCache]
+                                        streamingCacheClientOpt: Option[StreamingCacheClient]
                                        ): StreamingDataConnector = {
     if (ssc == null) throw new Exception("streaming context is null!")
     val conType = dcParam.conType
     val version = dcParam.version
     conType match {
-      case KafkaRegex() => getKafkaDataConnector(sparkSession, ssc, dcParam, tmstCache, dataSourceCacheOpt)
+      case KafkaRegex() => getKafkaDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
       case _ => throw new Exception("streaming connector creation error!")
     }
   }
@@ -87,7 +87,7 @@ object DataConnectorFactory extends Loggable {
                                     ssc: StreamingContext,
                                     dcParam: DataConnectorParam,
                                     tmstCache: TmstCache,
-                                    dataSourceCacheOpt: Option[DataSourceCache]
+                                    streamingCacheClientOpt: Option[StreamingCacheClient]
                                    ): KafkaStreamingDataConnector  = {
     val KeyType = "key.type"
     val ValueType = "value.type"
@@ -96,7 +96,7 @@ object DataConnectorFactory extends Loggable {
     val valueType = config.getOrElse(ValueType, "java.lang.String").toString
     (getClassTag(keyType), getClassTag(valueType)) match {
       case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
-        KafkaStreamingStringDataConnector(sparkSession, ssc, dcParam, tmstCache, dataSourceCacheOpt)
+        KafkaStreamingStringDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
       }
       case _ => {
         throw new Exception("not supported type kafka data connector")

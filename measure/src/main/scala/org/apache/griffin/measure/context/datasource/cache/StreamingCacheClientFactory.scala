@@ -23,7 +23,7 @@ import org.apache.griffin.measure.context.datasource.info.TmstCache
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.spark.sql.SQLContext
 
-object DataSourceCacheFactory extends Loggable {
+object StreamingCacheClientFactory extends Loggable {
 
   private object DataSourceCacheType {
     val ParquetRegex = "^(?i)parq(uet)?$".r
@@ -35,25 +35,25 @@ object DataSourceCacheFactory extends Loggable {
   val _type = "type"
 
   /**
-    * create data source cache
+    * create streaming cache client
     * @param sqlContext   sqlContext in spark environment
     * @param param        data source cache config
     * @param name         data source name
     * @param index        data source index
     * @param tmstCache    the same tmstCache instance inside a data source
-    * @return             data source option
+    * @return             streaming cache client option
     */
-  def getDataSourceCacheOpt(sqlContext: SQLContext, param: Map[String, Any],
-                            name: String, index: Int, tmstCache: TmstCache
-                           ): Option[DataSourceCache] = {
+  def getClientOpt(sqlContext: SQLContext, param: Map[String, Any],
+                   name: String, index: Int, tmstCache: TmstCache
+                  ): Option[StreamingCacheClient] = {
     if (param != null) {
       try {
         val tp = param.getString(_type, "")
         val dsCache = tp match {
-          case ParquetRegex() => ParquetDataSourceCache(sqlContext, param, name, index, tmstCache)
-          case JsonRegex() => JsonDataSourceCache(sqlContext, param, name, index, tmstCache)
-          case OrcRegex() => OrcDataSourceCache(sqlContext, param, name, index, tmstCache)
-          case _ => ParquetDataSourceCache(sqlContext, param, name, index, tmstCache)
+          case ParquetRegex() => StreamingCacheParquetClient(sqlContext, param, name, index, tmstCache)
+          case JsonRegex() => StreamingCacheJsonClient(sqlContext, param, name, index, tmstCache)
+          case OrcRegex() => StreamingCacheOrcClient(sqlContext, param, name, index, tmstCache)
+          case _ => StreamingCacheParquetClient(sqlContext, param, name, index, tmstCache)
         }
         Some(dsCache)
       } catch {

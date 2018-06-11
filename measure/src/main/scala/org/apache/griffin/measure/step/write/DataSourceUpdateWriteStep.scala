@@ -23,11 +23,11 @@ import org.apache.griffin.measure.context.DQContext
 import org.apache.spark.sql.DataFrame
 
 /**
-  * update streaming data source cache
+  * update data source streaming cache
   */
-case class DsCacheUpdateWriteStep(dsName: String,
-                                  inputName: String
-                                 ) extends WriteStep {
+case class DataSourceUpdateWriteStep(dsName: String,
+                                     inputName: String
+                                    ) extends WriteStep {
 
   val name: String = ""
   val writeTimestampOpt: Option[Long] = None
