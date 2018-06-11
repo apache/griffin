@@ -42,7 +42,7 @@ object DslType {
 /**
   * spark-sql: rule defined in "SPARK-SQL" directly
   */
-final case object SparkSqlType extends DslType {
+ case object SparkSqlType extends DslType {
   val regex = "^(?i)spark-?sql$".r
   val desc = "spark-sql"
 }
@@ -50,7 +50,7 @@ final case object SparkSqlType extends DslType {
 /**
   * df-ops: data frame operations rule, support some pre-defined data frame ops
   */
-final case object DataFrameOpsType extends DslType {
+ case object DataFrameOpsType extends DslType {
   val regex = "^(?i)df-?(?:op|opr|ops)$".r
   val desc = "df-opr"
 }
@@ -58,7 +58,7 @@ final case object DataFrameOpsType extends DslType {
 /**
   * griffin-dsl: griffin dsl rule, to define dq measurements easier
   */
-final case object GriffinDslType extends DslType {
+ case object GriffinDslType extends DslType {
   val regex = "^(?i)griffin-?dsl$".r
   val desc = "griffin-dsl"
 }
