@@ -25,7 +25,7 @@ import scala.util.matching.Regex
   * indicates the dq type of griffin pre-defined measurements
   */
 sealed trait DqType {
-  val regex: Regex
+  val idPattern: Regex
   val desc: String
 }
 
@@ -34,8 +34,8 @@ object DqType {
     AccuracyType, ProfilingType, UniquenessType, DistinctnessType, TimelinessType, CompletenessType, UnknownType
   )
   def apply(ptn: String): DqType = {
-    dqTypes.find(tp => ptn match {
-      case tp.regex() => true
+    dqTypes.find(dqType => ptn match {
+      case dqType.idPattern() => true
       case _ => false
     }).getOrElse(UnknownType)
   }
@@ -50,7 +50,7 @@ object DqType {
   *       accuracy is 80%.
   */
  case object AccuracyType extends DqType {
-  val regex = "^(?i)accuracy$".r
+  val idPattern = "^(?i)accuracy$".r
   val desc = "accuracy"
 }
 
@@ -59,7 +59,7 @@ object DqType {
   * e.g.: max, min, average, group by count, ...
   */
  case object ProfilingType extends DqType {
-  val regex = "^(?i)profiling$".r
+  val idPattern = "^(?i)profiling$".r
   val desc = "profiling"
 }
 
@@ -70,7 +70,7 @@ object DqType {
   * uniqueness indicates the items without any replica of data
   */
  case object UniquenessType extends DqType {
-  val regex = "^(?i)uniqueness|duplicate$".r
+  val idPattern = "^(?i)uniqueness|duplicate$".r
   val desc = "uniqueness"
 }
 
@@ -82,7 +82,7 @@ object DqType {
   * comparing with uniqueness, distinctness is more meaningful
   */
  case object DistinctnessType extends DqType {
-  val regex = "^(?i)distinct$".r
+  val idPattern = "^(?i)distinct$".r
   val desc = "distinct"
 }
 
@@ -93,7 +93,7 @@ object DqType {
   * even more, it can record the items with latency above threshold you configured
   */
  case object TimelinessType extends DqType {
-  val regex = "^(?i)timeliness$".r
+  val idPattern = "^(?i)timeliness$".r
   val desc = "timeliness"
 }
 
@@ -102,11 +102,11 @@ object DqType {
   * the columns you measure is incomplete if it is null
   */
  case object CompletenessType extends DqType {
-  val regex = "^(?i)completeness$".r
+  val idPattern = "^(?i)completeness$".r
   val desc = "completeness"
 }
 
  case object UnknownType extends DqType {
-  val regex = "".r
+  val idPattern = "".r
   val desc = "unknown"
 }
