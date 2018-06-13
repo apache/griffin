@@ -65,14 +65,14 @@ trait DataConnector extends Loggable with Serializable {
       saveTmst(timestamp)    // save timestamp
 
       dfOpt.flatMap { df =>
-        val preProcRules = PreProcRuleParamGenerator.getNewPreProcRules(dcParam.preProc, suffix)
+        val preProcRules = PreProcRuleParamGenerator.getNewPreProcRules(dcParam.getPreProcRules, suffix)
 
         // init data
         context.compileTableRegister.registerTable(thisTable)
         context.runTimeTableRegister.registerTable(thisTable, df)
 
         // build job
-        val preprocJob = DQJobBuilder.buildDQJob(context, preProcRules, SparkSqlType)
+        val preprocJob = DQJobBuilder.buildDQJob(context, preProcRules)
 
         // job execute
         preprocJob.execute(context)

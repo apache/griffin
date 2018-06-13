@@ -38,15 +38,15 @@ import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
 import scala.util.Try
 
-case class StreamingDQApp(allParam: AllParam) extends DQApp {
+case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
-  val envParam: EnvParam = allParam.envParam
-  val dqParam: DQParam = allParam.dqParam
+  val envParam: EnvConfig = allParam.getEnvConfig
+  val dqParam: DQConfig = allParam.getDqConfig
 
   val sparkParam = envParam.sparkParam
   val metricName = dqParam.name
-  val dataSourceParams = dqParam.dataSources
-  val dataSourceNames = dataSourceParams.map(_.name)
+//  val dataSourceParams = dqParam.dataSources
+//  val dataSourceNames = dataSourceParams.map(_.name)
   val persistParams = envParam.persistParams
 
   var sqlContext: SQLContext = _
@@ -58,10 +58,10 @@ case class StreamingDQApp(allParam: AllParam) extends DQApp {
   def init: Try[_] = Try {
     // build spark 2.0+ application context
     val conf = new SparkConf().setAppName(metricName)
-    conf.setAll(sparkParam.config)
+    conf.setAll(sparkParam.getConfig)
     conf.set("spark.sql.crossJoin.enabled", "true")
     sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
-    sparkSession.sparkContext.setLogLevel(sparkParam.logLevel)
+    sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
     sqlContext = sparkSession.sqlContext
 
     // clear checkpoint directory
@@ -78,7 +78,7 @@ case class StreamingDQApp(allParam: AllParam) extends DQApp {
   def run: Try[_] = Try {
 
     // streaming context
-    val ssc = StreamingContext.getOrCreate(sparkParam.cpDir, () => {
+    val ssc = StreamingContext.getOrCreate(sparkParam.getCpDir, () => {
       try {
         createStreamingContext
       } catch {
@@ -94,7 +94,7 @@ case class StreamingDQApp(allParam: AllParam) extends DQApp {
     val contextId = ContextId(measureTime)
 
     // generate data sources
-    val dataSources = DataSourceFactory.getDataSources(sparkSession, ssc, dqParam.dataSources)
+    val dataSources = DataSourceFactory.getDataSources(sparkSession, ssc, dqParam.getDataSources)
     dataSources.foreach(_.init)
 
     // create dq context
@@ -109,7 +109,7 @@ case class StreamingDQApp(allParam: AllParam) extends DQApp {
     // process thread
     val dqCalculator = StreamingDQCalculator(globalContext, dqParam.evaluateRule)
 
-    val processInterval = TimeUtil.milliseconds(sparkParam.processInterval) match {
+    val processInterval = TimeUtil.milliseconds(sparkParam.getProcessInterval) match {
       case Some(interval) => interval
       case _ => throw new Exception("invalid batch interval")
     }
@@ -135,19 +135,19 @@ case class StreamingDQApp(allParam: AllParam) extends DQApp {
 
 
   def createStreamingContext: StreamingContext = {
-    val batchInterval = TimeUtil.milliseconds(sparkParam.batchInterval) match {
+    val batchInterval = TimeUtil.milliseconds(sparkParam.getBatchInterval) match {
       case Some(interval) => Milliseconds(interval)
       case _ => throw new Exception("invalid batch interval")
     }
     val ssc = new StreamingContext(sparkSession.sparkContext, batchInterval)
-    ssc.checkpoint(sparkParam.cpDir)
+    ssc.checkpoint(sparkParam.getCpDir)
 
     ssc
   }
 
   private def clearCpDir: Unit = {
     if (sparkParam.needInitClear) {
-      val cpDir = sparkParam.cpDir
+      val cpDir = sparkParam.getCpDir
       info(s"clear checkpoint directory ${cpDir}")
       HdfsUtil.deleteHdfsPath(cpDir)
     }

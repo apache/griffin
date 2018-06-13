@@ -21,28 +21,37 @@ package org.apache.griffin.measure.configuration.params
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import org.apache.commons.lang.StringUtils
+import org.apache.griffin.measure.utils.TimeUtil
 
 /**
   * environment param
   * @param sparkParam       config of spark environment (must)
   * @param persistParams    config of persist ways (optional)
-  * @param infoCacheParams  config of information cache ways (must in streaming mode)
-  * @param cleanerParam     config of cleaner (optional)
+  * @param infoCacheParams  config of information cache ways (required in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
-case class EnvParam( @JsonProperty("spark") sparkParam: SparkParam,
+case class EnvConfig(@JsonProperty("spark") sparkParam: SparkParam,
                      @JsonProperty("persist") persistParams: List[PersistParam],
-                     @JsonProperty("info.cache") infoCacheParams: List[InfoCacheParam],
-                     @JsonProperty("cleaner") cleanerParam: CleanerParam
+                     @JsonProperty("info.cache") infoCacheParams: List[InfoCacheParam]
                    ) extends Param {
+  def getSparkParam: SparkParam = sparkParam
+  def getPersistParams: Seq[PersistParam] = if (persistParams != null) persistParams else Nil
+  def getInfoCacheParams: Seq[InfoCacheParam] = if (infoCacheParams != null) infoCacheParams else Nil
+
+  def validate(): Unit = {
+    assert((sparkParam != null), "spark param should not be null")
+    sparkParam.validate
+    getPersistParams.foreach(_.validate)
+    getInfoCacheParams.foreach(_.validate)
+  }
 }
 
 /**
   * spark param
   * @param logLevel         log level of spark application (optional)
-  * @param cpDir            checkpoint directory for spark streaming (must in streaming mode)
-  * @param batchInterval    batch interval for spark streaming (must in streaming mode)
-  * @param processInterval  process interval for streaming dq calculation (must in streaming mode)
+  * @param cpDir            checkpoint directory for spark streaming (required in streaming mode)
+  * @param batchInterval    batch interval for spark streaming (required in streaming mode)
+  * @param processInterval  process interval for streaming dq calculation (required in streaming mode)
   * @param config           extra config for spark environment (optional)
   * @param initClear        clear checkpoint directory or not when initial (optional)
   */
@@ -55,7 +64,17 @@ case class SparkParam( @JsonProperty("log.level") logLevel: String,
                        @JsonProperty("init.clear") initClear: Boolean
                      ) extends Param {
   def getLogLevel: String = if (logLevel != null) logLevel else "WARN"
+  def getCpDir: String = if (cpDir != null) cpDir else ""
+  def getBatchInterval: String = if (batchInterval != null) batchInterval else ""
+  def getProcessInterval: String = if (processInterval != null) processInterval else ""
+  def getConfig: Map[String, String] = if (config != null) config else Map[String, String]()
   def needInitClear: Boolean = if (initClear != null) initClear else false
+
+  def validate(): Unit = {
+//    assert(StringUtils.isNotBlank(cpDir), "checkpoint.dir should not be empty")
+//    assert(TimeUtil.milliseconds(getBatchInterval).nonEmpty, "batch.interval should be valid time string")
+//    assert(TimeUtil.milliseconds(getProcessInterval).nonEmpty, "process.interval should be valid time string")
+  }
 }
 
 /**
@@ -67,8 +86,11 @@ case class SparkParam( @JsonProperty("log.level") logLevel: String,
 case class PersistParam( @JsonProperty("type") persistType: String,
                          @JsonProperty("config") config: Map[String, Any]
                        ) extends Param {
-  override def validate(): Boolean = {
-    StringUtils.isNotBlank(persistType)
+  def getType: String = persistType
+  def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
+
+  def validate(): Unit = {
+    assert(StringUtils.isNotBlank(persistType), "persist type should not be empty")
   }
 }
 
@@ -81,17 +103,10 @@ case class PersistParam( @JsonProperty("type") persistType: String,
 case class InfoCacheParam( @JsonProperty("type") cacheType: String,
                            @JsonProperty("config") config: Map[String, Any]
                          ) extends Param {
-  override def validate(): Boolean = {
-    StringUtils.isNotBlank(cacheType)
+  def getType: String = cacheType
+  def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
+
+  def validate(): Unit = {
+    assert(StringUtils.isNotBlank(cacheType), "info cache type should not be empty")
   }
-}
-
-/**
-  * cleaner param, invalid at current
-  * @param cleanInterval    clean interval (optional)
-  */
-@JsonInclude(Include.NON_NULL)
-case class CleanerParam( @JsonProperty("clean.interval") cleanInterval: String
-                       ) extends Param {
-
 }

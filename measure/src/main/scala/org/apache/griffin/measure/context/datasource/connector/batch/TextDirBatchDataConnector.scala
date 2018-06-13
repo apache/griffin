@@ -33,7 +33,7 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
                                      tmstCache: TmstCache
                                     ) extends BatchDataConnector {
 
-  val config = dcParam.config
+  val config = dcParam.getConfig
 
   val DirPath = "dir.path"
   val DataDirDepth = "data.dir.depth"

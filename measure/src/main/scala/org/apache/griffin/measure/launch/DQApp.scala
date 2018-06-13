@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.launch
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.params.{DQParam, EnvParam}
+import org.apache.griffin.measure.configuration.params.{DQConfig, EnvConfig}
 
 import scala.util.Try
 
@@ -28,8 +28,8 @@ import scala.util.Try
   */
 trait DQApp extends Loggable with Serializable {
 
-  val envParam: EnvParam
-  val dqParam: DQParam
+  val envParam: EnvConfig
+  val dqParam: DQConfig
 
   def init: Try[_]
 

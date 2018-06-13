@@ -23,14 +23,20 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 
 /**
   * full set of griffin configuration
-  * @param envParam   environment configuration (must)
-  * @param dqParam    dq measurement configuration (must)
+  * @param envConfig   environment configuration (must)
+  * @param dqConfig    dq measurement configuration (must)
   */
 @JsonInclude(Include.NON_NULL)
-case class AllParam( @JsonProperty("env") envParam: EnvParam,
-                     @JsonProperty("dq") dqParam: DQParam
+case class GriffinConfig(@JsonProperty("env") envConfig: EnvConfig,
+                         @JsonProperty("dq") dqConfig: DQConfig
                    ) extends Param {
-  override def validate(): Boolean = {
-    envParam != null && dqParam != null
+  def getEnvConfig: EnvConfig = envConfig
+  def getDqConfig: DQConfig = dqConfig
+
+  def validate(): Unit = {
+    assert((envConfig != null), "environment config should not be null")
+    assert((dqConfig != null), "dq config should not be null")
+    envConfig.validate
+    dqConfig.validate
   }
 }

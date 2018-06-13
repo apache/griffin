@@ -33,7 +33,7 @@ case class AvroBatchDataConnector(@transient sparkSession: SparkSession,
                                   tmstCache: TmstCache
                                  ) extends BatchDataConnector {
 
-  val config = dcParam.config
+  val config = dcParam.getConfig
 
   val FilePath = "file.path"
   val FileName = "file.name"

@@ -32,15 +32,15 @@ import org.apache.spark.sql.{SQLContext, SparkSession}
 
 import scala.util.Try
 
-case class BatchDQApp(allParam: AllParam) extends DQApp {
+case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
-  val envParam: EnvParam = allParam.envParam
-  val dqParam: DQParam = allParam.dqParam
+  val envParam: EnvConfig = allParam.getEnvConfig
+  val dqParam: DQConfig = allParam.getDqConfig
 
   val sparkParam = envParam.sparkParam
   val metricName = dqParam.name
-  val dataSourceParams = dqParam.dataSources
-  val dataSourceNames = dataSourceParams.map(_.name)
+//  val dataSourceParams = dqParam.dataSources
+//  val dataSourceNames = dataSourceParams.map(_.name)
   val persistParams = envParam.persistParams
 
   var sqlContext: SQLContext = _
@@ -52,10 +52,10 @@ case class BatchDQApp(allParam: AllParam) extends DQApp {
   def init: Try[_] = Try {
     // build spark 2.0+ application context
     val conf = new SparkConf().setAppName(metricName)
-    conf.setAll(sparkParam.config)
+    conf.setAll(sparkParam.getConfig)
     conf.set("spark.sql.crossJoin.enabled", "true")
     sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
-    sparkSession.sparkContext.setLogLevel(sparkParam.logLevel)
+    sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
     sqlContext = sparkSession.sqlContext
 
     // register udf
@@ -70,7 +70,7 @@ case class BatchDQApp(allParam: AllParam) extends DQApp {
     val contextId = ContextId(measureTime)
 
     // get data sources
-    val dataSources = DataSourceFactory.getDataSources(sparkSession, null, dqParam.dataSources)
+    val dataSources = DataSourceFactory.getDataSources(sparkSession, null, dqParam.getDataSources)
     dataSources.foreach(_.init)
 
     // create dq context
