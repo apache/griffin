@@ -30,11 +30,12 @@ sealed trait NormalizeType {
 
 object NormalizeType {
   private val normalizeTypes: List[NormalizeType] = List(DefaultNormalizeType, EntriesNormalizeType, ArrayNormalizeType, MapNormalizeType)
+  val default = DefaultNormalizeType
   def apply(ptn: String): NormalizeType = {
     normalizeTypes.find(tp => ptn match {
       case tp.idPattern() => true
       case _ => false
-    }).getOrElse(DefaultNormalizeType)
+    }).getOrElse(default)
   }
   def unapply(pt: NormalizeType): Option[String] = Some(pt.desc)
 }

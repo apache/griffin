@@ -131,8 +131,9 @@ case class TimelinessExpr2DQSteps(context: DQContext,
       }
       val metricTransStep = SparkSqlTransformStep(metricTableName, metricSql, emptyMap)
       val metricWriteStep = {
-        val mwName = ruleParam.metricOpt.map(_.name).getOrElse(ruleParam.name)
-        val collectType = NormalizeType(ruleParam.metricOpt.map(_.collectType).getOrElse(""))
+        val metricOpt = ruleParam.getMetricOpt
+        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.name)
+        val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
         MetricWriteStep(mwName, metricTableName, collectType)
       }
 
@@ -149,7 +150,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
           }
           val recordTransStep = SparkSqlTransformStep(recordTableName, recordSql, emptyMap)
           val recordWriteStep = {
-            val rwName = ruleParam.recordOpt.map(_.name).getOrElse(recordTableName)
+            val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(recordTableName)
             RecordWriteStep(rwName, recordTableName, None)
           }
           (recordTransStep :: Nil, recordWriteStep :: Nil)

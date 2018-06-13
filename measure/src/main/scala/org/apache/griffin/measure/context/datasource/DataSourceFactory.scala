@@ -32,9 +32,9 @@ object DataSourceFactory extends Loggable {
 
   def getDataSources(sparkSession: SparkSession,
                      ssc: StreamingContext,
-                     dataSourceParams: Seq[DataSourceParam]
+                     dataSources: Seq[DataSourceParam]
                     ): Seq[DataSource] = {
-    dataSourceParams.zipWithIndex.flatMap { pair =>
+    dataSources.zipWithIndex.flatMap { pair =>
       val (param, index) = pair
       getDataSource(sparkSession, ssc, param, index)
     }
@@ -45,13 +45,13 @@ object DataSourceFactory extends Loggable {
                             dataSourceParam: DataSourceParam,
                             index: Int
                            ): Option[DataSource] = {
-    val name = dataSourceParam.name
+    val name = dataSourceParam.getName
     val connectorParams = dataSourceParam.getConnectors
     val tmstCache = TmstCache()
 
     // for streaming data cache
     val streamingCacheClientOpt = StreamingCacheClientFactory.getClientOpt(
-      sparkSession.sqlContext, dataSourceParam.cache, name, index, tmstCache)
+      sparkSession.sqlContext, dataSourceParam.getCacheOpt, name, index, tmstCache)
 
     val dataConnectors: Seq[DataConnector] = connectorParams.flatMap { connectorParam =>
       DataConnectorFactory.getDataConnector(sparkSession, ssc, connectorParam,

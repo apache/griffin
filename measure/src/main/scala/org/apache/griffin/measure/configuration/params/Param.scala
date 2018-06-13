@@ -22,8 +22,7 @@ trait Param extends Serializable {
 
   /**
     * validate param internally
-    * @return
     */
-  def validate(): Boolean = true
+  def validate(): Unit
   
 }
