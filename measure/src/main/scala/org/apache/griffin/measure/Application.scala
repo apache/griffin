@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure
 
 import org.apache.griffin.measure.configuration.enums._
-import org.apache.griffin.measure.configuration.json.ParamReaderFactory
+import org.apache.griffin.measure.configuration.params.reader.ParamReaderFactory
 import org.apache.griffin.measure.configuration.params.{AllParam, DQParam, EnvParam, Param}
 import org.apache.griffin.measure.configuration.validator.ParamValidator
 import org.apache.griffin.measure.context.writer.PersistTaskRunner

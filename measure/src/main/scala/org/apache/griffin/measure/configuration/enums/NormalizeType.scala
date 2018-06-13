@@ -24,7 +24,7 @@ import scala.util.matching.Regex
   * the normalize strategy to collect metric
   */
 sealed trait NormalizeType {
-  val regex: Regex
+  val idPattern: Regex
   val desc: String
 }
 
@@ -32,7 +32,7 @@ object NormalizeType {
   private val normalizeTypes: List[NormalizeType] = List(DefaultNormalizeType, EntriesNormalizeType, ArrayNormalizeType, MapNormalizeType)
   def apply(ptn: String): NormalizeType = {
     normalizeTypes.find(tp => ptn match {
-      case tp.regex() => true
+      case tp.idPattern() => true
       case _ => false
     }).getOrElse(DefaultNormalizeType)
   }
@@ -48,7 +48,7 @@ object NormalizeType {
   * all rows
   */
  case object DefaultNormalizeType extends NormalizeType {
-  val regex: Regex = "".r
+  val idPattern: Regex = "".r
   val desc: String = "default"
 }
 
@@ -59,7 +59,7 @@ object NormalizeType {
   * the first row only
   */
  case object EntriesNormalizeType extends NormalizeType {
-  val regex: Regex = "^(?i)entries$".r
+  val idPattern: Regex = "^(?i)entries$".r
   val desc: String = "entries"
 }
 
@@ -70,7 +70,7 @@ object NormalizeType {
   * all rows
   */
  case object ArrayNormalizeType extends NormalizeType {
-  val regex: Regex = "^(?i)array|list$".r
+  val idPattern: Regex = "^(?i)array|list$".r
   val desc: String = "array"
 }
 
@@ -81,6 +81,6 @@ object NormalizeType {
   * the first row only
   */
  case object MapNormalizeType extends NormalizeType {
-  val regex: Regex = "^(?i)map$".r
+  val idPattern: Regex = "^(?i)map$".r
   val desc: String = "map"
 }
