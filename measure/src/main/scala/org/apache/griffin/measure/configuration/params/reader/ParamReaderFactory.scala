@@ -16,23 +16,32 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.json
+package org.apache.griffin.measure.configuration.params.reader
 
-import org.apache.griffin.measure.configuration.params.Param
 import org.apache.griffin.measure.utils.JsonUtil
 
-import scala.util.Try
+object ParamReaderFactory {
 
-/**
-  * read params from json string directly
-  * @param jsonString
-  */
-case class ParamJsonReader(jsonString: String) extends ParamReader {
+  val json = "json"
+  val file = "file"
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
-    Try {
-      val param = JsonUtil.fromJson[T](jsonString)
-      param
+  /**
+    * parse string content to get param reader
+    * @param pathOrJson
+    * @return
+    */
+  def getParamReader(pathOrJson: String): ParamReader = {
+    val strType = paramStrType(pathOrJson)
+    if (json.equals(strType)) ParamJsonReader(pathOrJson)
+    else ParamFileReader(pathOrJson)
+  }
+
+  private def paramStrType(str: String): String = {
+    try {
+      JsonUtil.toAnyMap(str)
+      json
+    } catch {
+      case e: Throwable => file
     }
   }
 

@@ -16,32 +16,27 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.json
+package org.apache.griffin.measure.configuration.params.reader
 
-import org.apache.griffin.measure.utils.JsonUtil
+import org.apache.griffin.measure.configuration.params.Param
+import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 
-object ParamReaderFactory {
+import scala.util.Try
 
-  val json = "json"
-  val file = "file"
+/**
+  * read params from config file path
+  * @param filePath:  hdfs path ("hdfs://cluster-name/path")
+  *                   local file path ("file:///path")
+  *                   relative file path ("relative/path")
+  */
+case class ParamFileReader(filePath: String) extends ParamReader {
 
-  /**
-    * parse string content to get param reader
-    * @param pathOrJson
-    * @return
-    */
-  def getParamReader(pathOrJson: String): ParamReader = {
-    val strType = paramStrType(pathOrJson)
-    if (json.equals(strType)) ParamJsonReader(pathOrJson)
-    else ParamFileReader(pathOrJson)
-  }
-
-  private def paramStrType(str: String): String = {
-    try {
-      JsonUtil.toAnyMap(str)
-      json
-    } catch {
-      case e: Throwable => file
+  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
+    Try {
+      val source = HdfsUtil.openFile(filePath)
+      val param = JsonUtil.fromJson[T](source)
+      source.close
+      param
     }
   }
 
