@@ -41,8 +41,8 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
   }
 
   private def getPersist(timeStamp: Long, persistParam: PersistParam, block: Boolean): Option[Persist] = {
-    val config = persistParam.config
-    val persistTry = persistParam.persistType match {
+    val config = persistParam.getConfig
+    val persistTry = persistParam.getType match {
       case LOG_REGEX() => Try(LoggerPersist(config, metricName, timeStamp))
       case HDFS_REGEX() => Try(HdfsPersist(config, metricName, timeStamp))
       case HTTP_REGEX() => Try(HttpPersist(config, metricName, timeStamp, block))

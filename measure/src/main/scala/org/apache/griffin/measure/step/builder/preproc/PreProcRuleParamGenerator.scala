@@ -28,10 +28,8 @@ object PreProcRuleParamGenerator {
   val _name = "name"
 
   def getNewPreProcRules(rules: Seq[RuleParam], suffix: String): Seq[RuleParam] = {
-    if (rules == null) Nil else {
-      rules.map { rule =>
-        getNewPreProcRule(rule, suffix)
-      }
+    rules.map { rule =>
+      getNewPreProcRule(rule, suffix)
     }
   }
 

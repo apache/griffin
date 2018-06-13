@@ -271,7 +271,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
           }
           val dupItemsTransStep = SparkSqlTransformStep(dupItemsTableName, dupItemsSql, emptyMap)
           val dupItemsWriteStep = {
-            val rwName = ruleParam.recordOpt.map(_.name).getOrElse(dupItemsTableName)
+            val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(dupItemsTableName)
             RecordWriteStep(rwName, dupItemsTableName, None, writeTimestampOpt)
           }
 
@@ -317,7 +317,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
           }
           val dupRecordTransStep = SparkSqlTransformStep(dupRecordTableName, dupRecordSql, emptyMap, true)
           val dupRecordWriteStep = {
-            val rwName = ruleParam.recordOpt.map(_.name).getOrElse(dupRecordTableName)
+            val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(dupRecordTableName)
             RecordWriteStep(rwName, dupRecordTableName, None, writeTimestampOpt)
           }
 

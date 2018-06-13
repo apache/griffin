@@ -27,8 +27,8 @@ case class InfoCacheFactory(infoCacheParams: Iterable[InfoCacheParam], metricNam
   val ZK_REGEX = """^(?i)zk|zookeeper$""".r
 
   def getInfoCache(infoCacheParam: InfoCacheParam): Option[InfoCache] = {
-    val config = infoCacheParam.config
-    val infoCacheTry = infoCacheParam.cacheType match {
+    val config = infoCacheParam.getConfig
+    val infoCacheTry = infoCacheParam.getType match {
       case ZK_REGEX() => Try(ZKInfoCache(config, metricName))
       case _ => throw new Exception("not supported info cache type")
     }
