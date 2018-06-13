@@ -94,8 +94,9 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       val profilingName = ruleParam.name
       val profilingTransStep = SparkSqlTransformStep(profilingName, profilingSql, details)
       val profilingMetricWriteStep = {
-        val mwName = ruleParam.metricOpt.map(_.name).getOrElse(ruleParam.name)
-        val collectType = NormalizeType(ruleParam.metricOpt.map(_.collectType).getOrElse(""))
+        val metricOpt = ruleParam.getMetricOpt
+        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.name)
+        val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
         MetricWriteStep(mwName, profilingName, collectType)
       }
       profilingTransStep :: profilingMetricWriteStep :: Nil

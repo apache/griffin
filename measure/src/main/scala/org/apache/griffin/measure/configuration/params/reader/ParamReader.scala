@@ -32,4 +32,14 @@ trait ParamReader extends Loggable with Serializable {
     */
   def readConfig[T <: Param](implicit m : Manifest[T]): Try[T]
 
+  /**
+    * validate config param
+    * @param param  param to be validated
+    * @return       param itself
+    */
+  protected def validate[T <: Param](param: T): T = {
+    param.validate()
+    param
+  }
+
 }

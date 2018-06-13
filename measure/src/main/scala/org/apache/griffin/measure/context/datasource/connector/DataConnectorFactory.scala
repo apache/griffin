@@ -53,8 +53,8 @@ object DataConnectorFactory extends Loggable {
                        tmstCache: TmstCache,
                        streamingCacheClientOpt: Option[StreamingCacheClient]
                       ): Try[DataConnector] = {
-    val conType = dcParam.conType
-    val version = dcParam.version
+    val conType = dcParam.getType
+    val version = dcParam.getVersion
     Try {
       conType match {
         case HiveRegex() => HiveBatchDataConnector(sparkSession, dcParam, tmstCache)
@@ -75,8 +75,8 @@ object DataConnectorFactory extends Loggable {
                                         streamingCacheClientOpt: Option[StreamingCacheClient]
                                        ): StreamingDataConnector = {
     if (ssc == null) throw new Exception("streaming context is null!")
-    val conType = dcParam.conType
-    val version = dcParam.version
+    val conType = dcParam.getType
+    val version = dcParam.getVersion
     conType match {
       case KafkaRegex() => getKafkaDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
       case _ => throw new Exception("streaming connector creation error!")

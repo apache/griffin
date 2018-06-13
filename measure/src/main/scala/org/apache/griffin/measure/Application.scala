@@ -20,9 +20,7 @@ package org.apache.griffin.measure
 
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.params.reader.ParamReaderFactory
-import org.apache.griffin.measure.configuration.params.{AllParam, DQParam, EnvParam, Param}
-import org.apache.griffin.measure.configuration.validator.ParamValidator
-import org.apache.griffin.measure.context.writer.PersistTaskRunner
+import org.apache.griffin.measure.configuration.params.{GriffinConfig, DQConfig, EnvConfig, Param}
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
@@ -48,35 +46,24 @@ object Application extends Loggable {
     info(dqParamFile)
 
     // read param files
-    val envParam = readParamFile[EnvParam](envParamFile) match {
+    val envParam = readParamFile[EnvConfig](envParamFile) match {
       case Success(p) => p
       case Failure(ex) => {
         error(ex.getMessage)
         sys.exit(-2)
       }
     }
-    val dqParam = readParamFile[DQParam](dqParamFile) match {
+    val dqParam = readParamFile[DQConfig](dqParamFile) match {
       case Success(p) => p
       case Failure(ex) => {
         error(ex.getMessage)
         sys.exit(-2)
       }
     }
-    val allParam: AllParam = AllParam(envParam, dqParam)
-
-    // validate param files
-    ParamValidator.validate(allParam) match {
-      case Failure(ex) => {
-        error(ex.getMessage)
-        sys.exit(-3)
-      }
-      case _ => {
-        info("params validation pass")
-      }
-    }
+    val allParam: GriffinConfig = GriffinConfig(envParam, dqParam)
 
     // choose process
-    val procType = ProcessType(allParam.dqParam.procType)
+    val procType = ProcessType(allParam.getDqConfig.procType)
     val dqApp: DQApp = procType match {
       case BatchProcessType => BatchDQApp(allParam)
       case StreamingProcessType => StreamingDQApp(allParam)

@@ -33,7 +33,7 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
   type VD <: Decoder[V]
   type OUT = (K, V)
 
-  val config = dcParam.config
+  val config = dcParam.getConfig
 
   val KafkaConfig = "kafka.config"
   val Topics = "topics"

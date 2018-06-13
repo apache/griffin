@@ -32,7 +32,7 @@ case class ParamJsonReader(jsonString: String) extends ParamReader {
   def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
     Try {
       val param = JsonUtil.fromJson[T](jsonString)
-      param
+      validate(param)
     }
   }
 

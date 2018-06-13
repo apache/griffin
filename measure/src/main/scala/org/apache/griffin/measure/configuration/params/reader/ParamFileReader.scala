@@ -36,7 +36,7 @@ case class ParamFileReader(filePath: String) extends ParamReader {
       val source = HdfsUtil.openFile(filePath)
       val param = JsonUtil.fromJson[T](source)
       source.close
-      param
+      validate(param)
     }
   }
 

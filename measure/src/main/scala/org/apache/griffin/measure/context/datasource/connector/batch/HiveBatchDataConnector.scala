@@ -32,7 +32,7 @@ case class HiveBatchDataConnector(@transient sparkSession: SparkSession,
                                   tmstCache: TmstCache
                                  ) extends BatchDataConnector {
 
-  val config = dcParam.config
+  val config = dcParam.getConfig
 
   val Database = "database"
   val TableName = "table.name"
