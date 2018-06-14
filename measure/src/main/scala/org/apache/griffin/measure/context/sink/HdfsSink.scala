@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.writer
+package org.apache.griffin.measure.context.sink
 
 import java.util.Date
 
@@ -27,7 +27,7 @@ import org.apache.spark.rdd.RDD
 /**
   * persist metric and record to hdfs
   */
-case class HdfsPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
+case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Long) extends Sink {
 
   val block: Boolean = true
 

@@ -16,14 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.writer
+package org.apache.griffin.measure.context.sink
 
 import org.apache.spark.rdd.RDD
 
 /**
   * persist metric and record in multiple ways
   */
-case class MultiPersists(persists: Iterable[Persist]) extends Persist {
+case class MultiSinks(persists: Iterable[Sink]) extends Sink {
 
   val block: Boolean = false
 
