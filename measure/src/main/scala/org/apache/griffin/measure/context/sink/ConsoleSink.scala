@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.writer
+package org.apache.griffin.measure.context.sink
 
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -25,7 +25,7 @@ import org.apache.spark.rdd.RDD
 /**
   * persist metric and record to console, for debug
   */
-case class LoggerPersist(config: Map[String, Any], metricName: String, timeStamp: Long) extends Persist {
+case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: Long) extends Sink {
 
   val block: Boolean = true
 
