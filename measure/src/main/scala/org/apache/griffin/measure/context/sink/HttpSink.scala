@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.writer
+package org.apache.griffin.measure.context.sink
 
 import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -28,9 +28,9 @@ import scala.concurrent.{Await, Future}
 /**
   * persist metric and record through http request
   */
-case class HttpPersist(config: Map[String, Any], metricName: String,
-                       timeStamp: Long, block: Boolean
-                      ) extends Persist {
+case class HttpSink(config: Map[String, Any], metricName: String,
+                    timeStamp: Long, block: Boolean
+                      ) extends Sink {
 
   val Api = "api"
   val Method = "method"
@@ -62,8 +62,8 @@ case class HttpPersist(config: Map[String, Any], metricName: String,
         import scala.concurrent.ExecutionContext.Implicits.global
         (timeStamp, Future(HttpUtil.httpRequest(api, method, params, header, data)))
       }
-      if (block) PersistTaskRunner.addBlockTask(func _, retry, overTime)
-      else PersistTaskRunner.addNonBlockTask(func _, retry)
+      if (block) SinkTaskRunner.addBlockTask(func _, retry, overTime)
+      else SinkTaskRunner.addNonBlockTask(func _, retry)
     } catch {
       case e: Throwable => error(e.getMessage)
     }

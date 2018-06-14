@@ -16,14 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.writer
+package org.apache.griffin.measure.context.sink
 
 import org.apache.griffin.measure.configuration.params.PersistParam
 
 import scala.util.{Success, Try}
 
 
-case class PersistFactory(persistParams: Iterable[PersistParam], metricName: String) extends Serializable {
+case class SinkFactory(persistParams: Iterable[PersistParam], metricName: String) extends Serializable {
 
   val HDFS_REGEX = """^(?i)hdfs$""".r
   val HTTP_REGEX = """^(?i)http$""".r
@@ -36,17 +36,17 @@ case class PersistFactory(persistParams: Iterable[PersistParam], metricName: Str
     * @param block        persist write metric in block or non-block way
     * @return   persist
     */
-  def getPersists(timeStamp: Long, block: Boolean): MultiPersists = {
-    MultiPersists(persistParams.flatMap(param => getPersist(timeStamp, param, block)))
+  def getPersists(timeStamp: Long, block: Boolean): MultiSinks = {
+    MultiSinks(persistParams.flatMap(param => getPersist(timeStamp, param, block)))
   }
 
-  private def getPersist(timeStamp: Long, persistParam: PersistParam, block: Boolean): Option[Persist] = {
+  private def getPersist(timeStamp: Long, persistParam: PersistParam, block: Boolean): Option[Sink] = {
     val config = persistParam.getConfig
     val persistTry = persistParam.getType match {
-      case LOG_REGEX() => Try(LoggerPersist(config, metricName, timeStamp))
-      case HDFS_REGEX() => Try(HdfsPersist(config, metricName, timeStamp))
-      case HTTP_REGEX() => Try(HttpPersist(config, metricName, timeStamp, block))
-      case MONGO_REGEX() => Try(MongoPersist(config, metricName, timeStamp, block))
+      case LOG_REGEX() => Try(ConsoleSink(config, metricName, timeStamp))
+      case HDFS_REGEX() => Try(HdfsSink(config, metricName, timeStamp))
+      case HTTP_REGEX() => Try(HttpSink(config, metricName, timeStamp, block))
+      case MONGO_REGEX() => Try(MongoSink(config, metricName, timeStamp, block))
       case _ => throw new Exception("not supported persist type")
     }
     persistTry match {

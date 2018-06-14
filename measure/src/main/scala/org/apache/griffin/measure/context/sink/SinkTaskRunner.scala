@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.writer
+package org.apache.griffin.measure.context.sink
 
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -30,7 +30,7 @@ import scala.util.{Failure, Success}
 /**
   * persist task runner, to persist metrics in block or non-block mode
   */
-object PersistTaskRunner extends Loggable {
+object SinkTaskRunner extends Loggable {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 

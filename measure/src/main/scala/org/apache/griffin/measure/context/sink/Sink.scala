@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.writer
+package org.apache.griffin.measure.context.sink
 
 import org.apache.griffin.measure.Loggable
 import org.apache.spark.rdd.RDD
@@ -24,7 +24,7 @@ import org.apache.spark.rdd.RDD
 /**
   * persist metric and record
   */
-trait Persist extends Loggable with Serializable {
+trait Sink extends Loggable with Serializable {
   val metricName: String
   val timeStamp: Long
 
