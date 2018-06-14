@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.writer
+package org.apache.griffin.measure.context.sink
 
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.griffin.measure.utils.TimeUtil
@@ -30,9 +30,9 @@ import scala.concurrent.Future
 /**
   * persist metric and record to mongo
   */
-case class MongoPersist(config: Map[String, Any], metricName: String,
-                        timeStamp: Long, block: Boolean
-                       ) extends Persist {
+case class MongoSink(config: Map[String, Any], metricName: String,
+                     timeStamp: Long, block: Boolean
+                       ) extends Sink {
 
   MongoConnection.init(config)
 
@@ -72,8 +72,8 @@ case class MongoPersist(config: Map[String, Any], metricName: String,
         (timeStamp, MongoConnection.getDataCollection.updateOne(
           filter, update, UpdateOptions().upsert(true)).toFuture)
       }
-      if (block) PersistTaskRunner.addBlockTask(func _, retry, overTime)
-      else PersistTaskRunner.addNonBlockTask(func _, retry)
+      if (block) SinkTaskRunner.addBlockTask(func _, retry, overTime)
+      else SinkTaskRunner.addNonBlockTask(func _, retry)
     } catch {
       case e: Throwable => error(e.getMessage)
     }
