@@ -22,33 +22,33 @@ import org.apache.griffin.measure.configuration.params.OffsetCacheParam
 import org.apache.griffin.measure.context.streaming.lock.{CacheLock, MultiCacheLock}
 
 object OffsetCacheClient extends OffsetCache with OffsetKeys {
-  var infoCaches: List[OffsetCache] = Nil
+  var offsetCaches: List[OffsetCache] = Nil
 
   def initClient(offsetCacheParams: Iterable[OffsetCacheParam], metricName: String) = {
     val fac = OffsetCacheFactory(offsetCacheParams, metricName)
-    infoCaches = offsetCacheParams.flatMap(param => fac.getOffsetCache(param)).toList
+    offsetCaches = offsetCacheParams.flatMap(param => fac.getOffsetCache(param)).toList
   }
 
-  def init(): Unit = infoCaches.foreach(_.init)
-  def available(): Boolean = infoCaches.foldLeft(false)(_ || _.available)
-  def close(): Unit = infoCaches.foreach(_.close)
+  def init(): Unit = offsetCaches.foreach(_.init)
+  def available(): Boolean = offsetCaches.foldLeft(false)(_ || _.available)
+  def close(): Unit = offsetCaches.foreach(_.close)
 
-  def cacheInfo(info: Map[String, String]): Boolean = {
-    infoCaches.foldLeft(false) { (res, infoCache) => res || infoCache.cacheInfo(info) }
+  def cache(kvs: Map[String, String]): Unit = {
+    offsetCaches.foreach(_.cache(kvs))
   }
-  def readInfo(keys: Iterable[String]): Map[String, String] = {
-    val maps = infoCaches.map(_.readInfo(keys)).reverse
+  def read(keys: Iterable[String]): Map[String, String] = {
+    val maps = offsetCaches.map(_.read(keys)).reverse
     maps.fold(Map[String, String]())(_ ++ _)
   }
-  def deleteInfo(keys: Iterable[String]): Unit = infoCaches.foreach(_.deleteInfo(keys))
-  def clearInfo(): Unit = infoCaches.foreach(_.clearInfo)
+  def delete(keys: Iterable[String]): Unit = offsetCaches.foreach(_.delete(keys))
+  def clear(): Unit = offsetCaches.foreach(_.clear)
 
   def listKeys(path: String): List[String] = {
-    infoCaches.foldLeft(Nil: List[String]) { (res, infoCache) =>
-      if (res.size > 0) res else infoCache.listKeys(path)
+    offsetCaches.foldLeft(Nil: List[String]) { (res, offsetCache) =>
+      if (res.size > 0) res else offsetCache.listKeys(path)
     }
   }
 
-  def genLock(s: String): CacheLock = MultiCacheLock(infoCaches.map(_.genLock(s)))
+  def genLock(s: String): CacheLock = MultiCacheLock(offsetCaches.map(_.genLock(s)))
 
 }

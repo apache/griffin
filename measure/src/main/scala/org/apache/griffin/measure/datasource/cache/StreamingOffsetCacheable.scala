@@ -40,20 +40,20 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
 
   protected def submitCacheTime(ms: Long): Unit = {
     val map = Map[String, String]((selfCacheTime -> ms.toString))
-    OffsetCacheClient.cacheInfo(map)
+    OffsetCacheClient.cache(map)
   }
 
   protected def submitReadyTime(ms: Long): Unit = {
     val curReadyTime = ms - readyTimeDelay
     if (curReadyTime % readyTimeInterval == 0) {
       val map = Map[String, String]((selfReadyTime -> curReadyTime.toString))
-      OffsetCacheClient.cacheInfo(map)
+      OffsetCacheClient.cache(map)
     }
   }
 
   protected def submitLastProcTime(ms: Long): Unit = {
     val map = Map[String, String]((selfLastProcTime -> ms.toString))
-    OffsetCacheClient.cacheInfo(map)
+    OffsetCacheClient.cache(map)
   }
 
   protected def readLastProcTime(): Option[Long] = readSelfInfo(selfLastProcTime)
@@ -61,7 +61,7 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
   protected def submitCleanTime(ms: Long): Unit = {
     val cleanTime = genCleanTime(ms)
     val map = Map[String, String]((selfCleanTime -> cleanTime.toString))
-    OffsetCacheClient.cacheInfo(map)
+    OffsetCacheClient.cache(map)
   }
 
   protected def genCleanTime(ms: Long): Long = ms
@@ -70,13 +70,13 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
 
   protected def submitOldCacheIndex(index: Long): Unit = {
     val map = Map[String, String]((selfOldCacheIndex -> index.toString))
-    OffsetCacheClient.cacheInfo(map)
+    OffsetCacheClient.cache(map)
   }
 
   def readOldCacheIndex(): Option[Long] = readSelfInfo(selfOldCacheIndex)
 
   private def readSelfInfo(key: String): Option[Long] = {
-    OffsetCacheClient.readInfo(key :: Nil).get(key).flatMap { v =>
+    OffsetCacheClient.read(key :: Nil).get(key).flatMap { v =>
       try {
         Some(v.toLong)
       } catch {

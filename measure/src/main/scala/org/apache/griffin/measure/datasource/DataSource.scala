@@ -21,9 +21,8 @@ package org.apache.griffin.measure.datasource
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.params.DataSourceParam
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
-import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
+import org.apache.griffin.measure.context.{DQContext, TimeRange}
 import org.apache.griffin.measure.datasource.connector.DataConnector
-import TimestampStorage
 import org.apache.griffin.measure.utils.DataFrameUtil._
 import org.apache.spark.sql._
 

@@ -22,7 +22,6 @@ import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.params.DataSourceParam
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClientFactory
 import org.apache.griffin.measure.datasource.connector.{DataConnector, DataConnectorFactory}
-import TimestampStorage
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.StreamingContext
 

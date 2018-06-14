@@ -27,10 +27,10 @@ trait OffsetCache extends Loggable with Serializable {
   def available(): Boolean
   def close(): Unit
 
-  def cacheInfo(info: Map[String, String]): Boolean
-  def readInfo(keys: Iterable[String]): Map[String, String]
-  def deleteInfo(keys: Iterable[String]): Unit
-  def clearInfo(): Unit
+  def cache(kvs: Map[String, String]): Unit
+  def read(keys: Iterable[String]): Map[String, String]
+  def delete(keys: Iterable[String]): Unit
+  def clear(): Unit
 
   def listKeys(path: String): List[String]
 

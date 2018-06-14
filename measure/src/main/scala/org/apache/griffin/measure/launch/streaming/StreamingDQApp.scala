@@ -174,7 +174,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
       if (locked) {
         try {
 
-          OffsetCacheClient.startTimeInfoCache
+          OffsetCacheClient.startOffsetCache
 
           val startTime = new Date().getTime
           appPersist.log(startTime, s"starting process ...")
@@ -196,7 +196,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
           val endTime = new Date().getTime
           appPersist.log(endTime, s"process using time: ${endTime - startTime} ms")
 
-          OffsetCacheClient.endTimeInfoCache
+          OffsetCacheClient.endOffsetCache
 
           // clean old data
           cleanData(dqContext)

@@ -22,20 +22,18 @@ import org.apache.griffin.measure.configuration.params.OffsetCacheParam
 
 import scala.util.{Success, Try}
 
-case class OffsetCacheFactory(infoCacheParams: Iterable[OffsetCacheParam], metricName: String) extends Serializable {
+case class OffsetCacheFactory(offsetCacheParams: Iterable[OffsetCacheParam], metricName: String
+                             ) extends Serializable {
 
   val ZK_REGEX = """^(?i)zk|zookeeper$""".r
 
   def getOffsetCache(offsetCacheParam: OffsetCacheParam): Option[OffsetCache] = {
     val config = offsetCacheParam.getConfig
-    val infoCacheTry = offsetCacheParam.getType match {
+    val offsetCacheTry = offsetCacheParam.getType match {
       case ZK_REGEX() => Try(OffsetCacheInZK(config, metricName))
       case _ => throw new Exception("not supported info cache type")
     }
-    infoCacheTry match {
-      case Success(infoCache) => Some(infoCache)
-      case _ => None
-    }
+    offsetCacheTry.toOption
   }
 
 }

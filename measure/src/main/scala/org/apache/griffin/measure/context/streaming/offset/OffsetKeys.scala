@@ -39,7 +39,7 @@ trait OffsetKeys extends Serializable { this: OffsetCache =>
   val finalLastProcTime = s"${finalCacheInfoPath}/${LastProcTime}"
   val finalCleanTime = s"${finalCacheInfoPath}/${CleanTime}"
 
-  def startTimeInfoCache(): Unit = {
+  def startOffsetCache(): Unit = {
     genFinalReadyTime
   }
 
@@ -51,7 +51,7 @@ trait OffsetKeys extends Serializable { this: OffsetCache =>
     readCleanTime
   }
 
-  def endTimeInfoCache: Unit = {
+  def endOffsetCache: Unit = {
     genFinalLastProcTime
     genFinalCleanTime
   }
@@ -59,54 +59,54 @@ trait OffsetKeys extends Serializable { this: OffsetCache =>
   private def genFinalReadyTime(): Unit = {
     val subPath = listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${ReadyTime}" }
-    val result = readInfo(keys)
+    val result = read(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
       val map = Map[String, String]((finalReadyTime -> time.toString))
-      cacheInfo(map)
+      cache(map)
     }
   }
 
   private def genFinalLastProcTime(): Unit = {
     val subPath = listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${LastProcTime}" }
-    val result = readInfo(keys)
+    val result = read(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
       val map = Map[String, String]((finalLastProcTime -> time.toString))
-      cacheInfo(map)
+      cache(map)
     }
   }
 
   private def genFinalCleanTime(): Unit = {
     val subPath = listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${CleanTime}" }
-    val result = readInfo(keys)
+    val result = read(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
       val map = Map[String, String]((finalCleanTime -> time.toString))
-      cacheInfo(map)
+      cache(map)
     }
   }
 
   private def readTimeRange(): (Long, Long) = {
-    val map = readInfo(List(finalLastProcTime, finalReadyTime))
+    val map = read(List(finalLastProcTime, finalReadyTime))
     val lastProcTime = getLong(map, finalLastProcTime)
     val curReadyTime = getLong(map, finalReadyTime)
     (lastProcTime, curReadyTime)
   }
 
   private def readCleanTime(): Long = {
-    val map = readInfo(List(finalCleanTime))
+    val map = read(List(finalCleanTime))
     val cleanTime = getLong(map, finalCleanTime)
     cleanTime
   }

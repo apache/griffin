@@ -79,9 +79,9 @@ case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends
     info("start zk info cache")
     client.usingNamespace(cacheNamespace)
     info(s"init with namespace: ${cacheNamespace}")
-    deleteInfo(lockPath :: Nil)
+    delete(lockPath :: Nil)
     if (initClear) {
-      clearInfo
+      clear
     }
   }
 
@@ -94,20 +94,17 @@ case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends
 
   def close(): Unit = {
     if (closeClear) {
-      clearInfo
+      clear
     }
     info("close zk info cache")
     client.close()
   }
 
-  def cacheInfo(info: Map[String, String]): Boolean = {
-    info.foldLeft(true) { (rs, pair) =>
-      val (k, v) = pair
-      createOrUpdate(path(k), v) && rs
-    }
+  def cache(kvs: Map[String, String]): Unit = {
+    kvs.foreach(kv => createOrUpdate(path(kv._1), kv._2))
   }
 
-  def readInfo(keys: Iterable[String]): Map[String, String] = {
+  def read(keys: Iterable[String]): Map[String, String] = {
     keys.flatMap { key =>
       read(path(key)) match {
         case Some(v) => Some((key, v))
@@ -116,14 +113,14 @@ case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends
     }.toMap
   }
 
-  def deleteInfo(keys: Iterable[String]): Unit = {
+  def delete(keys: Iterable[String]): Unit = {
     keys.foreach { key => delete(path(key)) }
   }
 
-  def clearInfo(): Unit = {
+  def clear(): Unit = {
 //    delete("/")
-    deleteInfo(finalCacheInfoPath :: Nil)
-    deleteInfo(infoPath :: Nil)
+    delete(finalCacheInfoPath :: Nil)
+    delete(infoPath :: Nil)
     info("clear info")
   }
 

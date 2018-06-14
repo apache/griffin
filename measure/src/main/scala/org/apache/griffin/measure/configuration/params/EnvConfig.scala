@@ -36,13 +36,13 @@ case class EnvConfig(@JsonProperty("spark") sparkParam: SparkParam,
                    ) extends Param {
   def getSparkParam: SparkParam = sparkParam
   def getPersistParams: Seq[PersistParam] = if (persistParams != null) persistParams else Nil
-  def getInfoCacheParams: Seq[OffsetCacheParam] = if (offsetCacheParams != null) offsetCacheParams else Nil
+  def getOffsetCacheParams: Seq[OffsetCacheParam] = if (offsetCacheParams != null) offsetCacheParams else Nil
 
   def validate(): Unit = {
     assert((sparkParam != null), "spark param should not be null")
     sparkParam.validate
     getPersistParams.foreach(_.validate)
-    getInfoCacheParams.foreach(_.validate)
+    getOffsetCacheParams.foreach(_.validate)
   }
 }
 
@@ -95,8 +95,8 @@ case class PersistParam( @JsonProperty("type") persistType: String,
 }
 
 /**
-  * info cache param
-  * @param cacheType    information cache type, e.g.: zookeeper (must)
+  * offset cache param
+  * @param cacheType    offset cache type, e.g.: zookeeper (must)
   * @param config       config of cache way
   */
 @JsonInclude(Include.NON_NULL)
