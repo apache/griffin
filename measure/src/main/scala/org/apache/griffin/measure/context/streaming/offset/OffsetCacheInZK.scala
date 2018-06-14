@@ -33,7 +33,7 @@ import scala.collection.JavaConverters._
   * @param config
   * @param metricName
   */
-case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends OffsetCache {
+case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends OffsetCache with OffsetKeys {
 
   val Hosts = "hosts"
   val Namespace = "namespace"
@@ -122,8 +122,8 @@ case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends
 
   def clearInfo(): Unit = {
 //    delete("/")
-    deleteInfo(TimeInfoCache.finalCacheInfoPath :: Nil)
-    deleteInfo(TimeInfoCache.infoPath :: Nil)
+    deleteInfo(finalCacheInfoPath :: Nil)
+    deleteInfo(infoPath :: Nil)
     info("clear info")
   }
 

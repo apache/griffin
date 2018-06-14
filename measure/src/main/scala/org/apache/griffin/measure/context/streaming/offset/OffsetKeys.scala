@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.context.streaming.offset
 
-trait OffsetKeys extends Serializable {
+trait OffsetKeys extends Serializable { this: OffsetCache =>
 
   val CacheTime = "cache.time"
   val LastProcTime = "last.proc.time"
@@ -38,5 +38,88 @@ trait OffsetKeys extends Serializable {
   val finalReadyTime = s"${finalCacheInfoPath}/${ReadyTime}"
   val finalLastProcTime = s"${finalCacheInfoPath}/${LastProcTime}"
   val finalCleanTime = s"${finalCacheInfoPath}/${CleanTime}"
+
+  def startTimeInfoCache(): Unit = {
+    genFinalReadyTime
+  }
+
+  def getTimeRange(): (Long, Long) = {
+    readTimeRange
+  }
+
+  def getCleanTime(): Long = {
+    readCleanTime
+  }
+
+  def endTimeInfoCache: Unit = {
+    genFinalLastProcTime
+    genFinalCleanTime
+  }
+
+  private def genFinalReadyTime(): Unit = {
+    val subPath = listKeys(infoPath)
+    val keys = subPath.map { p => s"${infoPath}/${p}/${ReadyTime}" }
+    val result = readInfo(keys)
+    val times = keys.flatMap { k =>
+      getLongOpt(result, k)
+    }
+    if (times.nonEmpty) {
+      val time = times.min
+      val map = Map[String, String]((finalReadyTime -> time.toString))
+      cacheInfo(map)
+    }
+  }
+
+  private def genFinalLastProcTime(): Unit = {
+    val subPath = listKeys(infoPath)
+    val keys = subPath.map { p => s"${infoPath}/${p}/${LastProcTime}" }
+    val result = readInfo(keys)
+    val times = keys.flatMap { k =>
+      getLongOpt(result, k)
+    }
+    if (times.nonEmpty) {
+      val time = times.min
+      val map = Map[String, String]((finalLastProcTime -> time.toString))
+      cacheInfo(map)
+    }
+  }
+
+  private def genFinalCleanTime(): Unit = {
+    val subPath = listKeys(infoPath)
+    val keys = subPath.map { p => s"${infoPath}/${p}/${CleanTime}" }
+    val result = readInfo(keys)
+    val times = keys.flatMap { k =>
+      getLongOpt(result, k)
+    }
+    if (times.nonEmpty) {
+      val time = times.min
+      val map = Map[String, String]((finalCleanTime -> time.toString))
+      cacheInfo(map)
+    }
+  }
+
+  private def readTimeRange(): (Long, Long) = {
+    val map = readInfo(List(finalLastProcTime, finalReadyTime))
+    val lastProcTime = getLong(map, finalLastProcTime)
+    val curReadyTime = getLong(map, finalReadyTime)
+    (lastProcTime, curReadyTime)
+  }
+
+  private def readCleanTime(): Long = {
+    val map = readInfo(List(finalCleanTime))
+    val cleanTime = getLong(map, finalCleanTime)
+    cleanTime
+  }
+
+  private def getLongOpt(map: Map[String, String], key: String): Option[Long] = {
+    try {
+      map.get(key).map(_.toLong)
+    } catch {
+      case e: Throwable => None
+    }
+  }
+  private def getLong(map: Map[String, String], key: String) = {
+    getLongOpt(map, key).getOrElse(-1L)
+  }
 
 }

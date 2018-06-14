@@ -19,10 +19,10 @@ under the License.
 package org.apache.griffin.measure.datasource.cache
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.context.streaming.offset.{OffsetCacheAgent, TimeInfoCache}
+import org.apache.griffin.measure.context.streaming.offset.OffsetCacheClient
 
 /**
-  * timestamp info of data source cache
+  * timestamp offset of streaming data source cache
   */
 trait StreamingOffsetCacheable extends Loggable with Serializable {
 
@@ -30,30 +30,30 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
   val readyTimeInterval: Long
   val readyTimeDelay: Long
 
-  def selfCacheInfoPath = s"${TimeInfoCache.infoPath}/${cacheInfoPath}"
+  def selfCacheInfoPath = s"${OffsetCacheClient.infoPath}/${cacheInfoPath}"
 
-  def selfCacheTime = TimeInfoCache.cacheTime(selfCacheInfoPath)
-  def selfLastProcTime = TimeInfoCache.lastProcTime(selfCacheInfoPath)
-  def selfReadyTime = TimeInfoCache.readyTime(selfCacheInfoPath)
-  def selfCleanTime = TimeInfoCache.cleanTime(selfCacheInfoPath)
-  def selfOldCacheIndex = TimeInfoCache.oldCacheIndex(selfCacheInfoPath)
+  def selfCacheTime = OffsetCacheClient.cacheTime(selfCacheInfoPath)
+  def selfLastProcTime = OffsetCacheClient.lastProcTime(selfCacheInfoPath)
+  def selfReadyTime = OffsetCacheClient.readyTime(selfCacheInfoPath)
+  def selfCleanTime = OffsetCacheClient.cleanTime(selfCacheInfoPath)
+  def selfOldCacheIndex = OffsetCacheClient.oldCacheIndex(selfCacheInfoPath)
 
   protected def submitCacheTime(ms: Long): Unit = {
     val map = Map[String, String]((selfCacheTime -> ms.toString))
-    OffsetCacheAgent.cacheInfo(map)
+    OffsetCacheClient.cacheInfo(map)
   }
 
   protected def submitReadyTime(ms: Long): Unit = {
     val curReadyTime = ms - readyTimeDelay
     if (curReadyTime % readyTimeInterval == 0) {
       val map = Map[String, String]((selfReadyTime -> curReadyTime.toString))
-      OffsetCacheAgent.cacheInfo(map)
+      OffsetCacheClient.cacheInfo(map)
     }
   }
 
   protected def submitLastProcTime(ms: Long): Unit = {
     val map = Map[String, String]((selfLastProcTime -> ms.toString))
-    OffsetCacheAgent.cacheInfo(map)
+    OffsetCacheClient.cacheInfo(map)
   }
 
   protected def readLastProcTime(): Option[Long] = readSelfInfo(selfLastProcTime)
@@ -61,7 +61,7 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
   protected def submitCleanTime(ms: Long): Unit = {
     val cleanTime = genCleanTime(ms)
     val map = Map[String, String]((selfCleanTime -> cleanTime.toString))
-    OffsetCacheAgent.cacheInfo(map)
+    OffsetCacheClient.cacheInfo(map)
   }
 
   protected def genCleanTime(ms: Long): Long = ms
@@ -70,13 +70,13 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
 
   protected def submitOldCacheIndex(index: Long): Unit = {
     val map = Map[String, String]((selfOldCacheIndex -> index.toString))
-    OffsetCacheAgent.cacheInfo(map)
+    OffsetCacheClient.cacheInfo(map)
   }
 
   def readOldCacheIndex(): Option[Long] = readSelfInfo(selfOldCacheIndex)
 
   private def readSelfInfo(key: String): Option[Long] = {
-    OffsetCacheAgent.readInfo(key :: Nil).get(key).flatMap { v =>
+    OffsetCacheClient.readInfo(key :: Nil).get(key).flatMap { v =>
       try {
         Some(v.toLong)
       } catch {

@@ -26,7 +26,7 @@ import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.params._
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.datasource.DataSourceFactory
-import org.apache.griffin.measure.context.streaming.offset.{OffsetCacheAgent, TimeInfoCache}
+import org.apache.griffin.measure.context.streaming.offset.OffsetCacheClient
 import org.apache.griffin.measure.context.streaming.metric.CacheResults
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
@@ -68,8 +68,8 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     clearCpDir
 
     // init info cache instance
-    OffsetCacheAgent.initAgent(envParam.infoCacheParams, metricName)
-    OffsetCacheAgent.init
+    OffsetCacheClient.initClient(envParam.offsetCacheParams, metricName)
+    OffsetCacheClient.init
 
     // register udf
     GriffinUDFAgent.register(sqlContext)
@@ -163,7 +163,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
                                    evaluateRuleParam: EvaluateRuleParam
                                   ) extends Runnable with Loggable {
 
-    val lock = OffsetCacheAgent.genLock("process")
+    val lock = OffsetCacheClient.genLock("process")
     val appPersist = globalContext.getPersist()
 
     def run(): Unit = {
@@ -174,7 +174,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
       if (locked) {
         try {
 
-          TimeInfoCache.startTimeInfoCache
+          OffsetCacheClient.startTimeInfoCache
 
           val startTime = new Date().getTime
           appPersist.log(startTime, s"starting process ...")
@@ -196,7 +196,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
           val endTime = new Date().getTime
           appPersist.log(endTime, s"process using time: ${endTime - startTime} ms")
 
-          TimeInfoCache.endTimeInfoCache
+          OffsetCacheClient.endTimeInfoCache
 
           // clean old data
           cleanData(dqContext)
@@ -225,7 +225,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
         context.clean()
 
-        val cleanTime = TimeInfoCache.getCleanTime
+        val cleanTime = OffsetCacheClient.getCleanTime
         CacheResults.refresh(cleanTime)
       } catch {
         case e: Throwable => error(s"clean data error: ${e.getMessage}")

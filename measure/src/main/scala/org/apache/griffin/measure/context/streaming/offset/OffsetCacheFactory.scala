@@ -18,17 +18,17 @@ under the License.
 */
 package org.apache.griffin.measure.context.streaming.offset
 
-import org.apache.griffin.measure.configuration.params.InfoCacheParam
+import org.apache.griffin.measure.configuration.params.OffsetCacheParam
 
 import scala.util.{Success, Try}
 
-case class InfoCacheFactory(infoCacheParams: Iterable[InfoCacheParam], metricName: String) extends Serializable {
+case class OffsetCacheFactory(infoCacheParams: Iterable[OffsetCacheParam], metricName: String) extends Serializable {
 
   val ZK_REGEX = """^(?i)zk|zookeeper$""".r
 
-  def getInfoCache(infoCacheParam: InfoCacheParam): Option[OffsetCache] = {
-    val config = infoCacheParam.getConfig
-    val infoCacheTry = infoCacheParam.getType match {
+  def getOffsetCache(offsetCacheParam: OffsetCacheParam): Option[OffsetCache] = {
+    val config = offsetCacheParam.getConfig
+    val infoCacheTry = offsetCacheParam.getType match {
       case ZK_REGEX() => Try(OffsetCacheInZK(config, metricName))
       case _ => throw new Exception("not supported info cache type")
     }
