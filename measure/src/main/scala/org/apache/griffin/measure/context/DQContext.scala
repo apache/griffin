@@ -20,7 +20,7 @@ package org.apache.griffin.measure.context
 
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.params._
-import org.apache.griffin.measure.context.datasource._
+import org.apache.griffin.measure.datasource._
 import org.apache.griffin.measure.context.writer._
 import org.apache.spark.sql.{Encoders, SQLContext, SparkSession}
 
