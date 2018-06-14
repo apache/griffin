@@ -19,10 +19,10 @@ under the License.
 package org.apache.griffin.measure.context.streaming.offset
 
 import org.apache.griffin.measure.configuration.params.OffsetCacheParam
-import org.apache.griffin.measure.context.streaming.lock.{CacheLock, MultiCacheLock}
+import org.apache.griffin.measure.context.streaming.lock.{CacheLock, CacheLockSeq}
 
-object OffsetCacheClient extends OffsetCache with OffsetKeys {
-  var offsetCaches: List[OffsetCache] = Nil
+object OffsetCacheClient extends OffsetCache with OffsetOps {
+  var offsetCaches: Seq[OffsetCache] = Nil
 
   def initClient(offsetCacheParams: Iterable[OffsetCacheParam], metricName: String) = {
     val fac = OffsetCacheFactory(offsetCacheParams, metricName)
@@ -49,6 +49,6 @@ object OffsetCacheClient extends OffsetCache with OffsetKeys {
     }
   }
 
-  def genLock(s: String): CacheLock = MultiCacheLock(offsetCaches.map(_.genLock(s)))
+  def genLock(s: String): CacheLock = CacheLockSeq(offsetCaches.map(_.genLock(s)))
 
 }

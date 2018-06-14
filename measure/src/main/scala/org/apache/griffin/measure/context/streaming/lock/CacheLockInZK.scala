@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
 
-case class ZKCacheLock(@transient mutex: InterProcessMutex) extends CacheLock {
+case class CacheLockInZK(@transient mutex: InterProcessMutex) extends CacheLock {
 
   def lock(outtime: Long, unit: TimeUnit): Boolean = {
     try {

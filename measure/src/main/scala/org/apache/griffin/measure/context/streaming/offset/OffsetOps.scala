@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.context.streaming.offset
 
-trait OffsetKeys extends Serializable { this: OffsetCache =>
+trait OffsetOps extends Serializable { this: OffsetCache =>
 
   val CacheTime = "cache.time"
   val LastProcTime = "last.proc.time"

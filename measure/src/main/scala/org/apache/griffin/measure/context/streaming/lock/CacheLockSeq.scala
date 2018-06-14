@@ -20,20 +20,14 @@ package org.apache.griffin.measure.context.streaming.lock
 
 import java.util.concurrent.TimeUnit
 
-case class MultiCacheLock(cacheLocks: List[CacheLock]) extends CacheLock {
+case class CacheLockSeq(cacheLocks: Seq[CacheLock]) extends CacheLock {
 
   def lock(outtime: Long, unit: TimeUnit): Boolean = {
-    cacheLocks.headOption match {
-      case Some(cl) => cl.lock(outtime, unit)
-      case None => true
-    }
+    cacheLocks.headOption.map(_.lock(outtime, unit)).getOrElse(true)
   }
 
   def unlock(): Unit = {
-    cacheLocks.headOption match {
-      case Some(cl) => cl.unlock
-      case None => {}
-    }
+    cacheLocks.headOption.foreach(_.unlock)
   }
 
 }

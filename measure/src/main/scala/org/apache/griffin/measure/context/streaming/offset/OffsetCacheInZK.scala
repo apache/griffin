@@ -23,7 +23,7 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.utils.ZKPaths
-import org.apache.griffin.measure.context.streaming.lock.ZKCacheLock
+import org.apache.griffin.measure.context.streaming.lock.CacheLockInZK
 import org.apache.zookeeper.CreateMode
 
 import scala.collection.JavaConverters._
@@ -33,7 +33,7 @@ import scala.collection.JavaConverters._
   * @param config
   * @param metricName
   */
-case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends OffsetCache with OffsetKeys {
+case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends OffsetCache with OffsetOps {
 
   val Hosts = "hosts"
   val Namespace = "namespace"
@@ -128,9 +128,9 @@ case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends
     children(path(p))
   }
 
-  def genLock(s: String): ZKCacheLock = {
+  def genLock(s: String): CacheLockInZK = {
     val lpt = if (s.isEmpty) path(lockPath) else path(lockPath) + separator + s
-    ZKCacheLock(new InterProcessMutex(client, lpt))
+    CacheLockInZK(new InterProcessMutex(client, lpt))
   }
 
   private def path(k: String): String = {
