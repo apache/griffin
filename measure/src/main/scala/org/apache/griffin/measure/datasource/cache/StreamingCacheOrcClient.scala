@@ -16,25 +16,25 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.cache
+package org.apache.griffin.measure.datasource.cache
 
-import org.apache.griffin.measure.context.datasource.info.TmstCache
+import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.spark.sql._
 
 /**
-  * data source cache in json format
+  * data source cache in orc format
   */
-case class StreamingCacheJsonClient(sqlContext: SQLContext, param: Map[String, Any],
-                                    dsName: String, index: Int, tmstCache: TmstCache
-                              ) extends StreamingCacheClient {
+case class StreamingCacheOrcClient(sqlContext: SQLContext, param: Map[String, Any],
+                                   dsName: String, index: Int, timestampStorage: TimestampStorage
+                             ) extends StreamingCacheClient {
 
   protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit = {
     info(s"write path: ${path}")
-    dfw.json(path)
+    dfw.orc(path)
   }
 
   protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame = {
-    dfr.json(path)
+    dfr.orc(path)
   }
 
 }

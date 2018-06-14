@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.info
+package org.apache.griffin.measure.context.streaming.offset
 
 import org.apache.griffin.measure.Loggable
 
@@ -59,56 +59,56 @@ object TimeInfoCache extends Loggable with Serializable {
   }
 
   private def genFinalReadyTime(): Unit = {
-    val subPath = InfoCacheInstance.listKeys(infoPath)
+    val subPath = OffsetCacheAgent.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${ReadyTime}" }
-    val result = InfoCacheInstance.readInfo(keys)
+    val result = OffsetCacheAgent.readInfo(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
       val map = Map[String, String]((finalReadyTime -> time.toString))
-      InfoCacheInstance.cacheInfo(map)
+      OffsetCacheAgent.cacheInfo(map)
     }
   }
 
   private def genFinalLastProcTime(): Unit = {
-    val subPath = InfoCacheInstance.listKeys(infoPath)
+    val subPath = OffsetCacheAgent.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${LastProcTime}" }
-    val result = InfoCacheInstance.readInfo(keys)
+    val result = OffsetCacheAgent.readInfo(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
       val map = Map[String, String]((finalLastProcTime -> time.toString))
-      InfoCacheInstance.cacheInfo(map)
+      OffsetCacheAgent.cacheInfo(map)
     }
   }
 
   private def genFinalCleanTime(): Unit = {
-    val subPath = InfoCacheInstance.listKeys(infoPath)
+    val subPath = OffsetCacheAgent.listKeys(infoPath)
     val keys = subPath.map { p => s"${infoPath}/${p}/${CleanTime}" }
-    val result = InfoCacheInstance.readInfo(keys)
+    val result = OffsetCacheAgent.readInfo(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
       val map = Map[String, String]((finalCleanTime -> time.toString))
-      InfoCacheInstance.cacheInfo(map)
+      OffsetCacheAgent.cacheInfo(map)
     }
   }
 
   private def readTimeRange(): (Long, Long) = {
-    val map = InfoCacheInstance.readInfo(List(finalLastProcTime, finalReadyTime))
+    val map = OffsetCacheAgent.readInfo(List(finalLastProcTime, finalReadyTime))
     val lastProcTime = getLong(map, finalLastProcTime)
     val curReadyTime = getLong(map, finalReadyTime)
     (lastProcTime, curReadyTime)
   }
 
   private def readCleanTime(): Long = {
-    val map = InfoCacheInstance.readInfo(List(finalCleanTime))
+    val map = OffsetCacheAgent.readInfo(List(finalCleanTime))
     val cleanTime = getLong(map, finalCleanTime)
     cleanTime
   }

@@ -16,15 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.info
+package org.apache.griffin.measure.context.streaming.offset
 
 import org.apache.griffin.measure.configuration.params.InfoCacheParam
 import org.apache.griffin.measure.context.streaming.lock.{CacheLock, MultiCacheLock}
 
-object InfoCacheInstance extends InfoCache {
-  var infoCaches: List[InfoCache] = Nil
+object OffsetCacheAgent extends OffsetCache {
+  var infoCaches: List[OffsetCache] = Nil
 
-  def initInstance(infoCacheParams: Iterable[InfoCacheParam], metricName: String) = {
+  def initAgent(infoCacheParams: Iterable[InfoCacheParam], metricName: String) = {
     val fac = InfoCacheFactory(infoCacheParams, metricName)
     infoCaches = infoCacheParams.flatMap(param => fac.getInfoCache(param)).toList
   }
@@ -50,4 +50,8 @@ object InfoCacheInstance extends InfoCache {
   }
 
   def genLock(s: String): CacheLock = MultiCacheLock(infoCaches.map(_.genLock(s)))
+
+  object Keys {
+    ;
+  }
 }

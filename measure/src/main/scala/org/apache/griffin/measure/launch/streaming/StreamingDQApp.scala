@@ -25,8 +25,8 @@ import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.params._
 import org.apache.griffin.measure.context._
-import org.apache.griffin.measure.context.datasource.DataSourceFactory
-import org.apache.griffin.measure.context.streaming.info.{InfoCacheInstance, TimeInfoCache}
+import org.apache.griffin.measure.datasource.DataSourceFactory
+import org.apache.griffin.measure.context.streaming.offset.{OffsetCacheAgent, TimeInfoCache}
 import org.apache.griffin.measure.context.streaming.metric.CacheResults
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
@@ -68,8 +68,8 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     clearCpDir
 
     // init info cache instance
-    InfoCacheInstance.initInstance(envParam.infoCacheParams, metricName)
-    InfoCacheInstance.init
+    OffsetCacheAgent.initAgent(envParam.infoCacheParams, metricName)
+    OffsetCacheAgent.init
 
     // register udf
     GriffinUDFAgent.register(sqlContext)
@@ -163,7 +163,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
                                    evaluateRuleParam: EvaluateRuleParam
                                   ) extends Runnable with Loggable {
 
-    val lock = InfoCacheInstance.genLock("process")
+    val lock = OffsetCacheAgent.genLock("process")
     val appPersist = globalContext.getPersist()
 
     def run(): Unit = {

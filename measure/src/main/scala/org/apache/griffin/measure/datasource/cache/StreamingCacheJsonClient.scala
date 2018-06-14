@@ -16,12 +16,25 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.connector.batch
+package org.apache.griffin.measure.datasource.cache
 
-import org.apache.griffin.measure.context.datasource.connector.DataConnector
+import org.apache.griffin.measure.datasource.TimestampStorage
+import org.apache.spark.sql._
 
-trait BatchDataConnector extends DataConnector {
+/**
+  * data source cache in json format
+  */
+case class StreamingCacheJsonClient(sqlContext: SQLContext, param: Map[String, Any],
+                                    dsName: String, index: Int, timestampStorage: TimestampStorage
+                              ) extends StreamingCacheClient {
 
-  def init(): Unit = {}
+  protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit = {
+    info(s"write path: ${path}")
+    dfw.json(path)
+  }
+
+  protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame = {
+    dfr.json(path)
+  }
 
 }

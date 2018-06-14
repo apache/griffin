@@ -16,15 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.connector
+package org.apache.griffin.measure.datasource.connector
 
 import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.enums.{BatchProcessType, DslType, SparkSqlType}
 import org.apache.griffin.measure.configuration.params.DataConnectorParam
-import org.apache.griffin.measure.context.datasource.info.TmstCache
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
+import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.step.builder.preproc.PreProcRuleParamGenerator
@@ -40,9 +40,9 @@ trait DataConnector extends Loggable with Serializable {
   val id: String = DataConnectorIdGenerator.genId
   protected def thisName(suffix: String): String = s"this_${suffix}"
 
-  val tmstCache: TmstCache
-  protected def saveTmst(t: Long) = tmstCache.insert(t)
-  protected def readTmst(t: Long) = tmstCache.fromUntil(t, t + 1)
+  val timestampStorage: TimestampStorage
+  protected def saveTmst(t: Long) = timestampStorage.insert(t)
+  protected def readTmst(t: Long) = timestampStorage.fromUntil(t, t + 1)
 
   def init(): Unit
 

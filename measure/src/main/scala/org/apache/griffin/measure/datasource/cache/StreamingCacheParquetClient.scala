@@ -16,16 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.cache
+package org.apache.griffin.measure.datasource.cache
 
-import org.apache.griffin.measure.context.datasource.info.TmstCache
+import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.spark.sql._
 
 /**
   * data source cache in parquet format
   */
 case class StreamingCacheParquetClient(sqlContext: SQLContext, param: Map[String, Any],
-                                       dsName: String, index: Int, tmstCache: TmstCache
+                                       dsName: String, index: Int, timestampStorage: TimestampStorage
                                  ) extends StreamingCacheClient {
 
   sqlContext.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false")

@@ -16,14 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.connector
+package org.apache.griffin.measure.datasource.connector
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.params.DataConnectorParam
-import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClient
-import org.apache.griffin.measure.context.datasource.connector.batch._
-import org.apache.griffin.measure.context.datasource.connector.streaming._
-import org.apache.griffin.measure.context.datasource.info.TmstCache
+import org.apache.griffin.measure.datasource.TimestampStorage
+import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
+import org.apache.griffin.measure.datasource.connector.batch._
+import org.apache.griffin.measure.datasource.connector.streaming._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.StreamingContext
 
@@ -50,7 +50,7 @@ object DataConnectorFactory extends Loggable {
   def getDataConnector(sparkSession: SparkSession,
                        ssc: StreamingContext,
                        dcParam: DataConnectorParam,
-                       tmstCache: TmstCache,
+                       tmstCache: TimestampStorage,
                        streamingCacheClientOpt: Option[StreamingCacheClient]
                       ): Try[DataConnector] = {
     val conType = dcParam.getType
@@ -71,7 +71,7 @@ object DataConnectorFactory extends Loggable {
   private def getStreamingDataConnector(sparkSession: SparkSession,
                                         ssc: StreamingContext,
                                         dcParam: DataConnectorParam,
-                                        tmstCache: TmstCache,
+                                        tmstCache: TimestampStorage,
                                         streamingCacheClientOpt: Option[StreamingCacheClient]
                                        ): StreamingDataConnector = {
     if (ssc == null) throw new Exception("streaming context is null!")
@@ -86,7 +86,7 @@ object DataConnectorFactory extends Loggable {
   private def getKafkaDataConnector(sparkSession: SparkSession,
                                     ssc: StreamingContext,
                                     dcParam: DataConnectorParam,
-                                    tmstCache: TmstCache,
+                                    tmstCache: TimestampStorage,
                                     streamingCacheClientOpt: Option[StreamingCacheClient]
                                    ): KafkaStreamingDataConnector  = {
     val KeyType = "key.type"

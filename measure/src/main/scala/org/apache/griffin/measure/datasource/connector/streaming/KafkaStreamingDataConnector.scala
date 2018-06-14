@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.connector.streaming
+package org.apache.griffin.measure.datasource.connector.streaming
 
 import kafka.serializer.Decoder
 import org.apache.spark.streaming.dstream.InputDStream

@@ -16,12 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.connector.streaming
+package org.apache.griffin.measure.datasource.connector.streaming
 
 import kafka.serializer.StringDecoder
 import org.apache.griffin.measure.configuration.params.DataConnectorParam
-import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClient
-import org.apache.griffin.measure.context.datasource.info.TmstCache
+import org.apache.griffin.measure.datasource.TimestampStorage
+import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, _}
@@ -35,7 +35,7 @@ import org.apache.spark.streaming.kafka.KafkaUtils
 case class KafkaStreamingStringDataConnector(@transient sparkSession: SparkSession,
                                              @transient ssc: StreamingContext,
                                              dcParam: DataConnectorParam,
-                                             tmstCache: TmstCache,
+                                             timestampStorage: TimestampStorage,
                                              streamingCacheClientOpt: Option[StreamingCacheClient]
                                             ) extends KafkaStreamingDataConnector {
 

@@ -16,25 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.cache
+package org.apache.griffin.measure.datasource.connector.batch
 
-import org.apache.griffin.measure.context.datasource.info.TmstCache
-import org.apache.spark.sql._
+import org.apache.griffin.measure.datasource.connector.DataConnector
 
-/**
-  * data source cache in orc format
-  */
-case class StreamingCacheOrcClient(sqlContext: SQLContext, param: Map[String, Any],
-                                   dsName: String, index: Int, tmstCache: TmstCache
-                             ) extends StreamingCacheClient {
+trait BatchDataConnector extends DataConnector {
 
-  protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit = {
-    info(s"write path: ${path}")
-    dfw.orc(path)
-  }
-
-  protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame = {
-    dfr.orc(path)
-  }
+  def init(): Unit = {}
 
 }

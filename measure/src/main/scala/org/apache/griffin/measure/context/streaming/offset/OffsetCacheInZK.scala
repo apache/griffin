@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.info
+package org.apache.griffin.measure.context.streaming.offset
 
 import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
@@ -33,7 +33,7 @@ import scala.collection.JavaConverters._
   * @param config
   * @param metricName
   */
-case class ZKInfoCache(config: Map[String, Any], metricName: String) extends InfoCache {
+case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends OffsetCache {
 
   val Hosts = "hosts"
   val Namespace = "namespace"

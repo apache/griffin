@@ -16,15 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.info
+package org.apache.griffin.measure.datasource.cache
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.context.streaming.info.{InfoCacheInstance, TimeInfoCache}
+import org.apache.griffin.measure.context.streaming.offset.{OffsetCacheAgent, TimeInfoCache}
 
 /**
   * timestamp info of data source cache
   */
-trait DataSourceCacheable extends Loggable with Serializable {
+trait StreamingOffsetCacheable extends Loggable with Serializable {
 
   val cacheInfoPath: String
   val readyTimeInterval: Long
@@ -40,20 +40,20 @@ trait DataSourceCacheable extends Loggable with Serializable {
 
   protected def submitCacheTime(ms: Long): Unit = {
     val map = Map[String, String]((selfCacheTime -> ms.toString))
-    InfoCacheInstance.cacheInfo(map)
+    OffsetCacheAgent.cacheInfo(map)
   }
 
   protected def submitReadyTime(ms: Long): Unit = {
     val curReadyTime = ms - readyTimeDelay
     if (curReadyTime % readyTimeInterval == 0) {
       val map = Map[String, String]((selfReadyTime -> curReadyTime.toString))
-      InfoCacheInstance.cacheInfo(map)
+      OffsetCacheAgent.cacheInfo(map)
     }
   }
 
   protected def submitLastProcTime(ms: Long): Unit = {
     val map = Map[String, String]((selfLastProcTime -> ms.toString))
-    InfoCacheInstance.cacheInfo(map)
+    OffsetCacheAgent.cacheInfo(map)
   }
 
   protected def readLastProcTime(): Option[Long] = readSelfInfo(selfLastProcTime)
@@ -61,7 +61,7 @@ trait DataSourceCacheable extends Loggable with Serializable {
   protected def submitCleanTime(ms: Long): Unit = {
     val cleanTime = genCleanTime(ms)
     val map = Map[String, String]((selfCleanTime -> cleanTime.toString))
-    InfoCacheInstance.cacheInfo(map)
+    OffsetCacheAgent.cacheInfo(map)
   }
 
   protected def genCleanTime(ms: Long): Long = ms
@@ -70,13 +70,13 @@ trait DataSourceCacheable extends Loggable with Serializable {
 
   protected def submitOldCacheIndex(index: Long): Unit = {
     val map = Map[String, String]((selfOldCacheIndex -> index.toString))
-    InfoCacheInstance.cacheInfo(map)
+    OffsetCacheAgent.cacheInfo(map)
   }
 
   def readOldCacheIndex(): Option[Long] = readSelfInfo(selfOldCacheIndex)
 
   private def readSelfInfo(key: String): Option[Long] = {
-    InfoCacheInstance.readInfo(key :: Nil).get(key).flatMap { v =>
+    OffsetCacheAgent.readInfo(key :: Nil).get(key).flatMap { v =>
       try {
         Some(v.toLong)
       } catch {

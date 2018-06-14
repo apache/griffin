@@ -16,11 +16,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.connector.batch
+package org.apache.griffin.measure.datasource.connector.batch
 
 import org.apache.griffin.measure.configuration.params.DataConnectorParam
 import org.apache.griffin.measure.context.TimeRange
-import org.apache.griffin.measure.context.datasource.info.TmstCache
+import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.HdfsUtil
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -30,7 +30,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
   */
 case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
                                      dcParam: DataConnectorParam,
-                                     tmstCache: TmstCache
+                                     timestampStorage: TimestampStorage
                                     ) extends BatchDataConnector {
 
   val config = dcParam.getConfig

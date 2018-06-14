@@ -16,11 +16,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.connector.streaming
+package org.apache.griffin.measure.datasource.connector.streaming
 
 import org.apache.griffin.measure.context.TimeRange
-import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClient
-import org.apache.griffin.measure.context.datasource.connector.DataConnector
+import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
+import org.apache.griffin.measure.datasource.connector.DataConnector
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.streaming.dstream.InputDStream

@@ -16,14 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource
+package org.apache.griffin.measure.datasource
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.params.DataSourceParam
-import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClient
+import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
-import org.apache.griffin.measure.context.datasource.connector.DataConnector
-import org.apache.griffin.measure.context.datasource.info.TmstCache
+import org.apache.griffin.measure.datasource.connector.DataConnector
+import TimestampStorage
 import org.apache.griffin.measure.utils.DataFrameUtil._
 import org.apache.spark.sql._
 

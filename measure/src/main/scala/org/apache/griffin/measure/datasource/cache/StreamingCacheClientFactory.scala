@@ -16,10 +16,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.cache
+package org.apache.griffin.measure.datasource.cache
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.context.datasource.info.TmstCache
+import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.spark.sql.SQLContext
 
@@ -44,7 +44,7 @@ object StreamingCacheClientFactory extends Loggable {
     * @return             streaming cache client option
     */
   def getClientOpt(sqlContext: SQLContext, cacheOpt: Option[Map[String, Any]],
-                   name: String, index: Int, tmstCache: TmstCache
+                   name: String, index: Int, tmstCache: TimestampStorage
                   ): Option[StreamingCacheClient] = {
     cacheOpt.flatMap { param =>
       try {

@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.info
+package org.apache.griffin.measure.context.streaming.offset
 
 import org.apache.griffin.measure.configuration.params.InfoCacheParam
 
@@ -26,10 +26,10 @@ case class InfoCacheFactory(infoCacheParams: Iterable[InfoCacheParam], metricNam
 
   val ZK_REGEX = """^(?i)zk|zookeeper$""".r
 
-  def getInfoCache(infoCacheParam: InfoCacheParam): Option[InfoCache] = {
+  def getInfoCache(infoCacheParam: InfoCacheParam): Option[OffsetCache] = {
     val config = infoCacheParam.getConfig
     val infoCacheTry = infoCacheParam.getType match {
-      case ZK_REGEX() => Try(ZKInfoCache(config, metricName))
+      case ZK_REGEX() => Try(OffsetCacheInZK(config, metricName))
       case _ => throw new Exception("not supported info cache type")
     }
     infoCacheTry match {

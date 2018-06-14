@@ -16,13 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource
+package org.apache.griffin.measure.datasource
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.params.DataSourceParam
-import org.apache.griffin.measure.context.datasource.cache.StreamingCacheClientFactory
-import org.apache.griffin.measure.context.datasource.connector.{DataConnector, DataConnectorFactory}
-import org.apache.griffin.measure.context.datasource.info.TmstCache
+import org.apache.griffin.measure.datasource.cache.StreamingCacheClientFactory
+import org.apache.griffin.measure.datasource.connector.{DataConnector, DataConnectorFactory}
+import TimestampStorage
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.StreamingContext
 
@@ -47,15 +47,15 @@ object DataSourceFactory extends Loggable {
                            ): Option[DataSource] = {
     val name = dataSourceParam.getName
     val connectorParams = dataSourceParam.getConnectors
-    val tmstCache = TmstCache()
+    val timestampStorage = TimestampStorage()
 
     // for streaming data cache
     val streamingCacheClientOpt = StreamingCacheClientFactory.getClientOpt(
-      sparkSession.sqlContext, dataSourceParam.getCacheOpt, name, index, tmstCache)
+      sparkSession.sqlContext, dataSourceParam.getCacheOpt, name, index, timestampStorage)
 
     val dataConnectors: Seq[DataConnector] = connectorParams.flatMap { connectorParam =>
       DataConnectorFactory.getDataConnector(sparkSession, ssc, connectorParam,
-        tmstCache, streamingCacheClientOpt) match {
+        timestampStorage, streamingCacheClientOpt) match {
           case Success(connector) => Some(connector)
           case _ => None
         }

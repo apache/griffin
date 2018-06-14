@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.info
+package org.apache.griffin.measure.datasource
 
 import org.apache.griffin.measure.Loggable
 
@@ -25,7 +25,7 @@ import scala.collection.mutable.{SortedSet => MutableSortedSet}
 /**
   * tmst cache, CRUD of timestamps
   */
-case class TmstCache() extends Loggable {
+case class TimestampStorage() extends Loggable {
 
   private val tmstGroup: MutableSortedSet[Long] = MutableSortedSet.empty[Long]
 

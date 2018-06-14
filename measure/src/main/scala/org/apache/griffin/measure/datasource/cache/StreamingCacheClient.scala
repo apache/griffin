@@ -16,14 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.datasource.cache
+package org.apache.griffin.measure.datasource.cache
 
 import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.context.TimeRange
-import org.apache.griffin.measure.context.datasource.info.{DataSourceCacheable, TmstCache}
-import org.apache.griffin.measure.context.streaming.info.{InfoCacheInstance, TimeInfoCache}
+import org.apache.griffin.measure.context.streaming.offset.{OffsetCacheAgent, TimeInfoCache}
+import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.DataFrameUtil._
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -38,19 +38,19 @@ import scala.util.Random
   * read data frame from hdfs in calculate phase
   * with update and clean actions for the cache data
   */
-trait StreamingCacheClient extends DataSourceCacheable with WithFanIn[Long] with Loggable with Serializable {
+trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long] with Loggable with Serializable {
 
   val sqlContext: SQLContext
   val param: Map[String, Any]
   val dsName: String
   val index: Int
 
-  val tmstCache: TmstCache
-  protected def fromUntilRangeTmsts(from: Long, until: Long) = tmstCache.fromUntil(from, until)
-  protected def clearTmst(t: Long) = tmstCache.remove(t)
+  val timestampStorage: TimestampStorage
+  protected def fromUntilRangeTmsts(from: Long, until: Long) = timestampStorage.fromUntil(from, until)
+  protected def clearTmst(t: Long) = timestampStorage.remove(t)
   protected def clearTmstsUntil(until: Long) = {
-    val outDateTmsts = tmstCache.until(until)
-    tmstCache.remove(outDateTmsts)
+    val outDateTmsts = timestampStorage.until(until)
+    timestampStorage.remove(outDateTmsts)
   }
   protected def afterTilRangeTmsts(after: Long, til: Long) = fromUntilRangeTmsts(after + 1, til + 1)
   protected def clearTmstsTil(til: Long) = clearTmstsUntil(til + 1)
@@ -88,8 +88,8 @@ trait StreamingCacheClient extends DataSourceCacheable with WithFanIn[Long] with
   val _Updatable = "updatable"
   val updatable = param.getBoolean(_Updatable, false)
 
-  val newCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.new")
-  val oldCacheLock = InfoCacheInstance.genLock(s"${cacheInfoPath}.old")
+  val newCacheLock = OffsetCacheAgent.genLock(s"${cacheInfoPath}.new")
+  val oldCacheLock = OffsetCacheAgent.genLock(s"${cacheInfoPath}.old")
 
   val newFilePath = s"${filePath}/new"
   val oldFilePath = s"${filePath}/old"

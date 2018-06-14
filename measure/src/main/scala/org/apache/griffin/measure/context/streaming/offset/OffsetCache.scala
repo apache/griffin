@@ -16,12 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.info
+package org.apache.griffin.measure.context.streaming.offset
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.context.streaming.lock.CacheLock
 
-trait InfoCache extends Loggable with Serializable {
+trait OffsetCache extends Loggable with Serializable {
 
   def init(): Unit
   def available(): Boolean
