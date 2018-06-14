@@ -21,7 +21,7 @@ package org.apache.griffin.measure.context
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.params._
 import org.apache.griffin.measure.datasource._
-import org.apache.griffin.measure.context.sink._
+import org.apache.griffin.measure.sink.{Sink, SinkFactory}
 import org.apache.spark.sql.{Encoders, SQLContext, SparkSession}
 
 /**

@@ -16,15 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.sink
+package org.apache.griffin.measure.sink
 
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.Loggable
 
-import scala.concurrent.duration._
 import scala.concurrent._
+import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 /**
