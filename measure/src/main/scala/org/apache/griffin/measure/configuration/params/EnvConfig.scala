@@ -27,22 +27,22 @@ import org.apache.griffin.measure.utils.TimeUtil
   * environment param
   * @param sparkParam       config of spark environment (must)
   * @param persistParams    config of persist ways (optional)
-  * @param infoCacheParams  config of information cache ways (required in streaming mode)
+  * @param offsetCacheParams  config of information cache ways (required in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
 case class EnvConfig(@JsonProperty("spark") sparkParam: SparkParam,
                      @JsonProperty("persist") persistParams: List[PersistParam],
-                     @JsonProperty("info.cache") infoCacheParams: List[InfoCacheParam]
+                     @JsonProperty("info.cache") offsetCacheParams: List[OffsetCacheParam]
                    ) extends Param {
   def getSparkParam: SparkParam = sparkParam
   def getPersistParams: Seq[PersistParam] = if (persistParams != null) persistParams else Nil
-  def getInfoCacheParams: Seq[InfoCacheParam] = if (infoCacheParams != null) infoCacheParams else Nil
+  def getOffsetCacheParams: Seq[OffsetCacheParam] = if (offsetCacheParams != null) offsetCacheParams else Nil
 
   def validate(): Unit = {
     assert((sparkParam != null), "spark param should not be null")
     sparkParam.validate
     getPersistParams.foreach(_.validate)
-    getInfoCacheParams.foreach(_.validate)
+    getOffsetCacheParams.foreach(_.validate)
   }
 }
 
@@ -95,14 +95,14 @@ case class PersistParam( @JsonProperty("type") persistType: String,
 }
 
 /**
-  * info cache param
-  * @param cacheType    information cache type, e.g.: zookeeper (must)
+  * offset cache param
+  * @param cacheType    offset cache type, e.g.: zookeeper (must)
   * @param config       config of cache way
   */
 @JsonInclude(Include.NON_NULL)
-case class InfoCacheParam( @JsonProperty("type") cacheType: String,
-                           @JsonProperty("config") config: Map[String, Any]
-                         ) extends Param {
+case class OffsetCacheParam(@JsonProperty("type") cacheType: String,
+                            @JsonProperty("config") config: Map[String, Any]
+                          ) extends Param {
   def getType: String = cacheType
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
 
