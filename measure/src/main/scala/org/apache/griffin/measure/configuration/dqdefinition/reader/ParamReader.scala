@@ -16,28 +16,32 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.params.reader
+package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.apache.griffin.measure.configuration.params.Param
-import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
+import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.configuration.dqdefinition.Param
 
 import scala.util.Try
 
-/**
-  * read params from config file path
-  * @param filePath:  hdfs path ("hdfs://cluster-name/path")
-  *                   local file path ("file:///path")
-  *                   relative file path ("relative/path")
-  */
-case class ParamFileReader(filePath: String) extends ParamReader {
+trait ParamReader extends Loggable with Serializable {
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
-    Try {
-      val source = HdfsUtil.openFile(filePath)
-      val param = JsonUtil.fromJson[T](source)
-      source.close
-      validate(param)
-    }
+  /**
+    * read config param
+ *
+    * @tparam T     param type expected
+    * @return       parsed param
+    */
+  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T]
+
+  /**
+    * validate config param
+ *
+    * @param param  param to be validated
+    * @return       param itself
+    */
+  protected def validate[T <: Param](param: T): T = {
+    param.validate()
+    param
   }
 
 }

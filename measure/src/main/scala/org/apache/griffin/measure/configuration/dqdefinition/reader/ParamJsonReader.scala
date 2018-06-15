@@ -16,15 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.params.reader
+package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.apache.griffin.measure.configuration.params.Param
+import org.apache.griffin.measure.configuration.dqdefinition.Param
 import org.apache.griffin.measure.utils.JsonUtil
 
 import scala.util.Try
 
 /**
   * read params from json string directly
+ *
   * @param jsonString
   */
 case class ParamJsonReader(jsonString: String) extends ParamReader {

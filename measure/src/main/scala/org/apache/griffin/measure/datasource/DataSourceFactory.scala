@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.datasource
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.params.DataSourceParam
+import org.apache.griffin.measure.configuration.dqdefinition.DataSourceParam
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClientFactory
 import org.apache.griffin.measure.datasource.connector.{DataConnector, DataConnectorFactory}
 import org.apache.spark.sql.SparkSession
