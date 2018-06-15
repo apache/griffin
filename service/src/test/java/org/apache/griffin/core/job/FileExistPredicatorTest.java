@@ -39,7 +39,7 @@ public class FileExistPredicatorTest {
 		SegmentPredicate predicate = new SegmentPredicate();
 		predicate.setConfig("test config");
 		
-		Map<String, String> configMap = new HashMap<>();	
+		Map<String, Object> configMap = new HashMap<>();	
 		predicate.setConfigMap(configMap);
 		
 		FileExistPredicator predicator = new FileExistPredicator(predicate);
@@ -51,7 +51,7 @@ public class FileExistPredicatorTest {
 		SegmentPredicate predicate = new SegmentPredicate();
 		predicate.setConfig("test config");
 		
-		Map<String, String> configMap = new HashMap<>();
+		Map<String, Object> configMap = new HashMap<>();
 		configMap.put("path", fileName);
 		configMap.put("root.path", rootPath);
 		
