@@ -83,33 +83,31 @@ public class EntityHelper {
         return new ExternalMeasure(name, "description", "org", "test", "metricName", new VirtualJob());
     }
 
-    public static JobSchedule createJobSchedule() throws JsonProcessingException {
-        return createJobSchedule("jobName");
-    }
-
-    public static JobSchedule createJobSchedule(String jobName) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName) {
         JobDataSegment segment1 = createJobDataSegment("source_name", true);
         JobDataSegment segment2 = createJobDataSegment("target_name", false);
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+        return new BatchJob(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments, false);
     }
 
-    public static JobSchedule createJobSchedule(String jobName, SegmentRange range) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName, SegmentRange range) {
+        BatchJob job = new BatchJob();
         JobDataSegment segment1 = createJobDataSegment("source_name", true, range);
         JobDataSegment segment2 = createJobDataSegment("target_name", false, range);
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+
+        return new BatchJob(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments, false);
     }
 
-    public static JobSchedule createJobSchedule(String jobName, JobDataSegment source, JobDataSegment target) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName, JobDataSegment source, JobDataSegment target) {
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(source);
         segments.add(target);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+        return new BatchJob(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments, false);
     }
 
     public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline, SegmentRange range) {
