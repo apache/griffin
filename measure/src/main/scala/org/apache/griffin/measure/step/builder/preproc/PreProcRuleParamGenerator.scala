@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.preproc
 
-import org.apache.griffin.measure.configuration.params.RuleParam
+import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
 
 /**
   * generate rule params by template defined in pre-proc param

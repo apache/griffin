@@ -19,8 +19,8 @@ under the License.
 package org.apache.griffin.measure
 
 import org.apache.griffin.measure.configuration.enums._
-import org.apache.griffin.measure.configuration.params.reader.ParamReaderFactory
-import org.apache.griffin.measure.configuration.params.{GriffinConfig, DQConfig, EnvConfig, Param}
+import org.apache.griffin.measure.configuration.dqdefinition.reader.ParamReaderFactory
+import org.apache.griffin.measure.configuration.dqdefinition.{GriffinConfig, DQConfig, EnvConfig, Param}
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
