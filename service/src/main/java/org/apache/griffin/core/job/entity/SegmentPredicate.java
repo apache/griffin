@@ -67,7 +67,7 @@ public class SegmentPredicate extends AbstractAuditableEntity {
         return config;
     }
 
-    private void setConfig(String config) {
+    public void setConfig(String config) {
         this.config = config;
     }
 
