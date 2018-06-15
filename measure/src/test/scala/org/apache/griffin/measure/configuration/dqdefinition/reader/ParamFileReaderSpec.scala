@@ -16,23 +16,19 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.params.reader
 
-import org.apache.griffin.measure.configuration.params.DQConfig
-import org.scalatest.{FlatSpec, Matchers}
+package org.apache.griffin.measure.configuration.dqdefinition.reader
+import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
+import org.scalatest._
 
-import scala.io.Source
+
 import scala.util.{Failure, Success}
 
-class ParamJsonReaderSpec extends FlatSpec with Matchers{
+class ParamFileReaderSpec extends FlatSpec with Matchers{
 
 
   "params " should "be parsed from a valid file" in {
-    val bufferedSource = Source.fromFile(getClass.getResource("/_accuracy-batch-sparksql.json").getFile)
-    val jsonString = bufferedSource.getLines().mkString
-    bufferedSource.close
-
-    val reader :ParamReader = ParamJsonReader(jsonString)
+    val reader :ParamReader = ParamFileReader(getClass.getResource("/_accuracy-batch-sparksql.json").getFile)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
@@ -45,21 +41,15 @@ class ParamJsonReaderSpec extends FlatSpec with Matchers{
   }
 
   it should "fail for an invalid file" in {
-    val bufferedSource = Source.fromFile(getClass.getResource("/invalidconfigs/missingrule_accuracy_batch_sparksql.json").getFile)
-    val jsonString = bufferedSource.getLines().mkString
-    bufferedSource.close
-
-    val reader :ParamReader = ParamJsonReader(jsonString)
+    val reader :ParamReader = ParamFileReader(getClass.getResource("/invalidconfigs/missingrule_accuracy_batch_sparksql.json").getFile)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(_) =>
         fail("it is an invalid config file")
       case Failure(e) =>
-        e.getMessage should include ("evaluate.rule should not be null")
+        e.getMessage contains ("evaluate.rule should not be null")
     }
 
   }
 
 }
-
-
