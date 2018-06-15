@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.launch
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.params.{DQConfig, EnvConfig}
+import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig}
 
 import scala.util.Try
 

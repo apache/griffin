@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder
 
-import org.apache.griffin.measure.configuration.params._
+import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.read.ReadStep
 

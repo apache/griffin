@@ -16,28 +16,32 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.params.reader
+package org.apache.griffin.measure.sink
 
-import org.apache.griffin.measure.configuration.params.Param
-import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
-
-import scala.util.Try
+import org.apache.griffin.measure.Loggable
+import org.apache.spark.rdd.RDD
 
 /**
-  * read params from config file path
-  * @param filePath:  hdfs path ("hdfs://cluster-name/path")
-  *                   local file path ("file:///path")
-  *                   relative file path ("relative/path")
+  * persist metric and record
   */
-case class ParamFileReader(filePath: String) extends ParamReader {
+trait Sink extends Loggable with Serializable {
+  val metricName: String
+  val timeStamp: Long
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
-    Try {
-      val source = HdfsUtil.openFile(filePath)
-      val param = JsonUtil.fromJson[T](source)
-      source.close
-      validate(param)
-    }
-  }
+  val config: Map[String, Any]
+
+  val block: Boolean
+
+  def available(): Boolean
+
+  def start(msg: String): Unit
+  def finish(): Unit
+
+  def log(rt: Long, msg: String): Unit
+
+  def persistRecords(records: RDD[String], name: String): Unit
+  def persistRecords(records: Iterable[String], name: String): Unit
+
+  def persistMetrics(metrics: Map[String, Any]): Unit
 
 }
