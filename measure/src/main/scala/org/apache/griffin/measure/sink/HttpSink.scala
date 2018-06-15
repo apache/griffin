@@ -16,14 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.sink
+package org.apache.griffin.measure.sink
 
-import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
+import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
 import org.apache.spark.rdd.RDD
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 /**
   * persist metric and record through http request
