@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.datasource.connector.streaming
 
 import kafka.serializer.StringDecoder
-import org.apache.griffin.measure.configuration.params.DataConnectorParam
+import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.spark.rdd.RDD
