@@ -115,7 +115,7 @@ public class BatchJobOperatorImpl implements JobOperator {
     public JobState getState(AbstractJob job, String action) throws SchedulerException {
         JobState jobState = new JobState();
         Scheduler scheduler = factory.getScheduler();
-        if (job.getGroup() != null || job.getName() != null) {
+        if (job.getGroup() == null || job.getName() == null) {
             return null;
         }
         TriggerKey triggerKey = triggerKey(job.getName(), job.getGroup());
