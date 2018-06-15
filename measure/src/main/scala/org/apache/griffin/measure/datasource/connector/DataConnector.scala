@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.enums.{BatchProcessType, DslType, SparkSqlType}
-import org.apache.griffin.measure.configuration.params.DataConnectorParam
+import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.job.builder.DQJobBuilder

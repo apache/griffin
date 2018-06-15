@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.step.builder
 
 import org.apache.griffin.measure.configuration.enums.NormalizeType
-import org.apache.griffin.measure.configuration.params.RuleParam
+import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}
 import org.apache.griffin.measure.step.{DQStep, SeqDQStep}

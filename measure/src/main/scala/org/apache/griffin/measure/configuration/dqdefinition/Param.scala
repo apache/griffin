@@ -16,30 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.params.reader
+package org.apache.griffin.measure.configuration.dqdefinition
 
-import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.params.Param
-
-import scala.util.Try
-
-trait ParamReader extends Loggable with Serializable {
+trait Param extends Serializable {
 
   /**
-    * read config param
-    * @tparam T     param type expected
-    * @return       parsed param
+    * validate param internally
     */
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T]
-
-  /**
-    * validate config param
-    * @param param  param to be validated
-    * @return       param itself
-    */
-  protected def validate[T <: Param](param: T): T = {
-    param.validate()
-    param
-  }
-
+  def validate(): Unit
+  
 }
