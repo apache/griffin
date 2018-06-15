@@ -20,7 +20,7 @@ package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.enums._
-import org.apache.griffin.measure.configuration.params.RuleParam
+import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.dsl.expr.Expr

@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.context.streaming.offset
 
-import org.apache.griffin.measure.configuration.params.OffsetCacheParam
+import org.apache.griffin.measure.configuration.dqdefinition.OffsetCacheParam
 
 import scala.util.{Success, Try}
 
