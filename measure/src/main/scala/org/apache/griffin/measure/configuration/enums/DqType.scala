@@ -25,7 +25,7 @@ import scala.util.matching.Regex
   * indicates the dq type of griffin pre-defined measurements
   */
 sealed trait DqType {
-  val regex: Regex
+  val idPattern: Regex
   val desc: String
 }
 
@@ -34,8 +34,8 @@ object DqType {
     AccuracyType, ProfilingType, UniquenessType, DistinctnessType, TimelinessType, CompletenessType, UnknownType
   )
   def apply(ptn: String): DqType = {
-    dqTypes.find(tp => ptn match {
-      case tp.regex() => true
+    dqTypes.find(dqType => ptn match {
+      case dqType.idPattern() => true
       case _ => false
     }).getOrElse(UnknownType)
   }
@@ -49,8 +49,8 @@ object DqType {
   *       metric will be: { "total": 5, "miss": 1, "matched": 4 }
   *       accuracy is 80%.
   */
-final case object AccuracyType extends DqType {
-  val regex = "^(?i)accuracy$".r
+ case object AccuracyType extends DqType {
+  val idPattern = "^(?i)accuracy$".r
   val desc = "accuracy"
 }
 
@@ -58,8 +58,8 @@ final case object AccuracyType extends DqType {
   * profiling: the statistic data of data source
   * e.g.: max, min, average, group by count, ...
   */
-final case object ProfilingType extends DqType {
-  val regex = "^(?i)profiling$".r
+ case object ProfilingType extends DqType {
+  val idPattern = "^(?i)profiling$".r
   val desc = "profiling"
 }
 
@@ -69,8 +69,8 @@ final case object ProfilingType extends DqType {
   * e.g.: [1, 2, 3, 3] -> { "unique": 2, "total": 4, "dup-arr": [ "dup": 1, "num": 1 ] }
   * uniqueness indicates the items without any replica of data
   */
-final case object UniquenessType extends DqType {
-  val regex = "^(?i)uniqueness|duplicate$".r
+ case object UniquenessType extends DqType {
+  val idPattern = "^(?i)uniqueness|duplicate$".r
   val desc = "uniqueness"
 }
 
@@ -81,8 +81,8 @@ final case object UniquenessType extends DqType {
   * distinctness indicates the valid information of data
   * comparing with uniqueness, distinctness is more meaningful
   */
-final case object DistinctnessType extends DqType {
-  val regex = "^(?i)distinct$".r
+ case object DistinctnessType extends DqType {
+  val idPattern = "^(?i)distinct$".r
   val desc = "distinct"
 }
 
@@ -92,8 +92,8 @@ final case object DistinctnessType extends DqType {
   * timeliness can get the statistic metric of latency, like average, max, min, percentile-value,
   * even more, it can record the items with latency above threshold you configured
   */
-final case object TimelinessType extends DqType {
-  val regex = "^(?i)timeliness$".r
+ case object TimelinessType extends DqType {
+  val idPattern = "^(?i)timeliness$".r
   val desc = "timeliness"
 }
 
@@ -101,12 +101,12 @@ final case object TimelinessType extends DqType {
   * completeness: the completeness of data source
   * the columns you measure is incomplete if it is null
   */
-final case object CompletenessType extends DqType {
-  val regex = "^(?i)completeness$".r
+ case object CompletenessType extends DqType {
+  val idPattern = "^(?i)completeness$".r
   val desc = "completeness"
 }
 
-final case object UnknownType extends DqType {
-  val regex = "".r
+ case object UnknownType extends DqType {
+  val idPattern = "".r
   val desc = "unknown"
 }

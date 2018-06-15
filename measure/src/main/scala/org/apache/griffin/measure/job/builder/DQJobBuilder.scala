@@ -38,26 +38,24 @@ object DQJobBuilder {
     * @return       dq job
     */
   def buildDQJob(context: DQContext, evaluateRuleParam: EvaluateRuleParam): DQJob = {
-    val defaultDslType = evaluateRuleParam.getDslType
     val ruleParams = evaluateRuleParam.getRules
-    buildDQJob(context, ruleParams, defaultDslType)
+    buildDQJob(context, ruleParams)
   }
 
   /**
     * build dq job with rules in evaluate rule param or pre-proc param
     * @param context          dq context
     * @param ruleParams       rule params
-    * @param defaultDslType   default dsl type in evaluate rule param
     * @return       dq job
     */
-  def buildDQJob(context: DQContext, ruleParams: Seq[RuleParam], defaultDslType: DslType): DQJob = {
+  def buildDQJob(context: DQContext, ruleParams: Seq[RuleParam]): DQJob = {
     // build steps by datasources
     val dsSteps = context.dataSources.flatMap { dataSource =>
       DQStepBuilder.buildStepOptByDataSourceParam(context, dataSource.dsParam)
     }
     // build steps by rules
     val ruleSteps = ruleParams.flatMap { ruleParam =>
-      DQStepBuilder.buildStepOptByRuleParam(context, ruleParam, defaultDslType)
+      DQStepBuilder.buildStepOptByRuleParam(context, ruleParam)
     }
     // metric flush step
     val metricFlushStep = MetricFlushStep()

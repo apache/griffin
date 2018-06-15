@@ -27,7 +27,7 @@ import org.apache.griffin.measure.step.builder.dsl.expr._
 import org.apache.griffin.measure.step.builder.dsl.transform.analyzer.AccuracyAnalyzer
 import org.apache.griffin.measure.step.transform.DataFrameOps.AccuracyOprKeys
 import org.apache.griffin.measure.step.transform.{DataFrameOps, DataFrameOpsTransformStep, SparkSqlTransformStep}
-import org.apache.griffin.measure.step.write.{DsCacheUpdateWriteStep, MetricWriteStep, RecordWriteStep}
+import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -82,7 +82,7 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       val missRecordsTransStep = SparkSqlTransformStep(missRecordsTableName, missRecordsSql, emptyMap, true)
       val missRecordsWriteSteps = procType match {
         case BatchProcessType => {
-          val rwName = ruleParam.recordOpt.map(_.name).getOrElse(missRecordsTableName)
+          val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(missRecordsTableName)
           RecordWriteStep(rwName, missRecordsTableName) :: Nil
         }
         case StreamingProcessType => Nil
@@ -90,8 +90,8 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       val missRecordsUpdateWriteSteps = procType match {
         case BatchProcessType => Nil
         case StreamingProcessType => {
-          val dsName = ruleParam.dsCacheUpdateOpt.map(_.dsName).getOrElse(sourceName)
-          DsCacheUpdateWriteStep(dsName, missRecordsTableName) :: Nil
+          val dsName = ruleParam.getDsCacheUpdateOpt.flatMap(_.getDsNameOpt).getOrElse(sourceName)
+          DataSourceUpdateWriteStep(dsName, missRecordsTableName) :: Nil
         }
       }
 
@@ -139,8 +139,9 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       val accuracyTransStep = SparkSqlTransformStep(accuracyTableName, accuracyMetricSql, emptyMap)
       val accuracyMetricWriteSteps = procType match {
         case BatchProcessType => {
-          val mwName = ruleParam.metricOpt.map(_.name).getOrElse(ruleParam.name)
-          val collectType = NormalizeType(ruleParam.metricOpt.map(_.collectType).getOrElse(""))
+          val metricOpt = ruleParam.getMetricOpt
+          val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.name)
+          val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
           MetricWriteStep(mwName, accuracyTableName, collectType) :: Nil
         }
         case StreamingProcessType => Nil
@@ -166,8 +167,9 @@ case class AccuracyExpr2DQSteps(context: DQContext,
           val accuracyMetricTransStep = DataFrameOpsTransformStep(accuracyMetricTableName,
             accuracyMetricRule, accuracyMetricDetails)
           val accuracyMetricWriteStep = {
-            val mwName = ruleParam.metricOpt.map(_.name).getOrElse(ruleParam.name)
-            val collectType = NormalizeType(ruleParam.metricOpt.map(_.collectType).getOrElse(""))
+            val metricOpt = ruleParam.getMetricOpt
+            val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.name)
+            val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
             MetricWriteStep(mwName, accuracyMetricTableName, collectType)
           }
 
@@ -182,7 +184,7 @@ case class AccuracyExpr2DQSteps(context: DQContext,
           val accuracyRecordTransStep = SparkSqlTransformStep(
             accuracyRecordTableName, accuracyRecordSql, emptyMap)
           val accuracyRecordWriteStep = {
-            val rwName = ruleParam.recordOpt.map(_.name).getOrElse(missRecordsTableName)
+            val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(missRecordsTableName)
             RecordWriteStep(rwName, missRecordsTableName, Some(accuracyRecordTableName))
           }
 

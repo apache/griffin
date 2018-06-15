@@ -29,8 +29,8 @@ import scala.collection.mutable.{MutableList, Map => MutableMap}
   */
 case class DataFrameCache() extends Loggable {
 
-  private val dataFrames: MutableMap[String, DataFrame] = MutableMap()
-  private val trashDataFrames: MutableList[DataFrame] = MutableList()
+  val dataFrames: MutableMap[String, DataFrame] = MutableMap()
+  val trashDataFrames: MutableList[DataFrame] = MutableList()
 
   private def trashDataFrame(df: DataFrame): Unit = {
     trashDataFrames += df
@@ -67,6 +67,7 @@ case class DataFrameCache() extends Loggable {
 
   def clearAllTrashDataFrames(): Unit = {
     trashDataFrames.foreach(_.unpersist)
+    trashDataFrames.clear
   }
 
 }

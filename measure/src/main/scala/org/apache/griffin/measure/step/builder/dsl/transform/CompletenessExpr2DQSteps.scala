@@ -89,7 +89,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val incompleteRecordsSql = s"SELECT * FROM `${sourceAliasTableName}` WHERE ${incompleteWhereClause}"
       val incompleteRecordTransStep = SparkSqlTransformStep(incompleteRecordsTableName, incompleteRecordsSql, emptyMap, true)
       val incompleteRecordWriteStep = {
-        val rwName = ruleParam.recordOpt.map(_.name).getOrElse(incompleteRecordsTableName)
+        val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(incompleteRecordsTableName)
         RecordWriteStep(rwName, incompleteRecordsTableName)
       }
 
@@ -136,8 +136,10 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       }
       val completeTransStep = SparkSqlTransformStep(completeTableName, completeMetricSql, emptyMap)
       val completeWriteStep = {
-        val mwName = ruleParam.metricOpt.map(_.name).getOrElse(completeTableName)
-        MetricWriteStep(mwName, completeTableName, DefaultNormalizeType)
+        val metricOpt = ruleParam.getMetricOpt
+        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(completeTableName)
+        val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
+        MetricWriteStep(mwName, completeTableName, collectType)
       }
 
       val transSteps = {

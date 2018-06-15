@@ -24,7 +24,7 @@ import scala.util.matching.Regex
   * dsl type indicates the language type of rule param
   */
 sealed trait DslType {
-  val regex: Regex
+  val idPattern: Regex
   val desc: String
 }
 
@@ -32,7 +32,7 @@ object DslType {
   private val dslTypes: List[DslType] = List(SparkSqlType, GriffinDslType, DataFrameOpsType)
   def apply(ptn: String): DslType = {
     dslTypes.find(tp => ptn match {
-      case tp.regex() => true
+      case tp.idPattern() => true
       case _ => false
     }).getOrElse(GriffinDslType)
   }
@@ -42,23 +42,23 @@ object DslType {
 /**
   * spark-sql: rule defined in "SPARK-SQL" directly
   */
-final case object SparkSqlType extends DslType {
-  val regex = "^(?i)spark-?sql$".r
+ case object SparkSqlType extends DslType {
+  val idPattern = "^(?i)spark-?sql$".r
   val desc = "spark-sql"
 }
 
 /**
   * df-ops: data frame operations rule, support some pre-defined data frame ops
   */
-final case object DataFrameOpsType extends DslType {
-  val regex = "^(?i)df-?(?:op|opr|ops)$".r
+ case object DataFrameOpsType extends DslType {
+  val idPattern = "^(?i)df-?(?:op|opr|ops)$".r
   val desc = "df-opr"
 }
 
 /**
   * griffin-dsl: griffin dsl rule, to define dq measurements easier
   */
-final case object GriffinDslType extends DslType {
-  val regex = "^(?i)griffin-?dsl$".r
+ case object GriffinDslType extends DslType {
+  val idPattern = "^(?i)griffin-?dsl$".r
   val desc = "griffin-dsl"
 }

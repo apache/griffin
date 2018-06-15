@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.launch
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.params.{DQParam, EnvParam}
+import org.apache.griffin.measure.configuration.params.{DQConfig, EnvConfig}
 
 import scala.util.Try
 
@@ -28,8 +28,8 @@ import scala.util.Try
   */
 trait DQApp extends Loggable with Serializable {
 
-  val envParam: EnvParam
-  val dqParam: DQParam
+  val envParam: EnvConfig
+  val dqParam: DQConfig
 
   def init: Try[_]
 
@@ -44,9 +44,14 @@ trait DQApp extends Loggable with Serializable {
     */
   def retryable: Boolean
 
-  protected def getAppTime: Long = {
-    if (dqParam.timestamp != null && dqParam.timestamp > 0) { dqParam.timestamp }
-    else { System.currentTimeMillis }
+  /**
+    * timestamp as a key for metrics
+    */
+  protected def getMeasureTime: Long = {
+    dqParam.getTimestampOpt match {
+      case Some(t) if t > 0 => dqParam.timestamp
+      case _ => System.currentTimeMillis
+    }
   }
 
 }

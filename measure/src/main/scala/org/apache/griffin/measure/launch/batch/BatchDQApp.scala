@@ -23,7 +23,7 @@ import java.util.Date
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.params._
 import org.apache.griffin.measure.context._
-import org.apache.griffin.measure.context.datasource.DataSourceFactory
+import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
@@ -32,15 +32,15 @@ import org.apache.spark.sql.{SQLContext, SparkSession}
 
 import scala.util.Try
 
-case class BatchDQApp(allParam: AllParam) extends DQApp {
+case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
-  val envParam: EnvParam = allParam.envParam
-  val dqParam: DQParam = allParam.dqParam
+  val envParam: EnvConfig = allParam.getEnvConfig
+  val dqParam: DQConfig = allParam.getDqConfig
 
   val sparkParam = envParam.sparkParam
   val metricName = dqParam.name
-  val dataSourceParams = dqParam.dataSources
-  val dataSourceNames = dataSourceParams.map(_.name)
+//  val dataSourceParams = dqParam.dataSources
+//  val dataSourceNames = dataSourceParams.map(_.name)
   val persistParams = envParam.persistParams
 
   var sqlContext: SQLContext = _
@@ -52,10 +52,10 @@ case class BatchDQApp(allParam: AllParam) extends DQApp {
   def init: Try[_] = Try {
     // build spark 2.0+ application context
     val conf = new SparkConf().setAppName(metricName)
-    conf.setAll(sparkParam.config)
+    conf.setAll(sparkParam.getConfig)
     conf.set("spark.sql.crossJoin.enabled", "true")
     sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
-    sparkSession.sparkContext.setLogLevel(sparkParam.logLevel)
+    sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
     sqlContext = sparkSession.sqlContext
 
     // register udf
@@ -66,11 +66,11 @@ case class BatchDQApp(allParam: AllParam) extends DQApp {
     // start time
     val startTime = new Date().getTime
 
-    val appTime = getAppTime
-    val contextId = ContextId(appTime)
+    val measureTime = getMeasureTime
+    val contextId = ContextId(measureTime)
 
-    // generate data sources
-    val dataSources = DataSourceFactory.getDataSources(sparkSession, null, dqParam.dataSources)
+    // get data sources
+    val dataSources = DataSourceFactory.getDataSources(sparkSession, null, dqParam.getDataSources)
     dataSources.foreach(_.init)
 
     // create dq context

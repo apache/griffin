@@ -57,9 +57,9 @@ object DQStepBuilder {
     }
   }
 
-  def buildStepOptByRuleParam(context: DQContext, ruleParam: RuleParam, defaultDslType: DslType
+  def buildStepOptByRuleParam(context: DQContext, ruleParam: RuleParam
                              ): Option[DQStep] = {
-    val dslType = ruleParam.getDslType(defaultDslType)
+    val dslType = ruleParam.getDslType
     val dsNames = context.dataSourceNames
     val funcNames = context.functionNames
     val dqStepOpt = getRuleParamStepBuilder(dslType, dsNames, funcNames)

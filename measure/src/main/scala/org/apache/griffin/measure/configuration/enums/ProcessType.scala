@@ -24,7 +24,7 @@ import scala.util.matching.Regex
   * process type enum
   */
 sealed trait ProcessType {
-  val regex: Regex
+  val idPattern: Regex
   val desc: String
 }
 
@@ -32,7 +32,7 @@ object ProcessType {
   private val procTypes: List[ProcessType] = List(BatchProcessType, StreamingProcessType)
   def apply(ptn: String): ProcessType = {
     procTypes.find(tp => ptn match {
-      case tp.regex() => true
+      case tp.idPattern() => true
       case _ => false
     }).getOrElse(BatchProcessType)
   }
@@ -42,15 +42,15 @@ object ProcessType {
 /**
   * process in batch mode
   */
-final case object BatchProcessType extends ProcessType {
-  val regex = """^(?i)batch$""".r
+ case object BatchProcessType extends ProcessType {
+  val idPattern = """^(?i)batch$""".r
   val desc = "batch"
 }
 
 /**
   * process in streaming mode
   */
-final case object StreamingProcessType extends ProcessType {
-  val regex = """^(?i)streaming$""".r
+ case object StreamingProcessType extends ProcessType {
+  val idPattern = """^(?i)streaming$""".r
   val desc = "streaming"
 }

@@ -26,7 +26,7 @@ import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.step.builder.dsl.expr.{DistinctnessClause, _}
 import org.apache.griffin.measure.step.builder.dsl.transform.analyzer.DistinctnessAnalyzer
 import org.apache.griffin.measure.step.transform.SparkSqlTransformStep
-import org.apache.griffin.measure.step.write.{DsCacheUpdateWriteStep, MetricWriteStep, RecordWriteStep}
+import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -133,7 +133,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
       val ((transSteps2, writeSteps2), dupCountTableName) = procType match {
         case StreamingProcessType if (withOlderTable) => {
           // 4.0 update old data
-          val targetDsUpdateWriteStep = DsCacheUpdateWriteStep(targetName, targetName)
+          val targetDsUpdateWriteStep = DataSourceUpdateWriteStep(targetName, targetName)
 
           // 4. older alias
           val olderAliasTableName = "__older"
@@ -271,7 +271,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
           }
           val dupItemsTransStep = SparkSqlTransformStep(dupItemsTableName, dupItemsSql, emptyMap)
           val dupItemsWriteStep = {
-            val rwName = ruleParam.recordOpt.map(_.name).getOrElse(dupItemsTableName)
+            val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(dupItemsTableName)
             RecordWriteStep(rwName, dupItemsTableName, None, writeTimestampOpt)
           }
 
@@ -317,7 +317,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
           }
           val dupRecordTransStep = SparkSqlTransformStep(dupRecordTableName, dupRecordSql, emptyMap, true)
           val dupRecordWriteStep = {
-            val rwName = ruleParam.recordOpt.map(_.name).getOrElse(dupRecordTableName)
+            val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(dupRecordTableName)
             RecordWriteStep(rwName, dupRecordTableName, None, writeTimestampOpt)
           }
 

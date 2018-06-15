@@ -35,9 +35,9 @@ object WriteMode {
 /**
   * simple mode: write metrics and records directly
   */
-final case object SimpleMode extends WriteMode {}
+ case object SimpleMode extends WriteMode {}
 
 /**
   * timestamp mode: write metrics and records with timestamp information
   */
-final case object TimestampMode extends WriteMode {}
+ case object TimestampMode extends WriteMode {}

@@ -31,7 +31,7 @@ trait DataSourceParamStepBuilder extends DQStepBuilder {
   type ParamType = DataSourceParam
 
   def buildDQStep(context: DQContext, param: ParamType): Option[DQStep] = {
-    val name = getStepName(param.name)
+    val name = getStepName(param.getName)
     val steps = param.getConnectors.flatMap { dc =>
       buildReadSteps(context, dc)
     }

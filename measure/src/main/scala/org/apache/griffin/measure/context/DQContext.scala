@@ -20,12 +20,14 @@ package org.apache.griffin.measure.context
 
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.params._
-import org.apache.griffin.measure.context.datasource._
-import org.apache.griffin.measure.context.writer._
+import org.apache.griffin.measure.datasource._
+import org.apache.griffin.measure.context.sink._
 import org.apache.spark.sql.{Encoders, SQLContext, SparkSession}
 
 /**
   * dq context: the context of each calculation
+  * unique context id in each calculation
+  * access the same spark session this app created
   */
 case class DQContext(contextId: ContextId,
                      name: String,
@@ -61,14 +63,14 @@ case class DQContext(contextId: ContextId,
     if (dataSourceNames.size > index) dataSourceNames(index) else ""
   }
 
-  private val persistFactory = PersistFactory(persistParams, name)
-  private val defaultPersist: Persist = createPersist(contextId.timestamp)
-  def getPersist(timestamp: Long): Persist = {
+  private val persistFactory = SinkFactory(persistParams, name)
+  private val defaultPersist: Sink = createPersist(contextId.timestamp)
+  def getPersist(timestamp: Long): Sink = {
     if (timestamp == contextId.timestamp) getPersist()
     else createPersist(timestamp)
   }
-  def getPersist(): Persist = defaultPersist
-  private def createPersist(t: Long): Persist = {
+  def getPersist(): Sink = defaultPersist
+  private def createPersist(t: Long): Sink = {
     procType match {
       case BatchProcessType => persistFactory.getPersists(t, true)
       case StreamingProcessType => persistFactory.getPersists(t, false)

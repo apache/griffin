@@ -37,6 +37,10 @@ under the License.
   border-top: 1px solid transparent;
 }
 
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
 a {
   color: white;
 }
@@ -54,4 +58,13 @@ a {
 
 #pagination .pagination {
   margin: 20px 0 0 0;
+}
+
+.dropdown-menu {
+  top: 0;
+  left: 100%;
+}
+
+.btn-group {
+  margin: 0 0 10px;
 }
