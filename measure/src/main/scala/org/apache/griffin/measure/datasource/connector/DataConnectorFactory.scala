@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.datasource.connector
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.params.DataConnectorParam
+import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.datasource.connector.batch._
