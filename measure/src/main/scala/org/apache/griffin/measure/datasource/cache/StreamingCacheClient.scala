@@ -71,9 +71,10 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
   val readyTimeDelay: Long = TimeUtil.milliseconds(param.getString(_ReadyTimeDelay, "1m")).getOrElse(60000L)
   val deltaTimeRange: (Long, Long) = {
     def negative(n: Long): Long = if (n <= 0) n else 0
+    case class StringSeq(values:Seq[String])
     param.get(_TimeRange) match {
-      case Some(seq: Seq[String]) => {
-        val nseq = seq.flatMap(TimeUtil.milliseconds(_))
+      case Some(seq: StringSeq) => {
+        val nseq = seq.values.flatMap(TimeUtil.milliseconds(_))
         val ns = negative(nseq.headOption.getOrElse(0))
         val ne = negative(nseq.tail.headOption.getOrElse(0))
         (ns, ne)
