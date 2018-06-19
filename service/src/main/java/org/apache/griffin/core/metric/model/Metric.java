@@ -20,8 +20,6 @@ under the License.
 package org.apache.griffin.core.metric.model;
 
 import org.apache.griffin.core.measure.entity.DqType;
-import org.apache.griffin.core.measure.entity.Measure;
-
 import java.util.List;
 
 public class Metric {
