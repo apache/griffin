@@ -39,7 +39,7 @@ case class DQConfig(@JsonProperty("name") name: String,
                     @JsonProperty("evaluate.rule") evaluateRule: EvaluateRuleParam
                   ) extends Param {
   def getName: String = name
-  def getTimestampOpt: Option[Long] = if (timestamp != null) Some(timestamp) else None
+  def getTimestampOpt: Option[Long] = if (timestamp != 0) Some(timestamp) else None
   def getProcType: String = procType
   def getDataSources: Seq[DataSourceParam] = {
     dataSources.foldLeft((Nil: Seq[DataSourceParam], Set[String]())) { (ret, ds) =>
@@ -145,7 +145,7 @@ case class RuleParam( @JsonProperty("dsl.type") dslType: String,
                     ) extends Param {
   def getDslType: DslType = if (dslType != null) DslType(dslType) else DslType("")
   def getDqType: DqType = if (dqType != null) DqType(dqType) else DqType("")
-  def getCache: Boolean = if (cache != null) cache else false
+  def getCache: Boolean = if (cache) cache else false
 
   def getName: String = if (name != null) name else ""
   def getRule: String = if (rule != null) rule else ""
