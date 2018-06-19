@@ -65,7 +65,7 @@ public class FSUtil {
         try {
             fileSystem = FileSystem.get(conf);
         } catch (Exception e) {
-            LOGGER.error("Can not get hdfs file system. {}", e.getMessage());
+            LOGGER.error("Can not get hdfs file system. {}", e);
         }
 
     }
