@@ -21,7 +21,6 @@ package org.apache.griffin.core.metastore.hive;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +28,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
-import java.io.File;
-import java.net.URI;
-import java.net.URL;
-import java.security.CodeSource;
 
 @Component
 public class HiveMetaStoreProxy {
