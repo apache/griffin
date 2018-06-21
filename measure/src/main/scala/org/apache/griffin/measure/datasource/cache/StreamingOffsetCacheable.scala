@@ -80,7 +80,7 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
       try {
         Some(v.toLong)
       } catch {
-        case _ => error("try to read not existing value from OffsetCacheClient::readSelfInfo");None
+        case _:Throwable => error("try to read not existing value from OffsetCacheClient::readSelfInfo");None
       }
     }
   }
