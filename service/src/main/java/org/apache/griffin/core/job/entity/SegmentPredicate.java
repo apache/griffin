@@ -35,7 +35,9 @@ import java.util.Map;
 @Entity
 public class SegmentPredicate extends AbstractAuditableEntity {
 
-    private String type;
+	private static final long serialVersionUID = 1942715275465116154L;
+
+	private String type;
 
     @JsonIgnore
     private String config;
@@ -65,7 +67,7 @@ public class SegmentPredicate extends AbstractAuditableEntity {
         return config;
     }
 
-    private void setConfig(String config) {
+    public void setConfig(String config) {
         this.config = config;
     }
 
@@ -88,7 +90,7 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     public SegmentPredicate() {
     }
 
-    public SegmentPredicate(String type, Map configMap) throws JsonProcessingException {
+    public SegmentPredicate(String type, Map<String, String> configMap) throws JsonProcessingException {
         this.type = type;
         this.config = JsonUtil.toJson(configMap);
     }
