@@ -30,7 +30,7 @@ Apache Griffin is a model driven open source Data Quality solution for distribut
 - Data quality health monitoring visualization
 - Shared infrastructure resource management
 
-## Background and strategic fit
+## Background
 
 When people play with big data in Hadoop (or other streaming data), data quality often becomes one big challenge. Different teams have built customized data quality tools to detect and analyze data quality issues within their own domain. We are thinking to take a platform approach to provide shared Infrastructure and generic features to solve common data quality pain points. This would enable us to build trusted data assets.
 
