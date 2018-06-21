@@ -40,8 +40,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-@RunWith(SpringRunner.class)
-public class JobInstanceTest {
+//@RunWith(SpringRunner.class)
+//public class JobInstanceTest {
 
 //    @TestConfiguration
 //    public static class jobInstanceBean {
@@ -178,4 +178,4 @@ public class JobInstanceTest {
 //        assertTrue(true);
 //    }
 
-}
+//}
