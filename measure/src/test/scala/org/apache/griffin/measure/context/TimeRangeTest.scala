@@ -16,33 +16,26 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.params.reader
+package org.apache.griffin.measure.context
 
-import org.apache.griffin.measure.utils.JsonUtil
+import org.scalatest._
 
-object ParamReaderFactory {
+class TimeRangeTest extends FlatSpec with Matchers {
 
-  val json = "json"
-  val file = "file"
-
-  /**
-    * parse string content to get param reader
-    * @param pathOrJson
-    * @return
-    */
-  def getParamReader(pathOrJson: String): ParamReader = {
-    val strType = paramStrType(pathOrJson)
-    if (json.equals(strType)) ParamJsonReader(pathOrJson)
-    else ParamFileReader(pathOrJson)
+  "time range" should "be able to merge another time range" in {
+    val tr1 = TimeRange(1, 10, Set(2, 5, 8))
+    val tr2 = TimeRange(4, 15, Set(5, 6, 13, 7))
+    tr1.merge(tr2) should be (TimeRange(1, 15, Set(2, 5, 6, 7, 8, 13)))
   }
 
-  private def paramStrType(str: String): String = {
-    try {
-      JsonUtil.toAnyMap(str)
-      json
-    } catch {
-      case e: Throwable => file
-    }
+  it should "get minimum timestamp in not-empty timestamp set" in {
+    val tr = TimeRange(1, 10, Set(2, 5, 8))
+    tr.minTmstOpt should be (Some(2))
+  }
+
+  it should "not get minimum timestamp in empty timestamp set" in {
+    val tr = TimeRange(1, 10, Set[Long]())
+    tr.minTmstOpt should be (None)
   }
 
 }

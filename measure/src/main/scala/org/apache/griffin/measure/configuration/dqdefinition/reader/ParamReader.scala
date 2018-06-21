@@ -16,24 +16,32 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.params.reader
+package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.apache.griffin.measure.configuration.params.Param
-import org.apache.griffin.measure.utils.JsonUtil
+import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.configuration.dqdefinition.Param
 
 import scala.util.Try
 
-/**
-  * read params from json string directly
-  * @param jsonString
-  */
-case class ParamJsonReader(jsonString: String) extends ParamReader {
+trait ParamReader extends Loggable with Serializable {
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
-    Try {
-      val param = JsonUtil.fromJson[T](jsonString)
-      validate(param)
-    }
+  /**
+    * read config param
+ *
+    * @tparam T     param type expected
+    * @return       parsed param
+    */
+  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T]
+
+  /**
+    * validate config param
+ *
+    * @param param  param to be validated
+    * @return       param itself
+    */
+  protected def validate[T <: Param](param: T): T = {
+    param.validate()
+    param
   }
 
 }

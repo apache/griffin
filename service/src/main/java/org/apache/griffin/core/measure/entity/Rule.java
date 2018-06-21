@@ -42,8 +42,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 @Entity
 public class Rule extends AbstractAuditableEntity {
-
-	private static final long serialVersionUID = 4201131276663746740L;
+	private static final long serialVersionUID = -143019093509759648L;
 
 	/**
      * three type:1.griffin-dsl 2.df-opr 3.spark-sql

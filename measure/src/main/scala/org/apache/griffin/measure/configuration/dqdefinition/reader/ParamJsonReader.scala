@@ -16,32 +16,25 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.sink
+package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.apache.griffin.measure.Loggable
-import org.apache.spark.rdd.RDD
+import org.apache.griffin.measure.configuration.dqdefinition.Param
+import org.apache.griffin.measure.utils.JsonUtil
+
+import scala.util.Try
 
 /**
-  * persist metric and record
+  * read params from json string directly
+ *
+  * @param jsonString
   */
-trait Sink extends Loggable with Serializable {
-  val metricName: String
-  val timeStamp: Long
+case class ParamJsonReader(jsonString: String) extends ParamReader {
 
-  val config: Map[String, Any]
-
-  val block: Boolean
-
-  def available(): Boolean
-
-  def start(msg: String): Unit
-  def finish(): Unit
-
-  def log(rt: Long, msg: String): Unit
-
-  def persistRecords(records: RDD[String], name: String): Unit
-  def persistRecords(records: Iterable[String], name: String): Unit
-
-  def persistMetrics(metrics: Map[String, Any]): Unit
+  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
+    Try {
+      val param = JsonUtil.fromJson[T](jsonString)
+      validate(param)
+    }
+  }
 
 }

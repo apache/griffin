@@ -18,12 +18,14 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.preproc
 
-import org.apache.griffin.measure.configuration.params.RuleParam
+import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
 
 /**
   * generate rule params by template defined in pre-proc param
   */
 object PreProcRuleParamGenerator {
+
+  case class StringAnyMap(values:Map[String,Any])
 
   val _name = "name"
 
@@ -45,7 +47,7 @@ object PreProcRuleParamGenerator {
     keys.foldLeft(details) { (map, key) =>
       map.get(key) match {
         case Some(s: String) => map + (key -> genNewString(s, suffix))
-        case Some(subMap: Map[String, Any]) => map + (key -> getNewMap(subMap, suffix))
+        case Some(subMap: StringAnyMap) => map + (key -> getNewMap(subMap.values, suffix))
         case Some(arr: Seq[_]) => map + (key -> getNewArr(arr, suffix))
         case _ => map
       }
@@ -56,7 +58,7 @@ object PreProcRuleParamGenerator {
     paramArr.foldLeft(Nil: Seq[Any]) { (res, param) =>
       param match {
         case s: String => res :+ genNewString(s, suffix)
-        case map: Map[String, Any] => res :+ getNewMap(map, suffix)
+        case map: StringAnyMap => res :+ getNewMap(map.values, suffix)
         case arr: Seq[_] => res :+ getNewArr(arr, suffix)
         case _ => res :+ param
       }

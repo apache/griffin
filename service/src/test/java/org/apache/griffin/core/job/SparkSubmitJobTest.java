@@ -100,7 +100,6 @@ public class SparkSubmitJobTest {
         sparkSubmitJob.execute(context);
         
         verify(context, times(1)).getJobDetail();
-        verify(context, times(1)).getTrigger();
         verify(jobInstanceRepo, times(1)).findByPredicateName(Matchers.anyString());
     }
 
@@ -119,7 +118,6 @@ public class SparkSubmitJobTest {
         sparkSubmitJob.execute(context);
         
         verify(context, times(1)).getJobDetail();
-        verify(context, times(1)).getTrigger();
         verify(jobInstanceRepo, times(1)).findByPredicateName(Matchers.anyString());
     }
 
@@ -140,7 +138,6 @@ public class SparkSubmitJobTest {
         sparkSubmitJob.execute(context);
         
         verify(context, times(1)).getJobDetail();
-        verify(restTemplate, times(1)).postForObject(Matchers.anyString(), Matchers.any(), Matchers.any());
         verify(jobInstanceRepo, times(1)).findByPredicateName(Matchers.anyString());
     }
 

@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.params
+package org.apache.griffin.measure.configuration.dqdefinition
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
@@ -68,7 +68,7 @@ case class SparkParam( @JsonProperty("log.level") logLevel: String,
   def getBatchInterval: String = if (batchInterval != null) batchInterval else ""
   def getProcessInterval: String = if (processInterval != null) processInterval else ""
   def getConfig: Map[String, String] = if (config != null) config else Map[String, String]()
-  def needInitClear: Boolean = if (initClear != null) initClear else false
+  def needInitClear: Boolean = if (initClear) initClear else false
 
   def validate(): Unit = {
 //    assert(StringUtils.isNotBlank(cpDir), "checkpoint.dir should not be empty")

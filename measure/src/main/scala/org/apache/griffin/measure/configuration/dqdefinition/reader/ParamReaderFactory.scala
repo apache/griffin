@@ -16,24 +16,33 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.offset
+package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.apache.griffin.measure.configuration.dqdefinition.OffsetCacheParam
+import org.apache.griffin.measure.utils.JsonUtil
 
-import scala.util.{Success, Try}
+object ParamReaderFactory {
 
-case class OffsetCacheFactory(offsetCacheParams: Iterable[OffsetCacheParam], metricName: String
-                             ) extends Serializable {
+  val json = "json"
+  val file = "file"
 
-  val ZK_REGEX = """^(?i)zk|zookeeper$""".r
+  /**
+    * parse string content to get param reader
+    * @param pathOrJson
+    * @return
+    */
+  def getParamReader(pathOrJson: String): ParamReader = {
+    val strType = paramStrType(pathOrJson)
+    if (json.equals(strType)) ParamJsonReader(pathOrJson)
+    else ParamFileReader(pathOrJson)
+  }
 
-  def getOffsetCache(offsetCacheParam: OffsetCacheParam): Option[OffsetCache] = {
-    val config = offsetCacheParam.getConfig
-    val offsetCacheTry = offsetCacheParam.getType match {
-      case ZK_REGEX() => Try(OffsetCacheInZK(config, metricName))
-      case _ => throw new Exception("not supported info cache type")
+  private def paramStrType(str: String): String = {
+    try {
+      JsonUtil.toAnyMap(str)
+      json
+    } catch {
+      case e: Throwable => file
     }
-    offsetCacheTry.toOption
   }
 
 }

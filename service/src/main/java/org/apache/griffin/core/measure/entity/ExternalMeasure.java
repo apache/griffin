@@ -33,7 +33,6 @@ import javax.persistence.OneToOne;
  */
 @Entity
 public class ExternalMeasure extends Measure {
-
 	private static final long serialVersionUID = -7551493544224747244L;
 
 	private String metricName;
