@@ -38,18 +38,26 @@ import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_NAME;
 
 public class EntityHelper {
     public static GriffinMeasure createGriffinMeasure(String name) throws Exception {
-        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
-        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
+        DataConnector dcSource = createDataConnector("source_name", "default",
+            "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
+        DataConnector dcTarget = createDataConnector("target_name", "default",
+            "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
         return createGriffinMeasure(name, dcSource, dcTarget);
     }
 
-    public static GriffinMeasure createGriffinMeasure(String name, SegmentPredicate srcPredicate, SegmentPredicate tgtPredicate) throws Exception {
-        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#", srcPredicate);
-        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#", tgtPredicate);
+    public static GriffinMeasure createGriffinMeasure(String name,
+                                                      SegmentPredicate srcPredicate,
+                                                      SegmentPredicate tgtPredicate) throws Exception {
+        DataConnector dcSource = createDataConnector("source_name", "default",
+            "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#", srcPredicate);
+        DataConnector dcTarget = createDataConnector("target_name", "default",
+            "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#", tgtPredicate);
         return createGriffinMeasure(name, dcSource, dcTarget);
     }
 
-    public static GriffinMeasure createGriffinMeasure(String name, DataConnector dcSource, DataConnector dcTarget) throws Exception {
+    public static GriffinMeasure createGriffinMeasure(String name,
+                                                      DataConnector dcSource,
+                                                      DataConnector dcTarget) throws Exception {
         DataSource dataSource = new DataSource("source", Arrays.asList(dcSource));
         DataSource targetSource = new DataSource("target", Arrays.asList(dcTarget));
         List<DataSource> dataSources = new ArrayList<>();
@@ -63,7 +71,10 @@ public class EntityHelper {
         return new GriffinMeasure(name, "test", dataSources, evaluateRule);
     }
 
-    public static DataConnector createDataConnector(String name, String database, String table, String where) throws IOException {
+    public static DataConnector createDataConnector(String name,
+                                                    String database,
+                                                    String table,
+                                                    String where) throws IOException {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);
@@ -71,7 +82,11 @@ public class EntityHelper {
         return new DataConnector(name, "1h", config, null);
     }
 
-    public static DataConnector createDataConnector(String name, String database, String table, String where, SegmentPredicate predicate) throws IOException {
+    public static DataConnector createDataConnector(String name,
+                                                    String database,
+                                                    String table,
+                                                    String where,
+                                                    SegmentPredicate predicate) throws IOException {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);
@@ -127,7 +142,8 @@ public class EntityHelper {
         return jobBean;
     }
 
-    public static JobDetailImpl createJobDetail(String measureJson, String predicatesJson) {
+    public static JobDetailImpl createJobDetail(String measureJson,
+                                                String predicatesJson) {
         JobDetailImpl jobDetail = new JobDetailImpl();
         JobKey jobKey = new JobKey("name", "group");
         jobDetail.setKey(jobKey);
@@ -167,7 +183,7 @@ public class EntityHelper {
 
     public static BatchJob createGriffinJob() {
         return new BatchJob(1L, 1L, "jobName",
-                "quartzJobName", "quartzGroupName", false);
+            "quartzJobName", "quartzGroupName", false);
     }
 
 }

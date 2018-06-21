@@ -33,8 +33,9 @@ import java.util.Map;
 
 @Entity
 public class StreamingPreProcess extends AbstractAuditableEntity {
+	private static final long serialVersionUID = -7471448761795495384L;
 
-    private String dslType;
+	private String dslType;
 
     private String name;
 
