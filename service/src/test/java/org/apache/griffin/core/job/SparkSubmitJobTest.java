@@ -19,11 +19,19 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
+import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.PropertiesUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.internal.util.reflection.Whitebox;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,7 +40,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.Properties;
+
+import static org.apache.griffin.core.util.EntityHelper.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)
@@ -75,71 +88,79 @@ public class SparkSubmitJobTest {
 
     @Test
     public void testExecuteWithPredicateTriggerGreaterThanRepeat() throws Exception {
-//        JobExecutionContext context = mock(JobExecutionContext.class);
-//        JobInstanceBean instance = createJobInstance();
-//        GriffinMeasure measure = createGriffinMeasure("measureName");
-//        SegmentPredicate predicate = createFileExistPredicate();
-//        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), JsonUtil.toJson(Collections.singletonList(predicate)));
-//        given(context.getJobDetail()).willReturn(jd);
-//        given(context.getTrigger()).willReturn(createSimpleTrigger(4, 5));
-//        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
-//
-//        sparkSubmitJob.execute(context);
-//        assertTrue(true);
+        JobExecutionContext context = mock(JobExecutionContext.class);
+        JobInstanceBean instance = createJobInstance();
+        GriffinMeasure measure = createGriffinMeasure("measureName");
+        SegmentPredicate predicate = createFileExistPredicate();
+        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), JsonUtil.toJson(Collections.singletonList(predicate)));
+        given(context.getJobDetail()).willReturn(jd);
+        given(context.getTrigger()).willReturn(createSimpleTrigger(4, 5));
+        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
+
+        sparkSubmitJob.execute(context);
+
+        verify(context, times(1)).getJobDetail();
+        verify(jobInstanceRepo, times(1)).findByPredicateName(Matchers.anyString());
     }
 
     @Test
     public void testExecuteWithPredicateTriggerLessThanRepeat() throws Exception {
-//        JobExecutionContext context = mock(JobExecutionContext.class);
-//        JobInstanceBean instance = createJobInstance();
-//        GriffinMeasure measure = createGriffinMeasure("measureName");
-//        SegmentPredicate predicate = createFileExistPredicate();
-//        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), JsonUtil.toJson(Collections.singletonList(predicate)));
-//        given(context.getJobDetail()).willReturn(jd);
-//        given(context.getTrigger()).willReturn(createSimpleTrigger(4, 4));
-//        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
-//
-//        sparkSubmitJob.execute(context);
-//        assertTrue(true);
+
+        JobExecutionContext context = mock(JobExecutionContext.class);
+        JobInstanceBean instance = createJobInstance();
+        GriffinMeasure measure = createGriffinMeasure("measureName");
+        SegmentPredicate predicate = createFileExistPredicate();
+        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), JsonUtil.toJson(Collections.singletonList(predicate)));
+        given(context.getJobDetail()).willReturn(jd);
+        given(context.getTrigger()).willReturn(createSimpleTrigger(4, 4));
+        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
+
+        sparkSubmitJob.execute(context);
+
+        verify(context, times(1)).getJobDetail();
+        verify(jobInstanceRepo, times(1)).findByPredicateName(Matchers.anyString());
     }
 
     @Test
     public void testExecuteWithNoPredicateSuccess() throws Exception {
-//        String result = "{\"id\":1,\"state\":\"STARTING\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
-//        JobExecutionContext context = mock(JobExecutionContext.class);
-//        JobInstanceBean instance = createJobInstance();
-//        GriffinMeasure measure = createGriffinMeasure("measureName");
-//        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
-//        given(context.getJobDetail()).willReturn(jd);
-//        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
-//        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
-//        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(), Matchers.any())).willReturn(result);
-////        doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
-//
-//        sparkSubmitJob.execute(context);
-//        assertTrue(true);
+
+        String result = "{\"id\":1,\"state\":\"starting\",\"appId\":null,\"appInfo\":{\"driverLogUrl\":null,\"sparkUiUrl\":null},\"log\":[]}";
+        JobExecutionContext context = mock(JobExecutionContext.class);
+        JobInstanceBean instance = createJobInstance();
+        GriffinMeasure measure = createGriffinMeasure("measureName");
+        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
+        given(context.getJobDetail()).willReturn(jd);
+        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
+        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
+        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(), Matchers.any())).willReturn(result);
+        //doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
+
+        sparkSubmitJob.execute(context);
+
+        verify(context, times(1)).getJobDetail();
+        verify(jobInstanceRepo, times(1)).findByPredicateName(Matchers.anyString());
     }
 
     @Test
     public void testExecuteWithPost2LivyException() throws Exception {
-//        JobExecutionContext context = mock(JobExecutionContext.class);
-//        JobInstanceBean instance = createJobInstance();
-//        GriffinMeasure measure = createGriffinMeasure("measureName");
-//        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
-//        given(context.getJobDetail()).willReturn(jd);
-//        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
-////        doNothing().when(jobService).pauseJob(Matchers.any(), Matchers.any());
-//
-//        sparkSubmitJob.execute(context);
-//        assertTrue(true);
+
+        JobExecutionContext context = mock(JobExecutionContext.class);
+        JobInstanceBean instance = createJobInstance();
+        GriffinMeasure measure = createGriffinMeasure("measureName");
+        JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
+        given(context.getJobDetail()).willReturn(jd);
+        given(jobInstanceRepo.findByPredicateName(Matchers.anyString())).willReturn(instance);
+
+        sparkSubmitJob.execute(context);
+        verify(context, times(1)).getJobDetail();
+        verify(jobInstanceRepo, times(1)).findByPredicateName(Matchers.anyString());
     }
 
     @Test
     public void testExecuteWithNullException() {
-//        JobExecutionContext context = mock(JobExecutionContext.class);
-//
-//        sparkSubmitJob.execute(context);
-//        assertTrue(true);
+        JobExecutionContext context = mock(JobExecutionContext.class);
+
+        sparkSubmitJob.execute(context);
     }
 
 }

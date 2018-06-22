@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.job.repo.BatchJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobRepo;
@@ -48,11 +49,13 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
