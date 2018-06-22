@@ -530,7 +530,7 @@ public class JobServiceImpl implements JobService {
 
     private void setStateByYarn(JobInstanceBean instance) {
         LOGGER.warn("Spark session {} may be overdue! Now we use yarn to update state.", instance.getSessionId());
-        String yarnUrl = env.getProperty("rm.uri");
+        String yarnUrl = env.getProperty("yarn.uri");
         boolean success = YarnNetUtil.update(yarnUrl, instance);
         if (!success) {
             if (instance.getState().equals(UNKNOWN)) {
@@ -548,7 +548,7 @@ public class JobServiceImpl implements JobService {
             Object appId = resultMap.get("appId");
             instance.setState(state == null ? null : LivySessionStates.State.valueOf(state.toString().toUpperCase()));
             instance.setAppId(appId == null ? null : appId.toString());
-            instance.setAppUri(appId == null ? null : env.getProperty("rm.uri") + "/cluster/app/" + appId);
+            instance.setAppUri(appId == null ? null : env.getProperty("yarn.uri") + "/cluster/app/" + appId);
             instanceRepo.save(instance);
         }
     }
