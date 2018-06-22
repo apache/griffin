@@ -40,7 +40,9 @@ import java.util.*;
 @Entity
 public class JobSchedule extends AbstractAuditableEntity {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedule.class);
+	private static final long serialVersionUID = -267127340001680745L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedule.class);
 
     @NotNull
     private Long measureId;
@@ -139,14 +141,6 @@ public class JobSchedule extends AbstractAuditableEntity {
     @JsonProperty("predicate.config")
     public void setConfigMap(Map<String, Object> configMap) {
         this.configMap = configMap;
-    }
-
-    private String getPredicateConfig() {
-        return predicateConfig;
-    }
-
-    private void setPredicateConfig(String config) {
-        this.predicateConfig = config;
     }
 
     @PrePersist
