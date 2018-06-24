@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import static org.apache.griffin.core.util.PropertiesUtil.getConf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class PropertiesUtilTest {
 
@@ -50,7 +51,7 @@ public class PropertiesUtilTest {
         String defaultPath = "/" + name;
         String location = "src/test/resources";
         Properties properties = getConf(name, defaultPath, location);
-        assert properties != null;
+        assertNotNull(properties);
     }
 
     @Test
@@ -59,7 +60,7 @@ public class PropertiesUtilTest {
         String defaultPath = "/" + name;
         String location = "src/main";
         Properties properties = getConf(name, defaultPath, location);
-        assert properties != null;
+        assertNotNull(properties);
     }
 
     @Test
@@ -67,7 +68,7 @@ public class PropertiesUtilTest {
         String name = "sparkJob.properties";
         String defaultPath = "/" + name;
         Properties properties = getConf(name, defaultPath, null);
-        assert properties != null;
+        assertNotNull(properties);
     }
 
 }
