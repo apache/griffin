@@ -194,7 +194,6 @@ public class DataConnector extends AbstractAuditableEntity {
         }
     }
 
-
     public DataConnector() {
     }
 
