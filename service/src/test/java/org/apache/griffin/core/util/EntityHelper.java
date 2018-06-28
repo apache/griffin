@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.util;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.entity.JobDataSegment;
@@ -56,6 +55,10 @@ import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_NAME;
 
 public class EntityHelper {
+
+    public static final String CRON_EXPRESSION = "0 0/4 * * * ?";
+    public static final String TIME_ZONE = "GMT+8:00";
+
     public static GriffinMeasure createGriffinMeasure(String name) throws Exception {
         DataConnector dcSource = createDataConnector("source_name", "default",
             "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
@@ -128,7 +131,7 @@ public class EntityHelper {
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+        return new JobSchedule(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments);
     }
 
     public static JobSchedule createJobSchedule(String jobName,
@@ -138,7 +141,7 @@ public class EntityHelper {
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+        return new JobSchedule(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments);
     }
 
     public static JobSchedule createJobSchedule(String jobName,
@@ -147,7 +150,7 @@ public class EntityHelper {
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(source);
         segments.add(target);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+        return new JobSchedule(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments);
     }
 
     public static JobDataSegment createJobDataSegment(String dataConnectorName,
@@ -197,7 +200,7 @@ public class EntityHelper {
         detail.put("jobId", 1L);
         detail.put("jobName", "jobName");
         detail.put("measureId", 1L);
-        detail.put("cronExpression", "0 0/4 * * * ?");
+        detail.put("cronExpression", CRON_EXPRESSION);
         return detail;
     }
 
