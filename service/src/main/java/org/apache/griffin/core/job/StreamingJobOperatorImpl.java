@@ -81,18 +81,23 @@ public class StreamingJobOperatorImpl implements JobOperator {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public JobSchedule add(JobSchedule js, GriffinMeasure measure) throws Exception {
-        validateParams(js);
-        String qName = jobService.getQuartzName(js);
+    public AbstractJob add(AbstractJob job, GriffinMeasure measure) throws Exception {
+        validateParams(job);
+        String qName = jobService.getQuartzName(job);
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = jobService.getTriggerKeyIfValid(qName, qGroup);
-        StreamingJob streamingJob = new StreamingJob(js.getMeasureId(), js.getJobName(), qName, qGroup, false);
-        streamingJob.setJobSchedule(js);
+        StreamingJob streamingJob = genStreamingJobBean(job, qName, qGroup);
         streamingJob = streamingJobRepo.save(streamingJob);
-        jobService.addJob(triggerKey, js, streamingJob, STREAMING);
-        JobSchedule jobSchedule = streamingJob.getJobSchedule();
-        jobSchedule.setId(streamingJob.getId());
-        return jobSchedule;
+        jobService.addJob(triggerKey,streamingJob, STREAMING);
+        return streamingJob;
+    }
+
+    private StreamingJob genStreamingJobBean(AbstractJob job, String qName, String qGroup) {
+        StreamingJob streamingJob = (StreamingJob)job;
+        streamingJob.setMetricName(job.getJobName());
+        streamingJob.setGroup(qGroup);
+        streamingJob.setName(qName);
+        return streamingJob;
     }
 
     /**
@@ -107,14 +112,13 @@ public class StreamingJobOperatorImpl implements JobOperator {
         StreamingJob streamingJob = (StreamingJob) job;
         verifyJobState(streamingJob);
         streamingJob = streamingJobRepo.save(streamingJob);
-        JobSchedule js = streamingJob.getJobSchedule();
-        String qName = jobService.getQuartzName(js);
+        String qName = jobService.getQuartzName(job);
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = triggerKey(qName, qGroup);
-        jobService.addJob(triggerKey, js, streamingJob, STREAMING);
+        jobService.addJob(triggerKey,streamingJob, STREAMING);
     }
 
-    private void verifyJobState(StreamingJob job) throws SchedulerException {
+    private void verifyJobState(AbstractJob job) throws SchedulerException {
         /* Firstly you should check whether job is scheduled. If it is scheduled, triggers are empty. */
         List<? extends Trigger> triggers = jobService.getTriggers(job.getName(), job.getGroup());
         if (!CollectionUtils.isEmpty(triggers)) {
@@ -157,7 +161,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
     }
 
     @Override
-    public JobState getState(AbstractJob job, JobDataBean bean, String action) {
+    public JobState getState(AbstractJob job, String action) {
         JobState jobState = new JobState();
         List<JobInstanceBean> instances = instanceRepo.findByJobId(job.getId());
         for (JobInstanceBean instance : instances) {
@@ -256,8 +260,8 @@ public class StreamingJobOperatorImpl implements JobOperator {
     }
 
 
-    private void validateParams(JobSchedule js) {
-        if (!jobService.isValidJobName(js.getJobName())) {
+    private void validateParams(AbstractJob job) {
+        if (!jobService.isValidJobName(job.getJobName())) {
             throw new GriffinException.BadRequestException(INVALID_JOB_NAME);
         }
     }

@@ -27,15 +27,13 @@ import java.util.List;
 
 public interface JobService {
 
-    List<JobDataBean> getAliveJobs(String type);
+    List<AbstractJob> getAliveJobs(String type);
 
-    JobSchedule getJobSchedule(String jobName);
+    AbstractJob addJob(AbstractJob js) throws Exception;
 
-    JobSchedule getJobSchedule(Long jobId);
+    AbstractJob getJobConfig(Long jobId);
 
-    JobSchedule addJob(JobSchedule js) throws Exception;
-
-    JobDataBean onAction(Long jobId,String action) throws Exception;
+    AbstractJob onAction(Long jobId,String action) throws Exception;
 
     void deleteJob(Long jobId) throws SchedulerException;
 

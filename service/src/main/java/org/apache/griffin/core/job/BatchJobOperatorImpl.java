@@ -41,18 +41,23 @@ public class BatchJobOperatorImpl implements JobOperator {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public JobSchedule add(JobSchedule js, GriffinMeasure measure) throws Exception {
-        validateParams(js, measure);
-        String qName = jobService.getQuartzName(js);
+    public AbstractJob add(AbstractJob job, GriffinMeasure measure) throws Exception {
+        validateParams(job, measure);
+        String qName = jobService.getQuartzName(job);
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = jobService.getTriggerKeyIfValid(qName, qGroup);
-        BatchJob batchJob = new BatchJob(js.getMeasureId(), js.getJobName(), qName, qGroup, false);
-        batchJob.setJobSchedule(js);
+        BatchJob batchJob = genBatchJobBean(job, qName, qGroup);
         batchJob = batchJobRepo.save(batchJob);
-        jobService.addJob(triggerKey, js, batchJob, BATCH);
-        JobSchedule jobSchedule = batchJob.getJobSchedule();
-        jobSchedule.setId(batchJob.getId());
-        return jobSchedule;
+        jobService.addJob(triggerKey, batchJob, BATCH);
+        return job;
+    }
+
+    private BatchJob genBatchJobBean(AbstractJob job, String qName, String qGroup) {
+        BatchJob batchJob = (BatchJob)job;
+        batchJob.setMetricName(job.getJobName());
+        batchJob.setGroup(qGroup);
+        batchJob.setName(qName);
+        return batchJob;
     }
 
     /**
@@ -107,15 +112,32 @@ public class BatchJobOperatorImpl implements JobOperator {
     }
 
     @Override
-    public JobState getState(AbstractJob job, JobDataBean bean, String action) throws SchedulerException {
+    public JobState getState(AbstractJob job, String action) throws SchedulerException {
         JobState jobState = new JobState();
         Scheduler scheduler = factory.getScheduler();
+        if (job.getGroup() == null || job.getName() == null) {
+            return null;
+        }
         TriggerKey triggerKey = triggerKey(job.getName(), job.getGroup());
         TriggerState triggerState = scheduler.getTriggerState(triggerKey);
         jobState.setState(triggerState.toString());
         jobState.setToStart(getStartStatus(triggerState));
         jobState.setToStop(getStopStatus(triggerState));
+        setTriggerTime(job, jobState);
         return jobState;
+    }
+
+    private void setTriggerTime(AbstractJob job, JobState jobState) throws SchedulerException {
+        List<? extends Trigger> triggers = jobService.getTriggers(job.getName(), job.getGroup());
+        // If triggers are empty, in Griffin it means job is completed whose trigger state is NONE or not scheduled.
+        if (CollectionUtils.isEmpty(triggers)) {
+            return;
+        }
+        Trigger trigger = triggers.get(0);
+        Date nextFireTime = trigger.getNextFireTime();
+        Date previousFireTime = trigger.getPreviousFireTime();
+        jobState.setNextFireTime(nextFireTime != null ? nextFireTime.getTime() : -1);
+        jobState.setPreviousFireTime(previousFireTime != null ? previousFireTime.getTime() : -1);
     }
 
     /**
@@ -237,18 +259,18 @@ public class BatchJobOperatorImpl implements JobOperator {
         return status;
     }
 
-    private void validateParams(JobSchedule js, GriffinMeasure measure) {
-        if (!jobService.isValidJobName(js.getJobName())) {
+    private void validateParams(AbstractJob job, GriffinMeasure measure) {
+        if (!jobService.isValidJobName(job.getJobName())) {
             throw new GriffinException.BadRequestException(INVALID_JOB_NAME);
         }
-        if (!isValidCronExpression(js.getCronExpression())) {
+        if (!isValidCronExpression(job.getCronExpression())) {
             throw new GriffinException.BadRequestException(INVALID_CRON_EXPRESSION);
         }
-        if (!isValidBaseLine(js.getSegments())) {
+        if (!isValidBaseLine(job.getSegments())) {
             throw new GriffinException.BadRequestException(MISSING_BASELINE_CONFIG);
         }
         List<String> names = getConnectorNames(measure);
-        if (!isValidConnectorNames(js.getSegments(), names)) {
+        if (!isValidConnectorNames(job.getSegments(), names)) {
             throw new GriffinException.BadRequestException(INVALID_CONNECTOR_NAME);
         }
     }

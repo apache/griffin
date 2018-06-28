@@ -26,6 +26,11 @@ import javax.persistence.Entity;
 @DiscriminatorValue("griffinStreamingJob")
 public class StreamingJob extends AbstractJob {
 
+    @Override
+    public String getType() {
+        return "streaming";
+    }
+
     public StreamingJob() {
     }
 

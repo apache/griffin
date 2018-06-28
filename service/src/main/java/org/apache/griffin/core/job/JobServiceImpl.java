@@ -19,50 +19,11 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import static java.util.TimeZone.getTimeZone;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_MEASURE_ID;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_TYPE_DOES_NOT_SUPPORT;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_SUPPORT;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.NO_SUCH_JOB_ACTION;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
-import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.BUSY;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.IDLE;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.RECOVERING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.JobKey.jobKey;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
-import static org.quartz.TriggerKey.triggerKey;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
-
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
-import org.apache.griffin.core.job.entity.AbstractJob;
-import org.apache.griffin.core.job.entity.BatchJob;
-import org.apache.griffin.core.job.entity.JobDataBean;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
-import org.apache.griffin.core.job.entity.JobState;
-import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
-import org.apache.griffin.core.job.entity.StreamingJob;
 import org.apache.griffin.core.job.repo.BatchJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobRepo;
@@ -72,15 +33,7 @@ import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.YarnNetUtil;
-import org.quartz.CronTrigger;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +49,23 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
+
+import static java.util.TimeZone.getTimeZone;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.triggerKey;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -135,7 +104,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobDataBean> getAliveJobs(String type) {
+    public List<AbstractJob> getAliveJobs(String type) {
         List<? extends AbstractJob> jobs;
         if (BATCH_TYPE.equals(type)) {
             jobs = batchJobRepo.findByDeleted(false);
@@ -147,14 +116,13 @@ public class JobServiceImpl implements JobService {
         return getJobDataBeans(jobs);
     }
 
-    private List<JobDataBean> getJobDataBeans(List<? extends AbstractJob> jobs) {
-        List<JobDataBean> dataList = new ArrayList<>();
+    private List<AbstractJob> getJobDataBeans(List<? extends AbstractJob> jobs) {
+        List<AbstractJob> dataList = new ArrayList<>();
         try {
             for (AbstractJob job : jobs) {
-                JobDataBean jobData = genJobDataBean(job);
-                if (jobData != null) {
-                    dataList.add(jobData);
-                }
+                JobState jobState = genJobState(job);
+                job.setJobState(jobState);
+                dataList.add(job);
             }
         } catch (SchedulerException e) {
             LOGGER.error("Failed to get RUNNING jobs.", e);
@@ -164,38 +132,21 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public JobSchedule getJobSchedule(String jobName) {
-        List<AbstractJob> jobs = jobRepo.findByJobNameAndDeleted(jobName, false);
-        if (jobs.size() == 0) {
-            LOGGER.warn("Job name {} does not exist.", jobName);
-            throw new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST);
-        }
-        AbstractJob job = jobs.get(0);
-        return getJobSchedule(job);
+    public AbstractJob addJob(AbstractJob job) throws Exception {
+        Long measureId = job.getMeasureId();
+        GriffinMeasure measure = getMeasureIfValid(measureId);
+        JobOperator op = getJobOperator(measure.getProcessType());
+        return op.add(job, measure);
     }
 
     @Override
-    public JobSchedule getJobSchedule(Long jobId) {
+    public AbstractJob getJobConfig(Long jobId) {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         if (job == null) {
             LOGGER.warn("Job id {} does not exist.", jobId);
             throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
         }
-        return getJobSchedule(job);
-    }
-
-    private JobSchedule getJobSchedule(AbstractJob job) {
-        JobSchedule jobSchedule = job.getJobSchedule();
-        jobSchedule.setId(job.getId());
-        return jobSchedule;
-    }
-
-    @Override
-    public JobSchedule addJob(JobSchedule js) throws Exception {
-        Long measureId = js.getMeasureId();
-        GriffinMeasure measure = getMeasureIfValid(measureId);
-        JobOperator op = getJobOperator(measure.getProcessType());
-        return op.add(js, measure);
+        return job;
     }
 
     /**
@@ -203,12 +154,14 @@ public class JobServiceImpl implements JobService {
      * @param action job operation: start job, stop job
      */
     @Override
-    public JobDataBean onAction(Long jobId, String action) throws Exception {
+    public AbstractJob onAction(Long jobId, String action) throws Exception {
         AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
         validateJobExist(job);
         JobOperator op = getJobOperator(job);
         doAction(action, job, op);
-        return genJobDataBean(job, action);
+        JobState jobState = genJobState(job, action);
+        job.setJobState(jobState);
+        return job;
     }
 
     private void doAction(String action, AbstractJob job, JobOperator op) throws Exception {
@@ -350,65 +303,33 @@ public class JobServiceImpl implements JobService {
     }
 
     List<? extends Trigger> getTriggers(String name, String group) throws SchedulerException {
+        if (name == null || group == null) {
+            return null;
+        }
         JobKey jobKey = new JobKey(name, group);
         Scheduler scheduler = factory.getScheduler();
         return scheduler.getTriggersOfJob(jobKey);
     }
 
-    private JobDataBean genJobDataBean(AbstractJob job, String action) throws SchedulerException {
-        if (job.getName() == null || job.getGroup() == null) {
-            return null;
-        }
-        JobDataBean jobData = new JobDataBean();
-        List<? extends Trigger> triggers = getTriggers(job.getName(), job.getGroup());
-        /* If triggers are empty, in Griffin it means job is not scheduled or completed whose trigger state is NONE. */
-        if (CollectionUtils.isEmpty(triggers) && job instanceof BatchJob) {
-            return null;
-        }
-        setTriggerTime(triggers, jobData);
+    private JobState genJobState(AbstractJob job, String action) throws SchedulerException {
         JobOperator op = getJobOperator(job);
-        JobState state = op.getState(job, jobData, action);
-        jobData.setJobState(state);
-        jobData.setJobId(job.getId());
-        jobData.setJobName(job.getJobName());
-        jobData.setMeasureId(job.getMeasureId());
-        jobData.setCronExpression(getCronExpression(triggers));
-        jobData.setProcessType(job instanceof BatchJob ? BATCH : STREAMING);
-        return jobData;
+        JobState state = op.getState(job, action);
+        job.setJobState(state);
+        return state;
     }
 
-    private JobDataBean genJobDataBean(AbstractJob job) throws SchedulerException {
-        return genJobDataBean(job, null);
+    private JobState genJobState(AbstractJob job) throws SchedulerException {
+        return genJobState(job, null);
     }
 
-    private void setTriggerTime(List<? extends Trigger> triggers, JobDataBean jobBean) {
-        if (CollectionUtils.isEmpty(triggers)) {
-            return;
-        }
-        Trigger trigger = triggers.get(0);
-        Date nextFireTime = trigger.getNextFireTime();
-        Date previousFireTime = trigger.getPreviousFireTime();
-        jobBean.setNextFireTime(nextFireTime != null ? nextFireTime.getTime() : -1);
-        jobBean.setPreviousFireTime(previousFireTime != null ? previousFireTime.getTime() : -1);
-    }
-
-    private String getCronExpression(List<? extends Trigger> triggers) {
-        for (Trigger trigger : triggers) {
-            if (trigger instanceof CronTrigger) {
-                return ((CronTrigger) trigger).getCronExpression();
-            }
-        }
-        return null;
-    }
-
-    void addJob(TriggerKey tk, JobSchedule js, AbstractJob job, ProcessType type) throws Exception {
+    void addJob(TriggerKey tk, AbstractJob job, ProcessType type) throws Exception {
         JobDetail jobDetail = addJobDetail(tk, job);
-        Trigger trigger = genTriggerInstance(tk, jobDetail, js, type);
+        Trigger trigger = genTriggerInstance(tk, jobDetail, job, type);
         factory.getScheduler().scheduleJob(trigger);
     }
 
-    String getQuartzName(JobSchedule js) {
-        return js.getJobName() + "_" + System.currentTimeMillis();
+    String getQuartzName(AbstractJob job) {
+        return job.getJobName() + "_" + System.currentTimeMillis();
     }
 
     String getQuartzGroup() {
@@ -438,11 +359,11 @@ public class JobServiceImpl implements JobService {
         return measure;
     }
 
-    private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, JobSchedule js, ProcessType type) {
+    private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, AbstractJob job, ProcessType type) {
         TriggerBuilder builder = newTrigger().withIdentity(tk).forJob(jd);
         if (type == BATCH) {
-            TimeZone timeZone = getTimeZone(js.getTimeZone());
-            return builder.withSchedule(cronSchedule(js.getCronExpression()).inTimeZone(timeZone)).build();
+            TimeZone timeZone = getTimeZone(job.getTimeZone());
+            return builder.withSchedule(cronSchedule(job.getCronExpression()).inTimeZone(timeZone)).build();
         } else if (type == STREAMING) {
             return builder.startNow().withSchedule(simpleSchedule().withRepeatCount(0)).build();
         }
@@ -540,8 +461,9 @@ public class JobServiceImpl implements JobService {
 
     /**
      * Check instance status in case that session id is overdue and app id is null and so we cannot update instance state.
+     *
      * @param instance job instance bean
-     * @param e HttpClientErrorException
+     * @param e        HttpClientErrorException
      * @return boolean
      */
     private boolean checkStatus(JobInstanceBean instance, HttpClientErrorException e) {
