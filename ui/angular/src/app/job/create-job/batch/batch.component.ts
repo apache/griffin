@@ -71,6 +71,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
     "cron.expression": "",
     "measure.id": "",
     "job.name": "",
+    "job.type":"batch",
     "cron.time.zone": "",
     // "cron.time.zone": "GMT+8:00",
     // "predicate.config": {
@@ -137,6 +138,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
     let timezone = "GMT" + time + ":00";
     this.newJob = {
       "job.name": this.jobname,
+      "job.type":"batch",
       "measure.id": this.measureid,
       "cron.expression": this.cronExp,
       "cron.time.zone": timezone,
