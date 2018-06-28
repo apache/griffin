@@ -63,6 +63,9 @@ public class JobInstance implements Job {
     public static final String PREDICATE_JOB_NAME = "predicateJobName";
     static final String JOB_NAME = "jobName";
     static final String PATH_CONNECTOR_CHARACTER = ",";
+    public static final String INTERVAL = "interval";
+    public static final String REPEAT = "repeat";
+    public static final String CHECK_DONEFILE_SCHEDULE = "checkdonefile.schedule";
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -75,7 +78,6 @@ public class JobInstance implements Job {
     @Autowired
     private Environment env;
 
-    private JobSchedule jobSchedule;
     private GriffinMeasure measure;
     private AbstractJob job;
     private List<SegmentPredicate> mPredicates;
@@ -88,7 +90,7 @@ public class JobInstance implements Job {
         try {
             initParam(context);
             setSourcesPartitionsAndPredicates(measure.getDataSources());
-            createJobInstance(jobSchedule.getConfigMap());
+            createJobInstance(job.getConfigMap());
         } catch (Exception e) {
             LOGGER.error("Create predicate job failure.", e);
         }
@@ -99,8 +101,7 @@ public class JobInstance implements Job {
         JobDetail jobDetail = context.getJobDetail();
         Long jobId = jobDetail.getJobDataMap().getLong(GRIFFIN_JOB_ID);
         job = jobRepo.findOne(jobId);
-        jobSchedule = job.getJobSchedule();
-        Long measureId = jobSchedule.getMeasureId();
+        Long measureId = job.getMeasureId();
         measure = measureRepo.findOne(measureId);
         setJobStartTime(jobDetail);
     }
@@ -117,7 +118,7 @@ public class JobInstance implements Job {
 
     private void setSourcesPartitionsAndPredicates(List<DataSource> sources) throws Exception {
         boolean isFirstBaseline = true;
-        for (JobDataSegment jds : jobSchedule.getSegments()) {
+        for (JobDataSegment jds : job.getSegments()) {
             if (jds.isBaseline() && isFirstBaseline) {
                 Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
                 measure.setTimestamp(jobStartTime + tsOffset);
@@ -234,9 +235,10 @@ public class JobInstance implements Job {
 
     @SuppressWarnings("unchecked")
     private void createJobInstance(Map<String, Object> confMap) throws Exception {
-        Map<String, Object> config = (Map<String, Object>) confMap.get("checkdonefile.schedule");
-        Long interval = TimeUtil.str2Long((String) config.get("interval"));
-        Integer repeat = Integer.valueOf(config.get("repeat").toString());
+        confMap = checkConfMap(confMap != null ? confMap : new HashMap<>());
+        Map<String, Object> config = (Map<String, Object>) confMap.get(CHECK_DONEFILE_SCHEDULE);
+        Long interval = TimeUtil.str2Long((String) config.get(INTERVAL));
+        Integer repeat = Integer.valueOf(config.get(REPEAT).toString());
         String groupName = "PG";
         String jobName = job.getJobName() + "_predicate_" + System.currentTimeMillis();
         TriggerKey tk = triggerKey(jobName, groupName);
@@ -245,6 +247,29 @@ public class JobInstance implements Job {
         }
         saveJobInstance(jobName, groupName);
         createJobInstance(tk, interval, repeat, jobName);
+    }
+
+    @SuppressWarnings("unchecked")
+    Map<String, Object> checkConfMap(Map<String, Object> confMap) {
+        Map<String, Object> config = (Map<String, Object>) confMap.get(CHECK_DONEFILE_SCHEDULE);
+        String interval = env.getProperty("predicate.job.interval");
+        interval = interval != null ? interval : "5m";
+        String repeat = env.getProperty("predicate.job.repeat.count");
+        repeat = repeat != null ? repeat : "12";
+        if (config == null) {
+            Map<String, Object> map = new HashMap<>();
+            map.put(INTERVAL, interval);
+            map.put(REPEAT, repeat);
+            confMap.put(CHECK_DONEFILE_SCHEDULE, map);
+        } else { // replace if interval or repeat is not null
+            String confRepeat = config.get(REPEAT).toString();
+            String confInterval = config.get(INTERVAL).toString();
+            interval = confInterval != null ? confInterval : interval;
+            repeat = confRepeat != null ? confRepeat : repeat;
+            config.put(INTERVAL, interval);
+            config.put(REPEAT, repeat);
+        }
+        return confMap;
     }
 
     private void saveJobInstance(String pName, String pGroup) {

@@ -19,12 +19,14 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobHealth;
+import org.apache.griffin.core.job.entity.JobState;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.quartz.SchedulerException;
 
 public interface JobOperator {
-    JobSchedule add(JobSchedule js, GriffinMeasure measure) throws Exception;
+    AbstractJob add(AbstractJob job, GriffinMeasure measure) throws Exception;
 
     void start(AbstractJob job) throws Exception;
 
@@ -34,5 +36,5 @@ public interface JobOperator {
 
     JobHealth getHealth(JobHealth jobHealth, AbstractJob job) throws SchedulerException;
 
-    JobState getState(AbstractJob job, JobDataBean bean, String action) throws SchedulerException;
+    JobState getState(AbstractJob job, String action) throws SchedulerException;
 }
