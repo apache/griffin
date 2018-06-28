@@ -20,20 +20,8 @@ under the License.
 package org.apache.griffin.core.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.griffin.core.job.entity.BatchJob;
-import org.apache.griffin.core.job.entity.JobDataSegment;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobSchedule;
-import org.apache.griffin.core.job.entity.LivySessionStates;
-import org.apache.griffin.core.job.entity.SegmentPredicate;
-import org.apache.griffin.core.job.entity.SegmentRange;
-import org.apache.griffin.core.job.entity.VirtualJob;
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.apache.griffin.core.measure.entity.DataSource;
-import org.apache.griffin.core.measure.entity.EvaluateRule;
-import org.apache.griffin.core.measure.entity.ExternalMeasure;
-import org.apache.griffin.core.measure.entity.GriffinMeasure;
-import org.apache.griffin.core.measure.entity.Rule;
+import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.measure.entity.*;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
 import org.quartz.SimpleTrigger;
@@ -41,16 +29,9 @@ import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.apache.griffin.core.job.JobInstance.MEASURE_KEY;
-import static org.apache.griffin.core.job.JobInstance.PREDICATES_KEY;
-import static org.apache.griffin.core.job.JobInstance.PREDICATE_JOB_NAME;
+import static org.apache.griffin.core.job.JobInstance.*;
 import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_NAME;
 
@@ -117,50 +98,40 @@ public class EntityHelper {
     }
 
     public static ExternalMeasure createExternalMeasure(String name) {
-        return new ExternalMeasure(name, "description", "org", "test",
-            "metricName", new VirtualJob());
+        return new ExternalMeasure(name, "description", "org", "test", "metricName", new VirtualJob());
     }
 
-    public static JobSchedule createJobSchedule() throws JsonProcessingException {
-        return createJobSchedule("jobName");
-    }
-
-    public static JobSchedule createJobSchedule(String jobName) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName) {
         JobDataSegment segment1 = createJobDataSegment("source_name", true);
         JobDataSegment segment2 = createJobDataSegment("target_name", false);
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new JobSchedule(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments);
+        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
-    public static JobSchedule createJobSchedule(String jobName,
-                                                SegmentRange range) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName, SegmentRange range) {
+        BatchJob job = new BatchJob();
         JobDataSegment segment1 = createJobDataSegment("source_name", true, range);
         JobDataSegment segment2 = createJobDataSegment("target_name", false, range);
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new JobSchedule(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments);
+        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
-    public static JobSchedule createJobSchedule(String jobName,
-                                                JobDataSegment source,
-                                                JobDataSegment target) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName, JobDataSegment source, JobDataSegment target) {
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(source);
         segments.add(target);
-        return new JobSchedule(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments);
+        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
-    public static JobDataSegment createJobDataSegment(String dataConnectorName,
-                                                      Boolean baseline,
-                                                      SegmentRange range) {
+    public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline, SegmentRange range) {
         return new JobDataSegment(dataConnectorName, baseline, range);
     }
 
-    public static JobDataSegment createJobDataSegment(String dataConnectorName,
-                                                      Boolean baseline) {
+    public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline) {
         return new JobDataSegment(dataConnectorName, baseline);
     }
 
