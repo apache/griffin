@@ -53,6 +53,11 @@ public class JobController {
         return jobService.addJob(job);
     }
 
+    @RequestMapping(value = "/jobs/config/{jobId}")
+    public AbstractJob getJobConfig(@PathVariable("jobId") Long jobId) {
+        return jobService.getJobConfig(jobId);
+    }
+
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public AbstractJob onActions(@PathVariable("id") Long jobId, @RequestParam String action) throws Exception {

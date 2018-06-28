@@ -31,6 +31,8 @@ public interface JobService {
 
     AbstractJob addJob(AbstractJob js) throws Exception;
 
+    AbstractJob getJobConfig(Long jobId);
+
     AbstractJob onAction(Long jobId,String action) throws Exception;
 
     void deleteJob(Long jobId) throws SchedulerException;

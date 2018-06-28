@@ -139,6 +139,16 @@ public class JobServiceImpl implements JobService {
         return op.add(job, measure);
     }
 
+    @Override
+    public AbstractJob getJobConfig(Long jobId) {
+        AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
+        if (job == null) {
+            LOGGER.warn("Job id {} does not exist.", jobId);
+            throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
+        }
+        return job;
+    }
+
     /**
      * @param jobId  job id
      * @param action job operation: start job, stop job
