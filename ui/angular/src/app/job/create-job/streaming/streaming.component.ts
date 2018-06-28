@@ -67,6 +67,7 @@ export class StreamingComponent implements OnInit {
 
   newJob = {
     "cron.expression": "",
+    "job.type":"streaming",
     "measure.id": "",
     "job.name": "",
     "cron.time.zone": "",
@@ -134,6 +135,7 @@ export class StreamingComponent implements OnInit {
     let time = new Date().getTimezoneOffset() / 60;
     let timezone = "GMT" + time + ":00";
     this.newJob = {
+      "job.type":"streaming",
       "job.name": this.jobname,
       "measure.id": this.measureid,
       "cron.expression": this.cronExp,
