@@ -53,8 +53,8 @@ public class JobController {
         return jobService.addJob(job);
     }
 
-    @RequestMapping(value = "/jobs/config/{jobId}")
-    public AbstractJob getJobConfig(@PathVariable("jobId") Long jobId) {
+    @RequestMapping(value = "/jobs/config")
+    public AbstractJob getJobConfig(@RequestParam("jobId") Long jobId) {
         return jobService.getJobConfig(jobId);
     }
 
