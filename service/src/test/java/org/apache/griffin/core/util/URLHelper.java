@@ -21,4 +21,5 @@ package org.apache.griffin.core.util;
 
 public class URLHelper {
     public static final String API_VERSION_PATH = "/api/v1";
+    public static final String KAFKA_API_PATH = "/metadata/kafka";
 }
