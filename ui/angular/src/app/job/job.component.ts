@@ -34,7 +34,6 @@ import * as $ from "jquery";
 export class JobComponent implements OnInit {
   allInstances: any;
   results: any;
-  jobName: string;
   public visible = false;
   public visibleAnimate = false;
   oldindex: number;
@@ -72,7 +71,7 @@ export class JobComponent implements OnInit {
     setTimeout(() => (this.visibleAnimate = true), 100);
     this.deletedRow = row;
     this.deleteIndex = this.results.indexOf(row);
-    this.deleteId = row.jobId;
+    this.deleteId = row.id;
   }
 
   show(row) {
@@ -100,7 +99,7 @@ export class JobComponent implements OnInit {
   }
 
   stateMag(row){
-    let actionUrl = this.serviceService.config.uri.modifyJobs + "/" + row.jobId + "?action=" + row.action.toLowerCase();
+    let actionUrl = this.serviceService.config.uri.modifyJobs + "/" + row.id + "?action=" + row.action.toLowerCase();
     this.http.put(actionUrl, {}).subscribe(data => {
       var result = JSON.parse(JSON.stringify(data));
       row.action = (row.action === 'STOP' ? 'START' : 'STOP');
@@ -122,7 +121,7 @@ export class JobComponent implements OnInit {
       this.results[this.oldindex].showDetail = false;
     }
     let getInstances = this.serviceService.config.uri.getInstances;
-    let getInstanceUrl = getInstances + "?jobId=" + row.jobId + "&page=" + "0" + "&size=" + "200";
+    let getInstanceUrl = getInstances + "?jobId=" + row.id + "&page=" + "0" + "&size=" + "200";
     this.http.get(getInstanceUrl).subscribe(data => {
       row.showDetail = !row.showDetail;
       this.allInstances = data;
@@ -133,17 +132,29 @@ export class JobComponent implements OnInit {
     this.oldindex = index;
   }
 
+  toCamel(myString): string {
+    return myString.replace(/[.]([a-z])/g, function(g) { return g[1].toUpperCase(); })
+  }
+
+  swapJson(json): any {
+    var ret = {};
+    for (var key in json) {
+      ret[this.toCamel(key)] = json[key];
+    }
+    return ret;
+  }
+
   ngOnInit(): void {
     var self = this;
     let allJobs = this.serviceService.config.uri.allJobs;
     this.http.get(allJobs).subscribe(data => {
       let trans = Object.keys(data).map(function(index) {
-        let job = data[index];
+        let job = self.swapJson(data[index]);
         job.showDetail = false;
         job.action = (job.jobState.toStart === true) ? 'START' : 'STOP';
         return job;
       });
       this.results = Object.assign([],trans).reverse();
-    });   
+    });
   }
 }
