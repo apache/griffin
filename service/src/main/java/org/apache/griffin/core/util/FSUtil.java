@@ -148,19 +148,23 @@ public class FSUtil {
         if (isFileExist(path)) {
             FSDataInputStream missingData = fileSystem.open(new Path(path));
             BufferedReader bufReader = new BufferedReader(new InputStreamReader(missingData, Charsets.UTF_8));
-            String line = null;
-            int rowCnt = 0;
-            StringBuilder output = new StringBuilder(1024);
+            try {
+                String line = null;
+                int rowCnt = 0;
+                StringBuilder output = new StringBuilder(1024);
 
-            while ((line = bufReader.readLine()) != null) {
-                if (rowCnt < SAMPLE_ROW_COUNT) {
-                    output.append(line);
-                    output.append("\n");
+                while ((line = bufReader.readLine()) != null) {
+                    if (rowCnt < SAMPLE_ROW_COUNT) {
+                        output.append(line);
+                        output.append("\n");
+                    }
+                    rowCnt++;
                 }
-                rowCnt++;
-            }
 
-            return IOUtils.toInputStream(output, Charsets.UTF_8);
+                return IOUtils.toInputStream(output, Charsets.UTF_8);
+            } finally {
+                bufReader.close();
+            }
         } else {
             LOGGER.warn("HDFS file does not exist.", path);
             throw new GriffinException.NotFoundException(HDFS_FILE_NOT_EXIST);
