@@ -81,7 +81,7 @@ public class MetricStoreImpl implements MetricStore {
         this.urlGet = urlBase.concat("/_search?filter_path=hits.hits._source");
         this.urlPost = urlBase.concat("/_bulk");
         this.urlDelete = urlBase.concat("/_delete_by_query");
-        this.indexMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }\n", INDEX, TYPE);
+        this.indexMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }%n", INDEX, TYPE);
         this.mapper = new ObjectMapper();
     }
 
