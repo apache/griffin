@@ -46,12 +46,12 @@ case class DataFrameCache() extends Loggable {
         trashDataFrame(odf)
         dataFrames += (name -> df)
         df.cache
-        info(s"cache after replace old df")
+        info("cache after replace old df")
       }
       case _ => {
         dataFrames += (name -> df)
         df.cache
-        info(s"cache after replace no old df")
+        info("cache after replace no old df")
       }
     }
   }
