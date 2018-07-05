@@ -40,7 +40,7 @@ case class CompletenessAnalyzer(expr: CompletenessClause, sourceName: String) ex
   }
 
   if (selectionPairs.isEmpty) {
-    throw new Exception(s"completeness analyzer error: empty selection")
+    throw new Exception("completeness analyzer error: empty selection")
   }
 
 }
