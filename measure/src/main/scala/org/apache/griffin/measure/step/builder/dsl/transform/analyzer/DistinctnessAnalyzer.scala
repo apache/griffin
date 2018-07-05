@@ -41,7 +41,7 @@ case class DistinctnessAnalyzer(expr: DistinctnessClause, sourceName: String) ex
   }
 
   if (selectionPairs.isEmpty) {
-    throw new Exception(s"uniqueness analyzer error: empty selection")
+    throw new Exception("uniqueness analyzer error: empty selection")
   }
 
 }
