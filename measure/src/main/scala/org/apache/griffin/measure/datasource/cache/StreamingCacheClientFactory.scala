@@ -58,7 +58,7 @@ object StreamingCacheClientFactory extends Loggable {
         Some(dsCache)
       } catch {
         case e: Throwable => {
-          error(s"generate data source cache fails")
+          error("generate data source cache fails")
           None
         }
       }
