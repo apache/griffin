@@ -31,7 +31,9 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class JobDataSegment extends AbstractAuditableEntity {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobDataSegment.class);
+	private static final long serialVersionUID = -9056531122243340484L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobDataSegment.class);
 
     @NotNull
     private String dataConnectorName;

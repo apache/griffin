@@ -28,7 +28,9 @@ import javax.persistence.Entity;
 @Entity
 public class SegmentRange extends AbstractAuditableEntity {
 
-    @Column(name = "data_begin")
+	private static final long serialVersionUID = -8929713841303669564L;
+
+	@Column(name = "data_begin")
     private String begin = "-1h";
 
     private String length = "1h";
