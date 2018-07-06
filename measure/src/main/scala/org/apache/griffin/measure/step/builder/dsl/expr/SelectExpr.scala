@@ -57,7 +57,7 @@ trait SelectExpr extends Expr with AliasableExpr {
 }
 
 case class AllFieldsSelectExpr() extends SelectExpr {
-  def desc: String = s".*"
+  def desc: String = ".*"
   def coalesceDesc: String = desc
   def alias: Option[String] = None
 }
