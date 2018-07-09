@@ -35,5 +35,5 @@ public interface MetricService {
 
     ResponseEntity addMetricValues(List<MetricValue> values);
 
-    ResponseEntity deleteMetricValues(String metricName);
+    ResponseEntity<?> deleteMetricValues(String metricName);
 }
