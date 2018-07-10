@@ -135,7 +135,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
           df.unpersist
         }
         case _ => {
-          info(s"no data frame to save")
+          info("no data frame to save")
         }
       }
 
@@ -337,7 +337,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
           }
         }
         case _ => {
-          info(s"no data frame to update")
+          info("no data frame to update")
         }
       }
     }

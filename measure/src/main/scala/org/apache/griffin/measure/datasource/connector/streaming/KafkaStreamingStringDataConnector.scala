@@ -61,7 +61,7 @@ case class KafkaStreamingStringDataConnector(@transient sparkSession: SparkSessi
         Some(df)
       } catch {
         case e: Throwable => {
-          error(s"streaming data transform fails")
+          error("streaming data transform fails")
           None
         }
       }
