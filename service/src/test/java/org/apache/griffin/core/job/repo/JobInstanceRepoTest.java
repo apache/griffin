@@ -35,7 +35,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static org.apache.griffin.core.job.entity.LivySessionStates.State;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.BUSY;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.IDLE;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RECOVERING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -58,34 +66,54 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByActiveState() {
-//        State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
-//        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
-//        assertThat(beans.size()).isEqualTo(1);
+        State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
+        List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
+        assertThat(beans.size()).isEqualTo(1);
     }
 
     @Test
     public void testFindByPredicateName() {
-//        JobInstanceBean bean = jobInstanceRepo.findByPredicateName("pName1");
-//        assertThat(bean).isNotNull();
+        JobInstanceBean bean = jobInstanceRepo.findByPredicateName("pName1");
+        assertThat(bean).isNotNull();
     }
 
     @Test
     public void testFindByExpireTmsLessThanEqual() {
-//        List<JobInstanceBean> beans = jobInstanceRepo.findByExpireTmsLessThanEqual(1516004640092L);
-//        assertThat(beans.size()).isEqualTo(2);
+        List<JobInstanceBean> beans = jobInstanceRepo.findByExpireTmsLessThanEqual(1516004640092L);
+        assertThat(beans.size()).isEqualTo(2);
     }
 
     @Test
     public void testDeleteByExpireTimestamp() {
-//        int count = jobInstanceRepo.deleteByExpireTimestamp(1516004640092L);
-//        assertThat(count).isEqualTo(2);
+        int count = jobInstanceRepo.deleteByExpireTimestamp(1516004640092L);
+        assertThat(count).isEqualTo(2);
     }
 
     private void setEntityManager() {
-        JobInstanceBean bean1 = new JobInstanceBean(FINDING, "pName1", "pGroup1", null, 1516004640092L);
-        JobInstanceBean bean2 = new JobInstanceBean(NOT_FOUND, "pName2", "pGroup2", null, 1516004640093L);
-        JobInstanceBean bean3 = new JobInstanceBean(RUNNING, "pName3", "pGroup3", null, 1516004640082L);
-        JobInstanceBean bean4 = new JobInstanceBean(SUCCESS, "pName4", "pGroup4", null, 1516004640094L);
+        JobInstanceBean bean1 = new JobInstanceBean(
+            FINDING,
+            "pName1",
+            "pGroup1",
+            null,
+            1516004640092L);
+        JobInstanceBean bean2 = new JobInstanceBean(
+            NOT_FOUND,
+            "pName2",
+            "pGroup2",
+            null,
+            1516004640093L);
+        JobInstanceBean bean3 = new JobInstanceBean(
+            RUNNING,
+            "pName3",
+            "pGroup3",
+            null,
+            1516004640082L);
+        JobInstanceBean bean4 = new JobInstanceBean(
+            SUCCESS,
+            "pName4",
+            "pGroup4",
+            null,
+            1516004640094L);
         BatchJob job1 = new BatchJob();
         StreamingJob job2 = new StreamingJob();
         bean1.setJob(job1);
@@ -94,5 +122,9 @@ public class JobInstanceRepoTest {
         bean4.setJob(job2);
         entityManager.persistAndFlush(job1);
         entityManager.persistAndFlush(job2);
+        entityManager.persistAndFlush(bean1);
+        entityManager.persistAndFlush(bean2);
+        entityManager.persistAndFlush(bean3);
+        entityManager.persistAndFlush(bean4);
     }
 }
