@@ -50,13 +50,13 @@ public class MetricController {
     }
 
     @RequestMapping(value = "/metrics/values", method = RequestMethod.POST)
-    public ResponseEntity addMetricValues(@RequestBody List<MetricValue> values) {
+    public ResponseEntity<?> addMetricValues(@RequestBody List<MetricValue> values) {
         return metricService.addMetricValues(values);
     }
 
     @RequestMapping(value = "/metrics/values", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity deleteMetricValues(@RequestParam("metricName") String metricName) {
+    public ResponseEntity<?> deleteMetricValues(@RequestParam("metricName") String metricName) {
         return metricService.deleteMetricValues(metricName);
     }
 }
