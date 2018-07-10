@@ -118,7 +118,7 @@ You should also modify some configurations of Griffin for your environment.
 		}
 	]
 	```
-	Put the modified env.json file into HDFS.
+	Rename the modified env-streaming.json file as env.json and put it into HDFS.
 
 - <b>service/src/main/resources/sparkJob.properties</b>
     ```
