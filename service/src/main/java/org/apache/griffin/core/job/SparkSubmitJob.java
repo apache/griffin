@@ -140,7 +140,7 @@ public class SparkSubmitJob implements Job {
         measure.setName(jd.getJobDataMap().getString(JOB_NAME));
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void setPredicates(String json) throws IOException {
         if (StringUtils.isEmpty(json)) {
             return;

@@ -95,7 +95,8 @@ public class MetricServiceImpl implements MetricService {
         }
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public ResponseEntity addMetricValues(List<MetricValue> values) {
         for (MetricValue value : values) {
             checkFormat(value);
@@ -111,7 +112,8 @@ public class MetricServiceImpl implements MetricService {
         }
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public ResponseEntity deleteMetricValues(String metricName) {
         try {
             return metricStore.deleteMetricValues(metricName);

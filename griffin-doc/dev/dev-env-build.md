@@ -42,7 +42,7 @@ In service/src/main/resources/sparkJob.properties
 ```
 livy.uri=http://<docker host ip>:38998/batches
 
-spark.uri=http://<docker host ip>:38088
+yarn.uri=http://<docker host ip>:38088
 ```
 
 Now you can start the service module in your local IDE, by running or debugging org.apache.griffin.core.GriffinWebApplication.

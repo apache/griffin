@@ -70,7 +70,7 @@ public class MetricStoreImpl implements MetricStore {
         if (!user.isEmpty() && !password.isEmpty()) {
             String encodedAuth = buildBasicAuthString(user, password);
             Header[] requestHeaders = new Header[]{
-                    new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
+                new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
             builder.setDefaultHeaders(requestHeaders);
         }
         this.client = builder.build();
@@ -81,7 +81,7 @@ public class MetricStoreImpl implements MetricStore {
         this.urlGet = urlBase.concat("/_search?filter_path=hits.hits._source");
         this.urlPost = urlBase.concat("/_bulk");
         this.urlDelete = urlBase.concat("/_delete_by_query");
-        this.indexMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }\n", INDEX, TYPE);
+        this.indexMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }%n", INDEX, TYPE);
         this.mapper = new ObjectMapper();
     }
 
@@ -99,14 +99,14 @@ public class MetricStoreImpl implements MetricStore {
         }
     }
 
-    private HttpEntity getHttpEntityForSearch(String metricName, int from, int size, long tmst) throws JsonProcessingException {
+    private HttpEntity getHttpEntityForSearch(String metricName, int from, int size, long tmst)
+        throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> queryParam = new HashMap<>();
-//        Map<String, Object> rangeQuery = Collections.singletonMap("tmst", Collections.singletonMap("gte", tmst));
-//        queryParam.put("must", Collections.singletonMap("range", rangeQuery));
         Map<String, Object> termQuery = Collections.singletonMap("name.keyword", metricName);
         queryParam.put("filter", Collections.singletonMap("term", termQuery));
-        Map<String, Object> sortParam = Collections.singletonMap("tmst", Collections.singletonMap("order", "desc"));
+        Map<String, Object> sortParam = Collections
+            .singletonMap("tmst", Collections.singletonMap("order", "desc"));
         map.put("query", Collections.singletonMap("bool", queryParam));
         map.put("sort", sortParam);
         map.put("from", from);
@@ -117,12 +117,15 @@ public class MetricStoreImpl implements MetricStore {
     private List<MetricValue> getMetricValuesFromResponse(Response response) throws IOException {
         List<MetricValue> metricValues = new ArrayList<>();
         JsonNode jsonNode = mapper.readTree(EntityUtils.toString(response.getEntity()));
-        if (jsonNode.hasNonNull("hits") && jsonNode.get("hits").hasNonNull("hits")) {
+        if (jsonNode.hasNonNull("hits") && jsonNode.get("hits")
+            .hasNonNull("hits")) {
             for (JsonNode node : jsonNode.get("hits").get("hits")) {
                 JsonNode sourceNode = node.get("_source");
-                Map<String, Object> value = JsonUtil.toEntity(sourceNode.get("value").toString(), new TypeReference<Map<String, Object>>() {
-                });
-                MetricValue metricValue = new MetricValue(sourceNode.get("name").asText(), Long.parseLong(sourceNode.get("tmst").asText()), value);
+                Map<String, Object> value = JsonUtil.toEntity(sourceNode.get("value").toString(),
+                    new TypeReference<Map<String, Object>>() {
+                    });
+                MetricValue metricValue = new MetricValue(sourceNode.get("name").asText(),
+                    Long.parseLong(sourceNode.get("tmst").asText()), value);
                 metricValues.add(metricValue);
             }
         }
@@ -130,12 +133,11 @@ public class MetricStoreImpl implements MetricStore {
     }
 
     @Override
-    public ResponseEntity addMetricValues(List<MetricValue> metricValues) throws IOException {
+    public ResponseEntity<?> addMetricValues(List<MetricValue> metricValues) throws IOException {
         String bulkRequestBody = getBulkRequestBody(metricValues);
         HttpEntity entity = new NStringEntity(bulkRequestBody, ContentType.APPLICATION_JSON);
         Response response = client.performRequest("POST", urlPost, Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
-
     }
 
     private String getBulkRequestBody(List<MetricValue> metricValues) throws JsonProcessingException {
@@ -143,22 +145,21 @@ public class MetricStoreImpl implements MetricStore {
         for (MetricValue metricValue : metricValues) {
             bulkRequestBody.append(indexMetaData);
             bulkRequestBody.append(JsonUtil.toJson(metricValue));
-            bulkRequestBody.append("\n");
+            bulkRequestBody.append(System.lineSeparator());
         }
         return bulkRequestBody.toString();
     }
 
-
     @Override
-    public ResponseEntity deleteMetricValues(String metricName) throws IOException {
+    public ResponseEntity<?> deleteMetricValues(String metricName) throws IOException {
         Map<String, Object> param = Collections.singletonMap("query",
-                Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
+            Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
         HttpEntity entity = new NStringEntity(JsonUtil.toJson(param), ContentType.APPLICATION_JSON);
         Response response = client.performRequest("POST", urlDelete, Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
     }
 
-    private ResponseEntity getResponseEntityFromResponse(Response response) throws IOException {
+    private ResponseEntity<?> getResponseEntityFromResponse(Response response) throws IOException {
         String body = EntityUtils.toString(response.getEntity());
         HttpStatus status = HttpStatus.valueOf(response.getStatusLine().getStatusCode());
         return new ResponseEntity<>(body, responseHeaders, status);

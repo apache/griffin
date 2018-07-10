@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.griffin.core.util;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.measure.entity.*;
@@ -37,19 +36,31 @@ import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.hadoop.mapreduce.MRJobConfig.JOB_NAME;
 
 public class EntityHelper {
+
+    public static final String CRON_EXPRESSION = "0 0/4 * * * ?";
+    public static final String TIME_ZONE = "GMT+8:00";
+
     public static GriffinMeasure createGriffinMeasure(String name) throws Exception {
-        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
-        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
+        DataConnector dcSource = createDataConnector("source_name", "default",
+            "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
+        DataConnector dcTarget = createDataConnector("target_name", "default",
+            "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
         return createGriffinMeasure(name, dcSource, dcTarget);
     }
 
-    public static GriffinMeasure createGriffinMeasure(String name, SegmentPredicate srcPredicate, SegmentPredicate tgtPredicate) throws Exception {
-        DataConnector dcSource = createDataConnector("source_name", "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#", srcPredicate);
-        DataConnector dcTarget = createDataConnector("target_name", "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#", tgtPredicate);
+    public static GriffinMeasure createGriffinMeasure(String name,
+                                                      SegmentPredicate srcPredicate,
+                                                      SegmentPredicate tgtPredicate) throws Exception {
+        DataConnector dcSource = createDataConnector("source_name", "default",
+            "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#", srcPredicate);
+        DataConnector dcTarget = createDataConnector("target_name", "default",
+            "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#", tgtPredicate);
         return createGriffinMeasure(name, dcSource, dcTarget);
     }
 
-    public static GriffinMeasure createGriffinMeasure(String name, DataConnector dcSource, DataConnector dcTarget) throws Exception {
+    public static GriffinMeasure createGriffinMeasure(String name,
+                                                      DataConnector dcSource,
+                                                      DataConnector dcTarget) throws Exception {
         DataSource dataSource = new DataSource("source", Arrays.asList(dcSource));
         DataSource targetSource = new DataSource("target", Arrays.asList(dcTarget));
         List<DataSource> dataSources = new ArrayList<>();
@@ -63,7 +74,10 @@ public class EntityHelper {
         return new GriffinMeasure(name, "test", dataSources, evaluateRule);
     }
 
-    public static DataConnector createDataConnector(String name, String database, String table, String where) throws IOException {
+    public static DataConnector createDataConnector(String name,
+                                                    String database,
+                                                    String table,
+                                                    String where) throws IOException {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);
@@ -71,7 +85,11 @@ public class EntityHelper {
         return new DataConnector(name, "1h", config, null);
     }
 
-    public static DataConnector createDataConnector(String name, String database, String table, String where, SegmentPredicate predicate) throws IOException {
+    public static DataConnector createDataConnector(String name,
+                                                    String database,
+                                                    String table,
+                                                    String where,
+                                                    SegmentPredicate predicate) throws IOException {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);
@@ -83,33 +101,30 @@ public class EntityHelper {
         return new ExternalMeasure(name, "description", "org", "test", "metricName", new VirtualJob());
     }
 
-    public static JobSchedule createJobSchedule() throws JsonProcessingException {
-        return createJobSchedule("jobName");
-    }
-
-    public static JobSchedule createJobSchedule(String jobName) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName) {
         JobDataSegment segment1 = createJobDataSegment("source_name", true);
         JobDataSegment segment2 = createJobDataSegment("target_name", false);
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
-    public static JobSchedule createJobSchedule(String jobName, SegmentRange range) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName, SegmentRange range) {
+        BatchJob job = new BatchJob();
         JobDataSegment segment1 = createJobDataSegment("source_name", true, range);
         JobDataSegment segment2 = createJobDataSegment("target_name", false, range);
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
-    public static JobSchedule createJobSchedule(String jobName, JobDataSegment source, JobDataSegment target) throws JsonProcessingException {
+    public static AbstractJob createJob(String jobName, JobDataSegment source, JobDataSegment target) {
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(source);
         segments.add(target);
-        return new JobSchedule(1L, jobName, "0 0/4 * * * ?", "GMT+8:00", segments);
+        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
     public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline, SegmentRange range) {
@@ -129,7 +144,8 @@ public class EntityHelper {
         return jobBean;
     }
 
-    public static JobDetailImpl createJobDetail(String measureJson, String predicatesJson) {
+    public static JobDetailImpl createJobDetail(String measureJson,
+                                                String predicatesJson) {
         JobDetailImpl jobDetail = new JobDetailImpl();
         JobKey jobKey = new JobKey("name", "group");
         jobDetail.setKey(jobKey);
@@ -155,7 +171,7 @@ public class EntityHelper {
         detail.put("jobId", 1L);
         detail.put("jobName", "jobName");
         detail.put("measureId", 1L);
-        detail.put("cronExpression", "0 0/4 * * * ?");
+        detail.put("cronExpression", CRON_EXPRESSION);
         return detail;
     }
 
@@ -169,7 +185,7 @@ public class EntityHelper {
 
     public static BatchJob createGriffinJob() {
         return new BatchJob(1L, 1L, "jobName",
-                "quartzJobName", "quartzGroupName", false);
+            "quartzJobName", "quartzGroupName", false);
     }
 
 }

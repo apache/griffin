@@ -39,7 +39,7 @@ public class YarnNetUtil {
                 restTemplate.put(url + "ws/v1/cluster/apps/" + appId + "/state", "{\"state\": \"KILLED\"}");
             }
         } catch (Exception e) {
-            LOGGER.error("delete exception happens by yarn. {}", e.getMessage());
+            LOGGER.error("delete exception happens by yarn. {}", e);
         }
     }
 
@@ -53,7 +53,7 @@ public class YarnNetUtil {
             }
             return true;
         } catch (Exception e) {
-            LOGGER.error("update exception happens by yarn. {}", e.getMessage());
+            LOGGER.error("update exception happens by yarn. {}", e);
         }
         return false;
     }

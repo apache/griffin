@@ -177,7 +177,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
           OffsetCacheClient.startOffsetCache
 
           val startTime = new Date().getTime
-          appPersist.log(startTime, s"starting process ...")
+          appPersist.log(startTime, "starting process ...")
           val contextId = ContextId(startTime)
 
           // create dq context
