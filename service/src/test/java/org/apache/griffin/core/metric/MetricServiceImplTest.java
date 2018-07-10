@@ -132,7 +132,7 @@ public class MetricServiceImplTest {
         List<MetricValue> values = Collections.singletonList(
                 new MetricValue("jobName", 1L, value));
         given(metricStore.addMetricValues(values))
-                .willReturn(new ResponseEntity<>("{\"errors\": false, \"items\": []}", HttpStatus.OK));
+                .willReturn(new ResponseEntity("{\"errors\": false, \"items\": []}", HttpStatus.OK));
 
         ResponseEntity response = service.addMetricValues(values);
         Map body = JsonUtil.toEntity(response.getBody().toString(), Map.class);
@@ -163,7 +163,7 @@ public class MetricServiceImplTest {
     public void testDeleteMetricValuesSuccess() throws IOException {
 
         given(metricStore.deleteMetricValues("metricName"))
-                .willReturn(new ResponseEntity<>("{\"failures\": []}", HttpStatus.OK));
+                .willReturn(new ResponseEntity("{\"failures\": []}", HttpStatus.OK));
 
         ResponseEntity response = service.deleteMetricValues("metricName");
         Map body = JsonUtil.toEntity(response.getBody().toString(), Map.class);
