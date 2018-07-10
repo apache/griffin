@@ -48,9 +48,9 @@ Create database 'quartz' in postgresql
 ```
 createdb -O <username> quartz
 ```
-Init quartz tables in postgresql by [init_quartz.sql](../../service/src/main/resources/Init_quartz_postgres.sql)
+Init quartz tables in postgresql by [Init_quartz_postgres.sql](../../service/src/main/resources/Init_quartz_postgres.sql)
 ```
-psql -p <password> -h <host address> -U <username> -f init_quartz.sql quartz
+psql -p <password> -h <host address> -U <username> -f Init_quartz_postgres.sql quartz
 ```
 
 #### Mysql
@@ -59,9 +59,9 @@ Create database 'quartz' in mysql
 ```
 mysql -u <username> -e "create database quartz" -p
 ```
-Init quartz tables in mysql by [init_quartz.sql](../../service/src/main/resources/Init_quartz_mysql.sql)
+Init quartz tables in mysql by [Init_quartz_mysql_innodb.sql.sql](../../service/src/main/resources/Init_quartz_mysql_innodb.sql)
 ```
-mysql -u <username> -p quartz < init_quartz.sql
+mysql -u <username> -p quartz < Init_quartz_mysql_innodb.sql.sql
 ```
 
 
@@ -105,7 +105,7 @@ You should also modify some configurations of Griffin for your environment.
 	# elasticsearch.password = password
     ```
 
-- <b>measure/src/main/resources/env.json</b>
+- <b>measure/src/main/resources/env-streaming.json</b>
 	```
 	"persist": [
 	    ...
