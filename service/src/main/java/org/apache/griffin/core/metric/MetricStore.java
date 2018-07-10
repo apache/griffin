@@ -29,7 +29,7 @@ public interface MetricStore {
 
     List<MetricValue> getMetricValues(String metricName, int from, int size, long tmst) throws IOException;
 
-    ResponseEntity addMetricValues(List<MetricValue> metricValues) throws IOException;
+    ResponseEntity<?> addMetricValues(List<MetricValue> metricValues) throws IOException;
 
-    ResponseEntity deleteMetricValues(String metricName) throws IOException;
+    ResponseEntity<?> deleteMetricValues(String metricName) throws IOException;
 }
