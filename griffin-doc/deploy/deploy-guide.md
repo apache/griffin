@@ -132,7 +132,7 @@ You should also modify some configurations of Griffin for your environment.
     spark.yarn.dist.files = hdfs://<path to>/hive-site.xml
 
     livy.uri = http://<your IP>:8998/batches
-    spark.uri = http://<your IP>:8088
+    yarn.uri = http://<your IP>:8088
     ```
     - \<griffin measure path> is the location you should put the jar file of measure module.
     - \<griffin env path> is the location you should put the env.json file.
