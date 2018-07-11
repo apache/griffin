@@ -261,14 +261,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   }
   def binaryMathExpressions: Seq[Parser[MathExpr]] =
     MATH_BINARIES.foldLeft(List[Parser[MathExpr]](unaryMathExpression)) { (parsers, binaryParser) =>
-      val pre = parsers.head
+      val pre = parsers.headOption.orNull
       val cur = pre ~ rep(binaryParser ~ pre) ^^ {
         case a ~ Nil => a
         case a ~ list => BinaryMathExpr(a, list.map(c => (c._1, c._2)))
       }
       cur :: parsers
     }
-  def mathExpression: Parser[MathExpr] = binaryMathExpressions.head
+  def mathExpression: Parser[MathExpr] = binaryMathExpressions.headOption.orNull
 
   /**
     * -- logical expr --
@@ -314,14 +314,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   }
   def binaryLogicalExpressions: Seq[Parser[LogicalExpr]] =
     LOGICAL_BINARIES.foldLeft(List[Parser[LogicalExpr]](unaryLogicalExpression)) { (parsers, binaryParser) =>
-      val pre = parsers.head
+      val pre = parsers.headOption.orNull
       val cur = pre ~ rep(binaryParser ~ pre) ^^ {
         case a ~ Nil => a
         case a ~ list => BinaryLogicalExpr(a, list.map(c => (c._1, c._2)))
       }
       cur :: parsers
     }
-  def logicalExpression: Parser[LogicalExpr] = binaryLogicalExpressions.head
+  def logicalExpression: Parser[LogicalExpr] = binaryLogicalExpressions.headOption.orNull
 
   /**
     * -- expression --
