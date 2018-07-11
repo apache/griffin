@@ -102,8 +102,8 @@ export class JobComponent implements OnInit {
     let actionUrl = this.serviceService.config.uri.modifyJobs + "/" + row.id + "?action=" + row.action.toLowerCase();
     this.http.put(actionUrl, {}).subscribe(data => {
       var result = JSON.parse(JSON.stringify(data));
-      row.action = (row.action === 'STOP' ? 'START' : 'STOP');
-      row.jobState.state = result.jobState.state;
+      row.action = (row.jobState.toStart === true) ? 'START' : 'STOP';
+      row.jobState.state = result["job.state"].state;
     },
     err => {
       this.toasterService.pop("error", "Error!", "Failed to manage job state!");
