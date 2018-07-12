@@ -18,6 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.dsl.transform
 
+import org.apache.commons.lang.StringUtils
 import org.apache.griffin.measure.configuration.enums.{BatchProcessType, NormalizeType, StreamingProcessType}
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
 import org.apache.griffin.measure.context.DQContext
@@ -62,7 +63,7 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       val analyzer = ProfilingAnalyzer(profilingExpr, sourceName)
       val selExprDescs = analyzer.selectionExprs.map { sel =>
         val alias = sel match {
-          case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.getOrElse{""}}`"
+          case s: AliasableExpr => s.alias.filter(StringUtils.isNotEmpty).map(a => s" AS `${a}`").getOrElse("")
           case _ => ""
         }
         s"${sel.desc}${alias}"
