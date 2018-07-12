@@ -32,7 +32,6 @@ import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
@@ -44,7 +43,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Properties;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_RUNNING;
@@ -223,7 +221,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
             LOGGER.error("Your url may be wrong. Please check {}.\n {}", livyUri, e.getMessage());
         } catch (RestClientException e) {
             LOGGER.warn("sessionId({}) appId({}) {}.", instance.getSessionId(), instance.getAppId(), e.getMessage());
-            YarnNetUtil.delete(livyUri, instance.getAppId());
+            YarnNetUtil.delete(env.getProperty("yarn.uri"), instance.getAppId());
         }
     }
 

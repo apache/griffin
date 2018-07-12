@@ -39,13 +39,11 @@ public class JobHealth {
         this.jobCount = jobCount;
     }
 
-    public JobHealth() {
-        this.healthyJobCount = 0;
-        this.jobCount = 0;
-    }
-
     public JobHealth(int healthyJobCount, int jobCount) {
         this.healthyJobCount = healthyJobCount;
         this.jobCount = jobCount;
+    }
+    
+    public JobHealth() {
     }
 }
