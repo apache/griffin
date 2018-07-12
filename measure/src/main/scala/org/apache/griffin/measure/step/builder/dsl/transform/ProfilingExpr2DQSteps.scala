@@ -62,7 +62,7 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       val analyzer = ProfilingAnalyzer(profilingExpr, sourceName)
       val selExprDescs = analyzer.selectionExprs.map { sel =>
         val alias = sel match {
-          case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.get}`"
+          case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.getOrElse{""}}`"
           case _ => ""
         }
         s"${sel.desc}${alias}"
