@@ -27,14 +27,16 @@ case class MultiSinks(persists: Iterable[Sink]) extends Sink {
 
   val block: Boolean = false
 
-  val metricName: String = persists match {
-    case Nil => ""
-    case _ => persists.head.metricName
+  val headSink: Sink = persists.headOption.orNull
+
+  val metricName: String = headSink match {
+    case null => ""
+    case _ => headSink.metricName
   }
 
-  val timeStamp: Long = persists match {
-    case Nil => 0
-    case _ => persists.head.timeStamp
+  val timeStamp: Long = headSink match {
+    case null => 0
+    case _ => headSink.timeStamp
   }
 
   val config: Map[String, Any] = Map[String, Any]()
