@@ -29,7 +29,7 @@ public class VirtualJob extends AbstractJob {
 
     @Override
     public String getType() {
-        return "virtual";
+        return JobType.VIRTUAL.getName();
     }
 
     public VirtualJob() {

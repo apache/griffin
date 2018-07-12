@@ -25,10 +25,11 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("griffinStreamingJob")
 public class StreamingJob extends AbstractJob {
+	private static final long serialVersionUID = 3292253488392308505L;
 
-    @Override
+	@Override
     public String getType() {
-        return "streaming";
+        return JobType.STREAMING.getName();
     }
 
     public StreamingJob() {
