@@ -119,8 +119,8 @@ export class MeasureComponent implements OnInit {
           measure["dq.type"] = "external";
         }
         //FIXME if needed avoiding null, for calling string.toLowerCase() in html <td>{{row["dq.type"].toLowerCase()}}</td>
-        if (measure["dq.type"] === null) {
-          measure["dq.type"] = "null";
+        if (!measure["dq.type"]) {
+          measure["dq.type"] = "unknown";
         }
         return measure;
       });
