@@ -236,7 +236,7 @@ under the License.
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="typeSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Measure Type:
+                      Measure Type:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
                       <select id="typeSelector" class="form-control" [(ngModel)]="type" disabled required name="type">
@@ -245,33 +245,14 @@ under the License.
                     </div>
                   </div>
                 </div>
-                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group">
-                    <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Organization<span class="symbol required"></span>:
-                    </label>
-                    <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" id="systemSelector" class="form-control" required ng-pattern="'([0-9a-zA-Z\\_\\-])+'" name="org" [(ngModel)]="org">
-                    </div>
-                  </div>
-                </div> -->
-                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group">
-                    <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Group:<span class="symbol required"></span>:
-                    </label>
-                    <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <tag-input class="form-control" style="height: 44px;padding: 0 6px;" id="systemSelector" required [(ngModel)]='grp' [editable]='true' name="grp"></tag-input>
-                    </div>
-                  </div>
-                </div> -->
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      DataSource:
+                      DataSource:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10">
-                      <input type="text" class="form-control" name="DataAsset" value="{{currentTable}}" disabled>
+                       <input type="text" class="form-control" [(ngModel)]="currentTable" #prDataSource="ngModel" name="prDataSource" [readonly]="true" required   >
+                       <span class="error text-small block " *ngIf="prDataSource.dirty && (prDataSource.errors?.required)">Data source is required</span>
                     </div>
                   </div>
                 </div>
@@ -347,7 +328,7 @@ under the License.
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           DataSource:
                         </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8">
+                        <div class="col-md-8 col-lg-8 col-sm-8"  *ngIf="this.currentTable">
                           {{currentDB}}.{{currentTable}}
                         </div>
                       </div>
