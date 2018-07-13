@@ -225,7 +225,7 @@ under the License.
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
-            <version>6.0.1</version>
+            <version>6.2.4</version>
         </dependency>
     </dependencies>
     <profiles>
