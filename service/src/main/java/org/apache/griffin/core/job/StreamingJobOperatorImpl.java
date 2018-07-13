@@ -223,7 +223,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
             LOGGER.error("Your url may be wrong. Please check {}.\n {}", livyUri, e.getMessage());
         } catch (RestClientException e) {
             LOGGER.warn("sessionId({}) appId({}) {}.", instance.getSessionId(), instance.getAppId(), e.getMessage());
-            YarnNetUtil.delete(livyUri, instance.getAppId());
+            YarnNetUtil.delete(env.getProperty("yarn.uri"), instance.getAppId());
         }
     }
 
