@@ -40,8 +40,6 @@ public class JobHealth {
     }
 
     public JobHealth() {
-        this.healthyJobCount = 0;
-        this.jobCount = 0;
     }
 
     public JobHealth(int healthyJobCount, int jobCount) {
