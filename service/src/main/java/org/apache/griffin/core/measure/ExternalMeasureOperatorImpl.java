@@ -34,7 +34,6 @@ import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("externalOperation")
 public class ExternalMeasureOperatorImpl implements MeasureOperator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperatorImpl.class);
 
     @Autowired
     private ExternalMeasureRepo measureRepo;
