@@ -32,7 +32,7 @@
     "font-awesome": "^4.7.0",
     "ng2-bootstrap": "1.6.3",
     "ng2-nouislider": "^1.7.6",
-    "ngx-echarts": "1.2.4",
+    "ngx-echarts": "2.2.0",
     "nouislider": "11.0.3",
     "rxjs": "5.4.2",
     "zone.js": "^0.8.14"
