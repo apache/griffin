@@ -24,18 +24,21 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
 
 ### Environment preparation
 1. Install [docker](https://docs.docker.com/engine/installation/) and [docker compose](https://docs.docker.com/compose/install/).
-2. Increase vm.max_map_count of your local machine, to use elasticsearch.
+2. Increase vm.max_map_count of your local machine(linux), to use elasticsearch.
     ```
     sysctl -w vm.max_map_count=262144
     ```
-3. Pull griffin pre-built docker images.
+    For other platforms, please reference to this link from elastic.co
+    [max_map_count kernel setting](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+    
+3. Pull griffin pre-built docker images, but if you access docker repository easily(NOT in China).
     ```
     docker pull bhlx3lyx7/griffin_spark2:0.2.0
     docker pull bhlx3lyx7/elasticsearch
     docker pull bhlx3lyx7/kafka
     docker pull zookeeper:3.5
     ```
-   Or you can pull the images faster through mirror acceleration if you are in China.
+   For Chinese users, you can pull the images from the following mirrors.
     ```
     docker pull registry.docker-cn.com/bhlx3lyx7/griffin_spark2:0.2.0
     docker pull registry.docker-cn.com/bhlx3lyx7/elasticsearch

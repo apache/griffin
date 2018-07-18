@@ -17,12 +17,20 @@ specific language governing permissions and limitations
 under the License.
 -->
 <div>
-  <p>
-    <a routerLink="/createjob" class="btn btn-primary btn-o btn-wide">
+  <div class="btn-group">
+    <!-- <a routerLink="/createjob" class="btn btn-primary btn-o btn-wide">
       <i class="fa fa-plus"></i>
        Create Job
+    </a> -->
+    <a role="button" routerLink="/createjob/batch" class="btn btn-primary btn-o btn-wide dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <i class="fa fa-plus"></i>
+      Create Job
     </a>
-  </p>
+    <ul class="dropdown-menu">
+      <!-- <li><a class="dropdown-item" routerLink="/createjob/batch">Batch Job</a></li> -->
+      <!-- <li><a class="dropdown-item" routerLink="/createjob/streaming">Streaming Job</a></li> -->
+    </ul>
+  </div>
   <div id="modelContainer">
     <table class="table table-striped reco" [mfData]="results" #mf="mfDataTable" [mfRowsOnPage]="10">
       <thead>
@@ -30,8 +38,8 @@ under the License.
           <th st-ratio="15">Job Name</th>
           <th st-ratio="15">Previous Fire Time</th>
           <th st-ratio="20">Next Fire Time</th>
-          <th st-ratio="15">Trigger State</th>
-          <th st-ratio="5">Cron Expression</th>
+          <th st-ratio="15">Job State</th>
+          <!-- <th st-ratio="5">Cron Expression</th> -->
           <th st-ratio="5">Action</th>
           <th st-ratio="5">Metric</th>
         </tr>
@@ -54,19 +62,28 @@ under the License.
             <!-- -{{(row.createTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }} -->
           </td>
           <td [hidden]="row.previousFireTime!=-1">--/--/-- &nbsp;&nbsp;--:--</td>
-          <td [hidden]="row.previousFireTime==-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
-          <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
+          <td [hidden]="row.previousFireTime==-1">{{(row.jobState.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
+          <td>{{(row.jobState.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
           <td>
-            <span *ngIf='row.triggerState == "NORMAL"' class="normal">{{row.triggerState}}
+            <span *ngIf='row.jobState.state == "NORMAL"' class="normal">{{row.jobState.state}}
                     </span>
-            <span *ngIf='row.triggerState != "NORMAL"' class='unnormal'>{{row.triggerState}}</span>
+            <span *ngIf='row.jobState.state != "NORMAL"' class='unnormal'>{{row.jobState.state}}</span>
           </td>
-          <td>{{row.cronExpression}}</td>
+          <!-- <td>{{row.cronExpression}}</td> -->
           <td>
             &nbsp;
             <a (click)="remove(row)" title="delete" style="text-decoration:none">
               <i class="fa fa-trash-o po"></i>
             </a> &nbsp;
+            <a routerLink="/job/{{row.id}}" title="subscribe">
+              <i class="fa fa-eye"></i>
+            </a>&nbsp;
+            <a *ngIf="row.action==='START'" (click)="stateMag(row)" title="Start" style="text-decoration:none">
+              <i class="fa fa-play"></i>
+            </a>
+            <a *ngIf="row.action!=='START'" (click)="stateMag(row)" title="Stop" style="text-decoration:none">
+              <i class="fa fa-stop"></i>
+            </a>
           </td>
           <td>
             &nbsp;
@@ -121,7 +138,7 @@ under the License.
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <toaster-container></toaster-container>
-          <h4 class="modal-title">Delete the job with the below information?</h4>
+          <h4 class="modal-title">{{modalWndMsg}}</h4>
         </div>
         <div class="modal-body">
           <!-- <ng-include src="'/pages/jobs/delete-confirm.html'"/> -->
@@ -146,7 +163,7 @@ under the License.
                       Previous Fire Time:
                     </label>
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                      {{(deletedRow.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}
+                      {{(deletedRow.jobState.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}
                     </div>
                   </div>
                   <div class="row">
@@ -154,7 +171,7 @@ under the License.
                       Next Fire Time:
                     </label>
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                      {{(deletedRow.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}
+                      {{(deletedRow.jobState.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}
                     </div>
                   </div>
                   <div class="row">

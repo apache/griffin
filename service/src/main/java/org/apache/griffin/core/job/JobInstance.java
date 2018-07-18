@@ -19,30 +19,35 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.job.repo.GriffinJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
-import org.apache.griffin.core.job.repo.JobScheduleRepo;
+import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
+import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
-import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.TimeUtil;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
 import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
-import static org.apache.griffin.core.job.JobServiceImpl.JOB_SCHEDULE_ID;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
+import static org.apache.griffin.core.util.JsonUtil.toJson;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -58,34 +63,34 @@ public class JobInstance implements Job {
     public static final String PREDICATE_JOB_NAME = "predicateJobName";
     static final String JOB_NAME = "jobName";
     static final String PATH_CONNECTOR_CHARACTER = ",";
+    public static final String INTERVAL = "interval";
+    public static final String REPEAT = "repeat";
+    public static final String CHECK_DONEFILE_SCHEDULE = "checkdonefile.schedule";
 
     @Autowired
     private SchedulerFactoryBean factory;
     @Autowired
     private GriffinMeasureRepo measureRepo;
     @Autowired
-    private GriffinJobRepo jobRepo;
-    @Autowired
-    private JobScheduleRepo jobScheduleRepo;
+    private JobRepo<AbstractJob> jobRepo;
     @Autowired
     private JobInstanceRepo instanceRepo;
     @Autowired
-    @Qualifier("appConf")
-    private Properties appConfProps;
+    private Environment env;
 
-    private JobSchedule jobSchedule;
     private GriffinMeasure measure;
-    private GriffinJob griffinJob;
+    private AbstractJob job;
     private List<SegmentPredicate> mPredicates;
     private Long jobStartTime;
 
 
     @Override
+    @Transactional
     public void execute(JobExecutionContext context) {
         try {
             initParam(context);
             setSourcesPartitionsAndPredicates(measure.getDataSources());
-            createJobInstance(jobSchedule.getConfigMap());
+            createJobInstance(job.getConfigMap());
         } catch (Exception e) {
             LOGGER.error("Create predicate job failure.", e);
         }
@@ -94,14 +99,11 @@ public class JobInstance implements Job {
     private void initParam(JobExecutionContext context) throws SchedulerException {
         mPredicates = new ArrayList<>();
         JobDetail jobDetail = context.getJobDetail();
-        Long jobScheduleId = jobDetail.getJobDataMap().getLong(JOB_SCHEDULE_ID);
-        Long griffinJobId = jobDetail.getJobDataMap().getLong(GRIFFIN_JOB_ID);
-        jobSchedule = jobScheduleRepo.findOne(jobScheduleId);
-        Long measureId = jobSchedule.getMeasureId();
-        griffinJob = jobRepo.findOne(griffinJobId);
+        Long jobId = jobDetail.getJobDataMap().getLong(GRIFFIN_JOB_ID);
+        job = jobRepo.findOne(jobId);
+        Long measureId = job.getMeasureId();
         measure = measureRepo.findOne(measureId);
         setJobStartTime(jobDetail);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -116,7 +118,7 @@ public class JobInstance implements Job {
 
     private void setSourcesPartitionsAndPredicates(List<DataSource> sources) throws Exception {
         boolean isFirstBaseline = true;
-        for (JobDataSegment jds : jobSchedule.getSegments()) {
+        for (JobDataSegment jds : job.getSegments()) {
             if (jds.isBaseline() && isFirstBaseline) {
                 Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
                 measure.setTimestamp(jobStartTime + tsOffset);
@@ -180,7 +182,7 @@ public class JobInstance implements Job {
      * @param dc       data connector
      * @param sampleTs collection of data split start timestamp
      */
-    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs){
+    private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) {
         List<SegmentPredicate> predicates = dc.getPredicates();
         for (SegmentPredicate predicate : predicates) {
             genConfMap(predicate.getConfigMap(), sampleTs, dc.getDataTimeZone());
@@ -202,21 +204,25 @@ public class JobInstance implements Job {
      * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
      * or like {"path": "/year=2017/month=11/dt=15/hour=09/_DONE,/year=2017/month=11/dt=15/hour=10/_DONE"}
      */
-    private void genConfMap(Map<String, String> conf, Long[] sampleTs, String timezone) {
+
+    private void genConfMap(Map<String, Object> conf, Long[] sampleTs, String timezone) {
         if (conf == null) {
             LOGGER.warn("Predicate config is null.");
             return;
         }
-        for (Map.Entry<String, String> entry : conf.entrySet()) {
-            String value = entry.getValue();
-            Set<String> set = new HashSet<>();
-            if (StringUtils.isEmpty(value)) {
-                continue;
+        for (Map.Entry<String, Object> entry : conf.entrySet()) {
+            // in case entry value is a json object instead of a string
+            if (entry.getValue() instanceof String) {
+                String value = (String) entry.getValue();
+                Set<String> set = new HashSet<>();
+                if (StringUtils.isEmpty(value)) {
+                    continue;
+                }
+                for (Long timestamp : sampleTs) {
+                    set.add(TimeUtil.format(value, timestamp, getTimeZone(timezone)));
+                }
+                conf.put(entry.getKey(), StringUtils.join(set, PATH_CONNECTOR_CHARACTER));
             }
-            for (Long timestamp : sampleTs) {
-                set.add(TimeUtil.format(value, timestamp, getTimeZone(timezone)));
-            }
-            conf.put(entry.getKey(), StringUtils.join(set, PATH_CONNECTOR_CHARACTER));
         }
     }
 
@@ -228,50 +234,71 @@ public class JobInstance implements Job {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean createJobInstance(Map<String, Object> confMap) throws Exception {
-        Map<String, Object> config = (Map<String, Object>) confMap.get("checkdonefile.schedule");
-        Long interval = TimeUtil.str2Long((String) config.get("interval"));
-        Integer repeat = Integer.valueOf(config.get("repeat").toString());
+    private void createJobInstance(Map<String, Object> confMap) throws Exception {
+        confMap = checkConfMap(confMap != null ? confMap : new HashMap<>());
+        Map<String, Object> config = (Map<String, Object>) confMap.get(CHECK_DONEFILE_SCHEDULE);
+        Long interval = TimeUtil.str2Long((String) config.get(INTERVAL));
+        Integer repeat = Integer.valueOf(config.get(REPEAT).toString());
         String groupName = "PG";
-        String jobName = griffinJob.getJobName() + "_predicate_" + System.currentTimeMillis();
-        Scheduler scheduler = factory.getScheduler();
-        TriggerKey triggerKey = triggerKey(jobName, groupName);
-        return !(scheduler.checkExists(triggerKey)
-                || !saveJobInstance(jobName, groupName)
-                || !createJobInstance(triggerKey, interval, repeat, jobName));
+        String jobName = job.getJobName() + "_predicate_" + System.currentTimeMillis();
+        TriggerKey tk = triggerKey(jobName, groupName);
+        if (factory.getScheduler().checkExists(tk)) {
+            throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
+        }
+        saveJobInstance(jobName, groupName);
+        createJobInstance(tk, interval, repeat, jobName);
     }
 
-    private boolean saveJobInstance(String pName, String pGroup) {
+    @SuppressWarnings("unchecked")
+    Map<String, Object> checkConfMap(Map<String, Object> confMap) {
+        Map<String, Object> config = (Map<String, Object>) confMap.get(CHECK_DONEFILE_SCHEDULE);
+        String interval = env.getProperty("predicate.job.interval");
+        interval = interval != null ? interval : "5m";
+        String repeat = env.getProperty("predicate.job.repeat.count");
+        repeat = repeat != null ? repeat : "12";
+        if (config == null) {
+            Map<String, Object> map = new HashMap<>();
+            map.put(INTERVAL, interval);
+            map.put(REPEAT, repeat);
+            confMap.put(CHECK_DONEFILE_SCHEDULE, map);
+        } else { // replace if interval or repeat is not null
+            String confRepeat = config.get(REPEAT).toString();
+            String confInterval = config.get(INTERVAL).toString();
+            interval = confInterval != null ? confInterval : interval;
+            repeat = confRepeat != null ? confRepeat : repeat;
+            config.put(INTERVAL, interval);
+            config.put(REPEAT, repeat);
+        }
+        return confMap;
+    }
+
+    private void saveJobInstance(String pName, String pGroup) {
+        ProcessType type = measure.getProcessType() == BATCH ? BATCH : STREAMING;
         Long tms = System.currentTimeMillis();
-        Long expireTms = Long.valueOf(appConfProps.getProperty("jobInstance.expired.milliseconds")) + tms;
-        JobInstanceBean instance = new JobInstanceBean(LivySessionStates.State.finding, pName, pGroup, tms, expireTms);
-        instance.setGriffinJob(griffinJob);
+        String expired = env.getProperty("jobInstance.expired.milliseconds");
+        Long expireTms = Long.valueOf(expired != null ? expired : "604800000") + tms;
+        JobInstanceBean instance = new JobInstanceBean(FINDING, pName, pGroup, tms, expireTms, type);
+        instance.setJob(job);
         instanceRepo.save(instance);
-        return true;
-    }
-
-    private boolean createJobInstance(TriggerKey triggerKey, Long interval, Integer repeatCount, String pJobName) throws Exception {
-        JobDetail jobDetail = addJobDetail(triggerKey, pJobName);
-        factory.getScheduler().scheduleJob(newTriggerInstance(triggerKey, jobDetail, interval, repeatCount));
-        return true;
     }
 
 
-    private Trigger newTriggerInstance(TriggerKey triggerKey, JobDetail jd, Long interval, Integer repeatCount) {
-        return newTrigger()
-                .withIdentity(triggerKey)
-                .forJob(jd)
-                .startNow()
-                .withSchedule(simpleSchedule()
-                        .withIntervalInMilliseconds(interval)
-                        .withRepeatCount(repeatCount)
-                )
+    private void createJobInstance(TriggerKey tk, Long interval, Integer repeatCount, String pJobName) throws Exception {
+        JobDetail jobDetail = addJobDetail(tk, pJobName);
+        Trigger trigger = genTriggerInstance(tk, jobDetail, interval, repeatCount);
+        factory.getScheduler().scheduleJob(trigger);
+    }
+
+
+    private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, Long interval, Integer repeatCount) {
+        return newTrigger().withIdentity(tk).forJob(jd).startNow()
+                .withSchedule(simpleSchedule().withIntervalInMilliseconds(interval).withRepeatCount(repeatCount))
                 .build();
     }
 
-    private JobDetail addJobDetail(TriggerKey triggerKey, String pJobName) throws SchedulerException, JsonProcessingException {
+    private JobDetail addJobDetail(TriggerKey tk, String pJobName) throws SchedulerException, IOException {
         Scheduler scheduler = factory.getScheduler();
-        JobKey jobKey = jobKey(triggerKey.getName(), triggerKey.getGroup());
+        JobKey jobKey = jobKey(tk.getName(), tk.getGroup());
         JobDetail jobDetail;
         Boolean isJobKeyExist = scheduler.checkExists(jobKey);
         if (isJobKeyExist) {
@@ -287,12 +314,30 @@ public class JobInstance implements Job {
         return jobDetail;
     }
 
-    private void setJobDataMap(JobDetail jobDetail, String pJobName) throws JsonProcessingException {
+    private void setJobDataMap(JobDetail jobDetail, String pJobName) throws IOException {
         JobDataMap dataMap = jobDetail.getJobDataMap();
-        dataMap.put(MEASURE_KEY, JsonUtil.toJson(measure));
-        dataMap.put(PREDICATES_KEY, JsonUtil.toJson(mPredicates));
-        dataMap.put(JOB_NAME, griffinJob.getJobName());
+        preProcessMeasure();
+        String result = toJson(measure);
+        dataMap.put(MEASURE_KEY, result);
+        dataMap.put(PREDICATES_KEY, toJson(mPredicates));
+        dataMap.put(JOB_NAME, job.getJobName());
         dataMap.put(PREDICATE_JOB_NAME, pJobName);
+    }
+
+    private void preProcessMeasure() throws IOException {
+        for (DataSource source : measure.getDataSources()) {
+            Map cacheMap = source.getCacheMap();
+            //to skip batch job
+            if (cacheMap == null) {
+                return;
+            }
+            String cache = toJson(cacheMap);
+            cache = cache.replaceAll("\\$\\{JOB_NAME}", job.getJobName());
+            cache = cache.replaceAll("\\$\\{SOURCE_NAME}", source.getName());
+            cache = cache.replaceAll("\\$\\{TARGET_NAME}", source.getName());
+            cacheMap = toEntity(cache, Map.class);
+            source.setCacheMap(cacheMap);
+        }
     }
 
 }

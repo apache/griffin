@@ -35,7 +35,7 @@ object DataFrameUtil {
 
   def unionByName(a: DataFrame, b: DataFrame): DataFrame = {
     val columns = a.columns.toSet.intersect(b.columns.toSet).map(col).toSeq
-    a.select(columns: _*).unionAll(b.select(columns: _*))
+    a.select(columns: _*).union(b.select(columns: _*))
   }
 
 }

@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.griffin.core.job.entity.VirtualJob;
 
 import javax.persistence.CascadeType;
@@ -32,8 +33,9 @@ import javax.persistence.OneToOne;
  */
 @Entity
 public class ExternalMeasure extends Measure {
+	private static final long serialVersionUID = -7551493544224747244L;
 
-    private String metricName;
+	private String metricName;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -49,10 +51,12 @@ public class ExternalMeasure extends Measure {
         this.virtualJob = vj;
     }
 
+    @JsonProperty("metric.name")
     public String getMetricName() {
         return metricName;
     }
 
+    @JsonProperty("metric.name")
     public void setMetricName(String metricName) {
         this.metricName = metricName;
     }

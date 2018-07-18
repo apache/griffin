@@ -49,6 +49,18 @@ object ParamUtil {
       }
     }
 
+    def getLazyString(key: String, defValue: () => String): String = {
+      try {
+        params.get(key) match {
+          case Some(v: String) => v.toString
+          case Some(v) => v.toString
+          case _ => defValue()
+        }
+      } catch {
+        case _: Throwable => defValue()
+      }
+    }
+
     def getStringOrKey(key: String): String = getString(key, key)
 
     def getByte(key: String, defValue: Byte): Byte = {
@@ -165,10 +177,11 @@ object ParamUtil {
       }
     }
 
+    case class StringAnyMap(values:Map[String,Any])
     def getParamMap(key: String, defValue: Map[String, Any] = Map[String, Any]()): Map[String, Any] = {
       try {
         params.get(key) match {
-          case Some(v: Map[String, Any]) => v
+          case Some(v: StringAnyMap) => v.values
           case _ => defValue
         }
       } catch {
@@ -179,7 +192,7 @@ object ParamUtil {
     def getParamMapOpt(key: String): Option[Map[String, Any]] = {
       try {
         params.get(key) match {
-          case Some(v: Map[String, Any]) => Some(v)
+          case Some(v: StringAnyMap) => Some(v.values)
           case _ => None
         }
       } catch {
@@ -188,9 +201,10 @@ object ParamUtil {
     }
 
     def getArr[T](key: String): Seq[T] = {
+      case class TSeqs(values:Seq[T])
       try {
         params.get(key) match {
-          case Some(seq: Seq[T]) => seq
+          case Some(seq: TSeqs) => seq.values
           case _ => Nil
         }
       } catch {

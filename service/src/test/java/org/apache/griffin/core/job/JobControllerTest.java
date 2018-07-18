@@ -21,9 +21,10 @@ package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.exception.GriffinExceptionHandler;
-import org.apache.griffin.core.exception.GriffinExceptionMessage;
-import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.util.JsonUtil;
+import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobHealth;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.util.URLHelper;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,12 +41,13 @@ import java.util.Collections;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
-import static org.apache.griffin.core.util.EntityHelper.createJobSchedule;
+import static org.apache.griffin.core.util.EntityHelper.createGriffinJob;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -71,49 +73,16 @@ public class JobControllerTest {
 
     @Test
     public void testGetJobs() throws Exception {
-        JobDataBean jobBean = new JobDataBean();
+        AbstractJob jobBean = createGriffinJob();
         jobBean.setJobName("job_name");
-        given(service.getAliveJobs()).willReturn(Collections.singletonList(jobBean));
+        given(service.getAliveJobs(""))
+                .willReturn(Collections.singletonList(jobBean));
 
-        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(
+                get(URLHelper.API_VERSION_PATH + "/jobs")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].jobName", is("job_name")));
-    }
-
-    @Test
-    public void testAddJobForSuccess() throws Exception {
-        JobSchedule jobSchedule = createJobSchedule();
-        jobSchedule.setId(1L);
-        given(service.addJob(jobSchedule)).willReturn(jobSchedule);
-
-        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.toJson(jobSchedule)))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    public void testAddJobForFailureWithBadRequest() throws Exception {
-        JobSchedule jobSchedule = createJobSchedule();
-        given(service.addJob(jobSchedule))
-                .willThrow(new GriffinException.BadRequestException(GriffinExceptionMessage.MISSING_METRIC_NAME));
-
-        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.toJson(jobSchedule)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void testAddJobForFailureWithTriggerKeyExist() throws Exception {
-        JobSchedule jobSchedule = createJobSchedule();
-        given(service.addJob(jobSchedule))
-                .willThrow(new GriffinException.ConflictException(GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST));
-
-        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.toJson(jobSchedule)))
-                .andExpect(status().isConflict());
+                .andExpect(jsonPath("$[0]['job.name']", is("job_name")));
     }
 
     @Test
@@ -173,13 +142,13 @@ public class JobControllerTest {
     public void testFindInstancesOfJob() throws Exception {
         int page = 0;
         int size = 2;
-        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates.State.running, "", "", null, null);
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates.State.RUNNING, "", "", null, null);
         given(service.findInstancesOfJob(1L, page, size)).willReturn(Arrays.asList(jobInstance));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param("jobId", String.valueOf(1L))
                 .param("page", String.valueOf(page)).param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].state", is("running")));
+                .andExpect(jsonPath("$.[0].state", is("RUNNING")));
     }
 
     @Test

@@ -19,23 +19,32 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
+import java.io.IOException;
+import java.util.Map;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.util.JsonUtil;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.griffin.core.util.JsonUtil;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.Map;
 
 
 @Entity
 public class Rule extends AbstractAuditableEntity {
+	private static final long serialVersionUID = -143019093509759648L;
 
-    /**
+	/**
      * three type:1.griffin-dsl 2.df-opr 3.spark-sql
      */
     @NotNull
@@ -133,7 +142,7 @@ public class Rule extends AbstractAuditableEntity {
         this.recordMap = recordMap;
     }
 
-    public String getDetails() {
+    private String getDetails() {
         return details;
     }
 
@@ -141,19 +150,15 @@ public class Rule extends AbstractAuditableEntity {
         this.details = details;
     }
 
-    public String getMetric() {
-        return metric;
-    }
-
-    public void setMetric(String metric) {
+    private void setMetric(String metric) {
         this.metric = metric;
     }
 
-    public String getRecord() {
+    private String getRecord() {
         return record;
     }
 
-    public void setRecord(String record) {
+    private void setRecord(String record) {
         this.record = record;
     }
 
@@ -182,15 +187,15 @@ public class Rule extends AbstractAuditableEntity {
 
     @PostLoad
     public void load() throws IOException {
-        if (!org.springframework.util.StringUtils.isEmpty(details)) {
+        if (!StringUtils.isEmpty(details)) {
             this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
             });
         }
-        if (!org.springframework.util.StringUtils.isEmpty(metric)) {
+        if (!StringUtils.isEmpty(metric)) {
             this.metricMap = JsonUtil.toEntity(metric, new TypeReference<Map<String, Object>>() {
             });
         }
-        if (!org.springframework.util.StringUtils.isEmpty(record)) {
+        if (!StringUtils.isEmpty(record)) {
             this.recordMap = JsonUtil.toEntity(record, new TypeReference<Map<String, Object>>() {
             });
         }

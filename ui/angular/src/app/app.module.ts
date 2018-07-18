@@ -23,7 +23,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DataTableModule} from "angular2-datatable";
 import { TreeModule } from 'angular-tree-component';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { AngularEchartsModule } from 'ngx-echarts';
+import { NgxEchartsModule } from 'ngx-echarts';
 import { MatDatepickerModule, MatNativeDateModule} from '@angular/material';
 import { Location, LocationStrategy, HashLocationStrategy} from '@angular/common';
 import { ToasterModule, ToasterService} from 'angular2-toaster';
@@ -39,7 +39,7 @@ import { MeasureDetailComponent } from './measure/measure-detail/measure-detail.
 import { MetricComponent } from './metric/metric.component';
 import { DetailMetricComponent } from './metric/detail-metric/detail-metric.component';
 import { DataassetComponent } from './dataasset/dataasset.component';
-import { CreateJobComponent } from './job/create-job/create-job.component';
+import { BatchComponent } from './job/create-job/batch/batch.component';
 import { AcComponent} from './measure/create-measure/ac/ac.component';
 import { PrComponent } from './measure/create-measure/pr/pr.component';
 import { PubComponent } from './measure/create-measure/pub/pub.component';
@@ -50,8 +50,10 @@ import { TruncatePipe} from './sidebar/truncate.pipe';
 import { ConfigurationComponent } from './measure/create-measure/configuration/configuration.component';
 import { NouisliderModule } from 'ng2-nouislider';
 import { HttpService } from './service/http.service';
-import {LoaderService} from './loader/loader.service';
+import { LoaderService } from './loader/loader.service';
 import { LoaderComponent } from './loader/loader.component';
+import { JobDetailComponent } from './job/job-detail/job-detail.component';
+import { StreamingComponent } from './job/create-job/streaming/streaming.component';
 
 
 const appRoutes: Routes = [
@@ -73,11 +75,20 @@ const appRoutes: Routes = [
   },
   {
     path: 'jobs',
-    component: JobComponent,
+    component: JobComponent
   },
   {
-    path: 'createjob',
-    component: CreateJobComponent,
+    path: 'job/:id',
+    component: JobDetailComponent
+  },
+  {
+    path: 'createjob/batch',
+    component: BatchComponent
+
+  },
+  {
+    path: 'createjob/streaming',
+    component: StreamingComponent
 
   },
   {
@@ -137,7 +148,7 @@ const appRoutes: Routes = [
     MetricComponent,
     DetailMetricComponent,
     DataassetComponent,
-    CreateJobComponent,
+    BatchComponent,
     AcComponent,
     PrComponent,
     PubComponent,
@@ -145,7 +156,9 @@ const appRoutes: Routes = [
     RuleComponent,
     TruncatePipe,
     ConfigurationComponent,
-    LoaderComponent
+    LoaderComponent,
+    JobDetailComponent,
+    StreamingComponent
   ],
   imports: [
     BrowserModule,
@@ -155,7 +168,7 @@ const appRoutes: Routes = [
     ToasterModule,
     FormsModule,
     NouisliderModule,
-    AngularEchartsModule,
+    NgxEchartsModule,
     DataTableModule,
     AngularMultiSelectModule,
     RouterModule.forRoot(

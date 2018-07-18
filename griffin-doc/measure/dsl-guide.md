@@ -41,11 +41,11 @@ Griffin DSL is SQL-like, case insensitive, and easy to learn.
 - `., [, ]`
 
 ### Literals
-- **string**: any string surrounded with a pair of " or ', with escape charactor \ if any request.  
+- **string**: any string surrounded with a pair of " or ', with escape character \ if any request.  
 	e.g. `"test"`, `'string 1'`, `"hello \" world \" "`
 - **number**: double or integer number.  
 	e.g. `123`, `33.5`
-- **time**: a integer with unit in a string, will be translated to a integer number in millisecond.  
+- **time**: an integer with unit in a string, will be translated to an integer number by millisecond.  
 	e.g. `3d`, `5h`, `4ms`
 - **boolean**: boolean value directly.  
 	e.g. `true`, `false`

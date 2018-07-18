@@ -31,9 +31,9 @@ import java.sql.Timestamp;
 @MappedSuperclass
 public abstract class AbstractAuditableEntity implements Serializable {
 
-//    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4161638281338218249L;
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 

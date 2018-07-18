@@ -33,6 +33,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -62,8 +64,17 @@ public class MetricServiceImplTest {
     @Mock
     private MetricStoreImpl metricStore;
 
+    @Autowired
+    private Environment env;
+
     @Before
     public void setup() {
+    }
+
+    @Test
+    public void test() {
+        Environment e = env;
+        System.out.println(env.getProperty("spring.datasource.driver-class-name"));
     }
 
     @Test
@@ -121,7 +132,7 @@ public class MetricServiceImplTest {
         List<MetricValue> values = Collections.singletonList(
                 new MetricValue("jobName", 1L, value));
         given(metricStore.addMetricValues(values))
-                .willReturn(new ResponseEntity<>("{\"errors\": false, \"items\": []}", HttpStatus.OK));
+                .willReturn(new ResponseEntity("{\"errors\": false, \"items\": []}", HttpStatus.OK));
 
         ResponseEntity response = service.addMetricValues(values);
         Map body = JsonUtil.toEntity(response.getBody().toString(), Map.class);
@@ -152,7 +163,7 @@ public class MetricServiceImplTest {
     public void testDeleteMetricValuesSuccess() throws IOException {
 
         given(metricStore.deleteMetricValues("metricName"))
-                .willReturn(new ResponseEntity<>("{\"failures\": []}", HttpStatus.OK));
+                .willReturn(new ResponseEntity("{\"failures\": []}", HttpStatus.OK));
 
         ResponseEntity response = service.deleteMetricValues("metricName");
         Map body = JsonUtil.toEntity(response.getBody().toString(), Map.class);

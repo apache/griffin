@@ -19,10 +19,18 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
+@DiscriminatorValue("virtualJob")
 public class VirtualJob extends AbstractJob {
+    private static final long serialVersionUID = 1130038058433818835L;
+
+    @Override
+    public String getType() {
+        return JobType.VIRTUAL.getName();
+    }
 
     public VirtualJob() {
         super();

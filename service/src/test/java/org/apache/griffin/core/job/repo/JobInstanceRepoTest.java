@@ -20,9 +20,9 @@ under the License.
 package org.apache.griffin.core.job.repo;
 
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
-import org.apache.griffin.core.job.entity.GriffinJob;
+import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.entity.StreamingJob;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,8 +34,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.BUSY;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.IDLE;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RECOVERING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -58,7 +66,7 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        State[] states = {starting, not_started, recovering, idle, running, busy};
+        State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
         List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
         assertThat(beans.size()).isEqualTo(1);
     }
@@ -82,16 +90,38 @@ public class JobInstanceRepoTest {
     }
 
     private void setEntityManager() {
-        GriffinJob job = new GriffinJob(1L, "jobName", "qName", "qGroup", false);
-        entityManager.persistAndFlush(job);
-        JobInstanceBean bean1 = new JobInstanceBean(LivySessionStates.State.finding, "pName1", "pGroup1", null, 1516004640092L);
-        JobInstanceBean bean2 = new JobInstanceBean(LivySessionStates.State.not_found, "pName2", "pGroup2", null, 1516004640093L);
-        JobInstanceBean bean3 = new JobInstanceBean(LivySessionStates.State.running, "pName3", "pGroup3", null, 1516004640082L);
-        JobInstanceBean bean4 = new JobInstanceBean(LivySessionStates.State.success, "pName4", "pGroup4", null, 1516004640094L);
-        bean1.setGriffinJob(job);
-        bean2.setGriffinJob(job);
-        bean3.setGriffinJob(job);
-        bean4.setGriffinJob(job);
+        JobInstanceBean bean1 = new JobInstanceBean(
+            FINDING,
+            "pName1",
+            "pGroup1",
+            null,
+            1516004640092L);
+        JobInstanceBean bean2 = new JobInstanceBean(
+            NOT_FOUND,
+            "pName2",
+            "pGroup2",
+            null,
+            1516004640093L);
+        JobInstanceBean bean3 = new JobInstanceBean(
+            RUNNING,
+            "pName3",
+            "pGroup3",
+            null,
+            1516004640082L);
+        JobInstanceBean bean4 = new JobInstanceBean(
+            SUCCESS,
+            "pName4",
+            "pGroup4",
+            null,
+            1516004640094L);
+        BatchJob job1 = new BatchJob();
+        StreamingJob job2 = new StreamingJob();
+        bean1.setJob(job1);
+        bean2.setJob(job1);
+        bean3.setJob(job2);
+        bean4.setJob(job2);
+        entityManager.persistAndFlush(job1);
+        entityManager.persistAndFlush(job2);
         entityManager.persistAndFlush(bean1);
         entityManager.persistAndFlush(bean2);
         entityManager.persistAndFlush(bean3);

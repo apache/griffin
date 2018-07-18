@@ -34,7 +34,6 @@ import * as $ from "jquery";
 export class JobComponent implements OnInit {
   allInstances: any;
   results: any;
-  jobName: string;
   public visible = false;
   public visibleAnimate = false;
   oldindex: number;
@@ -43,6 +42,10 @@ export class JobComponent implements OnInit {
   targetTable: string;
   deleteId: string;
   deleteIndex: number;
+  action: string;
+  modalWndMsg:string;
+  isStop:boolean;
+
   private toasterService: ToasterService;
 
   constructor(
@@ -67,11 +70,12 @@ export class JobComponent implements OnInit {
 
   remove(row) {
     $("#save").removeAttr("disabled");
+    this.modalWndMsg = "Delete the job with the below information?";
     this.visible = true;
     setTimeout(() => (this.visibleAnimate = true), 100);
     this.deletedRow = row;
     this.deleteIndex = this.results.indexOf(row);
-    this.deleteId = row.jobId;
+    this.deleteId = row.id;
   }
 
   show(row) {
@@ -80,22 +84,67 @@ export class JobComponent implements OnInit {
   }
 
   confirmDelete() {
-    let deleteJob = this.serviceService.config.uri.deleteJob;
-    let deleteUrl = deleteJob + "/" + this.deleteId;
-    $("#save").attr("disabled", "true");
-    this.http.delete(deleteUrl).subscribe(
-      data => {
-        let self = this;
+    let self=this;
+    if(this.isStop){
+      $("#save").attr("disabled", "true");
+      let actionUrl = this.serviceService.config.uri.modifyJobs + "/" + this.deleteId + "?action=" + "stop";
+      this.http.put(actionUrl, {}).subscribe(data => {
+        let self=this;
         self.hide();
-        setTimeout(function() {
-          self.results.splice(self.deleteIndex, 1);
-        }, 0);
+        var result = JSON.parse(JSON.stringify(data));
+        self.results[self.deleteIndex].action = 'START';
+        self.results[self.deleteIndex].jobState.state = result["job.state"].state;
+        self.isStop=false;
       },
       err => {
-        this.toasterService.pop("error", "Error!", "Failed to delete job!");
-        console.log("Error when deleting job");
-      }
-    );
+        this.toasterService.pop("error", "Error!", "Failed to manage job state!");
+        console.log("Error when manage job state");
+      });
+    }
+    else{
+      let deleteJob = this.serviceService.config.uri.deleteJob;
+      let deleteUrl = deleteJob + "/" + this.deleteId;
+      $("#save").attr("disabled", "true");
+      this.http.delete(deleteUrl).subscribe(
+        data => {
+          let self = this;
+          self.hide();
+          setTimeout(function() {
+            self.results.splice(self.deleteIndex, 1);
+          }, 0);
+        },
+        err => {
+          this.toasterService.pop("error", "Error!", "Failed to delete job!");
+          console.log("Error when deleting job");
+        }
+      );
+    }
+
+  }
+
+  stateMag(row){
+    if(row.action.toLowerCase()=="stop"){
+      $("#save").removeAttr("disabled");
+      this.isStop = true;
+      this.modalWndMsg = "Stop the job with the below information?";
+      this.visible = true;
+      setTimeout(() => (this.visibleAnimate = true), 100);
+      this.deletedRow = row;
+      this.deleteIndex = this.results.indexOf(row);
+      this.deleteId = row.id;
+    }
+    else{
+      let actionUrl = this.serviceService.config.uri.modifyJobs + "/" + row.id + "?action=" + row.action.toLowerCase();
+      this.http.put(actionUrl, {}).subscribe(data => {
+        var result = JSON.parse(JSON.stringify(data));
+        row.action = (row.action === 'STOP' ? 'START' : 'STOP');
+        row.jobState.state = result["job.state"].state;
+      },
+      err => {
+        this.toasterService.pop("error", "Error!", "Failed to manage job state!");
+        console.log("Error when manage job state");
+      });
+    }
   }
 
   showInstances(row) {
@@ -108,7 +157,7 @@ export class JobComponent implements OnInit {
       this.results[this.oldindex].showDetail = false;
     }
     let getInstances = this.serviceService.config.uri.getInstances;
-    let getInstanceUrl = getInstances + "?jobId=" + row.jobId + "&page=" + "0" + "&size=" + "200";
+    let getInstanceUrl = getInstances + "?jobId=" + row.id + "&page=" + "0" + "&size=" + "200";
     this.http.get(getInstanceUrl).subscribe(data => {
       row.showDetail = !row.showDetail;
       this.allInstances = data;
@@ -119,16 +168,29 @@ export class JobComponent implements OnInit {
     this.oldindex = index;
   }
 
+  toCamel(myString): string {
+    return myString.replace(/[.]([a-z])/g, function(g) { return g[1].toUpperCase(); })
+  }
+
+  swapJson(json): any {
+    var ret = {};
+    for (var key in json) {
+      ret[this.toCamel(key)] = json[key];
+    }
+    return ret;
+  }
+
   ngOnInit(): void {
     var self = this;
     let allJobs = this.serviceService.config.uri.allJobs;
     this.http.get(allJobs).subscribe(data => {
       let trans = Object.keys(data).map(function(index) {
-        let job = data[index];
+        let job = self.swapJson(data[index]);
         job.showDetail = false;
+        job.action = (job.jobState.toStart === true) ? 'START' : 'STOP';
         return job;
       });
       this.results = Object.assign([],trans).reverse();
-    });   
+    });
   }
 }

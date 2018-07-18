@@ -1,61 +1,75 @@
 {
-  "name": "accu2",
-  "type": "accuracy",
+  "name": "prof_streaming",
 
-  "process.type": "steaming",
+  "process.type": "streaming",
 
-  "source": {
-    "type": "kafka",
-    "version": "0.8",
-    "config": {
-      "kafka.config": {
-        "bootstrap.servers": "a.b.c.d:9092",
-        "group.id": "group1",
-        "auto.offset.reset": "smallest",
-        "auto.commit.enable": "false",
-      },
-      "topics": "src",
-      "key.type": "java.lang.String",
-      "value.type": "java.lang.String",
-      "cache": {
-        "type": "df",
-        "config": {
-          "table.name": "source",
-          "info.path": "src",
-          "ready.time.interval": "1m",
-          "ready.time.delay": "1m"
+  "data.sources": [
+    {
+      "name": "source",
+      "connectors": [
+        {
+          "type": "kafka",
+          "version": "0.8",
+          "config": {
+            "kafka.config": {
+              "bootstrap.servers": "10.147.177.107:9092",
+              "group.id": "group1",
+              "auto.offset.reset": "smallest",
+              "auto.commit.enable": "false"
+            },
+            "topics": "sss",
+            "key.type": "java.lang.String",
+            "value.type": "java.lang.String"
+          },
+          "pre.proc": [
+            {
+              "dsl.type": "df-opr",
+              "name": "${s1}",
+              "rule": "from_json",
+              "details": {
+                "df.name": "${this}"
+              }
+            },
+            {
+              "dsl.type": "spark-sql",
+              "name": "${this}",
+              "rule": "select name, age from ${s1}"
+            }
+          ]
         }
+      ],
+      "cache": {
+        "file.path": "hdfs://localhost/griffin/streaming/dump/source",
+        "info.path": "source",
+        "ready.time.interval": "10s",
+        "ready.time.delay": "0",
+        "time.range": ["0", "0"],
+        "init.clear": true
       }
     }
-  },
+  ],
 
-  "target": {
-    "type": "kafka",
-    "version": "0.8",
-    "config": {
-      "kafka.config": {
-        "bootstrap.servers": "a.b.c.d:9092",
-        "group.id": "group1",
-        "auto.offset.reset": "smallest",
-        "auto.commit.enable": "false",
+  "evaluate.rule": {
+    "rules": [
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "name": "prof",
+        "rule": "select count(name) as `cnt`, max(age) as `max`, min(age) as `min` from source",
+        "metric": {
+          "name": "prof"
+        }
       },
-      "topics": "tgt",
-      "key.type": "java.lang.String",
-      "value.type": "java.lang.String",
-      "cache": {
-        "type": "hive",
-        "version": 1.2,
-        "config": {
-          "database": "default",
-          "table.name": "target_table",
-          "info.path": "tgt"
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "profiling",
+        "name": "grp",
+        "rule": "select name, count(*) as `cnt` from source group by name",
+        "metric": {
+          "name": "name_group",
+          "collect.type": "array"
         }
       }
-    }
-  },
-
-  "evaluateRule": {
-    "sampleRatio": 0.2,
-    "rules": "$source.json().seeds[*].json().url = $target.json().groups[0].attrsList['name' = 'URL'].values[0] AND $source.json().seeds[*].json().metadata.json().tracker.crawlRequestCreateTS = $target.json().groups[0].attrsList['name' = 'CRAWLMETADATA'].values[0].json().tracker.crawlRequestCreateTS WHEN $source._timestamp_ + 24h < $target._timestamp_"
+    ]
   }
 }
