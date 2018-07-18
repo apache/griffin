@@ -27,6 +27,7 @@ import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.persist.PersistThreadPool
 import org.apache.griffin.measure.process._
 
+import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 object Application extends Loggable {
@@ -166,7 +167,7 @@ object Application extends Loggable {
 //    }
   }
 
-  private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : Manifest[T]): Try[T] = {
+  private def readParamFile[T <: Param](file: String, fsType: String)(implicit m : ClassTag[T]): Try[T] = {
     val paramReader = ParamReaderFactory.getParamReader(file, fsType)
     paramReader.readConfig[T]
   }

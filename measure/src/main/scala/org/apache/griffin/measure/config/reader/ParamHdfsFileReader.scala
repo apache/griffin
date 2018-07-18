@@ -22,11 +22,12 @@ import org.apache.griffin.measure.config.params.Param
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.HdfsUtil
 
+import scala.reflect.ClassTag
 import scala.util.Try
 
 case class ParamHdfsFileReader(filePath: String) extends ParamReader {
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
+  def readConfig[T <: Param](implicit m : ClassTag[T]): Try[T] = {
     Try {
       val source = HdfsUtil.openFile(filePath)
       val param = JsonUtil.fromJson[T](source)

@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
+import scala.reflect.ClassTag
+
 object ParamUtil {
 
   implicit class ParamMap(params: Map[String, Any]) {
@@ -28,7 +30,7 @@ object ParamUtil {
       }
     }
 
-    def getAnyRef[T](key: String, defValue: T)(implicit m: Manifest[T]): T = {
+    def getAnyRef[T: ClassTag](key: String, defValue: T): T = {
       params.get(key) match {
         case Some(v: T) => v
         case _ => defValue
