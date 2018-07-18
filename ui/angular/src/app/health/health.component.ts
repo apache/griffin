@@ -38,9 +38,9 @@ export class HealthComponent implements OnInit {
   mesWithJob: any;
 
   onChartClick($event) {
+    let self = this;
     if ($event.data.name) {
-      this.router.navigate(["/detailed/" + $event.data.name]);
-      window.location.reload();
+      self.router.navigate(["/detailed/" + $event.data.name]);
     }
   }
 
@@ -86,6 +86,7 @@ export class HealthComponent implements OnInit {
           metricId++;
         }
       }
+      item.children = item.children.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
       result.push(item);
       sysId++;
     }

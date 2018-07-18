@@ -324,7 +324,7 @@ under the License.
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label for="typeSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Measure Type:
+                      Measure Type:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
                       <select id="typeSelector" class="form-control" [(ngModel)]="type" disabled required name="type">
@@ -334,33 +334,25 @@ under the License.
                     </div>
                   </div>
                 </div>
-                <!-- <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group">
-                    <label for="systemSelector" class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Group:<span class="symbol required"></span>:
-                    </label>
-                    <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <tag-input class="form-control" style="height: 44px;padding: 0 6px;" id="systemSelector" required [(ngModel)]='grp' [editable]='true' name="grp"></tag-input>
-                    </div>
-                  </div>
-                </div> -->
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Source:
+                      Source:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10">
-                      <input type="text" class="form-control" name="DataAsset" value="{{currentTable}}" disabled>
+                      <input type="text" class="form-control" name="DataAsset" [(ngModel)]="currentTable" #prDataSource="ngModel" name="prDataSource" [readonly]="true" required>
+                      <span class="error text-small block " *ngIf="prDataSource.dirty && (prDataSource.errors?.required)">Data source is required</span>
                     </div>
                   </div>
                 </div>
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Target:
+                      Target:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10">
-                      <input type="text" class="form-control" name="DataAsset" value="{{currentTableTarget}}" disabled>
+                      <input type="text" class="form-control" name="DataAsset" [(ngModel)]="currentTableTarget" #prDataTarget="ngModel" name="prDataTarget" [readonly]="true" required>
+                        <span class="error text-small block " *ngIf="prDataTarget.dirty && (prDataTarget.errors?.required)">Data target is required</span>
                     </div>
                   </div>
                 </div>
@@ -432,19 +424,11 @@ under the License.
                           {{type}}
                         </div>
                       </div>
-                      <!-- <div class="row">
-                        <label for="systemSelector" class="col-md-4 col-lg-4 col-sm-4">
-                          Group:
-                        </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8 ">
-                          {{showgrp}}
-                        </div>
-                      </div> -->
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Source:
                         </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8">
+                        <div class="col-md-8 col-lg-8 col-sm-8" *ngIf="this.currentTable">
                           {{currentDB}}.{{currentTable}}
                         </div>
                       </div>
@@ -484,7 +468,7 @@ under the License.
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Target:
                         </label>
-                        <div class="col-md-8 col-lg-8 col-sm-8">
+                        <div class="col-md-8 col-lg-8 col-sm-8" *ngIf="this.currentTableTarget">
                           {{currentDB}}.{{currentTableTarget}}
                         </div>
                       </div>
