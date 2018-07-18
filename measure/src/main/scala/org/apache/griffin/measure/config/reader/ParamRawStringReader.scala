@@ -21,11 +21,12 @@ package org.apache.griffin.measure.config.reader
 import org.apache.griffin.measure.config.params.Param
 import org.apache.griffin.measure.utils.JsonUtil
 
+import scala.reflect.ClassTag
 import scala.util.Try
 
 case class ParamRawStringReader(rawString: String) extends ParamReader {
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
+  def readConfig[T <: Param](implicit m : ClassTag[T]): Try[T] = {
     Try {
       val param = JsonUtil.fromJson[T](rawString)
       param

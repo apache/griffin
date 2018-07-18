@@ -21,10 +21,11 @@ package org.apache.griffin.measure.config.reader
 import org.apache.griffin.measure.log.Loggable
 import org.apache.griffin.measure.config.params.Param
 
+import scala.reflect.ClassTag
 import scala.util.Try
 
 trait ParamReader extends Loggable with Serializable {
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T]
+  def readConfig[T <: Param](implicit m : ClassTag[T]): Try[T]
 
 }
