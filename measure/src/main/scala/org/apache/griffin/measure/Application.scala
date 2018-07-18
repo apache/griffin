@@ -25,6 +25,7 @@ import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
 
+import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -119,7 +120,7 @@ object Application extends Loggable {
     shutdown
   }
 
-  private def readParamFile[T <: Param](file: String)(implicit m : Manifest[T]): Try[T] = {
+  private def readParamFile[T <: Param](file: String)(implicit m : ClassTag[T]): Try[T] = {
     val paramReader = ParamReaderFactory.getParamReader(file)
     paramReader.readConfig[T]
   }
