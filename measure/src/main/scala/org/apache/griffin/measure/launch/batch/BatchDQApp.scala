@@ -21,9 +21,9 @@ package org.apache.griffin.measure.launch.batch
 import java.util.Date
 
 import org.apache.griffin.measure.configuration.enums._
-import org.apache.griffin.measure.configuration.params._
+import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.context._
-import org.apache.griffin.measure.context.datasource.DataSourceFactory
+import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent

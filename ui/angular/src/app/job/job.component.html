@@ -62,8 +62,8 @@ under the License.
             <!-- -{{(row.createTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }} -->
           </td>
           <td [hidden]="row.previousFireTime!=-1">--/--/-- &nbsp;&nbsp;--:--</td>
-          <td [hidden]="row.previousFireTime==-1">{{(row.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
-          <td>{{(row.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
+          <td [hidden]="row.previousFireTime==-1">{{(row.jobState.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
+          <td>{{(row.jobState.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</td>
           <td>
             <span *ngIf='row.jobState.state == "NORMAL"' class="normal">{{row.jobState.state}}
                     </span>
@@ -75,7 +75,7 @@ under the License.
             <a (click)="remove(row)" title="delete" style="text-decoration:none">
               <i class="fa fa-trash-o po"></i>
             </a> &nbsp;
-            <a routerLink="/job/{{row.jobId}}" title="subscribe">
+            <a routerLink="/job/{{row.id}}" title="subscribe">
               <i class="fa fa-eye"></i>
             </a>&nbsp;
             <a *ngIf="row.action==='START'" (click)="stateMag(row)" title="Start" style="text-decoration:none">
@@ -138,7 +138,7 @@ under the License.
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <toaster-container></toaster-container>
-          <h4 class="modal-title">Delete the job with the below information?</h4>
+          <h4 class="modal-title">{{modalWndMsg}}</h4>
         </div>
         <div class="modal-body">
           <!-- <ng-include src="'/pages/jobs/delete-confirm.html'"/> -->
@@ -163,7 +163,7 @@ under the License.
                       Previous Fire Time:
                     </label>
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                      {{(deletedRow.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}
+                      {{(deletedRow.jobState.previousFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}
                     </div>
                   </div>
                   <div class="row">
@@ -171,7 +171,7 @@ under the License.
                       Next Fire Time:
                     </label>
                     <div class="col-md-8 col-lg-8 col-sm-8 " style="color: #fff">
-                      {{(deletedRow.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}
+                      {{(deletedRow.jobState.nextFireTime | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}
                     </div>
                   </div>
                   <div class="row">

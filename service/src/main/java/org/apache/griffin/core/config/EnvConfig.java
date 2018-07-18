@@ -52,8 +52,37 @@ public class EnvConfig {
         //Be careful, here we use getInputStream() to convert path file to stream.
         // It'll cause FileNotFoundException if you use  getFile() to convert path file to File Object
         InputStream in = new ClassPathResource(path).getInputStream();
-        Object result = toEntity(in, new TypeReference<Object>() {
-        });
+        Object result = null;
+        try {
+            result = toEntity(in, new TypeReference<Object>() {
+            });
+        } finally {
+        	in.close();
+        }
+        return toJsonWithFormat(result);
+    }
+    
+    /**
+     * read env config from resource
+     *
+     * @param path resource path
+     * @return String
+     * @throws IOException io exception
+     */
+    private static String readEnvFromAbsolutePath(String path) throws IOException {
+        if (path == null) {
+            LOGGER.warn("Parameter path is null.");
+            return null;
+        }
+
+        FileInputStream in = new FileInputStream(path);
+        Object result = null;
+        try {
+            result = toEntity(in, new TypeReference<Object>() {
+            });
+        } finally {
+        	in.close();
+        }
         return toJsonWithFormat(result);
     }
 
@@ -75,9 +104,7 @@ public class EnvConfig {
             path = defaultPath;
             ENV_BATCH = readEnvFromResource(path);
         } else {
-            FileInputStream in = new FileInputStream(path);
-            ENV_BATCH = toJsonWithFormat(toEntity(in, new TypeReference<Object>() {
-            }));
+            ENV_BATCH = readEnvFromAbsolutePath(path);
         }
         LOGGER.info(ENV_BATCH);
         return ENV_BATCH;
@@ -92,9 +119,7 @@ public class EnvConfig {
             path = defaultPath;
             ENV_STREAMING = readEnvFromResource(path);
         } else {
-            FileInputStream in = new FileInputStream(path);
-            ENV_STREAMING = readEnvFromResource(toEntity(in, new TypeReference<Object>() {
-            }));
+            ENV_STREAMING = readEnvFromAbsolutePath(path);
         }
         LOGGER.info(ENV_STREAMING);
         return ENV_STREAMING;

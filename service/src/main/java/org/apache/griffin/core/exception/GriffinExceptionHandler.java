@@ -31,7 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class GriffinExceptionHandler {
 
-    @ExceptionHandler(GriffinException.ServiceException.class)
+    @SuppressWarnings("rawtypes")
+	@ExceptionHandler(GriffinException.ServiceException.class)
     public ResponseEntity handleGriffinExceptionOfServer(HttpServletRequest request, GriffinException.ServiceException e) {
         String message = e.getMessage();
         Throwable cause = e.getCause();
@@ -40,7 +41,8 @@ public class GriffinExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(GriffinException.class)
+    @SuppressWarnings("rawtypes")
+	@ExceptionHandler(GriffinException.class)
     public ResponseEntity handleGriffinExceptionOfClient(HttpServletRequest request, GriffinException e) {
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class);
         HttpStatus status = responseStatus.code();

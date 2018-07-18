@@ -30,7 +30,6 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 public class TimeUtilTest {
 
-
     @Test
     public void testStr2LongWithPositive() {
         String time = "2hr3m4s";
@@ -52,7 +51,6 @@ public class TimeUtilTest {
     @Test
     public void testStr2LongWithDay() {
         String time = "1DAY";
-        System.out.println(TimeUtil.str2Long(time));
         assertEquals(String.valueOf(TimeUtil.str2Long(time)), "86400000");
     }
 

@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.launch
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.params.{DQConfig, EnvConfig}
+import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig}
 
 import scala.util.Try
 
@@ -48,8 +48,10 @@ trait DQApp extends Loggable with Serializable {
     * timestamp as a key for metrics
     */
   protected def getMeasureTime: Long = {
-    if (dqParam.timestamp != null && dqParam.timestamp > 0) { dqParam.timestamp }
-    else { System.currentTimeMillis }
+    dqParam.getTimestampOpt match {
+      case Some(t) if t > 0 => dqParam.timestamp
+      case _ => System.currentTimeMillis
+    }
   }
 
 }
