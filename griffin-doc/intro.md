@@ -60,9 +60,10 @@ For near real time analysis, we consume data from messaging system, then our dat
 
 **Apache Griffin Service**:
 
-We have RESTful services to accomplish all the functionalities of Apache Griffin, such as exploring data-sets, create data quality measures, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web serivces.
+We have restful services to accomplish all the functions of Apache Griffin, such as exploring data-sets, create data quality measures, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web services.
 
 ## Main architecture diagram
 
 ![Business_Process_image](img/arch.png)
+
 
