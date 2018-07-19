@@ -21,6 +21,7 @@ package org.apache.griffin.measure.configuration.dqdefinition.reader
 import org.apache.griffin.measure.configuration.dqdefinition.Param
 import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 
+import scala.reflect.ClassTag
 import scala.util.Try
 
 /**
@@ -32,7 +33,7 @@ import scala.util.Try
   */
 case class ParamFileReader(filePath: String) extends ParamReader {
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
+  def readConfig[T <: Param](implicit m : ClassTag[T]): Try[T] = {
     Try {
       val source = HdfsUtil.openFile(filePath)
       val param = JsonUtil.fromJson[T](source)
