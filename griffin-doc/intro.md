@@ -56,29 +56,13 @@ For real time mode, we can connect with messaging system like Kafka to near real
 
 For batch analysis, our data quality model will compute data quality metrics in our spark cluster based on data source in hadoop.
 
-For near real time analysis, we consume data from messaging system, then our data quality model will compute our real time data quality metrics in our spark cluster. for data storage, we use time series database in our back end to fulfill front end request.
+For near real time analysis, we consume data from messaging system, then our data quality model will compute our real time data quality metrics in our spark cluster. for data storage, we use elastic search in our back end to fulfill front end request.
 
 **Apache Griffin Service**:
 
-We have RESTful web services to accomplish all the functionalities of Apache Griffin, such as exploring data-sets, create data quality measures, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web serivces.
+We have RESTful services to accomplish all the functionalities of Apache Griffin, such as exploring data-sets, create data quality measures, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web serivces.
 
 ## Main architecture diagram
 
 ![Business_Process_image](img/arch.png)
 
-## Rationale
-The challenge we face at big data ecosystem is that our data volume is becoming bigger and bigger, systems process become more complex, while we do not have a unified data quality solution to ensure the trusted data sets which provide confidences on data quality to our data consumers.  The key challenges on data quality includes:
-
-1. Existing commercial data quality solution cannot address data quality lineage among systems, cannot scale out to support fast growing data at eBay
-2. Existing eBay's domain specific tools take a long time to identify and fix poor data quality when data flowed through multiple systems
-3. Business logic becomes complex, requires data quality system much flexible.
-4. Some data quality issues do have business impact on user experiences, revenue, efficiency & compliance.
-5. Communication overhead of data quality metrics, typically in a big organization, which involve different teams.
-
-The idea of  Apache Apache Griffin is to provide Data Quality validation as a Service, to allow data engineers and data consumers to have:
-
- - Near real-time understanding of the data quality health of your data pipelines with end-to-end monitoring, all in one place.
- - Profiling, detecting and correlating issues and providing recommendations that drive rapid and focused troubleshooting
- - A centralized data quality model management system including rule, metadata, scheduler etc.  
- - Native code generation to run everywhere, including Hadoop, Kafka, Spark, etc.
- - One set of tools to build data quality pipelines across all eBay data platforms.
