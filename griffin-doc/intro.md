@@ -62,17 +62,9 @@ For near real time analysis, we consume data from messaging system, then our dat
 
 We have RESTful web services to accomplish all the functionalities of Apache Griffin, such as exploring data-sets, create data quality measures, publish metrics, retrieve metrics, add subscription, etc. So, the developers can develop their own user interface based on these web serivces.
 
-## Main business process
-
-![Business_Process_image](img/Business_Process.png)
-
 ## Main architecture diagram
 
 ![Business_Process_image](img/arch.png)
-
-## Main tech stack diagram
-
-![Business_Process_image](img/techstack.png)
 
 ## Rationale
 The challenge we face at big data ecosystem is that our data volume is becoming bigger and bigger, systems process become more complex, while we do not have a unified data quality solution to ensure the trusted data sets which provide confidences on data quality to our data consumers.  The key challenges on data quality includes:
