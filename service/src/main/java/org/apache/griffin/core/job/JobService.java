@@ -42,4 +42,6 @@ public interface JobService {
     List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
 
     JobHealth getHealthInfo();
+
+    String getJobHdfsPersistPath(Long jobId, long timestamp);
 }

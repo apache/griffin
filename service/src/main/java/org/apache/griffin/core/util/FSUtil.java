@@ -27,7 +27,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.HDFS_FILE_NOT_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_STOPPED;
 
 public class FSUtil {
 
@@ -54,6 +54,7 @@ public class FSUtil {
 
     private static void initFileSystem() {
         Configuration conf = new Configuration();
+        conf.set("fs.defaultFS", "hdfs://localhost:8020");
 
         if (StringUtils.isEmpty(conf.get("fs.hdfs.impl"))) {
             LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
@@ -175,6 +176,25 @@ public class FSUtil {
         if (getFileSystem() == null) {
             throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
         }
+    }
+
+    public static String getFirstMissRecordPath(String hdfsDir) throws Exception{
+        List<FileStatus> fileList = listFileStatus(hdfsDir);
+        for(int i=0; i<fileList.size();i++){
+            if(fileList.get(i).getPath().toUri().toString().toLowerCase().contains("missrecord")){
+                return fileList.get(i).getPath().toUri().toString();
+            }
+        }
+        return null;
+    }
+
+    public static InputStream getMissSampleInputStream(String path) throws Exception {
+        List<String> subDirList = listSubDir(path);
+        //FIXME: only handle 1-sub dir here now
+        for(int i=0; i< subDirList.size();i++){
+            return getSampleInputStream(getFirstMissRecordPath(subDirList.get(i)));
+        }
+        return getSampleInputStream(getFirstMissRecordPath(path));
     }
 
 }
