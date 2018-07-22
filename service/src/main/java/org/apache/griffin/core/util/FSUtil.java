@@ -53,7 +53,6 @@ public class FSUtil {
 
     private static void initFileSystem() {
         Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", "hdfs://localhost:8020");
 
         if (StringUtils.isEmpty(conf.get("fs.hdfs.impl"))) {
             LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
