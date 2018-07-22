@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.HDFS_FILE_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_STOPPED;
 
 public class FSUtil {
 

@@ -518,16 +518,16 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public String getJobHdfsPersistPath(Long jobId, long timestamp) {
-        AbstractJob job = jobRepo.findByIdAndDeleted(jobId, false);
-        if (job == null) {
+    public String getJobHdfsPersistPath(String jobName, long timestamp) {
+        List<AbstractJob> jobList = jobRepo.findByJobNameAndDeleted(jobName, false);
+        if (jobList.size() == 0) {
             return null;
         }
-        if (job.getType().toLowerCase().equals("batch")) {
-            return getPersistPath(ENV_BATCH) + "/" + job.getJobName() + "/" + timestamp + "";
+        if (jobList.get(0).getType().toLowerCase().equals("batch")) {
+            return getPersistPath(ENV_BATCH) + "/" + jobName + "/" + timestamp + "";
         }
 
-        return getPersistPath(ENV_STREAMING) + "/" + job.getJobName() + "/" + timestamp + "";
+        return getPersistPath(ENV_STREAMING) + "/" + jobName + "/" + timestamp + "";
     }
 
     private String getPersistPath(String jsonString) {
