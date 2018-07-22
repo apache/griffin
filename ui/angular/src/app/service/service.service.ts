@@ -22,7 +22,7 @@ import { Injectable } from "@angular/core";
 export class ServiceService {
   constructor() {}
   // public BACKEND_SERVER = 'http://10.64.222.80:38080';
-  // public BACKEND_SERVER = 'http://localhost:8080';
+//  public BACKEND_SERVER = 'http://localhost:8080';
   public BACKEND_SERVER = "";
   public API_ROOT_PATH = "/api/v1";
 
@@ -71,6 +71,9 @@ export class ServiceService {
         this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/sample",
       metricdownload:
         this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/download",
+      missRecordDownload:
+        this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs/download",
+
 
       //Models
 
