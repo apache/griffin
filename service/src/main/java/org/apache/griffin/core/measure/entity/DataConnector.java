@@ -99,7 +99,6 @@ public class DataConnector extends AbstractAuditableEntity {
         return CollectionUtils.isEmpty(preProcess) ? null : preProcess;
     }
 
-    @JsonProperty("pre.proc")
     public void setPreProcess(List<StreamingPreProcess> preProcess) {
         this.preProcess = preProcess;
     }
@@ -109,7 +108,6 @@ public class DataConnector extends AbstractAuditableEntity {
         return configMap;
     }
 
-    @JsonProperty("config")
     public void setConfigMap(Map<String, Object> configMap) {
         this.configMap = configMap;
     }
@@ -127,7 +125,6 @@ public class DataConnector extends AbstractAuditableEntity {
         return dataUnit;
     }
 
-    @JsonProperty("data.unit")
     public void setDataUnit(String dataUnit) {
         this.dataUnit = dataUnit;
     }
@@ -137,7 +134,6 @@ public class DataConnector extends AbstractAuditableEntity {
         return dataTimeZone;
     }
 
-    @JsonProperty("data.time.zone")
     public void setDataTimeZone(String dataTimeZone) {
         this.dataTimeZone = dataTimeZone;
     }
