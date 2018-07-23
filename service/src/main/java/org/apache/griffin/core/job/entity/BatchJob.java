@@ -26,10 +26,11 @@ import java.util.List;
 @Entity
 @DiscriminatorValue("griffinBatchJob")
 public class BatchJob extends AbstractJob {
+	private static final long serialVersionUID = -1114269860236729008L;
 
-    @Override
+	@Override
     public String getType() {
-        return "batch";
+        return JobType.BATCH.getName();
     }
 
     public BatchJob() {

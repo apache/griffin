@@ -48,9 +48,9 @@ Create database 'quartz' in postgresql
 ```
 createdb -O <username> quartz
 ```
-Init quartz tables in postgresql by [init_quartz.sql](../../service/src/main/resources/Init_quartz_postgres.sql)
+Init quartz tables in postgresql by [Init_quartz_postgres.sql](../../service/src/main/resources/Init_quartz_postgres.sql)
 ```
-psql -p <password> -h <host address> -U <username> -f init_quartz.sql quartz
+psql -p <password> -h <host address> -U <username> -f Init_quartz_postgres.sql quartz
 ```
 
 #### Mysql
@@ -59,9 +59,9 @@ Create database 'quartz' in mysql
 ```
 mysql -u <username> -e "create database quartz" -p
 ```
-Init quartz tables in mysql by [init_quartz.sql](../../service/src/main/resources/Init_quartz_mysql.sql)
+Init quartz tables in mysql by [Init_quartz_mysql_innodb.sql.sql](../../service/src/main/resources/Init_quartz_mysql_innodb.sql)
 ```
-mysql -u <username> -p quartz < init_quartz.sql
+mysql -u <username> -p quartz < Init_quartz_mysql_innodb.sql.sql
 ```
 
 
@@ -105,7 +105,7 @@ You should also modify some configurations of Griffin for your environment.
 	# elasticsearch.password = password
     ```
 
-- <b>measure/src/main/resources/env.json</b>
+- <b>measure/src/main/resources/env-streaming.json</b>
 	```
 	"persist": [
 	    ...
@@ -118,7 +118,7 @@ You should also modify some configurations of Griffin for your environment.
 		}
 	]
 	```
-	Put the modified env.json file into HDFS.
+	Rename the modified env-streaming.json file as env.json and put it into HDFS.
 
 - <b>service/src/main/resources/sparkJob.properties</b>
     ```
@@ -132,7 +132,7 @@ You should also modify some configurations of Griffin for your environment.
     spark.yarn.dist.files = hdfs://<path to>/hive-site.xml
 
     livy.uri = http://<your IP>:8998/batches
-    spark.uri = http://<your IP>:8088
+    yarn.uri = http://<your IP>:8088
     ```
     - \<griffin measure path> is the location you should put the jar file of measure module.
     - \<griffin env path> is the location you should put the env.json file.
@@ -166,5 +166,5 @@ After a few seconds, we can visit our default UI of Griffin (by default the port
 
 You can use UI following the steps [here](../ui/user-guide.md).
 
-**Note**: The UI doesn't support all the features, for the advanced features you can try API of service.
+**Note**: The UI does not support all the backend features, to experience the advanced features you can use services directly.
 

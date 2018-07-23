@@ -133,12 +133,11 @@ public class MetricStoreImpl implements MetricStore {
     }
 
     @Override
-    public ResponseEntity addMetricValues(List<MetricValue> metricValues) throws IOException {
+    public ResponseEntity<?> addMetricValues(List<MetricValue> metricValues) throws IOException {
         String bulkRequestBody = getBulkRequestBody(metricValues);
         HttpEntity entity = new NStringEntity(bulkRequestBody, ContentType.APPLICATION_JSON);
         Response response = client.performRequest("POST", urlPost, Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
-
     }
 
     private String getBulkRequestBody(List<MetricValue> metricValues) throws JsonProcessingException {
@@ -152,7 +151,7 @@ public class MetricStoreImpl implements MetricStore {
     }
 
     @Override
-    public ResponseEntity deleteMetricValues(String metricName) throws IOException {
+    public ResponseEntity<?> deleteMetricValues(String metricName) throws IOException {
         Map<String, Object> param = Collections.singletonMap("query",
             Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
         HttpEntity entity = new NStringEntity(JsonUtil.toJson(param), ContentType.APPLICATION_JSON);
@@ -160,7 +159,7 @@ public class MetricStoreImpl implements MetricStore {
         return getResponseEntityFromResponse(response);
     }
 
-    private ResponseEntity getResponseEntityFromResponse(Response response) throws IOException {
+    private ResponseEntity<?> getResponseEntityFromResponse(Response response) throws IOException {
         String body = EntityUtils.toString(response.getEntity());
         HttpStatus status = HttpStatus.valueOf(response.getStatusLine().getStatusCode());
         return new ResponseEntity<>(body, responseHeaders, status);

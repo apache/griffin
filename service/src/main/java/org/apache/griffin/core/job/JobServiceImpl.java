@@ -75,8 +75,6 @@ public class JobServiceImpl implements JobService {
     private static final int DEFAULT_PAGE_SIZE = 10;
     static final String START = "start";
     static final String STOP = "stop";
-    private static final String BATCH_TYPE = "batch";
-    private static final String STREAMING_TYPE = "streaming";
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -106,9 +104,9 @@ public class JobServiceImpl implements JobService {
     @Override
     public List<AbstractJob> getAliveJobs(String type) {
         List<? extends AbstractJob> jobs;
-        if (BATCH_TYPE.equals(type)) {
+        if (JobType.BATCH.getName().equals(type)) {
             jobs = batchJobRepo.findByDeleted(false);
-        } else if (STREAMING_TYPE.equals(type)) {
+        } else if (JobType.STREAMING.getName().equals(type)) {
             jobs = streamingJobRepo.findByDeleted(false);
         } else {
             jobs = jobRepo.findByDeleted(false);
