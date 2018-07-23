@@ -53,11 +53,8 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;
 
-    private ThreadPoolExecutor singleThreadExecutor;
 
     public HiveMetaStoreServiceImpl() {
-        singleThreadExecutor = new ThreadPoolExecutor(1, 5, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(3), new ThreadPoolExecutor.DiscardPolicy());
-        LOGGER.info("HiveMetaStoreServiceImpl single thread pool created.");
     }
 
     @Override
@@ -72,7 +69,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             results = client.getAllDatabases();
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Can not get databases : {}", e.getMessage());
+            LOGGER.error("Can not get databases : {}", e);
         }
         return results;
     }
@@ -90,7 +87,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             results = client.getAllTables(getUseDbName(dbName));
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Exception fetching tables info: {}", e.getMessage());
+            LOGGER.error("Exception fetching tables info: {}", e);
         }
         return results;
     }
@@ -136,7 +133,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             result = client.getTable(getUseDbName(dbName), tableName);
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Exception fetching table info : {}. {}", tableName, e.getMessage());
+            LOGGER.error("Exception fetching table info : {}. {}", tableName, e);
         }
         return result;
     }
@@ -165,7 +162,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             }
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Exception fetching tables info: {}", e.getMessage());
+            LOGGER.error("Exception fetching tables info: {}", e);
         }
         return allTables;
     }
@@ -179,15 +176,10 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     }
 
     private void reconnect() {
-        if (singleThreadExecutor.getActiveCount() == 0) {
-            System.out.println("execute create thread.");
-            singleThreadExecutor.execute(() -> {
-                try {
-                    client.reconnect();
-                } catch (Exception e) {
-                    LOGGER.error("reconnect to hive failed.");
-                }
-            });
+        try {
+            client.reconnect();
+        } catch (Exception e) {
+            LOGGER.error("reconnect to hive failed: {}", e);
         }
     }
 }

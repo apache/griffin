@@ -247,7 +247,7 @@ public class JobServiceImpl implements JobService {
             try {
                 jobHealth = op.getHealth(jobHealth, job);
             } catch (SchedulerException e) {
-                LOGGER.error("Job schedule exception. {}", e.getMessage());
+                LOGGER.error("Job schedule exception. {}", e);
                 throw new GriffinException.ServiceException("Fail to Get HealthInfo", e);
             }
 
