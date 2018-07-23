@@ -76,7 +76,6 @@ export class ServiceService {
 
 
       //Models
-
       allModels: this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures",
       addModels: this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures",
       deleteModel: this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures",
