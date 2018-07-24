@@ -87,8 +87,9 @@ public class JobController {
     }
 
     @RequestMapping(path = "/jobs/download", method = RequestMethod.GET)
-    public ResponseEntity<Resource> download(@RequestParam("hdfsPath") String hdfsPath) throws IOException {
-        InputStreamResource resource = new InputStreamResource(FSUtil.getSampleInputStream(hdfsPath));
+    public ResponseEntity<Resource> download(@RequestParam("jobName") String jobName ,@RequestParam("ts") long timestamp) throws Exception {
+        String path = jobService.getJobHdfsPersistPath(jobName,timestamp);
+        InputStreamResource resource = new InputStreamResource(FSUtil.getMissSampleInputStream(path));
         return ResponseEntity.ok().
                 header("content-disposition", "attachment; filename = sampleMissingData.json")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
