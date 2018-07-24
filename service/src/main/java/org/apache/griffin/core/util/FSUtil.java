@@ -53,7 +53,7 @@ public class FSUtil {
 
     private static void initFileSystem() {
         Configuration conf = new Configuration();
-
+        
         if (StringUtils.isEmpty(conf.get("fs.hdfs.impl"))) {
             LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
             conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
