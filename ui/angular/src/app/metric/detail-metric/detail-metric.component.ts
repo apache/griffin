@@ -53,6 +53,10 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
   profiling = false;
   columnname = [];
   noresults = false;
+  missRecordList = [];
+  public visible = false;
+  public visibleAnimate = false;
+
 
   ngOnInit() {
     this.currentJob = this.route.snapshot.paramMap.get("name");
@@ -85,6 +89,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
             this.data[0].value.matched / this.data[0].value.total * 100;
             metric.details = JSON.parse(JSON.stringify(this.data));
           this.chartOption = this.chartService.getOptionBig(metric);
+          this.missRecordList = metric.details.filter(val => val.value.missed!== 0);
           $("#bigChartDiv").height(window.innerHeight - 120 + "px");
           $("#bigChartDiv").width(window.innerWidth - 400 + "px");
           $("#bigChartContainer").show();
@@ -110,10 +115,10 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
                   record = ' (' + name + ',' + count + ') ';
                   records += record;
                 }
-                delete item.value[key];                
+                delete item.value[key];
                 key = key + ' (' + keysplit[0] + ', count)';
                 item.value[key] = records;
-                // var sortable = [];  
+                // var sortable = [];
                 // for(let i in item.value[key]){
                 //   for(let category in item.value[key][i]){
                 //     if(category != "count"){
@@ -128,7 +133,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
                 // for(let i=0;i<5;i++){
                 //   let grpname = sortable[i][0];
                 //   item.value[grpname] = sortable[i][1];
-                // }       
+                // }
                 // delete item.value[key];
               }
             }
@@ -143,7 +148,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
       }
     );
   }
-  
+
   onResize(event) {
     this.resizeTreeMap();
   }
@@ -158,4 +163,48 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
   ngAfterViewChecked() {
     $(".main-table").addClass('clone');
   }
-}
+
+  showDownloadSample() {
+    this.visible = true;
+    setTimeout(() => (this.visibleAnimate = true), 100);
+  }
+
+  public hide(): void {
+    this.visibleAnimate = false;
+    setTimeout(() => (this.visible = false), 300);
+  }
+  public onContainerClicked(event: MouseEvent): void {
+    if ((<HTMLElement>event.target).classList.contains("close")) {
+      this.hide();
+    }
+  }
+  
+  downloadSample(row){
+    let urlDownload = this.serviceService.config.uri.missRecordDownload + "?jobName=" + row.name + "&ts=" + row.tmst;
+    this.http
+      .get(urlDownload,
+      { responseType: 'blob', observe: 'response' })
+      .map(res => {
+        return {
+          filename: row.name+"_"+row.tmst+'_missRecordSample.json',
+          data: res.body
+        };
+      })
+      .subscribe(res => {
+        console.log('start download:', res);
+        var url = window.URL.createObjectURL(res.data);
+        var a = document.createElement('a');
+        document.body.appendChild(a);
+        a.setAttribute('style', 'display: none');
+        a.href = url;
+        a.download = res.filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+      }, error => {
+        console.log('download error:', JSON.stringify(error));
+      }, () => {
+        console.log('Completed file download.')
+      });
+    }
+  }
