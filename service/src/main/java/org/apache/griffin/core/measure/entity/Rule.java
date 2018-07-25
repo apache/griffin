@@ -89,7 +89,6 @@ public class Rule extends AbstractAuditableEntity {
         return dslType;
     }
 
-    @JsonProperty("dsl.type")
     public void setDslType(String dslType) {
         this.dslType = dslType;
     }
@@ -99,7 +98,6 @@ public class Rule extends AbstractAuditableEntity {
         return dqType;
     }
 
-    @JsonProperty("dq.type")
     public void setDqType(String dqType) {
         this.dqType = dqType;
     }
@@ -117,7 +115,6 @@ public class Rule extends AbstractAuditableEntity {
         return detailsMap;
     }
 
-    @JsonProperty("details")
     public void setDetailsMap(Map<String, Object> detailsMap) {
         this.detailsMap = detailsMap;
     }
@@ -127,7 +124,6 @@ public class Rule extends AbstractAuditableEntity {
         return metricMap;
     }
 
-    @JsonProperty("metric")
     public void setMetricMap(Map<String, Object> metricMap) {
         this.metricMap = metricMap;
     }
@@ -137,7 +133,6 @@ public class Rule extends AbstractAuditableEntity {
         return recordMap;
     }
 
-    @JsonProperty("record")
     public void setRecordMap(Map<String, Object> recordMap) {
         this.recordMap = recordMap;
     }

@@ -64,7 +64,6 @@ public abstract class Measure extends AbstractAuditableEntity {
         return dqType;
     }
 
-    @JsonProperty("dq.type")
     public void setDqType(DqType dqType) {
         this.dqType = dqType;
     }

@@ -58,7 +58,6 @@ public class SegmentPredicate extends AbstractAuditableEntity {
         return configMap;
     }
 
-    @JsonProperty("config")
     public void setConfigMap(Map<String, Object> configMap) {
         this.configMap = configMap;
     }
