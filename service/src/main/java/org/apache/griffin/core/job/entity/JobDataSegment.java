@@ -49,7 +49,6 @@ public class JobDataSegment extends AbstractAuditableEntity {
         return baseline;
     }
 
-    @JsonProperty("as.baseline")
     public void setBaseline(boolean baseline) {
         this.baseline = baseline;
     }
@@ -59,7 +58,6 @@ public class JobDataSegment extends AbstractAuditableEntity {
         return segmentRange;
     }
 
-    @JsonProperty("segment.range")
     public void setSegmentRange(SegmentRange segmentRange) {
         this.segmentRange = segmentRange;
     }
@@ -69,7 +67,6 @@ public class JobDataSegment extends AbstractAuditableEntity {
         return dataConnectorName;
     }
 
-    @JsonProperty("data.connector.name")
     public void setDataConnectorName(String dataConnectorName) {
         if (StringUtils.isEmpty(dataConnectorName)) {
             LOGGER.warn(" Data connector name is invalid. Please check your connector name.");

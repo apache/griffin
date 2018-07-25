@@ -56,7 +56,6 @@ public class ExternalMeasure extends Measure {
         return metricName;
     }
 
-    @JsonProperty("metric.name")
     public void setMetricName(String metricName) {
         this.metricName = metricName;
     }
