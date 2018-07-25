@@ -47,7 +47,7 @@ public final class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
             return job;
 
         } catch (Exception e) {
-            LOGGER.error("fail to create job instance. {}", e.getMessage());
+            LOGGER.error("fail to create job instance. {}", e);
         }
         return null;
     }

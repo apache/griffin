@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.*;
@@ -33,6 +34,8 @@ import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.YarnNetUtil;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +58,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static java.util.TimeZone.getTimeZone;
+import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
+import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
@@ -247,7 +252,7 @@ public class JobServiceImpl implements JobService {
             try {
                 jobHealth = op.getHealth(jobHealth, job);
             } catch (SchedulerException e) {
-                LOGGER.error("Job schedule exception. {}", e.getMessage());
+                LOGGER.error("Job schedule exception. {}", e);
                 throw new GriffinException.ServiceException("Fail to Get HealthInfo", e);
             }
 
@@ -510,5 +515,35 @@ public class JobServiceImpl implements JobService {
         Pageable pageable = new PageRequest(0, 1, Sort.Direction.DESC, "tms");
         List<JobInstanceBean> instances = instanceRepo.findByJobId(jobId, pageable);
         return !CollectionUtils.isEmpty(instances) && LivySessionStates.isHealthy(instances.get(0).getState());
+    }
+
+    @Override
+    public String getJobHdfsPersistPath(String jobName, long timestamp) {
+        List<AbstractJob> jobList = jobRepo.findByJobNameAndDeleted(jobName, false);
+        if (jobList.size() == 0) {
+            return null;
+        }
+        if (jobList.get(0).getType().toLowerCase().equals("batch")) {
+            return getPersistPath(ENV_BATCH) + "/" + jobName + "/" + timestamp + "";
+        }
+
+        return getPersistPath(ENV_STREAMING) + "/" + jobName + "/" + timestamp + "";
+    }
+
+    private String getPersistPath(String jsonString) {
+        try {
+            JSONObject obj = new JSONObject(jsonString);
+            JSONArray persistArray = obj.getJSONArray("persist");
+            for (int i = 0; i < persistArray.length(); i++) {
+                if (persistArray.getJSONObject(i).get("type").equals("hdfs")) {
+                    return persistArray.getJSONObject(i).getJSONObject("config").getString("path");
+                }
+            }
+
+            return null;
+        } catch (Exception ex) {
+            LOGGER.error("Fail to get Persist path from {}", jsonString, ex);
+            return null;
+        }
     }
 }

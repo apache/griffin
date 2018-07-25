@@ -23,8 +23,6 @@ import org.apache.griffin.core.job.JobServiceImpl;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
 import org.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +30,6 @@ import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("griffinOperation")
 public class GriffinMeasureOperatorImpl implements MeasureOperator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GriffinMeasureOperatorImpl.class);
-
     private final MeasureRepo<Measure> measureRepo;
 
     private final JobServiceImpl jobService;
