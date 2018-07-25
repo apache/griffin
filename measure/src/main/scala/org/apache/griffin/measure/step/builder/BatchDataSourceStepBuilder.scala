@@ -22,6 +22,7 @@ import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.read.ReadStep
 
+
 case class BatchDataSourceStepBuilder() extends DataSourceParamStepBuilder {
 
   def buildReadSteps(context: DQContext, dcParam: DataConnectorParam): Option[ReadStep] = {

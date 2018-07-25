@@ -166,5 +166,5 @@ After a few seconds, we can visit our default UI of Griffin (by default the port
 
 You can use UI following the steps [here](../ui/user-guide.md).
 
-**Note**: The UI doesn't support all the features, for the advanced features you can try API of service.
+**Note**: The UI does not support all the backend features, to experience the advanced features you can use services directly.
 

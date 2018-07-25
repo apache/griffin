@@ -38,13 +38,13 @@ object JsonUtil {
     mapper.writeValueAsString(value)
   }
 
-  def toMap[V](json:String)(implicit m: Manifest[V]) = fromJson[Map[String,V]](json)
+  def toMap[V: ClassTag](json:String) = fromJson[Map[String,V]](json)
 
-  def fromJson[T: ClassTag](json: String)(implicit m : Manifest[T]): T = {
+  def fromJson[T: ClassTag](json: String): T = {
     mapper.readValue[T](json, classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
 
-  def fromJson[T: ClassTag](is: InputStream)(implicit m : Manifest[T]): T = {
+  def fromJson[T: ClassTag](is: InputStream): T = {
     mapper.readValue[T](is, classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
 
