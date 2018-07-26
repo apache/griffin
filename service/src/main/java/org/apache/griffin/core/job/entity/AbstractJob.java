@@ -89,7 +89,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return measureId;
     }
 
-    @JsonProperty("measure.id")
     public void setMeasureId(Long measureId) {
         this.measureId = measureId;
     }
@@ -99,7 +98,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return jobName;
     }
 
-    @JsonProperty("job.name")
     public void setJobName(String jobName) {
         if (StringUtils.isEmpty(jobName)) {
             LOGGER.warn("Job name cannot be empty.");
@@ -113,7 +111,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return cronExpression;
     }
 
-    @JsonProperty("cron.expression")
     public void setCronExpression(String cronExpression) {
         this.cronExpression = cronExpression;
     }
@@ -123,7 +120,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return jobState;
     }
 
-    @JsonProperty("job.state")
     public void setJobState(JobState jobState) {
         this.jobState = jobState;
     }
@@ -133,7 +129,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return timeZone;
     }
 
-    @JsonProperty("cron.time.zone")
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
     }
@@ -143,7 +138,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return segments;
     }
 
-    @JsonProperty("data.segments")
     public void setSegments(List<JobDataSegment> segments) {
         this.segments = segments;
     }
@@ -153,7 +147,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return configMap;
     }
 
-    @JsonProperty("predicate.config")
     public void setConfigMap(Map<String, Object> configMap) {
         this.configMap = configMap;
     }
@@ -171,7 +164,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return metricName;
     }
 
-    @JsonProperty("metric.name")
     public void setMetricName(String metricName) {
         this.metricName = metricName;
     }
@@ -189,7 +181,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return name;
     }
 
-    @JsonProperty("quartz.name")
     public void setName(String quartzName) {
         this.name = quartzName;
     }
@@ -199,7 +190,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return group;
     }
 
-    @JsonProperty("quartz.group")
     public void setGroup(String quartzGroup) {
         this.group = quartzGroup;
     }

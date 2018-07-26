@@ -80,7 +80,6 @@ public class GriffinMeasure extends Measure {
         return processType;
     }
 
-    @JsonProperty("process.type")
     public void setProcessType(ProcessType processType) {
         this.processType = processType;
     }
@@ -90,7 +89,6 @@ public class GriffinMeasure extends Measure {
         return dataSources;
     }
 
-    @JsonProperty("data.sources")
     public void setDataSources(List<DataSource> dataSources) {
         if (CollectionUtils.isEmpty(dataSources)) {
             throw new NullPointerException("Data source can not be empty.");
@@ -103,7 +101,6 @@ public class GriffinMeasure extends Measure {
         return evaluateRule;
     }
 
-    @JsonProperty("evaluate.rule")
     public void setEvaluateRule(EvaluateRule evaluateRule) {
         if (evaluateRule == null || CollectionUtils.isEmpty(evaluateRule.getRules())) {
             throw new NullPointerException("Evaluate rule can not be empty.");
@@ -116,7 +113,6 @@ public class GriffinMeasure extends Measure {
         return ruleDescriptionMap;
     }
 
-    @JsonProperty("rule.description")
     public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) {
         this.ruleDescriptionMap = ruleDescriptionMap;
     }

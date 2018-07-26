@@ -130,7 +130,6 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         return tms;
     }
 
-    @JsonProperty("timestamp")
     public void setTms(Long tms) {
         this.tms = tms;
     }
@@ -140,7 +139,6 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         return expireTms;
     }
 
-    @JsonProperty("expireTimestamp")
     public void setExpireTms(Long expireTms) {
         this.expireTms = expireTms;
     }
