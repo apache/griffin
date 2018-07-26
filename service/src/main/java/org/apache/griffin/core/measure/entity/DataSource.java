@@ -87,7 +87,6 @@ public class DataSource extends AbstractAuditableEntity {
         return cacheMap;
     }
 
-    @JsonProperty("cache")
     public void setCacheMap(Map<String, Object> cacheMap) {
         this.cacheMap = cacheMap;
     }

@@ -54,7 +54,6 @@ public class StreamingPreProcess extends AbstractAuditableEntity {
         return dslType;
     }
 
-    @JsonProperty(("dsl.type"))
     public void setDslType(String dslType) {
         this.dslType = dslType;
     }
@@ -88,7 +87,6 @@ public class StreamingPreProcess extends AbstractAuditableEntity {
         return detailsMap;
     }
 
-    @JsonProperty("details")
     public void setDetailsMap(Map<String, Object> details) {
         this.detailsMap = details;
     }
