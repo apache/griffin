@@ -37,20 +37,31 @@
         "dq.type": "accuracy",
         "name": "accu",
         "rule": "source.user_id = target.user_id AND upper(source.first_name) = upper(target.first_name) AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code",
-        "details": {
+        "alias": {
           "source": "source",
           "target": "target",
           "miss": "miss_count",
           "total": "total_count",
           "matched": "matched_count"
-        },
-        "metric": {
-          "name": "accu"
-        },
-        "record": {
-          "name": "missRecords"
         }
+//      ,
+//        "metric": {
+//          "name": "accu"
+//        },
+//        "record": {
+//          "name": "missRecords"
+//        }
       }
     ]
+  },
+
+  "sinks":[
+    {"accuracyMetricSink":{
+      "name":"accu"
+  }},
+    {"missRecordsSink":{
+      "name" : "missRecords"
   }
+  }
+  ]
 }
