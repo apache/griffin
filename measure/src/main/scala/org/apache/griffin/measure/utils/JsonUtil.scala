@@ -38,8 +38,6 @@ object JsonUtil {
     mapper.writeValueAsString(value)
   }
 
-  def toMap[V: ClassTag](json:String) = fromJson[Map[String,V]](json)
-
   def fromJson[T: ClassTag](json: String): T = {
     mapper.readValue[T](json, classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
