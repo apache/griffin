@@ -26,7 +26,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 
 /**
-  * write records needs to be persisted
+  * write records needs to be sink
   */
 case class RecordWriteStep(name: String,
                            inputName: String,
@@ -45,7 +45,7 @@ case class RecordWriteStep(name: String,
         // write records
         recordsOpt match {
           case Some(records) => {
-            context.getPersist(timestamp).persistRecords(records, name)
+            context.getSink(timestamp).sinkRecords(records, name)
           }
           case _ => {}
         }
@@ -57,11 +57,11 @@ case class RecordWriteStep(name: String,
         recordsOpt.foreach { records =>
           records.foreach { pair =>
             val (t, strs) = pair
-            context.getPersist(t).persistRecords(strs, name)
+            context.getSink(t).sinkRecords(strs, name)
           }
         }
         emptyTimestamps.foreach { t =>
-          context.getPersist(t).persistRecords(Nil, name)
+          context.getSink(t).sinkRecords(Nil, name)
         }
       }
     }

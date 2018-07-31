@@ -32,7 +32,5 @@
     }
   ],
 
-  "info.cache": [],
-
-  "cleaner": {}
+  "griffin.checkpoint": []
 }
