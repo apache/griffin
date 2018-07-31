@@ -19,11 +19,9 @@ under the License.
 
 package org.apache.griffin.core.login;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -32,9 +30,11 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class LoginServiceLdapImpl implements LoginService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginServiceLdapImpl.class);

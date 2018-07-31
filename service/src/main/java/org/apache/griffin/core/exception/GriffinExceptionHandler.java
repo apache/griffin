@@ -19,14 +19,14 @@ under the License.
 
 package org.apache.griffin.core.exception;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import javax.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class GriffinExceptionHandler {

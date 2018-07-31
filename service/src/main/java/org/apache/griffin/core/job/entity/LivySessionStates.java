@@ -22,10 +22,18 @@ package org.apache.griffin.core.job.entity;
 import com.cloudera.livy.sessions.SessionState;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.quartz.Trigger;
 
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
-import static org.quartz.Trigger.TriggerState;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.SHUTTING_DOWN;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
 
 public class LivySessionStates {
 

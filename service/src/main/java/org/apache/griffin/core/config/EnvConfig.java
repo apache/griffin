@@ -20,20 +20,22 @@ under the License.
 package org.apache.griffin.core.config;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 import static org.apache.griffin.core.util.FileUtil.getFilePath;
 import static org.apache.griffin.core.util.JsonUtil.toEntity;
 import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
 public class EnvConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EnvConfig.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(EnvConfig.class);
     public static String ENV_BATCH;
     public static String ENV_STREAMING;
 
@@ -44,13 +46,16 @@ public class EnvConfig {
      * @return String
      * @throws IOException io exception
      */
-    private static String readEnvFromResource(String path) throws IOException {
+    private static String readEnvFromResource(String path)
+            throws IOException {
         if (path == null) {
             LOGGER.warn("Parameter path is null.");
             return null;
         }
-        //Be careful, here we use getInputStream() to convert path file to stream.
-        // It'll cause FileNotFoundException if you use  getFile() to convert path file to File Object
+        // Be careful, here we use getInputStream() to convert
+        // path file to stream.
+        // It'll cause FileNotFoundException if you use  getFile()
+        // to convert path file to File Object
         InputStream in = new ClassPathResource(path).getInputStream();
         Object result = null;
         try {
