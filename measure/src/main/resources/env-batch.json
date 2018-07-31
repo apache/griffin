@@ -6,15 +6,15 @@
     }
   },
 
-  "persist": [
+  "sinks": [
     {
-      "type": "log",
+      "type": "CONSOLE",
       "config": {
         "max.log.lines": 10
       }
     },
     {
-      "type": "hdfs",
+      "type": "HDFS",
       "config": {
         "path": "hdfs://localhost/griffin/batch/persist",
         "max.persist.lines": 10000,
@@ -22,11 +22,11 @@
       }
     },
     {
-      "type": "http",
+      "type": "ELASTICSEARCH",
       "config": {
         "method": "post",
         "api": "http://10.148.181.248:39200/griffin/accuracy",
-        "over.time": "1m",
+        "connection.timeout": "1m",
         "retry": 10
       }
     }
