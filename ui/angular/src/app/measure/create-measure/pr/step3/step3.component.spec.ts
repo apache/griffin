@@ -16,7 +16,28 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-label.control-label {
-  margin-top: 7px;
-}
+import { PrStep3Component } from './step3.component';
+
+describe('PrStep3Component', () => {
+  let component: PrStep3Component;
+  let fixture: ComponentFixture<PrStep3Component>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ PrStep3Component ]
+    })
+      .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PrStep3Component);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should be created', () => {
+    expect(component).toBeTruthy();
+  });
+});

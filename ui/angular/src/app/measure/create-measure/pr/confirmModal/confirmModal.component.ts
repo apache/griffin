@@ -16,7 +16,31 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {ProfilingStep1, ProfilingStep2, ProfilingStep3, ProfilingStep4} from "../pr.component";
 
-label.control-label {
-  margin-top: 7px;
+@Component({
+  selector: "app-pr-confirm-modal",
+  templateUrl: "./confirmModal.component.html",
+  styleUrls: ["./confirmModal.component.css"]
+})
+export class PrConfirmModal {
+
+  @Input() step1: ProfilingStep1;
+  @Input() step2: ProfilingStep2;
+  @Input() step3: ProfilingStep3;
+  @Input() step4: ProfilingStep4;
+
+  @Output() hide: EventEmitter<Object> = new EventEmitter<Object>();
+  @Output() saveMeasure: EventEmitter<Object> = new EventEmitter<Object>();
+
+  constructor() {}
+
+  hideModal() {
+    this.hide.emit();
+  }
+
+  saveModal() {
+    this.saveMeasure.emit()
+  }
 }
