@@ -37,7 +37,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "distinct",
-        "name": "dist",
+        "out.dataframe.name": "dist",
         "rule": "user_id",
         "details": {
           "source": "source",

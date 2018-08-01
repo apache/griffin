@@ -12,14 +12,14 @@
         {
           "type": "avro",
           "version": "1.7",
+          "dataframe.name" : "this_table",
           "config": {
             "file.name": "src/test/resources/users_info_src.avro"
           },
           "pre.proc": [
             {
               "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select reg_replace(email, '^([^@0-9]+)([0-9]+)@(dc)(?:\\\\.[^@]+)$', '$1@$3') as email, post_code from ${this}"
+              "rule": "select * from this_table where user_id < 10014"
             }
           ]
         }
@@ -32,8 +32,8 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "prof",
-        "rule": "email, count(*) as cnt from source group by email",
+        "out.dataframe.name": "prof",
+        "rule": "user_id, count(*) as cnt from source group by user_id",
         "metric": {
           "name": "prof",
           "collect.type": "array"
@@ -42,7 +42,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "grp",
+        "out.dataframe.name": "grp",
         "rule": "source.post_code, count(*) as cnt from source group by source.post_code order by cnt desc",
         "metric": {
           "name": "post_group",

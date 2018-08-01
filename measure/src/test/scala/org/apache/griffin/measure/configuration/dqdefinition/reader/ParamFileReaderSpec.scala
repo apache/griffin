@@ -33,7 +33,7 @@ class ParamFileReaderSpec extends FlatSpec with Matchers{
     params match {
       case Success(v) =>
         v.evaluateRule.getRules(0).dslType should === ("spark-sql")
-        v.evaluateRule.getRules(0).name should === ("missRecords")
+        v.evaluateRule.getRules(0).outDfName should === ("missRecords")
       case Failure(_) =>
         fail("it should not happen")
     }

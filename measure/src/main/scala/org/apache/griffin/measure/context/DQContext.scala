@@ -46,8 +46,22 @@ case class DQContext(contextId: ContextId,
   val metricWrapper: MetricWrapper = MetricWrapper(name)
   val writeMode = WriteMode.defaultMode(procType)
 
-  val dataSourceNames: Seq[String] = dataSources.map(_.name)
+  val dataSourceNames: Seq[String] = {
+    // sort data source names, put baseline data source name to the head
+    val (blOpt, others) = dataSources.foldLeft((None: Option[String], Nil: Seq[String])) { (ret, ds) =>
+      val (opt, seq) = ret
+      if (opt.isEmpty && ds.isBaseline) (Some(ds.name), seq) else (opt, seq :+ ds.name)
+    }
+    blOpt match {
+      case Some(bl) => bl +: others
+      case _ => others
+    }
+  }
   dataSourceNames.foreach(name => compileTableRegister.registerTable(name))
+  def getDataSourceName(index: Int): String = {
+    if (dataSourceNames.size > index) dataSourceNames(index) else ""
+  }
+
   implicit val encoder = Encoders.STRING
   val functionNames: Seq[String] = sparkSession.catalog.listFunctions.map(_.name).collect.toSeq
 
@@ -58,10 +72,6 @@ case class DQContext(contextId: ContextId,
     }.toMap
   }
   printTimeRanges
-
-  def getDataSourceName(index: Int): String = {
-    if (dataSourceNames.size > index) dataSourceNames(index) else ""
-  }
 
   private val sinkFactory = SinkFactory(sinkParams, name)
   private val defaultSink: Sink = createSink(contextId.timestamp)

@@ -36,7 +36,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "uniqueness",
-        "name": "dup",
+        "out.dataframe.name": "dup",
         "rule": "user_id",
         "details": {
           "source": "source",

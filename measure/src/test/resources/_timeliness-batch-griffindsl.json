@@ -23,7 +23,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "timeliness",
-        "name": "timeliness",
+        "out.dataframe.name": "timeliness",
         "rule": "ts, end_ts",
         "details": {
           "source": "source",

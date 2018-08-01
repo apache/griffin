@@ -24,7 +24,7 @@
     "rules": [
       {
         "dsl.type": "spark-sql",
-        "name": "prof",
+        "out.dataframe.name": "prof",
         "rule": "select count(*) as `cnt`, count(distinct `post_code`) as `dis-cnt`, max(user_id) as `max` from source",
         "metric": {
           "name": "prof"
@@ -32,7 +32,7 @@
       },
       {
         "dsl.type": "spark-sql",
-        "name": "grp",
+        "out.dataframe.name": "grp",
         "rule": "select post_code as `pc`, count(*) as `cnt` from source group by post_code",
         "metric": {
           "name": "post_group",

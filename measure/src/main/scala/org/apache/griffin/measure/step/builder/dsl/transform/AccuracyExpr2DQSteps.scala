@@ -114,7 +114,7 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       val totalCountTransStep = SparkSqlTransformStep(totalCountTableName, totalCountSql, emptyMap)
 
       // 4. accuracy metric
-      val accuracyTableName = ruleParam.name
+      val accuracyTableName = ruleParam.outDfName
       val matchedColName = details.getStringOrKey(_matched)
       val accuracyMetricSql = procType match {
         case BatchProcessType => {
@@ -140,7 +140,7 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       val accuracyMetricWriteSteps = procType match {
         case BatchProcessType => {
           val metricOpt = ruleParam.getMetricOpt
-          val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.name)
+          val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.outDfName)
           val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
           MetricWriteStep(mwName, accuracyTableName, collectType) :: Nil
         }
@@ -159,16 +159,15 @@ case class AccuracyExpr2DQSteps(context: DQContext,
           val accuracyMetricTableName = "__accuracy"
           val accuracyMetricRule = DataFrameOps._accuracy
           val accuracyMetricDetails = Map[String, Any](
-            (AccuracyOprKeys._dfName -> accuracyTableName),
             (AccuracyOprKeys._miss -> missColName),
             (AccuracyOprKeys._total -> totalColName),
             (AccuracyOprKeys._matched -> matchedColName)
           )
           val accuracyMetricTransStep = DataFrameOpsTransformStep(accuracyMetricTableName,
-            accuracyMetricRule, accuracyMetricDetails)
+            accuracyTableName, accuracyMetricRule, accuracyMetricDetails)
           val accuracyMetricWriteStep = {
             val metricOpt = ruleParam.getMetricOpt
-            val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.name)
+            val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.outDfName)
             val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
             MetricWriteStep(mwName, accuracyMetricTableName, collectType)
           }

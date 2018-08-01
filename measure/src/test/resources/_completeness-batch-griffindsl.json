@@ -25,7 +25,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "completeness",
-        "name": "comp",
+        "out.dataframe.name": "comp",
         "rule": "email, post_code, first_name",
         "metric": {
           "name": "comp"
