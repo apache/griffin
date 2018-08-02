@@ -20,6 +20,14 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
@@ -36,15 +44,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_OFFSET;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_SIZE;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
 
 @Service
 public class MetricServiceImpl implements MetricService {

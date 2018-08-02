@@ -20,6 +20,8 @@ under the License.
 package org.apache.griffin.core.measure.repo;
 
 
+import java.util.List;
+
 import org.apache.griffin.core.measure.entity.Measure;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

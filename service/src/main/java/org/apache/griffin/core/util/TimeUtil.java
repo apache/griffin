@@ -19,9 +19,6 @@ under the License.
 
 package org.apache.griffin.core.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +27,9 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TimeUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtil.class);

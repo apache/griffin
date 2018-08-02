@@ -19,12 +19,12 @@ under the License.
 
 package org.apache.griffin.core.login;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginServiceDefaultImpl implements LoginService {
 

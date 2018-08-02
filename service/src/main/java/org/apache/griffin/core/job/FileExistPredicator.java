@@ -19,15 +19,15 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.FSUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Map;
 
 import static org.apache.griffin.core.job.JobInstance.PATH_CONNECTOR_CHARACTER;
 

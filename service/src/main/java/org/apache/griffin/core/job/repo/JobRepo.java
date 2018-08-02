@@ -19,11 +19,11 @@ under the License.
 
 package org.apache.griffin.core.job.repo;
 
+import java.util.List;
+
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-
-import java.util.List;
 
 public interface JobRepo<T extends AbstractJob> extends CrudRepository<T, Long> {
 
