@@ -52,10 +52,10 @@ export class ProfilingStep3 {
     needpath: false,
     path: ""
   };
-  timezone: string;
-  where: string;
-  size: string;
-  needpath: boolean;
+  timezone: string = "UTC(WET,GMT)";
+  where: string = "";
+  size: string = "1day";
+  needpath: boolean = false;
   path: string;
 }
 
@@ -400,7 +400,6 @@ export class PrComponent implements AfterViewChecked, OnInit {
   save() {
     let addModels = this.serviceService.config.uri.addModels;
 
-    console.log(this.newMeasure)
     $("#save").attr("disabled", "true");
 
     this.http.post(addModels, this.newMeasure).subscribe(
