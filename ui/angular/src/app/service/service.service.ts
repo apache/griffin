@@ -23,8 +23,7 @@ export class ServiceService {
   constructor() {}
   // public BACKEND_SERVER = 'http://10.64.222.80:38080';
 //  public BACKEND_SERVER = 'http://localhost:8080';
-//   public BACKEND_SERVER = "";
-  public BACKEND_SERVER = 'http://localhost:4444';
+  public BACKEND_SERVER = "";
   public API_ROOT_PATH = "/api/v1";
 
   public config = {
