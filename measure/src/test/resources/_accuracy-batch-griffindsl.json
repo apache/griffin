@@ -44,9 +44,12 @@
           "total": "total_count",
           "matched": "matched_count"
         },
-        "record": {
-          "name": "missRecords"
-        }
+        "out":[
+          {
+            "type": "record",
+            "name": "missRecords"
+          }
+        ]
       }
     ]
   }

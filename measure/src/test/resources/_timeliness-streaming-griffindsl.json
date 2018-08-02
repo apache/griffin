@@ -66,12 +66,16 @@
           "percentile": "percentile",
           "percentile.values": [0.2, 0.5, 0.8]
         },
-        "metric": {
-          "name": "timeliness"
-        },
-        "record": {
-          "name": "lateRecords"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "timeliness"
+          },
+          {
+            "type": "record",
+            "name": "lateRecords"
+          }
+        ]
       }
     ]
   }

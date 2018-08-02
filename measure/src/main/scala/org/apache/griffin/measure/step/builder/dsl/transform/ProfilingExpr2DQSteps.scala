@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.commons.lang.StringUtils
-import org.apache.griffin.measure.configuration.enums.{BatchProcessType, NormalizeType, StreamingProcessType}
+import org.apache.griffin.measure.configuration.enums.{BatchProcessType, FlattenType, MetricOutputType, StreamingProcessType}
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
@@ -95,10 +95,10 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       val profilingName = ruleParam.outDfName
       val profilingTransStep = SparkSqlTransformStep(profilingName, profilingSql, details)
       val profilingMetricWriteStep = {
-        val metricOpt = ruleParam.getMetricOpt
+        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.outDfName)
-        val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
-        MetricWriteStep(mwName, profilingName, collectType)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+        MetricWriteStep(mwName, profilingName, flattenType)
       }
       profilingTransStep :: profilingMetricWriteStep :: Nil
     }

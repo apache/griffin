@@ -71,13 +71,9 @@
         "rule": "select name, count(*) as `cnt` from source group by name",
         "out":[
           {
-            "type": "array",
+            "type": "metric",
             "name": "name_group",
-            "flatten":"array"
-          },
-          {
-            "type": "record",
-            "name": "missRecords"
+            "flatten": "array"
           }
         ]
       }

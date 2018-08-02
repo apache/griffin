@@ -46,11 +46,11 @@
         },
         "out":[
           {
-            "type":"metric",
+            "type": "metric",
             "name": "accu"
           },
           {
-            "type":"record",
+            "type": "record",
             "name": "missRecords"
           }
         ]

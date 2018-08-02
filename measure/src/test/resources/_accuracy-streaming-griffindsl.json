@@ -107,12 +107,16 @@
           "total": "total_count",
           "matched": "matched_count"
         },
-        "metric": {
-          "name": "accu"
-        },
-        "record": {
-          "name": "missRecords"
-        }
+        "out":[
+          {
+            "type":"metric",
+            "name": "accu"
+          },
+          {
+            "type":"record",
+            "name": "missRecords"
+          }
+        ]
       }
     ]
   }

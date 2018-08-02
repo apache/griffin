@@ -21,67 +21,68 @@ package org.apache.griffin.measure.configuration.enums
 import scala.util.matching.Regex
 
 /**
-  * the normalize strategy to collect metric
+  * the strategy to flatten metric
   */
-sealed trait NormalizeType {
+sealed trait FlattenType {
   val idPattern: Regex
   val desc: String
 }
 
-object NormalizeType {
-  private val normalizeTypes: List[NormalizeType] = List(DefaultNormalizeType, EntriesNormalizeType, ArrayNormalizeType, MapNormalizeType)
-  val default = DefaultNormalizeType
-  def apply(ptn: String): NormalizeType = {
-    normalizeTypes.find(tp => ptn match {
+object FlattenType {
+  private val flattenTypes: List[FlattenType] = List(DefaultFlattenType, EntriesFlattenType, ArrayFlattenType, MapFlattenType)
+  val default = DefaultFlattenType
+  def apply(ptn: String): FlattenType = {
+    flattenTypes.find(tp => ptn match {
       case tp.idPattern() => true
       case _ => false
     }).getOrElse(default)
   }
-  def unapply(pt: NormalizeType): Option[String] = Some(pt.desc)
+  def unapply(pt: FlattenType): Option[String] = Some(pt.desc)
 }
 
 /**
-  * default normalize strategy
-  * metrics contains n rows -> normalized metric json map
+  * default flatten strategy
+  * metrics contains 1 row -> flatten metric json map
+  * metrics contains n > 1 rows -> flatten metric json array
   * n = 0: { }
   * n = 1: { "col1": "value1", "col2": "value2", ... }
   * n > 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
   * all rows
   */
- case object DefaultNormalizeType extends NormalizeType {
+ case object DefaultFlattenType extends FlattenType {
   val idPattern: Regex = "".r
   val desc: String = "default"
 }
 
 /**
-  * metrics contains n rows -> normalized metric json map
+  * metrics contains n rows -> flatten metric json map
   * n = 0: { }
   * n >= 1: { "col1": "value1", "col2": "value2", ... }
   * the first row only
   */
- case object EntriesNormalizeType extends NormalizeType {
+ case object EntriesFlattenType extends FlattenType {
   val idPattern: Regex = "^(?i)entries$".r
   val desc: String = "entries"
 }
 
 /**
-  * metrics contains n rows -> normalized metric json map
+  * metrics contains n rows -> flatten metric json array
   * n = 0: { "arr-name": [ ] }
   * n >= 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
   * all rows
   */
- case object ArrayNormalizeType extends NormalizeType {
+ case object ArrayFlattenType extends FlattenType {
   val idPattern: Regex = "^(?i)array|list$".r
   val desc: String = "array"
 }
 
 /**
-  * metrics contains n rows -> normalized metric json map
+  * metrics contains n rows -> flatten metric json wrapped map
   * n = 0: { "map-name": { } }
   * n >= 1: { "map-name": { "col1": "value1", "col2": "value2", ... } }
   * the first row only
   */
- case object MapNormalizeType extends NormalizeType {
+ case object MapFlattenType extends FlattenType {
   val idPattern: Regex = "^(?i)map$".r
   val desc: String = "map"
 }

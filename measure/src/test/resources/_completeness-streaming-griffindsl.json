@@ -55,9 +55,12 @@
         "dq.type": "completeness",
         "out.dataframe.name": "comp",
         "rule": "name, age",
-        "metric": {
-          "name": "comp"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "comp"
+          }
+        ]
       }
     ]
   }

@@ -46,12 +46,16 @@
           "dup": "dup",
           "num": "num"
         },
-        "metric": {
-          "name": "unique"
-        },
-        "record": {
-          "name": "dupRecords"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "unique"
+          },
+          {
+            "type": "record",
+            "name": "dupRecords"
+          }
+        ]
       }
     ]
   }

@@ -27,9 +27,12 @@
         "dq.type": "completeness",
         "out.dataframe.name": "comp",
         "rule": "email, post_code, first_name",
-        "metric": {
-          "name": "comp"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "comp"
+          }
+        ]
       }
     ]
   }

@@ -131,10 +131,10 @@ case class TimelinessExpr2DQSteps(context: DQContext,
       }
       val metricTransStep = SparkSqlTransformStep(metricTableName, metricSql, emptyMap)
       val metricWriteStep = {
-        val metricOpt = ruleParam.getMetricOpt
+        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.outDfName)
-        val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
-        MetricWriteStep(mwName, metricTableName, collectType)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+        MetricWriteStep(mwName, metricTableName, flattenType)
       }
 
       // current steps
@@ -150,7 +150,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
           }
           val recordTransStep = SparkSqlTransformStep(recordTableName, recordSql, emptyMap)
           val recordWriteStep = {
-            val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(recordTableName)
+            val rwName = ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt).getOrElse(recordTableName)
             RecordWriteStep(rwName, recordTableName, None)
           }
           (recordTransStep :: Nil, recordWriteStep :: Nil)
@@ -191,7 +191,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
           }
           val rangeMetricTransStep = SparkSqlTransformStep(rangeMetricTableName, rangeMetricSql, emptyMap)
           val rangeMetricWriteStep = {
-            MetricWriteStep(stepColName, rangeMetricTableName, ArrayNormalizeType)
+            MetricWriteStep(stepColName, rangeMetricTableName, ArrayFlattenType)
           }
 
           (rangeTransStep :: rangeMetricTransStep :: Nil, rangeMetricWriteStep :: Nil)
@@ -216,7 +216,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
         }
         val percentileTransStep = SparkSqlTransformStep(percentileTableName, percentileSql, emptyMap)
         val percentileWriteStep = {
-          MetricWriteStep(percentileTableName, percentileTableName, DefaultNormalizeType)
+          MetricWriteStep(percentileTableName, percentileTableName, DefaultFlattenType)
         }
 
         (percentileTransStep :: Nil, percentileWriteStep :: Nil)

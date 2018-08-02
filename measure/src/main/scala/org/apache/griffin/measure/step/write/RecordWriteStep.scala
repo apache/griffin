@@ -41,7 +41,7 @@ case class RecordWriteStep(name: String,
     writeMode match {
       case SimpleMode => {
         // batch records
-        val recordsOpt = collectBatchRecords(context)
+        val recordsOpt = getBatchRecords(context)
         // write records
         recordsOpt match {
           case Some(records) => {
@@ -52,7 +52,7 @@ case class RecordWriteStep(name: String,
       }
       case TimestampMode => {
         // streaming records
-        val (recordsOpt, emptyTimestamps) = collectStreamingRecords(context)
+        val (recordsOpt, emptyTimestamps) = getStreamingRecords(context)
         // write records
         recordsOpt.foreach { records =>
           records.foreach { pair =>
@@ -92,11 +92,11 @@ case class RecordWriteStep(name: String,
 
   private def getFilterTableDataFrame(context: DQContext): Option[DataFrame] = filterTableNameOpt.flatMap(getDataFrame(context, _))
 
-  private def collectBatchRecords(context: DQContext): Option[RDD[String]] = {
+  private def getBatchRecords(context: DQContext): Option[RDD[String]] = {
     getRecordDataFrame(context).map(_.toJSON.rdd);
   }
 
-  private def collectStreamingRecords(context: DQContext): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
+  private def getStreamingRecords(context: DQContext): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
     implicit val encoder = Encoders.tuple(Encoders.scalaLong, Encoders.STRING)
     val defTimestamp = context.contextId.timestamp
     getRecordDataFrame(context) match {

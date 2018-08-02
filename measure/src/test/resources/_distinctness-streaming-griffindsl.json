@@ -75,9 +75,12 @@
           "num": "num",
           "duplication.array": "dup"
         },
-        "metric": {
-          "name": "distinct"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "distinct"
+          }
+        ]
       }
     ]
   }

@@ -55,19 +55,25 @@
         "dq.type": "profiling",
         "out.dataframe.name": "prof",
         "rule": "select count(name) as `cnt`, max(age) as `max`, min(age) as `min` from source",
-        "metric": {
-          "name": "prof"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "prof"
+          }
+        ]
       },
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "out.dataframe.name": "grp",
         "rule": "select name, count(*) as `cnt` from source group by name",
-        "metric": {
-          "name": "name_group",
-          "collect.type": "array"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "name_group",
+            "flatten": "array"
+          }
+        ]
       }
     ]
   }
