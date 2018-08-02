@@ -76,5 +76,7 @@
         ]
       }
     ]
-  }
+  },
+
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }

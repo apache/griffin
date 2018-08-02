@@ -52,5 +52,7 @@
         ]
       }
     ]
-  }
+  },
+
+  "sinks": ["LOG", "ELASTICSEARCH"]
 }

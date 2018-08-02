@@ -21,7 +21,7 @@ package org.apache.griffin.measure.configuration.dqdefinition
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import org.apache.commons.lang.StringUtils
-import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.griffin.measure.configuration.enums._
 
 /**
   * environment param
@@ -86,7 +86,7 @@ case class SparkParam( @JsonProperty("log.level") logLevel: String,
 case class SinkParam(@JsonProperty("type") sinkType: String,
                      @JsonProperty("config") config: Map[String, Any]
                     ) extends Param {
-  def getType: String = sinkType
+  def getType: SinkType = SinkType(sinkType)
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
 
   def validate(): Unit = {

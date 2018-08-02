@@ -119,5 +119,7 @@
         ]
       }
     ]
-  }
+  },
+
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }

@@ -25,18 +25,20 @@ import org.apache.griffin.measure.configuration.enums._
 
 /**
   * dq param
-  * @param name         name of dq measurement (must)
-  * @param timestamp    default timestamp of measure in batch mode (optional)
-  * @param procType     batch mode or streaming mode (must)
-  * @param dataSources   data sources (must)
-  * @param evaluateRule  dq measurement (must)
+  * @param name           name of dq measurement (must)
+  * @param timestamp      default timestamp of measure in batch mode (optional)
+  * @param procType       batch mode or streaming mode (must)
+  * @param dataSources    data sources (must)
+  * @param evaluateRule   dq measurement (must)
+  * @param sinks          sink types (optional, by default will be elasticsearch)
   */
 @JsonInclude(Include.NON_NULL)
 case class DQConfig(@JsonProperty("name") name: String,
                     @JsonProperty("timestamp") timestamp: Long,
                     @JsonProperty("process.type") procType: String,
                     @JsonProperty("data.sources") dataSources: List[DataSourceParam],
-                    @JsonProperty("evaluate.rule") evaluateRule: EvaluateRuleParam
+                    @JsonProperty("evaluate.rule") evaluateRule: EvaluateRuleParam,
+                    @JsonProperty("sinks") sinks: List[String]
                   ) extends Param {
   def getName: String = name
   def getTimestampOpt: Option[Long] = if (timestamp != 0) Some(timestamp) else None
@@ -50,6 +52,7 @@ case class DQConfig(@JsonProperty("name") name: String,
     }._1
   }
   def getEvaluateRule: EvaluateRuleParam = evaluateRule
+  def getValidSinkTypes: Seq[SinkType] = SinkType.validSinkTypes(if (sinks != null) sinks else Nil)
 
   def validate(): Unit = {
     assert(StringUtils.isNotBlank(name), "dq config name should not be blank")

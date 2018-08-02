@@ -19,16 +19,12 @@ under the License.
 package org.apache.griffin.measure.sink
 
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
+import org.apache.griffin.measure.configuration.enums._
 
 import scala.util.{Success, Try}
 
 
 case class SinkFactory(sinkParams: Iterable[SinkParam], metricName: String) extends Serializable {
-
-  val HDFS_REGEX = """^(?i)hdfs$""".r
-  val ELASTICSEARCH_REGEX = """^(?i)es|elasticsearch|http$""".r
-  val CONSOLE_REGEX = """^(?i)console|log$""".r
-  val MONGO_REGEX = """^(?i)mongo$""".r
 
   /**
     * create sink
@@ -44,10 +40,10 @@ case class SinkFactory(sinkParams: Iterable[SinkParam], metricName: String) exte
     val config = sinkParam.getConfig
     val sinkType = sinkParam.getType
     val sinkTry = sinkType match {
-      case CONSOLE_REGEX() => Try(ConsoleSink(config, metricName, timeStamp))
-      case HDFS_REGEX() => Try(HdfsSink(config, metricName, timeStamp))
-      case ELASTICSEARCH_REGEX() => Try(ElasticSearchSink(config, metricName, timeStamp, block))
-      case MONGO_REGEX() => Try(MongoSink(config, metricName, timeStamp, block))
+      case ConsoleSinkType => Try(ConsoleSink(config, metricName, timeStamp))
+      case HdfsSinkType => Try(HdfsSink(config, metricName, timeStamp))
+      case ElasticsearchSinkType => Try(ElasticSearchSink(config, metricName, timeStamp, block))
+      case MongoSinkType => Try(MongoSink(config, metricName, timeStamp, block))
       case _ => throw new Exception(s"sink type ${sinkType} is not supported!")
     }
     sinkTry match {

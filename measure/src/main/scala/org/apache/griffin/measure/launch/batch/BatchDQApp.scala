@@ -41,7 +41,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
   val metricName = dqParam.name
 //  val dataSourceParams = dqParam.dataSources
 //  val dataSourceNames = dataSourceParams.map(_.name)
-  val sinkParams = envParam.sinkParams
+  val sinkParams = getSinkParams
 
   var sqlContext: SQLContext = _
 
