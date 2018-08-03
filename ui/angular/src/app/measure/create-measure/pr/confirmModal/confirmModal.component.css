@@ -17,6 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-label.control-label {
-  margin-top: 7px;
+.viewrule-content {
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 10px;
 }

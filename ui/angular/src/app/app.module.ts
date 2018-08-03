@@ -42,6 +42,11 @@ import { DataassetComponent } from './dataasset/dataasset.component';
 import { BatchComponent } from './job/create-job/batch/batch.component';
 import { AcComponent} from './measure/create-measure/ac/ac.component';
 import { PrComponent } from './measure/create-measure/pr/pr.component';
+import { PrStep1Component } from './measure/create-measure/pr/step1/step1.component';
+import { PrStep2Component } from './measure/create-measure/pr/step2/step2.component';
+import { PrStep3Component } from './measure/create-measure/pr/step3/step3.component';
+import { PrStep4Component } from './measure/create-measure/pr/step4/step4.component';
+import { PrConfirmModal } from './measure/create-measure/pr/confirmModal/confirmModal.component';
 import { PubComponent } from './measure/create-measure/pub/pub.component';
 import { LoginComponent } from './login/login.component';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
@@ -151,6 +156,11 @@ const appRoutes: Routes = [
     BatchComponent,
     AcComponent,
     PrComponent,
+    PrStep1Component,
+    PrStep2Component,
+    PrStep3Component,
+    PrStep4Component,
+    PrConfirmModal,
     PubComponent,
     LoginComponent,
     RuleComponent,

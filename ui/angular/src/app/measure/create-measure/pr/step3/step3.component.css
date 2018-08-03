@@ -17,6 +17,21 @@ specific language governing permissions and limitations
 under the License.
 */
 
-label.control-label {
-  margin-top: 7px;
+@import url('../../../../../../node_modules/angular2-toaster/toaster.css');
+@import url('../../../measure.component.css');
+
+fieldset {
+  height: 60vh;
+}
+
+label.stepDesc {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+div.btn-container {
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+  clear: both;
 }
