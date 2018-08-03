@@ -72,6 +72,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <between-expr> ::= <math-expr> [<not>]? <between> (<math-expr> <and> <math-expr> | <range-expr>)
     * <range-expr> ::= "(" [<math-expr>]? [, <math-expr>]+ ")"
     * <like-expr> ::= <math-expr> [<not>]? <like> <math-expr>
+    * <rlike-expr> ::= <math-expr> [<not>]? <rlike> <math-expr>
     * <is-null-expr> ::= <math-expr> <is> [<not>]? <null>
     * <is-nan-expr> ::= <math-expr> <is> [<not>]? <nan>
     *
@@ -131,6 +132,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val AND_ONLY: Parser[String] = """(?i)and\s""".r
     val IS: Parser[String] = """(?i)is\s""".r
     val LIKE: Parser[String] = """(?i)like\s""".r
+    val RLIKE: Parser[String] = """(?i)rlike\s""".r
     val COMPARE: Parser[String] = "=" | "!=" | "<>" | "<=" | ">=" | "<" | ">"
     val LOGICAL_UNARY: Parser[String] = NOT
     val LOGICAL_BINARIES: Seq[Parser[String]] = Seq((COMPARE), (AND), (OR))
@@ -276,6 +278,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <between-expr> ::= <math-expr> [<not>]? <between> (<math-expr> <and> <math-expr> | <range-expr>)
     * <range-expr> ::= "(" [<math-expr>]? [, <math-expr>]+ ")"
     * <like-expr> ::= <math-expr> [<not>]? <like> <math-expr>
+    * <rlike-expr> ::= <math-expr> [<not>]? <rlike> <math-expr>
     * <is-null-expr> ::= <math-expr> <is> [<not>]? <null>
     * <is-nan-expr> ::= <math-expr> <is> [<not>]? <nan>
     *
@@ -296,6 +299,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   def likeExpr: Parser[LogicalExpr] = mathExpression ~ opt(NOT) ~ LIKE ~ mathExpression ^^ {
     case head ~ notOpt ~ _ ~ value => LikeExpr(head, notOpt.isEmpty, value)
   }
+  def rlikeExpr: Parser[LogicalExpr] = mathExpression ~ opt(NOT) ~ RLIKE ~ mathExpression ^^ {
+    case head ~ notOpt ~ _ ~ value => RLikeExpr(head, notOpt.isEmpty, value)
+  }
   def isNullExpr: Parser[LogicalExpr] = mathExpression ~ IS ~ opt(NOT) ~ NULL ^^ {
     case head ~ _ ~ notOpt ~ _ => IsNullExpr(head, notOpt.isEmpty)
   }
@@ -303,7 +309,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     case head ~ _ ~ notOpt ~ _ => IsNanExpr(head, notOpt.isEmpty)
   }
 
-  def logicalFactor: Parser[LogicalExpr] = (inExpr | betweenExpr | likeExpr | isNullExpr | isNanExpr | mathExpression) ^^ {
+  def logicalFactor: Parser[LogicalExpr] = (inExpr | betweenExpr | likeExpr | rlikeExpr | isNullExpr | isNanExpr | mathExpression) ^^ {
     LogicalFactorExpr(_, false, None)
   } | LBR ~ logicalExpression ~ RBR ~ opt(asAlias) ^^ {
     case _ ~ expr ~ _ ~ aliasOpt => LogicalFactorExpr(expr, true, aliasOpt)
