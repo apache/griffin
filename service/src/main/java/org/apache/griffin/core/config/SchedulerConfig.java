@@ -19,8 +19,10 @@ under the License.
 
 package org.apache.griffin.core.config;
 
+import java.util.Properties;
+import javax.sql.DataSource;
+
 import org.apache.griffin.core.job.factory.AutowiringSpringBeanJobFactory;
-import org.apache.griffin.core.util.PropertiesUtil;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,9 +30,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-
-import javax.sql.DataSource;
-import java.util.Properties;
 
 @Configuration
 public class SchedulerConfig {

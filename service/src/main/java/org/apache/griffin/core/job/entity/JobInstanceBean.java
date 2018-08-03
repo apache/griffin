@@ -22,11 +22,17 @@ package org.apache.griffin.core.job.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
-import  org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
-
-import javax.persistence.*;
+import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 

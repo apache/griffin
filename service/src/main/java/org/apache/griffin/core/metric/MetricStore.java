@@ -19,11 +19,11 @@ under the License.
 
 package org.apache.griffin.core.metric;
 
-import org.apache.griffin.core.metric.model.MetricValue;
-import org.springframework.http.ResponseEntity;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.apache.griffin.core.metric.model.MetricValue;
+import org.springframework.http.ResponseEntity;
 
 public interface MetricStore {
 

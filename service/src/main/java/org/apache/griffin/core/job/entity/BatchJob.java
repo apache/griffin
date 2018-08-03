@@ -19,9 +19,9 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import java.util.List;
 
 @Entity
 @DiscriminatorValue("griffinBatchJob")

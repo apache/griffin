@@ -20,13 +20,18 @@ under the License.
 package org.apache.griffin.core.job.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 public class JobDataSegment extends AbstractAuditableEntity {

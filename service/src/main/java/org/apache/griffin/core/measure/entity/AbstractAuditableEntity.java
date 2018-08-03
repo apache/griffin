@@ -21,12 +21,12 @@ package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
-import java.sql.Timestamp;
 
 @MappedSuperclass
 public abstract class AbstractAuditableEntity implements Serializable {

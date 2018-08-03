@@ -25,15 +25,25 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.griffin.core.util.JsonUtil;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
+
+import org.apache.griffin.core.util.JsonUtil;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 @Entity
 public class DataSource extends AbstractAuditableEntity {

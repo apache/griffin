@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
+import javax.annotation.PreDestroy;
+
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.slf4j.Logger;
@@ -26,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PreDestroy;
 
 @Component
 public class HiveMetaStoreProxy {
