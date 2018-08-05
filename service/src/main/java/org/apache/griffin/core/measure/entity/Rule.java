@@ -41,9 +41,9 @@ import org.apache.griffin.core.util.JsonUtil;
 
 @Entity
 public class Rule extends AbstractAuditableEntity {
-	private static final long serialVersionUID = -143019093509759648L;
+    private static final long serialVersionUID = -143019093509759648L;
 
-	/**
+    /**
      * three type:1.griffin-dsl 2.df-opr 3.spark-sql
      */
     @NotNull

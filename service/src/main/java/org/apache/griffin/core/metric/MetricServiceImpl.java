@@ -20,6 +20,10 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_OFFSET;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_SIZE;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,10 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_OFFSET;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_SIZE;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
 
 @Service
 public class MetricServiceImpl implements MetricService {
@@ -98,7 +98,7 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @SuppressWarnings("rawtypes")
-	@Override
+    @Override
     public ResponseEntity addMetricValues(List<MetricValue> values) {
         for (MetricValue value : values) {
             checkFormat(value);
@@ -115,7 +115,7 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @SuppressWarnings("rawtypes")
-	@Override
+    @Override
     public ResponseEntity deleteMetricValues(String metricName) {
         try {
             return metricStore.deleteMetricValues(metricName);

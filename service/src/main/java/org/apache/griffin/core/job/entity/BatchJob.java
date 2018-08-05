@@ -26,9 +26,9 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("griffinBatchJob")
 public class BatchJob extends AbstractJob {
-	private static final long serialVersionUID = -1114269860236729008L;
+    private static final long serialVersionUID = -1114269860236729008L;
 
-	@Override
+    @Override
     public String getType() {
         return JobType.BATCH.getName();
     }
@@ -48,7 +48,7 @@ public class BatchJob extends AbstractJob {
     }
 
     public BatchJob(Long measureId, String jobName, String cronExpression, String timeZone, List<JobDataSegment> segments, boolean deleted) {
-        super(measureId, jobName, cronExpression, timeZone,segments, deleted);
+        super(measureId, jobName, cronExpression, timeZone, segments, deleted);
     }
 
 }

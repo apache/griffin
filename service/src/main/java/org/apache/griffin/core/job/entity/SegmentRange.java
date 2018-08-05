@@ -28,9 +28,9 @@ import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 @Entity
 public class SegmentRange extends AbstractAuditableEntity {
 
-	private static final long serialVersionUID = -8929713841303669564L;
+    private static final long serialVersionUID = -8929713841303669564L;
 
-	@Column(name = "data_begin")
+    @Column(name = "data_begin")
     private String begin = "-1h";
 
     private String length = "1h";

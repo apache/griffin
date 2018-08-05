@@ -69,7 +69,7 @@ public class MeasureController {
     }
 
     @RequestMapping(value = "/measures/owner/{owner}", method = RequestMethod.GET)
-    public List<Measure> getAliveMeasuresByOwner(@PathVariable("owner")  @Valid String owner) {
+    public List<Measure> getAliveMeasuresByOwner(@PathVariable("owner") @Valid String owner) {
         return measureService.getAliveMeasuresByOwner(owner);
     }
 

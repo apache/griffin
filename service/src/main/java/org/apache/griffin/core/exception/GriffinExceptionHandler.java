@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GriffinExceptionHandler {
 
     @SuppressWarnings("rawtypes")
-	@ExceptionHandler(GriffinException.ServiceException.class)
+    @ExceptionHandler(GriffinException.ServiceException.class)
     public ResponseEntity handleGriffinExceptionOfServer(HttpServletRequest request, GriffinException.ServiceException e) {
         String message = e.getMessage();
         Throwable cause = e.getCause();
@@ -42,7 +42,7 @@ public class GriffinExceptionHandler {
     }
 
     @SuppressWarnings("rawtypes")
-	@ExceptionHandler(GriffinException.class)
+    @ExceptionHandler(GriffinException.class)
     public ResponseEntity handleGriffinExceptionOfClient(HttpServletRequest request, GriffinException e) {
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class);
         HttpStatus status = responseStatus.code();
