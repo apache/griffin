@@ -20,12 +20,12 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
-import java.util.Map;
 
 public interface MetricService {
 

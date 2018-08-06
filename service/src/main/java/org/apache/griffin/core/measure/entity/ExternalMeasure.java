@@ -21,12 +21,13 @@ package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.griffin.core.job.entity.VirtualJob;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
+
+import org.apache.griffin.core.job.entity.VirtualJob;
 
 /**
  * Measures to publish metrics that processed externally

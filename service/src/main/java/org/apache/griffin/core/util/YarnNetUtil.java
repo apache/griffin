@@ -21,6 +21,7 @@ package org.apache.griffin.core.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
