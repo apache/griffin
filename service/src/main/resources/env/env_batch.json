@@ -16,7 +16,6 @@
       "spark.hadoop.fs.hdfs.impl.disable.cache": true
     }
   },
-
   "persist": [
     {
       "type": "log",
@@ -38,7 +37,6 @@
       }
     }
   ],
-
   "info.cache": [
     {
       "type": "zk",
@@ -52,8 +50,6 @@
       }
     }
   ],
-
   "cleaner": {
-
   }
 }
