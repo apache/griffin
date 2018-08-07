@@ -114,12 +114,14 @@ public class PropertiesConfigTest {
     @Test
     public void quartzConfWithLocationNotNull() throws Exception {
         Properties conf = quartzConf.quartzConf();
-        assertEquals(conf.get("org.quartz.scheduler.instanceName"), "spring-boot-quartz-test");
+        assertEquals(conf.get("org.quartz.scheduler.instanceName"),
+                "spring-boot-quartz-test");
     }
 
     @Test
     public void quartzConfWithLocationNull() throws Exception {
         Properties conf = noQuartzConf.quartzConf();
-        assertEquals(conf.get("org.quartz.scheduler.instanceName"), "spring-boot-quartz-test");
+        assertEquals(conf.get("org.quartz.scheduler.instanceName"),
+                "spring-boot-quartz-test");
     }
 }

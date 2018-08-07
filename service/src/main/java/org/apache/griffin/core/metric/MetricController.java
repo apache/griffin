@@ -47,21 +47,28 @@ public class MetricController {
     }
 
     @RequestMapping(value = "/metrics/values", method = RequestMethod.GET)
-    public List<MetricValue> getMetricValues(@RequestParam("metricName") String metricName,
+    public List<MetricValue> getMetricValues(@RequestParam("metricName")
+                                                     String metricName,
                                              @RequestParam("size") int size,
-                                             @RequestParam(value = "offset", defaultValue = "0") int offset,
-                                             @RequestParam(value = "tmst", defaultValue = "0") long tmst) {
+                                             @RequestParam(value = "offset",
+                                                     defaultValue = "0")
+                                                     int offset,
+                                             @RequestParam(value = "tmst",
+                                                     defaultValue = "0")
+                                                     long tmst) {
         return metricService.getMetricValues(metricName, offset, size, tmst);
     }
 
     @RequestMapping(value = "/metrics/values", method = RequestMethod.POST)
-    public ResponseEntity<?> addMetricValues(@RequestBody List<MetricValue> values) {
+    public ResponseEntity<?> addMetricValues(@RequestBody List<MetricValue>
+                                                     values) {
         return metricService.addMetricValues(values);
     }
 
     @RequestMapping(value = "/metrics/values", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> deleteMetricValues(@RequestParam("metricName") String metricName) {
+    public ResponseEntity<?> deleteMetricValues(@RequestParam("metricName")
+                                                        String metricName) {
         return metricService.deleteMetricValues(metricName);
     }
 }

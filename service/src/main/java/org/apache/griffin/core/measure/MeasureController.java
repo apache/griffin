@@ -41,7 +41,8 @@ public class MeasureController {
     private MeasureService measureService;
 
     @RequestMapping(value = "/measures", method = RequestMethod.GET)
-    public List<? extends Measure> getAllAliveMeasures(@RequestParam(value = "type", defaultValue = "") String type) {
+    public List<? extends Measure> getAllAliveMeasures(@RequestParam(value =
+            "type", defaultValue = "") String type) {
         return measureService.getAllAliveMeasures(type);
     }
 
@@ -52,7 +53,8 @@ public class MeasureController {
 
     @RequestMapping(value = "/measures/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMeasureById(@PathVariable("id") Long id) throws SchedulerException {
+    public void deleteMeasureById(@PathVariable("id") Long id) throws
+            SchedulerException {
         measureService.deleteMeasureById(id);
     }
 
@@ -68,8 +70,10 @@ public class MeasureController {
         return measureService.updateMeasure(measure);
     }
 
-    @RequestMapping(value = "/measures/owner/{owner}", method = RequestMethod.GET)
-    public List<Measure> getAliveMeasuresByOwner(@PathVariable("owner") @Valid String owner) {
+    @RequestMapping(value = "/measures/owner/{owner}", method =
+            RequestMethod.GET)
+    public List<Measure> getAliveMeasuresByOwner(@PathVariable("owner")
+                                                 @Valid String owner) {
         return measureService.getAliveMeasuresByOwner(owner);
     }
 

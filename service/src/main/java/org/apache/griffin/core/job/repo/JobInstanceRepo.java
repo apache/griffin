@@ -29,7 +29,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
+public interface JobInstanceRepo
+        extends CrudRepository<JobInstanceBean, Long> {
 
     JobInstanceBean findByPredicateName(String name);
 
@@ -43,10 +44,10 @@ public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
 
     @Transactional(rollbackFor = Exception.class)
     @Modifying
-    @Query("delete from JobInstanceBean j where j.expireTms <= ?1 and j.deleted = false ")
+    @Query("delete from JobInstanceBean j " +
+            "where j.expireTms <= ?1 and j.deleted = false ")
     int deleteByExpireTimestamp(Long expireTms);
 
-    @Query("select DISTINCT s from JobInstanceBean s " +
-            "where s.state in ?1")
+    @Query("select DISTINCT s from JobInstanceBean s where s.state in ?1")
     List<JobInstanceBean> findByActiveState(State[] states);
 }

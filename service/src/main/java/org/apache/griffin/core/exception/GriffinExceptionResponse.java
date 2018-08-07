@@ -37,7 +37,8 @@ public class GriffinExceptionResponse {
     private String path;
 
 
-    GriffinExceptionResponse(HttpStatus status, GriffinExceptionMessage message, String path) {
+    GriffinExceptionResponse(HttpStatus status, GriffinExceptionMessage message,
+                             String path) {
         this.status = status.value();
         this.error = status.getReasonPhrase();
         this.code = Integer.toString(message.getCode());
@@ -45,7 +46,8 @@ public class GriffinExceptionResponse {
         this.path = path;
     }
 
-    GriffinExceptionResponse(HttpStatus status, String message, String path, String exception) {
+    GriffinExceptionResponse(HttpStatus status, String message, String path,
+                             String exception) {
         this.status = status.value();
         this.error = status.getReasonPhrase();
         this.message = message;

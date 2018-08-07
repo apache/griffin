@@ -48,7 +48,8 @@ public class JobController {
     private JobService jobService;
 
     @RequestMapping(value = "/jobs", method = RequestMethod.GET)
-    public List<AbstractJob> getJobs(@RequestParam(value = "type", defaultValue = "") String type) {
+    public List<AbstractJob> getJobs(@RequestParam(value = "type",
+            defaultValue = "") String type) {
         return jobService.getAliveJobs(type);
     }
 
@@ -65,24 +66,31 @@ public class JobController {
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public AbstractJob onActions(@PathVariable("id") Long jobId, @RequestParam String action) throws Exception {
+    public AbstractJob onActions(
+            @PathVariable("id") Long jobId,
+            @RequestParam String action) throws Exception {
         return jobService.onAction(jobId, action);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@RequestParam("jobName") String jobName) throws SchedulerException {
+    public void deleteJob(@RequestParam("jobName") String jobName)
+            throws SchedulerException {
         jobService.deleteJob(jobName);
     }
 
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable("id") Long id) throws SchedulerException {
+    public void deleteJob(@PathVariable("id") Long id)
+            throws SchedulerException {
         jobService.deleteJob(id);
     }
 
     @RequestMapping(value = "/jobs/instances", method = RequestMethod.GET)
-    public List<JobInstanceBean> findInstancesOfJob(@RequestParam("jobId") Long id, @RequestParam("page") int page, @RequestParam("size") int size) {
+    public List<JobInstanceBean> findInstancesOfJob(
+            @RequestParam("jobId") Long id,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size) {
         return jobService.findInstancesOfJob(id, page, size);
     }
 
@@ -92,11 +100,16 @@ public class JobController {
     }
 
     @RequestMapping(path = "/jobs/download", method = RequestMethod.GET)
-    public ResponseEntity<Resource> download(@RequestParam("jobName") String jobName, @RequestParam("ts") long timestamp) throws Exception {
+    public ResponseEntity<Resource> download(
+        @RequestParam("jobName") String jobName,
+        @RequestParam("ts") long timestamp)
+        throws Exception {
         String path = jobService.getJobHdfsSinksPath(jobName, timestamp);
-        InputStreamResource resource = new InputStreamResource(FSUtil.getMissSampleInputStream(path));
+        InputStreamResource resource = new InputStreamResource(
+            FSUtil.getMissSampleInputStream(path));
         return ResponseEntity.ok().
-                header("content-disposition", "attachment; filename = sampleMissingData.json")
+                header("content-disposition",
+                        "attachment; filename = sampleMissingData.json")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }

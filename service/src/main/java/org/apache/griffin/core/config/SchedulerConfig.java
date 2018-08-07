@@ -43,13 +43,15 @@ public class SchedulerConfig {
 
     @Bean
     public JobFactory jobFactory(ApplicationContext applicationContext) {
-        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
+        AutowiringSpringBeanJobFactory jobFactory =
+                new AutowiringSpringBeanJobFactory();
         jobFactory.setApplicationContext(applicationContext);
         return jobFactory;
     }
 
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource, JobFactory jobFactory) {
+    public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource,
+                                                     JobFactory jobFactory) {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         factory.setOverwriteExistingJobs(true);
         factory.setDataSource(dataSource);

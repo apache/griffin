@@ -53,7 +53,8 @@ import org.springframework.util.StringUtils;
 public class DataConnector extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815594L;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(DataConnector.class);
+    private final static Logger LOGGER = LoggerFactory
+        .getLogger(DataConnector.class);
 
     public enum DataType {
         /**
@@ -91,11 +92,13 @@ public class DataConnector extends AbstractAuditableEntity {
     @Transient
     private Map<String, Object> configMap;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+        CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "data_connector_id")
     private List<SegmentPredicate> predicates = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+        CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "pre_process_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<StreamingPreProcess> preProcess;
@@ -208,8 +211,9 @@ public class DataConnector extends AbstractAuditableEntity {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(config)) {
-            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
-            });
+            this.configMap = JsonUtil.toEntity(config,
+                new TypeReference<Map<String, Object>>() {
+                });
         }
     }
 
@@ -217,13 +221,15 @@ public class DataConnector extends AbstractAuditableEntity {
     }
 
     public DataConnector(String name, DataType type, String version,
-                         String config, String dataFrameName) throws IOException {
+                         String config, String dataFrameName)
+        throws IOException {
         this.name = name;
         this.type = type;
         this.version = version;
         this.config = config;
-        this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
-        });
+        this.configMap = JsonUtil.toEntity(config,
+            new TypeReference<Map<String, Object>>() {
+            });
         this.dataFrameName = dataFrameName;
     }
 
@@ -238,10 +244,10 @@ public class DataConnector extends AbstractAuditableEntity {
     @Override
     public String toString() {
         return "DataConnector{" +
-                "name=" + name +
-                "type=" + type +
-                ", version='" + version + '\'' +
-                ", config=" + config +
-                '}';
+            "name=" + name +
+            "type=" + type +
+            ", version='" + version + '\'' +
+            ", config=" + config +
+            '}';
     }
 }

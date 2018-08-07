@@ -34,7 +34,8 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
 public class PropertiesUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+            PropertiesUtil.class);
 
     public static Properties getProperties(String path, Resource resource) {
         PropertiesFactoryBean propFactoryBean = new PropertiesFactoryBean();
@@ -55,9 +56,12 @@ public class PropertiesUtil {
      * @param defaultPath properties classpath like /quartz.properties
      * @param location    custom properties path
      * @return Properties
-     * @throws FileNotFoundException location setting is wrong that there is no target file.
+     * @throws FileNotFoundException location setting is wrong that there is no
+     *                               target file.
      */
-    public static Properties getConf(String name, String defaultPath, String location) throws FileNotFoundException {
+    public static Properties getConf(String name, String defaultPath,
+                                     String location)
+            throws FileNotFoundException {
         String path = getConfPath(name, location);
         Resource resource;
         if (path == null) {

@@ -68,7 +68,8 @@ public class JobRepoTest {
 
     @Test
     public void findByJobNameAndDeleted() {
-        List<AbstractJob> jobs = jobRepo.findByJobNameAndDeleted("griffinJobName1", false);
+        List<AbstractJob> jobs = jobRepo
+                .findByJobNameAndDeleted("griffinJobName1", false);
         assertEquals(jobs.size(), 1);
     }
 
@@ -85,8 +86,10 @@ public class JobRepoTest {
     }
 
     public void setEntityManager() {
-        AbstractJob job1 = new BatchJob(1L, "griffinJobName1", "qName1", "qGroup1", false);
-        AbstractJob job2 = new BatchJob(1L, "griffinJobName2", "qName2", "qGroup2", false);
+        AbstractJob job1 = new BatchJob(1L, "griffinJobName1", "qName1",
+                "qGroup1", false);
+        AbstractJob job2 = new BatchJob(1L, "griffinJobName2", "qName2",
+                "qGroup2", false);
         AbstractJob job3 = new VirtualJob("virtualJobName1", 1L, "metricName1");
         AbstractJob job4 = new VirtualJob("virtualJobName2", 1L, "metricName2");
         entityManager.persistAndFlush(job1);

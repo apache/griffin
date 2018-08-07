@@ -77,7 +77,8 @@ public class MeasureControllerTest {
     @Test
     public void testGetAllMeasures() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
-        Mockito.<List<? extends Measure>>when(service.getAllAliveMeasures("")).thenReturn(Collections.singletonList(measure));
+        Mockito.<List<? extends Measure>>when(service.getAllAliveMeasures(""))
+                .thenReturn(Collections.singletonList(measure));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures"))
                 .andExpect(status().isOk())
@@ -105,7 +106,8 @@ public class MeasureControllerTest {
 
     @Test
     public void testDeleteMeasureByIdForNotFound() throws Exception {
-        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.MEASURE_ID_DOES_NOT_EXIST))
+        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage
+                .MEASURE_ID_DOES_NOT_EXIST))
                 .when(service).deleteMeasureById(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
@@ -113,8 +115,10 @@ public class MeasureControllerTest {
     }
 
     @Test
-    public void testDeleteMeasureByIdForGriffinFailureWithException() throws Exception {
-        doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
+    public void testDeleteMeasureByIdForGriffinFailureWithException() throws
+            Exception {
+        doThrow(new GriffinException.ServiceException("Failed to delete job",
+                new Exception()))
                 .when(service).deleteMeasureById(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures/1"))
@@ -131,7 +135,8 @@ public class MeasureControllerTest {
 
     @Test
     public void testDeleteMeasuresForNotFound() throws Exception {
-        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.MEASURE_ID_DOES_NOT_EXIST))
+        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage
+                .MEASURE_ID_DOES_NOT_EXIST))
                 .when(service).deleteMeasures();
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures"))
@@ -139,8 +144,10 @@ public class MeasureControllerTest {
     }
 
     @Test
-    public void testDeleteMeasuresForGriffinFailureWithException() throws Exception {
-        doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
+    public void testDeleteMeasuresForGriffinFailureWithException()
+            throws Exception {
+        doThrow(new GriffinException.ServiceException("Failed to delete job",
+                new Exception()))
                 .when(service).deleteMeasures();
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/measures"))
@@ -163,7 +170,8 @@ public class MeasureControllerTest {
     public void testUpdateMeasureForNotFound() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.MEASURE_ID_DOES_NOT_EXIST))
+        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage
+                .MEASURE_ID_DOES_NOT_EXIST))
                 .when(service).updateMeasure(measure);
 
         mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
@@ -175,7 +183,8 @@ public class MeasureControllerTest {
     public void testUpdateMeasureForTypeMismatch() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        doThrow(new GriffinException.BadRequestException(GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_MATCH))
+        doThrow(new GriffinException.BadRequestException(GriffinExceptionMessage
+                .MEASURE_TYPE_DOES_NOT_MATCH))
                 .when(service).updateMeasure(measure);
 
         mvc.perform(put(URLHelper.API_VERSION_PATH + "/measures")
@@ -191,7 +200,8 @@ public class MeasureControllerTest {
         measureList.add(measure);
         given(service.getAliveMeasuresByOwner(owner)).willReturn(measureList);
 
-        mvc.perform(get(URLHelper.API_VERSION_PATH + "/measures/owner/" + owner)
+        mvc.perform(get(URLHelper.API_VERSION_PATH
+                + "/measures/owner/" + owner)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].name", is("view_item_hourly")))
@@ -214,7 +224,8 @@ public class MeasureControllerTest {
     public void testCreateNewMeasureForFailWithDuplicate() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        doThrow(new GriffinException.ConflictException(GriffinExceptionMessage.MEASURE_NAME_ALREADY_EXIST))
+        doThrow(new GriffinException.ConflictException(GriffinExceptionMessage
+                .MEASURE_NAME_ALREADY_EXIST))
                 .when(service).createMeasure(measure);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")
@@ -226,7 +237,8 @@ public class MeasureControllerTest {
     public void testCreateNewMeasureForFailWithInvalidParams() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         String measureJson = JsonUtil.toJson(measure);
-        doThrow(new GriffinException.BadRequestException(GriffinExceptionMessage.MISSING_METRIC_NAME))
+        doThrow(new GriffinException.BadRequestException(GriffinExceptionMessage
+                .MISSING_METRIC_NAME))
                 .when(service).createMeasure(measure);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/measures")

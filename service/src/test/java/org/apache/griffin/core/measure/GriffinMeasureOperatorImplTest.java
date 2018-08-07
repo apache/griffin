@@ -72,9 +72,12 @@ public class GriffinMeasureOperatorImplTest {
     @Test(expected = GriffinException.BadRequestException.class)
     public void testCreateForFailureWithConnectorNull() throws Exception {
         String measureName = "view_item_hourly";
-        DataConnector dcSource = createDataConnector(null, "default", "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
-        DataConnector dcTarget = createDataConnector(null, "default", "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
-        GriffinMeasure measure = createGriffinMeasure(measureName, dcSource, dcTarget);
+        DataConnector dcSource = createDataConnector(null, "default",
+                "test_data_src", "dt=#YYYYMMdd# AND hour =#HH#");
+        DataConnector dcTarget = createDataConnector(null, "default",
+                "test_data_tgt", "dt=#YYYYMMdd# AND hour =#HH#");
+        GriffinMeasure measure = createGriffinMeasure(measureName, dcSource,
+                dcTarget);
 
         operator.create(measure);
     }
@@ -103,7 +106,8 @@ public class GriffinMeasureOperatorImplTest {
     public void testDeleteForFailureWithPauseJob() throws Exception {
         Measure measure = createGriffinMeasure("view_item_hourly");
         measure.setId(1L);
-        doThrow(new GriffinException.ServiceException("Service exception", new RuntimeException()))
+        doThrow(new GriffinException.ServiceException("Service exception",
+                new RuntimeException()))
                 .when(jobService).deleteJobsRelateToMeasure(1L);
 
         operator.delete(measure);

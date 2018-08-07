@@ -31,7 +31,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class HiveMetaStoreProxy {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetaStoreProxy.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(HiveMetaStoreProxy.class);
 
     @Value("${hive.metastore.uris}")
     private String uris;
@@ -39,8 +40,11 @@ public class HiveMetaStoreProxy {
     /**
      * Set attempts and interval for HiveMetastoreClient to retry.
      *
-     * @hive.hmshandler.retry.attempts: The number of times to retry a HMSHandler call if there were a connection error.
-     * @hive.hmshandler.retry.interval: The time between HMSHandler retry attempts on failure.
+     * @hive.hmshandler.retry.attempts: The number of times to retry a
+     * HMSHandler call if there were a connection error
+     * .
+     * @hive.hmshandler.retry.interval: The time between HMSHandler retry
+     * attempts on failure.
      */
     @Value("${hive.hmshandler.retry.attempts}")
     private int attempts;
@@ -54,7 +58,8 @@ public class HiveMetaStoreProxy {
     public HiveMetaStoreClient initHiveMetastoreClient() {
         HiveConf hiveConf = new HiveConf();
         hiveConf.set("hive.metastore.local", "false");
-        hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
+        hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES,
+                3);
         hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
         hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);

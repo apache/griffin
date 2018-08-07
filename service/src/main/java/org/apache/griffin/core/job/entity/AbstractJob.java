@@ -56,13 +56,21 @@ import org.slf4j.LoggerFactory;
 @Entity
 @Table(name = "job")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "job.type")
-@JsonSubTypes({@JsonSubTypes.Type(value = BatchJob.class, name = "batch"), @JsonSubTypes.Type(value = StreamingJob.class, name = "streaming"), @JsonSubTypes.Type(value = VirtualJob.class, name = "virtual")})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
+        property = "job.type")
+@JsonSubTypes({@JsonSubTypes.Type(value = BatchJob.class, name = "batch"),
+        @JsonSubTypes.Type(
+                value = StreamingJob.class,
+                name = "streaming"),
+        @JsonSubTypes.Type(
+                value = VirtualJob.class,
+                name = "virtual")})
 @DiscriminatorColumn(name = "type")
 public abstract class AbstractJob extends AbstractAuditableEntity {
     private static final long serialVersionUID = 7569493377868453677L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJob.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(AbstractJob.class);
 
     protected Long measureId;
 
@@ -98,7 +106,8 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
     private Map<String, Object> configMap;
 
     @NotNull
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+            CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "job_id")
     private List<JobDataSegment> segments = new ArrayList<>();
 
@@ -226,15 +235,17 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(predicateConfig)) {
-            this.configMap = JsonUtil.toEntity(predicateConfig, new TypeReference<Map<String, Object>>() {
-            });
+            this.configMap = JsonUtil.toEntity(predicateConfig,
+                    new TypeReference<Map<String, Object>>() {
+                    });
         }
     }
 
     AbstractJob() {
     }
 
-    AbstractJob(Long measureId, String jobName, String name, String group, boolean deleted) {
+    AbstractJob(Long measureId, String jobName, String name, String group,
+                boolean deleted) {
         this.measureId = measureId;
         this.jobName = jobName;
         this.name = name;
@@ -242,7 +253,9 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    AbstractJob(Long measureId, String jobName, String cronExpression, String timeZone, List<JobDataSegment> segments, boolean deleted) {
+    AbstractJob(Long measureId, String jobName, String cronExpression,
+                String timeZone, List<JobDataSegment> segments,
+                boolean deleted) {
         this.measureId = measureId;
         this.jobName = jobName;
         this.metricName = jobName;

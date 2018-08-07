@@ -74,7 +74,8 @@ public class MetricServiceImplTest {
     @Test
     public void test() {
         Environment e = env;
-        System.out.println(env.getProperty("spring.datasource.driver-class-name"));
+        System.out.println(env
+                .getProperty("spring.datasource.driver - class -name "));
     }
 
     @Test
@@ -83,9 +84,13 @@ public class MetricServiceImplTest {
         measure.setId(1L);
         AbstractJob job = createGriffinJob();
         MetricValue value = new MetricValue("jobName", 1L, new HashMap<>());
-        given(jobRepo.findByDeleted(false)).willReturn(Collections.singletonList(job));
-        given(measureRepo.findByDeleted(false)).willReturn(Collections.singletonList(measure));
-        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
+        given(jobRepo.findByDeleted(false)).willReturn(Collections
+                .singletonList(job));
+        given(measureRepo.findByDeleted(false)).willReturn(Collections
+                .singletonList(measure));
+        given(metricStore.getMetricValues(Matchers.anyString(),
+                Matchers.anyInt(), Matchers.anyInt(),
+                Matchers.anyLong()))
                 .willReturn(Collections.singletonList(value));
 
         Map<String, List<Metric>> metricMap = service.getAllMetrics();
@@ -97,9 +102,13 @@ public class MetricServiceImplTest {
         Measure measure = createGriffinMeasure("measureName");
         measure.setId(1L);
         AbstractJob job = createGriffinJob();
-        given(jobRepo.findByDeleted(false)).willReturn(Collections.singletonList(job));
-        given(measureRepo.findByDeleted(false)).willReturn(Collections.singletonList(measure));
-        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
+        given(jobRepo.findByDeleted(false)).willReturn(Collections
+                .singletonList(job));
+        given(measureRepo.findByDeleted(false)).willReturn(Collections
+                .singletonList(measure));
+        given(metricStore.getMetricValues(Matchers.anyString(),
+                Matchers.anyInt(), Matchers.anyInt(),
+                Matchers.anyLong()))
                 .willThrow(new IOException());
 
         service.getAllMetrics();
@@ -108,17 +117,22 @@ public class MetricServiceImplTest {
     @Test
     public void testGetMetricValuesSuccess() throws IOException {
         MetricValue value = new MetricValue("jobName", 1L, new HashMap<>());
-        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
+        given(metricStore.getMetricValues(Matchers.anyString(),
+                Matchers.anyInt(), Matchers.anyInt(),
+                Matchers.anyLong()))
                 .willReturn(Collections.singletonList(value));
 
-        List<MetricValue> values = service.getMetricValues("jobName", 0, 300, 0);
+        List<MetricValue> values = service.getMetricValues("jobName", 0, 300,
+                0);
         assertEquals(values.size(), 1);
         assertEquals(values.get(0).getName(), "jobName");
     }
 
     @Test(expected = GriffinException.ServiceException.class)
     public void testGetMetricValuesFailureWithException() throws IOException {
-        given(metricStore.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
+        given(metricStore.getMetricValues(Matchers.anyString(),
+                Matchers.anyInt(), Matchers.anyInt(),
+                Matchers.anyLong()))
                 .willThrow(new IOException());
 
         service.getMetricValues("jobName", 0, 300, 0);
@@ -132,12 +146,18 @@ public class MetricServiceImplTest {
         List<MetricValue> values = Collections.singletonList(
                 new MetricValue("jobName", 1L, value));
         given(metricStore.addMetricValues(values))
-                .willReturn(new ResponseEntity("{\"errors\": false, \"items\": []}", HttpStatus.OK));
+                .willReturn(
+                        new ResponseEntity(
+                                "{\"errors\": false, \"items\": []}",
+                                HttpStatus.OK));
 
         ResponseEntity response = service.addMetricValues(values);
         Map body = JsonUtil.toEntity(response.getBody().toString(), Map.class);
+
         assertEquals(response.getStatusCode(), HttpStatus.OK);
+
         assertNotNull(body);
+
         assertEquals(body.get("errors").toString(), "false");
     }
 
@@ -153,7 +173,8 @@ public class MetricServiceImplTest {
         Map<String, Object> value = new HashMap<>();
         value.put("total", 10000);
         value.put("matched", 10000);
-        List<MetricValue> values = Collections.singletonList(new MetricValue("jobName", 1L, value));
+        List<MetricValue> values = Collections.singletonList(
+                new MetricValue("jobName", 1L, value));
         given(metricStore.addMetricValues(values)).willThrow(new IOException());
 
         service.addMetricValues(values);
@@ -163,7 +184,8 @@ public class MetricServiceImplTest {
     public void testDeleteMetricValuesSuccess() throws IOException {
 
         given(metricStore.deleteMetricValues("metricName"))
-                .willReturn(new ResponseEntity("{\"failures\": []}", HttpStatus.OK));
+                .willReturn(new ResponseEntity("{\"failures\": []}",
+                        HttpStatus.OK));
 
         ResponseEntity response = service.deleteMetricValues("metricName");
         Map body = JsonUtil.toEntity(response.getBody().toString(), Map.class);
@@ -173,8 +195,10 @@ public class MetricServiceImplTest {
     }
 
     @Test(expected = GriffinException.ServiceException.class)
-    public void testDeleteMetricValuesFailureWithException() throws IOException {
-        given(metricStore.deleteMetricValues("metricName")).willThrow(new IOException());
+    public void testDeleteMetricValuesFailureWithException()
+            throws IOException {
+        given(metricStore.deleteMetricValues("metricName"))
+                .willThrow(new IOException());
 
         service.deleteMetricValues("metricName");
 

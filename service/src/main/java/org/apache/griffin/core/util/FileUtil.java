@@ -26,7 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(FileUtil.class);
 
     public static String getFilePath(String name, String location) {
         if (StringUtils.isEmpty(location)) {
@@ -37,13 +38,15 @@ public class FileUtil {
         LOGGER.info("File absolute path:" + file.getAbsolutePath());
         File[] files = file.listFiles();
         if (files == null) {
-            LOGGER.warn("The external location '{}' does not exist.Read from default path.", location);
+            LOGGER.warn("The external location '{}' does not exist.Read from"
+                    + "default path.", location);
             return null;
         }
         return getFilePath(name, files, location);
     }
 
-    private static String getFilePath(String name, File[] files, String location) {
+    private static String getFilePath(String name, File[] files,
+                                      String location) {
         String path = null;
         for (File f : files) {
             if (f.getName().equals(name)) {
