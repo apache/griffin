@@ -19,10 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import com.cloudera.livy.sessions.SessionState;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
@@ -34,6 +30,10 @@ import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTIN
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
+
+import com.cloudera.livy.sessions.SessionState;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class LivySessionStates {
 

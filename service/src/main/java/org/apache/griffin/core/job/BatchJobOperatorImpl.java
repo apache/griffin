@@ -1,5 +1,21 @@
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CONNECTOR_NAME;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CRON_EXPRESSION;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_IS_NOT_IN_PAUSED_STATUS;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_IS_NOT_SCHEDULED;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_KEY_DOES_NOT_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.MISSING_BASELINE_CONFIG;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.quartz.CronExpression.isValidExpression;
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.Trigger.TriggerState;
+import static org.quartz.Trigger.TriggerState.BLOCKED;
+import static org.quartz.Trigger.TriggerState.NORMAL;
+import static org.quartz.Trigger.TriggerState.PAUSED;
+import static org.quartz.TriggerKey.triggerKey;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -33,22 +49,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CONNECTOR_NAME;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CRON_EXPRESSION;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_IS_NOT_IN_PAUSED_STATUS;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_IS_NOT_SCHEDULED;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_KEY_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.MISSING_BASELINE_CONFIG;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
-import static org.quartz.CronExpression.isValidExpression;
-import static org.quartz.JobKey.jobKey;
-import static org.quartz.Trigger.TriggerState;
-import static org.quartz.Trigger.TriggerState.BLOCKED;
-import static org.quartz.Trigger.TriggerState.NORMAL;
-import static org.quartz.Trigger.TriggerState.PAUSED;
-import static org.quartz.TriggerKey.triggerKey;
-
 @Service
 public class BatchJobOperatorImpl implements JobOperator {
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchJobOperatorImpl.class);
@@ -76,7 +76,7 @@ public class BatchJobOperatorImpl implements JobOperator {
     }
 
     private BatchJob genBatchJobBean(AbstractJob job, String qName, String qGroup) {
-        BatchJob batchJob = (BatchJob)job;
+        BatchJob batchJob = (BatchJob) job;
         batchJob.setMetricName(job.getJobName());
         batchJob.setGroup(qGroup);
         batchJob.setName(qName);
@@ -165,6 +165,7 @@ public class BatchJobOperatorImpl implements JobOperator {
 
     /**
      * only PAUSED state of job can be started
+     *
      * @param state job state
      * @return true: job can be started, false: job is running which cannot be started
      */
@@ -174,6 +175,7 @@ public class BatchJobOperatorImpl implements JobOperator {
 
     /**
      * only NORMAL or  BLOCKED state of job can be started
+     *
      * @param state job state
      * @return true: job can be stopped, false: job is running which cannot be stopped
      */

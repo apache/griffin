@@ -34,7 +34,7 @@ public interface JobService {
 
     AbstractJob getJobConfig(Long jobId);
 
-    AbstractJob onAction(Long jobId,String action) throws Exception;
+    AbstractJob onAction(Long jobId, String action) throws Exception;
 
     void deleteJob(Long jobId) throws SchedulerException;
 

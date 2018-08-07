@@ -43,7 +43,7 @@ public class JobHealth {
         this.healthyJobCount = healthyJobCount;
         this.jobCount = jobCount;
     }
-    
+
     public JobHealth() {
     }
 }

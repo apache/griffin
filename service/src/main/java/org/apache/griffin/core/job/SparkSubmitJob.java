@@ -19,6 +19,19 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
+import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
+import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
+import static org.apache.griffin.core.job.JobInstance.JOB_NAME;
+import static org.apache.griffin.core.job.JobInstance.MEASURE_KEY;
+import static org.apache.griffin.core.job.JobInstance.PREDICATES_KEY;
+import static org.apache.griffin.core.job.JobInstance.PREDICATE_JOB_NAME;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
@@ -50,19 +63,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
-import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
-import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
-import static org.apache.griffin.core.job.JobInstance.JOB_NAME;
-import static org.apache.griffin.core.job.JobInstance.MEASURE_KEY;
-import static org.apache.griffin.core.job.JobInstance.PREDICATES_KEY;
-import static org.apache.griffin.core.job.JobInstance.PREDICATE_JOB_NAME;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
-import static org.apache.griffin.core.util.JsonUtil.toEntity;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
@@ -149,7 +149,7 @@ public class SparkSubmitJob implements Job {
         measure.setName(jd.getJobDataMap().getString(JOB_NAME));
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private void setPredicates(String json) throws IOException {
         if (StringUtils.isEmpty(json)) {
             return;
