@@ -40,9 +40,9 @@ import org.apache.griffin.core.util.JsonUtil;
 @Entity
 public class SegmentPredicate extends AbstractAuditableEntity {
 
-	private static final long serialVersionUID = 1942715275465116154L;
+    private static final long serialVersionUID = 1942715275465116154L;
 
-	private String type;
+    private String type;
 
     @JsonIgnore
     private String config;

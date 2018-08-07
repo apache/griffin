@@ -242,7 +242,7 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    AbstractJob(Long measureId, String jobName, String cronExpression, String timeZone,List<JobDataSegment> segments, boolean deleted) {
+    AbstractJob(Long measureId, String jobName, String cronExpression, String timeZone, List<JobDataSegment> segments, boolean deleted) {
         this.measureId = measureId;
         this.jobName = jobName;
         this.metricName = jobName;

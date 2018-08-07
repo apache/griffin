@@ -19,6 +19,18 @@ under the License.
 
 package org.apache.griffin.core.metric;
 
+import static org.apache.griffin.core.util.EntityHelper.createGriffinJob;
+import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.BDDMockito.given;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.repo.JobRepo;
@@ -38,18 +50,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.apache.griffin.core.util.EntityHelper.createGriffinJob;
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 public class MetricServiceImplTest {

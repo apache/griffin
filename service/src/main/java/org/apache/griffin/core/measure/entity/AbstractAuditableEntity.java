@@ -31,9 +31,9 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class AbstractAuditableEntity implements Serializable {
 
-	private static final long serialVersionUID = 4161638281338218249L;
+    private static final long serialVersionUID = 4161638281338218249L;
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 

@@ -26,15 +26,13 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
-
 /**
  * Interface to access measure repository
  *
  * @param <T> Measure and its subclass
  */
 public interface MeasureRepo<T extends Measure>
-    extends CrudRepository<T, Long> {
+        extends CrudRepository<T, Long> {
 
     /**
      * search repository by name and deletion state
@@ -78,7 +76,7 @@ public interface MeasureRepo<T extends Measure>
      * @return organization collection
      */
     @Query("select DISTINCT m.organization from #{#entityName} m "
-        + "where m.deleted = ?1 and m.organization is not null")
+            + "where m.deleted = ?1 and m.organization is not null")
     List<String> findOrganizations(Boolean deleted);
 
     /**
@@ -89,6 +87,6 @@ public interface MeasureRepo<T extends Measure>
      * @return organization collection
      */
     @Query("select m.name from #{#entityName} m "
-        + "where m.organization= ?1 and m.deleted= ?2")
+            + "where m.organization= ?1 and m.deleted= ?2")
     List<String> findNameByOrganization(String organization, Boolean deleted);
 }

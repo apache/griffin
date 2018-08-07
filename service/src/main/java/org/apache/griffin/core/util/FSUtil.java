@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.util;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.HDFS_FILE_NOT_EXIST;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +41,6 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.HDFS_FILE_NOT_EXIST;
-
 public class FSUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FSUtil.class);
@@ -58,7 +58,7 @@ public class FSUtil {
 
     private static void initFileSystem() {
         Configuration conf = new Configuration();
-        
+
         if (StringUtils.isEmpty(conf.get("fs.hdfs.impl"))) {
             LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
             conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
@@ -181,10 +181,10 @@ public class FSUtil {
         }
     }
 
-    public static String getFirstMissRecordPath(String hdfsDir) throws Exception{
+    public static String getFirstMissRecordPath(String hdfsDir) throws Exception {
         List<FileStatus> fileList = listFileStatus(hdfsDir);
-        for(int i=0; i<fileList.size();i++){
-            if(fileList.get(i).getPath().toUri().toString().toLowerCase().contains("missrecord")){
+        for (int i = 0; i < fileList.size(); i++) {
+            if (fileList.get(i).getPath().toUri().toString().toLowerCase().contains("missrecord")) {
                 return fileList.get(i).getPath().toUri().toString();
             }
         }
@@ -194,7 +194,7 @@ public class FSUtil {
     public static InputStream getMissSampleInputStream(String path) throws Exception {
         List<String> subDirList = listSubDir(path);
         //FIXME: only handle 1-sub dir here now
-        for(int i=0; i< subDirList.size();i++){
+        for (int i = 0; i < subDirList.size(); i++) {
             return getSampleInputStream(getFirstMissRecordPath(subDirList.get(i)));
         }
         return getSampleInputStream(getFirstMissRecordPath(path));
