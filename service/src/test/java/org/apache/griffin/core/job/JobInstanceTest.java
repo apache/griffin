@@ -19,6 +19,20 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.util.EntityHelper.createFileExistPredicate;
+import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityHelper.createJobDetail;
+import static org.apache.griffin.core.util.EntityHelper.createSimpleTrigger;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.repo.BatchJobRepo;
@@ -31,7 +45,12 @@ import org.apache.griffin.core.util.PropertiesUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
-import org.quartz.*;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -40,15 +59,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
-import static org.apache.griffin.core.util.EntityHelper.*;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 public class JobInstanceTest {

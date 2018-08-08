@@ -20,6 +20,21 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
+import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
@@ -32,24 +47,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.test.context.TestComponent;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @Component

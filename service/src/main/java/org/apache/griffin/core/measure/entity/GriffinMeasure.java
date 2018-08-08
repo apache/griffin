@@ -63,7 +63,7 @@ public class GriffinMeasure extends Measure {
 
     @Enumerated(EnumType.STRING)
     private ProcessType processType;
-	private static final long serialVersionUID = -475176898459647661L;
+    private static final long serialVersionUID = -475176898459647661L;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)

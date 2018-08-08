@@ -19,6 +19,12 @@ under the License.
 
 package org.apache.griffin.core.config;
 
+import static org.apache.griffin.core.config.EnvConfig.getBatchEnv;
+import static org.apache.griffin.core.config.EnvConfig.getStreamingEnv;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
+import static org.apache.griffin.core.util.PropertiesUtil.getConf;
+import static org.apache.griffin.core.util.PropertiesUtil.getConfPath;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.FileInputStream;
@@ -36,18 +42,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-import static org.apache.griffin.core.config.EnvConfig.getBatchEnv;
-import static org.apache.griffin.core.config.EnvConfig.getStreamingEnv;
-import static org.apache.griffin.core.util.JsonUtil.toEntity;
-import static org.apache.griffin.core.util.PropertiesUtil.getConf;
-import static org.apache.griffin.core.util.PropertiesUtil.getConfPath;
-
 @Configuration
 public class PropertiesConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesConfig.class);
 
-    public static Map<String,Object> livyConfMap;
+    public static Map<String, Object> livyConfMap;
 
     private String configLocation;
 
@@ -106,7 +106,7 @@ public class PropertiesConfig {
      * @return Map
      * @throws IOException io exception
      */
-    private static Map<String,Object>  readPropertiesFromResource(String path) throws IOException {
+    private static Map<String, Object> readPropertiesFromResource(String path) throws IOException {
         if (path == null) {
             LOGGER.warn("Parameter path is null.");
             return null;
@@ -114,7 +114,7 @@ public class PropertiesConfig {
         // Be careful, here we use getInputStream() to convert path file to stream.
         // It'll cause FileNotFoundException if you use  getFile() to convert path file to File Object
         InputStream in = new ClassPathResource(path).getInputStream();
-        return toEntity(in, new TypeReference<Map<String,Object> >() {
+        return toEntity(in, new TypeReference<Map<String, Object>>() {
         });
     }
 }

@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.job.JobInstance.PATH_CONNECTOR_CHARACTER;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -28,8 +30,6 @@ import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.util.FSUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.griffin.core.job.JobInstance.PATH_CONNECTOR_CHARACTER;
 
 public class FileExistPredicator implements Predicator {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileExistPredicator.class);
@@ -49,7 +49,7 @@ public class FileExistPredicator implements Predicator {
         String[] paths = null;
         String rootPath = null;
         if (config != null && !StringUtils.isEmpty((String) config.get(PREDICT_PATH))) {
-            paths = ((String)config.get(PREDICT_PATH)).split(PATH_CONNECTOR_CHARACTER);
+            paths = ((String) config.get(PREDICT_PATH)).split(PATH_CONNECTOR_CHARACTER);
             rootPath = (String) config.get(PREDICT_ROOT_PATH);
         }
         if (ArrayUtils.isEmpty(paths) || StringUtils.isEmpty(rootPath)) {

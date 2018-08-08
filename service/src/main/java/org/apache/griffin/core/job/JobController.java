@@ -66,7 +66,7 @@ public class JobController {
     @RequestMapping(value = "/jobs/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public AbstractJob onActions(@PathVariable("id") Long jobId, @RequestParam String action) throws Exception {
-        return jobService.onAction(jobId,action);
+        return jobService.onAction(jobId, action);
     }
 
     @RequestMapping(value = "/jobs", method = RequestMethod.DELETE)
@@ -92,8 +92,8 @@ public class JobController {
     }
 
     @RequestMapping(path = "/jobs/download", method = RequestMethod.GET)
-    public ResponseEntity<Resource> download(@RequestParam("jobName") String jobName ,@RequestParam("ts") long timestamp) throws Exception {
-        String path = jobService.getJobHdfsPersistPath(jobName,timestamp);
+    public ResponseEntity<Resource> download(@RequestParam("jobName") String jobName, @RequestParam("ts") long timestamp) throws Exception {
+        String path = jobService.getJobHdfsPersistPath(jobName, timestamp);
         InputStreamResource resource = new InputStreamResource(FSUtil.getMissSampleInputStream(path));
         return ResponseEntity.ok().
                 header("content-disposition", "attachment; filename = sampleMissingData.json")

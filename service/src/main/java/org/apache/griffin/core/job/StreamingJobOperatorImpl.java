@@ -19,6 +19,16 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_RUNNING;
+import static org.apache.griffin.core.job.JobServiceImpl.START;
+import static org.apache.griffin.core.job.JobServiceImpl.STOP;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.convert2QuartzState;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
+import static org.quartz.TriggerKey.triggerKey;
+
 import java.util.List;
 import javax.annotation.PostConstruct;
 
@@ -47,16 +57,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_RUNNING;
-import static org.apache.griffin.core.job.JobServiceImpl.START;
-import static org.apache.griffin.core.job.JobServiceImpl.STOP;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
-import static org.apache.griffin.core.job.entity.LivySessionStates.convert2QuartzState;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
-import static org.quartz.TriggerKey.triggerKey;
 
 @Service
 public class StreamingJobOperatorImpl implements JobOperator {
@@ -90,12 +90,12 @@ public class StreamingJobOperatorImpl implements JobOperator {
         TriggerKey triggerKey = jobService.getTriggerKeyIfValid(qName, qGroup);
         StreamingJob streamingJob = genStreamingJobBean(job, qName, qGroup);
         streamingJob = streamingJobRepo.save(streamingJob);
-        jobService.addJob(triggerKey,streamingJob, STREAMING);
+        jobService.addJob(triggerKey, streamingJob, STREAMING);
         return streamingJob;
     }
 
     private StreamingJob genStreamingJobBean(AbstractJob job, String qName, String qGroup) {
-        StreamingJob streamingJob = (StreamingJob)job;
+        StreamingJob streamingJob = (StreamingJob) job;
         streamingJob.setMetricName(job.getJobName());
         streamingJob.setGroup(qGroup);
         streamingJob.setName(qName);
@@ -117,7 +117,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
         String qName = jobService.getQuartzName(job);
         String qGroup = jobService.getQuartzGroup();
         TriggerKey triggerKey = triggerKey(qName, qGroup);
-        jobService.addJob(triggerKey,streamingJob, STREAMING);
+        jobService.addJob(triggerKey, streamingJob, STREAMING);
     }
 
     private void verifyJobState(AbstractJob job) throws SchedulerException {

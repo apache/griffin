@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.core.job.repo;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+
 import java.util.List;
 
 import org.apache.griffin.core.job.entity.JobInstanceBean;
@@ -26,8 +28,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 
 public interface JobInstanceRepo extends CrudRepository<JobInstanceBean, Long> {
 

@@ -19,6 +19,13 @@ under the License.
 
 package org.apache.griffin.core.measure.repo;
 
+import static org.apache.griffin.core.util.EntityHelper.createDataConnector;
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.junit.Before;
@@ -29,13 +36,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.apache.griffin.core.util.EntityHelper.createDataConnector;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest

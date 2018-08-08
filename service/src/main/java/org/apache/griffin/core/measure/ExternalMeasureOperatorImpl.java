@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
+
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.job.repo.VirtualJobRepo;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
@@ -27,8 +29,6 @@ import org.apache.griffin.core.measure.repo.ExternalMeasureRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
 
 @Component("externalOperation")
 public class ExternalMeasureOperatorImpl implements MeasureOperator {

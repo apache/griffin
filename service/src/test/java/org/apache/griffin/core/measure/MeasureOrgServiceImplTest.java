@@ -20,6 +20,18 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityHelper.createJobDetailMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.junit.Test;
@@ -27,14 +39,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.*;
-
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
-import static org.apache.griffin.core.util.EntityHelper.createJobDetailMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 public class MeasureOrgServiceImplTest {
@@ -73,7 +77,7 @@ public class MeasureOrgServiceImplTest {
     }
 
     @Test
-    public void testGetMeasureNamesGroupByOrgWithNull(){
+    public void testGetMeasureNamesGroupByOrgWithNull() {
         when(measureRepo.findByDeleted(false)).thenReturn(new ArrayList<>());
         Map<String, List<String>> map = service.getMeasureNamesGroupByOrg();
         assert map.size() == 0;
