@@ -43,7 +43,9 @@ public class StreamingPreProcess extends AbstractAuditableEntity {
 
     private String dslType;
 
-    private String name;
+    private String inDataFrameName;
+
+    private String outDataFrameName;
 
     private String rule;
 
@@ -64,13 +66,24 @@ public class StreamingPreProcess extends AbstractAuditableEntity {
         this.dslType = dslType;
     }
 
-    public String getName() {
-        return name;
+    @JsonProperty("in.dataframe.name")
+    public String getInDataFrameName() {
+        return inDataFrameName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setInDataFrameName(String inDataFrameName) {
+        this.inDataFrameName = inDataFrameName;
     }
+
+    @JsonProperty("out.dataframe.name")
+    public String getOutDataFrameName() {
+        return outDataFrameName;
+    }
+
+    public void setOutDataFrameName(String outDataFrameName) {
+        this.outDataFrameName = outDataFrameName;
+    }
+
 
     public String getRule() {
         return rule;

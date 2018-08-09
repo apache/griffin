@@ -3,10 +3,10 @@
     "log.level": "WARN",
     "checkpoint.dir": "hdfs:///griffin/checkpoint/${JOB_NAME}",
     "init.clear": true,
-    "batch.interval": "30s",
-    "process.interval": "3m",
+    "batch.interval": "2s",
+    "process.interval": "10s",
     "config": {
-      "spark.default.parallelism": 4,
+      "spark.master": "local[*]",
       "spark.task.maxFailures": 5,
       "spark.streaming.kafkaMaxRatePerPartition": 1000,
       "spark.streaming.concurrentJobs": 4,
@@ -17,28 +17,30 @@
       "spark.hadoop.fs.hdfs.impl.disable.cache": true
     }
   },
-  "persist": [
+  "sinks": [
     {
-      "type": "log",
+      "type": "CONSOLE",
       "config": {
-        "max.log.lines": 2
+        "max.log.lines": 100
       }
     },
     {
-      "type": "hdfs",
+      "type": "HDFS",
       "config": {
-        "path": "hdfs:///griffin/persist"
+        "path": "hdfs:///griffin/persist",
+        "max.persist.lines": 10000,
+        "max.lines.per.file": 10000
       }
     },
     {
-      "type": "http",
+      "type": "ELASTICSEARCH",
       "config": {
         "method": "post",
         "api": "http://es:9200/griffin/accuracy"
       }
     }
   ],
-  "info.cache": [
+  "griffin.checkpoint": [
     {
       "type": "zk",
       "config": {
@@ -46,11 +48,9 @@
         "namespace": "griffin/infocache",
         "lock.path": "lock",
         "mode": "persist",
-        "init.clear": false,
+        "init.clear": true,
         "close.clear": false
       }
     }
-  ],
-  "cleaner": {
-  }
+  ]
 }

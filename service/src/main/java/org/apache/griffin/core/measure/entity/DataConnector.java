@@ -73,6 +73,9 @@ public class DataConnector extends AbstractAuditableEntity {
     private String version;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String dataFrameName;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String dataUnit;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -129,6 +132,15 @@ public class DataConnector extends AbstractAuditableEntity {
 
     private String getConfig() {
         return config;
+    }
+
+    @JsonProperty("dataframe.name")
+    public String getDataFrameName() {
+        return dataFrameName;
+    }
+
+    public void setDataFrameName(String dataFrameName) {
+        this.dataFrameName = dataFrameName;
     }
 
     @JsonProperty("data.unit")
@@ -204,16 +216,19 @@ public class DataConnector extends AbstractAuditableEntity {
     public DataConnector() {
     }
 
-    public DataConnector(String name, DataType type, String version, String config) throws IOException {
+    public DataConnector(String name, DataType type, String version,
+                         String config, String dataFrameName) throws IOException {
         this.name = name;
         this.type = type;
         this.version = version;
         this.config = config;
         this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
         });
+        this.dataFrameName = dataFrameName;
     }
 
-    public DataConnector(String name, String dataUnit, Map configMap, List<SegmentPredicate> predicates) {
+    public DataConnector(String name, String dataUnit, Map configMap,
+                         List<SegmentPredicate> predicates) {
         this.name = name;
         this.dataUnit = dataUnit;
         this.configMap = configMap;

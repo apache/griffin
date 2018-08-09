@@ -43,19 +43,19 @@ public class JobDataSegment extends AbstractAuditableEntity {
     @NotNull
     private String dataConnectorName;
 
-    private boolean baseline = false;
+    private boolean asTmsBaseline = false;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "segment_range_id")
     private SegmentRange segmentRange = new SegmentRange();
 
     @JsonProperty("as.baseline")
-    public boolean isBaseline() {
-        return baseline;
+    public boolean asTmsBaseline() {
+        return asTmsBaseline;
     }
 
-    public void setBaseline(boolean baseline) {
-        this.baseline = baseline;
+    public void setTmsBaseline(boolean baseline) {
+        this.asTmsBaseline = baseline;
     }
 
     @JsonProperty("segment.range")
@@ -85,12 +85,12 @@ public class JobDataSegment extends AbstractAuditableEntity {
 
     public JobDataSegment(String dataConnectorName, boolean baseline) {
         this.dataConnectorName = dataConnectorName;
-        this.baseline = baseline;
+        this.asTmsBaseline = baseline;
     }
 
     public JobDataSegment(String dataConnectorName, boolean baseline, SegmentRange segmentRange) {
         this.dataConnectorName = dataConnectorName;
-        this.baseline = baseline;
+        this.asTmsBaseline = baseline;
         this.segmentRange = segmentRange;
     }
 }

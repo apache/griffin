@@ -140,7 +140,7 @@ public class JobInstance implements Job {
     private void setSourcesPartitionsAndPredicates(List<DataSource> sources) throws Exception {
         boolean isFirstBaseline = true;
         for (JobDataSegment jds : job.getSegments()) {
-            if (jds.isBaseline() && isFirstBaseline) {
+            if (jds.asTmsBaseline() && isFirstBaseline) {
                 Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
                 measure.setTimestamp(jobStartTime + tsOffset);
                 isFirstBaseline = false;
@@ -347,7 +347,7 @@ public class JobInstance implements Job {
 
     private void preProcessMeasure() throws IOException {
         for (DataSource source : measure.getDataSources()) {
-            Map cacheMap = source.getCacheMap();
+            Map cacheMap = source.getCheckpointMap();
             //to skip batch job
             if (cacheMap == null) {
                 return;
@@ -357,7 +357,7 @@ public class JobInstance implements Job {
             cache = cache.replaceAll("\\$\\{SOURCE_NAME}", source.getName());
             cache = cache.replaceAll("\\$\\{TARGET_NAME}", source.getName());
             cacheMap = toEntity(cache, Map.class);
-            source.setCacheMap(cacheMap);
+            source.setCheckpointMap(cacheMap);
         }
     }
 
