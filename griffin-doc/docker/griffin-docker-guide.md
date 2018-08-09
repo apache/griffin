@@ -28,7 +28,7 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     ```
     sysctl -w vm.max_map_count=262144
     ```
-    For macOS, please increase enough memory available for docker (For example, set > 4 GB in docker->preferences->Advanced) or decrease memory for es instance(For example, set -Xms512m -Xmx512m in jvm.options)
+    For macOS, please increase enough memory available for docker (For example, set more than 4 GB in docker->preferences->Advanced) or decrease memory for es instance(For example, set -Xms512m -Xmx512m in jvm.options)
 
     For other platforms, please reference to this link from elastic.co
     [max_map_count kernel setting](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
