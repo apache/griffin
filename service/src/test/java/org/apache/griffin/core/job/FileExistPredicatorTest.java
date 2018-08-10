@@ -21,7 +21,11 @@ public class FileExistPredicatorTest {
 
     @BeforeClass
     public static void mkFile() throws IOException {
+        File fileDirectory = new File(rootPath); // to fix createFileExclusively exception
         File file = new File(rootPath + fileName);
+        if (!fileDirectory.exists()) {
+            fileDirectory.mkdir();
+        }
         if (!file.exists()) {
             file.createNewFile();
         }

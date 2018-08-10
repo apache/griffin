@@ -43,12 +43,7 @@ import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.entity.SegmentRange;
 import org.apache.griffin.core.job.entity.VirtualJob;
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.apache.griffin.core.measure.entity.DataSource;
-import org.apache.griffin.core.measure.entity.EvaluateRule;
-import org.apache.griffin.core.measure.entity.ExternalMeasure;
-import org.apache.griffin.core.measure.entity.GriffinMeasure;
-import org.apache.griffin.core.measure.entity.Rule;
+import org.apache.griffin.core.measure.entity.*;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
 import org.quartz.SimpleTrigger;
@@ -81,17 +76,34 @@ public class EntityHelper {
     public static GriffinMeasure createGriffinMeasure(String name,
                                                       DataConnector dcSource,
                                                       DataConnector dcTarget) throws Exception {
-        DataSource dataSource = new DataSource("source", Arrays.asList(dcSource));
-        DataSource targetSource = new DataSource("target", Arrays.asList(dcTarget));
+        DataSource dataSource = new DataSource("source", true, createCheckpointMap(), Arrays.asList(dcSource));
+        DataSource targetSource = new DataSource("target", false, createCheckpointMap(), Arrays.asList(dcTarget));
         List<DataSource> dataSources = new ArrayList<>();
         dataSources.add(dataSource);
         dataSources.add(targetSource);
-        String rules = "source.id=target.id AND source.name=target.name AND source.age=target.age";
-        Map<String, Object> map = new HashMap<>();
-        map.put("detail", "detail info");
-        Rule rule = new Rule("griffin-dsl", "ACCURACY", rules, map);
+        Rule rule = createRule();
         EvaluateRule evaluateRule = new EvaluateRule(Arrays.asList(rule));
-        return new GriffinMeasure(name, "test", dataSources, evaluateRule);
+        return new GriffinMeasure(name, "test", dataSources, evaluateRule, Arrays.asList("ELASTICSEARCH", "HDFS"));
+    }
+
+    private static Rule createRule() throws JsonProcessingException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("detail", "detail");
+        String rule = "source.id=target.id AND source.name=target.name AND source.age=target.age";
+        Map<String, Object> metricMap = new HashMap<>();
+        Map<String, Object> recordMap = new HashMap<>();
+        metricMap.put("type", "metric");
+        metricMap.put("name", "accu");
+        recordMap.put("type", "record");
+        recordMap.put("name", "missRecords");
+        List<Map<String, Object>> outList = Arrays.asList(metricMap, recordMap);
+        return new Rule("griffin-dsl", DqType.ACCURACY, rule, "in", "out", map, outList);
+    }
+
+    private static Map<String, Object> createCheckpointMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("info.path", "source");
+        return map;
     }
 
     public static DataConnector createDataConnector(String name,
@@ -102,14 +114,14 @@ public class EntityHelper {
         config.put("database", database);
         config.put("table.name", table);
         config.put("where", where);
-        return new DataConnector(name, "1h", config, null);
+        return new DataConnector(name, DataConnector.DataType.HIVE, "1.2", JsonUtil.toJson(config), "kafka");
     }
 
     public static DataConnector createDataConnector(String name,
                                                     String database,
                                                     String table,
                                                     String where,
-                                                    SegmentPredicate predicate) throws IOException {
+                                                    SegmentPredicate predicate) {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);

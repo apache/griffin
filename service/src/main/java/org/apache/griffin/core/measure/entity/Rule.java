@@ -26,13 +26,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringUtils;
@@ -49,14 +45,18 @@ public class Rule extends AbstractAuditableEntity {
     @NotNull
     private String dslType;
 
-    @NotNull
-    private String dqType;
+    @Enumerated(EnumType.STRING)
+    private DqType dqType;
 
     @Column(length = 8 * 1024)
     @NotNull
     private String rule;
 
-    private String name;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String inDataFrameName;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String outDataFrameName;
 
     @JsonIgnore
 //    @Access(AccessType.PROPERTY)
@@ -67,21 +67,12 @@ public class Rule extends AbstractAuditableEntity {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, Object> detailsMap;
 
-    @JsonIgnore
-//    @Access(AccessType.PROPERTY)
-    private String metric;
-
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, Object> metricMap;
+    private List<Map<String, Object>> outList;
 
     @JsonIgnore
-//    @Access(AccessType.PROPERTY)
-    private String record;
-
-    @Transient
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, Object> recordMap;
+    private String out;
 
     @JsonProperty("dsl.type")
     public String getDslType() {
@@ -93,11 +84,11 @@ public class Rule extends AbstractAuditableEntity {
     }
 
     @JsonProperty("dq.type")
-    public String getDqType() {
+    public DqType getDqType() {
         return dqType;
     }
 
-    public void setDqType(String dqType) {
+    public void setDqType(DqType dqType) {
         this.dqType = dqType;
     }
 
@@ -109,6 +100,24 @@ public class Rule extends AbstractAuditableEntity {
         this.rule = rule;
     }
 
+    @JsonProperty("in.dataframe.name")
+    public String getInDataFrameName() {
+        return inDataFrameName;
+    }
+
+    public void setInDataFrameName(String inDataFrameName) {
+        this.inDataFrameName = inDataFrameName;
+    }
+
+    @JsonProperty("out.dataframe.name")
+    public String getOutDataFrameName() {
+        return outDataFrameName;
+    }
+
+    public void setOutDataFrameName(String outDataFrameName) {
+        this.outDataFrameName = outDataFrameName;
+    }
+
     @JsonProperty("details")
     public Map<String, Object> getDetailsMap() {
         return detailsMap;
@@ -116,24 +125,6 @@ public class Rule extends AbstractAuditableEntity {
 
     public void setDetailsMap(Map<String, Object> detailsMap) {
         this.detailsMap = detailsMap;
-    }
-
-    @JsonProperty("metric")
-    public Map<String, Object> getMetricMap() {
-        return metricMap;
-    }
-
-    public void setMetricMap(Map<String, Object> metricMap) {
-        this.metricMap = metricMap;
-    }
-
-    @JsonProperty("record")
-    public Map<String, Object> getRecordMap() {
-        return recordMap;
-    }
-
-    public void setRecordMap(Map<String, Object> recordMap) {
-        this.recordMap = recordMap;
     }
 
     private String getDetails() {
@@ -144,24 +135,21 @@ public class Rule extends AbstractAuditableEntity {
         this.details = details;
     }
 
-    private void setMetric(String metric) {
-        this.metric = metric;
+    @JsonProperty("out")
+    public List<Map<String, Object>> getOutList() {
+        return outList;
     }
 
-    private String getRecord() {
-        return record;
+    public void setOutList(List<Map<String, Object>> outList) {
+        this.outList = outList;
     }
 
-    private void setRecord(String record) {
-        this.record = record;
+    private String getOut() {
+        return out;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    private void setOut(String out) {
+        this.out = out;
     }
 
     @PrePersist
@@ -170,13 +158,9 @@ public class Rule extends AbstractAuditableEntity {
         if (detailsMap != null) {
             this.details = JsonUtil.toJson(detailsMap);
         }
-        if (metricMap != null) {
-            this.metric = JsonUtil.toJson(metricMap);
+        if (outList != null) {
+            this.out = JsonUtil.toJson(outList);
         }
-        if (recordMap != null) {
-            this.record = JsonUtil.toJson(recordMap);
-        }
-
     }
 
     @PostLoad
@@ -185,12 +169,8 @@ public class Rule extends AbstractAuditableEntity {
             this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
             });
         }
-        if (!StringUtils.isEmpty(metric)) {
-            this.metricMap = JsonUtil.toEntity(metric, new TypeReference<Map<String, Object>>() {
-            });
-        }
-        if (!StringUtils.isEmpty(record)) {
-            this.recordMap = JsonUtil.toEntity(record, new TypeReference<Map<String, Object>>() {
+        if (!StringUtils.isEmpty(out)) {
+            this.outList = JsonUtil.toEntity(out, new TypeReference<List<Map<String, Object>>>() {
             });
         }
     }
@@ -198,10 +178,21 @@ public class Rule extends AbstractAuditableEntity {
     public Rule() {
     }
 
-    public Rule(String dslType, String dqType, String rule, Map<String, Object> detailsMap) throws JsonProcessingException {
+    public Rule(String dslType, DqType dqType, String rule, Map<String, Object> detailsMap) throws JsonProcessingException {
         this.dslType = dslType;
         this.dqType = dqType;
         this.rule = rule;
+        this.detailsMap = detailsMap;
         this.details = JsonUtil.toJson(detailsMap);
+    }
+
+    public Rule(String dslType, DqType dqType, String rule,
+                String inDataFrameName, String outDataFrameName,
+                Map<String, Object> detailsMap,
+                List<Map<String, Object>> outList) throws JsonProcessingException {
+        this(dslType, dqType, rule, detailsMap);
+        this.inDataFrameName = inDataFrameName;
+        this.outDataFrameName = outDataFrameName;
+        this.outList = outList;
     }
 }
