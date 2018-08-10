@@ -382,6 +382,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
         }
       ],
       "evaluate.rule": {
+        "out.dataframe.name":"profiling",
         rules: []
       }
     };
