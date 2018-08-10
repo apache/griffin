@@ -70,6 +70,8 @@ You should also modify some configurations of Griffin for your environment.
 - <b>service/src/main/resources/application.properties</b>
 
     ```
+    # griffin server port (default 8080)
+    server.port = 8080
     # jpa
     spring.datasource.url = jdbc:postgresql://<your IP>:5432/quartz?autoReconnect=true&useSSL=false
     spring.datasource.username = <user name>
@@ -103,39 +105,37 @@ You should also modify some configurations of Griffin for your environment.
 	# authentication properties, uncomment if basic authentication is enabled
 	# elasticsearch.user = user
 	# elasticsearch.password = password
+	# livy
+	# Port Livy: 8998 Livy2:8999
+	livy.uri=http://localhost:8999/batches
+
+	# yarn url
+	yarn.uri=http://localhost:8088
+
+	
     ```
 
-- <b>measure/src/main/resources/env-streaming.json</b>
-	```
-	"persist": [
-	    ...
-	    {
-			"type": "http",
-			"config": {
-		        "method": "post",
-		        "api": "http://<your ES IP>:<ES rest port>/griffin/accuracy"
-			}
-		}
-	]
-	```
-	Rename the modified env-streaming.json file as env.json and put it into HDFS.
-
-- <b>service/src/main/resources/sparkJob.properties</b>
+- <b>service/src/main/resources/sparkProperties.json</b>
     ```
-    sparkJob.file = hdfs://<griffin measure path>/griffin-measure.jar
-    sparkJob.args_1 = hdfs://<griffin env path>/env.json
+	{
+	  "file": "hdfs:///<griffin measure path>/griffin-measure.jar",
+	  "className": "org.apache.griffin.measure.Application",
+	  "name": "griffin",
+	  "queue": "default",
+	  "numExecutors": 3,
+	  "executorCores": 1,
+	  "driverMemory": "1g",
+	  "executorMemory": "1g",
+	  "conf": {
+		"spark.yarn.dist.files": "hdfs:///<path to>/hive-site.xml"
+	 },
+	  "files": [
+	  ]
+	}
 
-    # other dependent jars
-    sparkJob.jars =
-
-    # hive-site.xml location
-    spark.yarn.dist.files = hdfs://<path to>/hive-site.xml
-
-    livy.uri = http://<your IP>:8998/batches
-    yarn.uri = http://<your IP>:8088
     ```
     - \<griffin measure path> is the location where you should put the jar file of measure module.
-    - \<griffin env path> is the location where you should put the env.json file.
+   
 
 ### Build and Run
 
