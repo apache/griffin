@@ -545,24 +545,25 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public String getJobHdfsPersistPath(String jobName, long timestamp) {
+    public String getJobHdfsSinksPath(String jobName, long timestamp) {
         List<AbstractJob> jobList = jobRepo.findByJobNameAndDeleted(jobName, false);
         if (jobList.size() == 0) {
             return null;
         }
         if (jobList.get(0).getType().toLowerCase().equals("batch")) {
-            return getPersistPath(ENV_BATCH) + "/" + jobName + "/" + timestamp + "";
+            return getSinksPath(ENV_BATCH) + "/" + jobName + "/" + timestamp + "";
         }
 
-        return getPersistPath(ENV_STREAMING) + "/" + jobName + "/" + timestamp + "";
+        return getSinksPath(ENV_STREAMING) + "/" + jobName + "/" + timestamp + "";
     }
 
-    private String getPersistPath(String jsonString) {
+    private String getSinksPath(String jsonString) {
         try {
             JSONObject obj = new JSONObject(jsonString);
-            JSONArray persistArray = obj.getJSONArray("persist");
+            JSONArray persistArray = obj.getJSONArray("sinks");
             for (int i = 0; i < persistArray.length(); i++) {
-                if (persistArray.getJSONObject(i).get("type").equals("hdfs")) {
+                Object type = persistArray.getJSONObject(i).get("type");
+                if (type instanceof String && "hdfs".equalsIgnoreCase(String.valueOf(type))) {
                     return persistArray.getJSONObject(i).getJSONObject("config").getString("path");
                 }
             }
