@@ -545,7 +545,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public String getJobHdfsPersistPath(String jobName, long timestamp) {
+    public String getJobHdfsSinksPath(String jobName, long timestamp) {
         List<AbstractJob> jobList = jobRepo.findByJobNameAndDeleted(jobName, false);
         if (jobList.size() == 0) {
             return null;
@@ -560,7 +560,7 @@ public class JobServiceImpl implements JobService {
     private String getSinksPath(String jsonString) {
         try {
             JSONObject obj = new JSONObject(jsonString);
-            JSONArray persistArray = obj.getJSONArray("persist");
+            JSONArray persistArray = obj.getJSONArray("sinks");
             for (int i = 0; i < persistArray.length(); i++) {
                 Object type = persistArray.getJSONObject(i).get("type");
                 if (type instanceof String && "hdfs".equalsIgnoreCase(String.valueOf(type))) {

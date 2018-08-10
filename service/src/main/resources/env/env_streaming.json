@@ -3,10 +3,10 @@
     "log.level": "WARN",
     "checkpoint.dir": "hdfs:///griffin/checkpoint/${JOB_NAME}",
     "init.clear": true,
-    "batch.interval": "2s",
-    "process.interval": "10s",
+    "batch.interval": "1m",
+    "process.interval": "5m",
     "config": {
-      "spark.master": "local[*]",
+      "spark.default.parallelism": 4,
       "spark.task.maxFailures": 5,
       "spark.streaming.kafkaMaxRatePerPartition": 1000,
       "spark.streaming.concurrentJobs": 4,
@@ -48,7 +48,7 @@
         "namespace": "griffin/infocache",
         "lock.path": "lock",
         "mode": "persist",
-        "init.clear": true,
+        "init.clear": false,
         "close.clear": false
       }
     }

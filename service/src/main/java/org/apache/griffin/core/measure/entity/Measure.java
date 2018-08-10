@@ -142,7 +142,7 @@ public abstract class Measure extends AbstractAuditableEntity {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(sinks)) {
-            this.sinksList = JsonUtil.toEntity(sinks, new TypeReference<List<Map<String, Object>>>() {
+            this.sinksList = JsonUtil.toEntity(sinks, new TypeReference<List<String>>() {
             });
         } else {
             this.sinksList = null;

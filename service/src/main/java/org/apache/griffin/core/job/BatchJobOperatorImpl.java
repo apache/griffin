@@ -315,7 +315,7 @@ public class BatchJobOperatorImpl implements JobOperator {
     private boolean isValidBaseLine(List<JobDataSegment> segments) {
         assert segments != null;
         for (JobDataSegment jds : segments) {
-            if (jds.asTmsBaseline()) {
+            if (jds.isAsTsBaseline()) {
                 return true;
             }
         }

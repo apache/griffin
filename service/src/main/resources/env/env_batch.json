@@ -1,9 +1,6 @@
 {
   "spark": {
-    "log.level": "WARN",
-    "config": {
-      "spark.master": "local[*]"
-    }
+    "log.level": "WARN"
   },
   "sinks": [
     {
