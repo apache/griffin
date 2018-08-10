@@ -156,11 +156,14 @@ public class GriffinMeasure extends Measure {
         super();
     }
 
-    public GriffinMeasure(String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+    public GriffinMeasure(String name, String owner, List<DataSource> dataSources,
+                          EvaluateRule evaluateRule,
+                          List<String> sinksList) {
         this.name = name;
         this.owner = owner;
         this.dataSources = dataSources;
         this.evaluateRule = evaluateRule;
+        setSinksList(sinksList);
     }
 
     public GriffinMeasure(Long measureId, String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {

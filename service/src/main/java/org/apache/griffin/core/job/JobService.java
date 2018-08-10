@@ -44,5 +44,5 @@ public interface JobService {
 
     JobHealth getHealthInfo();
 
-    String getJobHdfsPersistPath(String jobName, long timestamp);
+    String getJobHdfsSinksPath(String jobName, long timestamp);
 }
