@@ -16,38 +16,24 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.lock
+package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
-import java.util.concurrent.TimeUnit
+import org.apache.griffin.measure.configuration.dqdefinition.CheckpointParam
 
-import org.apache.curator.framework.recipes.locks.InterProcessMutex
+import scala.util.Try
 
-case class CacheLockInZK(@transient mutex: InterProcessMutex) extends CacheLock {
+case class OffsetCheckpointFactory(checkpointParams: Iterable[CheckpointParam], metricName: String
+                                  ) extends Serializable {
 
-  def lock(outtime: Long, unit: TimeUnit): Boolean = {
-    try {
-      if (outtime >= 0) {
-        mutex.acquire(outtime, unit)
-      } else {
-        mutex.acquire(-1, null)
-      }
-    } catch {
-      case e: Throwable => {
-        error(s"lock error: ${e.getMessage}")
-        false
-      }
+  val ZK_REGEX = """^(?i)zk|zookeeper$""".r
+
+  def getOffsetCheckpoint(checkpointParam: CheckpointParam): Option[OffsetCheckpoint] = {
+    val config = checkpointParam.getConfig
+    val offsetCheckpointTry = checkpointParam.getType match {
+      case ZK_REGEX() => Try(OffsetCheckpointInZK(config, metricName))
+      case _ => throw new Exception("not supported info cache type")
     }
-
-  }
-
-  def unlock(): Unit = {
-    try {
-      if (mutex.isAcquiredInThisProcess) mutex.release
-    } catch {
-      case e: Throwable => {
-        error(s"unlock error: ${e.getMessage}")
-      }
-    }
+    offsetCheckpointTry.toOption
   }
 
 }

@@ -129,7 +129,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         }
       }
       val totalTransStep = SparkSqlTransformStep(totalTableName, totalSql, emptyMap)
-      val totalMetricWriteStep = MetricWriteStep(totalColName, totalTableName, EntriesNormalizeType)
+      val totalMetricWriteStep = MetricWriteStep(totalColName, totalTableName, EntriesFlattenType)
 
       // 6. unique record
       val uniqueRecordTableName = "__uniqueRecord"
@@ -151,7 +151,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         }
       }
       val uniqueTransStep = SparkSqlTransformStep(uniqueTableName, uniqueSql, emptyMap)
-      val uniqueMetricWriteStep = MetricWriteStep(uniqueColName, uniqueTableName, EntriesNormalizeType)
+      val uniqueMetricWriteStep = MetricWriteStep(uniqueColName, uniqueTableName, EntriesFlattenType)
 
       val transSteps1 = sourceTransStep :: targetTransStep :: joinedTransStep :: groupTransStep ::
         totalTransStep :: uniqueRecordTransStep :: uniqueTransStep :: Nil
@@ -166,7 +166,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         }
         val dupRecordTransStep = SparkSqlTransformStep(dupRecordTableName, dupRecordSql, emptyMap, true)
         val dupRecordWriteStep = {
-          val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(dupRecordTableName)
+          val rwName = ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt).getOrElse(dupRecordTableName)
           RecordWriteStep(rwName, dupRecordTableName)
         }
 
@@ -189,7 +189,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         }
         val dupMetricTransStep = SparkSqlTransformStep(dupMetricTableName, dupMetricSql, emptyMap)
         val dupMetricWriteStep = {
-          MetricWriteStep(duplicationArrayName, dupMetricTableName, ArrayNormalizeType)
+          MetricWriteStep(duplicationArrayName, dupMetricTableName, ArrayFlattenType)
         }
 
         (dupRecordTransStep :: dupMetricTransStep :: Nil,

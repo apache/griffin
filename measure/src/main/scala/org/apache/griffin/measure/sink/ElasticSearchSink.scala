@@ -25,20 +25,20 @@ import org.apache.spark.rdd.RDD
 import scala.concurrent.Future
 
 /**
-  * persist metric and record through http request
+  * sink metric and record through http request
   */
-case class HttpSink(config: Map[String, Any], metricName: String,
-                    timeStamp: Long, block: Boolean
-                      ) extends Sink {
+case class ElasticSearchSink(config: Map[String, Any], metricName: String,
+                             timeStamp: Long, block: Boolean
+                            ) extends Sink {
 
   val Api = "api"
   val Method = "method"
-  val OverTime = "over.time"
+  val ConnectionTimeout = "connection.timeout"
   val Retry = "retry"
 
   val api = config.getString(Api, "")
   val method = config.getString(Method, "post")
-  val overTime = TimeUtil.milliseconds(config.getString(OverTime, "")).getOrElse(-1L)
+  val connectionTimeout = TimeUtil.milliseconds(config.getString(ConnectionTimeout, "")).getOrElse(-1L)
   val retry = config.getInt(Retry, 10)
 
   val _Value = "value"
@@ -61,7 +61,7 @@ case class HttpSink(config: Map[String, Any], metricName: String,
         import scala.concurrent.ExecutionContext.Implicits.global
         (timeStamp, Future(HttpUtil.httpRequest(api, method, params, header, data)))
       }
-      if (block) SinkTaskRunner.addBlockTask(func _, retry, overTime)
+      if (block) SinkTaskRunner.addBlockTask(func _, retry, connectionTimeout)
       else SinkTaskRunner.addNonBlockTask(func _, retry)
     } catch {
       case e: Throwable => error(e.getMessage)
@@ -71,10 +71,10 @@ case class HttpSink(config: Map[String, Any], metricName: String,
 
   def log(rt: Long, msg: String): Unit = {}
 
-  def persistRecords(records: RDD[String], name: String): Unit = {}
-  def persistRecords(records: Iterable[String], name: String): Unit = {}
+  def sinkRecords(records: RDD[String], name: String): Unit = {}
+  def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
-  def persistMetrics(metrics: Map[String, Any]): Unit = {
+  def sinkMetrics(metrics: Map[String, Any]): Unit = {
     httpResult(metrics)
   }
 

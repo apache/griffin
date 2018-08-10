@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.context.TimeRange
-import org.apache.griffin.measure.context.streaming.offset.OffsetCacheClient
+import org.apache.griffin.measure.context.streaming.checkpoint.offset.OffsetCheckpointClient
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.DataFrameUtil._
@@ -89,8 +89,8 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
   val _Updatable = "updatable"
   val updatable = param.getBoolean(_Updatable, false)
 
-  val newCacheLock = OffsetCacheClient.genLock(s"${cacheInfoPath}.new")
-  val oldCacheLock = OffsetCacheClient.genLock(s"${cacheInfoPath}.old")
+  val newCacheLock = OffsetCheckpointClient.genLock(s"${cacheInfoPath}.new")
+  val oldCacheLock = OffsetCheckpointClient.genLock(s"${cacheInfoPath}.old")
 
   val newFilePath = s"${filePath}/new"
   val oldFilePath = s"${filePath}/old"
@@ -155,7 +155,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
     */
   def readData(): (Option[DataFrame], TimeRange) = {
     // time range: (a, b]
-    val timeRange = OffsetCacheClient.getTimeRange
+    val timeRange = OffsetCheckpointClient.getTimeRange
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
 
     // read partition info
@@ -349,7 +349,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
     */
   def processFinish(): Unit = {
     // next last proc time
-    val timeRange = OffsetCacheClient.getTimeRange
+    val timeRange = OffsetCheckpointClient.getTimeRange
     submitLastProcTime(timeRange._2)
 
     // next clean time
@@ -359,7 +359,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
 
   // read next clean time
   private def getNextCleanTime(): Long = {
-    val timeRange = OffsetCacheClient.getTimeRange
+    val timeRange = OffsetCheckpointClient.getTimeRange
     val nextCleanTime = timeRange._2 + deltaTimeRange._1
     nextCleanTime
   }

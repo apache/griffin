@@ -16,24 +16,19 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.offset
+package org.apache.griffin.measure.context.streaming.checkpoint.lock
+
+import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.context.streaming.lock.CacheLock
 
-trait OffsetCache extends Loggable with Serializable {
+/**
+  * lock for checkpoint
+  */
+trait CheckpointLock extends Loggable with Serializable {
 
-  def init(): Unit
-  def available(): Boolean
-  def close(): Unit
+  def lock(outtime: Long, unit: TimeUnit): Boolean
 
-  def cache(kvs: Map[String, String]): Unit
-  def read(keys: Iterable[String]): Map[String, String]
-  def delete(keys: Iterable[String]): Unit
-  def clear(): Unit
-
-  def listKeys(path: String): List[String]
-
-  def genLock(s: String): CacheLock
+  def unlock(): Unit
 
 }

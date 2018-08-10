@@ -26,7 +26,7 @@ import org.apache.griffin.measure.step.transform.SparkSqlTransformStep
 case class SparkSqlDQStepBuilder() extends RuleParamStepBuilder {
 
   def buildSteps(context: DQContext, ruleParam: RuleParam): Seq[DQStep] = {
-    val name = getStepName(ruleParam.getName)
+    val name = getStepName(ruleParam.getOutDfName())
     val transformStep = SparkSqlTransformStep(
       name, ruleParam.getRule, ruleParam.getDetails, ruleParam.getCache)
     transformStep +: buildDirectWriteSteps(ruleParam)

@@ -21,28 +21,28 @@ package org.apache.griffin.measure.configuration.dqdefinition
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import org.apache.commons.lang.StringUtils
-import org.apache.griffin.measure.utils.TimeUtil
+import org.apache.griffin.measure.configuration.enums._
 
 /**
   * environment param
-  * @param sparkParam       config of spark environment (must)
-  * @param persistParams    config of persist ways (optional)
-  * @param offsetCacheParams  config of information cache ways (required in streaming mode)
+  * @param sparkParam         config of spark environment (must)
+  * @param sinkParams         config of sink ways (optional)
+  * @param checkpointParams   config of checkpoint locations (required in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
 case class EnvConfig(@JsonProperty("spark") sparkParam: SparkParam,
-                     @JsonProperty("persist") persistParams: List[PersistParam],
-                     @JsonProperty("info.cache") offsetCacheParams: List[OffsetCacheParam]
+                     @JsonProperty("sinks") sinkParams: List[SinkParam],
+                     @JsonProperty("griffin.checkpoint") checkpointParams: List[CheckpointParam]
                    ) extends Param {
   def getSparkParam: SparkParam = sparkParam
-  def getPersistParams: Seq[PersistParam] = if (persistParams != null) persistParams else Nil
-  def getOffsetCacheParams: Seq[OffsetCacheParam] = if (offsetCacheParams != null) offsetCacheParams else Nil
+  def getSinkParams: Seq[SinkParam] = if (sinkParams != null) sinkParams else Nil
+  def getCheckpointParams: Seq[CheckpointParam] = if (checkpointParams != null) checkpointParams else Nil
 
   def validate(): Unit = {
     assert((sparkParam != null), "spark param should not be null")
     sparkParam.validate
-    getPersistParams.foreach(_.validate)
-    getOffsetCacheParams.foreach(_.validate)
+    getSinkParams.foreach(_.validate)
+    getCheckpointParams.foreach(_.validate)
   }
 }
 
@@ -78,35 +78,35 @@ case class SparkParam( @JsonProperty("log.level") logLevel: String,
 }
 
 /**
-  * persist param
-  * @param persistType    persist type, e.g.: log, hdfs, http, mongo (must)
-  * @param config         config of persist way (must)
+  * sink param
+  * @param sinkType       sink type, e.g.: log, hdfs, http, mongo (must)
+  * @param config         config of sink way (must)
   */
 @JsonInclude(Include.NON_NULL)
-case class PersistParam( @JsonProperty("type") persistType: String,
-                         @JsonProperty("config") config: Map[String, Any]
-                       ) extends Param {
-  def getType: String = persistType
+case class SinkParam(@JsonProperty("type") sinkType: String,
+                     @JsonProperty("config") config: Map[String, Any]
+                    ) extends Param {
+  def getType: SinkType = SinkType(sinkType)
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
 
   def validate(): Unit = {
-    assert(StringUtils.isNotBlank(persistType), "persist type should not be empty")
+    assert(StringUtils.isNotBlank(sinkType), "sink type should not be empty")
   }
 }
 
 /**
-  * offset cache param
-  * @param cacheType    offset cache type, e.g.: zookeeper (must)
-  * @param config       config of cache way
+  * checkpoint param
+  * @param cpType       checkpoint location type, e.g.: zookeeper (must)
+  * @param config       config of checkpoint location
   */
 @JsonInclude(Include.NON_NULL)
-case class OffsetCacheParam(@JsonProperty("type") cacheType: String,
-                            @JsonProperty("config") config: Map[String, Any]
+case class CheckpointParam(@JsonProperty("type") cpType: String,
+                           @JsonProperty("config") config: Map[String, Any]
                           ) extends Param {
-  def getType: String = cacheType
+  def getType: String = cpType
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
 
   def validate(): Unit = {
-    assert(StringUtils.isNotBlank(cacheType), "info cache type should not be empty")
+    assert(StringUtils.isNotBlank(cpType), "griffin checkpoint type should not be empty")
   }
 }

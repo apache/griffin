@@ -6,7 +6,7 @@
   "data.sources": [
     {
       "name": "source",
-      "as.baseline": true,
+      "baseline": true,
       "connectors": [
         {
           "type": "avro",
@@ -37,7 +37,7 @@
         "dq.type": "accuracy",
         "out.dataframe.name": "accu",
         "rule": "source.user_id = target.user_id AND upper(source.first_name) = upper(target.first_name) AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code",
-        "alias": {
+        "details": {
           "source": "source",
           "target": "target",
           "miss": "miss_count",
@@ -46,11 +46,11 @@
         },
         "out":[
           {
-            "type":"metric",
+            "type": "metric",
             "name": "accu"
           },
           {
-            "type":"record",
+            "type": "record",
             "name": "missRecords"
           }
         ]
