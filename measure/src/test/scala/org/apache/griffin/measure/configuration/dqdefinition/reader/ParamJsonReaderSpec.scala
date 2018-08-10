@@ -28,7 +28,7 @@ class ParamJsonReaderSpec extends FlatSpec with Matchers{
 
 
   "params " should "be parsed from a valid file" in {
-    val bufferedSource = Source.fromFile(getClass.getResource("/_accuracy-batch-sparksql.json").getFile)
+    val bufferedSource = Source.fromFile(getClass.getResource("/_accuracy-batch-griffindsl.json").getFile)
     val jsonString = bufferedSource.getLines().mkString
     bufferedSource.close
 
@@ -36,8 +36,8 @@ class ParamJsonReaderSpec extends FlatSpec with Matchers{
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
-        v.evaluateRule.getRules(0).dslType should === ("spark-sql")
-        v.evaluateRule.getRules(0).name should === ("missRecords")
+        v.evaluateRule.getRules(0).dslType should === ("griffin-dsl")
+        v.evaluateRule.getRules(0).outDfName should === ("accu")
       case Failure(_) =>
         fail("it should not happen")
     }

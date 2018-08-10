@@ -25,18 +25,20 @@ import org.apache.griffin.measure.configuration.enums._
 
 /**
   * dq param
-  * @param name         name of dq measurement (must)
-  * @param timestamp    default timestamp of measure in batch mode (optional)
-  * @param procType     batch mode or streaming mode (must)
-  * @param dataSources   data sources (must)
-  * @param evaluateRule  dq measurement (must)
+  * @param name           name of dq measurement (must)
+  * @param timestamp      default timestamp of measure in batch mode (optional)
+  * @param procType       batch mode or streaming mode (must)
+  * @param dataSources    data sources (must)
+  * @param evaluateRule   dq measurement (must)
+  * @param sinks          sink types (optional, by default will be elasticsearch)
   */
 @JsonInclude(Include.NON_NULL)
 case class DQConfig(@JsonProperty("name") name: String,
                     @JsonProperty("timestamp") timestamp: Long,
                     @JsonProperty("process.type") procType: String,
                     @JsonProperty("data.sources") dataSources: List[DataSourceParam],
-                    @JsonProperty("evaluate.rule") evaluateRule: EvaluateRuleParam
+                    @JsonProperty("evaluate.rule") evaluateRule: EvaluateRuleParam,
+                    @JsonProperty("sinks") sinks: List[String]
                   ) extends Param {
   def getName: String = name
   def getTimestampOpt: Option[Long] = if (timestamp != 0) Some(timestamp) else None
@@ -50,6 +52,7 @@ case class DQConfig(@JsonProperty("name") name: String,
     }._1
   }
   def getEvaluateRule: EvaluateRuleParam = evaluateRule
+  def getValidSinkTypes: Seq[SinkType] = SinkType.validSinkTypes(if (sinks != null) sinks else Nil)
 
   def validate(): Unit = {
     assert(StringUtils.isNotBlank(name), "dq config name should not be blank")
@@ -64,17 +67,20 @@ case class DQConfig(@JsonProperty("name") name: String,
 /**
   * data source param
   * @param name         data source name (must)
+  * @param baseline     data source is baseline or not, false by default (optional)
   * @param connectors   data connectors (optional)
-  * @param cache        data source cache configuration (must in streaming mode with streaming connectors)
+  * @param checkpoint   data source checkpoint configuration (must in streaming mode with streaming connectors)
   */
 @JsonInclude(Include.NON_NULL)
 case class DataSourceParam( @JsonProperty("name") name: String,
+                            @JsonProperty("baseline") baseline: Boolean,
                             @JsonProperty("connectors") connectors: List[DataConnectorParam],
-                            @JsonProperty("cache") cache: Map[String, Any]
+                            @JsonProperty("checkpoint") checkpoint: Map[String, Any]
                           ) extends Param {
   def getName: String = name
+  def isBaseline: Boolean = if (baseline != null) baseline else false
   def getConnectors: Seq[DataConnectorParam] = if (connectors != null) connectors else Nil
-  def getCacheOpt: Option[Map[String, Any]] = if (cache != null) Some(cache) else None
+  def getCheckpointOpt: Option[Map[String, Any]] = if (checkpoint != null) Some(checkpoint) else None
 
   def validate(): Unit = {
     assert(StringUtils.isNotBlank(name), "data source name should not be empty")
@@ -86,17 +92,20 @@ case class DataSourceParam( @JsonProperty("name") name: String,
   * data connector param
   * @param conType    data connector type, e.g.: hive, avro, kafka (must)
   * @param version    data connector type version (optional)
+  * @param dataFrameName    data connector dataframe name, for pre-process input usage (optional)
   * @param config     detail configuration of data connector (must)
   * @param preProc    pre-process rules after load data (optional)
   */
 @JsonInclude(Include.NON_NULL)
 case class DataConnectorParam( @JsonProperty("type") conType: String,
                                @JsonProperty("version") version: String,
+                               @JsonProperty("dataframe.name") dataFrameName: String,
                                @JsonProperty("config") config: Map[String, Any],
                                @JsonProperty("pre.proc") preProc: List[RuleParam]
                              ) extends Param {
   def getType: String = conType
-  def getVersion: String = version
+  def getVersion: String = if (version != null) version else ""
+  def getDataFrameName(defName: String): String = if (dataFrameName != null) dataFrameName else defName
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
   def getPreProcRules: Seq[RuleParam] = if (preProc != null) preProc else Nil
 
@@ -124,94 +133,77 @@ case class EvaluateRuleParam( @JsonProperty("rules") rules: List[RuleParam]
   * rule param
   * @param dslType    dsl type of this rule (must)
   * @param dqType     dq type of this rule (must if dsl type is "griffin-dsl")
-  * @param name       name of result calculated by this rule (must if for later usage)
+  * @param inDfName       name of input dataframe of this rule, by default will be the previous rule output dataframe name
+  * @param outDfName      name of output dataframe of this rule, by default will be generated as data connector dataframe name with index suffix
   * @param rule       rule to define dq step calculation (must)
   * @param details    detail config of rule (optional)
-  * @param cache      cache the result for multiple usage (optional, valid for "spark-sql" and "df-opr" mode)
-  * @param metric     config for metric output (optional)
-  * @param record     config for record output (optional)
-  * @param dsCacheUpdate    config for data source cache update output (optional, valid in streaming mode)
+  * @param cache      cache the result for multiple usage (optional, valid for "spark-sql" and "df-ops" mode)
+  * @param outputs    output ways configuration (optional)
+//  * @param metric     config for metric output (optional)
+//  * @param record     config for record output (optional)
+//  * @param dsCacheUpdate    config for data source cache update output (optional, valid in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
-case class RuleParam( @JsonProperty("dsl.type") dslType: String,
-                      @JsonProperty("dq.type") dqType: String,
-                      @JsonProperty("name") name: String,
-                      @JsonProperty("rule") rule: String,
-                      @JsonProperty("details") details: Map[String, Any],
-                      @JsonProperty("cache") cache: Boolean,
-                      @JsonProperty("metric") metric: RuleMetricParam,
-                      @JsonProperty("record") record: RuleRecordParam,
-                      @JsonProperty("ds.cache.update") dsCacheUpdate: RuleDsCacheUpdateParam
+case class RuleParam(@JsonProperty("dsl.type") dslType: String,
+                     @JsonProperty("dq.type") dqType: String,
+                     @JsonProperty("in.dataframe.name") inDfName: String,
+                     @JsonProperty("out.dataframe.name") outDfName: String,
+                     @JsonProperty("rule") rule: String,
+                     @JsonProperty("details") details: Map[String, Any],
+                     @JsonProperty("cache") cache: Boolean,
+                     @JsonProperty("out") outputs: List[RuleOutputParam]
                     ) extends Param {
   def getDslType: DslType = if (dslType != null) DslType(dslType) else DslType("")
   def getDqType: DqType = if (dqType != null) DqType(dqType) else DqType("")
   def getCache: Boolean = if (cache) cache else false
 
-  def getName: String = if (name != null) name else ""
+  def getInDfName(defName: String = ""): String = if (inDfName != null) inDfName else defName
+  def getOutDfName(defName: String = ""): String = if (outDfName != null) outDfName else defName
   def getRule: String = if (rule != null) rule else ""
   def getDetails: Map[String, Any] = if (details != null) details else Map[String, Any]()
 
-  def getMetricOpt: Option[RuleMetricParam] = if (metric != null) Some(metric) else None
-  def getRecordOpt: Option[RuleRecordParam] = if (record != null) Some(record) else None
-  def getDsCacheUpdateOpt: Option[RuleDsCacheUpdateParam] = if (dsCacheUpdate != null) Some(dsCacheUpdate) else None
+  def getOutputs: Seq[RuleOutputParam] = if (outputs != null) outputs else Nil
+  def getOutputOpt(tp: OutputType): Option[RuleOutputParam] = getOutputs.filter(_.getOutputType == tp).headOption
 
-  def replaceName(newName: String): RuleParam = {
-    if (StringUtils.equals(newName, name)) this
-    else RuleParam(dslType, dqType, newName, rule, details, cache, metric, record, dsCacheUpdate)
+  def replaceInDfName(newName: String): RuleParam = {
+    if (StringUtils.equals(newName, inDfName)) this
+    else RuleParam(dslType, dqType, newName, outDfName, rule, details, cache, outputs)
+  }
+  def replaceOutDfName(newName: String): RuleParam = {
+    if (StringUtils.equals(newName, outDfName)) this
+    else RuleParam(dslType, dqType, inDfName, newName, rule, details, cache, outputs)
+  }
+  def replaceInOutDfName(in: String, out: String): RuleParam = {
+    if (StringUtils.equals(inDfName, in) && StringUtils.equals(outDfName, out)) this
+    else RuleParam(dslType, dqType, in, out, rule, details, cache, outputs)
   }
   def replaceRule(newRule: String): RuleParam = {
     if (StringUtils.equals(newRule, rule)) this
-    else RuleParam(dslType, dqType, name, newRule, details, cache, metric, record, dsCacheUpdate)
-  }
-  def replaceDetails(newDetails: Map[String, Any]): RuleParam = {
-    RuleParam(dslType, dqType, name, rule, newDetails, cache, metric, record, dsCacheUpdate)
+    else RuleParam(dslType, dqType, inDfName, outDfName, newRule, details, cache, outputs)
   }
 
   def validate(): Unit = {
     assert(!(getDslType.equals(GriffinDslType) && getDqType.equals(UnknownType)),
       "unknown dq type for griffin dsl")
 
-    getMetricOpt.foreach(_.validate)
-    getRecordOpt.foreach(_.validate)
-    getDsCacheUpdateOpt.foreach(_.validate)
+    getOutputs.foreach(_.validate)
   }
 }
 
 /**
-  * metric param of rule
-  * @param name         name of metric to output (optional)
-  * @param collectType  the normalize strategy to collect metric  (optional)
+  * out param of rule
+  * @param outputType     output type (must)
+  * @param name           output name (optional)
+  * @param flatten        flatten type of output metric (optional, available in output metric type)
   */
 @JsonInclude(Include.NON_NULL)
-case class RuleMetricParam( @JsonProperty("name") name: String,
-                            @JsonProperty("collect.type") collectType: String
+case class RuleOutputParam( @JsonProperty("type") outputType: String,
+                            @JsonProperty("name") name: String,
+                            @JsonProperty("flatten") flatten: String
                           ) extends Param {
+  def getOutputType: OutputType = if (outputType != null) OutputType(outputType) else OutputType("")
   def getNameOpt: Option[String] = if (StringUtils.isNotBlank(name)) Some(name) else None
-  def getCollectType: NormalizeType = if (StringUtils.isNotBlank(collectType)) NormalizeType(collectType) else NormalizeType("")
-
-  def validate(): Unit = {}
-}
-
-/**
-  * record param of rule
-  * @param name   name of record to output (optional)
-  */
-@JsonInclude(Include.NON_NULL)
-case class RuleRecordParam( @JsonProperty("name") name: String
-                          ) extends Param {
-  def getNameOpt: Option[String] = if (StringUtils.isNotBlank(name)) Some(name) else None
-
-  def validate(): Unit = {}
-}
-
-/**
-  * data source cache update param of rule
-  * @param dsName   name of data source to be updated by thie rule result (must)
-  */
-@JsonInclude(Include.NON_NULL)
-case class RuleDsCacheUpdateParam( @JsonProperty("ds.name") dsName: String
-                                 ) extends Param {
-  def getDsNameOpt: Option[String] = if (StringUtils.isNotBlank(dsName)) Some(dsName) else None
+  def getFlatten: FlattenType = if (StringUtils.isNotBlank(flatten)) FlattenType(flatten) else FlattenType("")
 
   def validate(): Unit = {}
 }

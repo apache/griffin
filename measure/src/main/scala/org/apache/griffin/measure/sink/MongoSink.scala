@@ -28,7 +28,7 @@ import org.mongodb.scala.result.UpdateResult
 import scala.concurrent.Future
 
 /**
-  * persist metric and record to mongo
+  * sink metric and record to mongo
   */
 case class MongoSink(config: Map[String, Any], metricName: String,
                      timeStamp: Long, block: Boolean
@@ -53,10 +53,10 @@ case class MongoSink(config: Map[String, Any], metricName: String,
 
   def log(rt: Long, msg: String): Unit = {}
 
-  def persistRecords(records: RDD[String], name: String): Unit = {}
-  def persistRecords(records: Iterable[String], name: String): Unit = {}
+  def sinkRecords(records: RDD[String], name: String): Unit = {}
+  def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
-  def persistMetrics(metrics: Map[String, Any]): Unit = {
+  def sinkMetrics(metrics: Map[String, Any]): Unit = {
     mongoInsert(metrics)
   }
 

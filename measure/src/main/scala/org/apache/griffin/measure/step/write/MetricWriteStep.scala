@@ -29,7 +29,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
   */
 case class MetricWriteStep(name: String,
                            inputName: String,
-                           collectType: NormalizeType,
+                           flattenType: FlattenType,
                            writeTimestampOpt: Option[Long] = None
                           ) extends WriteStep {
 
@@ -46,7 +46,7 @@ case class MetricWriteStep(name: String,
     val writeMode = writeTimestampOpt.map(_ => SimpleMode).getOrElse(context.writeMode)
     val timestampMetricMap: Map[Long, Map[String, Any]] = writeMode match {
       case SimpleMode => {
-        val metrics: Map[String, Any] = normalizeMetric(metricMaps, name, collectType)
+        val metrics: Map[String, Any] = flattenMetric(metricMaps, name, flattenType)
         emptyMetricMap + (timestamp -> metrics)
       }
       case TimestampMode => {
@@ -58,7 +58,7 @@ case class MetricWriteStep(name: String,
         tmstMetrics.groupBy(_._1).map { pair =>
           val (k, v) = pair
           val maps = v.map(_._2)
-          val mtc = normalizeMetric(maps, name, collectType)
+          val mtc = flattenMetric(maps, name, flattenType)
           (k, mtc)
         }
       }
@@ -95,12 +95,12 @@ case class MetricWriteStep(name: String,
     }
   }
 
-  private def normalizeMetric(metrics: Seq[Map[String, Any]], name: String, collectType: NormalizeType
+  private def flattenMetric(metrics: Seq[Map[String, Any]], name: String, flattenType: FlattenType
                              ): Map[String, Any] = {
-    collectType match {
-      case EntriesNormalizeType => metrics.headOption.getOrElse(emptyMap)
-      case ArrayNormalizeType => Map[String, Any]((name -> metrics))
-      case MapNormalizeType => {
+    flattenType match {
+      case EntriesFlattenType => metrics.headOption.getOrElse(emptyMap)
+      case ArrayFlattenType => Map[String, Any]((name -> metrics))
+      case MapFlattenType => {
         val v = metrics.headOption.getOrElse(emptyMap)
         Map[String, Any]((name -> v))
       }

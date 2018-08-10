@@ -41,7 +41,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
   val metricName = dqParam.name
 //  val dataSourceParams = dqParam.dataSources
 //  val dataSourceNames = dataSourceParams.map(_.name)
-  val persistParams = envParam.persistParams
+  val sinkParams = getSinkParams
 
   var sqlContext: SQLContext = _
 
@@ -75,12 +75,12 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // create dq context
     val dqContext: DQContext = DQContext(
-      contextId, metricName, dataSources, persistParams, BatchProcessType
+      contextId, metricName, dataSources, sinkParams, BatchProcessType
     )(sparkSession)
 
     // start id
     val applicationId = sparkSession.sparkContext.applicationId
-    dqContext.getPersist().start(applicationId)
+    dqContext.getSink().start(applicationId)
 
     // build job
     val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.evaluateRule)
@@ -90,13 +90,13 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // end time
     val endTime = new Date().getTime
-    dqContext.getPersist().log(endTime, s"process using time: ${endTime - startTime} ms")
+    dqContext.getSink().log(endTime, s"process using time: ${endTime - startTime} ms")
 
     // clean context
     dqContext.clean()
 
     // finish
-    dqContext.getPersist().finish()
+    dqContext.getSink().finish()
   }
 
   def close: Try[_] = Try {

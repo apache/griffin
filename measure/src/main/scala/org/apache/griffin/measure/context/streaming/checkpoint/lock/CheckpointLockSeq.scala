@@ -16,24 +16,18 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.offset
+package org.apache.griffin.measure.context.streaming.checkpoint.lock
 
-import org.apache.griffin.measure.configuration.dqdefinition.OffsetCacheParam
+import java.util.concurrent.TimeUnit
 
-import scala.util.{Success, Try}
+case class CheckpointLockSeq(locks: Seq[CheckpointLock]) extends CheckpointLock {
 
-case class OffsetCacheFactory(offsetCacheParams: Iterable[OffsetCacheParam], metricName: String
-                             ) extends Serializable {
+  def lock(outtime: Long, unit: TimeUnit): Boolean = {
+    locks.headOption.map(_.lock(outtime, unit)).getOrElse(true)
+  }
 
-  val ZK_REGEX = """^(?i)zk|zookeeper$""".r
-
-  def getOffsetCache(offsetCacheParam: OffsetCacheParam): Option[OffsetCache] = {
-    val config = offsetCacheParam.getConfig
-    val offsetCacheTry = offsetCacheParam.getType match {
-      case ZK_REGEX() => Try(OffsetCacheInZK(config, metricName))
-      case _ => throw new Exception("not supported info cache type")
-    }
-    offsetCacheTry.toOption
+  def unlock(): Unit = {
+    locks.headOption.foreach(_.unlock)
   }
 
 }
