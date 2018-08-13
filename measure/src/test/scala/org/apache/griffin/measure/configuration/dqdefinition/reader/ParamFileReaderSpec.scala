@@ -32,7 +32,7 @@ class ParamFileReaderSpec extends FlatSpec with Matchers{
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
-        v.getEvaluateRule.getRules(0).getDslType should === ("griffin-dsl")
+        v.getEvaluateRule.getRules(0).getDslType.desc should === ("griffin-dsl")
         v.getEvaluateRule.getRules(0).getOutDfName() should === ("accu")
       case Failure(_) =>
         fail("it should not happen")
