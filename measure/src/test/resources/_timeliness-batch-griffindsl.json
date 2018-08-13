@@ -23,7 +23,7 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "timeliness",
-        "name": "timeliness",
+        "out.dataframe.name": "timeliness",
         "rule": "ts, end_ts",
         "details": {
           "source": "source",
@@ -37,13 +37,19 @@
           "percentile": "percentile",
           "percentile.values": [0.95]
         },
-        "metric": {
-          "name": "timeliness"
-        },
-        "record": {
-          "name": "lateRecords"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "timeliness"
+          },
+          {
+            "type": "record",
+            "name": "lateRecords"
+          }
+        ]
       }
     ]
-  }
+  },
+
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }

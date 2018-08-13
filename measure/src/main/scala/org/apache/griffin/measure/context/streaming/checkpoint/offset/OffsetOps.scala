@@ -16,9 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.offset
+package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
-trait OffsetOps extends Serializable { this: OffsetCache =>
+trait OffsetOps extends Serializable { this: OffsetCheckpoint =>
 
   val CacheTime = "cache.time"
   val LastProcTime = "last.proc.time"
@@ -39,7 +39,7 @@ trait OffsetOps extends Serializable { this: OffsetCache =>
   val finalLastProcTime = s"${finalCacheInfoPath}/${LastProcTime}"
   val finalCleanTime = s"${finalCacheInfoPath}/${CleanTime}"
 
-  def startOffsetCache(): Unit = {
+  def startOffsetCheckpoint(): Unit = {
     genFinalReadyTime
   }
 
@@ -51,7 +51,7 @@ trait OffsetOps extends Serializable { this: OffsetCache =>
     readCleanTime
   }
 
-  def endOffsetCache: Unit = {
+  def endOffsetCheckpoint: Unit = {
     genFinalLastProcTime
     genFinalCleanTime
   }

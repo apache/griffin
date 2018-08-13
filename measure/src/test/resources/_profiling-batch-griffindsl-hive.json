@@ -26,23 +26,31 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "prof",
+        "out.dataframe.name": "prof",
         "rule": "name, count(*) as cnt from source group by name",
-        "metric": {
-          "name": "name_group",
-          "collect.type": "array"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "name_group",
+            "flatten": "array"
+          }
+        ]
       },
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "grp",
+        "out.dataframe.name": "grp",
         "rule": "age, count(*) as cnt from source group by age order by cnt",
-        "metric": {
-          "name": "age_group",
-          "collect.type": "array"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "age_group",
+            "flatten": "array"
+          }
+        ]
       }
     ]
-  }
+  },
+
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }

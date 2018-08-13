@@ -6,6 +6,7 @@
   "data.sources": [
     {
       "name": "source",
+      "baseline": true,
       "connectors": [
         {
           "type": "kafka",
@@ -24,11 +25,10 @@
           },
           "pre.proc": [
             {
-              "dsl.type": "df-opr",
+              "dsl.type": "df-ops",
               "in.dataframe.name": "kafka",
               "out.dataframe.name": "out1",
               "rule": "from_json"
-
             },
             {
               "dsl.type": "spark-sql",
@@ -71,13 +71,9 @@
         "rule": "select name, count(*) as `cnt` from source group by name",
         "out":[
           {
-            "type": "array",
+            "type": "metric",
             "name": "name_group",
-            "flatten":"array"
-          },
-          {
-            "type": "record",
-            "name": "missRecords"
+            "flatten": "array"
           }
         ]
       }

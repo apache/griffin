@@ -16,14 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.offset
+package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
 import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.utils.ZKPaths
-import org.apache.griffin.measure.context.streaming.lock.CacheLockInZK
+import org.apache.griffin.measure.context.streaming.checkpoint.lock.CheckpointLockInZK
 import org.apache.zookeeper.CreateMode
 
 import scala.collection.JavaConverters._
@@ -33,7 +33,7 @@ import scala.collection.JavaConverters._
   * @param config
   * @param metricName
   */
-case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends OffsetCache with OffsetOps {
+case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String) extends OffsetCheckpoint with OffsetOps {
 
   val Hosts = "hosts"
   val Namespace = "namespace"
@@ -42,7 +42,7 @@ case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends
   val CloseClear = "close.clear"
   val LockPath = "lock.path"
 
-  val PersistRegex = """^(?i)persist$""".r
+  val PersistentRegex = """^(?i)persist(ent)?$""".r
   val EphemeralRegex = """^(?i)ephemeral$""".r
 
   final val separator = ZKPaths.PATH_SEPARATOR
@@ -51,7 +51,7 @@ case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends
   val namespace = config.getOrElse(Namespace, "").toString
   val mode: CreateMode = config.get(Mode) match {
     case Some(s: String) => s match {
-      case PersistRegex() => CreateMode.PERSISTENT
+      case PersistentRegex() => CreateMode.PERSISTENT
       case EphemeralRegex() => CreateMode.EPHEMERAL
       case _ => CreateMode.PERSISTENT
     }
@@ -128,9 +128,9 @@ case class OffsetCacheInZK(config: Map[String, Any], metricName: String) extends
     children(path(p))
   }
 
-  def genLock(s: String): CacheLockInZK = {
+  def genLock(s: String): CheckpointLockInZK = {
     val lpt = if (s.isEmpty) path(lockPath) else path(lockPath) + separator + s
-    CacheLockInZK(new InterProcessMutex(client, lpt))
+    CheckpointLockInZK(new InterProcessMutex(client, lpt))
   }
 
   private def path(k: String): String = {

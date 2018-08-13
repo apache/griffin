@@ -28,7 +28,7 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 /**
-  * persist task runner, to persist metrics in block or non-block mode
+  * sink task runner, to sink metrics in block or non-block mode
   */
 object SinkTaskRunner extends Loggable {
 

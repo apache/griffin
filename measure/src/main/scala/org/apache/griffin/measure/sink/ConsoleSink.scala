@@ -23,7 +23,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.spark.rdd.RDD
 
 /**
-  * persist metric and record to console, for debug
+  * sink metric and record to console, for debug
   */
 case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: Long) extends Sink {
 
@@ -46,7 +46,7 @@ case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: 
     println(s"[${timeStamp}] ${rt}: ${msg}")
   }
 
-  def persistRecords(records: RDD[String], name: String): Unit = {
+  def sinkRecords(records: RDD[String], name: String): Unit = {
 //    println(s"${metricName} [${timeStamp}] records: ")
 //    try {
 //      val recordCount = records.count
@@ -61,7 +61,7 @@ case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: 
 //    }
   }
 
-  def persistRecords(records: Iterable[String], name: String): Unit = {
+  def sinkRecords(records: Iterable[String], name: String): Unit = {
 //    println(s"${metricName} [${timeStamp}] records: ")
 //    try {
 //      val recordCount = records.size
@@ -74,7 +74,7 @@ case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: 
 //    }
   }
 
-  def persistMetrics(metrics: Map[String, Any]): Unit = {
+  def sinkMetrics(metrics: Map[String, Any]): Unit = {
     println(s"${metricName} [${timeStamp}] metrics: ")
     val json = JsonUtil.toJson(metrics)
     println(json)

@@ -6,7 +6,7 @@
   "data.sources": [
     {
       "name": "source",
-      "as.baseline": true,
+      "baseline": true,
       "connectors": [
         {
           "type": "avro",

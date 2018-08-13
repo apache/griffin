@@ -32,7 +32,7 @@ import org.apache.spark.sql.{Encoders, SQLContext, SparkSession}
 case class DQContext(contextId: ContextId,
                      name: String,
                      dataSources: Seq[DataSource],
-                     persistParams: Seq[PersistParam],
+                     sinkParams: Seq[SinkParam],
                      procType: ProcessType
                     )(@transient implicit val sparkSession: SparkSession) {
 
@@ -46,8 +46,22 @@ case class DQContext(contextId: ContextId,
   val metricWrapper: MetricWrapper = MetricWrapper(name)
   val writeMode = WriteMode.defaultMode(procType)
 
-  val dataSourceNames: Seq[String] = dataSources.map(_.name)
+  val dataSourceNames: Seq[String] = {
+    // sort data source names, put baseline data source name to the head
+    val (blOpt, others) = dataSources.foldLeft((None: Option[String], Nil: Seq[String])) { (ret, ds) =>
+      val (opt, seq) = ret
+      if (opt.isEmpty && ds.isBaseline) (Some(ds.name), seq) else (opt, seq :+ ds.name)
+    }
+    blOpt match {
+      case Some(bl) => bl +: others
+      case _ => others
+    }
+  }
   dataSourceNames.foreach(name => compileTableRegister.registerTable(name))
+  def getDataSourceName(index: Int): String = {
+    if (dataSourceNames.size > index) dataSourceNames(index) else ""
+  }
+
   implicit val encoder = Encoders.STRING
   val functionNames: Seq[String] = sparkSession.catalog.listFunctions.map(_.name).collect.toSeq
 
@@ -59,26 +73,22 @@ case class DQContext(contextId: ContextId,
   }
   printTimeRanges
 
-  def getDataSourceName(index: Int): String = {
-    if (dataSourceNames.size > index) dataSourceNames(index) else ""
+  private val sinkFactory = SinkFactory(sinkParams, name)
+  private val defaultSink: Sink = createSink(contextId.timestamp)
+  def getSink(timestamp: Long): Sink = {
+    if (timestamp == contextId.timestamp) getSink()
+    else createSink(timestamp)
   }
-
-  private val persistFactory = SinkFactory(persistParams, name)
-  private val defaultPersist: Sink = createPersist(contextId.timestamp)
-  def getPersist(timestamp: Long): Sink = {
-    if (timestamp == contextId.timestamp) getPersist()
-    else createPersist(timestamp)
-  }
-  def getPersist(): Sink = defaultPersist
-  private def createPersist(t: Long): Sink = {
+  def getSink(): Sink = defaultSink
+  private def createSink(t: Long): Sink = {
     procType match {
-      case BatchProcessType => persistFactory.getPersists(t, true)
-      case StreamingProcessType => persistFactory.getPersists(t, false)
+      case BatchProcessType => sinkFactory.getSinks(t, true)
+      case StreamingProcessType => sinkFactory.getSinks(t, false)
     }
   }
 
   def cloneDQContext(newContextId: ContextId): DQContext = {
-    DQContext(newContextId, name, dataSources, persistParams, procType)(sparkSession)
+    DQContext(newContextId, name, dataSources, sinkParams, procType)(sparkSession)
   }
 
   def clean(): Unit = {

@@ -17,9 +17,9 @@
     }
   },
 
-  "persist": [
+  "sinks": [
     {
-      "type": "log",
+      "type": "console",
       "config": {
         "max.log.lines": 100
       }
@@ -34,7 +34,7 @@
     }
   ],
 
-  "info.cache": [
+  "griffin.checkpoint": [
     {
       "type": "zk",
       "config": {
@@ -46,9 +46,5 @@
         "close.clear": false
       }
     }
-  ],
-
-  "cleaner": {
-    "clean.interval": "2m"
-  }
+  ]
 }

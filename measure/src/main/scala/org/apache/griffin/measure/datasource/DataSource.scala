@@ -39,6 +39,8 @@ case class DataSource(name: String,
                       streamingCacheClientOpt: Option[StreamingCacheClient]
                      ) extends Loggable with Serializable {
 
+  val isBaseline: Boolean = dsParam.isBaseline
+
   def init(): Unit = {
     dataConnectors.foreach(_.init)
   }

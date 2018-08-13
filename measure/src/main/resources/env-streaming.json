@@ -54,9 +54,5 @@
         "close.clear": false
       }
     }
-  ],
-
-  "cleaner": {
-    "clean.interval": "2m"
-  }
+  ]
 }
