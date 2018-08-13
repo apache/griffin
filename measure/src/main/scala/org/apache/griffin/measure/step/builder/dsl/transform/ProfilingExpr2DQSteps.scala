@@ -92,11 +92,11 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       val profilingSql = {
         s"SELECT ${selCondition} ${selClause} ${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
       }
-      val profilingName = ruleParam.name
+      val profilingName = ruleParam.getName
       val profilingTransStep = SparkSqlTransformStep(profilingName, profilingSql, details)
       val profilingMetricWriteStep = {
         val metricOpt = ruleParam.getMetricOpt
-        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.name)
+        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getName)
         val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
         MetricWriteStep(mwName, profilingName, collectType)
       }

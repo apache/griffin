@@ -32,8 +32,8 @@ class ParamFileReaderSpec extends FlatSpec with Matchers{
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
-        v.evaluateRule.getRules(0).dslType should === ("spark-sql")
-        v.evaluateRule.getRules(0).name should === ("missRecords")
+        v.getEvaluateRule.getRules(0).getDslType should === ("spark-sql")
+        v.getEvaluateRule.getRules(0).getName should === ("missRecords")
       case Failure(_) =>
         fail("it should not happen")
     }

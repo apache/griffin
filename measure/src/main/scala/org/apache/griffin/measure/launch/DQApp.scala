@@ -49,7 +49,7 @@ trait DQApp extends Loggable with Serializable {
     */
   protected def getMeasureTime: Long = {
     dqParam.getTimestampOpt match {
-      case Some(t) if t > 0 => dqParam.timestamp
+      case Some(t) if t > 0 => t
       case _ => System.currentTimeMillis
     }
   }

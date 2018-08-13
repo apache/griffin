@@ -43,11 +43,11 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
   val envParam: EnvConfig = allParam.getEnvConfig
   val dqParam: DQConfig = allParam.getDqConfig
 
-  val sparkParam = envParam.sparkParam
-  val metricName = dqParam.name
+  val sparkParam = envParam.getSparkParam
+  val metricName = dqParam.getName
 //  val dataSourceParams = dqParam.dataSources
 //  val dataSourceNames = dataSourceParams.map(_.name)
-  val persistParams = envParam.persistParams
+  val persistParams = envParam.getPersistParams
 
   var sqlContext: SQLContext = _
 
@@ -68,7 +68,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     clearCpDir
 
     // init info cache instance
-    OffsetCacheClient.initClient(envParam.offsetCacheParams, metricName)
+    OffsetCacheClient.initClient(envParam.getOffsetCacheParams, metricName)
     OffsetCacheClient.init
 
     // register udf
@@ -107,7 +107,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     globalContext.getPersist().start(applicationId)
 
     // process thread
-    val dqCalculator = StreamingDQCalculator(globalContext, dqParam.evaluateRule)
+    val dqCalculator = StreamingDQCalculator(globalContext, dqParam.getEvaluateRule)
 
     val processInterval = TimeUtil.milliseconds(sparkParam.getProcessInterval) match {
       case Some(interval) => interval

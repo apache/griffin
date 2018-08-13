@@ -32,11 +32,11 @@ import org.apache.griffin.measure.configuration.enums._
   * @param evaluateRule  dq measurement (must)
   */
 @JsonInclude(Include.NON_NULL)
-case class DQConfig(@JsonProperty("name") name: String,
-                    @JsonProperty("timestamp") timestamp: Long,
-                    @JsonProperty("process.type") procType: String,
-                    @JsonProperty("data.sources") dataSources: List[DataSourceParam],
-                    @JsonProperty("evaluate.rule") evaluateRule: EvaluateRuleParam
+case class DQConfig(@JsonProperty("name") private val name: String,
+                    @JsonProperty("timestamp") private val timestamp: Long,
+                    @JsonProperty("process.type") private val procType: String,
+                    @JsonProperty("data.sources") private val dataSources: List[DataSourceParam],
+                    @JsonProperty("evaluate.rule") private val evaluateRule: EvaluateRuleParam
                   ) extends Param {
   def getName: String = name
   def getTimestampOpt: Option[Long] = if (timestamp != 0) Some(timestamp) else None
@@ -68,9 +68,9 @@ case class DQConfig(@JsonProperty("name") name: String,
   * @param cache        data source cache configuration (must in streaming mode with streaming connectors)
   */
 @JsonInclude(Include.NON_NULL)
-case class DataSourceParam( @JsonProperty("name") name: String,
-                            @JsonProperty("connectors") connectors: List[DataConnectorParam],
-                            @JsonProperty("cache") cache: Map[String, Any]
+case class DataSourceParam( @JsonProperty("name") private val name: String,
+                            @JsonProperty("connectors") private val connectors: List[DataConnectorParam],
+                            @JsonProperty("cache") private val cache: Map[String, Any]
                           ) extends Param {
   def getName: String = name
   def getConnectors: Seq[DataConnectorParam] = if (connectors != null) connectors else Nil
@@ -90,10 +90,10 @@ case class DataSourceParam( @JsonProperty("name") name: String,
   * @param preProc    pre-process rules after load data (optional)
   */
 @JsonInclude(Include.NON_NULL)
-case class DataConnectorParam( @JsonProperty("type") conType: String,
-                               @JsonProperty("version") version: String,
-                               @JsonProperty("config") config: Map[String, Any],
-                               @JsonProperty("pre.proc") preProc: List[RuleParam]
+case class DataConnectorParam( @JsonProperty("type") private val conType: String,
+                               @JsonProperty("version") private val version: String,
+                               @JsonProperty("config") private val config: Map[String, Any],
+                               @JsonProperty("pre.proc") private val preProc: List[RuleParam]
                              ) extends Param {
   def getType: String = conType
   def getVersion: String = version
@@ -111,7 +111,7 @@ case class DataConnectorParam( @JsonProperty("type") conType: String,
   * @param rules      rules to define dq measurement (optional)
   */
 @JsonInclude(Include.NON_NULL)
-case class EvaluateRuleParam( @JsonProperty("rules") rules: List[RuleParam]
+case class EvaluateRuleParam( @JsonProperty("rules") private val rules: List[RuleParam]
                             ) extends Param {
   def getRules: Seq[RuleParam] = if (rules != null) rules else Nil
 
@@ -133,15 +133,15 @@ case class EvaluateRuleParam( @JsonProperty("rules") rules: List[RuleParam]
   * @param dsCacheUpdate    config for data source cache update output (optional, valid in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
-case class RuleParam( @JsonProperty("dsl.type") dslType: String,
-                      @JsonProperty("dq.type") dqType: String,
-                      @JsonProperty("name") name: String,
-                      @JsonProperty("rule") rule: String,
-                      @JsonProperty("details") details: Map[String, Any],
-                      @JsonProperty("cache") cache: Boolean,
-                      @JsonProperty("metric") metric: RuleMetricParam,
-                      @JsonProperty("record") record: RuleRecordParam,
-                      @JsonProperty("ds.cache.update") dsCacheUpdate: RuleDsCacheUpdateParam
+case class RuleParam( @JsonProperty("dsl.type") private val dslType: String,
+                      @JsonProperty("dq.type") private val dqType: String,
+                      @JsonProperty("name") private val name: String,
+                      @JsonProperty("rule") private val rule: String,
+                      @JsonProperty("details") private val details: Map[String, Any],
+                      @JsonProperty("cache") private val cache: Boolean,
+                      @JsonProperty("metric") private val metric: RuleMetricParam,
+                      @JsonProperty("record") private val record: RuleRecordParam,
+                      @JsonProperty("ds.cache.update") private val dsCacheUpdate: RuleDsCacheUpdateParam
                     ) extends Param {
   def getDslType: DslType = if (dslType != null) DslType(dslType) else DslType("")
   def getDqType: DqType = if (dqType != null) DqType(dqType) else DqType("")
@@ -183,8 +183,8 @@ case class RuleParam( @JsonProperty("dsl.type") dslType: String,
   * @param collectType  the normalize strategy to collect metric  (optional)
   */
 @JsonInclude(Include.NON_NULL)
-case class RuleMetricParam( @JsonProperty("name") name: String,
-                            @JsonProperty("collect.type") collectType: String
+case class RuleMetricParam( @JsonProperty("name") private val name: String,
+                            @JsonProperty("collect.type") private val collectType: String
                           ) extends Param {
   def getNameOpt: Option[String] = if (StringUtils.isNotBlank(name)) Some(name) else None
   def getCollectType: NormalizeType = if (StringUtils.isNotBlank(collectType)) NormalizeType(collectType) else NormalizeType("")
@@ -197,7 +197,7 @@ case class RuleMetricParam( @JsonProperty("name") name: String,
   * @param name   name of record to output (optional)
   */
 @JsonInclude(Include.NON_NULL)
-case class RuleRecordParam( @JsonProperty("name") name: String
+case class RuleRecordParam( @JsonProperty("name") private val name: String
                           ) extends Param {
   def getNameOpt: Option[String] = if (StringUtils.isNotBlank(name)) Some(name) else None
 
@@ -209,7 +209,7 @@ case class RuleRecordParam( @JsonProperty("name") name: String
   * @param dsName   name of data source to be updated by thie rule result (must)
   */
 @JsonInclude(Include.NON_NULL)
-case class RuleDsCacheUpdateParam( @JsonProperty("ds.name") dsName: String
+case class RuleDsCacheUpdateParam( @JsonProperty("ds.name") private val dsName: String
                                  ) extends Param {
   def getDsNameOpt: Option[String] = if (StringUtils.isNotBlank(dsName)) Some(dsName) else None
 

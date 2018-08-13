@@ -44,7 +44,7 @@ trait RuleParamStepBuilder extends DQStepBuilder {
     val name = getStepName(ruleParam.getName)
     // metric writer
     val metricSteps = ruleParam.getMetricOpt.map { metric =>
-      MetricWriteStep(metric.getNameOpt.getOrElse(name), name, NormalizeType(metric.collectType))
+      MetricWriteStep(metric.getNameOpt.getOrElse(name), name, metric.getCollectType)
     }.toSeq
     // record writer
     val recordSteps = ruleParam.getRecordOpt.map { record =>
