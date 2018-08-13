@@ -19,9 +19,13 @@ under the License.
 <div *ngIf="noresults" style="text-align: center;font-size: 26px;margin-top: 20%">
   <b>No content</b>
 </div>
+
 <div *ngIf="!noresults" id="bigChartContainer" class="big-chart-container" (window:resize)="onResize($event)" style="display:none;">
   <div id="bigChartShow" class="big-chart-content">
     <div class="container-fluid">
+      <div class="row">
+        <a (click)="showDownloadSample()" style="font-size:15px;margin:30px 30px;"><u>Download Miss Sample</u></a>
+      </div>
       <div class="row">
         <div id="bigChartDiv" echarts [options]="chartOption"></div>
       </div>
@@ -54,5 +58,46 @@ under the License.
         </tr>
       </tfoot>
     </table>
+  </div>
+</div>
+
+<div class="modal fade" id="downloadSampleModal" role="dialog" tabindex="-1" [ngClass]="{'in': visibleAnimate}" *ngIf="missRecordList" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
+  <div class="modal-dialog modal-md modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <toaster-container></toaster-container>
+        <h4 class="modal-title">{{currentJob}} job miss records timestamp list</h4>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid" id="dowloadContent" style="overflow:auto;">
+          <tr  >
+            <td colspan="7" style="padding:20px 30px 10px 30px;">
+              <table class="table table-striped" [mfData]="missRecordList" #mf2="mfDataTable" [mfRowsOnPage]="10">
+
+                <tbody>
+                  <tr *ngIf="!missRecordList">
+                    <td colspan="7" style="text-align:center">No content.</td>
+                  </tr>
+                  <tr *ngFor="let item of mf2.data">
+                    <td style="background-color:black;"><a (click)="downloadSample(item)" >{{item.tmst}}  {{item.tmst | date: 'yyyy/MM/dd HH:mm:ss'}}</a>  </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td class="text-center" colspan="8" style="background-color:#1f1f1f;" id="paginationdownlad">
+                      <mfBootstrapPaginator></mfBootstrapPaginator>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </td>
+          </tr>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="hide()">Back</button>
+      </div>
+    </div>
   </div>
 </div>

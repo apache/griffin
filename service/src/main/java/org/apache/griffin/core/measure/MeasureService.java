@@ -20,10 +20,10 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import java.util.List;
+
 import org.apache.griffin.core.measure.entity.Measure;
 import org.quartz.SchedulerException;
-
-import java.util.List;
 
 public interface MeasureService {
 

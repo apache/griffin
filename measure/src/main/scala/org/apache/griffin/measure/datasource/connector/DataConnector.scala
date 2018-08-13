@@ -21,13 +21,13 @@ package org.apache.griffin.measure.datasource.connector
 import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.enums.{BatchProcessType, DslType, SparkSqlType}
+import org.apache.griffin.measure.configuration.enums.BatchProcessType
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.step.builder.ConstantColumns
-import org.apache.griffin.measure.step.builder.preproc.PreProcRuleParamGenerator
+import org.apache.griffin.measure.step.builder.preproc.PreProcParamMaker
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 
@@ -38,7 +38,6 @@ trait DataConnector extends Loggable with Serializable {
   val dcParam: DataConnectorParam
 
   val id: String = DataConnectorIdGenerator.genId
-  protected def thisName(suffix: String): String = s"this_${suffix}"
 
   val timestampStorage: TimestampStorage
   protected def saveTmst(t: Long) = timestampStorage.insert(t)
@@ -59,13 +58,13 @@ trait DataConnector extends Loggable with Serializable {
 
     val timestamp = context.contextId.timestamp
     val suffix = context.contextId.id
-    val thisTable = thisName(suffix)
+    val dcDfName = dcParam.getDataFrameName("this")
 
     try {
       saveTmst(timestamp)    // save timestamp
 
       dfOpt.flatMap { df =>
-        val preProcRules = PreProcRuleParamGenerator.getNewPreProcRules(dcParam.getPreProcRules, suffix)
+        val (preProcRules, thisTable) = PreProcParamMaker.makePreProcRules(dcParam.getPreProcRules, suffix, dcDfName)
 
         // init data
         context.compileTableRegister.registerTable(thisTable)

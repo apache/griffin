@@ -19,9 +19,9 @@ under the License.
 
 package org.apache.griffin.core.login;
 
-import org.springframework.http.ResponseEntity;
-
 import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
 
 public interface LoginService {
 

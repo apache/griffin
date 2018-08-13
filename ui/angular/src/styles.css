@@ -891,7 +891,7 @@ a:hover {
     }
 }
 
-@media (max-width: 991px) { 
+@media (max-width: 991px) {
     #footerwrap {
       width: 100%
     }
@@ -1074,7 +1074,7 @@ tbody {
 
 .normal{
   background-color: #00C853;
-  border-radius: 5px; 
+  border-radius: 5px;
   padding:3px 4px;
   display: inline-block;
   width: 70px;
@@ -1083,7 +1083,7 @@ tbody {
 
 .unnormal{
   background-color: #EF5350;
-  border-radius: 5px; 
+  border-radius: 5px;
   padding:3px 4px;
   display: inline-block;
   width: 70px;
@@ -1094,7 +1094,7 @@ tbody {
   position: absolute;
   z-index:1;
   height:100px;
-  background-color:white; 
+  background-color:white;
   /*width:80%;*/
   text-align: center;
   border: 5px solid #c5c5c5;
@@ -1112,7 +1112,7 @@ tbody {
   width:20%;
   height:100%;
   display: inline-block;
-  
+
 }
 
 
@@ -1120,7 +1120,7 @@ tbody {
   width:20%;
   height:100%;
   display: inline-block;
-  
+
 }
 
 #pmam{
@@ -1155,7 +1155,7 @@ tbody {
 }
 
 .myclass * div.selected-list .c-btn , .myclass * ul ,.myclass * div.list-area, .list-filter input{
-  background: #dcdad6; 
+  background: #dcdad6;
 }
 
 .myclass * div.arrow-up{
@@ -1195,4 +1195,5 @@ input{
 .y-scrollable {
   overflow-y: auto;
   overflow-x: hidden;
+  height: 100%;
 }

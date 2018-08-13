@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.launch
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig}
+import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig, SinkParam}
 
 import scala.util.Try
 
@@ -51,6 +51,13 @@ trait DQApp extends Loggable with Serializable {
     dqParam.getTimestampOpt match {
       case Some(t) if t > 0 => t
       case _ => System.currentTimeMillis
+    }
+  }
+
+  protected def getSinkParams: Seq[SinkParam] = {
+    val validSinkTypes = dqParam.getValidSinkTypes
+    envParam.getSinkParams.flatMap { sinkParam =>
+      if (validSinkTypes.contains(sinkParam.getType)) Some(sinkParam) else None
     }
   }
 

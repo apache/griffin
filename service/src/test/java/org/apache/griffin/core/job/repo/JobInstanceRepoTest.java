@@ -19,6 +19,20 @@ under the License.
 
 package org.apache.griffin.core.job.repo;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.BUSY;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.IDLE;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RECOVERING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
 import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
@@ -31,20 +45,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.List;
-
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.BUSY;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.IDLE;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.RECOVERING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -91,29 +91,29 @@ public class JobInstanceRepoTest {
 
     private void setEntityManager() {
         JobInstanceBean bean1 = new JobInstanceBean(
-            FINDING,
-            "pName1",
-            "pGroup1",
-            null,
-            1516004640092L);
+                FINDING,
+                "pName1",
+                "pGroup1",
+                null,
+                1516004640092L);
         JobInstanceBean bean2 = new JobInstanceBean(
-            NOT_FOUND,
-            "pName2",
-            "pGroup2",
-            null,
-            1516004640093L);
+                NOT_FOUND,
+                "pName2",
+                "pGroup2",
+                null,
+                1516004640093L);
         JobInstanceBean bean3 = new JobInstanceBean(
-            RUNNING,
-            "pName3",
-            "pGroup3",
-            null,
-            1516004640082L);
+                RUNNING,
+                "pName3",
+                "pGroup3",
+                null,
+                1516004640082L);
         JobInstanceBean bean4 = new JobInstanceBean(
-            SUCCESS,
-            "pName4",
-            "pGroup4",
-            null,
-            1516004640094L);
+                SUCCESS,
+                "pName4",
+                "pGroup4",
+                null,
+                1516004640094L);
         BatchJob job1 = new BatchJob();
         StreamingJob job2 = new StreamingJob();
         bean1.setJob(job1);

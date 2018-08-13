@@ -18,15 +18,15 @@ under the License.
 -->
 
 # Apache Griffin Deployment Guide
-For Griffin users, please follow the instructions below to deploy Griffin in your environment. Note that there are some dependencies should be installed first.
+For Griffin users, please follow the instructions below to deploy Griffin in your environment. Note that there are some dependencies that should be installed firstly.
 
 ### Prerequisites
 You need to install following items
-- jdk (1.8 or later versions).
-- Postgresql or Mysql.
+- JDK (1.8 or later versions).
+- PostgreSQL(version 10.4) or MySQL(version 8.0.11).
 - npm (version 6.0.0+).
 - [Hadoop](http://apache.claz.org/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz) (2.6.0 or later), you can get some help [here](https://hadoop.apache.org/docs/r2.7.2/hadoop-project-dist/hadoop-common/SingleCluster.html).
--  [Spark](http://spark.apache.org/downloads.html) (version 2.2.1), if you want to install Pseudo Distributed/Single Node Cluster, you can get some help [here](http://why-not-learn-something.blogspot.com/2015/06/spark-installation-pseudo.html).
+- [Spark](http://spark.apache.org/downloads.html) (version 2.2.1), if you want to install Pseudo Distributed/Single Node Cluster, you can get some help [here](http://why-not-learn-something.blogspot.com/2015/06/spark-installation-pseudo.html).
 - [Hive](http://apache.claz.org/hive/hive-2.2.0/apache-hive-2.2.0-bin.tar.gz) (version 2.2.0), you can get some help [here](https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHive).
     You need to make sure that your spark cluster could access your HiveContext.
 - [Livy](http://archive.cloudera.com/beta/livy/livy-server-0.3.0.zip), you can get some help [here](http://livy.io/quickstart.html).
@@ -37,29 +37,29 @@ You need to install following items
     datanucleus-core-3.2.10.jar
     datanucleus-rdbms-3.2.9.jar
     ```
-- ElasticSearch (5.0 or later).
-	ElasticSearch works as a metrics collector, Griffin produces metrics to it, and our default UI get metrics from it, you can use your own way as well.
+- ElasticSearch (5.0 or later versions).
+	ElasticSearch works as a metrics collector, Griffin produces metrics into it, and our default UI gets metrics from it, you can use them by your own way as well.
 
 ### Configuration
 
-#### Postgresql
+#### PostgreSQL
 
-Create database 'quartz' in postgresql
+Create database 'quartz' in PostgreSQL
 ```
 createdb -O <username> quartz
 ```
-Init quartz tables in postgresql by [Init_quartz_postgres.sql](../../service/src/main/resources/Init_quartz_postgres.sql)
+Init quartz tables in PostgreSQL using [Init_quartz_postgres.sql](../../service/src/main/resources/Init_quartz_postgres.sql)
 ```
 psql -p <password> -h <host address> -U <username> -f Init_quartz_postgres.sql quartz
 ```
 
-#### Mysql
+#### MySQL
 
-Create database 'quartz' in mysql
+Create database 'quartz' in MySQL
 ```
 mysql -u <username> -e "create database quartz" -p
 ```
-Init quartz tables in mysql by [Init_quartz_mysql_innodb.sql.sql](../../service/src/main/resources/Init_quartz_mysql_innodb.sql)
+Init quartz tables in MySQL using [Init_quartz_mysql_innodb.sql.sql](../../service/src/main/resources/Init_quartz_mysql_innodb.sql)
 ```
 mysql -u <username> -p quartz < Init_quartz_mysql_innodb.sql.sql
 ```
@@ -134,8 +134,8 @@ You should also modify some configurations of Griffin for your environment.
     livy.uri = http://<your IP>:8998/batches
     yarn.uri = http://<your IP>:8088
     ```
-    - \<griffin measure path> is the location you should put the jar file of measure module.
-    - \<griffin env path> is the location you should put the env.json file.
+    - \<griffin measure path> is the location where you should put the jar file of measure module.
+    - \<griffin env path> is the location where you should put the env.json file.
 
 ### Build and Run
 
@@ -166,5 +166,5 @@ After a few seconds, we can visit our default UI of Griffin (by default the port
 
 You can use UI following the steps [here](../ui/user-guide.md).
 
-**Note**: The UI doesn't support all the features, for the advanced features you can try API of service.
+**Note**: The UI does not support all the backend features, to experience the advanced features you can use services directly.
 

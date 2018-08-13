@@ -16,3 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+
+label.control-label {
+  margin-top: 7px;
+}
