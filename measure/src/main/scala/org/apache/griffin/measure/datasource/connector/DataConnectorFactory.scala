@@ -91,7 +91,7 @@ object DataConnectorFactory extends Loggable {
                                    ): KafkaStreamingDataConnector  = {
     val KeyType = "key.type"
     val ValueType = "value.type"
-    val config = dcParam.config
+    val config = dcParam.getConfig
     val keyType = config.getOrElse(KeyType, "java.lang.String").toString
     val valueType = config.getOrElse(ValueType, "java.lang.String").toString
     (getClassTag(keyType), getClassTag(valueType)) match {

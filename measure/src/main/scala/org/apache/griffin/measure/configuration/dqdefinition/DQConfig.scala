@@ -33,12 +33,12 @@ import org.apache.griffin.measure.configuration.enums._
   * @param sinks          sink types (optional, by default will be elasticsearch)
   */
 @JsonInclude(Include.NON_NULL)
-case class DQConfig(@JsonProperty("name") name: String,
-                    @JsonProperty("timestamp") timestamp: Long,
-                    @JsonProperty("process.type") procType: String,
-                    @JsonProperty("data.sources") dataSources: List[DataSourceParam],
-                    @JsonProperty("evaluate.rule") evaluateRule: EvaluateRuleParam,
-                    @JsonProperty("sinks") sinks: List[String]
+case class DQConfig(@JsonProperty("name") private val name: String,
+                    @JsonProperty("timestamp") private val timestamp: Long,
+                    @JsonProperty("process.type") private val procType: String,
+                    @JsonProperty("data.sources") private val dataSources: List[DataSourceParam],
+                    @JsonProperty("evaluate.rule") private val evaluateRule: EvaluateRuleParam,
+                    @JsonProperty("sinks") private val sinks: List[String]
                   ) extends Param {
   def getName: String = name
   def getTimestampOpt: Option[Long] = if (timestamp != 0) Some(timestamp) else None
@@ -72,10 +72,10 @@ case class DQConfig(@JsonProperty("name") name: String,
   * @param checkpoint   data source checkpoint configuration (must in streaming mode with streaming connectors)
   */
 @JsonInclude(Include.NON_NULL)
-case class DataSourceParam( @JsonProperty("name") name: String,
-                            @JsonProperty("baseline") baseline: Boolean,
-                            @JsonProperty("connectors") connectors: List[DataConnectorParam],
-                            @JsonProperty("checkpoint") checkpoint: Map[String, Any]
+case class DataSourceParam( @JsonProperty("name") private val name: String,
+                            @JsonProperty("baseline") private val baseline: Boolean,
+                            @JsonProperty("connectors") private val connectors: List[DataConnectorParam],
+                            @JsonProperty("checkpoint") private val checkpoint: Map[String, Any]
                           ) extends Param {
   def getName: String = name
   def isBaseline: Boolean = if (baseline != null) baseline else false
@@ -97,11 +97,11 @@ case class DataSourceParam( @JsonProperty("name") name: String,
   * @param preProc    pre-process rules after load data (optional)
   */
 @JsonInclude(Include.NON_NULL)
-case class DataConnectorParam( @JsonProperty("type") conType: String,
-                               @JsonProperty("version") version: String,
-                               @JsonProperty("dataframe.name") dataFrameName: String,
-                               @JsonProperty("config") config: Map[String, Any],
-                               @JsonProperty("pre.proc") preProc: List[RuleParam]
+case class DataConnectorParam( @JsonProperty("type") private val conType: String,
+                               @JsonProperty("version") private val version: String,
+                               @JsonProperty("dataframe.name") private val dataFrameName: String,
+                               @JsonProperty("config") private val config: Map[String, Any],
+                               @JsonProperty("pre.proc") private val preProc: List[RuleParam]
                              ) extends Param {
   def getType: String = conType
   def getVersion: String = if (version != null) version else ""
@@ -120,7 +120,7 @@ case class DataConnectorParam( @JsonProperty("type") conType: String,
   * @param rules      rules to define dq measurement (optional)
   */
 @JsonInclude(Include.NON_NULL)
-case class EvaluateRuleParam( @JsonProperty("rules") rules: List[RuleParam]
+case class EvaluateRuleParam( @JsonProperty("rules") private val rules: List[RuleParam]
                             ) extends Param {
   def getRules: Seq[RuleParam] = if (rules != null) rules else Nil
 
@@ -144,14 +144,14 @@ case class EvaluateRuleParam( @JsonProperty("rules") rules: List[RuleParam]
 //  * @param dsCacheUpdate    config for data source cache update output (optional, valid in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
-case class RuleParam(@JsonProperty("dsl.type") dslType: String,
-                     @JsonProperty("dq.type") dqType: String,
-                     @JsonProperty("in.dataframe.name") inDfName: String,
-                     @JsonProperty("out.dataframe.name") outDfName: String,
-                     @JsonProperty("rule") rule: String,
-                     @JsonProperty("details") details: Map[String, Any],
-                     @JsonProperty("cache") cache: Boolean,
-                     @JsonProperty("out") outputs: List[RuleOutputParam]
+case class RuleParam( @JsonProperty("dsl.type") private val dslType: String,
+                      @JsonProperty("dq.type") private val dqType: String,
+                      @JsonProperty("in.dataframe.name") private val inDfName: String,
+                      @JsonProperty("out.dataframe.name") private val outDfName: String,
+                      @JsonProperty("rule") private val rule: String,
+                      @JsonProperty("details") private val details: Map[String, Any],
+                      @JsonProperty("cache") private val cache: Boolean,
+                      @JsonProperty("out") private val outputs: List[RuleOutputParam]
                     ) extends Param {
   def getDslType: DslType = if (dslType != null) DslType(dslType) else DslType("")
   def getDqType: DqType = if (dqType != null) DqType(dqType) else DqType("")
@@ -197,12 +197,13 @@ case class RuleParam(@JsonProperty("dsl.type") dslType: String,
   * @param flatten        flatten type of output metric (optional, available in output metric type)
   */
 @JsonInclude(Include.NON_NULL)
-case class RuleOutputParam( @JsonProperty("type") outputType: String,
-                            @JsonProperty("name") name: String,
-                            @JsonProperty("flatten") flatten: String
+case class RuleOutputParam( @JsonProperty("type") private val outputType: String,
+                            @JsonProperty("name") private val name: String,
+                            @JsonProperty("flatten") private val flatten: String
                           ) extends Param {
   def getOutputType: OutputType = if (outputType != null) OutputType(outputType) else OutputType("")
   def getNameOpt: Option[String] = if (StringUtils.isNotBlank(name)) Some(name) else None
+
   def getFlatten: FlattenType = if (StringUtils.isNotBlank(flatten)) FlattenType(flatten) else FlattenType("")
 
   def validate(): Unit = {}

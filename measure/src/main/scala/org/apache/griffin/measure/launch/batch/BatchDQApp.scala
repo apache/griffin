@@ -37,10 +37,11 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
   val envParam: EnvConfig = allParam.getEnvConfig
   val dqParam: DQConfig = allParam.getDqConfig
 
-  val sparkParam = envParam.sparkParam
-  val metricName = dqParam.name
+  val sparkParam = envParam.getSparkParam
+  val metricName = dqParam.getName
 //  val dataSourceParams = dqParam.dataSources
 //  val dataSourceNames = dataSourceParams.map(_.name)
+
   val sinkParams = getSinkParams
 
   var sqlContext: SQLContext = _
@@ -83,7 +84,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     dqContext.getSink().start(applicationId)
 
     // build job
-    val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.evaluateRule)
+    val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
 
     // dq job execute
     dqJob.execute(dqContext)
