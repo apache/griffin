@@ -19,16 +19,22 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
-import  org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
-
-import javax.persistence.*;
-
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 
 @Entity
 public class JobInstanceBean extends AbstractAuditableEntity {
@@ -43,7 +49,9 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @Enumerated(EnumType.STRING)
     private ProcessType type = BATCH;
 
-    /** The application id of this session **/
+    /**
+     * The application id of this session
+     **/
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String appId;
 
@@ -73,7 +81,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     private boolean deleted = false;
 
     @ManyToOne
-    @JoinColumn(name = "job_id",nullable = false)
+    @JoinColumn(name = "job_id", nullable = false)
     @JsonIgnore
     private AbstractJob job;
 
@@ -192,7 +200,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.expireTms = expireTms;
     }
 
-    public JobInstanceBean(State state, String pName, String pGroup, Long tms, Long expireTms,AbstractJob job) {
+    public JobInstanceBean(State state, String pName, String pGroup, Long tms, Long expireTms, AbstractJob job) {
         this(state, pName, pGroup, tms, expireTms);
         this.job = job;
     }

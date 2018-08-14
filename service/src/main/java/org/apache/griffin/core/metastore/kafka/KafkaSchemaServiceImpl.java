@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.metastore.kafka;
 
+import java.util.Arrays;
+
 import io.confluent.kafka.schemaregistry.client.rest.entities.Config;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
@@ -29,8 +31,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
 
 @Service
 public class KafkaSchemaServiceImpl implements KafkaSchemaService {
@@ -45,7 +45,7 @@ public class KafkaSchemaServiceImpl implements KafkaSchemaService {
     private String registryUrl(final String path) {
         if (StringUtils.hasText(path)) {
             String usePath = path;
-            if (!path.startsWith("/")){
+            if (!path.startsWith("/")) {
                 usePath = "/" + path;
             }
             return this.url + usePath;

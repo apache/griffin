@@ -17,64 +17,54 @@ specific language governing permissions and limitations
 under the License.
 */
 import { Component, OnInit } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { FormsModule } from "@angular/forms";
 import { ServiceService } from "../../../service/service.service";
-import { TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from "angular-tree-component";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ToasterModule, ToasterService, ToasterContainerComponent } from "angular2-toaster";
-import * as $ from "jquery";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { DataTableModule } from "angular2-datatable";
 import { AfterViewChecked, ElementRef } from "@angular/core";
-import { AngularMultiSelectModule } from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
-import { ConfigurationComponent } from "../configuration/configuration.component";
+import { Col } from './step1/step1.component'
+import * as $ from "jquery";
 
-class node {
-  name: string;
-  id: number;
-  children: object[];
-  isExpanded: boolean;
-  cols: Col[];
-  parent: string;
-  location: string;
+export class ProfilingStep1 {
+  data: any;
+  schemaCollection: Col[] = [];
+  nodeList: object[] = [];
+  selection: Col[];
+  dropdownList: object = {};
+  currentDB: string;
+  currentDBStr: string;
+  currentTable: string;
+  srcname: string;
+  srclocation: string;
+  selectedItems: object = {};
 }
 
-class Rule {
-  type: string;
+export class ProfilingStep2 {
+  selectedItems: object = {};
 }
 
-class Col {
-  name: string;
-  type: string;
-  comment: string;
-  selected: boolean;
-  isNum: boolean;
-  isExpanded: boolean;
-  // rules:string[];
-  groupby: string;
-  RE: string;
-  rules: any;
-  newRules: Rule[];
-  ruleLength = 0;
-  constructor(name: string, type: string, comment: string, selected: boolean) {
-    this.name = name;
-    this.type = type;
-    this.comment = comment;
-    this.selected = false;
-    this.isExpanded = false;
-    this.groupby = "";
-    this.rules = [];
-    this.RE = "";
-    this.newRules = [];
+export class ProfilingStep3 {
+  config: object = {
+    where: "",
+    timezone: "UTC(WET,GMT)",
+    num: 1,
+    timetype: "day",
+    needpath: false,
+    path: ""
+  };
+  timezone: string = "UTC(WET,GMT)";
+  where: string = "";
+  size: string = "1day";
+  needpath: boolean = false;
+  path: string;
+}
 
-    var patt = new RegExp("int|double|float/i");
-    if (patt.test(this.type)) {
-      this.isNum = true;
-    }
-    // this.rules = [];
-  }
+export class ProfilingStep4 {
+  prName: string = "";
+  desc: string;
+  type: string = "profiling";
+  owner: string = "test";
+  noderule: object[] = [];
 }
 
 @Component({
@@ -84,255 +74,25 @@ class Col {
   styleUrls: ["./pr.component.css"]
 })
 export class PrComponent implements AfterViewChecked, OnInit {
-  noderule = [];
+  currentStep = 1;
+
+  step1: ProfilingStep1;
+  step2: ProfilingStep2;
+  step3: ProfilingStep3;
+  step4: ProfilingStep4;
+
   transrule = [];
   transenumrule = [];
   transnullrule = [];
-  showrule = false;
-  dropdownList = {};
-  selectedItems = {};
-  allRules = {};
-  dropdownSettings = {};
-  currentStep = 1;
-  firstCond = false;
-  mouseover = false;
-  selection: Col[];
-  selectedAll = false;
-  currentDB = "";
-  currentTable = "";
-  schemaCollection: Col[];
-  totallen = 0;
-  type = "profiling";
-  data: any;
-  desc: string;
-  owner = "test";
-  currentDBstr: string;
-  timezone = "";
-  ruledesc = "";
-  newMeasure = {
-    name: "",
-    "measure.type": "griffin",
-    "dq.type": "PROFILING",
-    "process.type": "BATCH",
-    owner: "",
-    description: "",
-    "rule.description": {
-      details:[]
-      },
-    // "group":[],
-    "data.sources": [
-      {
-        name: "source",
-        connectors: [
-          {
-            name: "",
-            type: "HIVE",
-            version: "1.2",
-            "data.unit": "",
-            "data.time.zone": "",
-            config: {
-              database: "",
-              "table.name": "",
-              where: ""
-            },
-            predicates: [
-              {
-                type: "file.exist",
-                config: {
-                  "root.path": '',
-                  path: ""
-                }
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "evaluate.rule": {
-      rules: [
-        // {
-        //   "dsl.type": "griffin-dsl",
-        //   "dq.type": "profiling",
-        //   rule: "",
-        //   name: "",
-        // }
-      ]
-    }
-  };
-  name: "";
+  transregexrule = [];
+  newMeasure = {};
   createResult: any;
-  newCond: any;
-  srclocation: string;
-  srcname: string;
-  config = {
-    where: "",
-    timezone: "",
-    num: 1,
-    timetype: "day",
-    needpath: false,
-    path: ""
-  };
-  where: string;
-  size: string;
-  path: string;
-  location: string;
-  needpath: boolean;
 
-  private toasterService: ToasterService;
   public visible = false;
   public visibleAnimate = false;
+  private toasterService: ToasterService;
 
-  public hide(): void {
-    this.visibleAnimate = false;
-    setTimeout(() => (this.visible = false), 300);
-    this.transrule = [];
-    this.transenumrule = [];
-    this.transnullrule = [];
-    this.noderule = [];
-    $("#save").removeAttr("disabled");
-  }
-
-  public onContainerClicked(event: MouseEvent): void {
-    if ((<HTMLElement>event.target).classList.contains("modal")) {
-      this.hide();
-    }
-  }
-
-  onResize(event) {
-    this.resizeWindow();
-  }
-
-  resizeWindow() {
-    var stepSelection = ".formStep";
-    $(stepSelection).css({
-      // height: window.innerHeight - $(stepSelection).offset().top - $('#footerwrap').outerHeight()
-      height: window.innerHeight - $(stepSelection).offset().top
-    });
-    $("fieldset").height(
-      $(stepSelection).height() -
-        $(stepSelection + ">.stepDesc").height() -
-        $(".btn-container").height() -
-        130
-    );
-    $(".y-scrollable").css({
-      // 'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()
-      height: $("fieldset").height()
-    });
-  }
-
-  setDropdownList() {
-    if (this.selection) {
-      for (let item of this.selection) {
-        if (item.isNum == true) {
-          this.dropdownList[item.name] = [
-            { id: 1, itemName: "Null Count", category: "Simple Statistics" },
-            { id: 2, itemName: "Distinct Count", category: "Simple Statistics" },
-            { id: 3, itemName: "Total Count", category: "Summary Statistics" },
-            { id: 4, itemName: "Maximum", category: "Summary Statistics" },
-            { id: 5, itemName: "Minimum", category: "Summary Statistics" },
-            { id: 6, itemName: "Average", category: "Summary Statistics" },
-            // {"id":7,"itemName":"Median","category": "Summary Statistics"},
-            // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
-            { id: 9, itemName: "Enum Detection Top5 Count", category: "Advanced Statistics" }
-          ];
-        } else {
-          this.dropdownList[item.name] = [
-            { id: 1, itemName: "Null Count", category: "Simple Statistics" },
-            { id: 2, itemName: "Distinct Count", category: "Simple Statistics" },
-            { id: 3, itemName: "Total Count", category: "Summary Statistics" },
-            // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
-            { id: 9, itemName: "Enum Detection Top5 Count", category: "Advanced Statistics" }
-            // {"id":10,"itemName":"Regular Expression Detection Count","category": "Advanced Statistics"}
-          ];
-        }
-      }
-    }
-  }
-
-  toggleSelection(row) {
-    row.selected = !row.selected;
-    var idx = this.selection.indexOf(row);
-    // is currently selected
-    if (idx > -1) {
-      this.selection.splice(idx, 1);
-      this.selectedAll = false;
-      for (let key in this.selectedItems) {
-        if (key === row.name) {
-          delete this.selectedItems[key];
-        }
-      }
-    } else {
-      // is newly selected
-      this.selection.push(row);
-    }
-    if (this.selection.length == 3) {
-      this.selectedAll = true;
-    } else {
-      this.selectedAll = false;
-    }
-    this.setDropdownList();
-  }
-
-  toggleAll() {
-    this.selectedAll = !this.selectedAll;
-    this.selection = [];
-    for (var i = 0; i < this.schemaCollection.length; i++) {
-      this.schemaCollection[i].selected = this.selectedAll;
-      if (this.selectedAll) {
-        this.selection.push(this.schemaCollection[i]);
-      }
-    }
-    this.setDropdownList();
-  }
-
-  transferRule(rule, col) {
-    switch (rule) {
-      case "Total Count":
-        return "count(source.`" + col.name + "`) AS `" + col.name + "-count`";
-      case "Distinct Count":
-        return (
-          "approx_count_distinct(source.`" +
-          col.name +
-          "`) AS `" +
-          col.name +
-          "-distcount`"
-        );
-      case "Null Count":
-        return (
-          "count(source.`" +
-          col.name +
-          "`) AS `" +
-          col.name +
-          "-nullcount" +
-          "` WHERE source.`" +
-          col.name +
-          "` IS NULL"
-        );
-      // case 'Regular Expression Detection Count':
-      //   return 'count(source.`'+col.name+'`) where source.`'+col.name+'` LIKE ';
-      // case 'Rule Detection Count':
-      //   return 'count(source.`'+col.name+'`) where source.`'+col.name+'` LIKE ';
-      case "Maximum":
-        return "max(source.`" + col.name + "`) AS `" + col.name + "-max`";
-      case "Minimum":
-        return "min(source.`" + col.name + "`) AS `" + col.name + "-min`";
-      // case 'Median':
-      //   return 'median(source.`'+col.name+'`) ';
-      case "Average":
-        return "avg(source.`" + col.name + "`) AS `" + col.name + "-average`";
-      case "Enum Detection Top5 Count":
-        return (
-          "source.`" +
-          col.name +
-          "`,count(*) AS `" +
-          "count` GROUP BY source.`" +
-          col.name +
-          "` ORDER BY `count` DESC LIMIT 5"
-        );
-    }
-  }
-
-  next(form) {
+  next() {
     if (this.formValidation(this.currentStep)) {
       this.currentStep++;
     } else {
@@ -345,104 +105,124 @@ export class PrComponent implements AfterViewChecked, OnInit {
     }
   }
 
-  formValidation = function(step) {
-    if (step == undefined) {
-      step = this.currentStep;
-    }
+  prev() {
+    this.currentStep--;
+  }
+
+  updateStep1(body:ProfilingStep1) {
+    this.step1 = body;
+    this.next();
+  }
+
+  updateStep2(body:ProfilingStep2) {
+    this.step2 = body;
+    this.next();
+  }
+
+  updateStep3(body:ProfilingStep3) {
+    this.step3 = body;
+    this.next();
+  }
+
+  formValidation = (step) => {
+    if (step == undefined) step = this.currentStep;
     if (step == 1) {
-      return this.selection && this.selection.length > 0;
+      return this.step1.selection && this.step1.selection.length > 0;
     } else if (step == 2) {
-      var len = 0;
-      var selectedlen = 0;
-      for (let key in this.selectedItems) {
+      let len = 0;
+      let selectedlen = 0;
+      for (let key in this.step2.selectedItems) {
         selectedlen++;
-        len = this.selectedItems[key].length;
+        len = this.step2.selectedItems[key].length;
         if (len == 0) {
           return false;
         }
       }
-      return this.selection.length == selectedlen ? true : false;
+      return this.step1.selection.length == selectedlen;
     } else if (step == 3) {
       return true;
     } else if (step == 4) {
+      return /^[a-zA-Z0-9_-]+$/.test(this.step4.prName);
     }
     return false;
   };
 
-  prev(form) {
-    this.currentStep--;
+  constructor(
+    private elementRef: ElementRef,
+    toasterService: ToasterService,
+    private http: HttpClient,
+    private router: Router,
+    public serviceService: ServiceService
+  ) {
+    this.toasterService = toasterService;
   }
-  goTo(i) {
-    this.currentStep = i;
-  }
-  submit(form) {
-    if (!form.valid) {
-      this.toasterService.pop(
-        "error",
-        "Error!",
-        "please complete the form in this step before proceeding"
-      );
-      return false;
-    }
-    this.newMeasure = {
-      name: this.name,
-      "measure.type": "griffin",
-      "dq.type": "PROFILING",
-      "rule.description": {
-        details:this.noderule
-      },
-      "process.type": "BATCH",
-      owner: this.owner,
-      description: this.desc,
-      // "group":this.finalgrp,
-      "data.sources": [
-        {
-          name: "source",
-          connectors: [
-            {
-              name: this.srcname,
-              type: "HIVE",
-              version: "1.2",
-              "data.unit": this.size,
-              "data.time.zone": this.timezone,
-              config: {
-                database: this.currentDB,
-                "table.name": this.currentTable,
-                where: this.where
-              },
-              predicates: [
-                {
-                  type: "file.exist",
-                  config: {
-                    "root.path": this.srclocation,
-                    path: this.path
-                  }
-                }
-              ]
-            }
-          ]
+
+  getGrouprule() {
+    var selected = { name: "" };
+    var value = "";
+    var nullvalue = "";
+    var nullname = "";
+    var enmvalue = ""
+    var regexvalue = "";
+    var regexname = "";
+    var grpname = "";
+
+    for (let key in this.step2.selectedItems) {
+      selected.name = key;
+      let info = "";
+      let otherinfo = "";
+      for (let i = 0; i < this.step2.selectedItems[key].length; i++) {
+        var originrule = this.step2.selectedItems[key][i].itemName;
+        info = info + originrule + ",";
+
+        if (originrule == "Enum Detection Top5 Count") {
+
+          enmvalue = this.transferRule(originrule, selected);
+          grpname = `${selected.name}_grp`;
+          this.transenumrule.push(enmvalue);
+          this.pushEnmRule(enmvalue, grpname);
+
+        } else if (originrule == "Null Count") {
+
+          nullvalue = this.transferRule(originrule, selected);
+          nullname = `${selected.name}_nullcount`;
+          this.transnullrule.push(nullvalue);
+          this.pushNullRule(nullvalue, nullname);
+
+        } else if (originrule == "Empty Count") {
+
+          nullvalue = this.transferRule(originrule, selected);
+          nullname = `${selected.name}_emptycount`;
+          this.transnullrule.push(nullvalue);
+          this.pushNullRule(nullvalue, nullname);
+
+        } else if (originrule == "Regular Expression Detection Count") {
+
+          selected['regex'] = this.step2.selectedItems[key].regex;
+          regexvalue = this.transferRule(originrule, selected);
+          regexname = `${selected.name}_regexcount`;
+          this.transregexrule.push(regexvalue);
+          this.pushRegexRule(regexvalue, regexname);
+
+        } else {
+
+          otherinfo = otherinfo + originrule + ",";
+          value = this.transferRule(originrule, selected);
+          this.transrule.push(value);
+
         }
-      ],
-      "evaluate.rule": {
-        rules: [
-          // {
-          //   "dsl.type": "griffin-dsl",
-          //   "dq.type": "profiling",
-          //   "rule": "",
-          //   "details": {}
-          // }
-        ]
       }
-    };
-    this.getGrouprule();
-    if (this.size.indexOf("0") == 0) {
-      delete this.newMeasure["data.sources"][0]["connectors"][0]["data.unit"];
+
+      info = info.substring(0, info.lastIndexOf(","));
+      otherinfo = otherinfo.substring(0, otherinfo.lastIndexOf(","));
+      this.step4.noderule.push({
+        name: key,
+        infos: info
+      });
     }
-    if (!this.needpath || this.path == "") {
-      delete this.newMeasure["data.sources"][0]["connectors"][0]["predicates"];
+    if (this.transrule.length != 0) {
+      this.getRule(this.transrule);
     }
-    this.visible = true;
-    setTimeout(() => (this.visibleAnimate = true), 100);
   }
 
   getRule(trans) {
@@ -455,8 +235,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
   }
 
   pushEnmRule(rule, grpname) {
-    var self = this;
-    self.newMeasure["evaluate.rule"].rules.push({
+    this.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "PROFILING",
       rule: rule,
@@ -468,8 +247,16 @@ export class PrComponent implements AfterViewChecked, OnInit {
   }
 
   pushNullRule(rule, nullname) {
-    var self = this;
-    self.newMeasure["evaluate.rule"].rules.push({
+    this.newMeasure["evaluate.rule"].rules.push({
+      "dsl.type": "griffin-dsl",
+      "dq.type": "PROFILING",
+      rule: rule,
+      name: nullname
+    });
+  }
+
+  pushRegexRule(rule, nullname) {
+    this.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "PROFILING",
       rule: rule,
@@ -478,8 +265,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
   }
 
   pushRule(rule) {
-    var self = this;
-    self.newMeasure["evaluate.rule"].rules.push({
+    this.newMeasure["evaluate.rule"].rules.push({
       "dsl.type": "griffin-dsl",
       "dq.type": "PROFILING",
       rule: rule,
@@ -487,9 +273,136 @@ export class PrComponent implements AfterViewChecked, OnInit {
     });
   }
 
+  transferRule(rule, col) {
+    switch (rule) {
+      case "Total Count":
+        return (
+          `count(source.${col.name}) AS \`${col.name}_count\``
+        );
+      case "Distinct Count":
+        return (
+          `approx_count_distinct(source.${col.name}) AS \`${col.name}_distcount\``
+        );
+      case "Null Count":
+        return (
+          `count(source.${col.name}) AS \`${col.name}_nullcount\` WHERE source.${col.name} IS NULL`
+        );
+      case "Maximum":
+        return (
+          `max(source.${col.name}) AS \`${col.name}_max\``
+        );
+      case "Minimum":
+        return (
+          `min(source.${col.name}) AS \`${col.name}_min\``
+        );
+      case "Average":
+        return (
+          `avg(source.${col.name}) AS \`${col.name}_average\``
+        );
+      case "Empty Count":
+        return (
+          `count(source.${col.name}) AS \`${col.name}_emptycount\` WHERE source.${col.name} = ''`
+        );
+      case "Regular Expression Detection Count":
+        return (
+          `count(source.${col.name} RLIKE '${col.regex}') AS \`${col.name}_regexcount\``
+        );
+      case "Enum Detection Top5 Count":
+        return (
+          `source.${col.name}, ${col.name}, count(*) AS count GROUP BY source.${col.name} ORDER BY count DESC LIMIT 5`
+        );
+    }
+  }
+
+  public hide(): void {
+    this.visibleAnimate = false;
+    setTimeout(() => (this.visible = false), 300);
+    this.transrule = [];
+    this.transenumrule = [];
+    this.transnullrule = [];
+    this.transregexrule = [];
+    this.step4.noderule = [];
+    $("#save").removeAttr("disabled");
+  }
+
+  public onContainerClicked(event: MouseEvent): void {
+    if ((<HTMLElement>event.target).classList.contains("modal")) {
+      this.hide();
+    }
+  }
+
+  submit(body:ProfilingStep4) {
+    this.step4 = body;
+
+    if (!this.formValidation(this.currentStep)) {
+      this.toasterService.pop(
+        "error",
+        "Error!",
+        "Please complete the form in this step before proceeding!"
+      );
+      return false;
+    }
+
+    this.newMeasure = {
+      name: this.step4.prName,
+      "measure.type": "griffin",
+      "dq.type": "PROFILING",
+      "rule.description": {
+        details: this.step4.noderule
+      },
+      "process.type": "BATCH",
+      owner: this.step4.owner,
+      description: this.step4.desc,
+      "data.sources": [
+        {
+          name: "source",
+          connectors: [
+            {
+              name: this.step1.srcname,
+              type: "HIVE",
+              version: "1.2",
+              "data.unit": this.step3.size,
+              "data.time.zone": this.step3.timezone,
+              config: {
+                database: this.step1.currentDB,
+                "table.name": this.step1.currentTable,
+                where: this.step3.config['where']
+              },
+              predicates: [
+                {
+                  type: "file.exist",
+                  config: {
+                    "root.path": this.step1.srclocation,
+                    path: this.step3.path
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "evaluate.rule": {
+        "out.dataframe.name":"profiling",
+        rules: []
+      }
+    };
+
+    this.getGrouprule();
+    if (this.step3.size.indexOf("0") == 0) {
+      delete this.newMeasure["data.sources"][0]["connectors"][0]["data.unit"];
+    }
+    if (!this.step3.needpath || this.step3.path == "") {
+      delete this.newMeasure["data.sources"][0]["connectors"][0]["predicates"];
+    }
+    this.visible = true;
+    setTimeout(() => (this.visibleAnimate = true), 100);
+  }
+
   save() {
-    var addModels = this.serviceService.config.uri.addModels;
+    let addModels = this.serviceService.config.uri.addModels;
+
     $("#save").attr("disabled", "true");
+
     this.http.post(addModels, this.newMeasure).subscribe(
       data => {
         this.createResult = data;
@@ -508,166 +421,12 @@ export class PrComponent implements AfterViewChecked, OnInit {
     );
   }
 
-  options: ITreeOptions = {
-    displayField: "name",
-    isExpandedField: "expanded",
-    idField: "id",
-    actionMapping: {
-      mouse: {
-        click: (tree, node, $event) => {
-          if (node.hasChildren) {
-            this.currentDB = node.data.name;
-            this.currentDBstr = this.currentDB + ".";
-            this.currentTable = "";
-            this.schemaCollection = [];
-            this.selectedAll = false;
-            TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
-          } else if (node.data.cols) {
-            this.currentTable = node.data.name;
-            this.currentDB = node.data.parent;
-            this.schemaCollection = node.data.cols;
-            this.srcname = "source" + new Date().getTime();
-            this.srclocation = node.data.location;
-            this.selectedAll = false;
-            this.selection = [];
-            for (let row of this.schemaCollection) {
-              row.selected = false;
-            }
-          }
-        }
-      }
-    },
-    animateExpand: true,
-    animateSpeed: 30,
-    animateAcceleration: 1.2
-  };
-
-  nodeList: object[];
-  nodeListTarget: object[];
-
-  constructor(
-    private elementRef: ElementRef,
-    toasterService: ToasterService,
-    private http: HttpClient,
-    private router: Router,
-    public serviceService: ServiceService
-  ) {
-    this.toasterService = toasterService;
-    this.selection = [];
-  }
-
-  getGrouprule() {
-    var selected = { name: "" };
-    var value = "";
-    var nullvalue = "";
-    var nullname = "";
-    var enmvalue = "";
-    var grpname = "";
-    for (let key in this.selectedItems) {
-      selected.name = key;
-      var info = "";
-      var otherinfo = "";
-      for (let i = 0; i < this.selectedItems[key].length; i++) {
-        var originrule = this.selectedItems[key][i].itemName;
-        info = info + originrule + ",";
-        if (originrule == "Enum Detection Top5 Count") {
-          enmvalue = this.transferRule(originrule, selected);
-          grpname = selected.name + "-grp";
-          this.transenumrule.push(enmvalue);
-          this.pushEnmRule(enmvalue, grpname);
-        } else if (originrule == "Null Count") {
-          nullvalue = this.transferRule(originrule, selected);
-          nullname = selected.name + "-nullct";
-          this.transnullrule.push(nullvalue);
-          this.pushNullRule(nullvalue, nullname);
-        } else {
-          otherinfo = otherinfo + originrule + ",";
-          value = this.transferRule(originrule, selected);
-          this.transrule.push(value);
-        }
-      }
-      info = info.substring(0, info.lastIndexOf(","));
-      otherinfo = otherinfo.substring(0, otherinfo.lastIndexOf(","));
-      this.noderule.push({
-        name: key,
-        infos: info
-      });
-    }
-    if (this.transrule.length != 0) {
-      this.getRule(this.transrule);
-    }
-    this.ruledesc = JSON.stringify(this.noderule);
-  }
-
-  confirmAdd() {
-    document.getElementById("rule").style.display = "none";
-  }
-
-  showRule() {
-    document.getElementById("showrule").style.display = "";
-    document.getElementById("notshowrule").style.display = "none";
-  }
-
-  back() {
-    document.getElementById("showrule").style.display = "none";
-    document.getElementById("notshowrule").style.display = "";
-  }
-
-  getData(evt) {
-    this.config = evt;
-    this.timezone = evt.timezone;
-    this.where = evt.where;
-    this.size = evt.num + evt.timetype;
-    this.needpath = evt.needpath;
-    this.path = evt.path;
-  }
-
   ngOnInit() {
-    var allDataassets = this.serviceService.config.uri.dataassetlist;
-    this.http.get(allDataassets).subscribe(data => {
-      this.nodeList = new Array();
-      let i = 1;
-      this.data = data;
-      for (let db in this.data) {
-        let new_node = new node();
-        new_node.name = db;
-        new_node.id = i;
-        new_node.isExpanded = true;
-        i++;
-        new_node.children = new Array();
-        for (let i = 0; i < this.data[db].length; i++) {
-          let new_child = new node();
-          new_child.name = this.data[db][i]["tableName"];
-          new_node.children.push(new_child);
-          new_child.isExpanded = false;
-          new_child.location = this.data[db][i]["sd"]["location"];
-          new_child.parent = db;
-          new_child.cols = Array<Col>();
-          for (let j = 0; j < this.data[db][i]["sd"]["cols"].length; j++) {
-            let new_col = new Col(
-              this.data[db][i]["sd"]["cols"][j].name,
-              this.data[db][i]["sd"]["cols"][j].type,
-              this.data[db][i]["sd"]["cols"][j].comment,
-              false
-            );
-            new_child.cols.push(new_col);
-          }
-        }
-        this.nodeList.push(new_node);
-      }
-      this.nodeListTarget = JSON.parse(JSON.stringify(this.nodeList));
-    });
-    this.dropdownSettings = {
-      singleSelection: false,
-      text: "Select Rule",
-      enableCheckAll: false,
-      enableSearchFilter: true,
-      classes: "myclass",
-      groupBy: "category"
-    };
-    this.size = "1day";
+    this.step1 = new ProfilingStep1();
+    this.step2 = new ProfilingStep2();
+    this.step3 = new ProfilingStep3();
+    this.step4 = new ProfilingStep4();
   }
-  ngAfterViewChecked() {
-    this.resizeWindow();
-  }
+
+  ngAfterViewChecked() {}
 }

@@ -19,11 +19,12 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
-import org.quartz.SchedulerException;
-
 import java.util.List;
+
+import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobHealth;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.quartz.SchedulerException;
 
 public interface JobService {
 
@@ -33,7 +34,7 @@ public interface JobService {
 
     AbstractJob getJobConfig(Long jobId);
 
-    AbstractJob onAction(Long jobId,String action) throws Exception;
+    AbstractJob onAction(Long jobId, String action) throws Exception;
 
     void deleteJob(Long jobId) throws SchedulerException;
 
@@ -43,5 +44,5 @@ public interface JobService {
 
     JobHealth getHealthInfo();
 
-    String getJobHdfsPersistPath(String jobName, long timestamp);
+    String getJobHdfsSinksPath(String jobName, long timestamp);
 }
