@@ -44,8 +44,7 @@
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["0", "0"],
-        "init.clear": true
+        "time.range": ["0", "0"]
       }
     }
   ],

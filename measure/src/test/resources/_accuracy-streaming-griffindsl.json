@@ -45,7 +45,6 @@
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
         "time.range": ["-2m", "0"],
-        "init.clear": true,
         "updatable": true
       }
     }, {
@@ -87,8 +86,7 @@
         "info.path": "target",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"],
-        "init.clear": true
+        "time.range": ["-2m", "0"]
       }
     }
   ],
