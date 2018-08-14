@@ -33,7 +33,7 @@ case class DataSourceUpdateWriteStep(dsName: String,
   val writeTimestampOpt: Option[Long] = None
 
   def execute(context: DQContext): Boolean = {
-    collectDsCacheUpdateDf(context) match {
+    getDataSourceCacheUpdateDf(context) match {
       case Some(df) => {
         context.dataSources.find(ds => StringUtils.equals(ds.name, dsName)).foreach(_.updateData(df))
       }
@@ -56,6 +56,6 @@ case class DataSourceUpdateWriteStep(dsName: String,
     }
   }
 
-  private def collectDsCacheUpdateDf(context: DQContext): Option[DataFrame] = getDataFrame(context, inputName)
+  private def getDataSourceCacheUpdateDf(context: DQContext): Option[DataFrame] = getDataFrame(context, inputName)
 
 }

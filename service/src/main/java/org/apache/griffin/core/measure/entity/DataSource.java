@@ -25,15 +25,25 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.griffin.core.util.JsonUtil;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
+
+import org.apache.griffin.core.util.JsonUtil;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 @Entity
 public class DataSource extends AbstractAuditableEntity {
@@ -45,13 +55,15 @@ public class DataSource extends AbstractAuditableEntity {
     @JoinColumn(name = "data_source_id")
     private List<DataConnector> connectors = new ArrayList<>();
 
+    private boolean baseline = false;
+
     @JsonIgnore
     @Column(length = 1024)
-    private String cache;
+    private String checkpoint;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, Object> cacheMap;
+    private Map<String, Object> checkpointMap;
 
 
     public String getName() {
@@ -73,36 +85,44 @@ public class DataSource extends AbstractAuditableEntity {
         this.connectors = connectors;
     }
 
-    private String getCache() {
-        return cache;
+    public boolean isBaseline() {
+        return baseline;
     }
 
-    private void setCache(String cache) {
-        this.cache = cache;
+    public void setBaseline(boolean baseline) {
+        this.baseline = baseline;
+    }
+
+    private String getCheckpoint() {
+        return checkpoint;
+    }
+
+    private void setCheckpoint(String checkpoint) {
+        this.checkpoint = checkpoint;
 
     }
 
-    @JsonProperty("cache")
-    public Map<String, Object> getCacheMap() {
-        return cacheMap;
+    @JsonProperty("checkpoint")
+    public Map<String, Object> getCheckpointMap() {
+        return checkpointMap;
     }
 
-    public void setCacheMap(Map<String, Object> cacheMap) {
-        this.cacheMap = cacheMap;
+    public void setCheckpointMap(Map<String, Object> checkpointMap) {
+        this.checkpointMap = checkpointMap;
     }
 
     @PrePersist
     @PreUpdate
     public void save() throws JsonProcessingException {
-        if (cacheMap != null) {
-            this.cache = JsonUtil.toJson(cacheMap);
+        if (checkpointMap != null) {
+            this.checkpoint = JsonUtil.toJson(checkpointMap);
         }
     }
 
     @PostLoad
     public void load() throws IOException {
-        if (!StringUtils.isEmpty(cache)) {
-            this.cacheMap = JsonUtil.toEntity(cache, new TypeReference<Map<String, Object>>() {
+        if (!StringUtils.isEmpty(checkpoint)) {
+            this.checkpointMap = JsonUtil.toEntity(checkpoint, new TypeReference<Map<String, Object>>() {
             });
         }
     }
@@ -113,5 +133,15 @@ public class DataSource extends AbstractAuditableEntity {
     public DataSource(String name, List<DataConnector> connectors) {
         this.name = name;
         this.connectors = connectors;
+    }
+
+    public DataSource(String name, boolean baseline,
+                      Map<String, Object> checkpointMap,
+                      List<DataConnector> connectors) {
+        this.name = name;
+        this.baseline = baseline;
+        this.checkpointMap = checkpointMap;
+        this.connectors = connectors;
+
     }
 }

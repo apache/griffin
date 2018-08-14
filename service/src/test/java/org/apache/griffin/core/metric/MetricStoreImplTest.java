@@ -19,11 +19,12 @@ under the License.
 
 package org.apache.griffin.core.metric;
 
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class MetricStoreImplTest {
 

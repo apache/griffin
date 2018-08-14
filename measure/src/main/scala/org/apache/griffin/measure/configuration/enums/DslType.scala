@@ -51,8 +51,8 @@ object DslType {
   * df-ops: data frame operations rule, support some pre-defined data frame ops
   */
  case object DataFrameOpsType extends DslType {
-  val idPattern = "^(?i)df-?(?:op|opr|ops)$".r
-  val desc = "df-opr"
+  val idPattern = "^(?i)df-?(?:ops|opr|operations)$".r
+  val desc = "df-ops"
 }
 
 /**

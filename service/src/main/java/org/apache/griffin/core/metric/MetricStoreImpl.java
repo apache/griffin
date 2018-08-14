@@ -23,6 +23,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.http.Header;
@@ -42,9 +51,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.*;
 
 @Component
 public class MetricStoreImpl implements MetricStore {
@@ -70,7 +76,7 @@ public class MetricStoreImpl implements MetricStore {
         if (!user.isEmpty() && !password.isEmpty()) {
             String encodedAuth = buildBasicAuthString(user, password);
             Header[] requestHeaders = new Header[]{
-                new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
+                    new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
             builder.setDefaultHeaders(requestHeaders);
         }
         this.client = builder.build();
@@ -100,13 +106,13 @@ public class MetricStoreImpl implements MetricStore {
     }
 
     private HttpEntity getHttpEntityForSearch(String metricName, int from, int size, long tmst)
-        throws JsonProcessingException {
+            throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> queryParam = new HashMap<>();
         Map<String, Object> termQuery = Collections.singletonMap("name.keyword", metricName);
         queryParam.put("filter", Collections.singletonMap("term", termQuery));
         Map<String, Object> sortParam = Collections
-            .singletonMap("tmst", Collections.singletonMap("order", "desc"));
+                .singletonMap("tmst", Collections.singletonMap("order", "desc"));
         map.put("query", Collections.singletonMap("bool", queryParam));
         map.put("sort", sortParam);
         map.put("from", from);
@@ -118,14 +124,14 @@ public class MetricStoreImpl implements MetricStore {
         List<MetricValue> metricValues = new ArrayList<>();
         JsonNode jsonNode = mapper.readTree(EntityUtils.toString(response.getEntity()));
         if (jsonNode.hasNonNull("hits") && jsonNode.get("hits")
-            .hasNonNull("hits")) {
+                .hasNonNull("hits")) {
             for (JsonNode node : jsonNode.get("hits").get("hits")) {
                 JsonNode sourceNode = node.get("_source");
                 Map<String, Object> value = JsonUtil.toEntity(sourceNode.get("value").toString(),
-                    new TypeReference<Map<String, Object>>() {
-                    });
+                        new TypeReference<Map<String, Object>>() {
+                        });
                 MetricValue metricValue = new MetricValue(sourceNode.get("name").asText(),
-                    Long.parseLong(sourceNode.get("tmst").asText()), value);
+                        Long.parseLong(sourceNode.get("tmst").asText()), value);
                 metricValues.add(metricValue);
             }
         }
@@ -153,7 +159,7 @@ public class MetricStoreImpl implements MetricStore {
     @Override
     public ResponseEntity<?> deleteMetricValues(String metricName) throws IOException {
         Map<String, Object> param = Collections.singletonMap("query",
-            Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
+                Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
         HttpEntity entity = new NStringEntity(JsonUtil.toJson(param), ContentType.APPLICATION_JSON);
         Response response = client.performRequest("POST", urlDelete, Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);

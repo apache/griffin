@@ -16,38 +16,28 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.lock
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import java.util.concurrent.TimeUnit
+import { PrStep1Component } from './step1.component';
 
-import org.apache.curator.framework.recipes.locks.InterProcessMutex
+describe('PrStep1Component', () => {
+  let component: PrStep1Component;
+  let fixture: ComponentFixture<PrStep1Component>;
 
-case class CacheLockInZK(@transient mutex: InterProcessMutex) extends CacheLock {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ PrStep1Component ]
+    })
+      .compileComponents();
+  }));
 
-  def lock(outtime: Long, unit: TimeUnit): Boolean = {
-    try {
-      if (outtime >= 0) {
-        mutex.acquire(outtime, unit)
-      } else {
-        mutex.acquire(-1, null)
-      }
-    } catch {
-      case e: Throwable => {
-        error(s"lock error: ${e.getMessage}")
-        false
-      }
-    }
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PrStep1Component);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-  }
-
-  def unlock(): Unit = {
-    try {
-      if (mutex.isAcquiredInThisProcess) mutex.release
-    } catch {
-      case e: Throwable => {
-        error(s"unlock error: ${e.getMessage}")
-      }
-    }
-  }
-
-}
+  it('should be created', () => {
+    expect(component).toBeTruthy();
+  });
+});

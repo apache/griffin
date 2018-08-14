@@ -20,37 +20,42 @@ under the License.
 package org.apache.griffin.core.job.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
 @Entity
 public class JobDataSegment extends AbstractAuditableEntity {
 
-	private static final long serialVersionUID = -9056531122243340484L;
+    private static final long serialVersionUID = -9056531122243340484L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JobDataSegment.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobDataSegment.class);
 
     @NotNull
     private String dataConnectorName;
 
-    private boolean baseline = false;
+    private boolean asTsBaseline = false;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "segment_range_id")
     private SegmentRange segmentRange = new SegmentRange();
 
     @JsonProperty("as.baseline")
-    public boolean isBaseline() {
-        return baseline;
+    public boolean isAsTsBaseline() {
+        return asTsBaseline;
     }
 
-    public void setBaseline(boolean baseline) {
-        this.baseline = baseline;
+    public void setAsTsBaseline(boolean asTsBaseline) {
+        this.asTsBaseline = asTsBaseline;
     }
 
     @JsonProperty("segment.range")
@@ -80,12 +85,12 @@ public class JobDataSegment extends AbstractAuditableEntity {
 
     public JobDataSegment(String dataConnectorName, boolean baseline) {
         this.dataConnectorName = dataConnectorName;
-        this.baseline = baseline;
+        this.asTsBaseline = baseline;
     }
 
     public JobDataSegment(String dataConnectorName, boolean baseline, SegmentRange segmentRange) {
         this.dataConnectorName = dataConnectorName;
-        this.baseline = baseline;
+        this.asTsBaseline = baseline;
         this.segmentRange = segmentRange;
     }
 }

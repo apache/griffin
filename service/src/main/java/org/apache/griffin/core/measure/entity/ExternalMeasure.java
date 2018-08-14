@@ -21,21 +21,22 @@ package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.griffin.core.job.entity.VirtualJob;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 
+import org.apache.griffin.core.job.entity.VirtualJob;
+
 /**
  * Measures to publish metrics that processed externally
  */
 @Entity
 public class ExternalMeasure extends Measure {
-	private static final long serialVersionUID = -7551493544224747244L;
+    private static final long serialVersionUID = -7551493544224747244L;
 
-	private String metricName;
+    private String metricName;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

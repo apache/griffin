@@ -20,6 +20,13 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_ID_DOES_NOT_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_NAME_ALREADY_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_MATCH;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_SUPPORT;
+
+import java.util.List;
+
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
@@ -34,10 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 
 @Service
 public class MeasureServiceImpl implements MeasureService {

@@ -6,24 +6,14 @@
     }
   },
 
-  "persist": [
+  "sinks": [
     {
-      "type": "log",
+      "type": "console",
       "config": {
         "max.log.lines": 10
-      }
-    },
-    {
-      "type": "hdfs",
-      "config": {
-        "path": "hdfs://localhost/griffin/batch/persist",
-        "max.persist.lines": 10000,
-        "max.lines.per.file": 10000
       }
     }
   ],
 
-  "info.cache": [],
-
-  "cleaner": {}
+  "griffin.checkpoint": []
 }

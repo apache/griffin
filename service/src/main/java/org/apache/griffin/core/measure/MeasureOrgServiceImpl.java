@@ -19,6 +19,13 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.ORGANIZATION_NAME_DOES_NOT_EXIST;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
@@ -26,13 +33,6 @@ import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.ORGANIZATION_NAME_DOES_NOT_EXIST;
 
 @Service
 public class MeasureOrgServiceImpl implements MeasureOrgService {
@@ -47,7 +47,7 @@ public class MeasureOrgServiceImpl implements MeasureOrgService {
 
     @Override
     public List<String> getMetricNameListByOrg(String org) {
-        List<String> orgs =  measureRepo.findNameByOrganization(org, false);
+        List<String> orgs = measureRepo.findNameByOrganization(org, false);
         if (CollectionUtils.isEmpty(orgs)) {
             throw new GriffinException.NotFoundException(ORGANIZATION_NAME_DOES_NOT_EXIST);
         }

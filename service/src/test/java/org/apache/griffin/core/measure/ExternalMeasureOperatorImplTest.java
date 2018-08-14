@@ -19,6 +19,11 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.job.repo.VirtualJobRepo;
@@ -31,11 +36,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
 public class ExternalMeasureOperatorImplTest {

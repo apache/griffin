@@ -19,6 +19,19 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.util.EntityHelper.createFileExistPredicate;
+import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityHelper.createJobDetail;
+import static org.apache.griffin.core.util.EntityHelper.createJobInstance;
+import static org.apache.griffin.core.util.EntityHelper.createSimpleTrigger;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.util.Collections;
+import java.util.Properties;
+
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
@@ -39,13 +52,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Collections;
-import java.util.Properties;
-
-import static org.apache.griffin.core.util.EntityHelper.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)

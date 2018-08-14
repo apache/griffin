@@ -16,12 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.context.streaming.offset
+package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.context.streaming.lock.CacheLock
+import org.apache.griffin.measure.context.streaming.checkpoint.lock.CheckpointLock
 
-trait OffsetCache extends Loggable with Serializable {
+trait OffsetCheckpoint extends Loggable with Serializable {
 
   def init(): Unit
   def available(): Boolean
@@ -34,6 +34,6 @@ trait OffsetCache extends Loggable with Serializable {
 
   def listKeys(path: String): List[String]
 
-  def genLock(s: String): CacheLock
+  def genLock(s: String): CheckpointLock
 
 }

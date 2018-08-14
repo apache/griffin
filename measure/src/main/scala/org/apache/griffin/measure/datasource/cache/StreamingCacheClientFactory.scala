@@ -36,17 +36,17 @@ object StreamingCacheClientFactory extends Loggable {
 
   /**
     * create streaming cache client
-    * @param sqlContext   sqlContext in spark environment
-    * @param cacheOpt     data source cache config option
-    * @param name         data source name
-    * @param index        data source index
-    * @param tmstCache    the same tmstCache instance inside a data source
-    * @return             streaming cache client option
+    * @param sqlContext     sqlContext in spark environment
+    * @param checkpointOpt  data source checkpoint/cache config option
+    * @param name           data source name
+    * @param index          data source index
+    * @param tmstCache      the same tmstCache instance inside a data source
+    * @return               streaming cache client option
     */
-  def getClientOpt(sqlContext: SQLContext, cacheOpt: Option[Map[String, Any]],
+  def getClientOpt(sqlContext: SQLContext, checkpointOpt: Option[Map[String, Any]],
                    name: String, index: Int, tmstCache: TimestampStorage
                   ): Option[StreamingCacheClient] = {
-    cacheOpt.flatMap { param =>
+    checkpointOpt.flatMap { param =>
       try {
         val tp = param.getString(_type, "")
         val dsCache = tp match {

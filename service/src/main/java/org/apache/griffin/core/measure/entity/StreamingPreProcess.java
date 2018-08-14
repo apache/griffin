@@ -24,20 +24,28 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import java.io.IOException;
+import java.util.Map;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
+
 import org.apache.griffin.core.util.JsonUtil;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import java.io.IOException;
-import java.util.Map;
-
 @Entity
 public class StreamingPreProcess extends AbstractAuditableEntity {
-	private static final long serialVersionUID = -7471448761795495384L;
+    private static final long serialVersionUID = -7471448761795495384L;
 
-	private String dslType;
+    private String dslType;
 
-    private String name;
+    private String inDataFrameName;
+
+    private String outDataFrameName;
 
     private String rule;
 
@@ -58,13 +66,24 @@ public class StreamingPreProcess extends AbstractAuditableEntity {
         this.dslType = dslType;
     }
 
-    public String getName() {
-        return name;
+    @JsonProperty("in.dataframe.name")
+    public String getInDataFrameName() {
+        return inDataFrameName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setInDataFrameName(String inDataFrameName) {
+        this.inDataFrameName = inDataFrameName;
     }
+
+    @JsonProperty("out.dataframe.name")
+    public String getOutDataFrameName() {
+        return outDataFrameName;
+    }
+
+    public void setOutDataFrameName(String outDataFrameName) {
+        this.outDataFrameName = outDataFrameName;
+    }
+
 
     public String getRule() {
         return rule;

@@ -18,39 +18,36 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
-import org.apache.griffin.measure.configuration.dqdefinition.PersistParam
+import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
+import org.apache.griffin.measure.configuration.enums._
 
 import scala.util.{Success, Try}
 
 
-case class SinkFactory(persistParams: Iterable[PersistParam], metricName: String) extends Serializable {
-
-  val HDFS_REGEX = """^(?i)hdfs$""".r
-  val HTTP_REGEX = """^(?i)http$""".r
-  val LOG_REGEX = """^(?i)log$""".r
-  val MONGO_REGEX = """^(?i)mongo$""".r
+case class SinkFactory(sinkParams: Iterable[SinkParam], metricName: String) extends Serializable {
 
   /**
-    * create persist
-    * @param timeStamp    the timestamp of persist
-    * @param block        persist write metric in block or non-block way
-    * @return   persist
+    * create sink
+    * @param timeStamp    the timestamp of sink
+    * @param block        sink write metric in block or non-block way
+    * @return   sink
     */
-  def getPersists(timeStamp: Long, block: Boolean): MultiSinks = {
-    MultiSinks(persistParams.flatMap(param => getPersist(timeStamp, param, block)))
+  def getSinks(timeStamp: Long, block: Boolean): MultiSinks = {
+    MultiSinks(sinkParams.flatMap(param => getSink(timeStamp, param, block)))
   }
 
-  private def getPersist(timeStamp: Long, persistParam: PersistParam, block: Boolean): Option[Sink] = {
-    val config = persistParam.getConfig
-    val persistTry = persistParam.getType match {
-      case LOG_REGEX() => Try(ConsoleSink(config, metricName, timeStamp))
-      case HDFS_REGEX() => Try(HdfsSink(config, metricName, timeStamp))
-      case HTTP_REGEX() => Try(HttpSink(config, metricName, timeStamp, block))
-      case MONGO_REGEX() => Try(MongoSink(config, metricName, timeStamp, block))
-      case _ => throw new Exception("not supported persist type")
+  private def getSink(timeStamp: Long, sinkParam: SinkParam, block: Boolean): Option[Sink] = {
+    val config = sinkParam.getConfig
+    val sinkType = sinkParam.getType
+    val sinkTry = sinkType match {
+      case ConsoleSinkType => Try(ConsoleSink(config, metricName, timeStamp))
+      case HdfsSinkType => Try(HdfsSink(config, metricName, timeStamp))
+      case ElasticsearchSinkType => Try(ElasticSearchSink(config, metricName, timeStamp, block))
+      case MongoSinkType => Try(MongoSink(config, metricName, timeStamp, block))
+      case _ => throw new Exception(s"sink type ${sinkType} is not supported!")
     }
-    persistTry match {
-      case Success(persist) if (persist.available) => Some(persist)
+    sinkTry match {
+      case Success(sink) if (sink.available) => Some(sink)
       case _ => None
     }
   }

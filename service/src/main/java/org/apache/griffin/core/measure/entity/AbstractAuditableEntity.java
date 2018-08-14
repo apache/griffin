@@ -21,19 +21,19 @@ package org.apache.griffin.core.measure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
-import java.sql.Timestamp;
 
 @MappedSuperclass
 public abstract class AbstractAuditableEntity implements Serializable {
 
-	private static final long serialVersionUID = 4161638281338218249L;
+    private static final long serialVersionUID = 4161638281338218249L;
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 
