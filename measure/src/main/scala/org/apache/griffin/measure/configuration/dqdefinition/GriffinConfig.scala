@@ -27,8 +27,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
   * @param dqConfig    dq measurement configuration (must)
   */
 @JsonInclude(Include.NON_NULL)
-case class GriffinConfig(@JsonProperty("env") envConfig: EnvConfig,
-                         @JsonProperty("dq") dqConfig: DQConfig
+case class GriffinConfig(@JsonProperty("env") private val envConfig: EnvConfig,
+                         @JsonProperty("dq") private val dqConfig: DQConfig
                    ) extends Param {
   def getEnvConfig: EnvConfig = envConfig
   def getDqConfig: DQConfig = dqConfig
