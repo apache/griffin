@@ -30,9 +30,9 @@ import org.apache.griffin.measure.configuration.enums._
   * @param checkpointParams   config of checkpoint locations (required in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
-case class EnvConfig(@JsonProperty("spark") sparkParam: SparkParam,
-                     @JsonProperty("sinks") sinkParams: List[SinkParam],
-                     @JsonProperty("griffin.checkpoint") checkpointParams: List[CheckpointParam]
+case class EnvConfig(@JsonProperty("spark") private val sparkParam: SparkParam,
+                     @JsonProperty("sinks") private val sinkParams: List[SinkParam],
+                     @JsonProperty("griffin.checkpoint") private val checkpointParams: List[CheckpointParam]
                    ) extends Param {
   def getSparkParam: SparkParam = sparkParam
   def getSinkParams: Seq[SinkParam] = if (sinkParams != null) sinkParams else Nil
@@ -56,12 +56,12 @@ case class EnvConfig(@JsonProperty("spark") sparkParam: SparkParam,
   * @param initClear        clear checkpoint directory or not when initial (optional)
   */
 @JsonInclude(Include.NON_NULL)
-case class SparkParam( @JsonProperty("log.level") logLevel: String,
-                       @JsonProperty("checkpoint.dir") cpDir: String,
-                       @JsonProperty("batch.interval") batchInterval: String,
-                       @JsonProperty("process.interval") processInterval: String,
-                       @JsonProperty("config") config: Map[String, String],
-                       @JsonProperty("init.clear") initClear: Boolean
+case class SparkParam( @JsonProperty("log.level") private val logLevel: String,
+                       @JsonProperty("checkpoint.dir") private val cpDir: String,
+                       @JsonProperty("batch.interval") private val batchInterval: String,
+                       @JsonProperty("process.interval") private val processInterval: String,
+                       @JsonProperty("config") private val config: Map[String, String],
+                       @JsonProperty("init.clear") private val initClear: Boolean
                      ) extends Param {
   def getLogLevel: String = if (logLevel != null) logLevel else "WARN"
   def getCpDir: String = if (cpDir != null) cpDir else ""
@@ -83,8 +83,8 @@ case class SparkParam( @JsonProperty("log.level") logLevel: String,
   * @param config         config of sink way (must)
   */
 @JsonInclude(Include.NON_NULL)
-case class SinkParam(@JsonProperty("type") sinkType: String,
-                     @JsonProperty("config") config: Map[String, Any]
+case class SinkParam(@JsonProperty("type") private val sinkType: String,
+                     @JsonProperty("config") private val config: Map[String, Any]
                     ) extends Param {
   def getType: SinkType = SinkType(sinkType)
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
@@ -100,8 +100,8 @@ case class SinkParam(@JsonProperty("type") sinkType: String,
   * @param config       config of checkpoint location
   */
 @JsonInclude(Include.NON_NULL)
-case class CheckpointParam(@JsonProperty("type") cpType: String,
-                           @JsonProperty("config") config: Map[String, Any]
+case class CheckpointParam(@JsonProperty("type") private val cpType: String,
+                           @JsonProperty("config") private val config: Map[String, Any]
                           ) extends Param {
   def getType: String = cpType
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()

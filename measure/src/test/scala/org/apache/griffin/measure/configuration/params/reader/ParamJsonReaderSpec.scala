@@ -18,7 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.configuration.params.reader
 
-import org.apache.griffin.measure.configuration.params.DQConfig
+import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
+import org.apache.griffin.measure.configuration.dqdefinition.reader.{ParamJsonReader, ParamReader}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.io.Source
@@ -36,8 +37,8 @@ class ParamJsonReaderSpec extends FlatSpec with Matchers{
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
-        v.evaluateRule.getRules(0).dslType should === ("spark-sql")
-        v.evaluateRule.getRules(0).name should === ("missRecords")
+        v.getEvaluateRule.getRules(0).getDslType.desc should === ("spark-sql")
+        v.getEvaluateRule.getRules(0).getOutDfName() should === ("missRecords")
       case Failure(_) =>
         fail("it should not happen")
     }
