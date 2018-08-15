@@ -78,7 +78,7 @@ case class DataSourceParam( @JsonProperty("name") private val name: String,
                             @JsonProperty("checkpoint") private val checkpoint: Map[String, Any]
                           ) extends Param {
   def getName: String = name
-  def isBaseline: Boolean = if (baseline != null) baseline else false
+  def isBaseline: Boolean = if (!baseline.equals(null)) baseline else false
   def getConnectors: Seq[DataConnectorParam] = if (connectors != null) connectors else Nil
   def getCheckpointOpt: Option[Map[String, Any]] = if (checkpoint != null) Some(checkpoint) else None
 

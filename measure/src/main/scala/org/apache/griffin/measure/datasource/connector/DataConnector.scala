@@ -33,7 +33,7 @@ import org.apache.spark.sql.functions._
 
 trait DataConnector extends Loggable with Serializable {
 
-  @transient val sparkSession: SparkSession
+  val sparkSession: SparkSession
 
   val dcParam: DataConnectorParam
 
