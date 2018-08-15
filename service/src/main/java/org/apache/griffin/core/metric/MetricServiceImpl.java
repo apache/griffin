@@ -50,7 +50,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MetricServiceImpl implements MetricService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetricServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(MetricServiceImpl.class);
 
     @Autowired
     private MeasureRepo<Measure> measureRepo;
@@ -64,16 +65,20 @@ public class MetricServiceImpl implements MetricService {
         Map<String, List<Metric>> metricMap = new HashMap<>();
         List<AbstractJob> jobs = jobRepo.findByDeleted(false);
         List<Measure> measures = measureRepo.findByDeleted(false);
-        Map<Long, Measure> measureMap = measures.stream().collect(Collectors.toMap(Measure::getId, Function.identity()));
-        Map<Long, List<AbstractJob>> jobMap = jobs.stream().collect(Collectors.groupingBy(AbstractJob::getMeasureId, Collectors.toList()));
+        Map<Long, Measure> measureMap = measures.stream().collect(Collectors
+                .toMap(Measure::getId, Function.identity()));
+        Map<Long, List<AbstractJob>> jobMap = jobs.stream().collect(Collectors
+                .groupingBy(AbstractJob::getMeasureId, Collectors.toList()));
         for (Map.Entry<Long, List<AbstractJob>> entry : jobMap.entrySet()) {
             Long measureId = entry.getKey();
             Measure measure = measureMap.get(measureId);
             List<AbstractJob> jobList = entry.getValue();
             List<Metric> metrics = new ArrayList<>();
             for (AbstractJob job : jobList) {
-                List<MetricValue> metricValues = getMetricValues(job.getMetricName(), 0, 300, job.getCreatedDate());
-                metrics.add(new Metric(job.getMetricName(), measure.getDqType(), measure.getOwner(), metricValues));
+                List<MetricValue> metricValues = getMetricValues(job
+                        .getMetricName(), 0, 300, job.getCreatedDate());
+                metrics.add(new Metric(job.getMetricName(), measure.getDqType(),
+                        measure.getOwner(), metricValues));
             }
             metricMap.put(measure.getName(), metrics);
 
@@ -82,18 +87,23 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @Override
-    public List<MetricValue> getMetricValues(String metricName, int offset, int size, long tmst) {
+    public List<MetricValue> getMetricValues(String metricName, int offset,
+                                             int size, long tmst) {
         if (offset < 0) {
-            throw new GriffinException.BadRequestException(INVALID_METRIC_RECORDS_OFFSET);
+            throw new GriffinException.BadRequestException
+                    (INVALID_METRIC_RECORDS_OFFSET);
         }
         if (size < 0) {
-            throw new GriffinException.BadRequestException(INVALID_METRIC_RECORDS_SIZE);
+            throw new GriffinException.BadRequestException
+                    (INVALID_METRIC_RECORDS_SIZE);
         }
         try {
             return metricStore.getMetricValues(metricName, offset, size, tmst);
         } catch (IOException e) {
-            LOGGER.error("Failed to get metric values named {}. {}", metricName, e.getMessage());
-            throw new GriffinException.ServiceException("Failed to get metric values", e);
+            LOGGER.error("Failed to get metric values named {}. {}",
+                    metricName, e.getMessage());
+            throw new GriffinException.ServiceException(
+                    "Failed to get metric values", e);
         }
     }
 
@@ -107,10 +117,12 @@ public class MetricServiceImpl implements MetricService {
             return metricStore.addMetricValues(values);
         } catch (JsonProcessingException e) {
             LOGGER.warn("Failed to parse metric value.", e.getMessage());
-            throw new GriffinException.BadRequestException(INVALID_METRIC_VALUE_FORMAT);
+            throw new GriffinException.BadRequestException
+                    (INVALID_METRIC_VALUE_FORMAT);
         } catch (IOException e) {
             LOGGER.error("Failed to add metric values", e);
-            throw new GriffinException.ServiceException("Failed to add metric values", e);
+            throw new GriffinException.ServiceException(
+                    "Failed to add metric values", e);
         }
     }
 
@@ -120,14 +132,18 @@ public class MetricServiceImpl implements MetricService {
         try {
             return metricStore.deleteMetricValues(metricName);
         } catch (IOException e) {
-            LOGGER.error("Failed to delete metric values named {}. {}", metricName, e.getMessage());
-            throw new GriffinException.ServiceException("Failed to delete metric values.", e);
+            LOGGER.error("Failed to delete metric values named {}. {}",
+                    metricName, e.getMessage());
+            throw new GriffinException.ServiceException(
+                    "Failed to delete metric values.", e);
         }
     }
 
     private void checkFormat(MetricValue value) {
-        if (StringUtils.isBlank(value.getName()) || value.getTmst() == null || MapUtils.isEmpty(value.getValue())) {
-            throw new GriffinException.BadRequestException(INVALID_METRIC_VALUE_FORMAT);
+        if (StringUtils.isBlank(value.getName()) || value.getTmst() == null
+                || MapUtils.isEmpty(value.getValue())) {
+            throw new GriffinException.BadRequestException
+                    (INVALID_METRIC_VALUE_FORMAT);
         }
     }
 }

@@ -86,15 +86,17 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(config)) {
-            this.configMap = JsonUtil.toEntity(config, new TypeReference<Map<String, Object>>() {
-            });
+            this.configMap = JsonUtil.toEntity(config,
+                    new TypeReference<Map<String, Object>>() {
+                    });
         }
     }
 
     public SegmentPredicate() {
     }
 
-    public SegmentPredicate(String type, Map<String, String> configMap) throws JsonProcessingException {
+    public SegmentPredicate(String type, Map<String, String> configMap) throws
+            JsonProcessingException {
         this.type = type;
         this.config = JsonUtil.toJson(configMap);
     }

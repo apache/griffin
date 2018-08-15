@@ -22,7 +22,8 @@ package org.apache.griffin.core.job.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Encapsulating job scheduler state to reduce job startup and stop logical processing
+ * Encapsulating job scheduler state to reduce job startup and stop logical
+ * processing
  */
 public class JobState {
 

@@ -74,7 +74,8 @@ public class EnvConfig {
      * @return String
      * @throws IOException io exception
      */
-    private static String readEnvFromAbsolutePath(String path) throws IOException {
+    private static String readEnvFromAbsolutePath(String path)
+            throws IOException {
         if (path == null) {
             LOGGER.warn("Parameter path is null.");
             return null;
@@ -101,7 +102,8 @@ public class EnvConfig {
      * @return String
      * @throws IOException io exception
      */
-    static String getBatchEnv(String name, String defaultPath, String location) throws IOException {
+    static String getBatchEnv(String name, String defaultPath, String location)
+            throws IOException {
         if (ENV_BATCH != null) {
             return ENV_BATCH;
         }
@@ -116,7 +118,9 @@ public class EnvConfig {
         return ENV_BATCH;
     }
 
-    static String getStreamingEnv(String name, String defaultPath, String location)
+    static String getStreamingEnv(String name,
+                                  String defaultPath,
+                                  String location)
             throws IOException {
         if (ENV_STREAMING != null) {
             return ENV_STREAMING;

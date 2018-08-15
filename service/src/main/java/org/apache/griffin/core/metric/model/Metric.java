@@ -33,7 +33,8 @@ public class Metric {
     public Metric() {
     }
 
-    public Metric(String name, DqType type, String owner, List<MetricValue> metricValues) {
+    public Metric(String name, DqType type, String owner,
+                  List<MetricValue> metricValues) {
         this.name = name;
         this.type = type;
         this.owner = owner;

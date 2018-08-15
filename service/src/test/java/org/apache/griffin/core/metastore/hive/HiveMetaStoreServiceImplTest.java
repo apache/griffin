@@ -82,7 +82,8 @@ public class HiveMetaStoreServiceImplTest {
     public void testGetAllTableNamesForNormalRun() throws MetaException {
         String dbName = "default";
         given(client.getAllTables(dbName)).willReturn(Arrays.asList(dbName));
-        assertEquals(service.getAllTableNames(dbName).iterator().hasNext(), true);
+        assertEquals(service.getAllTableNames(dbName).iterator().hasNext(),
+                true);
     }
 
     @Test
@@ -98,7 +99,8 @@ public class HiveMetaStoreServiceImplTest {
     public void testGetAllTableByDBNameForNormalRun() throws TException {
         String useDbName = "default";
         String tableName = "table";
-        given(client.getAllTables(useDbName)).willReturn(Arrays.asList(tableName));
+        given(client.getAllTables(useDbName)).willReturn(Arrays
+                .asList(tableName));
         given(client.getTable(useDbName, tableName)).willReturn(new Table());
         assertEquals(service.getAllTable(useDbName).size(), 1);
     }
@@ -117,7 +119,8 @@ public class HiveMetaStoreServiceImplTest {
         String tableName = "table";
         List<String> databases = Arrays.asList(useDbName);
         given(client.getAllDatabases()).willReturn(databases);
-        given(client.getAllTables(databases.get(0))).willReturn(Arrays.asList(tableName));
+        given(client.getAllTables(databases.get(0))).willReturn(Arrays
+                .asList(tableName));
         given(client.getTable(useDbName, tableName)).willReturn(new Table());
         assertEquals(service.getAllTable().size(), 1);
     }

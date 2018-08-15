@@ -66,15 +66,18 @@ public class JobInstanceBeanRepoTest {
 
     @Test
     public void testFindByJobIdWithPageable() {
-        Pageable pageRequest = new PageRequest(0, 10, Sort.Direction.DESC, "tms");
-        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(1L, pageRequest);
+        Pageable pageRequest = new PageRequest(0, 10, Sort.Direction.DESC,
+                "tms");
+        List<JobInstanceBean> instances = jobInstanceRepo.findByJobId(1L,
+                pageRequest);
         assertEquals(3, instances.size());
     }
 
 
     @Test
     public void testFindByActiveState() {
-        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
+        LivySessionStates.State[] states = {STARTING, NOT_STARTED, RECOVERING,
+                IDLE, RUNNING, BUSY};
         List<JobInstanceBean> list = jobInstanceRepo.findByActiveState(states);
         assertEquals(1, list.size());
     }
@@ -82,14 +85,20 @@ public class JobInstanceBeanRepoTest {
 
     private void setEntityManager() {
         VirtualJob job = new VirtualJob();
-        JobInstanceBean instance1 = new JobInstanceBean(1L, LivySessionStates.State.SUCCESS,
-                "appId1", "http://domain.com/uri1", System.currentTimeMillis(), System.currentTimeMillis());
+        JobInstanceBean instance1 = new JobInstanceBean(1L, LivySessionStates
+                .State.SUCCESS,
+                "appId1", "http://domain.com/uri1", System.currentTimeMillis(),
+                System.currentTimeMillis());
         instance1.setJob(job);
-        JobInstanceBean instance2 = new JobInstanceBean(2L, LivySessionStates.State.ERROR,
-                "appId2", "http://domain.com/uri2", System.currentTimeMillis(), System.currentTimeMillis());
+        JobInstanceBean instance2 = new JobInstanceBean(2L, LivySessionStates
+                .State.ERROR,
+                "appId2", "http://domain.com/uri2", System.currentTimeMillis(),
+                System.currentTimeMillis());
         instance2.setJob(job);
-        JobInstanceBean instance3 = new JobInstanceBean(2L, LivySessionStates.State.STARTING,
-                "appId3", "http://domain.com/uri3", System.currentTimeMillis(), System.currentTimeMillis());
+        JobInstanceBean instance3 = new JobInstanceBean(2L, LivySessionStates
+                .State.STARTING,
+                "appId3", "http://domain.com/uri3", System.currentTimeMillis(),
+                System.currentTimeMillis());
         instance3.setJob(job);
         entityManager.persistAndFlush(job);
         entityManager.persistAndFlush(instance1);

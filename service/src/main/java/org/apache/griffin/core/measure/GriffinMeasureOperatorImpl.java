@@ -35,7 +35,8 @@ public class GriffinMeasureOperatorImpl implements MeasureOperator {
     private final JobServiceImpl jobService;
 
     @Autowired
-    public GriffinMeasureOperatorImpl(MeasureRepo<Measure> measureRepo, JobServiceImpl jobService) {
+    public GriffinMeasureOperatorImpl(MeasureRepo<Measure> measureRepo,
+                                      JobServiceImpl jobService) {
         this.measureRepo = measureRepo;
         this.jobService = jobService;
     }

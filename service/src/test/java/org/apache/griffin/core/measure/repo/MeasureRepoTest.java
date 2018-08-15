@@ -83,7 +83,8 @@ public class MeasureRepoTest {
 
     @Test
     public void testFindByOwnerAndDeleted() {
-        List<Measure> measures = measureRepo.findByOwnerAndDeleted("test", false);
+        List<Measure> measures = measureRepo.findByOwnerAndDeleted("test",
+                false);
         assertThat(measures.size()).isEqualTo(2);
     }
 

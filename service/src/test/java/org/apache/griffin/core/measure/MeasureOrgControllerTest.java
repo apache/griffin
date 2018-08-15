@@ -63,7 +63,8 @@ public class MeasureOrgControllerTest {
     @Test
     public void testGetMetricNameListByOrg() throws Exception {
         String org = "hadoop";
-        when(measureOrgService.getMetricNameListByOrg(org)).thenReturn(Arrays.asList(org));
+        when(measureOrgService.getMetricNameListByOrg(org)).thenReturn(Arrays
+                .asList(org));
 
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/{org}", org))
                 .andExpect(status().isOk())

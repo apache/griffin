@@ -57,7 +57,8 @@ public class ExternalMeasureOperatorImplTest {
     public void testCreateForSuccess() {
         ExternalMeasure measure = createExternalMeasure("view_item_hourly");
         given(measureRepo.save(measure)).willReturn(measure);
-        given(jobRepo.save(Matchers.any(VirtualJob.class))).willReturn(new VirtualJob());
+        given(jobRepo.save(Matchers.any(VirtualJob.class))).willReturn(
+                new VirtualJob());
 
         operator.create(measure);
         verify(jobRepo, times(1)).save(new VirtualJob());
@@ -76,10 +77,12 @@ public class ExternalMeasureOperatorImplTest {
         ExternalMeasure measure = createExternalMeasure("view_item_hourly");
         measure.setId(1L);
         given(measureRepo.findOne(1L)).willReturn(measure);
-        given(measureRepo.save(Matchers.any(ExternalMeasure.class))).willReturn(measure);
+        given(measureRepo.save(Matchers.any(ExternalMeasure.class)))
+                .willReturn(measure);
 
         operator.create(measure);
-        verify(measureRepo, times(1)).save(Matchers.any(ExternalMeasure.class));
+        verify(measureRepo, times(1)).save(
+                Matchers.any(ExternalMeasure.class));
     }
 
     @Test(expected = GriffinException.BadRequestException.class)

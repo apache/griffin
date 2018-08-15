@@ -42,7 +42,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(value = KafkaSchemaController.class, secure = false)
 public class KafkaSchemaControllerTest {
 
-    private static final String API_PATH = URLHelper.API_VERSION_PATH + URLHelper.KAFKA_API_PATH;
+    private static final String API_PATH = URLHelper.API_VERSION_PATH +
+            URLHelper.KAFKA_API_PATH;
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,7 +77,8 @@ public class KafkaSchemaControllerTest {
     @Test
     public void test_getSubjectVersions() throws Exception {
         String subject = "s-1";
-        when(kafkaSchemaService.getSubjectVersions(subject)).thenReturn(Arrays.asList(1, 2, 3));
+        when(kafkaSchemaService.getSubjectVersions(subject)).thenReturn(Arrays
+                .asList(1, 2, 3));
         mockMvc.perform(get(API_PATH + "/versions")
                 .param("subject", subject))
                 .andExpect(status().isOk());
@@ -87,7 +89,8 @@ public class KafkaSchemaControllerTest {
     public void test_getSubjectSchema() throws Exception {
         String subject = "ss.s";
         String version = "ss";
-        when(kafkaSchemaService.getSubjectSchema(subject, version)).thenReturn(null);
+        when(kafkaSchemaService.getSubjectSchema(subject, version))
+                .thenReturn(null);
         mockMvc.perform(get(API_PATH + "/subjectSchema", subject, version)
                 .param("subject", subject)
                 .param("version", version))
@@ -106,7 +109,8 @@ public class KafkaSchemaControllerTest {
     @Test
     public void test_getSubjectLevelConfig() throws Exception {
         String subject = "sss";
-        when(kafkaSchemaService.getSubjectLevelConfig(subject)).thenReturn(null);
+        when(kafkaSchemaService.getSubjectLevelConfig(subject))
+                .thenReturn(null);
         mockMvc.perform(get(API_PATH + "/config/{subject}", subject))
                 .andExpect(status().isOk());
         verify(kafkaSchemaService).getSubjectLevelConfig(subject);

@@ -78,7 +78,8 @@ import org.springframework.transaction.annotation.Transactional;
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
 public class JobInstance implements Job {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobInstance.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(JobInstance.class);
     public static final String MEASURE_KEY = "measure";
     public static final String PREDICATES_KEY = "predicts";
     public static final String PREDICATE_JOB_NAME = "predicateJobName";
@@ -86,7 +87,8 @@ public class JobInstance implements Job {
     static final String PATH_CONNECTOR_CHARACTER = ",";
     public static final String INTERVAL = "interval";
     public static final String REPEAT = "repeat";
-    public static final String CHECK_DONEFILE_SCHEDULE = "checkdonefile.schedule";
+    public static final String CHECK_DONEFILE_SCHEDULE =
+            "checkdonefile.schedule";
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -104,7 +106,6 @@ public class JobInstance implements Job {
     private List<SegmentPredicate> mPredicates;
     private Long jobStartTime;
 
-
     @Override
     @Transactional
     public void execute(JobExecutionContext context) {
@@ -117,7 +118,8 @@ public class JobInstance implements Job {
         }
     }
 
-    private void initParam(JobExecutionContext context) throws SchedulerException {
+    private void initParam(JobExecutionContext context)
+            throws SchedulerException {
         mPredicates = new ArrayList<>();
         JobDetail jobDetail = context.getJobDetail();
         Long jobId = jobDetail.getJobDataMap().getLong(GRIFFIN_JOB_ID);
@@ -128,20 +130,24 @@ public class JobInstance implements Job {
     }
 
     @SuppressWarnings("unchecked")
-    private void setJobStartTime(JobDetail jobDetail) throws SchedulerException {
+    private void setJobStartTime(JobDetail jobDetail)
+            throws SchedulerException {
         Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobDetail.getKey();
-        List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+        List<Trigger> triggers =
+                (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         Date triggerTime = triggers.get(0).getPreviousFireTime();
         jobStartTime = triggerTime.getTime();
     }
 
 
-    private void setSourcesPartitionsAndPredicates(List<DataSource> sources) throws Exception {
+    private void setSourcesPartitionsAndPredicates(List<DataSource> sources)
+            throws Exception {
         boolean isFirstBaseline = true;
         for (JobDataSegment jds : job.getSegments()) {
             if (jds.isAsTsBaseline() && isFirstBaseline) {
-                Long tsOffset = TimeUtil.str2Long(jds.getSegmentRange().getBegin());
+                Long tsOffset = TimeUtil.str2Long(
+                    jds.getSegmentRange().getBegin());
                 measure.setTimestamp(jobStartTime + tsOffset);
                 isFirstBaseline = false;
             }
@@ -151,7 +157,8 @@ public class JobInstance implements Job {
         }
     }
 
-    private void setDataSourcePartitions(JobDataSegment jds, DataSource ds) throws Exception {
+    private void setDataSourcePartitions(JobDataSegment jds, DataSource ds)
+            throws Exception {
         List<DataConnector> connectors = ds.getConnectors();
         for (DataConnector dc : connectors) {
             setDataConnectorPartitions(jds, dc);
@@ -159,7 +166,9 @@ public class JobInstance implements Job {
     }
 
 
-    private void setDataConnectorPartitions(JobDataSegment jds, DataConnector dc) throws Exception {
+    private void setDataConnectorPartitions(
+            JobDataSegment jds,
+            DataConnector dc) throws Exception {
         String dcName = jds.getDataConnectorName();
         if (dcName.equals(dc.getName())) {
             Long[] sampleTs = genSampleTs(jds.getSegmentRange(), dc);
@@ -179,7 +188,8 @@ public class JobInstance implements Job {
         Long offset = TimeUtil.str2Long(segRange.getBegin());
         Long range = TimeUtil.str2Long(segRange.getLength());
         String unit = dc.getDataUnit();
-        Long dataUnit = TimeUtil.str2Long(StringUtils.isEmpty(unit) ? dc.getDefaultDataUnit() : unit);
+        Long dataUnit = TimeUtil.str2Long(StringUtils.isEmpty(unit) ? dc
+                .getDefaultDataUnit() : unit);
         //offset usually is negative
         Long dataStartTime = jobStartTime + offset;
         if (range < 0) {
@@ -206,7 +216,9 @@ public class JobInstance implements Job {
     private void setConnectorPredicates(DataConnector dc, Long[] sampleTs) {
         List<SegmentPredicate> predicates = dc.getPredicates();
         for (SegmentPredicate predicate : predicates) {
-            genConfMap(predicate.getConfigMap(), sampleTs, dc.getDataTimeZone());
+            genConfMap(predicate.getConfigMap(),
+                    sampleTs,
+                    dc.getDataTimeZone());
             //Do not forget to update origin string config
             predicate.setConfigMap(predicate.getConfigMap());
             mPredicates.add(predicate);
@@ -222,11 +234,15 @@ public class JobInstance implements Job {
     /**
      * @param conf     config map
      * @param sampleTs collection of data split start timestamp
-     * @return all config data combine,like {"where": "year=2017 AND month=11 AND dt=15 AND hour=09,year=2017 AND month=11 AND dt=15 AND hour=10"}
-     * or like {"path": "/year=2017/month=11/dt=15/hour=09/_DONE,/year=2017/month=11/dt=15/hour=10/_DONE"}
+     * @return all config data combine,like {"where": "year=2017 AND month=11
+     * AND dt=15 AND hour=09,year=2017 AND month=11 AND
+     * dt=15 AND hour=10"}
+     * or like {"path": "/year=2017/month=11/dt=15/hour=09/_DONE
+     * ,/year=2017/month=11/dt=15/hour=10/_DONE"}
      */
 
-    private void genConfMap(Map<String, Object> conf, Long[] sampleTs, String timezone) {
+    private void genConfMap(Map<String, Object> conf, Long[] sampleTs, String
+            timezone) {
         if (conf == null) {
             LOGGER.warn("Predicate config is null.");
             return;
@@ -240,9 +256,11 @@ public class JobInstance implements Job {
                     continue;
                 }
                 for (Long timestamp : sampleTs) {
-                    set.add(TimeUtil.format(value, timestamp, getTimeZone(timezone)));
+                    set.add(TimeUtil.format(value, timestamp,
+                            getTimeZone(timezone)));
                 }
-                conf.put(entry.getKey(), StringUtils.join(set, PATH_CONNECTOR_CHARACTER));
+                conf.put(entry.getKey(), StringUtils.join(set,
+                        PATH_CONNECTOR_CHARACTER));
             }
         }
     }
@@ -255,16 +273,20 @@ public class JobInstance implements Job {
     }
 
     @SuppressWarnings("unchecked")
-    private void createJobInstance(Map<String, Object> confMap) throws Exception {
+    private void createJobInstance(Map<String, Object> confMap)
+            throws Exception {
         confMap = checkConfMap(confMap != null ? confMap : new HashMap<>());
-        Map<String, Object> config = (Map<String, Object>) confMap.get(CHECK_DONEFILE_SCHEDULE);
+        Map<String, Object> config = (Map<String, Object>) confMap
+                .get(CHECK_DONEFILE_SCHEDULE);
         Long interval = TimeUtil.str2Long((String) config.get(INTERVAL));
         Integer repeat = Integer.valueOf(config.get(REPEAT).toString());
         String groupName = "PG";
-        String jobName = job.getJobName() + "_predicate_" + System.currentTimeMillis();
+        String jobName = job.getJobName() + "_predicate_" + System
+                .currentTimeMillis();
         TriggerKey tk = triggerKey(jobName, groupName);
         if (factory.getScheduler().checkExists(tk)) {
-            throw new GriffinException.ConflictException(QUARTZ_JOB_ALREADY_EXIST);
+            throw new GriffinException.ConflictException
+                    (QUARTZ_JOB_ALREADY_EXIST);
         }
         saveJobInstance(jobName, groupName);
         createJobInstance(tk, interval, repeat, jobName);
@@ -272,7 +294,8 @@ public class JobInstance implements Job {
 
     @SuppressWarnings("unchecked")
     Map<String, Object> checkConfMap(Map<String, Object> confMap) {
-        Map<String, Object> config = (Map<String, Object>) confMap.get(CHECK_DONEFILE_SCHEDULE);
+        Map<String, Object> config = (Map<String, Object>) confMap.get
+                (CHECK_DONEFILE_SCHEDULE);
         String interval = env.getProperty("predicate.job.interval");
         interval = interval != null ? interval : "5m";
         String repeat = env.getProperty("predicate.job.repeat.count");
@@ -294,30 +317,38 @@ public class JobInstance implements Job {
     }
 
     private void saveJobInstance(String pName, String pGroup) {
-        ProcessType type = measure.getProcessType() == BATCH ? BATCH : STREAMING;
+        ProcessType type = measure.getProcessType() == BATCH ? BATCH :
+                STREAMING;
         Long tms = System.currentTimeMillis();
         String expired = env.getProperty("jobInstance.expired.milliseconds");
-        Long expireTms = Long.valueOf(expired != null ? expired : "604800000") + tms;
-        JobInstanceBean instance = new JobInstanceBean(FINDING, pName, pGroup, tms, expireTms, type);
+        Long expireTms = Long.valueOf(expired != null ? expired : "604800000")
+                + tms;
+        JobInstanceBean instance = new JobInstanceBean(FINDING, pName, pGroup,
+                tms, expireTms, type);
         instance.setJob(job);
         instanceRepo.save(instance);
     }
 
 
-    private void createJobInstance(TriggerKey tk, Long interval, Integer repeatCount, String pJobName) throws Exception {
+    private void createJobInstance(TriggerKey tk, Long interval, Integer
+            repeatCount, String pJobName) throws Exception {
         JobDetail jobDetail = addJobDetail(tk, pJobName);
-        Trigger trigger = genTriggerInstance(tk, jobDetail, interval, repeatCount);
+        Trigger trigger = genTriggerInstance(tk, jobDetail, interval,
+                repeatCount);
         factory.getScheduler().scheduleJob(trigger);
     }
 
 
-    private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, Long interval, Integer repeatCount) {
+    private Trigger genTriggerInstance(TriggerKey tk, JobDetail jd, Long
+            interval, Integer repeatCount) {
         return newTrigger().withIdentity(tk).forJob(jd).startNow()
-                .withSchedule(simpleSchedule().withIntervalInMilliseconds(interval).withRepeatCount(repeatCount))
+                .withSchedule(simpleSchedule().withIntervalInMilliseconds
+                        (interval).withRepeatCount(repeatCount))
                 .build();
     }
 
-    private JobDetail addJobDetail(TriggerKey tk, String pJobName) throws SchedulerException, IOException {
+    private JobDetail addJobDetail(TriggerKey tk, String pJobName)
+            throws SchedulerException, IOException {
         Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobKey(tk.getName(), tk.getGroup());
         JobDetail jobDetail;
@@ -335,7 +366,8 @@ public class JobInstance implements Job {
         return jobDetail;
     }
 
-    private void setJobDataMap(JobDetail jobDetail, String pJobName) throws IOException {
+    private void setJobDataMap(JobDetail jobDetail, String pJobName)
+            throws IOException {
         JobDataMap dataMap = jobDetail.getJobDataMap();
         preProcessMeasure();
         String result = toJson(measure);
