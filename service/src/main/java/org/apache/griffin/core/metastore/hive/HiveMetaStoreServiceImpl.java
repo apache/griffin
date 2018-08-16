@@ -42,7 +42,8 @@ import org.springframework.util.StringUtils;
 @CacheConfig(cacheNames = "hive", keyGenerator = "cacheKeyGenerator")
 public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetaStoreService.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(HiveMetaStoreService.class);
 
     @Autowired
     private HiveMetaStoreClient client = null;
@@ -60,7 +61,8 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Iterable<String> results = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null. Please check your hive config.");
+                LOGGER.warn("Hive client is null. " +
+                        "Please check your hive config.");
                 return new ArrayList<>();
             }
             results = client.getAllDatabases();
@@ -78,7 +80,8 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Iterable<String> results = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null. Please check your hive config.");
+                LOGGER.warn("Hive client is null. " +
+                        "Please check your hive config.");
                 return new ArrayList<>();
             }
             results = client.getAllTables(getUseDbName(dbName));
@@ -102,7 +105,8 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     public Map<String, List<Table>> getAllTable() {
         Map<String, List<Table>> results = new HashMap<>();
         Iterable<String> dbs;
-        // if hive.metastore.uris in application.properties configs wrong, client will be injected failure and will be null.
+        // if hive.metastore.uris in application.properties configs wrong,
+        // client will be injected failure and will be null.
         if (client == null) {
             LOGGER.warn("Hive client is null. Please check your hive config.");
             return results;
@@ -124,23 +128,30 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         Table result = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null. Please check your hive config.");
+                LOGGER.warn("Hive client is null. " +
+                        "Please check your hive config.");
                 return null;
             }
             result = client.getTable(getUseDbName(dbName), tableName);
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Exception fetching table info : {}. {}", tableName, e);
+            LOGGER.error("Exception fetching table info : {}. {}", tableName,
+                    e);
         }
         return result;
     }
 
-    @Scheduled(fixedRateString = "${cache.evict.hive.fixedRate.in.milliseconds}")
-    @CacheEvict(cacheNames = "hive", allEntries = true, beforeInvocation = true)
+    @Scheduled(fixedRateString =
+            "${cache.evict.hive.fixedRate.in.milliseconds}")
+    @CacheEvict(
+            cacheNames = "hive",
+            allEntries = true,
+            beforeInvocation = true)
     public void evictHiveCache() {
         LOGGER.info("Evict hive cache");
         getAllTable();
-        LOGGER.info("After evict hive cache,automatically refresh hive tables cache.");
+        LOGGER.info("After evict hive cache, " +
+                "automatically refresh hive tables cache.");
     }
 
 
@@ -149,7 +160,8 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         List<Table> allTables = new ArrayList<>();
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null. Please check your hive config.");
+                LOGGER.warn("Hive client is null. " +
+                        "Please check your hive config.");
                 return allTables;
             }
             Iterable<String> tables = client.getAllTables(useDbName);

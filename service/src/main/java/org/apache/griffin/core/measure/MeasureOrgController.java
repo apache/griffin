@@ -42,8 +42,8 @@ public class MeasureOrgController {
 
     /**
      * @param org organization name
-     * @return list of metric name, and a metric is the result of executing the job sharing the same name with
-     * measure.
+     * @return list of metric name, and a metric is the result of executing the
+     * job sharing the same name with measure.
      */
     @RequestMapping(value = "/org/{org}", method = RequestMethod.GET)
     public List<String> getMetricNameListByOrg(@PathVariable("org") String org) {

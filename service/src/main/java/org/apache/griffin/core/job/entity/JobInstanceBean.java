@@ -192,7 +192,8 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.expireTms = expireTms;
     }
 
-    public JobInstanceBean(State state, String pName, String pGroup, Long tms, Long expireTms) {
+    public JobInstanceBean(State state, String pName, String pGroup, Long tms,
+                           Long expireTms) {
         this.state = state;
         this.predicateName = pName;
         this.predicateGroup = pGroup;
@@ -200,17 +201,20 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.expireTms = expireTms;
     }
 
-    public JobInstanceBean(State state, String pName, String pGroup, Long tms, Long expireTms, AbstractJob job) {
+    public JobInstanceBean(State state, String pName, String pGroup, Long tms,
+                           Long expireTms, AbstractJob job) {
         this(state, pName, pGroup, tms, expireTms);
         this.job = job;
     }
 
-    public JobInstanceBean(State state, String pName, String pGroup, Long tms, Long expireTms, ProcessType type) {
+    public JobInstanceBean(State state, String pName, String pGroup, Long tms,
+                           Long expireTms, ProcessType type) {
         this(state, pName, pGroup, tms, expireTms);
         this.type = type;
     }
 
-    public JobInstanceBean(Long sessionId, State state, String appId, String appUri, Long timestamp, Long expireTms) {
+    public JobInstanceBean(Long sessionId, State state, String appId,
+                           String appUri, Long timestamp, Long expireTms) {
         this.sessionId = sessionId;
         this.state = state;
         this.appId = appId;

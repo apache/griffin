@@ -55,41 +55,51 @@ public class EntityHelper {
     public static final String CRON_EXPRESSION = "0 0/4 * * * ?";
     public static final String TIME_ZONE = "GMT+8:00";
 
-    public static GriffinMeasure createGriffinMeasure(String name) throws Exception {
+    public static GriffinMeasure createGriffinMeasure(String name)
+        throws Exception {
         DataConnector dcSource = createDataConnector("source_name", "default",
-                "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
+            "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#");
         DataConnector dcTarget = createDataConnector("target_name", "default",
-                "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
+            "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#");
         return createGriffinMeasure(name, dcSource, dcTarget);
     }
 
-    public static GriffinMeasure createGriffinMeasure(String name,
-                                                      SegmentPredicate srcPredicate,
-                                                      SegmentPredicate tgtPredicate) throws Exception {
+    public static GriffinMeasure createGriffinMeasure(
+        String name,
+        SegmentPredicate srcPredicate,
+        SegmentPredicate tgtPredicate)
+        throws Exception {
         DataConnector dcSource = createDataConnector("source_name", "default",
-                "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#", srcPredicate);
+            "test_data_src", "dt=#YYYYMMdd# AND hour=#HH#", srcPredicate);
         DataConnector dcTarget = createDataConnector("target_name", "default",
-                "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#", tgtPredicate);
+            "test_data_tgt", "dt=#YYYYMMdd# AND hour=#HH#", tgtPredicate);
         return createGriffinMeasure(name, dcSource, dcTarget);
     }
 
-    public static GriffinMeasure createGriffinMeasure(String name,
-                                                      DataConnector dcSource,
-                                                      DataConnector dcTarget) throws Exception {
-        DataSource dataSource = new DataSource("source", true, createCheckpointMap(), Arrays.asList(dcSource));
-        DataSource targetSource = new DataSource("target", false, createCheckpointMap(), Arrays.asList(dcTarget));
+    public static GriffinMeasure createGriffinMeasure(
+        String name,
+        DataConnector dcSource,
+        DataConnector dcTarget)
+        throws Exception {
+        DataSource dataSource = new DataSource(
+            "source", true, createCheckpointMap(), Arrays.asList(dcSource));
+        DataSource targetSource = new DataSource(
+            "target", false, createCheckpointMap(), Arrays.asList(dcTarget));
         List<DataSource> dataSources = new ArrayList<>();
         dataSources.add(dataSource);
         dataSources.add(targetSource);
         Rule rule = createRule();
         EvaluateRule evaluateRule = new EvaluateRule(Arrays.asList(rule));
-        return new GriffinMeasure(name, "test", dataSources, evaluateRule, Arrays.asList("ELASTICSEARCH", "HDFS"));
+        return new GriffinMeasure(
+            name, "test", dataSources,
+            evaluateRule, Arrays.asList("ELASTICSEARCH", "HDFS"));
     }
 
     private static Rule createRule() throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
         map.put("detail", "detail");
-        String rule = "source.id=target.id AND source.name=target.name AND source.age=target.age";
+        String rule = "source.id=target.id " +
+            "AND source.name=target.name AND source.age=target.age";
         Map<String, Object> metricMap = new HashMap<>();
         Map<String, Object> recordMap = new HashMap<>();
         metricMap.put("type", "metric");
@@ -97,7 +107,9 @@ public class EntityHelper {
         recordMap.put("type", "record");
         recordMap.put("name", "missRecords");
         List<Map<String, Object>> outList = Arrays.asList(metricMap, recordMap);
-        return new Rule("griffin-dsl", DqType.ACCURACY, rule, "in", "out", map, outList);
+        return new Rule(
+            "griffin-dsl", DqType.ACCURACY, rule,
+            "in", "out", map, outList);
     }
 
     private static Map<String, Object> createCheckpointMap() {
@@ -106,22 +118,27 @@ public class EntityHelper {
         return map;
     }
 
-    public static DataConnector createDataConnector(String name,
-                                                    String database,
-                                                    String table,
-                                                    String where) throws IOException {
+    public static DataConnector createDataConnector(
+        String name,
+        String database,
+        String table,
+        String where)
+        throws IOException {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);
         config.put("where", where);
-        return new DataConnector(name, DataConnector.DataType.HIVE, "1.2", JsonUtil.toJson(config), "kafka");
+        return new DataConnector(
+            name, DataConnector.DataType.HIVE, "1.2",
+            JsonUtil.toJson(config), "kafka");
     }
 
-    public static DataConnector createDataConnector(String name,
-                                                    String database,
-                                                    String table,
-                                                    String where,
-                                                    SegmentPredicate predicate) {
+    public static DataConnector createDataConnector(
+        String name,
+        String database,
+        String table,
+        String where,
+        SegmentPredicate predicate) {
         HashMap<String, String> config = new HashMap<>();
         config.put("database", database);
         config.put("table.name", table);
@@ -130,7 +147,8 @@ public class EntityHelper {
     }
 
     public static ExternalMeasure createExternalMeasure(String name) {
-        return new ExternalMeasure(name, "description", "org", "test", "metricName", new VirtualJob());
+        return new ExternalMeasure(name, "description", "org",
+            "test", "metricName", new VirtualJob());
     }
 
     public static AbstractJob createJob(String jobName) {
@@ -139,31 +157,44 @@ public class EntityHelper {
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
+        return new BatchJob(1L, jobName,
+            CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
     public static AbstractJob createJob(String jobName, SegmentRange range) {
         BatchJob job = new BatchJob();
-        JobDataSegment segment1 = createJobDataSegment("source_name", true, range);
-        JobDataSegment segment2 = createJobDataSegment("target_name", false, range);
+        JobDataSegment segment1 = createJobDataSegment(
+            "source_name", true, range);
+        JobDataSegment segment2 = createJobDataSegment(
+            "target_name", false, range);
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(segment1);
         segments.add(segment2);
-        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
+        return new BatchJob(1L, jobName,
+            CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
-    public static AbstractJob createJob(String jobName, JobDataSegment source, JobDataSegment target) {
+    public static AbstractJob createJob(
+        String jobName,
+        JobDataSegment source,
+        JobDataSegment target) {
         List<JobDataSegment> segments = new ArrayList<>();
         segments.add(source);
         segments.add(target);
-        return new BatchJob(1L, jobName, CRON_EXPRESSION, TIME_ZONE, segments, false);
+        return new BatchJob(1L, jobName,
+            CRON_EXPRESSION, TIME_ZONE, segments, false);
     }
 
-    public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline, SegmentRange range) {
+    public static JobDataSegment createJobDataSegment(
+        String dataConnectorName,
+        Boolean baseline,
+        SegmentRange range) {
         return new JobDataSegment(dataConnectorName, baseline, range);
     }
 
-    public static JobDataSegment createJobDataSegment(String dataConnectorName, Boolean baseline) {
+    public static JobDataSegment createJobDataSegment(
+        String dataConnectorName,
+        Boolean baseline) {
         return new JobDataSegment(dataConnectorName, baseline);
     }
 
@@ -176,8 +207,9 @@ public class EntityHelper {
         return jobBean;
     }
 
-    public static JobDetailImpl createJobDetail(String measureJson,
-                                                String predicatesJson) {
+    public static JobDetailImpl createJobDetail(
+        String measureJson,
+        String predicatesJson) {
         JobDetailImpl jobDetail = new JobDetailImpl();
         JobKey jobKey = new JobKey("name", "group");
         jobDetail.setKey(jobKey);
@@ -191,7 +223,8 @@ public class EntityHelper {
         return jobDetail;
     }
 
-    public static SegmentPredicate createFileExistPredicate() throws JsonProcessingException {
+    public static SegmentPredicate createFileExistPredicate()
+        throws JsonProcessingException {
         Map<String, String> config = new HashMap<>();
         config.put("root.path", "hdfs:///griffin/demo_src");
         config.put("path", "/dt=#YYYYMMdd#/hour=#HH#/_DONE");
@@ -207,7 +240,9 @@ public class EntityHelper {
         return detail;
     }
 
-    public static SimpleTrigger createSimpleTrigger(int repeatCount, int triggerCount) {
+    public static SimpleTrigger createSimpleTrigger(
+        int repeatCount,
+        int triggerCount) {
         SimpleTriggerImpl trigger = new SimpleTriggerImpl();
         trigger.setRepeatCount(repeatCount);
         trigger.setTimesTriggered(triggerCount);
@@ -217,7 +252,7 @@ public class EntityHelper {
 
     public static BatchJob createGriffinJob() {
         return new BatchJob(1L, 1L, "jobName",
-                "quartzJobName", "quartzGroupName", false);
+            "quartzJobName", "quartzGroupName", false);
     }
 
 }

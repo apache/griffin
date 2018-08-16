@@ -66,7 +66,8 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByActiveState() {
-        State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING, BUSY};
+        State[] states = {STARTING, NOT_STARTED, RECOVERING, IDLE, RUNNING,
+                BUSY};
         List<JobInstanceBean> beans = jobInstanceRepo.findByActiveState(states);
         assertThat(beans.size()).isEqualTo(1);
     }
@@ -79,7 +80,8 @@ public class JobInstanceRepoTest {
 
     @Test
     public void testFindByExpireTmsLessThanEqual() {
-        List<JobInstanceBean> beans = jobInstanceRepo.findByExpireTmsLessThanEqual(1516004640092L);
+        List<JobInstanceBean> beans = jobInstanceRepo
+                .findByExpireTmsLessThanEqual(1516004640092L);
         assertThat(beans.size()).isEqualTo(2);
     }
 

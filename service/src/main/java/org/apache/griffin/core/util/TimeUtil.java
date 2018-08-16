@@ -32,12 +32,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TimeUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtil.class);
-    private static final String MILLISECONDS_PATTERN = "(?i)m(illi)?s(ec(ond)?)?";
-    private static final String SECONDS_PATTERN = "(?i)s(ec(ond)?)?";
-    private static final String MINUTES_PATTERN = "(?i)m(in(ute)?)?";
-    private static final String HOURS_PATTERN = "(?i)h((ou)?r)?";
-    private static final String DAYS_PATTERN = "(?i)d(ay)?";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtil
+            .class);
+    private static final String MILLISECONDS_PATTERN =
+            "(?i)m(illi)?s(ec(ond)?)?";
+    private static final String SECONDS_PATTERN =
+            "(?i)s(ec(ond)?)?";
+    private static final String MINUTES_PATTERN =
+            "(?i)m(in(ute)?)?";
+    private static final String HOURS_PATTERN =
+            "(?i)h((ou)?r)?";
+    private static final String DAYS_PATTERN =
+            "(?i)d(ay)?";
 
     private static class TimeUnitPair {
         private long t;
@@ -106,7 +112,10 @@ public class TimeUtil {
         } else if (unit.matches(DAYS_PATTERN)) {
             return milliseconds(t, TimeUnit.DAYS);
         } else {
-            LOGGER.warn("Time string format ERROR.It only supports d(day),h(hour),m(minute),s(second),ms(millsecond).Please check your time format.");
+            LOGGER.warn("Time string format ERROR. " +
+                    "It only supports d(day),h(hour), m(minute), " +
+                    "s(second), ms(millsecond). " +
+                    "Please check your time format.");
             return 0L;
         }
     }

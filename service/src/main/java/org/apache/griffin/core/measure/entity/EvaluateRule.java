@@ -33,7 +33,8 @@ import javax.persistence.OneToMany;
 public class EvaluateRule extends AbstractAuditableEntity {
     private static final long serialVersionUID = 4240072518233967528L;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+            CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluate_rule_id")
     private List<Rule> rules = new ArrayList<>();
 

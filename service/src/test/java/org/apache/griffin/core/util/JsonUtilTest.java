@@ -53,7 +53,8 @@ public class JsonUtilTest {
 
     @Test
     public void testToEntityWithParamClass() throws IOException {
-        JobHealth jobHealth = JsonUtil.toEntity(JOB_HEALTH_JSON, JobHealth.class);
+        JobHealth jobHealth = JsonUtil.toEntity(JOB_HEALTH_JSON,
+                JobHealth.class);
         assertEquals(jobHealth.getJobCount(), 10);
         assertEquals(jobHealth.getHealthyJobCount(), 5);
     }
@@ -67,8 +68,9 @@ public class JsonUtilTest {
 
     @Test
     public void testToEntityWithParamTypeReference() throws IOException {
-        TypeReference<HashMap<String, Integer>> type = new TypeReference<HashMap<String, Integer>>() {
-        };
+        TypeReference<HashMap<String, Integer>> type =
+                new TypeReference<HashMap<String, Integer>>() {
+                };
         Map map = JsonUtil.toEntity(JOB_HEALTH_JSON, type);
         assertEquals(map.get("jobCount"), 10);
     }
@@ -76,8 +78,9 @@ public class JsonUtilTest {
     @Test
     public void testToEntityWithNullParamTypeReference() throws IOException {
         String str = null;
-        TypeReference<HashMap<String, Integer>> type = new TypeReference<HashMap<String, Integer>>() {
-        };
+        TypeReference<HashMap<String, Integer>> type =
+                new TypeReference<HashMap<String, Integer>>() {
+                };
         Map map = JsonUtil.toEntity(str, type);
         assertNull(map);
     }

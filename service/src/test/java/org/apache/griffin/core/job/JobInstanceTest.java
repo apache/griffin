@@ -73,7 +73,8 @@ public class JobInstanceTest {
         @Bean(name = "appConf")
         public Properties sparkJobProps() {
             String path = "application.properties";
-            return PropertiesUtil.getProperties(path, new ClassPathResource(path));
+            return PropertiesUtil.getProperties(path,
+                    new ClassPathResource(path));
         }
 
         @Bean(name = "schedulerFactoryBean")
@@ -119,15 +120,19 @@ public class JobInstanceTest {
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
         given(repo.findOne(Matchers.anyLong())).willReturn(job);
         given(factory.getScheduler()).willReturn(scheduler);
-        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
-        given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
+        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(
+                JobKey.class))).willReturn(triggers);
+        given(scheduler.checkExists(Matchers.any(TriggerKey.class)))
+                .willReturn(false);
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
-        given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
+        given(scheduler.checkExists(Matchers.any(JobKey.class)))
+                .willReturn(false);
         jobInstance.execute(context);
 
         verify(measureRepo, times(1)).findOne(Matchers.anyLong());
         verify(factory, times(4)).getScheduler();
-        verify(scheduler, times(1)).getTriggersOfJob(Matchers.any(JobKey.class));
+        verify(scheduler, times(1)).getTriggersOfJob(Matchers.any(
+                JobKey.class));
     }
 
     @SuppressWarnings("unchecked")
@@ -143,10 +148,13 @@ public class JobInstanceTest {
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
         given(jobRepo.findOne(Matchers.anyLong())).willReturn(job);
         given(factory.getScheduler()).willReturn(scheduler);
-        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
-        given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
+        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(
+                JobKey.class))).willReturn(triggers);
+        given(scheduler.checkExists(Matchers.any(TriggerKey.class)))
+                .willReturn(false);
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
-        given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
+        given(scheduler.checkExists(Matchers.any(JobKey.class)))
+                .willReturn(false);
         jobInstance.execute(context);
 
     }
@@ -164,10 +172,13 @@ public class JobInstanceTest {
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
         given(jobRepo.findOne(Matchers.anyLong())).willReturn(job);
         given(factory.getScheduler()).willReturn(scheduler);
-        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
-        given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
+        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(
+                JobKey.class))).willReturn(triggers);
+        given(scheduler.checkExists(Matchers.any(TriggerKey.class)))
+                .willReturn(false);
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
-        given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
+        given(scheduler.checkExists(Matchers.any(JobKey.class)))
+                .willReturn(false);
         jobInstance.execute(context);
 
         verify(context, times(1)).getJobDetail();
@@ -189,10 +200,13 @@ public class JobInstanceTest {
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
         given(jobRepo.findOne(Matchers.anyLong())).willReturn(job);
         given(factory.getScheduler()).willReturn(scheduler);
-        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(JobKey.class))).willReturn(triggers);
-        given(scheduler.checkExists(Matchers.any(TriggerKey.class))).willReturn(false);
+        given((List<Trigger>) scheduler.getTriggersOfJob(Matchers.any(
+                JobKey.class))).willReturn(triggers);
+        given(scheduler.checkExists(Matchers.any(TriggerKey.class)))
+                .willReturn(false);
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
-        given(scheduler.checkExists(Matchers.any(JobKey.class))).willReturn(false);
+        given(scheduler.checkExists(Matchers.any(JobKey.class)))
+                .willReturn(false);
         jobInstance.execute(context);
 
         verify(context, times(1)).getJobDetail();

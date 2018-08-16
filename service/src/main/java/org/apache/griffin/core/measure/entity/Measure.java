@@ -34,8 +34,11 @@ import java.util.Map;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "measure.type")
-@JsonSubTypes({@JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"), @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
+        property = "measure.type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"),
+        @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
 public abstract class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
 
@@ -152,7 +155,8 @@ public abstract class Measure extends AbstractAuditableEntity {
     public Measure() {
     }
 
-    public Measure(String name, String description, String organization, String owner) {
+    public Measure(String name, String description, String organization,
+                   String owner) {
         this.name = name;
         this.description = description;
         this.organization = organization;

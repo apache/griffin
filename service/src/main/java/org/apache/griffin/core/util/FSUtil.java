@@ -60,12 +60,16 @@ public class FSUtil {
         Configuration conf = new Configuration();
 
         if (StringUtils.isEmpty(conf.get("fs.hdfs.impl"))) {
-            LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-            conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+            LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs
+                    .DistributedFileSystem.class.getName());
+            conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs
+                    .DistributedFileSystem.class.getName());
         }
         if (StringUtils.isEmpty(conf.get("fs.file.impl"))) {
-            LOGGER.info("Setting fs.file.impl:{}", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-            conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+            LOGGER.info("Setting fs.file.impl:{}", org.apache.hadoop.fs
+                    .LocalFileSystem.class.getName());
+            conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class
+                    .getName());
         }
         try {
             fileSystem = FileSystem.get(conf);
@@ -147,11 +151,13 @@ public class FSUtil {
         return fileSystem.isFile(hdfsPath) || fileSystem.isDirectory(hdfsPath);
     }
 
-    public static InputStream getSampleInputStream(String path) throws IOException {
+    public static InputStream getSampleInputStream(String path)
+            throws IOException {
         checkHDFSConf();
         if (isFileExist(path)) {
             FSDataInputStream missingData = fileSystem.open(new Path(path));
-            BufferedReader bufReader = new BufferedReader(new InputStreamReader(missingData, Charsets.UTF_8));
+            BufferedReader bufReader = new BufferedReader(
+                    new InputStreamReader(missingData, Charsets.UTF_8));
             try {
                 String line = null;
                 int rowCnt = 0;
@@ -177,25 +183,30 @@ public class FSUtil {
 
     private static void checkHDFSConf() {
         if (getFileSystem() == null) {
-            throw new NullPointerException("FileSystem is null.Please check your hdfs config default name.");
+            throw new NullPointerException("FileSystem is null. " +
+                    "Please check your hdfs config default name.");
         }
     }
 
-    public static String getFirstMissRecordPath(String hdfsDir) throws Exception {
+    public static String getFirstMissRecordPath(String hdfsDir)
+            throws Exception {
         List<FileStatus> fileList = listFileStatus(hdfsDir);
         for (int i = 0; i < fileList.size(); i++) {
-            if (fileList.get(i).getPath().toUri().toString().toLowerCase().contains("missrecord")) {
+            if (fileList.get(i).getPath().toUri().toString().toLowerCase()
+                    .contains("missrecord")) {
                 return fileList.get(i).getPath().toUri().toString();
             }
         }
         return null;
     }
 
-    public static InputStream getMissSampleInputStream(String path) throws Exception {
+    public static InputStream getMissSampleInputStream(String path)
+            throws Exception {
         List<String> subDirList = listSubDir(path);
         //FIXME: only handle 1-sub dir here now
         for (int i = 0; i < subDirList.size(); i++) {
-            return getSampleInputStream(getFirstMissRecordPath(subDirList.get(i)));
+            return getSampleInputStream(getFirstMissRecordPath(
+                    subDirList.get(i)));
         }
         return getSampleInputStream(getFirstMissRecordPath(path));
     }

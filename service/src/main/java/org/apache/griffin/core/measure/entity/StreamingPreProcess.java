@@ -121,8 +121,9 @@ public class StreamingPreProcess extends AbstractAuditableEntity {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(details)) {
-            this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
-            });
+            this.detailsMap = JsonUtil.toEntity(details,
+                    new TypeReference<Map<String, Object>>() {
+                    });
         }
     }
 
