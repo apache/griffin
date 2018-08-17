@@ -30,29 +30,28 @@ trait TreeNode extends Serializable {
   def preOrderTraverseDepthFirst[T, A <: TreeNode](z: T)(seqOp: (A, T) => T, combOp: (T, T) => T)(implicit tag: ClassTag[A]): T = {
 
     val clazz = tag.runtimeClass
-
-    this.getClass match {
-      case `clazz` => {
-          val tv = seqOp(this.asInstanceOf[A], z)
-          children.foldLeft(combOp(z, tv)) { (ov, tn) =>
-            combOp(ov, tn.preOrderTraverseDepthFirst(z)(seqOp, combOp))
-          }
+    if(clazz.isAssignableFrom(this.getClass)){
+      val tv = seqOp(this.asInstanceOf[A], z)
+      children.foldLeft(combOp(z, tv)) { (ov, tn) =>
+        combOp(ov, tn.preOrderTraverseDepthFirst(z)(seqOp, combOp))
       }
-      case _ => z
+    }
+    else {
+      z
     }
 
   }
   def postOrderTraverseDepthFirst[T, A <: TreeNode](z: T)(seqOp: (A, T) => T, combOp: (T, T) => T)(implicit tag: ClassTag[A]): T = {
 
     val clazz = tag.runtimeClass
-    this.getClass match {
-      case `clazz` => {
-        val cv = children.foldLeft(z) { (ov, tn) =>
+    if(clazz.isAssignableFrom(this.getClass)){
+      val cv = children.foldLeft(z) { (ov, tn) =>
         combOp(ov, tn.postOrderTraverseDepthFirst(z)(seqOp, combOp))
-        }
-        combOp(z, seqOp(this.asInstanceOf[A], cv))
       }
-      case _ => z
+      combOp(z, seqOp(this.asInstanceOf[A], cv))
+    }
+    else{
+      z
     }
   }
 
