@@ -56,7 +56,7 @@ public class PropertiesConfig {
 
     public PropertiesConfig(
             @Value("${external.config.location}") String configLocation,
-            @Value("${external.env .location}") String envLocation) {
+            @Value("${external.env.location}") String envLocation) {
         LOGGER.info("external.config.location : {}",
                 configLocation != null ? configLocation : "null");
         LOGGER.info("external.env.location : {}",
