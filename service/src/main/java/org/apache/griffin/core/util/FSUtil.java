@@ -52,6 +52,18 @@ public class FSUtil {
     private static String fsDefaultName;
 
     private static FileSystem fileSystem;
+    private static FileSystem defaultFS = getDefaultFileSystem();
+
+    private static FileSystem getDefaultFileSystem() {
+        FileSystem fs = null;
+        Configuration conf = new Configuration();
+        try {
+            fs = FileSystem.get(conf);
+        } catch (Exception e) {
+            LOGGER.error("Can not get default hdfs file system. {}", e);
+        }
+        return fs;
+    }
 
     private static FileSystem getFileSystem() {
         if (fileSystem == null) {
@@ -81,9 +93,9 @@ public class FSUtil {
         }
         try {
             fileSystem = FileSystem.get(conf);
-            System.out.println(fileSystem);
         } catch (Exception e) {
             LOGGER.error("Can not get hdfs file system. {}", e);
+            fileSystem = defaultFS;
         }
 
     }
