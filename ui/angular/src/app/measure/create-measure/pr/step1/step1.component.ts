@@ -16,12 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { ServiceService } from "../../../../service/service.service";
-import { TREE_ACTIONS, ITreeOptions } from "angular-tree-component";
-import { HttpClient } from "@angular/common/http";
-import { AfterViewChecked, ElementRef } from "@angular/core";
-import { ProfilingStep1 } from "../pr.component";
+import {Component, OnInit, Input, Output, EventEmitter} from "@angular/core";
+import {ServiceService} from "../../../../service/service.service";
+import {TREE_ACTIONS, ITreeOptions} from "angular-tree-component";
+import {HttpClient} from "@angular/common/http";
+import {AfterViewChecked, ElementRef} from "@angular/core";
+import {ProfilingStep1} from "../pr.component";
 
 export class node {
   name: string;
@@ -48,6 +48,7 @@ export class Col {
   RE: string;
   rules: any;
   newRules: Rule[];
+
   constructor(name: string, type: string, comment: string, selected: boolean) {
     this.name = name;
     this.type = type;
@@ -145,25 +146,25 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
       for (let item of this.step1.selection) {
         if (item.isNum == true) {
           this.step1.dropdownList[item.name] = [
-            { id: 1, itemName: "Null Count", category: "Simple Statistics" },
-            { id: 2, itemName: "Distinct Count", category: "Simple Statistics" },
-            { id: 3, itemName: "Total Count", category: "Summary Statistics" },
-            { id: 4, itemName: "Maximum", category: "Summary Statistics" },
-            { id: 5, itemName: "Minimum", category: "Summary Statistics" },
-            { id: 6, itemName: "Average", category: "Summary Statistics" },
+            {id: 1, itemName: "Null Count", category: "Simple Statistics"},
+            {id: 2, itemName: "Distinct Count", category: "Simple Statistics"},
+            {id: 3, itemName: "Total Count", category: "Summary Statistics"},
+            {id: 4, itemName: "Maximum", category: "Summary Statistics"},
+            {id: 5, itemName: "Minimum", category: "Summary Statistics"},
+            {id: 6, itemName: "Average", category: "Summary Statistics"},
             // {"id":7,"itemName":"Median","category": "Summary Statistics"},
             // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
-            { id: 9, itemName: "Enum Detection Top5 Count", category: "Advanced Statistics" }
+            {id: 9, itemName: "Enum Detection Top5 Count", category: "Advanced Statistics"}
           ];
         } else {
           this.step1.dropdownList[item.name] = [
-            { id: 1, itemName: "Null Count", category: "Simple Statistics" },
-            { id: 2, itemName: "Distinct Count", category: "Simple Statistics" },
-            { id: 3, itemName: "Total Count", category: "Summary Statistics" },
+            {id: 1, itemName: "Null Count", category: "Simple Statistics"},
+            {id: 2, itemName: "Distinct Count", category: "Simple Statistics"},
+            {id: 3, itemName: "Total Count", category: "Summary Statistics"},
             // {"id":8,"itemName":"Rule Detection Count","category": "Advanced Statistics"},
-            { id: 9, itemName: "Enum Detection Top5 Count", category: "Advanced Statistics" },
-            { id: 10, itemName:"Regular Expression Detection Count", regex: "", category: "Advanced Statistics"},
-            { id: 11, itemName: "Empty Count", category: "Simple Statistics" }
+            {id: 9, itemName: "Enum Detection Top5 Count", category: "Advanced Statistics"},
+            {id: 10, itemName: "Regular Expression Detection Count", regex: "", category: "Advanced Statistics"},
+            {id: 11, itemName: "Empty Count", category: "Simple Statistics"}
           ];
         }
       }
@@ -187,7 +188,8 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
     private elementRef: ElementRef,
     private http: HttpClient,
     public serviceService: ServiceService
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     if (this.step1.nodeList.length !== 0) return;
@@ -232,5 +234,6 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
     this.nextStep.emit(this.step1);
   }
 
-  ngAfterViewChecked() {}
+  ngAfterViewChecked() {
+  }
 }

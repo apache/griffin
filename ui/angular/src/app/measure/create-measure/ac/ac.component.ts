@@ -16,16 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit, AfterViewChecked, ViewChild } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { FormsModule, Validator } from "@angular/forms";
-import { ServiceService } from "../../../service/service.service";
-import { TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from "angular-tree-component";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { ToasterModule, ToasterService } from "angular2-toaster";
+import {Component, OnInit, AfterViewChecked, ViewChild} from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {FormsModule, Validator} from "@angular/forms";
+import {ServiceService} from "../../../service/service.service";
+import {TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions} from "angular-tree-component";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ToasterModule, ToasterService} from "angular2-toaster";
 import * as $ from "jquery";
-import { Router } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
+import {Router} from "@angular/router";
+import {HttpClient} from "@angular/common/http";
 
 class node {
   name: string;
@@ -36,20 +36,24 @@ class node {
   parent: string;
   location: string;
 }
+
 class Col {
   name: string;
   type: string;
   comment: string;
   selected: boolean;
+
   constructor(name: string, type: string, comment: string, selected: boolean) {
     this.name = name;
     this.type = type;
     this.comment = comment;
     this.selected = false;
   }
+
   getSelected() {
     return this.selected;
   }
+
   setSelected(selected) {
     this.selected = selected;
   }
@@ -325,7 +329,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  formValidation = function(step) {
+  formValidation = function (step) {
     if (step == undefined) {
       step = this.currentStep;
     }
@@ -350,9 +354,11 @@ export class AcComponent implements OnInit, AfterViewChecked {
   prev(form) {
     this.currentStep--;
   }
+
   goTo(i) {
     this.currentStep = i;
   }
+
   submit(form) {
     // form.$setPristine();
     // this.finalgrp = [];
@@ -469,13 +475,13 @@ export class AcComponent implements OnInit, AfterViewChecked {
     if (!this.tgt_needpath || this.tgt_path == "") {
       this.deletePredicates(1);
     }
-    var mappingRule = function(src, tgt, matches) {
+    var mappingRule = function (src, tgt, matches) {
       var rules;
       rules = "source." + src + matches + "target." + tgt;
       return rules;
     };
     var self = this;
-    var rules = this.mappings.map(function(item, i) {
+    var rules = this.mappings.map(function (item, i) {
       return mappingRule(item, self.selectionTarget[i], self.matches[i]);
     });
     rule = rules.join(" AND ");
@@ -485,11 +491,11 @@ export class AcComponent implements OnInit, AfterViewChecked {
     setTimeout(() => (this.visibleAnimate = true), 100);
   }
 
-  deleteUnit(index){
+  deleteUnit(index) {
     delete this.newMeasure["data.sources"][index]["connectors"][0]["data.unit"];
   }
 
-  deletePredicates(index){
+  deletePredicates(index) {
     delete this.newMeasure["data.sources"][index]["connectors"][0]["predicates"];
   }
 
@@ -504,7 +510,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
       },
       err => {
         let response = JSON.parse(err.error);
-        if(response.code === '40901'){
+        if (response.code === '40901') {
           this.toasterService.pop("error", "Error!", "Measure name already exists!");
         } else {
           this.toasterService.pop("error", "Error!", "Error when creating measure");
@@ -585,6 +591,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
 
   nodeList: object[];
   nodeListTarget: object[];
+
   constructor(
     toasterService: ToasterService,
     private http: HttpClient,
@@ -637,9 +644,9 @@ export class AcComponent implements OnInit, AfterViewChecked {
     });
     $("fieldset").height(
       $(stepSelection).height() -
-        $(stepSelection + ">.stepDesc").height() -
-        $(".btn-container").height() -
-        130
+      $(stepSelection + ">.stepDesc").height() -
+      $(".btn-container").height() -
+      130
     );
     $(".y-scrollable").css({
       // 'max-height': $('fieldset').height()- $('.add-dataset').outerHeight()

@@ -16,12 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Injectable } from "@angular/core";
+import {Injectable} from "@angular/core";
 
 @Injectable()
 export class UserService {
   ntAccount: string;
   timestamp: Date;
+
   setCookie(name, value, days) {
     let expires;
     if (days) {

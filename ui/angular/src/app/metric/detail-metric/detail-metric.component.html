@@ -20,7 +20,8 @@ under the License.
   <b>No content</b>
 </div>
 
-<div *ngIf="!noresults" id="bigChartContainer" class="big-chart-container" (window:resize)="onResize($event)" style="display:none;">
+<div *ngIf="!noresults" id="bigChartContainer" class="big-chart-container" (window:resize)="onResize($event)"
+     style="display:none;">
   <div id="bigChartShow" class="big-chart-content">
     <div class="container-fluid">
       <div class="row">
@@ -37,31 +38,34 @@ under the License.
   <div class="table-wrap">
     <table class="main-table y-scrollable" [mfData]="prodata" #mf="mfDataTable" [mfRowsOnPage]="18">
       <thead>
-        <tr style="background-color:#7D95CC">
-          <th class="fixed-side" scope="col" style="background-color:#7D95CC">Time</th>
-          <th class="cover" scope="col">Time</th>
-          <th scope="col" *ngFor="let name of this.columnname" style="text-align: center;">{{name}}</th>
-        </tr>
+      <tr style="background-color:#7D95CC">
+        <th class="fixed-side" scope="col" style="background-color:#7D95CC">Time</th>
+        <th class="cover" scope="col">Time</th>
+        <th scope="col" *ngFor="let name of this.columnname" style="text-align: center;">{{name}}</th>
+      </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of mf.data">
-          <th class="fixed-side">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
-          <th class="cover">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
-          <td *ngFor="let key of objectKeys(item.value)">{{item.value[key]}}</td>
-        </tr>
+      <tr *ngFor="let item of mf.data">
+        <th class="fixed-side">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
+        <th class="cover">{{(item.tmst | date: 'yyyy/MM/dd HH:mm:ss') || 'N/A' }}</th>
+        <td *ngFor="let key of objectKeys(item.value)">{{item.value[key]}}</td>
+      </tr>
       </tbody>
       <tfoot>
-        <tr>
-          <td class="text-center" colspan="8" style="background-color:#1f1f1f;position: fixed;margin-left: 30%;" id="pagination">
-            <mfBootstrapPaginator></mfBootstrapPaginator>
-          </td>
-        </tr>
+      <tr>
+        <td class="text-center" colspan="8" style="background-color:#1f1f1f;position: fixed;margin-left: 30%;"
+            id="pagination">
+          <mfBootstrapPaginator></mfBootstrapPaginator>
+        </td>
+      </tr>
       </tfoot>
     </table>
   </div>
 </div>
 
-<div class="modal fade" id="downloadSampleModal" role="dialog" tabindex="-1" [ngClass]="{'in': visibleAnimate}" *ngIf="missRecordList" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
+<div class="modal fade" id="downloadSampleModal" role="dialog" tabindex="-1" [ngClass]="{'in': visibleAnimate}"
+     *ngIf="missRecordList" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
+     (click)="onContainerClicked($event)">
   <div class="modal-dialog modal-md modal-md">
     <div class="modal-content">
       <div class="modal-header">
@@ -71,24 +75,25 @@ under the License.
       </div>
       <div class="modal-body">
         <div class="container-fluid" id="dowloadContent" style="overflow:auto;">
-          <tr  >
+          <tr>
             <td colspan="7" style="padding:20px 30px 10px 30px;">
               <table class="table table-striped" [mfData]="missRecordList" #mf2="mfDataTable" [mfRowsOnPage]="10">
 
                 <tbody>
-                  <tr *ngIf="!missRecordList">
-                    <td colspan="7" style="text-align:center">No content.</td>
-                  </tr>
-                  <tr *ngFor="let item of mf2.data">
-                    <td style="background-color:black;"><a (click)="downloadSample(item)" >{{item.tmst}}  {{item.tmst | date: 'yyyy/MM/dd HH:mm:ss'}}</a>  </td>
-                  </tr>
+                <tr *ngIf="!missRecordList">
+                  <td colspan="7" style="text-align:center">No content.</td>
+                </tr>
+                <tr *ngFor="let item of mf2.data">
+                  <td style="background-color:black;"><a (click)="downloadSample(item)">{{item.tmst}} {{item.tmst |
+                    date: 'yyyy/MM/dd HH:mm:ss'}}</a></td>
+                </tr>
                 </tbody>
                 <tfoot>
-                  <tr>
-                    <td class="text-center" colspan="8" style="background-color:#1f1f1f;" id="paginationdownlad">
-                      <mfBootstrapPaginator></mfBootstrapPaginator>
-                    </td>
-                  </tr>
+                <tr>
+                  <td class="text-center" colspan="8" style="background-color:#1f1f1f;" id="paginationdownlad">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                  </td>
+                </tr>
                 </tfoot>
               </table>
             </td>

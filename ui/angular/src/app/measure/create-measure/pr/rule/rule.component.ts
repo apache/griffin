@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-rule',
@@ -24,11 +24,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./rule.component.css']
 })
 export class RuleComponent implements OnInit {
-  
-  vaType : string;
-  constructor() { }
+
+  vaType: string;
+
+  constructor() {
+  }
 
   ngOnInit() {
-  	this.vaType = '2';
+    this.vaType = '2';
   }
 }

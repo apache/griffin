@@ -31,7 +31,8 @@ under the License.
                 Measure Name<span class="symbol required"></span>:
               </label>
               <div class="col-md-10 col-lg-10 col-sm-10 ">
-                <input type="text" class="form-control" [(ngModel)]="step4.prName" #prName="ngModel" placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$">
+                <input type="text" class="form-control" [(ngModel)]="step4.prName" #prName="ngModel"
+                       placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$">
                 <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.required)">Measure Name is required</span>
                 <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
               </div>
@@ -43,7 +44,8 @@ under the License.
                 Measure Description:
               </label>
               <div class="col-md-10 col-lg-10 col-sm-10">
-                <input type="text" class="form-control" [(ngModel)]="step4.desc" placeholder="Please input detailed description of your measure" name="desc">
+                <input type="text" class="form-control" [(ngModel)]="step4.desc"
+                       placeholder="Please input detailed description of your measure" name="desc">
               </div>
             </div>
           </div>
@@ -82,7 +84,9 @@ under the License.
         </div>
         <div style="color:#b2c831">
           <p>
-            <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" routerLink="/measures">Measures</a>" to check the measure status
+            <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link"
+                                                                                routerLink="/measures">Measures</a>" to
+            check the measure status
           </p>
         </div>
       </fieldset>

@@ -171,7 +171,9 @@ under the License.
           </div>
           <div class="" style="text-align:center;display:block;float:left;margin:0 10px 0 10px">
             <div class="formula-text-up" style="border-bottom:1px solid;">
-              Total Count of Matched records between <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{targetTable}}</span> and <span class="badge">{{sourceLength}}</span> <span style="color:green;">{{sourceTable}}</span> fields
+              Total Count of Matched records between <span class="badge">{{sourceLength}}</span> <span
+              style="color:green;">{{targetTable}}</span> and <span class="badge">{{sourceLength}}</span> <span
+              style="color:green;">{{sourceTable}}</span> fields
             </div>
             <div class="">
               Total Count of records in <span style="color:green;font-weight:bold;">{{targetDB}}&nbsp;&nbsp;{{targetTable}}</span>
@@ -184,7 +186,7 @@ under the License.
       </div>
     </div>
     <div *ngIf="ruleData.type=='profiling'" class="">
-      <div *ngFor="let index of ruleDes;" >
+      <div *ngFor="let index of ruleDes;">
         {{index.name}}&nbsp;:&nbsp;{{index.infos}}
       </div>
     </div>

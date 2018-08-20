@@ -16,9 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { TestBed, inject } from '@angular/core/testing';
+import {TestBed, inject} from '@angular/core/testing';
 
-import { HttpService } from './http.service';
+import {HttpService} from './http.service';
 
 describe('ServiceService', () => {
   beforeEach(() => {

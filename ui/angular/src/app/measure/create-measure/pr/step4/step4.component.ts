@@ -17,9 +17,9 @@ specific language governing permissions and limitations
 under the License.
 */
 import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, AfterViewInit} from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { FormsModule } from "@angular/forms";
-import { AfterViewChecked, ElementRef } from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
+import {AfterViewChecked, ElementRef} from "@angular/core";
 import {ProfilingStep1, ProfilingStep2, ProfilingStep3, ProfilingStep4} from "../pr.component";
 
 @Component({
@@ -38,7 +38,8 @@ export class PrStep4Component implements AfterViewChecked, OnInit, AfterViewInit
   @Output() prevStep: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() submitMeasure: EventEmitter<Object> = new EventEmitter<Object>();
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) {
+  }
 
   prevChildStep() {
     this.prevStep.emit(this.step4);
@@ -49,11 +50,13 @@ export class PrStep4Component implements AfterViewChecked, OnInit, AfterViewInit
     this.submitMeasure.emit(this.step4);
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   ngAfterViewInit() {
     this.cdr.detectChanges();
   }
 
-  ngAfterViewChecked() {}
+  ngAfterViewChecked() {
+  }
 }

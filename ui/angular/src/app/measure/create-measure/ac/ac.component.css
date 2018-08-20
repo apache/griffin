@@ -16,7 +16,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-
 @import url('../../../../../node_modules/angular2-toaster/toaster.css');
 @import url('../../measure.component.css');
 
@@ -59,19 +58,19 @@ div.tree div.tree-children::before {
   left: 5px
 }
 
-div.tree treenode>div>.node-wrapper {
+div.tree treenode > div > .node-wrapper {
   margin-left: 24px
 }
 
-div.tree treenode>div>.node-wrapper>.node-content-wrapper {
+div.tree treenode > div > .node-wrapper > .node-content-wrapper {
   margin-left: 4px
 }
 
-div.tree treenode>div.tree-node-leaf>.node-wrapper {
+div.tree treenode > div.tree-node-leaf > .node-wrapper {
   margin-left: 0
 }
 
-div.tree treenode>div::before {
+div.tree treenode > div::before {
   content: "";
   position: absolute;
   border-bottom: 1px dotted #23527c;
@@ -80,7 +79,7 @@ div.tree treenode>div::before {
   left: 7px
 }
 
-div.tree treenode>div .toggle-children-wrapper {
+div.tree treenode > div .toggle-children-wrapper {
   width: 13px;
   height: 13px;
   border: 1px solid #23527c;
@@ -93,7 +92,7 @@ div.tree treenode>div .toggle-children-wrapper {
   z-index: 1
 }
 
-div.tree treenode>div .toggle-children-wrapper::before {
+div.tree treenode > div .toggle-children-wrapper::before {
   content: "";
   display: inline-block;
   width: 7px;
@@ -103,7 +102,7 @@ div.tree treenode>div .toggle-children-wrapper::before {
   left: 2px
 }
 
-div.tree treenode>div .toggle-children-wrapper.toggle-children-wrapper-collapsed::after {
+div.tree treenode > div .toggle-children-wrapper.toggle-children-wrapper-collapsed::after {
   content: "";
   display: inline-block;
   height: 7px;
@@ -113,18 +112,18 @@ div.tree treenode>div .toggle-children-wrapper.toggle-children-wrapper-collapsed
   left: 5px
 }
 
-div.tree treenode>div .toggle-children-wrapper .toggle-children {
+div.tree treenode > div .toggle-children-wrapper .toggle-children {
   display: none
 }
 
-div.tree treenode>div .node-content-wrapper {
+div.tree treenode > div .node-content-wrapper {
   margin-left: 4px
 }
 
-div.tree>treenode>div::before {
+div.tree > treenode > div::before {
   left: 14px
 }
 
-div.tree>treenode>div>.node-wrapper>treenodeexpander>.toggle-children-wrapper {
+div.tree > treenode > div > .node-wrapper > treenodeexpander > .toggle-children-wrapper {
   left: 22px
 }

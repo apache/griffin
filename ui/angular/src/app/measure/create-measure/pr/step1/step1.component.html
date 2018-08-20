@@ -18,56 +18,58 @@ under the License.
 -->
 <div class="container-fluid">
   <form name="Form" id="form" #prForm="ngForm" novalidate>
-      <label class="stepDesc">This step lets you select the single source of truth for data quality comparision with a target source.</label>
-      <div class="container-fluid">
-        <div class="col-md-4 col-lg-4 col-sm-4">
-          <fieldset>
-            <legend>Please select schema</legend>
-            <tree-root [nodes]="step1.nodeList" [options]="options"></tree-root>
-          </fieldset>
-        </div>
-        <div class="col-md-8 col-lg-8 col-sm-8">
-          <fieldset>
-            <legend>
-              Select attributes
-            </legend>
-            <div class="y-scrollable">
-              <div style="margin-top:10px;">
-                <label>View schema:</label>
-                <i style="color:#fff;font-weight: bold;">{{step1.currentDBstr}}{{step1.currentTable}}
-                </i>
-              </div>
-              <div style="margin-top:5px;">
-                <table class="table table-striped no-border">
-                  <thead>
-                  <tr style="background-color:#7D95CC">
-                    <th>
-                      <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll" />
-                    </th>
-                    <th>Column Name</th>
-                    <th>Type</th>
-                    <th>Comment</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngIf="!step1.schemaCollection || step1.schemaCollection.length == 0">
-                    <td colspan="5" style="text-align:center;"><span class="highlight">Please select a schema from the left tree first</span></td>
-                  </tr>
-                  <tr *ngFor="let row of step1.schemaCollection">
-                    <td>
-                      <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}} />
-                    </td>
-                    <td>{{row.name}}</td>
-                    <td>{{row.type}}</td>
-                    <td>{{row.comment}}</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
+    <label class="stepDesc">This step lets you select the single source of truth for data quality comparision with a
+      target source.</label>
+    <div class="container-fluid">
+      <div class="col-md-4 col-lg-4 col-sm-4">
+        <fieldset>
+          <legend>Please select schema</legend>
+          <tree-root [nodes]="step1.nodeList" [options]="options"></tree-root>
+        </fieldset>
       </div>
+      <div class="col-md-8 col-lg-8 col-sm-8">
+        <fieldset>
+          <legend>
+            Select attributes
+          </legend>
+          <div class="y-scrollable">
+            <div style="margin-top:10px;">
+              <label>View schema:</label>
+              <i style="color:#fff;font-weight: bold;">{{step1.currentDBstr}}{{step1.currentTable}}
+              </i>
+            </div>
+            <div style="margin-top:5px;">
+              <table class="table table-striped no-border">
+                <thead>
+                <tr style="background-color:#7D95CC">
+                  <th>
+                    <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll"/>
+                  </th>
+                  <th>Column Name</th>
+                  <th>Type</th>
+                  <th>Comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngIf="!step1.schemaCollection || step1.schemaCollection.length == 0">
+                  <td colspan="5" style="text-align:center;"><span class="highlight">Please select a schema from the left tree first</span>
+                  </td>
+                </tr>
+                <tr *ngFor="let row of step1.schemaCollection">
+                  <td>
+                    <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}}/>
+                  </td>
+                  <td>{{row.name}}</td>
+                  <td>{{row.type}}</td>
+                  <td>{{row.comment}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
   </form>
 
   <div class="form-group btn-container">

@@ -44,14 +44,18 @@ under the License.
         <div style="text-align:center;margin-bottom:30px;">
           <img src="../assets/img/logo.png" class="img-rounded" style="width:80%;">
         </div>
-        <input type="input" class="form-control" placeholder="username" autocomplete="on" style="margin-bottom:20px;" (focus)="focus($event)">
-        <input type="password" class="form-control" placeholder="password" autocomplete="on" (keyup)="submit($event)" (focus)="focus($event)">
+        <input type="input" class="form-control" placeholder="username" autocomplete="on" style="margin-bottom:20px;"
+               (focus)="focus($event)">
+        <input type="password" class="form-control" placeholder="password" autocomplete="on" (keyup)="submit($event)"
+               (focus)="focus($event)">
         <div class="checkbox">
           <label style="color:white;">
             <input type="checkbox" value="remember-me" checked>Remember me
           </label>
         </div>
-        <button class="btn btn-default btn-large btn-block" id="login-btn" (click)="login()" style="margin-bottom: 20px;">Log in</button>
+        <button class="btn btn-default btn-large btn-block" id="login-btn" (click)="login()"
+                style="margin-bottom: 20px;">Log in
+        </button>
         <div id="loginMsg">Login failed. Try again.</div>
       </div>
     </div>
