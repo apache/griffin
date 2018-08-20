@@ -16,20 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit, AfterViewChecked, ViewChildren } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { FormsModule } from "@angular/forms";
-import { MaxLengthValidator } from "@angular/forms";
-import { NgControlStatus, Validators } from "@angular/forms";
-import { PatternValidator } from "@angular/forms";
-import { MatDatepickerModule } from "@angular/material";
-import { ServiceService } from "../../../service/service.service";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { ToasterModule, ToasterService, ToasterConfig } from "angular2-toaster";
+import {Component, OnInit, AfterViewChecked, ViewChildren} from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
+import {MaxLengthValidator} from "@angular/forms";
+import {NgControlStatus, Validators} from "@angular/forms";
+import {PatternValidator} from "@angular/forms";
+import {MatDatepickerModule} from "@angular/material";
+import {ServiceService} from "../../../service/service.service";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ToasterModule, ToasterService, ToasterConfig} from "angular2-toaster";
 import * as $ from "jquery";
-import { HttpParams } from "@angular/common/http";
-import { Router } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
+import {HttpParams} from "@angular/common/http";
+import {Router} from "@angular/router";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-streaming',
@@ -67,7 +67,7 @@ export class StreamingComponent implements OnInit {
 
   newJob = {
     "cron.expression": "",
-    "job.type":"streaming",
+    "job.type": "streaming",
     "measure.id": "",
     "job.name": "",
     "cron.time.zone": "",
@@ -135,7 +135,7 @@ export class StreamingComponent implements OnInit {
     let time = new Date().getTimezoneOffset() / 60;
     let timezone = "GMT" + time + ":00";
     this.newJob = {
-      "job.type":"streaming",
+      "job.type": "streaming",
       "job.name": this.jobname,
       "measure.id": this.measureid,
       "cron.expression": this.cronExp,
@@ -177,7 +177,7 @@ export class StreamingComponent implements OnInit {
       },
       err => {
         let response = JSON.parse(err.error);
-        if(response.code === '40004'){
+        if (response.code === '40004') {
           this.toasterService.pop("error", "Error!", "Job name already exists!");
         } else {
           this.toasterService.pop("error", "Error!", "Error when creating job");
@@ -195,15 +195,15 @@ export class StreamingComponent implements OnInit {
     var stepSelection = ".formStep";
     $(stepSelection).css({
       height:
-        window.innerHeight -
-        $(stepSelection).offset().top -
-        $("#footerwrap").outerHeight()
+      window.innerHeight -
+      $(stepSelection).offset().top -
+      $("#footerwrap").outerHeight()
     });
     $("fieldset").height(
       $(stepSelection).height() -
-        $(stepSelection + ">.stepDesc").height() -
-        $(".btn-container").height() -
-        200
+      $(stepSelection + ">.stepDesc").height() -
+      $(".btn-container").height() -
+      200
     );
     $(".y-scrollable").css({
       height: $("fieldset").height()
@@ -260,8 +260,8 @@ export class StreamingComponent implements OnInit {
     var allModels = this.serviceService.config.uri.allModels + '?type=griffin';
     this.http.get(allModels).subscribe(data => {
       let originData = data;
-      for(let i in originData){
-        if(originData[i]["process.type"] === "STREAING"){
+      for (let i in originData) {
+        if (originData[i]["process.type"] === "STREAING") {
           this.Measures.push(originData[i]);
         }
       }

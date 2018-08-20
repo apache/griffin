@@ -16,13 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from "@angular/core";
-import { ServiceService } from "../../../service/service.service";
-import { ToasterModule, ToasterService, ToasterContainerComponent } from "angular2-toaster";
-import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
-import { AfterViewChecked, ElementRef } from "@angular/core";
-import { Col } from './step1/step1.component'
+import {Component, OnInit} from "@angular/core";
+import {ServiceService} from "../../../service/service.service";
+import {ToasterModule, ToasterService, ToasterContainerComponent} from "angular2-toaster";
+import {HttpClient} from "@angular/common/http";
+import {Router} from "@angular/router";
+import {AfterViewChecked, ElementRef} from "@angular/core";
+import {Col} from './step1/step1.component'
 import * as $ from "jquery";
 
 export class ProfilingStep1 {
@@ -109,17 +109,17 @@ export class PrComponent implements AfterViewChecked, OnInit {
     this.currentStep--;
   }
 
-  updateStep1(body:ProfilingStep1) {
+  updateStep1(body: ProfilingStep1) {
     this.step1 = body;
     this.next();
   }
 
-  updateStep2(body:ProfilingStep2) {
+  updateStep2(body: ProfilingStep2) {
     this.step2 = body;
     this.next();
   }
 
-  updateStep3(body:ProfilingStep3) {
+  updateStep3(body: ProfilingStep3) {
     this.step3 = body;
     this.next();
   }
@@ -158,7 +158,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
   }
 
   getGrouprule() {
-    var selected = { name: "" };
+    var selected = {name: ""};
     var value = "";
     var nullvalue = "";
     var nullname = "";
@@ -331,7 +331,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
     }
   }
 
-  submit(body:ProfilingStep4) {
+  submit(body: ProfilingStep4) {
     this.step4 = body;
 
     if (!this.formValidation(this.currentStep)) {
@@ -382,7 +382,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
         }
       ],
       "evaluate.rule": {
-        "out.dataframe.name":"profiling",
+        "out.dataframe.name": "profiling",
         rules: []
       }
     };
@@ -411,7 +411,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       },
       err => {
         let response = JSON.parse(err.error);
-        if(response.code === '40901'){
+        if (response.code === '40901') {
           this.toasterService.pop("error", "Error!", "Measure name already exists!");
         } else {
           this.toasterService.pop("error", "Error!", "Error when creating measure");
@@ -428,5 +428,6 @@ export class PrComponent implements AfterViewChecked, OnInit {
     this.step4 = new ProfilingStep4();
   }
 
-  ngAfterViewChecked() {}
+  ngAfterViewChecked() {
+  }
 }

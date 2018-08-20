@@ -22,7 +22,8 @@ under the License.
       Where:
     </label>
     <div class="col-md-10 col-lg-10 col-sm-10 ">
-      <input type="text" class="form-control" id="where" name="where" placeholder=" dt=#YYYYMMdd# AND hour=#HH#" [(ngModel)]="where" (change)="upward()">
+      <input type="text" class="form-control" id="where" name="where" placeholder=" dt=#YYYYMMdd# AND hour=#HH#"
+             [(ngModel)]="where" (change)="upward()">
     </div>
   </div>
 </div>
@@ -66,6 +67,7 @@ under the License.
     please write the Done file path relative to {{location}}
   </div>
   <div style="margin-left:45px">
-    <input type="text" class="form-control" id="path" [(ngModel)]="path" name="filepath" (change)="upward()" placeholder="/dt=#YYYYMMdd#/hour=#HH#/_DONE">
+    <input type="text" class="form-control" id="path" [(ngModel)]="path" name="filepath" (change)="upward()"
+           placeholder="/dt=#YYYYMMdd#/hour=#HH#/_DONE">
   </div>
 </div>

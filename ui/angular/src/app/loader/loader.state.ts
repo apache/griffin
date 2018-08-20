@@ -17,5 +17,5 @@ specific language governing permissions and limitations
 under the License.
 */
 export interface LoadingState {
-    show: boolean;
+  show: boolean;
 }

@@ -16,8 +16,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-mydashboard',
@@ -26,7 +26,8 @@ import { Router } from '@angular/router';
 })
 export class MydashboardComponent implements OnInit {
 
-  constructor(public router: Router) { }
+  constructor(public router: Router) {
+  }
 
   ngOnInit() {
   }

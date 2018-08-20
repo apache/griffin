@@ -16,9 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { LoaderService } from './loader.service';
+import {LoaderService} from './loader.service';
 
 describe('CreateMeasureComponent', () => {
   let component: LoaderService;
@@ -26,9 +26,9 @@ describe('CreateMeasureComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoaderService ]
+      declarations: [LoaderService]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

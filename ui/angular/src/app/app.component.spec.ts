@@ -16,9 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { TestBed, async } from '@angular/core/testing';
+import {TestBed, async} from '@angular/core/testing';
 
-import { AppComponent } from './app.component';
+import {AppComponent} from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {

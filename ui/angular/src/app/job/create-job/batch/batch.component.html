@@ -36,12 +36,14 @@ under the License.
               </legend>
               <div class="y-scrollable">
                 <div class="col-md-12 col-lg-12 col-sm-12">
-                  <div class="form-group" [ngClass]="{'has-error':jobName.dirty&&jobName.invalid, 'has-success':jobName.valid}">
+                  <div class="form-group"
+                       [ngClass]="{'has-error':jobName.dirty&&jobName.invalid, 'has-success':jobName.valid}">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Job Name<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="jobname" name="jobName" #jobName="ngModel" placeholder="Please input the job name" required pattern="^[a-zA-Z0-9_-]*$" id="jobName">
+                      <input type="text" class="form-control" [(ngModel)]="jobname" name="jobName" #jobName="ngModel"
+                             placeholder="Please input the job name" required pattern="^[a-zA-Z0-9_-]*$" id="jobName">
                       <span class="error text-small block " *ngIf="jobName.dirty && (jobName.errors?.required)">
                         Job Name is required</span>
                       <span class="error text-small block " *ngIf="jobName.dirty && (jobName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
@@ -54,7 +56,8 @@ under the License.
                       Measure Name<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select id="measureSelector" class="form-control" ngControl="name" required name="measure.name" [(ngModel)]="measure" (ngModelChange)="onChange($event)">
+                      <select id="measureSelector" class="form-control" ngControl="name" required name="measure.name"
+                              [(ngModel)]="measure" (ngModelChange)="onChange($event)">
                         <option *ngFor="let row of Measures" value="{{row.name}}">{{row.name}}</option>
                       </select>
                     </div>
@@ -77,14 +80,21 @@ under the License.
                     </label>
                   </div>
                   <p style="margin-left:60px" class="setcolor">
-                    <i class="fa fa-info-circle"></i> One step means a partition size,and {{connector.name}} partition size = {{connector.size}}
+                    <i class="fa fa-info-circle"></i> One step means a partition size,and {{connector.name}} partition
+                    size = {{connector.size}}
                   </p>
                   <div class="col-md-11 col-lg-11 col-sm-11 center">
                     begin :
-                    <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}" [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}" (ngModelChange)="changeRange(index,someKeyboard[i][0],i)"> end :
-                    <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}" [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
+                    <input type="number" class="setborder" value="{{ someKeyboard[i][0] }}"
+                           [(ngModel)]="someKeyboard[i][0]" max="0" name="begin{{i}}"
+                           (ngModelChange)="changeRange(index,someKeyboard[i][0],i)"> end :
+                    <input type="number" class="setborder" max="0" value="{{ someKeyboard[i][1] }}"
+                           [(ngModel)]="someKeyboard[i][1]" name="end{{i}}" (ngModelChange)="changeRange(1,$event,i)">
                   </div>
-                  <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]" (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()" (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
+                  <nouislider class="col-md-11 col-lg-11 col-sm-11 center" id="slider{{i}}" #sliderRef
+                              name="slider{{i}}" [config]="someKeyboardConfig[i]" [(ngModel)]="someKeyboard[i]"
+                              (ngModelChange)="rangeChange($event,i)" (keyup)="blinkKeyupLabel()"
+                              (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
                 </div>
               </div>
               <div class="setcolor">
@@ -106,11 +116,14 @@ under the License.
           </div>
         </div>
       </div>
-      <div class="modal fade" id="confirm-job" role="dialog" [ngClass]="{'in': visibleAnimate}" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
+      <div class="modal fade" id="confirm-job" role="dialog" [ngClass]="{'in': visibleAnimate}"
+           [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
+           (click)="onContainerClicked($event)">
         <div class="modal-dialog modal-xg modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="hide()">&times;</button>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="hide()">&times;
+              </button>
               <h4 class="modal-title">Save the job with the below information?</h4>
             </div>
             <div class="modal-body">

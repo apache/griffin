@@ -16,10 +16,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from '@angular/core';
-import { ServiceService } from "../../service/service.service";
-import { HttpClient } from "@angular/common/http";
-import { Router, ActivatedRoute, ParamMap } from "@angular/router";
+import {Component, OnInit} from '@angular/core';
+import {ServiceService} from "../../service/service.service";
+import {HttpClient} from "@angular/common/http";
+import {Router, ActivatedRoute, ParamMap} from "@angular/router";
 
 @Component({
   selector: 'app-job-detail',
@@ -28,7 +28,7 @@ import { Router, ActivatedRoute, ParamMap } from "@angular/router";
   styleUrls: ['./job-detail.component.css']
 })
 export class JobDetailComponent implements OnInit {
-  
+
   currentId: string;
   jobData: any;
   measureData: any;
@@ -40,11 +40,13 @@ export class JobDetailComponent implements OnInit {
   processType: string;
   rangeConfig = [];
   tableInfo = [];
+
   constructor(
-  	private route: ActivatedRoute,
-  	private router: Router,
-  	private http: HttpClient,
-    public serviceService: ServiceService) { }
+    private route: ActivatedRoute,
+    private router: Router,
+    private http: HttpClient,
+    public serviceService: ServiceService) {
+  }
 
   getMeasureById(measureId) {
     let url = this.serviceService.config.uri.getModel + "/" + measureId;
@@ -54,7 +56,7 @@ export class JobDetailComponent implements OnInit {
         this.measureName = this.measureData.name;
         this.measureType = this.measureData["dq.type"].toLowerCase();
         this.processType = this.measureData["process.type"].toLowerCase();
-        for(let item of this.measureData["data.sources"]){
+        for (let item of this.measureData["data.sources"]) {
           let config = item.connectors[0].config;
           let tableName = config.database + "." + config["table.name"];
           this.tableInfo.push(tableName);
@@ -67,7 +69,7 @@ export class JobDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-  	this.currentId = this.route.snapshot.paramMap.get("id");
+    this.currentId = this.route.snapshot.paramMap.get("id");
     var getJobById = this.serviceService.config.uri.getJobById + "?jobId=" + this.currentId;
     this.http.get(getJobById).subscribe(
       data => {
@@ -77,7 +79,7 @@ export class JobDetailComponent implements OnInit {
         this.cronTimeZone = this.jobData["cron.time.zone"];
         let mesureId = this.jobData["measure.id"];
         this.getMeasureById(mesureId);
-        for(let item of this.jobData["data.segments"]){
+        for (let item of this.jobData["data.segments"]) {
           this.rangeConfig.push(item["segment.range"]);
         }
       },

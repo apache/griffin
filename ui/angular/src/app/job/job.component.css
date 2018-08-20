@@ -17,15 +17,15 @@ specific language governing permissions and limitations
 under the License.
 */
 
-.table-striped>tbody>tr:nth-of-type(even) {
+.table-striped > tbody > tr:nth-of-type(even) {
   background-color: #1f1f1f;
 }
 
-.table-striped>tbody>tr:nth-of-type(odd) {
+.table-striped > tbody > tr:nth-of-type(odd) {
   background-color: #080808;
 }
 
-.reco>tbody:nth-of-type(odd)>tr {
+.reco > tbody:nth-of-type(odd) > tr {
   background-color: #1f1f1f;
 }
 
@@ -33,7 +33,7 @@ under the License.
   border-collapse: separate;
 }
 
-.table>tbody+tbody {
+.table > tbody + tbody {
   border-top: 1px solid transparent;
 }
 

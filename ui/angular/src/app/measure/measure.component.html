@@ -19,53 +19,55 @@ under the License.
 <div>
   <p>
     <a routerLink="/createmeasure" style="background-color: #337ab7;" class="btn btn-primary  btn-wide">
-      <i class="fa fa-plus"></i> 
+      <i class="fa fa-plus"></i>
       Create Measure
     </a>
   </p>
   <div id="modelContainer">
     <table class="table table-striped" [mfData]="results" #mf="mfDataTable" [mfRowsOnPage]="10">
       <thead>
-        <tr style="background-color:#7D95CC">
-          <th st-ratio="15">Measure Name</th>
-          <th st-ratio="15">Measure Type</th>
-          <th st-ratio="20">Description</th>
-          <!-- <th st-ratio="5">Group</th> -->
-          <th st-ratio="5">Action</th>
-        </tr>
+      <tr style="background-color:#7D95CC">
+        <th st-ratio="15">Measure Name</th>
+        <th st-ratio="15">Measure Type</th>
+        <th st-ratio="20">Description</th>
+        <!-- <th st-ratio="5">Group</th> -->
+        <th st-ratio="5">Action</th>
+      </tr>
       </thead>
       <tbody>
-        <tr *ngIf="!results">
-          <td colspan="7" style="text-align:center;display:none">No content!</td>
-          <!-- <td class="icon" style="border-top-style:none">
-            <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
-          </td> -->
-        </tr>
-        <tr *ngFor="let row of mf.data">
-          <td><a routerLink="/measure/{{row.id}}">{{row.name}}</a></td>
-          <td>{{row["dq.type"].toLowerCase()}}</td>
-          <td>{{row.description}}</td>
-          <td>
-            &nbsp;
-            <a (click)="remove(row)" title="delete" style="text-decoration:none">
-              <i class="fa fa-trash-o po"></i>
-            </a> &nbsp;
-            <a routerLink="/measure/{{row.id}}" title="subscribe">
-              <i class="fa fa-eye"></i>
-            </a>
-          </td>
-        </tr>
+      <tr *ngIf="!results">
+        <td colspan="7" style="text-align:center;display:none">No content!</td>
+        <!-- <td class="icon" style="border-top-style:none">
+          <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
+        </td> -->
+      </tr>
+      <tr *ngFor="let row of mf.data">
+        <td><a routerLink="/measure/{{row.id}}">{{row.name}}</a></td>
+        <td>{{row["dq.type"].toLowerCase()}}</td>
+        <td>{{row.description}}</td>
+        <td>
+          &nbsp;
+          <a (click)="remove(row)" title="delete" style="text-decoration:none">
+            <i class="fa fa-trash-o po"></i>
+          </a> &nbsp;
+          <a routerLink="/measure/{{row.id}}" title="subscribe">
+            <i class="fa fa-eye"></i>
+          </a>
+        </td>
+      </tr>
       </tbody>
       <tfoot>
-        <tr>
-          <td colspan="8" class="text-right">
-            <mfBootstrapPaginator></mfBootstrapPaginator>
-          </td>
-        </tr>
+      <tr>
+        <td colspan="8" class="text-right">
+          <mfBootstrapPaginator></mfBootstrapPaginator>
+        </td>
+      </tr>
       </tfoot>
     </table>
   </div>
-  <div class="modal fade" id="deleteConfirmation" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}" *ngIf="deletedRow" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
+  <div class="modal fade" id="deleteConfirmation" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}"
+       *ngIf="deletedRow" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
+       (click)="onContainerClicked($event)">
     <div class="modal-dialog modal-xg modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -128,7 +130,8 @@ under the License.
           </div>
         </div>
         <div class="modal-footer">
-          <p class="delete-alert">If you delete this measure, your running jobs on this measure will also be deleted, please be careful!</p>
+          <p class="delete-alert">If you delete this measure, your running jobs on this measure will also be deleted,
+            please be careful!</p>
           <button type="button" id="save" class="btn btn-default" (click)="confirmDelete()">Yes</button>
           <button type="button" class="btn btn-primary" (click)="hide()">No</button>
         </div>
