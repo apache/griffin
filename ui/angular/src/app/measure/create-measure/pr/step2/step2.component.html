@@ -31,7 +31,10 @@ under the License.
               <tr style="background-color:#7D95CC">
                 <th>Column Name</th>
                 <th>Data Type</th>
-                <th>Rule&nbsp;&nbsp;&nbsp;&nbsp;<i style="color:#b2c831;" class="fa fa-question-circle fa-lg"></i><i style="font-family: 'Open Sans', sans-serif;">Click <a (click)="showRule()" class="bark-link po">here</a> to view the rule definition</i></th>
+                <th>Rule&nbsp;&nbsp;&nbsp;&nbsp;<i style="color:#b2c831;" class="fa fa-question-circle fa-lg"></i><i
+                  style="font-family: 'Open Sans', sans-serif;">Click <a (click)="showRule()"
+                                                                         class="bark-link po">here</a> to view the rule
+                  definition</i></th>
               </tr>
               </thead>
               <tbody>
@@ -39,7 +42,9 @@ under the License.
                 <td class="middle">{{item.name}}</td>
                 <td class="middle">{{item.type}}</td>
                 <td class="col-md-5 middle">
-                  <angular2-multiselect [data]="step1.dropdownList[item.name]" name="rules-{{item.name}}" [(ngModel)]="step2.selectedItems[item.name]" [settings]="dropdownSettings"></angular2-multiselect>
+                  <angular2-multiselect [data]="step1.dropdownList[item.name]" name="rules-{{item.name}}"
+                                        [(ngModel)]="step2.selectedItems[item.name]"
+                                        [settings]="dropdownSettings"></angular2-multiselect>
                   <div *ngIf="containsRegex(step2.selectedItems[item.name])" class="block">
                     <label class="regex-label">
                       Regular Expression:

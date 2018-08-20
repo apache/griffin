@@ -16,14 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-
 @import url('../../node_modules/bootstrap/dist/css/bootstrap.css');
+
 * {
   color: white;
 }
 
-.navbar-default .navbar-nav>li>a:hover,
-.navbar-default .navbar-nav>li>a:focus {
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
   color: #ffffff;
   background-color: transparent;
 }
@@ -47,7 +47,6 @@ under the License.
   cursor: pointer;
 }
 
-
 h3 {
   font-size: 34px;
 }
@@ -56,23 +55,21 @@ input {
   margin: 12px;
 }
 
-
-
 .dropdown-menu {
   background-color: #222222;
 }
 
-.dropdown-menu>li>a {
+.dropdown-menu > li > a {
   color: #ffffff;
 }
 
-.dropdown-menu>li>a:hover {
+.dropdown-menu > li > a:hover {
   text-decoration: none;
   color: #ffffff;
   background-color: #2a9fd6;
 }
 
-.navbar-default .navbar-nav>.open>a {
+.navbar-default .navbar-nav > .open > a {
   background-color: #333;
 }
 
@@ -114,7 +111,7 @@ hr {
   }
 }
 
-@media (max-width:991px) {
+@media (max-width: 991px) {
 
   #content-row {
     margin-top: 0em;

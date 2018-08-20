@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-import { Component, OnInit, EventEmitter, Input, Output } from "@angular/core";
+import {Component, OnInit, EventEmitter, Input, Output} from "@angular/core";
 import * as $ from "jquery";
 
 @Component({
@@ -38,7 +38,9 @@ export class ConfigurationComponent implements OnInit {
   };
   @Input() location: string;
 
-  constructor() {}
+  constructor() {
+  }
+
   num: number;
   path: string;
   where: string;

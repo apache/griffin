@@ -16,10 +16,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
-import { ServiceService } from "../service/service.service";
+import {Component, OnInit} from "@angular/core";
+import {HttpClient} from "@angular/common/http";
+import {Router} from "@angular/router";
+import {ServiceService} from "../service/service.service";
 import * as $ from "jquery";
 
 @Component({
@@ -29,10 +29,12 @@ import * as $ from "jquery";
 })
 export class HealthComponent implements OnInit {
   constructor(
-    private http:HttpClient,
+    private http: HttpClient,
     private router: Router,
     public serviceService: ServiceService
-  ) {}
+  ) {
+  }
+
   chartOption: object;
   finalData = [];
   mesWithJob: any;
@@ -86,7 +88,9 @@ export class HealthComponent implements OnInit {
           metricId++;
         }
       }
-      item.children = item.children.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
+      item.children = item.children.sort(function (a, b) {
+        return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);
+      });
       result.push(item);
       sysId++;
     }
@@ -127,20 +131,20 @@ export class HealthComponent implements OnInit {
       },
       backgroundColor: "transparent",
       tooltip: {
-        formatter: function(info) {
+        formatter: function (info) {
           var dqFormat = info.data.dq > 100 ? "" : "%";
           if (info.data.dq)
             return [
               '<span style="font-size:1.8em;">' +
-                info.data.sysName +
-                " &gt; </span>",
+              info.data.sysName +
+              " &gt; </span>",
               '<span style="font-size:1.5em;">' +
-                info.data.name +
-                "</span><br>",
+              info.data.name +
+              "</span><br>",
               '<span style="font-size:1.5em;">dq : ' +
-                info.data.dq.toFixed(2) +
-                dqFormat +
-                "</span>"
+              info.data.dq.toFixed(2) +
+              dqFormat +
+              "</span>"
             ].join("");
         }
       },
@@ -169,7 +173,7 @@ export class HealthComponent implements OnInit {
     this.chartOption = option;
   }
 
-  checkvalue(job){
+  checkvalue(job) {
     return job.metricValues.length === 0;
   }
 
@@ -177,9 +181,9 @@ export class HealthComponent implements OnInit {
     let url_dashboard = this.serviceService.config.uri.dashboard;
     this.http.get(url_dashboard).subscribe(data => {
       this.mesWithJob = JSON.parse(JSON.stringify(data));
-      for(let i=0;i<this.mesWithJob.length;i++) {
-        if(this.mesWithJob[i].some(this.checkvalue)){
-          this.mesWithJob[i].splice(i,1);
+      for (let i = 0; i < this.mesWithJob.length; i++) {
+        if (this.mesWithJob[i].some(this.checkvalue)) {
+          this.mesWithJob[i].splice(i, 1);
         }
       }
       for (let mesName in this.mesWithJob) {

@@ -16,16 +16,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit, AfterViewInit } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { FormsModule } from "@angular/forms";
+import {Component, OnInit, AfterViewInit} from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
 
-import { TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from "angular-tree-component";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { ToasterModule, ToasterService, ToasterConfig } from "angular2-toaster";
+import {TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions} from "angular-tree-component";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ToasterModule, ToasterService, ToasterConfig} from "angular2-toaster";
 import * as $ from "jquery";
-import { HttpService } from '../../service/http.service';
-import { Router } from "@angular/router";
+import {HttpService} from '../../service/http.service';
+import {Router} from "@angular/router";
 
 @Component({
   selector: "app-create-measure",
@@ -33,23 +33,25 @@ import { Router } from "@angular/router";
   styleUrls: ["./create-measure.component.css"]
 })
 export class CreateMeasureComponent implements AfterViewInit {
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+  }
 
   click(type) {
     this.router.navigate(["/createmeasure" + type]);
   }
+
   ngAfterViewInit() {
     $("#panel-2 >.panel-body").css({
       height:
-        $("#panel-1 >.panel-body").outerHeight() +
-        $("#panel-1 >.panel-footer").outerHeight() -
-        $("#panel-2 >.panel-footer").outerHeight()
+      $("#panel-1 >.panel-body").outerHeight() +
+      $("#panel-1 >.panel-footer").outerHeight() -
+      $("#panel-2 >.panel-footer").outerHeight()
     });
     $("#panel-4 >.panel-body").css({
       height:
-        $("#panel-3 >.panel-body").outerHeight() +
-        $("#panel-3 >.panel-footer").outerHeight() -
-        $("#panel-4 >.panel-footer").outerHeight()
+      $("#panel-3 >.panel-body").outerHeight() +
+      $("#panel-3 >.panel-footer").outerHeight() -
+      $("#panel-4 >.panel-footer").outerHeight()
     });
   }
 }

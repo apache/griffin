@@ -45,11 +45,11 @@ under the License.
   vertical-align: top;
 }
 
-.main-table>tbody>tr:nth-of-type(even) {
+.main-table > tbody > tr:nth-of-type(even) {
   background-color: #1f1f1f;
 }
 
-.main-table>tbody>tr:nth-of-type(odd) {
+.main-table > tbody > tr:nth-of-type(odd) {
   background-color: #080808;
 }
 

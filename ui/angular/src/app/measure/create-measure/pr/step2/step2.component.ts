@@ -17,9 +17,9 @@ specific language governing permissions and limitations
 under the License.
 */
 import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
-import { AfterViewChecked } from "@angular/core";
-import { AngularMultiSelectModule } from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
-import { ProfilingStep1, ProfilingStep2 } from './../pr.component'
+import {AfterViewChecked} from "@angular/core";
+import {AngularMultiSelectModule} from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
+import {ProfilingStep1, ProfilingStep2} from './../pr.component'
 
 
 @Component({
@@ -35,7 +35,8 @@ export class PrStep2Component implements AfterViewChecked, OnInit {
   @Output() prevStep: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() nextStep: EventEmitter<Object> = new EventEmitter<Object>();
 
-  constructor() {}
+  constructor() {
+  }
 
   showRule() {
     document.getElementById("showrule").style.display = "";
@@ -55,7 +56,7 @@ export class PrStep2Component implements AfterViewChecked, OnInit {
     this.prevStep.emit(this.step2);
   }
 
-  containsRegex(obj){
+  containsRegex(obj) {
     if (!obj) return false;
     return obj.some(rule =>
       rule.itemName == 'Regular Expression Detection Count'
@@ -73,5 +74,6 @@ export class PrStep2Component implements AfterViewChecked, OnInit {
     };
   }
 
-  ngAfterViewChecked() {}
+  ngAfterViewChecked() {
+  }
 }

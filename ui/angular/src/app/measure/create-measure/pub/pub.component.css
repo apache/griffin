@@ -16,7 +16,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-
 @import url('../../../../../node_modules/angular2-toaster/toaster.css');
 /* @import url('../../measure.component.css'); */
 
@@ -53,19 +52,19 @@ div.tree div.tree-children::before {
   left: 5px
 }
 
-div.tree treenode>div>.node-wrapper {
+div.tree treenode > div > .node-wrapper {
   margin-left: 24px
 }
 
-div.tree treenode>div>.node-wrapper>.node-content-wrapper {
+div.tree treenode > div > .node-wrapper > .node-content-wrapper {
   margin-left: 4px
 }
 
-div.tree treenode>div.tree-node-leaf>.node-wrapper {
+div.tree treenode > div.tree-node-leaf > .node-wrapper {
   margin-left: 0
 }
 
-div.tree treenode>div::before {
+div.tree treenode > div::before {
   content: "";
   position: absolute;
   border-bottom: 1px dotted #23527c;
@@ -74,7 +73,7 @@ div.tree treenode>div::before {
   left: 7px
 }
 
-div.tree treenode>div .toggle-children-wrapper {
+div.tree treenode > div .toggle-children-wrapper {
   width: 13px;
   height: 13px;
   border: 1px solid #23527c;
@@ -87,7 +86,7 @@ div.tree treenode>div .toggle-children-wrapper {
   z-index: 1
 }
 
-div.tree treenode>div .toggle-children-wrapper::before {
+div.tree treenode > div .toggle-children-wrapper::before {
   content: "";
   display: inline-block;
   width: 7px;
@@ -97,7 +96,7 @@ div.tree treenode>div .toggle-children-wrapper::before {
   left: 2px
 }
 
-div.tree treenode>div .toggle-children-wrapper.toggle-children-wrapper-collapsed::after {
+div.tree treenode > div .toggle-children-wrapper.toggle-children-wrapper-collapsed::after {
   content: "";
   display: inline-block;
   height: 7px;
@@ -107,19 +106,19 @@ div.tree treenode>div .toggle-children-wrapper.toggle-children-wrapper-collapsed
   left: 5px
 }
 
-div.tree treenode>div .toggle-children-wrapper .toggle-children {
+div.tree treenode > div .toggle-children-wrapper .toggle-children {
   display: none
 }
 
-div.tree treenode>div .node-content-wrapper {
+div.tree treenode > div .node-content-wrapper {
   margin-left: 4px
 }
 
-div.tree>treenode>div::before {
+div.tree > treenode > div::before {
   left: 14px
 }
 
-div.tree>treenode>div>.node-wrapper>treenodeexpander>.toggle-children-wrapper {
+div.tree > treenode > div > .node-wrapper > treenodeexpander > .toggle-children-wrapper {
   left: 22px
 }
 
@@ -151,11 +150,11 @@ specific language governing permissions and limitations
 under the License.
 */
 
-.table-striped>tbody>tr:nth-of-type(even) {
+.table-striped > tbody > tr:nth-of-type(even) {
   background-color: #1f1f1f;
 }
 
-.table-striped>tbody>tr:nth-of-type(odd) {
+.table-striped > tbody > tr:nth-of-type(odd) {
   background-color: #080808;
 }
 
@@ -182,11 +181,11 @@ under the License.
   background-color: #7D95CC;
 }
 
-.pagination>li>a {
+.pagination > li > a {
   cursor: pointer;
 }
 
-.swMain>ul {
+.swMain > ul {
   display: table;
   list-style: none;
   margin: 0 0 20px;
@@ -204,13 +203,13 @@ under the License.
   /*height:800px;*/
 }
 
-.swMain>ul li {
+.swMain > ul li {
   display: table-cell;
   text-align: center;
   width: 1%
 }
 
-.swMain>ul li>a:before {
+.swMain > ul li > a:before {
   border-top: 4px solid #c8c7cc;
   /* content: ""; */
   display: block;
@@ -229,7 +228,7 @@ under the License.
   width: 100% !important;
 }
 
-.swMain>ul .stepNumber {
+.swMain > ul .stepNumber {
   background-color: #fff;
   border: 5px solid #c8c7cc;
   border-radius: 100%;
@@ -244,18 +243,18 @@ under the License.
   z-index: 2
 }
 
-.swMain>ul li>a.selected .stepNumber {
+.swMain > ul li > a.selected .stepNumber {
   border-color: #007AFF
 }
 
-.swMain ul li>a.done .stepNumber {
+.swMain ul li > a.done .stepNumber {
   border-color: #007AFF;
   background-color: #007AFF;
   color: #fff;
   text-indent: -9999px
 }
 
-.swMain ul li>a.done .stepNumber:before {
+.swMain ul li > a.done .stepNumber:before {
   content: "\f00c";
   display: inline;
   float: right;
@@ -267,17 +266,17 @@ under the License.
   text-indent: 0
 }
 
-.swMain ul li>a.done.wait .stepNumber {
-  background-color: #F6F6F6!important;
-  color: #CCC!important;
-  text-indent: 0!important
+.swMain ul li > a.done.wait .stepNumber {
+  background-color: #F6F6F6 !important;
+  color: #CCC !important;
+  text-indent: 0 !important
 }
 
-.swMain ul li>a.done.wait .stepNumber:before {
-  content: ""!important
+.swMain ul li > a.done.wait .stepNumber:before {
+  content: "" !important
 }
 
-.swMain>ul li .stepDesc {
+.swMain > ul li .stepDesc {
   color: #8e8e93;
   display: block;
   font-size: 14px;
@@ -289,13 +288,13 @@ under the License.
   z-index: 104
 }
 
-.swMain li>a.done .stepDesc,
-.swMain>ul li>a.selected .stepDesc {
+.swMain li > a.done .stepDesc,
+.swMain > ul li > a.selected .stepDesc {
   /*color: #2B3D53*/
   color: #007AFF
 }
 
-.swMain>ul li>a.disabled {
+.swMain > ul li > a.disabled {
   cursor: default
 }
 
@@ -304,7 +303,7 @@ under the License.
 }
 
 .swMain .stepContainer {
-  height: auto!important
+  height: auto !important
 }
 
 .swMain .y-scrollable {
@@ -331,12 +330,12 @@ fieldset legend {
   top: -12px;
   color: #fff;
   font-weight: 400;
-  width: auto!important;
-  border: none!important;
+  width: auto !important;
+  border: none !important;
 }
 
 .btn-o {
-  background: 0 0!important;
+  background: 0 0 !important;
 }
 
 .btn-wide {
@@ -357,11 +356,11 @@ fieldset legend {
   color: #fff;
 }
 
-.formStep>.stepDesc {
+.formStep > .stepDesc {
   color: #b2c831;
 }
 
-.formStep>.container-fluid {
+.formStep > .container-fluid {
   /*position:relative;*/
 }
 
@@ -375,17 +374,16 @@ fieldset legend {
   border-color: #B9D3DF;
 }
 
-.panel-disabled>.panel-heading {
+.panel-disabled > .panel-heading {
   background-color: #B9D3DF;
   border-color: #B9D3DF;
 }
 
-.panel-body>ul {
+.panel-body > ul {
   border-radius: 0;
   background: none;
   margin: 0;
 }
-
 
 .panel-green {
   border-color: #5cb85c;
@@ -447,11 +445,11 @@ fieldset legend {
   padding: 10px;
 }
 
-.ruletypes>.panel {
+.ruletypes > .panel {
   cursor: pointer
 }
 
-.ruletypes>.panel:hover {
+.ruletypes > .panel:hover {
   box-shadow: 3px 3px 5px 6px #ccc;
   /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
   -webkit-box-shadow: 3px 3px 5px 6px #ccc;
@@ -464,7 +462,6 @@ fieldset legend {
   color: #b2c831;
   padding-top: 10px;
 }
-
 
 ::-webkit-scrollbar {
   width: 6px;

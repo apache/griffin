@@ -34,7 +34,8 @@ export class PrConfirmModal {
   @Output() hide: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() saveMeasure: EventEmitter<Object> = new EventEmitter<Object>();
 
-  constructor() {}
+  constructor() {
+  }
 
   hideModal() {
     this.hide.emit();

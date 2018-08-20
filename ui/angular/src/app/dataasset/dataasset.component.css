@@ -22,15 +22,19 @@ under the License.
   left: 50%;
   top: 20%;
 }
+
 .co {
   border-collapse: separate;
 }
+
 .co > tbody > tr:nth-of-type(even) {
   background-color: #1f1f1f;
 }
+
 .co > tbody > tr:nth-of-type(odd) {
   background-color: #080808;
 }
+
 .table-striped > tbody > tr {
   background-color: #1f1f1f;
   border: 1px solid transparent;

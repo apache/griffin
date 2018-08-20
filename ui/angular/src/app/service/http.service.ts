@@ -16,35 +16,35 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from "@angular/common/http";
-import { Observable } from "rxjs/Observable";
+import {Injectable} from '@angular/core';
+import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse} from "@angular/common/http";
+import {Observable} from "rxjs/Observable";
 import 'rxjs/add/operator/do';
-import { LoaderService } from "./../loader/loader.service";
+import {LoaderService} from "./../loader/loader.service";
 
 @Injectable()
 export class HttpService implements HttpInterceptor {
 
-    constructor(private loaderService: LoaderService) {
-    }
+  constructor(private loaderService: LoaderService) {
+  }
 
-    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {  
-        this.showLoading();
-        return next.handle(req).do((event: HttpEvent<any>) => {           
-            if (event instanceof HttpResponse) {               
-                this.hideLoading();
-            }
-        }, (err: any) => {            
-            this.hideLoading();
-        });
-    }
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    this.showLoading();
+    return next.handle(req).do((event: HttpEvent<any>) => {
+      if (event instanceof HttpResponse) {
+        this.hideLoading();
+      }
+    }, (err: any) => {
+      this.hideLoading();
+    });
+  }
 
-    private showLoading(): void {
-        this.loaderService.show();
-    }
+  private showLoading(): void {
+    this.loaderService.show();
+  }
 
-    private hideLoading(): void {
-        this.loaderService.hide();
-    }
+  private hideLoading(): void {
+    this.loaderService.hide();
+  }
 
 }

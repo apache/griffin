@@ -67,7 +67,8 @@ under the License.
         </ul>
       </div>
       <div id="step-1" *ngIf="currentStep == 1" class="formStep">
-        <label class="stepDesc">This step let you choose the single source of truth for data quality comparision with target. Currently you can only select the attributes from one schema</label>
+        <label class="stepDesc">This step let you choose the single source of truth for data quality comparision with
+          target. Currently you can only select the attributes from one schema</label>
         <div class="container-fluid">
           <div class="col-md-4 col-lg-4 col-sm-4">
             <fieldset>
@@ -84,32 +85,34 @@ under the License.
                 <div style="margin-top:10px;">
                   <label>View schema:</label>
                   <i style="color:#fff;font-weight: bold;">{{currentDBstr}}{{currentTable}}
-                    </i>
+                  </i>
                 </div>
                 <div style="margin-top:5px;">
                   <table class="table table-striped">
                     <thead>
-                      <tr style="background-color:#7D95CC">
-                        <th>
-                          <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll" />
-                        </th>
-                        <th>Column Name</th>
-                        <th>Type</th>
-                        <th>Comment</th>
-                      </tr>
+                    <tr style="background-color:#7D95CC">
+                      <th>
+                        <input type="checkbox" (click)="toggleAll()" [checked]="selectedAll"/>
+                      </th>
+                      <th>Column Name</th>
+                      <th>Type</th>
+                      <th>Comment</th>
+                    </tr>
                     </thead>
                     <tbody>
-                      <tr *ngIf="!schemaCollection || schemaCollection.length == 0">
-                        <td colspan="5" style="text-align:center"><span class="highlight">Please select a schema from the left tree first</span></td>
-                      </tr>
-                      <tr *ngFor="let row of schemaCollection">
-                        <td>
-                          <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected" value={{row.name}} />
-                        </td>
-                        <td>{{row.name}}</td>
-                        <td>{{row.type}}</td>
-                        <td>{{row.comment}}</td>
-                      </tr>
+                    <tr *ngIf="!schemaCollection || schemaCollection.length == 0">
+                      <td colspan="5" style="text-align:center"><span class="highlight">Please select a schema from the left tree first</span>
+                      </td>
+                    </tr>
+                    <tr *ngFor="let row of schemaCollection">
+                      <td>
+                        <input type="checkbox" (click)='toggleSelection(row)' [checked]="row.selected"
+                               value={{row.name}}/>
+                      </td>
+                      <td>{{row.name}}</td>
+                      <td>{{row.type}}</td>
+                      <td>{{row.comment}}</td>
+                    </tr>
                     </tbody>
                   </table>
                 </div>
@@ -146,27 +149,28 @@ under the License.
                 <div style="margin-top:5px;">
                   <table st-table="schemaCollectionTarget" class="table table-striped">
                     <thead>
-                      <tr style="background-color:#7D95CC">
-                        <th>
-                          <input type="checkbox" (click)="toggleAllTarget()" [checked]="selectedAllTarget" />
-                        </th>
-                        <th>Column Name</th>
-                        <th>Type</th>
-                        <th>Comment</th>
-                      </tr>
+                    <tr style="background-color:#7D95CC">
+                      <th>
+                        <input type="checkbox" (click)="toggleAllTarget()" [checked]="selectedAllTarget"/>
+                      </th>
+                      <th>Column Name</th>
+                      <th>Type</th>
+                      <th>Comment</th>
+                    </tr>
                     </thead>
                     <tbody>
-                      <tr *ngIf="!schemaCollectionTarget || schemaCollectionTarget.length == 0">
-                        <td colspan="5" style="text-align:center"><span class="highlight">Please select a schema from the left tree first</span></td>
-                      </tr>
-                      <tr *ngFor="let row of schemaCollectionTarget">
-                        <td>
-                          <input type="checkbox" (click)='toggleSelectionTarget(row)' [checked]="row.selected" />
-                        </td>
-                        <td>{{row.name}}</td>
-                        <td>{{row.type}}</td>
-                        <td>{{row.comment}}</td>
-                      </tr>
+                    <tr *ngIf="!schemaCollectionTarget || schemaCollectionTarget.length == 0">
+                      <td colspan="5" style="text-align:center"><span class="highlight">Please select a schema from the left tree first</span>
+                      </td>
+                    </tr>
+                    <tr *ngFor="let row of schemaCollectionTarget">
+                      <td>
+                        <input type="checkbox" (click)='toggleSelectionTarget(row)' [checked]="row.selected"/>
+                      </td>
+                      <td>{{row.name}}</td>
+                      <td>{{row.type}}</td>
+                      <td>{{row.comment}}</td>
+                    </tr>
                     </tbody>
                   </table>
                 </div>
@@ -185,7 +189,8 @@ under the License.
         </div>
       </div>
       <div id="step-3" *ngIf="currentStep == 3" class="formStep">
-        <label class="stepDesc">This step let you map the target data fields to source fields, you can choose the related fields from dropdown list of source</label>
+        <label class="stepDesc">This step let you map the target data fields to source fields, you can choose the
+          related fields from dropdown list of source</label>
         <div class="container-fluid">
           <div class="col-md-12 col-lg-12 col-sm-12">
             <fieldset>
@@ -196,39 +201,44 @@ under the License.
                 <div class="container col-md-12 col-lg-12 col-sm-12">
                   <table class="table table-striped">
                     <thead>
-                      <tr style="background-color:#7D95CC;font-size:20px">
-                        <th style="width:40%;">Target Fields</th>
-                        <th style="width:10%;text-align:center">Map To</th>
-                        <th style="width:40%;text-align:center">Source Fields</th>
-                      </tr>
+                    <tr style="background-color:#7D95CC;font-size:20px">
+                      <th style="width:40%;">Target Fields</th>
+                      <th style="width:10%;text-align:center">Map To</th>
+                      <th style="width:40%;text-align:center">Source Fields</th>
+                    </tr>
                     </thead>
                     <tbody>
-                      <tr *ngFor="let item of selectionTarget; let i=index">
-                        <td>{{currentDBTarget}}.{{currentTableTarget}}.{{item}}</td>
-                        <td style="text-align:center;">
-                          <select class="form-control" style="background:#00FFFF;font-weight:bold" id="mapRule" name='mapRule-{{i}}' [(ngModel)]="matches[i]" value="matches[i]">
-                            <option *ngFor="let func of matchFunctions">{{func}}</option>
-                          </select>
-                        </td>
-                        <td>
-                          <select class="form-control" [(ngModel)]='mappings[i]' name="mappings{{i}}" (ngModelChange)="addMapping($event,i)" value="mappings[i]">
-                            <option *ngFor="let itemSrc of selection" [ngValue]="itemSrc">
-                              {{currentDB}}.{{currentTable}}.{{itemSrc}}</option>
-                          </select>
-                        </td>
-                      </tr>
+                    <tr *ngFor="let item of selectionTarget; let i=index">
+                      <td>{{currentDBTarget}}.{{currentTableTarget}}.{{item}}</td>
+                      <td style="text-align:center;">
+                        <select class="form-control" style="background:#00FFFF;font-weight:bold" id="mapRule"
+                                name='mapRule-{{i}}' [(ngModel)]="matches[i]" value="matches[i]">
+                          <option *ngFor="let func of matchFunctions">{{func}}</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select class="form-control" [(ngModel)]='mappings[i]' name="mappings{{i}}"
+                                (ngModelChange)="addMapping($event,i)" value="mappings[i]">
+                          <option *ngFor="let itemSrc of selection" [ngValue]="itemSrc">
+                            {{currentDB}}.{{currentTable}}.{{itemSrc}}
+                          </option>
+                        </select>
+                      </td>
+                    </tr>
                     </tbody>
                   </table>
                   <p>
                     <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
                   </p>
-                  <div class="col-md-12 col-lg-12 col-sm-12" style="color:#fff;font-size:16px;display: flex;align-items: center">
+                  <div class="col-md-12 col-lg-12 col-sm-12"
+                       style="color:#fff;font-size:16px;display: flex;align-items: center">
                     <div class="" style="text-align:right;display:block;float:left;width:20%;">
                       Accuracy Rate(%) =
                     </div>
                     <div class="" style="text-align:center;display:block;float:left;margin:0 10px 0 10px">
                       <div class="formula-text-up" style="border-bottom:1px solid;">
-                        Total Count of Matched records between <span class="badge">{{selectionTarget.length}}</span> <span style="color:green;">{{currentTableTarget}}</span> and <span class="badge">{{mappings.length}}
+                        Total Count of Matched records between <span class="badge">{{selectionTarget.length}}</span>
+                        <span style="color:green;">{{currentTableTarget}}</span> and <span class="badge">{{mappings.length}}
                           </span> <span style="color:green;">{{currentTable}}</span> fields
                       </div>
                       <div>
@@ -255,7 +265,8 @@ under the License.
         </div>
       </div>
       <div id="step-4" *ngIf="currentStep == 4" class="formStep">
-        <label class="stepDesc">Please complete the partition configuration for {{currentTable}} and {{currentTableTarget}}</label>
+        <label class="stepDesc">Please complete the partition configuration for {{currentTable}} and
+          {{currentTableTarget}}</label>
         <div class="container-fluid">
           <div class="col-md-12 col-lg-12 col-sm-12">
             <fieldset>
@@ -267,13 +278,15 @@ under the License.
                   <div class="form-group" style="text-align:center">
                     {{currentDB}}.{{currentTable}}
                   </div>
-                  <app-configuration [data]="srcconfig" [location]="src_location" (event)="getSrc($event)"></app-configuration>
+                  <app-configuration [data]="srcconfig" [location]="src_location"
+                                     (event)="getSrc($event)"></app-configuration>
                 </div>
                 <div class="col-md-6 col-lg-6 col-sm-6" id="target">
                   <div class="form-group" style="text-align:center">
                     {{currentDB}}.{{currentTableTarget}}
                   </div>
-                  <app-configuration [data]="tgtconfig" [location]="tgt_location" (event)="getTgt($event)"></app-configuration>
+                  <app-configuration [data]="tgtconfig" [location]="tgt_location"
+                                     (event)="getTgt($event)"></app-configuration>
                 </div>
               </div>
             </fieldset>
@@ -299,12 +312,15 @@ under the License.
               </legend>
               <div class="y-scrollable">
                 <div class="col-md-12 col-lg-12 col-sm-12" style="margin-top:20px;">
-                  <div class="form-group" [ngClass]="{'has-error':acName.dirty&&acName.invalid, 'has-success':acName.valid}">
+                  <div class="form-group"
+                       [ngClass]="{'has-error':acName.dirty&&acName.invalid, 'has-success':acName.valid}">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Measure Name<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="name" name="acName" #acName="ngModel" placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$" id="acName">
+                      <input type="text" class="form-control" [(ngModel)]="name" name="acName" #acName="ngModel"
+                             placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$"
+                             id="acName">
                       <span class="error text-small block " *ngIf="acName.dirty && (acName.errors?.required)">
                         Measure Name is required</span>
                       <span class="error text-small block " *ngIf="acName.dirty && (acName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
@@ -317,7 +333,8 @@ under the License.
                       Measure Description:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="desc" placeholder="Please input detailed description of your measure" name="desc">
+                      <input type="text" class="form-control" [(ngModel)]="desc"
+                             placeholder="Please input detailed description of your measure" name="desc">
                     </div>
                   </div>
                 </div>
@@ -340,8 +357,10 @@ under the License.
                       Source:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10">
-                      <input type="text" class="form-control" name="DataAsset" [(ngModel)]="currentTable" #prDataSource="ngModel" name="prDataSource" [readonly]="true" required>
-                      <span class="error text-small block " *ngIf="prDataSource.dirty && (prDataSource.errors?.required)">Data source is required</span>
+                      <input type="text" class="form-control" name="DataAsset" [(ngModel)]="currentTable"
+                             #prDataSource="ngModel" name="prDataSource" [readonly]="true" required>
+                      <span class="error text-small block "
+                            *ngIf="prDataSource.dirty && (prDataSource.errors?.required)">Data source is required</span>
                     </div>
                   </div>
                 </div>
@@ -351,8 +370,10 @@ under the License.
                       Target:<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10">
-                      <input type="text" class="form-control" name="DataAsset" [(ngModel)]="currentTableTarget" #prDataTarget="ngModel" name="prDataTarget" [readonly]="true" required>
-                        <span class="error text-small block " *ngIf="prDataTarget.dirty && (prDataTarget.errors?.required)">Data target is required</span>
+                      <input type="text" class="form-control" name="DataAsset" [(ngModel)]="currentTableTarget"
+                             #prDataTarget="ngModel" name="prDataTarget" [readonly]="true" required>
+                      <span class="error text-small block "
+                            *ngIf="prDataTarget.dirty && (prDataTarget.errors?.required)">Data target is required</span>
                     </div>
                   </div>
                 </div>
@@ -369,7 +390,9 @@ under the License.
               </div>
               <div style="color:#b2c831">
                 <p>
-                  <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" routerLink="/measures">Measures</a>" to check the measure status
+                  <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link"
+                                                                                      routerLink="/measures">Measures</a>"
+                  to check the measure status
                 </p>
               </div>
             </fieldset>
@@ -385,7 +408,9 @@ under the License.
           </div>
         </div>
       </div>
-      <div class="modal fade" id="confirm" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
+      <div class="modal fade" id="confirm" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}"
+           [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
+           (click)="onContainerClicked($event)">
         <div class="modal-dialog modal-xg modal-lg">
           <div class="modal-content">
             <div class="modal-header">
@@ -522,13 +547,15 @@ under the License.
                   <p>
                     <label style="color:#B2C831">Accuracy Calculation Formula as Below:</label>
                   </p>
-                  <div class="col-md-12 col-lg-12 col-sm-12" style="color:#fff;font-size:16px;display: flex;                align-items: center">
+                  <div class="col-md-12 col-lg-12 col-sm-12"
+                       style="color:#fff;font-size:16px;display: flex;                align-items: center">
                     <div class="" style="text-align:right;display:block;float:left;width:20%;">
                       Accuracy Rate(%) =
                     </div>
                     <div class="" style="text-align:center;display:block;float:left;margin:0 10px 0 10px">
                       <div class="formula-text-up" style="border-bottom:1px solid;">
-                        Total Count of Matched records between <span class="badge">{{selectionTarget.length}}</span> <span style="color:green;">{{currentTableTarget}}</span> and <span class="badge">{{mappings.length}}
+                        Total Count of Matched records between <span class="badge">{{selectionTarget.length}}</span>
+                        <span style="color:green;">{{currentTableTarget}}</span> and <span class="badge">{{mappings.length}}
                           </span> <span style="color:green;">{{currentTable}}</span> fields
                       </div>
                       <div>

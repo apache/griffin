@@ -23,12 +23,12 @@ under the License.
   align-items: center
 }
 
-.sidebar-stat-center>img {
+.sidebar-stat-center > img {
   max-width: 24px;
   margin-right: 5px;
 }
 
-.sidebar-stat-center>span {
+.sidebar-stat-center > span {
   font-size: 18px;
   color: #fff
 }
@@ -108,7 +108,7 @@ under the License.
   /*margin-left: 20px;*/
 }
 
-a>.side-name:hover {
+a > .side-name:hover {
   color: #b2c831;
   /*position: absolute;*/
   /*left: 210px;*/
@@ -146,9 +146,7 @@ a>.side-name:hover {
   float: none;
 }
 
-
 /*side-bar end*/
-
 
 /* led start */
 
@@ -184,7 +182,6 @@ a>.side-name:hover {
   border-radius: 50%;
   box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7D0 0 2px 12px;
 }
-
 
 /* led end   */
 

@@ -21,13 +21,16 @@ under the License.
   <nav class="navbar navbar-default navbar-fixed-top" ng-controller="NavCtrl">
     <div class="container-fluid">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-expanded="false">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a routerLink="/" class="navbar-brand" style="padding-top:5px;padding-bottom:0;"><img src="/assets/img/logo.png" title="Data Quality Service" style="max-height:40px;"/></a>
+        <a routerLink="/" class="navbar-brand" style="padding-top:5px;padding-bottom:0;"><img src="/assets/img/logo.png"
+                                                                                              title="Data Quality Service"
+                                                                                              style="max-height:40px;"/></a>
       </div>
       <div class="collapse navbar-collapse" id="navbar-collapse">
         <ul class="nav navbar-nav">
@@ -38,15 +41,20 @@ under the License.
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="toggle">{{fullName}} <i class="fa fa-user fa-fw"></i><span class="caret"></span></a>
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+               id="toggle">{{fullName}} <i class="fa fa-user fa-fw"></i><span class="caret"></span></a>
             <ul class="dropdown-menu dropdown-user">
               <li><a href="#!/undercons"><i class="fa fa-user fa-fw"></i> User Profile</a></li>
               <li><a href="#!/undercons"><i class="fa fa-gear fa-fw"></i> Settings</a></li>
               <li class="divider"></li>
-              <li><a href="https://griffin.incubator.apache.org/" target="_blank"><i class="fa fa-home fa-fw"></i> Home Page</a></li>
-              <li><a href="https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/api-guide.md" target="_blank"><i class="fa fa-book fa-fw"></i> API DOCs</a></li>
-              <li><a href="https://github.com/apache/incubator-griffin/blob/master/griffin-doc/ui/user-guide.md" target="_blank"><i class="fa fa-question-circle fa-fw"></i> User Guide</a></li>
-              <li><a href="mailto:dev@griffin.incubator.apache.org"><i class="fa fa-envelope fa-fw"></i> Contact us</a></li>
+              <li><a href="https://griffin.incubator.apache.org/" target="_blank"><i class="fa fa-home fa-fw"></i> Home
+                Page</a></li>
+              <li><a href="https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/api-guide.md"
+                     target="_blank"><i class="fa fa-book fa-fw"></i> API DOCs</a></li>
+              <li><a href="https://github.com/apache/incubator-griffin/blob/master/griffin-doc/ui/user-guide.md"
+                     target="_blank"><i class="fa fa-question-circle fa-fw"></i> User Guide</a></li>
+              <li><a href="mailto:dev@griffin.incubator.apache.org"><i class="fa fa-envelope fa-fw"></i> Contact us</a>
+              </li>
               <li class="divider"></li>
               <li><a (click)="logout()" class="re"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
               </li>
@@ -54,16 +62,22 @@ under the License.
           </li>
         </ul>
         <form class="navbar-search navbar-right nav navbar-nav">
-          <input id="searchBox" type="text" class="search-query" placeholder="Search..." ng-disabled="!isActive('/measures')&&!isActive('/dataassets')">
+          <input id="searchBox" type="text" class="search-query" placeholder="Search..."
+                 ng-disabled="!isActive('/measures')&&!isActive('/dataassets')">
         </form>
       </div>
     </div>
   </nav>
-  <div class="container-fluid" us-spinner="{color:'#ffffff', lines:13, width:14, length:28, radius:42, shadow:true, hwaccel:true, speed:0.8}" spinner-on="false" style="padding-top:56px;padding-bottom:90px;height:100%;padding-right:0;" id="mainContent">
+  <div class="container-fluid"
+       us-spinner="{color:'#ffffff', lines:13, width:14, length:28, radius:42, shadow:true, hwaccel:true, speed:0.8}"
+       spinner-on="false" style="padding-top:56px;padding-bottom:90px;height:100%;padding-right:0;" id="mainContent">
     <div class="col-md-9 col-xs-12">
-      <button type="button" class="btn btn-primary btn-circle" style="position: absolute; top: 0px; right: 30px; z-index:99" (click)="goback();"><span style="margin-bottom:20px;">Back</span></button>
+      <button type="button" class="btn btn-primary btn-circle"
+              style="position: absolute; top: 0px; right: 30px; z-index:99" (click)="goback();"><span
+        style="margin-bottom:20px;">Back</span></button>
       <!-- main content goes here-->
-      <div id="mainWindow" (window:resize)="onResize($event)" class="row y-scrollable" ng-view style="padding-right: 10px;">
+      <div id="mainWindow" (window:resize)="onResize($event)" class="row y-scrollable" ng-view
+           style="padding-right: 10px;">
         <app-loader></app-loader>
         <router-outlet></router-outlet>
       </div>

@@ -16,9 +16,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { AfterViewChecked } from "@angular/core";
-import { ProfilingStep1, ProfilingStep2, ProfilingStep3 } from './../pr.component'
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {AfterViewChecked} from "@angular/core";
+import {ProfilingStep1, ProfilingStep2, ProfilingStep3} from './../pr.component'
 
 @Component({
   selector: "app-pr-step-3",
@@ -33,7 +33,8 @@ export class PrStep3Component implements AfterViewChecked, OnInit {
   @Output() prevStep: EventEmitter<Object> = new EventEmitter<Object>();
   @Output() nextStep: EventEmitter<Object> = new EventEmitter<Object>();
 
-  constructor() {}
+  constructor() {
+  }
 
   getData(evt) {
     this.step3.config = evt;
@@ -52,6 +53,9 @@ export class PrStep3Component implements AfterViewChecked, OnInit {
     this.prevStep.emit(this.step3);
   }
 
-  ngOnInit() {}
-  ngAfterViewChecked() {}
+  ngOnInit() {
+  }
+
+  ngAfterViewChecked() {
+  }
 }

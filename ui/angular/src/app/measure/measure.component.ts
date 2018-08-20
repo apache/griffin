@@ -16,15 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { DataTableModule } from "angular2-datatable";
-import { Router } from "@angular/router";
-import { FormControl } from "@angular/forms";
-import { FormsModule } from "@angular/forms";
-import { ServiceService } from "../service/service.service";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { ToasterModule, ToasterService } from "angular2-toaster";
+import {Component, OnInit} from "@angular/core";
+import {HttpClient} from "@angular/common/http";
+import {DataTableModule} from "angular2-datatable";
+import {Router} from "@angular/router";
+import {FormControl} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
+import {ServiceService} from "../service/service.service";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ToasterModule, ToasterService} from "angular2-toaster";
 import * as $ from "jquery";
 
 @Component({
@@ -71,7 +71,7 @@ export class MeasureComponent implements OnInit {
     this.deleteIndex = this.results.indexOf(row);
     this.deletedRow = row;
     $("#save").removeAttr("disabled");
-    if(this.deletedRow["measure.type"]!=="external"){
+    if (this.deletedRow["measure.type"] !== "external") {
       var sourcedata = this.deletedRow["data.sources"][0].connectors[0].config;
       this.sourceTable = sourcedata["table.name"];
     }
@@ -90,7 +90,7 @@ export class MeasureComponent implements OnInit {
     this.http.delete(deleteUrl).subscribe(
       data => {
         var self = this;
-        setTimeout(function() {
+        setTimeout(function () {
           self.results.splice(self.deleteIndex, 1);
           self.hide();
         }, 200);
@@ -113,7 +113,7 @@ export class MeasureComponent implements OnInit {
       //     data[measure].type = '';
       //   }
       // }
-      let trans = Object.keys(data).map(function(index) {
+      let trans = Object.keys(data).map(function (index) {
         let measure = data[index];
         if (measure["measure.type"] === "external") {
           measure["dq.type"] = "external";
@@ -125,7 +125,7 @@ export class MeasureComponent implements OnInit {
         return measure;
       });
       // this.results = Object.assign([],trans).reverse();
-      this.results = Object.assign([],trans).sort(function(a,b){
+      this.results = Object.assign([], trans).sort(function (a, b) {
         return b.id - a.id;
       });
     });

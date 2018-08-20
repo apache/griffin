@@ -57,19 +57,25 @@ under the License.
       </div>
 
       <div id="step-2" *ngIf="currentStep == 2" class="formStep">
-        <app-pr-step-2 [step1]='step1' [step2]='step2' (prevStep)='prev($event)' (nextStep)='updateStep2($event)'></app-pr-step-2>
+        <app-pr-step-2 [step1]='step1' [step2]='step2' (prevStep)='prev($event)'
+                       (nextStep)='updateStep2($event)'></app-pr-step-2>
       </div>
 
       <div id="step-3" *ngIf="currentStep == 3" class="formStep">
-        <app-pr-step-3 [step1]='step1' [step2]='step2' [step3]='step3' (prevStep)='prev($event)' (nextStep)='updateStep3($event)'></app-pr-step-3>
+        <app-pr-step-3 [step1]='step1' [step2]='step2' [step3]='step3' (prevStep)='prev($event)'
+                       (nextStep)='updateStep3($event)'></app-pr-step-3>
       </div>
 
       <div id="step-4" *ngIf="currentStep == 4" class="formStep">
-        <app-pr-step-4 [step1]='step1' [step2]='step2' [step3]='step3' [step4]='step4' (prevStep)='prev($event)' (submitMeasure)='submit($event)'></app-pr-step-4>
+        <app-pr-step-4 [step1]='step1' [step2]='step2' [step3]='step3' [step4]='step4' (prevStep)='prev($event)'
+                       (submitMeasure)='submit($event)'></app-pr-step-4>
       </div>
 
-      <div class="modal fade" id="confirm" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
-        <app-pr-confirm-modal [step1]='step1' [step2]='step2' [step3]='step3' [step4]='step4' (hide)='hide($event)' (saveMeasure)='save($event)'></app-pr-confirm-modal>
+      <div class="modal fade" id="confirm" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}"
+           [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
+           (click)="onContainerClicked($event)">
+        <app-pr-confirm-modal [step1]='step1' [step2]='step2' [step3]='step3' [step4]='step4' (hide)='hide($event)'
+                              (saveMeasure)='save($event)'></app-pr-confirm-modal>
       </div>
     </form>
   </div>
