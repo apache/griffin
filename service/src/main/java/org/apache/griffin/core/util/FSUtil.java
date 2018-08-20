@@ -40,11 +40,16 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FSUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FSUtil.class);
     private static final int SAMPLE_ROW_COUNT = 100;
+
+    private static String fsDefaultName;
 
     private static FileSystem fileSystem;
 
@@ -55,9 +60,16 @@ public class FSUtil {
         return fileSystem;
     }
 
+    public FSUtil(@Value("${fs.defaultFS}") String defaultName) {
+        fsDefaultName = defaultName;
+    }
 
     private static void initFileSystem() {
         Configuration conf = new Configuration();
+        if (!StringUtils.isEmpty(fsDefaultName)) {
+            conf.set("fs.defaultFS", fsDefaultName);
+            LOGGER.info("Setting fs.defaultFS:{}", fsDefaultName);
+        }
 
         if (StringUtils.isEmpty(conf.get("fs.hdfs.impl"))) {
             LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
@@ -69,6 +81,7 @@ public class FSUtil {
         }
         try {
             fileSystem = FileSystem.get(conf);
+            System.out.println(fileSystem);
         } catch (Exception e) {
             LOGGER.error("Can not get hdfs file system. {}", e);
         }
