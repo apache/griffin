@@ -40,13 +40,30 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FSUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FSUtil.class);
     private static final int SAMPLE_ROW_COUNT = 100;
 
+    private static String fsDefaultName;
+
     private static FileSystem fileSystem;
+
+    private static FileSystem defaultFS = getDefaultFileSystem();
+    private static FileSystem getDefaultFileSystem() {
+        FileSystem fs = null;
+        Configuration conf = new Configuration();
+        try {
+            fs = FileSystem.get(conf);
+        } catch (Exception e) {
+            LOGGER.error("Can not get default hdfs file system. {}", e);
+        }
+        return fs;
+    }
 
     private static FileSystem getFileSystem() {
         if (fileSystem == null) {
@@ -55,26 +72,30 @@ public class FSUtil {
         return fileSystem;
     }
 
+    public FSUtil(@Value("${fs.defaultFS}") String defaultName) {
+        fsDefaultName = defaultName;
+    }
 
     private static void initFileSystem() {
         Configuration conf = new Configuration();
+        if (!StringUtils.isEmpty(fsDefaultName)) {
+            conf.set("fs.defaultFS", fsDefaultName);
+            LOGGER.info("Setting fs.defaultFS:{}", fsDefaultName);
+        }
 
         if (StringUtils.isEmpty(conf.get("fs.hdfs.impl"))) {
-            LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs
-                    .DistributedFileSystem.class.getName());
-            conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs
-                    .DistributedFileSystem.class.getName());
+            LOGGER.info("Setting fs.hdfs.impl:{}", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+            conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
         }
         if (StringUtils.isEmpty(conf.get("fs.file.impl"))) {
-            LOGGER.info("Setting fs.file.impl:{}", org.apache.hadoop.fs
-                    .LocalFileSystem.class.getName());
-            conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class
-                    .getName());
+            LOGGER.info("Setting fs.file.impl:{}", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+            conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
         }
         try {
             fileSystem = FileSystem.get(conf);
         } catch (Exception e) {
             LOGGER.error("Can not get hdfs file system. {}", e);
+            fileSystem = defaultFS;
         }
 
     }
