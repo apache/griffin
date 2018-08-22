@@ -71,10 +71,9 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
   val readyTimeDelay: Long = TimeUtil.milliseconds(param.getString(_ReadyTimeDelay, "1m")).getOrElse(60000L)
   val deltaTimeRange: (Long, Long) = {
     def negative(n: Long): Long = if (n <= 0) n else 0
-    case class StringSeq(values:Seq[String])
     param.get(_TimeRange) match {
-      case Some(seq: StringSeq) => {
-        val nseq = seq.values.flatMap(TimeUtil.milliseconds(_))
+      case Some(seq: Seq[String]) => {
+        val nseq = seq.flatMap(TimeUtil.milliseconds(_))
         val ns = negative(nseq.headOption.getOrElse(0))
         val ne = negative(nseq.tail.headOption.getOrElse(0))
         (ns, ne)
@@ -99,6 +98,11 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
 
   protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit
   protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame
+
+  private def readDataFrameOpt(dfr: DataFrameReader, path: String): Option[DataFrame] = {
+    val df = readDataFrame(dfr, path)
+    if (df.count() > 0) Some(df) else None
+  }
 
   /**
     * save data frame in dump phase
@@ -170,7 +174,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
     // new cache data
     val newDfOpt = try {
       val dfr = sqlContext.read
-      Some(readDataFrame(dfr, newFilePath).filter(filterStr))
+      readDataFrameOpt(dfr, newFilePath).map(_.filter(filterStr))
     } catch {
       case e: Throwable => {
         warn(s"read data source cache warn: ${e.getMessage}")
@@ -184,7 +188,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
       val oldDfPath = s"${oldFilePath}/${idx}"
       try {
         val dfr = sqlContext.read
-        Some(readDataFrame(dfr, oldDfPath).filter(filterStr))
+        readDataFrameOpt(dfr, oldDfPath).map(_.filter(filterStr))
       } catch {
         case e: Throwable => {
           warn(s"read old data source cache warn: ${e.getMessage}")
