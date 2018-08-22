@@ -48,7 +48,7 @@
         "namespace": "griffin/infocache",
         "lock.path": "lock",
         "mode": "persist",
-        "init.clear": false,
+        "init.clear": true,
         "close.clear": false
       }
     }
