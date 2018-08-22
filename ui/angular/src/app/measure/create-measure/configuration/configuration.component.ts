@@ -48,7 +48,7 @@ export class ConfigurationComponent implements OnInit {
   selectedType: string;
   configuration = {
     where: "",
-    timezone: "",
+    timezone: "UTC(WET,GMT)",
     num: 1,
     timetype: "day",
     needpath: false,

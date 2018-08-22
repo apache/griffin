@@ -77,16 +77,24 @@ under the License.
         <div class="container-fluid" id="dowloadContent" style="overflow:auto;">
           <tr>
             <td colspan="7" style="padding:20px 30px 10px 30px;">
-              <table class="table table-striped" [mfData]="missRecordList" #mf2="mfDataTable" [mfRowsOnPage]="10">
+              <table class="table table-striped" style="border-spacing: 15px;" [mfData]="missRecordList" #mf2="mfDataTable" [mfRowsOnPage]="10">
 
                 <tbody>
                 <tr *ngIf="!missRecordList">
                   <td colspan="7" style="text-align:center">No content.</td>
                 </tr>
-                <tr *ngFor="let item of mf2.data">
+                <!-- <tr *ngFor="let item of mf2.data">
                   <td style="background-color:black;"><a (click)="downloadSample(item)">{{item.tmst}} {{item.tmst |
                     date: 'yyyy/MM/dd HH:mm:ss'}}</a></td>
-                </tr>
+                </tr> -->
+                <div *ngFor="let item of mf2.data; let isEven = even;let i = index;let isLast= last">
+                 <tr *ngIf="isEven && !isLast">
+                   <td style="background-color:black; cursor: pointer;" nowrap><a [ngClass]="{'adisabled': !isDownloadClickDisabled}" (click)="downloadSample(item)" style="margin: 15px 15px 15px 15px;">{{mf2.data[i].tmst}} {{mf2.data[i].tmst |
+                     date: 'yyyy/MM/dd HH:mm:ss'}}</a></td>
+                   <td style="background-color:black; cursor: pointer;" nowrap><a ng-class="{'adisabled': !isDownloadClickDisabled}" (click)="downloadSample(item)">{{mf2.data[i].tmst}} {{mf2.data[i+1].tmst |
+                     date: 'yyyy/MM/dd HH:mm:ss'}}</a></td>
+                   </tr>
+                 </div>
                 </tbody>
                 <tfoot>
                 <tr>

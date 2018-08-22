@@ -90,7 +90,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
   currentDBstr: string;
   srcconfig = {
     where: "",
-    timezone: "",
+    timezone: "UTC(WET,GMT)",
     num: 1,
     timetype: "day",
     needpath: false,
@@ -98,7 +98,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
   };
   tgtconfig = {
     where: "",
-    timezone: "",
+    timezone: "UTC(WET,GMT)",
     num: 1,
     timetype: "day",
     needpath: false,
@@ -691,6 +691,8 @@ export class AcComponent implements OnInit, AfterViewChecked {
     });
     this.src_size = "1day";
     this.tgt_size = "1day";
+    this.src_timezone = this.srcconfig.timezone;
+    this.tgt_timezone = this.tgtconfig.timezone;
   }
 
   ngAfterViewChecked() {

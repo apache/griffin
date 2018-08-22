@@ -68,7 +68,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
   missRecordList = [];
   public visible = false;
   public visibleAnimate = false;
-
+  isDownloadClickDisabled = true;
 
   ngOnInit() {
     this.currentJob = this.route.snapshot.paramMap.get("name");
@@ -194,6 +194,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
   }
 
   downloadSample(row) {
+    this.isDownloadClickDisabled = !this.isDownloadClickDisabled;
     let urlDownload = this.serviceService.config.uri.missRecordDownload + "?jobName=" + row.name + "&ts=" + row.tmst;
     this.http
       .get(urlDownload,
@@ -205,6 +206,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
         };
       })
       .subscribe(res => {
+        this.isDownloadClickDisabled = !this.isDownloadClickDisabled;
         console.log('start download:', res);
         var url = window.URL.createObjectURL(res.data);
         var a = document.createElement('a');
