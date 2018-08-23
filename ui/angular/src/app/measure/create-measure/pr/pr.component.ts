@@ -46,13 +46,13 @@ export class ProfilingStep2 {
 export class ProfilingStep3 {
   config: object = {
     where: "",
-    timezone: "UTC(WET,GMT)",
+    timezone: "",
     num: 1,
     timetype: "day",
     needpath: false,
     path: ""
   };
-  timezone: string = "UTC(WET,GMT)";
+  timezone: string = "";
   where: string = "";
   size: string = "1day";
   needpath: boolean = false;
@@ -178,7 +178,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
         if (originrule == "Enum Detection Top5 Count") {
 
           enmvalue = this.transferRule(originrule, selected);
-          grpname = `${selected.name}_grp`;
+          grpname = `${selected.name}_top5count`;
           this.transenumrule.push(enmvalue);
           this.pushEnmRule(enmvalue, grpname);
 
@@ -243,7 +243,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "out": [
         {
           "type": "metric",
-          "name": grpname+"_group",
+          "name": grpname.split("_")[0]=="id"?"id":grpname,
           "flatten": "array"
         }
       ]

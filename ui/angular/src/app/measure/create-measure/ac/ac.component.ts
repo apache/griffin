@@ -90,7 +90,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
   currentDBstr: string;
   srcconfig = {
     where: "",
-    timezone: "UTC(WET,GMT)",
+    timezone: "",
     num: 1,
     timetype: "day",
     needpath: false,
@@ -98,7 +98,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
   };
   tgtconfig = {
     where: "",
-    timezone: "UTC(WET,GMT)",
+    timezone: "",
     num: 1,
     timetype: "day",
     needpath: false,
