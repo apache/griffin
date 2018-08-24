@@ -70,11 +70,11 @@ under the License.
                   {{step3.size}}
                 </div>
               </div>
-              <div class="row">
+              <div class="row" *ngIf="step3.timezone">
                 <label class="col-md-4 col-lg-4 col-sm-4">
                   Source Time Zone:
                 </label>
-                <div class="col-md-8 col-lg-8 col-sm-8">
+                <div class="col-md-8 col-lg-8 col-sm-8" *ngIf="step3.timezone">
                   {{step3.timezone}}
                 </div>
               </div>
