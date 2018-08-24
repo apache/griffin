@@ -68,7 +68,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
   missRecordList = [];
   public visible = false;
   public visibleAnimate = false;
-
+  isDownloadClickDisabled = true;
 
   ngOnInit() {
     this.currentJob = this.route.snapshot.paramMap.get("name");
@@ -128,25 +128,8 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
                   records += record;
                 }
                 delete item.value[key];
-                key = key + ' (' + keysplit[0] + ', count)';
+                key = key + ' (' + keysplit[0].split("_")[0] + ', count)';
                 item.value[key] = records;
-                // var sortable = [];
-                // for(let i in item.value[key]){
-                //   for(let category in item.value[key][i]){
-                //     if(category != "count"){
-                //       let name = category + ':' + item.value[key][i][category];
-                //       sortable.push([name, item.value[key][i].count]);
-                //       sortable.sort(function(a, b) {
-                //         return b[1] - a[1];
-                //       });
-                //     }
-                //   }
-                // }
-                // for(let i=0;i<5;i++){
-                //   let grpname = sortable[i][0];
-                //   item.value[grpname] = sortable[i][1];
-                // }
-                // delete item.value[key];
               }
             }
           }
@@ -194,6 +177,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
   }
 
   downloadSample(row) {
+    this.isDownloadClickDisabled = !this.isDownloadClickDisabled;
     let urlDownload = this.serviceService.config.uri.missRecordDownload + "?jobName=" + row.name + "&ts=" + row.tmst;
     this.http
       .get(urlDownload,
@@ -205,6 +189,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
         };
       })
       .subscribe(res => {
+        this.isDownloadClickDisabled = !this.isDownloadClickDisabled;
         console.log('start download:', res);
         var url = window.URL.createObjectURL(res.data);
         var a = document.createElement('a');

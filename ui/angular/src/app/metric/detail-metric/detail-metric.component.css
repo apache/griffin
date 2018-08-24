@@ -97,3 +97,12 @@ under the License.
 .clone tfoot {
   background: transparent;
 }
+
+a.adisabled {
+  cursor: not-allowed;
+  opacity: .65;
+}
+
+a.adisabled:hover { text-decoration: none; }
+a.adisabled:focus { text-decoration: none; }
+a.adisabled:active { text-decoration: none; }

@@ -691,6 +691,8 @@ export class AcComponent implements OnInit, AfterViewChecked {
     });
     this.src_size = "1day";
     this.tgt_size = "1day";
+    this.src_timezone = this.srcconfig.timezone;
+    this.tgt_timezone = this.tgtconfig.timezone;
   }
 
   ngAfterViewChecked() {

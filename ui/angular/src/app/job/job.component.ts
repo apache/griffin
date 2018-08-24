@@ -189,6 +189,7 @@ export class JobComponent implements OnInit {
       let trans = Object.keys(data).map(function (index) {
         let job = self.swapJson(data[index]);
         job.showDetail = false;
+        job.jobState.previousFireTime = job.jobState.previousFireTime < 0?'':job.jobState.previousFireTime;
         job.action = (job.jobState.toStart === true) ? 'START' : 'STOP';
         return job;
       });

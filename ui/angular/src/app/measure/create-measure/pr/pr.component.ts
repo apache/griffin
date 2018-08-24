@@ -46,13 +46,13 @@ export class ProfilingStep2 {
 export class ProfilingStep3 {
   config: object = {
     where: "",
-    timezone: "UTC(WET,GMT)",
+    timezone: "",
     num: 1,
     timetype: "day",
     needpath: false,
     path: ""
   };
-  timezone: string = "UTC(WET,GMT)";
+  timezone: string = "";
   where: string = "";
   size: string = "1day";
   needpath: boolean = false;
@@ -178,7 +178,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
         if (originrule == "Enum Detection Top5 Count") {
 
           enmvalue = this.transferRule(originrule, selected);
-          grpname = `${selected.name}_grp`;
+          grpname = `${selected.name}_top5count`;
           this.transenumrule.push(enmvalue);
           this.pushEnmRule(enmvalue, grpname);
 
@@ -239,10 +239,14 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "dsl.type": "griffin-dsl",
       "dq.type": "PROFILING",
       rule: rule,
-      name: grpname,
-      metric: {
-        "collect.type": "array"
-      }
+      "out.dataframe.name": grpname,
+      "out": [
+        {
+          "type": "metric",
+          "name": grpname,
+          "flatten": "array"
+        }
+      ]
     });
   }
 
@@ -251,7 +255,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "dsl.type": "griffin-dsl",
       "dq.type": "PROFILING",
       rule: rule,
-      name: nullname
+      "out.dataframe.name": nullname
     });
   }
 
@@ -260,7 +264,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "dsl.type": "griffin-dsl",
       "dq.type": "PROFILING",
       rule: rule,
-      name: nullname
+      "out.dataframe.name": nullname
     });
   }
 
@@ -305,11 +309,11 @@ export class PrComponent implements AfterViewChecked, OnInit {
         );
       case "Regular Expression Detection Count":
         return (
-          `count(source.${col.name} RLIKE '${col.regex}') AS \`${col.name}_regexcount\``
+          `count(source.${col.name}) AS \`${col.name}_regexcount\` WHERE source.${col.name} RLIKE '^[0-9]{4}$'`
         );
       case "Enum Detection Top5 Count":
         return (
-          `source.${col.name}, ${col.name}, count(*) AS count GROUP BY source.${col.name} ORDER BY count DESC LIMIT 5`
+          `source.${col.name} AS ${col.name}, count(*) AS count GROUP BY source.${col.name} ORDER BY count DESC LIMIT 5`
         );
     }
   }
