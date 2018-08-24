@@ -243,7 +243,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "out": [
         {
           "type": "metric",
-          "name": grpname.split("_")[0]=="id"?"id":grpname,
+          "name": grpname,
           "flatten": "array"
         }
       ]

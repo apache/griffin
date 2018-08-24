@@ -128,7 +128,7 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
                   records += record;
                 }
                 delete item.value[key];
-                key = key + ' (' + keysplit[0] + ', count)';
+                key = key + ' (' + keysplit[0].split("_")[0] + ', count)';
                 item.value[key] = records;
                 // var sortable = [];
                 // for(let i in item.value[key]){
