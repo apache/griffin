@@ -130,23 +130,6 @@ export class DetailMetricComponent implements AfterViewChecked, OnInit {
                 delete item.value[key];
                 key = key + ' (' + keysplit[0].split("_")[0] + ', count)';
                 item.value[key] = records;
-                // var sortable = [];
-                // for(let i in item.value[key]){
-                //   for(let category in item.value[key][i]){
-                //     if(category != "count"){
-                //       let name = category + ':' + item.value[key][i][category];
-                //       sortable.push([name, item.value[key][i].count]);
-                //       sortable.sort(function(a, b) {
-                //         return b[1] - a[1];
-                //       });
-                //     }
-                //   }
-                // }
-                // for(let i=0;i<5;i++){
-                //   let grpname = sortable[i][0];
-                //   item.value[grpname] = sortable[i][1];
-                // }
-                // delete item.value[key];
               }
             }
           }
