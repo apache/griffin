@@ -35,14 +35,14 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     
 3. Pull griffin pre-built docker images, but if you access docker repository easily(NOT in China).
     ```
-    docker pull bhlx3lyx7/griffin_spark2:0.2.0
+    docker pull bhlx3lyx7/griffin_spark2:0.2.1
     docker pull bhlx3lyx7/elasticsearch
     docker pull bhlx3lyx7/kafka
     docker pull zookeeper:3.5
     ```
    For Chinese users, you can pull the images from the following mirrors.
     ```
-    docker pull registry.docker-cn.com/bhlx3lyx7/griffin_spark2:0.2.0
+    docker pull registry.docker-cn.com/bhlx3lyx7/griffin_spark2:0.2.1
     docker pull registry.docker-cn.com/bhlx3lyx7/elasticsearch
     docker pull registry.docker-cn.com/bhlx3lyx7/kafka
     docker pull registry.docker-cn.com/zookeeper:3.5
