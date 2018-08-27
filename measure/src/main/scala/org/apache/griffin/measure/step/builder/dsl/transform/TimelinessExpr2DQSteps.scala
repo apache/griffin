@@ -108,7 +108,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
       val latencyTransStep = SparkSqlTransformStep(latencyTableName, latencySql, emptyMap, true)
 
       // 3. timeliness metric
-      val metricTableName = ruleParam.outDfName
+      val metricTableName = ruleParam.getOutDfName()
       val totalColName = details.getStringOrKey(_total)
       val avgColName = details.getStringOrKey(_avg)
       val metricSql = procType match {
@@ -132,7 +132,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
       val metricTransStep = SparkSqlTransformStep(metricTableName, metricSql, emptyMap)
       val metricWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
-        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.outDfName)
+        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
         val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
         MetricWriteStep(mwName, metricTableName, flattenType)
       }
