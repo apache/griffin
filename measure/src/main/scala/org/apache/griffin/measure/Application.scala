@@ -64,7 +64,7 @@ object Application extends Loggable {
     val allParam: GriffinConfig = GriffinConfig(envParam, dqParam)
 
     // choose process
-    val procType = ProcessType(allParam.getDqConfig.procType)
+    val procType = ProcessType(allParam.getDqConfig.getProcType)
     val dqApp: DQApp = procType match {
       case BatchProcessType => BatchDQApp(allParam)
       case StreamingProcessType => StreamingDQApp(allParam)

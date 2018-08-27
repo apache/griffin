@@ -112,7 +112,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val totalCountTransStep = SparkSqlTransformStep(totalCountTableName, totalCountSql, emptyMap)
 
       // 5. complete metric
-      val completeTableName = ruleParam.outDfName
+      val completeTableName = ruleParam.getOutDfName()
       val completeColName = details.getStringOrKey(_complete)
       val completeMetricSql = procType match {
         case BatchProcessType => {
