@@ -29,11 +29,12 @@ Apache Griffin is a model driven data quality solution for modern data systems. 
 
 ### Quick Start
 
-You can try Griffin in docker following the [docker guide](griffin-doc/docker/griffin-docker-guide.md).
+You can try running Griffin in docker following the [docker guide](griffin-doc/docker/griffin-docker-guide.md).
 
 ### Environment for Dev
 
 Follow [Apache Griffin Development Environment Build Guide](griffin-doc/dev/dev-env-build.md) to set up development environment.
+<br>If you want to contribute codes to Griffin, please follow [Apache Griffin Development Code Style Config Guide](griffin-doc/dev/code-style.md) to keep consistent code style.
 
 ### Deployment at Local
 
