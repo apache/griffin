@@ -63,6 +63,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
@@ -113,8 +117,13 @@ public class SparkSubmitJob implements Job {
     private String post2Livy() {
         String result = null;
         try {
-            result = restTemplate.postForObject(livyUri, livyConfMap,
-                    String.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-Requested-By","admin");
+          
+            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap), headers );
+            result = restTemplate.postForObject(livyUri,springEntity,String.class);
+           
             LOGGER.info(result);
         } catch (HttpClientErrorException e) {
             LOGGER.error("Post to livy ERROR. \n {} {}",
