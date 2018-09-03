@@ -45,7 +45,7 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     docker pull registry.docker-cn.com/apachegriffin/griffin_spark2:0.3.0
     docker pull registry.docker-cn.com/apachegriffin/elasticsearch
     docker pull registry.docker-cn.com/apachegriffin/kafka
-    docker pull registry.docker-cn.com/zookeeper:3.5
+    docker pull zookeeper:3.5
     ```
    The docker images are the griffin environment images.
     - `apachegriffin/griffin_spark2`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
