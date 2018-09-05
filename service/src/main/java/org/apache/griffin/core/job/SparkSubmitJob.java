@@ -74,7 +74,7 @@ import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 public class SparkSubmitJob implements Job {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(SparkSubmitJob.class);
-
+    private static final String REQUEST_BY_HEADER = "X-Requested-By";
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
@@ -119,7 +119,7 @@ public class SparkSubmitJob implements Job {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-Requested-By","admin");
+            headers.set(REQUEST_BY_HEADER,"admin");
           
             HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap), headers );
             result = restTemplate.postForObject(livyUri,springEntity,String.class);
