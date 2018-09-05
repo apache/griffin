@@ -23,7 +23,7 @@ under the License.
   <div class="row">
     <form name="Form" id="form" #prForm="ngForm" novalidate>
       <div id="wizard" class="swMain">
-        <ul> 
+        <ul>
           <li>
             <a class="selected">
               <div class="stepNumber">
@@ -33,8 +33,8 @@ under the License.
             </a>
           </li>
         </ul>
-      </div>  
-      <div id="step-4"  class="formStep">
+      </div>
+      <div id="step-4" class="formStep">
         <label class="stepDesc">Please setup the measure required information</label>
         <div class="container-fluid">
           <div class="col-md-12 col-lg-12 col-sm-12">
@@ -44,39 +44,47 @@ under the License.
               </legend>
               <div class="y-scrollable">
                 <div class="col-md-12 col-lg-12 col-sm-12" style="margin-top:30px;">
-                  <div class="form-group" [ngClass]="{'has-error':prName.dirty&&prName.invalid, 'has-success':prName.valid}">
+                  <div class="form-group"
+                       [ngClass]="{'has-error':prName.dirty&&prName.invalid, 'has-success':prName.valid}">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Measure Name<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="newMeasure.name" #prName="ngModel" name="prName" placeholder="Please input the measure name" required pattern="^[a-zA-Z0-9_-]*$">
+                      <input type="text" class="form-control" [(ngModel)]="newMeasure.name" #prName="ngModel"
+                             name="prName" placeholder="Please input the measure name" required
+                             pattern="^[a-zA-Z0-9_-]*$">
                       <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.required)">Measure Name is required</span>
                       <span class="error text-small block " *ngIf="prName.dirty && (prName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-12 col-lg-12 col-sm-12" >
-                  <div class="form-group" [ngClass]="{'has-error':mName.dirty&&mName.invalid, 'has-success':mName.valid}">
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group"
+                       [ngClass]="{'has-error':mName.dirty&&mName.invalid, 'has-success':mName.valid}">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Metric Name<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="newMeasure.metricName" #mName="ngModel" name="mName" placeholder="Please input the metric name" required pattern="^[a-zA-Z0-9_-]*$">
+                      <input type="text" class="form-control" [(ngModel)]="newMeasure.metricName" #mName="ngModel"
+                             name="mName" placeholder="Please input the metric name" required
+                             pattern="^[a-zA-Z0-9_-]*$">
                       <span class="error text-small block " *ngIf="mName.dirty && (mName.errors?.required)">Metric Name is required</span>
                       <span class="error text-small block " *ngIf="mName.dirty && (mName.errors?.pattern)">Only letter, number, "-" and "_" are allowed</span>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-12 col-lg-12 col-sm-12" >
-                  <div class="form-group" [ngClass]="{'has-error':mName.dirty&&mName.invalid, 'has-success':mName.valid}">
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                  <div class="form-group"
+                       [ngClass]="{'has-error':mName.dirty&&mName.invalid, 'has-success':mName.valid}">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
                       Dq Type<span class="symbol required"></span>:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select [(ngModel)]="newMeasure.dqType" name="dqTypeOptions[{{i}}]"  class="form-control input-sm" placeholder="Visual Type" required>
-                       <option *ngFor="let t of dqTypeOptions" value="{{t}}">{{t}}</option>
-                      </select>  
-                      <span class="error text-small block " *ngIf="mName.dirty && (mName.errors?.required)">Metric Name is required</span>                     
+                      <select [(ngModel)]="newMeasure.dqType" name="dqTypeOptions[{{i}}]" class="form-control input-sm"
+                              placeholder="Visual Type" required>
+                        <option *ngFor="let t of dqTypeOptions" value="{{t}}">{{t}}</option>
+                      </select>
+                      <span class="error text-small block " *ngIf="mName.dirty && (mName.errors?.required)">Metric Name is required</span>
                     </div>
                   </div>
                 </div>
@@ -86,7 +94,8 @@ under the License.
                       Measure Description:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <input type="text" class="form-control" [(ngModel)]="newMeasure.description" placeholder="Please input detailed description of your measure" name="desc">
+                      <input type="text" class="form-control" [(ngModel)]="newMeasure.description"
+                             placeholder="Please input detailed description of your measure" name="desc">
                     </div>
                   </div>
                 </div>
@@ -96,12 +105,13 @@ under the License.
                       Measure Type:
                     </label>
                     <div class="col-md-10 col-lg-10 col-sm-10 ">
-                      <select id="typeSelector" class="form-control" [(ngModel)]="newMeasure.measureType" disabled required name="type">
+                      <select id="typeSelector" class="form-control" [(ngModel)]="newMeasure.measureType" disabled
+                              required name="type">
                         <option>{{newMeasure.measureType}}</option>
                       </select>
                     </div>
                   </div>
-                </div> 
+                </div>
                 <div class="col-md-12 col-lg-12 col-sm-12">
                   <div class="form-group">
                     <label class="col-md-2 col-lg-2 col-sm-2 control-label">
@@ -115,7 +125,9 @@ under the License.
               </div>
               <div style="color:#b2c831">
                 <p>
-                  <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link" routerLink="/measures">Measures</a>" to check the measure status
+                  <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link"
+                                                                                      routerLink="/measures">Measures</a>"
+                  to check the measure status
                 </p>
               </div>
             </fieldset>
@@ -128,7 +140,9 @@ under the License.
           </div>
         </div>
       </div>
-      <div class="modal fade" id="confirm" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}" [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}" (click)="onContainerClicked($event)">
+      <div class="modal fade" id="confirm" role="dialog" #modal tabindex="-1" [ngClass]="{'in': visibleAnimate}"
+           [ngStyle]="{'display': visible ? 'block' : 'none', 'opacity': visibleAnimate ? 1 : 0}"
+           (click)="onContainerClicked($event)">
         <div class="modal-dialog modal-xg modal-lg">
           <div class="modal-content">
             <div class="modal-header">
@@ -182,7 +196,7 @@ under the License.
                         <div class="col-md-8 col-lg-8 col-sm-8 ">
                           {{newMeasure.measureType}}
                         </div>
-                      </div> 
+                      </div>
                       <div class="row">
                         <label class="col-md-4 col-lg-4 col-sm-4">
                           Owner:
@@ -193,7 +207,7 @@ under the License.
                       </div>
                     </div>
                   </div>
-                </div>                
+                </div>
               </div>
             </div>
             <div class="modal-footer">

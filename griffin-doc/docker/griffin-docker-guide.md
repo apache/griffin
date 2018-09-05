@@ -35,22 +35,22 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     
 3. Pull griffin pre-built docker images, but if you access docker repository easily(NOT in China).
     ```
-    docker pull bhlx3lyx7/griffin_spark2:0.2.0
-    docker pull bhlx3lyx7/elasticsearch
-    docker pull bhlx3lyx7/kafka
+    docker pull apachegriffin/griffin_spark2:0.3.0
+    docker pull apachegriffin/elasticsearch
+    docker pull apachegriffin/kafka
     docker pull zookeeper:3.5
     ```
    For Chinese users, you can pull the images from the following mirrors.
     ```
-    docker pull registry.docker-cn.com/bhlx3lyx7/griffin_spark2:0.2.0
-    docker pull registry.docker-cn.com/bhlx3lyx7/elasticsearch
-    docker pull registry.docker-cn.com/bhlx3lyx7/kafka
+    docker pull registry.docker-cn.com/apachegriffin/griffin_spark2:0.3.0
+    docker pull registry.docker-cn.com/apachegriffin/elasticsearch
+    docker pull registry.docker-cn.com/apachegriffin/kafka
     docker pull registry.docker-cn.com/zookeeper:3.5
     ```
    The docker images are the griffin environment images.
-    - `bhlx3lyx7/griffin_spark2`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
-    - `bhlx3lyx7/elasticsearch`: This image is based on official elasticsearch, adding some configurations to enable cors requests, to provide elasticsearch service for metrics persist.
-    - `bhlx3lyx7/kafka`: This image contains kafka 0.8, and some demo streaming data, to provide streaming data source in streaming mode.
+    - `apachegriffin/griffin_spark2`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
+    - `apachegriffin/elasticsearch`: This image is based on official elasticsearch, adding some configurations to enable cors requests, to provide elasticsearch service for metrics persist.
+    - `apachegriffin/kafka`: This image contains kafka 0.8, and some demo streaming data, to provide streaming data source in streaming mode.
     - `zookeeper:3.5`: This image is official zookeeper, to provide zookeeper service in streaming mode.
 
 ### How to use griffin docker images in batch mode

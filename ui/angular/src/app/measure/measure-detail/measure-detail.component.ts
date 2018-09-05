@@ -16,11 +16,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from "@angular/core";
-import { Router, ActivatedRoute, ParamMap } from "@angular/router";
+import {Component, OnInit} from "@angular/core";
+import {Router, ActivatedRoute, ParamMap} from "@angular/router";
 import "rxjs/add/operator/switchMap";
-import { HttpClient } from "@angular/common/http";
-import { ServiceService } from "../../service/service.service";
+import {HttpClient} from "@angular/common/http";
+import {ServiceService} from "../../service/service.service";
 
 @Component({
   selector: "app-measure-detail",
@@ -30,12 +30,15 @@ import { ServiceService } from "../../service/service.service";
 })
 export class MeasureDetailComponent implements OnInit {
   currentId: string;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient,
     public serviceService: ServiceService
-  ) {}
+  ) {
+  }
+
   ruleData: any;
   ruleDes = [];
   sourceLength: number;
@@ -86,10 +89,10 @@ export class MeasureDetailComponent implements OnInit {
         if (this.ruleData["measure.type"] === "external") {
           this.ruleData.type = this.ruleData["measure.type"].toLowerCase();
           this.ruleData.dqType = this.ruleData["dq.type"].toLowerCase();
-        } else{
+        } else {
           this.ruleData.type = this.ruleData["dq.type"].toLowerCase();
           this.currentrule = this.ruleData["evaluate.rule"].rules;
-          if(this.ruleData["rule.description"]){
+          if (this.ruleData["rule.description"]) {
             this.ruleDes = this.ruleData["rule.description"].details
           }
           this.fetchData("source", 0);

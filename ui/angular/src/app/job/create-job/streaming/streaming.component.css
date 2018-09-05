@@ -17,74 +17,80 @@ specific language governing permissions and limitations
 under the License.
 */
 .job {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 .info {
-    color: #b2c831;
+  color: #b2c831;
 }
 
 .btn-o {
-    background: 0 0 !important;
+  background: 0 0 !important;
 }
 
 legend {
-    background-color: #000;
-    color: #007aff;
-    left: 10px;
-    padding: 0 10px;
-    position: absolute;
-    top: -12px;
-    font-weight: 400;
-    color: #fff;
-    margin-bottom: 20px;
-    font-size: 21px;
-    width: auto !important;
-    border: none !important;
+  background-color: #000;
+  color: #007aff;
+  left: 10px;
+  padding: 0 10px;
+  position: absolute;
+  top: -12px;
+  font-weight: 400;
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 21px;
+  width: auto !important;
+  border: none !important;
 }
+
 fieldset {
-    border: 1px solid #e6e8e8;
-    border-radius: 5px;
-    margin: 20px 0;
-    padding: 25px;
-    position: relative;
-    min-width: 0;
-    display: block;
-    height: 320px;
+  border: 1px solid #e6e8e8;
+  border-radius: 5px;
+  margin: 20px 0;
+  padding: 25px;
+  position: relative;
+  min-width: 0;
+  display: block;
+  height: 320px;
 }
 
 .formStep {
-    background-color: #000;
+  background-color: #000;
 }
+
 .setcolor {
-    color: #b2c831;
+  color: #b2c831;
 }
+
 .setgrey {
-    color: #888888;
+  color: #888888;
 }
+
 .mat-calendar-table {
-    height: 400px;
+  height: 400px;
 }
+
 .mat-datepicker-content {
-    overflow-y: auto;
+  overflow-y: auto;
 }
 
 #md-datepicker-0 {
-    height: 250px;
+  height: 250px;
 }
 
 .center {
-    margin-left: 5%;
+  margin-left: 5%;
 }
 
 .range {
-    display: block;
-    width: 20%;
-    height: 10%;
-    margin-bottom: 5px;
+  display: block;
+  width: 20%;
+  height: 10%;
+  margin-bottom: 5px;
 }
+
 .setborder {
-    border: 2px solid;
-    border-radius: 5px;
-    width: 8%;
+  border: 2px solid;
+  border-radius: 5px;
+  width: 8%;
 }

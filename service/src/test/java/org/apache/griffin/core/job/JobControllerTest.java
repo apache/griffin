@@ -95,7 +95,8 @@ public class JobControllerTest {
 
     @Test
     public void testDeleteJobByIdForFailureWithNotFound() throws Exception {
-        doThrow(new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST)).when(service).deleteJob(1L);
+        doThrow(new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST))
+                .when(service).deleteJob(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs/1"))
                 .andExpect(status().isNotFound());
@@ -103,7 +104,8 @@ public class JobControllerTest {
 
     @Test
     public void testDeleteJobByIdForFailureWithException() throws Exception {
-        doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
+        doThrow(new GriffinException.ServiceException("Failed to delete job",
+                new Exception()))
                 .when(service).deleteJob(1L);
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs/1"))
@@ -115,26 +117,31 @@ public class JobControllerTest {
         String jobName = "jobName";
         doNothing().when(service).deleteJob(jobName);
 
-        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("jobName", jobName))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("jobName"
+                , jobName))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     public void testDeleteJobByNameForFailureWithNotFound() throws Exception {
         String jobName = "jobName";
-        doThrow(new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST)).when(service).deleteJob(jobName);
+        doThrow(new GriffinException.NotFoundException(JOB_NAME_DOES_NOT_EXIST))
+                .when(service).deleteJob(jobName);
 
-        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("jobName", jobName))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("jobName"
+                , jobName))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void testDeleteJobByNameForFailureWithException() throws Exception {
         String jobName = "jobName";
-        doThrow(new GriffinException.ServiceException("Failed to delete job", new Exception()))
+        doThrow(new GriffinException.ServiceException("Failed to delete job",
+                new Exception()))
                 .when(service).deleteJob(jobName);
 
-        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("jobName", jobName))
+        mvc.perform(delete(URLHelper.API_VERSION_PATH + "/jobs").param("jobName"
+                , jobName))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -142,11 +149,15 @@ public class JobControllerTest {
     public void testFindInstancesOfJob() throws Exception {
         int page = 0;
         int size = 2;
-        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates.State.RUNNING, "", "", null, null);
-        given(service.findInstancesOfJob(1L, page, size)).willReturn(Arrays.asList(jobInstance));
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates
+                .State.RUNNING, "", "", null, null);
+        given(service.findInstancesOfJob(1L, page, size)).willReturn(Arrays
+                .asList(jobInstance));
 
-        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param("jobId", String.valueOf(1L))
-                .param("page", String.valueOf(page)).param("size", String.valueOf(size)))
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances").param
+                ("jobId", String.valueOf(1L))
+                .param("page", String.valueOf(page)).param("size",
+                        String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].state", is("RUNNING")));
     }

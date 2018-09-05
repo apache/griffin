@@ -68,7 +68,8 @@ import org.springframework.web.client.RestTemplate;
 @DisallowConcurrentExecution
 @Component
 public class SparkSubmitJob implements Job {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SparkSubmitJob.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(SparkSubmitJob.class);
 
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
@@ -99,7 +100,8 @@ public class SparkSubmitJob implements Job {
         }
     }
 
-    private void updateJobInstanceState(JobExecutionContext context) throws IOException {
+    private void updateJobInstanceState(JobExecutionContext context) throws
+            IOException {
         SimpleTrigger simpleTrigger = (SimpleTrigger) context.getTrigger();
         int repeatCount = simpleTrigger.getRepeatCount();
         int fireCount = simpleTrigger.getTimesTriggered();
@@ -111,10 +113,13 @@ public class SparkSubmitJob implements Job {
     private String post2Livy() {
         String result = null;
         try {
-            result = restTemplate.postForObject(livyUri, livyConfMap, String.class);
+            result = restTemplate.postForObject(livyUri, livyConfMap,
+                    String.class);
             LOGGER.info(result);
         } catch (HttpClientErrorException e) {
-            LOGGER.error("Post to livy ERROR. \n {} {}", e.getMessage(), e.getResponseBodyAsString());
+            LOGGER.error("Post to livy ERROR. \n {} {}",
+                    e.getMessage(),
+                    e.getResponseBodyAsString());
         } catch (Exception e) {
             LOGGER.error("Post to livy ERROR. {}", e.getMessage());
         }
@@ -126,7 +131,8 @@ public class SparkSubmitJob implements Job {
             return true;
         }
         for (SegmentPredicate segPredicate : predicates) {
-            Predicator predicator = PredicatorFactory.newPredicateInstance(segPredicate);
+            Predicator predicator = PredicatorFactory
+                    .newPredicateInstance(segPredicate);
             try {
                 if (predicator != null && !predicator.predicate()) {
                     return false;
@@ -141,11 +147,14 @@ public class SparkSubmitJob implements Job {
 
     private void initParam(JobDetail jd) throws IOException {
         mPredicates = new ArrayList<>();
-        jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap().getString(PREDICATE_JOB_NAME));
-        measure = toEntity(jd.getJobDataMap().getString(MEASURE_KEY), GriffinMeasure.class);
+        jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap()
+                .getString(PREDICATE_JOB_NAME));
+        measure = toEntity(jd.getJobDataMap().getString(MEASURE_KEY),
+                GriffinMeasure.class);
         livyUri = env.getProperty("livy.uri");
         setPredicates(jd.getJobDataMap().getString(PREDICATES_KEY));
-        // in order to keep metric name unique, we set job name as measure name at present
+        // in order to keep metric name unique, we set job name
+        // as measure name at present
         measure.setName(jd.getJobDataMap().getString(JOB_NAME));
     }
 
@@ -154,8 +163,9 @@ public class SparkSubmitJob implements Job {
         if (StringUtils.isEmpty(json)) {
             return;
         }
-        List<Map<String, Object>> maps = toEntity(json, new TypeReference<List<Map>>() {
-        });
+        List<Map<String, Object>> maps = toEntity(json,
+                new TypeReference<List<Map>>() {
+                });
         for (Map<String, Object> map : maps) {
             SegmentPredicate sp = new SegmentPredicate();
             sp.setType((String) map.get("type"));
@@ -195,8 +205,10 @@ public class SparkSubmitJob implements Job {
     }
 
 
-    private void saveJobInstance(JobDetail jd) throws SchedulerException, IOException {
-        // If result is null, it may livy uri is wrong or livy parameter is wrong.
+    private void saveJobInstance(JobDetail jd) throws SchedulerException,
+            IOException {
+        // If result is null, it may livy uri is wrong
+        // or livy parameter is wrong.
         String result = post2Livy();
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();
@@ -205,9 +217,11 @@ public class SparkSubmitJob implements Job {
         saveJobInstance(result, FOUND);
     }
 
-    private void saveJobInstance(String result, State state) throws IOException {
-        TypeReference<HashMap<String, Object>> type = new TypeReference<HashMap<String, Object>>() {
-        };
+    private void saveJobInstance(String result, State state)
+            throws IOException {
+        TypeReference<HashMap<String, Object>> type =
+                new TypeReference<HashMap<String, Object>>() {
+                };
         Map<String, Object> resultMap = null;
         if (result != null) {
             resultMap = toEntity(result, type);
@@ -223,8 +237,10 @@ public class SparkSubmitJob implements Job {
             Object status = resultMap.get("state");
             Object id = resultMap.get("id");
             Object appId = resultMap.get("appId");
-            jobInstance.setState(status == null ? null : State.valueOf(status.toString().toUpperCase()));
-            jobInstance.setSessionId(id == null ? null : Long.parseLong(id.toString()));
+            jobInstance.setState(status == null ? null : State.valueOf(status
+                    .toString().toUpperCase()));
+            jobInstance.setSessionId(id == null ? null : Long.parseLong(id
+                    .toString()));
             jobInstance.setAppId(appId == null ? null : appId.toString());
         }
     }

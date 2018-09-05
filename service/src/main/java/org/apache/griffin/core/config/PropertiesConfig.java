@@ -45,7 +45,8 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 public class PropertiesConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesConfig.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(PropertiesConfig.class);
 
     public static Map<String, Object> livyConfMap;
 
@@ -53,9 +54,13 @@ public class PropertiesConfig {
 
     private String envLocation;
 
-    public PropertiesConfig(@Value("${external.config.location}") String configLocation, @Value("${external.env.location}") String envLocation) {
-        LOGGER.info("external.config.location : {}", configLocation != null ? configLocation : "null");
-        LOGGER.info("external.env.location : {}", envLocation != null ? envLocation : "null");
+    public PropertiesConfig(
+            @Value("${external.config.location}") String configLocation,
+            @Value("${external.env.location}") String envLocation) {
+        LOGGER.info("external.config.location : {}",
+                configLocation != null ? configLocation : "null");
+        LOGGER.info("external.env.location : {}",
+                envLocation != null ? envLocation : "null");
         this.configLocation = configLocation;
         this.envLocation = envLocation;
     }
@@ -73,10 +78,12 @@ public class PropertiesConfig {
     }
 
     /**
-     * Config quartz.properties will be replaced if it's found in external.config.location setting.
+     * Config quartz.properties will be replaced if it's found in external
+     * .config.location setting.
      *
      * @return Properties
-     * @throws FileNotFoundException It'll throw FileNotFoundException when path is wrong.
+     * @throws FileNotFoundException It'll throw FileNotFoundException
+     *                               when path is wrong.
      */
     @Bean(name = "quartzConf")
     public Properties quartzConf() throws FileNotFoundException {
@@ -85,7 +92,10 @@ public class PropertiesConfig {
         return getConf(name, defaultPath, configLocation);
     }
 
-    private static void genLivyConf(String name, String defaultPath, String location) throws IOException {
+    private static void genLivyConf(
+            String name,
+            String defaultPath,
+            String location) throws IOException {
         if (livyConfMap != null) {
             return;
         }
@@ -106,13 +116,15 @@ public class PropertiesConfig {
      * @return Map
      * @throws IOException io exception
      */
-    private static Map<String, Object> readPropertiesFromResource(String path) throws IOException {
+    private static Map<String, Object> readPropertiesFromResource(String path)
+            throws IOException {
         if (path == null) {
             LOGGER.warn("Parameter path is null.");
             return null;
         }
-        // Be careful, here we use getInputStream() to convert path file to stream.
-        // It'll cause FileNotFoundException if you use  getFile() to convert path file to File Object
+        // Be careful, here we use getInputStream() to convert path file to
+        // stream. It'll cause FileNotFoundException if you use  getFile()
+        // to convert path file to File Object
         InputStream in = new ClassPathResource(path).getInputStream();
         return toEntity(in, new TypeReference<Map<String, Object>>() {
         });

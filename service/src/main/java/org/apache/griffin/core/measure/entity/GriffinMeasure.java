@@ -70,7 +70,6 @@ public class GriffinMeasure extends Measure {
     private Long timestamp;
 
     @JsonIgnore
-//    @Access(AccessType.PROPERTY)
     @Column(length = 1024)
     private String ruleDescription;
 
@@ -79,12 +78,14 @@ public class GriffinMeasure extends Measure {
     private Map<String, Object> ruleDescriptionMap;
 
     @NotNull
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+        CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "measure_id")
     private List<DataSource> dataSources = new ArrayList<>();
 
     @NotNull
-    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+        CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluate_rule_id")
     private EvaluateRule evaluateRule;
 
@@ -115,7 +116,8 @@ public class GriffinMeasure extends Measure {
     }
 
     public void setEvaluateRule(EvaluateRule evaluateRule) {
-        if (evaluateRule == null || CollectionUtils.isEmpty(evaluateRule.getRules())) {
+        if (evaluateRule == null || CollectionUtils.isEmpty(evaluateRule
+            .getRules())) {
             throw new NullPointerException("Evaluate rule can not be empty.");
         }
         this.evaluateRule = evaluateRule;
@@ -156,7 +158,8 @@ public class GriffinMeasure extends Measure {
         super();
     }
 
-    public GriffinMeasure(String name, String owner, List<DataSource> dataSources,
+    public GriffinMeasure(String name, String owner,
+                          List<DataSource> dataSources,
                           EvaluateRule evaluateRule,
                           List<String> sinksList) {
         this.name = name;
@@ -166,7 +169,9 @@ public class GriffinMeasure extends Measure {
         setSinksList(sinksList);
     }
 
-    public GriffinMeasure(Long measureId, String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+    public GriffinMeasure(Long measureId, String name, String owner,
+                          List<DataSource> dataSources,
+                          EvaluateRule evaluateRule) {
         this.setId(measureId);
         this.name = name;
         this.owner = owner;
@@ -185,8 +190,9 @@ public class GriffinMeasure extends Measure {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(ruleDescription)) {
-            this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription, new TypeReference<Map<String, Object>>() {
-            });
+            this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription,
+                new TypeReference<Map<String, Object>>() {
+                });
         }
     }
 }

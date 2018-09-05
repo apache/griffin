@@ -34,14 +34,17 @@ public class PropertiesUtilTest {
     @Test
     public void testGetPropertiesForSuccess() {
         String path = "/quartz.properties";
-        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
-        assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
+        Properties properties = PropertiesUtil.getProperties(path,
+                new ClassPathResource(path));
+        assertEquals(properties
+                .get("org.quartz.jobStore.isClustered"), "true");
     }
 
     @Test
     public void testGetPropertiesForFailureWithWrongPath() {
         String path = ".././quartz.properties";
-        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
+        Properties properties = PropertiesUtil.getProperties(path,
+                new ClassPathResource(path));
         assertEquals(properties, null);
     }
 

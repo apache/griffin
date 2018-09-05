@@ -62,7 +62,8 @@ public class HiveMetaStoreControllerTest {
     @Test
     public void testGetAllDatabases() throws Exception {
         String dbName = "default";
-        given(hiveMetaStoreService.getAllDatabases()).willReturn(Arrays.asList(dbName));
+        given(hiveMetaStoreService.getAllDatabases()).willReturn(Arrays
+                .asList(dbName));
 
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/dbs"))
                 .andExpect(status().isOk())
@@ -74,9 +75,12 @@ public class HiveMetaStoreControllerTest {
     public void testGetAllTableNames() throws Exception {
         String dbName = "default";
         String tableName = "table";
-        given(hiveMetaStoreService.getAllTableNames(dbName)).willReturn(Arrays.asList(tableName));
+        given(hiveMetaStoreService.getAllTableNames(dbName)).willReturn(Arrays
+                .asList(tableName));
 
-        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/tables/names").param("db", dbName))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH +
+                "/metadata/hive/tables/names").param("db",
+                dbName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0]", is(tableName)));
     }
@@ -84,9 +88,12 @@ public class HiveMetaStoreControllerTest {
     @Test
     public void testGetAllTablesWithDb() throws Exception {
         String dbName = "default";
-        given(hiveMetaStoreService.getAllTable(dbName)).willReturn(Arrays.asList(new Table()));
+        given(hiveMetaStoreService.getAllTable(dbName)).willReturn(Arrays
+                .asList(new Table()));
 
-        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/tables").param("db", dbName))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH +
+                "/metadata/hive/tables").param("db",
+                dbName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].tableName", is(nullValue())));
     }
@@ -97,7 +104,8 @@ public class HiveMetaStoreControllerTest {
         results.put("table", new ArrayList<>());
         given(hiveMetaStoreService.getAllTable()).willReturn(results);
 
-        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/dbs/tables"))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH +
+                "/metadata/hive/dbs/tables"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.table", hasSize(0)));
     }
@@ -107,9 +115,13 @@ public class HiveMetaStoreControllerTest {
     public void testGetTable() throws Exception {
         String dbName = "default";
         String tableName = "table";
-        given(hiveMetaStoreService.getTable(dbName, tableName)).willReturn(new Table(tableName, null, null, 0, 0, 0, null, null, null, null, null, null));
+        given(hiveMetaStoreService.getTable(dbName, tableName)).willReturn(
+                new Table(tableName, null, null, 0, 0, 0, null, null,
+                null, null, null, null));
 
-        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/table").param("db", dbName).param("table", tableName))
+        mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/table")
+                .param("db", dbName).param("table",
+                        tableName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tableName", is(tableName)));
     }

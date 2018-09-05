@@ -52,7 +52,8 @@ public class MeasureOrgServiceImplTest {
     @Test
     public void testGetOrgs() {
         String orgName = "orgName";
-        given(measureRepo.findOrganizations(false)).willReturn(Arrays.asList(orgName));
+        given(measureRepo.findOrganizations(false)).willReturn(Arrays
+                .asList(orgName));
         List<String> orgs = service.getOrgs();
         assertThat(orgs.size()).isEqualTo(1);
         assertThat(orgs.get(0)).isEqualTo(orgName);
@@ -62,7 +63,8 @@ public class MeasureOrgServiceImplTest {
     public void testGetMetricNameListByOrg() {
         String orgName = "orgName";
         String measureName = "measureName";
-        given(measureRepo.findNameByOrganization(orgName, false)).willReturn(Arrays.asList(measureName));
+        given(measureRepo.findNameByOrganization(orgName, false))
+                .willReturn(Arrays.asList(measureName));
         List<String> measureNames = service.getMetricNameListByOrg(orgName);
         assertThat(measureNames.size()).isEqualTo(1);
         assertThat(measureNames.get(0)).isEqualTo(measureName);
@@ -71,7 +73,8 @@ public class MeasureOrgServiceImplTest {
     @Test
     public void testGetMeasureNamesGroupByOrg() throws Exception {
         GriffinMeasure measure = createGriffinMeasure("measure");
-        when(measureRepo.findByDeleted(false)).thenReturn(Arrays.asList(measure));
+        when(measureRepo.findByDeleted(false)).thenReturn(Arrays
+                .asList(measure));
         Map<String, List<String>> map = service.getMeasureNamesGroupByOrg();
         assertThat(map.size()).isEqualTo(1);
     }
@@ -84,13 +87,15 @@ public class MeasureOrgServiceImplTest {
     }
 
     @Test
-    public void testGetMeasureWithJobDetailsGroupByOrgForSuccess() throws Exception {
+    public void testGetMeasureWithJobDetailsGroupByOrgForSuccess()
+            throws Exception {
         String measureName = "measureName";
         String measureId = "1";
         GriffinMeasure measure = createGriffinMeasure(measureName);
         measure.setOrganization("org");
         measure.setId(Long.valueOf(measureId));
-        given(measureRepo.findByDeleted(false)).willReturn(Arrays.asList(measure));
+        given(measureRepo.findByDeleted(false)).willReturn(Arrays
+                .asList(measure));
 
         Map<String, Object> jobDetail = createJobDetailMap();
 
@@ -98,14 +103,16 @@ public class MeasureOrgServiceImplTest {
         Map<String, List<Map<String, Object>>> measuresById = new HashMap<>();
         measuresById.put(measureId, jobList);
 
-        Map<String, Map<String, List<Map<String, Object>>>> map = service.getMeasureWithJobDetailsGroupByOrg(measuresById);
+        Map<String, Map<String, List<Map<String, Object>>>> map = service
+                .getMeasureWithJobDetailsGroupByOrg(measuresById);
         assertThat(map.size()).isEqualTo(1);
         assertThat(map).containsKey("org");
         assertThat(map.get("org").get(measureName)).isEqualTo(jobList);
     }
 
     @Test
-    public void testGetMeasureWithJobDetailsGroupByOrgForFailure() throws Exception {
+    public void testGetMeasureWithJobDetailsGroupByOrgForFailure()
+            throws Exception {
         Map detail = new HashMap();
         given(measureRepo.findByDeleted(false)).willReturn(null);
         Map map = service.getMeasureWithJobDetailsGroupByOrg(detail);

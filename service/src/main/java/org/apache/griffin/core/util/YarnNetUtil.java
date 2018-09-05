@@ -30,14 +30,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
 public class YarnNetUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(YarnNetUtil.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(YarnNetUtil.class);
     private static RestTemplate restTemplate = new RestTemplate();
 
     public static void delete(String url, String appId) {
         try {
             if (appId != null) {
                 LOGGER.info("{} will delete by yarn", appId);
-                restTemplate.put(url + "ws/v1/cluster/apps/" + appId + "/state", "{\"state\": \"KILLED\"}");
+                restTemplate.put(url + "ws/v1/cluster/apps/"
+                                + appId + "/state",
+                        "{\"state\": \"KILLED\"}");
             }
         } catch (Exception e) {
             LOGGER.error("delete exception happens by yarn. {}", e);

@@ -28,7 +28,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringUtils;
@@ -59,7 +66,6 @@ public class Rule extends AbstractAuditableEntity {
     private String outDataFrameName;
 
     @JsonIgnore
-//    @Access(AccessType.PROPERTY)
     @Column(length = 1024)
     private String details;
 
@@ -166,11 +172,13 @@ public class Rule extends AbstractAuditableEntity {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(details)) {
-            this.detailsMap = JsonUtil.toEntity(details, new TypeReference<Map<String, Object>>() {
+            this.detailsMap = JsonUtil.toEntity(
+                details, new TypeReference<Map<String, Object>>() {
             });
         }
         if (!StringUtils.isEmpty(out)) {
-            this.outList = JsonUtil.toEntity(out, new TypeReference<List<Map<String, Object>>>() {
+            this.outList = JsonUtil.toEntity(
+                out, new TypeReference<List<Map<String, Object>>>() {
             });
         }
     }
@@ -178,7 +186,11 @@ public class Rule extends AbstractAuditableEntity {
     public Rule() {
     }
 
-    public Rule(String dslType, DqType dqType, String rule, Map<String, Object> detailsMap) throws JsonProcessingException {
+    public Rule(String dslType,
+                DqType dqType,
+                String rule,
+                Map<String, Object> detailsMap)
+        throws JsonProcessingException {
         this.dslType = dslType;
         this.dqType = dqType;
         this.rule = rule;
@@ -189,7 +201,8 @@ public class Rule extends AbstractAuditableEntity {
     public Rule(String dslType, DqType dqType, String rule,
                 String inDataFrameName, String outDataFrameName,
                 Map<String, Object> detailsMap,
-                List<Map<String, Object>> outList) throws JsonProcessingException {
+                List<Map<String, Object>> outList)
+        throws JsonProcessingException {
         this(dslType, dqType, rule, detailsMap);
         this.inDataFrameName = inDataFrameName;
         this.outDataFrameName = outDataFrameName;

@@ -26,7 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PredicatorFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PredicatorFactory.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(PredicatorFactory.class);
 
     public static Predicator newPredicateInstance(SegmentPredicate segPredicate) {
         Predicator predicate = null;

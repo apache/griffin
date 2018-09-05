@@ -37,9 +37,11 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 @TestConfiguration
 @ComponentScan("org.apache.griffin.core")
 public class EclipseLinkJpaConfigForTest extends JpaBaseConfiguration {
-    protected EclipseLinkJpaConfigForTest(DataSource ds, JpaProperties properties,
-                                          ObjectProvider<JtaTransactionManager> jtm,
-                                          ObjectProvider<TransactionManagerCustomizers> tmc) {
+    protected EclipseLinkJpaConfigForTest(
+            DataSource ds,
+            JpaProperties properties,
+            ObjectProvider<JtaTransactionManager> jtm,
+            ObjectProvider<TransactionManagerCustomizers> tmc) {
         super(ds, properties, jtm, tmc);
     }
 
@@ -52,7 +54,8 @@ public class EclipseLinkJpaConfigForTest extends JpaBaseConfiguration {
     protected Map<String, Object> getVendorProperties() {
         Map<String, Object> map = new HashMap<>();
         map.put(PersistenceUnitProperties.WEAVING, "false");
-        map.put(PersistenceUnitProperties.DDL_GENERATION, "create-or-extend-tables");
+        map.put(PersistenceUnitProperties.DDL_GENERATION,
+                "create-or-extend-tables");
         return map;
     }
 }

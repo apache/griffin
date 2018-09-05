@@ -25,10 +25,11 @@ under the License.
           Required Information
         </legend>
         <div class="y-scrollable">
-            <div class="form-group" style="text-align:center">
-              Data Source:{{step1.currentDB}}.{{step1.currentTable}}
-            </div>
-            <app-configuration [data]="step3.config" [location]="srclocation" (event)="getData($event)"></app-configuration>
+          <div class="form-group" style="text-align:center">
+            Data Source:{{step1.currentDB}}.{{step1.currentTable}}
+          </div>
+          <app-configuration [data]="step3.config" [location]="srclocation"
+                             (event)="getData($event)"></app-configuration>
         </div>
       </fieldset>
     </div>

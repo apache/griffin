@@ -18,133 +18,132 @@ specific language governing permissions and limitations
 under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.apache.griffin</groupId>
         <artifactId>griffin</artifactId>
         <version>0.2.0-incubating-SNAPSHOT</version>
     </parent>
-  <artifactId>ui</artifactId>
-  <packaging>pom</packaging>
+    <artifactId>ui</artifactId>
+    <packaging>pom</packaging>
 
-  <name>Apache Griffin :: UI :: Default UI</name>
-  <url>http://maven.apache.org</url>
+    <name>Apache Griffin :: UI :: Default UI</name>
+    <url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>
-    <node.version>v6.11.3</node.version>
-    <npm.version>3.10.10</npm.version>
-  </properties>
-
-
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <node.version>v6.11.3</node.version>
+        <npm.version>3.10.10</npm.version>
+    </properties>
 
 
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.github.eirslett</groupId>
-        <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.6</version>
-        <configuration>
-          <workingDirectory>angular</workingDirectory>
-          <installDirectory>.tmp</installDirectory>
-        </configuration>
-        <executions>
-          <!-- It will install nodejs and npm -->
-          <execution>
-            <id>install node and npm</id>
-            <goals>
-              <goal>install-node-and-npm</goal>
-            </goals>
-            <configuration>
-              <nodeVersion>${node.version}</nodeVersion>
-              <npmVersion>${npm.version}</npmVersion>
-            </configuration>
-          </execution>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <workingDirectory>angular</workingDirectory>
+                    <installDirectory>.tmp</installDirectory>
+                </configuration>
+                <executions>
+                    <!-- It will install nodejs and npm -->
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>${node.version}</nodeVersion>
+                            <npmVersion>${npm.version}</npmVersion>
+                        </configuration>
+                    </execution>
 
-          <!-- It will execute command "npm install" inside "/angular" directory -->
-          <execution>
-            <id>npm install</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>install</arguments>
-            </configuration>
-          </execution>
+                    <!-- It will execute command "npm install" inside "/angular" directory -->
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
 
-          <!-- It will execute command "npm build" inside "/angular" directory to clean and create "/.tmp" directory-->
-          <execution>
-            <id>npm build</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run build</arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.2</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <!-- here the phase you need -->
-            <phase>verify</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/../service/src/main/resources/public</outputDirectory>
-              <nonFilteredFileExtensions>
-                <nonFilteredFileExtension>otf</nonFilteredFileExtension>
-                <nonFilteredFileExtension>eot</nonFilteredFileExtension>
-                <nonFilteredFileExtension>svg</nonFilteredFileExtension>
-                <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
-                <nonFilteredFileExtension>woff</nonFilteredFileExtension>
-                <nonFilteredFileExtension>woff.bak</nonFilteredFileExtension>
-                <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
-              </nonFilteredFileExtensions>
-              <resources>
-                <resource>
-                  <directory>${basedir}/angular/dist</directory>
-                  <excludes>
-                    <exclude>src/**</exclude>
-                    <exclude>target/**</exclude>
-                    <exclude>pom.xml</exclude>
-                    <exclude>.DS_Store</exclude>
-                  </excludes>
-                  <filtering>true</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+                    <!-- It will execute command "npm build" inside "/angular" directory to clean and create "/.tmp" directory-->
+                    <execution>
+                        <id>npm build</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/../service/src/main/resources/public</outputDirectory>
+                            <nonFilteredFileExtensions>
+                                <nonFilteredFileExtension>otf</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>eot</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>woff.bak</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                            </nonFilteredFileExtensions>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/angular/dist</directory>
+                                    <excludes>
+                                        <exclude>src/**</exclude>
+                                        <exclude>target/**</exclude>
+                                        <exclude>pom.xml</exclude>
+                                        <exclude>.DS_Store</exclude>
+                                    </excludes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

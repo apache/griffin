@@ -4,6 +4,7 @@
     "checkpoint.dir": "hdfs://localhost/test/griffin/cp",
     "batch.interval": "2s",
     "process.interval": "10s",
+    "init.clear": true,
     "config": {
       "spark.master": "local[*]",
       "spark.task.maxFailures": 5,

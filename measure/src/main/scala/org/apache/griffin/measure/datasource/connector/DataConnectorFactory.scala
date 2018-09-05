@@ -91,25 +91,17 @@ object DataConnectorFactory extends Loggable {
                                    ): KafkaStreamingDataConnector  = {
     val KeyType = "key.type"
     val ValueType = "value.type"
-    val config = dcParam.config
+    val config = dcParam.getConfig
     val keyType = config.getOrElse(KeyType, "java.lang.String").toString
     val valueType = config.getOrElse(ValueType, "java.lang.String").toString
-    (getClassTag(keyType), getClassTag(valueType)) match {
-      case (ClassTag(k: Class[String]), ClassTag(v: Class[String])) => {
+
+    (keyType, valueType) match {
+      case ("java.lang.String", "java.lang.String") => {
         KafkaStreamingStringDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
       }
       case _ => {
         throw new Exception("not supported type kafka data connector")
       }
-    }
-  }
-
-  private def getClassTag(tp: String): ClassTag[_] = {
-    try {
-      val clazz = Class.forName(tp)
-      ClassTag(clazz)
-    } catch {
-      case e: Throwable => throw e
     }
   }
 

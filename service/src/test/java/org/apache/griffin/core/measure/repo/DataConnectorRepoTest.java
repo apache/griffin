@@ -57,25 +57,30 @@ public class DataConnectorRepoTest {
 
     @Test
     public void testFindByConnectorNames() {
-        List<DataConnector> connectors = dcRepo.findByConnectorNames(Arrays.asList("name1", "name2"));
+        List<DataConnector> connectors = dcRepo.findByConnectorNames(Arrays
+                .asList("name1", "name2"));
         assertEquals(connectors.size(), 2);
     }
 
     @Test
     public void testFindByConnectorNamesWithEmpty() {
-        List<DataConnector> connectors = dcRepo.findByConnectorNames(new ArrayList<>());
+        List<DataConnector> connectors = dcRepo.findByConnectorNames(
+                new ArrayList<>());
         assertEquals(connectors.size(), 0);
     }
 
     public void setEntityManager() throws Exception {
-        DataConnector dc1 = createDataConnector("name1", "database1", "table1", "/dt=#YYYYMM#");
+        DataConnector dc1 = createDataConnector("name1", "database1", "table1",
+                "/dt=#YYYYMM#");
 
         entityManager.persistAndFlush(dc1);
 
-        DataConnector dc2 = createDataConnector("name2", "database2", "table2", "/dt=#YYYYMM#");
+        DataConnector dc2 = createDataConnector("name2", "database2", "table2",
+                "/dt=#YYYYMM#");
         entityManager.persistAndFlush(dc2);
 
-        DataConnector dc3 = createDataConnector("name3", "database3", "table3", "/dt=#YYYYMM#");
+        DataConnector dc3 = createDataConnector("name3", "database3", "table3",
+                "/dt=#YYYYMM#");
         entityManager.persistAndFlush(dc3);
     }
 

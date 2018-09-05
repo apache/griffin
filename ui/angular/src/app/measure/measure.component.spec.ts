@@ -17,9 +17,9 @@ specific language governing permissions and limitations
 under the License.
 */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { MeasureComponent } from './measure.component';
+import {MeasureComponent} from './measure.component';
 
 describe('MeasureComponent', () => {
   let component: MeasureComponent;
@@ -27,9 +27,9 @@ describe('MeasureComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MeasureComponent ]
+      declarations: [MeasureComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

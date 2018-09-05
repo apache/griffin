@@ -51,7 +51,8 @@ public class DataSource extends AbstractAuditableEntity {
 
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+            CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "data_source_id")
     private List<DataConnector> connectors = new ArrayList<>();
 
@@ -122,8 +123,9 @@ public class DataSource extends AbstractAuditableEntity {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(checkpoint)) {
-            this.checkpointMap = JsonUtil.toEntity(checkpoint, new TypeReference<Map<String, Object>>() {
-            });
+            this.checkpointMap = JsonUtil.toEntity(
+                checkpoint, new TypeReference<Map<String, Object>>() {
+                });
         }
     }
 

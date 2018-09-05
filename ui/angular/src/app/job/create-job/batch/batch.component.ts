@@ -16,22 +16,22 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit, AfterViewChecked, ViewChildren } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { FormsModule } from "@angular/forms";
-import { MaxLengthValidator } from "@angular/forms";
-import { NgControlStatus, Validators } from "@angular/forms";
-import { PatternValidator } from "@angular/forms";
-import { MatDatepickerModule } from "@angular/material";
-import { ServiceService } from "../../../service/service.service";
-import { AngularMultiSelectModule } from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { ToasterModule, ToasterService, ToasterConfig } from "angular2-toaster";
+import {Component, OnInit, AfterViewChecked, ViewChildren} from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
+import {MaxLengthValidator} from "@angular/forms";
+import {NgControlStatus, Validators} from "@angular/forms";
+import {PatternValidator} from "@angular/forms";
+import {MatDatepickerModule} from "@angular/material";
+import {ServiceService} from "../../../service/service.service";
+import {AngularMultiSelectModule} from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ToasterModule, ToasterService, ToasterConfig} from "angular2-toaster";
 import * as $ from "jquery";
-import { HttpParams } from "@angular/common/http";
-import { Router } from "@angular/router";
-import { NouisliderModule } from "ng2-nouislider";
-import { HttpClient } from "@angular/common/http";
+import {HttpParams} from "@angular/common/http";
+import {Router} from "@angular/router";
+import {NouisliderModule} from "ng2-nouislider";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: "app-batch",
@@ -71,7 +71,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
     "cron.expression": "",
     "measure.id": "",
     "job.name": "",
-    "job.type":"batch",
+    "job.type": "batch",
     "cron.time.zone": "",
     // "cron.time.zone": "GMT+8:00",
     // "predicate.config": {
@@ -138,7 +138,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
     let timezone = "GMT" + time + ":00";
     this.newJob = {
       "job.name": this.jobname,
-      "job.type":"batch",
+      "job.type": "batch",
       "measure.id": this.measureid,
       "cron.expression": this.cronExp,
       "cron.time.zone": timezone,
@@ -199,7 +199,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
       },
       err => {
         let response = JSON.parse(err.error);
-        if(response.code === '40004'){
+        if (response.code === '40004') {
           this.toasterService.pop("error", "Error!", "Job name already exists!");
         } else {
           this.toasterService.pop("error", "Error!", "Error when creating job");
@@ -217,15 +217,15 @@ export class BatchComponent implements OnInit, AfterViewChecked {
     var stepSelection = ".formStep";
     $(stepSelection).css({
       height:
-        window.innerHeight -
-        $(stepSelection).offset().top -
-        $("#footerwrap").outerHeight()
+      window.innerHeight -
+      $(stepSelection).offset().top -
+      $("#footerwrap").outerHeight()
     });
     $("fieldset").height(
       $(stepSelection).height() -
-        $(stepSelection + ">.stepDesc").height() -
-        $(".btn-container").height() -
-        200
+      $(stepSelection + ">.stepDesc").height() -
+      $(".btn-container").height() -
+      200
     );
     $(".y-scrollable").css({
       height: $("fieldset").height()
@@ -365,8 +365,8 @@ export class BatchComponent implements OnInit, AfterViewChecked {
     var allModels = this.serviceService.config.uri.allModels + '?type=griffin';
     this.http.get(allModels).subscribe(data => {
       let originData = data;
-      for(let i in originData){
-        if(originData[i]["process.type"] === "BATCH"){
+      for (let i in originData) {
+        if (originData[i]["process.type"] === "BATCH") {
           this.Measures.push(originData[i]);
         }
       }

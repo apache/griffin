@@ -47,7 +47,8 @@ public class LoginConfig {
             case "default":
                 return new LoginServiceDefaultImpl();
             case "ldap":
-                return new LoginServiceLdapImpl(url, email, searchBase, searchPattern);
+                return new LoginServiceLdapImpl(url, email, searchBase,
+                        searchPattern);
             default:
                 return null;
         }

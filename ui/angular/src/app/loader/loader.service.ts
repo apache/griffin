@@ -16,23 +16,24 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Injectable } from "@angular/core";
-import { Subject } from "rxjs/Subject";
-import { LoadingState } from "./loader.state";
+import {Injectable} from "@angular/core";
+import {Subject} from "rxjs/Subject";
+import {LoadingState} from "./loader.state";
 
 @Injectable()
 export class LoaderService {
 
-    private loaderSubject = new Subject<LoadingState>();
-    LoadingState = this.loaderSubject.asObservable();
+  private loaderSubject = new Subject<LoadingState>();
+  LoadingState = this.loaderSubject.asObservable();
 
-    constructor() { }
+  constructor() {
+  }
 
-    show() { 
-        this.loaderSubject.next(<LoadingState>{show: true});
-    }
+  show() {
+    this.loaderSubject.next(<LoadingState>{show: true});
+  }
 
-    hide() {
-        this.loaderSubject.next(<LoadingState>{show: false});
-    }
+  hide() {
+    this.loaderSubject.next(<LoadingState>{show: false});
+  }
 }
