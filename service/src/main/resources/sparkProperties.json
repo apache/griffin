@@ -3,7 +3,7 @@
   "className": "org.apache.griffin.measure.Application",
   "name": "griffin",
   "queue": "default",
-  "numExecutors": 3,
+  "numExecutors": 2,
   "executorCores": 1,
   "driverMemory": "1g",
   "executorMemory": "1g",
