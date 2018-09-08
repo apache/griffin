@@ -40,9 +40,18 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 
 <h2 id = "0"></h2>
 
-## HTTP Response Desigin
-### Normal Response
-The normal HTTP response is designed as follow:
+## HTTP Response Design
+We follow general rules to design Griffin's REST APIs. In the HTTP response that is sent to a client, 
+the status code, which is a three-digit number, is accompanied by a reason phrase (also known as status text) that simply describes the meaning of the code. 
+The status codes are classified by number range, with each class of codes having the same basic meaning.
+* The range 100-199 is classed as Informational.
+* 200-299 is Successful.
+* 300-399 is Redirection.
+* 400-499 is Client error.
+* 500-599 is Server error.
+
+### Valid Griffin Response
+The valid HTTP response is designed as follows:
 
 | Action | HTTP Status | Response Body |
 | ---- | ------------------ | ------ |
@@ -51,11 +60,15 @@ The normal HTTP response is designed as follow:
 | PUT | 204, "No Content" | no content |
 | DELETE | 204, "No Content" | no content |
 
-Note that metric module is implemented with elasticsearch bulk api, so the responses do not follow rules above.
+***Note that:*** The metric module is implemented with elasticsearch bulk api, so the responses do not follow rules above.
 
-### Exception Response
-The response for exception is designed as follow :
+### Invalid Griffin Response
+The response for exception is designed as follows:
 
+| Action | HTTP Status | Response Body |
+| ---- | ------------------ | ------ |
+| ANY | 400, "Bad Request" | error detail |
+| ANY | 500, "Internal Server Error" | error detail |
 ```
 {
     "timestamp": 1517208444322,
@@ -86,7 +99,7 @@ Description:
 - exception: fully qualified name of cause exception
 - path: the requested api
 
-Note that 'exception' field may not exist if it is caused by client error, and 'code' field may not exist for server error.
+***Note that:*** 'exception' field may not exist if it is caused by client error, and 'code' field may not exist for server error.
 
 <h2 id = "1"></h2>
 
