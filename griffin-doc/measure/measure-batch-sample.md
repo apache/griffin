@@ -68,12 +68,16 @@ Measures consists of batch measure and streaming measure. This document is for t
           "total": "total_count",
           "matched": "matched_count"
         },
-        "metric": {
-          "name": "accu"
-        },
-        "record": {
-          "name": "missRecords"
-        }
+        "out": [
+          {
+            "type": "metric",
+            "name": "accu"
+          },
+          {
+            "type": "record",
+            "name": "missRecords"
+          }        
+        ]        
       }
     ]
   }
@@ -119,19 +123,25 @@ The miss records of source will be persisted as record.
         "dq.type": "profiling",
         "name": "prof",
         "rule": "select max(age) as `max_age`, min(age) as `min_age` from source",
-        "metric": {
-          "name": "prof"
-        }
+        "out": [
+          {
+            "type": "metric",
+            "name": "prof"
+          }        
+        ]        
       },
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
         "name": "name_grp",
         "rule": "select name, count(*) as cnt from source group by name",
-        "metric": {
-          "name": "name_grp",
-          "collect.type": "array"
-        }
+        "out": [
+          {
+            "type": "metric",
+            "name": "name_grp",
+            "flatten": "array"
+          }        
+        ]
       }
     ]
   }

@@ -158,13 +158,16 @@ Above lists environment parameters.
           "miss": "miss_count",
           "total": "total_count",
           "matched": "matched_count"
-        },
-        "metric": {
-          "name": "accu"
-        },
-        "record": {
-          "name": "missRecords"
-        }
+        },        
+        "out": [
+          {
+            "type": "metric",
+            "name": "accu"
+          },
+          {
+            "type": "record"
+          }        
+        ]
       }
     ]
   }
@@ -201,7 +204,7 @@ Above lists DQ job configure parameters.
 
 ### <a name="rule"></a>Rule
 - **dsl.type**: Rule dsl type, "spark-sql", "df-opr" and "griffin-dsl".
-- **dq.type**: DQ type of this rule, only for "griffin-dsl" type, supporting "accuracy" and "profiling".
+- **dq.type**: DQ type of this rule, only for "griffin-dsl" type. Supported types: "accuracy", "profiling", "timeliness", "uniqueness", "completeness".
 - **name** (step information): Result table name of this rule, optional for "griffin-dsl" type.
 - **rule**: The rule string.
 - **details**: Details of this rule, optional.
@@ -235,10 +238,18 @@ Above lists DQ job configure parameters.
     * source: name of data source to measure timeliness.
     * latency: the latency column name in metric, optional.
     * threshold: optional, if set as a time string like "1h", the items with latency more than 1 hour will be record.
-- **metric**: Configuration of metric export.
-  + name: name of metric.
-  + collect.type: collect metric as the type set, including "default", "entries", "array", "map", optional.
-- **record**: Configuration of record export.
-  + name: name of record.
-  + data.source.cache: optional, if set as data source name, the cache of this data source will be updated by the records, always used in streaming accuracy case.
-  + origin.DF: avaiable only if "data.source.cache" is set, the origin data frame name of records.
+- **out**: Lits of output sinks for the job.
+  + Metric output.
+    * type: "metric"
+    * name: Metric name, semantics depends on "flatten" field value.   
+    * flatten: Aggregation method used before sending data frame result into the sink:  
+      - default: use "array" if data frame returned multiple records, otherwise use "entries" 
+      - entries: sends first row of data frame as metric results, like like `{"agg_col": "value"}`
+      - array: wraps all metrics into a map, like `{"my_out_name": [{"agg_col": "value"}]}`
+      - map: wraps first row of data frame into a map, like `{"my_out_name": {"agg_col": "value"}}`
+  + Record output. Currenly handled only by HDFS sink.
+    * type: "record"
+    * name: File name within sink output folder to dump files to.   
+  + Data source cache update for streaming jobs.
+    * type: "dsc-update"
+    * name: Data source name to update cache.   
