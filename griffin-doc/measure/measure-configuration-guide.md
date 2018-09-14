@@ -41,7 +41,7 @@ Griffin measure module needs two configuration files to define the parameters of
     }
   },
 
-  "persist": [
+  "sinks": [
     {
       "type": "log",
       "config": {
@@ -82,22 +82,22 @@ Above lists environment parameters.
 - **persist**: This field configures list of metrics persist parameters, multiple persist ways are supported. Details of persist configuration [here](#persist).
 - **info.cache**: This field configures list of information cache parameters, multiple cache ways are supported. It is only for streaming dq case. Details of info cache configuration [here](#info-cache).
 
-### <a name="persist"></a>Persist
-- **type**: Metrics persist type, "log", "hdfs" and "http". 
+### <a name="sinks"></a>Sinks
+- **type**: Metrics and records persist type, "log", "hdfs", "http", "mongo". 
 - **config**: Configure parameters of each persist type.
-	+ log persist
+	+ log persist (aliases: "console")
 		* max.log.lines: the max lines of log.
 	+ hdfs persist
 		* path: hdfs path to persist metrics
 		* max.persist.lines: the max lines of total persist data.
 		* max.lines.per.file: the max lines of each persist file.
-	+ http persist
+	+ http persist (aliases: "es", "elasticsearch")
 		* api: api to submit persist metrics.
 		* method: http method, "post" default.
-  + mongo persist
-    * url: url of mongo db.
-    * database: database name.
-    * collection: collection name. 
+    + mongo persist
+        * url: url of mongo db.
+        * database: database name.
+        * collection: collection name. 
 
 ### <a name="info-cache"></a>Info Cache
 - **type**: Information cache type, "zk" for zookeeper cache.
@@ -167,7 +167,9 @@ Above lists environment parameters.
         }
       }
     ]
-  }
+  },
+  
+  "sinks": ["console", "http", "hdfs"]
 }
 ```
 Above lists DQ job configure parameters.  
@@ -177,9 +179,10 @@ Above lists DQ job configure parameters.
 - **data.sources**: List of data sources in this DQ job.
 	+ name: Name of this data source, it should be different from other data sources.
 	+ connectors: List of data connectors combined as the same data source. Details of data connector configuration [here](#data-connector).
-- **evaluateRule**: Evaluate rule parameters of this DQ job.
+- **evaluate.rule**: Evaluate rule parameters of this DQ job.
 	+ dsl.type: Default dsl type of all the rules.
 	+ rules: List of rules, to define every rule step. Details of rule configuration [here](#rule).
+- **sinks**: Whitelisted sink types for this job. Note: no sinks will be used, if empty or omitted. 
 
 ### <a name="data-connector"></a>Data Connector
 - **type**: Data connector type, "avro", "hive", "text-dir" for batch mode, "kafka" for streaming mode.
