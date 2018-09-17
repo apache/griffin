@@ -45,7 +45,7 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
     docker pull registry.docker-cn.com/apachegriffin/griffin_spark2:0.3.0
     docker pull registry.docker-cn.com/apachegriffin/elasticsearch
     docker pull registry.docker-cn.com/apachegriffin/kafka
-    docker pull registry.docker-cn.com/zookeeper:3.5
+    docker pull zookeeper:3.5
     ```
    The docker images are the griffin environment images.
     - `apachegriffin/griffin_spark2`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
@@ -55,13 +55,24 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
 
 ### How to use griffin docker images in batch mode
 1. Copy [docker-compose-batch.yml](compose/docker-compose-batch.yml) to your work path.
-2. In your work path, start docker containers by using docker compose, wait for about one minutes, then griffin service is ready.
+2. In your work path, start docker containers by using docker compose, wait for about one minute, then griffin service is ready.
+    ```bash
+    $ docker-compose -f docker-compose-batch.yml up -d
     ```
-    docker-compose -f docker-compose-batch.yml up -d
+    After approximate one minute, you can check result. If result looks like below, it means startup is successful.
+    ```bash
+    $ docker container ls
+    CONTAINER ID        IMAGE                                COMMAND                  CREATED             STATUS              PORTS                                                                                                                                                                                                                                                                                                                                                    NAMES
+    bfec3192096d        apachegriffin/griffin_spark2:0.3.0   "/etc/bootstrap-al..."   5 hours ago         Up 5 hours          6066/tcp, 8030-8033/tcp, 8040/tcp, 9000/tcp, 10020/tcp, 19888/tcp, 27017/tcp, 49707/tcp, 50010/tcp, 50020/tcp, 50070/tcp, 50075/tcp, 50090/tcp, 0.0.0.0:32122->2122/tcp, 0.0.0.0:33306->3306/tcp, 0.0.0.0:35432->5432/tcp, 0.0.0.0:38042->8042/tcp, 0.0.0.0:38080->8080/tcp, 0.0.0.0:38088->8088/tcp, 0.0.0.0:38998->8998/tcp, 0.0.0.0:39083->9083/tcp   griffin
+    fb9d04285070        apachegriffin/elasticsearch          "/docker-entrypoin..."   5 hours ago         Up 5 hours          0.0.0.0:39200->9200/tcp, 0.0.0.0:39300->9300/tcp                                                                                                                                                                                                                                                                                                         es
     ```
-3. Now you can try griffin APIs by using postman after importing the [json files](../service/postman).
-    In which you need to modify the environment `BASE_PATH` value to `<your local IP address>:38080`.
-4. You can try the api `Basic -> Get griffin version`, to make sure griffin service has started up.
+3. Now you can try griffin APIs by using any http client, here we use [postman](https://github.com/postmanlabs/postman-app-support) as example.
+We have prepared two postman configuration files, you can download them from [json files](../service/postman).<br><br>For sake of usage, you need to import two files into postman firstly.<br><br>
+![import ](../img/devguide/import_postman_conf.png)<br><br>
+And change the initial environment `BASE_PATH` value to `<your local IP address>:38080`.<br><br>
+![update env](../img/devguide/revise_postman_env.png)<br><br>
+4. You can try the api `Basic -> Get griffin version`, to make sure griffin service has started up.<br><br>
+![update env](../img/devguide/call_postman.png)<br><br>
 5. Add an accuracy measure through api `Measures -> Add measure`, to create a measure in griffin.
 6. Add a job to through api `jobs -> Add job`, to schedule a job to execute the measure. In the example, the schedule interval is 5 minutes.
 7. After some minutes, you can get the metrics from elasticsearch.

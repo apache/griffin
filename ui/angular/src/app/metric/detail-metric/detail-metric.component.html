@@ -91,7 +91,7 @@ under the License.
                  <tr *ngIf="isEven && !isLast">
                    <td style="background-color:black; cursor: pointer;" nowrap><a [ngClass]="{'adisabled': !isDownloadClickDisabled}" (click)="downloadSample(item)" style="margin: 15px 15px 15px 15px;">{{mf2.data[i].tmst}} {{mf2.data[i].tmst |
                      date: 'yyyy/MM/dd HH:mm:ss'}}</a></td>
-                   <td style="background-color:black; cursor: pointer;" nowrap><a [ngClass]="{'adisabled': !isDownloadClickDisabled}" (click)="downloadSample(item)">{{mf2.data[i].tmst}} {{mf2.data[i+1].tmst |
+                   <td style="background-color:black; cursor: pointer;" nowrap><a [ngClass]="{'adisabled': !isDownloadClickDisabled}" (click)="downloadSample(item)">{{mf2.data[i+1].tmst}} {{mf2.data[i+1].tmst |
                      date: 'yyyy/MM/dd HH:mm:ss'}}</a></td>
                    </tr>
                  </div>
