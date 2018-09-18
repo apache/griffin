@@ -69,6 +69,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         } catch (Exception e) {
             reconnect();
             LOGGER.error("Can not get databases : {}", e);
+            throw new RuntimeException(e);
         }
         return results;
     }
@@ -88,6 +89,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         } catch (Exception e) {
             reconnect();
             LOGGER.error("Exception fetching tables info: {}", e);
+            throw new RuntimeException(e);
         }
         return results;
     }
@@ -116,6 +118,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             return results;
         }
         for (String db : dbs) {
+            // TODO: getAllTable() is not reusing caches of getAllTable(db) and vise versa
             results.put(db, getTables(db));
         }
         return results;
@@ -137,6 +140,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             reconnect();
             LOGGER.error("Exception fetching table info : {}. {}", tableName,
                     e);
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -172,6 +176,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         } catch (Exception e) {
             reconnect();
             LOGGER.error("Exception fetching tables info: {}", e);
+            throw new RuntimeException(e);
         }
         return allTables;
     }
