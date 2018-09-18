@@ -64,6 +64,40 @@ Init quartz tables in MySQL using [Init_quartz_mysql_innodb.sql.sql](../../servi
 mysql -u <username> -p quartz < Init_quartz_mysql_innodb.sql.sql
 ```
 
+#### Elasticsearch
+
+You might want to create Elasticsearch index in advance, in order to set number of shards, replicas, and other settings to desired values:
+```
+curl -XPUT http://es:9200/griffin -d '
+{
+    "aliases": {},
+    "mappings": {
+        "accuracy": {
+            "properties": {
+                "name": {
+                    "fields": {
+                        "keyword": {
+                            "ignore_above": 256,
+                            "type": "keyword"
+                        }
+                    },
+                    "type": "text"
+                },
+                "tmst": {
+                    "type": "long"
+                }
+            }
+        }
+    },
+    "settings": {
+        "index": {
+            "number_of_replicas": "1",
+            "number_of_shards": "5"
+        }
+    }
+}
+'
+```
 
 You should also modify some configurations of Griffin for your environment.
 
@@ -135,6 +169,13 @@ You should also modify some configurations of Griffin for your environment.
 
     ```
     - \<griffin measure path> is the location where you should put the jar file of measure module.
+
+- <b>service/src/main/resources/env/env_batch.json</b>
+
+    Adjust sinks according to your requirement. At least, you will need to adjust HDFS output
+    directory (hdfs:///griffin/persist by default), and Elasticsearch URL (http://es:9200/griffin/accuracy by default).
+    Similar changes are required in `env_streaming.json`.
+
    
 
 ### Build and Run
