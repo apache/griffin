@@ -56,7 +56,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     }
 
     @Override
-    @Cacheable
+    @Cacheable(unless = "#result==null")
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
@@ -75,7 +75,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(unless = "#result==null")
     public Iterable<String> getAllTableNames(String dbName) {
         Iterable<String> results = null;
         try {
@@ -88,20 +88,21 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         } catch (Exception e) {
             reconnect();
             LOGGER.error("Exception fetching tables info: {}", e);
+            return null;
         }
         return results;
     }
 
 
     @Override
-    @Cacheable
+    @Cacheable(unless = "#result==null || #result.isEmpty()")
     public List<Table> getAllTable(String db) {
         return getTables(db);
     }
 
 
     @Override
-    @Cacheable
+    @Cacheable(unless = "#result==null")
     public Map<String, List<Table>> getAllTable() {
         Map<String, List<Table>> results = new HashMap<>();
         Iterable<String> dbs;
@@ -116,6 +117,8 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             return results;
         }
         for (String db : dbs) {
+            // TODO: getAllTable() is not reusing caches of getAllTable(db) and vise versa
+            // TODO: getTables() can return empty values on metastore exception
             results.put(db, getTables(db));
         }
         return results;
@@ -123,7 +126,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(unless="#result==null")
     public Table getTable(String dbName, String tableName) {
         Table result = null;
         try {
@@ -149,9 +152,10 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             beforeInvocation = true)
     public void evictHiveCache() {
         LOGGER.info("Evict hive cache");
-        getAllTable();
-        LOGGER.info("After evict hive cache, " +
-                "automatically refresh hive tables cache.");
+        // TODO: calls within same bean are not cached -- this call is not populating anything
+//        getAllTable();
+//        LOGGER.info("After evict hive cache, " +
+//                "automatically refresh hive tables cache.");
     }
 
 

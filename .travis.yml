@@ -24,4 +24,4 @@ node_js:
 install:
   - npm install -g bower
 
-script: mvn clean verify -q
+script: travis_wait mvn clean verify -q
