@@ -26,13 +26,13 @@ griffin:
     - /var/lib/mysql
   ports:
     - 32122:2122
-    - 38088:8088
-    - 33306:3306
-    - 35432:5432
-    - 38042:8042
-    - 39083:9083
-    - 38998:8998
-    - 38080:8080
+    - 38088:8088  # yarn rm web ui
+    - 33306:3306  # mysql
+    - 35432:5432  # postgres
+    - 38042:8042  # yarn nm web ui
+    - 39083:9083  # hive-metastore
+    - 38998:8998  # livy
+    - 38080:8080  # griffin ui
   tty: true
   container_name: griffin
 
