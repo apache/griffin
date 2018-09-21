@@ -22,21 +22,26 @@ package org.apache.griffin.core.metastore.hive;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.griffin.core.config.CacheConfig;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -45,10 +50,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class HiveMetaStoreServiceImplTest {
 
     @TestConfiguration
-    public static class HiveMetaStoreServiceConfiguration {
+    @EnableCaching
+    public static class HiveMetaStoreServiceConfiguration extends CacheConfig {
         @Bean("hiveMetaStoreServiceImpl")
         public HiveMetaStoreService service() {
             return new HiveMetaStoreServiceImpl();
+        }
+
+        @Bean
+        CacheManager cacheManager() {
+            return new ConcurrentMapCacheManager("hive");
         }
     }
 
@@ -58,9 +69,12 @@ public class HiveMetaStoreServiceImplTest {
     @Autowired
     private HiveMetaStoreService service;
 
+    @Autowired
+    private CacheManager cacheManager;
+
     @Before
     public void setup() {
-
+        cacheManager.getCache("hive").clear();
     }
 
     @Test
@@ -73,8 +87,13 @@ public class HiveMetaStoreServiceImplTest {
     public void testGetAllDatabasesForMetaException() throws MetaException {
         given(client.getAllDatabases()).willThrow(MetaException.class);
         doNothing().when(client).reconnect();
-        service.getAllDatabases();
         assertTrue(service.getAllDatabases() == null);
+        verify(client).getAllDatabases();
+        verify(client).reconnect();
+        // check it's not cached
+        service.getAllDatabases();
+        verify(client, times(2)).reconnect();
+        verify(client, times(2)).getAllDatabases();
     }
 
 
@@ -92,6 +111,12 @@ public class HiveMetaStoreServiceImplTest {
         given(client.getAllTables(dbName)).willThrow(MetaException.class);
         doNothing().when(client).reconnect();
         assertTrue(service.getAllTableNames(dbName) == null);
+        verify(client).reconnect();
+        verify(client).getAllTables(dbName);
+        // check it's not cached
+        service.getAllTableNames(dbName);
+        verify(client, times(2)).reconnect();
+        verify(client, times(2)).getAllTables(dbName);
 
     }
 
@@ -110,7 +135,13 @@ public class HiveMetaStoreServiceImplTest {
         String useDbName = "default";
         given(client.getAllTables(useDbName)).willThrow(MetaException.class);
         doNothing().when(client).reconnect();
-        assertEquals(service.getAllTable(useDbName).size(), 0);
+        assertEquals(0, service.getAllTable(useDbName).size());
+        verify(client).reconnect();
+        verify(client).getAllTables(useDbName);
+        // check it's not cached
+        service.getAllTable(useDbName);
+        verify(client, times(2)).reconnect();
+        verify(client, times(2)).getAllTables(useDbName);
     }
 
     @Test
@@ -157,5 +188,37 @@ public class HiveMetaStoreServiceImplTest {
         given(client.getTable(dbName, tableName)).willThrow(Exception.class);
         doNothing().when(client).reconnect();
         assertTrue(service.getTable(dbName, tableName) == null);
+        verify(client).reconnect();
+        verify(client).getTable(dbName, tableName);
+        // check it's not cached
+        service.getTable(dbName, tableName);
+        verify(client, times(2)).reconnect();
+        verify(client, times(2)).getTable(dbName, tableName);
+    }
+
+    @Test
+    public void testEvictHiveCache() throws Exception {
+        String useDbName = "default";
+        String tableName = "tableName";
+        List<String> databases = Arrays.asList(useDbName);
+        given(client.getAllDatabases()).willReturn(databases);
+        given(client.getAllTables(databases.get(0))).willReturn(Arrays
+                .asList(tableName));
+        given(client.getTable(useDbName, tableName)).willReturn(new Table());
+        // populate cache
+        assertEquals(service.getAllTable().size(), 1);
+        verify(client).getAllDatabases();
+        verify(client).getAllTables(useDbName);
+        verify(client).getTable(useDbName, tableName);
+        // verify cached
+        service.getAllTable();
+        verifyNoMoreInteractions(client);
+        // reset the cache, verify values are cached again
+        service.evictHiveCache();
+        service.getAllTable().size();
+        service.getAllTable().size();
+        verify(client, times(2)).getAllDatabases();
+        verify(client, times(2)).getAllTables(useDbName);
+        verify(client, times(2)).getTable(useDbName, tableName);
     }
 }
