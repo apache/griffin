@@ -38,15 +38,15 @@ under the License.
   <div id="side-bar-metrics" class="row y-scrollable">
     <div *ngFor="let outerItems of finalData;let parent=index">
       <div class="well" *ngIf="outerItems.metrics.length != 0">
-        <div class="col-sm-4 col-lg-4 col-md-4 ">
+        <div class="col-sm-4 col-lg-4 col-md-4 " style="width: fit-content">
           <h4>
             <!-- <a routerLink="/metrics/{{outerItems.name}}"> {{outerItems.name}}</a> -->
             <a> {{outerItems.name}}</a>
           </h4>
         </div>
-        <div class="col-sm-3 col-lg-3 col-md-3 " style="display: flex;justify-content: center;height:46px;">
-          <!-- <div [ngClass]="outerItems.dq >=90 ? 'led-green':'led-yellow'" style="align-self: center;"></div> -->
-        </div>
+        <!--<div class="col-sm-3 col-lg-3 col-md-3 " style="display: flex;justify-content: center;height:46px;">-->
+           <!--<div [ngClass]="outerItems.dq >=90 ? 'led-green':'led-yellow'" style="align-self: center;"></div> -->
+        <!--</div>-->
         <!-- <div class="col-sm-5 col-lg-5 col-md-5 " style="display: flex;justify-content: center;height:46px;"><a style="align-self: center;" class="btn btn-primary" href="https://github.com/eBay/DQSolution/issues" target="_blank">Report&nbsp;issue</a></div> -->
       </div>
       <br/>
