@@ -35,4 +35,6 @@ public interface HiveMetaStoreService {
     Map<String, List<Table>> getAllTable();
 
     Table getTable(String dbName, String tableName);
+
+    void evictHiveCache();
 }
