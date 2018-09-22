@@ -78,6 +78,7 @@ public class Rule extends AbstractAuditableEntity {
     private List<Map<String, Object>> outList;
 
     @JsonIgnore
+    @Column(name = "\"out\"")
     private String out;
 
     @JsonProperty("dsl.type")
