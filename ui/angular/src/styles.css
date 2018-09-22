@@ -939,7 +939,7 @@ a:hover {
   height: 20px;
   background: #1f1f1f;
   padding-top: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 0px;
   border-top-style: solid;
   border-top-width: 8px;
   border-top-color: #1d1d1d;
