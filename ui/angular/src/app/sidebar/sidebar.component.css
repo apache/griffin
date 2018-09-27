@@ -34,6 +34,7 @@ under the License.
 }
 
 .well {
+  margin-bottom: 0px;
   padding: 0px;
   background: transparent;
   border: 0px;
@@ -53,6 +54,7 @@ under the License.
   position: relative;
   background: transparent;
   border-color: #262626;
+  border-top: 0px;
 }
 
 .side-bar-scroll {
