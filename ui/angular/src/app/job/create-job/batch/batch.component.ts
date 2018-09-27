@@ -202,7 +202,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
         if (response.code === '40004') {
           this.toasterService.pop("error", "Error!", "Job name already exists!");
         } else {
-          this.toasterService.pop("error", "Error!", "Error when creating job");
+          this.toasterService.pop("error", "Error!", response.message);
         }
         console.log("Error when creating job");
       }
