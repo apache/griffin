@@ -24,7 +24,7 @@ import org.apache.griffin.measure.context.streaming.checkpoint.lock.{CheckpointL
 object OffsetCheckpointClient extends OffsetCheckpoint with OffsetOps {
   var offsetCheckpoints: Seq[OffsetCheckpoint] = Nil
 
-  def initClient(checkpointParams: Iterable[CheckpointParam], metricName: String) = {
+  def initClient(checkpointParams: Iterable[CheckpointParam], metricName: String) : Unit = {
     val fac = OffsetCheckpointFactory(checkpointParams, metricName)
     offsetCheckpoints = checkpointParams.flatMap(param => fac.getOffsetCheckpoint(param)).toList
   }

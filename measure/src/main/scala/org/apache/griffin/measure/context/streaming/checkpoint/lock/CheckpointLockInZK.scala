@@ -32,10 +32,9 @@ case class CheckpointLockInZK(@transient mutex: InterProcessMutex) extends Check
         mutex.acquire(-1, null)
       }
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"lock error: ${e.getMessage}")
         false
-      }
     }
 
   }
@@ -44,9 +43,8 @@ case class CheckpointLockInZK(@transient mutex: InterProcessMutex) extends Check
     try {
       if (mutex.isAcquiredInThisProcess) mutex.release
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"unlock error: ${e.getMessage}")
-      }
     }
   }
 

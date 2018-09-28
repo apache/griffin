@@ -20,9 +20,10 @@ package org.apache.griffin.measure.sink
 
 import java.util.Date
 
-import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
+
+import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
+import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
   * sink metric and record to hdfs
@@ -83,6 +84,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
       case e: Throwable => error(e.getMessage)
     }
   }
+
   def finish(): Unit = {
     try {
       HdfsUtil.createEmptyFile(FinishFile)
@@ -103,6 +105,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
   private def getHdfsPath(path: String, groupId: Int): String = {
     HdfsUtil.getHdfsFilePath(path, s"${groupId}")
   }
+
   private def getHdfsPath(path: String, ptnId: Int, groupId: Int): String = {
     HdfsUtil.getHdfsFilePath(path, s"${ptnId}.${groupId}")
   }
@@ -116,7 +119,10 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     clearOldRecords(path)
     try {
       val recordCount = records.count
-      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
+      val count =
+        if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
       if (count > 0) {
         val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
         if (groupCount <= 1) {
@@ -145,7 +151,10 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     clearOldRecords(path)
     try {
       val recordCount = records.size
-      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
+      val count =
+        if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
       if (count > 0) {
         val groupCount = (count - 1) / maxLinesPerFile + 1
         if (groupCount <= 1) {

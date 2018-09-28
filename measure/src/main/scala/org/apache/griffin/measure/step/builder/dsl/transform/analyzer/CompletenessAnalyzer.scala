@@ -21,7 +21,8 @@ package org.apache.griffin.measure.step.builder.dsl.transform.analyzer
 import org.apache.griffin.measure.step.builder.dsl.expr._
 
 
-case class CompletenessAnalyzer(expr: CompletenessClause, sourceName: String) extends BasicAnalyzer {
+case class CompletenessAnalyzer(expr: CompletenessClause, sourceName: String)
+  extends BasicAnalyzer {
 
   val seqAlias = (expr: Expr, v: Seq[String]) => {
     expr match {

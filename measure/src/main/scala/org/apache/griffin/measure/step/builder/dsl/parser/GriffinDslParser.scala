@@ -37,11 +37,10 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
 
   def profilingClause: Parser[ProfilingClause] = selectClause ~ opt(fromClause) ~ opt(whereClause) ~
     opt(groupbyClause) ~ opt(orderbyClause) ~ opt(limitClause) ^^ {
-    case sel ~ fromOpt ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
+    case sel ~ fromOpt ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt =>
       val preClauses = Seq(whereOpt).flatMap(opt => opt)
       val postClauses = Seq(orderbyOpt, limitOpt).flatMap(opt => opt)
       ProfilingClause(sel, fromOpt, groupbyOpt, preClauses, postClauses)
-    }
   }
 
   /**
@@ -59,7 +58,7 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
     * <distinctness-clauses> = <distExpr> [, <distExpr>]+
     */
   def sqbrExpr: Parser[Expr] = LSQBR ~> expression <~ RSQBR ^^ {
-    case expr => { expr.tag = "[]"; expr}
+    case expr => expr.tag = "[]"; expr
   }
   def distExpr: Parser[Expr] = expression | sqbrExpr
   def distinctnessClause: Parser[DistinctnessClause] = rep1sep(distExpr, Operator.COMMA) ^^ {

@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.configuration.dqdefinition
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.commons.lang.StringUtils
+
 import org.apache.griffin.measure.configuration.enums._
 
 /**

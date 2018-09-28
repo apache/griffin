@@ -18,11 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
+import scala.reflect.ClassTag
+import scala.util.Try
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.Param
 
-import scala.reflect.ClassTag
-import scala.util.Try
 
 trait ParamReader extends Loggable with Serializable {
 

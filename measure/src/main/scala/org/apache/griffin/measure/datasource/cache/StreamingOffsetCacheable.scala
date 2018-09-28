@@ -30,13 +30,13 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
   val readyTimeInterval: Long
   val readyTimeDelay: Long
 
-  def selfCacheInfoPath = s"${OffsetCheckpointClient.infoPath}/${cacheInfoPath}"
+  def selfCacheInfoPath : String = s"${OffsetCheckpointClient.infoPath}/${cacheInfoPath}"
 
-  def selfCacheTime = OffsetCheckpointClient.cacheTime(selfCacheInfoPath)
-  def selfLastProcTime = OffsetCheckpointClient.lastProcTime(selfCacheInfoPath)
-  def selfReadyTime = OffsetCheckpointClient.readyTime(selfCacheInfoPath)
-  def selfCleanTime = OffsetCheckpointClient.cleanTime(selfCacheInfoPath)
-  def selfOldCacheIndex = OffsetCheckpointClient.oldCacheIndex(selfCacheInfoPath)
+  def selfCacheTime : String = OffsetCheckpointClient.cacheTime(selfCacheInfoPath)
+  def selfLastProcTime : String = OffsetCheckpointClient.lastProcTime(selfCacheInfoPath)
+  def selfReadyTime : String = OffsetCheckpointClient.readyTime(selfCacheInfoPath)
+  def selfCleanTime : String = OffsetCheckpointClient.cleanTime(selfCacheInfoPath)
+  def selfOldCacheIndex : String = OffsetCheckpointClient.oldCacheIndex(selfCacheInfoPath)
 
   protected def submitCacheTime(ms: Long): Unit = {
     val map = Map[String, String]((selfCacheTime -> ms.toString))
@@ -80,7 +80,9 @@ trait StreamingOffsetCacheable extends Loggable with Serializable {
       try {
         Some(v.toLong)
       } catch {
-        case _:Throwable => error("try to read not existing value from OffsetCacheClient::readSelfInfo");None
+        case _: Throwable =>
+          error("try to read not existing value from OffsetCacheClient::readSelfInfo")
+          None
       }
     }
   }

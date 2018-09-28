@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.context.streaming.metric
 
+import scala.collection.mutable.{Map => MutableMap}
+
 import org.apache.griffin.measure.Loggable
 
-import scala.collection.mutable.{Map => MutableMap}
 
 /**
   * in streaming mode, some metrics may update,
@@ -32,10 +33,9 @@ object CacheResults extends Loggable {
     def olderThan(ut: Long): Boolean = updateTime < ut
     def update(ut: Long, r: Metric): Option[Metric] = {
       r match {
-        case m: result.T if (olderThan(ut)) => {
+        case m: result.T if (olderThan(ut)) =>
           val ur = result.update(m)
           if (result.differsFrom(ur)) Some(ur) else None
-        }
         case _ => None
       }
     }

@@ -18,11 +18,13 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
-import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
+import scala.concurrent.Future
+
 import org.apache.spark.rdd.RDD
 
-import scala.concurrent.Future
+import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
+import org.apache.griffin.measure.utils.ParamUtil._
+
 
 /**
   * sink metric and record through http request
@@ -38,7 +40,10 @@ case class ElasticSearchSink(config: Map[String, Any], metricName: String,
 
   val api = config.getString(Api, "")
   val method = config.getString(Method, "post")
-  val connectionTimeout = TimeUtil.milliseconds(config.getString(ConnectionTimeout, "")).getOrElse(-1L)
+
+  val connectionTimeout =
+    TimeUtil.milliseconds(config.getString(ConnectionTimeout, "")).getOrElse(-1L)
+
   val retry = config.getInt(Retry, 10)
 
   val _Value = "value"
@@ -55,7 +60,7 @@ case class ElasticSearchSink(config: Map[String, Any], metricName: String,
       val data = JsonUtil.toJson(dataMap)
       // http request
       val params = Map[String, Object]()
-      val header = Map[String, Object](("Content-Type","application/json"))
+      val header = Map[String, Object](("Content-Type", "application/json"))
 
       def func(): (Long, Future[Boolean]) = {
         import scala.concurrent.ExecutionContext.Implicits.global
