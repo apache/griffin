@@ -18,11 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.context
 
-import org.apache.griffin.measure.Loggable
+import scala.collection.mutable.{Map => MutableMap, MutableList}
+
 import org.apache.spark.sql.DataFrame
 
-import scala.collection.concurrent.{Map => ConcMap}
-import scala.collection.mutable.{MutableList, Map => MutableMap}
+import org.apache.griffin.measure.Loggable
 
 /**
   * cache and unpersist dataframes
@@ -42,17 +42,15 @@ case class DataFrameCache() extends Loggable {
   def cacheDataFrame(name: String, df: DataFrame): Unit = {
     info(s"try to cache data frame ${name}")
     dataFrames.get(name) match {
-      case Some(odf) => {
+      case Some(odf) =>
         trashDataFrame(odf)
         dataFrames += (name -> df)
         df.cache
         info("cache after replace old df")
-      }
-      case _ => {
+      case _ =>
         dataFrames += (name -> df)
         df.cache
         info("cache after replace no old df")
-      }
     }
   }
 

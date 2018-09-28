@@ -18,8 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
-import org.apache.griffin.measure.Loggable
 import org.apache.spark.rdd.RDD
+
+import org.apache.griffin.measure.Loggable
 
 /**
   * sink metric and record
