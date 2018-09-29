@@ -20,13 +20,14 @@ package org.apache.griffin.measure.step.transform
 
 import java.util.Date
 
+import org.apache.spark.sql.{Encoders, Row, SQLContext, _}
+import org.apache.spark.sql.types.{BooleanType, LongType, StructField, StructType}
+
 import org.apache.griffin.measure.context.ContextId
-import org.apache.griffin.measure.context.streaming.metric.CacheResults.CacheResult
 import org.apache.griffin.measure.context.streaming.metric._
+import org.apache.griffin.measure.context.streaming.metric.CacheResults.CacheResult
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.spark.sql.types.{BooleanType, LongType, StructField, StructType}
-import org.apache.spark.sql.{Encoders, Row, SQLContext, _}
 
 /**
   * pre-defined data frame operations
@@ -44,7 +45,9 @@ object DataFrameOps {
     val _matched = "matched"
   }
 
-  def fromJson(sqlContext: SQLContext, inputDfName: String, details: Map[String, Any]): DataFrame = {
+  def fromJson(sqlContext: SQLContext,
+               inputDfName: String,
+               details: Map[String, Any]): DataFrame = {
     val _colName = "col.name"
     val colNameOpt = details.get(_colName).map(_.toString)
 
@@ -58,7 +61,10 @@ object DataFrameOps {
     sqlContext.read.json(rdd) // slow process
   }
 
-  def accuracy(sqlContext: SQLContext, inputDfName: String, contextId: ContextId, details: Map[String, Any]): DataFrame = {
+  def accuracy(sqlContext: SQLContext,
+               inputDfName: String,
+               contextId: ContextId,
+               details: Map[String, Any]): DataFrame = {
     import AccuracyOprKeys._
 
     val miss = details.getStringOrKey(_miss)

@@ -18,8 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure.step.read
 
-import org.apache.griffin.measure.context.DQContext
 import org.apache.spark.sql._
+
+import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.utils.DataFrameUtil._
 
 case class UnionReadStep(name: String,
