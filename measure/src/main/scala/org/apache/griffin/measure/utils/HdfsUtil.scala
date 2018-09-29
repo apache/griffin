@@ -18,8 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
-import org.apache.griffin.measure.Loggable
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
+
+import org.apache.griffin.measure.Loggable
 
 object HdfsUtil extends Loggable {
 
@@ -90,24 +91,9 @@ object HdfsUtil extends Loggable {
     }
   }
 
-  //  def listPathFiles(dirPath: String): Iterable[String] = {
-  //    val path = new Path(dirPath)
-  //    try {
-  //      val fileStatusArray = dfs.listStatus(path)
-  //      fileStatusArray.flatMap { fileStatus =>
-  //        if (fileStatus.isFile) {
-  //          Some(fileStatus.getPath.getName)
-  //        } else None
-  //      }
-  //    } catch {
-  //      case e: Throwable => {
-  //        println(s"list path files error: ${e.getMessage}")
-  //        Nil
-  //      }
-  //    }
-  //  }
 
-  def listSubPathsByType(dirPath: String, subType: String, fullPath: Boolean = false): Iterable[String] = {
+  def listSubPathsByType(dirPath: String, subType: String, fullPath: Boolean = false)
+    : Iterable[String] = {
     if (existPath(dirPath)) {
       try {
         implicit val path = new Path(dirPath)
@@ -123,15 +109,15 @@ object HdfsUtil extends Loggable {
           if (fullPath) getHdfsFilePath(dirPath, fname) else fname
         }
       } catch {
-        case e: Throwable => {
+        case e: Throwable =>
           warn(s"list path [${dirPath}] warn: ${e.getMessage}")
           Nil
-        }
       }
     } else Nil
   }
 
-  def listSubPathsByTypes(dirPath: String, subTypes: Iterable[String], fullPath: Boolean = false): Iterable[String] = {
+  def listSubPathsByTypes(dirPath: String, subTypes: Iterable[String], fullPath: Boolean = false)
+    : Iterable[String] = {
     subTypes.flatMap { subType =>
       listSubPathsByType(dirPath, subType, fullPath)
     }

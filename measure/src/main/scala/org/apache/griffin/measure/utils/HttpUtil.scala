@@ -27,22 +27,30 @@ object HttpUtil {
   val PUT_REGEX = """^(?i)put$""".r
   val DELETE_REGEX = """^(?i)delete$""".r
 
-  def postData(url: String, params: Map[String, Object], headers: Map[String, Object], data: String): Boolean = {
-    val response = Http(url).params(convertObjMap2StrMap(params)).headers(convertObjMap2StrMap(headers)).postData(data).asString
+  def postData(url: String,
+               params: Map[String, Object],
+               headers: Map[String, Object],
+               data: String): Boolean = {
+    val response = Http(url).params(convertObjMap2StrMap(params))
+      .headers(convertObjMap2StrMap(headers)).postData(data).asString
+
     response.isSuccess
   }
 
-  def httpRequest(url: String, method: String, params: Map[String, Object], headers: Map[String, Object], data: String): Boolean = {
-    val httpReq = Http(url).params(convertObjMap2StrMap(params)).headers(convertObjMap2StrMap(headers))
+  def httpRequest(url: String,
+                  method: String,
+                  params: Map[String, Object],
+                  headers: Map[String, Object],
+                  data: String): Boolean = {
+    val httpReq = Http(url).params(convertObjMap2StrMap(params))
+        .headers(convertObjMap2StrMap(headers))
     method match {
-      case POST_REGEX() => {
+      case POST_REGEX() =>
         val res = httpReq.postData(data).asString
         res.isSuccess
-      }
-      case PUT_REGEX() => {
+      case PUT_REGEX() =>
         val res = httpReq.put(data).asString
         res.isSuccess
-      }
       case _ => false
     }
   }

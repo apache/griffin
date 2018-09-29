@@ -183,7 +183,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         val numColName = details.getStringOrKey(_num)
         val dupMetricSelClause = procType match {
           case BatchProcessType => s"`${dupColName}`, COUNT(*) AS `${numColName}`"
-            
+
           case StreamingProcessType =>
             s"`${ConstantColumns.tmst}`, `${dupColName}`, COUNT(*) AS `${numColName}`"
         }
