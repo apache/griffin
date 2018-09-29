@@ -18,12 +18,13 @@ under the License.
 */
 package org.apache.griffin.measure.step.write
 
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql._
+
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.JsonUtil
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql._
 
 /**
   * write records needs to be sink
@@ -39,18 +40,16 @@ case class RecordWriteStep(name: String,
 
     val writeMode = writeTimestampOpt.map(_ => SimpleMode).getOrElse(context.writeMode)
     writeMode match {
-      case SimpleMode => {
+      case SimpleMode =>
         // batch records
         val recordsOpt = getBatchRecords(context)
         // write records
         recordsOpt match {
-          case Some(records) => {
+          case Some(records) =>
             context.getSink(timestamp).sinkRecords(records, name)
-          }
-          case _ => {}
+          case _ =>
         }
-      }
-      case TimestampMode => {
+      case TimestampMode =>
         // streaming records
         val (recordsOpt, emptyTimestamps) = getStreamingRecords(context)
         // write records
@@ -63,7 +62,6 @@ case class RecordWriteStep(name: String,
         emptyTimestamps.foreach { t =>
           context.getSink(t).sinkRecords(Nil, name)
         }
-      }
     }
     true
   }
@@ -81,28 +79,31 @@ case class RecordWriteStep(name: String,
       val df = context.sqlContext.table(s"`${name}`")
       Some(df)
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"get data frame ${name} fails")
         None
-      }
     }
   }
 
-  private def getRecordDataFrame(context: DQContext): Option[DataFrame] = getDataFrame(context, inputName)
+  private def getRecordDataFrame(context: DQContext): Option[DataFrame]
+    = getDataFrame(context, inputName)
 
-  private def getFilterTableDataFrame(context: DQContext): Option[DataFrame] = filterTableNameOpt.flatMap(getDataFrame(context, _))
+  private def getFilterTableDataFrame(context: DQContext): Option[DataFrame]
+    = filterTableNameOpt.flatMap(getDataFrame(context, _))
 
   private def getBatchRecords(context: DQContext): Option[RDD[String]] = {
     getRecordDataFrame(context).map(_.toJSON.rdd);
   }
 
-  private def getStreamingRecords(context: DQContext): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
+  private def getStreamingRecords(context: DQContext)
+    : (Option[RDD[(Long, Iterable[String])]], Set[Long])
+    = {
     implicit val encoder = Encoders.tuple(Encoders.scalaLong, Encoders.STRING)
     val defTimestamp = context.contextId.timestamp
     getRecordDataFrame(context) match {
-      case Some(df) => {
+      case Some(df) =>
         val (filterFuncOpt, emptyTimestamps) = getFilterTableDataFrame(context) match {
-          case Some(filterDf) => {
+          case Some(filterDf) =>
             // timestamps with empty flag
             val tmsts: Array[(Long, Boolean)] = (filterDf.collect.flatMap { row =>
               try {
@@ -120,13 +121,12 @@ case class RecordWriteStep(name: String,
             } else None
 
             (filterFuncOpt, emptyTmsts)
-          }
           case _ => (Some((t: Long) => true), Set[Long]())
         }
 
         // filter timestamps need to record
         filterFuncOpt match {
-          case Some(filterFunc) => {
+          case Some(filterFunc) =>
             val records = df.flatMap { row =>
               val tmst = getTmst(row, defTimestamp)
               if (filterFunc(tmst)) {
@@ -140,10 +140,8 @@ case class RecordWriteStep(name: String,
               } else None
             }
             (Some(records.rdd.groupByKey), emptyTimestamps)
-          }
           case _ => (None, emptyTimestamps)
         }
-      }
       case _ => (None, Set[Long]())
     }
   }

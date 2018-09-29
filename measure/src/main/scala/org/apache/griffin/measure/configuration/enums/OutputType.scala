@@ -29,7 +29,13 @@ sealed trait OutputType {
 }
 
 object OutputType {
-  private val outputTypes: List[OutputType] = List(MetricOutputType, RecordOutputType, DscUpdateOutputType, UnknownOutputType)
+  private val outputTypes: List[OutputType] = List(
+    MetricOutputType,
+    RecordOutputType,
+    DscUpdateOutputType,
+    UnknownOutputType
+  )
+
   val default = UnknownOutputType
   def apply(ptn: String): OutputType = {
     outputTypes.find(tp => ptn match {

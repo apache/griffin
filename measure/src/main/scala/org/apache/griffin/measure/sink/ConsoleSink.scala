@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
+import org.apache.spark.rdd.RDD
+
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.spark.rdd.RDD
 
 /**
   * sink metric and record to console, for debug

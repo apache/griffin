@@ -18,18 +18,18 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
-import org.apache.griffin.measure.Loggable
-
-import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
+import scala.util.matching.Regex
+
+import org.apache.griffin.measure.Loggable
 
 object TimeUtil extends Loggable {
 
   private object Units {
     case class TimeUnit(name: String, shortName: String, ut: Long, regex: Regex) {
-      def toMs(t: Long) = t * ut
-      def fromMs(ms: Long) = ms / ut
-      def fitUnit(ms: Long) = (ms % ut == 0)
+      def toMs(t: Long) : Long = t * ut
+      def fromMs(ms: Long) : Long = ms / ut
+      def fitUnit(ms: Long) : Boolean = (ms % ut == 0)
     }
 
     val dayUnit = TimeUnit("day", "d", 24 * 60 * 60 * 1000, """^(?i)d(?:ay)?$""".r)
@@ -50,7 +50,7 @@ object TimeUtil extends Loggable {
     val value: Option[Long] = {
       Try {
         timeString match {
-          case TimeRegex(time, unit) => {
+          case TimeRegex(time, unit) =>
             val t = time.toLong
             unit match {
               case dayUnit.regex() => dayUnit.toMs(t)
@@ -60,11 +60,9 @@ object TimeUtil extends Loggable {
               case msUnit.regex() => msUnit.toMs(t)
               case _ => throw new Exception(s"${timeString} is invalid time format")
             }
-          }
-          case PureTimeRegex(time) => {
+          case PureTimeRegex(time) =>
             val t = time.toLong
             msUnit.toMs(t)
-          }
           case _ => throw new Exception(s"${timeString} is invalid time format")
         }
       } match {

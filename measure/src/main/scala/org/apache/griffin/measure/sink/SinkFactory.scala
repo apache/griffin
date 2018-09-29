@@ -18,10 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
+import scala.util.{Success, Try}
+
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums._
 
-import scala.util.{Success, Try}
 
 
 case class SinkFactory(sinkParams: Iterable[SinkParam], metricName: String) extends Serializable {

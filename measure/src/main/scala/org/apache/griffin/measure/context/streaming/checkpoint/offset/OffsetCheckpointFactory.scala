@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
+import scala.util.Try
+
 import org.apache.griffin.measure.configuration.dqdefinition.CheckpointParam
 
-import scala.util.Try
 
 case class OffsetCheckpointFactory(checkpointParams: Iterable[CheckpointParam], metricName: String
                                   ) extends Serializable {

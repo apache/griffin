@@ -24,13 +24,15 @@ trait TreeNode extends Serializable {
 
   var children = Seq[TreeNode]()
 
-  def addChild(expr: TreeNode) = { children :+= expr }
-  def addChildren(exprs: Seq[TreeNode]) = { children ++= exprs }
+  def addChild(expr: TreeNode) : Unit = { children :+= expr }
+  def addChildren(exprs: Seq[TreeNode]) : Unit = { children ++= exprs }
 
-  def preOrderTraverseDepthFirst[T, A <: TreeNode](z: T)(seqOp: (A, T) => T, combOp: (T, T) => T)(implicit tag: ClassTag[A]): T = {
+  def preOrderTraverseDepthFirst[T, A <: TreeNode](z: T)
+                                                  (seqOp: (A, T) => T, combOp: (T, T) => T)
+                                                  (implicit tag: ClassTag[A]): T = {
 
     val clazz = tag.runtimeClass
-    if(clazz.isAssignableFrom(this.getClass)){
+    if(clazz.isAssignableFrom(this.getClass)) {
       val tv = seqOp(this.asInstanceOf[A], z)
       children.foldLeft(combOp(z, tv)) { (ov, tn) =>
         combOp(ov, tn.preOrderTraverseDepthFirst(z)(seqOp, combOp))
@@ -41,16 +43,18 @@ trait TreeNode extends Serializable {
     }
 
   }
-  def postOrderTraverseDepthFirst[T, A <: TreeNode](z: T)(seqOp: (A, T) => T, combOp: (T, T) => T)(implicit tag: ClassTag[A]): T = {
+  def postOrderTraverseDepthFirst[T, A <: TreeNode](z: T)
+                                                   (seqOp: (A, T) => T, combOp: (T, T) => T)
+                                                   (implicit tag: ClassTag[A]): T = {
 
     val clazz = tag.runtimeClass
-    if(clazz.isAssignableFrom(this.getClass)){
+    if(clazz.isAssignableFrom(this.getClass)) {
       val cv = children.foldLeft(z) { (ov, tn) =>
         combOp(ov, tn.postOrderTraverseDepthFirst(z)(seqOp, combOp))
       }
       combOp(z, seqOp(this.asInstanceOf[A], cv))
     }
-    else{
+    else {
       z
     }
   }

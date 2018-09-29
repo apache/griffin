@@ -45,9 +45,11 @@ case class AccuracyMetric(miss: Long, total: Long) extends Metric {
     (this.miss != other.miss) || (this.total != other.total)
   }
 
-  def getMiss = miss
-  def getTotal = total
-  def getMatch = total - miss
+  def getMiss: Long = miss
+
+  def getTotal: Long = total
+
+  def getMatch: Long = total - miss
 
   def matchPercentage: Double = if (getTotal <= 0) 0 else getMatch.toDouble / getTotal * 100
 
