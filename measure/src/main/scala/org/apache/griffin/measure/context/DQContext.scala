@@ -18,11 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.context
 
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.spark.sql.{Encoders, SparkSession, SQLContext}
+
 import org.apache.griffin.measure.configuration.dqdefinition._
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.datasource._
 import org.apache.griffin.measure.sink.{Sink, SinkFactory}
-import org.apache.spark.sql.{Encoders, SQLContext, SparkSession}
 
 /**
   * dq context: the context of each calculation
@@ -58,6 +59,7 @@ case class DQContext(contextId: ContextId,
     }
   }
   dataSourceNames.foreach(name => compileTableRegister.registerTable(name))
+
   def getDataSourceName(index: Int): String = {
     if (dataSourceNames.size > index) dataSourceNames(index) else ""
   }
@@ -66,20 +68,25 @@ case class DQContext(contextId: ContextId,
   val functionNames: Seq[String] = sparkSession.catalog.listFunctions.map(_.name).collect.toSeq
 
   val dataSourceTimeRanges = loadDataSources()
+
   def loadDataSources(): Map[String, TimeRange] = {
     dataSources.map { ds =>
       (ds.name, ds.loadData(this))
     }.toMap
   }
+
   printTimeRanges
 
   private val sinkFactory = SinkFactory(sinkParams, name)
   private val defaultSink: Sink = createSink(contextId.timestamp)
+
   def getSink(timestamp: Long): Sink = {
     if (timestamp == contextId.timestamp) getSink()
     else createSink(timestamp)
   }
+
   def getSink(): Sink = defaultSink
+
   private def createSink(t: Long): Sink = {
     procType match {
       case BatchProcessType => sinkFactory.getSinks(t, true)

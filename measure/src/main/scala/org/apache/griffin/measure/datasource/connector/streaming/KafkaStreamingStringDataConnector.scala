@@ -19,15 +19,16 @@ under the License.
 package org.apache.griffin.measure.datasource.connector.streaming
 
 import kafka.serializer.StringDecoder
-import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
-import org.apache.griffin.measure.datasource.TimestampStorage
-import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, _}
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka.KafkaUtils
+
+import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
+import org.apache.griffin.measure.datasource.TimestampStorage
+import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 
 /**
   * streaming data connector for kafka with string format key and value
@@ -60,10 +61,9 @@ case class KafkaStreamingStringDataConnector(@transient sparkSession: SparkSessi
         val df = sparkSession.createDataFrame(rowRdd, schema)
         Some(df)
       } catch {
-        case e: Throwable => {
+        case e: Throwable =>
           error("streaming data transform fails")
           None
-        }
       }
     }
   }

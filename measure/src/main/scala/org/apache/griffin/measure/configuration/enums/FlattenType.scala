@@ -29,7 +29,13 @@ sealed trait FlattenType {
 }
 
 object FlattenType {
-  private val flattenTypes: List[FlattenType] = List(DefaultFlattenType, EntriesFlattenType, ArrayFlattenType, MapFlattenType)
+  private val flattenTypes: List[FlattenType] = List(
+    DefaultFlattenType,
+    EntriesFlattenType,
+    ArrayFlattenType,
+    MapFlattenType
+  )
+
   val default = DefaultFlattenType
   def apply(ptn: String): FlattenType = {
     flattenTypes.find(tp => ptn match {

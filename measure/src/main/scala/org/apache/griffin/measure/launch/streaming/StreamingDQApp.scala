@@ -21,22 +21,24 @@ package org.apache.griffin.measure.launch.streaming
 import java.util.{Date, Timer, TimerTask}
 import java.util.concurrent.{Executors, ThreadPoolExecutor, TimeUnit}
 
+import scala.util.Try
+
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.{SparkSession, SQLContext}
+import org.apache.spark.streaming.{Milliseconds, StreamingContext}
+
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.dqdefinition._
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.context.streaming.checkpoint.offset.OffsetCheckpointClient
-import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.context.streaming.metric.CacheResults
+import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.{SQLContext, SparkSession}
-import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
-import scala.util.Try
 
 case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
@@ -82,10 +84,9 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
       try {
         createStreamingContext
       } catch {
-        case e: Throwable => {
+        case e: Throwable =>
           error(s"create streaming context error: ${e.getMessage}")
           throw e
-        }
       }
     })
 
@@ -118,7 +119,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
     ssc.start()
     ssc.awaitTermination()
-    ssc.stop(stopSparkContext=true, stopGracefully=true)
+    ssc.stop(stopSparkContext = true, stopGracefully = true)
 
     // clean context
     globalContext.clean()

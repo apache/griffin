@@ -18,15 +18,16 @@ under the License.
 */
 package org.apache.griffin.measure
 
-import org.apache.griffin.measure.configuration.enums._
+import scala.reflect.ClassTag
+import scala.util.{Failure, Success, Try}
+
+import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig, GriffinConfig, Param}
 import org.apache.griffin.measure.configuration.dqdefinition.reader.ParamReaderFactory
-import org.apache.griffin.measure.configuration.dqdefinition.{GriffinConfig, DQConfig, EnvConfig, Param}
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
 
-import scala.reflect.ClassTag
-import scala.util.{Failure, Success, Try}
 
 /**
   * application entrance
@@ -49,17 +50,15 @@ object Application extends Loggable {
     // read param files
     val envParam = readParamFile[EnvConfig](envParamFile) match {
       case Success(p) => p
-      case Failure(ex) => {
+      case Failure(ex) =>
         error(ex.getMessage)
         sys.exit(-2)
-      }
     }
     val dqParam = readParamFile[DQConfig](dqParamFile) match {
       case Success(p) => p
-      case Failure(ex) => {
+      case Failure(ex) =>
         error(ex.getMessage)
         sys.exit(-2)
-      }
     }
     val allParam: GriffinConfig = GriffinConfig(envParam, dqParam)
 
@@ -68,32 +67,28 @@ object Application extends Loggable {
     val dqApp: DQApp = procType match {
       case BatchProcessType => BatchDQApp(allParam)
       case StreamingProcessType => StreamingDQApp(allParam)
-      case _ => {
+      case _ =>
         error(s"${procType} is unsupported process type!")
         sys.exit(-4)
-      }
     }
 
     startup
 
     // dq app init
     dqApp.init match {
-      case Success(_) => {
+      case Success(_) =>
         info("process init success")
-      }
-      case Failure(ex) => {
+      case Failure(ex) =>
         error(s"process init error: ${ex.getMessage}")
         shutdown
         sys.exit(-5)
-      }
     }
 
     // dq app run
     dqApp.run match {
-      case Success(_) => {
+      case Success(_) =>
         info("process run success")
-      }
-      case Failure(ex) => {
+      case Failure(ex) =>
         error(s"process run error: ${ex.getMessage}")
 
         if (dqApp.retryable) {
@@ -102,19 +97,16 @@ object Application extends Loggable {
           shutdown
           sys.exit(-5)
         }
-      }
     }
 
     // dq app end
     dqApp.close match {
-      case Success(_) => {
+      case Success(_) =>
         info("process end success")
-      }
-      case Failure(ex) => {
+      case Failure(ex) =>
         error(s"process end error: ${ex.getMessage}")
         shutdown
         sys.exit(-5)
-      }
     }
 
     shutdown

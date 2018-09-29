@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.configuration.dqdefinition
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.commons.lang.StringUtils
+
 import org.apache.griffin.measure.configuration.enums._
 
 /**
@@ -46,7 +47,7 @@ case class DQConfig(@JsonProperty("name") private val name: String,
   def getDataSources: Seq[DataSourceParam] = {
     dataSources.foldLeft((Nil: Seq[DataSourceParam], Set[String]())) { (ret, ds) =>
       val (seq, names) = ret
-      if (!names.contains(ds.getName)){
+      if (!names.contains(ds.getName)) {
         (seq :+ ds, names + ds.getName)
       } else ret
     }._1
@@ -133,8 +134,9 @@ case class EvaluateRuleParam( @JsonProperty("rules") private val rules: List[Rul
   * rule param
   * @param dslType    dsl type of this rule (must)
   * @param dqType     dq type of this rule (must if dsl type is "griffin-dsl")
-  * @param inDfName       name of input dataframe of this rule, by default will be the previous rule output dataframe name
-  * @param outDfName      name of output dataframe of this rule, by default will be generated as data connector dataframe name with index suffix
+  * @param inDfName   name of input dataframe of this rule, by default will be the previous rule output dataframe name
+  * @param outDfName  name of output dataframe of this rule, by default will be generated
+  *                   as data connector dataframe name with index suffix
   * @param rule       rule to define dq step calculation (must)
   * @param details    detail config of rule (optional)
   * @param cache      cache the result for multiple usage (optional, valid for "spark-sql" and "df-ops" mode)

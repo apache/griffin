@@ -18,10 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.cache
 
+import org.apache.spark.sql.SQLContext
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.spark.sql.SQLContext
 
 object StreamingCacheClientFactory extends Loggable {
 
@@ -50,17 +51,20 @@ object StreamingCacheClientFactory extends Loggable {
       try {
         val tp = param.getString(_type, "")
         val dsCache = tp match {
-          case ParquetRegex() => StreamingCacheParquetClient(sqlContext, param, name, index, tmstCache)
-          case JsonRegex() => StreamingCacheJsonClient(sqlContext, param, name, index, tmstCache)
-          case OrcRegex() => StreamingCacheOrcClient(sqlContext, param, name, index, tmstCache)
-          case _ => StreamingCacheParquetClient(sqlContext, param, name, index, tmstCache)
+          case ParquetRegex() =>
+            StreamingCacheParquetClient(sqlContext, param, name, index, tmstCache)
+          case JsonRegex() =>
+            StreamingCacheJsonClient(sqlContext, param, name, index, tmstCache)
+          case OrcRegex() =>
+            StreamingCacheOrcClient(sqlContext, param, name, index, tmstCache)
+          case _ =>
+            StreamingCacheParquetClient(sqlContext, param, name, index, tmstCache)
         }
         Some(dsCache)
       } catch {
-        case e: Throwable => {
+        case e: Throwable =>
           error("generate data source cache fails")
           None
-        }
       }
     }
   }

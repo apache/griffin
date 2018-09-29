@@ -18,22 +18,24 @@ under the License.
 */
 package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
+import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
-import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.utils.ZKPaths
-import org.apache.griffin.measure.context.streaming.checkpoint.lock.CheckpointLockInZK
 import org.apache.zookeeper.CreateMode
-
 import scala.collection.JavaConverters._
+
+import org.apache.griffin.measure.context.streaming.checkpoint.lock.CheckpointLockInZK
+
 
 /**
   * leverage zookeeper for info cache
   * @param config
   * @param metricName
   */
-case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String) extends OffsetCheckpoint with OffsetOps {
+case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
+  extends OffsetCheckpoint with OffsetOps {
 
   val Hosts = "hosts"
   val Namespace = "namespace"
@@ -67,7 +69,9 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String) ex
   }
   val lockPath = config.getOrElse(LockPath, "lock").toString
 
-  private val cacheNamespace: String = if (namespace.isEmpty) metricName else namespace + separator + metricName
+  private val cacheNamespace: String =
+    if (namespace.isEmpty) metricName else namespace + separator + metricName
+
   private val builder = CuratorFrameworkFactory.builder()
     .connectString(hosts)
     .retryPolicy(new ExponentialBackoffRetry(1000, 3))
@@ -141,10 +145,9 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String) ex
     try {
       client.getChildren().forPath(path).asScala.toList
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         warn(s"list ${path} warn: ${e.getMessage}")
         Nil
-      }
     }
   }
 
@@ -162,10 +165,9 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String) ex
         .forPath(path, content.getBytes("utf-8"))
       true
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"create ( ${path} -> ${content} ) error: ${e.getMessage}")
         false
-      }
     }
   }
 
@@ -174,10 +176,9 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String) ex
       client.setData().forPath(path, content.getBytes("utf-8"))
       true
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"update ( ${path} -> ${content} ) error: ${e.getMessage}")
         false
-      }
     }
   }
 
@@ -185,10 +186,9 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String) ex
     try {
       Some(new String(client.getData().forPath(path), "utf-8"))
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         warn(s"read ${path} warn: ${e.getMessage}")
         None
-      }
     }
   }
 
@@ -204,10 +204,9 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String) ex
     try {
       client.checkExists().forPath(path) != null
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         warn(s"check exists ${path} warn: ${e.getMessage}")
         false
-      }
     }
   }
 
