@@ -312,7 +312,9 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
           // 9. duplicate record
           val dupRecordTableName = "__dupRecords"
           val dupRecordSelClause = procType match {
-            case StreamingProcessType if (withOlderTable) => s"${distAliasesClause}, `${dupColName}`, `${accuDupColName}`"
+            case StreamingProcessType if (withOlderTable) =>
+              s"${distAliasesClause}, `${dupColName}`, `${accuDupColName}`"
+
             case _ => s"${distAliasesClause}, `${dupColName}`"
           }
           val dupRecordSql = {

@@ -100,7 +100,7 @@ object MongoConnection {
   var dataConf: MongoConf = _
   private var dataCollection: MongoCollection[Document] = _
 
-  def getDataCollection = dataCollection
+  def getDataCollection : MongoCollection[Document] = dataCollection
 
   def init(config: Map[String, Any]): Unit = {
     if (!initialed) {

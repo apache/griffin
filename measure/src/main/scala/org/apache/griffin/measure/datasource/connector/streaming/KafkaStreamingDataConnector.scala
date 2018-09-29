@@ -19,6 +19,7 @@ under the License.
 package org.apache.griffin.measure.datasource.connector.streaming
 
 import scala.util.{Failure, Success, Try}
+
 import kafka.serializer.Decoder
 import org.apache.spark.streaming.dstream.InputDStream
 
