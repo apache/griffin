@@ -31,7 +31,13 @@ sealed trait DqType {
 
 object DqType {
   private val dqTypes: List[DqType] = List(
-    AccuracyType, ProfilingType, UniquenessType, DistinctnessType, TimelinessType, CompletenessType, UnknownType
+    AccuracyType,
+    ProfilingType,
+    UniquenessType,
+    DistinctnessType,
+    TimelinessType,
+    CompletenessType,
+    UnknownType
   )
   def apply(ptn: String): DqType = {
     dqTypes.find(dqType => ptn match {

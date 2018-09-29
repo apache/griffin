@@ -18,14 +18,16 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.connector.streaming
 
-import org.apache.griffin.measure.context.TimeRange
-import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
-import org.apache.griffin.measure.datasource.connector.DataConnector
+import scala.util.Try
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.streaming.dstream.InputDStream
 
-import scala.util.Try
+import org.apache.griffin.measure.context.TimeRange
+import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
+import org.apache.griffin.measure.datasource.connector.DataConnector
+
 
 trait StreamingDataConnector extends DataConnector {
 

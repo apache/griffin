@@ -18,10 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.step.write
 
+import scala.collection.mutable.ArrayBuffer
+
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
 
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * spark row formatter
@@ -46,7 +47,8 @@ object SparkRowFormatter {
       case (sf, a) =>
         sf.dataType match {
           case ArrayType(et, _) =>
-            Map(sf.name -> (if (a == null) a else formatArray(et, a.asInstanceOf[ArrayBuffer[Any]])))
+            Map(sf.name ->
+              (if (a == null) a else formatArray(et, a.asInstanceOf[ArrayBuffer[Any]])))
           case StructType(s) =>
             Map(sf.name -> (if (a == null) a else formatStruct(s, a.asInstanceOf[Row])))
           case _ => Map(sf.name -> a)

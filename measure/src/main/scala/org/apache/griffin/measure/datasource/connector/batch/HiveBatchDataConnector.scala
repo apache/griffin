@@ -18,10 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.connector.batch
 
+import org.apache.spark.sql.{DataFrame, SparkSession}
+
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.context.TimeRange
 import org.apache.griffin.measure.datasource.TimestampStorage
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -54,10 +55,9 @@ case class HiveBatchDataConnector(@transient sparkSession: SparkSession,
       val preDfOpt = preProcess(dfOpt, ms)
       preDfOpt
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"load hive table ${concreteTableName} fails: ${e.getMessage}")
         None
-      }
     }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))

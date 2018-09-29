@@ -21,11 +21,12 @@ package org.apache.griffin.measure.utils
 import java.io.File
 import java.net.URI
 
-import org.apache.griffin.measure.Loggable
+import scala.collection.mutable.{Map => MutableMap}
+
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 
-import scala.collection.mutable.{Map => MutableMap}
+import org.apache.griffin.measure.Loggable
 
 object FSUtil extends Loggable {
 
@@ -34,23 +35,20 @@ object FSUtil extends Loggable {
 
   def getFileSystem(path: String): FileSystem = {
     getUriOpt(path) match {
-      case Some(uri) => {
+      case Some(uri) =>
         fsMap.get(uri.getScheme) match {
           case Some(fs) => fs
-          case _ => {
+          case _ =>
             val fs = try {
               FileSystem.get(uri, getConfiguration)
             } catch {
-              case e: Throwable => {
+              case e: Throwable =>
                 error(s"get file system error: ${e.getMessage}")
                 throw e
-              }
             }
             fsMap += (uri.getScheme -> fs)
             fs
-          }
         }
-      }
       case _ => defaultFS
     }
   }

@@ -18,14 +18,18 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.cache
 
-import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.spark.sql._
+
+import org.apache.griffin.measure.datasource.TimestampStorage
 
 /**
   * data source cache in parquet format
   */
-case class StreamingCacheParquetClient(sqlContext: SQLContext, param: Map[String, Any],
-                                       dsName: String, index: Int, timestampStorage: TimestampStorage
+case class StreamingCacheParquetClient(sqlContext: SQLContext,
+                                       param: Map[String, Any],
+                                       dsName: String,
+                                       index: Int,
+                                       timestampStorage: TimestampStorage
                                  ) extends StreamingCacheClient {
 
   sqlContext.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false")

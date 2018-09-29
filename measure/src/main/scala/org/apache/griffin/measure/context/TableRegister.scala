@@ -18,10 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.context
 
-import org.apache.griffin.measure.Loggable
+import scala.collection.mutable.{Set => MutableSet}
+
 import org.apache.spark.sql._
 
-import scala.collection.mutable.{Set => MutableSet}
+import org.apache.griffin.measure.Loggable
+
 
 /**
   * register table name

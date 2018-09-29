@@ -26,9 +26,10 @@ import org.apache.griffin.measure.configuration.enums._
   */
 object PreProcParamMaker {
 
-  case class StringAnyMap(values:Map[String,Any])
+  case class StringAnyMap ( values: Map[String, Any] )
 
-  def makePreProcRules(rules: Seq[RuleParam], suffix: String, dfName: String): (Seq[RuleParam], String) = {
+  def makePreProcRules(rules: Seq[RuleParam],
+                       suffix: String, dfName: String): (Seq[RuleParam], String) = {
     val len = rules.size
     val (newRules, _) = rules.zipWithIndex.foldLeft((Nil: Seq[RuleParam], dfName)) { (ret, pair) =>
       val (rls, prevOutDfName) = ret
@@ -47,10 +48,9 @@ object PreProcParamMaker {
     val rpRule = rule.replaceInOutDfName(newInDfName, newOutDfName)
     rule.getDslType match {
       case DataFrameOpsType => rpRule
-      case _ => {
+      case _ =>
         val newRule = replaceDfNameSuffix(rule.getRule, rule.getInDfName(), suffix)
         rpRule.replaceRule(newRule)
-      }
     }
   }
 

@@ -18,8 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.cache
 
-import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.spark.sql._
+
+import org.apache.griffin.measure.datasource.TimestampStorage
 
 /**
   * data source cache in orc format
