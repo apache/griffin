@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.util;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.lang.StringUtils;
@@ -30,13 +32,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
-
 public class YarnNetUtil {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(YarnNetUtil.class);
     private static RestTemplate restTemplate = new RestTemplate();
 
+    /**
+     * delete app task scheduling by yarn.
+     *
+     * @param url prefix part of whole url
+     * @param appId application id
+     */
     public static void delete(String url, String appId) {
         try {
             if (appId != null) {
@@ -53,6 +59,13 @@ public class YarnNetUtil {
         }
     }
 
+    /**
+     * update app task scheduling by yarn.
+     *
+     * @param url prefix part of whole url
+     * @param instance job instance
+     * @return
+     */
     public static boolean update(String url, JobInstanceBean instance) {
         try {
             url += "/ws/v1/cluster/apps/" + instance.getAppId();
@@ -76,6 +89,12 @@ public class YarnNetUtil {
         return false;
     }
 
+    /**
+     * parse json string and get app json object.
+     *
+     * @param json json string
+     * @return
+     */
     public static JsonObject parse(String json) {
         if (StringUtils.isEmpty(json)) {
             LOGGER.warn("Input string is empty.");
