@@ -78,6 +78,19 @@ under the License.
     <!--<pluginRepositories>-->
     <!--</pluginRepositories>-->
 
+    <repositories>
+        <repository>
+            <id>sonatype-apache</id>
+            <url>http://</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <scm>
         <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</connection>
         <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</developerConnection>
