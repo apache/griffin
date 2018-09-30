@@ -21,13 +21,16 @@ package org.apache.griffin.core.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
 
 public class YarnNetUtil {
     private static final Logger LOGGER = LoggerFactory
@@ -42,6 +45,9 @@ public class YarnNetUtil {
                                 + appId + "/state",
                         "{\"state\": \"KILLED\"}");
             }
+        } catch (HttpClientErrorException e) {
+            LOGGER.warn("client error {} from yarn: {}",
+                    e.getMessage(), e.getResponseBodyAsString());
         } catch (Exception e) {
             LOGGER.error("delete exception happens by yarn. {}", e);
         }
@@ -56,6 +62,14 @@ public class YarnNetUtil {
                 instance.setState(LivySessionStates.toLivyState(state));
             }
             return true;
+        } catch (HttpClientErrorException e) {
+            LOGGER.warn("client error {} from yarn: {}",
+                    e.getMessage(), e.getResponseBodyAsString());
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                // in sync with Livy behavior, see com.cloudera.livy.utils.SparkYarnApp
+                instance.setState(DEAD);
+                return true;
+            }
         } catch (Exception e) {
             LOGGER.error("update exception happens by yarn. {}", e);
         }
