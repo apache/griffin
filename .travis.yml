@@ -24,4 +24,8 @@ node_js:
 install:
   - npm install -g bower
 
-script: travis_wait mvn clean verify -q
+script: travis_wait 30 mvn clean verify -q
+
+cache:
+  directories:
+  - $HOME/.m2
