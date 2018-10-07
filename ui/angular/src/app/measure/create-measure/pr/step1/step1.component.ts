@@ -22,6 +22,7 @@ import {TREE_ACTIONS, ITreeOptions, TreeComponent} from "angular-tree-component"
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {AfterViewChecked, ElementRef} from "@angular/core";
 import {ProfilingStep1} from "../pr.component";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 export class node {
   name: string;
@@ -98,7 +99,7 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
             this.selectedAll = false;
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
           } else if (node.data.cols !== undefined) {
-            this.onTableNodeClick(node.data);
+            this.onTableNodeClick(node);
           }
         }
       }
@@ -231,7 +232,8 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
     });
   }
 
-  onTableNodeClick(node: node) {
+  onTableNodeClick(treeNode: ITreeNode) {
+    let node: node = treeNode.data;
     if (node.cols == null) {
       let getTable = this.serviceService.config.uri.dbtable;
       let dbName = node.parent;
@@ -249,10 +251,10 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
           );
           node.cols.push(new_col);
         }
-        this.setCurrentTable(node);
+        this.setCurrentTable(treeNode);
       })
     } else {
-      this.setCurrentTable(node);
+      this.setCurrentTable(treeNode);
     }
   }
 
@@ -268,9 +270,11 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
     });
   }
 
-  setCurrentTable(node: node) {
+  setCurrentTable(treeNode: ITreeNode) {
+    let node: node = treeNode.data;
     this.step1.currentTable = node.name;
-    this.step1.currentDB = node.parent;
+    this.step1.currentDB = treeNode.parent.data.name;
+    this.step1.currentDBStr = this.step1.currentDB + ".";
     this.step1.schemaCollection = node.cols;
     this.step1.srcname = "source" + new Date().getTime();
     this.step1.srclocation = node.location;
