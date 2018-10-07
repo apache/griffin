@@ -256,6 +256,18 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
     }
   }
 
+  onSearch(query) {
+    this.tree.treeModel.filterNodes((node) => {
+      let name;
+      if (node.data.children !== undefined) {
+        name = node.data.name + ".";
+      } else {
+        name = node.parent.data.name + "." + node.data.name;
+      }
+      return name.indexOf(query) >= 0;
+    });
+  }
+
   setCurrentTable(node: node) {
     this.step1.currentTable = node.name;
     this.step1.currentDB = node.parent;
