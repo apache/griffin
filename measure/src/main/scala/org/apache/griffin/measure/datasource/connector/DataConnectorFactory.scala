@@ -38,6 +38,7 @@ object DataConnectorFactory extends Loggable {
   val TextDirRegex = """^(?i)text-dir$""".r
 
   val KafkaRegex = """^(?i)kafka$""".r
+  val SqlServerRegex = """^(?i)sqlserver$""".r
 
   /**
     * create data connector
@@ -63,6 +64,7 @@ object DataConnectorFactory extends Loggable {
         case TextDirRegex() => TextDirBatchDataConnector(sparkSession, dcParam, tmstCache)
         case KafkaRegex() =>
           getStreamingDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
+        case SqlServerRegex() => SqlServerBatchDataConnector(sparkSession, dcParam, tmstCache)
         case _ => throw new Exception("connector creation error!")
       }
     }
