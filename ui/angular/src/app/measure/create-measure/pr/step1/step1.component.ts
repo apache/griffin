@@ -193,6 +193,11 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
     this.http.get(allDatabases).subscribe((databases: Array<string>) => {
       this.step1.nodeList = new Array();
       let i = 1;
+      let pending = databases.length;
+      if (databases.length > 10) {
+        this.options.animateExpand = false;
+        this.tree.treeModel.update();
+      }
       for (let dbName of databases) {
         let dbNode = new node();
         dbNode.name = dbName;
@@ -209,6 +214,15 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
             tableNode.location = null;
             tableNode.parent = dbName;
             tableNode.cols = null;
+          }
+          pending -= 1;
+          if (pending == 0) {
+            this.tree.treeModel.update();
+          }
+        },
+        () => {
+          pending -= 1;
+          if (pending == 0) {
             this.tree.treeModel.update();
           }
         });
