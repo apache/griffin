@@ -20,12 +20,13 @@ import {Component, OnInit, AfterViewChecked, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {FormsModule, Validator} from "@angular/forms";
 import {ServiceService} from "../../../service/service.service";
-import {TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions} from "angular-tree-component";
+import {TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions, TreeComponent} from "angular-tree-component";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ToasterModule, ToasterService} from "angular2-toaster";
 import * as $ from "jquery";
 import {Router} from "@angular/router";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 class node {
   name: string;
@@ -235,6 +236,12 @@ export class AcComponent implements OnInit, AfterViewChecked {
   private toasterService: ToasterService;
   public visible = false;
   public visibleAnimate = false;
+
+  @ViewChild("srcTree")
+  private tree: TreeComponent;
+
+  @ViewChild("tgtTree")
+  private tgtTree: TreeComponent;
 
   public hide(): void {
     this.visibleAnimate = false;
@@ -534,17 +541,8 @@ export class AcComponent implements OnInit, AfterViewChecked {
             this.selectedAll = false;
             this.schemaCollection = [];
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
-          } else if (node.data.cols) {
-            this.currentTable = node.data.name;
-            this.currentDB = node.data.parent;
-            this.schemaCollection = node.data.cols;
-            this.src_location = node.data.location;
-            this.src_name = "source" + new Date().getTime();
-            this.selectedAll = false;
-            this.selection = [];
-            for (let row of this.schemaCollection) {
-              row.selected = false;
-            }
+          } else if (node.data.cols !== undefined) {
+            this.onTableNodeClick(node, this.setSrcTable.bind(this));
           }
         }
       }
@@ -569,17 +567,8 @@ export class AcComponent implements OnInit, AfterViewChecked {
             this.selectionTarget = [];
             this.schemaCollectionTarget = [];
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
-          } else if (node.data.cols) {
-            this.currentTableTarget = node.data.name;
-            this.currentDBTarget = node.data.parent;
-            this.schemaCollectionTarget = node.data.cols;
-            this.tgt_location = node.data.location;
-            this.tgt_name = "target" + new Date().getTime();
-            this.selectedAllTarget = false;
-            this.selectionTarget = [];
-            for (let row of this.schemaCollectionTarget) {
-              row.selected = false;
-            }
+          } else if (node.data.cols !== undefined) {
+            this.onTableNodeClick(node, this.setTargetTable.bind(this));
           }
         }
       }
@@ -655,44 +644,132 @@ export class AcComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit() {
-    var allDataassets = this.serviceService.config.uri.dataassetlist;
-    this.http.get(allDataassets).subscribe(data => {
+    let allDatabases = this.serviceService.config.uri.dblist;
+    let getTableNames = this.serviceService.config.uri.tablenames;
+
+    this.http.get(allDatabases).subscribe((databases: Array<string>) => {
       this.nodeList = new Array();
+      this.nodeListTarget = this.nodeList;  // share same model instead of copying(?)
       let i = 1;
-      this.data = data;
-      for (let db in this.data) {
-        let new_node = new node();
-        new_node.name = db;
-        new_node.id = i;
-        new_node.isExpanded = true;
-        i++;
-        new_node.children = new Array();
-        for (let i = 0; i < this.data[db].length; i++) {
-          let new_child = new node();
-          new_child.name = this.data[db][i]["tableName"];
-          new_node.children.push(new_child);
-          new_child.isExpanded = false;
-          new_child.location = this.data[db][i]["sd"]["location"];
-          new_child.parent = db;
-          new_child.cols = Array<Col>();
-          for (let j = 0; j < this.data[db][i]["sd"]["cols"].length; j++) {
-            let new_col = new Col(
-              this.data[db][i]["sd"]["cols"][j].name,
-              this.data[db][i]["sd"]["cols"][j].type,
-              this.data[db][i]["sd"]["cols"][j].comment,
-              false
-            );
-            new_child.cols.push(new_col);
-          }
-        }
-        this.nodeList.push(new_node);
+      let pending = databases.length;
+      if (databases.length > 10) {
+        this.options.animateExpand = false;
+        this.updateTrees();
       }
-      this.nodeListTarget = JSON.parse(JSON.stringify(this.nodeList));
+      for (let dbName of databases) {
+        let dbNode = new node();
+        dbNode.name = dbName;
+        dbNode.id = i++;
+        dbNode.isExpanded = false;
+        dbNode.children = new Array();
+        let params = new HttpParams({fromString: "db="+dbName});
+        this.http.get(getTableNames, {params: params}).subscribe((tables: Array<string>) => {
+            for (let tableName of tables) {
+              let tableNode = new node();
+              tableNode.name = tableName;
+              dbNode.children.push(tableNode);
+              tableNode.isExpanded = true;
+              tableNode.location = null;
+              tableNode.parent = dbName;
+              tableNode.cols = null;
+            }
+            pending -= 1;
+            if (pending == 0) {
+              this.updateTrees();
+            }
+          },
+          () => {
+            pending -= 1;
+            if (pending == 0) {
+              this.updateTrees();
+            }
+          });
+        this.nodeList.push(dbNode);
+      }
     });
     this.src_size = "1day";
     this.tgt_size = "1day";
     this.src_timezone = this.srcconfig.timezone;
     this.tgt_timezone = this.tgtconfig.timezone;
+  }
+
+  updateTrees() {
+    if (this.currentStep == 1) {
+      this.tree.treeModel.update();
+    } else if (this.currentStep == 2) {
+      this.tgtTree.treeModel.update();
+    }
+  }
+
+  onTableNodeClick(treeNode: ITreeNode, callback) {
+    let node: node = treeNode.data;
+    if (node.cols == null) {
+      let getTable = this.serviceService.config.uri.dbtable;
+      let dbName = node.parent;
+      let tableName = node.name;
+      let params = new HttpParams({fromString: "db="+dbName+"&table="+tableName});
+      this.http.get(getTable, {params: params}).subscribe(data => {
+        node.location = data["sd"]["location"];
+        node.cols = Array<Col>();
+        for (let j = 0; j < data["sd"]["cols"].length; j++) {
+          let new_col = new Col(
+            data["sd"]["cols"][j].name,
+            data["sd"]["cols"][j].type,
+            data["sd"]["cols"][j].comment,
+            false
+          );
+          node.cols.push(new_col);
+        }
+        callback(treeNode);
+      })
+    } else {
+      callback(treeNode);
+    }
+  }
+
+  setSrcTable(node: ITreeNode) {
+    this.currentTable = node.data.name;
+    this.currentDB = node.data.parent;
+    this.schemaCollection = node.data.cols;
+    this.src_location = node.data.location;
+    this.src_name = "source" + new Date().getTime();
+    this.selectedAll = false;
+    this.selection = [];
+    for (let row of this.schemaCollection) {
+      row.selected = false;
+    }
+  }
+
+  setTargetTable(node: ITreeNode) {
+    this.currentTableTarget = node.data.name;
+    this.currentDBTarget = node.data.parent;
+    this.schemaCollectionTarget = node.data.cols;
+    this.tgt_location = node.data.location;
+    this.tgt_name = "target" + new Date().getTime();
+    this.selectedAllTarget = false;
+    this.selectionTarget = [];
+    for (let row of this.schemaCollectionTarget) {
+      row.selected = false;
+    }
+  }
+
+  onKeyPress(event, query, tree) {
+    if (event.keyCode == 13) {
+      event.preventDefault();
+      this.onSearch(query, tree);
+    }
+  }
+
+  onSearch(query, tree) {
+    tree.treeModel.filterNodes((node) => {
+      let name;
+      if (node.data.children !== undefined) {
+        name = node.data.name + ".";
+      } else {
+        name = node.parent.data.name + "." + node.data.name;
+      }
+      return name.indexOf(query) >= 0;
+    });
   }
 
   ngAfterViewChecked() {
