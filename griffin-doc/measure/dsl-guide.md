@@ -18,15 +18,15 @@ under the License.
 -->
 
 # Apache Griffin DSL Guide
-Griffin DSL is designed for DQ measurement, as a SQL-like language, trying to describe the DQ domain request.
+Griffin DSL is designed for DQ measurement, as a SQL-like language, which describes the DQ domain request.
 
 ## Griffin DSL Syntax Description
-Griffin DSL is SQL-like, case insensitive, and easy to learn.
+Griffin DSL syntax is easy to learn as it's SQL-like, case insensitive.
 
 ### Supporting process
-- logical operation: not, and, or, in, between, like, is null, is nan, =, !=, <>, <=, >=, <, >
-- mathematical operation: +, -, *, /, %
-- sql statement: as, where, group by, having, order by, limit
+- logical operation: `not, and, or, in, between, like, is null, is nan, =, !=, <>, <=, >=, <, >`
+- mathematical operation: `+, -, *, /, %`
+- sql statement: `as, where, group by, having, order by, limit`
 
 ### Keywords
 - `null, nan, true, false`
@@ -57,7 +57,7 @@ Griffin DSL is SQL-like, case insensitive, and easy to learn.
 	e.g. `*`, `source.*`, `target.*`
 - **field selection**: field name or with data source name ahead.  
 	e.g. `source.age`, `target.name`, `user_id`
-- **index selection**: interget between square brackets "[]" with field name ahead.  
+- **index selection**: integer between square brackets "[]" with field name ahead.  
 	e.g. `source.attributes[3]`
 - **function selection**: function name with brackets "()", with field name ahead or not.  
 	e.g. `count(*)`, `*.count()`, `source.user_id.count()`, `max(source.age)`
@@ -121,10 +121,6 @@ Accuracy rule expression in Griffin DSL is a logical expression, telling the map
 Profiling rule expression in Griffin DSL is a sql-like expression, with select clause ahead, following optional from clause, where clause, group-by clause, order-by clause, limit clause in order.  
 	e.g. `source.gender, source.id.count() where source.age > 20 group by source.gender`, `select country, max(age), min(age), count(*) as cnt from source group by country order by cnt desc limit 5`
 
-### Uniqueness Rule
-Uniqueness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is unique.  
-	e.g. `name, age`, `name, (age + 1) as next_age`
-
 ### Distinctness Rule
 Distinctness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is distinct.
     e.g. `name, age`, `name, (age + 1) as next_age`
@@ -154,21 +150,6 @@ For example, the dsl rule is `source.cntry, source.id.count(), source.age.max() 
 - **profiling sql rule**: `SELECT source.cntry, count(source.id), max(source.age) FROM source GROUP BY source.cntry`, save as table `profiling`.  
 
 After the translation, the metrics will be persisted in table `profiling`.
-
-### Uniqueness
-For uniqueness, or called duplicate, is to find out the duplicate items of data, and rollup the items count group by duplicate times.
-For example, the dsl rule is `name, age`, which represents the duplicate requests, in this case, source and target are the same data set. After the translation, the sql rule is as below:
-- **get distinct items from source**: `SELECT name, age FROM source`, save as table `src`.
-- **get all items from target**: `SELECT name, age FROM target`, save as table `tgt`.
-- **join two tables**: `SELECT src.name, src.age FROM tgt RIGHT JOIN src ON coalesce(src.name, '') = coalesce(tgt.name, '') AND coalesce(src.age, '') = coalesce(tgt.age, '')`, save as table `joined`.
-- **get items duplication**: `SELECT name, age, (count(*) - 1) AS dup FROM joined GROUP BY name, age`, save as table `grouped`.
-- **get total metric**: `SELECT count(*) FROM source`, save as table `total_metric`.
-- **get unique record**: `SELECT * FROM grouped WHERE dup = 0`, save as table `unique_record`.
-- **get unique metric**: `SELECT count(*) FROM unique_record`, save as table `unique_metric`.
-- **get duplicate record**: `SELECT * FROM grouped WHERE dup > 0`, save as table `dup_record`.
-- **get duplicate metric**: `SELECT dup, count(*) AS num FROM dup_records GROUP BY dup`, save as table `dup_metric`.
-
-After the translation, the metrics will be persisted in table `dup_metric`.
 
 ### Distinctness
 For distinctness, is to find out the duplicate items of data, the same as uniqueness in batch mode, but with some differences in streaming mode.
