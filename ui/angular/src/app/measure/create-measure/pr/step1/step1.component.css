@@ -138,3 +138,7 @@ table > tbody > tr > td, .table > thead > tr > th {
   word-wrap: break-word;
   min-width: 80px;
 }
+
+.select-schema .search-query {
+  width: 100%;
+}

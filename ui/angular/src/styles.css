@@ -875,7 +875,7 @@ a:hover {
   margin-bottom: 0;
 }
 
-.navbar-search .search-query {
+.search-query {
   padding: 4px 9px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
@@ -895,20 +895,20 @@ a:hover {
   transition: none;
 }
 
-.navbar-search .search-query:disabled {
+.search-query:disabled {
   background-color: #626262;
   cursor: not-allowed;
 }
 
-.navbar-search .search-query:-moz-placeholder {
+.search-query:-moz-placeholder {
   color: #cccccc;
 }
 
-.navbar-search .search-query::-webkit-input-placeholder {
+.search-query::-webkit-input-placeholder {
   color: #cccccc;
 }
 
-.navbar-search .search-query:focus, .navbar-search .search-query.focused {
+.search-query:focus, .search-query.focused {
   padding: 5px 10px;
   color: #333333;
   text-shadow: 0 1px 0 #ffffff;

@@ -23,6 +23,7 @@ import javax.annotation.PreDestroy;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,10 +53,10 @@ public class HiveMetaStoreProxy {
     @Value("${hive.hmshandler.retry.interval}")
     private String interval;
 
-    private HiveMetaStoreClient client = null;
+    private IMetaStoreClient client = null;
 
     @Bean
-    public HiveMetaStoreClient initHiveMetastoreClient() {
+    public IMetaStoreClient initHiveMetastoreClient() {
         HiveConf hiveConf = new HiveConf();
         hiveConf.set("hive.metastore.local", "false");
         hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES,
@@ -64,7 +65,7 @@ public class HiveMetaStoreProxy {
         hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);
         try {
-            client = new HiveMetaStoreClient(hiveConf);
+            client = HiveMetaStoreClient.newSynchronizedClient(new HiveMetaStoreClient(hiveConf));
         } catch (Exception e) {
             LOGGER.error("Failed to connect hive metastore. {}", e);
         }

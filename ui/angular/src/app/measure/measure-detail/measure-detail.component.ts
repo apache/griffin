@@ -96,7 +96,7 @@ export class MeasureDetailComponent implements OnInit {
             this.ruleDes = this.ruleData["rule.description"].details
           }
           this.fetchData("source", 0);
-          if (this.ruleData.type === "ACCURACY") {
+          if (this.ruleData.type.toLowerCase() === "accuracy") {
             this.fetchData("target", 1);
           } else {
             this.targetDB = "";
