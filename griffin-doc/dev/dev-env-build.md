@@ -66,6 +66,12 @@ public BACKEND_SERVER = 'http://localhost:8080';
 ```
 Making the change, you can start service module locally, and test your UI module using local service.
 
+After that, you can run local server using following command:
+```
+cd ui/angular 
+../angular/node_modules/.bin/ng serve --port 8080
+```
+
 ### For measure module
 If you only wanna develop the measure module, you can ignore both of service or UI module.
 You can test your measure JAR built in the docker container, using the existed spark environment.

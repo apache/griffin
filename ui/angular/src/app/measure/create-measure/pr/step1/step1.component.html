@@ -21,9 +21,11 @@ under the License.
     <label class="stepDesc">This step lets you select the single source of truth for data quality comparision with a
       target source.</label>
     <div class="container-fluid">
-      <div class="col-md-4 col-lg-4 col-sm-4">
+      <div class="col-md-4 col-lg-4 col-sm-4 select-schema">
         <fieldset>
           <legend>Please select schema</legend>
+          <input #schemaSearchBox id="schemaSearchBox" type="text" class="search-query" placeholder="Search..."
+                 (keyup.enter)="onSearch(schemaSearchBox.value)">
           <tree-root [nodes]="step1.nodeList" [options]="options"></tree-root>
         </fieldset>
       </div>
@@ -35,7 +37,7 @@ under the License.
           <div class="y-scrollable">
             <div style="margin-top:10px;">
               <label>View schema:</label>
-              <i style="color:#fff;font-weight: bold;">{{step1.currentDBstr}}{{step1.currentTable}}
+              <i style="color:#fff;font-weight: bold;">{{step1.currentDBStr}}{{step1.currentTable}}
               </i>
             </div>
             <div style="margin-top:5px;">
