@@ -134,8 +134,8 @@ export class BatchComponent implements OnInit, AfterViewChecked {
       return false;
     }
     this.measureid = this.getMeasureId();
-    let time = new Date().getTimezoneOffset() / 60;
-    let timezone = "GMT" + time + ":00";
+    let time = -(new Date().getTimezoneOffset() / 60);
+    let timezone = "GMT" + (time >= 0 ? "+"+time : time) + ":00";
     this.newJob = {
       "job.name": this.jobname,
       "job.type": "batch",
