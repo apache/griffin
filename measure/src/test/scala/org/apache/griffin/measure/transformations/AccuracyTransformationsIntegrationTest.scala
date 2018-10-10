@@ -28,7 +28,7 @@ import org.apache.griffin.measure.context.{ContextId, DQContext}
 import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 
-case class AccuracyResult(total: Long, miss: Long, matched: Long)
+case class AccuracyResult(total: Long, miss: Long, matched: Long, matchedFraction: Double)
 
 class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with DataFrameSuiteBase {
   import spark.implicits._
@@ -39,29 +39,45 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
   override def beforeAll(): Unit = {
     super.beforeAll()
 
+    dropTables()
     createPersonTable()
     createEmptyPersonTable()
 
     spark.conf.set("spark.sql.crossJoin.enabled", "true")
   }
 
+  override def afterAll(): Unit = {
+    dropTables()
+    super.afterAll()
+  }
+
   "accuracy" should "basically work" in {
-    checkAccuracy(sourceName = PERSON_TABLE, targetName = PERSON_TABLE, expectedResult = AccuracyResult(2, 0, 2))
+    checkAccuracy(
+      sourceName = PERSON_TABLE,
+      targetName = PERSON_TABLE,
+      expectedResult = AccuracyResult(total = 2, miss = 0, matched = 2, matchedFraction = 1.0))
   }
 
   "accuracy" should "work with empty target" in {
-    checkAccuracy(sourceName = PERSON_TABLE, targetName = EMPTY_PERSON_TABLE, expectedResult = AccuracyResult(2, 2, 0))
+    checkAccuracy(
+      sourceName = PERSON_TABLE,
+      targetName = EMPTY_PERSON_TABLE,
+      expectedResult = AccuracyResult(total = 2, miss = 2, matched = 0, matchedFraction = 0.0)
+    )
   }
 
   "accuracy" should "work with empty source" in {
-    checkAccuracy(sourceName = EMPTY_PERSON_TABLE, targetName = PERSON_TABLE, expectedResult = AccuracyResult(0, 0, 0))
+    checkAccuracy(
+      sourceName = EMPTY_PERSON_TABLE,
+      targetName = PERSON_TABLE,
+      expectedResult = AccuracyResult(total = 0, miss = 0, matched = 0, matchedFraction = 1.0))
   }
 
   "accuracy" should "work with empty source and target" in {
     checkAccuracy(
       sourceName = EMPTY_PERSON_TABLE,
       targetName = EMPTY_PERSON_TABLE,
-      expectedResult = AccuracyResult(0, 0, 0))
+      expectedResult = AccuracyResult(total = 0, miss = 0, matched = 0, matchedFraction = 1.0))
   }
 
   private def checkAccuracy(sourceName: String, targetName: String, expectedResult: AccuracyResult) = {
@@ -108,7 +124,7 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
     val personCsvPath = getClass.getResource("/hive/person_table.csv").getFile
 
     spark.sql(
-      s"CREATE TABLE IF NOT EXISTS ${PERSON_TABLE} " +
+      s"CREATE TABLE ${PERSON_TABLE} " +
         "( " +
         "  name String," +
         "  age int " +
@@ -122,7 +138,7 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
 
   private def createEmptyPersonTable(): Unit = {
     spark.sql(
-      s"CREATE TABLE IF NOT EXISTS ${EMPTY_PERSON_TABLE} " +
+      s"CREATE TABLE ${EMPTY_PERSON_TABLE} " +
         "( " +
         "  name String," +
         "  age int " +
@@ -132,6 +148,11 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
     )
 
     spark.sql(s"select * from ${EMPTY_PERSON_TABLE}").show()
+  }
+
+  private def dropTables(): Unit = {
+    spark.sql(s"DROP TABLE IF EXISTS ${PERSON_TABLE} ")
+    spark.sql(s"DROP TABLE IF EXISTS ${EMPTY_PERSON_TABLE} ")
   }
 
   private def getDqContext(dataSourcesParam: Seq[DataSourceParam], name: String = "test-context"): DQContext = {
