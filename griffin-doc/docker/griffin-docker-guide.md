@@ -18,7 +18,7 @@ under the License.
 -->
 
 # Apache Griffin Docker Guide
-Griffin docker images are pre-built on docker hub, users can pull them to try apache griffin in docker.
+Griffin docker images are pre-built on docker hub, users can pull them to try Apache Griffin in docker.
 
 ## Preparation
 
@@ -33,7 +33,7 @@ Griffin docker images are pre-built on docker hub, users can pull them to try ap
     For other platforms, please reference to this link from elastic.co
     [max_map_count kernel setting](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
     
-3. Pull apache griffin pre-built docker images, but if you access docker repository easily(NOT in China).
+3. Pull Apache Griffin pre-built docker images, but if you access docker repository easily(NOT in China).
     ```
     docker pull apachegriffin/griffin_spark2:0.3.0
     docker pull apachegriffin/elasticsearch
@@ -47,15 +47,15 @@ Griffin docker images are pre-built on docker hub, users can pull them to try ap
     docker pull registry.docker-cn.com/apachegriffin/kafka
     docker pull zookeeper:3.5
     ```
-   The docker images are the griffin environment images.
-    - `apachegriffin/griffin_spark2`: This image contains mysql, hadoop, hive, spark, livy, apache griffin service, apache griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and apache griffin service.
+   The docker images are the Apache Griffin environment images.
+    - `apachegriffin/griffin_spark2`: This image contains mysql, hadoop, hive, spark, livy, Apache Griffin service, Apache Griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and Apache Griffin service.
     - `apachegriffin/elasticsearch`: This image is based on official elasticsearch, adding some configurations to enable cors requests, to provide elasticsearch service for metrics persist.
     - `apachegriffin/kafka`: This image contains kafka 0.8, and some demo streaming data, to provide streaming data source in streaming mode.
     - `zookeeper:3.5`: This image is official zookeeper, to provide zookeeper service in streaming mode.
 
-### How to use griffin docker images in batch mode
+### How to use Apache Griffin docker images in batch mode
 1. Copy [docker-compose-batch.yml](compose/docker-compose-batch.yml) to your work path.
-2. In your work path, start docker containers by using docker compose, wait for about one minute, then apache griffin service is ready.
+2. In your work path, start docker containers by using docker compose, wait for about one minute, then Apache Griffin service is ready.
     ```bash
     $ docker-compose -f docker-compose-batch.yml up -d
     ```
@@ -66,12 +66,12 @@ Griffin docker images are pre-built on docker hub, users can pull them to try ap
     bfec3192096d        apachegriffin/griffin_spark2:0.3.0   "/etc/bootstrap-al..."   5 hours ago         Up 5 hours          6066/tcp, 8030-8033/tcp, 8040/tcp, 9000/tcp, 10020/tcp, 19888/tcp, 27017/tcp, 49707/tcp, 50010/tcp, 50020/tcp, 50070/tcp, 50075/tcp, 50090/tcp, 0.0.0.0:32122->2122/tcp, 0.0.0.0:33306->3306/tcp, 0.0.0.0:35432->5432/tcp, 0.0.0.0:38042->8042/tcp, 0.0.0.0:38080->8080/tcp, 0.0.0.0:38088->8088/tcp, 0.0.0.0:38998->8998/tcp, 0.0.0.0:39083->9083/tcp   griffin
     fb9d04285070        apachegriffin/elasticsearch          "/docker-entrypoin..."   5 hours ago         Up 5 hours          0.0.0.0:39200->9200/tcp, 0.0.0.0:39300->9300/tcp                                                                                                                                                                                                                                                                                                         es
     ```
-3. Now you can try apache griffin APIs by using any http client, here we use [postman](https://github.com/postmanlabs/postman-app-support) as example.
+3. Now you can try Apache Griffin APIs by using any http client, here we use [postman](https://github.com/postmanlabs/postman-app-support) as example.
 We have prepared two postman configuration files, you can download them from [json files](../service/postman).<br><br>For sake of usage, you need to import two files into postman firstly.<br><br>
 ![import ](../img/devguide/import_postman_conf.png)<br><br>
 And change the initial environment `BASE_PATH` value to `<your local IP address>:38080`.<br><br>
 ![update env](../img/devguide/revise_postman_env.png)<br><br>
-4. You can try the api `Basic -> Get griffin version`, to make sure griffin service has started up.<br><br>
+4. You can try the api `Basic -> Get griffin version`, to make sure Apache Griffin service has started up.<br><br>
 ![update env](../img/devguide/call_postman.png)<br><br>
 5. Add an accuracy measure through api `Measures -> Add measure`, to create a measure in apache griffin.<br><br>
 ![update env](../img/devguide/add-measure.png)<br><br>
@@ -82,13 +82,13 @@ And change the initial environment `BASE_PATH` value to `<your local IP address>
     curl -XGET '<your local IP address>:39200/griffin/accuracy/_search?pretty&filter_path=hits.hits._source' -d '{"query":{"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}]}'
     ```
 
-### How to use griffin docker images in streaming mode
+### How to use Apache Griffin docker images in streaming mode
 1. Copy [docker-compose-streaming.yml](compose/docker-compose-streaming.yml) to your work path.
-2. In your work path, start docker containers by using docker compose, wait for about one minutes, then apache griffin service is ready.
+2. In your work path, start docker containers by using docker compose, wait for about one minutes, then Apache Griffin service is ready.
     ```
     docker-compose -f docker-compose-streaming.yml up -d
     ```
-3. Enter the griffin docker container.
+3. Enter the Apache Griffin docker container.
     ```
     docker exec -it griffin bash
     ```
