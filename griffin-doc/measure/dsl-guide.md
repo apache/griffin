@@ -20,7 +20,7 @@ under the License.
 # Apache Griffin DSL Guide
 Griffin DSL is designed for DQ measurement, as a SQL-like language, which describes the DQ domain request.
 
-## Griffin DSL Syntax Description
+## Apache Griffin DSL Syntax Description
 Griffin DSL syntax is easy to learn as it's SQL-like, case insensitive.
 
 ### Supporting process
@@ -100,7 +100,7 @@ Griffin DSL syntax is easy to learn as it's SQL-like, case insensitive.
 	e.g. `max(source.age, target.age)`, `count(*)`
 
 ### Clause
-- **select clause**: the result columns like sql select clause, we can ignore the word "select" in Griffin DSL.  
+- **select clause**: the result columns like sql select clause, we can ignore the word "select" in Apache Griffin DSL.  
 	e.g. `select user_id.count(), age.max() as max`, `source.user_id.count() as cnt, source.age.min()`
 - **from clause**: the table name like sql from clause, in which the data source name must be one of data source names or the output table name of the former rule steps, we can ignore this clause by configoring the data source name.  
 	e.g. `from source`, ``from `target` ``
@@ -114,28 +114,28 @@ Griffin DSL syntax is easy to learn as it's SQL-like, case insensitive.
 	e.g. `limit 5`
 
 ### Accuracy Rule
-Accuracy rule expression in Griffin DSL is a logical expression, telling the mapping relation between data sources.  
+Accuracy rule expression in Apache Griffin DSL is a logical expression, telling the mapping relation between data sources.  
 	e.g. `source.id = target.id and source.name = target.name and source.age between (target.age, target.age + 5)`
 
 ### Profiling Rule
-Profiling rule expression in Griffin DSL is a sql-like expression, with select clause ahead, following optional from clause, where clause, group-by clause, order-by clause, limit clause in order.  
+Profiling rule expression in Apache Griffin DSL is a sql-like expression, with select clause ahead, following optional from clause, where clause, group-by clause, order-by clause, limit clause in order.  
 	e.g. `source.gender, source.id.count() where source.age > 20 group by source.gender`, `select country, max(age), min(age), count(*) as cnt from source group by country order by cnt desc limit 5`
 
 ### Distinctness Rule
-Distinctness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is distinct.
+Distinctness rule expression in Apache Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is distinct.
     e.g. `name, age`, `name, (age + 1) as next_age`
 
 ### Timeliness Rule
-Timeliness rule expression in Griffin DSL is a list of selection expressions separated by comma, indicates the input time and output time (calculate time as default if not set).  
+Timeliness rule expression in Apache Griffin DSL is a list of selection expressions separated by comma, indicates the input time and output time (calculate time as default if not set).  
 	e.g. `ts`, `ts, end_ts`
 
-## Griffin DSL translation to SQL
-Griffin DSL is defined for DQ measurement, to describe DQ domain problem.  
-Actually, in Griffin, we get Griffin DSL rules, translate them into spark-sql rules for calculation in spark-sql engine.  
+## Apache Griffin DSL translation to SQL
+Apache Griffin DSL is defined for DQ measurement, to describe DQ domain problem.  
+Actually, in Apache Griffin, we get Apache Griffin DSL rules, translate them into spark-sql rules for calculation in spark-sql engine.  
 In DQ domain, there're multiple dimensions, we need to translate them in different ways.
 
 ### Accuracy
-For accuracy, we need to get the match count between source and target, the rule describes the mapping relation between data sources. Griffin needs to translate the dsl rule into multiple sql rules.  
+For accuracy, we need to get the match count between source and target, the rule describes the mapping relation between data sources. Apache Griffin needs to translate the dsl rule into multiple sql rules.  
 For example, the dsl rule is `source.id = target.id and source.name = target.name`, which represents the match condition of accuracy. After the translation, the sql rules are as below:  
 - **get miss items from source**: `SELECT source.* FROM source LEFT JOIN target ON coalesce(source.id, '') = coalesce(target.id, '') and coalesce(source.name, '') = coalesce(target.name, '') WHERE (NOT (source.id IS NULL AND source.name IS NULL)) AND (target.id IS NULL AND target.name IS NULL)`, save as table `miss_items`.
 - **get miss count**: `SELECT COUNT(*) AS miss FROM miss_items`, save as table `miss_count`.
@@ -175,7 +175,7 @@ For example, the dsl rule is `ts, out_ts`, the first column means the input time
 After the translation, the metrics will be persisted in table `time_metric`.
 
 ## Alternative Rules
-You can simply use Griffin DSL rule to describe your problem in DQ domain, for some complicate requirement, you can also use some alternative rules supported by Griffin.  
+You can simply use Griffin DSL rule to describe your problem in DQ domain, for some complicate requirement, you can also use some alternative rules supported by Apache Griffin.  
 
 ### Spark sql
 Griffin supports spark-sql directly, you can write rule in sql like this:  
@@ -201,12 +201,12 @@ Griffin supports some other operations on data frame in spark, like converting j
 }
 ```
 Griffin will do the operation to extract json strings.  
-Actually, you can also extend the df-opr engine and df-opr adaptor in Griffin to support more types of data frame operations.  
+Actually, you can also extend the df-opr engine and df-opr adaptor in Apache Griffin to support more types of data frame operations.  
 
 ## Tips
 Griffin engine runs on spark, it might work in two phases, pre-proc phase and run phase.  
-- **Pre-proc phase**: Griffin calculates data source directly, to get appropriate data format, as a preparation for DQ calculation. In this phase, you can use df-opr and spark-sql rules.  
+- **Pre-proc phase**: Apache Griffin calculates data source directly, to get appropriate data format, as a preparation for DQ calculation. In this phase, you can use df-opr and spark-sql rules.  
 After preparation, to support streaming DQ calculation, a timestamp column will be added in each row of data, so the data frame in run phase contains an extra column named "__tmst".  
-- **Run phase**: Griffin calculates with prepared data, to get the DQ metrics. In this phase, you can use griffin-dsl, spark-sql rules, and a part of df-opr rules.  
-For griffin-dsl rule, griffin translates it into spark-sql rule with a group-by condition for column "__tmst", it's useful for especially streaming DQ calculation.  
-But for spark-sql rule, griffin use it directly, you need to add the "__tmst" column in your spark-sql rule explicitly, or you can't get correct metrics result after calculation.
+- **Run phase**: Apache Griffin calculates with prepared data, to get the DQ metrics. In this phase, you can use griffin-dsl, spark-sql rules, and a part of df-opr rules.  
+For griffin-dsl rule, apache griffin translates it into spark-sql rule with a group-by condition for column "__tmst", it's useful for especially streaming DQ calculation.  
+But for spark-sql rule, apache griffin use it directly, you need to add the "__tmst" column in your spark-sql rule explicitly, or you can't get correct metrics result after calculation.
