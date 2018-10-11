@@ -95,7 +95,7 @@ export class ConfigurationComponent implements OnInit {
     ["UTC+12(PSTB)", "GMT+12"],
     ["UTC+12:45(CIT)", "GMT+12:45"],
     ["UTC+13(PSTC)", "GMT+13"],
-    ["UTC+14(PSTD)", "GMT+15"],
+    ["UTC+14(PSTD)", "GMT+14"],
   ]);
   timezone: string;
 

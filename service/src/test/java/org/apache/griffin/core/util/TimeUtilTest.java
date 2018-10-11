@@ -22,6 +22,7 @@ package org.apache.griffin.core.util;
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.junit.Test;
@@ -113,7 +114,7 @@ public class TimeUtilTest {
 
     @Test
     public void testGetTimeZone() {
-        HashMap<String, String> tests = new HashMap<>();
+        Map<String, String> tests = new HashMap<>();
         tests.put("", TimeZone.getDefault().getID());
         // standard cases
         tests.put("GMT", "GMT");
@@ -134,12 +135,10 @@ public class TimeUtilTest {
         tests.put("UTC-1", "GMT");
         tests.put("UTC-1:00", "GMT");
         tests.put("UTC-01:00", "GMT");
-        for (HashMap.Entry<String, String> e: tests.entrySet()) {
-            String input = e.getKey();
-            String actual = TimeUtil.getTimeZone(e.getKey()).getID();
-            String expected = e.getValue();
+        tests.forEach((input, expected) -> {
+            String actual = TimeUtil.getTimeZone(input).getID();
             assertEquals(String.format("For input: %s", input), actual, expected);
-        }
+        });
     }
 
 
