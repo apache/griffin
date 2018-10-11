@@ -19,54 +19,91 @@ under the License.
 
 package org.apache.griffin.core.config;
 
+import static org.apache.griffin.core.util.FileUtil.getFilePath;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
+import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
+
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.apache.griffin.core.util.FileUtil.getFilePath;
-import static org.apache.griffin.core.util.JsonUtil.toEntity;
-import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 public class EnvConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EnvConfig.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(EnvConfig.class);
     public static String ENV_BATCH;
     public static String ENV_STREAMING;
 
     /**
-     * read env config from resource
+     * read env config from resource.
      *
      * @param path resource path
      * @return String
      * @throws IOException io exception
      */
-    private static String readEnvFromResource(String path) throws IOException {
+    private static String readEnvFromResource(String path)
+            throws IOException {
         if (path == null) {
             LOGGER.warn("Parameter path is null.");
             return null;
         }
-        //Be careful, here we use getInputStream() to convert path file to stream.
-        // It'll cause FileNotFoundException if you use  getFile() to convert path file to File Object
+        // Be careful, here we use getInputStream() to convert
+        // path file to stream.
+        // It'll cause FileNotFoundException if you use  getFile()
+        // to convert path file to File Object
         InputStream in = new ClassPathResource(path).getInputStream();
-        Object result = toEntity(in, new TypeReference<Object>() {
-        });
+        Object result = null;
+        try {
+            result = toEntity(in, new TypeReference<Object>() {
+            });
+        } finally {
+            in.close();
+        }
         return toJsonWithFormat(result);
     }
 
     /**
-     * read batch env
+     * read env config from resource.
+     *
+     * @param path resource path
+     * @return String
+     * @throws IOException io exception
+     */
+    private static String readEnvFromAbsolutePath(String path)
+            throws IOException {
+        if (path == null) {
+            LOGGER.warn("Parameter path is null.");
+            return null;
+        }
+
+        FileInputStream in = new FileInputStream(path);
+        Object result = null;
+        try {
+            result = toEntity(in, new TypeReference<Object>() {
+            });
+        } finally {
+            in.close();
+        }
+        return toJsonWithFormat(result);
+    }
+
+    /**
+     * read batch env.
      *
      * @param name        batch env name that you need to search
-     * @param defaultPath If there is no target file in location directory, it'll read from default path.
+     * @param defaultPath If there is no target file in location directory,
+     *                    it'll read from default path.
      * @param location    env path that you configure in application.properties
      * @return String
      * @throws IOException io exception
      */
-    static String getBatchEnv(String name, String defaultPath, String location) throws IOException {
+    static String getBatchEnv(String name, String defaultPath, String location)
+            throws IOException {
         if (ENV_BATCH != null) {
             return ENV_BATCH;
         }
@@ -75,15 +112,16 @@ public class EnvConfig {
             path = defaultPath;
             ENV_BATCH = readEnvFromResource(path);
         } else {
-            FileInputStream in = new FileInputStream(path);
-            ENV_BATCH = toJsonWithFormat(toEntity(in, new TypeReference<Object>() {
-            }));
+            ENV_BATCH = readEnvFromAbsolutePath(path);
         }
         LOGGER.info(ENV_BATCH);
         return ENV_BATCH;
     }
 
-    static String getStreamingEnv(String name, String defaultPath, String location) throws IOException {
+    static String getStreamingEnv(String name,
+                                  String defaultPath,
+                                  String location)
+            throws IOException {
         if (ENV_STREAMING != null) {
             return ENV_STREAMING;
         }
@@ -92,9 +130,7 @@ public class EnvConfig {
             path = defaultPath;
             ENV_STREAMING = readEnvFromResource(path);
         } else {
-            FileInputStream in = new FileInputStream(path);
-            ENV_STREAMING = readEnvFromResource(toEntity(in, new TypeReference<Object>() {
-            }));
+            ENV_STREAMING = readEnvFromAbsolutePath(path);
         }
         LOGGER.info(ENV_STREAMING);
         return ENV_STREAMING;

@@ -19,22 +19,19 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
+
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.job.repo.VirtualJobRepo;
 import org.apache.griffin.core.measure.entity.ExternalMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.ExternalMeasureRepo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.apache.griffin.core.util.MeasureUtil.validateMeasure;
-
 @Component("externalOperation")
 public class ExternalMeasureOperatorImpl implements MeasureOperator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalMeasureOperatorImpl.class);
 
     @Autowired
     private ExternalMeasureRepo measureRepo;
@@ -57,8 +54,10 @@ public class ExternalMeasureOperatorImpl implements MeasureOperator {
     public Measure update(Measure measure) {
         ExternalMeasure latestMeasure = (ExternalMeasure) measure;
         validateMeasure(latestMeasure);
-        ExternalMeasure originMeasure = measureRepo.findOne(latestMeasure.getId());
-        VirtualJob vj = genVirtualJob(latestMeasure, originMeasure.getVirtualJob());
+        ExternalMeasure originMeasure = measureRepo.findOne(
+                latestMeasure.getId());
+        VirtualJob vj = genVirtualJob(latestMeasure,
+                originMeasure.getVirtualJob());
         latestMeasure.setVirtualJob(vj);
         measure = measureRepo.save(latestMeasure);
         return measure;

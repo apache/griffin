@@ -20,17 +20,19 @@ package org.apache.griffin.measure.datasource.cache
 
 import java.util.concurrent.TimeUnit
 
-import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.context.TimeRange
-import org.apache.griffin.measure.context.streaming.offset.OffsetCacheClient
-import org.apache.griffin.measure.datasource.TimestampStorage
-import org.apache.griffin.measure.step.builder.ConstantColumns
-import org.apache.griffin.measure.utils.DataFrameUtil._
-import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
+import scala.util.Random
+
 import org.apache.spark.sql._
 
-import scala.util.Random
+import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.context.TimeRange
+import org.apache.griffin.measure.context.streaming.checkpoint.offset.OffsetCheckpointClient
+import org.apache.griffin.measure.datasource.TimestampStorage
+import org.apache.griffin.measure.step.builder.ConstantColumns
+import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
+import org.apache.griffin.measure.utils.DataFrameUtil._
+import org.apache.griffin.measure.utils.ParamUtil._
+
 
 /**
   * data source cache in streaming mode
@@ -38,7 +40,8 @@ import scala.util.Random
   * read data frame from hdfs in calculate phase
   * with update and clean actions for the cache data
   */
-trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long] with Loggable with Serializable {
+trait StreamingCacheClient
+  extends StreamingOffsetCacheable with WithFanIn[Long] with Loggable with Serializable {
 
   val sqlContext: SQLContext
   val param: Map[String, Any]
@@ -46,7 +49,9 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
   val index: Int
 
   val timestampStorage: TimestampStorage
-  protected def fromUntilRangeTmsts(from: Long, until: Long) = timestampStorage.fromUntil(from, until)
+  protected def fromUntilRangeTmsts(from: Long, until: Long) =
+    timestampStorage.fromUntil(from, until)
+
   protected def clearTmst(t: Long) = timestampStorage.remove(t)
   protected def clearTmstsUntil(until: Long) = {
     val outDateTmsts = timestampStorage.until(until)
@@ -67,18 +72,20 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
 
   val filePath: String = param.getString(_FilePath, defFilePath)
   val cacheInfoPath: String = param.getString(_InfoPath, defInfoPath)
-  val readyTimeInterval: Long = TimeUtil.milliseconds(param.getString(_ReadyTimeInterval, "1m")).getOrElse(60000L)
-  val readyTimeDelay: Long = TimeUtil.milliseconds(param.getString(_ReadyTimeDelay, "1m")).getOrElse(60000L)
+  val readyTimeInterval: Long =
+    TimeUtil.milliseconds(param.getString(_ReadyTimeInterval, "1m")).getOrElse(60000L)
+
+  val readyTimeDelay: Long =
+    TimeUtil.milliseconds(param.getString(_ReadyTimeDelay, "1m")).getOrElse(60000L)
+
   val deltaTimeRange: (Long, Long) = {
     def negative(n: Long): Long = if (n <= 0) n else 0
-    case class StringSeq(values:Seq[String])
     param.get(_TimeRange) match {
-      case Some(seq: StringSeq) => {
-        val nseq = seq.values.flatMap(TimeUtil.milliseconds(_))
+      case Some(seq: Seq[String]) =>
+        val nseq = seq.flatMap(TimeUtil.milliseconds(_))
         val ns = negative(nseq.headOption.getOrElse(0))
         val ne = negative(nseq.tail.headOption.getOrElse(0))
         (ns, ne)
-      }
       case _ => (0, 0)
     }
   }
@@ -89,8 +96,8 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
   val _Updatable = "updatable"
   val updatable = param.getBoolean(_Updatable, false)
 
-  val newCacheLock = OffsetCacheClient.genLock(s"${cacheInfoPath}.new")
-  val oldCacheLock = OffsetCacheClient.genLock(s"${cacheInfoPath}.old")
+  val newCacheLock = OffsetCheckpointClient.genLock(s"${cacheInfoPath}.new")
+  val oldCacheLock = OffsetCheckpointClient.genLock(s"${cacheInfoPath}.old")
 
   val newFilePath = s"${filePath}/new"
   val oldFilePath = s"${filePath}/old"
@@ -100,6 +107,11 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
   protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit
   protected def readDataFrame(dfr: DataFrameReader, path: String): DataFrame
 
+  private def readDataFrameOpt(dfr: DataFrameReader, path: String): Option[DataFrame] = {
+    val df = readDataFrame(dfr, path)
+    if (df.count() > 0) Some(df) else None
+  }
+
   /**
     * save data frame in dump phase
     * @param dfOpt    data frame to be saved
@@ -108,7 +120,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
   def saveData(dfOpt: Option[DataFrame], ms: Long): Unit = {
     if (!readOnly) {
       dfOpt match {
-        case Some(df) => {
+        case Some(df) =>
           // cache df
           df.cache
 
@@ -133,10 +145,8 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
 
           // uncache df
           df.unpersist
-        }
-        case _ => {
-          info(s"no data frame to save")
-        }
+        case _ =>
+          info("no data frame to save")
       }
 
       // submit cache time and ready time
@@ -155,7 +165,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
     */
   def readData(): (Option[DataFrame], TimeRange) = {
     // time range: (a, b]
-    val timeRange = OffsetCacheClient.getTimeRange
+    val timeRange = OffsetCheckpointClient.getTimeRange
     val reviseTimeRange = (timeRange._1 + deltaTimeRange._1, timeRange._2 + deltaTimeRange._2)
 
     // read partition info
@@ -164,18 +174,19 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
       s"`${ConstantColumns.tmst}` = ${reviseTimeRange._1}"
     } else {
       info(s"read time range: (${reviseTimeRange._1}, ${reviseTimeRange._2}]")
-      s"`${ConstantColumns.tmst}` > ${reviseTimeRange._1} AND `${ConstantColumns.tmst}` <= ${reviseTimeRange._2}"
+
+      s"`${ConstantColumns.tmst}` > ${reviseTimeRange._1} " +
+        s"AND `${ConstantColumns.tmst}` <= ${reviseTimeRange._2}"
     }
 
     // new cache data
     val newDfOpt = try {
       val dfr = sqlContext.read
-      Some(readDataFrame(dfr, newFilePath).filter(filterStr))
+      readDataFrameOpt(dfr, newFilePath).map(_.filter(filterStr))
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         warn(s"read data source cache warn: ${e.getMessage}")
         None
-      }
     }
 
     // old cache data
@@ -184,12 +195,11 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
       val oldDfPath = s"${oldFilePath}/${idx}"
       try {
         val dfr = sqlContext.read
-        Some(readDataFrame(dfr, oldDfPath).filter(filterStr))
+        readDataFrameOpt(dfr, oldDfPath).map(_.filter(filterStr))
       } catch {
-        case e: Throwable => {
+        case e: Throwable =>
           warn(s"read old data source cache warn: ${e.getMessage}")
           None
-        }
       }
     }
 
@@ -224,12 +234,11 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
     }
     names.filter { name =>
       name match {
-        case regex(value) => {
+        case regex(value) =>
           str2Long(value) match {
             case Some(t) => func(t, bound)
             case _ => false
           }
-        }
         case _ => false
       }
     }.map(name => s"${path}/${name}")
@@ -254,7 +263,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
       // new cache data
       val newCacheCleanTime = if (updatable) readLastProcTime else readCleanTime
       newCacheCleanTime match {
-        case Some(nct) => {
+        case Some(nct) =>
           // clean calculated new cache data
           val newCacheLocked = newCacheLock.lock(-1, TimeUnit.SECONDS)
           if (newCacheLocked) {
@@ -267,16 +276,15 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
               newCacheLock.unlock()
             }
           }
-        }
-        case _ => {
+        case _ =>
           // do nothing
-        }
+          info("should not happen")
       }
 
       // old cache data
       val oldCacheCleanTime = if (updatable) readCleanTime else None
       oldCacheCleanTime match {
-        case Some(oct) => {
+        case Some(oct) =>
           val oldCacheIndexOpt = readOldCacheIndex
           oldCacheIndexOpt.foreach { idx =>
             val oldDfPath = s"${oldFilePath}/${idx}"
@@ -294,10 +302,9 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
               }
             }
           }
-        }
-        case _ => {
+        case _ =>
           // do nothing
-        }
+          info("should not happen")
       }
     }
   }
@@ -309,7 +316,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
   def updateData(dfOpt: Option[DataFrame]): Unit = {
     if (!readOnly && updatable) {
       dfOpt match {
-        case Some(df) => {
+        case Some(df) =>
           // old cache lock
           val oldCacheLocked = oldCacheLock.lock(-1, TimeUnit.SECONDS)
           if (oldCacheLocked) {
@@ -335,10 +342,8 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
               oldCacheLock.unlock()
             }
           }
-        }
-        case _ => {
-          info(s"no data frame to update")
-        }
+        case _ =>
+          info("no data frame to update")
       }
     }
   }
@@ -349,7 +354,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
     */
   def processFinish(): Unit = {
     // next last proc time
-    val timeRange = OffsetCacheClient.getTimeRange
+    val timeRange = OffsetCheckpointClient.getTimeRange
     submitLastProcTime(timeRange._2)
 
     // next clean time
@@ -359,7 +364,7 @@ trait StreamingCacheClient extends StreamingOffsetCacheable with WithFanIn[Long]
 
   // read next clean time
   private def getNextCleanTime(): Long = {
-    val timeRange = OffsetCacheClient.getTimeRange
+    val timeRange = OffsetCheckpointClient.getTimeRange
     val nextCleanTime = timeRange._2 + deltaTimeRange._1
     nextCleanTime
   }

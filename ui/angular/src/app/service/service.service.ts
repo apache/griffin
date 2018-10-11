@@ -16,13 +16,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Injectable } from "@angular/core";
+import {Injectable} from "@angular/core";
 
 @Injectable()
 export class ServiceService {
-  constructor() {}
+  constructor() {
+  }
+
   // public BACKEND_SERVER = 'http://10.64.222.80:38080';
-  // public BACKEND_SERVER = 'http://localhost:8080';
+//  public BACKEND_SERVER = 'http://localhost:8080';
   public BACKEND_SERVER = "";
   public API_ROOT_PATH = "/api/v1";
 
@@ -32,16 +34,18 @@ export class ServiceService {
       base: this.BACKEND_SERVER + this.API_ROOT_PATH,
 
       login: this.BACKEND_SERVER + this.API_ROOT_PATH + "/login/authenticate",
-      dbtree:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
-      dataassetlist:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
+      
+      dbtree: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
+      dataassetlist: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
+      dblist: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs",
+      tablenames: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/tables/names", // ?db=...
+      dbtable: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/table", // ?db=...&table=...
 
       getdataasset: this.BACKEND_SERVER + this.API_ROOT_PATH + "/dataassets",
 
       //mydashboard
       getmydashboard:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/mydashboard/",
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/mydashboard/",
       // getsubscribe: this.BACKEND_SERVER + this.API_ROOT_PATH + '/subscribe/',
       // newsubscribe: this.BACKEND_SERVER + this.API_ROOT_PATH + '/subscribe',
 
@@ -64,22 +68,24 @@ export class ServiceService {
       // organization:this.BACKEND_SERVER + this.API_ROOT_PATH + '/org/measure/jobs',
       dashboard: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics",
       metricdetail:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/values",
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/values",
 
       // dashboard:this.ES_SERVER+'/griffin/accuracy/_search?pretty&filter_path=hits.hits._source',
       metricsample:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/sample",
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/sample",
       metricdownload:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/download",
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/metrics/download",
+      missRecordDownload:
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs/download",
+
 
       //Models
-
       allModels: this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures",
       addModels: this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures",
       deleteModel: this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures",
       getModel: this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures",
       enableModel:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/models/enableModel",
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/models/enableModel",
 
       //Jobs
       allJobs: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
@@ -87,10 +93,10 @@ export class ServiceService {
       modifyJobs: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
       getJobById: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs/config",
       getMeasuresByOwner:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures/owner/",
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures/owner/",
       deleteJob: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
       getInstances:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs/instances",
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs/instances",
 
       //              allJobs:'/jobs.json',
       newAccuracyModel: this.BACKEND_SERVER + this.API_ROOT_PATH + "/models",
@@ -108,7 +114,7 @@ export class ServiceService {
 
       //Notification
       getnotifications:
-        this.BACKEND_SERVER + this.API_ROOT_PATH + "/notifications"
+      this.BACKEND_SERVER + this.API_ROOT_PATH + "/notifications"
     }
   };
 }

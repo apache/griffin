@@ -19,34 +19,34 @@ under the License.
 # Apache Griffin Roadmap
 
 ## Current feature list
-In the current version, we've implemented the below main DQ features
+In the current release, we've implemented main DQ features below
 
 - **Data Asset Detection**
-  After configuration in service module, Griffin can detect the Hive tables metadata through Hive metastore service.
+  Enabling configuration in service module, Griffin can detect the Hive tables metadata through Hive metastore service.
 
 - **Measure Management**
-  Through UI, user can create, delete measures for 3 types: accuracy, profiling and publish metrics.
-  Through service API, user can create, delete and update measures for 6 types: accuracy, profiling, timeliness, uniqueness, completeness and publish metrics.
+  Performing operations on UI, user can create, delete and update three types of measures, including: accuracy, profiling and publish metrics.
+  However, calling service APIs, user can create, delete and update six types of measures, including: accuracy, profiling, timeliness, uniqueness, completeness and publish metrics.
 
 - **Job Management**
-  User can create, delete job to schedule batch job for calculative measures, data range of each calculation, and the extra trigger condition like "done file" on hdfs.
+  User can create, delete jobs to schedule a batch job for calculative measures, data range of each calculation, and the extra trigger condition like "done file" on hdfs.
 
 - **Measure Calculation on Spark**
   Service module will trigger and submit calculation jobs to Spark cluster through livy, the measure module calculates and persists the metric values to elasticsearch by default.
 
 - **Metrics Visualization**
-  Through service API, user can get metric values of each job from elasticsearch.
-  On UI, accuracy metrics will be rendered as a chart, profiling metrics will be displayed as a table.
+  Through service APIs, user can get metric values of each job from elasticsearch.
+  Accuracy metrics will be rendered as a chart, profiling metrics will be showed as a table on UI.
 
 
 ## Short-term Roadmap
 
 - **Support more data source types**
-  At current, Griffin only supports Hive table, avro files on hdfs as data source in batch mode, Kafka as data source in streaming mode.
+  Currently, Griffin only supports Hive table, avro files on hdfs as data source in batch mode, Kafka as data source in streaming mode.
   We plan to support more data source types, like RDBM, elasticsearch.
 
 - **Support more data quality dimensions**
-  Griffin need to support more data quality dimensions, like consistency and validity.
+  Griffin needs to support more data quality dimensions, like consistency and validity.
 
 - **Anomaly Detection**
-  Griffin plan to support anomaly detection, by analyzing calculated metrics from elasticsearch.
+  Griffin plans to support anomaly detection, by analyzing metrics calculated from elasticsearch.

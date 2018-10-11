@@ -18,13 +18,14 @@ under the License.
 */
 package org.apache.griffin.measure.datasource
 
+import org.apache.spark.sql._
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.DataSourceParam
-import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.context.{DQContext, TimeRange}
+import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.datasource.connector.DataConnector
 import org.apache.griffin.measure.utils.DataFrameUtil._
-import org.apache.spark.sql._
 
 /**
   * data source
@@ -39,6 +40,8 @@ case class DataSource(name: String,
                       streamingCacheClientOpt: Option[StreamingCacheClient]
                      ) extends Loggable with Serializable {
 
+  val isBaseline: Boolean = dsParam.isBaseline
+
   def init(): Unit = {
     dataConnectors.foreach(_.init)
   }
@@ -48,12 +51,10 @@ case class DataSource(name: String,
     val timestamp = context.contextId.timestamp
     val (dfOpt, timeRange) = data(timestamp)
     dfOpt match {
-      case Some(df) => {
+      case Some(df) =>
         context.runTimeTableRegister.registerTable(name, df)
-      }
-      case None => {
+      case None =>
         warn(s"load data source [${name}] fails")
-      }
     }
     timeRange
   }

@@ -57,7 +57,7 @@ trait SelectExpr extends Expr with AliasableExpr {
 }
 
 case class AllFieldsSelectExpr() extends SelectExpr {
-  def desc: String = s".*"
+  def desc: String = ".*"
   def coalesceDesc: String = desc
   def alias: Option[String] = None
 }
@@ -96,17 +96,17 @@ case class FunctionSelectExpr(functionName: String, args: Seq[Expr]) extends Sel
 
 // -------------
 
-case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: Option[String]) extends SelectExpr {
+case class SelectionExpr(head: HeadExpr, selectors: Seq[SelectExpr], aliasOpt: Option[String])
+  extends SelectExpr {
 
   addChildren(head +: selectors)
 
   def desc: String = {
     selectors.foldLeft(head.desc) { (hd, sel) =>
       sel match {
-        case FunctionSelectExpr(funcName, args) => {
+        case FunctionSelectExpr(funcName, args) =>
           val nargs = hd +: args.map(_.desc)
           s"${funcName}(${nargs.mkString(", ")})"
-        }
         case _ => s"${hd}${sel.desc}"
       }
     }

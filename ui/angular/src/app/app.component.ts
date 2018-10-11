@@ -14,14 +14,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, Directive, ViewContainerRef, OnInit, AfterViewChecked } from "@angular/core";
-import { Router } from "@angular/router";
-import { XHRBackend } from '@angular/http';
+import {Component, Directive, ViewContainerRef, OnInit, AfterViewChecked} from "@angular/core";
+import {Router} from "@angular/router";
+import {XHRBackend} from '@angular/http';
 import * as $ from "jquery";
-import { ServiceService } from "./service/service.service";
-import { UserService } from "./service/user.service";
-import { Location, LocationStrategy, HashLocationStrategy } from "@angular/common";
-import { HttpClient } from "@angular/common/http";
+import {ServiceService} from "./service/service.service";
+import {UserService} from "./service/user.service";
+import {Location, LocationStrategy, HashLocationStrategy} from "@angular/common";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: "app-root",
@@ -34,26 +34,33 @@ export class AppComponent implements AfterViewChecked, OnInit {
   ntAccount: string;
   timestamp: Date;
   fullName: string;
+
   onResize(event) {
     this.resizeMainWindow();
   }
+
   goback() {
     this.location.back();
   }
+
   ngOnInit() {
     this.ntAccount = this.userService.getCookie("ntAccount");
     this.fullName = this.userService.getCookie("fullName");
   }
+
   constructor(
     private router: Router,
-    private http:HttpClient,
+    private http: HttpClient,
     private location: Location,
     public serviceService: ServiceService,
     public userService: UserService
-  ) {}
+  ) {
+  }
+
   resizeMainWindow() {
     $("#mainWindow").height(window.innerHeight - 56 - 20);
   }
+
   logout() {
     this.ntAccount = undefined;
     this.userService.setCookie("ntAccount", undefined, -1);
@@ -62,6 +69,7 @@ export class AppComponent implements AfterViewChecked, OnInit {
     window.location.reload();
     // window.location.replace ('login');
   }
+
   ngAfterViewChecked() {
     this.resizeMainWindow();
     $("#rightbar").css({
@@ -69,7 +77,7 @@ export class AppComponent implements AfterViewChecked, OnInit {
     });
     $("#side-bar-metrics").css({
       height:
-        $("#mainContent").height() - $("#side-bar-stats").outerHeight()
+      $("#mainContent").height() - $("#side-bar-stats").outerHeight()
     });
   }
 }

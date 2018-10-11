@@ -18,6 +18,10 @@ under the License.
 */
 package org.apache.griffin.core.config;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.sql.DataSource;
+
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
@@ -29,16 +33,13 @@ import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
-
 @Configuration
 @ComponentScan("org.apache.griffin.core")
 public class EclipseLinkJpaConfig extends JpaBaseConfiguration {
-    protected EclipseLinkJpaConfig(DataSource ds, JpaProperties properties,
-                                   ObjectProvider<JtaTransactionManager> jtm,
-                                   ObjectProvider<TransactionManagerCustomizers> tmc) {
+    protected EclipseLinkJpaConfig(
+            DataSource ds, JpaProperties properties,
+            ObjectProvider<JtaTransactionManager> jtm,
+            ObjectProvider<TransactionManagerCustomizers> tmc) {
         super(ds, properties, jtm, tmc);
     }
 
@@ -51,7 +52,8 @@ public class EclipseLinkJpaConfig extends JpaBaseConfiguration {
     protected Map<String, Object> getVendorProperties() {
         Map<String, Object> map = new HashMap<>();
         map.put(PersistenceUnitProperties.WEAVING, "false");
-        map.put(PersistenceUnitProperties.DDL_GENERATION, "create-or-extend-tables");
+        map.put(PersistenceUnitProperties.DDL_GENERATION,
+                "create-or-extend-tables");
         return map;
     }
 }

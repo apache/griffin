@@ -20,20 +20,21 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.griffin.core.metric.model.Metric;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
-import java.util.Map;
 
 public interface MetricService {
 
     Map<String, List<Metric>> getAllMetrics();
 
-    List<MetricValue> getMetricValues(String metricName, int offset, int size, long tmst);
+    List<MetricValue> getMetricValues(String metricName, int offset, int size,
+                                      long tmst);
 
     ResponseEntity addMetricValues(List<MetricValue> values);
 
-    ResponseEntity deleteMetricValues(String metricName);
+    ResponseEntity<?> deleteMetricValues(String metricName);
 }

@@ -29,7 +29,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
   */
 case class MetricWriteStep(name: String,
                            inputName: String,
-                           collectType: NormalizeType,
+                           flattenType: FlattenType,
                            writeTimestampOpt: Option[Long] = None
                           ) extends WriteStep {
 
@@ -45,11 +45,12 @@ case class MetricWriteStep(name: String,
     // get timestamp and normalize metric
     val writeMode = writeTimestampOpt.map(_ => SimpleMode).getOrElse(context.writeMode)
     val timestampMetricMap: Map[Long, Map[String, Any]] = writeMode match {
-      case SimpleMode => {
-        val metrics: Map[String, Any] = normalizeMetric(metricMaps, name, collectType)
+
+      case SimpleMode =>
+        val metrics: Map[String, Any] = flattenMetric(metricMaps, name, flattenType)
         emptyMetricMap + (timestamp -> metrics)
-      }
-      case TimestampMode => {
+
+      case TimestampMode =>
         val tmstMetrics = metricMaps.map { metric =>
           val tmst = metric.getLong(ConstantColumns.tmst, timestamp)
           val pureMetric = metric.removeKeys(ConstantColumns.columns)
@@ -58,10 +59,9 @@ case class MetricWriteStep(name: String,
         tmstMetrics.groupBy(_._1).map { pair =>
           val (k, v) = pair
           val maps = v.map(_._2)
-          val mtc = normalizeMetric(maps, name, collectType)
+          val mtc = flattenMetric(maps, name, flattenType)
           (k, mtc)
         }
-      }
     }
 
     // write to metric wrapper
@@ -88,26 +88,23 @@ case class MetricWriteStep(name: String,
         }.toSeq
       } else Nil
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"get metric ${name} fails")
         Nil
-      }
     }
   }
 
-  private def normalizeMetric(metrics: Seq[Map[String, Any]], name: String, collectType: NormalizeType
+  private def flattenMetric(metrics: Seq[Map[String, Any]], name: String, flattenType: FlattenType
                              ): Map[String, Any] = {
-    collectType match {
-      case EntriesNormalizeType => metrics.headOption.getOrElse(emptyMap)
-      case ArrayNormalizeType => Map[String, Any]((name -> metrics))
-      case MapNormalizeType => {
+    flattenType match {
+      case EntriesFlattenType => metrics.headOption.getOrElse(emptyMap)
+      case ArrayFlattenType => Map[String, Any]((name -> metrics))
+      case MapFlattenType =>
         val v = metrics.headOption.getOrElse(emptyMap)
         Map[String, Any]((name -> v))
-      }
-      case _ => {
+      case _ =>
         if (metrics.size > 1) Map[String, Any]((name -> metrics))
         else metrics.headOption.getOrElse(emptyMap)
-      }
     }
   }
 

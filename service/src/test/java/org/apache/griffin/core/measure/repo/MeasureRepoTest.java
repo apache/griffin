@@ -19,8 +19,14 @@ under the License.
 
 package org.apache.griffin.core.measure.repo;
 
+import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
-import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.measure.entity.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,11 +35,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.List;
-
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -57,7 +58,21 @@ public class MeasureRepoTest {
     public void testFindByNameAndDeleted() {
         String name = "m1";
         List<Measure> measures = measureRepo.findByNameAndDeleted(name, false);
-        assertThat(measures.get(0).getName()).isEqualTo(name);
+        GriffinMeasure m = (GriffinMeasure) measures.get(0);
+
+        List<DataSource> sources = m.getDataSources();
+        DataConnector connector = sources.get(0).getConnectors().get(0);
+        Rule rule = m.getEvaluateRule().getRules().get(0);
+        assertEquals(m.getSinksList().size(), 2);
+        assertEquals(sources.get(0).isBaseline(), true);
+        assertEquals(sources.get(0).getCheckpointMap().size(), 1);
+        assertEquals(connector.getDataFrameName(), "kafka");
+        assertEquals(connector.getConfigMap().size(), 3);
+        assertEquals(rule.getDqType(), DqType.ACCURACY);
+        assertEquals(rule.getInDataFrameName(), "in");
+        assertEquals(rule.getOutDataFrameName(), "out");
+        assertEquals(rule.getDetailsMap().size(), 1);
+        assertEquals(rule.getOutList().size(), 2);
     }
 
     @Test
@@ -68,7 +83,8 @@ public class MeasureRepoTest {
 
     @Test
     public void testFindByOwnerAndDeleted() {
-        List<Measure> measures = measureRepo.findByOwnerAndDeleted("test", false);
+        List<Measure> measures = measureRepo.findByOwnerAndDeleted("test",
+                false);
         assertThat(measures.size()).isEqualTo(2);
     }
 

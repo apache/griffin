@@ -16,7 +16,7 @@
 #under the License.
 
 griffin:
-  image: bhlx3lyx7/griffin_spark2:0.2.0
+  image: apachegriffin/griffin_spark2:0.3.0
   hostname: griffin
   links:
     - es
@@ -41,7 +41,7 @@ griffin:
   container_name: griffin
 
 es:
-  image: bhlx3lyx7/elasticsearch
+  image: apachegriffin/elasticsearch
   hostname: es
   ports:
     - 39200:9200
@@ -57,7 +57,7 @@ zk:
   restart: always
 
 kafka:
-  image: bhlx3lyx7/kafka
+  image: apachegriffin/kafka
   hostname: kafka
   ports:
     - 39092:9092

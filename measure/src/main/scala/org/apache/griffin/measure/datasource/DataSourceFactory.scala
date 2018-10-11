@@ -18,14 +18,16 @@ under the License.
 */
 package org.apache.griffin.measure.datasource
 
+import scala.util.Success
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.streaming.StreamingContext
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.DataSourceParam
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClientFactory
 import org.apache.griffin.measure.datasource.connector.{DataConnector, DataConnectorFactory}
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.streaming.StreamingContext
 
-import scala.util.Success
 
 object DataSourceFactory extends Loggable {
 
@@ -50,7 +52,7 @@ object DataSourceFactory extends Loggable {
 
     // for streaming data cache
     val streamingCacheClientOpt = StreamingCacheClientFactory.getClientOpt(
-      sparkSession.sqlContext, dataSourceParam.getCacheOpt, name, index, timestampStorage)
+      sparkSession.sqlContext, dataSourceParam.getCheckpointOpt, name, index, timestampStorage)
 
     val dataConnectors: Seq[DataConnector] = connectorParams.flatMap { connectorParam =>
       DataConnectorFactory.getDataConnector(sparkSession, ssc, connectorParam,

@@ -35,7 +35,8 @@ case class SelectClause(exprs: Seq[Expr], extraConditionOpt: Option[ExtraConditi
   def coalesceDesc: String = desc
 
   override def map(func: (Expr) => Expr): SelectClause = {
-    SelectClause(exprs.map(func(_)), extraConditionOpt.map(func(_).asInstanceOf[ExtraConditionExpr]))
+    SelectClause(exprs.map(func(_)),
+      extraConditionOpt.map(func(_).asInstanceOf[ExtraConditionExpr]))
   }
 
 }
@@ -81,11 +82,10 @@ case class GroupbyClause(exprs: Seq[Expr], havingClauseOpt: Option[Expr]) extend
 
   def merge(other: GroupbyClause): GroupbyClause = {
     val newHavingClauseOpt = (havingClauseOpt, other.havingClauseOpt) match {
-      case (Some(hc), Some(ohc)) => {
+      case (Some(hc), Some(ohc)) =>
         val logical1 = LogicalFactorExpr(hc, false, None)
         val logical2 = LogicalFactorExpr(ohc, false, None)
         Some(BinaryLogicalExpr(logical1, ("AND", logical2) :: Nil))
-      }
       case (a @ Some(_), _) => a
       case (_, b @ Some(_)) => b
       case (_, _) => None
@@ -250,7 +250,8 @@ case class DistinctnessClause(exprs: Seq[Expr]) extends ClauseExpression {
 
   def desc: String = exprs.map(_.desc).mkString(", ")
   def coalesceDesc: String = exprs.map(_.coalesceDesc).mkString(", ")
-  override def map(func: (Expr) => Expr): DistinctnessClause = DistinctnessClause(exprs.map(func(_)))
+  override def map(func: (Expr) => Expr) : DistinctnessClause =
+    DistinctnessClause(exprs.map(func(_)))
 }
 
 case class TimelinessClause(exprs: Seq[Expr]) extends ClauseExpression {
@@ -266,5 +267,6 @@ case class CompletenessClause(exprs: Seq[Expr]) extends ClauseExpression {
 
   def desc: String = exprs.map(_.desc).mkString(", ")
   def coalesceDesc: String = exprs.map(_.coalesceDesc).mkString(", ")
-  override def map(func: (Expr) => Expr): CompletenessClause = CompletenessClause(exprs.map(func(_)))
+  override def map(func: (Expr) => Expr): CompletenessClause =
+    CompletenessClause(exprs.map(func(_)))
 }

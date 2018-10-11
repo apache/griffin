@@ -18,10 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
+import scala.reflect.ClassTag
+import scala.util.Try
+
 import org.apache.griffin.measure.configuration.dqdefinition.Param
 import org.apache.griffin.measure.utils.JsonUtil
 
-import scala.util.Try
 
 /**
   * read params from json string directly
@@ -30,7 +32,7 @@ import scala.util.Try
   */
 case class ParamJsonReader(jsonString: String) extends ParamReader {
 
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T] = {
+  def readConfig[T <: Param](implicit m : ClassTag[T]): Try[T] = {
     Try {
       val param = JsonUtil.fromJson[T](jsonString)
       validate(param)

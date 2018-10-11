@@ -18,8 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.dsl.transform
 
-import org.apache.griffin.measure.configuration.enums.{BatchProcessType, NormalizeType, StreamingProcessType}
+import org.apache.commons.lang.StringUtils
+
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
+import org.apache.griffin.measure.configuration.enums.{BatchProcessType, FlattenType, MetricOutputType, StreamingProcessType}
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -62,7 +64,9 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       val analyzer = ProfilingAnalyzer(profilingExpr, sourceName)
       val selExprDescs = analyzer.selectionExprs.map { sel =>
         val alias = sel match {
-          case s: AliasableExpr if (s.alias.nonEmpty) => s" AS `${s.alias.get}`"
+          case s: AliasableExpr =>
+            s.alias.filter(StringUtils.isNotEmpty).map(a => s" AS `${a}`").getOrElse("")
+
           case _ => ""
         }
         s"${sel.desc}${alias}"
@@ -75,29 +79,30 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       val groupByClauseOpt = analyzer.groupbyExprOpt
       val groupbyClause = procType match {
         case BatchProcessType => groupByClauseOpt.map(_.desc).getOrElse("")
-        case StreamingProcessType => {
-          val tmstGroupbyClause = GroupbyClause(LiteralStringExpr(s"`${ConstantColumns.tmst}`") :: Nil, None)
+        case StreamingProcessType =>
+          val tmstGroupbyClause =
+            GroupbyClause(LiteralStringExpr(s"`${ConstantColumns.tmst}`") :: Nil, None)
           val mergedGroubbyClause = tmstGroupbyClause.merge(groupByClauseOpt match {
             case Some(gbc) => gbc
             case _ => GroupbyClause(Nil, None)
           })
           mergedGroubbyClause.desc
-        }
       }
       val preGroupbyClause = analyzer.preGroupbyExprs.map(_.desc).mkString(" ")
       val postGroupbyClause = analyzer.postGroupbyExprs.map(_.desc).mkString(" ")
 
       // 1. select statement
       val profilingSql = {
-        s"SELECT ${selCondition} ${selClause} ${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
+        s"SELECT ${selCondition} ${selClause} " +
+          s"${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
       }
-      val profilingName = ruleParam.name
+      val profilingName = ruleParam.getOutDfName()
       val profilingTransStep = SparkSqlTransformStep(profilingName, profilingSql, details)
       val profilingMetricWriteStep = {
-        val metricOpt = ruleParam.getMetricOpt
-        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.name)
-        val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
-        MetricWriteStep(mwName, profilingName, collectType)
+        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
+        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+        MetricWriteStep(mwName, profilingName, flattenType)
       }
       profilingTransStep :: profilingMetricWriteStep :: Nil
     }

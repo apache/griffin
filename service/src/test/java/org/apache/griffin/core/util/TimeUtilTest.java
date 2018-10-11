@@ -19,13 +19,13 @@ under the License.
 
 package org.apache.griffin.core.util;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.junit.Assert.assertEquals;
 
 import java.util.TimeZone;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 public class TimeUtilTest {
@@ -89,7 +89,8 @@ public class TimeUtilTest {
         String format = "dt=#YYYYMMdd#";
         Long time = 1516186620155L;
         String timeZone = "GMT+8:00";
-        assertEquals(TimeUtil.format(format, time, TimeZone.getTimeZone(timeZone)), "dt=20180117");
+        assertEquals(TimeUtil.format(format, time, TimeZone
+                .getTimeZone(timeZone)), "dt=20180117");
     }
 
     @Test
@@ -97,7 +98,8 @@ public class TimeUtilTest {
         String format = "dt=#YYYYMMdd#/hour=#HH#";
         Long time = 1516186620155L;
         String timeZone = "GMT+8:00";
-        assertEquals(TimeUtil.format(format, time, TimeZone.getTimeZone(timeZone)), "dt=20180117/hour=18");
+        assertEquals(TimeUtil.format(format, time, TimeZone
+                .getTimeZone(timeZone)), "dt=20180117/hour=18");
     }
 
     @Test(expected = IllegalArgumentException.class)

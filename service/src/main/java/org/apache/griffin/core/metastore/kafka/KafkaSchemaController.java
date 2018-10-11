@@ -23,7 +23,11 @@ import io.confluent.kafka.schemaregistry.client.rest.entities.Config;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/metadata/kafka")
@@ -43,12 +47,14 @@ public class KafkaSchemaController {
     }
 
     @RequestMapping(value = "/versions", method = RequestMethod.GET)
-    public Iterable<Integer> getSubjectVersions(@RequestParam("subject") String subject) {
+    public Iterable<Integer> getSubjectVersions(
+            @RequestParam("subject") String subject) {
         return kafkaSchemaService.getSubjectVersions(subject);
     }
 
     @RequestMapping(value = "/subjectSchema", method = RequestMethod.GET)
-    public Schema getSubjectSchema(@RequestParam("subject") String subject, @RequestParam("version") String version) {
+    public Schema getSubjectSchema(@RequestParam("subject") String subject,
+                                   @RequestParam("version") String version) {
         return kafkaSchemaService.getSubjectSchema(subject, version);
     }
 

@@ -19,11 +19,9 @@ under the License.
 
 package org.apache.griffin.core.login;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -32,14 +30,18 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class LoginServiceLdapImpl implements LoginService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginServiceLdapImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger
+            (LoginServiceLdapImpl.class);
 
-    private static final String LDAP_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
+    private static final String LDAP_FACTORY =
+            "com.sun.jndi.ldap.LdapCtxFactory";
 
     private String url;
     private String email;
@@ -47,7 +49,8 @@ public class LoginServiceLdapImpl implements LoginService {
     private String searchPattern;
     private SearchControls searchControls;
 
-    public LoginServiceLdapImpl(String url, String email, String searchBase, String searchPattern) {
+    public LoginServiceLdapImpl(String url, String email, String searchBase,
+                                String searchPattern) {
         this.url = url;
         this.email = email;
         this.searchBase = searchBase;
@@ -64,7 +67,8 @@ public class LoginServiceLdapImpl implements LoginService {
         String searchFilter = searchPattern.replace("{0}", ntAccount);
         try {
             LdapContext ctx = getContextInstance(ntAccount, password);
-            NamingEnumeration<SearchResult> results = ctx.search(searchBase, searchFilter, searchControls);
+            NamingEnumeration<SearchResult> results = ctx.search(searchBase,
+                    searchFilter, searchControls);
             String fullName = getFullName(results, ntAccount);
             Map<String, Object> message = new HashMap<>();
             message.put("ntAccount", ntAccount);
@@ -72,12 +76,14 @@ public class LoginServiceLdapImpl implements LoginService {
             message.put("status", 0);
             return new ResponseEntity<>(message, HttpStatus.OK);
         } catch (NamingException e) {
-            LOGGER.warn("User {} failed to login with LDAP auth. {}", ntAccount, e.getMessage());
+            LOGGER.warn("User {} failed to login with LDAP auth. {}", ntAccount,
+                    e.getMessage());
         }
         return null;
     }
 
-    private String getFullName(NamingEnumeration<SearchResult> results, String ntAccount) {
+    private String getFullName(NamingEnumeration<SearchResult> results,
+                               String ntAccount) {
         String fullName = ntAccount;
         try {
             while (results.hasMoreElements()) {
@@ -91,12 +97,14 @@ public class LoginServiceLdapImpl implements LoginService {
                 }
             }
         } catch (NamingException e) {
-            LOGGER.warn("User {} successfully login with LDAP auth, but failed to get full name.", ntAccount);
+            LOGGER.warn("User {} successfully login with LDAP auth, " +
+                    "but failed to get full name.", ntAccount);
         }
         return fullName;
     }
 
-    private LdapContext getContextInstance(String ntAccount, String password) throws NamingException {
+    private LdapContext getContextInstance(String ntAccount, String password)
+            throws NamingException {
         Hashtable<String, String> ht = new Hashtable<>();
         ht.put(Context.INITIAL_CONTEXT_FACTORY, LDAP_FACTORY);
         ht.put(Context.PROVIDER_URL, url);

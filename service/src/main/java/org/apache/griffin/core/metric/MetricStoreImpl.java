@@ -23,6 +23,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.http.Header;
@@ -42,9 +51,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.*;
 
 @Component
 public class MetricStoreImpl implements MetricStore {
@@ -70,7 +76,8 @@ public class MetricStoreImpl implements MetricStore {
         if (!user.isEmpty() && !password.isEmpty()) {
             String encodedAuth = buildBasicAuthString(user, password);
             Header[] requestHeaders = new Header[]{
-                    new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION, encodedAuth)};
+                    new BasicHeader(org.apache.http.HttpHeaders.AUTHORIZATION,
+                            encodedAuth)};
             builder.setDefaultHeaders(requestHeaders);
         }
         this.client = builder.build();
@@ -81,15 +88,23 @@ public class MetricStoreImpl implements MetricStore {
         this.urlGet = urlBase.concat("/_search?filter_path=hits.hits._source");
         this.urlPost = urlBase.concat("/_bulk");
         this.urlDelete = urlBase.concat("/_delete_by_query");
-        this.indexMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }\n", INDEX, TYPE);
+        this.indexMetaData = String.format(
+                "{ \"index\" : { \"_index\" : " +
+                        "\"%s\",\"_type\" : \"%s\" } }%n",
+                INDEX,
+                TYPE);
         this.mapper = new ObjectMapper();
     }
 
     @Override
-    public List<MetricValue> getMetricValues(String metricName, int from, int size, long tmst) throws IOException {
-        HttpEntity entity = getHttpEntityForSearch(metricName, from, size, tmst);
+    public List<MetricValue> getMetricValues(String metricName, int from,
+                                             int size, long tmst)
+            throws IOException {
+        HttpEntity entity = getHttpEntityForSearch(metricName, from, size,
+                tmst);
         try {
-            Response response = client.performRequest("GET", urlGet, Collections.emptyMap(), entity);
+            Response response = client.performRequest("GET", urlGet,
+                    Collections.emptyMap(), entity);
             return getMetricValuesFromResponse(response);
         } catch (ResponseException e) {
             if (e.getResponse().getStatusLine().getStatusCode() == 404) {
@@ -99,30 +114,43 @@ public class MetricStoreImpl implements MetricStore {
         }
     }
 
-    private HttpEntity getHttpEntityForSearch(String metricName, int from, int size, long tmst) throws JsonProcessingException {
+    private HttpEntity getHttpEntityForSearch(String metricName, int from, int
+            size, long tmst)
+            throws JsonProcessingException {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> queryParam = new HashMap<>();
-//        Map<String, Object> rangeQuery = Collections.singletonMap("tmst", Collections.singletonMap("gte", tmst));
-//        queryParam.put("must", Collections.singletonMap("range", rangeQuery));
-        Map<String, Object> termQuery = Collections.singletonMap("name.keyword", metricName);
+        Map<String, Object> termQuery = Collections.singletonMap("name.keyword",
+                metricName);
         queryParam.put("filter", Collections.singletonMap("term", termQuery));
-        Map<String, Object> sortParam = Collections.singletonMap("tmst", Collections.singletonMap("order", "desc"));
+        Map<String, Object> sortParam = Collections
+                .singletonMap("tmst", Collections.singletonMap("order",
+                        "desc"));
         map.put("query", Collections.singletonMap("bool", queryParam));
         map.put("sort", sortParam);
         map.put("from", from);
         map.put("size", size);
-        return new NStringEntity(JsonUtil.toJson(map), ContentType.APPLICATION_JSON);
+        return new NStringEntity(JsonUtil.toJson(map),
+                ContentType.APPLICATION_JSON);
     }
 
-    private List<MetricValue> getMetricValuesFromResponse(Response response) throws IOException {
+    private List<MetricValue> getMetricValuesFromResponse(Response response)
+            throws IOException {
         List<MetricValue> metricValues = new ArrayList<>();
-        JsonNode jsonNode = mapper.readTree(EntityUtils.toString(response.getEntity()));
-        if (jsonNode.hasNonNull("hits") && jsonNode.get("hits").hasNonNull("hits")) {
+        JsonNode jsonNode = mapper.readTree(EntityUtils.toString(response
+                .getEntity()));
+        if (jsonNode.hasNonNull("hits") && jsonNode.get("hits")
+                .hasNonNull("hits")) {
             for (JsonNode node : jsonNode.get("hits").get("hits")) {
                 JsonNode sourceNode = node.get("_source");
-                Map<String, Object> value = JsonUtil.toEntity(sourceNode.get("value").toString(), new TypeReference<Map<String, Object>>() {
-                });
-                MetricValue metricValue = new MetricValue(sourceNode.get("name").asText(), Long.parseLong(sourceNode.get("tmst").asText()), value);
+                Map<String, Object> value = JsonUtil.toEntity(sourceNode
+                                .get("value").toString(),
+                        new TypeReference<Map<String, Object>>() {
+                        });
+                MetricValue metricValue = new MetricValue(sourceNode
+                        .get("name")
+                        .asText(),
+                        Long.parseLong(sourceNode.get("tmst").asText()),
+                        value);
                 metricValues.add(metricValue);
             }
         }
@@ -130,42 +158,52 @@ public class MetricStoreImpl implements MetricStore {
     }
 
     @Override
-    public ResponseEntity addMetricValues(List<MetricValue> metricValues) throws IOException {
+    public ResponseEntity<?> addMetricValues(List<MetricValue> metricValues)
+            throws IOException {
         String bulkRequestBody = getBulkRequestBody(metricValues);
-        HttpEntity entity = new NStringEntity(bulkRequestBody, ContentType.APPLICATION_JSON);
-        Response response = client.performRequest("POST", urlPost, Collections.emptyMap(), entity);
+        HttpEntity entity = new NStringEntity(bulkRequestBody,
+                ContentType.APPLICATION_JSON);
+        Response response = client.performRequest("POST", urlPost,
+                Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
-
     }
 
-    private String getBulkRequestBody(List<MetricValue> metricValues) throws JsonProcessingException {
+    private String getBulkRequestBody(List<MetricValue> metricValues) throws
+            JsonProcessingException {
         StringBuilder bulkRequestBody = new StringBuilder();
         for (MetricValue metricValue : metricValues) {
             bulkRequestBody.append(indexMetaData);
             bulkRequestBody.append(JsonUtil.toJson(metricValue));
-            bulkRequestBody.append("\n");
+            bulkRequestBody.append(System.lineSeparator());
         }
         return bulkRequestBody.toString();
     }
 
-
     @Override
-    public ResponseEntity deleteMetricValues(String metricName) throws IOException {
+    public ResponseEntity<?> deleteMetricValues(String metricName) throws
+            IOException {
         Map<String, Object> param = Collections.singletonMap("query",
-                Collections.singletonMap("term", Collections.singletonMap("name.keyword", metricName)));
-        HttpEntity entity = new NStringEntity(JsonUtil.toJson(param), ContentType.APPLICATION_JSON);
-        Response response = client.performRequest("POST", urlDelete, Collections.emptyMap(), entity);
+                Collections.singletonMap("term",
+                        Collections.singletonMap("name.keyword", metricName)));
+        HttpEntity entity = new NStringEntity(
+                JsonUtil.toJson(param),
+                ContentType.APPLICATION_JSON);
+        Response response = client.performRequest("POST", urlDelete,
+                Collections.emptyMap(), entity);
         return getResponseEntityFromResponse(response);
     }
 
-    private ResponseEntity getResponseEntityFromResponse(Response response) throws IOException {
+    private ResponseEntity<?> getResponseEntityFromResponse(Response response)
+            throws IOException {
         String body = EntityUtils.toString(response.getEntity());
-        HttpStatus status = HttpStatus.valueOf(response.getStatusLine().getStatusCode());
+        HttpStatus status = HttpStatus.valueOf(response.getStatusLine()
+                .getStatusCode());
         return new ResponseEntity<>(body, responseHeaders, status);
     }
 
     private static String buildBasicAuthString(String user, String password) {
         String auth = user + ":" + password;
-        return String.format("Basic %s", Base64.getEncoder().encodeToString(auth.getBytes()));
+        return String.format("Basic %s", Base64.getEncoder().encodeToString(
+                auth.getBytes()));
     }
 }

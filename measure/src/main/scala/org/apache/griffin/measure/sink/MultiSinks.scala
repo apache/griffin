@@ -21,63 +21,59 @@ package org.apache.griffin.measure.sink
 import org.apache.spark.rdd.RDD
 
 /**
-  * persist metric and record in multiple ways
+  * sink metric and record in multiple ways
   */
-case class MultiSinks(persists: Iterable[Sink]) extends Sink {
+case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
 
   val block: Boolean = false
 
-  val metricName: String = persists match {
-    case Nil => ""
-    case _ => persists.head.metricName
-  }
+  val headSinkOpt: Option[Sink] = sinks.headOption
 
-  val timeStamp: Long = persists match {
-    case Nil => 0
-    case _ => persists.head.timeStamp
-  }
+  val metricName: String = headSinkOpt.map(_.metricName).getOrElse("")
+
+  val timeStamp: Long = headSinkOpt.map(_.timeStamp).getOrElse(0)
 
   val config: Map[String, Any] = Map[String, Any]()
 
-  def available(): Boolean = { persists.exists(_.available()) }
+  def available(): Boolean = { sinks.exists(_.available()) }
 
-  def start(msg: String): Unit = { persists.foreach(_.start(msg)) }
-  def finish(): Unit = { persists.foreach(_.finish()) }
+  def start(msg: String): Unit = { sinks.foreach(_.start(msg)) }
+  def finish(): Unit = { sinks.foreach(_.finish()) }
 
   def log(rt: Long, msg: String): Unit = {
-    persists.foreach { persist =>
+    sinks.foreach { sink =>
       try {
-        persist.log(rt, msg)
+        sink.log(rt, msg)
       } catch {
         case e: Throwable => error(s"log error: ${e.getMessage}")
       }
     }
   }
 
-  def persistRecords(records: RDD[String], name: String): Unit = {
-    persists.foreach { persist =>
+  def sinkRecords(records: RDD[String], name: String): Unit = {
+    sinks.foreach { sink =>
       try {
-        persist.persistRecords(records, name)
+        sink.sinkRecords(records, name)
       } catch {
-        case e: Throwable => error(s"persist records error: ${e.getMessage}")
+        case e: Throwable => error(s"sink records error: ${e.getMessage}")
       }
     }
   }
-  def persistRecords(records: Iterable[String], name: String): Unit = {
-    persists.foreach { persist =>
+  def sinkRecords(records: Iterable[String], name: String): Unit = {
+    sinks.foreach { sink =>
       try {
-        persist.persistRecords(records, name)
+        sink.sinkRecords(records, name)
       } catch {
-        case e: Throwable => error(s"persist records error: ${e.getMessage}")
+        case e: Throwable => error(s"sink records error: ${e.getMessage}")
       }
     }
   }
-  def persistMetrics(metrics: Map[String, Any]): Unit = {
-    persists.foreach { persist =>
+  def sinkMetrics(metrics: Map[String, Any]): Unit = {
+    sinks.foreach { sink =>
       try {
-        persist.persistMetrics(metrics)
+        sink.sinkMetrics(metrics)
       } catch {
-        case e: Throwable => error(s"persist metrics error: ${e.getMessage}")
+        case e: Throwable => error(s"sink metrics error: ${e.getMessage}")
       }
     }
   }

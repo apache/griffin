@@ -18,10 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
+import scala.reflect.ClassTag
+import scala.util.Try
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.Param
 
-import scala.util.Try
 
 trait ParamReader extends Loggable with Serializable {
 
@@ -31,7 +33,7 @@ trait ParamReader extends Loggable with Serializable {
     * @tparam T     param type expected
     * @return       parsed param
     */
-  def readConfig[T <: Param](implicit m : Manifest[T]): Try[T]
+  def readConfig[T <: Param](implicit m : ClassTag[T]): Try[T]
 
   /**
     * validate config param

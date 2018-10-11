@@ -16,12 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from "@angular/core";
-import { ServiceService } from "../service/service.service";
-import { UserService } from "../service/user.service";
-import { Router } from "@angular/router";
-import { LocationStrategy, HashLocationStrategy } from "@angular/common";
-import { HttpClient } from "@angular/common/http";
+import {Component, OnInit} from "@angular/core";
+import {ServiceService} from "../service/service.service";
+import {UserService} from "../service/user.service";
+import {Router} from "@angular/router";
+import {LocationStrategy, HashLocationStrategy} from "@angular/common";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: "app-login",
@@ -34,12 +34,15 @@ export class LoginComponent implements OnInit {
   timestamp: Date;
   fullName: string;
   results: any;
+
   constructor(
     private router: Router,
     private http: HttpClient,
     public serviceService: ServiceService,
     public userService: UserService
-  ) {}
+  ) {
+  }
+
   loginBtnWait() {
     $("#login-btn")
       .addClass("disabled")
@@ -80,7 +83,7 @@ export class LoginComponent implements OnInit {
     var password = $("input:eq(1)").val();
     var loginUrl = this.serviceService.config.uri.login;
     this.loginBtnWait();
-    this.http.post(loginUrl, { username: name, password: password }).subscribe(
+    this.http.post(loginUrl, {username: name, password: password}).subscribe(
       data => {
         this.results = data;
         if (this.results.status == 0) {
@@ -105,6 +108,7 @@ export class LoginComponent implements OnInit {
       }
     );
   }
+
   ngOnInit() {
     this.ntAccount = this.userService.getCookie("ntAccount");
     this.fullName = this.userService.getCookie("fullName");

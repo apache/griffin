@@ -21,7 +21,8 @@ package org.apache.griffin.measure.step.builder.dsl.transform.analyzer
 import org.apache.griffin.measure.step.builder.dsl.expr._
 
 
-case class CompletenessAnalyzer(expr: CompletenessClause, sourceName: String) extends BasicAnalyzer {
+case class CompletenessAnalyzer(expr: CompletenessClause, sourceName: String)
+  extends BasicAnalyzer {
 
   val seqAlias = (expr: Expr, v: Seq[String]) => {
     expr match {
@@ -40,7 +41,7 @@ case class CompletenessAnalyzer(expr: CompletenessClause, sourceName: String) ex
   }
 
   if (selectionPairs.isEmpty) {
-    throw new Exception(s"completeness analyzer error: empty selection")
+    throw new Exception("completeness analyzer error: empty selection")
   }
 
 }

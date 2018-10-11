@@ -18,10 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.connector.streaming
 
+import scala.util.{Failure, Success, Try}
+
 import kafka.serializer.Decoder
 import org.apache.spark.streaming.dstream.InputDStream
 
-import scala.util.{Failure, Success, Try}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -64,10 +65,9 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
         // pre-process
         preProcess(dfOpt, ms)
       } catch {
-        case e: Throwable => {
+        case e: Throwable =>
           error(s"streaming data connector error: ${e.getMessage}")
           None
-        }
       }
 
       // save data frame

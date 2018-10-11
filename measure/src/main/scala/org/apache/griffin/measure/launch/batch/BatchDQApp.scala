@@ -20,28 +20,30 @@ package org.apache.griffin.measure.launch.batch
 
 import java.util.Date
 
-import org.apache.griffin.measure.configuration.enums._
+import scala.util.Try
+
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.{SparkSession, SQLContext}
+
 import org.apache.griffin.measure.configuration.dqdefinition._
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.{SQLContext, SparkSession}
 
-import scala.util.Try
 
 case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
   val envParam: EnvConfig = allParam.getEnvConfig
   val dqParam: DQConfig = allParam.getDqConfig
 
-  val sparkParam = envParam.sparkParam
-  val metricName = dqParam.name
+  val sparkParam = envParam.getSparkParam
+  val metricName = dqParam.getName
 //  val dataSourceParams = dqParam.dataSources
 //  val dataSourceNames = dataSourceParams.map(_.name)
-  val persistParams = envParam.persistParams
+  val sinkParams = getSinkParams
 
   var sqlContext: SQLContext = _
 
@@ -75,28 +77,28 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // create dq context
     val dqContext: DQContext = DQContext(
-      contextId, metricName, dataSources, persistParams, BatchProcessType
+      contextId, metricName, dataSources, sinkParams, BatchProcessType
     )(sparkSession)
 
     // start id
     val applicationId = sparkSession.sparkContext.applicationId
-    dqContext.getPersist().start(applicationId)
+    dqContext.getSink().start(applicationId)
 
     // build job
-    val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.evaluateRule)
+    val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
 
     // dq job execute
     dqJob.execute(dqContext)
 
     // end time
     val endTime = new Date().getTime
-    dqContext.getPersist().log(endTime, s"process using time: ${endTime - startTime} ms")
+    dqContext.getSink().log(endTime, s"process using time: ${endTime - startTime} ms")
 
     // clean context
     dqContext.clean()
 
     // finish
-    dqContext.getPersist().finish()
+    dqContext.getSink().finish()
   }
 
   def close: Try[_] = Try {

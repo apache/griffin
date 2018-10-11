@@ -24,6 +24,7 @@ import org.apache.griffin.measure.context.DQContext
   * data frame ops transform step
   */
 case class DataFrameOpsTransformStep(name: String,
+                                     inputDfName: String,
                                      rule: String,
                                      details: Map[String, Any],
                                      cache: Boolean = false
@@ -33,19 +34,20 @@ case class DataFrameOpsTransformStep(name: String,
     val sqlContext = context.sqlContext
     try {
       val df = rule match {
-        case DataFrameOps._fromJson => DataFrameOps.fromJson(sqlContext, details)
-        case DataFrameOps._accuracy => DataFrameOps.accuracy(sqlContext, context.contextId, details)
-        case DataFrameOps._clear => DataFrameOps.clear(sqlContext, details)
+        case DataFrameOps._fromJson => DataFrameOps.fromJson(sqlContext, inputDfName, details)
+        case DataFrameOps._accuracy =>
+          DataFrameOps.accuracy(sqlContext, inputDfName, context.contextId, details)
+
+        case DataFrameOps._clear => DataFrameOps.clear(sqlContext, inputDfName, details)
         case _ => throw new Exception(s"df opr [ ${rule} ] not supported")
       }
       if (cache) context.dataFrameCache.cacheDataFrame(name, df)
       context.runTimeTableRegister.registerTable(name, df)
       true
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"run data frame ops [ ${rule} ] error: ${e.getMessage}")
         false
-      }
     }
   }
 

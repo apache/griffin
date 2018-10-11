@@ -10,6 +10,7 @@
         {
           "type": "kafka",
           "version": "0.8",
+          "dataframe.name": "this",
           "config": {
             "kafka.config": {
               "bootstrap.servers": "10.147.177.107:9092",
@@ -23,28 +24,25 @@
           },
           "pre.proc": [
             {
-              "dsl.type": "df-opr",
-              "name": "${s1}",
-              "rule": "from_json",
-              "details": {
-                "df.name": "${this}"
-              }
+              "dsl.type": "df-ops",
+              "in.dataframe.name": "this",
+              "out.dataframe.name": "s1",
+              "rule": "from_json"
             },
             {
               "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select name, age from ${s1}"
+              "out.dataframe.name": "this",
+              "rule": "select name, age from s1"
             }
           ]
         }
       ],
-      "cache": {
+      "checkpoint": {
         "file.path": "hdfs://localhost/griffin/streaming/dump/source",
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["0", "0"],
-        "init.clear": true
+        "time.range": ["0", "0"]
       }
     }
   ],
@@ -54,22 +52,30 @@
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "prof",
+        "out.dataframe.name": "prof",
         "rule": "select count(name) as `cnt`, max(age) as `max`, min(age) as `min` from source",
-        "metric": {
-          "name": "prof"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "prof"
+          }
+        ]
       },
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "grp",
+        "out.dataframe.name": "grp",
         "rule": "select name, count(*) as `cnt` from source group by name",
-        "metric": {
-          "name": "name_group",
-          "collect.type": "array"
-        }
+        "out":[
+          {
+            "type": "metric",
+            "name": "name_group",
+            "flatten": "array"
+          }
+        ]
       }
     ]
-  }
+  },
+
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }

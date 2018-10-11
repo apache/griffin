@@ -27,6 +27,6 @@ require("jquery");
 // import 'bootstrap/dist/css/bootstrap.css';
 require("bootstrap/dist/css/bootstrap.css");
 if (environment_1.environment.production) {
-    core_1.enableProdMode();
+  core_1.enableProdMode();
 }
 platform_browser_dynamic_1.platformBrowserDynamic().bootstrapModule(app_module_1.AppModule);

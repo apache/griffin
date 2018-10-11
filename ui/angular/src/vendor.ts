@@ -24,7 +24,6 @@ import '@angular/http';
 import '@angular/router';
 
 
-
 // RxJS
 import 'rxjs';
 

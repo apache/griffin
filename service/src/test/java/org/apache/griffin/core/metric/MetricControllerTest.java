@@ -19,6 +19,22 @@ under the License.
 
 package org.apache.griffin.core.metric;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
+import static org.apache.griffin.core.measure.entity.DqType.ACCURACY;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.exception.GriffinExceptionHandler;
 import org.apache.griffin.core.metric.model.Metric;
@@ -37,20 +53,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
-import static org.apache.griffin.core.measure.entity.DqType.ACCURACY;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 public class MetricControllerTest {
@@ -74,9 +76,11 @@ public class MetricControllerTest {
 
     @Test
     public void testGetAllMetricsSuccess() throws Exception {
-        Metric metric = new Metric("metricName", ACCURACY, "owner", Collections.emptyList());
+        Metric metric = new Metric("metricName", ACCURACY, "owner", Collections
+                .emptyList());
         given(service.getAllMetrics()).willReturn(
-                Collections.singletonMap("measureName", Collections.singletonList(metric)));
+                Collections.singletonMap("measureName", Collections
+                        .singletonList(metric)));
 
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/metrics"))
@@ -87,7 +91,8 @@ public class MetricControllerTest {
     @Test
     public void testGetAllMetricsFailureWithException() throws Exception {
         given(service.getAllMetrics())
-                .willThrow(new GriffinException.ServiceException("Failed to get metrics", new RuntimeException()));
+                .willThrow(new GriffinException.ServiceException(
+                        "Failed to get metrics", new RuntimeException()));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/metrics"))
                 .andExpect(status().isInternalServerError());
@@ -96,7 +101,8 @@ public class MetricControllerTest {
     @Test
     public void testGetMetricValuesSuccess() throws Exception {
         MetricValue value = new MetricValue("jobName", 1L, new HashMap<>());
-        given(service.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
+        given(service.getMetricValues(Matchers.anyString(), Matchers.anyInt(),
+                Matchers.anyInt(), Matchers.anyLong()))
                 .willReturn(Collections.singletonList(value));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/metrics/values")
@@ -107,8 +113,10 @@ public class MetricControllerTest {
 
     @Test
     public void testGetMetricValuesFailureWithException() throws Exception {
-        given(service.getMetricValues(Matchers.anyString(), Matchers.anyInt(), Matchers.anyInt(), Matchers.anyLong()))
-                .willThrow(new GriffinException.ServiceException("Failed to get metric values", new IOException()));
+        given(service.getMetricValues(Matchers.anyString(), Matchers.anyInt(),
+                Matchers.anyInt(), Matchers.anyLong()))
+                .willThrow(new GriffinException.ServiceException(
+                        "Failed to get metric values", new IOException()));
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/metrics/values")
                 .param("metricName", "jobName")
@@ -120,10 +128,16 @@ public class MetricControllerTest {
     public void testAddMetricValuesSuccess() throws Exception {
         List<MetricValue> values = Collections.singletonList(new MetricValue());
         given(service.addMetricValues(Matchers.any()))
-                .willReturn(new ResponseEntity<>("{\"errors\": false, \"items\": []}", HttpStatus.OK));
+                .willReturn(
+                        new ResponseEntity<>(
+                                "{\"errors\": false, \"items\": []}",
+                                HttpStatus.OK));
 
-        mvc.perform(post(URLHelper.API_VERSION_PATH + "/metrics/values")
-                .contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(values)))
+        mvc.perform(
+
+                post(URLHelper.API_VERSION_PATH + "/metrics/values")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtil.toJson(values)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors", is(false)));
     }
@@ -132,9 +146,11 @@ public class MetricControllerTest {
     public void testAddMetricValuesFailureWithException() throws Exception {
         List<MetricValue> values = Collections.singletonList(new MetricValue());
         given(service.addMetricValues(Matchers.any()))
-                .willThrow(new GriffinException.ServiceException("Failed to add metric values", new IOException()));
+                .willThrow(new GriffinException.ServiceException(
+                        "Failed to add metric values", new IOException()));
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/metrics/values")
-                .contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(values)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.toJson(values)))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -142,9 +158,11 @@ public class MetricControllerTest {
     public void testAddMetricValuesFailureWithInvalidFormat() throws Exception {
         List<MetricValue> values = Collections.singletonList(new MetricValue());
         given(service.addMetricValues(Matchers.any()))
-                .willThrow(new GriffinException.BadRequestException(INVALID_METRIC_VALUE_FORMAT));
+                .willThrow(new GriffinException.BadRequestException
+                        (INVALID_METRIC_VALUE_FORMAT));
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/metrics/values")
-                .contentType(MediaType.APPLICATION_JSON).content(JsonUtil.toJson(values)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.toJson(values)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -152,7 +170,8 @@ public class MetricControllerTest {
     @Test
     public void testDeleteMetricValuesSuccess() throws Exception {
         given(service.deleteMetricValues("metricName"))
-                .willReturn(new ResponseEntity<>("{\"failures\": []}", HttpStatus.OK));
+                .willReturn(new ResponseEntity<>("{\"failures\": []}",
+                        HttpStatus.OK));
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/metrics/values")
                 .param("metricName", "metricName"))
@@ -163,7 +182,9 @@ public class MetricControllerTest {
     @Test
     public void testDeleteMetricValuesFailureWithException() throws Exception {
         given(service.deleteMetricValues("metricName"))
-                .willThrow(new GriffinException.ServiceException("Failed to delete metric values.", new IOException()));
+                .willThrow(new GriffinException.ServiceException(
+                        "Failed to delete metric values.",
+                        new IOException()));
 
         mvc.perform(delete(URLHelper.API_VERSION_PATH + "/metrics/values")
                 .param("metricName", "metricName"))

@@ -20,12 +20,13 @@ package org.apache.griffin.measure.sink
 
 import java.util.Date
 
-import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
 
+import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
+import org.apache.griffin.measure.utils.ParamUtil._
+
 /**
-  * persist metric and record to hdfs
+  * sink metric and record to hdfs
   */
 case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Long) extends Sink {
 
@@ -83,6 +84,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
       case e: Throwable => error(e.getMessage)
     }
   }
+
   def finish(): Unit = {
     try {
       HdfsUtil.createEmptyFile(FinishFile)
@@ -103,6 +105,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
   private def getHdfsPath(path: String, groupId: Int): String = {
     HdfsUtil.getHdfsFilePath(path, s"${groupId}")
   }
+
   private def getHdfsPath(path: String, ptnId: Int, groupId: Int): String = {
     HdfsUtil.getHdfsFilePath(path, s"${ptnId}.${groupId}")
   }
@@ -111,17 +114,20 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     HdfsUtil.deleteHdfsPath(path)
   }
 
-  def persistRecords(records: RDD[String], name: String): Unit = {
+  def sinkRecords(records: RDD[String], name: String): Unit = {
     val path = filePath(name)
     clearOldRecords(path)
     try {
       val recordCount = records.count
-      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
+      val count =
+        if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
       if (count > 0) {
         val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
         if (groupCount <= 1) {
           val recs = records.take(count.toInt)
-          persistRecords2Hdfs(path, recs)
+          sinkRecords2Hdfs(path, recs)
         } else {
           val groupedRecords: RDD[(Long, Iterable[String])] =
             records.zipWithIndex.flatMap { r =>
@@ -131,7 +137,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
           groupedRecords.foreach { group =>
             val (gid, recs) = group
             val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
-            persistRecords2Hdfs(hdfsPath, recs)
+            sinkRecords2Hdfs(hdfsPath, recs)
           }
         }
       }
@@ -140,23 +146,26 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     }
   }
 
-  def persistRecords(records: Iterable[String], name: String): Unit = {
+  def sinkRecords(records: Iterable[String], name: String): Unit = {
     val path = filePath(name)
     clearOldRecords(path)
     try {
       val recordCount = records.size
-      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
+      val count =
+        if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
       if (count > 0) {
         val groupCount = (count - 1) / maxLinesPerFile + 1
         if (groupCount <= 1) {
           val recs = records.take(count.toInt)
-          persistRecords2Hdfs(path, recs)
+          sinkRecords2Hdfs(path, recs)
         } else {
           val groupedRecords = records.grouped(maxLinesPerFile).zipWithIndex
           groupedRecords.take(groupCount).foreach { group =>
             val (recs, gid) = group
             val hdfsPath = getHdfsPath(path, gid)
-            persistRecords2Hdfs(hdfsPath, recs)
+            sinkRecords2Hdfs(hdfsPath, recs)
           }
         }
       }
@@ -165,16 +174,16 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     }
   }
 
-  def persistMetrics(metrics: Map[String, Any]): Unit = {
+  def sinkMetrics(metrics: Map[String, Any]): Unit = {
     try {
       val json = JsonUtil.toJson(metrics)
-      persistRecords2Hdfs(MetricsFile, json :: Nil)
+      sinkRecords2Hdfs(MetricsFile, json :: Nil)
     } catch {
       case e: Throwable => error(e.getMessage)
     }
   }
 
-  private def persistRecords2Hdfs(hdfsPath: String, records: Iterable[String]): Unit = {
+  private def sinkRecords2Hdfs(hdfsPath: String, records: Iterable[String]): Unit = {
     try {
       val recStr = records.mkString("\n")
       HdfsUtil.writeContent(hdfsPath, recStr)

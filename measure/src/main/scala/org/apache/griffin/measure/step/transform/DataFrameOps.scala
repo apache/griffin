@@ -20,13 +20,14 @@ package org.apache.griffin.measure.step.transform
 
 import java.util.Date
 
+import org.apache.spark.sql.{Encoders, Row, SQLContext, _}
+import org.apache.spark.sql.types.{BooleanType, LongType, StructField, StructType}
+
 import org.apache.griffin.measure.context.ContextId
-import org.apache.griffin.measure.context.streaming.metric.CacheResults.CacheResult
 import org.apache.griffin.measure.context.streaming.metric._
+import org.apache.griffin.measure.context.streaming.metric.CacheResults.CacheResult
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.spark.sql.types.{BooleanType, LongType, StructField, StructType}
-import org.apache.spark.sql.{Encoders, Row, SQLContext, _}
 
 /**
   * pre-defined data frame operations
@@ -44,15 +45,15 @@ object DataFrameOps {
     val _matched = "matched"
   }
 
-  def fromJson(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
-    val _dfName = "df.name"
+  def fromJson(sqlContext: SQLContext,
+               inputDfName: String,
+               details: Map[String, Any]): DataFrame = {
     val _colName = "col.name"
-    val dfName = details.getOrElse(_dfName, "").toString
     val colNameOpt = details.get(_colName).map(_.toString)
 
     implicit val encoder = Encoders.STRING
 
-    val df: DataFrame = sqlContext.table(s"`${dfName}`")
+    val df: DataFrame = sqlContext.table(s"`${inputDfName}`")
     val rdd = colNameOpt match {
       case Some(colName: String) => df.map(r => r.getAs[String](colName))
       case _ => df.map(_.getAs[String](0))
@@ -60,18 +61,15 @@ object DataFrameOps {
     sqlContext.read.json(rdd) // slow process
   }
 
-  def accuracy(sqlContext: SQLContext, contextId: ContextId, details: Map[String, Any]): DataFrame = {
+  def accuracy(sqlContext: SQLContext,
+               inputDfName: String,
+               contextId: ContextId,
+               details: Map[String, Any]): DataFrame = {
     import AccuracyOprKeys._
 
-    val dfName = details.getStringOrKey(_dfName)
     val miss = details.getStringOrKey(_miss)
     val total = details.getStringOrKey(_total)
     val matched = details.getStringOrKey(_matched)
-
-//    val _enableIgnoreCache = "enable.ignore.cache"
-//    val enableIgnoreCache = details.getBoolean(_enableIgnoreCache, false)
-
-//    val tmst = InternalColumns.tmst
 
     val updateTime = new Date().getTime
 
@@ -83,7 +81,7 @@ object DataFrameOps {
       }
     }
 
-    val df = sqlContext.table(s"`${dfName}`")
+    val df = sqlContext.table(s"`${inputDfName}`")
 
     val results = df.rdd.flatMap { row =>
       try {
@@ -122,11 +120,8 @@ object DataFrameOps {
     retDf
   }
 
-  def clear(sqlContext: SQLContext, details: Map[String, Any]): DataFrame = {
-    val _dfName = "df.name"
-    val dfName = details.getOrElse(_dfName, "").toString
-
-    val df = sqlContext.table(s"`${dfName}`")
+  def clear(sqlContext: SQLContext, inputDfName: String, details: Map[String, Any]): DataFrame = {
+    val df = sqlContext.table(s"`${inputDfName}`")
     val emptyRdd = sqlContext.sparkContext.emptyRDD[Row]
     sqlContext.createDataFrame(emptyRdd, df.schema)
   }

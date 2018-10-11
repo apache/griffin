@@ -19,8 +19,9 @@ under the License.
 package org.apache.griffin.measure.step.write
 
 import org.apache.commons.lang.StringUtils
-import org.apache.griffin.measure.context.DQContext
 import org.apache.spark.sql.DataFrame
+
+import org.apache.griffin.measure.context.DQContext
 
 /**
   * update data source streaming cache
@@ -33,13 +34,13 @@ case class DataSourceUpdateWriteStep(dsName: String,
   val writeTimestampOpt: Option[Long] = None
 
   def execute(context: DQContext): Boolean = {
-    collectDsCacheUpdateDf(context) match {
-      case Some(df) => {
-        context.dataSources.find(ds => StringUtils.equals(ds.name, dsName)).foreach(_.updateData(df))
-      }
-      case _ => {
+    getDataSourceCacheUpdateDf(context) match {
+      case Some(df) =>
+        context.dataSources
+          .find(ds => StringUtils.equals(ds.name, dsName))
+          .foreach(_.updateData(df))
+      case _ =>
         warn(s"update ${dsName} from ${inputName} fails")
-      }
     }
     true
   }
@@ -49,13 +50,13 @@ case class DataSourceUpdateWriteStep(dsName: String,
       val df = context.sqlContext.table(s"`${name}`")
       Some(df)
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"get data frame ${name} fails")
         None
-      }
     }
   }
 
-  private def collectDsCacheUpdateDf(context: DQContext): Option[DataFrame] = getDataFrame(context, inputName)
+  private def getDataSourceCacheUpdateDf(context: DQContext): Option[DataFrame]
+    = getDataFrame(context, inputName)
 
 }

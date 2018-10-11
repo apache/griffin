@@ -24,7 +24,6 @@ import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.dsl.parser.GriffinDslParser
 import org.apache.griffin.measure.step.builder.dsl.transform.Expr2DQSteps
 
-import scala.util.{Failure, Success}
 
 case class GriffinDslDQStepBuilder(dataSourceNames: Seq[String],
                                    functionNames: Seq[String]
@@ -36,24 +35,23 @@ case class GriffinDslDQStepBuilder(dataSourceNames: Seq[String],
   val parser = GriffinDslParser(dataSourceNames, filteredFunctionNames)
 
   def buildSteps(context: DQContext, ruleParam: RuleParam): Seq[DQStep] = {
-    val name = getStepName(ruleParam.getName)
+    val name = getStepName(ruleParam.getOutDfName())
     val rule = ruleParam.getRule
     val dqType = ruleParam.getDqType
     try {
       val result = parser.parseRule(rule, dqType)
       if (result.successful) {
         val expr = result.get
-        val expr2DQSteps = Expr2DQSteps(context, expr, ruleParam.replaceName(name))
+        val expr2DQSteps = Expr2DQSteps(context, expr, ruleParam.replaceOutDfName(name))
         expr2DQSteps.getDQSteps()
       } else {
         warn(s"parse rule [ ${rule} ] fails: \n${result}")
         Nil
       }
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         error(s"generate rule plan ${name} fails: ${e.getMessage}")
         Nil
-      }
     }
   }
 

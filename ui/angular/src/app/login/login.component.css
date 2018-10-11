@@ -17,6 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 @import url("../../../node_modules/bootstrap/dist/css/bootstrap.css");
+
 #content {
   background-color: #1a237e;
   background-position: center center;
@@ -25,6 +26,7 @@ under the License.
   background-size: cover;
   height: 100vh;
 }
+
 hr {
   margin-bottom: 30px;
 }

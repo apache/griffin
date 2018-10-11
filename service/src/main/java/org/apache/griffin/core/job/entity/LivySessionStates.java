@@ -19,13 +19,21 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.SHUTTING_DOWN;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
+
 import com.cloudera.livy.sessions.SessionState;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.quartz.Trigger;
-
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
-import static org.quartz.Trigger.TriggerState;
 
 public class LivySessionStates {
 
@@ -118,7 +126,8 @@ public class LivySessionStates {
     }
 
     public static boolean isActive(State state) {
-        if (UNKNOWN.equals(state) || STOPPED.equals(state) || NOT_FOUND.equals(state) || FOUND.equals(state)) {
+        if (UNKNOWN.equals(state) || STOPPED.equals(state) || NOT_FOUND.equals
+                (state) || FOUND.equals(state)) {
             // set UNKNOWN isActive() as false.
             return false;
         } else if (FINDING.equals(state)) {
@@ -133,7 +142,9 @@ public class LivySessionStates {
         if (STOPPED.equals(state) || SUCCESS.equals(state)) {
             return "COMPLETE";
         }
-        if (UNKNOWN.equals(state) || NOT_FOUND.equals(state) || FOUND.equals(state) || sessionState == null || !sessionState.isActive()) {
+        if (UNKNOWN.equals(state) || NOT_FOUND.equals(state)
+                || FOUND.equals(state) || sessionState == null
+                || !sessionState.isActive()) {
             return "ERROR";
         }
         return "NORMAL";
@@ -141,8 +152,10 @@ public class LivySessionStates {
     }
 
     public static boolean isHealthy(State state) {
-        return !(State.ERROR.equals(state) || State.DEAD.equals(state) ||
-                State.SHUTTING_DOWN.equals(state) || State.FINDING.equals(state) ||
-                State.NOT_FOUND.equals(state) || State.FOUND.equals(state));
+        return !(State.ERROR.equals(state) || State.DEAD.equals(state)
+                || State.SHUTTING_DOWN.equals(state)
+                || State.FINDING.equals(state)
+                || State.NOT_FOUND.equals(state)
+                || State.FOUND.equals(state));
     }
 }

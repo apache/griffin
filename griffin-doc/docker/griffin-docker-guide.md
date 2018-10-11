@@ -24,39 +24,55 @@ Griffin docker images are pre-built on docker hub, users can pull them to try gr
 
 ### Environment preparation
 1. Install [docker](https://docs.docker.com/engine/installation/) and [docker compose](https://docs.docker.com/compose/install/).
-2. Increase vm.max_map_count of your local machine, to use elasticsearch.
+2. Increase vm.max_map_count of your local machine(linux), to use elasticsearch.
     ```
     sysctl -w vm.max_map_count=262144
     ```
-3. Pull griffin pre-built docker images.
+    For macOS, please increase enough memory available for docker (For example, set more than 4 GB in docker->preferences->Advanced) or decrease memory for es instance(For example, set -Xms512m -Xmx512m in jvm.options)
+
+    For other platforms, please reference to this link from elastic.co
+    [max_map_count kernel setting](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+    
+3. Pull griffin pre-built docker images, but if you access docker repository easily(NOT in China).
     ```
-    docker pull bhlx3lyx7/griffin_spark2:0.2.0
-    docker pull bhlx3lyx7/elasticsearch
-    docker pull bhlx3lyx7/kafka
+    docker pull apachegriffin/griffin_spark2:0.3.0
+    docker pull apachegriffin/elasticsearch
+    docker pull apachegriffin/kafka
     docker pull zookeeper:3.5
     ```
-   Or you can pull the images faster through mirror acceleration if you are in China.
+   For Chinese users, you can pull the images from the following mirrors.
     ```
-    docker pull registry.docker-cn.com/bhlx3lyx7/griffin_spark2:0.2.0
-    docker pull registry.docker-cn.com/bhlx3lyx7/elasticsearch
-    docker pull registry.docker-cn.com/bhlx3lyx7/kafka
-    docker pull registry.docker-cn.com/zookeeper:3.5
+    docker pull registry.docker-cn.com/apachegriffin/griffin_spark2:0.3.0
+    docker pull registry.docker-cn.com/apachegriffin/elasticsearch
+    docker pull registry.docker-cn.com/apachegriffin/kafka
+    docker pull zookeeper:3.5
     ```
    The docker images are the griffin environment images.
-    - `bhlx3lyx7/griffin_spark2`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
-    - `bhlx3lyx7/elasticsearch`: This image is based on official elasticsearch, adding some configurations to enable cors requests, to provide elasticsearch service for metrics persist.
-    - `bhlx3lyx7/kafka`: This image contains kafka 0.8, and some demo streaming data, to provide streaming data source in streaming mode.
+    - `apachegriffin/griffin_spark2`: This image contains mysql, hadoop, hive, spark, livy, griffin service, griffin measure, and some prepared demo data, it works as a single node spark cluster, providing spark engine and griffin service.
+    - `apachegriffin/elasticsearch`: This image is based on official elasticsearch, adding some configurations to enable cors requests, to provide elasticsearch service for metrics persist.
+    - `apachegriffin/kafka`: This image contains kafka 0.8, and some demo streaming data, to provide streaming data source in streaming mode.
     - `zookeeper:3.5`: This image is official zookeeper, to provide zookeeper service in streaming mode.
 
 ### How to use griffin docker images in batch mode
 1. Copy [docker-compose-batch.yml](compose/docker-compose-batch.yml) to your work path.
-2. In your work path, start docker containers by using docker compose, wait for about one minutes, then griffin service is ready.
+2. In your work path, start docker containers by using docker compose, wait for about one minute, then griffin service is ready.
+    ```bash
+    $ docker-compose -f docker-compose-batch.yml up -d
     ```
-    docker-compose -f docker-compose-batch.yml up -d
+    After approximate one minute, you can check result. If result looks like below, it means startup is successful.
+    ```bash
+    $ docker container ls
+    CONTAINER ID        IMAGE                                COMMAND                  CREATED             STATUS              PORTS                                                                                                                                                                                                                                                                                                                                                    NAMES
+    bfec3192096d        apachegriffin/griffin_spark2:0.3.0   "/etc/bootstrap-al..."   5 hours ago         Up 5 hours          6066/tcp, 8030-8033/tcp, 8040/tcp, 9000/tcp, 10020/tcp, 19888/tcp, 27017/tcp, 49707/tcp, 50010/tcp, 50020/tcp, 50070/tcp, 50075/tcp, 50090/tcp, 0.0.0.0:32122->2122/tcp, 0.0.0.0:33306->3306/tcp, 0.0.0.0:35432->5432/tcp, 0.0.0.0:38042->8042/tcp, 0.0.0.0:38080->8080/tcp, 0.0.0.0:38088->8088/tcp, 0.0.0.0:38998->8998/tcp, 0.0.0.0:39083->9083/tcp   griffin
+    fb9d04285070        apachegriffin/elasticsearch          "/docker-entrypoin..."   5 hours ago         Up 5 hours          0.0.0.0:39200->9200/tcp, 0.0.0.0:39300->9300/tcp                                                                                                                                                                                                                                                                                                         es
     ```
-3. Now you can try griffin APIs by using postman after importing the [json files](../service/postman).
-    In which you need to modify the environment `BASE_PATH` value to `<your local IP address>:38080`.
-4. You can try the api `Basic -> Get griffin version`, to make sure griffin service has started up.
+3. Now you can try griffin APIs by using any http client, here we use [postman](https://github.com/postmanlabs/postman-app-support) as example.
+We have prepared two postman configuration files, you can download them from [json files](../service/postman).<br><br>For sake of usage, you need to import two files into postman firstly.<br><br>
+![import ](../img/devguide/import_postman_conf.png)<br><br>
+And change the initial environment `BASE_PATH` value to `<your local IP address>:38080`.<br><br>
+![update env](../img/devguide/revise_postman_env.png)<br><br>
+4. You can try the api `Basic -> Get griffin version`, to make sure griffin service has started up.<br><br>
+![update env](../img/devguide/call_postman.png)<br><br>
 5. Add an accuracy measure through api `Measures -> Add measure`, to create a measure in griffin.
 6. Add a job to through api `jobs -> Add job`, to schedule a job to execute the measure. In the example, the schedule interval is 5 minutes.
 7. After some minutes, you can get the metrics from elasticsearch.

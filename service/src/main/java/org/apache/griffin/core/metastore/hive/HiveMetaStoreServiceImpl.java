@@ -19,7 +19,12 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,83 +37,77 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 
 @Service
 @CacheConfig(cacheNames = "hive", keyGenerator = "cacheKeyGenerator")
 public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetaStoreService.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(HiveMetaStoreService.class);
 
     @Autowired
-    private HiveMetaStoreClient client = null;
+    private IMetaStoreClient client = null;
 
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;
 
-    private ThreadPoolExecutor singleThreadExecutor;
 
     public HiveMetaStoreServiceImpl() {
-        singleThreadExecutor = new ThreadPoolExecutor(1, 5, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(3), new ThreadPoolExecutor.DiscardPolicy());
-        LOGGER.info("HiveMetaStoreServiceImpl single thread pool created.");
     }
 
     @Override
-    @Cacheable
+    @Cacheable(unless = "#result==null")
     public Iterable<String> getAllDatabases() {
         Iterable<String> results = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null. Please check your hive config.");
+                LOGGER.warn("Hive client is null. " +
+                        "Please check your hive config.");
                 return new ArrayList<>();
             }
             results = client.getAllDatabases();
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Can not get databases : {}", e.getMessage());
+            LOGGER.error("Can not get databases : {}", e);
         }
         return results;
     }
 
 
     @Override
-    @Cacheable
+    @Cacheable(unless = "#result==null")
     public Iterable<String> getAllTableNames(String dbName) {
         Iterable<String> results = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null. Please check your hive config.");
+                LOGGER.warn("Hive client is null. " +
+                        "Please check your hive config.");
                 return new ArrayList<>();
             }
             results = client.getAllTables(getUseDbName(dbName));
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Exception fetching tables info: {}", e.getMessage());
+            LOGGER.error("Exception fetching tables info: {}", e);
+            return null;
         }
         return results;
     }
 
 
     @Override
-    @Cacheable
+    @Cacheable(unless = "#result==null || #result.isEmpty()")
     public List<Table> getAllTable(String db) {
         return getTables(db);
     }
 
 
     @Override
-    @Cacheable
+    @Cacheable(unless = "#result==null")
     public Map<String, List<Table>> getAllTable() {
         Map<String, List<Table>> results = new HashMap<>();
         Iterable<String> dbs;
-        // if hive.metastore.uris in application.properties configs wrong, client will be injected failure and will be null.
+        // if hive.metastore.uris in application.properties configs wrong,
+        // client will be injected failure and will be null.
         if (client == null) {
             LOGGER.warn("Hive client is null. Please check your hive config.");
             return results;
@@ -118,6 +117,8 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             return results;
         }
         for (String db : dbs) {
+            // TODO: getAllTable() is not reusing caches of getAllTable(db) and vise versa
+            // TODO: getTables() can return empty values on metastore exception
             results.put(db, getTables(db));
         }
         return results;
@@ -125,28 +126,36 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
 
     @Override
-    @Cacheable
+    @Cacheable(unless="#result==null")
     public Table getTable(String dbName, String tableName) {
         Table result = null;
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null. Please check your hive config.");
+                LOGGER.warn("Hive client is null. " +
+                        "Please check your hive config.");
                 return null;
             }
             result = client.getTable(getUseDbName(dbName), tableName);
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Exception fetching table info : {}. {}", tableName, e.getMessage());
+            LOGGER.error("Exception fetching table info : {}. {}", tableName,
+                    e);
         }
         return result;
     }
 
-    @Scheduled(fixedRateString = "${cache.evict.hive.fixedRate.in.milliseconds}")
-    @CacheEvict(cacheNames = "hive", allEntries = true, beforeInvocation = true)
+    @Scheduled(fixedRateString =
+            "${cache.evict.hive.fixedRate.in.milliseconds}")
+    @CacheEvict(
+            cacheNames = "hive",
+            allEntries = true,
+            beforeInvocation = true)
     public void evictHiveCache() {
         LOGGER.info("Evict hive cache");
-        getAllTable();
-        LOGGER.info("After evict hive cache,automatically refresh hive tables cache.");
+        // TODO: calls within same bean are not cached -- this call is not populating anything
+//        getAllTable();
+//        LOGGER.info("After evict hive cache, " +
+//                "automatically refresh hive tables cache.");
     }
 
 
@@ -155,7 +164,8 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
         List<Table> allTables = new ArrayList<>();
         try {
             if (client == null) {
-                LOGGER.warn("Hive client is null. Please check your hive config.");
+                LOGGER.warn("Hive client is null. " +
+                        "Please check your hive config.");
                 return allTables;
             }
             Iterable<String> tables = client.getAllTables(useDbName);
@@ -165,7 +175,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             }
         } catch (Exception e) {
             reconnect();
-            LOGGER.error("Exception fetching tables info: {}", e.getMessage());
+            LOGGER.error("Exception fetching tables info: {}", e);
         }
         return allTables;
     }
@@ -179,15 +189,10 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     }
 
     private void reconnect() {
-        if (singleThreadExecutor.getActiveCount() == 0) {
-            System.out.println("execute create thread.");
-            singleThreadExecutor.execute(() -> {
-                try {
-                    client.reconnect();
-                } catch (Exception e) {
-                    LOGGER.error("reconnect to hive failed.");
-                }
-            });
+        try {
+            client.reconnect();
+        } catch (Exception e) {
+            LOGGER.error("reconnect to hive failed: {}", e);
         }
     }
 }

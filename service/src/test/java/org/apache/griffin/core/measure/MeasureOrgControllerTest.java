@@ -19,6 +19,18 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.griffin.core.util.URLHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,18 +39,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = MeasureOrgController.class, secure = false)
@@ -63,7 +63,8 @@ public class MeasureOrgControllerTest {
     @Test
     public void testGetMetricNameListByOrg() throws Exception {
         String org = "hadoop";
-        when(measureOrgService.getMetricNameListByOrg(org)).thenReturn(Arrays.asList(org));
+        when(measureOrgService.getMetricNameListByOrg(org)).thenReturn(Arrays
+                .asList(org));
 
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/org/{org}", org))
                 .andExpect(status().isOk())

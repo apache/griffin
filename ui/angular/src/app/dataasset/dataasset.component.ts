@@ -16,24 +16,24 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import {Component, OnInit} from '@angular/core';
+import {HttpClient} from "@angular/common/http";
 import * as $ from 'jquery';
 import {ServiceService} from '../service/service.service';
 
 @Component({
   selector: 'app-dataasset',
   templateUrl: './dataasset.component.html',
-  providers:[ServiceService],
+  providers: [ServiceService],
   styleUrls: ['./dataasset.component.css']
 })
 export class DataassetComponent implements OnInit {
   public results = [];
   public visible = false;
   public visibleAnimate = false;
-  sourceTable :string;
-  targetTable :string;
-  data:object;
+  sourceTable: string;
+  targetTable: string;
+  data: object;
 
   public hide(): void {
     this.visibleAnimate = false;
@@ -45,20 +45,22 @@ export class DataassetComponent implements OnInit {
       this.hide();
     }
   }
-  constructor(private http:HttpClient,public serviceService:ServiceService) { }
+
+  constructor(private http: HttpClient, public serviceService: ServiceService) {
+  }
 
   ngOnInit() {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
-    this.http.get(allDataassets).subscribe(data =>{
+    this.http.get(allDataassets).subscribe(data => {
       for (let db in data) {
-        for(let table of data[db]){           
+        for (let table of data[db]) {
           table.location = table.sd.location;
           this.results.push(table);
-        }       
+        }
       }
       $('.icon').hide();
-    },err =>{
-      
+    }, err => {
+
     });
   };
 }

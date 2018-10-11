@@ -29,7 +29,8 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 public final class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
         implements ApplicationContextAware {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutowiringSpringBeanJobFactory.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(AutowiringSpringBeanJobFactory.class);
 
     private transient AutowireCapableBeanFactory beanFactory;
 
@@ -47,7 +48,7 @@ public final class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
             return job;
 
         } catch (Exception e) {
-            LOGGER.error("fail to create job instance. {}", e.getMessage());
+            LOGGER.error("fail to create job instance. {}", e);
         }
         return null;
     }

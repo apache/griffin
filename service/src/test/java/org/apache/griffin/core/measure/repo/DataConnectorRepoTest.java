@@ -19,6 +19,13 @@ under the License.
 
 package org.apache.griffin.core.measure.repo;
 
+import static org.apache.griffin.core.util.EntityHelper.createDataConnector;
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
 import org.apache.griffin.core.measure.entity.DataConnector;
 import org.junit.Before;
@@ -29,13 +36,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.apache.griffin.core.util.EntityHelper.createDataConnector;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -57,25 +57,30 @@ public class DataConnectorRepoTest {
 
     @Test
     public void testFindByConnectorNames() {
-        List<DataConnector> connectors = dcRepo.findByConnectorNames(Arrays.asList("name1", "name2"));
+        List<DataConnector> connectors = dcRepo.findByConnectorNames(Arrays
+                .asList("name1", "name2"));
         assertEquals(connectors.size(), 2);
     }
 
     @Test
     public void testFindByConnectorNamesWithEmpty() {
-        List<DataConnector> connectors = dcRepo.findByConnectorNames(new ArrayList<>());
+        List<DataConnector> connectors = dcRepo.findByConnectorNames(
+                new ArrayList<>());
         assertEquals(connectors.size(), 0);
     }
 
     public void setEntityManager() throws Exception {
-        DataConnector dc1 = createDataConnector("name1", "database1", "table1", "/dt=#YYYYMM#");
+        DataConnector dc1 = createDataConnector("name1", "database1", "table1",
+                "/dt=#YYYYMM#");
 
         entityManager.persistAndFlush(dc1);
 
-        DataConnector dc2 = createDataConnector("name2", "database2", "table2", "/dt=#YYYYMM#");
+        DataConnector dc2 = createDataConnector("name2", "database2", "table2",
+                "/dt=#YYYYMM#");
         entityManager.persistAndFlush(dc2);
 
-        DataConnector dc3 = createDataConnector("name3", "database3", "table3", "/dt=#YYYYMM#");
+        DataConnector dc3 = createDataConnector("name3", "database3", "table3",
+                "/dt=#YYYYMM#");
         entityManager.persistAndFlush(dc3);
     }
 

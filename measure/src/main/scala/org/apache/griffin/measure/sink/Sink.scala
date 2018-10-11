@@ -18,11 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
-import org.apache.griffin.measure.Loggable
 import org.apache.spark.rdd.RDD
 
+import org.apache.griffin.measure.Loggable
+
 /**
-  * persist metric and record
+  * sink metric and record
   */
 trait Sink extends Loggable with Serializable {
   val metricName: String
@@ -39,9 +40,9 @@ trait Sink extends Loggable with Serializable {
 
   def log(rt: Long, msg: String): Unit
 
-  def persistRecords(records: RDD[String], name: String): Unit
-  def persistRecords(records: Iterable[String], name: String): Unit
+  def sinkRecords(records: RDD[String], name: String): Unit
+  def sinkRecords(records: Iterable[String], name: String): Unit
 
-  def persistMetrics(metrics: Map[String, Any]): Unit
+  def sinkMetrics(metrics: Map[String, Any]): Unit
 
 }

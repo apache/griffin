@@ -19,24 +19,21 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
+import javax.annotation.PreDestroy;
+
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
-import java.io.File;
-import java.net.URI;
-import java.net.URL;
-import java.security.CodeSource;
-
 @Component
 public class HiveMetaStoreProxy {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiveMetaStoreProxy.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(HiveMetaStoreProxy.class);
 
     @Value("${hive.metastore.uris}")
     private String uris;
@@ -44,8 +41,11 @@ public class HiveMetaStoreProxy {
     /**
      * Set attempts and interval for HiveMetastoreClient to retry.
      *
-     * @hive.hmshandler.retry.attempts: The number of times to retry a HMSHandler call if there were a connection error.
-     * @hive.hmshandler.retry.interval: The time between HMSHandler retry attempts on failure.
+     * @hive.hmshandler.retry.attempts: The number of times to retry a
+     * HMSHandler call if there were a connection error
+     * .
+     * @hive.hmshandler.retry.interval: The time between HMSHandler retry
+     * attempts on failure.
      */
     @Value("${hive.hmshandler.retry.attempts}")
     private int attempts;
@@ -53,20 +53,21 @@ public class HiveMetaStoreProxy {
     @Value("${hive.hmshandler.retry.interval}")
     private String interval;
 
-    private HiveMetaStoreClient client = null;
+    private IMetaStoreClient client = null;
 
     @Bean
-    public HiveMetaStoreClient initHiveMetastoreClient() {
+    public IMetaStoreClient initHiveMetastoreClient() {
         HiveConf hiveConf = new HiveConf();
         hiveConf.set("hive.metastore.local", "false");
-        hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
+        hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES,
+                3);
         hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
         hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);
         try {
-            client = new HiveMetaStoreClient(hiveConf);
+            client = HiveMetaStoreClient.newSynchronizedClient(new HiveMetaStoreClient(hiveConf));
         } catch (Exception e) {
-            LOGGER.error("Failed to connect hive metastore. {}", e.getMessage());
+            LOGGER.error("Failed to connect hive metastore. {}", e);
         }
         return client;
     }

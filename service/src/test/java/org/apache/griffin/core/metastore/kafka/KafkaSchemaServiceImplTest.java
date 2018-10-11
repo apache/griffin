@@ -19,6 +19,11 @@ under the License.
 
 package org.apache.griffin.core.metastore.kafka;
 
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import io.confluent.kafka.schemaregistry.client.rest.entities.Config;
 import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
@@ -29,11 +34,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
-
-import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 public class KafkaSchemaServiceImplTest {
@@ -52,8 +52,8 @@ public class KafkaSchemaServiceImplTest {
             SchemaString ss = new SchemaString();
             ResponseEntity entity = mock(ResponseEntity.class);
             when(service.restTemplate.getForEntity(
-                "${kafka.schema.registry.url}/schemas/ids/1",
-                SchemaString.class)).thenReturn(entity);
+                    "${kafka.schema.registry.url}/schemas/ids/1",
+                    SchemaString.class)).thenReturn(entity);
             when(entity.getBody()).thenReturn(ss);
             service.getSchemaString(1);
             assertTrue(true);
@@ -67,8 +67,8 @@ public class KafkaSchemaServiceImplTest {
         try {
             ResponseEntity entity = mock(ResponseEntity.class);
             when(service.restTemplate.getForEntity(
-                "${kafka.schema.registry.url}/subjects",
-                String[].class)).thenReturn(entity);
+                    "${kafka.schema.registry.url}/subjects",
+                    String[].class)).thenReturn(entity);
             when(entity.getBody()).thenReturn(new String[]{"aaa", "bbb"});
             service.getSubjects();
             assertTrue(true);
@@ -82,8 +82,8 @@ public class KafkaSchemaServiceImplTest {
         try {
             ResponseEntity entity = mock(ResponseEntity.class);
             when(service.restTemplate.getForEntity(
-                "${kafka.schema.registry.url}/subjects/sub/versions",
-                Integer[].class)).thenReturn(entity);
+                    "${kafka.schema.registry.url}/subjects/sub/versions",
+                    Integer[].class)).thenReturn(entity);
             when(entity.getBody()).thenReturn(new Integer[]{1, 2});
             service.getSubjectVersions("sub");
             assertTrue(true);
@@ -98,8 +98,8 @@ public class KafkaSchemaServiceImplTest {
             Schema schema = mock(Schema.class);
             ResponseEntity entity = mock(ResponseEntity.class);
             when(service.restTemplate.getForEntity(
-                "${kafka.schema.registry.url}/subjects/sub/versions/ver",
-                Schema.class)).thenReturn(entity);
+                    "${kafka.schema.registry.url}/subjects/sub/versions/ver",
+                    Schema.class)).thenReturn(entity);
             when(entity.getBody()).thenReturn(schema);
             service.getSubjectSchema("sub", "ver");
             assertTrue(true);
@@ -114,8 +114,8 @@ public class KafkaSchemaServiceImplTest {
             Config config = mock(Config.class);
             ResponseEntity entity = mock(ResponseEntity.class);
             when(service.restTemplate.getForEntity(
-                "${kafka.schema.registry.url}/config",
-                Config.class)).thenReturn(entity);
+                    "${kafka.schema.registry.url}/config",
+                    Config.class)).thenReturn(entity);
             when(entity.getBody()).thenReturn(config);
             service.getTopLevelConfig();
             assertTrue(true);
@@ -130,8 +130,8 @@ public class KafkaSchemaServiceImplTest {
             Config config = mock(Config.class);
             ResponseEntity entity = mock(ResponseEntity.class);
             when(service.restTemplate.getForEntity(
-                "${kafka.schema.registry.url}/config/subject",
-                Config.class)).thenReturn(entity);
+                    "${kafka.schema.registry.url}/config/subject",
+                    Config.class)).thenReturn(entity);
             when(entity.getBody()).thenReturn(config);
             service.getSubjectLevelConfig("subject");
             assertTrue(true);

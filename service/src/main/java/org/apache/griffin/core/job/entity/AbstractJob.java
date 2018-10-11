@@ -19,32 +19,58 @@ under the License.
 
 package org.apache.griffin.core.job.entity;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 @Entity
 @Table(name = "job")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "job.type")
-@JsonSubTypes({@JsonSubTypes.Type(value = BatchJob.class, name = "batch"), @JsonSubTypes.Type(value = StreamingJob.class, name = "streaming"), @JsonSubTypes.Type(value = VirtualJob.class, name = "virtual")})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
+        property = "job.type")
+@JsonSubTypes({@JsonSubTypes.Type(value = BatchJob.class, name = "batch"),
+        @JsonSubTypes.Type(
+                value = StreamingJob.class,
+                name = "streaming"),
+        @JsonSubTypes.Type(
+                value = VirtualJob.class,
+                name = "virtual")})
 @DiscriminatorColumn(name = "type")
 public abstract class AbstractJob extends AbstractAuditableEntity {
     private static final long serialVersionUID = 7569493377868453677L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJob.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(AbstractJob.class);
 
     protected Long measureId;
 
@@ -80,7 +106,8 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
     private Map<String, Object> configMap;
 
     @NotNull
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+            CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "job_id")
     private List<JobDataSegment> segments = new ArrayList<>();
 
@@ -89,7 +116,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return measureId;
     }
 
-    @JsonProperty("measure.id")
     public void setMeasureId(Long measureId) {
         this.measureId = measureId;
     }
@@ -99,7 +125,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return jobName;
     }
 
-    @JsonProperty("job.name")
     public void setJobName(String jobName) {
         if (StringUtils.isEmpty(jobName)) {
             LOGGER.warn("Job name cannot be empty.");
@@ -113,7 +138,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return cronExpression;
     }
 
-    @JsonProperty("cron.expression")
     public void setCronExpression(String cronExpression) {
         this.cronExpression = cronExpression;
     }
@@ -123,7 +147,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return jobState;
     }
 
-    @JsonProperty("job.state")
     public void setJobState(JobState jobState) {
         this.jobState = jobState;
     }
@@ -133,7 +156,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return timeZone;
     }
 
-    @JsonProperty("cron.time.zone")
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
     }
@@ -143,7 +165,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return segments;
     }
 
-    @JsonProperty("data.segments")
     public void setSegments(List<JobDataSegment> segments) {
         this.segments = segments;
     }
@@ -153,7 +174,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return configMap;
     }
 
-    @JsonProperty("predicate.config")
     public void setConfigMap(Map<String, Object> configMap) {
         this.configMap = configMap;
     }
@@ -171,7 +191,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return metricName;
     }
 
-    @JsonProperty("metric.name")
     public void setMetricName(String metricName) {
         this.metricName = metricName;
     }
@@ -189,7 +208,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return name;
     }
 
-    @JsonProperty("quartz.name")
     public void setName(String quartzName) {
         this.name = quartzName;
     }
@@ -199,7 +217,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         return group;
     }
 
-    @JsonProperty("quartz.group")
     public void setGroup(String quartzGroup) {
         this.group = quartzGroup;
     }
@@ -218,15 +235,17 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(predicateConfig)) {
-            this.configMap = JsonUtil.toEntity(predicateConfig, new TypeReference<Map<String, Object>>() {
-            });
+            this.configMap = JsonUtil.toEntity(predicateConfig,
+                    new TypeReference<Map<String, Object>>() {
+                    });
         }
     }
 
     AbstractJob() {
     }
 
-    AbstractJob(Long measureId, String jobName, String name, String group, boolean deleted) {
+    AbstractJob(Long measureId, String jobName, String name, String group,
+                boolean deleted) {
         this.measureId = measureId;
         this.jobName = jobName;
         this.name = name;
@@ -234,7 +253,9 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    AbstractJob(Long measureId, String jobName, String cronExpression, String timeZone,List<JobDataSegment> segments, boolean deleted) {
+    AbstractJob(Long measureId, String jobName, String cronExpression,
+                String timeZone, List<JobDataSegment> segments,
+                boolean deleted) {
         this.measureId = measureId;
         this.jobName = jobName;
         this.metricName = jobName;

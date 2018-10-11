@@ -19,15 +19,16 @@ under the License.
 
 package org.apache.griffin.core.job.repo;
 
+import java.util.List;
+
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
-
 public interface JobRepo<T extends AbstractJob> extends CrudRepository<T, Long> {
 
-    @Query("select count(j) from #{#entityName} j where j.jobName = ?1 and j.deleted = ?2")
+    @Query("select count(j) from #{#entityName} j " +
+            "where j.jobName = ?1 and j.deleted = ?2")
     int countByJobNameAndDeleted(String jobName, Boolean deleted);
 
     List<T> findByDeleted(boolean deleted);

@@ -29,7 +29,11 @@ sealed trait ProcessType {
 }
 
 object ProcessType {
-  private val procTypes: List[ProcessType] = List(BatchProcessType, StreamingProcessType)
+  private val procTypes: List[ProcessType] = List(
+    BatchProcessType,
+    StreamingProcessType
+  )
+
   def apply(ptn: String): ProcessType = {
     procTypes.find(tp => ptn match {
       case tp.idPattern() => true

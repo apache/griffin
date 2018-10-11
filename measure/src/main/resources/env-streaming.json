@@ -18,15 +18,15 @@
     }
   },
 
-  "persist": [
+  "sinks": [
     {
-      "type": "log",
+      "type": "CONSOLE",
       "config": {
         "max.log.lines": 100
       }
     },
     {
-      "type": "hdfs",
+      "type": "HDFS",
       "config": {
         "path": "hdfs://localhost/griffin/streaming/persist",
         "max.persist.lines": 10000,
@@ -34,7 +34,7 @@
       }
     },
     {
-      "type": "http",
+      "type": "ELASTICSEARCH",
       "config": {
         "method": "post",
         "api": "http://localhost:9200/griffin/accuracy"
@@ -42,7 +42,7 @@
     }
   ],
 
-  "info.cache": [
+  "griffin.checkpoint": [
     {
       "type": "zk",
       "config": {
@@ -54,9 +54,5 @@
         "close.clear": false
       }
     }
-  ],
-
-  "cleaner": {
-    "clean.interval": "2m"
-  }
+  ]
 }

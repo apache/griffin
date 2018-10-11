@@ -19,29 +19,32 @@ under the License.
 
 package org.apache.griffin.core.util;
 
-import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
+import static org.apache.griffin.core.util.PropertiesUtil.getConf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.FileNotFoundException;
 import java.util.Properties;
 
-import static org.apache.griffin.core.util.PropertiesUtil.getConf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
 public class PropertiesUtilTest {
 
     @Test
     public void testGetPropertiesForSuccess() {
         String path = "/quartz.properties";
-        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
-        assertEquals(properties.get("org.quartz.jobStore.isClustered"), "true");
+        Properties properties = PropertiesUtil.getProperties(path,
+                new ClassPathResource(path));
+        assertEquals(properties
+                .get("org.quartz.jobStore.isClustered"), "true");
     }
 
     @Test
     public void testGetPropertiesForFailureWithWrongPath() {
         String path = ".././quartz.properties";
-        Properties properties = PropertiesUtil.getProperties(path, new ClassPathResource(path));
+        Properties properties = PropertiesUtil.getProperties(path,
+                new ClassPathResource(path));
         assertEquals(properties, null);
     }
 

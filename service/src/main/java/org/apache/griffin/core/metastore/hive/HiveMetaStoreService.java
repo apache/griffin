@@ -19,10 +19,10 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import org.apache.hadoop.hive.metastore.api.Table;
-
 import java.util.List;
 import java.util.Map;
+
+import org.apache.hadoop.hive.metastore.api.Table;
 
 public interface HiveMetaStoreService {
 
@@ -35,4 +35,6 @@ public interface HiveMetaStoreService {
     Map<String, List<Table>> getAllTable();
 
     Table getTable(String dbName, String tableName);
+
+    void evictHiveCache();
 }

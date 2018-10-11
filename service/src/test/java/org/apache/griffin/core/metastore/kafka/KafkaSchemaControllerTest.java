@@ -18,6 +18,13 @@ under the License.
 */
 package org.apache.griffin.core.metastore.kafka;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaString;
 import org.apache.griffin.core.util.URLHelper;
 import org.junit.Before;
@@ -30,19 +37,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = KafkaSchemaController.class, secure = false)
 public class KafkaSchemaControllerTest {
 
-    private static final String API_PATH = URLHelper.API_VERSION_PATH + URLHelper.KAFKA_API_PATH;
+    private static final String API_PATH = URLHelper.API_VERSION_PATH +
+            URLHelper.KAFKA_API_PATH;
 
     @Autowired
     private MockMvc mockMvc;
@@ -61,7 +62,7 @@ public class KafkaSchemaControllerTest {
         SchemaString ss = new SchemaString();
         when(kafkaSchemaService.getSchemaString(id)).thenReturn(ss);
         mockMvc.perform(get(API_PATH + "/schema/{id}", id))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
         verify(kafkaSchemaService).getSchemaString(id);
     }
 
@@ -69,17 +70,18 @@ public class KafkaSchemaControllerTest {
     public void test_getSchemaString() throws Exception {
         when(kafkaSchemaService.getSubjects()).thenReturn(null);
         mockMvc.perform(get(API_PATH + "/subject"))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
         verify(kafkaSchemaService).getSubjects();
     }
 
     @Test
     public void test_getSubjectVersions() throws Exception {
         String subject = "s-1";
-        when(kafkaSchemaService.getSubjectVersions(subject)).thenReturn(Arrays.asList(1, 2, 3));
+        when(kafkaSchemaService.getSubjectVersions(subject)).thenReturn(Arrays
+                .asList(1, 2, 3));
         mockMvc.perform(get(API_PATH + "/versions")
-            .param("subject", subject))
-            .andExpect(status().isOk());
+                .param("subject", subject))
+                .andExpect(status().isOk());
         verify(kafkaSchemaService).getSubjectVersions(subject);
     }
 
@@ -87,11 +89,12 @@ public class KafkaSchemaControllerTest {
     public void test_getSubjectSchema() throws Exception {
         String subject = "ss.s";
         String version = "ss";
-        when(kafkaSchemaService.getSubjectSchema(subject, version)).thenReturn(null);
+        when(kafkaSchemaService.getSubjectSchema(subject, version))
+                .thenReturn(null);
         mockMvc.perform(get(API_PATH + "/subjectSchema", subject, version)
-            .param("subject", subject)
-            .param("version", version))
-            .andExpect(status().isOk());
+                .param("subject", subject)
+                .param("version", version))
+                .andExpect(status().isOk());
         verify(kafkaSchemaService).getSubjectSchema(subject, version);
     }
 
@@ -99,16 +102,17 @@ public class KafkaSchemaControllerTest {
     public void test_getTopLevelConfig() throws Exception {
         when(kafkaSchemaService.getTopLevelConfig()).thenReturn(null);
         mockMvc.perform(get(API_PATH + "/config"))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
         verify(kafkaSchemaService).getTopLevelConfig();
     }
 
     @Test
     public void test_getSubjectLevelConfig() throws Exception {
         String subject = "sss";
-        when(kafkaSchemaService.getSubjectLevelConfig(subject)).thenReturn(null);
+        when(kafkaSchemaService.getSubjectLevelConfig(subject))
+                .thenReturn(null);
         mockMvc.perform(get(API_PATH + "/config/{subject}", subject))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
         verify(kafkaSchemaService).getSubjectLevelConfig(subject);
     }
 }

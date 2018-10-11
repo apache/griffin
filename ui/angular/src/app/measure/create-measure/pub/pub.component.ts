@@ -16,20 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Component, OnInit } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { FormsModule } from "@angular/forms";
-import { ServiceService } from "../../../service/service.service";
-import { TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions } from "angular-tree-component";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { ToasterModule, ToasterService, ToasterContainerComponent } from "angular2-toaster";
+import {Component, OnInit} from "@angular/core";
+import {FormControl} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
+import {ServiceService} from "../../../service/service.service";
+import {TREE_ACTIONS, KEYS, IActionMapping, ITreeOptions} from "angular-tree-component";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ToasterModule, ToasterService, ToasterContainerComponent} from "angular2-toaster";
 import * as $ from "jquery";
-import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
-import { DataTableModule } from "angular2-datatable";
-import { AfterViewChecked, ElementRef } from "@angular/core";
-import { AngularMultiSelectModule } from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
-import { ConfigurationComponent } from "../configuration/configuration.component";
+import {HttpClient} from "@angular/common/http";
+import {Router} from "@angular/router";
+import {DataTableModule} from "angular2-datatable";
+import {AfterViewChecked, ElementRef} from "@angular/core";
+import {AngularMultiSelectModule} from "angular2-multiselect-dropdown/angular2-multiselect-dropdown";
+import {ConfigurationComponent} from "../configuration/configuration.component";
 
 interface pubMeasure {
   name: string;
@@ -39,12 +39,13 @@ interface pubMeasure {
   dqType: string;
   owner: string
 }
+
 export function createPubMeasure(name: string,
-  metricName: string,
-  description: string,
-  measureType: string,
-  dqType: string,
-  owner: string) {
+                                 metricName: string,
+                                 description: string,
+                                 measureType: string,
+                                 dqType: string,
+                                 owner: string) {
   return {
     name,
     metricName,
@@ -54,15 +55,16 @@ export function createPubMeasure(name: string,
     owner
   }
 }
+
 @Component({
   selector: "app-pub",
   templateUrl: "./pub.component.html",
   providers: [ServiceService],
   styleUrls: ["./pub.component.css"]
 })
-export class PubComponent implements AfterViewChecked, OnInit {    
-  newMeasure = createPubMeasure("", "", "","external","ACCURACY","test"); 
-  dqTypeOptions =["accuracy"];
+export class PubComponent implements AfterViewChecked, OnInit {
+  newMeasure = createPubMeasure("", "", "", "external", "ACCURACY", "test");
+  dqTypeOptions = ["accuracy"];
   createResult: any;
   private toasterService: ToasterService;
   public visible = false;
@@ -91,9 +93,9 @@ export class PubComponent implements AfterViewChecked, OnInit {
     });
     $("fieldset").height(
       $(stepSelection).height() -
-        $(stepSelection + ">.stepDesc").height() -
-        $(".btn-container").height() -
-        130
+      $(stepSelection + ">.stepDesc").height() -
+      $(".btn-container").height() -
+      130
     );
     $(".y-scrollable").css({
       height: $("fieldset").height()
@@ -101,7 +103,7 @@ export class PubComponent implements AfterViewChecked, OnInit {
   }
 
 
-  formValidation = function(step) {
+  formValidation = function (step) {
     if (step == undefined) {
       step = this.currentStep;
     }
@@ -138,16 +140,15 @@ export class PubComponent implements AfterViewChecked, OnInit {
     setTimeout(() => (this.visibleAnimate = true), 100);
   }
 
-  
 
-  save() {     
-    var measure2Save ={
-      name:this.newMeasure.name,
+  save() {
+    var measure2Save = {
+      name: this.newMeasure.name,
       "metric.name": this.newMeasure.metricName,
-      "measure.type":this.newMeasure.measureType,
-      description:this.newMeasure.description,
-      "dq.type":this.newMeasure.dqType.toUpperCase(),
-      owner:this.newMeasure.owner
+      "measure.type": this.newMeasure.measureType,
+      description: this.newMeasure.description,
+      "dq.type": this.newMeasure.dqType.toUpperCase(),
+      owner: this.newMeasure.owner
     }
     console.log(measure2Save);
     var addModels = this.serviceService.config.uri.addModels;
@@ -160,7 +161,7 @@ export class PubComponent implements AfterViewChecked, OnInit {
       },
       err => {
         let response = JSON.parse(err.error);
-        if(response.code === '40901'){
+        if (response.code === '40901') {
           this.toasterService.pop("error", "Error!", "Measure name already exists!");
         } else {
           this.toasterService.pop("error", "Error!", "Error when creating measure");
@@ -178,11 +179,11 @@ export class PubComponent implements AfterViewChecked, OnInit {
       mouse: {
         click: (tree, node, $event) => {
           if (node.hasChildren) {
-            
+
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
           } else if (node.data.cols) {
-           
-            
+
+
           }
         }
       }
@@ -209,10 +210,11 @@ export class PubComponent implements AfterViewChecked, OnInit {
     var allDataassets = this.serviceService.config.uri.dataassetlist;
     this.http.get(allDataassets).subscribe(data => {
       this.nodeList = new Array();
-      
+
     });
-    
+
   }
+
   ngAfterViewChecked() {
     this.resizeWindow();
   }

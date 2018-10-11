@@ -19,6 +19,10 @@ under the License.
 
 package org.apache.griffin.core.job.repo;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.BatchJob;
@@ -31,10 +35,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -68,7 +68,8 @@ public class JobRepoTest {
 
     @Test
     public void findByJobNameAndDeleted() {
-        List<AbstractJob> jobs = jobRepo.findByJobNameAndDeleted("griffinJobName1", false);
+        List<AbstractJob> jobs = jobRepo
+                .findByJobNameAndDeleted("griffinJobName1", false);
         assertEquals(jobs.size(), 1);
     }
 
@@ -85,8 +86,10 @@ public class JobRepoTest {
     }
 
     public void setEntityManager() {
-        AbstractJob job1 = new BatchJob(1L, "griffinJobName1", "qName1", "qGroup1", false);
-        AbstractJob job2 = new BatchJob(1L, "griffinJobName2", "qName2", "qGroup2", false);
+        AbstractJob job1 = new BatchJob(1L, "griffinJobName1", "qName1",
+                "qGroup1", false);
+        AbstractJob job2 = new BatchJob(1L, "griffinJobName2", "qName2",
+                "qGroup2", false);
         AbstractJob job3 = new VirtualJob("virtualJobName1", 1L, "metricName1");
         AbstractJob job4 = new VirtualJob("virtualJobName2", 1L, "metricName2");
         entityManager.persistAndFlush(job1);

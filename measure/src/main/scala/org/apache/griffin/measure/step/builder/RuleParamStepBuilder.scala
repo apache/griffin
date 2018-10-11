@@ -18,11 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder
 
-import org.apache.griffin.measure.configuration.enums.NormalizeType
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context.DQContext
-import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}
 import org.apache.griffin.measure.step.{DQStep, SeqDQStep}
+import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}
 
 /**
   * build dq step by rule param
@@ -41,18 +41,18 @@ trait RuleParamStepBuilder extends DQStepBuilder {
   def buildSteps(context: DQContext, ruleParam: RuleParam): Seq[DQStep]
 
   protected def buildDirectWriteSteps(ruleParam: RuleParam): Seq[DQStep] = {
-    val name = getStepName(ruleParam.getName)
+    val name = getStepName(ruleParam.getOutDfName())
     // metric writer
-    val metricSteps = ruleParam.getMetricOpt.map { metric =>
-      MetricWriteStep(metric.getNameOpt.getOrElse(name), name, NormalizeType(metric.collectType))
+    val metricSteps = ruleParam.getOutputOpt(MetricOutputType).map { metric =>
+      MetricWriteStep(metric.getNameOpt.getOrElse(name), name, metric.getFlatten)
     }.toSeq
     // record writer
-    val recordSteps = ruleParam.getRecordOpt.map { record =>
+    val recordSteps = ruleParam.getOutputOpt(RecordOutputType).map { record =>
       RecordWriteStep(record.getNameOpt.getOrElse(name), name)
     }.toSeq
     // update writer
-    val dsCacheUpdateSteps = ruleParam.getDsCacheUpdateOpt.map { dsCacheUpdate =>
-      DataSourceUpdateWriteStep(dsCacheUpdate.getDsNameOpt.getOrElse(""), name)
+    val dsCacheUpdateSteps = ruleParam.getOutputOpt(DscUpdateOutputType).map { dsCacheUpdate =>
+      DataSourceUpdateWriteStep(dsCacheUpdate.getNameOpt.getOrElse(""), name)
     }.toSeq
 
     metricSteps ++ recordSteps ++ dsCacheUpdateSteps

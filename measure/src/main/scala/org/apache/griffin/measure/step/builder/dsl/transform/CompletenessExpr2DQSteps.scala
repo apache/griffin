@@ -18,8 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.dsl.transform
 
-import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -80,16 +80,23 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val sourceAliasSql = {
         s"SELECT ${selClause} FROM `${sourceName}`"
       }
-      val sourceAliasTransStep = SparkSqlTransformStep(sourceAliasTableName, sourceAliasSql, emptyMap, true)
+      val sourceAliasTransStep =
+        SparkSqlTransformStep(sourceAliasTableName, sourceAliasSql, emptyMap, true)
 
       // 2. incomplete record
       val incompleteRecordsTableName = "__incompleteRecords"
       val completeWhereClause = aliases.map(a => s"`${a}` IS NOT NULL").mkString(" AND ")
       val incompleteWhereClause = s"NOT (${completeWhereClause})"
-      val incompleteRecordsSql = s"SELECT * FROM `${sourceAliasTableName}` WHERE ${incompleteWhereClause}"
-      val incompleteRecordTransStep = SparkSqlTransformStep(incompleteRecordsTableName, incompleteRecordsSql, emptyMap, true)
+
+      val incompleteRecordsSql =
+        s"SELECT * FROM `${sourceAliasTableName}` WHERE ${incompleteWhereClause}"
+
+      val incompleteRecordTransStep =
+        SparkSqlTransformStep(incompleteRecordsTableName, incompleteRecordsSql, emptyMap, true)
       val incompleteRecordWriteStep = {
-        val rwName = ruleParam.getRecordOpt.flatMap(_.getNameOpt).getOrElse(incompleteRecordsTableName)
+        val rwName =
+          ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
+            .getOrElse(incompleteRecordsTableName)
         RecordWriteStep(rwName, incompleteRecordsTableName)
       }
 
@@ -97,33 +104,39 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val incompleteCountTableName = "__incompleteCount"
       val incompleteColName = details.getStringOrKey(_incomplete)
       val incompleteCountSql = procType match {
-        case BatchProcessType => s"SELECT COUNT(*) AS `${incompleteColName}` FROM `${incompleteRecordsTableName}`"
-        case StreamingProcessType => s"SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${incompleteColName}` FROM `${incompleteRecordsTableName}` GROUP BY `${ConstantColumns.tmst}`"
+        case BatchProcessType =>
+          s"SELECT COUNT(*) AS `${incompleteColName}` FROM `${incompleteRecordsTableName}`"
+        case StreamingProcessType =>
+          s"SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${incompleteColName}` " +
+            s"FROM `${incompleteRecordsTableName}` GROUP BY `${ConstantColumns.tmst}`"
       }
-      val incompleteCountTransStep = SparkSqlTransformStep(incompleteCountTableName, incompleteCountSql, emptyMap)
+      val incompleteCountTransStep =
+        SparkSqlTransformStep(incompleteCountTableName, incompleteCountSql, emptyMap)
 
       // 4. total count
       val totalCountTableName = "__totalCount"
       val totalColName = details.getStringOrKey(_total)
       val totalCountSql = procType match {
-        case BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceAliasTableName}`"
-        case StreamingProcessType => s"SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${totalColName}` FROM `${sourceAliasTableName}` GROUP BY `${ConstantColumns.tmst}`"
+        case BatchProcessType =>
+          s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceAliasTableName}`"
+        case StreamingProcessType =>
+          s"SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${totalColName}` " +
+            s"FROM `${sourceAliasTableName}` GROUP BY `${ConstantColumns.tmst}`"
       }
       val totalCountTransStep = SparkSqlTransformStep(totalCountTableName, totalCountSql, emptyMap)
 
       // 5. complete metric
-      val completeTableName = ruleParam.name
+      val completeTableName = ruleParam.getOutDfName()
       val completeColName = details.getStringOrKey(_complete)
       val completeMetricSql = procType match {
-        case BatchProcessType => {
+        case BatchProcessType =>
           s"""
              |SELECT `${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
              |coalesce(`${incompleteCountTableName}`.`${incompleteColName}`, 0) AS `${incompleteColName}`,
              |(`${totalCountTableName}`.`${totalColName}` - coalesce(`${incompleteCountTableName}`.`${incompleteColName}`, 0)) AS `${completeColName}`
              |FROM `${totalCountTableName}` LEFT JOIN `${incompleteCountTableName}`
          """.stripMargin
-        }
-        case StreamingProcessType => {
+        case StreamingProcessType =>
           s"""
              |SELECT `${totalCountTableName}`.`${ConstantColumns.tmst}` AS `${ConstantColumns.tmst}`,
              |`${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
@@ -132,14 +145,13 @@ case class CompletenessExpr2DQSteps(context: DQContext,
              |FROM `${totalCountTableName}` LEFT JOIN `${incompleteCountTableName}`
              |ON `${totalCountTableName}`.`${ConstantColumns.tmst}` = `${incompleteCountTableName}`.`${ConstantColumns.tmst}`
          """.stripMargin
-        }
       }
       val completeTransStep = SparkSqlTransformStep(completeTableName, completeMetricSql, emptyMap)
       val completeWriteStep = {
-        val metricOpt = ruleParam.getMetricOpt
+        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(completeTableName)
-        val collectType = metricOpt.map(_.getCollectType).getOrElse(NormalizeType.default)
-        MetricWriteStep(mwName, completeTableName, collectType)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+        MetricWriteStep(mwName, completeTableName, flattenType)
       }
 
       val transSteps = {

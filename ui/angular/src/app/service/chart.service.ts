@@ -16,11 +16,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import { Injectable } from "@angular/core";
+import {Injectable} from "@angular/core";
 
 @Injectable()
 export class ChartService {
-  constructor() {}
+  constructor() {
+  }
 
   formatter_value(value, index) {
     if (value < 1000) {
@@ -83,7 +84,7 @@ export class ChartService {
           ]);
       }
     }
-    data.sort(function(a, b) {
+    data.sort(function (a, b) {
       return a[0] - b[0];
     });
     return data;
@@ -106,7 +107,7 @@ export class ChartService {
       },
       tooltip: {
         trigger: "axis",
-        formatter: function(params) {
+        formatter: function (params) {
           return self.getTooltip(params);
         }
       },
@@ -208,10 +209,10 @@ export class ChartService {
       },
       tooltip: {
         trigger: "axis",
-        formatter: function(params) {
+        formatter: function (params) {
           return self.getTooltip(params);
         },
-        position: function(point, params, dom) {
+        position: function (point, params, dom) {
           return self.getTooltipPosition(point, params, dom);
         }
       },
@@ -297,7 +298,7 @@ export class ChartService {
       ],
       tooltip: {
         trigger: "axis",
-        formatter: function(params) {
+        formatter: function (params) {
           return self.getTooltip(params);
         }
       },

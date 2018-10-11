@@ -24,16 +24,29 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.griffin.core.util.JsonUtil;
-import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.griffin.core.util.JsonUtil;
+import org.springframework.util.StringUtils;
 
 /**
  * Measures processed on Griffin
@@ -50,14 +63,13 @@ public class GriffinMeasure extends Measure {
 
     @Enumerated(EnumType.STRING)
     private ProcessType processType;
-	private static final long serialVersionUID = -475176898459647661L;
+    private static final long serialVersionUID = -475176898459647661L;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long timestamp;
 
     @JsonIgnore
-//    @Access(AccessType.PROPERTY)
     @Column(length = 1024)
     private String ruleDescription;
 
@@ -66,12 +78,14 @@ public class GriffinMeasure extends Measure {
     private Map<String, Object> ruleDescriptionMap;
 
     @NotNull
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+        CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "measure_id")
     private List<DataSource> dataSources = new ArrayList<>();
 
     @NotNull
-    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+        CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "evaluate_rule_id")
     private EvaluateRule evaluateRule;
 
@@ -80,7 +94,6 @@ public class GriffinMeasure extends Measure {
         return processType;
     }
 
-    @JsonProperty("process.type")
     public void setProcessType(ProcessType processType) {
         this.processType = processType;
     }
@@ -90,7 +103,6 @@ public class GriffinMeasure extends Measure {
         return dataSources;
     }
 
-    @JsonProperty("data.sources")
     public void setDataSources(List<DataSource> dataSources) {
         if (CollectionUtils.isEmpty(dataSources)) {
             throw new NullPointerException("Data source can not be empty.");
@@ -103,9 +115,9 @@ public class GriffinMeasure extends Measure {
         return evaluateRule;
     }
 
-    @JsonProperty("evaluate.rule")
     public void setEvaluateRule(EvaluateRule evaluateRule) {
-        if (evaluateRule == null || CollectionUtils.isEmpty(evaluateRule.getRules())) {
+        if (evaluateRule == null || CollectionUtils.isEmpty(evaluateRule
+            .getRules())) {
             throw new NullPointerException("Evaluate rule can not be empty.");
         }
         this.evaluateRule = evaluateRule;
@@ -116,7 +128,6 @@ public class GriffinMeasure extends Measure {
         return ruleDescriptionMap;
     }
 
-    @JsonProperty("rule.description")
     public void setRuleDescriptionMap(Map<String, Object> ruleDescriptionMap) {
         this.ruleDescriptionMap = ruleDescriptionMap;
     }
@@ -147,14 +158,20 @@ public class GriffinMeasure extends Measure {
         super();
     }
 
-    public GriffinMeasure(String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+    public GriffinMeasure(String name, String owner,
+                          List<DataSource> dataSources,
+                          EvaluateRule evaluateRule,
+                          List<String> sinksList) {
         this.name = name;
         this.owner = owner;
         this.dataSources = dataSources;
         this.evaluateRule = evaluateRule;
+        setSinksList(sinksList);
     }
 
-    public GriffinMeasure(Long measureId, String name, String owner, List<DataSource> dataSources, EvaluateRule evaluateRule) {
+    public GriffinMeasure(Long measureId, String name, String owner,
+                          List<DataSource> dataSources,
+                          EvaluateRule evaluateRule) {
         this.setId(measureId);
         this.name = name;
         this.owner = owner;
@@ -173,8 +190,9 @@ public class GriffinMeasure extends Measure {
     @PostLoad
     public void load() throws IOException {
         if (!StringUtils.isEmpty(ruleDescription)) {
-            this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription, new TypeReference<Map<String, Object>>() {
-            });
+            this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription,
+                new TypeReference<Map<String, Object>>() {
+                });
         }
     }
 }

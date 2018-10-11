@@ -86,6 +86,25 @@ case class LikeExpr(head: Expr, is: Boolean, value: Expr) extends LogicalExpr {
   }
 }
 
+case class RLikeExpr(head: Expr, is: Boolean, value: Expr) extends LogicalExpr {
+
+  addChildren(head :: value :: Nil)
+
+  def desc: String = {
+    val notStr = if (is) "" else " NOT"
+    s"${head.desc}${notStr} RLIKE ${value.desc}"
+  }
+  def coalesceDesc: String = {
+    val notStr = if (is) "" else " NOT"
+    s"${head.coalesceDesc}${notStr} RLIKE ${value.coalesceDesc}"
+  }
+
+  override def map(func: (Expr) => Expr): RLikeExpr = {
+    RLikeExpr(func(head), is, func(value))
+  }
+}
+
+
 case class IsNullExpr(head: Expr, is: Boolean) extends LogicalExpr {
 
   addChild(head)
@@ -166,7 +185,8 @@ case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends Logi
   }
 }
 
-case class BinaryLogicalExpr(factor: LogicalExpr, tails: Seq[(String, LogicalExpr)]) extends LogicalExpr {
+case class BinaryLogicalExpr(factor: LogicalExpr, tails: Seq[(String, LogicalExpr)])
+  extends LogicalExpr {
 
   addChildren(factor +: tails.map(_._2))
 

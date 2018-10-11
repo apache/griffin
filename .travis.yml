@@ -20,8 +20,15 @@ scala:
   - 2.10.6
 node_js:
   - "6"
+git:
+  quiet: true
+cache:
+  directories:
+  - $HOME/.m2
 
 install:
   - npm install -g bower
 
-script: mvn clean verify -q
+# keep 30, need change according to ci logs.
+script: travis_wait 30 mvn clean verify -q
+

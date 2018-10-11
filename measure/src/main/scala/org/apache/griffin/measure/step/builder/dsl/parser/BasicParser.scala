@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.dsl.parser
 
+import scala.util.parsing.combinator.JavaTokenParsers
+
 import org.apache.griffin.measure.step.builder.dsl.expr._
 
-import scala.util.parsing.combinator.JavaTokenParsers
 
 /**
   * basic parser for sql like syntax
@@ -72,6 +73,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <between-expr> ::= <math-expr> [<not>]? <between> (<math-expr> <and> <math-expr> | <range-expr>)
     * <range-expr> ::= "(" [<math-expr>]? [, <math-expr>]+ ")"
     * <like-expr> ::= <math-expr> [<not>]? <like> <math-expr>
+    * <rlike-expr> ::= <math-expr> [<not>]? <rlike> <math-expr>
     * <is-null-expr> ::= <math-expr> <is> [<not>]? <null>
     * <is-nan-expr> ::= <math-expr> <is> [<not>]? <nan>
     *
@@ -131,6 +133,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     val AND_ONLY: Parser[String] = """(?i)and\s""".r
     val IS: Parser[String] = """(?i)is\s""".r
     val LIKE: Parser[String] = """(?i)like\s""".r
+    val RLIKE: Parser[String] = """(?i)rlike\s""".r
     val COMPARE: Parser[String] = "=" | "!=" | "<>" | "<=" | ">=" | "<" | ">"
     val LOGICAL_UNARY: Parser[String] = NOT
     val LOGICAL_BINARIES: Seq[Parser[String]] = Seq((COMPARE), (AND), (OR))
@@ -261,14 +264,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   }
   def binaryMathExpressions: Seq[Parser[MathExpr]] =
     MATH_BINARIES.foldLeft(List[Parser[MathExpr]](unaryMathExpression)) { (parsers, binaryParser) =>
-      val pre = parsers.head
+      val pre = parsers.headOption.orNull
       val cur = pre ~ rep(binaryParser ~ pre) ^^ {
         case a ~ Nil => a
         case a ~ list => BinaryMathExpr(a, list.map(c => (c._1, c._2)))
       }
       cur :: parsers
     }
-  def mathExpression: Parser[MathExpr] = binaryMathExpressions.head
+  def mathExpression: Parser[MathExpr] = binaryMathExpressions.headOption.orNull
 
   /**
     * -- logical expr --
@@ -276,6 +279,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     * <between-expr> ::= <math-expr> [<not>]? <between> (<math-expr> <and> <math-expr> | <range-expr>)
     * <range-expr> ::= "(" [<math-expr>]? [, <math-expr>]+ ")"
     * <like-expr> ::= <math-expr> [<not>]? <like> <math-expr>
+    * <rlike-expr> ::= <math-expr> [<not>]? <rlike> <math-expr>
     * <is-null-expr> ::= <math-expr> <is> [<not>]? <null>
     * <is-nan-expr> ::= <math-expr> <is> [<not>]? <nan>
     *
@@ -296,6 +300,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   def likeExpr: Parser[LogicalExpr] = mathExpression ~ opt(NOT) ~ LIKE ~ mathExpression ^^ {
     case head ~ notOpt ~ _ ~ value => LikeExpr(head, notOpt.isEmpty, value)
   }
+  def rlikeExpr: Parser[LogicalExpr] = mathExpression ~ opt(NOT) ~ RLIKE ~ mathExpression ^^ {
+    case head ~ notOpt ~ _ ~ value => RLikeExpr(head, notOpt.isEmpty, value)
+  }
   def isNullExpr: Parser[LogicalExpr] = mathExpression ~ IS ~ opt(NOT) ~ NULL ^^ {
     case head ~ _ ~ notOpt ~ _ => IsNullExpr(head, notOpt.isEmpty)
   }
@@ -303,7 +310,7 @@ trait BasicParser extends JavaTokenParsers with Serializable {
     case head ~ _ ~ notOpt ~ _ => IsNanExpr(head, notOpt.isEmpty)
   }
 
-  def logicalFactor: Parser[LogicalExpr] = (inExpr | betweenExpr | likeExpr | isNullExpr | isNanExpr | mathExpression) ^^ {
+  def logicalFactor: Parser[LogicalExpr] = (inExpr | betweenExpr | likeExpr | rlikeExpr | isNullExpr | isNanExpr | mathExpression) ^^ {
     LogicalFactorExpr(_, false, None)
   } | LBR ~ logicalExpression ~ RBR ~ opt(asAlias) ^^ {
     case _ ~ expr ~ _ ~ aliasOpt => LogicalFactorExpr(expr, true, aliasOpt)
@@ -314,14 +321,14 @@ trait BasicParser extends JavaTokenParsers with Serializable {
   }
   def binaryLogicalExpressions: Seq[Parser[LogicalExpr]] =
     LOGICAL_BINARIES.foldLeft(List[Parser[LogicalExpr]](unaryLogicalExpression)) { (parsers, binaryParser) =>
-      val pre = parsers.head
+      val pre = parsers.headOption.orNull
       val cur = pre ~ rep(binaryParser ~ pre) ^^ {
         case a ~ Nil => a
         case a ~ list => BinaryLogicalExpr(a, list.map(c => (c._1, c._2)))
       }
       cur :: parsers
     }
-  def logicalExpression: Parser[LogicalExpr] = binaryLogicalExpressions.head
+  def logicalExpression: Parser[LogicalExpr] = binaryLogicalExpressions.headOption.orNull
 
   /**
     * -- expression --
@@ -382,10 +389,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
 
   def combinedClause: Parser[CombinedClause] = selectClause ~ opt(fromClause) ~ opt(whereClause) ~
     opt(groupbyClause) ~ opt(orderbyClause) ~ opt(limitClause) ^^ {
-    case sel ~ fromOpt ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
+    case sel ~ fromOpt ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt =>
       val tails = Seq(whereOpt, groupbyOpt, orderbyOpt, limitOpt).flatMap(opt => opt)
       CombinedClause(sel, fromOpt, tails)
-    }
   }
 
 }

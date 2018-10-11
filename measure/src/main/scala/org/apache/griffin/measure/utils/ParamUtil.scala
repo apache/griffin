@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.utils
 
+import scala.reflect.ClassTag
+
 object ParamUtil {
 
   implicit class ParamMap(params: Map[String, Any]) {
@@ -28,7 +30,7 @@ object ParamUtil {
       }
     }
 
-    def getAnyRef[T](key: String, defValue: T)(implicit m: Manifest[T]): T = {
+    def getAnyRef[T: ClassTag](key: String, defValue: T): T = {
       params.get(key) match {
         case Some(v: T) => v
         case _ => defValue
@@ -38,24 +40,24 @@ object ParamUtil {
     def getString(key: String, defValue: String): String = {
       try {
         params.get(key) match {
-          case Some(v: String) => v.toString
+          case Some(v: String) => v
           case Some(v) => v.toString
           case _ => defValue
         }
       } catch {
-        case _: Throwable => defValue
+        case _: NumberFormatException => defValue
       }
     }
 
     def getLazyString(key: String, defValue: () => String): String = {
       try {
         params.get(key) match {
-          case Some(v: String) => v.toString
+          case Some(v: String) => v
           case Some(v) => v.toString
           case _ => defValue()
         }
       } catch {
-        case _: Throwable => defValue()
+        case _: NumberFormatException => defValue()
       }
     }
 
@@ -65,7 +67,7 @@ object ParamUtil {
       try {
         params.get(key) match {
           case Some(v: String) => v.toByte
-          case Some(v: Byte) => v.toByte
+          case Some(v: Byte) => v
           case Some(v: Short) => v.toByte
           case Some(v: Int) => v.toByte
           case Some(v: Long) => v.toByte
@@ -74,7 +76,7 @@ object ParamUtil {
           case _ => defValue
         }
       } catch {
-        case _: Throwable => defValue
+        case _: NumberFormatException => defValue
       }
     }
 
@@ -83,7 +85,7 @@ object ParamUtil {
         params.get(key) match {
           case Some(v: String) => v.toShort
           case Some(v: Byte) => v.toShort
-          case Some(v: Short) => v.toShort
+          case Some(v: Short) => v
           case Some(v: Int) => v.toShort
           case Some(v: Long) => v.toShort
           case Some(v: Float) => v.toShort
@@ -91,7 +93,7 @@ object ParamUtil {
           case _ => defValue
         }
       } catch {
-        case _: Throwable => defValue
+        case _: NumberFormatException => defValue
       }
     }
 
@@ -101,14 +103,14 @@ object ParamUtil {
           case Some(v: String) => v.toInt
           case Some(v: Byte) => v.toInt
           case Some(v: Short) => v.toInt
-          case Some(v: Int) => v.toInt
+          case Some(v: Int) => v
           case Some(v: Long) => v.toInt
           case Some(v: Float) => v.toInt
           case Some(v: Double) => v.toInt
           case _ => defValue
         }
       } catch {
-        case _: Throwable => defValue
+        case _: NumberFormatException => defValue
       }
     }
 
@@ -119,13 +121,13 @@ object ParamUtil {
           case Some(v: Byte) => v.toLong
           case Some(v: Short) => v.toLong
           case Some(v: Int) => v.toLong
-          case Some(v: Long) => v.toLong
+          case Some(v: Long) => v
           case Some(v: Float) => v.toLong
           case Some(v: Double) => v.toLong
           case _ => defValue
         }
       } catch {
-        case _: Throwable => defValue
+        case _: NumberFormatException => defValue
       }
     }
 
@@ -137,12 +139,12 @@ object ParamUtil {
           case Some(v: Short) => v.toFloat
           case Some(v: Int) => v.toFloat
           case Some(v: Long) => v.toFloat
-          case Some(v: Float) => v.toFloat
+          case Some(v: Float) => v
           case Some(v: Double) => v.toFloat
           case _ => defValue
         }
       } catch {
-        case _: Throwable => defValue
+        case _: NumberFormatException => defValue
       }
     }
 
@@ -155,11 +157,11 @@ object ParamUtil {
           case Some(v: Int) => v.toDouble
           case Some(v: Long) => v.toDouble
           case Some(v: Float) => v.toDouble
-          case Some(v: Double) => v.toDouble
+          case Some(v: Double) => v
           case _ => defValue
         }
       } catch {
-        case _: Throwable => defValue
+        case _: NumberFormatException => defValue
       }
     }
 
@@ -171,42 +173,32 @@ object ParamUtil {
           case _ => defValue
         }
       } catch {
-        case _: Throwable => defValue
+        case _: NumberFormatException => defValue
       }
     }
 
-    case class StringAnyMap(values:Map[String,Any])
-    def getParamMap(key: String, defValue: Map[String, Any] = Map[String, Any]()): Map[String, Any] = {
-      try {
-        params.get(key) match {
-          case Some(v: StringAnyMap) => v.values
-          case _ => defValue
-        }
-      } catch {
-        case _: Throwable => defValue
+    case class StringAnyMap(values: Map[String, Any])
+
+    def getParamMap(key: String, defValue: Map[String, Any]
+      = Map[String, Any]()): Map[String, Any] = {
+      params.get(key) match {
+        case Some(v: StringAnyMap) => v.values
+        case _ => defValue
       }
     }
 
     def getParamMapOpt(key: String): Option[Map[String, Any]] = {
-      try {
-        params.get(key) match {
-          case Some(v: StringAnyMap) => Some(v.values)
-          case _ => None
-        }
-      } catch {
-        case _: Throwable => None
+      params.get(key) match {
+        case Some(v: StringAnyMap) => Some(v.values)
+        case _ => None
       }
     }
 
     def getArr[T](key: String): Seq[T] = {
-      case class TSeqs(values:Seq[T])
-      try {
-        params.get(key) match {
-          case Some(seq: TSeqs) => seq.values
-          case _ => Nil
-        }
-      } catch {
-        case _: Throwable => Nil
+      case class TSeqs(values: Seq[T])
+      params.get(key) match {
+        case Some(seq: TSeqs) => seq.values
+        case _ => Nil
       }
     }
 
