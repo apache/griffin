@@ -104,7 +104,7 @@ You should also modify some configurations of Apache Griffin for your environmen
 - <b>service/src/main/resources/application.properties</b>
 
     ```
-    # apache griffin server port (default 8080)
+    # Apache Griffin server port (default 8080)
     server.port = 8080
     # jpa
     spring.datasource.url = jdbc:postgresql://<your IP>:5432/quartz?autoReconnect=true&useSSL=false

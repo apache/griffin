@@ -105,7 +105,7 @@ Description:
 
 ## Apache Griffin Basic
 
-### Get apache griffin version
+### Get Apache Griffin version
 `GET /api/v1/version`
 
 #### Response Body Sample
@@ -132,9 +132,9 @@ Description:
 
 #### Request Body example 
 
-There are two kind of different measures, apache griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
+There are two kind of different measures, Apache Griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
 
-Here is a request body example to create a griffin measure of  profiling:
+Here is a request body example to create a Apache Griffin measure of  profiling:
 ```
 {
     "name":"profiling_measure",
@@ -194,7 +194,7 @@ Here is a request body example to create a griffin measure of  profiling:
     }
 }
 ```
-And for apache griffin measure of accuracy:
+And for Apache Griffin measure of accuracy:
 ```
 {
     "name":"accuracy_measure",
@@ -457,9 +457,9 @@ The response body should be the created measure if success. For example:
 | measure | measure entity | Measure |
 
 #### Request Body example 
-There are two kind of different measures, apache griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
+There are two kind of different measures, Apache Griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
 
-Here is a request body example to update a griffin measure of accuracy:
+Here is a request body example to update a Apache Griffin measure of accuracy:
 ```
 {
     "id": 1,

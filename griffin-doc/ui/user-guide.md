@@ -139,7 +139,7 @@ Fill out the block of job configuration.
 - Begin: data segment start time comparing with trigger time
 - End: data segment end time comparing with trigger time.
 
-After submit the job, apache griffin will schedule the job in background, and after calculation, you can monitor the dashboard to view the result on UI.
+After submit the job, Apache Griffin will schedule the job in background, and after calculation, you can monitor the dashboard to view the result on UI.
 
 ## 3 Metrics dashboard
 
