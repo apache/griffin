@@ -18,7 +18,7 @@ under the License.
 -->
 
 # Apache Griffin Deployment Guide
-For Griffin users, please follow the instructions below to deploy Griffin in your environment. Note that there are some dependencies that should be installed firstly.
+For Apache Griffin users, please follow the instructions below to deploy Apache Griffin in your environment. Note that there are some dependencies that should be installed firstly.
 
 ### Prerequisites
 You need to install following items
@@ -30,7 +30,7 @@ You need to install following items
 - [Hive](http://apache.claz.org/hive/hive-2.2.0/apache-hive-2.2.0-bin.tar.gz) (version 2.2.0), you can get some help [here](https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHive).
     You need to make sure that your spark cluster could access your HiveContext.
 - [Livy](http://archive.cloudera.com/beta/livy/livy-server-0.3.0.zip), you can get some help [here](http://livy.io/quickstart.html).
-    Griffin need to schedule spark jobs by server, we use livy to submit our jobs.
+    Apache Griffin need to schedule spark jobs by server, we use livy to submit our jobs.
     For some issues of Livy for HiveContext, we need to download 3 files or get them from Spark lib `$SPARK_HOME/lib/`, and put them into HDFS.
     ```
     datanucleus-api-jdo-3.2.6.jar
@@ -38,7 +38,7 @@ You need to install following items
     datanucleus-rdbms-3.2.9.jar
     ```
 - ElasticSearch (5.0 or later versions).
-	ElasticSearch works as a metrics collector, Griffin produces metrics into it, and our default UI gets metrics from it, you can use them by your own way as well.
+	ElasticSearch works as a metrics collector, Apache Griffin produces metrics into it, and our default UI gets metrics from it, you can use them by your own way as well.
 
 ### Configuration
 
@@ -99,12 +99,12 @@ curl -XPUT http://es:9200/griffin -d '
 '
 ```
 
-You should also modify some configurations of Griffin for your environment.
+You should also modify some configurations of Apache Griffin for your environment.
 
 - <b>service/src/main/resources/application.properties</b>
 
     ```
-    # griffin server port (default 8080)
+    # apache griffin server port (default 8080)
     server.port = 8080
     # jpa
     spring.datasource.url = jdbc:postgresql://<your IP>:5432/quartz?autoReconnect=true&useSSL=false
@@ -199,7 +199,7 @@ After all environment services startup, we can start our server.
   java -jar service/target/service.jar
   ```
 
-After a few seconds, we can visit our default UI of Griffin (by default the port of spring boot is 8080).
+After a few seconds, we can visit our default UI of Apache Griffin (by default the port of spring boot is 8080).
 
   ```
   http://<your IP>:8080

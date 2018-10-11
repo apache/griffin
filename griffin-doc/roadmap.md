@@ -22,7 +22,7 @@ under the License.
 In the current release, we've implemented main DQ features below
 
 - **Data Asset Detection**
-  Enabling configuration in service module, Griffin can detect the Hive tables metadata through Hive metastore service.
+  Enabling configuration in service module, Apache Griffin can detect the Hive tables metadata through Hive metastore service.
 
 - **Measure Management**
   Performing operations on UI, user can create, delete and update three types of measures, including: accuracy, profiling and publish metrics.
@@ -42,11 +42,11 @@ In the current release, we've implemented main DQ features below
 ## Short-term Roadmap
 
 - **Support more data source types**
-  Currently, Griffin only supports Hive table, avro files on hdfs as data source in batch mode, Kafka as data source in streaming mode.
+  Currently, Apache Griffin only supports Hive table, avro files on hdfs as data source in batch mode, Kafka as data source in streaming mode.
   We plan to support more data source types, like RDBM, elasticsearch.
 
 - **Support more data quality dimensions**
-  Griffin needs to support more data quality dimensions, like consistency and validity.
+  Apache Griffin needs to support more data quality dimensions, like consistency and validity.
 
 - **Anomaly Detection**
-  Griffin plans to support anomaly detection, by analyzing metrics calculated from elasticsearch.
+  Apache Griffin plans to support anomaly detection, by analyzing metrics calculated from elasticsearch.
