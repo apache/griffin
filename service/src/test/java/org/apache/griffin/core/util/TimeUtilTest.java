@@ -135,9 +135,13 @@ public class TimeUtilTest {
         tests.put("UTC-1", "GMT");
         tests.put("UTC-1:00", "GMT");
         tests.put("UTC-01:00", "GMT");
+        // "named" time zones support
+        tests.put("CST", "CST"); // supported
+        tests.put("CDT", "GMT"); // not supported
+        tests.put("America/Los_Angeles", "America/Los_Angeles"); // supported
         tests.forEach((input, expected) -> {
             String actual = TimeUtil.getTimeZone(input).getID();
-            assertEquals(String.format("For input: %s", input), actual, expected);
+            assertEquals(String.format("For input: %s", input), expected, actual);
         });
     }
 
