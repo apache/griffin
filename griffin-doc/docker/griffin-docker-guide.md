@@ -73,8 +73,10 @@ And change the initial environment `BASE_PATH` value to `<your local IP address>
 ![update env](../img/devguide/revise_postman_env.png)<br><br>
 4. You can try the api `Basic -> Get griffin version`, to make sure griffin service has started up.<br><br>
 ![update env](../img/devguide/call_postman.png)<br><br>
-5. Add an accuracy measure through api `Measures -> Add measure`, to create a measure in griffin.
-6. Add a job to through api `jobs -> Add job`, to schedule a job to execute the measure. In the example, the schedule interval is 5 minutes.
+5. Add an accuracy measure through api `Measures -> Add measure`, to create a measure in griffin.<br><br>
+![update env](../img/devguide/add-measure.png)<br><br>
+6. Add a job to through api `jobs -> Add job`, to schedule a job to execute the measure. In the example, the schedule interval is 5 minutes.<br><br>
+![update env](../img/devguide/add-job.png)<br><br>
 7. After some minutes, you can get the metrics from elasticsearch.
     ```
     curl -XGET '<your local IP address>:39200/griffin/accuracy/_search?pretty&filter_path=hits.hits._source' -d '{"query":{"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}]}'
