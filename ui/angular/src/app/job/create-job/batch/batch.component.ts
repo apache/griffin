@@ -33,6 +33,8 @@ import {Router} from "@angular/router";
 import {NouisliderModule} from "ng2-nouislider";
 import {HttpClient} from "@angular/common/http";
 
+import {TimeUtils} from "../../../shared/time-utils";
+
 @Component({
   selector: "app-batch",
   templateUrl: "./batch.component.html",
@@ -134,8 +136,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
       return false;
     }
     this.measureid = this.getMeasureId();
-    let time = -(new Date().getTimezoneOffset() / 60);
-    let timezone = "GMT" + (time >= 0 ? "+"+time : time) + ":00";
+    let timezone = TimeUtils.getBrowserTimeZone();
     this.newJob = {
       "job.name": this.jobname,
       "job.type": "batch",
