@@ -48,17 +48,15 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
           },
           "pre.proc": [
             {
-              "dsl.type": "df-opr",
-              "name": "${s1}",
-              "rule": "from_json",
-              "details": {
-                "df.name": "${this}"
-              }
+              "dsl.type": "df-ops",
+              "in.dataframe.name": "this",
+              "out.dataframe.name": "s1",
+              "rule": "from_json"
             },
             {
               "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select name, age from ${s1}"
+              "out.dataframe.name": "this",
+              "rule": "select name, age from s1"
             }
           ]
         }
@@ -68,7 +66,8 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"]
+        "time.range": ["-2m", "0"],
+        "updatable": true
       }
     }, {
       "name": "target",
@@ -89,17 +88,15 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
           },
           "pre.proc": [
             {
-              "dsl.type": "df-opr",
-              "name": "${t1}",
-              "rule": "from_json",
-              "details": {
-                "df.name": "${this}"
-              }
+              "dsl.type": "df-ops",
+              "in.dataframe.name": "this",
+              "out.dataframe.name": "t1",
+              "rule": "from_json"
             },
             {
               "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select name, age from ${t1}"
+              "out.dataframe.name": "this",
+              "rule": "select name, age from t1"
             }
           ]
         }
@@ -119,7 +116,7 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "accuracy",
-        "name": "accu",
+        "out.dataframe.name": "accu",
         "rule": "source.name = target.name and source.age = target.age",
         "details": {
           "source": "source",
@@ -140,7 +137,9 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
         ]
       }
     ]
-  }
+  },
+   
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }
 ```
 Above is the configure file of streaming accuracy job.  
@@ -199,17 +198,15 @@ The miss records of source will be persisted as record.
           },
           "pre.proc": [
             {
-              "dsl.type": "df-opr",
-              "name": "${s1}",
-              "rule": "from_json",
-              "details": {
-                "df.name": "${this}"
-              }
+              "dsl.type": "df-ops",
+              "in.dataframe.name": "this",
+              "out.dataframe.name": "s1",
+              "rule": "from_json"
             },
             {
               "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select name, age from ${s1}"
+              "out.dataframe.name": "this",
+              "rule": "select name, age from s1"
             }
           ]
         }
@@ -229,7 +226,7 @@ The miss records of source will be persisted as record.
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "prof",
+        "out.dataframe.name": "prof",
         "rule": "select count(name) as `cnt`, max(age) as `max`, min(age) as `min` from source",
         "out": [
           {
@@ -241,7 +238,7 @@ The miss records of source will be persisted as record.
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "profiling",
-        "name": "grp",
+        "out.dataframe.name": "grp",
         "rule": "select name, count(*) as `cnt` from source group by name",
         "out": [
           {
@@ -252,7 +249,9 @@ The miss records of source will be persisted as record.
         ]        
       }
     ]
-  }
+  },
+      
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }
 ```
 Above is the configure file of streaming profiling job.  

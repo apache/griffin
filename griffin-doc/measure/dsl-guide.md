@@ -24,14 +24,14 @@ Griffin DSL is designed for DQ measurement, as a SQL-like language, which descri
 Griffin DSL syntax is easy to learn as it's SQL-like, case insensitive.
 
 ### Supporting process
-- logical operation: `not, and, or, in, between, like, is null, is nan, =, !=, <>, <=, >=, <, >`
+- logical operation: `not, and, or, in, between, like, rlike, is null, is nan, =, !=, <>, <=, >=, <, >`
 - mathematical operation: `+, -, *, /, %`
 - sql statement: `as, where, group by, having, order by, limit`
 
 ### Keywords
 - `null, nan, true, false`
 - `not, and, or`
-- `in, between, like, is`
+- `in, between, like, rlike, is`
 - `select, distinct, from, as, where, group, by, having, order, desc, asc, limit`
 
 ### Operators
@@ -79,6 +79,8 @@ Griffin DSL syntax is easy to learn as it's SQL-like, case insensitive.
 	e.g. `source.age between 3 and 30`, `source.age between (3, 30)`
 - **like**: like clause like sql.  
 	e.g. `source.name like "%abc%"`
+- **rlike**: rlike clause like spark sql.  
+    e.g. `source.name rlike "^abc.*$"`
 - **is null**: is null operator like sql.  
 	e.g. `source.desc is not null`
 - **is nan**: check if the value is not a number, the syntax like `is null`  

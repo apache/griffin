@@ -43,7 +43,7 @@ Apache Griffin measure module needs two configuration files to define the parame
 
   "sinks": [
     {
-      "type": "log",
+      "type": "console",
       "config": {
         "max.log.lines": 100
       }
@@ -56,7 +56,7 @@ Apache Griffin measure module needs two configuration files to define the parame
     }
   ],
 
-  "info.cache": [
+  "griffin.checkpoint": [
     {
       "type": "zk",
       "config": {
@@ -79,30 +79,30 @@ Above lists environment parameters.
 	+ batch.interval: Interval of dumping streaming data, for streaming mode.
 	+ process.interval: Interval of processing dumped streaming data, for streaming mode.
 	+ config: Configuration of spark parameters.
-- **persist**: This field configures list of metrics persist parameters, multiple persist ways are supported. Details of persist configuration [here](#persist).
-- **info.cache**: This field configures list of information cache parameters, multiple cache ways are supported. It is only for streaming dq case. Details of info cache configuration [here](#info-cache).
+- **sinks**: This field configures list of metrics sink parameters, multiple sink ways are supported. Details of sink configuration [here](#sinks).
+- **griffin.checkpoint**: This field configures list of griffin checkpoint parameters, multiple cache ways are supported. It is only for streaming dq case. Details of info cache configuration [here](#griffin-checkpoint).
 
 ### <a name="sinks"></a>Sinks
-- **type**: Metrics and records persist type, "log", "hdfs", "http", "mongo". 
-- **config**: Configure parameters of each persist type.
-	+ log persist (aliases: "console")
+- **type**: Metrics and records sink type, "console", "hdfs", "http", "mongo". 
+- **config**: Configure parameters of each sink type.
+	+ console sink (aliases: "log")
 		* max.log.lines: the max lines of log.
-	+ hdfs persist
-		* path: hdfs path to persist metrics
-		* max.persist.lines: the max lines of total persist data.
-		* max.lines.per.file: the max lines of each persist file.
-	+ http persist (aliases: "es", "elasticsearch")
-		* api: api to submit persist metrics.
+	+ hdfs sink
+		* path: hdfs path to sink metrics
+		* max.persist.lines: the max lines of total sink data.
+		* max.lines.per.file: the max lines of each sink file.
+	+ http sink (aliases: "es", "elasticsearch")
+		* api: api to submit sink metrics.
 		* method: http method, "post" default.
-    + mongo persist
+    + mongo sink
         * url: url of mongo db.
         * database: database name.
         * collection: collection name. 
 
-### <a name="info-cache"></a>Info Cache
-- **type**: Information cache type, "zk" for zookeeper cache.
-- **config**: Configure parameters of info cache type.
-	+ zookeeper cache
+### <a name="griffin-checkpoint"></a>Griffin Checkpoint
+- **type**: Griffin checkpoint type, "zk" for zookeeper checkpoint.
+- **config**: Configure parameters of griffin checkpoint type.
+	+ zookeeper checkpoint
 		* hosts: zookeeper hosts list as a string, separated by comma.
 		* namespace: namespace of cache info, "" as default.
 		* lock.path: path of lock info, "lock" as default.
@@ -150,7 +150,7 @@ Above lists environment parameters.
       {
         "dsl.type": "griffin-dsl",
         "dq.type": "accuracy",
-        "name": "accu",
+        "out.dataframe.name": "accu",
         "rule": "source.user_id = target.user_id AND upper(source.first_name) = upper(target.first_name) AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code",
         "details": {
           "source": "source",
@@ -206,9 +206,10 @@ Above lists DQ job configure parameters.
 		* done.file: 
 
 ### <a name="rule"></a>Rule
-- **dsl.type**: Rule dsl type, "spark-sql", "df-opr" and "griffin-dsl".
+- **dsl.type**: Rule dsl type, "spark-sql", "df-ops" and "griffin-dsl".
 - **dq.type**: DQ type of this rule, only for "griffin-dsl" type. Supported types: "accuracy", "profiling", "timeliness", "uniqueness", "completeness".
-- **name** (step information): Result table name of this rule, optional for "griffin-dsl" type.
+- **out.dataframe.name** (step information): Output table name of this rule, could be used in the following rules.
+- **in.dataframe.name** (step information): Input table name of this rule, only used for "df-ops" type.
 - **rule**: The rule string.
 - **details**: Details of this rule, optional.
   + accuracy dq type detail configuration
@@ -219,14 +220,6 @@ Above lists DQ job configure parameters.
     * matched: the matched count name in metric, optional.
   + profiling dq type detail configuration
     * source: the data source name which as source in profiling, default is the name of first data source in "data.sources" if not configured. If the griffin-dsl rule contains from clause, this parameter is ignored.
-  + uniqueness dq type detail configuration
-    * source: name of data source to measure uniqueness.
-    * target: name of data source to compare with. It is always the same as source, or more than source.
-    * unique: the unique count name in metric, optional.
-    * total: the total count name in metric, optional.
-    * dup: the duplicate count name in metric, optional.
-    * num: the duplicate number name in metric, optional.
-    * duplication.array: optional, if set as a non-empty string, the duplication metric will be computed, and the group metric name is this string.
   + distinctness dq type detail configuration
     * source: name of data source to measure uniqueness.
     * target: name of data source to compare with. It is always the same as source, or more than source.
@@ -241,7 +234,7 @@ Above lists DQ job configure parameters.
     * source: name of data source to measure timeliness.
     * latency: the latency column name in metric, optional.
     * threshold: optional, if set as a time string like "1h", the items with latency more than 1 hour will be record.
-- **out**: Lits of output sinks for the job.
+- **out**: List of output sinks for the job.
   + Metric output.
     * type: "metric"
     * name: Metric name, semantics depends on "flatten" field value.   
@@ -250,7 +243,7 @@ Above lists DQ job configure parameters.
       - entries: sends first row of data frame as metric results, like like `{"agg_col": "value"}`
       - array: wraps all metrics into a map, like `{"my_out_name": [{"agg_col": "value"}]}`
       - map: wraps first row of data frame into a map, like `{"my_out_name": {"agg_col": "value"}}`
-  + Record output. Currenly handled only by HDFS sink.
+  + Record output. Currently handled only by HDFS sink.
     * type: "record"
     * name: File name within sink output folder to dump files to.   
   + Data source cache update for streaming jobs.
