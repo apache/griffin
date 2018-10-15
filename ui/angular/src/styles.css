@@ -1239,3 +1239,17 @@ input {
   overflow-x: hidden;
   height: 100%;
 }
+
+.bottom-info {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 5px;
+}
+
+.bottom-info p {
+  margin-bottom: 0;
+}
+
+.bottom-info .fa {
+  margin-right: 3px;
+}
