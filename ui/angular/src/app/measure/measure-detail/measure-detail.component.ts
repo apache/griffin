@@ -40,6 +40,8 @@ export class MeasureDetailComponent implements OnInit {
   }
 
   ruleData: any;
+  getModelUrl: string;
+  showFullRules: boolean;
   ruleDes = [];
   sourceLength: number;
   sourceDB: string;
@@ -79,11 +81,10 @@ export class MeasureDetailComponent implements OnInit {
     this.ruleData = {
       evaluateRule: ""
     };
-    var getModelUrl;
-    var getModel = this.serviceService.config.uri.getModel;
+    let getModel = this.serviceService.config.uri.getModel;
     this.currentId = this.route.snapshot.paramMap.get("id");
-    getModelUrl = getModel + "/" + this.currentId;
-    this.http.get(getModelUrl).subscribe(
+    this.getModelUrl = getModel + "/" + this.currentId;
+    this.http.get(this.getModelUrl).subscribe(
       data => {
         this.ruleData = data;
         if (this.ruleData["measure.type"] === "external") {
@@ -109,5 +110,15 @@ export class MeasureDetailComponent implements OnInit {
         // toaster.pop('error', 'Error when geting record', response.message);
       }
     );
+  }
+
+  getJsonContent() {
+    let content;
+    if (!this.showFullRules) {
+      content = (this.ruleData['evaluate.rule'] || {})['rules'];
+    } else {
+      content = this.ruleData;
+    }
+    return JSON.stringify(content, null, 4);
   }
 }
