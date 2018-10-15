@@ -78,8 +78,41 @@ And change the initial environment `BASE_PATH` value to `<your local IP address>
 6. Add a job to through api `jobs -> Add job`, to schedule a job to execute the measure. In the example, the schedule interval is 5 minutes.<br><br>
 ![update env](../img/devguide/add-job.png)<br><br>
 7. After some minutes, you can get the metrics from elasticsearch.
-    ```
-    curl -XGET '<your local IP address>:39200/griffin/accuracy/_search?pretty&filter_path=hits.hits._source' -d '{"query":{"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}]}'
+    ```bash
+    curl -XGET '<IP Address>:39200/griffin/accuracy/_search?pretty&filter_path=hits.hits._source' \
+    -d '{"query":{"match_all":{}},  "sort": [{"tmst": {"order": "asc"}}]}'
+    
+    # json metric data returned
+    {
+      "hits" : {
+        "hits" : [
+          {
+            "_source" : {
+              "name" : "metricName",
+              "tmst" : 1509599811123,
+              "value" : {
+                "__tmst" : 1509599811123,
+                "miss" : 11,
+                "total" : 125000,
+                "matched" : 124989
+              }
+            }
+          },
+          {
+            "_source" : {
+              "name" : "metricName",
+              "tmst" : 1509599811123,
+              "value" : {
+                "__tmst" : 1509599811123,
+                "miss" : 11,
+                "total" : 125000,
+                "matched" : 124989
+              }
+            }
+          }
+        ]
+      }
+    }
     ```
 
 ### How to use Apache Griffin docker images in streaming mode
