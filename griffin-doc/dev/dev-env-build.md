@@ -18,7 +18,7 @@ under the License.
 -->
 
 # Apache Griffin Development Environment Building Guide
-We have pre-built Griffin docker images for Griffin developers. You can use those images directly, which set up a ready development environment for you much faster than building the environment locally.
+We have pre-built Apache Griffin docker images for Apache Griffin developers. You can use those images directly, which set up a ready development environment for you much faster than building the environment locally.
 
 ## Set Up with Docker Images
 Here are step-by-step instructions of how to [pull Docker images](../docker/griffin-docker-guide.md#environment-preparation) from the repository and run containers using the images.
@@ -85,7 +85,7 @@ mvn clean install
 ```
 
 ### For service module and ui module
-1. Login to docker container, and stop running griffin service.
+1. Login to docker container, and stop running Apache Griffin service.
 ```
 docker exec -it <griffin docker container id> bash
 cd ~/service
@@ -114,10 +114,10 @@ docker exec -it <griffin docker container id> bash
 hadoop fs -rm /griffin/griffin-measure.jar
 hadoop fs -put /root/measure/griffin-measure.jar /griffin/griffin-measure.jar
 ```
-Now the griffin service will submit jobs by using this new griffin-measure.jar.
+Now the Apache Griffin service will submit jobs by using this new griffin-measure.jar.
 
-## Build new griffin docker image
-For end2end test, you will need to build a new griffin docker image, for more convenient test.
+## Build new Apache Griffin docker image
+For end2end test, you will need to build a new Apache Griffin docker image, for more convenient test.
 1. Pull the docker build repo on your docker host.
 ```
 git clone https://github.com/bhlx3lyx7/griffin-docker.git
@@ -127,7 +127,7 @@ git clone https://github.com/bhlx3lyx7/griffin-docker.git
 cp service-<version>.jar <path to>/griffin-docker/griffin_spark2/prep/service/service.jar
 cp measure-<version>.jar <path to>/griffin-docker/griffin_spark2/prep/measure/griffin-measure.jar
 ```
-3. Build your new griffin docker image.
+3. Build your new Apache Griffin docker image.
 In griffin_spark2 directory.
 ```
 cd <path to>/griffin-docker/griffin_spark2
@@ -138,7 +138,7 @@ docker build -t <image name>[:<image version>] .
 griffin:
   image: <image name>[:<image version>]
 ```
-5. Now you can run your new griffin docker image.
+5. Now you can run your new Apache Griffin docker image.
 ```
 docker-compose -f <docker-compose file> up -d
 ```

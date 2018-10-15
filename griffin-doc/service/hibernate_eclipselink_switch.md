@@ -69,7 +69,7 @@ To use it in our Spring Boot application, we just need to add the org.eclipse.pe
 <h2 id = "1.3"></h2> 
 
 ### Configure EclipseLink static weaving
-EclipseLink requires the domain types to be instrumented to implement lazy-loading. This can be achieved either through static weaving at compile time or dynamically at class loading time (load-time weaving). In Griffin,we use static weaving in pom.xml.
+EclipseLink requires the domain types to be instrumented to implement lazy-loading. This can be achieved either through static weaving at compile time or dynamically at class loading time (load-time weaving). In Apache Griffin,we use static weaving in pom.xml.
 
     <build>
         <plugins>
@@ -102,7 +102,7 @@ EclipseLink requires the domain types to be instrumented to implement lazy-loadi
 **JpaBaseConfiguration is an abstract class which defines beans for JPA** in Spring Boot. Spring  provides a configuration implementation for Hibernate out of the box called HibernateJpaAutoConfiguration. However, for EclipseLink, we have to create a custom configuration.To customize it, we have to implement some methods like createJpaVendorAdapter() or getVendorProperties().
 First, we need to implement the createJpaVendorAdapter() method which specifies the JPA implementation to use.
 Also, we have to define some vendor-specific properties which will be used by EclipseLink.We can add these via the getVendorProperties() method.
-**Add following code as a class to org.apache.griffin.core.config package in Griffin project.**
+**Add following code as a class to org.apache.griffin.core.config package in Apache Griffin project.**
    
 
         @Configuration
@@ -131,7 +131,7 @@ Also, we have to define some vendor-specific properties which will be used by Ec
 <h2 id = "1.5"></h2>
 
 #### Configure properties
-You need to configure properties according to the database you use in Griffin.
+You need to configure properties according to the database you use in Apache Griffin.
 Please see [Mysql and postgresql switch](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/mysql_postgresql_switch.md) to configure.
 
 <h2 id = "0.1"></h2>
@@ -140,7 +140,7 @@ Please see [Mysql and postgresql switch](https://github.com/apache/incubator-gri
 Here we'll go through steps necessary to migrate applications from using EclipseLink JPA to using Hibernate JPA.The migration will not need to convert any EclipseLink annotations to Hibernate annotations in application code. 
 
 ## Quick use
-In Griffin, we provide **hibernate_mysql_pom.xml** file for hibernate and mysql. If you want to quick use hibernate and mysql with jar, firstly you should [configure properties](#2.3) and then use command `mvn clean package -f pom_hibernate.xml` to package jar.
+In Apache Griffin, we provide **hibernate_mysql_pom.xml** file for hibernate and mysql. If you want to quick use hibernate and mysql with jar, firstly you should [configure properties](#2.3) and then use command `mvn clean package -f pom_hibernate.xml` to package jar.
 
 ## Migration main steps
 - [add hibernate dependency](#2.1)
@@ -200,5 +200,5 @@ By default, Spring Data uses Hibernate as the default JPA implementation provide
 <h2 id = "2.3"></h2>
 
 #### Configure properties
-You need to configure properties according to the database you use in Griffin.
+You need to configure properties according to the database you use in Apache Griffin.
 Please see [Mysql and postgresql switch](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/mysql_postgresql_switch.md) to configure.

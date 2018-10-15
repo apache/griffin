@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# Griffin Measure Configuration Guide
+# Apache Griffin Measure Configuration Guide
 Apache Griffin measure module needs two configuration files to define the parameters of execution, one is for environment, the other is for dq job.
 
 ## Environment Parameters
