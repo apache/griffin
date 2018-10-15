@@ -49,7 +49,7 @@ under the License.
     </label>
     <div class="col-md-10 col-lg-10 col-sm-10 scrollable">
       <select id="timezone" class="form-control" name="zone" [(ngModel)]="timezone" required (change)="upward()">
-        <option *ngFor="let item of timezones;let i = index" [value]="item">{{item}}</option>
+        <option *ngFor="let item of timezones.keys(); let i = index" [value]="timezones.get(item)">{{item}}</option>
       </select>
     </div>
   </div>

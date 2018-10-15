@@ -31,6 +31,8 @@ import {HttpParams} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 
+import {TimeUtils} from '../../../shared/time-utils';
+
 @Component({
   selector: 'app-streaming',
   templateUrl: './streaming.component.html',
@@ -132,8 +134,7 @@ export class StreamingComponent implements OnInit {
       return false;
     }
     this.measureid = this.getMeasureId();
-    let time = new Date().getTimezoneOffset() / 60;
-    let timezone = "GMT" + time + ":00";
+    let timezone = TimeUtils.getBrowserTimeZone();
     this.newJob = {
       "job.type": "streaming",
       "job.name": this.jobname,

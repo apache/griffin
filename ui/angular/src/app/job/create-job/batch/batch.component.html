@@ -97,10 +97,13 @@ under the License.
                               (keydown)="blinkKeydownLabel()" style="margin-bottom: 5rem"></nouislider>
                 </div>
               </div>
-              <div class="setcolor">
+              <div class="setcolor bottom-info">
                 <p>
-                  <i class="fa fa-info-circle"></i> After submitted, please go to "
-                  <a class="bark-link" href="/jobs">Jobs</a>" to check the job status
+                  <i class="fa fa-info-circle"></i>After submitted, please go to
+                  "<a class="bark-link" href="/jobs">Jobs</a>" to check the job status
+                </p>
+                <p>
+                  <i class="fa fa-info-circle"></i>Cron expression is using browser's time zone: {{timezone}}
                 </p>
               </div>
             </fieldset>
