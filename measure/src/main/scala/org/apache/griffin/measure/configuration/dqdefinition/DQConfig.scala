@@ -141,9 +141,6 @@ case class EvaluateRuleParam( @JsonProperty("rules") private val rules: List[Rul
   * @param details    detail config of rule (optional)
   * @param cache      cache the result for multiple usage (optional, valid for "spark-sql" and "df-ops" mode)
   * @param outputs    output ways configuration (optional)
-//  * @param metric     config for metric output (optional)
-//  * @param record     config for record output (optional)
-//  * @param dsCacheUpdate    config for data source cache update output (optional, valid in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
 case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
