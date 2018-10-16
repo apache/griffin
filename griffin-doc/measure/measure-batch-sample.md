@@ -18,7 +18,7 @@ under the License.
 -->
 
 # Measure Batch Sample
-Measures consists of batch measure and streaming measure. This document is for the batch measure sample.
+Apache Griffin measures consist of batch measure and streaming measure, this document merely gives the batch measure sample.
 
 ## Batch Accuracy Sample
 ```

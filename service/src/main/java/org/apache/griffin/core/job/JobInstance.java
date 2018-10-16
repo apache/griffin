@@ -257,19 +257,12 @@ public class JobInstance implements Job {
                 }
                 for (Long timestamp : sampleTs) {
                     set.add(TimeUtil.format(value, timestamp,
-                            getTimeZone(timezone)));
+                            TimeUtil.getTimeZone(timezone)));
                 }
                 conf.put(entry.getKey(), StringUtils.join(set,
                         PATH_CONNECTOR_CHARACTER));
             }
         }
-    }
-
-    private TimeZone getTimeZone(String timezone) {
-        if (StringUtils.isEmpty(timezone)) {
-            return TimeZone.getDefault();
-        }
-        return TimeZone.getTimeZone(timezone);
     }
 
     @SuppressWarnings("unchecked")

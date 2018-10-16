@@ -70,10 +70,14 @@ under the License.
         <label class="stepDesc">This step let you choose the single source of truth for data quality comparision with
           target. Currently you can only select the attributes from one schema</label>
         <div class="container-fluid">
-          <div class="col-md-4 col-lg-4 col-sm-4">
+          <div class="col-md-4 col-lg-4 col-sm-4 select-schema">
             <fieldset>
               <legend>Please select schema</legend>
-              <tree-root [nodes]="nodeList" [options]="options"></tree-root>
+              <!-- ac form has Next button inside the form, so keypress handler is required to intercept form submit -->
+              <!-- apparently this is not required in pr.step1, probably because buttons are outside the form -->
+              <input #srcSearchBox id="srcSearchBox" type="text" class="search-query" placeholder="Search..."
+                     (keypress)="onKeyPress($event, srcSearchBox.value, srcTree)">
+              <tree-root #srcTree [nodes]="nodeList" [options]="options"></tree-root>
             </fieldset>
           </div>
           <div class="col-md-8 col-lg-8 col-sm-8">
@@ -130,12 +134,16 @@ under the License.
       <div id="step-2" *ngIf="currentStep == 2" class="formStep">
         <label class="stepDesc">This step let you choose the target for data quality comparision with source</label>
         <div class="container-fluid">
-          <div class="col-md-4 col-lg-4 col-sm-4">
+          <div class="col-md-4 col-lg-4 col-sm-4 select-schema">
             <fieldset>
               <legend>Please select schema</legend>
-              <tree-root [nodes]="nodeListTarget" [options]="targetOptions"></tree-root>
+              <!-- see comment on #srcSearchBox -->
+              <input #tgtSearchBox id="tgtSearchBox" type="text" class="search-query" placeholder="Search..."
+                     (keypress)="onKeyPress($event, tgtSearchBox.value, tgtTree)">
+              <tree-root #tgtTree [nodes]="nodeListTarget" [options]="targetOptions"></tree-root>
             </fieldset>
           </div>
+          <form>
           <div class="col-md-8 col-lg-8 col-sm-8">
             <fieldset>
               <legend>
@@ -177,6 +185,7 @@ under the License.
               </div>
             </fieldset>
           </div>
+          </form>
           <div class="form-group btn-container">
             <button class="btn btn-primary btn-o back-step btn-wide pull-left" (click)="prev(Form)">
               <i class="fa fa-arrow-circle-left"></i> Back

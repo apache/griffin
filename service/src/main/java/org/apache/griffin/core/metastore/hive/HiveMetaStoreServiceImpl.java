@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             .getLogger(HiveMetaStoreService.class);
 
     @Autowired
-    private HiveMetaStoreClient client = null;
+    private IMetaStoreClient client = null;
 
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;

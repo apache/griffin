@@ -18,7 +18,7 @@ under the License.
 -->
 
 # Measure Streaming Sample
-Measures consists of batch measure and streaming measure. This document is for the streaming measure sample.
+Apache Griffin measures consist of batch measure and streaming measure, this document merely gives the streaming measure sample.
 
 ## Streaming Accuracy Sample
 ```
@@ -147,9 +147,9 @@ Above is the configure file of streaming accuracy job.
 
 ### Data source
 In this sample, we use kafka topics as source and target.  
-At current, griffin supports kafka 0.8, for 1.0 or later version is during implementation.  
-In griffin implementation, we can only support json string as kafka data, which could describe itself in data. In some other solution, there might be a schema proxy for kafka binary data, you can implement such data source connector if you need, it's also during implementation by us.
-In streaming cases, the data from topics always needs some pre-process first, which is configured in `pre.proc`, just like the `rules`, griffin will not parse sql content, so we use some pattern to mark your temporory tables. `${this}` means the origin data set, and the output table name should also be `${this}`.
+At current, Apache Griffin supports kafka 0.8, for 1.0 or later version is during implementation.  
+In Apache Griffin implementation, we can only support json string as kafka data, which could describe itself in data. In some other solution, there might be a schema proxy for kafka binary data, you can implement such data source connector if you need, it's also during implementation by us.
+In streaming cases, the data from topics always needs some pre-process first, which is configured in `pre.proc`, just like the `rules`, Apache Griffin will not parse sql content, so we use some pattern to mark your temporory tables. `${this}` means the origin data set, and the output table name should also be `${this}`.
 
 For example, you can create two topics in kafka, for source and target data, the format could be json string.
 Source data could be:
