@@ -45,4 +45,8 @@ case class SqlServerBatchDataConnector(@transient sparkSession: SparkSession,
 
     connectionProperties
   }
+
+  override def jdbcUrl(): String = {
+    s"jdbc:sqlserver://${serverAndPort};database=${database}"
+  }
 }

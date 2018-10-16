@@ -51,15 +51,17 @@ trait JdbcBatchDataConnector extends BatchDataConnector {
 
   def getConnectionProperties(): Properties
 
+  def jdbcUrl(): String
+
   def data(ms: Long): (Option[DataFrame], TimeRange) = {
     val dfOpt = try {
       assert(!serverAndPort.isEmpty && !user.isEmpty && !password.isEmpty && !table.isEmpty,
         "Missing Datasource config parameters")
-      val jdbcUrl = s"jdbc:sqlserver://${serverAndPort};database=${database}"
-      info(jdbcUrl)
+      val dbUrl = jdbcUrl()
+      info(dbUrl)
       val dtSql = dataSql
       info(dtSql)
-      val df = sparkSession.read.jdbc(jdbcUrl, dtSql, getConnectionProperties)
+      val df = sparkSession.read.jdbc(dbUrl, dtSql, getConnectionProperties)
       val dfOpt = Some(df)
       val preDfOpt = preProcess(dfOpt, ms)
       preDfOpt
