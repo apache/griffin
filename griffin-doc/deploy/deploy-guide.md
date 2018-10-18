@@ -84,14 +84,14 @@ curl -XPUT http://es:9200/griffin -d '
                     "type": "text"
                 },
                 "tmst": {
-                    "type": "long"
+                    "type": "date"
                 }
             }
         }
     },
     "settings": {
         "index": {
-            "number_of_replicas": "1",
+            "number_of_replicas": "2",
             "number_of_shards": "5"
         }
     }
