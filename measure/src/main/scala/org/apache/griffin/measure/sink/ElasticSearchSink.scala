@@ -22,7 +22,7 @@ import scala.concurrent.Future
 
 import org.apache.spark.rdd.RDD
 
-import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
+import org.apache.griffin.measure.utils.{HttpDQUtil, JsonUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 
@@ -64,7 +64,7 @@ case class ElasticSearchSink(config: Map[String, Any], metricName: String,
 
       def func(): (Long, Future[Boolean]) = {
         import scala.concurrent.ExecutionContext.Implicits.global
-        (timeStamp, Future(HttpUtil.httpRequest(api, method, params, header, data)))
+        (timeStamp, Future(HttpDQUtil.httpRequest(api, method, params, header, data)))
       }
       if (block) SinkTaskRunner.addBlockTask(func _, retry, connectionTimeout)
       else SinkTaskRunner.addNonBlockTask(func _, retry)
