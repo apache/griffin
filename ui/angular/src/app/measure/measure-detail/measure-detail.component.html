@@ -190,5 +190,11 @@ under the License.
         {{index.name}}&nbsp;:&nbsp;{{index.infos}}
       </div>
     </div>
+    <h5 class="row">Rules JSON</h5>
+    <div *ngIf="ruleData['evaluate.rule']">
+      <a *ngIf="!showFullRules" (click)="showFullRules=true">Show full JSON</a>
+      <a *ngIf="showFullRules" (click)="showFullRules=false">Show rules only</a>
+      <pre class="code-viewport">{{ getJsonContent() }}</pre>
+    </div>
   </div>
 </div>
