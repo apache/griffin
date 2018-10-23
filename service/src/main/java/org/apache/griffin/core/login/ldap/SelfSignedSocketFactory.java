@@ -19,6 +19,8 @@ under the License.
 
 package org.apache.griffin.core.login.ldap;
 
+import org.apache.griffin.core.exception.GriffinException;
+
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -54,7 +56,7 @@ public class SelfSignedSocketFactory extends SocketFactory {
         try {
             return new SelfSignedSocketFactory();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new GriffinException.ServiceException("Failed to create socket factory", e);
         }
     }
 
