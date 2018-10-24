@@ -14,7 +14,7 @@ public class DatasourceConfig {
     public DatasourceConfig(@Value("${external.config.location}") String configLocation,
             ConfigurableEnvironment environment) {
         MapPropertySource propertySource = new MapPropertySource("datasources",
-                PropertiesUtil.getYamlProperties("datasources.yml", "", configLocation));
+                PropertiesUtil.getYamlProperties("datasources.yml", configLocation));
         environment.getPropertySources().addFirst(propertySource);
     }
 }

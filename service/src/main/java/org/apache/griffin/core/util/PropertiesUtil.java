@@ -15,7 +15,7 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
-*/
+ */
 
 package org.apache.griffin.core.util;
 
@@ -37,8 +37,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
 public class PropertiesUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-            PropertiesUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtil.class);
 
     public static Properties getProperties(String path, Resource resource) {
         PropertiesFactoryBean propFactoryBean = new PropertiesFactoryBean();
@@ -54,13 +53,13 @@ public class PropertiesUtil {
         return properties;
     }
 
-    public static Map<String, Object> getYamlProperties(String path, String defaultPath, String location) {
+    public static Map<String, Object> getYamlProperties(String path, String location) {
         Map<String, Object> properties = null;
         String confPath = getConfPath(path, location);
         Resource resource;
         if (confPath == null) {
-            resource = new ClassPathResource(defaultPath);
-            confPath = defaultPath;
+            resource = new ClassPathResource(path);
+            confPath = path;
         } else {
             resource = new FileSystemResource(confPath);
         }
@@ -78,16 +77,14 @@ public class PropertiesUtil {
     }
 
     /**
-     * @param name        properties name like quartz.properties
+     * @param name properties name like quartz.properties
      * @param defaultPath properties classpath like /quartz.properties
-     * @param location    custom properties path
+     * @param location custom properties path
      * @return Properties
      * @throws FileNotFoundException location setting is wrong that there is no
      *                               target file.
      */
-    public static Properties getConf(String name, String defaultPath,
-                                     String location)
-            throws FileNotFoundException {
+    public static Properties getConf(String name, String defaultPath, String location) throws FileNotFoundException {
         String path = getConfPath(name, location);
         Resource resource;
         if (path == null) {
