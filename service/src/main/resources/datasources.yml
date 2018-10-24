@@ -1,6 +1,9 @@
 ds:
   sqlserver:
     griffin:
+      host: localhost
+      port: 1433
+      database: griffin
       url: jdbc:sqlserver://localhost:1433;database=griffin
       username: griffin
       password: 1@E45678

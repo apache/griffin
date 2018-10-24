@@ -24,12 +24,15 @@ import static org.apache.griffin.core.util.FileUtil.getFilePath;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.beans.factory.config.YamlMapFactoryBean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
@@ -47,6 +50,29 @@ public class PropertiesUtil {
             LOGGER.info("Read properties successfully from {}.", path);
         } catch (IOException e) {
             LOGGER.error("Get properties from {} failed. {}", path, e);
+        }
+        return properties;
+    }
+
+    public static Map<String, Object> getYamlProperties(String path, String defaultPath, String location) {
+        Map<String, Object> properties = null;
+        String confPath = getConfPath(path, location);
+        Resource resource;
+        if (confPath == null) {
+            resource = new ClassPathResource(defaultPath);
+            confPath = defaultPath;
+        } else {
+            resource = new FileSystemResource(confPath);
+        }
+        try {
+            YamlMapFactoryBean ymlFactoryBean = new YamlMapFactoryBean();
+            ymlFactoryBean.setResources(resource);
+            ymlFactoryBean.afterPropertiesSet();
+            properties = ymlFactoryBean.getObject();
+            LOGGER.info("Read YAML properties successfully from {}.", confPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.error("Get YAML properties from {} failed. {}", confPath, e);
         }
         return properties;
     }
