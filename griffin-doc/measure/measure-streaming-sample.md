@@ -25,7 +25,7 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
 {
   "name": "accu_streaming",
 
-  "process.type": "streaming",
+  "process.type": "STREAMING",
 
   "data.sources": [
     {
@@ -33,7 +33,7 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
       "baseline": true,
       "connectors": [
         {
-          "type": "kafka",
+          "type": "KAFKA",
           "version": "0.8",
           "config": {
             "kafka.config": {
@@ -73,7 +73,7 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
       "name": "target",
       "connectors": [
         {
-          "type": "kafka",
+          "type": "KAFKA",
           "version": "0.8",
           "config": {
             "kafka.config": {
@@ -115,7 +115,7 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "accuracy",
+        "dq.type": "ACCURACY",
         "out.dataframe.name": "accu",
         "rule": "source.name = target.name and source.age = target.age",
         "details": {
@@ -176,14 +176,14 @@ The miss records of source will be persisted as record.
 {
   "name": "prof_streaming",
 
-  "process.type": "streaming",
+  "process.type": "STREAMING",
 
   "data.sources": [
     {
       "name": "source",
       "connectors": [
         {
-          "type": "kafka",
+          "type": "KAFKA",
           "version": "0.8",
           "config": {
             "kafka.config": {
@@ -225,7 +225,7 @@ The miss records of source will be persisted as record.
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
+        "dq.type": "PROFILING",
         "out.dataframe.name": "prof",
         "rule": "select count(name) as `cnt`, max(age) as `max`, min(age) as `min` from source",
         "out": [
@@ -237,7 +237,7 @@ The miss records of source will be persisted as record.
       },
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
+        "dq.type": "PROFILING",
         "out.dataframe.name": "grp",
         "rule": "select name, count(*) as `cnt` from source group by name",
         "out": [
