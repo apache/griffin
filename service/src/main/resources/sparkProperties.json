@@ -7,6 +7,7 @@
   "executorCores": 1,
   "driverMemory": "1g",
   "executorMemory": "1g",
+  "jars": "hdfs://node-master:9000/user/enquero/dq/mssql-jdbc-7.0.0.jre8.jar",
   "conf": {
     "spark.yarn.dist.files": "hdfs:///home/spark_conf/hive-site.xml"
   },
