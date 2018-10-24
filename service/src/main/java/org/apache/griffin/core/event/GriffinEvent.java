@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.integration;
+package org.apache.griffin.core.event;
 
 /**
  * A semantic event which indicates that a griffin-defined action occurred.
@@ -33,7 +33,17 @@ public interface GriffinEvent<T> {
     /**
      * @return concrete event type
      */
-    String getType();
+    EventType getType();
+
+    /**
+     * @return concrete event pointcut type
+     */
+    EventPointcutType getPointcut();
+
+    /**
+     * @return concrete event source type
+     */
+    EventSourceType getSourceType();
 
     /**
      * The object on which the Event initially occurred.

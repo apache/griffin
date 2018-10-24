@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.integration;
+package org.apache.griffin.core.event;
 
 import org.apache.griffin.core.exception.GriffinException;
 

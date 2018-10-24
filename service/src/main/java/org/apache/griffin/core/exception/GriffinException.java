@@ -60,4 +60,9 @@ public abstract class GriffinException extends RuntimeException {
         }
     }
 
+    public static class UnImplementedException extends GriffinException {
+        public UnImplementedException(String message) {
+            super(message);
+        }
+    }
 }
