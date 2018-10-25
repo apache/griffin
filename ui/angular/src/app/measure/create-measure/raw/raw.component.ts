@@ -32,7 +32,7 @@ import {MeasureFormatService, Format} from "../../../service/measure-format.serv
   providers: [ServiceService, MeasureFormatService],
   styleUrls: ["./raw.component.css"]
 })
-export class RawComponent implements AfterViewChecked, OnInit {
+export class RawComponent implements AfterViewChecked {
 
   constructor(
     private elementRef: ElementRef,
@@ -113,7 +113,7 @@ export class RawComponent implements AfterViewChecked, OnInit {
         if (response.code === '40901') {
           this.toasterService.pop("error", "Error!", "Measure name already exists!");
         } else {
-          this.toasterService.pop("error", "Error!", "Measure is not valid");
+          this.toasterService.pop("error", "Error!", response.message);
         }
         console.log("Error when creating measure");
       }
@@ -138,40 +138,6 @@ export class RawComponent implements AfterViewChecked, OnInit {
       this.data = this.measureFormatService.format(content, format);
       this.format = format;
     }
-  }
-
-  options: ITreeOptions = {
-    displayField: "name",
-    isExpandedField: "expanded",
-    idField: "id",
-    actionMapping: {
-      mouse: {
-        click: (tree, node, $event) => {
-          if (node.hasChildren) {
-
-            TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
-          } else if (node.data.cols) {
-
-
-          }
-        }
-      }
-    },
-    animateExpand: true,
-    animateSpeed: 30,
-    animateAcceleration: 1.2
-  };
-
-  nodeList: object[];
-  nodeListTarget: object[];
-
-  ngOnInit() {
-    var allDataassets = this.serviceService.config.uri.dataassetlist;
-    this.http.get(allDataassets).subscribe(data => {
-      this.nodeList = new Array();
-
-    });
-
   }
 
   ngAfterViewChecked() {
