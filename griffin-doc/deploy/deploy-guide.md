@@ -50,7 +50,7 @@ createdb -O <username> quartz
 ```
 Init quartz tables in PostgreSQL using [Init_quartz_postgres.sql](../../service/src/main/resources/Init_quartz_postgres.sql)
 ```
-psql -p <password> -h <host address> -U <username> -f Init_quartz_postgres.sql quartz
+psql -p <port> -h <host address> -U <username> -f Init_quartz_postgres.sql quartz
 ```
 
 #### MySQL
