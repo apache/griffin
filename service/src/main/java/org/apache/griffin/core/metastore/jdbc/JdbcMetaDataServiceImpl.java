@@ -98,7 +98,6 @@ public class JdbcMetaDataServiceImpl implements JdbcMetaDataService {
                 for (String k : columns) {
                     colMap.put(k, rs.getString(k));
                 }
-                System.out.println("colMap = " + colMap);
                 values.add(valueFunction.apply(colMap));
                 if (firstOnly) {
                     break;
@@ -113,7 +112,7 @@ public class JdbcMetaDataServiceImpl implements JdbcMetaDataService {
 
     private void cleanUp(DataSource dataSource) {
         if (dataSource != null) {
-            System.out.println("Cleanup datasource connection");
+            LOGGER.debug("Cleanup datasource connection");
             try {
                 closeConnection(dataSource.getConnection());
             } catch (SQLException e) {
@@ -176,6 +175,11 @@ public class JdbcMetaDataServiceImpl implements JdbcMetaDataService {
                 for (String schema : schemas) {
                     ResultSet resultSet = dbmd.getTables(null, schema, null, new String[] {"VIEW", "TABLE"});
                     tables.addAll(valuesFromResultSet(resultSet, TableMetaData.class, false));
+                }
+                for (TableMetaData tmd : tables) {
+                    tmd.setColumns(new ArrayList<>(
+                            valuesFromResultSet(dbmd.getColumns(database, tmd.getSchema(), tmd.getTableName(), null),
+                                    ColumnMetaData.class, false)));
                 }
                 return tables;
             });
