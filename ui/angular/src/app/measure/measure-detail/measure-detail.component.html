@@ -190,11 +190,25 @@ under the License.
         {{index.name}}&nbsp;:&nbsp;{{index.infos}}
       </div>
     </div>
-    <h5 class="row">Rules JSON</h5>
+    <h5 class="row">Rules</h5>
     <div *ngIf="ruleData['evaluate.rule']">
-      <a *ngIf="!showFullRules" (click)="showFullRules=true">Show full JSON</a>
-      <a *ngIf="showFullRules" (click)="showFullRules=false">Show rules only</a>
-      <pre class="code-viewport">{{ getJsonContent() }}</pre>
+      <div class="row">
+        <div class="col-md-6 col-lg-6 col-sm-6">
+          <label class="form-check-label">
+            Show rules only:
+            <input class="form-check-input" type="checkbox" [checked]="!showFullRules" (change)="showFullRules = !showFullRules">
+          </label>
+        </div>
+        <div class="col-md-6 col-lg-6 col-sm-6">
+          <div class="btn-group btn-group-sm navbar-right" role="group" aria-label="Format">
+            <button type="button" class="btn btn-primary" [ngClass]="{'active': format == Format.json}" (click)="format=Format.json">JSON</button>
+            <button type="button" class="btn btn-primary" [ngClass]="{'active': format == Format.yaml}" (click)="format=Format.yaml">YAML</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <pre class="code-viewport">{{ getRawContent() }}</pre>
+      </div>
     </div>
   </div>
 </div>
