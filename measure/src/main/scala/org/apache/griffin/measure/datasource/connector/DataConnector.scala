@@ -92,7 +92,7 @@ trait DataConnector extends Loggable with Serializable {
 
     } catch {
       case e: Throwable =>
-        error(s"pre-process of data connector [${id}] error: ${e.getMessage}")
+        error(s"pre-process of data connector [${id}] error: ${e.getMessage}", e)
         None
     }
   }

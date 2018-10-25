@@ -51,13 +51,13 @@ object Application extends Loggable {
     val envParam = readParamFile[EnvConfig](envParamFile) match {
       case Success(p) => p
       case Failure(ex) =>
-        error(ex.getMessage)
+        error(ex.getMessage, ex)
         sys.exit(-2)
     }
     val dqParam = readParamFile[DQConfig](dqParamFile) match {
       case Success(p) => p
       case Failure(ex) =>
-        error(ex.getMessage)
+        error(ex.getMessage, ex)
         sys.exit(-2)
     }
     val allParam: GriffinConfig = GriffinConfig(envParam, dqParam)
@@ -79,7 +79,7 @@ object Application extends Loggable {
       case Success(_) =>
         info("process init success")
       case Failure(ex) =>
-        error(s"process init error: ${ex.getMessage}")
+        error(s"process init error: ${ex.getMessage}", ex)
         shutdown
         sys.exit(-5)
     }
@@ -89,7 +89,7 @@ object Application extends Loggable {
       case Success(_) =>
         info("process run success")
       case Failure(ex) =>
-        error(s"process run error: ${ex.getMessage}")
+        error(s"process run error: ${ex.getMessage}", ex)
 
         if (dqApp.retryable) {
           throw ex
@@ -104,7 +104,7 @@ object Application extends Loggable {
       case Success(_) =>
         info("process end success")
       case Failure(ex) =>
-        error(s"process end error: ${ex.getMessage}")
+        error(s"process end error: ${ex.getMessage}", ex)
         shutdown
         sys.exit(-5)
     }

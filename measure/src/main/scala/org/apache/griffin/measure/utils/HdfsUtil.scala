@@ -87,7 +87,7 @@ object HdfsUtil extends Loggable {
       implicit val path = new Path(dirPath)
       if (getFS.exists(path)) getFS.delete(path, true)
     } catch {
-      case e: Throwable => error(s"delete path [${dirPath}] error: ${e.getMessage}")
+      case e: Throwable => error(s"delete path [${dirPath}] error: ${e.getMessage}", e)
     }
   }
 
@@ -110,7 +110,7 @@ object HdfsUtil extends Loggable {
         }
       } catch {
         case e: Throwable =>
-          warn(s"list path [${dirPath}] warn: ${e.getMessage}")
+          warn(s"list path [${dirPath}] warn: ${e.getMessage}", e)
           Nil
       }
     } else Nil

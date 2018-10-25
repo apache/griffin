@@ -81,7 +81,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     try {
       HdfsUtil.writeContent(StartFile, msg)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -89,7 +89,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     try {
       HdfsUtil.createEmptyFile(FinishFile)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -98,7 +98,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
       val logStr = logWrap(rt, msg)
       HdfsUtil.appendContent(LogFile, logStr)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -142,7 +142,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
         }
       }
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -170,7 +170,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
         }
       }
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -179,7 +179,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
       val json = JsonUtil.toJson(metrics)
       sinkRecords2Hdfs(MetricsFile, json :: Nil)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -188,7 +188,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
       val recStr = records.mkString("\n")
       HdfsUtil.writeContent(hdfsPath, recStr)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 

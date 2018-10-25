@@ -45,7 +45,7 @@ case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
       try {
         sink.log(rt, msg)
       } catch {
-        case e: Throwable => error(s"log error: ${e.getMessage}")
+        case e: Throwable => error(s"log error: ${e.getMessage}", e)
       }
     }
   }
@@ -55,7 +55,7 @@ case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
       try {
         sink.sinkRecords(records, name)
       } catch {
-        case e: Throwable => error(s"sink records error: ${e.getMessage}")
+        case e: Throwable => error(s"sink records error: ${e.getMessage}", e)
       }
     }
   }
@@ -64,7 +64,7 @@ case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
       try {
         sink.sinkRecords(records, name)
       } catch {
-        case e: Throwable => error(s"sink records error: ${e.getMessage}")
+        case e: Throwable => error(s"sink records error: ${e.getMessage}", e)
       }
     }
   }
@@ -73,7 +73,7 @@ case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
       try {
         sink.sinkMetrics(metrics)
       } catch {
-        case e: Throwable => error(s"sink metrics error: ${e.getMessage}")
+        case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
       }
     }
   }

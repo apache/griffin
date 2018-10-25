@@ -37,7 +37,7 @@ case class MetricFlushStep() extends WriteStep {
         true
       } catch {
         case e: Throwable =>
-          error(s"flush metrics error: ${e.getMessage}")
+          error(s"flush metrics error: ${e.getMessage}", e)
           false
       }
       ret && pr

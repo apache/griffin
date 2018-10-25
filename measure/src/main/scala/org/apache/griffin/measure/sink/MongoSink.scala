@@ -77,7 +77,7 @@ case class MongoSink(config: Map[String, Any], metricName: String,
       if (block) SinkTaskRunner.addBlockTask(func _, retry, overTime)
       else SinkTaskRunner.addNonBlockTask(func _, retry)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
