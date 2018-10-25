@@ -85,9 +85,11 @@ object Application extends Loggable {
     }
 
     // dq app run
-    dqApp.run match {
-      case Success(_) =>
-        info("process run success")
+    val success = dqApp.run match {
+      case Success(result) =>
+        info("process run result: " + (if (result) "success" else "failed"))
+        result
+
       case Failure(ex) =>
         error(s"process run error: ${ex.getMessage}", ex)
 
@@ -110,6 +112,10 @@ object Application extends Loggable {
     }
 
     shutdown
+
+    if (!success) {
+      sys.exit(-5)
+    }
   }
 
   private def readParamFile[T <: Param](file: String)(implicit m : ClassTag[T]): Try[T] = {
