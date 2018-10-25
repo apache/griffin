@@ -234,6 +234,7 @@ Above lists DQ job configure parameters.
     * source: name of data source to measure timeliness.
     * latency: the latency column name in metric, optional.
     * threshold: optional, if set as a time string like "1h", the items with latency more than 1 hour will be record.
+- **cache**: Cache output dataframe. Optional, valid only for "spark-sql" and "df-ops" mode. Defaults to `false` if not specified.
 - **out**: List of output sinks for the job.
   + Metric output.
     * type: "metric"
