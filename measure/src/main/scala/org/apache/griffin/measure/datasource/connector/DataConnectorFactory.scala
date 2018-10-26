@@ -39,6 +39,7 @@ object DataConnectorFactory extends Loggable {
 
   val KafkaRegex = """^(?i)kafka$""".r
   val SqlServerRegex = """^(?i)sqlserver$""".r
+  val MySqlRegex = """^(?i)mysql$""".r
 
   /**
     * create data connector
@@ -65,6 +66,7 @@ object DataConnectorFactory extends Loggable {
         case KafkaRegex() =>
           getStreamingDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
         case SqlServerRegex() => SqlServerBatchDataConnector(sparkSession, dcParam, tmstCache)
+        case MySqlRegex() => MySqlBatchDataConnector(sparkSession, dcParam, tmstCache)
         case _ => throw new Exception("connector creation error!")
       }
     }

@@ -3,8 +3,17 @@ ds:
     griffin:
       host: localhost
       port: 1433
-      database: griffin
-      url: jdbc:sqlserver://localhost:1433;database=griffin
-      username: griffin
+      database: dq
+      url: jdbc:sqlserver://localhost:1433;database=dq
+      username: dq
+      password: 1@E45678
+      schemas: dbo,INFORMATION_SCHEMA
+  mysql:
+    griffin:
+      host: localhost
+      port: 1433
+      database: dq
+      url: jdbc:mysql://localhost:3306/dq?autoReconnect=true&useSSL=false&serverTimezone=UTC
+      username: dq
       password: 1@E45678
       schemas: dbo,INFORMATION_SCHEMA

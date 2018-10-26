@@ -21,9 +21,11 @@ package org.apache.griffin.measure.datasource.connector.batch
 
 import java.util.Properties
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
+import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.context.TimeRange
+import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -85,5 +87,56 @@ trait JdbcBatchDataConnector extends BatchDataConnector {
       }
       s"(${clauses.mkString(" UNION ALL ")}) as t"
     } else s"(${tableClause}) as t"
+  }
+}
+
+
+/**
+  * Batch Data Connector for MS SQL Server (JDBC)
+  *
+  * @param sparkSession     Spark session
+  * @param dcParam          Data Connector Parameters
+  * @param timestampStorage TimestampStorage
+  */
+case class SqlServerBatchDataConnector(@transient sparkSession: SparkSession,
+                                       dcParam: DataConnectorParam,
+                                       timestampStorage: TimestampStorage
+                                      ) extends JdbcBatchDataConnector {
+  def getConnectionProperties(): Properties = {
+    val connectionProperties = new Properties()
+    connectionProperties.put("user", user)
+    connectionProperties.put("password", password)
+    connectionProperties.put("driver", "com.microsoft.sqlserver.jdbc.SQLServerDriver")
+
+    connectionProperties
+  }
+
+  override def jdbcUrl(): String = {
+    s"jdbc:sqlserver://${serverAndPort};database=${database}"
+  }
+}
+
+/**
+  * Batch Data Connector for MYSQL Server (JDBC)
+  *
+  * @param sparkSession     Spark session
+  * @param dcParam          Data Connector Parameters
+  * @param timestampStorage TimestampStorage
+  */
+case class MySqlBatchDataConnector(@transient sparkSession: SparkSession,
+                                       dcParam: DataConnectorParam,
+                                       timestampStorage: TimestampStorage
+                                      ) extends JdbcBatchDataConnector {
+  def getConnectionProperties(): Properties = {
+    val connectionProperties = new Properties()
+    connectionProperties.put("user", user)
+    connectionProperties.put("password", password)
+    connectionProperties.put("driver", "com.mysql.cj.jdbc.Driver")
+
+    connectionProperties
+  }
+
+  override def jdbcUrl(): String = {
+    s"jdbc:mysql://${serverAndPort}/${database}?autoReconnect=true&useSSL=false&serverTimezone=UTC"
   }
 }
