@@ -42,32 +42,34 @@ under the License.
               <legend>
                 Required Information
               </legend>
-              <div class="col-md-12 col-lg-12 col-sm-12" style="margin-top:30px;">
-                <div class="form-group"
-                     [ngClass]="{'has-error': !valid, 'has-success': valid}">
-                  <div class="row">
-                    <label class="col-md-2 col-lg-2 col-sm-2 control-label">
-                      Raw measure<span class="symbol required"></span>:
-                    </label>
-                    <div class="col-md-10 col-lg-10 col-sm-10">
-                      <div class="btn-group btn-group-sm navbar-right" role="group" aria-label="Format">
-                        <button type="button" class="btn btn-primary" [ngClass]="{'active': format == Format.json}" (click)="changeFormat(Format.json)">JSON</button>
-                        <button type="button" class="btn btn-primary" [ngClass]="{'active': format == Format.yaml}" (click)="changeFormat(Format.yaml)">YAML</button>
+              <div class="y-scrollable">
+                <div class="col-md-12 col-lg-12 col-sm-12" style="margin-top:30px;">
+                  <div class="form-group"
+                       [ngClass]="{'has-error': !valid, 'has-success': valid}">
+                    <div class="row">
+                      <label class="col-md-2 col-lg-2 col-sm-2 control-label">
+                        Raw measure<span class="symbol required"></span>:
+                      </label>
+                      <div class="col-md-10 col-lg-10 col-sm-10">
+                        <div class="btn-group btn-group-sm navbar-right" role="group" aria-label="Format">
+                          <button type="button" class="btn btn-flat btn-primary" [ngClass]="{'active': format == Format.json}" (click)="changeFormat(Format.json)">JSON</button>
+                          <button type="button" class="btn btn-flat btn-primary" [ngClass]="{'active': format == Format.yaml}" (click)="changeFormat(Format.yaml)">YAML</button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="row">
-                    <textarea class="code-viewport" rows="20" required [(ngModel)]="data" #content="ngModel" name="content" (ngModelChange)="onInputChange()"></textarea>
-                    <span class="error text-small block " *ngIf="!valid">Measure is not valid</span>
+                    <div class="row">
+                      <textarea class="code-viewport" required [(ngModel)]="data" #content="ngModel" name="content" (ngModelChange)="onInputChange()"></textarea>
+                      <span class="error text-small block " *ngIf="!valid">Measure is not valid</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div style="color:#b2c831">
-                <p>
-                  <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link"
-                                                                                      routerLink="/measures">Measures</a>"
-                  to check the measure status
-                </p>
+                <div style="color:#b2c831">
+                  <p>
+                    <i class="fa fa-info-circle"></i> After submitted, please go to "<a class="bark-link"
+                                                                                        routerLink="/measures">Measures</a>"
+                    to check the measure status
+                  </p>
+                </div>
               </div>
             </fieldset>
           </div>

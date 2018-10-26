@@ -185,6 +185,10 @@ fieldset legend {
   bottom: 10;*/
 }
 
+.btn-flat {
+  outline: none !important;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -224,4 +228,7 @@ a {
   word-break: break-all;
   word-wrap: break-word;
   white-space: pre;
+  overflow: auto;
+  resize: none;
+  outline: none;
 }

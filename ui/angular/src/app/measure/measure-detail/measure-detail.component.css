@@ -28,3 +28,7 @@ under the License.
   word-break: break-all;
   word-wrap: break-word;
 }
+
+.btn-flat {
+  outline: none !important;
+}

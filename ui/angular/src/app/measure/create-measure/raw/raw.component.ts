@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import {Component, OnInit} from "@angular/core";
+import {Component} from "@angular/core";
 import {ServiceService} from "../../../service/service.service";
 import {TREE_ACTIONS, ITreeOptions} from "angular-tree-component";
 import {ToasterService} from "angular2-toaster";
@@ -65,6 +65,10 @@ export class RawComponent implements AfterViewChecked {
   }
 
   onResize(event) {
+    this.resizeWindow();
+  }
+
+  ngAfterViewChecked() {
     this.resizeWindow();
   }
 
@@ -138,9 +142,5 @@ export class RawComponent implements AfterViewChecked {
       this.data = this.measureFormatService.format(content, format);
       this.format = format;
     }
-  }
-
-  ngAfterViewChecked() {
-    this.resizeWindow();
   }
 }
