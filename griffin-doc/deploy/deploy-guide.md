@@ -176,7 +176,35 @@ You should also modify some configurations of Apache Griffin for your environmen
     directory (hdfs:///griffin/persist by default), and Elasticsearch URL (http://es:9200/griffin/accuracy by default).
     Similar changes are required in `env_streaming.json`.
 
-   
+#### Compression
+
+Griffin Service is regular Spring Boot application, so it supports all customizations from Spring Boot.
+To enable output compression, the following should be added to `application.properties`:
+```
+server.compression.enabled=true
+server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css
+```
+
+#### SSL
+
+It is possible to enable SSL encryption for api and web endpoints. To do that, you will need to prepare keystore in Spring-compatible format (for example, PKCS12), and add the following values to `application.properties`:
+```
+server.ssl.key-store=/path/to/keystore.p12
+server.ssl.key-store-password=yourpassword
+server.ssl.keyStoreType=PKCS12
+server.ssl.keyAlias=your_key_alias
+```
+
+#### LDAP
+
+The following properties are available for LDAP:
+ - **ldap.url**: URL of LDAP server.
+ - **ldap.email**: Arbitrary suffix added to user's login before search, can be empty string. Used when user's DN contains some common suffix, and there is no bindDN specified. In this case, string after concatenation is used as DN for sending initial bind request.
+ - **ldap.searchBase**: Subtree DN to search.
+ - **ldap.searchPattern**: Filter expression, substring `{0}` is replaced with user's login after ldap.email is concatenated. This expression is used to find user object in LDAP. Access is denied if filter expression did not match any users.
+ - **ldap.sslSkipVerify**: Allows to disable certificate validation for secure LDAP servers.
+ - **ldap.bindDN**: Optional DN of service account used for user lookup. Useful if user's DN is different than attribute used as user's login, or if users' DNs are ambiguous.
+ - **ldap.bindPassword**: Optional password of bind service account.
 
 ### Build and Run
 
@@ -208,4 +236,3 @@ After a few seconds, we can visit our default UI of Apache Griffin (by default t
 You can use UI following the steps [here](../ui/user-guide.md).
 
 **Note**: The UI does not support all the backend features, to experience the advanced features you can use services directly.
-
