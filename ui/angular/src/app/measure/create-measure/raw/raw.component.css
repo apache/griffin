@@ -232,3 +232,7 @@ a {
   resize: none;
   outline: none;
 }
+
+.fixed-textarea {
+  height: 450px;
+}

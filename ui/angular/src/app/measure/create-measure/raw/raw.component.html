@@ -58,7 +58,7 @@ under the License.
                       </div>
                     </div>
                     <div class="row">
-                      <textarea class="code-viewport" required [(ngModel)]="data" #content="ngModel" name="content" (ngModelChange)="onInputChange()"></textarea>
+                      <textarea class="code-viewport fixed-textarea" required [(ngModel)]="data" #content="ngModel" name="content" (ngModelChange)="onInputChange()"></textarea>
                       <span class="error text-small block " *ngIf="!valid">Measure is not valid</span>
                     </div>
                   </div>
