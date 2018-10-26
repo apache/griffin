@@ -644,48 +644,37 @@ export class AcComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit() {
-    let allDatabases = this.serviceService.config.uri.dblist;
-    let getTableNames = this.serviceService.config.uri.tablenames;
+    let getTableNames = this.serviceService.config.uri.dbtablenames;
 
-    this.http.get(allDatabases).subscribe((databases: Array<string>) => {
+    this.http.get(getTableNames).subscribe((databases) => {
       this.nodeList = new Array();
       this.nodeListTarget = this.nodeList;  // share same model instead of copying(?)
       let i = 1;
-      let pending = databases.length;
-      if (databases.length > 10) {
-        this.options.animateExpand = false;
-        this.updateTrees();
-      }
-      for (let dbName of databases) {
+      for (let dbName in databases) {
+        if (!databases.hasOwnProperty(dbName)) {
+          continue;
+        }
         let dbNode = new node();
         dbNode.name = dbName;
         dbNode.id = i++;
         dbNode.isExpanded = false;
         dbNode.children = new Array();
-        let params = new HttpParams({fromString: "db="+dbName});
-        this.http.get(getTableNames, {params: params}).subscribe((tables: Array<string>) => {
-            for (let tableName of tables) {
-              let tableNode = new node();
-              tableNode.name = tableName;
-              dbNode.children.push(tableNode);
-              tableNode.isExpanded = true;
-              tableNode.location = null;
-              tableNode.parent = dbName;
-              tableNode.cols = null;
-            }
-            pending -= 1;
-            if (pending == 0) {
-              this.updateTrees();
-            }
-          },
-          () => {
-            pending -= 1;
-            if (pending == 0) {
-              this.updateTrees();
-            }
-          });
+        for (let tableName of databases[dbName]) {
+          let tableNode = new node();
+          tableNode.name = tableName;
+          dbNode.children.push(tableNode);
+          tableNode.isExpanded = true;
+          tableNode.location = null;
+          tableNode.parent = dbName;
+          tableNode.cols = null;
+        }
         this.nodeList.push(dbNode);
       }
+      if (i >= 10) {
+        this.options.animateExpand = false;
+        this.targetOptions.animateExpand = false;
+      }
+      this.updateTrees();
     });
     this.src_size = "1day";
     this.tgt_size = "1day";
