@@ -167,10 +167,19 @@ public class JdbcMetaDataServiceImpl implements JdbcMetaDataService {
         }
 
         try {
+            List<String> schemas =
+                    Lists.newArrayList(
+                            Splitter.on(',').omitEmptyStrings().trimResults()
+                                    .split(defaultIfEmpty(
+                                            datasources.getOrDefault(dbType, emptyMap())
+                                                    .getOrDefault(database, emptyMap()).getOrDefault("schemas", ""),
+                                            "")));
+            if (schemas.isEmpty()) {
+                extractDatabaseMetaData(dataSource, dbmd -> schemas.addAll(valuesFromResultSet(dbmd.getSchemas(),
+                        singletonList("TABLE_SCHEM"), m -> m.get("TABLE_SCHEM"), false)));
+            }
+
             extractDatabaseMetaData(dataSource, dbmd -> {
-                Iterable<String> schemas = Splitter.on(',').omitEmptyStrings().trimResults()
-                        .split(datasources.getOrDefault(dbType, emptyMap()).getOrDefault(database, emptyMap())
-                                .getOrDefault("schemas", ""));
                 for (String schema : schemas) {
                     ResultSet resultSet = dbmd.getTables(null, schema, null, new String[] {"VIEW", "TABLE"});
                     tables.addAll(valuesFromResultSet(resultSet, TableMetaData.class, false));
