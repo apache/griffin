@@ -41,13 +41,14 @@ trait JdbcBatchDataConnector extends BatchDataConnector {
   val TableName = "table.name"
   val Where = "where"
   val User = "user"
+  val Username = "username"
   val Password = "password"
 
   val serverAndPort = config.getString(Url, "")
   val database = config.getString(Database, "")
-  val table = config.getString(Table, config.getString(TableName, ""))
+  val table = config.getString(TableName, config.getString(Table, ""))
   val whereString = config.getString(Where, "")
-  val user = config.getString(User, "")
+  val user = config.getString(User, config.getString(Username, ""))
   val password = config.getString(Password, "")
 
   val wheres = whereString.split(",").map(_.trim).filter(_.nonEmpty)
