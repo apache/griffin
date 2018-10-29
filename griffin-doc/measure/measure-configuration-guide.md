@@ -115,14 +115,14 @@ Above lists environment parameters.
 {
   "name": "accu_batch",
 
-  "process.type": "batch",
+  "process.type": "BATCH",
 
   "data.sources": [
     {
       "name": "src",
       "connectors": [
         {
-          "type": "avro",
+          "type": "AVRO",
           "version": "1.7",
           "config": {
           	"file.path": "<path>/<to>",
@@ -134,7 +134,7 @@ Above lists environment parameters.
       "name": "tgt",
       "connectors": [
         {
-          "type": "avro",
+          "type": "AVRO",
           "version": "1.7",
           "config": {
           	"file.path": "<path>/<to>",
@@ -149,7 +149,7 @@ Above lists environment parameters.
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "accuracy",
+        "dq.type": "ACCURACY",
         "out.dataframe.name": "accu",
         "rule": "source.user_id = target.user_id AND upper(source.first_name) = upper(target.first_name) AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code",
         "details": {
@@ -172,13 +172,13 @@ Above lists environment parameters.
     ]
   },
   
-  "sinks": ["console", "http", "hdfs"]
+  "sinks": ["CONSOLE", "HTTP", "HDFS"]
 }
 ```
 Above lists DQ job configure parameters.  
 
 - **name**: Name of DQ job.
-- **process.type**: Process type of DQ job, "batch" or "streaming".
+- **process.type**: Process type of DQ job, "BATCH" or "STREAMING".
 - **data.sources**: List of data sources in this DQ job.
 	+ name: Name of this data source, it should be different from other data sources.
 	+ connectors: List of data connectors combined as the same data source. Details of data connector configuration [here](#data-connector).
@@ -188,7 +188,7 @@ Above lists DQ job configure parameters.
 - **sinks**: Whitelisted sink types for this job. Note: no sinks will be used, if empty or omitted. 
 
 ### <a name="data-connector"></a>Data Connector
-- **type**: Data connector type, "avro", "hive", "text-dir" for batch mode, "kafka" for streaming mode.
+- **type**: Data connector type, "AVRO", "HIVE", "TEXT-DIR" for batch mode, "KAFKA" for streaming mode.
 - **version**: Version string of data connector type.
 - **config**: Configure parameters of each data connector type.
 	+ avro data connector
@@ -207,7 +207,7 @@ Above lists DQ job configure parameters.
 
 ### <a name="rule"></a>Rule
 - **dsl.type**: Rule dsl type, "spark-sql", "df-ops" and "griffin-dsl".
-- **dq.type**: DQ type of this rule, only for "griffin-dsl" type. Supported types: "accuracy", "profiling", "timeliness", "uniqueness", "completeness".
+- **dq.type**: DQ type of this rule, only for "griffin-dsl" type. Supported types: "ACCURACY", "PROFILING", "TIMELINESS", "UNIQUENESS", "COMPLETENESS".
 - **out.dataframe.name** (step information): Output table name of this rule, could be used in the following rules.
 - **in.dataframe.name** (step information): Input table name of this rule, only used for "df-ops" type.
 - **rule**: The rule string.
@@ -234,6 +234,7 @@ Above lists DQ job configure parameters.
     * source: name of data source to measure timeliness.
     * latency: the latency column name in metric, optional.
     * threshold: optional, if set as a time string like "1h", the items with latency more than 1 hour will be record.
+- **cache**: Cache output dataframe. Optional, valid only for "spark-sql" and "df-ops" mode. Defaults to `false` if not specified.
 - **out**: List of output sinks for the job.
   + Metric output.
     * type: "metric"

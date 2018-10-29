@@ -38,6 +38,7 @@ export class ServiceService {
       dataassetlist: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
       dblist: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs",
       tablenames: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/tables/names", // ?db=...
+      dbtablenames: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables/names",
       dbtable: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/table", // ?db=...&table=...
 
       getdataasset: this.BACKEND_SERVER + this.API_ROOT_PATH + "/dataassets",

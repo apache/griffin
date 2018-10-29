@@ -188,47 +188,35 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
 
   ngOnInit() {
     if (this.step1.nodeList.length !== 0) return;
-    let allDatabases = this.serviceService.config.uri.dblist;
-    let getTableNames = this.serviceService.config.uri.tablenames;
-
-    this.http.get(allDatabases).subscribe((databases: Array<string>) => {
+    let getTableNames = this.serviceService.config.uri.dbtablenames;
+    
+    this.http.get(getTableNames).subscribe((databases) => {
       this.step1.nodeList = new Array();
       let i = 1;
-      let pending = databases.length;
-      if (databases.length > 10) {
-        this.options.animateExpand = false;
-        this.tree.treeModel.update();
-      }
-      for (let dbName of databases) {
+      for (let dbName in databases) {
+        if (!databases.hasOwnProperty(dbName)) {
+          continue;
+        }
         let dbNode = new node();
         dbNode.name = dbName;
         dbNode.id = i++;
         dbNode.isExpanded = false;
         dbNode.children = new Array();
-        let params = new HttpParams({fromString: "db="+dbName});
-        this.http.get(getTableNames, {params: params}).subscribe((tables: Array<string>) => {
-          for (let tableName of tables) {
-            let tableNode = new node();
-            tableNode.name = tableName;
-            dbNode.children.push(tableNode);
-            tableNode.isExpanded = true;
-            tableNode.location = null;
-            tableNode.parent = dbName;
-            tableNode.cols = null;
-          }
-          pending -= 1;
-          if (pending == 0) {
-            this.tree.treeModel.update();
-          }
-        },
-        () => {
-          pending -= 1;
-          if (pending == 0) {
-            this.tree.treeModel.update();
-          }
-        });
+        for (let tableName of databases[dbName]) {
+          let tableNode = new node();
+          tableNode.name = tableName;
+          dbNode.children.push(tableNode);
+          tableNode.isExpanded = true;
+          tableNode.location = null;
+          tableNode.parent = dbName;
+          tableNode.cols = null;
+        }
         this.step1.nodeList.push(dbNode);
       }
+      if (i >= 10) {
+        this.options.animateExpand = false;
+      }
+      this.tree.treeModel.update();
     });
   }
 

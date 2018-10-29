@@ -30,6 +30,8 @@ public interface HiveMetaStoreService {
 
     Iterable<String> getAllTableNames(String dbName);
 
+    Map<String, List<String>> getAllTableNames();
+
     List<Table> getAllTable(String db);
 
     Map<String, List<Table>> getAllTable();

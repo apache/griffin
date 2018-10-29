@@ -22,15 +22,20 @@ package org.apache.griffin.core.login;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.login.ldap.SelfSignedSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -48,13 +53,20 @@ public class LoginServiceLdapImpl implements LoginService {
     private String searchBase;
     private String searchPattern;
     private SearchControls searchControls;
+    private boolean sslSkipVerify;
+    private String bindDN;
+    private String bindPassword;
 
     public LoginServiceLdapImpl(String url, String email, String searchBase,
-                                String searchPattern) {
+                                String searchPattern, boolean sslSkipVerify,
+                                String bindDN, String bindPassword) {
         this.url = url;
         this.email = email;
         this.searchBase = searchBase;
         this.searchPattern = searchPattern;
+        this.sslSkipVerify = sslSkipVerify;
+        this.bindDN = bindDN;
+        this.bindPassword = bindPassword;
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         this.searchControls = searchControls;
@@ -62,54 +74,116 @@ public class LoginServiceLdapImpl implements LoginService {
 
     @Override
     public ResponseEntity<Map<String, Object>> login(Map<String, String> map) {
-        String ntAccount = map.get("username");
+        String username = map.get("username");
         String password = map.get("password");
-        String searchFilter = searchPattern.replace("{0}", ntAccount);
+
+        // use separate bind credentials, if bindDN is provided
+        String bindAccount = StringUtils.isEmpty(this.bindDN) ? username : this.bindDN;
+        String bindPassword = StringUtils.isEmpty(this.bindDN) ? password : this.bindPassword;
+        String searchFilter = searchPattern.replace("{0}", username);
+        LdapContext ctx = null;
         try {
-            LdapContext ctx = getContextInstance(ntAccount, password);
+            ctx = getContextInstance(toPrincipal(bindAccount), bindPassword);
+
             NamingEnumeration<SearchResult> results = ctx.search(searchBase,
                     searchFilter, searchControls);
-            String fullName = getFullName(results, ntAccount);
+            SearchResult userObject = getSingleUser(results);
+
+            // verify password if different bind user is used
+            if (!StringUtils.equals(username, bindAccount)) {
+                String userDN = getAttributeValue(userObject, "distinguishedName", toPrincipal(username));
+                checkPassword(userDN, password);
+            }
+
             Map<String, Object> message = new HashMap<>();
-            message.put("ntAccount", ntAccount);
-            message.put("fullName", fullName);
+            message.put("ntAccount", username);
+            message.put("fullName", getFullName(userObject, username));
             message.put("status", 0);
             return new ResponseEntity<>(message, HttpStatus.OK);
-        } catch (NamingException e) {
-            LOGGER.warn("User {} failed to login with LDAP auth. {}", ntAccount,
+        } catch (AuthenticationException e) {
+            LOGGER.warn("User {} failed to login with LDAP auth. {}", username,
                     e.getMessage());
+        } catch (NamingException e) {
+            LOGGER.warn(String.format("User %s failed to login with LDAP auth.", username), e);
+        } finally {
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (NamingException e) {
+                    LOGGER.debug("Failed to close LDAP context", e);
+                }
+            }
         }
         return null;
     }
 
-    private String getFullName(NamingEnumeration<SearchResult> results,
-                               String ntAccount) {
-        String fullName = ntAccount;
+    private void checkPassword(String name, String password) throws NamingException {
+        getContextInstance(name, password).close();
+    }
+
+    private SearchResult getSingleUser(NamingEnumeration<SearchResult> results) throws NamingException {
+        if (!results.hasMoreElements()) {
+            throw new AuthenticationException("User does not exist or not allowed by search string");
+        }
+        SearchResult result = results.nextElement();
+        if (results.hasMoreElements()) {
+            SearchResult second = results.nextElement();
+            throw new NamingException(String.format("Ambiguous search, found two users: %s, %s",
+                    result.getNameInNamespace(), second.getNameInNamespace()));
+        }
+        return result;
+    }
+
+    private String getAttributeValue(SearchResult searchResult, String key, String defaultValue) throws NamingException {
+        Attributes attrs = searchResult.getAttributes();
+        if (attrs == null) {
+            return defaultValue;
+        }
+        Attribute attrObj = attrs.get(key);
+        if (attrObj == null) {
+            return defaultValue;
+        }
         try {
-            while (results.hasMoreElements()) {
-                SearchResult searchResult = results.nextElement();
-                Attributes attrs = searchResult.getAttributes();
-                if (attrs != null && attrs.get("cn") != null) {
-                    String cnName = (String) attrs.get("cn").get();
-                    if (cnName.indexOf("(") > 0) {
-                        fullName = cnName.substring(0, cnName.indexOf("("));
-                    }
-                }
+            return (String) attrObj.get();
+        } catch (NoSuchElementException e) {
+            return defaultValue;
+        }
+    }
+
+    private String getFullName(SearchResult searchResult, String ntAccount) {
+        try {
+            String cnName = getAttributeValue(searchResult, "cn", null);
+            if (cnName.indexOf("(") > 0) {
+                return cnName.substring(0, cnName.indexOf("("));
+            } else {
+                // old behavior ignores CNs without "("
+                return ntAccount;
             }
         } catch (NamingException e) {
             LOGGER.warn("User {} successfully login with LDAP auth, " +
                     "but failed to get full name.", ntAccount);
+            return ntAccount;
         }
-        return fullName;
     }
 
-    private LdapContext getContextInstance(String ntAccount, String password)
+    private String toPrincipal(String ntAccount) {
+        if (ntAccount.toUpperCase().startsWith("CN=")) {
+            return ntAccount;
+        } else {
+            return ntAccount + email;
+        }
+    }
+
+    private LdapContext getContextInstance(String principal, String password)
             throws NamingException {
         Hashtable<String, String> ht = new Hashtable<>();
         ht.put(Context.INITIAL_CONTEXT_FACTORY, LDAP_FACTORY);
         ht.put(Context.PROVIDER_URL, url);
-        ht.put(Context.SECURITY_PRINCIPAL, ntAccount + email);
+        ht.put(Context.SECURITY_PRINCIPAL, principal);
         ht.put(Context.SECURITY_CREDENTIALS, password);
+        if (url.startsWith("ldaps") && sslSkipVerify) {
+            ht.put("java.naming.ldap.factory.socket", SelfSignedSocketFactory.class.getName());
+        }
         return new InitialLdapContext(ht, null);
     }
 }
