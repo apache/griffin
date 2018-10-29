@@ -7,6 +7,7 @@ import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.springframework.jdbc.support.JdbcUtils.closeConnection;
 import static org.springframework.jdbc.support.JdbcUtils.extractDatabaseMetaData;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,7 +18,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+
 import javax.sql.DataSource;
+
 import org.apache.griffin.core.metastore.jdbc.model.ColumnMetaData;
 import org.apache.griffin.core.metastore.jdbc.model.DatabaseMetaData;
 import org.apache.griffin.core.metastore.jdbc.model.TableMetaData;
@@ -32,6 +35,7 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -175,8 +179,7 @@ public class JdbcMetaDataServiceImpl implements JdbcMetaDataService {
                                                     .getOrDefault(database, emptyMap()).getOrDefault("schemas", ""),
                                             "")));
             if (schemas.isEmpty()) {
-                extractDatabaseMetaData(dataSource, dbmd -> schemas.addAll(valuesFromResultSet(dbmd.getSchemas(),
-                        singletonList("TABLE_SCHEM"), m -> m.get("TABLE_SCHEM"), false)));
+                schemas.add(null);
             }
 
             extractDatabaseMetaData(dataSource, dbmd -> {
