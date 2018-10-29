@@ -2,7 +2,6 @@ package org.apache.griffin.core.metastore.jdbc.model;
 
 import java.io.Serializable;
 import java.util.List;
-
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -11,6 +10,7 @@ public class TableMetaData implements Serializable {
     private String database;
     private String schema;
     private String tableName;
+    private String fullTableName;
     private String comments;
 
     private List<ColumnMetaData> columns;
@@ -53,5 +53,13 @@ public class TableMetaData implements Serializable {
 
     public void setColumns(List<ColumnMetaData> columns) {
         this.columns = columns;
+    }
+
+    public String getFullTableName() {
+        return fullTableName;
+    }
+
+    public void setFullTableName(String fullTableName) {
+        this.fullTableName = fullTableName;
     }
 }

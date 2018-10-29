@@ -3,10 +3,10 @@ package org.apache.griffin.core.metastore.jdbc;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.springframework.jdbc.support.JdbcUtils.closeConnection;
 import static org.springframework.jdbc.support.JdbcUtils.extractDatabaseMetaData;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,9 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-
 import javax.sql.DataSource;
-
 import org.apache.griffin.core.metastore.jdbc.model.ColumnMetaData;
 import org.apache.griffin.core.metastore.jdbc.model.DatabaseMetaData;
 import org.apache.griffin.core.metastore.jdbc.model.TableMetaData;
@@ -34,7 +32,7 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -43,11 +41,10 @@ import com.google.common.collect.Sets;
 @CacheConfig(cacheNames = "jdbc", keyGenerator = "cacheKeyGenerator")
 public class JdbcMetaDataServiceImpl implements JdbcMetaDataService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcMetaDataServiceImpl.class);
-
-    public JdbcMetaDataServiceImpl() {}
-
     @Value("#{environment.getProperty('ds', T(java.util.Map))}")
     private Map<String, Map<String, Map<String, String>>> datasources;
+
+    public JdbcMetaDataServiceImpl() {}
 
     private DataSource createDataSource(String dbType, String database) {
         Map<String, String> ds = datasources.getOrDefault(dbType, emptyMap()).getOrDefault(database, emptyMap());
@@ -66,6 +63,8 @@ public class JdbcMetaDataServiceImpl implements JdbcMetaDataService {
                 tmd.setDatabase(cm.get("TABLE_CAT"));
                 tmd.setSchema(cm.get("TABLE_SCHEM"));
                 tmd.setTableName(cm.get("TABLE_NAME"));
+                tmd.setFullTableName(
+                        Joiner.on(".").skipNulls().join(defaultIfEmpty(tmd.getSchema(), null), tmd.getTableName()));
                 tmd.setComments(cm.get("REMARKS"));
                 return resultClass.cast(tmd);
             }, firstOnly);
