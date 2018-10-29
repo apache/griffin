@@ -59,6 +59,7 @@ import {LoaderService} from './loader/loader.service';
 import {LoaderComponent} from './loader/loader.component';
 import {JobDetailComponent} from './job/job-detail/job-detail.component';
 import {StreamingComponent} from './job/create-job/streaming/streaming.component';
+import {RawComponent} from "./measure/create-measure/raw/raw.component";
 
 
 const appRoutes: Routes = [
@@ -111,6 +112,10 @@ const appRoutes: Routes = [
   {
     path: 'createmeasurepub',
     component: PubComponent
+  },
+  {
+    path: 'createmeasureraw',
+    component: RawComponent
   },
   {
     path: 'detailed/:name',
@@ -168,7 +173,8 @@ const appRoutes: Routes = [
     ConfigurationComponent,
     LoaderComponent,
     JobDetailComponent,
-    StreamingComponent
+    StreamingComponent,
+    RawComponent
   ],
   imports: [
     BrowserModule,

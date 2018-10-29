@@ -17,15 +17,16 @@ specific language governing permissions and limitations
 under the License.
 */
 import {Component, OnInit} from "@angular/core";
-import {Router, ActivatedRoute, ParamMap} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import "rxjs/add/operator/switchMap";
 import {HttpClient} from "@angular/common/http";
 import {ServiceService} from "../../service/service.service";
+import {MeasureFormatService, Format} from "../../service/measure-format.service";
 
 @Component({
   selector: "app-measure-detail",
   templateUrl: "./measure-detail.component.html",
-  providers: [ServiceService],
+  providers: [ServiceService, MeasureFormatService],
   styleUrls: ["./measure-detail.component.css"]
 })
 export class MeasureDetailComponent implements OnInit {
@@ -35,6 +36,7 @@ export class MeasureDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient,
+    private measureFormatService: MeasureFormatService,
     public serviceService: ServiceService
   ) {
   }
@@ -42,6 +44,8 @@ export class MeasureDetailComponent implements OnInit {
   ruleData: any;
   getModelUrl: string;
   showFullRules: boolean;
+  Format: typeof Format = Format;
+  format: Format = Format.json;
   ruleDes = [];
   sourceLength: number;
   sourceDB: string;
@@ -112,13 +116,13 @@ export class MeasureDetailComponent implements OnInit {
     );
   }
 
-  getJsonContent() {
+  getRawContent() {
     let content;
     if (!this.showFullRules) {
       content = (this.ruleData['evaluate.rule'] || {})['rules'];
     } else {
       content = this.ruleData;
     }
-    return JSON.stringify(content, null, 4);
+    return this.measureFormatService.format(content, this.format);
   }
 }
