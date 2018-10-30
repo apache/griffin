@@ -80,7 +80,7 @@ case class RecordWriteStep(name: String,
       Some(df)
     } catch {
       case e: Throwable =>
-        error(s"get data frame ${name} fails")
+        error(s"get data frame ${name} fails", e)
         None
     }
   }

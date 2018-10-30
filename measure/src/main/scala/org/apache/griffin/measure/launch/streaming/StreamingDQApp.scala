@@ -77,7 +77,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     GriffinUDFAgent.register(sqlContext)
   }
 
-  def run: Try[_] = Try {
+  def run: Try[Boolean] = Try {
 
     // streaming context
     val ssc = StreamingContext.getOrCreate(sparkParam.getCpDir, () => {
@@ -127,6 +127,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     // finish
     globalContext.getSink().finish()
 
+    true
   }
 
   def close: Try[_] = Try {

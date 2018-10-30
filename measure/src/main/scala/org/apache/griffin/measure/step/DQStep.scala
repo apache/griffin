@@ -25,6 +25,9 @@ trait DQStep extends Loggable {
 
   val name: String
 
+  /**
+    * @return execution success
+    */
   def execute(context: DQContext): Boolean
 
   def getNames(): Seq[String] = name :: Nil

@@ -36,8 +36,16 @@ trait Loggable {
     logger.warn(msg)
   }
 
+  protected def warn(msg: String, e: Throwable): Unit = {
+    logger.warn(msg, e)
+  }
+
   protected def error(msg: String): Unit = {
     logger.error(msg)
+  }
+
+  protected def error(msg: String, e: Throwable): Unit = {
+    logger.error(msg, e)
   }
 
 }

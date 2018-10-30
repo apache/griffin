@@ -56,7 +56,7 @@ case class HiveBatchDataConnector(@transient sparkSession: SparkSession,
       preDfOpt
     } catch {
       case e: Throwable =>
-        error(s"load hive table ${concreteTableName} fails: ${e.getMessage}")
+        error(s"load hive table ${concreteTableName} fails: ${e.getMessage}", e)
         None
     }
     val tmsts = readTmst(ms)

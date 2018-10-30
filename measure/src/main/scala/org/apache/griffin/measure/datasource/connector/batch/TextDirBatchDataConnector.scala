@@ -70,7 +70,7 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
       }
     } catch {
       case e: Throwable =>
-        error(s"load text dir ${dirPath} fails: ${e.getMessage}")
+        error(s"load text dir ${dirPath} fails: ${e.getMessage}", e)
         None
     }
     val tmsts = readTmst(ms)

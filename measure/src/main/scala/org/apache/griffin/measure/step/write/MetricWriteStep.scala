@@ -89,7 +89,7 @@ case class MetricWriteStep(name: String,
       } else Nil
     } catch {
       case e: Throwable =>
-        error(s"get metric ${name} fails")
+        error(s"get metric ${name} fails", e)
         Nil
     }
   }

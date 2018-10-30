@@ -64,7 +64,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     GriffinUDFAgent.register(sqlContext)
   }
 
-  def run: Try[_] = Try {
+  def run: Try[Boolean] = Try {
     // start time
     val startTime = new Date().getTime
 
@@ -88,7 +88,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
 
     // dq job execute
-    dqJob.execute(dqContext)
+    val result = dqJob.execute(dqContext)
 
     // end time
     val endTime = new Date().getTime
@@ -99,6 +99,8 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // finish
     dqContext.getSink().finish()
+
+    result
   }
 
   def close: Try[_] = Try {

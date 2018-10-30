@@ -50,7 +50,7 @@ case class GriffinDslDQStepBuilder(dataSourceNames: Seq[String],
       }
     } catch {
       case e: Throwable =>
-        error(s"generate rule plan ${name} fails: ${e.getMessage}")
+        error(s"generate rule plan ${name} fails: ${e.getMessage}", e)
         Nil
     }
   }
