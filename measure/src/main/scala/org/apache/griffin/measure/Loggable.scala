@@ -40,4 +40,7 @@ trait Loggable {
     logger.error(msg)
   }
 
+  protected def error(msg: String, throwable: Throwable): Unit = {
+    logger.error(msg, throwable)
+  }
 }
