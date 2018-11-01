@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.commons.lang.StringUtils.lowerCase;
 import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
 import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
 import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
@@ -193,8 +194,10 @@ public class SparkSubmitJob implements Job {
 
     private String genEnv() {
         ProcessType type = measure.getProcessType();
+        final String dqType = lowerCase(measure.getDqType().name());
         String env = type == BATCH ? ENV_BATCH : ENV_STREAMING;
-        return env.replaceAll("\\$\\{JOB_NAME}", measure.getName());
+        return env.replaceAll("\\$\\{JOB_NAME}", measure.getName())
+                  .replaceAll("\\$\\{DQ_TYPE}", dqType);
     }
 
     private void setLivyConf() throws IOException {
