@@ -38,6 +38,10 @@ case class DataFrameOpsTransformStep(name: String,
         case DataFrameOps._accuracy =>
           DataFrameOps.accuracy(sqlContext, inputDfName, context.contextId, details)
 
+         
+        case AnomalyDectectionOps._anomalyCalc => AnomalyDectectionOps.anomalyDetectionComparison(sqlContext)
+        case AnomalyDectectionOps._anomalyMedian => AnomalyDectectionOps.anomalyDetectionBasedOnRange(sqlContext)
+         
         case DataFrameOps._clear => DataFrameOps.clear(sqlContext, inputDfName, details)
         case _ => throw new Exception(s"df opr [ ${rule} ] not supported")
       }

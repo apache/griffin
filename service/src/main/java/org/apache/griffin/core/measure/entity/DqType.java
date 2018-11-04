@@ -23,10 +23,13 @@ public enum DqType {
     /**
      * Currently we support six dimensions of measure.
      */
-    ACCURACY,
+	ACCURACY,
+    VALIDITY,
+    DISTINCTNESS,
     PROFILING,
     TIMELINESS,
     UNIQUENESS,
     COMPLETENESS,
-    CONSISTENCY
+    CONSISTENCY,
+    ANOMALY
 }

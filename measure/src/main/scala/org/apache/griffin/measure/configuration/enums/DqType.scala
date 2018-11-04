@@ -37,6 +37,8 @@ object DqType {
     DistinctnessType,
     TimelinessType,
     CompletenessType,
+    ValidityType, 
+      AnomalyType, 
     UnknownType
   )
   def apply(ptn: String): DqType = {
@@ -88,8 +90,8 @@ object DqType {
   * comparing with uniqueness, distinctness is more meaningful
   */
  case object DistinctnessType extends DqType {
-  val idPattern = "^(?i)distinct$".r
-  val desc = "distinct"
+  val idPattern = "^(?i)distinctness$".r
+  val desc = "distinctness"
 }
 
 /**
@@ -110,6 +112,22 @@ object DqType {
  case object CompletenessType extends DqType {
   val idPattern = "^(?i)completeness$".r
   val desc = "completeness"
+}
+ 
+  /**
+  * validity: the validity of data source
+  */
+ case object ValidityType extends DqType {
+  val idPattern = "^(?i)validity$".r
+  val desc = "validity"
+}
+ 
+  /**
+  * anomaly: the validity of data source
+  */
+ case object AnomalyType extends DqType {
+  val idPattern = "^(?i)anomaly$".r
+  val desc = "anomaly"
 }
 
  case object UnknownType extends DqType {
