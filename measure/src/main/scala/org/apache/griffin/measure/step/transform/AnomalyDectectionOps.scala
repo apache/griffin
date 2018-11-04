@@ -20,7 +20,7 @@ object AnomalyDectectionOps {
   final val _anomalyCalc = "anomaly_calc"
   final val _anomalyMedian = "anomaly_median"
   
-  def saveRecordsInCsv(spark: SQLContext) = DataFrame {
+  /*def saveRecordsInCsv(spark: SQLContext) = DataFrame {
     val dfMarketDay = spark.sql("SELECT MARKET, LOCAL_DATE, sum(DURATION) as DURATION, sum(uplink+downlink) as PAYLOAD FROM LTE_MSISDN_LEAKAGE_DAILY GROUP BY MARKET, LOCAL_DATE")
     val dfMarketDayP2p = spark.sql("SELECT MARKET, LOCAL_DATE, P2P_PROTOCOL, sum(DURATION) as DURATION, sum(uplink+downlink) as PAYLOAD FROM LTE_MSISDN_LEAKAGE_DAILY GROUP BY MARKET, LOCAL_DATE, P2P_PROTOCOL")
     val dfDayP2p = spark.sql("SELECT LOCAL_DATE, P2P_PROTOCOL, sum(DURATION) as DURATION, sum(uplink+downlink) as PAYLOAD FROM LTE_MSISDN_LEAKAGE_DAILY GROUP BY LOCAL_DATE, P2P_PROTOCOL")
@@ -192,6 +192,6 @@ object AnomalyDectectionOps {
     
     val returnDf = topP2PUpperLteBasedOnTopLteDuration.union(topP2PUpperNonLteBasedOnTopNonLteDuration)
     returnDf
-  }
+  }*/
   
 }
