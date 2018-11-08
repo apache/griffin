@@ -60,7 +60,7 @@ case class AvroBatchDataConnector(@transient sparkSession: SparkSession,
       preDfOpt
     } catch {
       case e: Throwable =>
-        error(s"load avro file ${concreteFileFullPath} fails")
+        error(s"load avro file ${concreteFileFullPath} fails", e)
         None
     }
     val tmsts = readTmst(ms)

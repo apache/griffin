@@ -46,7 +46,7 @@ case class DataFrameOpsTransformStep(name: String,
       true
     } catch {
       case e: Throwable =>
-        error(s"run data frame ops [ ${rule} ] error: ${e.getMessage}")
+        error(s"run data frame ops [ ${rule} ] error: ${e.getMessage}", e)
         false
     }
   }

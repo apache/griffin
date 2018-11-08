@@ -29,6 +29,9 @@ case class SeqDQStep(dqSteps: Seq[DQStep]) extends DQStep {
   val rule: String = ""
   val details: Map[String, Any] = Map()
 
+  /**
+    * @return execution success
+    */
   def execute(context: DQContext): Boolean = {
     dqSteps.foldLeft(true) { (ret, dqStep) =>
       ret && dqStep.execute(context)

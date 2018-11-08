@@ -43,7 +43,7 @@ object FSUtil extends Loggable {
               FileSystem.get(uri, getConfiguration)
             } catch {
               case e: Throwable =>
-                error(s"get file system error: ${e.getMessage}")
+                error(s"get file system error: ${e.getMessage}", e)
                 throw e
             }
             fsMap += (uri.getScheme -> fs)

@@ -64,7 +64,7 @@ object SinkTaskRunner extends Loggable {
           info(s"task ${t} retry [ rest retry count: ${nextRetry} ]")
           nonBlockExecute(func, nextRetry)
         } else {
-          error(s"task fails: task ${t} retry ends but fails")
+          error(s"task fails: task ${t} retry ends but fails", e)
         }
     }
   }
@@ -86,7 +86,7 @@ object SinkTaskRunner extends Loggable {
           info(s"task ${t} retry [ rest retry count: ${nextRetry} ]")
           blockExecute(func, nextRetry, waitDuration)
         } else {
-          error(s"task fails: task ${t} retry ends but fails")
+          error(s"task fails: task ${t} retry ends but fails", e)
         }
     }
   }

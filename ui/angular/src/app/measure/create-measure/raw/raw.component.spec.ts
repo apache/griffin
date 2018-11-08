@@ -16,19 +16,28 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-.code-viewport {
-  background-color: #333333;
-  border: 1px solid #1d1d1d;
-  border-radius: 4px;
-  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #e4e4e4;
-  word-break: break-all;
-  word-wrap: break-word;
-}
+import {RawComponent} from './raw.component';
 
-.btn-flat {
-  outline: none !important;
-}
+describe('RawComponent', () => {
+  let component: RawComponent;
+  let fixture: ComponentFixture<RawComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [RawComponent]
+    })
+      .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(RawComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should be created', () => {
+    expect(component).toBeTruthy();
+  });
+});
