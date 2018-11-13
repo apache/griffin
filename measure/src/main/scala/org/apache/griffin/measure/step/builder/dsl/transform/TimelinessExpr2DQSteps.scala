@@ -231,7 +231,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
   }
 
   private def getPercentiles(details: Map[String, Any]): Seq[Double] = {
-    details.getArr[Double](_percentileValues).filter(d => (d >= 0 && d <= 1))
+    details.getDoubleArr(_percentileValues).filter(d => (d >= 0 && d <= 1))
   }
 
 }
