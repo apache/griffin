@@ -20,8 +20,8 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
-import static org.apache.griffin.core.util.EntityMockupHelper.createGriffinMeasure;
-import static org.apache.griffin.core.util.EntityMockupHelper.createJobDetailMap;
+import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityMocksHelper.createJobDetailMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;

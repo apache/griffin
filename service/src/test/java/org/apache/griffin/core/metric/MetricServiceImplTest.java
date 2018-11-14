@@ -19,8 +19,8 @@ under the License.
 
 package org.apache.griffin.core.metric;
 
-import static org.apache.griffin.core.util.EntityMockupHelper.createGriffinJob;
-import static org.apache.griffin.core.util.EntityMockupHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinJob;
+import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinMeasure;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.given;
