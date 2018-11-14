@@ -20,8 +20,8 @@ under the License.
 package org.apache.griffin.core.measure;
 
 
-import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityMockupHelper.createExternalMeasure;
+import static org.apache.griffin.core.util.EntityMockupHelper.createGriffinMeasure;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;

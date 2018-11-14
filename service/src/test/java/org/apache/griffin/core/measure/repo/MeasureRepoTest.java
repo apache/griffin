@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure.repo;
 
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityMockupHelper.createGriffinMeasure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 

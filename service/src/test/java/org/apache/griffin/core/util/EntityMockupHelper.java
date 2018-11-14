@@ -50,7 +50,7 @@ import org.quartz.SimpleTrigger;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
-public class EntityHelper {
+public class EntityMockupHelper {
 
     public static final String CRON_EXPRESSION = "0 0/4 * * * ?";
     public static final String TIME_ZONE = "GMT+8:00";
