@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure.repo;
 
-import static org.apache.griffin.core.util.EntityHelper.createDataConnector;
+import static org.apache.griffin.core.util.EntityMocksHelper.createDataConnector;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;

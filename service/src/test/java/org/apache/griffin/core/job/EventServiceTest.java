@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinMeasure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.entity.JobDataSegment;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
-import org.apache.griffin.core.util.EntityHelper;
+import org.apache.griffin.core.util.EntityMocksHelper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,7 +68,7 @@ public class EventServiceTest {
 
     @Test
     public void testAddJobEvent() throws Exception {
-        BatchJob batch_Job = EntityHelper.createGriffinJob();
+        BatchJob batch_Job = EntityMocksHelper.createGriffinJob();
         batch_Job.setCronExpression("0 0 12 * * ?");
         batch_Job.setTimeZone("Asia/Shanghai");
         JobDataSegment jds = new JobDataSegment();

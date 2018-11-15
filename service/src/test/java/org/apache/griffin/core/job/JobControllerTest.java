@@ -21,7 +21,7 @@ package org.apache.griffin.core.job;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
-import static org.apache.griffin.core.util.EntityHelper.createGriffinJob;
+import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinJob;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;

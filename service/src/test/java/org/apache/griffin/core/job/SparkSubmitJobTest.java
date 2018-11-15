@@ -19,11 +19,11 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import static org.apache.griffin.core.util.EntityHelper.createFileExistPredicate;
-import static org.apache.griffin.core.util.EntityHelper.createGriffinMeasure;
-import static org.apache.griffin.core.util.EntityHelper.createJobDetail;
-import static org.apache.griffin.core.util.EntityHelper.createJobInstance;
-import static org.apache.griffin.core.util.EntityHelper.createSimpleTrigger;
+import static org.apache.griffin.core.util.EntityMocksHelper.createFileExistPredicate;
+import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinMeasure;
+import static org.apache.griffin.core.util.EntityMocksHelper.createJobDetail;
+import static org.apache.griffin.core.util.EntityMocksHelper.createJobInstance;
+import static org.apache.griffin.core.util.EntityMocksHelper.createSimpleTrigger;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
