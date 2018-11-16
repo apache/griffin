@@ -51,6 +51,8 @@ case class AccuracyMetric(miss: Long, total: Long) extends Metric {
 
   def getMatch: Long = total - miss
 
-  def matchPercentage: Double = if (getTotal <= 0) 0 else getMatch.toDouble / getTotal * 100
+  def matchFraction: Double = if (getTotal <= 0) 1 else getMatch.toDouble / getTotal
+
+  def matchPercentage: Double = matchFraction * 100
 
 }

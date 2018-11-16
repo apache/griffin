@@ -21,8 +21,7 @@ package org.apache.griffin.measure.step.transform
 import java.util.Date
 
 import org.apache.spark.sql.{Encoders, Row, SQLContext, _}
-import org.apache.spark.sql.types.{BooleanType, LongType, StructField, StructType}
-
+import org.apache.spark.sql.types._
 import org.apache.griffin.measure.context.ContextId
 import org.apache.griffin.measure.context.streaming.metric._
 import org.apache.griffin.measure.context.streaming.metric.CacheResults.CacheResult
@@ -43,6 +42,7 @@ object DataFrameOps {
     val _miss = "miss"
     val _total = "total"
     val _matched = "matched"
+    val _matchedFraction = "matchedFraction"
   }
 
   def fromJson(sqlContext: SQLContext,
@@ -70,6 +70,7 @@ object DataFrameOps {
     val miss = details.getStringOrKey(_miss)
     val total = details.getStringOrKey(_total)
     val matched = details.getStringOrKey(_matched)
+    val matchedFraction = details.getStringOrKey(_matchedFraction)
 
     val updateTime = new Date().getTime
 
@@ -107,12 +108,13 @@ object DataFrameOps {
       StructField(miss, LongType),
       StructField(total, LongType),
       StructField(matched, LongType),
+      StructField(matchedFraction, DoubleType),
       StructField(ConstantColumns.record, BooleanType),
       StructField(ConstantColumns.empty, BooleanType)
     ))
     val rows = updatedResults.map { r =>
       val ar = r.result.asInstanceOf[AccuracyMetric]
-      Row(r.timeStamp, ar.miss, ar.total, ar.getMatch, !ar.initial, ar.eventual)
+      Row(r.timeStamp, ar.miss, ar.total, ar.getMatch, ar.matchFraction, !ar.initial, ar.eventual)
     }.toArray
     val rowRdd = sqlContext.sparkContext.parallelize(rows)
     val retDf = sqlContext.createDataFrame(rowRdd, schema)
