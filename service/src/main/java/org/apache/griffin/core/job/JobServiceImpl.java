@@ -604,7 +604,7 @@ public class JobServiceImpl implements JobService {
                     ()));
             instance.setAppId(appId == null ? null : appId.toString());
             instance.setAppUri(appId == null ? null : env
-                .getProperty("yarn.uri") + " /cluster/app/ " + appId);
+                .getProperty("yarn.uri") + "/cluster/app/" + appId);
             instanceRepo.save(instance);
         }
     }
