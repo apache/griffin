@@ -39,6 +39,8 @@ object DataConnectorFactory extends Loggable {
 
   val KafkaRegex = """^(?i)kafka$""".r
 
+  val CustomRegex = """^(?i)custom$""".r
+
   /**
     * create data connector
     * @param sparkSession     spark env
@@ -61,6 +63,7 @@ object DataConnectorFactory extends Loggable {
         case HiveRegex() => HiveBatchDataConnector(sparkSession, dcParam, tmstCache)
         case AvroRegex() => AvroBatchDataConnector(sparkSession, dcParam, tmstCache)
         case TextDirRegex() => TextDirBatchDataConnector(sparkSession, dcParam, tmstCache)
+        case CustomRegex() => getCustomConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
         case KafkaRegex() =>
           getStreamingDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
         case _ => throw new Exception("connector creation error!")
@@ -81,6 +84,26 @@ object DataConnectorFactory extends Loggable {
       case KafkaRegex() =>
         getKafkaDataConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
       case _ => throw new Exception("streaming connector creation error!")
+    }
+  }
+
+  private def getCustomConnector(session: SparkSession,
+                                 context: StreamingContext,
+                                 param: DataConnectorParam,
+                                 storage: TimestampStorage,
+                                 maybeClient: Option[StreamingCacheClient]): DataConnector = {
+    val className = param.getConfig("class").asInstanceOf[String]
+    val cls = Class.forName(className)
+    if (classOf[BatchDataConnector].isAssignableFrom(cls)) {
+      val ctx = BatchDataConnectorContext(session, param, storage)
+      val meth = cls.getDeclaredMethod("apply", classOf[BatchDataConnectorContext])
+      meth.invoke(null, ctx).asInstanceOf[BatchDataConnector]
+    } else if (classOf[StreamingDataConnector].isAssignableFrom(cls)) {
+      val ctx = StreamingDataConnectorContext(session, context, param, storage, maybeClient)
+      val meth = cls.getDeclaredMethod("apply", classOf[StreamingDataConnectorContext])
+      meth.invoke(null, ctx).asInstanceOf[StreamingDataConnector]
+    } else {
+      throw new ClassCastException("")
     }
   }
 
