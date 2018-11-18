@@ -31,7 +31,26 @@ import os
 import re
 import subprocess
 import sys
-import urllib2
+
+try:
+    # Python3
+    import urllib.request
+    Request = urllib.request.Request
+    urlopen = urllib.request.urlopen
+    HTTPError = urllib.request.HTTPError
+except ImportError:
+    # Python2
+    import urllib2
+    Request = urllib2.Request
+    urlopen = urllib2.urlopen
+    HTTPError = urllib2.HTTPError
+
+try:
+    # raw_input renamed as input in python3+
+    input = raw_input
+except NameError:
+    pass
+
 
 try:
     import jira.client
@@ -69,28 +88,28 @@ PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/incubator-griffin.git"
 
 def get_json(url):
     try:
-        request = urllib2.Request(url)
+        request = Request(url)
         if GITHUB_OAUTH_KEY:
             request.add_header('Authorization', 'token %s' % GITHUB_OAUTH_KEY)
-        return json.load(urllib2.urlopen(request))
-    except urllib2.HTTPError as e:
+        return json.load(urlopen(request))
+    except HTTPError as e:
         if "X-RateLimit-Remaining" in e.headers and e.headers["X-RateLimit-Remaining"] == '0':
-            print "Exceeded the GitHub API rate limit; see the instructions in " + \
+            print("Exceeded the GitHub API rate limit; see the instructions in " + \
                   "merge_pr.py to configure an OAuth token for making authenticated " + \
-                  "GitHub requests."
+                  "GitHub requests.")
         else:
-            print "Unable to fetch URL, exiting: %s" % url
+            print("Unable to fetch URL, exiting: %s" % url)
         sys.exit(-1)
 
 
 def fail(msg):
-    print msg
+    print(msg)
     clean_up()
     sys.exit(-1)
 
 
 def run_cmd(cmd):
-    print cmd
+    print(cmd)
     if isinstance(cmd, list):
         return subprocess.check_output(cmd)
     else:
@@ -98,13 +117,13 @@ def run_cmd(cmd):
 
 
 def continue_maybe(prompt):
-    result = raw_input("\n%s (y/n): " % prompt)
+    result = input("\n%s (y/n): " % prompt)
     if result.lower() != "y":
         fail("Okay, exiting")
 
 
 def clean_up():
-    print "Restoring head pointer to %s" % original_head
+    print("Restoring head pointer to %s" % original_head)
     run_cmd("git checkout %s" % original_head)
 
     ansi_escape = re.compile(r'\x1b[^m]*m')
@@ -112,7 +131,7 @@ def clean_up():
 
     for branch in filter(lambda x: x.startswith(BRANCH_PREFIX), branches):
         branch = ansi_escape.sub('', branch)
-        print "Deleting local branch %s" % branch
+        print("Deleting local branch %s" % branch)
         run_cmd("git branch -D %s" % branch)
 
 
@@ -138,7 +157,7 @@ def merge_pr(pr_num, target_ref, title, body, pr_repo_desc):
                               '--pretty=format:%an <%ae>']).split("\n")
     distinct_authors = sorted(set(commit_authors),
                               key=lambda x: commit_authors.count(x), reverse=True)
-    primary_author = raw_input(
+    primary_author = input(
             "Enter primary author in the format of \"name <email>\" [%s]: " %
             distinct_authors[0])
     if primary_author == "":
@@ -188,7 +207,7 @@ def merge_pr(pr_num, target_ref, title, body, pr_repo_desc):
 
 
 def cherry_pick(pr_num, merge_hash, default_branch):
-    pick_ref = raw_input("Enter a branch name [%s]: " % default_branch)
+    pick_ref = input("Enter a branch name [%s]: " % default_branch)
     if pick_ref == "":
         pick_ref = default_branch
 
@@ -235,7 +254,7 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id="5"):
     asf_jira = jira.client.JIRA({'server': JIRA_API_BASE},
                                 basic_auth=(JIRA_USERNAME, JIRA_PASSWORD))
 
-    jira_id = raw_input("Enter a Griffin JIRA number id [%s]: " % default_jira_id)
+    jira_id = input("Enter a Griffin JIRA number id [%s]: " % default_jira_id)
     if jira_id == "":
         jira_id = default_jira_id
 
@@ -254,8 +273,8 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id="5"):
 
     if cur_status == "Resolved" or cur_status == "Closed":
         fail("JIRA issue %s already has status '%s'" % (jira_id, cur_status))
-    print ("=== JIRA %s ===" % jira_id)
-    print ("summary\t\t%s\nassignee\t%s\nstatus\t\t%s\nurl\t\t%s/%s\n" % (
+    print("=== JIRA %s ===" % jira_id)
+    print("summary\t\t%s\nassignee\t%s\nstatus\t\t%s\nurl\t\t%s/%s\n" % (
         cur_summary, cur_assignee, cur_status, JIRA_BASE, jira_id))
 
     versions = asf_jira.project_versions("GRIFFIN")
@@ -277,7 +296,7 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id="5"):
                 default_fix_versions = filter(lambda x: x != v, default_fix_versions)
     default_fix_versions = ",".join(default_fix_versions)
 
-    fix_versions = raw_input("Enter comma-separated fix version(s) [%s]: " % default_fix_versions)
+    fix_versions = input("Enter comma-separated fix version(s) [%s]: " % default_fix_versions)
     if fix_versions == "":
         fix_versions = default_fix_versions
     fix_versions = fix_versions.replace(" ", "").split(",")
@@ -293,7 +312,7 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id="5"):
             jira_id, resolve["id"], fixVersions=jira_fix_versions,
             comment=comment, resolution={'id': resolution.raw['id']})
 
-    print "Successfully resolved %s with fixVersions=%s!" % (jira_id, fix_versions)
+    print("Successfully resolved %s with fixVersions=%s!" % (jira_id, fix_versions))
 
 
 def resolve_jira_issues(title, merge_branches, comment):
@@ -374,7 +393,7 @@ def main():
     # Assumes branch names can be sorted lexicographically
     latest_branch = sorted(branch_names, reverse=True)[0]
 
-    pr_num = raw_input("Which pull request would you like to merge? (e.g. 34): ")
+    pr_num = input("Which pull request would you like to merge? (e.g. 34): ")
     pr = get_json("%s/pulls/%s" % (GITHUB_API_BASE, pr_num))
     pr_events = get_json("%s/issues/%s/events" % (GITHUB_API_BASE, pr_num))
 
@@ -383,17 +402,17 @@ def main():
     # Decide whether to use the modified title or not
     modified_title = standardize_jira_ref(pr["title"])
     if modified_title != pr["title"]:
-        print "I've re-written the title as follows to match the standard format:"
-        print "Original: %s" % pr["title"]
-        print "Modified: %s" % modified_title
-        result = raw_input("Would you like to use the modified title? (y/n): ")
+        print("I've re-written the title as follows to match the standard format:")
+        print("Original: %s" % pr["title"])
+        print("Modified: %s" % modified_title)
+        result = input("Would you like to use the modified title? (y/n): ")
         if result.lower() == "y":
             title = modified_title
-            print "Using modified title:"
+            print("Using modified title:")
         else:
             title = pr["title"]
-            print "Using original title:"
-        print title
+            print("Using original title:")
+        print(title)
     else:
         title = pr["title"]
 
@@ -412,13 +431,13 @@ def main():
         merge_hash = merge_commits[0]["commit_id"]
         message = get_json("%s/commits/%s" % (GITHUB_API_BASE, merge_hash))["commit"]["message"]
 
-        print "Pull request %s has already been merged, assuming you want to backport" % pr_num
+        print("Pull request %s has already been merged, assuming you want to backport" % pr_num)
         commit_is_downloaded = run_cmd(['git', 'rev-parse', '--quiet', '--verify',
                                         "%s^{commit}" % merge_hash]).strip() != ""
         if not commit_is_downloaded:
             fail("Couldn't find any merge commit for #%s, you may need to update HEAD." % pr_num)
 
-        print "Found commit %s:\n%s" % (merge_hash, message)
+        print("Found commit %s:\n%s" % (merge_hash, message))
         cherry_pick(pr_num, merge_hash, latest_branch)
         sys.exit(0)
 
@@ -427,8 +446,8 @@ def main():
               "Continue? (experts only!)"
         continue_maybe(msg)
 
-    print ("\n=== Pull Request #%s ===" % pr_num)
-    print ("title\t%s\nsource\t%s\ntarget\t%s\nurl\t%s" % (
+    print("\n=== Pull Request #%s ===" % pr_num)
+    print("title\t%s\nsource\t%s\ntarget\t%s\nurl\t%s" % (
         title, pr_repo_desc, target_ref, url))
     continue_maybe("Proceed with merging pull request #%s?" % pr_num)
 
@@ -437,7 +456,7 @@ def main():
     merge_hash = merge_pr(pr_num, target_ref, title, body, pr_repo_desc)
 
     pick_prompt = "Would you like to pick %s into another branch?" % merge_hash
-    while raw_input("\n%s (y/n): " % pick_prompt).lower() == "y":
+    while input("\n%s (y/n): " % pick_prompt).lower() == "y":
         merged_refs = merged_refs + [cherry_pick(pr_num, merge_hash, latest_branch)]
 
     if JIRA_IMPORTED:
@@ -446,11 +465,11 @@ def main():
             jira_comment = "Issue resolved by pull request %s\n[%s/%s]" % (pr_num, GITHUB_BASE, pr_num)
             resolve_jira_issues(title, merged_refs, jira_comment)
         else:
-            print "JIRA_USERNAME and JIRA_PASSWORD not set"
-            print "Exiting without trying to close the associated JIRA."
+            print("JIRA_USERNAME and JIRA_PASSWORD not set")
+            print("Exiting without trying to close the associated JIRA.")
     else:
-        print "Could not find jira-python library. Run 'sudo pip install jira' to install."
-        print "Exiting without trying to close the associated JIRA."
+        print("Could not find jira-python library. Run 'sudo pip install jira' to install.")
+        print("Exiting without trying to close the associated JIRA.")
 
 
 if __name__ == "__main__":
