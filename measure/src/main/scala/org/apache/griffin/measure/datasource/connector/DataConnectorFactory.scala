@@ -103,7 +103,7 @@ object DataConnectorFactory extends Loggable {
       val meth = cls.getDeclaredMethod("apply", classOf[StreamingDataConnectorContext])
       meth.invoke(null, ctx).asInstanceOf[StreamingDataConnector]
     } else {
-      throw new ClassCastException("")
+      throw new ClassCastException(s"$className should extend BatchDataConnector or StreamingDataConnector")
     }
   }
 
