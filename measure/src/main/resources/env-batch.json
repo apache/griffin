@@ -26,6 +26,8 @@
       "config": {
         "method": "post",
         "api": "http://10.148.181.248:39200/griffin/accuracy",
+        "user": "elastic",
+        "password": "changeme",
         "connection.timeout": "1m",
         "retry": 10
       }

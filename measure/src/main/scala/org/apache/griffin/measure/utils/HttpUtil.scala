@@ -28,22 +28,41 @@ object HttpUtil {
   val DELETE_REGEX = """^(?i)delete$""".r
 
   def postData(url: String,
+               user: String,
+               password: String,
                params: Map[String, Object],
                headers: Map[String, Object],
                data: String): Boolean = {
-    val response = Http(url).params(convertObjMap2StrMap(params))
-      .headers(convertObjMap2StrMap(headers)).postData(data).asString
+    var httpReq = Http(url)
+      .params(convertObjMap2StrMap(params))
+      .headers(convertObjMap2StrMap(headers))
+    if (user!=null && password!=null) {
+      httpReq = Http(url)
+        .params(convertObjMap2StrMap(params))
+        .auth(user, password)
+        .headers(convertObjMap2StrMap(headers))
+    }
+    val response = httpReq.postData(data).asString
 
     response.isSuccess
   }
 
   def httpRequest(url: String,
                   method: String,
+                  user: String,
+                  password: String,
                   params: Map[String, Object],
                   headers: Map[String, Object],
                   data: String): Boolean = {
-    val httpReq = Http(url).params(convertObjMap2StrMap(params))
+    var httpReq = Http(url)
+      .params(convertObjMap2StrMap(params))
+      .headers(convertObjMap2StrMap(headers))
+    if (user!=null && password!=null) {
+      httpReq = Http(url)
+        .params(convertObjMap2StrMap(params))
+        .auth(user, password)
         .headers(convertObjMap2StrMap(headers))
+    }
     method match {
       case POST_REGEX() =>
         val res = httpReq.postData(data).asString
