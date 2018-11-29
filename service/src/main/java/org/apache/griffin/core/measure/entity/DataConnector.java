@@ -62,7 +62,8 @@ public class DataConnector extends AbstractAuditableEntity {
          */
         HIVE,
         KAFKA,
-        AVRO
+        AVRO,
+        CUSTOM
     }
 
     @NotNull

@@ -188,7 +188,7 @@ Above lists DQ job configure parameters.
 - **sinks**: Whitelisted sink types for this job. Note: no sinks will be used, if empty or omitted. 
 
 ### <a name="data-connector"></a>Data Connector
-- **type**: Data connector type, "AVRO", "HIVE", "TEXT-DIR" for batch mode, "KAFKA" for streaming mode.
+- **type**: Data connector type: "AVRO", "HIVE", "TEXT-DIR", "CUSTOM" for batch mode; "KAFKA", "CUSTOM" for streaming mode.
 - **version**: Version string of data connector type.
 - **config**: Configure parameters of each data connector type.
 	+ avro data connector
@@ -204,6 +204,14 @@ Above lists DQ job configure parameters.
 		* data.dir.depth: integer, depth of data directories, 0 as default.
 		* success.file: success file name, 
 		* done.file: 
+	+ custom connector
+	    * class: class name for user-provided data connector implementation. For Batch
+	    it should be implementing BatchDataConnector trait and have static method with signature
+	    ```def apply(ctx: BatchDataConnectorContext): BatchDataConnector```. 
+	    For Streaming, it should be implementing StreamingDataConnector and have static method
+	    ```def apply(ctx: StreamingDataConnectorContext): StreamingDataConnector```. User-provided
+	    data connector should be present in Spark job's class path, by providing custom jar as -jar parameter
+	    to spark-submit or by adding to "jars" list in sparkProperties.json.  
 
 ### <a name="rule"></a>Rule
 - **dsl.type**: Rule dsl type, "spark-sql", "df-ops" and "griffin-dsl".

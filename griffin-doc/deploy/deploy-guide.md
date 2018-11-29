@@ -164,6 +164,8 @@ You should also modify some configurations of Apache Griffin for your environmen
 		"spark.yarn.dist.files": "hdfs:///<path to>/hive-site.xml"
 	 },
 	  "files": [
+	  ],
+	  "jars": [
 	  ]
 	}
 
