@@ -35,11 +35,15 @@ case class ElasticSearchSink(config: Map[String, Any], metricName: String,
 
   val Api = "api"
   val Method = "method"
+  val User = "user"
+  val Password = "password"
   val ConnectionTimeout = "connection.timeout"
   val Retry = "retry"
 
   val api = config.getString(Api, "")
   val method = config.getString(Method, "post")
+  val user = config.getString(User, null)
+  val password = config.getString(Password, null)
 
   val connectionTimeout =
     TimeUtil.milliseconds(config.getString(ConnectionTimeout, "")).getOrElse(-1L)
@@ -64,7 +68,7 @@ case class ElasticSearchSink(config: Map[String, Any], metricName: String,
 
       def func(): (Long, Future[Boolean]) = {
         import scala.concurrent.ExecutionContext.Implicits.global
-        (timeStamp, Future(HttpUtil.httpRequest(api, method, params, header, data)))
+        (timeStamp, Future(HttpUtil.httpRequest(api, method, user, password, params, header, data)))
       }
       if (block) SinkTaskRunner.addBlockTask(func _, retry, connectionTimeout)
       else SinkTaskRunner.addNonBlockTask(func _, retry)
