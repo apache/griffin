@@ -139,6 +139,7 @@ under the License.
                             <exclude>**/*.db</exclude>
                             <exclude>**/velocity.log*</exclude>
                             <exclude>**/*.json</exclude>
+                            <exclude>**/*.csv</exclude>
                             <exclude>**/*.avro</exclude>
                             <exclude>**/*.dat</exclude>
                             <exclude>**/banner.txt</exclude>
