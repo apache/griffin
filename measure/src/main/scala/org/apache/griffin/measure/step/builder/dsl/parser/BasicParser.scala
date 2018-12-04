@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.dsl.parser
 
+import scala.util.parsing.combinator.JavaTokenParsers
+
 import org.apache.griffin.measure.step.builder.dsl.expr._
 
-import scala.util.parsing.combinator.JavaTokenParsers
 
 /**
   * basic parser for sql like syntax
@@ -388,10 +389,9 @@ trait BasicParser extends JavaTokenParsers with Serializable {
 
   def combinedClause: Parser[CombinedClause] = selectClause ~ opt(fromClause) ~ opt(whereClause) ~
     opt(groupbyClause) ~ opt(orderbyClause) ~ opt(limitClause) ^^ {
-    case sel ~ fromOpt ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt => {
+    case sel ~ fromOpt ~ whereOpt ~ groupbyOpt ~ orderbyOpt ~ limitOpt =>
       val tails = Seq(whereOpt, groupbyOpt, orderbyOpt, limitOpt).flatMap(opt => opt)
       CombinedClause(sel, fromOpt, tails)
-    }
   }
 
 }

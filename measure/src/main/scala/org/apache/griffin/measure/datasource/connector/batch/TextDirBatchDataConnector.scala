@@ -18,11 +18,12 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.connector.batch
 
+import org.apache.spark.sql.{DataFrame, SparkSession}
+
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.context.TimeRange
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.HdfsUtil
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -60,7 +61,7 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
       val validDataDirs = dataDirs.filter(dir => !emptyDir(dir))
 
       if (validDataDirs.nonEmpty) {
-        val df = sparkSession.read.text(validDataDirs:  _*)
+        val df = sparkSession.read.text(validDataDirs: _*)
         val dfOpt = Some(df)
         val preDfOpt = preProcess(dfOpt, ms)
         preDfOpt
@@ -68,16 +69,17 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
         None
       }
     } catch {
-      case e: Throwable => {
-        error(s"load text dir ${dirPath} fails: ${e.getMessage}")
+      case e: Throwable =>
+        error(s"load text dir ${dirPath} fails: ${e.getMessage}", e)
         None
-      }
     }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))
   }
 
-  private def listSubDirs(paths: Seq[String], depth: Int, filteFunc: (String) => Boolean): Seq[String] = {
+  private def listSubDirs(paths: Seq[String],
+                          depth: Int,
+                          filteFunc: (String) => Boolean): Seq[String] = {
     val subDirs = paths.flatMap { path => HdfsUtil.listSubPathsByType(path, "dir", true) }
     if (depth <= 0) {
       subDirs.filter(filteFunc)
@@ -90,7 +92,8 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
   private def isDone(dir: String): Boolean = HdfsUtil.existFileInDir(dir, doneFile)
   private def isSuccess(dir: String): Boolean = HdfsUtil.existFileInDir(dir, successFile)
 
-  private def touchDone(dir: String): Unit = HdfsUtil.createEmptyFile(HdfsUtil.getHdfsFilePath(dir, doneFile))
+  private def touchDone(dir: String): Unit =
+    HdfsUtil.createEmptyFile(HdfsUtil.getHdfsFilePath(dir, doneFile))
 
   private def emptyDir(dir: String): Boolean = {
     HdfsUtil.listSubPathsByType(dir, "file").filter(!_.startsWith(ignoreFilePrefix)).size == 0
@@ -98,7 +101,8 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
 
 //  def metaData(): Try[Iterable[(String, String)]] = {
 //    Try {
-//      val st = sqlContext.read.format("com.databricks.spark.avro").load(concreteFileFullPath).schema
+//      val st = sqlContext.read.format("com.databricks.spark.avro").
+  //       load(concreteFileFullPath).schema
 //      st.fields.map(f => (f.name, f.dataType.typeName))
 //    }
 //  }

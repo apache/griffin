@@ -19,14 +19,17 @@ under the License.
 
 package org.apache.griffin.core.util;
 
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 public class YarnNetUtil {
@@ -34,6 +37,12 @@ public class YarnNetUtil {
             .getLogger(YarnNetUtil.class);
     private static RestTemplate restTemplate = new RestTemplate();
 
+    /**
+     * delete app task scheduling by yarn.
+     *
+     * @param url prefix part of whole url
+     * @param appId application id
+     */
     public static void delete(String url, String appId) {
         try {
             if (appId != null) {
@@ -42,11 +51,21 @@ public class YarnNetUtil {
                                 + appId + "/state",
                         "{\"state\": \"KILLED\"}");
             }
+        } catch (HttpClientErrorException e) {
+            LOGGER.warn("client error {} from yarn: {}",
+                    e.getMessage(), e.getResponseBodyAsString());
         } catch (Exception e) {
             LOGGER.error("delete exception happens by yarn. {}", e);
         }
     }
 
+    /**
+     * update app task scheduling by yarn.
+     *
+     * @param url prefix part of whole url
+     * @param instance job instance
+     * @return
+     */
     public static boolean update(String url, JobInstanceBean instance) {
         try {
             url += "/ws/v1/cluster/apps/" + instance.getAppId();
@@ -56,12 +75,26 @@ public class YarnNetUtil {
                 instance.setState(LivySessionStates.toLivyState(state));
             }
             return true;
+        } catch (HttpClientErrorException e) {
+            LOGGER.warn("client error {} from yarn: {}",
+                    e.getMessage(), e.getResponseBodyAsString());
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                // in sync with Livy behavior, see com.cloudera.livy.utils.SparkYarnApp
+                instance.setState(DEAD);
+                return true;
+            }
         } catch (Exception e) {
             LOGGER.error("update exception happens by yarn. {}", e);
         }
         return false;
     }
 
+    /**
+     * parse json string and get app json object.
+     *
+     * @param json json string
+     * @return
+     */
     public static JsonObject parse(String json) {
         if (StringUtils.isEmpty(json)) {
             LOGGER.warn("Input string is empty.");

@@ -18,7 +18,7 @@ under the License.
 -->
 
 # Apache Griffin Deployment Guide
-For Griffin users, please follow the instructions below to deploy Griffin in your environment. Note that there are some dependencies that should be installed firstly.
+For Apache Griffin users, please follow the instructions below to deploy Apache Griffin in your environment. Note that there are some dependencies that should be installed firstly.
 
 ### Prerequisites
 You need to install following items
@@ -30,7 +30,7 @@ You need to install following items
 - [Hive](http://apache.claz.org/hive/hive-2.2.0/apache-hive-2.2.0-bin.tar.gz) (version 2.2.0), you can get some help [here](https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHive).
     You need to make sure that your spark cluster could access your HiveContext.
 - [Livy](http://archive.cloudera.com/beta/livy/livy-server-0.3.0.zip), you can get some help [here](http://livy.io/quickstart.html).
-    Griffin need to schedule spark jobs by server, we use livy to submit our jobs.
+    Apache Griffin need to schedule spark jobs by server, we use livy to submit our jobs.
     For some issues of Livy for HiveContext, we need to download 3 files or get them from Spark lib `$SPARK_HOME/lib/`, and put them into HDFS.
     ```
     datanucleus-api-jdo-3.2.6.jar
@@ -38,7 +38,7 @@ You need to install following items
     datanucleus-rdbms-3.2.9.jar
     ```
 - ElasticSearch (5.0 or later versions).
-	ElasticSearch works as a metrics collector, Griffin produces metrics into it, and our default UI gets metrics from it, you can use them by your own way as well.
+	ElasticSearch works as a metrics collector, Apache Griffin produces metrics into it, and our default UI gets metrics from it, you can use them by your own way as well.
 
 ### Configuration
 
@@ -50,7 +50,7 @@ createdb -O <username> quartz
 ```
 Init quartz tables in PostgreSQL using [Init_quartz_postgres.sql](../../service/src/main/resources/Init_quartz_postgres.sql)
 ```
-psql -p <password> -h <host address> -U <username> -f Init_quartz_postgres.sql quartz
+psql -p <port> -h <host address> -U <username> -f Init_quartz_postgres.sql quartz
 ```
 
 #### MySQL
@@ -84,14 +84,14 @@ curl -XPUT http://es:9200/griffin -d '
                     "type": "text"
                 },
                 "tmst": {
-                    "type": "long"
+                    "type": "date"
                 }
             }
         }
     },
     "settings": {
         "index": {
-            "number_of_replicas": "1",
+            "number_of_replicas": "2",
             "number_of_shards": "5"
         }
     }
@@ -99,12 +99,12 @@ curl -XPUT http://es:9200/griffin -d '
 '
 ```
 
-You should also modify some configurations of Griffin for your environment.
+You should also modify some configurations of Apache Griffin for your environment.
 
 - <b>service/src/main/resources/application.properties</b>
 
     ```
-    # griffin server port (default 8080)
+    # Apache Griffin server port (default 8080)
     server.port = 8080
     # jpa
     spring.datasource.url = jdbc:postgresql://<your IP>:5432/quartz?autoReconnect=true&useSSL=false
@@ -164,6 +164,8 @@ You should also modify some configurations of Griffin for your environment.
 		"spark.yarn.dist.files": "hdfs:///<path to>/hive-site.xml"
 	 },
 	  "files": [
+	  ],
+	  "jars": [
 	  ]
 	}
 
@@ -176,7 +178,35 @@ You should also modify some configurations of Griffin for your environment.
     directory (hdfs:///griffin/persist by default), and Elasticsearch URL (http://es:9200/griffin/accuracy by default).
     Similar changes are required in `env_streaming.json`.
 
-   
+#### Compression
+
+Griffin Service is regular Spring Boot application, so it supports all customizations from Spring Boot.
+To enable output compression, the following should be added to `application.properties`:
+```
+server.compression.enabled=true
+server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css
+```
+
+#### SSL
+
+It is possible to enable SSL encryption for api and web endpoints. To do that, you will need to prepare keystore in Spring-compatible format (for example, PKCS12), and add the following values to `application.properties`:
+```
+server.ssl.key-store=/path/to/keystore.p12
+server.ssl.key-store-password=yourpassword
+server.ssl.keyStoreType=PKCS12
+server.ssl.keyAlias=your_key_alias
+```
+
+#### LDAP
+
+The following properties are available for LDAP:
+ - **ldap.url**: URL of LDAP server.
+ - **ldap.email**: Arbitrary suffix added to user's login before search, can be empty string. Used when user's DN contains some common suffix, and there is no bindDN specified. In this case, string after concatenation is used as DN for sending initial bind request.
+ - **ldap.searchBase**: Subtree DN to search.
+ - **ldap.searchPattern**: Filter expression, substring `{0}` is replaced with user's login after ldap.email is concatenated. This expression is used to find user object in LDAP. Access is denied if filter expression did not match any users.
+ - **ldap.sslSkipVerify**: Allows to disable certificate validation for secure LDAP servers.
+ - **ldap.bindDN**: Optional DN of service account used for user lookup. Useful if user's DN is different than attribute used as user's login, or if users' DNs are ambiguous.
+ - **ldap.bindPassword**: Optional password of bind service account.
 
 ### Build and Run
 
@@ -199,7 +229,7 @@ After all environment services startup, we can start our server.
   java -jar service/target/service.jar
   ```
 
-After a few seconds, we can visit our default UI of Griffin (by default the port of spring boot is 8080).
+After a few seconds, we can visit our default UI of Apache Griffin (by default the port of spring boot is 8080).
 
   ```
   http://<your IP>:8080
@@ -208,4 +238,3 @@ After a few seconds, we can visit our default UI of Griffin (by default the port
 You can use UI following the steps [here](../ui/user-guide.md).
 
 **Note**: The UI does not support all the backend features, to experience the advanced features you can use services directly.
-

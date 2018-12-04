@@ -30,15 +30,22 @@ sealed trait SinkType {
 
 object SinkType {
   private val sinkTypes: List[SinkType] = List(
-    ConsoleSinkType, HdfsSinkType, ElasticsearchSinkType, MongoSinkType, UnknownSinkType
+    ConsoleSinkType,
+    HdfsSinkType,
+    ElasticsearchSinkType,
+    MongoSinkType,
+    UnknownSinkType
   )
+
   def apply(ptn: String): SinkType = {
     sinkTypes.find(tp => ptn match {
       case tp.idPattern() => true
       case _ => false
     }).getOrElse(UnknownSinkType)
   }
+
   def unapply(pt: SinkType): Option[String] = Some(pt.desc)
+
   def validSinkTypes(strs: Seq[String]): Seq[SinkType] = {
     val seq = strs.map(s => SinkType(s)).filter(_ != UnknownSinkType).distinct
     if (seq.size > 0) seq else Seq(ElasticsearchSinkType)
@@ -48,7 +55,7 @@ object SinkType {
 /**
   * console sink, will sink metric in console
   */
- case object ConsoleSinkType extends SinkType {
+case object ConsoleSinkType extends SinkType {
   val idPattern = "^(?i)console|log$".r
   val desc = "console"
 }
@@ -56,7 +63,7 @@ object SinkType {
 /**
   * hdfs sink, will sink metric and record in hdfs
   */
- case object HdfsSinkType extends SinkType {
+case object HdfsSinkType extends SinkType {
   val idPattern = "^(?i)hdfs$".r
   val desc = "hdfs"
 }
@@ -64,7 +71,7 @@ object SinkType {
 /**
   * elasticsearch sink, will sink metric in elasticsearch
   */
- case object ElasticsearchSinkType extends SinkType {
+case object ElasticsearchSinkType extends SinkType {
   val idPattern = "^(?i)es|elasticsearch|http$".r
   val desc = "elasticsearch"
 }
@@ -72,12 +79,12 @@ object SinkType {
 /**
   * mongo sink, will sink metric in mongo db
   */
- case object MongoSinkType extends SinkType {
+case object MongoSinkType extends SinkType {
   val idPattern = "^(?i)mongo|mongodb$".r
   val desc = "distinct"
 }
 
- case object UnknownSinkType extends SinkType {
+case object UnknownSinkType extends SinkType {
   val idPattern = "".r
   val desc = "unknown"
 }

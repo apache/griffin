@@ -19,191 +19,215 @@ under the License.
 package org.apache.griffin.measure.utils
 
 import scala.reflect.ClassTag
+import scala.util.Try
 
 object ParamUtil {
 
+  object TransUtil {
+    def toAny(value: Any): Option[Any] = Some(value)
+    def toAnyRef[T: ClassTag](value: Any): Option[T] = {
+      value match {
+        case v: T => Some(v)
+        case _ => None
+      }
+    }
+    def toStringOpt(value: Any): Option[String] = {
+      value match {
+        case v: String => Some(v)
+        case v => Some(v.toString)
+      }
+    }
+    def toByte(value: Any): Option[Byte] = {
+      try {
+        value match {
+          case v: String => Some(v.toByte)
+          case v: Byte => Some(v.toByte)
+          case v: Short => Some(v.toByte)
+          case v: Int => Some(v.toByte)
+          case v: Long => Some(v.toByte)
+          case v: Float => Some(v.toByte)
+          case v: Double => Some(v.toByte)
+          case _ => None
+        }
+      } catch {
+        case _: NumberFormatException => None
+      }
+    }
+    def toShort(value: Any): Option[Short] = {
+      try {
+        value match {
+          case v: String => Some(v.toShort)
+          case v: Byte => Some(v.toShort)
+          case v: Short => Some(v.toShort)
+          case v: Int => Some(v.toShort)
+          case v: Long => Some(v.toShort)
+          case v: Float => Some(v.toShort)
+          case v: Double => Some(v.toShort)
+          case _ => None
+        }
+      } catch {
+        case _: NumberFormatException => None
+      }
+    }
+    def toInt(value: Any): Option[Int] = {
+      try {
+        value match {
+          case v: String => Some(v.toInt)
+          case v: Byte => Some(v.toInt)
+          case v: Short => Some(v.toInt)
+          case v: Int => Some(v.toInt)
+          case v: Long => Some(v.toInt)
+          case v: Float => Some(v.toInt)
+          case v: Double => Some(v.toInt)
+          case _ => None
+        }
+      } catch {
+        case _: NumberFormatException => None
+      }
+    }
+    def toLong(value: Any): Option[Long] = {
+      try {
+        value match {
+          case v: String => Some(v.toLong)
+          case v: Byte => Some(v.toLong)
+          case v: Short => Some(v.toLong)
+          case v: Int => Some(v.toLong)
+          case v: Long => Some(v.toLong)
+          case v: Float => Some(v.toLong)
+          case v: Double => Some(v.toLong)
+          case _ => None
+        }
+      } catch {
+        case _: NumberFormatException => None
+      }
+    }
+    def toFloat(value: Any): Option[Float] = {
+      try {
+        value match {
+          case v: String => Some(v.toFloat)
+          case v: Byte => Some(v.toFloat)
+          case v: Short => Some(v.toFloat)
+          case v: Int => Some(v.toFloat)
+          case v: Long => Some(v.toFloat)
+          case v: Float => Some(v.toFloat)
+          case v: Double => Some(v.toFloat)
+          case _ => None
+        }
+      } catch {
+        case _: NumberFormatException => None
+      }
+    }
+    def toDouble(value: Any): Option[Double] = {
+      try {
+        value match {
+          case v: String => Some(v.toDouble)
+          case v: Byte => Some(v.toDouble)
+          case v: Short => Some(v.toDouble)
+          case v: Int => Some(v.toDouble)
+          case v: Long => Some(v.toDouble)
+          case v: Float => Some(v.toDouble)
+          case v: Double => Some(v.toDouble)
+          case _ => None
+        }
+      } catch {
+        case _: NumberFormatException => None
+      }
+    }
+    def toBoolean(value: Any): Option[Boolean] = {
+      try {
+        value match {
+          case v: String => Some(v.toBoolean)
+          case v: Boolean => Some(v)
+          case _ => None
+        }
+      } catch {
+        case _: IllegalArgumentException => None
+      }
+    }
+  }
+  import TransUtil._
+
   implicit class ParamMap(params: Map[String, Any]) {
     def getAny(key: String, defValue: Any): Any = {
-      params.get(key) match {
-        case Some(v) => v
-        case _ => defValue
-      }
+      params.get(key).flatMap(toAny).getOrElse(defValue)
     }
 
     def getAnyRef[T: ClassTag](key: String, defValue: T): T = {
-      params.get(key) match {
-        case Some(v: T) => v
-        case _ => defValue
-      }
+      params.get(key).flatMap(toAnyRef[T]).getOrElse(defValue)
     }
 
     def getString(key: String, defValue: String): String = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v
-          case Some(v) => v.toString
-          case _ => defValue
-        }
-      } catch {
-        case _: NumberFormatException => defValue
-      }
+      params.get(key).flatMap(toStringOpt).getOrElse(defValue)
     }
 
     def getLazyString(key: String, defValue: () => String): String = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v
-          case Some(v) => v.toString
-          case _ => defValue()
-        }
-      } catch {
-        case _: NumberFormatException => defValue()
-      }
+      params.get(key).flatMap(toStringOpt).getOrElse(defValue())
     }
 
     def getStringOrKey(key: String): String = getString(key, key)
 
     def getByte(key: String, defValue: Byte): Byte = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v.toByte
-          case Some(v: Byte) => v
-          case Some(v: Short) => v.toByte
-          case Some(v: Int) => v.toByte
-          case Some(v: Long) => v.toByte
-          case Some(v: Float) => v.toByte
-          case Some(v: Double) => v.toByte
-          case _ => defValue
-        }
-      } catch {
-        case _: NumberFormatException => defValue
-      }
+      params.get(key).flatMap(toByte).getOrElse(defValue)
     }
 
     def getShort(key: String, defValue: Short): Short = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v.toShort
-          case Some(v: Byte) => v.toShort
-          case Some(v: Short) => v
-          case Some(v: Int) => v.toShort
-          case Some(v: Long) => v.toShort
-          case Some(v: Float) => v.toShort
-          case Some(v: Double) => v.toShort
-          case _ => defValue
-        }
-      } catch {
-        case _: NumberFormatException => defValue
-      }
+      params.get(key).flatMap(toShort).getOrElse(defValue)
     }
 
     def getInt(key: String, defValue: Int): Int = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v.toInt
-          case Some(v: Byte) => v.toInt
-          case Some(v: Short) => v.toInt
-          case Some(v: Int) => v
-          case Some(v: Long) => v.toInt
-          case Some(v: Float) => v.toInt
-          case Some(v: Double) => v.toInt
-          case _ => defValue
-        }
-      } catch {
-        case _: NumberFormatException => defValue
-      }
+      params.get(key).flatMap(toInt).getOrElse(defValue)
     }
 
     def getLong(key: String, defValue: Long): Long = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v.toLong
-          case Some(v: Byte) => v.toLong
-          case Some(v: Short) => v.toLong
-          case Some(v: Int) => v.toLong
-          case Some(v: Long) => v
-          case Some(v: Float) => v.toLong
-          case Some(v: Double) => v.toLong
-          case _ => defValue
-        }
-      } catch {
-        case _: NumberFormatException => defValue
-      }
+      params.get(key).flatMap(toLong).getOrElse(defValue)
     }
 
     def getFloat(key: String, defValue: Float): Float = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v.toFloat
-          case Some(v: Byte) => v.toFloat
-          case Some(v: Short) => v.toFloat
-          case Some(v: Int) => v.toFloat
-          case Some(v: Long) => v.toFloat
-          case Some(v: Float) => v
-          case Some(v: Double) => v.toFloat
-          case _ => defValue
-        }
-      } catch {
-        case _: NumberFormatException => defValue
-      }
+      params.get(key).flatMap(toFloat).getOrElse(defValue)
     }
 
     def getDouble(key: String, defValue: Double): Double = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v.toDouble
-          case Some(v: Byte) => v.toDouble
-          case Some(v: Short) => v.toDouble
-          case Some(v: Int) => v.toDouble
-          case Some(v: Long) => v.toDouble
-          case Some(v: Float) => v.toDouble
-          case Some(v: Double) => v
-          case _ => defValue
-        }
-      } catch {
-        case _: NumberFormatException => defValue
-      }
+      params.get(key).flatMap(toDouble).getOrElse(defValue)
     }
 
     def getBoolean(key: String, defValue: Boolean): Boolean = {
-      try {
-        params.get(key) match {
-          case Some(v: String) => v.toBoolean
-          case Some(v: Boolean) => v
-          case _ => defValue
-        }
-      } catch {
-        case _: NumberFormatException => defValue
-      }
+      params.get(key).flatMap(toBoolean).getOrElse(defValue)
     }
 
-    case class StringAnyMap(values:Map[String,Any])
-    def getParamMap(key: String, defValue: Map[String, Any] = Map[String, Any]()): Map[String, Any] = {
+    def getParamAnyMap(key: String, defValue: Map[String, Any]
+      = Map[String, Any]()): Map[String, Any] = {
       params.get(key) match {
-        case Some(v: StringAnyMap) => v.values
+        case Some(v: Map[_, _]) => v.map(pair => (pair._1.toString, pair._2))
         case _ => defValue
       }
     }
 
-    def getParamMapOpt(key: String): Option[Map[String, Any]] = {
+    def getParamStringMap(key: String, defValue: Map[String, String]
+    = Map[String, String]()): Map[String, String] = {
       params.get(key) match {
-        case Some(v: StringAnyMap) => Some(v.values)
-        case _ => None
+        case Some(v: Map[_, _]) => v.map(pair => (pair._1.toString, pair._2.toString))
+        case _ => defValue
       }
     }
 
-    def getArr[T](key: String): Seq[T] = {
-      case class TSeqs(values:Seq[T])
+    def getStringArr(key: String, defValue: Seq[String] = Nil): Seq[String] = {
       params.get(key) match {
-        case Some(seq: TSeqs) => seq.values
-        case _ => Nil
+        case Some(seq: Seq[_]) => seq.flatMap(toStringOpt)
+        case _ => defValue
+      }
+    }
+
+    def getDoubleArr(key: String, defValue: Seq[Double] = Nil): Seq[Double] = {
+      params.get(key) match {
+        case Some(seq: Seq[_]) => seq.flatMap(toDouble)
+        case _ => defValue
       }
     }
 
     def addIfNotExist(key: String, value: Any): Map[String, Any] = {
       params.get(key) match {
-        case Some(v) => params
-        case _ => params + (key -> value)
+        case None => params + (key -> value)
+        case _ => params
       }
     }
 
@@ -213,3 +237,4 @@ object ParamUtil {
   }
 
 }
+

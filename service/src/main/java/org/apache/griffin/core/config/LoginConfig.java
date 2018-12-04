@@ -39,7 +39,12 @@ public class LoginConfig {
     private String searchBase;
     @Value("${ldap.searchPattern}")
     private String searchPattern;
-
+    @Value("${ldap.sslSkipVerify:false}")
+    private boolean sslSkipVerify;
+    @Value("${ldap.bindDN:}")
+    private String bindDN;
+    @Value("${ldap.bindPassword:}")
+    private String bindPassword;
 
     @Bean
     public LoginService loginService() {
@@ -48,7 +53,7 @@ public class LoginConfig {
                 return new LoginServiceDefaultImpl();
             case "ldap":
                 return new LoginServiceLdapImpl(url, email, searchBase,
-                        searchPattern);
+                        searchPattern, sslSkipVerify, bindDN, bindPassword);
             default:
                 return null;
         }

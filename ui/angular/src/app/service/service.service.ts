@@ -17,15 +17,14 @@ specific language governing permissions and limitations
 under the License.
 */
 import {Injectable} from "@angular/core";
+import {environment} from "../../environments/environment";
 
 @Injectable()
 export class ServiceService {
   constructor() {
   }
 
-  // public BACKEND_SERVER = 'http://10.64.222.80:38080';
-//  public BACKEND_SERVER = 'http://localhost:8080';
-  public BACKEND_SERVER = "";
+  public BACKEND_SERVER = environment.BACKEND_SERVER;
   public API_ROOT_PATH = "/api/v1";
 
   public config = {
@@ -34,10 +33,13 @@ export class ServiceService {
       base: this.BACKEND_SERVER + this.API_ROOT_PATH,
 
       login: this.BACKEND_SERVER + this.API_ROOT_PATH + "/login/authenticate",
-      dbtree:
-      this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
-      dataassetlist:
-      this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
+      
+      dbtree: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
+      dataassetlist: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables",
+      dblist: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs",
+      tablenames: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/tables/names", // ?db=...
+      dbtablenames: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/dbs/tables/names",
+      dbtable: this.BACKEND_SERVER + this.API_ROOT_PATH + "/metadata/hive/table", // ?db=...&table=...
 
       getdataasset: this.BACKEND_SERVER + this.API_ROOT_PATH + "/dataassets",
 

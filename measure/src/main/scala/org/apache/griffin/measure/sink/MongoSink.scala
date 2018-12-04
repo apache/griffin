@@ -18,14 +18,16 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
-import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.griffin.measure.utils.TimeUtil
+import scala.concurrent.Future
+
 import org.apache.spark.rdd.RDD
 import org.mongodb.scala._
 import org.mongodb.scala.model.{Filters, UpdateOptions, Updates}
 import org.mongodb.scala.result.UpdateResult
 
-import scala.concurrent.Future
+import org.apache.griffin.measure.utils.ParamUtil._
+import org.apache.griffin.measure.utils.TimeUtil
+
 
 /**
   * sink metric and record to mongo
@@ -75,7 +77,7 @@ case class MongoSink(config: Map[String, Any], metricName: String,
       if (block) SinkTaskRunner.addBlockTask(func _, retry, overTime)
       else SinkTaskRunner.addNonBlockTask(func _, retry)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -98,7 +100,7 @@ object MongoConnection {
   var dataConf: MongoConf = _
   private var dataCollection: MongoCollection[Document] = _
 
-  def getDataCollection = dataCollection
+  def getDataCollection : MongoCollection[Document] = dataCollection
 
   def init(config: Map[String, Any]): Unit = {
     if (!initialed) {

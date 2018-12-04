@@ -17,15 +17,16 @@ specific language governing permissions and limitations
 under the License.
 */
 import {Component, OnInit} from "@angular/core";
-import {Router, ActivatedRoute, ParamMap} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import "rxjs/add/operator/switchMap";
 import {HttpClient} from "@angular/common/http";
 import {ServiceService} from "../../service/service.service";
+import {MeasureFormatService, Format} from "../../service/measure-format.service";
 
 @Component({
   selector: "app-measure-detail",
   templateUrl: "./measure-detail.component.html",
-  providers: [ServiceService],
+  providers: [ServiceService, MeasureFormatService],
   styleUrls: ["./measure-detail.component.css"]
 })
 export class MeasureDetailComponent implements OnInit {
@@ -35,11 +36,16 @@ export class MeasureDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient,
+    private measureFormatService: MeasureFormatService,
     public serviceService: ServiceService
   ) {
   }
 
   ruleData: any;
+  getModelUrl: string;
+  showFullRules: boolean;
+  Format: typeof Format = Format;
+  format: Format = Format.json;
   ruleDes = [];
   sourceLength: number;
   sourceDB: string;
@@ -79,11 +85,10 @@ export class MeasureDetailComponent implements OnInit {
     this.ruleData = {
       evaluateRule: ""
     };
-    var getModelUrl;
-    var getModel = this.serviceService.config.uri.getModel;
+    let getModel = this.serviceService.config.uri.getModel;
     this.currentId = this.route.snapshot.paramMap.get("id");
-    getModelUrl = getModel + "/" + this.currentId;
-    this.http.get(getModelUrl).subscribe(
+    this.getModelUrl = getModel + "/" + this.currentId;
+    this.http.get(this.getModelUrl).subscribe(
       data => {
         this.ruleData = data;
         if (this.ruleData["measure.type"] === "external") {
@@ -96,7 +101,7 @@ export class MeasureDetailComponent implements OnInit {
             this.ruleDes = this.ruleData["rule.description"].details
           }
           this.fetchData("source", 0);
-          if (this.ruleData.type === "ACCURACY") {
+          if (this.ruleData.type.toLowerCase() === "accuracy") {
             this.fetchData("target", 1);
           } else {
             this.targetDB = "";
@@ -109,5 +114,15 @@ export class MeasureDetailComponent implements OnInit {
         // toaster.pop('error', 'Error when geting record', response.message);
       }
     );
+  }
+
+  getRawContent() {
+    let content;
+    if (!this.showFullRules) {
+      content = (this.ruleData['evaluate.rule'] || {})['rules'];
+    } else {
+      content = this.ruleData;
+    }
+    return this.measureFormatService.format(content, this.format);
   }
 }

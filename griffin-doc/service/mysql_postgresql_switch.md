@@ -20,14 +20,14 @@ under the License.
 # Mysql and postgresql switch
 
 ## Overview
-By default, Griffin uses EclipseLink as the default JPA implementation. This document provides ways to switch mysql and postgresql.
+Apache Griffin uses EclipseLink as the default JPA implementation, which supports two kinds of database, mysql and postgresql. This document mainly describes the steps of how to switch mysql and postgresql as backend database.
 
-- [Use mysql database](#1.1)
-- [Use postgresql database](#1.2)
+- [Mysql database](#1.1)
+- [Postgresql database](#1.2)
 
 <h2 id = "1.1"></h2>
 
-## Use mysql database 
+## Mysql database 
 ### Add mysql dependency
 
     <dependency>
@@ -54,7 +54,7 @@ By default, Griffin uses EclipseLink as the default JPA implementation. This doc
 
 <h2 id = "1.2"></h2>
 
-## Use postgresql database 
+## Postgresql database 
 
 ### Add postgresql dependency
 

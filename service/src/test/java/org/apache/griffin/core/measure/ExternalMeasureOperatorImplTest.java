@@ -19,7 +19,7 @@ under the License.
 
 package org.apache.griffin.core.measure;
 
-import static org.apache.griffin.core.util.EntityHelper.createExternalMeasure;
+import static org.apache.griffin.core.util.EntityMocksHelper.createExternalMeasure;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

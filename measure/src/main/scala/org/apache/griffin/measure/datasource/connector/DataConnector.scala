@@ -20,16 +20,17 @@ package org.apache.griffin.measure.datasource.connector
 
 import java.util.concurrent.atomic.AtomicLong
 
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions._
+
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.enums.BatchProcessType
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
+import org.apache.griffin.measure.configuration.enums.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.step.builder.preproc.PreProcParamMaker
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions._
 
 trait DataConnector extends Loggable with Serializable {
 
@@ -64,7 +65,8 @@ trait DataConnector extends Loggable with Serializable {
       saveTmst(timestamp)    // save timestamp
 
       dfOpt.flatMap { df =>
-        val (preProcRules, thisTable) = PreProcParamMaker.makePreProcRules(dcParam.getPreProcRules, suffix, dcDfName)
+        val (preProcRules, thisTable) =
+          PreProcParamMaker.makePreProcRules(dcParam.getPreProcRules, suffix, dcDfName)
 
         // init data
         context.compileTableRegister.registerTable(thisTable)
@@ -89,10 +91,9 @@ trait DataConnector extends Loggable with Serializable {
       }
 
     } catch {
-      case e: Throwable => {
-        error(s"pre-process of data connector [${id}] error: ${e.getMessage}")
+      case e: Throwable =>
+        error(s"pre-process of data connector [${id}] error: ${e.getMessage}", e)
         None
-      }
     }
   }
 }

@@ -23,7 +23,8 @@ import org.apache.griffin.measure.step.builder.dsl.expr._
 
 case class ProfilingAnalyzer(expr: ProfilingClause, sourceName: String) extends BasicAnalyzer {
 
-  val dataSourceNames = expr.preOrderTraverseDepthFirst(Set[String]())(seqDataSourceNames, combDataSourceNames)
+  val dataSourceNames =
+    expr.preOrderTraverseDepthFirst(Set[String]())(seqDataSourceNames, combDataSourceNames)
 
   val selectionExprs: Seq[Expr] = {
     expr.selectClause.exprs.map(_.extractSelf).flatMap { expr =>

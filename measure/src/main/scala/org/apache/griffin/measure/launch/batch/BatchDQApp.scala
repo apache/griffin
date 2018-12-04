@@ -20,17 +20,19 @@ package org.apache.griffin.measure.launch.batch
 
 import java.util.Date
 
-import org.apache.griffin.measure.configuration.enums._
+import scala.util.Try
+
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.{SparkSession, SQLContext}
+
 import org.apache.griffin.measure.configuration.dqdefinition._
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.{SQLContext, SparkSession}
 
-import scala.util.Try
 
 case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
@@ -62,7 +64,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     GriffinUDFAgent.register(sqlContext)
   }
 
-  def run: Try[_] = Try {
+  def run: Try[Boolean] = Try {
     // start time
     val startTime = new Date().getTime
 
@@ -86,7 +88,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
 
     // dq job execute
-    dqJob.execute(dqContext)
+    val result = dqJob.execute(dqContext)
 
     // end time
     val endTime = new Date().getTime
@@ -97,6 +99,8 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // finish
     dqContext.getSink().finish()
+
+    result
   }
 
   def close: Try[_] = Try {

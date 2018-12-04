@@ -24,7 +24,7 @@ keep any codes submitted by various committers consistent.
 
 ## Config Java Code Style
 We suggest developers use automatic tools to check code violation like [CheckStyle](https://github.com/checkstyle/checkstyle).<br>
-+ Firstly, you need to apply Griffin's Java Code Style Rules. Copy configuration and save as griffin_check.xml
++ Firstly, you need to apply Apache Griffin's Java Code Style Rules. Copy configuration and save as griffin_check.xml
 ```xml
 <?xml version="1.0"?>
 <!DOCTYPE module PUBLIC
@@ -300,7 +300,7 @@ We suggest developers use automatic tools to check code violation like [CheckSty
 
         ![idea plugin](../img/devguide/style-check-plugin-idea.png)
 
-        + Add Griffin Checks In IDEA Setting
+        + Add Apache Griffin Checks In IDEA Setting
 
         ![idea setting](../img/devguide/config-addition-idea.png)
 

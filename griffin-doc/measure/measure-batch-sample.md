@@ -18,14 +18,14 @@ under the License.
 -->
 
 # Measure Batch Sample
-Measures consists of batch measure and streaming measure. This document is for the batch measure sample.
+Apache Griffin measures consist of batch measure and streaming measure, this document merely gives the batch measure sample.
 
 ## Batch Accuracy Sample
 ```
 {
   "name": "accu_batch",
 
-  "process.type": "batch",
+  "process.type": "BATCH",
 
   "data.sources": [
     {
@@ -33,7 +33,7 @@ Measures consists of batch measure and streaming measure. This document is for t
       "baseline": true,
       "connectors": [
         {
-          "type": "avro",
+          "type": "AVRO",
           "version": "1.7",
           "config": {
             "file.name": "src/test/resources/users_info_src.avro"
@@ -44,7 +44,7 @@ Measures consists of batch measure and streaming measure. This document is for t
       "name": "target",
       "connectors": [
         {
-          "type": "avro",
+          "type": "AVRO",
           "version": "1.7",
           "config": {
             "file.name": "src/test/resources/users_info_target.avro"
@@ -58,8 +58,8 @@ Measures consists of batch measure and streaming measure. This document is for t
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "accuracy",
-        "name": "accu",
+        "dq.type": "ACCURACY",
+        "out.dataframe.name": "accu",
         "rule": "source.user_id = target.user_id AND upper(source.first_name) = upper(target.first_name) AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code",
         "details": {
           "source": "source",
@@ -80,7 +80,9 @@ Measures consists of batch measure and streaming measure. This document is for t
         ]        
       }
     ]
-  }
+  },
+  
+  "sinks": ["CONSOLE", "ELASTICSEARCH"]
 }
 ```
 Above is the configure file of batch accuracy job.  
@@ -98,14 +100,14 @@ The miss records of source will be persisted as record.
 {
   "name": "prof_batch",
 
-  "process.type": "batch",
+  "process.type": "BATCH",
 
   "data.sources": [
     {
       "name": "source",
       "connectors": [
         {
-          "type": "hive",
+          "type": "HIVE",
           "version": "1.2",
           "config": {
             "database": "default",
@@ -120,8 +122,8 @@ The miss records of source will be persisted as record.
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
-        "name": "prof",
+        "dq.type": "PROFILING",
+        "out.dataframe.name": "prof",
         "rule": "select max(age) as `max_age`, min(age) as `min_age` from source",
         "out": [
           {
@@ -132,8 +134,8 @@ The miss records of source will be persisted as record.
       },
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
-        "name": "name_grp",
+        "dq.type": "PROFILING",
+        "out.dataframe.name": "name_grp",
         "rule": "select name, count(*) as cnt from source group by name",
         "out": [
           {
@@ -144,7 +146,9 @@ The miss records of source will be persisted as record.
         ]
       }
     ]
-  }
+  },
+   
+  "sinks": ["CONSOLE", "ELASTICSEARCH"]
 }
 ```
 Above is the configure file of batch profiling job.  

@@ -18,10 +18,11 @@ under the License.
 */
 package org.apache.griffin.measure.launch
 
+import scala.util.Try
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig, SinkParam}
 
-import scala.util.Try
 
 /**
   * dq application process
@@ -33,7 +34,10 @@ trait DQApp extends Loggable with Serializable {
 
   def init: Try[_]
 
-  def run: Try[_]
+  /**
+    * @return execution success
+    */
+  def run: Try[Boolean]
 
   def close: Try[_]
 

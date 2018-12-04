@@ -1,5 +1,3 @@
-
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -23,7 +21,10 @@ under the License.
 # Apache Griffin  
 [![Build Status](https://travis-ci.org/apache/incubator-griffin.svg?branch=master)](https://travis-ci.org/apache/incubator-griffin) [![License: Apache 2.0](https://camo.githubusercontent.com/8cb994f6c4a156c623fe057fccd7fb7d7d2e8c9b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d417061636865253230322d3445423142412e737667)](https://www.apache.org/licenses/LICENSE-2.0.html)    
 
-Apache Griffin is a model driven data quality solution for modern data systems. It provides a standard process to define data quality measures, execute, report, as well as an unified dashboard across multiple data systems. 
+The data quality (DQ) is a key criteria for many data consumers like IoT, machine learning etc., however, there is no standard agreement on how to determine “good” data.
+Apache Griffin is a model-driven data quality service platform where you can examine your data on-demand. It provides a standard process to define data quality measures, executions and reports, allowing those examinations across multiple data systems.
+When you don't trust your data, or concern that poorly controlled data can negatively impact critical decision, you can utilize Apache Griffin to ensure data quality.
+
 
 ## Getting Started
 
@@ -59,7 +60,16 @@ You can access our issues on [JIRA page](https://issues.apache.org/jira/browse/G
 
 ## Contributing
 
-See [How to Contribute](http://griffin.apache.org/2017/03/04/community) for details on how to contribute code, documentation, etc.
+See [How to Contribute](http://griffin.apache.org/docs/contribute.html) for details on how to contribute code, documentation, etc.
+
+Here's the most direct way to contribute your work merged into Apache Griffin.
+
+* Fork the project from [github](https://github.com/apache/incubator-griffin)
+* Clone down your fork
+* Implement your feature or bug fix and commit changes
+* Push the branch up to your fork
+* Send a pull request to Apache Griffin branch
+
 
 ## References
 - [Home Page](http://griffin.incubator.apache.org/)

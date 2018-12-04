@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,6 +147,13 @@ public class TimeUtil {
         String escapeHashTagPattern = "\\\\#";
         String hashTag = "#";
         return str.replaceAll(escapeHashTagPattern, hashTag);
+    }
+
+    public static TimeZone getTimeZone(String timezone) {
+        if (StringUtils.isEmpty(timezone)) {
+            return TimeZone.getDefault();
+        }
+        return TimeZone.getTimeZone(timezone);
     }
 
 }

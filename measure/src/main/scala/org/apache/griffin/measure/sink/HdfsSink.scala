@@ -20,9 +20,10 @@ package org.apache.griffin.measure.sink
 
 import java.util.Date
 
-import org.apache.griffin.measure.utils.ParamUtil._
-import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.spark.rdd.RDD
+
+import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
+import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
   * sink metric and record to hdfs
@@ -80,14 +81,15 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     try {
       HdfsUtil.writeContent(StartFile, msg)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
+
   def finish(): Unit = {
     try {
       HdfsUtil.createEmptyFile(FinishFile)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -96,13 +98,14 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
       val logStr = logWrap(rt, msg)
       HdfsUtil.appendContent(LogFile, logStr)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
   private def getHdfsPath(path: String, groupId: Int): String = {
     HdfsUtil.getHdfsFilePath(path, s"${groupId}")
   }
+
   private def getHdfsPath(path: String, ptnId: Int, groupId: Int): String = {
     HdfsUtil.getHdfsFilePath(path, s"${ptnId}.${groupId}")
   }
@@ -116,7 +119,10 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     clearOldRecords(path)
     try {
       val recordCount = records.count
-      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
+      val count =
+        if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
       if (count > 0) {
         val groupCount = ((count - 1) / maxLinesPerFile + 1).toInt
         if (groupCount <= 1) {
@@ -136,7 +142,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
         }
       }
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -145,7 +151,10 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     clearOldRecords(path)
     try {
       val recordCount = records.size
-      val count = if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
+      val count =
+        if (maxPersistLines < 0) recordCount else scala.math.min(maxPersistLines, recordCount)
+
       if (count > 0) {
         val groupCount = (count - 1) / maxLinesPerFile + 1
         if (groupCount <= 1) {
@@ -161,7 +170,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
         }
       }
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -170,7 +179,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
       val json = JsonUtil.toJson(metrics)
       sinkRecords2Hdfs(MetricsFile, json :: Nil)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 
@@ -179,7 +188,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
       val recStr = records.mkString("\n")
       HdfsUtil.writeContent(hdfsPath, recStr)
     } catch {
-      case e: Throwable => error(e.getMessage)
+      case e: Throwable => error(e.getMessage, e)
     }
   }
 

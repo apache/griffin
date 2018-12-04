@@ -18,9 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.configuration.dqdefinition
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.commons.lang.StringUtils
+
 import org.apache.griffin.measure.configuration.enums._
 
 /**
@@ -46,7 +47,7 @@ case class DQConfig(@JsonProperty("name") private val name: String,
   def getDataSources: Seq[DataSourceParam] = {
     dataSources.foldLeft((Nil: Seq[DataSourceParam], Set[String]())) { (ret, ds) =>
       val (seq, names) = ret
-      if (!names.contains(ds.getName)){
+      if (!names.contains(ds.getName)) {
         (seq :+ ds, names + ds.getName)
       } else ret
     }._1
@@ -73,9 +74,9 @@ case class DQConfig(@JsonProperty("name") private val name: String,
   */
 @JsonInclude(Include.NON_NULL)
 case class DataSourceParam( @JsonProperty("name") private val name: String,
-                            @JsonProperty("baseline") private val baseline: Boolean,
                             @JsonProperty("connectors") private val connectors: List[DataConnectorParam],
-                            @JsonProperty("checkpoint") private val checkpoint: Map[String, Any]
+                            @JsonProperty("baseline") private val baseline: Boolean = false,
+                            @JsonProperty("checkpoint") private val checkpoint: Map[String, Any] = null
                           ) extends Param {
   def getName: String = name
   def isBaseline: Boolean = if (!baseline.equals(null)) baseline else false
@@ -133,25 +134,23 @@ case class EvaluateRuleParam( @JsonProperty("rules") private val rules: List[Rul
   * rule param
   * @param dslType    dsl type of this rule (must)
   * @param dqType     dq type of this rule (must if dsl type is "griffin-dsl")
-  * @param inDfName       name of input dataframe of this rule, by default will be the previous rule output dataframe name
-  * @param outDfName      name of output dataframe of this rule, by default will be generated as data connector dataframe name with index suffix
+  * @param inDfName   name of input dataframe of this rule, by default will be the previous rule output dataframe name
+  * @param outDfName  name of output dataframe of this rule, by default will be generated
+  *                   as data connector dataframe name with index suffix
   * @param rule       rule to define dq step calculation (must)
   * @param details    detail config of rule (optional)
   * @param cache      cache the result for multiple usage (optional, valid for "spark-sql" and "df-ops" mode)
   * @param outputs    output ways configuration (optional)
-//  * @param metric     config for metric output (optional)
-//  * @param record     config for record output (optional)
-//  * @param dsCacheUpdate    config for data source cache update output (optional, valid in streaming mode)
   */
 @JsonInclude(Include.NON_NULL)
 case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
                      @JsonProperty("dq.type") private val dqType: String,
-                     @JsonProperty("in.dataframe.name") private val inDfName: String,
-                     @JsonProperty("out.dataframe.name") private val outDfName: String,
-                     @JsonProperty("rule") private val rule: String,
-                     @JsonProperty("details") private val details: Map[String, Any],
-                     @JsonProperty("cache") private val cache: Boolean,
-                     @JsonProperty("out") private val outputs: List[RuleOutputParam]
+                     @JsonProperty("in.dataframe.name") private val inDfName: String = null,
+                     @JsonProperty("out.dataframe.name") private val outDfName: String = null,
+                     @JsonProperty("rule") private val rule: String = null,
+                     @JsonProperty("details") private val details: Map[String, Any] = null,
+                     @JsonProperty("cache") private val cache: Boolean = false,
+                     @JsonProperty("out") private val outputs: List[RuleOutputParam] = null
                     ) extends Param {
   def getDslType: DslType = if (dslType != null) DslType(dslType) else DslType("")
   def getDqType: DqType = if (dqType != null) DqType(dqType) else DqType("")

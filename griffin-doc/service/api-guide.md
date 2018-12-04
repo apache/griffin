@@ -19,7 +19,7 @@ under the License.
 
 # Apache Griffin API Guide
 
-This page lists the major RESTful APIs provided by Griffin.
+This page lists the major RESTful APIs provided by Apache Griffin.
 
 Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`. 
 
@@ -41,7 +41,7 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 <h2 id = "0"></h2>
 
 ## HTTP Response Design
-We follow general rules to design Griffin's REST APIs. In the HTTP response that is sent to a client, 
+We follow general rules to design Apache Griffin's REST APIs. In the HTTP response that is sent to a client, 
 the status code, which is a three-digit number, is accompanied by a reason phrase (also known as status text) that simply describes the meaning of the code. 
 The status codes are classified by number range, with each class of codes having the same basic meaning.
 * The range 100-199 is classed as Informational.
@@ -50,7 +50,7 @@ The status codes are classified by number range, with each class of codes having
 * 400-499 is Client error.
 * 500-599 is Server error.
 
-### Valid Griffin Response
+### Valid Apache Griffin Response
 The valid HTTP response is designed as follows:
 
 | Action | HTTP Status | Response Body |
@@ -62,7 +62,7 @@ The valid HTTP response is designed as follows:
 
 ***Note that:*** The metric module is implemented with elasticsearch bulk api, so the responses do not follow rules above.
 
-### Invalid Griffin Response
+### Invalid Apache Griffin Response
 The response for exception is designed as follows:
 
 | Action | HTTP Status | Response Body |
@@ -103,9 +103,9 @@ Description:
 
 <h2 id = "1"></h2>
 
-## Griffin Basic
+## Apache Griffin Basic
 
-### Get griffin version
+### Get Apache Griffin version
 `GET /api/v1/version`
 
 #### Response Body Sample
@@ -132,9 +132,9 @@ Description:
 
 #### Request Body example 
 
-There are two kind of different measures, griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
+There are two kind of different measures, Apache Griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
 
-Here is a request body example to create a griffin measure of  profiling:
+Here is a request body example to create a Apache Griffin measure of  profiling:
 ```
 {
     "name":"profiling_measure",
@@ -194,7 +194,7 @@ Here is a request body example to create a griffin measure of  profiling:
     }
 }
 ```
-And for griffin measure of accuracy:
+And for Apache Griffin measure of accuracy:
 ```
 {
     "name":"accuracy_measure",
@@ -457,9 +457,9 @@ The response body should be the created measure if success. For example:
 | measure | measure entity | Measure |
 
 #### Request Body example 
-There are two kind of different measures, griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
+There are two kind of different measures, Apache Griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
 
-Here is a request body example to update a griffin measure of accuracy:
+Here is a request body example to update a Apache Griffin measure of accuracy:
 ```
 {
     "id": 1,

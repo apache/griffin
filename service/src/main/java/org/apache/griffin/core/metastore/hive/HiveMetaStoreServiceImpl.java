@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import com.google.common.collect.Lists;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
             .getLogger(HiveMetaStoreService.class);
 
     @Autowired
-    private HiveMetaStoreClient client = null;
+    private IMetaStoreClient client = null;
 
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;
@@ -99,8 +100,17 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     public List<Table> getAllTable(String db) {
         return getTables(db);
     }
-
-
+    
+    @Override
+    @Cacheable(unless = "#result==null || #result.isEmpty()")
+    public Map<String, List<String>> getAllTableNames() {
+        Map<String, List<String>> result = new HashMap<>();
+        for (String dbName: getAllDatabases()) {
+            result.put(dbName, Lists.newArrayList(getAllTableNames(dbName)));
+        }
+        return result;
+    }
+    
     @Override
     @Cacheable(unless = "#result==null")
     public Map<String, List<Table>> getAllTable() {

@@ -33,6 +33,8 @@ import {Router} from "@angular/router";
 import {NouisliderModule} from "ng2-nouislider";
 import {HttpClient} from "@angular/common/http";
 
+import {TimeUtils} from "../../../shared/time-utils";
+
 @Component({
   selector: "app-batch",
   templateUrl: "./batch.component.html",
@@ -66,6 +68,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
   Measures = [];
   measure: string;
   measureid: any;
+  timezone = TimeUtils.getBrowserTimeZone();
 
   newJob = {
     "cron.expression": "",
@@ -134,14 +137,12 @@ export class BatchComponent implements OnInit, AfterViewChecked {
       return false;
     }
     this.measureid = this.getMeasureId();
-    let time = new Date().getTimezoneOffset() / 60;
-    let timezone = "GMT" + time + ":00";
     this.newJob = {
       "job.name": this.jobname,
       "job.type": "batch",
       "measure.id": this.measureid,
       "cron.expression": this.cronExp,
-      "cron.time.zone": timezone,
+      "cron.time.zone": this.timezone,
       // "cron.time.zone": "GMT+8:00",
       // "predicate.config": {
       // "interval": "1m",
@@ -202,7 +203,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
         if (response.code === '40004') {
           this.toasterService.pop("error", "Error!", "Job name already exists!");
         } else {
-          this.toasterService.pop("error", "Error!", "Error when creating job");
+          this.toasterService.pop("error", "Error!", response.message);
         }
         console.log("Error when creating job");
       }
@@ -228,7 +229,7 @@ export class BatchComponent implements OnInit, AfterViewChecked {
       200
     );
     $(".y-scrollable").css({
-      height: $("fieldset").height()
+      height: $("fieldset").height() - 20
     });
     $("#data-asset-pie").css({
       height: $("#data-asset-pie")

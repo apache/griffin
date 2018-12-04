@@ -19,9 +19,10 @@ under the License.
 package org.apache.griffin.measure.step.builder
 
 import org.apache.commons.lang.StringUtils
+
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.dqdefinition.{DataSourceParam, Param, RuleParam}
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step._
 
@@ -49,7 +50,8 @@ object DQStepBuilder {
       .flatMap(_.buildDQStep(context, dsParam))
   }
 
-  private def getDataSourceParamStepBuilder(procType: ProcessType): Option[DataSourceParamStepBuilder] = {
+  private def getDataSourceParamStepBuilder(procType: ProcessType)
+  : Option[DataSourceParamStepBuilder] = {
     procType match {
       case BatchProcessType => Some(BatchDataSourceStepBuilder())
       case StreamingProcessType => Some(StreamingDataSourceStepBuilder())
@@ -64,7 +66,9 @@ object DQStepBuilder {
     val funcNames = context.functionNames
     val dqStepOpt = getRuleParamStepBuilder(dslType, dsNames, funcNames)
       .flatMap(_.buildDQStep(context, ruleParam))
-    dqStepOpt.toSeq.flatMap(_.getNames).foreach(name => context.compileTableRegister.registerTable(name))
+    dqStepOpt.toSeq.flatMap(_.getNames).foreach(name =>
+      context.compileTableRegister.registerTable(name)
+    )
     dqStepOpt
   }
 

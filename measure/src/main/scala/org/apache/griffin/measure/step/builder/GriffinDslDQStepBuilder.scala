@@ -24,7 +24,6 @@ import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.dsl.parser.GriffinDslParser
 import org.apache.griffin.measure.step.builder.dsl.transform.Expr2DQSteps
 
-import scala.util.{Failure, Success}
 
 case class GriffinDslDQStepBuilder(dataSourceNames: Seq[String],
                                    functionNames: Seq[String]
@@ -50,10 +49,9 @@ case class GriffinDslDQStepBuilder(dataSourceNames: Seq[String],
         Nil
       }
     } catch {
-      case e: Throwable => {
-        error(s"generate rule plan ${name} fails: ${e.getMessage}")
+      case e: Throwable =>
+        error(s"generate rule plan ${name} fails: ${e.getMessage}", e)
         Nil
-      }
     }
   }
 

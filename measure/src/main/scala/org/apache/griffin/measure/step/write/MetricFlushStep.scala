@@ -36,10 +36,9 @@ case class MetricFlushStep() extends WriteStep {
         context.getSink(t).sinkMetrics(metric)
         true
       } catch {
-        case e: Throwable => {
-          error(s"flush metrics error: ${e.getMessage}")
+        case e: Throwable =>
+          error(s"flush metrics error: ${e.getMessage}", e)
           false
-        }
       }
       ret && pr
     }

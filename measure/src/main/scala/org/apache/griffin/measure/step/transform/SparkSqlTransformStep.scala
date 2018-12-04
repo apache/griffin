@@ -37,10 +37,9 @@ case class SparkSqlTransformStep(name: String,
       context.runTimeTableRegister.registerTable(name, df)
       true
     } catch {
-      case e: Throwable => {
-        error(s"run spark sql [ ${rule} ] error: ${e.getMessage}")
+      case e: Throwable =>
+        error(s"run spark sql [ ${rule} ] error: ${e.getMessage}", e)
         false
-      }
     }
   }
 

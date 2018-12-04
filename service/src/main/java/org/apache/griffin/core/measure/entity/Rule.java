@@ -81,6 +81,9 @@ public class Rule extends AbstractAuditableEntity {
     @Column(name = "\"out\"")
     private String out;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean cache;
+
     @JsonProperty("dsl.type")
     public String getDslType() {
         return dslType;
@@ -157,6 +160,14 @@ public class Rule extends AbstractAuditableEntity {
 
     private void setOut(String out) {
         this.out = out;
+    }
+
+    public Boolean getCache() {
+        return cache;
+    }
+
+    public void setCache(Boolean cache) {
+        this.cache = cache;
     }
 
     @PrePersist

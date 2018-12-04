@@ -127,3 +127,7 @@ div.tree > treenode > div::before {
 div.tree > treenode > div > .node-wrapper > treenodeexpander > .toggle-children-wrapper {
   left: 22px
 }
+
+.select-schema .search-query {
+  width: 100%;
+}

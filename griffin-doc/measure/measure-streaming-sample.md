@@ -18,14 +18,14 @@ under the License.
 -->
 
 # Measure Streaming Sample
-Measures consists of batch measure and streaming measure. This document is for the streaming measure sample.
+Apache Griffin measures consist of batch measure and streaming measure, this document merely gives the streaming measure sample.
 
 ## Streaming Accuracy Sample
 ```
 {
   "name": "accu_streaming",
 
-  "process.type": "streaming",
+  "process.type": "STREAMING",
 
   "data.sources": [
     {
@@ -33,7 +33,7 @@ Measures consists of batch measure and streaming measure. This document is for t
       "baseline": true,
       "connectors": [
         {
-          "type": "kafka",
+          "type": "KAFKA",
           "version": "0.8",
           "config": {
             "kafka.config": {
@@ -48,17 +48,15 @@ Measures consists of batch measure and streaming measure. This document is for t
           },
           "pre.proc": [
             {
-              "dsl.type": "df-opr",
-              "name": "${s1}",
-              "rule": "from_json",
-              "details": {
-                "df.name": "${this}"
-              }
+              "dsl.type": "df-ops",
+              "in.dataframe.name": "this",
+              "out.dataframe.name": "s1",
+              "rule": "from_json"
             },
             {
               "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select name, age from ${s1}"
+              "out.dataframe.name": "this",
+              "rule": "select name, age from s1"
             }
           ]
         }
@@ -68,13 +66,14 @@ Measures consists of batch measure and streaming measure. This document is for t
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"]
+        "time.range": ["-2m", "0"],
+        "updatable": true
       }
     }, {
       "name": "target",
       "connectors": [
         {
-          "type": "kafka",
+          "type": "KAFKA",
           "version": "0.8",
           "config": {
             "kafka.config": {
@@ -89,17 +88,15 @@ Measures consists of batch measure and streaming measure. This document is for t
           },
           "pre.proc": [
             {
-              "dsl.type": "df-opr",
-              "name": "${t1}",
-              "rule": "from_json",
-              "details": {
-                "df.name": "${this}"
-              }
+              "dsl.type": "df-ops",
+              "in.dataframe.name": "this",
+              "out.dataframe.name": "t1",
+              "rule": "from_json"
             },
             {
               "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select name, age from ${t1}"
+              "out.dataframe.name": "this",
+              "rule": "select name, age from t1"
             }
           ]
         }
@@ -118,8 +115,8 @@ Measures consists of batch measure and streaming measure. This document is for t
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "accuracy",
-        "name": "accu",
+        "dq.type": "ACCURACY",
+        "out.dataframe.name": "accu",
         "rule": "source.name = target.name and source.age = target.age",
         "details": {
           "source": "source",
@@ -140,16 +137,18 @@ Measures consists of batch measure and streaming measure. This document is for t
         ]
       }
     ]
-  }
+  },
+   
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }
 ```
 Above is the configure file of streaming accuracy job.  
 
 ### Data source
 In this sample, we use kafka topics as source and target.  
-At current, griffin supports kafka 0.8, for 1.0 or later version is during implementation.  
-In griffin implementation, we can only support json string as kafka data, which could describe itself in data. In some other solution, there might be a schema proxy for kafka binary data, you can implement such data source connector if you need, it's also during implementation by us.
-In streaming cases, the data from topics always needs some pre-process first, which is configured in `pre.proc`, just like the `rules`, griffin will not parse sql content, so we use some pattern to mark your temporory tables. `${this}` means the origin data set, and the output table name should also be `${this}`.
+At current, Apache Griffin supports kafka 0.8, for 1.0 or later version is during implementation.  
+In Apache Griffin implementation, we can only support json string as kafka data, which could describe itself in data. In some other solution, there might be a schema proxy for kafka binary data, you can implement such data source connector if you need, it's also during implementation by us.
+In streaming cases, the data from topics always needs some pre-process first, which is configured in `pre.proc`, just like the `rules`, Apache Griffin will not parse sql content, so we use some pattern to mark your temporory tables. `${this}` means the origin data set, and the output table name should also be `${this}`.
 
 For example, you can create two topics in kafka, for source and target data, the format could be json string.
 Source data could be:
@@ -177,14 +176,14 @@ The miss records of source will be persisted as record.
 {
   "name": "prof_streaming",
 
-  "process.type": "streaming",
+  "process.type": "STREAMING",
 
   "data.sources": [
     {
       "name": "source",
       "connectors": [
         {
-          "type": "kafka",
+          "type": "KAFKA",
           "version": "0.8",
           "config": {
             "kafka.config": {
@@ -199,17 +198,15 @@ The miss records of source will be persisted as record.
           },
           "pre.proc": [
             {
-              "dsl.type": "df-opr",
-              "name": "${s1}",
-              "rule": "from_json",
-              "details": {
-                "df.name": "${this}"
-              }
+              "dsl.type": "df-ops",
+              "in.dataframe.name": "this",
+              "out.dataframe.name": "s1",
+              "rule": "from_json"
             },
             {
               "dsl.type": "spark-sql",
-              "name": "${this}",
-              "rule": "select name, age from ${s1}"
+              "out.dataframe.name": "this",
+              "rule": "select name, age from s1"
             }
           ]
         }
@@ -228,8 +225,8 @@ The miss records of source will be persisted as record.
     "rules": [
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
-        "name": "prof",
+        "dq.type": "PROFILING",
+        "out.dataframe.name": "prof",
         "rule": "select count(name) as `cnt`, max(age) as `max`, min(age) as `min` from source",
         "out": [
           {
@@ -240,8 +237,8 @@ The miss records of source will be persisted as record.
       },
       {
         "dsl.type": "griffin-dsl",
-        "dq.type": "profiling",
-        "name": "grp",
+        "dq.type": "PROFILING",
+        "out.dataframe.name": "grp",
         "rule": "select name, count(*) as `cnt` from source group by name",
         "out": [
           {
@@ -252,7 +249,9 @@ The miss records of source will be persisted as record.
         ]        
       }
     ]
-  }
+  },
+      
+  "sinks": ["CONSOLE","ELASTICSEARCH"]
 }
 ```
 Above is the configure file of streaming profiling job.  

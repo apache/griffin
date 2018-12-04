@@ -16,12 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import {Component, OnInit, Input, Output, EventEmitter} from "@angular/core";
+import {Component, OnInit, Input, Output, EventEmitter, ViewChild} from "@angular/core";
 import {ServiceService} from "../../../../service/service.service";
-import {TREE_ACTIONS, ITreeOptions} from "angular-tree-component";
-import {HttpClient} from "@angular/common/http";
+import {TREE_ACTIONS, ITreeOptions, TreeComponent} from "angular-tree-component";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {AfterViewChecked, ElementRef} from "@angular/core";
 import {ProfilingStep1} from "../pr.component";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 export class node {
   name: string;
@@ -80,6 +81,9 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
   @Input() step1: ProfilingStep1;
   @Output() nextStep: EventEmitter<Object> = new EventEmitter<Object>();
 
+  @ViewChild(TreeComponent)
+  private tree: TreeComponent;
+
   options: ITreeOptions = {
     displayField: "name",
     isExpandedField: "expanded",
@@ -94,17 +98,8 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
             this.step1.schemaCollection = [];
             this.selectedAll = false;
             TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
-          } else if (node.data.cols) {
-            this.step1.currentTable = node.data.name;
-            this.step1.currentDB = node.data.parent;
-            this.step1.schemaCollection = node.data.cols;
-            this.step1.srcname = "source" + new Date().getTime();
-            this.step1.srclocation = node.data.location;
-            this.selectedAll = false;
-            this.step1.selection = [];
-            for (let row of this.step1.schemaCollection) {
-              row.selected = false;
-            }
+          } else if (node.data.cols !== undefined) {
+            this.onTableNodeClick(node);
           }
         }
       }
@@ -193,41 +188,89 @@ export class PrStep1Component implements AfterViewChecked, OnInit {
 
   ngOnInit() {
     if (this.step1.nodeList.length !== 0) return;
-
-    let allDataassets = this.serviceService.config.uri.dataassetlist;
-
-    this.http.get(allDataassets).subscribe(data => {
+    let getTableNames = this.serviceService.config.uri.dbtablenames;
+    
+    this.http.get(getTableNames).subscribe((databases) => {
       this.step1.nodeList = new Array();
       let i = 1;
-      this.step1.data = data;
-      for (let db in this.step1.data) {
-        let new_node = new node();
-        new_node.name = db;
-        new_node.id = i;
-        new_node.isExpanded = true;
-        i++;
-        new_node.children = new Array();
-        for (let i = 0; i < this.step1.data[db].length; i++) {
-          let new_child = new node();
-          new_child.name = this.step1.data[db][i]["tableName"];
-          new_node.children.push(new_child);
-          new_child.isExpanded = false;
-          new_child.location = this.step1.data[db][i]["sd"]["location"];
-          new_child.parent = db;
-          new_child.cols = Array<Col>();
-          for (let j = 0; j < this.step1.data[db][i]["sd"]["cols"].length; j++) {
-            let new_col = new Col(
-              this.step1.data[db][i]["sd"]["cols"][j].name,
-              this.step1.data[db][i]["sd"]["cols"][j].type,
-              this.step1.data[db][i]["sd"]["cols"][j].comment,
-              false
-            );
-            new_child.cols.push(new_col);
-          }
+      for (let dbName in databases) {
+        if (!databases.hasOwnProperty(dbName)) {
+          continue;
         }
-        this.step1.nodeList.push(new_node);
+        let dbNode = new node();
+        dbNode.name = dbName;
+        dbNode.id = i++;
+        dbNode.isExpanded = false;
+        dbNode.children = new Array();
+        for (let tableName of databases[dbName]) {
+          let tableNode = new node();
+          tableNode.name = tableName;
+          dbNode.children.push(tableNode);
+          tableNode.isExpanded = true;
+          tableNode.location = null;
+          tableNode.parent = dbName;
+          tableNode.cols = null;
+        }
+        this.step1.nodeList.push(dbNode);
       }
+      if (i >= 10) {
+        this.options.animateExpand = false;
+      }
+      this.tree.treeModel.update();
     });
+  }
+
+  onTableNodeClick(treeNode: ITreeNode) {
+    let node: node = treeNode.data;
+    if (node.cols == null) {
+      let getTable = this.serviceService.config.uri.dbtable;
+      let dbName = node.parent;
+      let tableName = node.name;
+      let params = new HttpParams({fromString: "db="+dbName+"&table="+tableName});
+      this.http.get(getTable, {params: params}).subscribe(data => {
+        node.location = data["sd"]["location"];
+        node.cols = Array<Col>();
+        for (let j = 0; j < data["sd"]["cols"].length; j++) {
+          let new_col = new Col(
+            data["sd"]["cols"][j].name,
+            data["sd"]["cols"][j].type,
+            data["sd"]["cols"][j].comment,
+            false
+          );
+          node.cols.push(new_col);
+        }
+        this.setCurrentTable(treeNode);
+      })
+    } else {
+      this.setCurrentTable(treeNode);
+    }
+  }
+
+  onSearch(query) {
+    this.tree.treeModel.filterNodes((node) => {
+      let name;
+      if (node.data.children !== undefined) {
+        name = node.data.name + ".";
+      } else {
+        name = node.parent.data.name + "." + node.data.name;
+      }
+      return name.indexOf(query) >= 0;
+    });
+  }
+
+  setCurrentTable(treeNode: ITreeNode) {
+    let node: node = treeNode.data;
+    this.step1.currentTable = node.name;
+    this.step1.currentDB = treeNode.parent.data.name;
+    this.step1.currentDBStr = this.step1.currentDB + ".";
+    this.step1.schemaCollection = node.cols;
+    this.step1.srcname = "source" + new Date().getTime();
+    this.step1.srclocation = node.location;
+    this.selectedAll = false;
+    this.step1.selection = [];
+    for (let row of this.step1.schemaCollection) {
+      row.selected = false;
+    }
   }
 
   nextChildStep() {
