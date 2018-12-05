@@ -132,7 +132,7 @@ Also, we have to define some vendor-specific properties which will be used by Ec
 
 #### Configure properties
 You need to configure properties according to the database you use in Apache Griffin.
-Please see [Mysql and postgresql switch](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/mysql_postgresql_switch.md) to configure.
+Please see [Mysql and postgresql switch](https://github.com/apache/griffin/blob/master/griffin-doc/service/mysql_postgresql_switch.md) to configure.
 
 <h2 id = "0.1"></h2>
 
@@ -201,4 +201,4 @@ By default, Spring Data uses Hibernate as the default JPA implementation provide
 
 #### Configure properties
 You need to configure properties according to the database you use in Apache Griffin.
-Please see [Mysql and postgresql switch](https://github.com/apache/incubator-griffin/blob/master/griffin-doc/service/mysql_postgresql_switch.md) to configure.
+Please see [Mysql and postgresql switch](https://github.com/apache/griffin/blob/master/griffin-doc/service/mysql_postgresql_switch.md) to configure.
