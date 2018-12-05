@@ -19,7 +19,7 @@ under the License.
 
 
 # Apache Griffin  
-[![Build Status](https://travis-ci.org/apache/griffin.svg?branch=master)](https://travis-ci.org/apache/incubator-griffin) [![License: Apache 2.0](https://camo.githubusercontent.com/8cb994f6c4a156c623fe057fccd7fb7d7d2e8c9b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d417061636865253230322d3445423142412e737667)](https://www.apache.org/licenses/LICENSE-2.0.html)    
+[![Build Status](https://travis-ci.org/apache/griffin.svg?branch=master)](https://travis-ci.org/apache/griffin) [![License: Apache 2.0](https://camo.githubusercontent.com/8cb994f6c4a156c623fe057fccd7fb7d7d2e8c9b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d417061636865253230322d3445423142412e737667)](https://www.apache.org/licenses/LICENSE-2.0.html)    
 
 The data quality (DQ) is a key criteria for many data consumers like IoT, machine learning etc., however, there is no standard agreement on how to determine “good” data.
 Apache Griffin is a model-driven data quality service platform where you can examine your data on-demand. It provides a standard process to define data quality measures, executions and reports, allowing those examinations across multiple data systems.
