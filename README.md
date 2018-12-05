@@ -46,10 +46,10 @@ If you want to deploy Griffin in your local environment, please follow [Apache G
 For more information about Griffin, please visit our website at: [griffin home page](http://griffin.apache.org).
 
 You can contact us via email:
-- dev-list: <a href="mailto:dev@griffin.incubator.apache.org">dev@griffin.incubator.apache.org</a>
-- user-list: <a href="mailto:users@griffin.incubator.apache.org">users@griffin.incubator.apache.org</a>
+- dev-list: <a href="mailto:dev@griffin.apache.org">dev@griffin.apache.org</a>
+- user-list: <a href="mailto:users@griffin.apache.org">users@griffin.apache.org</a>
 
-You can also subscribe the latest information by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.incubator.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.incubator.apache.org).
+You can also subscribe the latest information by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.incubator.apache.org).
 You can also subscribe the latest information by sending a email to subscribe dev-list and user-list:
 ```
 dev-subscribe@griffin.incubator.apache.org
