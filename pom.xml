@@ -33,7 +33,7 @@ under the License.
     <version>0.3.1-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
-    <url>http://griffin.incubator.apache.org</url>
+    <url>http://griffin.apache.org</url>
 
     <prerequisites>
         <maven>3.2.5</maven>
@@ -69,9 +69,9 @@ under the License.
     <mailingLists>
         <mailingList>
             <name>griffin-dev</name>
-            <subscribe>dev-subscribe@griffin.incubator.apache.org</subscribe>
-            <unsubscribe>dev-unsubscribe@griffin.incubator.apache.org</unsubscribe>
-            <post>dev@griffin.incubator.apache.org</post>
+            <subscribe>dev-subscribe@griffin.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@griffin.apache.org</unsubscribe>
+            <post>dev@griffin.apache.org</post>
         </mailingList>
     </mailingLists>
 
@@ -79,9 +79,9 @@ under the License.
     <!--</pluginRepositories>-->
 
     <scm>
-        <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</connection>
-        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-griffin.git</developerConnection>
-        <url>https://git-wip-us.apache.org/repos/asf?p=incubator-griffin.git;a=summary</url>
+        <connection>scm:git:https://git-wip-us.apache.org/repos/asf/griffin.git</connection>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/griffin.git</developerConnection>
+        <url>https://git-wip-us.apache.org/repos/asf?p=griffin.git;a=summary</url>
         <tag>HEAD</tag>
     </scm>
 
