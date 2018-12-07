@@ -225,7 +225,7 @@ public class SparkSubmitJob implements Job {
             IOException {
         // If result is null, it may livy uri is wrong
         // or livy parameter is wrong.
-                String result = post2Livy();
+        String result = post2Livy();
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();
         batchJobOp.deleteJob(group, name);
