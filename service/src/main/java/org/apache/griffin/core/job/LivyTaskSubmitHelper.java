@@ -193,22 +193,46 @@ public class LivyTaskSubmitHelper {
 
     // Maximum number of parallel tasks
     protected int getMaxConcurrentTaskCount() {
-        return Integer.parseInt(env.getProperty("livy.task.max.concurrent.count"));
+        int maxTaskCnt = 20;
+        try {
+            return Integer.parseInt(env.getProperty("livy.task.max.concurrent.count"));
+        }catch (Exception e){
+           //do nothing
+        }
+        return maxTaskCnt;
     }
 
     // Submit once every 3 seconds by default
     protected int getBatchIntervalSecond() {
-        return Integer.parseInt(env.getProperty("livy.task.submit.interval.second"));
+        int intervalSecond = 3;
+        try {
+            return Integer.parseInt(env.getProperty("livy.task.submit.interval.second"));
+        }catch (Exception e){
+            //do nothing
+        }
+        return intervalSecond;
     }
 
     // Livy can't get the number of retries for appid
     protected int getAppIdRetryCount() {
-        return Integer.parseInt(env.getProperty("livy.task.appId.retry.count"));
+        int retryCnt = 3;
+        try {
+            return Integer.parseInt(env.getProperty("livy.task.appId.retry.count"));
+        }catch (Exception e){
+            //do nothing
+        }
+        return retryCnt;
     }
 
     // Livy queue select
     protected boolean isNeedLivyQueue() {
-        return Boolean.parseBoolean(env.getProperty("livy.need.queue"));
+        boolean needLivy = false;
+        try {
+            return Boolean.parseBoolean(env.getProperty("livy.need.queue"));
+        }catch (Exception e){
+            //do nothing
+        }
+        return needLivy;
     }
 
 }
