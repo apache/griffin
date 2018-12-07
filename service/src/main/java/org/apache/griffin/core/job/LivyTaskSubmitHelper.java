@@ -51,6 +51,7 @@ public class LivyTaskSubmitHelper {
     public void init() {
         startWorker();
         uri = env.getProperty("livy.uri");
+        logger.info("Livy uri : {}",uri);
     }
 
     public LivyTaskSubmitHelper() {
