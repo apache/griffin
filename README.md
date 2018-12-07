@@ -49,11 +49,11 @@ You can contact us via email:
 - dev-list: <a href="mailto:dev@griffin.apache.org">dev@griffin.apache.org</a>
 - user-list: <a href="mailto:users@griffin.apache.org">users@griffin.apache.org</a>
 
-You can also subscribe the latest information by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.incubator.apache.org).
+You can also subscribe the latest information by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.apache.org).
 You can also subscribe the latest information by sending a email to subscribe dev-list and user-list:
 ```
-dev-subscribe@griffin.incubator.apache.org
-users-subscribe@griffin.incubator.apache.org
+dev-subscribe@griffin.apache.org
+users-subscribe@griffin.apache.org
 ```
 
 You can access our issues on [JIRA page](https://issues.apache.org/jira/browse/GRIFFIN)
@@ -72,7 +72,7 @@ Here's the most direct way to contribute your work merged into Apache Griffin.
 
 
 ## References
-- [Home Page](http://griffin.incubator.apache.org/)
+- [Home Page](http://griffin.apache.org/)
 - [Wiki](https://cwiki.apache.org/confluence/display/GRIFFIN/Apache+Griffin)
 - Documents:
 	- [Measure](griffin-doc/measure)
