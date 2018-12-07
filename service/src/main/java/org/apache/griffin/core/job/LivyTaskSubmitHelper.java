@@ -222,7 +222,7 @@ public class LivyTaskSubmitHelper {
         return Integer.parseInt(env.getProperty("livy.task.appId.retry.count"));
     }
 
-    // Livy can't get the number of retries for appid
+    // Livy queue select
     protected boolean isNeedLivyQueue() {
         return Boolean.parseBoolean(env.getProperty("livy.need.queue"));
     }
