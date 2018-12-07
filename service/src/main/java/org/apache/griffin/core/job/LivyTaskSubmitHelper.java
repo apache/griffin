@@ -1,11 +1,9 @@
 package org.apache.griffin.core.job;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +24,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
-import static org.apache.griffin.core.util.JsonUtil.toEntity;
 import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
 @Component
