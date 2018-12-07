@@ -131,6 +131,8 @@ public class JobServiceImpl implements JobService {
     private StreamingJobOperatorImpl streamingJobOp;
     @Autowired
     private GriffinEventManager eventManager;
+    @Autowired
+    private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
     private RestTemplate restTemplate;
 
@@ -529,6 +531,8 @@ public class JobServiceImpl implements JobService {
             LOGGER.warn("sessionId({}) appId({}) {}.", instance.getSessionId(),
                 instance.getAppId(), e.getMessage());
             setStateByYarn(instance, e);
+            // Spark Task Execution Completes One,TaskNum--
+            livyTaskSubmitHelper.decreaseCurTaskNum(instance.getId());
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
@@ -606,6 +610,10 @@ public class JobServiceImpl implements JobService {
             instance.setAppUri(appId == null ? null : env
                 .getProperty("yarn.uri") + "/cluster/app/" + appId);
             instanceRepo.save(instance);
+            // If Livy returns to success or dead, task execution completes one,TaskNum--
+            if ("SUCCESS".equals(state) || "DEAD".equals(state)) {
+                livyTaskSubmitHelper.decreaseCurTaskNum(instance.getId());
+            }
         }
     }
 

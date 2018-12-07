@@ -81,6 +81,8 @@ public class SparkSubmitJob implements Job {
     private BatchJobOperatorImpl batchJobOp;
     @Autowired
     private Environment env;
+    @Autowired
+    private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
     private GriffinMeasure measure;
     private String livyUri;
@@ -98,7 +100,12 @@ public class SparkSubmitJob implements Job {
                 updateJobInstanceState(context);
                 return;
             }
-            saveJobInstance(jd);
+            if(livyTaskSubmitHelper.isNeedLivyQueue()){
+                //livy batch limit
+                livyTaskSubmitHelper.addTaskToWaitingQueue(livyConfMap);
+            }else{
+                saveJobInstance(jd);
+            }
         } catch (Exception e) {
             LOGGER.error("Post spark task ERROR.", e);
         }
@@ -218,7 +225,7 @@ public class SparkSubmitJob implements Job {
             IOException {
         // If result is null, it may livy uri is wrong
         // or livy parameter is wrong.
-        String result = post2Livy();
+                String result = post2Livy();
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();
         batchJobOp.deleteJob(group, name);
@@ -226,7 +233,7 @@ public class SparkSubmitJob implements Job {
         saveJobInstance(result, FOUND);
     }
 
-    private void saveJobInstance(String result, State state)
+    protected void saveJobInstance(String result, State state)
             throws IOException {
         TypeReference<HashMap<String, Object>> type =
                 new TypeReference<HashMap<String, Object>>() {
