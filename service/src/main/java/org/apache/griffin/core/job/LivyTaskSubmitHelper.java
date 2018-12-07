@@ -29,33 +29,22 @@ import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 @Component
 public class LivyTaskSubmitHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(LivyTaskSubmitHelper.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(LivyTaskSubmitHelper.class);
 
     private static final String REQUEST_BY_HEADER = "X-Requested-By";
-
     private JobInstanceBean jobInstance;
-
     private SparkSubmitJob sparkSubmitJob;
-
     private ConcurrentMap<Long, Integer> taskAppIdMap = new ConcurrentHashMap<>();
-
     // Current number of tasks
     private AtomicInteger curConcurrentTaskNum = new AtomicInteger(0);
-
     private String workerNamePre;
-
     private RestTemplate restTemplate = new RestTemplate();
-
     // queue for pub or sub
     private BlockingQueue<Map<String, Object>> queue;
-
     public static final int DEFAULT_QUEUE_SIZE = 20000;
-
     private String uri;
 
-
-    @Autowired
-    private JobInstanceRepo jobInstanceRepo;
     @Autowired
     private Environment env;
 
