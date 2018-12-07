@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
