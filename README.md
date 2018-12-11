@@ -68,7 +68,7 @@ Here's the most direct way to contribute your work merged into Apache Griffin.
 * Clone down your fork
 * Implement your feature or bug fix and commit changes
 * Push the branch up to your fork
-* Send a pull request to Apache Griffin branch
+* Send a pull request to Apache Griffin master branch
 
 
 ## References
