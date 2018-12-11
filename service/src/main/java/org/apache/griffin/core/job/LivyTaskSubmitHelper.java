@@ -1,20 +1,19 @@
 package org.apache.griffin.core.job;
 
-import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
-import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.collections.map.HashedMap;
+import org.quartz.JobDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,8 +21,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
-import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
 
 @Component
 public class LivyTaskSubmitHelper {
@@ -32,7 +31,6 @@ public class LivyTaskSubmitHelper {
             .getLogger(LivyTaskSubmitHelper.class);
 
     private static final String REQUEST_BY_HEADER = "X-Requested-By";
-    private JobInstanceBean jobInstance;
     private SparkSubmitJob sparkSubmitJob;
     private ConcurrentMap<Long, Integer> taskAppIdMap = new ConcurrentHashMap<>();
     // Current number of tasks
@@ -40,9 +38,16 @@ public class LivyTaskSubmitHelper {
     private String workerNamePre;
     private RestTemplate restTemplate = new RestTemplate();
     // queue for pub or sub
-    private BlockingQueue<Map<String, Object>> queue;
+    private BlockingQueue<JobDetail> queue;
     public static final int DEFAULT_QUEUE_SIZE = 20000;
+    private static final int SLEEP_TIME = 300;
     private String uri;
+
+    @Value("${livy.task.max.concurrent.count}")
+    private int maxConcurrentTaskCount;
+    @Value("${livy.task.submit.interval.second}")
+    private int batchIntervalSecond;
+
 
     @Autowired
     private Environment env;
@@ -51,7 +56,7 @@ public class LivyTaskSubmitHelper {
     public void init() {
         startWorker();
         uri = env.getProperty("livy.uri");
-        logger.info("Livy uri : {}",uri);
+        logger.info("Livy uri : {}", uri);
     }
 
     public LivyTaskSubmitHelper() {
@@ -66,20 +71,21 @@ public class LivyTaskSubmitHelper {
         worker.start();
     }
 
-    public void addTaskToWaitingQueue(Map<String, Object> t) {
-        if (t == null) {
+    public void addTaskToWaitingQueue(JobDetail jd) throws IOException {
+        if (jd == null) {
             logger.warn("task is blank, workerNamePre: {}", workerNamePre);
             return;
         }
 
         if (queue.remainingCapacity() <= 0) {
-            logger.warn("task is discard, workerNamePre: {}, task: {}", workerNamePre, JSON.toJSON(t));
+            logger.warn("task is discard, workerNamePre: {}, task: {}", workerNamePre, jd);
+            sparkSubmitJob.saveJobInstance(null, NOT_FOUND);
             return;
         }
 
-        queue.add(t);
+        queue.add(jd);
 
-        logger.info("add_task_to_waiting_queue_success, workerNamePre: {}, task: {}", workerNamePre, JSON.toJSON(t));
+        logger.info("add_task_to_waiting_queue_success, workerNamePre: {}, task: {}", workerNamePre, jd);
     }
 
     /**
@@ -92,11 +98,13 @@ public class LivyTaskSubmitHelper {
             // Keep sequential execution within a limited number of tasks
             while (true) {
                 try {
-                    if (curConcurrentTaskNum.get() < getMaxConcurrentTaskCount()
-                            && (System.currentTimeMillis() - insertTime) >= getBatchIntervalSecond() * 1000) {
-                        Map<String, Object> task = queue.take();
-                        doTask(task);
+                    if (curConcurrentTaskNum.get() < maxConcurrentTaskCount
+                            && (System.currentTimeMillis() - insertTime) >= batchIntervalSecond * 1000) {
+                        JobDetail jd = queue.take();
+                        sparkSubmitJob.saveJobInstance(jd);
                         insertTime = System.currentTimeMillis();
+                    } else {
+                        Thread.sleep(SLEEP_TIME);
                     }
                 } catch (Throwable e) {
                     logger.error("Async_worker_doTask_failed, {}", workerNamePre + e.getMessage(), e);
@@ -118,58 +126,26 @@ public class LivyTaskSubmitHelper {
         }
     }
 
-    /**
-     * Submit a task to Livy and concurrent TaskNum++
-     */
-    protected void doTask(Map<String, Object> livyConfMap) {
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set(REQUEST_BY_HEADER, "admin");
+    protected Map<String, Object> retryLivyGetAppId(String result, int appIdRetryCount)
+            throws IOException {
 
-            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap), headers);
-
-            String result = restTemplate.postForObject(uri, springEntity, String.class);
-            logger.info("submit livy result: {}", result);
-
-
-            Gson gson = new Gson();
-            try {
-                jobInstance = gson.fromJson(result, JobInstanceBean.class);
-
-                // The first time didn't get appId, try again several times
-                if (StringUtils.isBlank(jobInstance.getAppId())) {
-                    jobInstance = retryLivyGetAppId(jobInstance);
-                }
-
-                logger.info("submit livy scheduleResult: {}", jobInstance);
-            } catch (Exception e) {
-                logger.error("submit livy scheduleResult covert error!", e);
-            }
-
-            if (jobInstance != null) {
-                //save result info into DataBase
-                sparkSubmitJob.saveJobInstance(result, FOUND);
-
-                // Successful submission of a task
-                increaseCurTaskNum(jobInstance.getId());
-            }
-        } catch (Exception e) {
-            logger.error("submit task to livy error.", e);
-        }
-    }
-
-    private JobInstanceBean retryLivyGetAppId(JobInstanceBean jobInstance) {
-
-        int retryCount = getAppIdRetryCount();
+        int retryCount = appIdRetryCount;
+        TypeReference<HashMap<String, Object>> type =
+                new TypeReference<HashMap<String, Object>>() {
+                };
+        Map<String, Object> resultMap = toEntity(result, type);
 
         if (retryCount <= 0) {
-            return jobInstance;
+            return null;
         }
 
-        Long livyBatchesId = jobInstance.getId();
+        if (resultMap.get("appId") != null) {
+            return resultMap;
+        }
+
+        Object livyBatchesId = resultMap.get("id");
         if (livyBatchesId == null) {
-            return jobInstance;
+            return null;
         }
 
         while (retryCount-- > 0) {
@@ -178,61 +154,22 @@ public class LivyTaskSubmitHelper {
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
             }
-            String result = restTemplate.getForObject(uri + "/" + livyBatchesId, String.class);
-            logger.info("retry get livy result: {}, batches id : {}", result, livyBatchesId);
+            resultMap = getResultByLivyId(livyBatchesId, type);
+            logger.info("retry get livy resultMap: {}, batches id : {}", resultMap, livyBatchesId);
 
-            Gson gson = new Gson();
-            JobInstanceBean newJobInstance = gson.fromJson(result, JobInstanceBean.class);
-            if (StringUtils.isNotBlank(newJobInstance.getAppId())) {
-                return newJobInstance;
+            if (resultMap.get("appId") != null) {
+                break;
             }
         }
 
-        return jobInstance;
+        return resultMap;
     }
 
-    // Maximum number of parallel tasks
-    protected int getMaxConcurrentTaskCount() {
-        int maxTaskCnt = 20;
-        try {
-            return Integer.parseInt(env.getProperty("livy.task.max.concurrent.count"));
-        }catch (Exception e){
-           //do nothing
-        }
-        return maxTaskCnt;
-    }
-
-    // Submit once every 3 seconds by default
-    protected int getBatchIntervalSecond() {
-        int intervalSecond = 3;
-        try {
-            return Integer.parseInt(env.getProperty("livy.task.submit.interval.second"));
-        }catch (Exception e){
-            //do nothing
-        }
-        return intervalSecond;
-    }
-
-    // Livy can't get the number of retries for appid
-    protected int getAppIdRetryCount() {
-        int retryCnt = 3;
-        try {
-            return Integer.parseInt(env.getProperty("livy.task.appId.retry.count"));
-        }catch (Exception e){
-            //do nothing
-        }
-        return retryCnt;
-    }
-
-    // Livy queue select
-    protected boolean isNeedLivyQueue() {
-        boolean needLivy = false;
-        try {
-            return Boolean.parseBoolean(env.getProperty("livy.need.queue"));
-        }catch (Exception e){
-            //do nothing
-        }
-        return needLivy;
+    private Map<String, Object> getResultByLivyId(Object livyBatchesId, TypeReference<HashMap<String, Object>> type)
+            throws IOException {
+        Map<String, Object> resultMap = new HashedMap();
+        String newResult = restTemplate.getForObject(uri + "/" + livyBatchesId, String.class);
+        return newResult == null ? resultMap : toEntity(newResult, type);
     }
 
 }

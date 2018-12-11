@@ -125,11 +125,6 @@ under the License.
             <version>2.6.3</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.44</version>
-        </dependency>
         <!-- to access metastore from hive-->
         <dependency>
             <groupId>org.apache.hadoop</groupId>

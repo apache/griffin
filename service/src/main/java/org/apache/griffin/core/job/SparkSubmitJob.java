@@ -57,6 +57,7 @@ import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -84,6 +85,11 @@ public class SparkSubmitJob implements Job {
     @Autowired
     private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
+    @Value("${livy.need.queue}")
+    private boolean isNeedLivyQueue;
+    @Value("${livy.task.appId.retry.count:3}")
+    private int appIdRetryCount;
+
     private GriffinMeasure measure;
     private String livyUri;
     private List<SegmentPredicate> mPredicates;
@@ -100,9 +106,9 @@ public class SparkSubmitJob implements Job {
                 updateJobInstanceState(context);
                 return;
             }
-            if(livyTaskSubmitHelper.isNeedLivyQueue()){
+            if(isNeedLivyQueue){
                 //livy batch limit
-                livyTaskSubmitHelper.addTaskToWaitingQueue(livyConfMap);
+                livyTaskSubmitHelper.addTaskToWaitingQueue(jd);
             }else{
                 saveJobInstance(jd);
             }
@@ -130,7 +136,7 @@ public class SparkSubmitJob implements Job {
           
             HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap), headers );
             result = restTemplate.postForObject(livyUri,springEntity,String.class);
-           
+
             LOGGER.info(result);
         } catch (HttpClientErrorException e) {
             LOGGER.error("Post to livy ERROR. \n {} {}",
@@ -221,16 +227,28 @@ public class SparkSubmitJob implements Job {
     }
 
 
-    private void saveJobInstance(JobDetail jd) throws SchedulerException,
+    protected void saveJobInstance(JobDetail jd) throws SchedulerException,
             IOException {
         // If result is null, it may livy uri is wrong
         // or livy parameter is wrong.
-        String result = post2Livy();
+        Map<String, Object> resultMap = post2LivyWithRetry();
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();
         batchJobOp.deleteJob(group, name);
         LOGGER.info("Delete predicate job({},{}) SUCCESS.", group, name);
-        saveJobInstance(result, FOUND);
+        setJobInstance(resultMap, FOUND);
+        jobInstanceRepo.save(jobInstance);
+    }
+
+    private Map<String, Object> post2LivyWithRetry()
+            throws IOException{
+        String result = post2Livy();
+        Map<String, Object> resultMap = null;
+        if(result != null){
+            resultMap=livyTaskSubmitHelper.retryLivyGetAppId(result,appIdRetryCount);
+        }
+
+        return resultMap;
     }
 
     protected void saveJobInstance(String result, State state)
