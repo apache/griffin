@@ -43,9 +43,9 @@ public class LivyTaskSubmitHelper {
     private static final int SLEEP_TIME = 300;
     private String uri;
 
-    @Value("${livy.task.max.concurrent.count}")
+    @Value("${livy.task.max.concurrent.count:20}")
     private int maxConcurrentTaskCount;
-    @Value("${livy.task.submit.interval.second}")
+    @Value("${livy.task.submit.interval.second:3}")
     private int batchIntervalSecond;
 
 

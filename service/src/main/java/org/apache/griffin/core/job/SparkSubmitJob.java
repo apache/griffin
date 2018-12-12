@@ -85,7 +85,7 @@ public class SparkSubmitJob implements Job {
     @Autowired
     private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
-    @Value("${livy.need.queue}")
+    @Value("${livy.need.queue:false}")
     private boolean isNeedLivyQueue;
     @Value("${livy.task.appId.retry.count:3}")
     private int appIdRetryCount;
@@ -133,7 +133,7 @@ public class SparkSubmitJob implements Job {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set(REQUEST_BY_HEADER,"admin");
-          
+
             HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap), headers );
             result = restTemplate.postForObject(livyUri,springEntity,String.class);
 
