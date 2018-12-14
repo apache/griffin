@@ -46,14 +46,14 @@ If you want to deploy Griffin in your local environment, please follow [Apache G
 For more information about Griffin, please visit our website at: [griffin home page](http://griffin.apache.org).
 
 You can contact us via email:
-- dev-list: <a href="mailto:dev@griffin.incubator.apache.org">dev@griffin.incubator.apache.org</a>
-- user-list: <a href="mailto:users@griffin.incubator.apache.org">users@griffin.incubator.apache.org</a>
+- dev-list: <a href="mailto:dev@griffin.apache.org">dev@griffin.apache.org</a>
+- user-list: <a href="mailto:users@griffin.apache.org">users@griffin.apache.org</a>
 
-You can also subscribe the latest information by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.incubator.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.incubator.apache.org).
+You can also subscribe the latest information by sending a email to [subscribe dev-list](mailto:dev-subscribe@griffin.apache.org) and [subscribe user-list](mailto:users-subscribe@griffin.apache.org).
 You can also subscribe the latest information by sending a email to subscribe dev-list and user-list:
 ```
-dev-subscribe@griffin.incubator.apache.org
-users-subscribe@griffin.incubator.apache.org
+dev-subscribe@griffin.apache.org
+users-subscribe@griffin.apache.org
 ```
 
 You can access our issues on [JIRA page](https://issues.apache.org/jira/browse/GRIFFIN)
@@ -64,15 +64,15 @@ See [How to Contribute](http://griffin.apache.org/docs/contribute.html) for deta
 
 Here's the most direct way to contribute your work merged into Apache Griffin.
 
-* Fork the project from [github](https://github.com/apache/incubator-griffin)
+* Fork the project from [github](https://github.com/apache/griffin)
 * Clone down your fork
 * Implement your feature or bug fix and commit changes
 * Push the branch up to your fork
-* Send a pull request to Apache Griffin branch
+* Send a pull request to Apache Griffin master branch
 
 
 ## References
-- [Home Page](http://griffin.incubator.apache.org/)
+- [Home Page](http://griffin.apache.org/)
 - [Wiki](https://cwiki.apache.org/confluence/display/GRIFFIN/Apache+Griffin)
 - Documents:
 	- [Measure](griffin-doc/measure)

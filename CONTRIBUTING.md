@@ -27,10 +27,10 @@ The following guidelines apply to all contributors.
 
 ### Making Changes
 
-* Fork the `apache/incubator-griffin` repository
+* Fork the `apache/griffin` repository
 * Make your changes and push them to a topic branch in your fork
   * See our commit message guidelines further down in this document
-* Submit a pull request to the `apache/incubator-griffin` repository
+* Submit a pull request to the `apache/griffin` repository
 
 ### General Guidelines
 

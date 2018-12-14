@@ -56,15 +56,15 @@ JIRA_PASSWORD = os.environ.get("JIRA_PASSWORD", "")
 # https://github.com/settings/tokens. This script only requires the "public_repo" scope.
 GITHUB_OAUTH_KEY = os.environ.get("GITHUB_OAUTH_KEY")
 
-GITHUB_BASE = "https://github.com/apache/incubator-griffin/pull"
-GITHUB_API_BASE = "https://api.github.com/repos/apache/incubator-griffin"
+GITHUB_BASE = "https://github.com/apache/griffin/pull"
+GITHUB_API_BASE = "https://api.github.com/repos/apache/griffin"
 JIRA_BASE = "https://issues.apache.org/jira/browse"
 JIRA_API_BASE = "https://issues.apache.org/jira"
 # Prefix added to temporary branches
 BRANCH_PREFIX = "PR_TOOL"
 
-PR_REPO = "https://github.com/apache/incubator-griffin.git"
-PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/incubator-griffin.git"
+PR_REPO = "https://github.com/apache/griffin.git"
+PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/griffin.git"
 
 
 def get_json(url):

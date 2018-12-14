@@ -79,7 +79,7 @@ You can test your measure JAR built in the docker container, using the existed s
 For debug purpose, you'd better install hadoop, spark, hive locally, so you can test your program more quickly.
 
 ## Deploy on docker container
-Firstly, in the incubator-griffin directory, build you packages at once.
+Firstly, in the griffin directory, build you packages at once.
 ```
 mvn clean install
 ```
