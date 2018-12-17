@@ -105,7 +105,20 @@ under the License.
             <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>${eclipselink.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
@@ -223,13 +236,6 @@ under the License.
                     <name>mysql</name>
                 </property>
             </activation>
-            <dependencies>
-                <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.java.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>dev</id>
@@ -238,28 +244,15 @@ under the License.
                     <name>dev</name>
                 </property>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.h2database</groupId>
-                    <artifactId>h2</artifactId>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>postgresql</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
                 <property>
-                    <name>!mysql</name>
+                    <name>prod</name>
                 </property>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                    <version>${postgresql.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
     <build>
