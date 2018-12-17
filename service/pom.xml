@@ -46,6 +46,8 @@ under the License.
         <spring-boot-maven-plugin.version>1.5.1.RELEASE</spring-boot-maven-plugin.version>
         <derby.version>10.14.1.0</derby.version>
         <eclipselink.version>2.6.0</eclipselink.version>
+        <mysql.java.version>5.1.47</mysql.java.version>
+        <postgresql.version>9.4.1212.jre7</postgresql.version>
     </properties>
 
     <repositories>
@@ -110,10 +112,7 @@ under the License.
         </dependency>
 
         <!--prod db-->
-        <!--<dependency>-->
-        <!--<groupId>mysql</groupId>-->
-        <!--<artifactId>mysql-connector-java</artifactId>-->
-        <!--</dependency>-->
+
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -228,6 +227,37 @@ under the License.
         </dependency>
     </dependencies>
     <profiles>
+        <profile>
+            <id>mysql</id>
+            <activation>
+                <property>
+                    <name>mysql</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.java.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>postgresql</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>!mysql</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>${postgresql.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
     <build>
         <plugins>
