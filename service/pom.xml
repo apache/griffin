@@ -111,13 +111,6 @@ under the License.
             <artifactId>spring-retry</artifactId>
         </dependency>
 
-        <!--prod db-->
-
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
