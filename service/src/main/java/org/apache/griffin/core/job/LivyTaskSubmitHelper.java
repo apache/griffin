@@ -1,17 +1,6 @@
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.collections.map.HashedMap;
-import org.quartz.JobDetail;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +10,18 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.PostConstruct;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
 import static org.apache.griffin.core.util.JsonUtil.toEntity;
+import org.apache.commons.collections.map.HashedMap;
+import org.quartz.JobDetail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 @Component
 public class LivyTaskSubmitHelper {
@@ -52,6 +51,9 @@ public class LivyTaskSubmitHelper {
     @Autowired
     private Environment env;
 
+    /**
+     * Initialize related parameters and open consumer threads.
+     */
     @PostConstruct
     public void init() {
         startWorker();
@@ -63,6 +65,9 @@ public class LivyTaskSubmitHelper {
         this.workerNamePre = "livy-task-submit-worker";
     }
 
+    /**
+     * Initialize blocking queues and start consumer threads.
+     */
     public void startWorker() {
         queue = new LinkedBlockingQueue<>(DEFAULT_QUEUE_SIZE);
         BatchTaskWorker worker = new BatchTaskWorker();
@@ -71,6 +76,10 @@ public class LivyTaskSubmitHelper {
         worker.start();
     }
 
+    /**
+     * Put job detail into the queue.
+     * @param jd job detail.
+     */
     public void addTaskToWaitingQueue(JobDetail jd) throws IOException {
         if (jd == null) {
             logger.warn("task is blank, workerNamePre: {}", workerNamePre);
@@ -85,11 +94,12 @@ public class LivyTaskSubmitHelper {
 
         queue.add(jd);
 
-        logger.info("add_task_to_waiting_queue_success, workerNamePre: {}, task: {}", workerNamePre, jd);
+        logger.info("add_task_to_waiting_queue_success, workerNamePre: {}, task: {}",
+                workerNamePre, jd);
     }
 
     /**
-     * Consumer thread
+     * Consumer thread.
      */
     class BatchTaskWorker extends Thread {
         public void run() {
@@ -107,18 +117,30 @@ public class LivyTaskSubmitHelper {
                         Thread.sleep(SLEEP_TIME);
                     }
                 } catch (Throwable e) {
-                    logger.error("Async_worker_doTask_failed, {}", workerNamePre + e.getMessage(), e);
+                    logger.error("Async_worker_doTask_failed, {}",
+                            workerNamePre + e.getMessage(), e);
                 }
             }
         }
     }
 
+    /**
+     * Add the batch id returned by Livy.
+     *
+     * @param scheduleId livy batch id.
+     */
     public void increaseCurTaskNum(Long scheduleId) {
         curConcurrentTaskNum.incrementAndGet();
-        if (scheduleId != null) taskAppIdMap.put(scheduleId, 1);
+        if (scheduleId != null) {
+            taskAppIdMap.put(scheduleId, 1);
+        }
     }
 
-    //Remove tasks after job status updates
+    /**
+     * Remove tasks after job status updates.
+     *
+     * @param scheduleId livy batch id.
+     */
     public void decreaseCurTaskNum(Long scheduleId) {
         if (scheduleId != null && taskAppIdMap.containsKey(scheduleId)) {
             curConcurrentTaskNum.decrementAndGet();
@@ -131,8 +153,7 @@ public class LivyTaskSubmitHelper {
 
         int retryCount = appIdRetryCount;
         TypeReference<HashMap<String, Object>> type =
-                new TypeReference<HashMap<String, Object>>() {
-                };
+                new TypeReference<HashMap<String, Object>>() {};
         Map<String, Object> resultMap = toEntity(result, type);
 
         if (retryCount <= 0) {
@@ -145,7 +166,7 @@ public class LivyTaskSubmitHelper {
 
         Object livyBatchesId = resultMap.get("id");
         if (livyBatchesId == null) {
-            return null;
+            return resultMap;
         }
 
         while (retryCount-- > 0) {

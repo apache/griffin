@@ -56,17 +56,18 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
 @PersistJobDataAfterExecution
@@ -106,10 +107,10 @@ public class SparkSubmitJob implements Job {
                 updateJobInstanceState(context);
                 return;
             }
-            if(isNeedLivyQueue){
+            if (isNeedLivyQueue) {
                 //livy batch limit
                 livyTaskSubmitHelper.addTaskToWaitingQueue(jd);
-            }else{
+            } else {
                 saveJobInstance(jd);
             }
         } catch (Exception e) {
@@ -134,7 +135,8 @@ public class SparkSubmitJob implements Job {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set(REQUEST_BY_HEADER,"admin");
 
-            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap), headers );
+            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap),
+                    headers);
             result = restTemplate.postForObject(livyUri,springEntity,String.class);
 
             LOGGER.info(result);
@@ -241,11 +243,14 @@ public class SparkSubmitJob implements Job {
     }
 
     private Map<String, Object> post2LivyWithRetry()
-            throws IOException{
+            throws IOException {
         String result = post2Livy();
         Map<String, Object> resultMap = null;
-        if(result != null){
-            resultMap=livyTaskSubmitHelper.retryLivyGetAppId(result,appIdRetryCount);
+        if (result != null) {
+            resultMap = livyTaskSubmitHelper.retryLivyGetAppId(result,appIdRetryCount);
+            if (resultMap != null) {
+                livyTaskSubmitHelper.increaseCurTaskNum(Long.valueOf(String.valueOf(resultMap.get("id"))).longValue());
+            }
         }
 
         return resultMap;
@@ -254,8 +259,7 @@ public class SparkSubmitJob implements Job {
     protected void saveJobInstance(String result, State state)
             throws IOException {
         TypeReference<HashMap<String, Object>> type =
-                new TypeReference<HashMap<String, Object>>() {
-                };
+                new TypeReference<HashMap<String, Object>>() {};
         Map<String, Object> resultMap = null;
         if (result != null) {
             resultMap = toEntity(result, type);
