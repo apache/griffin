@@ -23,7 +23,7 @@ under the License.
     <parent>
         <groupId>org.apache.griffin</groupId>
         <artifactId>griffin</artifactId>
-        <version>0.3.1-incubating-SNAPSHOT</version>
+        <version>0.4.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>service</artifactId>
@@ -46,6 +46,8 @@ under the License.
         <spring-boot-maven-plugin.version>1.5.1.RELEASE</spring-boot-maven-plugin.version>
         <derby.version>10.14.1.0</derby.version>
         <eclipselink.version>2.6.0</eclipselink.version>
+        <mysql.java.version>5.1.47</mysql.java.version>
+        <postgresql.version>9.4.1212.jre7</postgresql.version>
     </properties>
 
     <repositories>
@@ -103,20 +105,23 @@ under the License.
             <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>${eclipselink.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
-        </dependency>
-
-        <!--prod db-->
-        <!--<dependency>-->
-        <!--<groupId>mysql</groupId>-->
-        <!--<artifactId>mysql-connector-java</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>mysql</groupId>-->
+            <!--<artifactId>mysql-connector-java</artifactId>-->
+            <!--<version>${mysql.java.version}</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
         </dependency>
 
         <dependency>
@@ -219,16 +224,38 @@ under the License.
         </dependency>
 
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
             <version>6.2.4</version>
         </dependency>
     </dependencies>
     <profiles>
+        <!--if you need mysql, please uncomment mysql-connector-java -->
+        <!--<profile>-->
+            <!--<id>mysql</id>-->
+            <!--<activation>-->
+                <!--<property>-->
+                    <!--<name>mysql</name>-->
+                <!--</property>-->
+            <!--</activation>-->
+        <!--</profile>-->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <property>
+                    <name>dev</name>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>postgresql</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>prod</name>
+                </property>
+            </activation>
+        </profile>
     </profiles>
     <build>
         <plugins>
