@@ -220,7 +220,7 @@ public class SparkSubmitJob implements Job {
         List<String> args = new ArrayList<>();
         args.add(genEnv());
         String measureJson = JsonUtil.toJsonWithFormat(measure);
-        // to fix livy bug: character ` will be ignored by livy
+        // to fix livy bug: character will be ignored by livy
         String finalMeasureJson = escapeCharacter(measureJson, "\\`");
         LOGGER.info(finalMeasureJson);
         args.add(finalMeasureJson);
