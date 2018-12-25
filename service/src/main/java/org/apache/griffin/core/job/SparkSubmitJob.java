@@ -31,7 +31,6 @@ import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 import static org.apache.griffin.core.util.JsonUtil.toEntity;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
