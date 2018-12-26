@@ -64,7 +64,7 @@ JIRA_API_BASE = "https://issues.apache.org/jira"
 BRANCH_PREFIX = "PR_TOOL"
 
 PR_REPO = "https://github.com/apache/griffin.git"
-PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/griffin.git"
+PUSH_REPO = "https://gitbox.apache.org/repos/asf/griffin.git"
 
 
 def get_json(url):
