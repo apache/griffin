@@ -26,6 +26,7 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 - [HTTP Response Design](#0)
 
 - [Griffin Basic](#1)
+    - [Get Version](#11)
 
 - [Measures](#2)
 
@@ -104,6 +105,8 @@ Description:
 <h2 id = "1"></h2>
 
 ## Apache Griffin Basic
+
+<div id = "11"></div>
 
 ### Get Apache Griffin version
 `GET /api/v1/version`
