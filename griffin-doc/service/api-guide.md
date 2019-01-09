@@ -28,13 +28,32 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 - [Griffin Basic](#1)
     - [Get Version](#11)
 
-- [Measures](#2)
+- [Griffin Measures](#2)
+    - [Add Measure](#21)
+    - [Get Measure](#22)
+    - [Remove Measure](#23)
+    - [Update Measure](#24)
 
-- [Jobs](#3)
+- [Griffin Jobs](#3)
+    - [Add Job](#31)
+    - [Get Job](#32)
+    - [Remove Job](#33)
+    - [Get Job Instances](#34)
+    - [Get Job Healthy Statistics](#35)
+    - [Download Sample Records](#36)
 
 - [Metrics](#4)
+    - [Get Metrics](#41)
+    - [Add Metric Value](#42)
+    - [Get Metric Value](#43)
+    - [Remove Metric Value](#44)
 
 - [Hive MetaStore](#5)
+    - [Get Table Metadata](#51)
+    - [Get Table Name](#52)
+    - [Get All Databases Metadata](#53)
+    - [Get Database Names](#54)
+    - [Get All Tables Metadata](#55)
 
 - [Auth](#6)
 
@@ -111,15 +130,19 @@ Description:
 ### Get Apache Griffin version
 `GET /api/v1/version`
 
-#### Response Body Sample
-`0.1.0`
+#### API Example
+```bash
+curl -k -H "Accept: application/json" -X GET http://127.0.0.1:8080/api/v1/version
+0.3.0
+```
 
 <h2 id = "2"></h2>
 
-## Measures
+## Griffin Measures
+
+<div id = "21"></div>
 
 ### Add measure
-
 `POST /api/v1/measures`
 
 #### Request Header
@@ -127,22 +150,18 @@ Description:
 | ------------ | ---------------- |
 | Content-Type | application/json |
 
-#### Request Body
+#### API Example
+There are two kinds of measures, Apache Griffin measure and external measure.
+<br>The measure's 'dq.type' can either be 'ACCURACY' or 'PROFILING'.
 
-| name    | description    | type    |
-| ------- | -------------- | ------- |
-| measure | measure entity | Measure |
-
-#### Request Body example 
-
-There are two kind of different measures, Apache Griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
-
-Here is a request body example to create a Apache Griffin measure of  profiling:
+Here is an example to define measure of profiling:
 ```
-{
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X POST http://127.0.0.1:8080/api/v1/measures \
+-d '{
     "name":"profiling_measure",
     "measure.type":"griffin",
-    "dq.type":"profiling",
+    "dq.type":"PROFILING",
     "rule.description":{
         "details":[
             {
@@ -151,7 +170,7 @@ Here is a request body example to create a Apache Griffin measure of  profiling:
             }
         ]
     },
-    "process.type":"batch",
+    "process.type":"BATCH",
     "owner":"test",
     "description":"measure description",
     "data.sources":[
@@ -160,7 +179,7 @@ Here is a request body example to create a Apache Griffin measure of  profiling:
             "connectors":[
                 {
                     "name":"connector_name",
-                    "type":"hive",
+                    "type":"HIVE",
                     "version":"1.2",
                     "data.unit":"1hour",
                     "data.time.zone":"UTC(WET,GMT)",
@@ -186,24 +205,24 @@ Here is a request body example to create a Apache Griffin measure of  profiling:
         "rules":[
             {
                 "dsl.type":"griffin-dsl",
-                "dq.type":"profiling",
+                "dq.type":"PROFILING",
                 "rule":"count(source.`age`) AS `age-count`,avg(source.`age`) AS `age-average`",
                 "name":"profiling",
-                "details":{
-
-                }
+                "details":{}
             }
         ]
     }
-}
+}'
 ```
-And for Apache Griffin measure of accuracy:
+Here is an example to define measure of accuracy:
 ```
-{
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X POST http://127.0.0.1:8080/api/v1/measures \
+-d '{
     "name":"accuracy_measure",
     "measure.type":"griffin",
-    "dq.type":"accuracy",
-    "process.type":"batch",
+    "dq.type":"ACCURACY",
+    "process.type":"BATCH",
     "owner":"test",
     "description":"measure description",
     "data.sources":[
@@ -264,142 +283,66 @@ And for Apache Griffin measure of accuracy:
         "rules":[
             {
                 "dsl.type":"griffin-dsl",
-                "dq.type":"accuracy",
+                "dq.type":"ACCURACY",
                 "name":"accuracy",
                 "rule":"source.desc=target.desc"
             }
         ]
     }
-}
+}'
 ```
-Example of request body to create external measure:
+Here is an example to define external measure:
 ```
-{
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X POST http://127.0.0.1:8080/api/v1/measures \
+-d '{
     "name": "external_name",
     "measure.type": "external",
-    "dq.type": "accuracy",
+    "dq.type": "ACCURACY",
     "description": "measure description",
     "organization": "orgName",
     "owner": "test",
-    "metricName": "metricName"
-}
-```
-#### Response Body Sample
-
-The response body should be the created measure if success. For example:
-```
-{
-    "measure.type": "griffin",
-    "id": 1,
-    "name": "measureName",
-    "description": "measure description",
-    "organization": "orgName",
-    "owner": "test",
-    "deleted": false,
-    "dq.type": "accuracy",
-    "process.type": "batch",
-    "data.sources": [
-        {
-            "id": 1,
-            "name": "source",
-            "connectors": [
-                {
-                    "id": 1,
-                    "name": "connector_name_source",
-                    "type": "HIVE",
-                    "version": "1.2",
-                    "predicates": [
-                        {
-                            "id": 1,
-                            "type": "file.exist",
-                            "config": {
-                                "root.path": "hdfs:///griffin/demo_src",
-                                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                            }
-                        }
-                    ],
-                    "data.unit": "1h",
-                    "config": {
-                        "database": "default",
-                        "table.name": "demo_src",
-                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                    }
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "name": "target",
-            "connectors": [
-                {
-                    "id": 2,
-                    "name": "connector_name_target",
-                    "type": "HIVE",
-                    "version": "1.2",
-                    "predicates": [
-                        {
-                            "id": 2,
-                            "type": "file.exist",
-                            "config": {
-                                "root.path": "hdfs:///griffin/demo_src",
-                                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                            }
-                        }
-                    ],
-                    "data.unit": "1h",
-                    "config": {
-                        "database": "default",
-                        "table.name": "demo_src",
-                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                    }
-                }
-            ]
-        }
-    ],
-    "evaluate.rule": {
-        "id": 1,
-        "rules": [
-            {
-                "id": 1,
-                "rule": "source.desc=target.desc",
-                "name": "rule_name",
-                "description": "Total count",
-                "dsl.type": "griffin-dsl",
-                "dq.type": "accuracy",
-                "details": {}
-            }
-        ]
-    }
-}
+    "metric.name": "metricName"
+}'
 ```
 
-### Get measures
-`GET /api/v1/measures`
-#### Response Body Sample
-```
-[
-    {
+<div id = "22"></div>
+
+### Get measure
+`GET /api/v1/measures`<br>
+`GET /api/v1/measures/{measure_id}`
+
+#### API Example
+```bash
+curl -k -H "Accept: application/json" -X GET http://127.0.0.1:8080/api/v1/measures
+[{
         "measure.type": "griffin",
-        "id": 4,
-        "name": "measure_no_predicate_day",
+        "id": 1,
+        "name": "accuracy_measure",
         "owner": "test",
-        "description": null,
-        "organization": null,
+        "description": "measure description",
         "deleted": false,
-        "dq.type": "accuracy",
-        "process.type": "batch",
-        "data.sources": [
-            {
-                "id": 6,
+        "dq.type": "ACCURACY",
+        "sinks": ["ELASTICSEARCH", "HDFS"],
+        "process.type": "BATCH",
+        "data.sources": [{
+                "id": 4,
                 "name": "source",
-                "connectors": [
-                    {
-                        "id": 6,
-                        "name": "source1517994133405",
+                "connectors": [{
+                        "id": 5,
+                        "name": "connector_name_source",
                         "type": "HIVE",
                         "version": "1.2",
-                        "predicates": [],
-                        "data.unit": "1day",
+                        "predicates": [{
+                                "id": 6,
+                                "type": "file.exist",
+                                "config": {
+                                    "root.path": "hdfs:///127.0.0.1/demo_src",
+                                    "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+                                }
+                            }
+                        ],
+                        "data.unit": "1hour",
                         "data.time.zone": "UTC(WET,GMT)",
                         "config": {
                             "database": "default",
@@ -407,19 +350,26 @@ The response body should be the created measure if success. For example:
                             "where": "dt=#YYYYMMdd# AND hour=#HH#"
                         }
                     }
-                ]
-            },
-            {
+                ],
+                "baseline": false
+            }, {
                 "id": 7,
                 "name": "target",
-                "connectors": [
-                    {
-                        "id": 7,
-                        "name": "target1517994142573",
+                "connectors": [{
+                        "id": 8,
+                        "name": "connector_name_target",
                         "type": "HIVE",
                         "version": "1.2",
-                        "predicates": [],
-                        "data.unit": "1day",
+                        "predicates": [{
+                                "id": 9,
+                                "type": "file.exist",
+                                "config": {
+                                    "root.path": "hdfs:///127.0.0.1/demo_src",
+                                    "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+                                }
+                            }
+                        ],
+                        "data.unit": "1hour",
                         "data.time.zone": "UTC(WET,GMT)",
                         "config": {
                             "database": "default",
@@ -427,65 +377,73 @@ The response body should be the created measure if success. For example:
                             "where": "dt=#YYYYMMdd# AND hour=#HH#"
                         }
                     }
-                ]
+                ],
+                "baseline": false
             }
         ],
         "evaluate.rule": {
-            "id": 4,
-            "rules": [
-                {
-                    "id": 4,
-                    "rule": "source.age=target.age AND source.desc=target.desc",
-                    "name": "accuracy",
+            "id": 2,
+            "rules": [{
+                    "id": 3,
+                    "rule": "source.desc=target.desc",
                     "dsl.type": "griffin-dsl",
-                    "dq.type": "accuracy"
+                    "dq.type": "ACCURACY"
                 }
             ]
-        }
+        },
+        "measure.type": "griffin"
     }
 ]
 ```
 
+<div id = "23"></div>
+
+### Remove measure
+`DELETE /api/v1/measures/{measure_id}`
+When deleting a measure,api will also delete related jobs.
+#### API example
+```bash
+curl -k -H "Accept: application/json" -X DELETE http://127.0.0.1:8080/api/v1/measures/1
+```
+The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
+
+<div id = "24"></div>
 
 ### Update measure
 `PUT /api/v1/measures`
-#### Request Header
-| key          | value            |
-| ------------ | ---------------- |
-| Content-Type | application/json |
 
-#### Request Body
-| name    | description    | type    |
-| ------- | -------------- | ------- |
-| measure | measure entity | Measure |
-
-#### Request Body example 
-There are two kind of different measures, Apache Griffin measure and external measure. And for each type of measure, the 'dq.type' can be 'accuracy' or 'profiling'.
-
-Here is a request body example to update a Apache Griffin measure of accuracy:
+#### API example
+Here is an example to update measure:
 ```
-{
-    "id": 1,
-    "name": "measureName_edit",
-    "description": "measure description",
-    "organization": "orgName",
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X PUT http://127.0.0.1:8080/api/v1/measures \
+-d '{
+    "measure.type": "griffin",
+    "id": 19,
+    "name": "profiling_measure_edited",
     "owner": "test",
+    "description": "measure description",
     "deleted": false,
-    "dq.type": "accuracy",
-    "process.type": "batch",
-    "data.sources": [
-        {
-            "id": 1,
+    "dq.type": "PROFILING",
+    "sinks": ["ELASTICSEARCH", "HDFS"],
+    "process.type": "BATCH",
+    "rule.description": {
+        "details": [{
+                "name": "age",
+                "infos": "Total Count,Average"
+            }
+        ]
+    },
+    "data.sources": [{
+            "id": 22,
             "name": "source",
-            "connectors": [
-                {
-                    "id": 1,
-                    "name": "connector_name_source",
+            "connectors": [{
+                    "id": 23,
+                    "name": "connector_name",
                     "type": "HIVE",
                     "version": "1.2",
-                    "predicates": [
-                        {
-                            "id": 1,
+                    "predicates": [{
+                            "id": 24,
                             "type": "file.exist",
                             "config": {
                                 "root.path": "hdfs:///griffin/demo_src",
@@ -493,204 +451,81 @@ Here is a request body example to update a Apache Griffin measure of accuracy:
                             }
                         }
                     ],
-                    "data.unit": "1h",
+                    "data.unit": "1hour",
+                    "data.time.zone": "UTC(WET,GMT)",
                     "config": {
                         "database": "default",
                         "table.name": "demo_src",
                         "where": "dt=#YYYYMMdd# AND hour=#HH#"
                     }
                 }
-            ]
-        },
-        {
-            "id": 2,
-            "name": "target",
-            "connectors": [
-                {
-                    "id": 2,
-                    "name": "connector_name_target",
-                    "type": "HIVE",
-                    "version": "1.2",
-                    "predicates": [
-                        {
-                            "id": 2,
-                            "type": "file.exist",
-                            "config": {
-                                "root.path": "hdfs:///griffin/demo_src",
-                                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                            }
-                        }
-                    ],
-                    "data.unit": "1h",
-                    "config": {
-                        "database": "default",
-                        "table.name": "demo_src",
-                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                    }
-                }
-            ]
+            ],
+            "baseline": false
         }
     ],
     "evaluate.rule": {
-        "id": 1,
-        "rules": [
-            {
-                "id": 1,
-                "rule": "source.desc=target.desc",
-                "name": "rule_name",
-                "description": "Total count",
+        "id": 20,
+        "rules": [{
+                "id": 21,
+                "rule": "count(source.`age`) AS `age-count`,avg(source.`age`) AS `age-average`",
                 "dsl.type": "griffin-dsl",
-                "dq.type": "accuracy",
+                "dq.type": "PROFILING",
                 "details": {}
             }
         ]
     },
     "measure.type": "griffin"
-}
+}'
 ```
-If you want to update an external measure, you can use following example json in request body.
+Here is an example to update external measure:
 ```
-{
-	"id":1,
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X PUT http://127.0.0.1:8080/api/v1/measures \
+-d '{
     "measure.type": "external",
-    "dq.type": "accuracy",
+    "id": 25,
     "name": "external_name",
-    "description": " update test measure",
+    "owner": "test",
+    "description": "measure description edited",
     "organization": "orgName",
-    "owner": "test",
-    "metricName": "metricName"
-}
-```
-#### Response Body Sample
-The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
-
-### Delete measure
-`DELETE /api/v1/measures/{id}`
-When deleting a measure,api will also delete related jobs.
-#### Path Variable
-- id -`required` `Long` measure id
-
-#### Request Sample
-
-`/api/v1/measures/1`
-
-#### Response Body Sample
-
-The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
-
-### Get measure by id
-`GET /api/v1/measures/{id}`
-#### Path Variable
-- id -`required` `Long` measure id
-
-#### Request Sample
-
-`/api/v1/measures/1`
-
-#### Response Body Sample
-```
-{
-    "measure.type": "griffin",
-    "id": 4,
-    "name": "measure_no_predicate_day",
-    "owner": "test",
-    "description": null,
-    "organization": null,
     "deleted": false,
-    "dq.type": "accuracy",
-    "process.type": "batch",
-    "data.sources": [
-        {
-            "id": 6,
-            "name": "source",
-            "connectors": [
-                {
-                    "id": 6,
-                    "name": "source1517994133405",
-                    "type": "HIVE",
-                    "version": "1.2",
-                    "predicates": [],
-                    "data.unit": "1day",
-                    "data.time.zone": "UTC(WET,GMT)",
-                    "config": {
-                        "database": "default",
-                        "table.name": "demo_src",
-                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                    }
-                }
-            ]
-        },
-        {
-            "id": 7,
-            "name": "target",
-            "connectors": [
-                {
-                    "id": 7,
-                    "name": "target1517994142573",
-                    "type": "HIVE",
-                    "version": "1.2",
-                    "predicates": [],
-                    "data.unit": "1day",
-                    "data.time.zone": "UTC(WET,GMT)",
-                    "config": {
-                        "database": "default",
-                        "table.name": "demo_tgt",
-                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                    }
-                }
-            ]
-        }
-    ],
-    "evaluate.rule": {
-        "id": 4,
-        "rules": [
-            {
-                "id": 4,
-                "rule": "source.age=target.age AND source.desc=target.desc",
-                "name": "accuracy",
-                "dsl.type": "griffin-dsl",
-                "dq.type": "accuracy"
-            }
-        ]
-    }
-}
+    "dq.type": "ACCURACY",
+    "sinks": ["ELASTICSEARCH", "HDFS"],
+    "metric.name": "metricName",
+    "measure.type": "external"
+}'
 ```
 
 <h2 id = "3"></h2>
 
-## Jobs
+## Griffin Jobs
+
+<div id = "31"></div>
 
 ### Add job
 
 `POST /api/v1/jobs`
 
-#### Request Header
-| key          | value            |
-| ------------ | ---------------- |
-| Content-Type | application/json |
-
-#### Request Body
-| name        | description                              | type        |
-| ----------- | ---------------------------------------- | ----------- |
-| jobSchedule | custom class composed of job key parameters | JobSchedule |
-
-#### Request Body Sample
+#### API Example
 ```
-{
-    "measure.id": 5,
-	"job.name":"job_name",
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X POST http://127.0.0.1:8080/api/v1/jobs \
+-d '{
+    "measure.id": 10,
+    "job.name":"job_name_10",
+    "job.type":"batch",
     "cron.expression": "0 0/4 * * * ?",
     "cron.time.zone": "GMT+8:00",
     "predicate.config": {
-		"checkdonefile.schedule":{
-			"interval": "1m",
-			"repeat": 2
-		}
+        "checkdonefile.schedule":{
+            "interval": "1m",
+            "repeat": 2
+        }
     },
     "data.segments": [
         {
             "data.connector.name": "connector_name_source",
-			"as.baseline":true, 
+            "as.baseline":true,
             "segment.range": {
                 "begin": "-1h",
                 "length": "1h"
@@ -704,15 +539,81 @@ The response body should be empty if no error happens, and the HTTP status is (2
             }
         }
     ]
-}
+}'
 ```
-#### Response Body Sample
-The response body should be the created job schedule if success. For example:
+
+<div id = "32"></div>
+
+### Get all jobs
+`GET /api/v1/jobs`
+
+#### API Example
 ```
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X GET http://127.0.0.1:8080/api/v1/jobs
+[{
+        "job.type": "batch",
+        "id": 51,
+        "measure.id": 10,
+        "job.name": "job_name_10",
+        "metric.name": "job_name_10",
+        "quartz.name": "job_name_10_1547192473206",
+        "quartz.group": "BA",
+        "cron.expression": "0 0/4 * * * ?",
+        "job.state": {
+            "state": "NORMAL",
+            "toStart": false,
+            "toStop": true,
+            "nextFireTime": 1547693040000,
+            "previousFireTime": 1547692800000
+        },
+        "cron.time.zone": "GMT+8:00",
+        "predicate.config": {
+            "checkdonefile.schedule": {
+                "interval": "1m",
+                "repeat": 2
+            }
+        },
+        "data.segments": [{
+                "id": 52,
+                "data.connector.name": "connector_name_source",
+                "as.baseline": true,
+                "segment.range": {
+                    "id": 53,
+                    "begin": "-1h",
+                    "length": "1h"
+                }
+            }, {
+                "id": 54,
+                "data.connector.name": "connector_name_target",
+                "as.baseline": false,
+                "segment.range": {
+                    "id": 55,
+                    "begin": "-1h",
+                    "length": "1h"
+                }
+            }
+        ],
+        "job.type": "batch"
+    }
+]
+```
+
+### Get a job by id
+`GET /api/v1/jobs/config?jobId={job_id}`
+
+#### API Example
+```
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X GET http://127.0.0.1:8080/api/v1/jobs/config?jobId=827
 {
-    "id": 3,
-    "measure.id": 5,
-    "job.name": "job_name",
+    "job.type": "batch",
+    "id": 827,
+    "measure.id": 10,
+    "job.name": "job_name_10",
+    "metric.name": "job_name_10",
+    "quartz.name": "job_name_10_1547694147531",
+    "quartz.group": "BA",
     "cron.expression": "0 0/4 * * * ?",
     "cron.time.zone": "GMT+8:00",
     "predicate.config": {
@@ -721,124 +622,54 @@ The response body should be the created job schedule if success. For example:
             "repeat": 2
         }
     },
-    "data.segments": [
-        {
-            "id": 5,
+    "data.segments": [{
+            "id": 828,
             "data.connector.name": "connector_name_source",
             "as.baseline": true,
             "segment.range": {
-                "id": 5,
+                "id": 829,
                 "begin": "-1h",
                 "length": "1h"
             }
-        },
-        {
-            "id": 6,
+        }, {
+            "id": 830,
             "data.connector.name": "connector_name_target",
             "as.baseline": false,
             "segment.range": {
-                "id": 6,
+                "id": 831,
                 "begin": "-1h",
                 "length": "1h"
             }
         }
-    ]
+    ],
+    "job.type": "batch"
 }
 ```
 
-### Get jobs
-`GET /api/v1/jobs`
-
-#### Response Body Sample
-```
-[
-    {
-        "jobId": 1,
-        "jobName": "job_name",
-        "measureId": 1,
-        "triggerState": "NORMAL",
-        "nextFireTime": 1515400080000,
-        "previousFireTime": 1515399840000,
-        "cronExpression": "0 0/4 * * * ?"
-    }
-]
-
-```
+<div id = "33"></div>
 
 ### Delete job by id
-`DELETE /api/v1/jobs/{id}`
-#### Path Variable
-- id -`required` `Long` job id
-
-#### Response Body Sample
-
-The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
-
-### Get job schedule by job name
-`GET /api/v1/jobs/config/{jobName}`
-
-#### Path Variable
-- jobName -`required` `String` job name
-
-#### Request Sample
-
-`/api/v1/jobs/config/job_no_predicate_day`
-
-#### Response Sample
+`DELETE /api/v1/jobs/{job_id}`
+#### API Example
 ```
-{
-    "id": 2,
-    "measure.id": 4,
-    "job.name": "job_no_predicate_day",
-    "cron.expression": "0 0/4 * * * ?",
-    "cron.time.zone": "GMT-8:00",
-    "predicate.config": {
-        "checkdonefile.schedule": {
-            "repeat": "12",
-            "interval": "5m"
-        }
-    },
-    "data.segments": [
-        {
-            "id": 3,
-            "data.connector.name": "source1517994133405",
-            "as.baseline": true,
-            "segment.range": {
-                "id": 3,
-                "begin": "-2",
-                "length": "2"
-            }
-        },
-        {
-            "id": 4,
-            "data.connector.name": "target1517994142573",
-            "as.baseline": false,
-            "segment.range": {
-                "id": 4,
-                "begin": "-5",
-                "length": "2"
-            }
-        }
-    ]
-}
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X DELETE http://127.0.0.1:8080/api/v1/jobs/51
 ```
 
 ### Delete job by name
-`DELETE /api/v1/jobs`
-
-#### Request Parameter
-
-| name    | description | type   | example value |
-| ------- | ----------- | ------ | ------------- |
-| jobName | job name    | String | job_name      |
-
-#### Response Body Sample
+`DELETE /api/v1/jobs?jobName={name}`
+#### API Example
+```
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X DELETE http://127.0.0.1:8080/api/v1/jobs?jobName=job_name_10
+```
 
 The response body should be empty if no error happens, and the HTTP status is (204, "No Content").
 
+<div id = "34"></div>
 
 ### Get job instances
-`GET /api/v1/jobs/instances`
+`GET /api/v1/jobs/instances?jobId={id}&page={pageNum}&size={pageSize}`
 
 #### Request Parameter
 
@@ -848,68 +679,78 @@ The response body should be empty if no error happens, and the HTTP status is (2
 | page  | page you want starting from index 0 | int  | 0             |
 | size  | instance number per page            | int  | 10            |
 
-#### Response Body Sample
+#### API Example
 ```
-[
-    {
-        "id": 1,
+curl -k -G -X GET http://127.0.0.1:8080/api/v1/jobs/instances -d jobId=827 -d page=1 -d size=5
+[{
+        "id": 1176,
         "sessionId": null,
-        "state": "success",
-        "appId": null,
-        "appUri": null,
+        "state": "NOT_FOUND",
+        "type": "BATCH",
         "predicateGroup": "PG",
-        "predicateName": "job_name_predicate_1515399840077",
-        "deleted": true,
-        "timestamp": 1515399840092,
-        "expireTimestamp": 1516004640092
-    },
-    {
-        "id": 2,
+        "predicateName": "job_name_10_predicate_1547776800012",
+        "timestamp": 1547776800012,
+        "expireTimestamp": 1548381600012
+    }, {
+        "id": 1175,
         "sessionId": null,
-        "state": "not_found",
-        "appId": null,
-        "appUri": null,
+        "state": "NOT_FOUND",
+        "type": "BATCH",
         "predicateGroup": "PG",
-        "predicateName": "job_name_predicate_1515399840066",
-        "deleted": true,
-        "timestamp": 1515399840067,
-        "expireTimestamp": 1516004640067
+        "predicateName": "job_name_10_predicate_1547776560018",
+        "timestamp": 1547776560019,
+        "expireTimestamp": 1548381360019
     }
 ]
 ```
 
+<div id = "35"></div>
+
 ### Get job healthy statistics
 `GET /api/v1/jobs/health`
 
-#### Response Body Sample
+#### API Example
 ```
+curl -k -X GET http://127.0.0.1:8080/api/v1/jobs/health
 {
-  "healthyJobCount": 1,
-  "jobCount": 2
+	"healthyJobCount": 0,
+	"jobCount": 1
 }
 ```
 
-### Download sample missing/mismatched records
-`GET /api/v1/jobs/download?hdfsPath={missingDataFilePath}`
+<div id = "36"></div>
 
-#### Response
-```
-If successful, this method returns missing records in the response body, 
-maximum record count is 100.
+### Download sample records
+`GET /api/v1/jobs/download?jobName={name}&ts={timestamp}`
 
+#### Request Parameter
+
+| name  | description                         | type | example value |
+| ----- | ----------------------------------- | ---- | ------------- |
+| jobName    | job name                       | String | 1             |
+| timestamp  | timestamp                      | Long   | 0             |
+
+#### API Example
 ```
+curl -k -G -X GET http://127.0.0.1:8080/api/v1/jobs/download \
+-d jobName=job_name_10 -d timestamp=1547778857807
+```
+If successful, this method returns missing records in the response body, maximum record count is 100.
 
 <h2 id = "4"></h2>
 
 ## Metrics
 
+<div id = "41"></div>
+
 ### Get metrics
 
 `GET /api/v1/metrics`
 
-#### Response Example
+#### API Example
 The response is a map of metrics group by measure name. For example:
 ```
+curl -k -X GET http://127.0.0.1:8080/api/v1/metrics
 {
     "measure_no_predicate_day": [
         {
@@ -938,7 +779,7 @@ The response is a map of metrics group by measure name. For example:
             ]
         }
     ],
-    "measre_predicate_hour": [
+    "measure_predicate_hour": [
         {
             "name": "job_predicate_hour",
             "type": "accuracy",
@@ -949,34 +790,32 @@ The response is a map of metrics group by measure name. For example:
 }
 ```
 
+<div id = "42"></div>
+
 ### Add metric values
 `POST /api/v1/metrics/values`
-#### Request Header
-| key          | value            |
-| ------------ | ---------------- |
-| Content-Type | application/json |
 #### Request Body
 | name          | description             | type        |
 | ------------- | ----------------------- | ----------- |
 | Metric Values | A list of metric values | MetricValue |
-#### Request Body Sample
+#### API Example
 ```
-[
-	{
-		"name" : "metricName",
-		"tmst" : 1509599811123,
-		"value" : {
-			"__tmst" : 1509599811123,
-			"miss" : 11,
-			"total" : 125000,
-			"matched" : 124989
-		}
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X POST http://127.0.0.1:8080/api/v1/metrics/values \
+-d '[
+    {
+        "name" : "metricName",
+        "tmst" : 1509599811123,
+        "value" : {
+            "__tmst" : 1509599811123,
+            "miss" : 11,
+            "total" : 125000,
+            "matched" : 124989
+        }
    }
-]
+]'
 ```
-#### Response Body Sample
 The response body should have 'errors' field as 'false' if success, for example
-
 ```
 {
     "took": 32,
@@ -1002,8 +841,10 @@ The response body should have 'errors' field as 'false' if success, for example
 }
 ```
 
+<div id = "43"></div>
+
 ### Get metric values by name 
-`GET /api/v1/metrics/values`
+`GET /api/v1/metrics/values?metricName={name}&size={size}&offset={offset}&tmst={timestamp}`
 
 #### Request Parameter
 name | description | type | example value
@@ -1014,8 +855,9 @@ offset | the amount of records to skip by timestamp in descending order | int | 
 tmst | the start timestamp of records you want to get | long | 0
 
 Parameter offset and tmst are optional.
-#### Response Body Sample
+#### API Example
 ```
+curl -k -G -X GET http://127.0.0.1:8080/api/v1/metrics/values -d metricName=job_no_predicate_day -d size=10
 [
     {
         "name": "job_no_predicate_day",
@@ -1047,15 +889,15 @@ Parameter offset and tmst are optional.
 ]
 ```
 
+<div id = "44"></div>
+
 ### Delete metric values by name
-`DELETE /api/v1/metrics/values`
-#### Request Parameters 
-| name       | description               | type   | example value |
-| ---------- | ------------------------- | ------ | ------------- |
-| metricName | name of the metric values | String | metricName    |
-#### Response Body Sample
+`DELETE /api/v1/metrics/values?metricName={name}`
+#### API Example
 The response body should have 'failures' field as empty if success, for example
 ```
+curl -k -H "Accept: application/json" \
+-X DELETE http://127.0.0.1:8080/api/v1/metrics/values?metricName=job_no_predicate_day
 {
     "took": 363,
     "timed_out": false,
@@ -1079,9 +921,11 @@ The response body should have 'failures' field as empty if success, for example
 
 ### Hive MetaStore
 
+<div id = "51"></div>
+
 ### Get table metadata
 
-`GET /api/v1/metadata/hive/table`
+`GET /api/v1/metadata/hive/table?db={}&table={}`
 
 #### Request Parameters
 | name  | description        | type   | example value |
@@ -1089,8 +933,12 @@ The response body should have 'failures' field as empty if success, for example
 | db    | hive database name | String | default       |
 | table | hive table name    | String | demo_src      |
 
-#### Response Example Sample
+#### API Example
 ```
+curl -k -H "Accept: application/json" \
+-G -X GET http://127.0.0.1:8080/api/v1/metadata/hive/table \
+-d db=default \
+-d table=demo_src
 {
     "tableName": "demo_src",
     "dbName": "default",
@@ -1147,25 +995,34 @@ The response body should have 'failures' field as empty if success, for example
     ]
 }
 ```
+
+<div id = "52"></div>
+
 ### Get table names
-`GET /api/v1/metadata/hive/tables/names`
+`GET /api/v1/metadata/hive/tables/names?db={}`
 #### Request Parameter
 | name | description        | typ    | example value |
 | ---- | ------------------ | ------ | ------------- |
 | db   | hive database name | String | default       |
 
-#### Response Example Sample
+#### API Example
 ```
+curl -k -H "Accept: application/json" \
+-X GET http://127.0.0.1:8080/api/v1/metadata/hive/table?db=default
 [
   "demo_src",
   "demo_tgt"
 ]
 ```
 
+<div id = "53"></div>
+
 ### Get all database tables metadata
 `GET /api/v1/metadata/hive/dbs/tables`
-#### Response Example Sample
+#### API Example
 ```
+curl -k -H "Accept: application/json" \
+-X GET http://127.0.0.1:8080/api/v1/metadata/hive/dbs/tables
 {
    "default": [
     {
@@ -1281,23 +1138,31 @@ The response body should have 'failures' field as empty if success, for example
 
 ```
 
+<div id = "54"></div>
+
 ### Get database names
 `GET /api/v1/metadata/hive/dbs`
-#### Response Example Sample
+#### API Example
 ```
+curl -k -H "Accept: application/json" \
+-X GET http://127.0.0.1:8080/api/v1/metadata/hive/dbs
 [
-	"default"
+    "default"
 ]
 ```
 
+<div id = "55"></div>
+
 ### Get tables metadata
-`GET /api/v1/metadata/hive/tables`
+`GET /api/v1/metadata/hive/tables?db={name}`
 #### Request Parameter
 | name | description        | typ    | example value |
 | ---- | ------------------ | ------ | ------------- |
 | db   | hive database name | String | default       |
-#### Response Body Sample
+#### API Example
 ```
+curl -k -H "Accept: application/json" \
+-X GET http://127.0.0.1:8080/api/v1/metadata/hive/tables?db=default
 [
   {
     "tableName": "demo_src",
@@ -1425,7 +1290,13 @@ The response body should have 'failures' field as empty if success, for example
 | ---- | ------------------------------------- | ---- | --------------------------------------- |
 | map  | a map contains user name and password | Map  | `{"username":"user","password":"test"}` |
 
-#### Response Body Sample
+#### API Example
+```
+curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
+-X POST http://127.0.0.1:8080/api/v1/login/authenticate \
+-d '{"username":"user","password":"test"}'
+```
+if authentication passes, response below will be returned.
 ```
 {
   "fullName": "Default",
