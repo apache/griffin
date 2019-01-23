@@ -246,13 +246,18 @@ Above lists DQ job configure parameters.
     * dup: the duplicate count name in metric, optional.
     * num: the duplicate number name in metric, optional.
     * duplication.array: optional, if set as a non-empty string, the duplication metric will be computed, and the group metric name is this string.
+  + completeness dq type detail configuration
+    * source: name of data source to measure completeness.
+    * total: name of data source to compare with. It is always the same as source, or more than source.
+    * complete: the column name in metric, optional. The number of not null values.
+    * incomplete: the column name in metric, optional. The number of null values.
   + timeliness dq type detail configuration
     * source: name of data source to measure timeliness.
     * latency: the latency column name in metric, optional.
     * total: column name, optional.
-    * avg: column name, optional.
-    * step: column nmae, optional.
-    * count: column name, optional.
+    * avg: column name, optional. The average latency.
+    * step: column nmae, optional. The histogram where "bin" is step=floor(latency/step.size).
+    * count: column name, optional. The number of the same latencies in the concrete step.
     * percentile: column name, optional.
     * threshold: optional, if set as a time string like "1h", the items with latency more than 1 hour will be record.
     * step.size: optional, used to build the histogram of latencies, in milliseconds (ex. "100").
