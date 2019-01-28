@@ -127,6 +127,14 @@ Profiling rule expression in Apache Griffin DSL is a sql-like expression, with s
 Distinctness rule expression in Apache Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is distinct.
     e.g. `name, age`, `name, (age + 1) as next_age`
 
+### Uniqueness Rule
+Uniqueness rule expression in Apache Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is unique. The uniqueness indicates the items without any replica of data.
+    e.g. `name, age`, `name, (age + 1) as next_age`
+
+### Completeness Rule
+Completeness rule expression in Apache Griffin DSL is a list of selection expressions separated by comma, indicates the columns to check if is null.
+    e.g. `name, age`, `name, (age + 1) as next_age`
+
 ### Timeliness Rule
 Timeliness rule expression in Apache Griffin DSL is a list of selection expressions separated by comma, indicates the input time and output time (calculate time as default if not set).  
 	e.g. `ts`, `ts, end_ts`
@@ -166,6 +174,12 @@ For example, the dsl rule is `name, age`, which represents the distinct requests
 - **duplicate metric**: `SELECT name, age, dup, COUNT(*) AS num FROM dup_records GROUP BY name, age, dup`, save as table `dup_metric`.
 
 After the translation, the metrics will be persisted in table `distinct_metric` and `dup_metric`.
+
+### Completeness
+For completeness, is to check for null. The columns you measure are incomplete if they are null. 
+- **total count of source**: `SELECT COUNT(*) AS total FROM source`, save as table `total_count`.
+- **incomplete metric**: `SELECT count(*) as incomplete FROM source WHERE NOT (id IS NOT NULL)`, save as table `incomplete_count`.
+- **complete metric**: `SELECT (source.total - incomplete_count.incomplete) AS complete FROM source LEFT JOIN incomplete_count`, save as table `complete_count`.
 
 ### Timeliness
 For timeliness, is to measure the latency of each item, and get the statistics of the latencies.  
