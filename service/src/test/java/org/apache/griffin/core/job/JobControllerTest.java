@@ -171,4 +171,22 @@ public class JobControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.healthyJobCount", is(1)));
     }
+
+    @Test
+    public void testTriggerJobForSuccess() throws Exception {
+        doNothing().when(service).triggerJobById(1L);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testTriggerJobForFailureWithException() throws Exception {
+        doThrow(new GriffinException.ServiceException("Failed to trigger job",
+                new Exception()))
+                .when(service).triggerJobById(1L);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
+                .andExpect(status().isInternalServerError());
+    }
 }

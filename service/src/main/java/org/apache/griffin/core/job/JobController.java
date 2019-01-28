@@ -113,4 +113,10 @@ public class JobController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
+
+    @RequestMapping(value = "/jobs/trigger/{id}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void triggerJob(@PathVariable("id") Long id) throws SchedulerException {
+        jobService.triggerJobById(id);
+    }
 }
