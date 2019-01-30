@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.job;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +28,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
+
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
 import static org.apache.griffin.core.util.JsonUtil.toEntity;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.quartz.JobDetail;
 import org.slf4j.Logger;
@@ -45,8 +50,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class LivyTaskSubmitHelper {
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(LivyTaskSubmitHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(LivyTaskSubmitHelper.class);
 
     private static final String REQUEST_BY_HEADER = "X-Requested-By";
     private SparkSubmitJob sparkSubmitJob;
@@ -89,14 +93,14 @@ public class LivyTaskSubmitHelper {
      */
     public void startWorker() {
         queue = new LinkedBlockingQueue<>(DEFAULT_QUEUE_SIZE);
-        BatchTaskWorker worker = new BatchTaskWorker();
-        worker.setDaemon(true);
-        worker.setName(workerNamePre + "-" + worker.getName());
-        worker.start();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        TaskInner taskInner = new TaskInner(executorService);
+        executorService.execute(taskInner);
     }
 
     /**
      * Put job detail into the queue.
+     *
      * @param jd job detail.
      */
     public void addTaskToWaitingQueue(JobDetail jd) throws IOException {
@@ -120,11 +124,15 @@ public class LivyTaskSubmitHelper {
     /**
      * Consumer thread.
      */
-    class BatchTaskWorker extends Thread {
+    class TaskInner implements Runnable {
+        private ExecutorService es;
+
+        public TaskInner(ExecutorService es) {
+            this.es = es;
+        }
+
         public void run() {
             long insertTime = System.currentTimeMillis();
-
-            // Keep sequential execution within a limited number of tasks
             while (true) {
                 try {
                     if (curConcurrentTaskNum.get() < maxConcurrentTaskCount
@@ -135,9 +143,9 @@ public class LivyTaskSubmitHelper {
                     } else {
                         Thread.sleep(SLEEP_TIME);
                     }
-                } catch (Throwable e) {
-                    logger.error("Async_worker_doTask_failed, {}",
-                            workerNamePre + e.getMessage(), e);
+                } catch (Exception e) {
+                    logger.error("Async_worker_doTask_failed, {}", e.getMessage(), e);
+                    es.execute(this);
                 }
             }
         }
@@ -172,7 +180,8 @@ public class LivyTaskSubmitHelper {
 
         int retryCount = appIdRetryCount;
         TypeReference<HashMap<String, Object>> type =
-                new TypeReference<HashMap<String, Object>>() {};
+                new TypeReference<HashMap<String, Object>>() {
+                };
         Map<String, Object> resultMap = toEntity(result, type);
 
         if (retryCount <= 0) {
@@ -190,7 +199,7 @@ public class LivyTaskSubmitHelper {
 
         while (retryCount-- > 0) {
             try {
-                Thread.sleep(300);
+                Thread.sleep(SLEEP_TIME);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
             }

@@ -533,7 +533,6 @@ public class JobServiceImpl implements JobService {
             LOGGER.warn("sessionId({}) appId({}) {}.", instance.getSessionId(),
                 instance.getAppId(), e.getMessage());
             setStateByYarn(instance, e);
-            // Spark Task Execution Completes One,TaskNum--
             livyTaskSubmitHelper.decreaseCurTaskNum(instance.getId());
         } catch (Exception e) {
             LOGGER.error(e.getMessage());

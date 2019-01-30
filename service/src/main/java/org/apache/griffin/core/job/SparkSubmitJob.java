@@ -134,8 +134,7 @@ public class SparkSubmitJob implements Job {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set(REQUEST_BY_HEADER,"admin");
 
-            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap),
-                    headers);
+            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap),headers);
             result = restTemplate.postForObject(livyUri,springEntity,String.class);
 
             LOGGER.info(result);
