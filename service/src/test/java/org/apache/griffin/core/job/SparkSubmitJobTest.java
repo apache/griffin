@@ -88,6 +88,8 @@ public class SparkSubmitJobTest {
     @MockBean
     private BatchJobOperatorImpl batchJobOp;
 
+    @MockBean
+    private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
     @Before
     public void setUp() {
