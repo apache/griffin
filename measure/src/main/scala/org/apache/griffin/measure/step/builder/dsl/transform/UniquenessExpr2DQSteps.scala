@@ -140,7 +140,8 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         SparkSqlTransformStep(uniqueRecordTableName, uniqueRecordSql, emptyMap)
 
       // 7. unique metric
-      val uniqueTableName = "__uniqueMetric"
+      //val uniqueTableName = "__uniqueMetric"
+      val uniqueTableName = ruleParam.getOutDfName()
       val uniqueColName = details.getStringOrKey(_unique)
       val uniqueSql = procType match {
         case BatchProcessType =>
@@ -153,9 +154,15 @@ case class UniquenessExpr2DQSteps(context: DQContext,
       }
       val uniqueTransStep = SparkSqlTransformStep(uniqueTableName, uniqueSql, emptyMap)
 
-      val uniqueMetricWriteStep =
-        MetricWriteStep(uniqueColName, uniqueTableName, EntriesFlattenType)
-
+      //val uniqueMetricWriteStep =
+      //  MetricWriteStep(uniqueColName, uniqueTableName, EntriesFlattenType)
+      val uniqueMetricWriteStep = {
+        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
+        val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(uniqueTableName)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+        MetricWriteStep(mwName, uniqueTableName, flattenType)
+      }
+        
       val transSteps1 = sourceTransStep :: targetTransStep :: joinedTransStep :: groupTransStep ::
         totalTransStep :: uniqueRecordTransStep :: uniqueTransStep :: Nil
       val writeSteps1 = totalMetricWriteStep :: uniqueMetricWriteStep :: Nil
