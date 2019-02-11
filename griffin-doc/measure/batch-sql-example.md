@@ -1,12 +1,13 @@
 input table <events>:
 
+```
 id                  	int
 unix_time           	int
 category_id         	int
 ip                  	string
 type                	string
 dt                  	string
-
+```
 
 
 Example of category_id range checking using 3 sigma. We expect that less 5% values exceed 3 sigma.
