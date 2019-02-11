@@ -12,7 +12,7 @@ dt                  	string
 Example of category_id range checking using 3 sigma. We expect that less 5% values exceed 3 sigma.
 
 
-
+```
 {
   "name": "batch_sigma",
 
@@ -87,3 +87,4 @@ Example of category_id range checking using 3 sigma. We expect that less 5% valu
 
   "sinks": ["CONSOLE", "HDFS"]
 }
+```
