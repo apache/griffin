@@ -223,9 +223,6 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
          """.stripMargin
       }
       val distTransStep = SparkSqlTransformStep(distTableName, distSql, emptyMap)
-      //val distMetricWriteStep = {
-      //  MetricWriteStep(distColName, distTableName, EntriesFlattenType, writeTimestampOpt)
-      //}
       val distMetricWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(distTableName)

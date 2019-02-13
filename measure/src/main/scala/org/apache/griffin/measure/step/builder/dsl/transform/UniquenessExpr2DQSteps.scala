@@ -154,8 +154,6 @@ case class UniquenessExpr2DQSteps(context: DQContext,
       }
       val uniqueTransStep = SparkSqlTransformStep(uniqueTableName, uniqueSql, emptyMap)
 
-      //val uniqueMetricWriteStep =
-      //  MetricWriteStep(uniqueColName, uniqueTableName, EntriesFlattenType)
       val uniqueMetricWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(uniqueTableName)
