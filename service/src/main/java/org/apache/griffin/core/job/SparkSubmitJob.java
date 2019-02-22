@@ -31,14 +31,14 @@ import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 import static org.apache.griffin.core.util.JsonUtil.toEntity;
-import com.fasterxml.jackson.core.type.TypeReference;
+import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.factory.PredicatorFactory;
@@ -55,7 +55,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -67,7 +66,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
@@ -132,10 +130,10 @@ public class SparkSubmitJob implements Job {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set(REQUEST_BY_HEADER,"admin");
+            headers.set(REQUEST_BY_HEADER, "admin");
 
-            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap),headers);
-            result = restTemplate.postForObject(livyUri,springEntity,String.class);
+            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap), headers);
+            result = restTemplate.postForObject(livyUri, springEntity, String.class);
 
             LOGGER.info(result);
         } catch (HttpClientErrorException e) {
@@ -195,13 +193,13 @@ public class SparkSubmitJob implements Job {
             mPredicates.add(sp);
         }
     }
-
+    //TODO: 该方法会使SQL语句别名 as'count'为 as/`count`/导致该Json无法被Spark识别，暂时废弃，让功能通过，确认了原因后再确认是否删除
     private String escapeCharacter(String str, String regex) {
         if (StringUtils.isEmpty(str)) {
             return str;
         }
-        String escapeCh = "\\" + regex;
-        return str.replaceAll(regex, escapeCh);
+        //Redundant character escape '\\`' in RegExp
+        return str.replaceAll(regex, regex);
     }
 
     private String genEnv() {
@@ -219,9 +217,9 @@ public class SparkSubmitJob implements Job {
         args.add(genEnv());
         String measureJson = JsonUtil.toJsonWithFormat(measure);
         // to fix livy bug: character will be ignored by livy
-        String finalMeasureJson = escapeCharacter(measureJson, "\\`");
-        LOGGER.info(finalMeasureJson);
-        args.add(finalMeasureJson);
+//        String finalMeasureJson = escapeCharacter(measureJson, "\\`");
+        LOGGER.info(measureJson);
+        args.add(measureJson);
         args.add("raw,raw");
         livyConfMap.put("args", args);
     }
@@ -245,7 +243,7 @@ public class SparkSubmitJob implements Job {
         String result = post2Livy();
         Map<String, Object> resultMap = null;
         if (result != null) {
-            resultMap = livyTaskSubmitHelper.retryLivyGetAppId(result,appIdRetryCount);
+            resultMap = livyTaskSubmitHelper.retryLivyGetAppId(result, appIdRetryCount);
             if (resultMap != null) {
                 livyTaskSubmitHelper.increaseCurTaskNum(Long.valueOf(String.valueOf(resultMap.get("id"))).longValue());
             }
@@ -257,7 +255,8 @@ public class SparkSubmitJob implements Job {
     protected void saveJobInstance(String result, State state)
             throws IOException {
         TypeReference<HashMap<String, Object>> type =
-                new TypeReference<HashMap<String, Object>>() {};
+                new TypeReference<HashMap<String, Object>>() {
+                };
         Map<String, Object> resultMap = null;
         if (result != null) {
             resultMap = toEntity(result, type);
