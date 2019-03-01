@@ -291,6 +291,7 @@ under the License.
                     </execution>
                 </executions>
                 <configuration>
+                    <classifier>exec</classifier>
                     <fork>true</fork>
                     <layout>JAR</layout>
                     <mainClass>org.apache.griffin.core.GriffinWebApplication</mainClass>
