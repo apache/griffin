@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import static org.apache.griffin.core.util.EntityMocksHelper.createFileExistPredicate;
@@ -20,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 public class PredicatorFactoryTest {
 
     @Test
-    public void testFileExistPredicatorCreation() throws JsonProcessingException {
+    public void testFileExistPredicatorCreation() throws IOException {
         Predicator predicator = PredicatorFactory.newPredicateInstance(createFileExistPredicate());
         assertNotNull(predicator);
         assertTrue(predicator instanceof FileExistPredicator);

@@ -293,7 +293,7 @@ under the License.
                 <configuration>
                     <classifier>exec</classifier>
                     <fork>true</fork>
-                    <layout>JAR</layout>
+                    <layout>ZIP</layout>
                     <mainClass>org.apache.griffin.core.GriffinWebApplication</mainClass>
                 </configuration>
             </plugin>

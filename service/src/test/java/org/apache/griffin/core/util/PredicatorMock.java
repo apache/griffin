@@ -11,6 +11,6 @@ public class PredicatorMock implements Predicator {
 
     @Override
     public boolean predicate() throws IOException {
-        return false;
+        return true;
     }
 }

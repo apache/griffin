@@ -65,10 +65,7 @@ public class MeasureUtil {
             for (DataConnector dataConnector: dataSource.getConnectors()) {
                 for (SegmentPredicate segmentPredicate : dataConnector.getPredicates()) {
                     try {
-                        Predicator predicator = PredicatorFactory.newPredicateInstance(segmentPredicate);
-                        if (predicator == null) {
-                            return false;
-                        }
+                        PredicatorFactory.newPredicateInstance(segmentPredicate);
                     } catch (Exception e) {
                         return false;
                     }
