@@ -92,5 +92,5 @@ First jar is executable Spring-Boot application, second jar you can use as a dep
 - Build the module into a jar file and put it in any folder (for example /path-to-jar)
 - Start the Griffin service application using command 
 ```
-java -Dloader.path=/path-to-jar/ -jar target/service-VERSION-exec.jar 
+java -cp target/service-VERSION-exec.jar -Dloader.path=/path-to-jar/ org.springframework.boot.loader.PropertiesLauncher
 ```
