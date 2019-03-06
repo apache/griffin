@@ -20,7 +20,8 @@ under the License.
 #About predicates
 
 ##Overview
-Sometimes we need to check certain conditions before starting a measurement. Depending on these conditions, start or not start the measurement. For example, check whether the file. For these purposes, serve as predicate functional.
+The purpose of predicates is obligate Griffin to check certain conditions before starting SparkSubmitJob. 
+Depending on these conditions Griffin need to start or not start the measurement.
 
 ##Configure predicates
 
@@ -55,7 +56,7 @@ Possible values for predicates.type:
                            "root.path": "/path/to/",
                            "path": "file.ext,file2.txt"
                          }
-                     }
+                       }
 ```
 
 - "custom" - in this case required transmit class name in the property "class" in config. 
@@ -68,10 +69,28 @@ This example creates same predicate like in previous example
                            "root.path": "/path/to/",
                            "path": "file.ext,file2.txt"
                          }
-                     }
+                       }
 ```
 It important to notice that predicate class must satisfy follow conditions:
 - implement interface **org.apache.griffin.core.job.Predicator**
 - have constructor with argument of type **org.apache.griffin.core.job.entity.SegmentPredicate**
 
-
+##Deployment custom predicates
+For the creating custom predicate you need 
+- Build the Griffin service to get two artifacts - **service-VERSION-exec.jar** and **service-VERSION.jar**. 
+First jar is executable Spring-Boot application, second jar you can use as a dependency in your custom predicate 
+- Create module and add dependency which was building in previous step
+```
+         <dependency>
+             <groupId>org.apache.griffin</groupId>
+             <artifactId>service</artifactId>
+             <version>${griffin.version}</version>
+             <scope>provided</scope>
+         </dependency>
+```
+- Create a Predicate class, which should, as mentioned earlier, implement the Predicator interface and have a constructor with an argument of type SegmentPredicate
+- Build the module into a jar file and put it in any folder (for example /path-to-jar)
+- Start the Griffin service application using command 
+```
+java -Dloader.path=/path-to-jar/ -jar target/service-VERSION-exec.jar 
+```
