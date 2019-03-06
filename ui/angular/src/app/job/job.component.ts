@@ -45,6 +45,7 @@ export class JobComponent implements OnInit {
   action: string;
   modalWndMsg: string;
   isStop: boolean;
+  isTrigger: boolean;
 
   private toasterService: ToasterService;
 
@@ -99,6 +100,19 @@ export class JobComponent implements OnInit {
         err => {
           this.toasterService.pop("error", "Error!", "Failed to manage job state!");
           console.log("Error when manage job state");
+        });
+    }
+    else if (this.isTrigger) {
+      $("#save").attr("disabled", "true");
+      let actionUrl = this.serviceService.config.uri.triggerJobById + "/" + this.deleteId;
+      this.http.get(actionUrl, {}).subscribe(data => {
+          let self = this;
+          self.hide();
+          this.isTrigger = false;
+        },
+        err => {
+          this.toasterService.pop("error", "Error!", "Failed to trigger job!");
+          console.log("Error when trigger job");
         });
     }
     else {
@@ -195,5 +209,16 @@ export class JobComponent implements OnInit {
       });
       this.results = Object.assign([], trans).reverse();
     });
+  }
+
+  trigger(row): void {
+    $("#save").removeAttr("disabled");
+    this.modalWndMsg = "Trigger the job with the below information?";
+    this.visible = true;
+    setTimeout(() => (this.visibleAnimate = true), 100);
+    this.deletedRow = row;
+    this.deleteIndex = this.results.indexOf(row);
+    this.deleteId = row.id;
+    this.isTrigger = true;
   }
 }
