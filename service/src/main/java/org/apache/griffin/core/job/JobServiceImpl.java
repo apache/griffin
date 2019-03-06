@@ -661,15 +661,14 @@ public class JobServiceImpl implements JobService {
         validateJobExist(job);
         Scheduler scheduler = factory.getScheduler();
         JobKey jobKey = jobKey(job.getName(), job.getGroup());
-        Boolean isJobKeyExist = scheduler.checkExists(jobKey);
-        if (isJobKeyExist) {
+        if (scheduler.checkExists(jobKey)) {
             Trigger trigger = TriggerBuilder.newTrigger()
                     .forJob(jobKey)
                     .startNow()
                     .build();
             scheduler.scheduleJob(trigger);
         } else {
-            LOGGER.warn("Could not trigger job id {}.");
+            LOGGER.warn("Could not trigger job id {}.", id);
         }
     }
 }

@@ -114,7 +114,7 @@ public class JobController {
                 .body(resource);
     }
 
-    @RequestMapping(value = "/jobs/trigger/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/jobs/trigger/{id}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void triggerJob(@PathVariable("id") Long id) throws SchedulerException {
         jobService.triggerJobById(id);

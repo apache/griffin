@@ -28,6 +28,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -176,7 +177,7 @@ public class JobControllerTest {
     public void testTriggerJobForSuccess() throws Exception {
         doNothing().when(service).triggerJobById(1L);
 
-        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
                 .andExpect(status().isNoContent());
     }
 
@@ -186,7 +187,7 @@ public class JobControllerTest {
                 new Exception()))
                 .when(service).triggerJobById(1L);
 
-        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
                 .andExpect(status().isInternalServerError());
     }
 }

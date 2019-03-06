@@ -105,7 +105,7 @@ export class JobComponent implements OnInit {
     else if (this.isTrigger) {
       $("#save").attr("disabled", "true");
       let actionUrl = this.serviceService.config.uri.triggerJobById + "/" + this.deleteId;
-      this.http.get(actionUrl, {}).subscribe(data => {
+      this.http.post(actionUrl, {}).subscribe(data => {
           let self = this;
           self.hide();
           this.isTrigger = false;
