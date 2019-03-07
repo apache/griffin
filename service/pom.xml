@@ -44,6 +44,7 @@ under the License.
         <powermock.version>1.6.6</powermock.version>
         <mockito.version>1.10.19</mockito.version>
         <spring-boot-maven-plugin.version>1.5.1.RELEASE</spring-boot-maven-plugin.version>
+        <spring-boot-maven-plugin.classifier></spring-boot-maven-plugin.classifier>
         <derby.version>10.14.1.0</derby.version>
         <eclipselink.version>2.6.0</eclipselink.version>
         <mysql.java.version>5.1.47</mysql.java.version>
@@ -291,7 +292,7 @@ under the License.
                     </execution>
                 </executions>
                 <configuration>
-                    <classifier>exec</classifier>
+                    <classifier>${spring-boot-maven-plugin.classifier}</classifier>
                     <fork>true</fork>
                     <layout>JAR</layout>
                     <mainClass>org.apache.griffin.core.GriffinWebApplication</mainClass>
@@ -305,7 +306,6 @@ under the License.
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-
             </plugin>
         </plugins>
     </build>
