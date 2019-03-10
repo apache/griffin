@@ -163,6 +163,17 @@ public class JobControllerTest {
     }
 
     @Test
+    public void testFindInstance() throws Exception {
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates
+                .State.RUNNING, "", "", null, null);
+        given(service.findInstance(1L)).willReturn(jobInstance);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.state", is("RUNNING")));
+    }
+
+    @Test
     public void testGetHealthInfo() throws Exception {
         JobHealth jobHealth = new JobHealth(1, 3);
         given(service.getHealthInfo()).willReturn(jobHealth);

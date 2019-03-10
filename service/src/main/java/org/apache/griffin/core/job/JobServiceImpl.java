@@ -288,6 +288,11 @@ public class JobServiceImpl implements JobService {
         return updateState(instances);
     }
 
+    @Override
+    public JobInstanceBean findInstance(Long id) {
+        return instanceRepo.findByInstanceId(id);
+    }
+
     private List<JobInstanceBean> updateState(List<JobInstanceBean> instances) {
         for (JobInstanceBean instance : instances) {
             State state = instance.getState();
