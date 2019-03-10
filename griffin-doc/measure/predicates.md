@@ -78,18 +78,16 @@ It important to notice that predicate class must satisfy follow conditions:
 ##Deployment custom predicates
 For the creating custom predicate you need 
 1. Build the Griffin service using command
-```
-mvn clean install -Dspring-boot-maven-plugin.classifier=exec
-```
 As a result, two artifacts will be built  
-- **service-VERSION-exec.jar** - executable Spring-Boot application
-- **service-VERSION.jar** - jar, which we can use as a dependency
+- **service-VERSION.jar** - executable Spring-Boot application
+- **service-VERSION-lib.jar** - jar, which we can use as a dependency
 This step is necessary because we can't use executable Spring-Boot application as a dependency in our plugin. 
 2. Create module and add dependency that was built in previous step
 ```
          <dependency>
              <groupId>org.apache.griffin</groupId>
              <artifactId>service</artifactId>
+             <classifier>lib</classifier>
              <version>${griffin.version}</version>
              <scope>provided</scope>
          </dependency>
@@ -98,5 +96,5 @@ This step is necessary because we can't use executable Spring-Boot application a
 4. Build the module into a jar file and put it in any folder (for example /path-to-jar)
 5. Start the Griffin service application using command 
 ```
-java -cp target/service-VERSION-exec.jar -Dloader.path=/path-to-jar/ org.springframework.boot.loader.PropertiesLauncher
+java -cp target/service-VERSION.jar -Dloader.path=/path-to-jar/ org.springframework.boot.loader.PropertiesLauncher
 ```

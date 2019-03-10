@@ -281,6 +281,23 @@ under the License.
                 </dependencies>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedClassifierName>lib</shadedClassifierName>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot-maven-plugin.version}</version>
@@ -292,7 +309,6 @@ under the License.
                     </execution>
                 </executions>
                 <configuration>
-                    <classifier>${spring-boot-maven-plugin.classifier}</classifier>
                     <fork>true</fork>
                     <layout>JAR</layout>
                     <mainClass>org.apache.griffin.core.GriffinWebApplication</mainClass>
