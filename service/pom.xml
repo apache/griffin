@@ -281,17 +281,16 @@ under the License.
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <shadedClassifierName>lib</shadedClassifierName>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <classifier>lib</classifier>
                         </configuration>
                     </execution>
                 </executions>
