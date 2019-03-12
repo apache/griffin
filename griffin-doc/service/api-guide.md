@@ -36,6 +36,7 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 
 - [Griffin Jobs](#3)
     - [Add Job](#31)
+    - [Trigger job by id](37)
     - [Get Job](#32)
     - [Remove Job](#33)
     - [Get Job Instances](#34)
@@ -540,6 +541,15 @@ curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
         }
     ]
 }'
+```
+
+<div id = "37"></div>
+
+### Trigger job by id
+`POST /api/v1/jobs/trigger/{job_id}`
+#### API Example
+```
+curl -k -X POST http://127.0.0.1:8080/api/v1/jobs/trigger/51
 ```
 
 <div id = "32"></div>
