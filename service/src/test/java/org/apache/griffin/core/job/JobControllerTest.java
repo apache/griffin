@@ -36,6 +36,7 @@ import java.util.Collections;
 
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.exception.GriffinExceptionHandler;
+import org.apache.griffin.core.exception.GriffinExceptionMessage;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
@@ -160,6 +161,27 @@ public class JobControllerTest {
                         String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].state", is("RUNNING")));
+    }
+
+    @Test
+    public void testFindInstance() throws Exception {
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates
+                .State.RUNNING, "", "", null, null);
+        given(service.findInstance(1L)).willReturn(jobInstance);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.state", is("RUNNING")));
+    }
+
+    @Test
+    public void testJobInstanceWithGivenIdNotFound() throws Exception {
+        Long jobInstanceId = 2L;
+        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.JOB_INSTANCE_NOT_FOUND))
+                .when(service).findInstance(jobInstanceId);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances/2"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

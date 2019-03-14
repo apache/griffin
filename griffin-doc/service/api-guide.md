@@ -41,6 +41,7 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
     - [Get Job Instances](#34)
     - [Get Job Healthy Statistics](#35)
     - [Download Sample Records](#36)
+    - [Get Job Instance by Id](#38)
 
 - [Metrics](#4)
     - [Get Metrics](#41)
@@ -736,6 +737,17 @@ curl -k -G -X GET http://127.0.0.1:8080/api/v1/jobs/download \
 -d jobName=job_name_10 -d timestamp=1547778857807
 ```
 If successful, this method returns missing records in the response body, maximum record count is 100.
+
+<div id = "38"></div>
+
+### Get Job Instance by Id
+`GET /api/v1/jobs/instances/{jobInstanceId}`
+
+#### API Example
+```
+curl -k -G -X GET http://127.0.0.1:8080/api/v1/jobs/instances/1
+```
+If successful, this method returns job instance description for the given job instance id. If there is no instance with given id found, returns Griffin Exception.
 
 <h2 id = "4"></h2>
 

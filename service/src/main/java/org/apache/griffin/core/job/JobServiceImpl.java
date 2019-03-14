@@ -76,13 +76,7 @@ import java.util.TimeZone;
 import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
 import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_MEASURE_ID;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_TYPE_DOES_NOT_SUPPORT;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_SUPPORT;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.NO_SUCH_JOB_ACTION;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
@@ -286,6 +280,17 @@ public class JobServiceImpl implements JobService {
         List<JobInstanceBean> instances = instanceRepo.findByJobId(jobId,
             pageable);
         return updateState(instances);
+    }
+
+    @Override
+    public JobInstanceBean findInstance(Long id) {
+        JobInstanceBean jobInstanceBean = instanceRepo.findByInstanceId(id);
+        if (jobInstanceBean == null){
+            LOGGER.warn("There are no job instances with id {} ", id);
+            throw new GriffinException
+                    .NotFoundException(JOB_INSTANCE_NOT_FOUND);
+        }
+        return jobInstanceBean;
     }
 
     private List<JobInstanceBean> updateState(List<JobInstanceBean> instances) {
