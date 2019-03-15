@@ -65,6 +65,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
@@ -656,7 +658,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void triggerJobById(Long id) throws SchedulerException {
+    public JobInstanceBean triggerJobById(Long id, Long timeout) throws SchedulerException {
+        LOGGER.info("triggerJobById start");
         AbstractJob job = jobRepo.findByIdAndDeleted(id, false);
         validateJobExist(job);
         Scheduler scheduler = factory.getScheduler();
@@ -666,9 +669,28 @@ public class JobServiceImpl implements JobService {
                     .forJob(jobKey)
                     .startNow()
                     .build();
+            TriggerKey key = trigger.getKey();
+            CountDownLatch latch = new CountDownLatch(1);
+            scheduler.getListenerManager().addTriggerListener(
+                    new CountDownTriggerListener(latch, "listenerJob_" + jobKey.toString())
+                    , key::equals);
+
             scheduler.scheduleJob(trigger);
+
+            try {
+                latch.await(timeout, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                LOGGER.warn("CountDownLatch awaiting is interrupted");
+            }
+            List<JobInstanceBean> instanceBeans = instanceRepo.findByTriggerName(key.toString());
+            if (instanceBeans != null && instanceBeans.size() > 0) {
+                LOGGER.info("triggerJobById finished");
+                return instanceBeans.get(0);
+            }
         } else {
             LOGGER.warn("Could not trigger job id {}.", id);
         }
+        LOGGER.info("triggerJobById finished");
+        return null;
     }
 }

@@ -22,6 +22,7 @@ package org.apache.griffin.core.job;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
 import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinJob;
+import static org.apache.griffin.core.util.EntityMocksHelper.createJobInstance;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -175,17 +176,18 @@ public class JobControllerTest {
 
     @Test
     public void testTriggerJobForSuccess() throws Exception {
-        doNothing().when(service).triggerJobById(1L);
+        Long id = 1L;
+        given(service.triggerJobById(id, 0L)).willReturn(createJobInstance());
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test
     public void testTriggerJobForFailureWithException() throws Exception {
         doThrow(new GriffinException.ServiceException("Failed to trigger job",
                 new Exception()))
-                .when(service).triggerJobById(1L);
+                .when(service).triggerJobById(1L, 0L);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
                 .andExpect(status().isInternalServerError());

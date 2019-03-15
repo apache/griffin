@@ -19,8 +19,11 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
@@ -115,8 +118,20 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs/trigger/{id}", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void triggerJob(@PathVariable("id") Long id) throws SchedulerException {
-        jobService.triggerJobById(id);
+    @ResponseStatus(HttpStatus.OK)
+    public JobInstanceBean triggerJob(@PathVariable("id") Long id, @RequestBody(required = false) String request) throws SchedulerException {
+        long timeout = extractTimeOut(request);
+        return jobService.triggerJobById(id, timeout);
+    }
+
+    private long extractTimeOut(String request) {
+        long timeout = 0;
+        try {
+            Map map = new ObjectMapper().readValue(request, Map.class);
+            timeout = Long.valueOf((String) map.get("timeout"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return timeout;
     }
 }

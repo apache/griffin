@@ -549,7 +549,21 @@ curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
 `POST /api/v1/jobs/trigger/{job_id}`
 #### API Example
 ```
-curl -k -X POST http://127.0.0.1:8080/api/v1/jobs/trigger/51
+curl -k -X POST http://127.0.0.1:8080/api/v1/jobs/trigger/51 \
+-d '{
+    "timeout": "1000"
+}'
+{
+    "id": 1906,
+    "sessionId": null,
+    "state": "FINDING",
+    "type": "BATCH",
+    "predicateGroup": "PG",
+    "predicateName": "job_name_10",
+    "triggerName": "6da64b5bd2ee-624ff5bf-beee-4655-9636-09d2bbcc3355",
+    "timestamp": 1552649902649,
+    "expireTimestamp": 1553254702649
+}
 ```
 
 <div id = "32"></div>

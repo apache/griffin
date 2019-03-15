@@ -85,6 +85,8 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @JsonIgnore
     private AbstractJob job;
 
+    private String triggerName;
+
     public AbstractJob getJob() {
         return job;
     }
@@ -181,6 +183,14 @@ public class JobInstanceBean extends AbstractAuditableEntity {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public String getTriggerName() {
+        return triggerName;
+    }
+
+    public void setTriggerName(String triggerName) {
+        this.triggerName = triggerName;
     }
 
     public JobInstanceBean() {
