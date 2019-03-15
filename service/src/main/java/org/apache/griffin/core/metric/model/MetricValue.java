@@ -27,6 +27,8 @@ public class MetricValue {
 
     private Long tmst;
 
+    private String applicationId;
+
     private Map<String, Object> value;
 
     public MetricValue() {
@@ -35,6 +37,14 @@ public class MetricValue {
     public MetricValue(String name, Long tmst, Map<String, Object> value) {
         this.name = name;
         this.tmst = tmst;
+        this.value = value;
+    }
+
+
+    public MetricValue(String name, Long tmst, String applicationId, Map<String, Object> value) {
+        this.name = name;
+        this.tmst = tmst;
+        this.applicationId = applicationId;
         this.value = value;
     }
 
@@ -60,5 +70,23 @@ public class MetricValue {
 
     public void setValue(Map<String, Object> value) {
         this.value = value;
+    }
+
+    public String getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    @Override
+    public String toString() {
+        return "MetricValue{" +
+                "name='" + name + '\'' +
+                ", tmst=" + tmst +
+                ", applicationId='" + applicationId + '\'' +
+                ", value=" + value +
+                '}';
     }
 }

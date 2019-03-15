@@ -34,4 +34,6 @@ public interface MetricStore {
             throws IOException;
 
     ResponseEntity<?> deleteMetricValues(String metricName) throws IOException;
+
+    MetricValue getMetric(String applicationId) throws IOException;
 }

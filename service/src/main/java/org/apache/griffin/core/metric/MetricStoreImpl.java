@@ -206,4 +206,14 @@ public class MetricStoreImpl implements MetricStore {
         return String.format("Basic %s", Base64.getEncoder().encodeToString(
                 auth.getBytes()));
     }
+
+    @Override
+    public MetricValue getMetric(String applicationId) throws IOException {
+        Map<String, String> map =new HashMap<>();
+        map.put("applicationId", applicationId);
+        Response response = client.performRequest("GET", urlGet,
+                map);
+        List<MetricValue> metricValues = getMetricValuesFromResponse(response);
+        return metricValues.get(0);
+    }
 }

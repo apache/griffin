@@ -20,10 +20,6 @@ under the License.
 package org.apache.griffin.core.metric;
 
 
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_OFFSET;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_RECORDS_SIZE;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_METRIC_VALUE_FORMAT;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +32,8 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -48,6 +46,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
+
 @Service
 public class MetricServiceImpl implements MetricService {
     private static final Logger LOGGER = LoggerFactory
@@ -59,6 +59,8 @@ public class MetricServiceImpl implements MetricService {
     private JobRepo<AbstractJob> jobRepo;
     @Autowired
     private MetricStore metricStore;
+    @Autowired
+    private JobInstanceRepo jobInstanceRepo;
 
     @Override
     public Map<String, List<Metric>> getAllMetrics() {
@@ -136,6 +138,22 @@ public class MetricServiceImpl implements MetricService {
                     metricName, e.getMessage());
             throw new GriffinException.ServiceException(
                     "Failed to delete metric values.", e);
+        }
+    }
+
+    @Override
+    public MetricValue findMetric(Long id) {
+        JobInstanceBean jobInstanceBean = jobInstanceRepo.findByInstanceId(id);
+        if (jobInstanceBean == null){
+            LOGGER.warn("There are no job instances with id {} ", id);
+            throw new GriffinException
+                    .NotFoundException(JOB_INSTANCE_NOT_FOUND);
+        }
+        String appId = jobInstanceBean.getAppId();
+        try {
+            return metricStore.getMetric(appId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);//todo:fix
         }
     }
 
