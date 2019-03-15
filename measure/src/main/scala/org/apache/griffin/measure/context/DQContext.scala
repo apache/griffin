@@ -44,7 +44,7 @@ case class DQContext(contextId: ContextId,
 
   val dataFrameCache: DataFrameCache = DataFrameCache()
 
-  val metricWrapper: MetricWrapper = MetricWrapper(name)
+  val metricWrapper: MetricWrapper = MetricWrapper(name, sparkSession.sparkContext.applicationId)
   val writeMode = WriteMode.defaultMode(procType)
 
   val dataSourceNames: Seq[String] = {

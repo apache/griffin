@@ -77,7 +77,7 @@ under the License.
           &nbsp;
           <a (click)="remove(row)" title="delete" style="text-decoration:none">
             <i class="fa fa-trash-o po"></i>
-          </a> &nbsp;
+          </a>&nbsp;
           <a routerLink="/job/{{row.id}}" title="subscribe">
             <i class="fa fa-eye"></i>
           </a>&nbsp;
@@ -86,6 +86,9 @@ under the License.
           </a>
           <a *ngIf="row.action!=='START'" (click)="stateMag(row)" title="Stop" style="text-decoration:none">
             <i class="fa fa-stop"></i>
+          </a>&nbsp;
+          <a (click)="trigger(row)" title="trigger now" style="text-decoration:none">
+            <i class="fa fa-caret-square-o-right po"></i>
           </a>
         </td>
         <td>

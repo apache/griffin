@@ -185,17 +185,13 @@ public class SparkSubmitJob implements Job {
         if (StringUtils.isEmpty(json)) {
             return;
         }
-        List<Map<String, Object>> maps = toEntity(json,
-                new TypeReference<List<Map>>() {
+        List<SegmentPredicate> predicates = toEntity(json,
+                new TypeReference<List<SegmentPredicate>>() {
                 });
-        for (Map<String, Object> map : maps) {
-            SegmentPredicate sp = new SegmentPredicate();
-            sp.setType((String) map.get("type"));
-            sp.setConfigMap((Map<String, Object>) map.get("config"));
-            mPredicates.add(sp);
+        if (predicates != null) {
+            mPredicates.addAll(predicates);
         }
     }
-
     private String escapeCharacter(String str, String regex) {
         if (StringUtils.isEmpty(str)) {
             return str;
