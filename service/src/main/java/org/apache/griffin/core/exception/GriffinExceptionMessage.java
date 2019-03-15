@@ -70,6 +70,8 @@ public enum GriffinExceptionMessage {
 
     HDFS_FILE_NOT_EXIST(40407, "Hadoop data file not exist"),
 
+    INSTANCE_ID_DOES_NOT_EXIST(40408, "Instance id does not exist"),
+
     //409, "Conflict"
     MEASURE_NAME_ALREADY_EXIST(40901, "Measure name already exists"),
 
