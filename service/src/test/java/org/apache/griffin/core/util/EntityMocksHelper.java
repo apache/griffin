@@ -217,6 +217,7 @@ public class EntityMocksHelper {
         jobDataMap.put(MEASURE_KEY, measureJson);
         jobDataMap.put(PREDICATES_KEY, predicatesJson);
         jobDataMap.put(JOB_NAME, "jobName");
+        jobDataMap.put("jobName", "jobName");
         jobDataMap.put(PREDICATE_JOB_NAME, "predicateJobName");
         jobDataMap.put(GRIFFIN_JOB_ID, 1L);
         jobDetail.setJobDataMap(jobDataMap);
@@ -224,11 +225,24 @@ public class EntityMocksHelper {
     }
 
     public static SegmentPredicate createFileExistPredicate()
-        throws JsonProcessingException {
+            throws IOException {
         Map<String, String> config = new HashMap<>();
         config.put("root.path", "hdfs:///griffin/demo_src");
         config.put("path", "/dt=#YYYYMMdd#/hour=#HH#/_DONE");
-        return new SegmentPredicate("file.exist", config);
+        SegmentPredicate segmentPredicate = new SegmentPredicate("file.exist", config);
+        segmentPredicate.setId(1L);
+        segmentPredicate.load();
+        return segmentPredicate;
+    }
+
+    public static SegmentPredicate createMockPredicate()
+            throws IOException {
+        Map<String, String> config = new HashMap<>();
+        config.put("class", "org.apache.griffin.core.util.PredicatorMock");
+        SegmentPredicate segmentPredicate = new SegmentPredicate("custom", config);
+        segmentPredicate.setId(1L);
+        segmentPredicate.load();
+        return segmentPredicate;
     }
 
     public static Map<String, Object> createJobDetailMap() {
