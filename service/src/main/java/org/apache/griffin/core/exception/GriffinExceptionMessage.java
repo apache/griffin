@@ -54,6 +54,8 @@ public enum GriffinExceptionMessage {
 
     JOB_IS_IN_PAUSED_STATUS(40015, "The job is already in paused status."),
 
+    INVALID_MEASURE_PREDICATE(40016, "The measure predicate is invalid"),
+
     //404, "Not Found"
     MEASURE_ID_DOES_NOT_EXIST(40401, "Measure id does not exist"),
 
@@ -69,6 +71,8 @@ public enum GriffinExceptionMessage {
             "does not exist"),
 
     HDFS_FILE_NOT_EXIST(40407, "Hadoop data file not exist"),
+
+    PREDICATE_TYPE_NOT_FOUND(40408, "Unknown predicate type"),
 
     //409, "Conflict"
     MEASURE_NAME_ALREADY_EXIST(40901, "Measure name already exists"),

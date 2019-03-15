@@ -45,14 +45,7 @@ import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.YarnNetUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +92,7 @@ import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
 
@@ -664,6 +657,23 @@ public class JobServiceImpl implements JobService {
         } catch (Exception ex) {
             LOGGER.error("Fail to get Persist path from {}", jsonString, ex);
             return null;
+        }
+    }
+
+    @Override
+    public void triggerJobById(Long id) throws SchedulerException {
+        AbstractJob job = jobRepo.findByIdAndDeleted(id, false);
+        validateJobExist(job);
+        Scheduler scheduler = factory.getScheduler();
+        JobKey jobKey = jobKey(job.getName(), job.getGroup());
+        if (scheduler.checkExists(jobKey)) {
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .forJob(jobKey)
+                    .startNow()
+                    .build();
+            scheduler.scheduleJob(trigger);
+        } else {
+            LOGGER.warn("Could not trigger job id {}.", id);
         }
     }
 }
