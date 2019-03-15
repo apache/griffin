@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.util;
 
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CONNECTOR_NAME;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_MEASURE_PREDICATE;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.MISSING_METRIC_NAME;
 
 import java.util.ArrayList;
@@ -29,10 +30,10 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
-import org.apache.griffin.core.measure.entity.DataSource;
-import org.apache.griffin.core.measure.entity.ExternalMeasure;
-import org.apache.griffin.core.measure.entity.GriffinMeasure;
-import org.apache.griffin.core.measure.entity.Measure;
+import org.apache.griffin.core.job.Predicator;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
+import org.apache.griffin.core.job.factory.PredicatorFactory;
+import org.apache.griffin.core.measure.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,24 @@ public class MeasureUtil {
             throw new GriffinException.BadRequestException
                     (INVALID_CONNECTOR_NAME);
         }
+        if (!validatePredicates(measure)) {
+            throw new GriffinException.BadRequestException(INVALID_MEASURE_PREDICATE);
+        }
+    }
+
+    private static boolean validatePredicates(GriffinMeasure measure) {
+        for (DataSource dataSource : measure.getDataSources()) {
+            for (DataConnector dataConnector: dataSource.getConnectors()) {
+                for (SegmentPredicate segmentPredicate : dataConnector.getPredicates()) {
+                    try {
+                        PredicatorFactory.newPredicateInstance(segmentPredicate);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private static void validateExternalMeasure(ExternalMeasure measure) {
