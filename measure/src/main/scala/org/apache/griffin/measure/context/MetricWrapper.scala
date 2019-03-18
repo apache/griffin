@@ -23,11 +23,12 @@ import scala.collection.mutable.{Map => MutableMap}
 /**
   * wrap metrics into one, each calculation produces one metric map
   */
-case class MetricWrapper(name: String) extends Serializable {
+case class MetricWrapper(name: String, applicationId: String) extends Serializable {
 
   val _Name = "name"
   val _Timestamp = "tmst"
   val _Value = "value"
+  val _ApplicationId = "applicationId"
 
   val metrics: MutableMap[Long, Map[String, Any]] = MutableMap()
 
@@ -45,7 +46,8 @@ case class MetricWrapper(name: String) extends Serializable {
       (timestamp, Map[String, Any](
         (_Name -> name),
         (_Timestamp -> timestamp),
-        (_Value -> value)
+        (_Value -> value),
+        (_ApplicationId -> applicationId)
       ))
     }
   }
