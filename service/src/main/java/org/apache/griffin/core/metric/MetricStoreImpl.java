@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.http.Header;
@@ -150,6 +151,7 @@ public class MetricStoreImpl implements MetricStore {
                         .get("name")
                         .asText(),
                         Long.parseLong(sourceNode.get("tmst").asText()),
+                        String.valueOf(sourceNode.get("applicationId")),
                         value);
                 metricValues.add(metricValue);
             }

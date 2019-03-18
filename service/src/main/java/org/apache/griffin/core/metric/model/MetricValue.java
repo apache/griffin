@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.metric.model;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class MetricValue {
 
@@ -78,6 +79,22 @@ public class MetricValue {
 
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MetricValue that = (MetricValue) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(tmst, that.tmst) &&
+                Objects.equals(applicationId, that.applicationId) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, tmst, applicationId, value);
     }
 
     @Override

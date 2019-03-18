@@ -27,6 +27,22 @@
           },
           "applicationId": "application_1549876136110_0018"
         }
+      },
+      {
+        "_index": "griffin",
+        "_type": "accuracy",
+        "_id": "taMpvmgBfOpRJiYFj5Xg",
+        "_score": 2.4107988,
+        "_source": {
+          "name": "de_demo_results_comparision",
+          "tmst": 1549378607658,
+          "value": {
+            "total": 74,
+            "miss": 0,
+            "matched": 74,
+            "matchedFraction": 1
+          }
+        }
       }
     ]
   }
