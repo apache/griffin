@@ -29,6 +29,22 @@ cache:
 install:
   - npm install -g bower
 
+env:
+  global:
+    # The next declration is the encrypted COVERITY_SCAN_TOKEN, created
+    #   via the "travis encrypt" command using the project repo's public key
+    - secure: "MMQNe53XXZqOVGEA/KR7Us90nEZk72vt1qid2dBtZ3hROL/dZo0oYjfqzQR3wzs/pXVETjnL5rLv+tUI6pAH5S1fIhM2TjR/61FDySKMPNnhCHfFZnKWOTDhhfPPLvDQaLNRQJXxpUL23JdBUTtZPKQ3bH4n0uyx2CT6mYrGX4yIDFenfkRN1h0t9cSlZzWN3DN0ZVpZsW0cb0A79/fySOxvtm8jsxuOAQGGREUpzXPJXlvUqwD3t/uSW7m+AZRPsDGeCeCqWY+m/c/ec4KA7bf7KkV9B5Qo+Pcju/U/2a9pNeysBZ7YkV3Lsao/9khXCuSsMX+Y7KYWywjyHktRHqbSGO19vr3d2/zIgIVpF3KWSYHHGguD4SDk7RvwExiLu9j9o+BuzkVITMKPv4e0XqmtNVne7QQ1Esx7FrHo5wajvi3H0t5rcGY6ygfsvCHweF6XBloYiZ1//wCD4N11UqG+iSWFCsckAyAP+VpmojpZ5BhHGJioA0Fn3FOQlaWwnamLx9qQavKwuEcd+cbBQE7/UZbDFDi9G290VRuoIWsVaBXtiGdLJDSyEcvGqMUAZ/epv19xYD24RIoGp2tnk1aLXuwWiO+aJEQP0g73kpN0cUe1hIXjKwEt4Lqdj/R/LMMTfz2e9Ss6miTCy4dM+2NwpLAAuokNpmk2wBnAYjQ="
+
+addons:
+  coverity_scan:
+    project:
+      name: "apache/griffin"
+      description: "<Your project description here>"
+    notification_email: toyboxman0001@163.com
+    build_command_prepend: "mvn clean"
+    build_command: "mvn verify -q"
+    branch_pattern: master
+
 # keep 30, need change according to ci logs.
 script: travis_wait 30 mvn clean verify -q
 
