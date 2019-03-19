@@ -286,8 +286,8 @@ public class JobInstance implements Job {
             throw new GriffinException.ConflictException
                     (QUARTZ_JOB_ALREADY_EXIST);
         }
-        String triggerName = (String) confMap.get(TRIGGER_KEY);
-        saveJobInstance(jobName, groupName, triggerName);
+        String triggerKey = (String) confMap.get(TRIGGER_KEY);
+        saveJobInstance(jobName, groupName, triggerKey);
         createJobInstance(tk, interval, repeat, jobName);
     }
 
@@ -315,7 +315,7 @@ public class JobInstance implements Job {
         return confMap;
     }
 
-    private void saveJobInstance(String pName, String pGroup, String triggerName) {
+    private void saveJobInstance(String pName, String pGroup, String triggerKey) {
         ProcessType type = measure.getProcessType() == BATCH ? BATCH :
                 STREAMING;
         Long tms = System.currentTimeMillis();
@@ -325,7 +325,7 @@ public class JobInstance implements Job {
         JobInstanceBean instance = new JobInstanceBean(FINDING, pName, pGroup,
                 tms, expireTms, type);
         instance.setJob(job);
-        instance.setTriggerName(triggerName);
+        instance.setTriggerKey(triggerKey);
         instanceRepo.save(instance);
     }
 

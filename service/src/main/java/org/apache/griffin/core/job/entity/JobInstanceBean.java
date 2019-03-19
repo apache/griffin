@@ -85,7 +85,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
     @JsonIgnore
     private AbstractJob job;
 
-    private String triggerName;
+    private String triggerKey;
 
     public AbstractJob getJob() {
         return job;
@@ -185,12 +185,12 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.deleted = deleted;
     }
 
-    public String getTriggerName() {
-        return triggerName;
+    public String getTriggerKey() {
+        return triggerKey;
     }
 
-    public void setTriggerName(String triggerName) {
-        this.triggerName = triggerName;
+    public void setTriggerKey(String triggerKey) {
+        this.triggerKey = triggerKey;
     }
 
     public JobInstanceBean() {

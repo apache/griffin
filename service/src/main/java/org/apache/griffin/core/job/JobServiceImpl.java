@@ -659,7 +659,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobInstanceBean triggerJobById(Long id, Long timeout) throws SchedulerException {
-        LOGGER.info("triggerJobById start");
         AbstractJob job = jobRepo.findByIdAndDeleted(id, false);
         validateJobExist(job);
         Scheduler scheduler = factory.getScheduler();
@@ -671,26 +670,29 @@ public class JobServiceImpl implements JobService {
                     .build();
             TriggerKey key = trigger.getKey();
             CountDownLatch latch = new CountDownLatch(1);
-            scheduler.getListenerManager().addTriggerListener(
-                    new CountDownTriggerListener(latch, "listenerJob_" + jobKey.toString())
-                    , key::equals);
-
-            scheduler.scheduleJob(trigger);
-
+            String listenerName = "listenerJob_" + jobKey.toString();
             try {
-                latch.await(timeout, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                LOGGER.warn("CountDownLatch awaiting is interrupted");
-            }
-            List<JobInstanceBean> instanceBeans = instanceRepo.findByTriggerName(key.toString());
-            if (instanceBeans != null && instanceBeans.size() > 0) {
-                LOGGER.info("triggerJobById finished");
-                return instanceBeans.get(0);
+                scheduler.getListenerManager().addTriggerListener(
+                        new CountDownTriggerListener(latch, listenerName)
+                        , key::equals);
+
+                scheduler.scheduleJob(trigger);
+
+                try {
+                    latch.await(0, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    LOGGER.warn("CountDownLatch awaiting is interrupted");
+                }
+                List<JobInstanceBean> instanceBeans = instanceRepo.findByTriggerKey(key.toString());
+                if (instanceBeans != null && instanceBeans.size() > 0) {
+                    return instanceBeans.get(0);
+                }
+            } finally {
+                scheduler.getListenerManager().removeTriggerListener(listenerName);
             }
         } else {
             LOGGER.warn("Could not trigger job id {}.", id);
         }
-        LOGGER.info("triggerJobById finished");
         return null;
     }
 }

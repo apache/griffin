@@ -54,7 +54,7 @@ public class JobServiceImplTest {
         doNothing().when(listenerManager).addTriggerListener(any(CountDownTriggerListener.class), any(Matcher.class));
         given(factory.getScheduler()).willReturn(scheduler);
         JobInstanceBean jobInstanceBean = createJobInstance();
-        given(instanceRepo.findByTriggerName(anyString())).willReturn(Collections.singletonList(jobInstanceBean));
+        given(instanceRepo.findByTriggerKey(anyString())).willReturn(Collections.singletonList(jobInstanceBean));
 
         JobInstanceBean result = jobService.triggerJobById(jobId, 0L);
 
