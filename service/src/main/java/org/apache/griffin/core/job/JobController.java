@@ -94,6 +94,11 @@ public class JobController {
         return jobService.findInstancesOfJob(id, page, size);
     }
 
+    @RequestMapping(value = "/jobs/instances/{instanceId}", method = RequestMethod.GET)
+    public JobInstanceBean findInstanceByInstanceId(@PathVariable("instanceId") Long id) {
+        return jobService.findInstance(id);
+    }
+
     @RequestMapping(value = "/jobs/health", method = RequestMethod.GET)
     public JobHealth getHealthInfo() {
         return jobService.getHealthInfo();

@@ -74,6 +74,8 @@ public enum GriffinExceptionMessage {
 
     PREDICATE_TYPE_NOT_FOUND(40408, "Unknown predicate type"),
 
+    INSTANCE_ID_DOES_NOT_EXIST(40409, "Instance id does not exist"),
+
     //409, "Conflict"
     MEASURE_NAME_ALREADY_EXIST(40901, "Measure name already exists"),
 

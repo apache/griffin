@@ -31,8 +31,10 @@ import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTIN
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.avro.generic.GenericData;
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
 import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
@@ -57,6 +59,8 @@ public class JobInstanceRepoTest {
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
 
+    private List<Long> entityIds;
+
     @Before
     public void setup() {
         entityManager.clear();
@@ -75,6 +79,12 @@ public class JobInstanceRepoTest {
     @Test
     public void testFindByPredicateName() {
         JobInstanceBean bean = jobInstanceRepo.findByPredicateName("pName1");
+        assertThat(bean).isNotNull();
+    }
+
+    @Test
+    public void testFindByInstanceId() {
+        JobInstanceBean bean = jobInstanceRepo.findByInstanceId(entityIds.get(0));
         assertThat(bean).isNotNull();
     }
 
@@ -128,5 +138,10 @@ public class JobInstanceRepoTest {
         entityManager.persistAndFlush(bean2);
         entityManager.persistAndFlush(bean3);
         entityManager.persistAndFlush(bean4);
+        entityIds = new ArrayList<>();
+        entityIds.add(bean1.getId());
+        entityIds.add(bean2.getId());
+        entityIds.add(bean3.getId());
+        entityIds.add(bean4.getId());
     }
 }
