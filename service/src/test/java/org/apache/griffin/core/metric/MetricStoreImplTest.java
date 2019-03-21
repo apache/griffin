@@ -21,33 +21,28 @@ package org.apache.griffin.core.metric;
 
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.http.HttpEntity;
-import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.BDDMockito.*;
-
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RestClient.class, RestClientBuilder.class})
