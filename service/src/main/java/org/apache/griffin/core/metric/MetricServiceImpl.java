@@ -153,7 +153,8 @@ public class MetricServiceImpl implements MetricService {
         try {
             return metricStore.getMetric(appId);
         } catch (IOException e) {
-            throw new RuntimeException(e);//todo:fix
+            LOGGER.warn("Failed to get metric for applicationId {} ", appId);
+            throw new GriffinException.ServiceException("Failed to find metric", e);
         }
     }
 

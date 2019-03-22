@@ -33,6 +33,9 @@ import java.util.Map;
 
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobRepo;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.measure.repo.MeasureRepo;
@@ -63,6 +66,8 @@ public class MetricServiceImplTest {
     private JobRepo<AbstractJob> jobRepo;
     @Mock
     private MetricStoreImpl metricStore;
+    @Mock
+    private JobInstanceRepo jobInstanceRepo;
 
     @Autowired
     private Environment env;
@@ -203,5 +208,43 @@ public class MetricServiceImplTest {
         service.deleteMetricValues("metricName");
 
     }
+
+    @Test
+    public void testFindMetricSuccess() throws IOException {
+        Long id = 1L;
+        String appId = "application";
+        MetricValue expectedMetric = new MetricValue("name", 1234L, appId, new HashMap<>());
+
+        given(jobInstanceRepo.findByInstanceId(id))
+                .willReturn(new JobInstanceBean(LivySessionStates.State.RUNNING, 12L, 32L, appId));
+        given(metricStore.getMetric(appId))
+                .willReturn(expectedMetric);
+        MetricValue actualMetric = service.findMetric(id);
+
+        assertEquals(expectedMetric, actualMetric);
+    }
+
+    @Test(expected = GriffinException.NotFoundException.class)
+    public void testFailedToFindJobInstance() throws IOException {
+        Long id = 1L;
+        given(jobInstanceRepo.findByInstanceId(id))
+                .willReturn(null);
+        service.findMetric(id);
+
+    }
+
+    @Test(expected = GriffinException.ServiceException.class)
+    public void testFindMetricFailure() throws IOException {
+        Long id = 1L;
+        String appId = "application";
+
+        given(jobInstanceRepo.findByInstanceId(id))
+                .willReturn(new JobInstanceBean(LivySessionStates.State.RUNNING, 12L, 32L, appId));
+        given(metricStore.getMetric(appId))
+                .willThrow(new GriffinException.ServiceException("", new RuntimeException()));
+        service.findMetric(id);
+
+    }
+
 
 }
