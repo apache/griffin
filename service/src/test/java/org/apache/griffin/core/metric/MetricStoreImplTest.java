@@ -87,7 +87,7 @@ public class MetricStoreImplTest {
         InputStream is = Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream("metricvalue.json");
         Map<String, String> map =new HashMap<>();
-        map.put("applicationId", "application_1549876136110_0018");
+        map.put("q", "applicationId:application_1549876136110_0018");
 
         Map<String, Object> value = new HashMap<String, Object>(){{
             put("total", 74);

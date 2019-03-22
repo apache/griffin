@@ -212,7 +212,7 @@ public class MetricStoreImpl implements MetricStore {
     @Override
     public MetricValue getMetric(String applicationId) throws IOException {
         Map<String, String> map =new HashMap<>();
-        map.put("applicationId", applicationId);
+        map.put("q", "applicationId:"+applicationId);
         Response response = client.performRequest("GET", urlGet,
                 map);
         List<MetricValue> metricValues = getMetricValuesFromResponse(response);
