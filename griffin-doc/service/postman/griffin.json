@@ -2149,7 +2149,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{\n\t\t\"name\" : \"metricName\",\n\t\t\"tmst\" : 1509599811123,\n\t\t\"value\" : {\n\t\t\t\"__tmst\" : 1509599811123,\n\t\t\t\"miss\" : 11,\n\t\t\t\"total\" : 125000,\n\t\t\t\"matched\" : 124989\n\t\t}\n   }\n]"
+							"raw": "[\n\t{\n\t\t\"name\" : \"metricName\",\n\t\t\"tmst\" : 1509599811123,\n\t\t\"applicationId\" : \"app_1\",\n\t\t\"value\" : {\n\t\t\t\"__tmst\" : 1509599811123,\n\t\t\t\"miss\" : 11,\n\t\t\t\"total\" : 125000,\n\t\t\t\"matched\" : 124989\n\t\t}\n   }\n]"
 						},
 						"url": {
 							"raw": "{{BASE_PATH}}/api/v1/metrics/values",
@@ -2178,7 +2178,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n\t{\n\t\t\"name\" : \"metricName\",\n\t\t\"tmst\" : 1509599811123,\n\t\t\"value\" : {\n\t\t\t\"__tmst\" : 1509599811123,\n\t\t\t\"miss\" : 11,\n\t\t\t\"total\" : 125000,\n\t\t\t\"matched\" : 124989\n\t\t}\n   }\n]"
+									"raw": "[\n\t{\n\t\t\"name\" : \"metricName\",\n\t\t\"tmst\" : 1509599811123,\n\t\t\"applicationId\" : \"app_1\",\n\t\t\"value\" : {\n\t\t\t\"__tmst\" : 1509599811123,\n\t\t\t\"miss\" : 11,\n\t\t\t\"total\" : 125000,\n\t\t\t\"matched\" : 124989\n\t\t}\n   }\n]"
 								},
 								"url": {
 									"raw": "{{BASE_PATH}}/api/v1/metrics/values",
