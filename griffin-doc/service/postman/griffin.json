@@ -1592,6 +1592,38 @@
 					]
 				},
 				{
+					"name": "Trigger job by id",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_PATH}}/api/v1/jobs/trigger/:id",
+							"host": [
+								"{{BASE_PATH}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"jobs",
+								"trigger",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						},
+						"description": "`POST /api/v1/jobs/trigger/{id}`\n\n#### Path Variable\n- id -`required` `Long` job id\n\n#### Response\nThe response body should be empty if no error happens, and the HTTP status is (204, \"No Content\").\n\nIt may return failed messages. For example\n```\n{\n    \"timestamp\": 1517208792108,\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"code\": 40402,\n    \"message\": \"Job id does not exist\",\n    \"path\": \"/api/v1/jobs/trigger/2\"\n}\n```\nThere will be 'status' and 'error' fields in response if error happens, which correspond to HTTP status.\n\nThere may also be 'code' and 'message' fields, which will point out the cause.\n\nIf an exception happens at server, there will be an 'exception' field, which is the name of exception."
+					},
+					"response": []
+				},
+				{
 					"name": "Delete  job by name",
 					"request": {
 						"method": "DELETE",
