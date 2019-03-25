@@ -1406,7 +1406,7 @@
 								"health"
 							]
 						},
-						"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"healthyJobCount\": 1,\n  \"jobCount\": 2\n}\n```"
+						"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"job instance info\"\n}\n```"
 					},
 					"response": [
 						{
@@ -1430,7 +1430,7 @@
 										"health"
 									]
 								},
-								"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"healthyJobCount\": 1,\n  \"jobCount\": 2\n}\n```"
+								"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"job instance info\"\n}\n```"
 							},
 							"status": "OK",
 							"code": 200,
@@ -1836,6 +1836,75 @@
 								}
 							],
 							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Get Job Instance by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_PATH}}/api/v1/jobs/instances/:id",
+							"host": [
+								"{{BASE_PATH}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"jobs",
+								"instances",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						},
+						"description": "`GET /api/v1/jobs/instances/{id}`\n\n#### Response Body Sample\n```\n{\n  \"job instance info\"\n}\n```"
+					},
+					"response": [
+						{
+							"name": "Get Job Instance by Id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BASE_PATH}}/api/v1/jobs/instances/:id",
+									"host": [
+										"{{BASE_PATH}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"jobs",
+										"instances",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								},
+								"description": "`GET /api/v1/jobs/instances/{id}`\n\n#### Response Body Sample\n```\n{\n  \"job instance info\"\n}\n```"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"cookie": [],
+							"body": "{\n    \"healthyJobCount\": 1,\n    \"jobCount\": 2\n}"
 						}
 					]
 				}
