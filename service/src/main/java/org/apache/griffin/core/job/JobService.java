@@ -49,4 +49,5 @@ public interface JobService {
     JobInstanceBean findInstance(Long id);
 
     void triggerJobById(Long id) throws SchedulerException;
+  
 }

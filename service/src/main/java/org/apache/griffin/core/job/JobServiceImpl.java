@@ -277,13 +277,13 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobInstanceBean findInstance(Long id) {
-        JobInstanceBean jobInstanceBean = instanceRepo.findByInstanceId(id);
-        if (jobInstanceBean == null){
-            LOGGER.warn("There are no job instances with id {} ", id);
+        JobInstanceBean bean = instanceRepo.findByInstanceId(id);
+        if (bean == null) {
+            LOGGER.warn("Instance id {} does not exist.", id);
             throw new GriffinException
-                    .NotFoundException(JOB_INSTANCE_NOT_FOUND);
+                .NotFoundException(INSTANCE_ID_DOES_NOT_EXIST);
         }
-        return jobInstanceBean;
+        return bean;
     }
 
     private List<JobInstanceBean> updateState(List<JobInstanceBean> instances) {
