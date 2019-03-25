@@ -49,6 +49,7 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
     - [Add Metric Value](#42)
     - [Get Metric Value](#43)
     - [Remove Metric Value](#44)
+    - [Get Metric Value by Job Instance Id](#45)
 
 - [Hive MetaStore](#5)
     - [Get Table Metadata](#51)
@@ -938,6 +939,30 @@ curl -k -H "Accept: application/json" \
     "failures": []
 }
 ```
+
+<div id = "45"></div>
+
+### Get Metric Value by Job Instance Id
+`GET http://127.0.0.1:8080/api/v1/metrics/values/:jobInstanceId`
+#### API Example
+```
+curl -k -G -X GET http://127.0.0.1:8080/api/v1/metrics/values/{304}
+{
+    "name": "some_job",
+    "tmst": 1553526960000,
+    "applicationId": "\"application_1549876136110_0237\"",
+    "value": {
+        "total": 74,
+        "miss": 31,
+        "matched": 43,
+        "matchedFraction": 0.581081081081081
+    }
+}
+```
+
+
+
+
 
 <h2 id = "5"></h2>
 

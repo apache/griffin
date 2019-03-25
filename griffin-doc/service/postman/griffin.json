@@ -2376,6 +2376,75 @@
 							"body": "{\"took\":363,\"timed_out\":false,\"total\":5,\"deleted\":5,\"batches\":1,\"version_conflicts\":0,\"noops\":0,\"retries\":{\"bulk\":0,\"search\":0},\"throttled_millis\":0,\"requests_per_second\":-1.0,\"throttled_until_millis\":0,\"failures\":[]}"
 						}
 					]
+				},
+				{
+					"name": "Get Metrics Value by Job Instance Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_PATH}}/api/v1/metrics/values/:jobInstanceId",
+							"host": [
+								"{{BASE_PATH}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"metrics",
+								"values",
+								":jobInstanceId"
+							],
+							"variable": [
+								{
+									"key": "jobInstanceId",
+									"value": "304"
+								}
+							]
+						},
+						"description": "`GET /api/v1/metrics/values/{jobInstanceId}`\n\n#### Response Body Sample\n```\n{\n  \"metric value\"\n}\n```"
+					},
+					"response": [
+						{
+							"name": "Get Metrics Value by Job Instance Id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BASE_PATH}}/api/v1/metrics/values/:jobInstanceId",
+									"host": [
+										"{{BASE_PATH}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"metrics",
+										"values",
+										":jobInstanceId"
+									],
+									"variable": [
+										{
+											"key": "jobInstanceId",
+											"value": "304"
+										}
+									]
+								},
+								"description": "`GET /api/v1/metrics/values/{jobInstanceId}`\n\n#### Response Body Sample\n```\n{\n  \"metric value\"\n}\n```"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"cookie": [],
+							"body": "{\n    \"name\": some_job,\n    \"tmst\": 1553526960000\n    \"applicationId\": application_1549876136110_0237\n    \"value\": {\n    \"total\": 74}}"
+						}
+					]
 				}
 			]
 		},
