@@ -45,14 +45,7 @@ import org.apache.griffin.core.util.JsonUtil;
 import org.apache.griffin.core.util.YarnNetUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,13 +69,7 @@ import java.util.TimeZone;
 import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
 import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_MEASURE_ID;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_TYPE_DOES_NOT_SUPPORT;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_SUPPORT;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.NO_SUCH_JOB_ACTION;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
@@ -99,7 +86,7 @@ import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
 
@@ -286,6 +273,17 @@ public class JobServiceImpl implements JobService {
         List<JobInstanceBean> instances = instanceRepo.findByJobId(jobId,
             pageable);
         return updateState(instances);
+    }
+
+    @Override
+    public JobInstanceBean findInstance(Long id) {
+        JobInstanceBean bean = instanceRepo.findByInstanceId(id);
+        if (bean == null) {
+            LOGGER.warn("Instance id {} does not exist.", id);
+            throw new GriffinException
+                .NotFoundException(INSTANCE_ID_DOES_NOT_EXIST);
+        }
+        return bean;
     }
 
     private List<JobInstanceBean> updateState(List<JobInstanceBean> instances) {
@@ -659,6 +657,23 @@ public class JobServiceImpl implements JobService {
         } catch (Exception ex) {
             LOGGER.error("Fail to get Persist path from {}", jsonString, ex);
             return null;
+        }
+    }
+
+    @Override
+    public void triggerJobById(Long id) throws SchedulerException {
+        AbstractJob job = jobRepo.findByIdAndDeleted(id, false);
+        validateJobExist(job);
+        Scheduler scheduler = factory.getScheduler();
+        JobKey jobKey = jobKey(job.getName(), job.getGroup());
+        if (scheduler.checkExists(jobKey)) {
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .forJob(jobKey)
+                    .startNow()
+                    .build();
+            scheduler.scheduleJob(trigger);
+        } else {
+            LOGGER.warn("Could not trigger job id {}.", id);
         }
     }
 }
