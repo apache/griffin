@@ -658,7 +658,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public JobInstanceBean triggerJobById(Long id, Long timeout) throws SchedulerException {
+    public String triggerJobById(Long id) throws SchedulerException {
         AbstractJob job = jobRepo.findByIdAndDeleted(id, false);
         validateJobExist(job);
         Scheduler scheduler = factory.getScheduler();
@@ -668,31 +668,10 @@ public class JobServiceImpl implements JobService {
                     .forJob(jobKey)
                     .startNow()
                     .build();
-            TriggerKey key = trigger.getKey();
-            CountDownLatch latch = new CountDownLatch(1);
-            String listenerName = "listenerJob_" + jobKey.toString();
-            try {
-                scheduler.getListenerManager().addTriggerListener(
-                        new CountDownTriggerListener(latch, listenerName)
-                        , key::equals);
-
-                scheduler.scheduleJob(trigger);
-
-                try {
-                    latch.await(timeout, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    LOGGER.warn("CountDownLatch awaiting is interrupted");
-                }
-                List<JobInstanceBean> instanceBeans = instanceRepo.findByTriggerKey(key.toString());
-                if (instanceBeans != null && instanceBeans.size() > 0) {
-                    return instanceBeans.get(0);
-                }
-            } finally {
-                scheduler.getListenerManager().removeTriggerListener(listenerName);
-            }
+            scheduler.scheduleJob(trigger);
+            return trigger.getKey().toString();
         } else {
-            LOGGER.warn("Could not trigger job id {}.", id);
+            throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
         }
-        return null;
     }
 }
