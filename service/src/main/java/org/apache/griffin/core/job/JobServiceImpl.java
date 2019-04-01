@@ -679,7 +679,7 @@ public class JobServiceImpl implements JobService {
                 scheduler.scheduleJob(trigger);
 
                 try {
-                    latch.await(0, TimeUnit.MILLISECONDS);
+                    latch.await(timeout, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     LOGGER.warn("CountDownLatch awaiting is interrupted");
                 }
