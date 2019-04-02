@@ -124,4 +124,8 @@ public class JobController {
         return Collections.singletonMap("triggerKey", jobService.triggerJobById(id));
     }
 
+    @RequestMapping(value = "jobs/trigger/{triggerKey:.+}", method = RequestMethod.GET)
+    public List<JobInstanceBean> findInstanceByTriggerKey(@PathVariable("triggerKey") String triggerKey) {
+        return jobService.findInstancesByTriggerKey(triggerKey);
+    }
 }

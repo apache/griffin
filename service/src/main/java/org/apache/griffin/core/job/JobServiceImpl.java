@@ -293,6 +293,11 @@ public class JobServiceImpl implements JobService {
         return instances;
     }
 
+    @Override
+    public List<JobInstanceBean> findInstancesByTriggerKey(String triggerKey) {
+        return instanceRepo.findByTriggerKey(triggerKey);
+    }
+
     /**
      * a job is regard as healthy job when its latest instance is in healthy
      * state.
