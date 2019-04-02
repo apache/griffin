@@ -20,12 +20,16 @@ under the License.
 package org.apache.griffin.core.job;
 
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.util.FSUtil;
 import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -43,7 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class JobController {
-
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(JobController.class);
     @Autowired
     private JobService jobService;
 
@@ -120,8 +125,19 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs/trigger/{id}", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void triggerJob(@PathVariable("id") Long id) throws SchedulerException {
-        jobService.triggerJobById(id);
+    @ResponseStatus(HttpStatus.OK)
+    public JobInstanceBean triggerJob(@PathVariable("id") Long id, @RequestBody(required = false) String request) throws SchedulerException {
+        return jobService.triggerJobById(id, extractTimeOut(request));
+    }
+
+    private long extractTimeOut(String request) {
+        long timeout = 0;
+        try {
+            Map map = new ObjectMapper().readValue(request, Map.class);
+            timeout = Long.valueOf((String) map.get("timeout"));
+        } catch (Exception e) {
+            LOGGER.warn("Error parsing timeout for waiting triggering job. Default value is 0");
+        }
+        return timeout;
     }
 }

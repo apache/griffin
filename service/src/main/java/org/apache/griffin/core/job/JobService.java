@@ -50,4 +50,5 @@ public interface JobService {
 
     void triggerJobById(Long id) throws SchedulerException;
   
+    JobInstanceBean triggerJobById(Long id, Long timeout) throws SchedulerException;
 }

@@ -53,4 +53,6 @@ public interface JobInstanceRepo
 
     @Query("select DISTINCT s from JobInstanceBean s where s.state in ?1")
     List<JobInstanceBean> findByActiveState(State[] states);
+
+    List<JobInstanceBean> findByTriggerKey(String triggerKey);
 }
