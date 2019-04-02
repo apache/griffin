@@ -27,12 +27,7 @@ import org.apache.griffin.core.metric.model.MetricValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -70,5 +65,10 @@ public class MetricController {
     public ResponseEntity<?> deleteMetricValues(@RequestParam("metricName")
                                                         String metricName) {
         return metricService.deleteMetricValues(metricName);
+    }
+
+    @RequestMapping(value = "/metrics/values/{instanceId}", method = RequestMethod.GET)
+    public MetricValue getMetric(@PathVariable("instanceId") Long id){
+        return metricService.findMetric(id);
     }
 }

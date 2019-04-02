@@ -42,12 +42,14 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
     - [Get Job Instances](#34)
     - [Get Job Healthy Statistics](#35)
     - [Download Sample Records](#36)
+    - [Get Job Instance by Id](#38)
 
 - [Metrics](#4)
     - [Get Metrics](#41)
     - [Add Metric Value](#42)
     - [Get Metric Value](#43)
     - [Remove Metric Value](#44)
+    - [Get Metric Value by Job Instance Id](#45)
 
 - [Hive MetaStore](#5)
     - [Get Table Metadata](#51)
@@ -747,6 +749,17 @@ curl -k -G -X GET http://127.0.0.1:8080/api/v1/jobs/download \
 ```
 If successful, this method returns missing records in the response body, maximum record count is 100.
 
+<div id = "38"></div>
+
+### Get Job Instance by Id
+`GET /api/v1/jobs/instances/{jobInstanceId}`
+
+#### API Example
+```
+curl -k -G -X GET http://127.0.0.1:8080/api/v1/jobs/instances/1
+```
+If successful, this method returns job instance description for the given job instance id. If there is no instance with given id found, returns Griffin Exception.
+
 <h2 id = "4"></h2>
 
 ## Metrics
@@ -926,6 +939,30 @@ curl -k -H "Accept: application/json" \
     "failures": []
 }
 ```
+
+<div id = "45"></div>
+
+### Get Metric Value by Job Instance Id
+`GET http://127.0.0.1:8080/api/v1/metrics/values/:jobInstanceId`
+#### API Example
+```
+curl -k -G -X GET http://127.0.0.1:8080/api/v1/metrics/values/{304}
+{
+    "name": "some_job",
+    "tmst": 1553526960000,
+    "applicationId": "\"application_1549876136110_0237\"",
+    "value": {
+        "total": 74,
+        "miss": 31,
+        "matched": 43,
+        "matchedFraction": 0.581081081081081
+    }
+}
+```
+
+
+
+
 
 <h2 id = "5"></h2>
 

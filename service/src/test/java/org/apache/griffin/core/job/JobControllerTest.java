@@ -38,6 +38,7 @@ import java.util.Collections;
 
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.exception.GriffinExceptionHandler;
+import org.apache.griffin.core.exception.GriffinExceptionMessage;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
@@ -183,6 +184,16 @@ public class JobControllerTest {
 
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances/1"))
            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testJobInstanceWithGivenIdNotFound() throws Exception {
+        Long jobInstanceId = 2L;
+        doThrow(new GriffinException.NotFoundException(GriffinExceptionMessage.JOB_INSTANCE_NOT_FOUND))
+                .when(service).findInstance(jobInstanceId);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances/2"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

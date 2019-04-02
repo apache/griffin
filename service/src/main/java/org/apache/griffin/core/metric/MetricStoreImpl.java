@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.http.Header;
@@ -150,6 +151,7 @@ public class MetricStoreImpl implements MetricStore {
                         .get("name")
                         .asText(),
                         Long.parseLong(sourceNode.get("tmst").asText()),
+                        String.valueOf(sourceNode.get("applicationId")),
                         value);
                 metricValues.add(metricValue);
             }
@@ -205,5 +207,15 @@ public class MetricStoreImpl implements MetricStore {
         String auth = user + ":" + password;
         return String.format("Basic %s", Base64.getEncoder().encodeToString(
                 auth.getBytes()));
+    }
+
+    @Override
+    public MetricValue getMetric(String applicationId) throws IOException {
+        Map<String, String> map =new HashMap<>();
+        map.put("q", "applicationId:"+applicationId);
+        Response response = client.performRequest("GET", urlGet,
+                map);
+        List<MetricValue> metricValues = getMetricValuesFromResponse(response);
+        return metricValues.get(0);
     }
 }
