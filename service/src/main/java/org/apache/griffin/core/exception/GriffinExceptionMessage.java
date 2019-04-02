@@ -72,11 +72,11 @@ public enum GriffinExceptionMessage {
 
     HDFS_FILE_NOT_EXIST(40407, "Hadoop data file not exist"),
 
-    JOB_INSTANCE_NOT_FOUND(40408, "No job instances with given job instance id found"),
+    PREDICATE_TYPE_NOT_FOUND(40408, "Unknown predicate type"),
 
-    PREDICATE_TYPE_NOT_FOUND(40409, "Unknown predicate type"),
+    INSTANCE_ID_DOES_NOT_EXIST(40409, "Instance id does not exist"),
 
-    INSTANCE_ID_DOES_NOT_EXIST(40410, "Instance id does not exist"),
+    JOB_INSTANCE_NOT_FOUND(40410, "No job instances with given job instance id found"),
 
     //409, "Conflict"
     MEASURE_NAME_ALREADY_EXIST(40901, "Measure name already exists"),
