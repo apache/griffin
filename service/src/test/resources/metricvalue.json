@@ -25,7 +25,9 @@
             "matched": 74,
             "matchedFraction": 1
           },
-          "applicationId": "application_1549876136110_0018"
+          "metadata": {
+            "applicationId": "application_1549876136110_0018"
+          }
         }
       },
       {

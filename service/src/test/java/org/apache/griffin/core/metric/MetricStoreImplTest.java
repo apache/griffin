@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,8 +87,8 @@ public class MetricStoreImplTest {
         HttpEntity httpEntityMock = PowerMockito.mock(HttpEntity.class);
         InputStream is = Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream("metricvalue.json");
-        Map<String, String> map =new HashMap<>();
-        map.put("q", "applicationId:application_1549876136110_0018");
+        Map<String, String> map = new HashMap<>();
+        map.put("q", "metadata.applicationId:application_1549876136110_0018");
 
         Map<String, Object> value = new HashMap<String, Object>(){{
             put("total", 74);
@@ -97,7 +98,7 @@ public class MetricStoreImplTest {
         }};
         MetricValue expectedMetric = new MetricValue("de_demo_results_comparision",
                 1549985089648L,
-                "\"application_1549876136110_0018\"",
+                Collections.singletonMap("applicationId", "application_1549876136110_0018"),
                 value);
 
 

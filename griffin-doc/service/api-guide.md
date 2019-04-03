@@ -950,12 +950,14 @@ curl -k -G -X GET http://127.0.0.1:8080/api/v1/metrics/values/{304}
 {
     "name": "some_job",
     "tmst": 1553526960000,
-    "applicationId": "\"application_1549876136110_0237\"",
     "value": {
         "total": 74,
         "miss": 31,
         "matched": 43,
         "matchedFraction": 0.581081081081081
+    },
+    "metadata": {
+        "applicationId": "\"application_1549876136110_0237\"",
     }
 }
 ```

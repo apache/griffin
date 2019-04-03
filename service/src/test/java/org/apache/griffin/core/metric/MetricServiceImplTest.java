@@ -213,7 +213,8 @@ public class MetricServiceImplTest {
     public void testFindMetricSuccess() throws IOException {
         Long id = 1L;
         String appId = "application";
-        MetricValue expectedMetric = new MetricValue("name", 1234L, appId, new HashMap<>());
+        MetricValue expectedMetric = new MetricValue(
+                "name", 1234L, Collections.singletonMap("applicationId", appId), new HashMap<>());
 
         given(jobInstanceRepo.findByInstanceId(id))
                 .willReturn(new JobInstanceBean(LivySessionStates.State.RUNNING, 12L, 32L, appId));

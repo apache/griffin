@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.metric.model;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,7 +29,7 @@ public class MetricValue {
 
     private Long tmst;
 
-    private String applicationId;
+    private Map<String, Object> metadata;
 
     private Map<String, Object> value;
 
@@ -39,13 +40,14 @@ public class MetricValue {
         this.name = name;
         this.tmst = tmst;
         this.value = value;
+        this.metadata = Collections.emptyMap();
     }
 
 
-    public MetricValue(String name, Long tmst, String applicationId, Map<String, Object> value) {
+    public MetricValue(String name, Long tmst, Map<String, Object> metadata, Map<String, Object> value) {
         this.name = name;
         this.tmst = tmst;
-        this.applicationId = applicationId;
+        this.metadata = metadata;
         this.value = value;
     }
 
@@ -73,12 +75,12 @@ public class MetricValue {
         this.value = value;
     }
 
-    public String getApplicationId() {
-        return applicationId;
+    public Map<String, Object> getMetadata() {
+        return metadata;
     }
 
-    public void setApplicationId(String applicationId) {
-        this.applicationId = applicationId;
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
     }
 
     @Override
@@ -88,22 +90,19 @@ public class MetricValue {
         MetricValue that = (MetricValue) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(tmst, that.tmst) &&
-                Objects.equals(applicationId, that.applicationId) &&
+                Objects.equals(metadata, that.metadata) &&
                 Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, tmst, applicationId, value);
+        return Objects.hash(name, tmst, metadata, value);
     }
 
     @Override
     public String toString() {
-        return "MetricValue{" +
-                "name='" + name + '\'' +
-                ", tmst=" + tmst +
-                ", applicationId='" + applicationId + '\'' +
-                ", value=" + value +
-                '}';
+        return String.format(
+                "MetricValue{name=%s, ts=%s, meta=%s, value=%s}",
+                name, tmst, metadata, value);
     }
 }
