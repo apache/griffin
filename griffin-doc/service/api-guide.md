@@ -36,10 +36,11 @@ Apache Griffin default `BASE_PATH` is `http://<your ip>:8080`.
 
 - [Griffin Jobs](#3)
     - [Add Job](#31)
-    - [Trigger job by id](37)
+    - [Trigger job by id](#37)
     - [Get Job](#32)
     - [Remove Job](#33)
     - [Get Job Instances](#34)
+    - [Get Job Instance by triggerKey](#38)
     - [Get Job Healthy Statistics](#35)
     - [Download Sample Records](#36)
 
@@ -547,22 +548,16 @@ curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
 
 ### Trigger job by id
 `POST /api/v1/jobs/trigger/{job_id}`
+
+In the current version triggering the job in this way leads to scheduling of a single job instance. The method returns
+immediately even if starting it may take time. The response contains `triggerKey` by which the instance could be found
+when it is started (see [find instance by trigger key](#38)).
+
 #### API Example
 ```
-curl -k -X POST http://127.0.0.1:8080/api/v1/jobs/trigger/51 \
--d '{
-    "timeout": "1000"
-}'
+curl -k -X POST http://127.0.0.1:8080/api/v1/jobs/trigger/101
 {
-    "id": 1906,
-    "sessionId": null,
-    "state": "FINDING",
-    "type": "BATCH",
-    "predicateGroup": "PG",
-    "predicateName": "job_name_10",
-    "triggerName": "6da64b5bd2ee-624ff5bf-beee-4655-9636-09d2bbcc3355",
-    "timestamp": 1552649902649,
-    "expireTimestamp": 1553254702649
+    "triggerKey": "DEFAULT.6da64b5bd2ee-34e2cb23-11a2-4f92-9cbd-6cb3402cdb48",
 }
 ```
 
@@ -727,6 +722,35 @@ curl -k -G -X GET http://127.0.0.1:8080/api/v1/jobs/instances -d jobId=827 -d pa
     }
 ]
 ```
+
+<div id = "38"></div>
+
+### Find job instance by triggerKey
+`GET /api/v1/jobs/triggerKeys/{triggerKey}`
+
+This could be used after [triggering the job by job id](#37) to find the job instance when it is scheduled.
+In the current version no more than one instance is triggered and thus the response is a list with single
+element (or empty list if not found).
+
+```
+curl http://127.0.0.1:8080/api/v1/jobs/triggerKeys/DEFAULT.6da64b5bd2ee-34e2cb23-11a2-4f92-9cbd-6cb3402cdb48
+[
+    {
+        "id":201,
+        "sessionId":1,
+        "state":"SUCCESS",
+        "type":"BATCH",
+        "appId":"application_1554199833471_0002",
+        "appUri":"http://localhost:38088/cluster/app/application_1554199833471_0002",
+        "predicateGroup":"PG",
+        "predicateName":"acc1a_name_predicate_1554202748883",
+        "triggerKey":"DEFAULT.6da64b5bd2ee-34e2cb23-11a2-4f92-9cbd-6cb3402cdb49",
+        "timestamp":1554202748884,
+        "expireTimestamp":1554807548884
+    }
+]
+```
+
 
 <div id = "35"></div>
 

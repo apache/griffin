@@ -37,6 +37,7 @@ import java.util.Collections;
 import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinJob;
 import static org.apache.griffin.core.util.EntityMocksHelper.createJobInstance;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -70,17 +71,14 @@ public class JobServiceImplTest {
         given(scheduler.checkExists(any(JobKey.class))).willReturn(true);
         ListenerManager listenerManager = mock(ListenerManager.class);
         given(scheduler.getListenerManager()).willReturn(listenerManager);
-        doNothing().when(listenerManager).addTriggerListener(any(CountDownTriggerListener.class), any(Matcher.class));
         given(factory.getScheduler()).willReturn(scheduler);
         JobInstanceBean jobInstanceBean = createJobInstance();
         given(instanceRepo.findByTriggerKey(anyString())).willReturn(Collections.singletonList(jobInstanceBean));
 
-        JobInstanceBean result = jobService.triggerJobById(jobId, 0L);
+        String result = jobService.triggerJobById(jobId);
 
-        assertEquals(result.getAppId(), jobInstanceBean.getAppId());
-        assertEquals(result.getTms(), result.getTms());
+        assertTrue(result.matches("DEFAULT\\.[0-9a-f\\-]{49}"));
         verify(scheduler, times(1)).scheduleJob(any());
-        verify(listenerManager, times(1)).addTriggerListener(any(CountDownTriggerListener.class), any(Matcher.class));
     }
 
 
@@ -88,6 +86,6 @@ public class JobServiceImplTest {
     public void testTriggerJobByIdFail() throws SchedulerException {
         Long jobId = 1L;
         given(jobRepo.findByIdAndDeleted(jobId,false)).willReturn(null);
-        jobService.triggerJobById(jobId, 0L);
+        jobService.triggerJobById(jobId);
     }
 }

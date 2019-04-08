@@ -199,7 +199,7 @@ public class JobControllerTest {
     @Test
     public void testTriggerJobForSuccess() throws Exception {
         Long id = 1L;
-        given(service.triggerJobById(id, 0L)).willReturn(createJobInstance());
+        given(service.triggerJobById(id)).willReturn(null);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
                 .andExpect(status().isOk());
@@ -209,7 +209,7 @@ public class JobControllerTest {
     public void testTriggerJobForFailureWithException() throws Exception {
         doThrow(new GriffinException.ServiceException("Failed to trigger job",
                 new Exception()))
-                .when(service).triggerJobById(1L, 0L);
+                .when(service).triggerJobById(1L);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
                 .andExpect(status().isInternalServerError());

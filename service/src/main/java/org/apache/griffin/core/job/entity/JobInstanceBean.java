@@ -29,14 +29,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.griffin.core.job.entity.LivySessionStates.State;
 import org.apache.griffin.core.measure.entity.AbstractAuditableEntity;
 import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
 
 @Entity
+@Table(indexes = {@Index(columnList = "triggerKey")})
 public class JobInstanceBean extends AbstractAuditableEntity {
 
     private static final long serialVersionUID = -4748881017029815874L;
