@@ -28,7 +28,7 @@ case class MetricWrapper(name: String, applicationId: String) extends Serializab
   val _Name = "name"
   val _Timestamp = "tmst"
   val _Value = "value"
-  val _ApplicationId = "applicationId"
+  val _Metadata = "metadata"
 
   val metrics: MutableMap[Long, Map[String, Any]] = MutableMap()
 
@@ -47,7 +47,7 @@ case class MetricWrapper(name: String, applicationId: String) extends Serializab
         (_Name -> name),
         (_Timestamp -> timestamp),
         (_Value -> value),
-        (_ApplicationId -> applicationId)
+        (_Metadata -> Map("applicationId" -> applicationId))
       ))
     }
   }
