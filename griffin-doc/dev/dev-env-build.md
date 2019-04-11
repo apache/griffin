@@ -81,7 +81,7 @@ For debug purpose, you'd better install hadoop, spark, hive locally, so you can 
 Note: If you run Hadoop in a pseudo-distributed mode on MacOS you have to update hdfs-site.xml, namely, comment out the parameters **dfs.namenode.servicerpc-address** and **dfs.namenode.rpc-address**, otherwise you can get the error like: "java.net.ConnectException: Call From mycomputer/127.0.1.1 to localhost:9000 failed on connection exception: java.net.ConnectException: Connection refused; For more details see:  http://wiki.apache.org/hadoop/ConnectionRefused"
 
 ## Deploy on docker container
-Firstly, in the griffin directory, build you packages at once.
+Firstly, in the griffin directory, build your packages at once.
 ```
 mvn clean install
 ```
