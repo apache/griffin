@@ -45,4 +45,9 @@ public interface JobService {
     JobHealth getHealthInfo();
 
     String getJobHdfsSinksPath(String jobName, long timestamp);
+
+    JobInstanceBean findInstance(Long id);
+
+    void triggerJobById(Long id) throws SchedulerException;
+  
 }

@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INSTANCE_ID_DOES_NOT_EXIST;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
 import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinJob;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -163,6 +165,27 @@ public class JobControllerTest {
     }
 
     @Test
+    public void testFindInstance() throws Exception {
+        JobInstanceBean jobInstance = new JobInstanceBean(1L, LivySessionStates
+                .State.RUNNING, "", "", null, null);
+        given(service.findInstance(1L)).willReturn(jobInstance);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.state", is("RUNNING")));
+    }
+
+    @Test
+    public void testFindInstanceForFailureWithNotFound() throws Exception {
+        Long id = 1L;
+        doThrow(new GriffinException.NotFoundException(INSTANCE_ID_DOES_NOT_EXIST))
+            .when(service).findInstance(id);
+
+        mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/instances/1"))
+           .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testGetHealthInfo() throws Exception {
         JobHealth jobHealth = new JobHealth(1, 3);
         given(service.getHealthInfo()).willReturn(jobHealth);
@@ -170,5 +193,23 @@ public class JobControllerTest {
         mvc.perform(get(URLHelper.API_VERSION_PATH + "/jobs/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.healthyJobCount", is(1)));
+    }
+
+    @Test
+    public void testTriggerJobForSuccess() throws Exception {
+        doNothing().when(service).triggerJobById(1L);
+
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testTriggerJobForFailureWithException() throws Exception {
+        doThrow(new GriffinException.ServiceException("Failed to trigger job",
+                new Exception()))
+                .when(service).triggerJobById(1L);
+
+        mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
+                .andExpect(status().isInternalServerError());
     }
 }

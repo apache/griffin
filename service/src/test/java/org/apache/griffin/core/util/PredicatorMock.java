@@ -17,18 +17,19 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.info;
+package org.apache.griffin.core.util;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.griffin.core.job.Predicator;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
 
-@RestController
-@RequestMapping("/api/v1")
-public class GriffinInfoController {
+import java.io.IOException;
 
-    @RequestMapping(value = "/version", method = RequestMethod.GET)
-    public String greeting() {
-        return "0.5.0";
+public class PredicatorMock implements Predicator {
+    public PredicatorMock(SegmentPredicate segmentPredicate) {
+    }
+
+    @Override
+    public boolean predicate() throws IOException {
+        return true;
     }
 }

@@ -34,6 +34,9 @@ public interface JobInstanceRepo
 
     JobInstanceBean findByPredicateName(String name);
 
+    @Query("select s from JobInstanceBean s where s.id = ?1")
+    JobInstanceBean findByInstanceId(Long id);
+
     @Query("select s from JobInstanceBean s where s.job.id = ?1")
     List<JobInstanceBean> findByJobId(Long jobId, Pageable pageable);
 

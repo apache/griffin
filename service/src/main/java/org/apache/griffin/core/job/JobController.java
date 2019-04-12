@@ -94,6 +94,11 @@ public class JobController {
         return jobService.findInstancesOfJob(id, page, size);
     }
 
+    @RequestMapping(value = "/jobs/instances/{instanceId}", method = RequestMethod.GET)
+    public JobInstanceBean findInstanceByInstanceId(@PathVariable("instanceId") Long id) {
+        return jobService.findInstance(id);
+    }
+
     @RequestMapping(value = "/jobs/health", method = RequestMethod.GET)
     public JobHealth getHealthInfo() {
         return jobService.getHealthInfo();
@@ -112,5 +117,11 @@ public class JobController {
                         "attachment; filename = sampleMissingData.json")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    @RequestMapping(value = "/jobs/trigger/{id}", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void triggerJob(@PathVariable("id") Long id) throws SchedulerException {
+        jobService.triggerJobById(id);
     }
 }

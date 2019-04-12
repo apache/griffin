@@ -92,6 +92,7 @@ export class ServiceService {
       addJobs: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
       modifyJobs: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
       getJobById: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs/config",
+      triggerJobById: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs/trigger",
       getMeasuresByOwner:
       this.BACKEND_SERVER + this.API_ROOT_PATH + "/measures/owner/",
       deleteJob: this.BACKEND_SERVER + this.API_ROOT_PATH + "/jobs",
