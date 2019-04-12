@@ -34,6 +34,7 @@ object SinkType {
     HdfsSinkType,
     ElasticsearchSinkType,
     MongoSinkType,
+    CustomSinkType,
     UnknownSinkType
   )
 
@@ -82,6 +83,14 @@ case object ElasticsearchSinkType extends SinkType {
 case object MongoSinkType extends SinkType {
   val idPattern = "^(?i)mongo|mongodb$".r
   val desc = "distinct"
+}
+
+/**
+  * custom sink (needs using extra jar-file-extension)
+  */
+case object CustomSinkType extends SinkType {
+  val idPattern = "^(?i)custom$".r
+  val desc = "custom"
 }
 
 case object UnknownSinkType extends SinkType {
