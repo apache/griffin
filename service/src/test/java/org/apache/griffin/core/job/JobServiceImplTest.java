@@ -21,20 +21,27 @@ package org.apache.griffin.core.job;
 
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.JobRepo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Collections;
+
 import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinJob;
+import static org.apache.griffin.core.util.EntityMocksHelper.createJobInstance;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -48,6 +55,9 @@ public class JobServiceImplTest {
     @Mock
     private SchedulerFactoryBean factory;
 
+    @Mock
+    private JobInstanceRepo instanceRepo;
+
     @InjectMocks
     private JobServiceImpl jobService;
 
@@ -59,9 +69,15 @@ public class JobServiceImplTest {
         given(jobRepo.findByIdAndDeleted(jobId,false)).willReturn(job);
         Scheduler scheduler = mock(Scheduler.class);
         given(scheduler.checkExists(any(JobKey.class))).willReturn(true);
+        ListenerManager listenerManager = mock(ListenerManager.class);
+        given(scheduler.getListenerManager()).willReturn(listenerManager);
         given(factory.getScheduler()).willReturn(scheduler);
-        jobService.triggerJobById(jobId);
+        JobInstanceBean jobInstanceBean = createJobInstance();
+        given(instanceRepo.findByTriggerKey(anyString())).willReturn(Collections.singletonList(jobInstanceBean));
 
+        String result = jobService.triggerJobById(jobId);
+
+        assertTrue(result.matches("DEFAULT\\.[0-9a-f\\-]{49}"));
         verify(scheduler, times(1)).scheduleJob(any());
     }
 

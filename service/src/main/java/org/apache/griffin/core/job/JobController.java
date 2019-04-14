@@ -19,13 +19,17 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.JobHealth;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.util.FSUtil;
 import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -120,8 +124,13 @@ public class JobController {
     }
 
     @RequestMapping(value = "/jobs/trigger/{id}", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void triggerJob(@PathVariable("id") Long id) throws SchedulerException {
-        jobService.triggerJobById(id);
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Object> triggerJob(@PathVariable("id") Long id, @RequestBody(required = false) String request) throws SchedulerException {
+        return Collections.singletonMap("triggerKey", jobService.triggerJobById(id));
+    }
+
+    @RequestMapping(value = "jobs/triggerKeys/{triggerKey:.+}", method = RequestMethod.GET)
+    public List<JobInstanceBean> findInstanceByTriggerKey(@PathVariable("triggerKey") String triggerKey) {
+        return jobService.findInstancesByTriggerKey(triggerKey);
     }
 }

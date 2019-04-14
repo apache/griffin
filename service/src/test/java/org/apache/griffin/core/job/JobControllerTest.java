@@ -23,6 +23,7 @@ import static org.apache.griffin.core.exception.GriffinExceptionMessage.INSTANCE
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
 import static org.apache.griffin.core.util.EntityMocksHelper.createGriffinJob;
+import static org.apache.griffin.core.util.EntityMocksHelper.createJobInstance;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -208,10 +209,11 @@ public class JobControllerTest {
 
     @Test
     public void testTriggerJobForSuccess() throws Exception {
-        doNothing().when(service).triggerJobById(1L);
+        Long id = 1L;
+        given(service.triggerJobById(id)).willReturn(null);
 
         mvc.perform(post(URLHelper.API_VERSION_PATH + "/jobs/trigger/1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test

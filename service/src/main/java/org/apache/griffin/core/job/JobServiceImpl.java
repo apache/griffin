@@ -65,6 +65,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.TimeZone.getTimeZone;
 import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
@@ -294,6 +296,11 @@ public class JobServiceImpl implements JobService {
             }
         }
         return instances;
+    }
+
+    @Override
+    public List<JobInstanceBean> findInstancesByTriggerKey(String triggerKey) {
+        return instanceRepo.findByTriggerKey(triggerKey);
     }
 
     /**
@@ -661,7 +668,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void triggerJobById(Long id) throws SchedulerException {
+    public String triggerJobById(Long id) throws SchedulerException {
         AbstractJob job = jobRepo.findByIdAndDeleted(id, false);
         validateJobExist(job);
         Scheduler scheduler = factory.getScheduler();
@@ -672,8 +679,9 @@ public class JobServiceImpl implements JobService {
                     .startNow()
                     .build();
             scheduler.scheduleJob(trigger);
+            return trigger.getKey().toString();
         } else {
-            LOGGER.warn("Could not trigger job id {}.", id);
+            throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
         }
     }
 }

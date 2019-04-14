@@ -83,6 +83,7 @@ public class JobInstance implements Job {
     public static final String MEASURE_KEY = "measure";
     public static final String PREDICATES_KEY = "predicts";
     public static final String PREDICATE_JOB_NAME = "predicateJobName";
+    private static final String TRIGGER_KEY = "trigger";
     static final String JOB_NAME = "jobName";
     static final String PATH_CONNECTOR_CHARACTER = ",";
     public static final String INTERVAL = "interval";
@@ -127,6 +128,10 @@ public class JobInstance implements Job {
         Long measureId = job.getMeasureId();
         measure = measureRepo.findOne(measureId);
         setJobStartTime(jobDetail);
+        if (job.getConfigMap() == null) {
+            job.setConfigMap(new HashMap<>());
+        }
+        job.getConfigMap().put(TRIGGER_KEY, context.getTrigger().getKey().toString());
     }
 
     @SuppressWarnings("unchecked")
@@ -281,7 +286,8 @@ public class JobInstance implements Job {
             throw new GriffinException.ConflictException
                     (QUARTZ_JOB_ALREADY_EXIST);
         }
-        saveJobInstance(jobName, groupName);
+        String triggerKey = (String) confMap.get(TRIGGER_KEY);
+        saveJobInstance(jobName, groupName, triggerKey);
         createJobInstance(tk, interval, repeat, jobName);
     }
 
@@ -309,7 +315,7 @@ public class JobInstance implements Job {
         return confMap;
     }
 
-    private void saveJobInstance(String pName, String pGroup) {
+    private void saveJobInstance(String pName, String pGroup, String triggerKey) {
         ProcessType type = measure.getProcessType() == BATCH ? BATCH :
                 STREAMING;
         Long tms = System.currentTimeMillis();
@@ -319,6 +325,7 @@ public class JobInstance implements Job {
         JobInstanceBean instance = new JobInstanceBean(FINDING, pName, pGroup,
                 tms, expireTms, type);
         instance.setJob(job);
+        instance.setTriggerKey(triggerKey);
         instanceRepo.save(instance);
     }
 
