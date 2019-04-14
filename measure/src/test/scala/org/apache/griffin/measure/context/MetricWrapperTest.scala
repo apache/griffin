@@ -35,8 +35,9 @@ class MetricWrapperTest extends FlatSpec with Matchers {
     metricWrapper.insertMetric(2, Map("miss" -> 4))
     metricWrapper.flush should be (Map(
       1L -> Map("name" -> "test", "tmst" -> 1, "value" -> Map("total" -> 10, "miss"-> 2, "match" -> 8),
-        "applicationId" -> "appId"),
-      2L -> Map("name" -> "test", "tmst" -> 2, "value" -> Map("total" -> 20, "miss"-> 4), "applicationId" -> "appId")
+        "metadata" -> Map("applicationId" -> "appId")),
+      2L -> Map("name" -> "test", "tmst" -> 2, "value" -> Map("total" -> 20, "miss"-> 4),
+        "metadata" -> Map("applicationId" -> "appId"))
     ))
   }
 

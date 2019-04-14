@@ -31,7 +31,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.metric.model.MetricValue;
 import org.apache.griffin.core.util.JsonUtil;
 import org.apache.http.Header;
@@ -142,14 +144,16 @@ public class MetricStoreImpl implements MetricStore {
                 .hasNonNull("hits")) {
             for (JsonNode node : jsonNode.get("hits").get("hits")) {
                 JsonNode sourceNode = node.get("_source");
-                Map<String, Object> value = JsonUtil.toEntity(sourceNode
-                                .get("value").toString(),
-                        new TypeReference<Map<String, Object>>() {
-                        });
-                MetricValue metricValue = new MetricValue(sourceNode
-                        .get("name")
-                        .asText(),
+                Map<String, Object> value = JsonUtil.toEntity(
+                        sourceNode.get("value").toString(),
+                        new TypeReference<Map<String, Object>>() {});
+                Map<String, Object> meta = JsonUtil.toEntity(
+                        Objects.toString(sourceNode.get("metadata"), null),
+                        new TypeReference<Map<String, Object>>() {});
+                MetricValue metricValue = new MetricValue(
+                        sourceNode.get("name").asText(),
                         Long.parseLong(sourceNode.get("tmst").asText()),
+                        meta,
                         value);
                 metricValues.add(metricValue);
             }
@@ -205,5 +209,15 @@ public class MetricStoreImpl implements MetricStore {
         String auth = user + ":" + password;
         return String.format("Basic %s", Base64.getEncoder().encodeToString(
                 auth.getBytes()));
+    }
+
+    @Override
+    public MetricValue getMetric(String applicationId) throws IOException {
+        Response response = client.performRequest(
+                "GET", urlGet,
+                Collections.singletonMap(
+                        "q", "metadata.applicationId:" + applicationId));
+        List<MetricValue> metricValues = getMetricValuesFromResponse(response);
+        return metricValues.get(0);
     }
 }

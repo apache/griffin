@@ -76,6 +76,8 @@ public enum GriffinExceptionMessage {
 
     INSTANCE_ID_DOES_NOT_EXIST(40409, "Instance id does not exist"),
 
+    JOB_INSTANCE_NOT_FOUND(40410, "No job instances with given job instance id found"),
+
     //409, "Conflict"
     MEASURE_NAME_ALREADY_EXIST(40901, "Measure name already exists"),
 
