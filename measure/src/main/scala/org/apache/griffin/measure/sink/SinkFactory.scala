@@ -22,6 +22,7 @@ import scala.util.{Success, Try}
 
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.utils.ParamUtil._
 
 
 
