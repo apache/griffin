@@ -83,7 +83,7 @@ Above lists environment parameters.
 - **griffin.checkpoint**: This field configures list of griffin checkpoint parameters, multiple cache ways are supported. It is only for streaming dq case. Details of info cache configuration [here](#griffin-checkpoint).
 
 ### <a name="sinks"></a>Sinks
-- **type**: Metrics and records sink type, "console", "hdfs", "http", "mongo". 
+- **type**: Metrics and records sink type, "console", "hdfs", "http", "mongo", "custom". 
 - **config**: Configure parameters of each sink type.
 	+ console sink (aliases: "log")
 		* max.log.lines: the max lines of log.
@@ -98,6 +98,12 @@ Above lists environment parameters.
         * url: url of mongo db.
         * database: database name.
         * collection: collection name. 
+    + custom sink
+        * class: class name for user-provided data sink implementation
+        it should be implementing org.apache.griffin.measure.sink.Sink trait and have static method with signature
+		    ```def apply(ctx: SinkContext): Sink```. 
+        User-provided data sink should be present in Spark job's class path, by providing custom jar as -jar parameter
+		    to spark-submit or by adding to "jars" list in sparkProperties.json.
 
 ### <a name="griffin-checkpoint"></a>Griffin Checkpoint
 - **type**: Griffin checkpoint type, "zk" for zookeeper checkpoint.
