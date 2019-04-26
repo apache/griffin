@@ -23,18 +23,18 @@ import scala.util.{Success, Try}
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums._
 
-
-
-case class SinkFactory(sinkParams: Iterable[SinkParam], metricName: String) extends Serializable {
+case class SinkFactory(sinkParamIter: Iterable[SinkParam],
+                       metricName: String) extends Serializable {
 
   /**
     * create sink
-    * @param timeStamp    the timestamp of sink
-    * @param block        sink write metric in block or non-block way
-    * @return   sink
+    *
+    * @param timeStamp the timestamp of sink
+    * @param block     sink write metric in block or non-block way
+    * @return sink
     */
   def getSinks(timeStamp: Long, block: Boolean): MultiSinks = {
-    MultiSinks(sinkParams.flatMap(param => getSink(timeStamp, param, block)))
+    MultiSinks(sinkParamIter.flatMap(param => getSink(timeStamp, param, block)))
   }
 
   private def getSink(timeStamp: Long, sinkParam: SinkParam, block: Boolean): Option[Sink] = {

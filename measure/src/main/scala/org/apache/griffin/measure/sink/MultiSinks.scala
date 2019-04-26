@@ -23,11 +23,11 @@ import org.apache.spark.rdd.RDD
 /**
   * sink metric and record in multiple ways
   */
-case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
+case class MultiSinks(sinkIter: Iterable[Sink]) extends Sink {
 
   val block: Boolean = false
 
-  val headSinkOpt: Option[Sink] = sinks.headOption
+  val headSinkOpt: Option[Sink] = sinkIter.headOption
 
   val metricName: String = headSinkOpt.map(_.metricName).getOrElse("")
 
@@ -35,13 +35,20 @@ case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
 
   val config: Map[String, Any] = Map[String, Any]()
 
-  def available(): Boolean = { sinks.exists(_.available()) }
+  def available(): Boolean = {
+    sinkIter.exists(_.available())
+  }
 
-  def start(msg: String): Unit = { sinks.foreach(_.start(msg)) }
-  def finish(): Unit = { sinks.foreach(_.finish()) }
+  def start(msg: String): Unit = {
+    sinkIter.foreach(_.start(msg))
+  }
+
+  def finish(): Unit = {
+    sinkIter.foreach(_.finish())
+  }
 
   def log(rt: Long, msg: String): Unit = {
-    sinks.foreach { sink =>
+    sinkIter.foreach { sink =>
       try {
         sink.log(rt, msg)
       } catch {
@@ -51,7 +58,7 @@ case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
   }
 
   def sinkRecords(records: RDD[String], name: String): Unit = {
-    sinks.foreach { sink =>
+    sinkIter.foreach { sink =>
       try {
         sink.sinkRecords(records, name)
       } catch {
@@ -59,8 +66,9 @@ case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
       }
     }
   }
+
   def sinkRecords(records: Iterable[String], name: String): Unit = {
-    sinks.foreach { sink =>
+    sinkIter.foreach { sink =>
       try {
         sink.sinkRecords(records, name)
       } catch {
@@ -68,8 +76,9 @@ case class MultiSinks(sinks: Iterable[Sink]) extends Sink {
       }
     }
   }
+
   def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    sinks.foreach { sink =>
+    sinkIter.foreach { sink =>
       try {
         sink.sinkMetrics(metrics)
       } catch {
