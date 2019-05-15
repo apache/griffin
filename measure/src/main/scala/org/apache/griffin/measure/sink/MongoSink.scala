@@ -32,9 +32,11 @@ import org.apache.griffin.measure.utils.TimeUtil
 /**
   * sink metric and record to mongo
   */
-case class MongoSink(config: Map[String, Any], metricName: String,
-                     timeStamp: Long, block: Boolean
-                       ) extends Sink {
+case class MongoSink(
+                      config: Map[String, Any],
+                      metricName: String,
+                      timeStamp: Long,
+                      block: Boolean) extends Sink {
 
   MongoConnection.init(config)
 

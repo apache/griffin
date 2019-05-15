@@ -28,15 +28,18 @@ import org.apache.griffin.measure.utils.ParamUtil._
 /**
   * sink metric and record to hdfs
   */
-case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Long) extends Sink {
+case class HdfsSink(
+                     config: Map[String, Any],
+                     metricName: String,
+                     timeStamp: Long) extends Sink {
 
   val block: Boolean = true
 
-  val Path = "path"
+  val PathKey = "path"
   val MaxPersistLines = "max.persist.lines"
   val MaxLinesPerFile = "max.lines.per.file"
 
-  val path = config.getOrElse(Path, "").toString
+  val parentPath = config.getOrElse(PathKey, "").toString
   val maxPersistLines = config.getInt(MaxPersistLines, -1)
   val maxLinesPerFile = math.min(config.getInt(MaxLinesPerFile, 10000), 1000000)
 
@@ -49,7 +52,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
   var _init = true
 
   def available(): Boolean = {
-    path.nonEmpty
+    parentPath.nonEmpty
   }
 
   private def logHead: String = {
@@ -70,7 +73,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
   }
 
   protected def filePath(file: String): String = {
-    HdfsUtil.getHdfsFilePath(path, s"${metricName}/${timeStamp}/${file}")
+    HdfsUtil.getHdfsFilePath(parentPath, s"${metricName}/${timeStamp}/${file}")
   }
 
   protected def withSuffix(path: String, suffix: String): String = {

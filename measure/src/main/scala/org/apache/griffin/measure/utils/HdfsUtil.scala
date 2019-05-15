@@ -77,7 +77,6 @@ object HdfsUtil extends Loggable {
     out.close
   }
 
-
   def getHdfsFilePath(parentPath: String, fileName: String): String = {
     if (parentPath.endsWith(seprator)) parentPath + fileName else parentPath + seprator + fileName
   }
@@ -91,9 +90,10 @@ object HdfsUtil extends Loggable {
     }
   }
 
-
-  def listSubPathsByType(dirPath: String, subType: String, fullPath: Boolean = false)
-    : Iterable[String] = {
+  def listSubPathsByType(
+                          dirPath: String,
+                          subType: String,
+                          fullPath: Boolean = false) : Iterable[String] = {
     if (existPath(dirPath)) {
       try {
         implicit val path = new Path(dirPath)
@@ -116,8 +116,10 @@ object HdfsUtil extends Loggable {
     } else Nil
   }
 
-  def listSubPathsByTypes(dirPath: String, subTypes: Iterable[String], fullPath: Boolean = false)
-    : Iterable[String] = {
+  def listSubPathsByTypes(
+                           dirPath: String,
+                           subTypes: Iterable[String],
+                           fullPath: Boolean = false) : Iterable[String] = {
     subTypes.flatMap { subType =>
       listSubPathsByType(dirPath, subType, fullPath)
     }
