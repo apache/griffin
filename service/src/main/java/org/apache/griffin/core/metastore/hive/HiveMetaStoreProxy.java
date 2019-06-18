@@ -38,6 +38,9 @@ public class HiveMetaStoreProxy {
     @Value("${hive.metastore.uris}")
     private String uris;
 
+    @Value("${hive.metastore.kerberos.principal}")
+    private String principal;
+
     /**
      * Set attempts and interval for HiveMetastoreClient to retry.
      *
@@ -62,10 +65,13 @@ public class HiveMetaStoreProxy {
         hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES,
                 3);
         hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
+        hiveConf.setVar(HiveConf.ConfVars.METASTORE_KERBEROS_PRINCIPAL, principal);
         hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);
         try {
+            LOGGER.info("Starting to get a client. ");
             client = HiveMetaStoreClient.newSynchronizedClient(new HiveMetaStoreClient(hiveConf));
+            LOGGER.info("Successfully get a client. ");
         } catch (Exception e) {
             LOGGER.error("Failed to connect hive metastore. {}", e);
         }
