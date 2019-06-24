@@ -315,7 +315,6 @@ public class BatchJobOperatorImpl implements JobOperator {
 
     private boolean pauseJobInstance(JobInstanceBean instance,
                                      List<JobInstanceBean> deletedInstances) {
-        boolean status = true;
         String pGroup = instance.getPredicateGroup();
         String pName = instance.getPredicateName();
         try {
@@ -327,9 +326,9 @@ public class BatchJobOperatorImpl implements JobOperator {
         } catch (SchedulerException e) {
             LOGGER.error("Failed to pause predicate job({},{}).", pGroup,
                     pName);
-            status = false;
+            return false;
         }
-        return status;
+        return true;
     }
 
     private void validateParams(AbstractJob job, GriffinMeasure measure) {
@@ -357,7 +356,7 @@ public class BatchJobOperatorImpl implements JobOperator {
             return false;
         }
         if (!isValidExpression(cronExpression)) {
-            LOGGER.warn("Cron Expression is invalid.");
+            LOGGER.warn("Cron Expression is invalid: {}", cronExpression);
             return false;
         }
         return true;
