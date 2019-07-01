@@ -33,3 +33,12 @@ trait DQStep extends Loggable {
   def getNames(): Seq[String] = name :: Nil
 
 }
+
+object DQStepStatus extends Enumeration {
+  val PENDING = Value
+  val RUNNING = Value
+  val COMPLETE = Value
+  val FAILED = Value
+}
+
+

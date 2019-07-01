@@ -29,7 +29,7 @@ case class SparkSqlTransformStep(name: String,
                                  cache: Boolean = false
                                 ) extends TransformStep {
 
-  def execute(context: DQContext): Boolean = {
+  def doExecute(context: DQContext): Boolean = {
     val sqlContext = context.sqlContext
     try {
       val df = sqlContext.sql(rule)
