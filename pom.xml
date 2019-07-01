@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Licensed to the Apache Software Foundation (ASF) under one
+Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
 distributed with this work for additional information
 regarding copyright ownership.  The ASF licenses this file
@@ -17,310 +17,163 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.apache.griffin</groupId>
-        <artifactId>griffin</artifactId>
-        <version>0.6.0-SNAPSHOT</version>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>17</version>
+        <relativePath />
     </parent>
 
-    <artifactId>service</artifactId>
-    <packaging>jar</packaging>
+    <groupId>org.apache.griffin</groupId>
+    <artifactId>griffin</artifactId>
+    <version>0.6.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Apache Griffin ${project.version}</name>
+    <url>http://griffin.apache.org</url>
 
-    <name>Apache Griffin :: Web Service</name>
+    <prerequisites>
+        <maven>3.2.5</maven>
+    </prerequisites>
 
     <properties>
         <java.version>1.8</java.version>
+        <maven-apache-rat.version>0.11</maven-apache-rat.version>
+        <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <hadoop.version>2.7.1</hadoop.version>
-        <hive.version>1.2.2</hive.version>
-        <scala.version>2.11</scala.version>
-        <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
-        <confluent.version>3.2.0</confluent.version>
-        <quartz.version>2.2.1</quartz.version>
-        <start-class>org.apache.griffin.core.GriffinWebApplication</start-class>
-        <powermock.version>1.6.6</powermock.version>
-        <mockito.version>1.10.19</mockito.version>
-        <spring-boot-maven-plugin.version>1.5.1.RELEASE</spring-boot-maven-plugin.version>
-        <derby.version>10.14.1.0</derby.version>
-        <eclipselink.version>2.6.0</eclipselink.version>
-        <mysql.java.version>5.1.47</mysql.java.version>
-        <postgresql.version>9.4.1212.jre7</postgresql.version>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>confluent</id>
-            <url>http://packages.confluent.io/maven/</url>
-        </repository>
-    </repositories>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://www.apache.org</url>
+    </organization>
+
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://issues.apache.org/jira/browse/GRIFFIN</url>
+    </issueManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>griffin-dev</name>
+            <subscribe>dev-subscribe@griffin.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@griffin.apache.org</unsubscribe>
+            <post>dev@griffin.apache.org</post>
+        </mailingList>
+    </mailingLists>
+
+    <!--<pluginRepositories>-->
+    <!--</pluginRepositories>-->
+
+    <scm>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/griffin.git</connection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/griffin.git</developerConnection>
+        <url>https://gitbox.apache.org/repos/asf?p=griffin.git;a=summary</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+    </distributionManagement>
 
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <modules>
+        <module>ui</module>
+        <module>service</module>
+        <module>measure</module>
+    </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.aspectj</groupId>
-                    <artifactId>aspectjrt</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aspects</artifactId>
-        </dependency>
-        <!--eclipse link-->
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa</artifactId>
-            <version>${eclipselink.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
-        </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.6.3</version>
-        </dependency>
-
-        <!-- to access metastore from hive-->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>${hadoop.version}</version>
-            <!--<scope>provided</scope>-->
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hive</groupId>
-            <artifactId>hive-metastore</artifactId>
-            <version>${hive.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.aggregate</groupId>
-                    <artifactId>jetty-all</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.orbit</groupId>
-                    <artifactId>javax.servlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>de.ruedigermoeller</groupId>
-                    <artifactId>fst</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- to access confluent schema registry -->
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>kafka-schema-registry-client</artifactId>
-            <version>${confluent.version}</version>
-        </dependency>
-
-        <!--schedule-->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz-jobs</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-
-        <!--livy-core-->
-        <dependency>
-            <groupId>com.cloudera.livy</groupId>
-            <artifactId>livy-core_2.10</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-
-        <!-- test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-client</artifactId>
-            <version>6.2.4</version>
-        </dependency>
-    </dependencies>
-    <profiles>
-        <!--if you need mysql, please uncomment mysql-connector-java -->
-        <!--<profile>-->
-        <!--<id>mysql</id>-->
-        <!--<activation>-->
-        <!--<property>-->
-        <!--<name>mysql</name>-->
-        <!--</property>-->
-        <!--</activation>-->
-        <!--</profile>-->
-        <profile>
-            <id>dev</id>
-            <activation>
-                <property>
-                    <name>dev</name>
-                </property>
-            </activation>
-        </profile>
-        <profile>
-            <id>postgresql</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>prod</name>
-                </property>
-            </activation>
-        </profile>
-    </profiles>
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.6.1</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.rat</groupId>
+                    <artifactId>apache-rat-plugin</artifactId>
+                    <version>${maven-apache-rat.version}</version>
+                    <configuration>
+                        <!-- Exclude files/folders for apache release -->
+                        <excludes>
+                            <!-- Git specific files -->
+                            <exclude>.git/</exclude>
+                            <exclude>.gitignore</exclude>
+                            <!-- IDE specific files-->
+                            <exclude>**/.idea/</exclude>
+                            <exclude>**/.scalastyle/</exclude>
+                            <exclude>**/*.iml</exclude>
+                            <exclude>**/.classpath</exclude>
+                            <exclude>**/.settings/**</exclude>
+                            <exclude>**/.project</exclude>
+                            <!-- Maven working directory -->
+                            <exclude>**/target/**</exclude>
+                            <!-- Patch files which can be lying around -->
+                            <exclude>**/*.patch</exclude>
+                            <exclude>**/*.rej</exclude>
+                            <!-- README and test data with exact format -->
+                            <exclude>README*</exclude>
+                            <exclude>DEPENDENCIES</exclude>
+                            <exclude>**/licenses/*</exclude>
+                            <exclude>**/*.log</exclude>
+                            <exclude>**/*.out</exclude>
+                            <exclude>**/*.db</exclude>
+                            <exclude>**/velocity.log*</exclude>
+                            <exclude>**/*.json</exclude>
+                            <exclude>**/*.csv</exclude>
+                            <exclude>**/*.avro</exclude>
+                            <exclude>**/*.dat</exclude>
+                            <exclude>**/banner.txt</exclude>
+                            <exclude>**/bower_components/**</exclude>
+                            <exclude>**/node_modules/**</exclude>
+                            <exclude>**/.tmp/**</exclude>
+                            <exclude>**/angular/src/assets/.gitkeep</exclude>
+                            <exclude>**/angular/.editorconfig</exclude>
+                            <exclude>**/dist/**</exclude>
+                            <exclude>**/.bowerrc</exclude>
+                            <exclude>**/src/main/resources/public/**</exclude>
+                            <exclude>**/pom.xml.releaseBackup</exclude>
+                            <exclude>**/pom.xml.tag</exclude>
+                        </excludes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>rat-check</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>com.ethlo.persistence.tools</groupId>
-                <artifactId>eclipselink-maven-plugin</artifactId>
-                <version>2.7.0</version>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>weave</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.eclipse.persistence</groupId>
-                        <artifactId>org.eclipse.persistence.jpa</artifactId>
-                        <version>${eclipselink.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>lib</classifier>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <fork>true</fork>
-                    <layout>JAR</layout>
-                    <mainClass>org.apache.griffin.core.GriffinWebApplication</mainClass>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
+
         </plugins>
     </build>
+
 </project>
