@@ -137,8 +137,6 @@ public abstract class Measure extends AbstractAuditableEntity {
     public void save() throws JsonProcessingException {
         if (sinksList != null) {
             this.sinks = JsonUtil.toJson(sinksList);
-        } else {
-            this.sinks = null;
         }
     }
 
@@ -147,8 +145,6 @@ public abstract class Measure extends AbstractAuditableEntity {
         if (!StringUtils.isEmpty(sinks)) {
             this.sinksList = JsonUtil.toEntity(sinks, new TypeReference<List<String>>() {
             });
-        } else {
-            this.sinksList = null;
         }
     }
 
