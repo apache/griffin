@@ -24,8 +24,12 @@ class HiveConnectMgr {
     @Value("${hive.jdbc.url}")
     private String hiveURL;
 
-    private HiveConnectMgr() {
+    private HiveConnectMgr() {}
 
+    private Connection conn;
+
+    public void setConn(Connection conn) {
+        this.conn = conn;
     }
 
     static HiveConnectMgr getHiveConnectionMgr() {
@@ -35,13 +39,15 @@ class HiveConnectMgr {
     }
 
     Connection getConnection() throws Exception {
+        if (conn != null) return this.conn;
+
         String url = hiveURL;
         String driver = hiveClassName;
 
         Class.forName(driver);
         LOGGER.info("getting connection");
 
-        Connection conn = DriverManager.getConnection(url);
+        conn = DriverManager.getConnection(url);
 
         LOGGER.info("got connection");
         return conn;

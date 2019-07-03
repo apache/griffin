@@ -5,9 +5,9 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -24,7 +24,7 @@ import java.util.Map;
  * Date:   2019-06-18.
  */
 @Service
-@Component(value = "hive_jdbc")
+@Qualifier(value = "hive_jdbc")
 @CacheConfig(cacheNames = "hive", keyGenerator = "cacheKeyGenerator")
 public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
 
@@ -80,6 +80,9 @@ public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
     @Cacheable(unless = "#result==null")
     public Table getTable(String dbName, String tableName) {
         Table result = new Table();
+        result.setDbName(dbName);
+        result.setTableName(tableName);
+
         String sql = "show create table " + dbName + "." + tableName;
         Connection conn = null;
         Statement stmt = null;
@@ -92,7 +95,6 @@ public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 String s = rs.getString(1);
-                System.out.println(s);
                 sb.append(s);
             }
             String location = getLocation(sb.toString());
@@ -120,6 +122,11 @@ public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
         LOGGER.info("Evict hive cache");
     }
 
+    /**
+     * Query Hive for Show tables or show databases, which will return List of String
+     * @param sql
+     * @return
+     */
     private Iterable<String> queryHiveString(String sql) {
         List<String> res = new ArrayList<>();
         Connection conn = null;
@@ -157,10 +164,12 @@ public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
         int index = tableMetadata.indexOf("location");
         if (index == -1) return "";
 
-        int start = tableMetadata.indexOf("\'", index) + 1;
-        int end = tableMetadata.indexOf("\'", start);
+        int start = tableMetadata.indexOf("\'", index);
+        int end = tableMetadata.indexOf("\'", start + 1);
 
-        return tableMetadata.substring(start, end);
+        if (start == -1 || end == -1) return "";
+
+        return tableMetadata.substring(start + 1, end);
     }
 
     /**
@@ -178,10 +187,38 @@ public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
             String[] parts = colStr.split(" ");
             String colName = parts[0].trim().substring(1, parts[0].trim().length() - 1);
             String colType = parts[1].trim();
-            String comment = parts[3].trim().substring(1, parts[3].trim().length() - 1);
+            String comment = getComment(colStr);
             FieldSchema schema = new FieldSchema(colName, colType, comment);
             res.add(schema);
         }
         return res;
+    }
+
+    /**
+     * Parse one column string, such as : `merch_date` string COMMENT 'this is merch process date'
+     *
+     * @param colStr
+     * @return
+     */
+    public String getComment(String colStr) {
+        colStr = colStr.toLowerCase();
+        int i = colStr.indexOf("comment");
+        if (i == -1) return "";
+
+        int s = -1, e = -1;
+        while (i < colStr.length()) {
+            if (colStr.charAt(i) == '\'') {
+                if (s == -1) s = i;
+                else {
+                    e = i;
+                    break;
+                }
+            }
+            i++;
+        }
+        if (s == -1 || e == -1) return "";
+        if (s > e) return "";
+
+        return colStr.substring(s+1, e);
     }
 }

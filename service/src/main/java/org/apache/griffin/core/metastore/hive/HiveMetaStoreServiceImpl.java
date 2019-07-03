@@ -19,17 +19,13 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.collect.Lists;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,8 +34,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 @Service
+@Qualifier(value = "hive_metastore")
 @CacheConfig(cacheNames = "hive", keyGenerator = "cacheKeyGenerator")
 public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
@@ -51,6 +53,10 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
 
     @Value("${hive.metastore.dbname}")
     private String defaultDbName;
+
+    public void setClient(IMetaStoreClient client) {
+        this.client = client;
+    }
 
 
     public HiveMetaStoreServiceImpl() {
