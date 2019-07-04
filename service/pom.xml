@@ -105,16 +105,16 @@ under the License.
             <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>${eclipselink.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.postgresql</groupId>-->
+<!--            <artifactId>postgresql</artifactId>-->
+<!--            <version>${postgresql.version}</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.java.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>mysql</groupId>-->
-            <!--<artifactId>mysql-connector-java</artifactId>-->
-            <!--<version>${mysql.java.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -143,26 +143,42 @@ under the License.
                 </exclusion>
             </exclusions>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.hive</groupId>-->
+<!--            <artifactId>hive-metastore</artifactId>-->
+<!--            <version>${hive.version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.eclipse.jetty.aggregate</groupId>-->
+<!--                    <artifactId>jetty-all</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.eclipse.jetty.orbit</groupId>-->
+<!--                    <artifactId>javax.servlet</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>javax.servlet</groupId>-->
+<!--                    <artifactId>servlet-api</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>de.ruedigermoeller</groupId>-->
+<!--                    <artifactId>fst</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>org.apache.hive</groupId>
-            <artifactId>hive-metastore</artifactId>
+            <artifactId>hive-jdbc</artifactId>
             <version>${hive.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.aggregate</groupId>
-                    <artifactId>jetty-all</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.orbit</groupId>
-                    <artifactId>javax.servlet</artifactId>
+                    <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>de.ruedigermoeller</groupId>
-                    <artifactId>fst</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -231,14 +247,14 @@ under the License.
     </dependencies>
     <profiles>
         <!--if you need mysql, please uncomment mysql-connector-java -->
-        <!--<profile>-->
-            <!--<id>mysql</id>-->
-            <!--<activation>-->
-                <!--<property>-->
-                    <!--<name>mysql</name>-->
-                <!--</property>-->
-            <!--</activation>-->
-        <!--</profile>-->
+        <profile>
+            <id>mysql</id>
+            <activation>
+                <property>
+                    <name>mysql</name>
+                </property>
+            </activation>
+        </profile>
         <profile>
             <id>dev</id>
             <activation>
@@ -247,15 +263,15 @@ under the License.
                 </property>
             </activation>
         </profile>
-        <profile>
-            <id>postgresql</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>prod</name>
-                </property>
-            </activation>
-        </profile>
+<!--        <profile>-->
+<!--            <id>postgresql</id>-->
+<!--            <activation>-->
+<!--                <activeByDefault>true</activeByDefault>-->
+<!--                <property>-->
+<!--                    <name>prod</name>-->
+<!--                </property>-->
+<!--            </activation>-->
+<!--        </profile>-->
     </profiles>
     <build>
         <plugins>
