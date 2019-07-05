@@ -78,13 +78,13 @@ public class HiveMetaStoreServiceImplTest {
     }
 
     @Test
-    public void testGetAllDatabasesForNormalRun() throws MetaException {
+    public void testGetAllDatabasesForNormalRun() throws TException {
         given(client.getAllDatabases()).willReturn(Arrays.asList("default"));
         assertEquals(service.getAllDatabases().iterator().hasNext(), true);
     }
 
     @Test
-    public void testGetAllDatabasesForMetaException() throws MetaException {
+    public void testGetAllDatabasesForMetaException() throws TException {
         given(client.getAllDatabases()).willThrow(MetaException.class);
         doNothing().when(client).reconnect();
         assertTrue(service.getAllDatabases() == null);

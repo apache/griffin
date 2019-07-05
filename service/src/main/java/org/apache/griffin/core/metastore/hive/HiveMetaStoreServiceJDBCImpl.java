@@ -6,14 +6,12 @@ import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +28,12 @@ public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(HiveMetaStoreService.class);
+
+    @Value("${hive.jdbc.className}")
+    private String hiveClassName;
+
+    @Value("${hive.jdbc.url}")
+    private String hiveURL;
 
     @Override
     @Cacheable(unless = "#result==null")
@@ -90,7 +94,9 @@ public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
         StringBuilder sb = new StringBuilder();
 
         try {
-            conn = HiveConnectMgr.getHiveConnectionMgr().getConnection();
+            Class.forName(hiveClassName);
+            conn = DriverManager.getConnection(hiveURL);
+            LOGGER.info("got connection");
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -134,7 +140,9 @@ public class HiveMetaStoreServiceJDBCImpl implements HiveMetaStoreService {
         ResultSet rs = null;
 
         try {
-            conn = HiveConnectMgr.getHiveConnectionMgr().getConnection();
+            Class.forName(hiveClassName);
+            conn = DriverManager.getConnection(hiveURL);
+            LOGGER.info("got connection");
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
