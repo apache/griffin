@@ -93,6 +93,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
 
       val incompleteRecordTransStep =
         SparkSqlTransformStep(incompleteRecordsTableName, incompleteRecordsSql, emptyMap, true)
+      incompleteRecordTransStep.parentSteps += sourceAliasTransStep
       val incompleteRecordWriteStep = {
         val rwName =
           ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
@@ -112,6 +113,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       }
       val incompleteCountTransStep =
         SparkSqlTransformStep(incompleteCountTableName, incompleteCountSql, emptyMap)
+      incompleteCountTransStep.parentSteps += incompleteRecordTransStep
 
       // 4. total count
       val totalCountTableName = "__totalCount"
@@ -124,6 +126,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
             s"FROM `${sourceAliasTableName}` GROUP BY `${ConstantColumns.tmst}`"
       }
       val totalCountTransStep = SparkSqlTransformStep(totalCountTableName, totalCountSql, emptyMap)
+      totalCountTransStep.parentSteps += sourceAliasTransStep
 
       // 5. complete metric
       val completeTableName = ruleParam.getOutDfName()
@@ -147,6 +150,8 @@ case class CompletenessExpr2DQSteps(context: DQContext,
          """.stripMargin
       }
       val completeTransStep = SparkSqlTransformStep(completeTableName, completeMetricSql, emptyMap)
+      completeTransStep.parentSteps += incompleteCountTransStep
+      completeTransStep.parentSteps += totalCountTransStep
       val completeWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(completeTableName)
@@ -154,14 +159,8 @@ case class CompletenessExpr2DQSteps(context: DQContext,
         MetricWriteStep(mwName, completeTableName, flattenType)
       }
 
-      val transSteps = {
-        sourceAliasTransStep :: incompleteRecordTransStep ::
-          incompleteCountTransStep :: totalCountTransStep ::
-          completeTransStep :: Nil
-      }
-      val writeSteps = {
-        incompleteRecordWriteStep :: completeWriteStep :: Nil
-      }
+      val transSteps = completeTransStep :: Nil
+      val writeSteps = incompleteRecordWriteStep :: completeWriteStep :: Nil
 
       // full steps
       transSteps ++ writeSteps
