@@ -163,12 +163,11 @@ case class AccuracyExpr2DQSteps(context: DQContext,
         case StreamingProcessType => Nil
       }
 
-      // accuracy current steps
-      val writeSteps1 =
+      val batchWriteSteps =
         accuracyMetricWriteSteps ++ missRecordsWriteSteps ++ missRecordsUpdateWriteSteps
 
       procType match {
-        case BatchProcessType => accuracyTransStep :: writeSteps1
+        case BatchProcessType => accuracyTransStep :: batchWriteSteps
         // streaming extra steps
         case StreamingProcessType =>
           // 5. accuracy metric merge
@@ -209,8 +208,8 @@ case class AccuracyExpr2DQSteps(context: DQContext,
           }
 
           // extra steps
-          val writeSteps2 = accuracyMetricWriteStep :: accuracyRecordWriteStep :: Nil
-          accuracyRecordTransStep :: writeSteps1 ++ writeSteps2
+          val streamingWriteSteps = accuracyMetricWriteStep :: accuracyRecordWriteStep :: Nil
+          accuracyRecordTransStep :: batchWriteSteps ++ streamingWriteSteps
       }
     }
   }
