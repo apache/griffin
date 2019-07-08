@@ -32,14 +32,12 @@ under the License.
     <name>Apache Griffin :: Web Service</name>
 
     <properties>
-        <java.version>1.8</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hadoop.version>2.7.1</hadoop.version>
         <hive.version>2.2.0</hive.version>
         <scala.version>2.10</scala.version>
         <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
         <confluent.version>3.2.0</confluent.version>
-        <quartz.version>2.2.1</quartz.version>
+        <quartz.version>2.2.2</quartz.version>
         <start-class>org.apache.griffin.core.GriffinWebApplication</start-class>
         <powermock.version>1.6.6</powermock.version>
         <mockito.version>1.10.19</mockito.version>
@@ -48,6 +46,9 @@ under the License.
         <eclipselink.version>2.6.0</eclipselink.version>
         <mysql.java.version>5.1.47</mysql.java.version>
         <postgresql.version>9.4.1212.jre7</postgresql.version>
+        <livy.core.version>0.3.0</livy.core.version>
+        <elasticsearch-rest-client.version>6.2.4</elasticsearch-rest-client.version>
+        <jackson-databind.version>2.6.3</jackson-databind.version>
     </properties>
 
     <repositories>
@@ -127,7 +128,7 @@ under the License.
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson-databind.version}</version>
         </dependency>
 
         <!-- to access metastore from hive-->
@@ -182,19 +183,19 @@ under the License.
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.2.2</version>
+            <version>${quartz.version}</version>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
-            <version>2.2.2</version>
+            <version>${quartz.version}</version>
         </dependency>
 
         <!--livy-core-->
         <dependency>
             <groupId>com.cloudera.livy</groupId>
-            <artifactId>livy-core_2.10</artifactId>
-            <version>0.3.0</version>
+            <artifactId>livy-core_${scala.version}</artifactId>
+            <version>${livy.core.version}</version>
         </dependency>
 
         <!-- test -->
@@ -207,7 +208,6 @@ under the License.
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -226,7 +226,7 @@ under the License.
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
-            <version>6.2.4</version>
+            <version>${elasticsearch-rest-client.version}</version>
         </dependency>
     </dependencies>
     <profiles>
@@ -315,11 +315,6 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
         </plugins>
     </build>
