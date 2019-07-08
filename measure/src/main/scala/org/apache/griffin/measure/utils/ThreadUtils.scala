@@ -109,7 +109,7 @@ private[griffin] object ThreadUtils {
    *
    * SomeException: exception-message
    *   at CallerClass.body-method (sourcefile.scala)
-   *   at ... run in separate thread using org.apache.spark.util.ThreadUtils ... ()
+   *   at ... run in separate thread using org.apache.griffin.measure.utils.ThreadUtils ... ()
    *   at CallerClass.caller-method (sourcefile.scala)
    *   ...
    */
@@ -188,14 +188,13 @@ private[griffin] object ThreadUtils {
    * `BlockingContext`. Codes running in the user's thread may be in a thread of Scala ForkJoinPool.
    * As concurrent executions in ForkJoinPool may see some [[ThreadLocal]] value unexpectedly, this
    * method basically prevents ForkJoinPool from running other tasks in the current waiting thread.
-   * In general, we should use this method because many places in Spark use [[ThreadLocal]] and it's
-   * hard to debug when [[ThreadLocal]]s leak to other tasks.
+   * In general, we should use this method because it's hard to debug when [[ThreadLocal]]s leak
+   * to other tasks.
    */
   @throws(classOf[Exception])
   def awaitResult[T](awaitable: Awaitable[T], atMost: Duration): T = {
     try {
       // `awaitPermission` is not actually used anywhere so it's safe to pass in null here.
-      // See SPARK-13747.
       val awaitPermission = null.asInstanceOf[scala.concurrent.CanAwait]
       awaitable.result(atMost)(awaitPermission)
     } catch {
@@ -216,7 +215,6 @@ private[griffin] object ThreadUtils {
   def awaitReady[T](awaitable: Awaitable[T], atMost: Duration): awaitable.type = {
     try {
       // `awaitPermission` is not actually used anywhere so it's safe to pass in null here.
-      // See SPARK-13747.
       val awaitPermission = null.asInstanceOf[scala.concurrent.CanAwait]
       awaitable.ready(atMost)(awaitPermission)
     } catch {
