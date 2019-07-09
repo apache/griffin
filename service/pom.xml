@@ -58,7 +58,6 @@ under the License.
         </repository>
     </repositories>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>

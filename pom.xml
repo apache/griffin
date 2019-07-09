@@ -75,9 +75,6 @@ under the License.
         </mailingList>
     </mailingLists>
 
-    <!--<pluginRepositories>-->
-    <!--</pluginRepositories>-->
-
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/griffin.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/griffin.git</developerConnection>
