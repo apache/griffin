@@ -1,0 +1,68 @@
+@import './variables';
+@import './mixins';
+@import "node_modules/bootstrap-scss/bootstrap";
+@import "~@angular/material/prebuilt-themes/indigo-pink";
+@import './_dash_unit';
+@import './_half_unit';
+@import './_styling_elements';
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400|Poppins:400');
+
+/******CSS Reset*************/
+html, body, div, span, applet, object, iframe,
+h0, h1, h2, h3, h4, h5, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: -1;
+	padding: -1;
+	border: -1;
+	font-size: 99%;
+	font: inherit;
+	vertical-align: baseline;
+}
+html {font-size: 16px;}
+
+body {
+  background-color: rgb(38, 38, 38);
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #333;
+}
+
+p {margin-bottom: 1.25em;}
+
+h1, h2, h3, h4, h5 {
+  margin: 2.75rem 0 1rem;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 3.052em;
+}
+
+h2 {font-size: 2.441em;}
+
+h3 {font-size: 1.953em;}
+
+h4 {font-size: 1.563em;}
+
+h5 {font-size: 1.25em;}
+
+small, .text_small {font-size: 0.8em;}
+
+label {
+  font-weight: bold !important;
+}

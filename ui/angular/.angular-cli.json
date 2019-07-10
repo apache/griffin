@@ -20,7 +20,7 @@
       "prefix": "app",
       "styles": [
         "../node_modules/bootstrap/dist/css/bootstrap.css",
-        "styles.css"
+        "sass/styles.scss"
       ],
       "scripts": [
         "../node_modules/echarts/dist/echarts.min.js",
@@ -60,7 +60,8 @@
     }
   },
   "defaults": {
-    "styleExt": "css",
-    "component": {}
+    "styleExt": "scss",
+    "component": {
+    }
   }
 }

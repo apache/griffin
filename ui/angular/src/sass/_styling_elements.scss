@@ -1,0 +1,33 @@
+.cont {
+	text-align: center;
+	margin-top: 30px;
+	ok {
+		color: #b2c831;
+	}
+	bad {
+		color: #fa1d2d;
+	}
+}
+.cont2 {
+	text-align: center;
+	margin-top: -15px;
+	font-size: 12px;
+	line-height: 7px;
+	bold {
+		font-size: 10px;
+		font-weight: bold;
+		color: #b2c831;
+	}
+}
+.text {
+	p {
+		font-family: 'Open Sans', sans-serif;
+		margin-left: 8px;
+		font-size: 14px;
+		line-height: 18px;
+	}
+	grey {
+		font-size: 11px;
+		color: silver;
+	}
+}

@@ -28,20 +28,20 @@ under the License.
   background-color: transparent;
 }
 
-.navbar-default {
+/* .navbar-default {
   background-color: #060606;
   border-color: #282828;
-}
+} */
 
 #toggle {
   background: #060606;
   color: #fff;
 }
 
-#toggle:hover {
+/* #toggle:hover {
   color: #fff;
   background-color: #060606;
-}
+} */
 
 .re:hover {
   cursor: pointer;

@@ -1,0 +1,1190 @@
+{
+  "actions": [
+    {
+      "action": "install",
+      "module": "@angular/cli",
+      "target": "8.0.4",
+      "isMajor": true,
+      "resolves": [
+        {
+          "id": 788,
+          "path": "@angular/cli>css-loader>cssnano>postcss-svgo>svgo>js-yaml",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 788,
+          "path": "@angular/cli>cssnano>postcss-svgo>svgo>js-yaml",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 813,
+          "path": "@angular/cli>css-loader>cssnano>postcss-svgo>svgo>js-yaml",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 813,
+          "path": "@angular/cli>cssnano>postcss-svgo>svgo>js-yaml",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 39,
+          "path": "@angular/cli>postcss-url>directory-encoder>handlebars>uglify-js",
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        },
+        {
+          "id": 48,
+          "path": "@angular/cli>postcss-url>directory-encoder>handlebars>uglify-js",
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        },
+        {
+          "id": 535,
+          "path": "@angular/cli>url-loader>mime",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 566,
+          "path": "@angular/cli>less>request>hawk>boom>hoek",
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        },
+        {
+          "id": 566,
+          "path": "@angular/cli>less>request>hawk>cryptiles>boom>hoek",
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        },
+        {
+          "id": 566,
+          "path": "@angular/cli>less>request>hawk>hoek",
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        },
+        {
+          "id": 566,
+          "path": "@angular/cli>less>request>hawk>sntp>hoek",
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        },
+        {
+          "id": 755,
+          "path": "@angular/cli>postcss-url>directory-encoder>handlebars",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 61,
+          "path": "@angular/cli>postcss-url>directory-encoder>handlebars",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 786,
+          "path": "@angular/cli>webpack-dev-server>chokidar>anymatch>micromatch>braces",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 786,
+          "path": "@angular/cli>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 725,
+          "path": "@angular/cli>webpack-dev-server",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "install",
+      "module": "karma",
+      "target": "4.1.0",
+      "isMajor": true,
+      "resolves": [
+        {
+          "id": 782,
+          "path": "karma>lodash",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 577,
+          "path": "karma>lodash",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 534,
+          "path": "karma>socket.io>debug",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 534,
+          "path": "karma>socket.io>engine.io>debug",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 534,
+          "path": "karma>socket.io>socket.io-adapter>debug",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 534,
+          "path": "karma>socket.io>socket.io-client>debug",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 534,
+          "path": "karma>socket.io>socket.io-client>engine.io-client>debug",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 534,
+          "path": "karma>socket.io>socket.io-adapter>socket.io-parser>debug",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 534,
+          "path": "karma>socket.io>socket.io-client>socket.io-parser>debug",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 534,
+          "path": "karma>socket.io>socket.io-parser>debug",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 786,
+          "path": "karma>chokidar>anymatch>micromatch>braces",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 786,
+          "path": "karma>expand-braces>braces",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 550,
+          "path": "karma>socket.io>engine.io>ws",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 550,
+          "path": "karma>socket.io>socket.io-client>engine.io-client>ws",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 528,
+          "path": "karma>socket.io>socket.io-client>engine.io-client>parsejson",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "install",
+      "module": "protractor",
+      "target": "6.0.0",
+      "isMajor": true,
+      "resolves": [
+        {
+          "id": 593,
+          "path": "protractor>saucelabs>https-proxy-agent",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 681,
+          "path": "protractor>webdriver-js-extender>selenium-webdriver>adm-zip",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 550,
+          "path": "protractor>webdriver-js-extender>selenium-webdriver>ws",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "install",
+      "module": "angular-tree-component",
+      "target": "8.4.0",
+      "isMajor": true,
+      "resolves": [
+        {
+          "id": 782,
+          "path": "angular-tree-component>lodash",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 577,
+          "path": "angular-tree-component>lodash",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "https-proxy-agent",
+      "resolves": [
+        {
+          "id": 593,
+          "path": "typings>typings-core>popsicle-proxy-agent>https-proxy-agent",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "http-proxy-agent",
+      "resolves": [
+        {
+          "id": 607,
+          "path": "typings>typings-core>popsicle-proxy-agent>http-proxy-agent",
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "moment",
+      "resolves": [
+        {
+          "id": 532,
+          "path": "ng2-bootstrap>moment",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    }
+  ],
+  "advisories": {
+    "39": {
+      "findings": [
+        {
+          "version": "2.3.6",
+          "paths": [
+            "@angular/cli>postcss-url>directory-encoder>handlebars>uglify-js"
+          ],
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        }
+      ],
+      "id": 39,
+      "created": "2015-10-17T19:41:46.382Z",
+      "updated": "2019-06-14T23:28:21.694Z",
+      "deleted": null,
+      "title": "Incorrect Handling of Non-Boolean Comparisons During Minification",
+      "found_by": {
+        "name": "Tom MacWright"
+      },
+      "reported_by": {
+        "name": "Tom MacWright"
+      },
+      "module_name": "uglify-js",
+      "cves": [
+        "CVE-2015-8857"
+      ],
+      "vulnerable_versions": "<= 2.4.23",
+      "patched_versions": ">= 2.4.24",
+      "overview": "Versions of `uglify-js` prior to 2.4.24 are affected by a vulnerability which may cause crafted JavaScript to have altered functionality after minification.\n\n",
+      "recommendation": "Upgrade UglifyJS to version >= 2.4.24.",
+      "references": "- [Backdooring JS - Yan Zhu(@bcrypt)](https://zyan.scripts.mit.edu/blog/backdooring-js/)\n- [Issue #751](https://github.com/mishoo/UglifyJS2/issues/751)",
+      "access": "public",
+      "severity": "low",
+      "cwe": "CWE-95",
+      "metadata": {
+        "module_type": "Multi.Compiler",
+        "exploitability": 2,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/39"
+    },
+    "48": {
+      "findings": [
+        {
+          "version": "2.3.6",
+          "paths": [
+            "@angular/cli>postcss-url>directory-encoder>handlebars>uglify-js"
+          ],
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        }
+      ],
+      "id": 48,
+      "created": "2015-10-24T17:58:34.232Z",
+      "updated": "2018-02-24T00:59:58.129Z",
+      "deleted": null,
+      "title": "Regular Expression Denial of Service",
+      "found_by": {
+        "name": "Adam Baldwin"
+      },
+      "reported_by": {
+        "name": "Adam Baldwin"
+      },
+      "module_name": "uglify-js",
+      "cves": [
+        "CVE-2015-8858"
+      ],
+      "vulnerable_versions": "<2.6.0",
+      "patched_versions": ">=2.6.0",
+      "overview": "Versions of `uglify-js` prior to 2.6.0 are affected by a regular expression denial of service vulnerability when malicious inputs are passed into the `parse()` method.\n\n\n### Proof of Concept\n\n```\nvar u = require('uglify-js');\nvar genstr = function (len, chr) {\n    var result = \"\";\n    for (i=0; i<=len; i++) {\n        result = result + chr;\n    }\n\n    return result;\n}\n\nu.parse(\"var a = \" + genstr(process.argv[2], \"1\") + \".1ee7;\");\n```\n\n### Results\n```\n$ time node test.js 10000\nreal\t0m1.091s\nuser\t0m1.047s\nsys\t0m0.039s\n\n$ time node test.js 80000\nreal\t0m6.486s\nuser\t0m6.229s\nsys\t0m0.094s\n```",
+      "recommendation": "Update to version 2.6.0 or later.",
+      "references": "",
+      "access": "public",
+      "severity": "low",
+      "cwe": "CWE-400",
+      "metadata": {
+        "module_type": "CLI.Compiler",
+        "exploitability": 3,
+        "affected_components": "Internal::Code::Method::parse([*])"
+      },
+      "url": "https://npmjs.com/advisories/48"
+    },
+    "61": {
+      "findings": [
+        {
+          "version": "1.3.0",
+          "paths": [
+            "@angular/cli>postcss-url>directory-encoder>handlebars"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 61,
+      "created": "2015-12-14T16:51:56.173Z",
+      "updated": "2019-06-24T15:19:06.409Z",
+      "deleted": null,
+      "title": "Cross-Site Scripting",
+      "found_by": {
+        "name": "Matias P. Brutti"
+      },
+      "reported_by": {
+        "name": "Matias P. Brutti"
+      },
+      "module_name": "handlebars",
+      "cves": [
+        "CVE-2015-8861"
+      ],
+      "vulnerable_versions": "<4.0.0",
+      "patched_versions": ">=4.0.0",
+      "overview": "Versions of `handlebars` prior to 4.0.0 are affected by a cross-site scripting vulnerability when attributes in handlebar templates are not quoted.\n\n\n## Proof of Concept\nTemplate:\n```<a href={{foo}}/>```\n\nInput:\n```{ 'foo' : 'test.com onload=alert(1)'}```\n\nRendered result:\n```<a href=test.com onload=alert(1)/>```",
+      "recommendation": "Update to version 4.0.0 or later.\nAlternatively, ensure that all attributes in handlebars templates are encapsulated with quotes.",
+      "references": "- [SourceClear - Handlebars Research Findings](https://blog.srcclr.com/handlebars_vulnerability_research_findings/)\n- [PR #1083](https://github.com/wycats/handlebars.js/pull/1083)",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-79",
+      "metadata": {
+        "module_type": "Network.Library",
+        "exploitability": 7,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/61"
+    },
+    "528": {
+      "findings": [
+        {
+          "version": "0.0.3",
+          "paths": [
+            "karma>socket.io>socket.io-client>engine.io-client>parsejson"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 528,
+      "created": "2017-09-08T20:43:02.594Z",
+      "updated": "2018-04-09T00:18:57.149Z",
+      "deleted": null,
+      "title": "Regular Expression Denial of Service",
+      "found_by": {
+        "name": "Cristian-Alexandru Staicu"
+      },
+      "reported_by": {
+        "name": "Cristian-Alexandru Staicu"
+      },
+      "module_name": "parsejson",
+      "cves": [
+        "CVE-2017-16113"
+      ],
+      "vulnerable_versions": "<=0.0.3",
+      "patched_versions": "<0.0.0",
+      "overview": "Affected versions of `parsejson` are vulnerable to a regular expression denial of service when parsing untrusted user input.",
+      "recommendation": "The `parsejson` package has not been functionally updated since it was initially released.\n\nAdditionally, it provides functionality which is natively included in Node.js, and therefore the native `JSON.parse()` should be used, for both performance and security reasons.",
+      "references": "[Issue #4](https://github.com/get/parsejson/issues/4)",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-400",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/528"
+    },
+    "532": {
+      "findings": [
+        {
+          "version": "2.18.1",
+          "paths": [
+            "ng2-bootstrap>moment"
+          ],
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 532,
+      "created": "2017-09-21T20:40:00.889Z",
+      "updated": "2019-06-24T15:10:05.868Z",
+      "deleted": null,
+      "title": "Regular Expression Denial of Service",
+      "found_by": {
+        "name": "Cristian-Alexandru Staicu"
+      },
+      "reported_by": {
+        "name": "Cristian-Alexandru Staicu"
+      },
+      "module_name": "moment",
+      "cves": [],
+      "vulnerable_versions": "<2.19.3",
+      "patched_versions": ">=2.19.3",
+      "overview": "Affected versions of `moment` are vulnerable to a low severity regular expression denial of service when parsing dates as strings.",
+      "recommendation": "Update to version 2.19.3 or later.",
+      "references": "- [Issue #4163](https://github.com/moment/moment/issues/4163)\n- [PR #4326](https://github.com/moment/moment/pull/4326)",
+      "access": "public",
+      "severity": "low",
+      "cwe": "CWE-400",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/532"
+    },
+    "534": {
+      "findings": [
+        {
+          "version": "2.3.3",
+          "paths": [
+            "karma>socket.io>debug",
+            "karma>socket.io>engine.io>debug",
+            "karma>socket.io>socket.io-adapter>debug",
+            "karma>socket.io>socket.io-client>debug",
+            "karma>socket.io>socket.io-client>engine.io-client>debug"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "version": "2.2.0",
+          "paths": [
+            "karma>socket.io>socket.io-adapter>socket.io-parser>debug",
+            "karma>socket.io>socket.io-client>socket.io-parser>debug",
+            "karma>socket.io>socket.io-parser>debug"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 534,
+      "created": "2017-09-25T18:55:55.956Z",
+      "updated": "2018-05-16T19:37:43.686Z",
+      "deleted": null,
+      "title": "Regular Expression Denial of Service",
+      "found_by": {
+        "name": "Cristian-Alexandru Staicu"
+      },
+      "reported_by": {
+        "name": "Cristian-Alexandru Staicu"
+      },
+      "module_name": "debug",
+      "cves": [
+        "CVE-2017-16137"
+      ],
+      "vulnerable_versions": "<= 2.6.8 || >= 3.0.0 <= 3.0.1",
+      "patched_versions": ">= 2.6.9 < 3.0.0 || >= 3.1.0",
+      "overview": "Affected versions of `debug` are vulnerable to regular expression denial of service when untrusted user input is passed into the `o` formatter. \n\nAs it takes 50,000 characters to block the event loop for 2 seconds, this issue is a low severity issue.",
+      "recommendation": "Version 2.x.x: Update to version 2.6.9 or later.\nVersion 3.x.x: Update to version 3.1.0 or later.\n",
+      "references": "- [Issue #501](https://github.com/visionmedia/debug/issues/501)\n- [PR #504](https://github.com/visionmedia/debug/pull/504)",
+      "access": "public",
+      "severity": "low",
+      "cwe": "CWE-400",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/534"
+    },
+    "535": {
+      "findings": [
+        {
+          "version": "1.3.6",
+          "paths": [
+            "@angular/cli>url-loader>mime"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 535,
+      "created": "2017-09-25T19:02:28.152Z",
+      "updated": "2018-04-09T00:38:22.785Z",
+      "deleted": null,
+      "title": "Regular Expression Denial of Service",
+      "found_by": {
+        "name": "Cristian-Alexandru Staicu"
+      },
+      "reported_by": {
+        "name": "Cristian-Alexandru Staicu"
+      },
+      "module_name": "mime",
+      "cves": [
+        "CVE-2017-16138"
+      ],
+      "vulnerable_versions": "< 1.4.1 || > 2.0.0 < 2.0.3",
+      "patched_versions": ">= 1.4.1 < 2.0.0 || >= 2.0.3",
+      "overview": "Affected versions of `mime` are vulnerable to regular expression denial of service when a mime lookup is performed on untrusted user input.",
+      "recommendation": "Update to version 2.0.3 or later.",
+      "references": "[Issue #167](https://github.com/broofa/node-mime/issues/167)",
+      "access": "public",
+      "severity": "moderate",
+      "cwe": "CWE-400",
+      "metadata": {
+        "module_type": "Multi.Library",
+        "exploitability": 4,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/535"
+    },
+    "550": {
+      "findings": [
+        {
+          "version": "1.1.2",
+          "paths": [
+            "karma>socket.io>engine.io>ws",
+            "karma>socket.io>socket.io-client>engine.io-client>ws",
+            "protractor>webdriver-js-extender>selenium-webdriver>ws"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 550,
+      "created": "2017-11-08T19:25:17.211Z",
+      "updated": "2019-06-24T14:54:52.443Z",
+      "deleted": null,
+      "title": "Denial of Service",
+      "found_by": {
+        "name": "Nick Starke, Ryan Knell"
+      },
+      "reported_by": {
+        "name": "Nick Starke, Ryan Knell"
+      },
+      "module_name": "ws",
+      "cves": [],
+      "vulnerable_versions": "<1.1.5 || >=2.0.0 <3.3.1",
+      "patched_versions": ">= 1.1.5 <2.0.0 || >=3.3.1",
+      "overview": "Affected versions of `ws` can crash when a specially crafted `Sec-WebSocket-Extensions` header containing `Object.prototype` property names as extension or parameter names is sent.\n\n## Proof of concept\n\n```\nconst WebSocket = require('ws');\nconst net = require('net');\n\nconst wss = new WebSocket.Server({ port: 3000 }, function () {\n  const payload = 'constructor';  // or ',;constructor'\n\n  const request = [\n    'GET / HTTP/1.1',\n    'Connection: Upgrade',\n    'Sec-WebSocket-Key: test',\n    'Sec-WebSocket-Version: 8',\n    `Sec-WebSocket-Extensions: ${payload}`,\n    'Upgrade: websocket',\n    '\\r\\n'\n  ].join('\\r\\n');\n\n  const socket = net.connect(3000, function () {\n    socket.resume();\n    socket.write(request);\n  });\n});\n```",
+      "recommendation": "Update to version 3.3.1 or later.",
+      "references": "- [GitHub Commit #c4fe466](https://github.com/websockets/ws/commit/c4fe46608acd61fbf7397eadc47378903f95b78a)\n",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-20",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/550"
+    },
+    "566": {
+      "findings": [
+        {
+          "version": "2.16.3",
+          "paths": [
+            "@angular/cli>less>request>hawk>boom>hoek",
+            "@angular/cli>less>request>hawk>cryptiles>boom>hoek",
+            "@angular/cli>less>request>hawk>hoek",
+            "@angular/cli>less>request>hawk>sntp>hoek"
+          ],
+          "dev": true,
+          "optional": true,
+          "bundled": false
+        }
+      ],
+      "id": 566,
+      "created": "2018-04-20T21:25:58.421Z",
+      "updated": "2019-06-19T20:16:59.758Z",
+      "deleted": null,
+      "title": "Prototype Pollution",
+      "found_by": {
+        "name": "HoLyVieR"
+      },
+      "reported_by": {
+        "name": "HoLyVieR"
+      },
+      "module_name": "hoek",
+      "cves": [
+        "CVE-2018-3728"
+      ],
+      "vulnerable_versions": "<= 4.2.0 || >= 5.0.0 < 5.0.3",
+      "patched_versions": "> 4.2.0 < 5.0.0 || >= 5.0.3",
+      "overview": "Versions of `hoek` prior to 4.2.1 and 5.0.3 are vulnerable to prototype pollution.\n\nThe `merge` function, and the `applyToDefaults` and `applyToDefaultsWithShallow` functions which leverage `merge` behind the scenes, are vulnerable to a prototype pollution attack when provided an _unvalidated_ payload created from a JSON string containing the `__proto__` property.\n\nThis can be demonstrated like so:\n\n```javascript\nvar Hoek = require('hoek');\nvar malicious_payload = '{\"__proto__\":{\"oops\":\"It works !\"}}';\n\nvar a = {};\nconsole.log(\"Before : \" + a.oops);\nHoek.merge({}, JSON.parse(malicious_payload));\nconsole.log(\"After : \" + a.oops);\n```\n\nThis type of attack can be used to overwrite existing properties causing a potential denial of service.",
+      "recommendation": "Update to version 4.2.1, 5.0.3 or later.",
+      "references": "- [HackerOne Report](https://hackerone.com/reports/310439)",
+      "access": "public",
+      "severity": "moderate",
+      "cwe": "CWE-471",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/566"
+    },
+    "577": {
+      "findings": [
+        {
+          "version": "4.17.4",
+          "paths": [
+            "angular-tree-component>lodash"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "version": "3.10.1",
+          "paths": [
+            "karma>lodash"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 577,
+      "created": "2018-04-24T14:27:02.796Z",
+      "updated": "2018-04-24T14:27:13.049Z",
+      "deleted": null,
+      "title": "Prototype Pollution",
+      "found_by": {
+        "name": "Olivier Arteau (HoLyVieR)"
+      },
+      "reported_by": {
+        "name": "Olivier Arteau (HoLyVieR)"
+      },
+      "module_name": "lodash",
+      "cves": [
+        "CVE-2018-3721"
+      ],
+      "vulnerable_versions": "<4.17.5",
+      "patched_versions": ">=4.17.5",
+      "overview": "Versions of `lodash` before 4.17.5 are vulnerable to prototype pollution. \n\nThe vulnerable functions are 'defaultsDeep', 'merge', and 'mergeWith' which allow a malicious user to modify the prototype of `Object` via `__proto__` causing the addition or modification of an existing property that will exist on all objects.\n\n",
+      "recommendation": "Update to version 4.17.5 or later.",
+      "references": "- [HackerOne Report](https://hackerone.com/reports/310443)",
+      "access": "public",
+      "severity": "low",
+      "cwe": "CWE-471",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 1,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/577"
+    },
+    "593": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            "protractor>saucelabs>https-proxy-agent",
+            "typings>typings-core>popsicle-proxy-agent>https-proxy-agent"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 593,
+      "created": "2018-04-24T15:54:57.432Z",
+      "updated": "2018-04-24T15:55:49.931Z",
+      "deleted": null,
+      "title": "Denial of Service",
+      "found_by": {
+        "name": "Сковорода Никита Андреевич"
+      },
+      "reported_by": {
+        "name": "Сковорода Никита Андреевич"
+      },
+      "module_name": "https-proxy-agent",
+      "cves": [],
+      "vulnerable_versions": "<=2.1.1",
+      "patched_versions": ">=2.2.0",
+      "overview": "Versions of `https-proxy-agent` before 2.2.0 are vulnerable to denial of service. This is due to unsanitized options (proxy.auth) being passed to `Buffer()`.",
+      "recommendation": "Update to version 2.2.0 or later.",
+      "references": "- [index.js Line 207](https://github.com/TooTallNate/node-https-proxy-agent/blob/2.1.1/index.js#L207)\n- [HackerOne Report](https://hackerone.com/reports/319532)",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-20",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 3,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/593"
+    },
+    "607": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            "typings>typings-core>popsicle-proxy-agent>http-proxy-agent"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 607,
+      "created": "2018-04-24T22:28:57.482Z",
+      "updated": "2018-04-24T22:28:57.482Z",
+      "deleted": null,
+      "title": "Denial of Service",
+      "found_by": {
+        "name": "Сковорода Никита Андреевич"
+      },
+      "reported_by": {
+        "name": "Сковорода Никита Андреевич"
+      },
+      "module_name": "http-proxy-agent",
+      "cves": [],
+      "vulnerable_versions": "<=2.0.0",
+      "patched_versions": ">=2.1.0",
+      "overview": "Versions of `http-proxy-agent` before 2.1.0 are vulnerable to denial of service and uninitialized memory leak when unsanitized options are passed to `Buffer`.",
+      "recommendation": "Update to version 2.1.0 or later.",
+      "references": "- https://github.com/TooTallNate/node-http-proxy-agent/blob/2.0.0/index.js#L80\n- [HackerOne Report](https://hackerone.com/reports/321631)",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-20",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/607"
+    },
+    "681": {
+      "findings": [
+        {
+          "version": "0.4.4",
+          "paths": [
+            "protractor>webdriver-js-extender>selenium-webdriver>adm-zip"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 681,
+      "created": "2018-08-03T15:15:42.145Z",
+      "updated": "2018-08-03T15:15:42.145Z",
+      "deleted": null,
+      "title": "Arbitrary File Write via Archive Extraction",
+      "found_by": {
+        "name": "snyk security team"
+      },
+      "reported_by": {
+        "name": "snyk security team"
+      },
+      "module_name": "adm-zip",
+      "cves": [
+        "CVE-2018-1002204"
+      ],
+      "vulnerable_versions": "<0.4.9",
+      "patched_versions": ">=0.4.9",
+      "overview": "Versions of `adm-zip` before 0.4.9 are vulnerable to arbitrary file write when used to extract a specifically crafted archive that contains path traversal filenames (`../../file.txt` for example).",
+      "recommendation": "Update to version 0.4.9 or later.",
+      "references": "- [GitHub Pull Request](https://github.com/cthackers/adm-zip/pull/212)\n- [Zip Slip Advisory](https://snyk.io/research/zip-slip-vulnerability)",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-29",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/681"
+    },
+    "725": {
+      "findings": [
+        {
+          "version": "2.5.1",
+          "paths": [
+            "@angular/cli>webpack-dev-server"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 725,
+      "created": "2018-11-07T17:10:22.191Z",
+      "updated": "2019-04-12T20:15:22.334Z",
+      "deleted": null,
+      "title": "Missing Origin Validation",
+      "found_by": {
+        "link": "https://blog.cal1.cn/link",
+        "name": "Jiantao Li"
+      },
+      "reported_by": {
+        "link": "https://blog.cal1.cn/link",
+        "name": "Jiantao Li"
+      },
+      "module_name": "webpack-dev-server",
+      "cves": [
+        "CVE-2018-14732"
+      ],
+      "vulnerable_versions": "<2.11.4 || >=3.0.0 <=3.1.10",
+      "patched_versions": ">=2.11.4 <3.0.0 || >=3.1.11",
+      "overview": "Versions of `webpack-dev-server` before 3.1.10 are missing origin validation on the websocket server. This vulnerability allows a remote attacker to steal a developer's source code because the origin of requests to the websocket server that is used for Hot Module Replacement (HMR) are not validated.",
+      "recommendation": "For `webpack-dev-server` 2.x update to version 2.11.4 or later.\nFor `webpack-dev-server` 3.x update to version 3.1.11 or later.",
+      "references": "- [Sniffing Codes in Hot Module Reloading Messages](https://blog.cal1.cn/post/Sniffing%20Codes%20in%20Hot%20Module%20Reloading%20Messages)\n- [GitHub commit](https://github.com/webpack/webpack-dev-server/commit/f18e5adf123221a1015be63e1ca2491ca45b8d10)",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-346",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/725"
+    },
+    "755": {
+      "findings": [
+        {
+          "version": "1.3.0",
+          "paths": [
+            "@angular/cli>postcss-url>directory-encoder>handlebars"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 755,
+      "created": "2018-12-28T20:34:57.708Z",
+      "updated": "2019-04-15T20:54:25.416Z",
+      "deleted": null,
+      "title": "Prototype Pollution",
+      "found_by": {
+        "link": "",
+        "name": "Mahmoud Gamal, Matías Lang"
+      },
+      "reported_by": {
+        "link": "",
+        "name": "Mahmoud Gamal, Matías Lang"
+      },
+      "module_name": "handlebars",
+      "cves": [],
+      "vulnerable_versions": "<=4.0.13 || >=4.1.0 <4.1.2",
+      "patched_versions": ">=4.0.14 <4.1.0 || >=4.1.2",
+      "overview": "Versions of `handlebars` prior to 4.0.14 are vulnerable to Prototype Pollution. Templates may alter an Objects' prototype, thus allowing an attacker to execute arbitrary code on the server.",
+      "recommendation": "For handlebars 4.1.x upgrade to 4.1.2 or later.\nFor handlebars 4.0.x upgrade to 4.0.14 or later.",
+      "references": "",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-471",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 6,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/755"
+    },
+    "782": {
+      "findings": [
+        {
+          "version": "4.17.4",
+          "paths": [
+            "angular-tree-component>lodash"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "version": "3.10.1",
+          "paths": [
+            "karma>lodash"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 782,
+      "created": "2019-02-13T16:16:53.770Z",
+      "updated": "2019-02-13T16:16:53.770Z",
+      "deleted": null,
+      "title": "Prototype Pollution",
+      "found_by": {
+        "link": "",
+        "name": "asgerf"
+      },
+      "reported_by": {
+        "link": "",
+        "name": "asgerf"
+      },
+      "module_name": "lodash",
+      "cves": [
+        "CVE-2018-16487"
+      ],
+      "vulnerable_versions": "<4.17.11",
+      "patched_versions": ">=4.17.11",
+      "overview": "Versions of `lodash` before 4.17.5 are vulnerable to prototype pollution. \n\nThe vulnerable functions are 'defaultsDeep', 'merge', and 'mergeWith' which allow a malicious user to modify the prototype of `Object` via `{constructor: {prototype: {...}}}` causing the addition or modification of an existing property that will exist on all objects.\n\n",
+      "recommendation": "Update to version 4.17.11 or later.",
+      "references": "- [HackerOne Report](https://hackerone.com/reports/380873)",
+      "access": "public",
+      "severity": "moderate",
+      "cwe": "CWE-471",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 3,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/782"
+    },
+    "786": {
+      "findings": [
+        {
+          "version": "1.8.5",
+          "paths": [
+            "@angular/cli>webpack-dev-server>chokidar>anymatch>micromatch>braces",
+            "@angular/cli>webpack-dev-server>http-proxy-middleware>micromatch>braces",
+            "karma>chokidar>anymatch>micromatch>braces"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "version": "0.1.5",
+          "paths": [
+            "karma>expand-braces>braces"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 786,
+      "created": "2019-02-15T21:44:30.680Z",
+      "updated": "2019-04-02T18:18:29.356Z",
+      "deleted": null,
+      "title": "Regular Expression Denial of Service",
+      "found_by": {
+        "link": "",
+        "name": "Santosh Rao"
+      },
+      "reported_by": {
+        "link": "",
+        "name": "Santosh Rao"
+      },
+      "module_name": "braces",
+      "cves": [],
+      "vulnerable_versions": "<2.3.1",
+      "patched_versions": ">=2.3.1",
+      "overview": "Versions of `braces` prior to 2.3.1 are vulnerable to Regular Expression Denial of Service (ReDoS). Untrusted input may cause catastrophic backtracking while matching regular expressions. This can cause the application to be unresponsive leading to Denial of Service.",
+      "recommendation": "Upgrade to version 2.3.1 or higher.",
+      "references": "- [GitHub Commit](https://github.com/micromatch/braces/commit/abdafb0cae1e0c00f184abbadc692f4eaa98f451)",
+      "access": "public",
+      "severity": "low",
+      "cwe": "CWE-185",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 4,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/786"
+    },
+    "788": {
+      "findings": [
+        {
+          "version": "3.7.0",
+          "paths": [
+            "@angular/cli>css-loader>cssnano>postcss-svgo>svgo>js-yaml",
+            "@angular/cli>cssnano>postcss-svgo>svgo>js-yaml"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 788,
+      "created": "2019-03-18T21:29:08.514Z",
+      "updated": "2019-04-04T03:44:12.205Z",
+      "deleted": null,
+      "title": "Denial of Service",
+      "found_by": {
+        "link": "https://sites.google.com/site/jensdietrich/",
+        "name": "Shawn Rasheed, Jens DIetrich"
+      },
+      "reported_by": {
+        "link": "https://conf.researchr.org/profile/shawnrasheed",
+        "name": "Shawn Rasheed"
+      },
+      "module_name": "js-yaml",
+      "cves": [],
+      "vulnerable_versions": "<3.13.0",
+      "patched_versions": ">=3.13.0",
+      "overview": "Versions of `js-yaml` prior to 3.13.0 are vulnerable to Denial of Service. By parsing a carefully-crafted YAML file, the node process stalls and may exhaust system resources leading to a Denial of Service.",
+      "recommendation": "Upgrade to version 3.13.0.",
+      "references": "",
+      "access": "public",
+      "severity": "moderate",
+      "cwe": "CWE-400",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 6,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/788"
+    },
+    "813": {
+      "findings": [
+        {
+          "version": "3.7.0",
+          "paths": [
+            "@angular/cli>css-loader>cssnano>postcss-svgo>svgo>js-yaml",
+            "@angular/cli>cssnano>postcss-svgo>svgo>js-yaml"
+          ],
+          "dev": true,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 813,
+      "created": "2019-04-10T19:02:51.064Z",
+      "updated": "2019-04-15T21:29:06.670Z",
+      "deleted": null,
+      "title": "Code Injection",
+      "found_by": {
+        "link": "",
+        "name": "Alex Kocharin"
+      },
+      "reported_by": {
+        "link": "",
+        "name": "Alex Kocharin"
+      },
+      "module_name": "js-yaml",
+      "cves": [],
+      "vulnerable_versions": "<3.13.1",
+      "patched_versions": ">=3.13.1",
+      "overview": "Versions of `js-yaml` prior to 3.13.1 are vulnerable to Code Injection. The `load()` function may execute arbitrary code injected through a malicious YAML file. Objects that have `toString` as key, JavaScript code as value and are used as explicit mapping keys allow attackers to execute the supplied code through the `load()` function. The `safeLoad()` function is unaffected.\n\nAn example payload is \n`{ toString: !<tag:yaml.org,2002:js/function> 'function (){return Date.now()}' } : 1` \nwhich returns the object \n{\n  \"1553107949161\": 1\n}",
+      "recommendation": "Upgrade to version 3.13.1.",
+      "references": "- [GitHub PR](https://github.com/nodeca/js-yaml/pull/480)",
+      "access": "public",
+      "severity": "high",
+      "cwe": "CWE-94",
+      "metadata": {
+        "module_type": "",
+        "exploitability": 5,
+        "affected_components": ""
+      },
+      "url": "https://npmjs.com/advisories/813"
+    }
+  },
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 17,
+      "moderate": 9,
+      "high": 13,
+      "critical": 0
+    },
+    "dependencies": 45,
+    "devDependencies": 12356,
+    "optionalDependencies": 994,
+    "totalDependencies": 12401
+  },
+  "runId": "6a92813b-2729-4771-8d75-3e066320e14b"
+}

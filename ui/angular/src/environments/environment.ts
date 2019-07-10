@@ -23,5 +23,5 @@ under the License.
 
 export const environment = {
   production: false,
-  BACKEND_SERVER: '',
+  BACKEND_SERVER: '192.168.132.116:38080',
 };
