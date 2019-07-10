@@ -18,11 +18,22 @@ under the License.
 */
 package org.apache.griffin.measure
 
-import org.slf4j.LoggerFactory
+import org.apache.log4j.Level
+import org.apache.log4j.Logger
 
 trait Loggable {
 
-  @transient private lazy val logger = LoggerFactory.getLogger(getClass)
+  @transient private lazy val logger = Logger.getLogger(getClass)
+
+  @transient protected lazy val griffinLogger = Logger.getLogger("org.apache.griffin")
+
+  def getGriffinLogLevel(): Level = {
+    var logger = griffinLogger
+    while (logger != null && logger.getLevel == null) {
+      logger = logger.getParent.asInstanceOf[Logger]
+    }
+    logger.getLevel
+  }
 
   protected def info(msg: String): Unit = {
     logger.info(msg)
