@@ -1,0 +1,47 @@
+/**********Media Styles**********/
+
+@media (max-width: 360px) {
+  /*Calendar Adsjustments*/
+  .fc-header {
+    margin-top: 15px;
+  }
+  .fc-header-title h2 {
+    font-size: 10px;
+  }
+  .fc-header-right {
+    display: none;
+  }
+}
+
+/* portrait tablet */
+@media (min-width: 767px) and (max-width: 768px) {
+  .info-aapl ul {
+    margin-left: 10px;
+    float: left;
+  }
+  #load, #space {
+    margin-left: 5px;
+    margin-right: 10px;
+  }
+}
+
+/* Landscape iphone 5 and samsung galaxy */
+@media (min-width: 560px) and (max-width: 685px) {
+  .info-aapl ul {
+    margin-left: 40%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-xg {
+    width: 1024px;
+  }
+}
+
+.form-control {
+  color: #000000;
+}
+
+tbody {
+  word-break: break-all;
+}

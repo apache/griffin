@@ -1,0 +1,19 @@
+/**********Link Styling**********/
+
+a {
+  color: #b2c831;
+  text-decoration: none;
+  &:hover {
+    color: #dff948;
+    text-decoration: none;
+  }
+}
+
+.bark-link {
+  color: #b2c831;
+  text-decoration: underline;
+  &:hover {
+    color: #dff948;
+    text-decoration: none;
+  }
+}

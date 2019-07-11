@@ -1,0 +1,122 @@
+/**********Mail Style Configuration**********/
+
+.framemail {
+  cursor: default;
+  .window {
+    font-size: 0;
+    margin-top: -1px;
+    overflow: hidden;
+    margin-left: -18px;
+    .mail li {
+      background-color: #3d3d3d;
+      background-image: -webkit-linear-gradient(hsla(0, 0%, 100%, 0.05), hsla(0, 0%, 0%, 0.05));
+      background-image: -moz-linear-gradient(hsla(0, 0%, 100%, 0.05), hsla(0, 0%, 0%, 0.05));
+      background-image: -ms-linear-gradient(hsla(0, 0%, 100%, 0.05), hsla(0, 0%, 0%, 0.05));
+      background-image: -o-linear-gradient(hsla(0, 0%, 100%, 0.05), hsla(0, 0%, 0%, 0.05));
+      background-image: linear-gradient(hsla(0, 0%, 100%, 0.05), hsla(0, 0%, 0%, 0.05));
+      border-top: 1px solid #888;
+      position: relative;
+      margin-left: -18px;
+      &:first-child {
+        border-top: none;
+      }
+      &:hover {
+        background-color: #5d5b5b;
+      }
+      &:after {
+        border-left: 8px solid transparent;
+        border-top: 8px solid #df6;
+        content: '';
+        height: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 0;
+      }
+      &:before {
+        border-left: 8px solid transparent;
+        border-top: 8px solid #df6;
+        content: '';
+        height: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 0;
+        border-top-color: #bbb;
+        border-width: 9px;
+      }
+      &:nth-child(1) {
+        &:after, &:before {
+          border: none;
+        }
+      }
+      &:nth-child(2):after {
+        border-top-color: #fa1d2d;
+      }
+      i {
+        display: inline-block;
+        height: 48px;
+        width: 6px;
+      }
+      .read {
+        background-color: #ddd;
+      }
+      .unread {
+        background: #b2c831;
+      }
+      img {
+        background: #819da2;
+        border-radius: 2px;
+        height: 36px;
+        left: 12px;
+        position: absolute;
+        top: 6px;
+        width: 36px;
+      }
+      p {
+        font: 13px/24px sans-serif;
+        left: 56px;
+        position: absolute;
+        top: 3px;
+      }
+      .sender {
+        color: #e9e8e8;
+        font-weight: bold;
+        text-shadow: 0 1px 1px hsla(0, 0%, 100%, 0.5);
+      }
+      .message {
+        color: #999;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        top: 21px;
+        white-space: nowrap;
+        strong {
+          color: #999;
+        }
+      }
+      .actions {
+        height: 16px;
+        position: absolute;
+        right: 19px;
+        text-align: right;
+        top: 0;
+        width: 96px;
+        img {
+          background: none;
+          display: inline-block;
+          height: 16px;
+          margin-left: 6px;
+          opacity: .1;
+          position: relative;
+          width: 16px;
+        }
+      }
+      &:hover .actions img {
+        opacity: .25;
+      }
+      .actions img:hover {
+        opacity: .75;
+      }
+    }
+  }
+}

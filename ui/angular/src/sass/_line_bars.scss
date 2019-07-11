@@ -1,0 +1,39 @@
+/**********LINE AND BARS**********/
+
+.section-graph {
+  position: relative;
+  height: 130px;
+  color: #fff;
+  background-image: linear-gradient(color-stops(#b2c831, #b2c831 50%, #b2c831 50%));
+  margin-bottom: 20px;
+  .graph-info {
+    z-index: 99;
+    position: absolute;
+    font-weight: bold;
+    margin-top: 12px;
+    margin-left: 21px;
+    width: 100px;
+    .graph-arrow {
+      width: 0;
+      height: 0;
+      margin-top: 18px;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 4px solid white;
+      float: left;
+    }
+    .graph-info-big {
+      font-size: 24px;
+      float: left;
+      margin-left: 3px;
+    }
+    .graph-info-small {
+      margin-left: 3px;
+      font-size: 12px;
+      font-weight: normal;
+      color: rgba(255, 255, 255, 0.5);
+      clear: left;
+      margin-left: 8px;
+    }
+  }
+}

@@ -1,0 +1,68 @@
+/***********FULLCALENDAR STYLE***********/
+
+#external-events {
+  padding: 0 10px;
+  border: 1px solid #8b8b8a;
+  background-color: #8b8b8a;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  text-align: left;
+  h4 {
+    font-size: 16px;
+    margin-top: 0;
+    padding-top: 1em;
+  }
+}
+
+.external-event {
+  /* try to mimick the look of a real event */
+  margin: 10px 0;
+  padding: 2px 4px;
+  background: #b2c831;
+  color: #fff;
+  font-size: .85em;
+  cursor: pointer;
+}
+
+#external-events p {
+  margin: 1.5em 0;
+  font-size: 11px;
+  color: #b2c831;
+  input {
+    margin: 0;
+    vertical-align: middle;
+  }
+}
+
+#calendar {
+  width: 100%;
+}
+
+.symbol.required:before {
+  content: "*";
+  display: inline;
+  color: #E6674A;
+}
+
+.has-success .symbol:before {
+  content: "\f00c";
+  display: inline;
+  font-family: FontAwesome;
+  color: #468847;
+}
+
+.has-error .symbol:before {
+  content: "\f00d";
+  display: inline;
+  font-family: FontAwesome;
+  color: #C82E29;
+}
+
+.text-small {
+  font-size: 12px !important;
+}
+
+.has-error .error {
+  color: #a94442;
+}

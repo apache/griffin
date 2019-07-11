@@ -1,12 +1,29 @@
-@import './variables';
-@import './mixins';
 @import "node_modules/bootstrap-scss/bootstrap";
 @import "~@angular/material/prebuilt-themes/indigo-pink";
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400|Poppins:400');
+
+@import './_variables';
+@import './_mixins';
 @import './_dash_unit';
 @import './_half_unit';
 @import './_styling_elements';
-
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400|Poppins:400');
+@import './_bootstrap_default_modifications';
+@import './_line_icon';
+@import './_clock_configurations';
+@import './_main_configuration';
+@import './_donut_chart';
+@import './_line_bars';
+@import './_info_section';
+@import './_twitter_widget';
+@import './_buttons';
+@import './_gauge_chart';
+@import './_accordion';
+@import './_links';
+@import './_navigation_bar';
+@import './_footer';
+@import './_full_calendar';
+@import './_media';
+@import './_job';
 
 /******CSS Reset*************/
 html, body, div, span, applet, object, iframe,

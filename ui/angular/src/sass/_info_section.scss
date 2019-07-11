@@ -1,0 +1,33 @@
+/*
+ * Info Section
+ */
+
+.info-aapl {
+  text-align: center;
+  ul {
+    margin-left: 30%;
+  }
+  li {
+    margin: 0;
+    display: block;
+    width: 9px;
+    height: 40px;
+    margin-right: 6px;
+    background-color: #f5f0ec;
+    float: left;
+    position: relative;
+    span {
+      display: block;
+      width: 9px;
+      height: 40px;
+      position: absolute;
+      bottom: 0;
+      &.orange {
+        background-color: #fa1d2d;
+      }
+      &.green {
+        background-color: #b2c831;
+      }
+    }
+  }
+}

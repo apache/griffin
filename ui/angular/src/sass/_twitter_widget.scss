@@ -1,0 +1,22 @@
+/**********TWITTER WIDGET **********/
+
+#jstwitter {
+  ul {
+    li {
+      color: #bdbdbd;
+      padding: .5em .75em;
+    }
+    margin-left: 0;
+    list-style: none;
+  }
+  &:first-child {
+    border-top: 0;
+  }
+}
+
+ul#jstwitter li a {
+  font-size: 10px;
+  font-style: italic;
+  color: #666;
+  text-decoration: none;
+}
