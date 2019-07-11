@@ -57,7 +57,9 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     conf.setAll(sparkParam.getConfig)
     conf.set("spark.sql.crossJoin.enabled", "true")
     sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
+    var logLevel = getGriffinLogLevel()
     sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
+    griffinLogger.setLevel(logLevel)
     sqlContext = sparkSession.sqlContext
 
     // register udf
