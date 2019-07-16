@@ -360,7 +360,7 @@ livy.server.host = 127.0.0.1
 livy.spark.master = yarn
 livy.spark.deployMode = cluster
 livy.repl.enableHiveContext = true
-livy.server.port 8998
+livy.server.port = 8998
 ```
 * **start up livy**
 ```bash
