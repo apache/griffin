@@ -19,17 +19,6 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -41,9 +30,11 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-
-
-
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Qualifier(value = "hive_jdbc")
@@ -86,12 +77,15 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
     @Override
     @Cacheable(unless = "#result==null")
     public Map<String, List<String>> getAllTableNames() {
+        // Not recommend this method because this method will generate one query for every database
+        // If there has a lots of databases in Hive, this method will lead to Griffin crash
         Map<String, List<String>> res = new HashMap<>();
 
         for (String dbName : getAllDatabases()) {
             List<String> list = (List<String>) queryHiveString("show tables in " + dbName);
             res.put(dbName, list);
         }
+
         return res;
     }
 
@@ -123,6 +117,7 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
                 conn = DriverManager.getConnection(hiveUrl);
             }
             LOGGER.info("got connection");
+
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -138,19 +133,7 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            closeConnection(conn, stmt, rs);
         }
         return result;
     }
@@ -158,6 +141,22 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
     @Override
     public void evictHiveCache() {
         LOGGER.info("Evict hive cache");
+    }
+
+    private void closeConnection(Connection conn, Statement stmt, ResultSet rs) {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -184,19 +183,7 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            closeConnection(conn, stmt, rs);
         }
         return res;
     }
