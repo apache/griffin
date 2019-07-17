@@ -53,7 +53,7 @@ public class HiveMetaStoreControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    @Qualifier(value = "hive_jdbc")
+    @Qualifier(value = "hive_metastore")
     private HiveMetaStoreService hiveMetaStoreService;
 
 

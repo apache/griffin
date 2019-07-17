@@ -20,6 +20,7 @@ under the License.
 package org.apache.griffin.core.metastore.hive;
 
 
+import org.apache.griffin.core.config.CacheConfig;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.junit.Assert;
@@ -27,9 +28,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import static org.mockito.Matchers.anyInt;
@@ -39,6 +48,20 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(SpringRunner.class)
 public class HiveMetastoreServiceJDBCImplTest {
+
+    @TestConfiguration
+    @EnableCaching
+    public static class HiveMetaStoreServiceConfiguration extends CacheConfig {
+        @Bean("hiveMetaStoreServiceJdbcImpl")
+        public HiveMetaStoreServiceJdbcImpl serviceJDBC() {
+            return new HiveMetaStoreServiceJdbcImpl();
+        }
+
+        @Bean
+        CacheManager cacheManager() {
+            return new ConcurrentMapCacheManager("jdbchive");
+        }
+    }
 
     private HiveMetaStoreServiceJdbcImpl serviceJDBC = new HiveMetaStoreServiceJdbcImpl();
 
