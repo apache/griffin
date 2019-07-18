@@ -108,18 +108,23 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
         result.setDbName(dbName);
         result.setTableName(tableName);
 
+        try {
+            Class.forName(hiveClassName);
+            if (conn == null) {
+                conn = DriverManager.getConnection(hiveUrl);
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+
+        LOGGER.info("got connection");
+
         String sql = "show create table " + dbName + "." + tableName;
         Statement stmt = null;
         ResultSet rs = null;
         StringBuilder sb = new StringBuilder();
 
         try {
-            Class.forName(hiveClassName);
-            if (conn == null) {
-                conn = DriverManager.getConnection(hiveUrl);
-            }
-            LOGGER.info("got connection");
-
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -182,6 +187,11 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
                 conn = DriverManager.getConnection(hiveUrl);
             }
             LOGGER.info("got connection");
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {

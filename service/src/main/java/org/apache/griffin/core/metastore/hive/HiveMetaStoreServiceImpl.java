@@ -58,10 +58,6 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     public HiveMetaStoreServiceImpl() {
     }
 
-    public HiveMetaStoreServiceImpl(IMetaStoreClient client) {
-        this.client = client;
-    }
-
     public void setClient(IMetaStoreClient client) {
         this.client = client;
     }

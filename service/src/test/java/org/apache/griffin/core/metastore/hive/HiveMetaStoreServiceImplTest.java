@@ -35,6 +35,8 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
@@ -47,13 +49,14 @@ import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)
+@ContextConfiguration
 public class HiveMetaStoreServiceImplTest {
 
-    @TestConfiguration
+    @Configuration
     @EnableCaching
     public static class HiveMetaStoreServiceConfiguration extends CacheConfig {
         @Bean("hiveMetaStoreServiceImpl")
-        public HiveMetaStoreService service() {
+        public HiveMetaStoreServiceImpl service() {
             return new HiveMetaStoreServiceImpl();
         }
 
