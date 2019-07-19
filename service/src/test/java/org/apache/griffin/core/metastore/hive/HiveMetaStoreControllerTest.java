@@ -53,7 +53,7 @@ public class HiveMetaStoreControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    @Qualifier(value = "hive_metastore")
+    @Qualifier(value = "jdbcSvc")
     private HiveMetaStoreService hiveMetaStoreService;
 
 
@@ -119,7 +119,7 @@ public class HiveMetaStoreControllerTest {
         String tableName = "table";
         given(hiveMetaStoreService.getTable(dbName, tableName)).willReturn(
                 new Table(tableName, null, null, 0, 0, 0, null, null,
-                null, null, null, null));
+                        null, null, null, null));
 
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/table")
                 .param("db", dbName).param("table",

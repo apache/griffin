@@ -59,11 +59,11 @@ public class HiveMetastoreServiceJDBCImplTest {
 
         @Bean
         CacheManager cacheManager() {
-            return new ConcurrentMapCacheManager("jdbchive");
+            return new ConcurrentMapCacheManager("jdbcHive");
         }
     }
 
-    private HiveMetaStoreServiceJdbcImpl serviceJDBC = new HiveMetaStoreServiceJdbcImpl();
+    private HiveMetaStoreServiceJdbcImpl serviceJdbc = new HiveMetaStoreServiceJdbcImpl();
 
     @Mock
     private Connection conn;
@@ -76,18 +76,21 @@ public class HiveMetastoreServiceJDBCImplTest {
 
     @Before
     public void setUp() throws SQLException {
-        serviceJDBC.setConn(conn);
-        serviceJDBC.setHiveClassName("org.apache.hive.jdbc.HiveDriver");
+        serviceJdbc.setConn(conn);
+        serviceJdbc.setHiveClassName("org.apache.hive.jdbc.HiveDriver");
+        serviceJdbc.setNeedKerberos("true");
+        serviceJdbc.setKeytabPath("/path/to/keytab");
+        serviceJdbc.setKeytabUser("user");
     }
 
     @Test
     public void testGetComment() {
-        String colStr = "`merch_date` string COMMENT 'this is merch date'";
-        String comment = serviceJDBC.getComment(colStr);
-        assert (comment.equals("this is merch date"));
+        String colStr = "`session_date` string COMMENT 'this is session date'";
+        String comment = serviceJdbc.getComment(colStr);
+        assert (comment.equals("this is session date"));
 
-        colStr = "`merch_date` string COMMENT ''";
-        comment = serviceJDBC.getComment(colStr);
+        colStr = "`session_date` string COMMENT ''";
+        comment = serviceJdbc.getComment(colStr);
         Assert.assertTrue(comment.isEmpty());
     }
 
@@ -98,7 +101,7 @@ public class HiveMetastoreServiceJDBCImplTest {
         when(rs.next()).thenReturn(true).thenReturn(false);
         when(rs.getString(anyInt())).thenReturn("default");
 
-        Iterable<String> res = serviceJDBC.getAllDatabases();
+        Iterable<String> res = serviceJdbc.getAllDatabases();
         for (String s : res) {
             Assert.assertEquals(s, "default");
             break;
@@ -110,34 +113,34 @@ public class HiveMetastoreServiceJDBCImplTest {
         when(conn.createStatement()).thenReturn(stmt);
         when(stmt.executeQuery(anyString())).thenReturn(rs);
         when(rs.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        when(rs.getString(anyInt())).thenReturn("merch_data").thenReturn("merch_summary");
+        when(rs.getString(anyInt())).thenReturn("session_data").thenReturn("session_summary");
 
-        Iterable<String> res = serviceJDBC.getAllTableNames("default");
+        Iterable<String> res = serviceJdbc.getAllTableNames("default");
         StringBuilder sb = new StringBuilder();
         for (String s : res) {
             sb.append(s).append(",");
         }
-        Assert.assertEquals(sb.toString(), "merch_data,merch_summary,");
+        Assert.assertEquals(sb.toString(), "session_data,session_summary,");
     }
 
     @Test
     public void testGetTable() throws SQLException {
-        String meta = "CREATE EXTERNAL TABLE `default.merch_data`(  `merch_date` string COMMENT 'this is merch date',   `site_id` int COMMENT '',   `guid` string COMMENT '',   `user_id` string COMMENT '',   `treatments` string COMMENT '',   `experiments` string COMMENT '',   `page_id` int COMMENT '',   `placement_id` int COMMENT '',   `meid` string COMMENT '',   `program_id` bigint COMMENT '',   `module_id` int COMMENT '',   `algorithm_selected_config_id` bigint COMMENT '',   `algorithm_id` int COMMENT '',   `mbe` string COMMENT '',   `issps` string COMMENT '',   `mbe_version` string COMMENT '',   `trks` string COMMENT '',   `session_skey` string COMMENT '',   `seqnum` string COMMENT '',   `channel` int COMMENT '',   `icf` string COMMENT '',   `device` string COMMENT '',   `device_exp` string COMMENT '',   `experience` string COMMENT '',   `euid` string COMMENT '',   `impression_count` bigint COMMENT '',   `surface_plmt_imp` bigint COMMENT '',   `plmt_imp` bigint COMMENT '',   `oi` int COMMENT '',   `in` string COMMENT '',   `seeditem` string COMMENT '',   `seeditem_v2` array<string> COMMENT '',   `multi_seeds` array<string> COMMENT '',   `out` array<string> COMMENT '',   `vi` array<string> COMMENT '',   `bid` array<string> COMMENT '',   `bin` array<string> COMMENT '',   `offer` array<string> COMMENT '',   `watch` array<string> COMMENT '',   `asq` array<string> COMMENT '',   `add2cart` array<string> COMMENT '',   `add2list` array<string> COMMENT '',   `purchase_items` array<string> COMMENT '',   `purchase` bigint COMMENT '',   `migmb` bigint COMMENT '',   `mbe_value` string COMMENT '',   `out_deals` string COMMENT '',   `collection` array<string> COMMENT '',   `lndpg_click` array<string> COMMENT '')COMMENT 'merch_data for merch team'PARTITIONED BY (   `dt` string,   `placement` int)ROW FORMAT SERDE   'org.apache.hadoop.hive.serde2.avro.AvroSerDe' STORED AS INPUTFORMAT   'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat' OUTPUTFORMAT   'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat'LOCATION  'hdfs://ares-lvs-nn-ha/apps/hdmi-set/buyexp/merch/common/merch_data'TBLPROPERTIES (  'COLUMN_STATS_ACCURATE'='false',   'avro.schema.url'='hdfs://ares-lvs-nn-ha/user/b_bis/merch/avro/merch-data-1.0.avsc',   'transient_lastDdlTime'='1535651637')";
+        String meta = "CREATE EXTERNAL TABLE `default.session_data`(  `session_date` string COMMENT 'this is session date',   `site_id` int COMMENT '',   `guid` string COMMENT '',   `user_id` string COMMENT '')COMMENT 'session_data for session team' PARTITIONED BY (   `dt` string,   `place` int) ROW FORMAT SERDE   'org.apache.hadoop.hive.serde2.avro.AvroSerDe' STORED AS INPUTFORMAT   'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat' OUTPUTFORMAT   'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat' LOCATION 'hdfs://localhost/session/common/session_data'TBLPROPERTIES (  'COLUMN_STATS_ACCURATE'='false',   'avro.schema.url'='hdfs://localhost/griffin/session/avro/session-data-1.0.avsc',   'transient_lastDdlTime'='1535651637')";
         when(conn.createStatement()).thenReturn(stmt);
         when(stmt.executeQuery(anyString())).thenReturn(rs);
         when(rs.next()).thenReturn(true).thenReturn(false);
         when(rs.getString(anyInt())).thenReturn(meta);
 
-        Table res = serviceJDBC.getTable("default", "merch_data");
+        Table res = serviceJdbc.getTable("default", "session_data");
 
         assert (res.getDbName().equals("default"));
-        assert (res.getTableName().equals("merch_data"));
-        assert (res.getSd().getLocation().equals("hdfs://ares-lvs-nn-ha/apps/hdmi-set/buyexp/merch/common/merch_data"));
+        assert (res.getTableName().equals("session_data"));
+        assert (res.getSd().getLocation().equals("hdfs://localhost/session/common/session_data"));
         List<FieldSchema> fieldSchemas = res.getSd().getCols();
         for (FieldSchema fieldSchema : fieldSchemas) {
-            Assert.assertEquals(fieldSchema.getName(),"merch_date");
+            Assert.assertEquals(fieldSchema.getName(),"session_date");
             Assert.assertEquals(fieldSchema.getType(),"string");
-            Assert.assertEquals(fieldSchema.getComment(),"this is merch date");
+            Assert.assertEquals(fieldSchema.getComment(),"this is session date");
             break;
         }
     }
