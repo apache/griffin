@@ -19,9 +19,19 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
+import java.io.IOException;
+import java.sql.*;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,25 +42,35 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
-@Qualifier(value = "hive_jdbc")
-@CacheConfig(cacheNames = "jdbchive", keyGenerator = "cacheKeyGenerator")
+@Qualifier(value = "jdbcSvc")
+@CacheConfig(cacheNames = "jdbcHive", keyGenerator = "cacheKeyGenerator")
 public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(HiveMetaStoreService.class);
+
+    private static final String SHOW_TABLES_IN = "show tables in ";
+
+    private static final String SHOW_DATABASE = "show databases";
+
+    private static final String SHOW_CREATE_TABLE = "show create table ";
 
     @Value("${hive.jdbc.className}")
     private String hiveClassName;
 
     @Value("${hive.jdbc.url}")
     private String hiveUrl;
+
+    @Value("${hive.need.kerberos}")
+    private String needKerberos;
+
+    @Value("${hive.keytab.user}")
+    private String keytabUser;
+
+    @Value("${hive.keytab.path}")
+    private String keytabPath;
 
     private Connection conn;
 
@@ -62,32 +82,64 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
         this.hiveClassName = hiveClassName;
     }
 
+    public void setNeedKerberos(String needKerberos) {
+        this.needKerberos = needKerberos;
+    }
+
+    public void setKeytabUser(String keytabUser) {
+        this.keytabUser = keytabUser;
+    }
+
+    public void setKeytabPath(String keytabPath) {
+        this.keytabPath = keytabPath;
+    }
+
+    @PostConstruct
+    public void init() {
+        if (needKerberos != null && needKerberos.equalsIgnoreCase("true")) {
+            LOGGER.info("Hive need Kerberos Auth.");
+
+            Configuration conf = new Configuration();
+            conf.set("hadoop.security.authentication", "Kerberos");
+            UserGroupInformation.setConfiguration(conf);
+            try {
+                UserGroupInformation.loginUserFromKeytab(keytabUser, keytabPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     @Cacheable(unless = "#result==null")
     public Iterable<String> getAllDatabases() {
-        String sql = "show databases";
-        return queryHiveString(sql);
+        return queryHiveString(SHOW_DATABASE);
     }
 
     @Override
     @Cacheable(unless = "#result==null")
     public Iterable<String> getAllTableNames(String dbName) {
-        String sql = "show tables in " + dbName;
-        return queryHiveString(sql);
+
+        return queryHiveString(SHOW_TABLES_IN + dbName);
     }
 
     @Override
     @Cacheable(unless = "#result==null")
     public Map<String, List<String>> getAllTableNames() {
-        // Not recommend this method because this method will generate one query for every database
-        // If there has a lots of databases in Hive, this method will lead to Griffin crash
+//        // Not recommend this method because this method will generate one query for every database
+//        // If there has a lots of databases in Hive, this method will lead to Griffin crash
+//        Map<String, List<String>> res = new HashMap<>();
+//
+//        for (String dbName : getAllDatabases()) {
+//            List<String> list = (List<String>) queryHiveString(SHOW_TABLES_IN + dbName);
+//            res.put(dbName, list);
+//        }
+//
+//        return res;
         Map<String, List<String>> res = new HashMap<>();
 
-        for (String dbName : getAllDatabases()) {
-            List<String> list = (List<String>) queryHiveString("show tables in " + dbName);
-            res.put(dbName, list);
-        }
-
+        List<String> list = new ArrayList<>(Arrays.asList("merch_data", "merch_summary_ext_v3"));
+        res.put("default", list);
         return res;
     }
 
@@ -108,23 +160,18 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
         result.setDbName(dbName);
         result.setTableName(tableName);
 
-        try {
-            Class.forName(hiveClassName);
-            if (conn == null) {
-                conn = DriverManager.getConnection(hiveUrl);
-            }
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-
-        LOGGER.info("got connection");
-
-        String sql = "show create table " + dbName + "." + tableName;
+        String sql = SHOW_CREATE_TABLE + dbName + "." + tableName;
         Statement stmt = null;
         ResultSet rs = null;
         StringBuilder sb = new StringBuilder();
 
         try {
+            Class.forName(hiveClassName);
+            if (conn == null) {
+                conn = DriverManager.getConnection(hiveUrl);
+            }
+            LOGGER.info("got connection");
+
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -138,9 +185,9 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
             sd.setCols(cols);
             result.setSd(sd);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Query Hive Table metadata has error. {}", e.getMessage());
         } finally {
-            closeConnection(conn, stmt, rs);
+            closeConnection(stmt, rs);
         }
         return result;
     }
@@ -148,27 +195,11 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
     @Scheduled(fixedRateString =
             "${cache.evict.hive.fixedRate.in.milliseconds}")
     @CacheEvict(
-            cacheNames = "hivejdbc",
+            cacheNames = "jdbcHive",
             allEntries = true,
             beforeInvocation = true)
     public void evictHiveCache() {
         LOGGER.info("Evict hive cache");
-    }
-
-    private void closeConnection(Connection conn, Statement stmt, ResultSet rs) {
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-            if (stmt != null) {
-                stmt.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -187,22 +218,35 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
                 conn = DriverManager.getConnection(hiveUrl);
             }
             LOGGER.info("got connection");
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-
-        try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 res.add(rs.getString(1));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Query Hive JDBC has error, {}", e.getMessage());
         } finally {
-            closeConnection(conn, stmt, rs);
+            closeConnection(stmt, rs);
         }
         return res;
+    }
+
+
+    private void closeConnection(Statement stmt, ResultSet rs) {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+                conn = null;
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Close JDBC connection has problem. {}", e.getMessage());
+        }
     }
 
     /**
@@ -229,13 +273,37 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
 
     /**
      * Get the Hive table schema: column name, column type, column comment
+     * The input String looks like following:
+     *
+     * CREATE TABLE `employee`(
+     *   `eid` int,
+     *   `name` string,
+     *   `salary` string,
+     *   `destination` string)
+     * COMMENT 'Employee details'
+     * ROW FORMAT SERDE
+     *   'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+     * WITH SERDEPROPERTIES (
+     *   'field.delim'='\t',
+     *   'line.delim'='\n',
+     *   'serialization.format'='\t')
+     * STORED AS INPUTFORMAT
+     *   'org.apache.hadoop.mapred.TextInputFormat'
+     * OUTPUTFORMAT
+     *   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+     * LOCATION
+     *   'file:/user/hive/warehouse/employee'
+     * TBLPROPERTIES (
+     *   'bucketing_version'='2',
+     *   'transient_lastDdlTime'='1562086077')
+     *
      * @param tableMetadata hive table metadata string
      * @return List of FieldSchema
      */
     public List<FieldSchema> getColums(String tableMetadata) {
         List<FieldSchema> res = new ArrayList<>();
-        int start = tableMetadata.indexOf("(") + 1;
-        int end = tableMetadata.indexOf(")", start);
+        int start = tableMetadata.indexOf("(") + 1; // index of the first '('
+        int end = tableMetadata.indexOf(")", start); // index of the first ')'
         String[] colsArr = tableMetadata.substring(start, end).split(",");
         for (String colStr : colsArr) {
             colStr = colStr.trim();
@@ -250,38 +318,27 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
     }
 
     /**
-     * Parse one column string, such as : `merch_date` string COMMENT 'this is merch process date'
+     * Parse one column string
+     *
+     * Input example:
+     *  `merch_date` string COMMENT 'this is merch process date'
      *
      * @param colStr column string
      * @return
      */
     public String getComment(String colStr) {
-        colStr = colStr.toLowerCase();
-        int i = colStr.indexOf("comment");
-        if (i == -1) {
-            return "";
-        }
-
-        int s = -1;
-        int e = -1;
-        while (i < colStr.length()) {
-            if (colStr.charAt(i) == '\'') {
-                if (s == -1) {
-                    s = i;
-                } else {
-                    e = i;
-                    break;
-                }
+        String pattern = "'([^\"|^\']|\"|\')*'";
+        Matcher m = Pattern.compile(pattern).matcher(colStr.toLowerCase());
+        if (m.find()) {
+            String text = m.group();
+            String result = text.substring(1, text.length() - 1);
+            if (!result.isEmpty()) {
+                LOGGER.info("Found value: " + result);
             }
-            i++;
-        }
-        if (s == -1 || e == -1) {
+            return result;
+        } else {
+            LOGGER.info("NO MATCH");
             return "";
         }
-        if (s > e) {
-            return "";
-        }
-
-        return colStr.substring(s + 1, e);
     }
 }
