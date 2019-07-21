@@ -121,8 +121,10 @@ here are sample configurations for hadoop<br>
 Put site-specific property overrides in this file **/apache/hadoop/etc/hadoop/core-site.xml**
 ```xml
 <configuration>
-    <name>fs.defaultFS</name>
-    <value>hdfs://127.0.0.1:9000</value>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://127.0.0.1:9000</value>
+    </property>    
 </configuration>
 ```
 
