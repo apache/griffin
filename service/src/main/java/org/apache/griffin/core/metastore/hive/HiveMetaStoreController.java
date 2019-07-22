@@ -35,7 +35,7 @@ import java.util.Map;
 public class HiveMetaStoreController {
 
     @Autowired
-    @Qualifier(value = "jdbcSvc")
+    @Qualifier(value = "metastoreSvc")
     private HiveMetaStoreService hiveMetaStoreService;
 
     @RequestMapping(value = "/dbs", method = RequestMethod.GET)
