@@ -36,6 +36,7 @@ under the License.
         <hive.version>2.2.0</hive.version>
         <scala.version>2.10</scala.version>
         <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
+        <spring.security.kerberos.version>1.0.0.RELEASE</spring.security.kerberos.version>
         <confluent.version>3.2.0</confluent.version>
         <quartz.version>2.2.2</quartz.version>
         <start-class>org.apache.griffin.core.GriffinWebApplication</start-class>
@@ -102,7 +103,7 @@ under the License.
         <dependency>
             <groupId>org.springframework.security.kerberos</groupId>
             <artifactId>spring-security-kerberos-client</artifactId>
-            <version>1.0.0.RELEASE</version>
+            <version>${spring.security.kerberos.version}</version>
         </dependency>
         <!--eclipse link-->
         <dependency>
@@ -110,16 +111,16 @@ under the License.
             <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>${eclipselink.version}</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.postgresql</groupId>-->
-        <!--            <artifactId>postgresql</artifactId>-->
-        <!--            <version>${postgresql.version}</version>-->
-        <!--        </dependency>-->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.java.version}</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
         </dependency>
+        <!--<dependency>-->
+        <!--<groupId>mysql</groupId>-->
+        <!--<artifactId>mysql-connector-java</artifactId>-->
+        <!--<version>${mysql.java.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -155,7 +156,7 @@ under the License.
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.aggregate</groupId>
-                    <artifactId>*</artifactId>
+                    <artifactId>jetty-all</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -171,6 +172,8 @@ under the License.
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- to access Hive using JDBC -->
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-jdbc</artifactId>
@@ -190,7 +193,6 @@ under the License.
                 </exclusion>
             </exclusions>
         </dependency>
-
 
         <!-- to access confluent schema registry -->
         <dependency>
@@ -254,29 +256,29 @@ under the License.
         </dependency>
     </dependencies>
     <profiles>
-        <!--if you need postgresql, please uncomment postgresql-connector-java -->
-        <!--        <profile>-->
-        <!--            <id>postgresql</id>-->
-        <!--            <activation>-->
-        <!--                <activeByDefault>true</activeByDefault>-->
-        <!--                <property>-->
-        <!--                    <name>prod</name>-->
-        <!--                </property>-->
-        <!--            </activation>-->
-        <!--        </profile>-->
-        <profile>
-            <id>mysql</id>
-            <activation>
-                <property>
-                    <name>mysql</name>
-                </property>
-            </activation>
-        </profile>
+        <!--if you need mysql, please uncomment mysql-connector-java -->
+        <!--<profile>-->
+        <!--<id>mysql</id>-->
+        <!--<activation>-->
+        <!--<property>-->
+        <!--<name>mysql</name>-->
+        <!--</property>-->
+        <!--</activation>-->
+        <!--</profile>-->
         <profile>
             <id>dev</id>
             <activation>
                 <property>
                     <name>dev</name>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>postgresql</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>prod</name>
                 </property>
             </activation>
         </profile>
