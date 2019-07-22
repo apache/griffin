@@ -111,16 +111,16 @@ under the License.
             <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>${eclipselink.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.postgresql</groupId>-->
+<!--            <artifactId>postgresql</artifactId>-->
+<!--            <version>${postgresql.version}</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.java.version}</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>mysql</groupId>-->
-        <!--<artifactId>mysql-connector-java</artifactId>-->
-        <!--<version>${mysql.java.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -257,14 +257,6 @@ under the License.
     </dependencies>
     <profiles>
         <!--if you need mysql, please uncomment mysql-connector-java -->
-        <!--<profile>-->
-        <!--<id>mysql</id>-->
-        <!--<activation>-->
-        <!--<property>-->
-        <!--<name>mysql</name>-->
-        <!--</property>-->
-        <!--</activation>-->
-        <!--</profile>-->
         <profile>
             <id>dev</id>
             <activation>
@@ -274,14 +266,22 @@ under the License.
             </activation>
         </profile>
         <profile>
-            <id>postgresql</id>
+            <id>mysql</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>prod</name>
-                </property>
+            <property>
+                <name>mysql</name>
+            </property>
             </activation>
         </profile>
+<!--        <profile>-->
+<!--            <id>postgresql</id>-->
+<!--            <activation>-->
+<!--                <activeByDefault>true</activeByDefault>-->
+<!--                <property>-->
+<!--                    <name>prod</name>-->
+<!--                </property>-->
+<!--            </activation>-->
+<!--        </profile>-->
     </profiles>
     <build>
         <plugins>
