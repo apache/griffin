@@ -104,7 +104,7 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
             try {
                 UserGroupInformation.loginUserFromKeytab(keytabUser, keytabPath);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Register Kerberos has error. {}", e.getMessage());
             }
         }
     }
@@ -124,19 +124,12 @@ public class HiveMetaStoreServiceJdbcImpl implements HiveMetaStoreService {
     @Override
     @Cacheable(unless = "#result==null")
     public Map<String, List<String>> getAllTableNames() {
-//        // If there has a lots of databases in Hive, this method will lead to Griffin crash
-//        Map<String, List<String>> res = new HashMap<>();
-//
-//        for (String dbName : getAllDatabases()) {
-//            List<String> list = (List<String>) queryHiveString(SHOW_TABLES_IN + dbName);
-//            res.put(dbName, list);
-//        }
-//
-//        return res;
+        // If there has a lots of databases in Hive, this method will lead to Griffin crash
         Map<String, List<String>> res = new HashMap<>();
-
-        List<String> list = new ArrayList<>(Arrays.asList("merch_data", "merch_summary_ext_v3"));
-        res.put("default", list);
+        for (String dbName : getAllDatabases()) {
+            List<String> list = (List<String>) queryHiveString(SHOW_TABLES_IN + dbName);
+            res.put(dbName, list);
+        }
         return res;
     }
 
