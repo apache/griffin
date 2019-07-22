@@ -19,30 +19,25 @@ under the License.
 
 package org.apache.griffin.core.metastore.hive;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.griffin.core.util.URLHelper;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.*;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = HiveMetaStoreController.class, secure = false)
@@ -52,6 +47,7 @@ public class HiveMetaStoreControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
+    @Qualifier(value = "metastoreSvc")
     private HiveMetaStoreService hiveMetaStoreService;
 
 
@@ -117,7 +113,7 @@ public class HiveMetaStoreControllerTest {
         String tableName = "table";
         given(hiveMetaStoreService.getTable(dbName, tableName)).willReturn(
                 new Table(tableName, null, null, 0, 0, 0, null, null,
-                null, null, null, null));
+                        null, null, null, null));
 
         mockMvc.perform(get(URLHelper.API_VERSION_PATH + "/metadata/hive/table")
                 .param("db", dbName).param("table",

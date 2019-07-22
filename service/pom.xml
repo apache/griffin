@@ -36,6 +36,7 @@ under the License.
         <hive.version>2.2.0</hive.version>
         <scala.version>2.10</scala.version>
         <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
+        <spring.security.kerberos.version>1.0.0.RELEASE</spring.security.kerberos.version>
         <confluent.version>3.2.0</confluent.version>
         <quartz.version>2.2.2</quartz.version>
         <start-class>org.apache.griffin.core.GriffinWebApplication</start-class>
@@ -99,6 +100,11 @@ under the License.
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security.kerberos</groupId>
+            <artifactId>spring-security-kerberos-client</artifactId>
+            <version>${spring.security.kerberos.version}</version>
+        </dependency>
         <!--eclipse link-->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
@@ -111,9 +117,9 @@ under the License.
             <version>${postgresql.version}</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>mysql</groupId>-->
-            <!--<artifactId>mysql-connector-java</artifactId>-->
-            <!--<version>${mysql.java.version}</version>-->
+        <!--<groupId>mysql</groupId>-->
+        <!--<artifactId>mysql-connector-java</artifactId>-->
+        <!--<version>${mysql.java.version}</version>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.h2database</groupId>
@@ -163,6 +169,27 @@ under the License.
                 <exclusion>
                     <groupId>de.ruedigermoeller</groupId>
                     <artifactId>fst</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- to access Hive using JDBC -->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>${hive.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.aggregate</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.orbit</groupId>
+                    <artifactId>javax.servlet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -231,12 +258,12 @@ under the License.
     <profiles>
         <!--if you need mysql, please uncomment mysql-connector-java -->
         <!--<profile>-->
-            <!--<id>mysql</id>-->
-            <!--<activation>-->
-                <!--<property>-->
-                    <!--<name>mysql</name>-->
-                <!--</property>-->
-            <!--</activation>-->
+        <!--<id>mysql</id>-->
+        <!--<activation>-->
+        <!--<property>-->
+        <!--<name>mysql</name>-->
+        <!--</property>-->
+        <!--</activation>-->
         <!--</profile>-->
         <profile>
             <id>dev</id>
