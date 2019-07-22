@@ -12,7 +12,7 @@
     {
       "type": "HDFS",
       "config": {
-        "path": "hdfs://ares-lvs-nn-ha/user/b_bis/griffin/persist",
+        "path": "hdfs:///griffin/persist",
         "max.persist.lines": 10000,
         "max.lines.per.file": 10000
       }
@@ -21,7 +21,7 @@
       "type": "ELASTICSEARCH",
       "config": {
         "method": "post",
-        "api": "http://k8s-004-2629572.lvs02.eaz.ebayc3.com:9200/griffin/accuracy",
+        "api": "http://es:9200/griffin/accuracy",
         "connection.timeout": "1m",
         "retry": 10
       }
