@@ -148,6 +148,10 @@ public class SparkSubmitJob implements Job {
         return result;
     }
 
+    private String post2LivyKerberos() {
+        return livyTaskSubmitHelper.postToLivy(livyUri);
+    }
+
     private boolean success(List<SegmentPredicate> predicates) {
         if (CollectionUtils.isEmpty(predicates)) {
             return true;
@@ -238,7 +242,7 @@ public class SparkSubmitJob implements Job {
 
     private Map<String, Object> post2LivyWithRetry()
             throws IOException {
-        String result = post2Livy();
+        String result = post2LivyKerberos();
         Map<String, Object> resultMap = null;
         if (result != null) {
             resultMap = livyTaskSubmitHelper.retryLivyGetAppId(result,appIdRetryCount);

@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
@@ -34,8 +35,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
+import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
 import static org.apache.griffin.core.util.JsonUtil.toEntity;
+import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.quartz.JobDetail;
@@ -44,6 +47,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.kerberos.client.KerberosRestTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -217,8 +224,98 @@ public class LivyTaskSubmitHelper {
     private Map<String, Object> getResultByLivyId(Object livyBatchesId, TypeReference<HashMap<String, Object>> type)
             throws IOException {
         Map<String, Object> resultMap = new HashedMap();
-        String newResult = restTemplate.getForObject(uri + "/" + livyBatchesId, String.class);
-        return newResult == null ? resultMap : toEntity(newResult, type);
+        String livyUri = uri + "/" + livyBatchesId;
+        String result = getFromLivy(livyUri);
+        logger.info(result);
+        return result == null ? resultMap : toEntity(result, type);
     }
 
+    public String postToLivy(String uri) {
+        String needKerberos = env.getProperty("livy.need.kerberos");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(REQUEST_BY_HEADER,"admin");
+
+        if (needKerberos == null) {
+            logger.error("The property \"livy.need.kerberos\" is empty");
+            return null;
+        }
+
+        if (needKerberos.equalsIgnoreCase("false")) {
+            logger.info("The livy server doesn't need Kerberos Authentication");
+            String result = null;
+            try {
+
+                HttpEntity<String> springEntity = new HttpEntity<>(toJsonWithFormat(livyConfMap),headers);
+                result = restTemplate.postForObject(uri,springEntity,String.class);
+
+                logger.info(result);
+            } catch (JsonProcessingException e) {
+                logger.error("Post to livy ERROR. \n {}", e.getMessage());
+            }
+            return result;
+        } else {
+            logger.info("The livy server needs Kerberos Authentication");
+            String userPrincipal = env.getProperty("livy.server.auth.kerberos.principal");
+            String keyTabLocation = env.getProperty("livy.server.auth.kerberos.keytab");
+            logger.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
+
+            KerberosRestTemplate restTemplate = new KerberosRestTemplate(keyTabLocation, userPrincipal);
+            HttpEntity<String> springEntity = null;
+            try {
+                springEntity = new HttpEntity<>(toJsonWithFormat(livyConfMap), headers);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            String result = restTemplate.postForObject(uri, springEntity, String.class);
+            logger.info(result);
+            return result;
+        }
+    }
+
+    public String getFromLivy(String uri) {
+        String needKerberos = env.getProperty("livy.need.kerberos");
+
+        if (needKerberos == null) {
+            logger.error("The property \"livy.need.kerberos\" is empty");
+            return null;
+        }
+
+        if (needKerberos.equalsIgnoreCase("false")) {
+            logger.info("The livy server doesn't need Kerberos Authentication");
+            return restTemplate.getForObject(uri, String.class);
+        } else {
+            logger.info("The livy server needs Kerberos Authentication");
+            String userPrincipal = env.getProperty("livy.server.auth.kerberos.principal");
+            String keyTabLocation = env.getProperty("livy.server.auth.kerberos.keytab");
+            logger.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
+
+            KerberosRestTemplate restTemplate = new KerberosRestTemplate(keyTabLocation, userPrincipal);
+            String result = restTemplate.getForObject(uri, String.class);
+            logger.info(result);
+            return result;
+        }
+    }
+
+    public void deleteByLivy(String uri) {
+        String needKerberos = env.getProperty("livy.need.kerberos");
+
+        if (needKerberos == null) {
+            logger.error("The property \"livy.need.kerberos\" is empty");
+            return;
+        }
+
+        if (needKerberos.equalsIgnoreCase("false")) {
+            logger.info("The livy server doesn't need Kerberos Authentication");
+            new RestTemplate().delete(uri);
+        } else {
+            logger.info("The livy server needs Kerberos Authentication");
+            String userPrincipal = env.getProperty("livy.server.auth.kerberos.principal");
+            String keyTabLocation = env.getProperty("livy.server.auth.kerberos.keytab");
+            logger.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
+
+            KerberosRestTemplate restTemplate = new KerberosRestTemplate(keyTabLocation, userPrincipal);
+            restTemplate.delete(uri);
+        }
+    }
 }
