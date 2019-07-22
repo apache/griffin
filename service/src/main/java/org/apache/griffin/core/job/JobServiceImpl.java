@@ -125,10 +125,8 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
-    private RestTemplate restTemplate;
-
     public JobServiceImpl() {
-        restTemplate = new RestTemplate();
+
     }
 
     @Override
@@ -527,7 +525,9 @@ public class JobServiceImpl implements JobService {
             new TypeReference<HashMap<String, Object>>() {
             };
         try {
-            String resultStr = restTemplate.getForObject(uri, String.class);
+            String resultStr = livyTaskSubmitHelper.getFromLivy(uri);
+            LOGGER.info(resultStr);
+
             HashMap<String, Object> resultMap = JsonUtil.toEntity(resultStr,
                 type);
             setJobInstanceIdAndUri(instance, resultMap);

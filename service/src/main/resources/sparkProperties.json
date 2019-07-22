@@ -1,14 +1,14 @@
 {
-  "file": "hdfs:///griffin/griffin-measure.jar",
+  "file": "hdfs:///user/b_bis/griffin/griffin-measure.jar",
   "className": "org.apache.griffin.measure.Application",
   "name": "griffin",
-  "queue": "default",
-  "numExecutors": 2,
-  "executorCores": 1,
-  "driverMemory": "1g",
-  "executorMemory": "1g",
+  "queue": "hdlq-data-bpe-default",
+  "numExecutors": 100,
+  "executorCores": 4,
+  "driverMemory": "10g",
+  "executorMemory": "5g",
   "conf": {
-    "spark.yarn.dist.files": "hdfs:///home/spark_conf/hive-site.xml"
+    "spark.yarn.dist.files": "hdfs:///user/b_bis/griffin/hive-site.xml"
   },
   "files": [
   ]
