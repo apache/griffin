@@ -31,6 +31,8 @@ import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
 import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
 import static org.apache.griffin.core.util.JsonUtil.toEntity;
+import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
@@ -55,7 +57,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -67,7 +68,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
