@@ -19,17 +19,17 @@ under the License.
 
 package org.apache.griffin.core.job.factory;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.PREDICATE_TYPE_NOT_FOUND;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.FileExistPredicator;
 import org.apache.griffin.core.job.Predicator;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.PREDICATE_TYPE_NOT_FOUND;
 
 public class PredicatorFactory {
     private static final Logger LOGGER = LoggerFactory
