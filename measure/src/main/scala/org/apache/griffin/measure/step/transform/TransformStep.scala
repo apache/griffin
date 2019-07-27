@@ -44,7 +44,7 @@ trait TransformStep extends DQStep {
 
   def execute(context: DQContext): Boolean = {
     val threadName = Thread.currentThread().getName
-    info(threadName + " bigin transform step : \n" + debugString())
+    info(threadName + " begin transform step : \n" + debugString())
     // Submit parents Steps
     val parentStepFutures = parentSteps.filter(checkAndUpdateStatus).map { parentStep =>
       Future {
