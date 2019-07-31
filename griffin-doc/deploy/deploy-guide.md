@@ -126,8 +126,10 @@ export PATH=$PATH:$HIVE_HOME/bin:$HADOOP_HOME/bin:$SPARK_HOME/bin:$LIVY_HOME/bin
 Put site-specific property overrides in this file **/apache/hadoop/etc/hadoop/core-site.xml**
 ```xml
 <configuration>
-    <name>fs.defaultFS</name>
-    <value>hdfs://127.0.0.1:9000</value>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://127.0.0.1:9000</value>
+    </property>    
 </configuration>
 ```
 

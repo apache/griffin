@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HiveMetaStoreController {
 
     @Autowired
+    @Qualifier(value = "metastoreSvc")
     private HiveMetaStoreService hiveMetaStoreService;
 
     @RequestMapping(value = "/dbs", method = RequestMethod.GET)
