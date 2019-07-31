@@ -42,3 +42,4 @@ measure/src/test/test_scala/*
 .vscode
 
 environment.local.ts
+logs/
