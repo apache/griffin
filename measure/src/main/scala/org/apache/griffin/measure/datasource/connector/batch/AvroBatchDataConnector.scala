@@ -53,15 +53,12 @@ case class AvroBatchDataConnector(@transient sparkSession: SparkSession,
   }
 
   def data(ms: Long): (Option[DataFrame], TimeRange) = {
-    val dfOpt = try {
+    assert(fileExist(), s"Avro file ${concreteFileFullPath} is not exists!")
+    val dfOpt = {
       val df = sparkSession.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
       val dfOpt = Some(df)
       val preDfOpt = preProcess(dfOpt, ms)
       preDfOpt
-    } catch {
-      case e: Throwable =>
-        error(s"load avro file ${concreteFileFullPath} fails", e)
-        None
     }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))

@@ -19,28 +19,7 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
-import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
-import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
-import static org.apache.griffin.core.job.JobInstance.JOB_NAME;
-import static org.apache.griffin.core.job.JobInstance.MEASURE_KEY;
-import static org.apache.griffin.core.job.JobInstance.PREDICATES_KEY;
-import static org.apache.griffin.core.job.JobInstance.PREDICATE_JOB_NAME;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
-import static org.apache.griffin.core.util.JsonUtil.toEntity;
-import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.factory.PredicatorFactory;
@@ -60,14 +39,26 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
+import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
+import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
+import static org.apache.griffin.core.job.JobInstance.*;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.FOUND;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
@@ -128,24 +119,7 @@ public class SparkSubmitJob implements Job {
     }
 
     private String post2Livy() {
-        String result = null;
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set(REQUEST_BY_HEADER,"admin");
-
-            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap),headers);
-            result = restTemplate.postForObject(livyUri,springEntity,String.class);
-
-            LOGGER.info(result);
-        } catch (HttpClientErrorException e) {
-            LOGGER.error("Post to livy ERROR. \n {} {}",
-                    e.getMessage(),
-                    e.getResponseBodyAsString());
-        } catch (Exception e) {
-            LOGGER.error("Post to livy ERROR. {}", e.getMessage());
-        }
-        return result;
+        return livyTaskSubmitHelper.postToLivy(livyUri);
     }
 
     private boolean success(List<SegmentPredicate> predicates) {

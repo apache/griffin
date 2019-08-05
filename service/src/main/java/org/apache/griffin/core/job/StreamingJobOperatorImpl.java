@@ -56,7 +56,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class StreamingJobOperatorImpl implements JobOperator {
@@ -72,13 +71,13 @@ public class StreamingJobOperatorImpl implements JobOperator {
     private JobInstanceRepo instanceRepo;
     @Autowired
     private SchedulerFactoryBean factory;
+    @Autowired
+    private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
     private String livyUri;
-    private RestTemplate restTemplate;
 
     @PostConstruct
     public void init() {
-        restTemplate = new RestTemplate();
         livyUri = env.getProperty("livy.uri");
     }
 
@@ -233,7 +232,9 @@ public class StreamingJobOperatorImpl implements JobOperator {
         }
         String url = livyUri + "/" + instance.getSessionId();
         try {
-            restTemplate.delete(url);
+            // Use livy helper to interact with livy
+            livyTaskSubmitHelper.deleteByLivy(url);
+
             LOGGER.info("Job instance({}) has been deleted. {}", instance
                     .getSessionId(), url);
         } catch (ResourceAccessException e) {
