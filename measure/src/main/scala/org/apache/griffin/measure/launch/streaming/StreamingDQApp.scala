@@ -34,11 +34,11 @@ import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.context.streaming.checkpoint.offset.OffsetCheckpointClient
 import org.apache.griffin.measure.context.streaming.metric.CacheResults
 import org.apache.griffin.measure.datasource.DataSourceFactory
+import org.apache.griffin.measure.job.DQJob
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
-
 
 case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
@@ -52,8 +52,6 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
   val sinkParams = getSinkParams
 
   var sqlContext: SQLContext = _
-
-  implicit var sparkSession: SparkSession = _
 
   def retryable: Boolean = true
 
@@ -170,6 +168,9 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     val lock = OffsetCheckpointClient.genLock("process")
     val appSink = globalContext.getSink()
 
+    var dqContext: DQContext = _
+    var dqJob: DQJob = _
+
     def run(): Unit = {
       val updateTimeDate = new Date()
       val updateTime = updateTimeDate.getTime
@@ -185,10 +186,10 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
           val contextId = ContextId(startTime)
 
           // create dq context
-          val dqContext: DQContext = globalContext.cloneDQContext(contextId)
+          dqContext = globalContext.cloneDQContext(contextId)
 
           // build job
-          val dqJob = DQJobBuilder.buildDQJob(dqContext, evaluateRuleParam)
+          dqJob = DQJobBuilder.buildDQJob(dqContext, evaluateRuleParam)
 
           // dq job execute
           dqJob.execute(dqContext)
