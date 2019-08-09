@@ -47,8 +47,6 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
   val sparkParam = envParam.getSparkParam
   val metricName = dqParam.getName
-//  val dataSourceParams = dqParam.dataSources
-//  val dataSourceNames = dataSourceParams.map(_.name)
   val sinkParams = getSinkParams
 
   var sqlContext: SQLContext = _
