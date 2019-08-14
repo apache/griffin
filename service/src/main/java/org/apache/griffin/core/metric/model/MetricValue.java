@@ -89,9 +89,9 @@ public class MetricValue {
         if (o == null || getClass() != o.getClass()) return false;
         MetricValue that = (MetricValue) o;
         return Objects.equals(name, that.name) &&
-                Objects.equals(tmst, that.tmst) &&
-                Objects.equals(metadata, that.metadata) &&
-                Objects.equals(value, that.value);
+            Objects.equals(tmst, that.tmst) &&
+            Objects.equals(metadata, that.metadata) &&
+            Objects.equals(value, that.value);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class MetricValue {
     @Override
     public String toString() {
         return String.format(
-                "MetricValue{name=%s, ts=%s, meta=%s, value=%s}",
-                name, tmst, metadata, value);
+            "MetricValue{name=%s, ts=%s, meta=%s, value=%s}",
+            name, tmst, metadata, value);
     }
 }

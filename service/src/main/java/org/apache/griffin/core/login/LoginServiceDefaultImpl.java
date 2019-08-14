@@ -34,10 +34,9 @@ public class LoginServiceDefaultImpl implements LoginService {
         if (StringUtils.isBlank(username)) {
             username = "Anonymous";
         }
-        String fullName = username;
         Map<String, Object> message = new HashMap<>();
         message.put("ntAccount", username);
-        message.put("fullName", fullName);
+        message.put("fullName", username);
         message.put("status", 0);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }

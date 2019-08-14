@@ -53,7 +53,7 @@ public class LoginConfig {
                 return new LoginServiceDefaultImpl();
             case "ldap":
                 return new LoginServiceLdapImpl(url, email, searchBase,
-                        searchPattern, sslSkipVerify, bindDN, bindPassword);
+                    searchPattern, sslSkipVerify, bindDN, bindPassword);
             default:
                 return null;
         }

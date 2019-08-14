@@ -35,7 +35,7 @@ import org.springframework.core.io.Resource;
 
 public class PropertiesUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(
-            PropertiesUtil.class);
+        PropertiesUtil.class);
 
     public static Properties getProperties(String path, Resource resource) {
         PropertiesFactoryBean propFactoryBean = new PropertiesFactoryBean();
@@ -61,7 +61,7 @@ public class PropertiesUtil {
      */
     public static Properties getConf(String name, String defaultPath,
                                      String location)
-            throws FileNotFoundException {
+        throws FileNotFoundException {
         String path = getConfPath(name, location);
         Resource resource;
         if (path == null) {

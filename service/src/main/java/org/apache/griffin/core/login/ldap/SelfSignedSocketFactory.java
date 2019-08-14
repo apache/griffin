@@ -35,7 +35,7 @@ import org.apache.griffin.core.exception.GriffinException;
 
 /**
  * SocketFactory ignoring insecure (self-signed, expired) certificates.
- *
+ * <p>
  * Maintains internal {@code SSLSocketFactory} configured with {@code NoopTrustManager}.
  * All SocketFactory methods are proxied to internal SSLSocketFactory instance.
  * Accepts all client and server certificates, from any issuers.

@@ -23,6 +23,14 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
+/**
+ * LoginService defines an abstract validation method for login action, you can implement
+ * it to customize authentication business.
+ *
+ * @see org.apache.griffin.core.config.LoginConfig
+ * @see LoginServiceDefaultImpl
+ * @see LoginServiceLdapImpl
+ */
 public interface LoginService {
 
     ResponseEntity<Map<String, Object>> login(Map<String, String> map);

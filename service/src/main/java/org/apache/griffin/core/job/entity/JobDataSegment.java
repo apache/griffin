@@ -39,7 +39,7 @@ public class JobDataSegment extends AbstractAuditableEntity {
     private static final long serialVersionUID = -9056531122243340484L;
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(JobDataSegment.class);
+        .getLogger(JobDataSegment.class);
 
     @NotNull
     private String dataConnectorName;
@@ -47,7 +47,7 @@ public class JobDataSegment extends AbstractAuditableEntity {
     private boolean asTsBaseline = false;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
-            CascadeType.REMOVE, CascadeType.MERGE})
+        CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "segment_range_id")
     private SegmentRange segmentRange = new SegmentRange();
 
@@ -77,7 +77,7 @@ public class JobDataSegment extends AbstractAuditableEntity {
     public void setDataConnectorName(String dataConnectorName) {
         if (StringUtils.isEmpty(dataConnectorName)) {
             LOGGER.warn(" Data connector name is invalid. " +
-                    "Please check your connector name.");
+                "Please check your connector name.");
             throw new NullPointerException();
         }
         this.dataConnectorName = dataConnectorName;

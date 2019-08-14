@@ -71,7 +71,7 @@ import org.springframework.util.StringUtils;
 @Service
 public class BatchJobOperatorImpl implements JobOperator {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(BatchJobOperatorImpl.class);
+        .getLogger(BatchJobOperatorImpl.class);
 
     @Autowired
     private SchedulerFactoryBean factory;
@@ -85,7 +85,7 @@ public class BatchJobOperatorImpl implements JobOperator {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AbstractJob add(AbstractJob job, GriffinMeasure measure)
-            throws Exception {
+        throws Exception {
         validateParams(job, measure);
         String qName = jobService.getQuartzName(job);
         String qGroup = jobService.getQuartzGroup();
@@ -120,20 +120,20 @@ public class BatchJobOperatorImpl implements JobOperator {
         TriggerState state = getTriggerState(name, group);
         if (state == null) {
             throw new GriffinException.BadRequestException(
-                    JOB_IS_NOT_SCHEDULED);
+                JOB_IS_NOT_SCHEDULED);
         }
         /* If job is not in paused state,we can't start it
         as it may be RUNNING.*/
         if (state != PAUSED) {
             throw new GriffinException.BadRequestException
-                    (JOB_IS_NOT_IN_PAUSED_STATUS);
+                (JOB_IS_NOT_IN_PAUSED_STATUS);
         }
         JobKey jobKey = jobKey(name, group);
         try {
             factory.getScheduler().resumeJob(jobKey);
         } catch (SchedulerException e) {
             throw new GriffinException.ServiceException(
-                    "Failed to start job.", e);
+                "Failed to start job.", e);
         }
     }
 
@@ -151,14 +151,14 @@ public class BatchJobOperatorImpl implements JobOperator {
 
     @Override
     public JobHealth getHealth(JobHealth jobHealth, AbstractJob job)
-            throws SchedulerException {
+        throws SchedulerException {
         List<? extends Trigger> triggers = jobService
-                .getTriggers(job.getName(), job.getGroup());
+            .getTriggers(job.getName(), job.getGroup());
         if (!CollectionUtils.isEmpty(triggers)) {
             jobHealth.setJobCount(jobHealth.getJobCount() + 1);
             if (jobService.isJobHealthy(job.getId())) {
                 jobHealth.setHealthyJobCount(
-                        jobHealth.getHealthyJobCount() + 1);
+                    jobHealth.getHealthyJobCount() + 1);
             }
         }
         return jobHealth;
@@ -166,7 +166,7 @@ public class BatchJobOperatorImpl implements JobOperator {
 
     @Override
     public JobState getState(AbstractJob job, String action)
-            throws SchedulerException {
+        throws SchedulerException {
         JobState jobState = new JobState();
         Scheduler scheduler = factory.getScheduler();
         if (job.getGroup() == null || job.getName() == null) {
@@ -182,9 +182,9 @@ public class BatchJobOperatorImpl implements JobOperator {
     }
 
     private void setTriggerTime(AbstractJob job, JobState jobState)
-            throws SchedulerException {
+        throws SchedulerException {
         List<? extends Trigger> triggers = jobService
-                .getTriggers(job.getName(), job.getGroup());
+            .getTriggers(job.getName(), job.getGroup());
         // If triggers are empty, in Griffin it means job is completed whose
         // trigger state is NONE or not scheduled.
         if (CollectionUtils.isEmpty(triggers)) {
@@ -194,9 +194,9 @@ public class BatchJobOperatorImpl implements JobOperator {
         Date nextFireTime = trigger.getNextFireTime();
         Date previousFireTime = trigger.getPreviousFireTime();
         jobState.setNextFireTime(nextFireTime != null ?
-                nextFireTime.getTime() : -1);
+            nextFireTime.getTime() : -1);
         jobState.setPreviousFireTime(previousFireTime != null ?
-                previousFireTime.getTime() : -1);
+            previousFireTime.getTime() : -1);
     }
 
     /**
@@ -225,7 +225,7 @@ public class BatchJobOperatorImpl implements JobOperator {
     private TriggerState getTriggerState(String name, String group) {
         try {
             List<? extends Trigger> triggers = jobService.getTriggers(name,
-                    group);
+                group);
             if (CollectionUtils.isEmpty(triggers)) {
                 return null;
             }
@@ -234,7 +234,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         } catch (SchedulerException e) {
             LOGGER.error("Failed to delete job", e);
             throw new GriffinException
-                    .ServiceException("Failed to delete job", e);
+                .ServiceException("Failed to delete job", e);
         }
 
     }
@@ -254,7 +254,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         } catch (Exception e) {
             LOGGER.error("Job schedule happens exception.", e);
             throw new GriffinException.ServiceException("Job schedule " +
-                    "happens exception.", e);
+                "happens exception.", e);
         }
     }
 
@@ -263,7 +263,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         for (JobInstanceBean instance : instances) {
             if (!instance.isPredicateDeleted()) {
                 deleteJob(instance.getPredicateGroup(), instance
-                        .getPredicateName());
+                    .getPredicateName());
                 instance.setPredicateDeleted(true);
                 if (instance.getState().equals(LivySessionStates.State.FINDING)) {
                     instance.setState(LivySessionStates.State.NOT_FOUND);
@@ -277,7 +277,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.info("Job({},{}) does not exist.", jobKey.getGroup(), jobKey
-                    .getName());
+                .getName());
             return;
         }
         scheduler.deleteJob(jobKey);
@@ -292,9 +292,9 @@ public class BatchJobOperatorImpl implements JobOperator {
         JobKey jobKey = new JobKey(name, group);
         if (!scheduler.checkExists(jobKey)) {
             LOGGER.warn("Job({},{}) does not exist.", jobKey.getGroup(), jobKey
-                    .getName());
+                .getName());
             throw new GriffinException.NotFoundException
-                    (JOB_KEY_DOES_NOT_EXIST);
+                (JOB_KEY_DOES_NOT_EXIST);
         }
         scheduler.pauseJob(jobKey);
     }
@@ -326,7 +326,7 @@ public class BatchJobOperatorImpl implements JobOperator {
             }
         } catch (SchedulerException e) {
             LOGGER.error("Failed to pause predicate job({},{}).", pGroup,
-                    pName);
+                pName);
             status = false;
         }
         return status;
@@ -338,16 +338,16 @@ public class BatchJobOperatorImpl implements JobOperator {
         }
         if (!isValidCronExpression(job.getCronExpression())) {
             throw new GriffinException.BadRequestException
-                    (INVALID_CRON_EXPRESSION);
+                (INVALID_CRON_EXPRESSION);
         }
         if (!isValidBaseLine(job.getSegments())) {
             throw new GriffinException.BadRequestException
-                    (MISSING_BASELINE_CONFIG);
+                (MISSING_BASELINE_CONFIG);
         }
         List<String> names = getConnectorNames(measure);
         if (!isValidConnectorNames(job.getSegments(), names)) {
             throw new GriffinException.BadRequestException
-                    (INVALID_CONNECTOR_NAME);
+                (INVALID_CONNECTOR_NAME);
         }
     }
 
@@ -371,7 +371,7 @@ public class BatchJobOperatorImpl implements JobOperator {
             }
         }
         LOGGER.warn("Please set segment timestamp baseline " +
-                "in as.baseline field.");
+            "in as.baseline field.");
         return false;
     }
 
@@ -383,16 +383,16 @@ public class BatchJobOperatorImpl implements JobOperator {
             String dcName = segment.getDataConnectorName();
             sets.add(dcName);
             boolean exist = names.stream().anyMatch(name -> name.equals
-                    (dcName));
+                (dcName));
             if (!exist) {
                 LOGGER.warn("Param {} is a illegal string. " +
-                        "Please input one of strings in {}.", dcName, names);
+                    "Please input one of strings in {}.", dcName, names);
                 return false;
             }
         }
         if (sets.size() < segments.size()) {
             LOGGER.warn("Connector names in job data segment " +
-                    "cannot duplicate.");
+                "cannot duplicate.");
             return false;
         }
         return true;

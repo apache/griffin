@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class PredicatorFactory {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(PredicatorFactory.class);
+        .getLogger(PredicatorFactory.class);
 
     public static Predicator newPredicateInstance(SegmentPredicate segPredicate) {
         Predicator predicate;
@@ -63,7 +63,7 @@ public class PredicatorFactory {
             throw new GriffinException.ServiceException(message, e);
         } catch (NoSuchMethodException e) {
             String message = "For predicate with type " + predicateClassName +
-                    " constructor with parameter of type " + SegmentPredicate.class.getName() + " not found";
+                " constructor with parameter of type " + SegmentPredicate.class.getName() + " not found";
             LOGGER.error(message, e);
             throw new GriffinException.ServiceException(message, e);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

@@ -54,6 +54,7 @@ public class FSUtil {
     private static FileSystem fileSystem;
 
     private static FileSystem defaultFS = getDefaultFileSystem();
+
     private static FileSystem getDefaultFileSystem() {
         FileSystem fs = null;
         Configuration conf = new Configuration();
@@ -173,12 +174,12 @@ public class FSUtil {
     }
 
     public static InputStream getSampleInputStream(String path)
-            throws IOException {
+        throws IOException {
         checkHDFSConf();
         if (isFileExist(path)) {
             FSDataInputStream missingData = fileSystem.open(new Path(path));
             BufferedReader bufReader = new BufferedReader(
-                    new InputStreamReader(missingData, Charsets.UTF_8));
+                new InputStreamReader(missingData, Charsets.UTF_8));
             try {
                 String line = null;
                 int rowCnt = 0;
@@ -205,16 +206,16 @@ public class FSUtil {
     private static void checkHDFSConf() {
         if (getFileSystem() == null) {
             throw new NullPointerException("FileSystem is null. " +
-                    "Please check your hdfs config default name.");
+                "Please check your hdfs config default name.");
         }
     }
 
     public static String getFirstMissRecordPath(String hdfsDir)
-            throws Exception {
+        throws Exception {
         List<FileStatus> fileList = listFileStatus(hdfsDir);
         for (int i = 0; i < fileList.size(); i++) {
             if (fileList.get(i).getPath().toUri().toString().toLowerCase()
-                    .contains("missrecord")) {
+                .contains("missrecord")) {
                 return fileList.get(i).getPath().toUri().toString();
             }
         }
@@ -222,12 +223,12 @@ public class FSUtil {
     }
 
     public static InputStream getMissSampleInputStream(String path)
-            throws Exception {
+        throws Exception {
         List<String> subDirList = listSubDir(path);
         //FIXME: only handle 1-sub dir here now
         for (int i = 0; i < subDirList.size(); i++) {
             return getSampleInputStream(getFirstMissRecordPath(
-                    subDirList.get(i)));
+                subDirList.get(i)));
         }
         return getSampleInputStream(getFirstMissRecordPath(path));
     }

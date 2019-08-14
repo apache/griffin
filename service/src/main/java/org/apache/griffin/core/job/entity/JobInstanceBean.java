@@ -203,7 +203,7 @@ public class JobInstanceBean extends AbstractAuditableEntity {
         this.state = state;
         this.tms = tms;
         this.expireTms = expireTms;
-        this.appId=appId;
+        this.appId = appId;
     }
 
     public JobInstanceBean(State state, Long tms, Long expireTms) {

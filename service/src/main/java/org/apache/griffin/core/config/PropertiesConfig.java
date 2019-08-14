@@ -42,11 +42,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+/**
+ * PropertiesConfig is responsible for initializing configuration objects
+ * from property files.
+ *
+ * @see EnvConfig
+ * @see org.apache.griffin.core.util.PropertiesUtil
+ */
 @Configuration
 public class PropertiesConfig {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(PropertiesConfig.class);
+        .getLogger(PropertiesConfig.class);
 
     public static Map<String, Object> livyConfMap;
 
@@ -55,12 +62,12 @@ public class PropertiesConfig {
     private String envLocation;
 
     public PropertiesConfig(
-            @Value("${external.config.location}") String configLocation,
-            @Value("${external.env.location}") String envLocation) {
+        @Value("${external.config.location}") String configLocation,
+        @Value("${external.env.location}") String envLocation) {
         LOGGER.info("external.config.location : {}",
-                configLocation != null ? configLocation : "null");
+            configLocation != null ? configLocation : "null");
         LOGGER.info("external.env.location : {}",
-                envLocation != null ? envLocation : "null");
+            envLocation != null ? envLocation : "null");
         this.configLocation = configLocation;
         this.envLocation = envLocation;
     }
@@ -93,9 +100,9 @@ public class PropertiesConfig {
     }
 
     private static void genLivyConf(
-            String name,
-            String defaultPath,
-            String location) throws IOException {
+        String name,
+        String defaultPath,
+        String location) throws IOException {
         if (livyConfMap != null) {
             return;
         }
@@ -117,7 +124,7 @@ public class PropertiesConfig {
      * @throws IOException io exception
      */
     private static Map<String, Object> readPropertiesFromResource(String path)
-            throws IOException {
+        throws IOException {
         if (path == null) {
             LOGGER.warn("Parameter path is null.");
             return null;

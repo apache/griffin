@@ -43,11 +43,11 @@ public class GriffinEventManager {
     void initializeListeners() {
         List<GriffinHook> eventListeners = new ArrayList<>();
         applicationContext.getBeansOfType(GriffinHook.class)
-                .forEach((beanName, listener) -> {
-                    if (enabledListeners.contains(beanName)) {
-                        eventListeners.add(listener);
-                    }
-                });
+            .forEach((beanName, listener) -> {
+                if (enabledListeners.contains(beanName)) {
+                    eventListeners.add(listener);
+                }
+            });
         this.eventListeners = eventListeners;
     }
 

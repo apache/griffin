@@ -47,10 +47,10 @@ import org.apache.griffin.core.util.JsonUtil;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
-        property = "measure.type")
+    property = "measure.type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"),
-        @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
+    @JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"),
+    @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
 public abstract class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
 

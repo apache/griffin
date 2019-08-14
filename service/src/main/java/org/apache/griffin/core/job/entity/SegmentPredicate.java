@@ -17,7 +17,6 @@ specific language governing permissions and limitations
 under the License.
 */
 
-
 package org.apache.griffin.core.job.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -87,16 +86,16 @@ public class SegmentPredicate extends AbstractAuditableEntity {
     public void load() throws IOException {
         if (!StringUtils.isEmpty(config)) {
             this.configMap = JsonUtil.toEntity(config,
-                    new TypeReference<Map<String, Object>>() {
-                    });
+                new TypeReference<Map<String, Object>>() {
+                });
         }
     }
 
     public SegmentPredicate() {
     }
 
-    public SegmentPredicate(String type, Map<String, String> configMap) throws
-            JsonProcessingException {
+    public SegmentPredicate(String type, Map<String, String> configMap)
+        throws JsonProcessingException {
         this.type = type;
         this.config = JsonUtil.toJson(configMap);
     }
