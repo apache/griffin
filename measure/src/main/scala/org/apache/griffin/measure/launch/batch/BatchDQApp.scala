@@ -41,13 +41,10 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
   val sparkParam = envParam.getSparkParam
   val metricName = dqParam.getName
-//  val dataSourceParams = dqParam.dataSources
-//  val dataSourceNames = dataSourceParams.map(_.name)
   val sinkParams = getSinkParams
 
   var sqlContext: SQLContext = _
-
-  implicit var sparkSession: SparkSession = _
+  var dqContext: DQContext = _
 
   def retryable: Boolean = false
 
@@ -78,7 +75,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     dataSources.foreach(_.init)
 
     // create dq context
-    val dqContext: DQContext = DQContext(
+    dqContext = DQContext(
       contextId, metricName, dataSources, sinkParams, BatchProcessType
     )(sparkSession)
 
