@@ -19,8 +19,25 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_RUNNING;
+import static org.apache.griffin.core.job.JobServiceImpl.START;
+import static org.apache.griffin.core.job.JobServiceImpl.STOP;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.convert2QuartzState;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
+import static org.quartz.TriggerKey.triggerKey;
+
+import java.util.List;
+import javax.annotation.PostConstruct;
+
 import org.apache.griffin.core.exception.GriffinException;
-import org.apache.griffin.core.job.entity.*;
+import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobHealth;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.JobState;
+import org.apache.griffin.core.job.entity.StreamingJob;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.job.repo.StreamingJobRepo;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
@@ -40,19 +57,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
-
-import javax.annotation.PostConstruct;
-import java.util.List;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.STREAMING_JOB_IS_RUNNING;
-import static org.apache.griffin.core.job.JobServiceImpl.START;
-import static org.apache.griffin.core.job.JobServiceImpl.STOP;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED;
-import static org.apache.griffin.core.job.entity.LivySessionStates.convert2QuartzState;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
-import static org.quartz.TriggerKey.triggerKey;
 
 @Service
 public class StreamingJobOperatorImpl implements JobOperator {

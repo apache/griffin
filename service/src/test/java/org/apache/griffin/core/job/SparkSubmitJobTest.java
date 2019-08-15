@@ -47,7 +47,10 @@ import java.util.Properties;
 
 import static org.apache.griffin.core.util.EntityMocksHelper.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 
 
 @RunWith(SpringRunner.class)
