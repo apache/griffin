@@ -19,29 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.exception.GriffinException;
-import org.apache.griffin.core.job.entity.*;
-import org.apache.griffin.core.job.repo.JobInstanceRepo;
-import org.apache.griffin.core.job.repo.JobRepo;
-import org.apache.griffin.core.measure.entity.DataConnector;
-import org.apache.griffin.core.measure.entity.DataSource;
-import org.apache.griffin.core.measure.entity.GriffinMeasure;
-import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
-import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
-import org.apache.griffin.core.util.TimeUtil;
-import org.quartz.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.util.*;
-
 import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
 import static org.apache.griffin.core.job.JobServiceImpl.GRIFFIN_JOB_ID;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.FINDING;
@@ -54,6 +31,49 @@ import static org.quartz.JobKey.jobKey;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.TriggerKey.triggerKey;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.exception.GriffinException;
+import org.apache.griffin.core.job.entity.AbstractJob;
+import org.apache.griffin.core.job.entity.JobDataSegment;
+import org.apache.griffin.core.job.entity.JobInstanceBean;
+import org.apache.griffin.core.job.entity.SegmentPredicate;
+import org.apache.griffin.core.job.entity.SegmentRange;
+import org.apache.griffin.core.job.repo.JobInstanceRepo;
+import org.apache.griffin.core.job.repo.JobRepo;
+import org.apache.griffin.core.measure.entity.DataConnector;
+import org.apache.griffin.core.measure.entity.DataSource;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
+import org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType;
+import org.apache.griffin.core.measure.repo.GriffinMeasureRepo;
+import org.apache.griffin.core.util.TimeUtil;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
+import org.quartz.PersistJobDataAfterExecution;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.transaction.annotation.Transactional;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
