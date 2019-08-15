@@ -18,19 +18,18 @@ under the License.
 */
 package org.apache.griffin.core.job.repo;
 
-import static org.apache.griffin.core.job.entity.LivySessionStates.State;
-
-import java.util.List;
-
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static org.apache.griffin.core.job.entity.LivySessionStates.State;
+
 public interface JobInstanceRepo
-    extends CrudRepository<JobInstanceBean, Long> {
+        extends BaseJpaRepository<JobInstanceBean, Long> {
 
     JobInstanceBean findByPredicateName(String name);
 
@@ -48,7 +47,7 @@ public interface JobInstanceRepo
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @Query("delete from JobInstanceBean j " +
-        "where j.expireTms <= ?1 and j.deleted = false ")
+            "where j.expireTms <= ?1 and j.deleted = false ")
     int deleteByExpireTimestamp(Long expireTms);
 
     @Query("select DISTINCT s from JobInstanceBean s where s.state in ?1")

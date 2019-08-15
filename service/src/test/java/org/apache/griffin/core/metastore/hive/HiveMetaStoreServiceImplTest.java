@@ -22,6 +22,7 @@ package org.apache.griffin.core.metastore.hive;
 import org.apache.griffin.core.config.CacheConfig;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;
 import org.junit.Before;
@@ -186,7 +187,7 @@ public class HiveMetaStoreServiceImplTest {
     public void testGetTableForException() throws Exception {
         String dbName = "default";
         String tableName = "tableName";
-        given(client.getTable(dbName, tableName)).willThrow(Exception.class);
+        given(client.getTable(dbName, tableName)).willThrow(NoSuchObjectException.class);
         doNothing().when(client).reconnect();
         assertTrue(service.getTable(dbName, tableName) == null);
         verify(client).reconnect();

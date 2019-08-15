@@ -19,54 +19,32 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CONNECTOR_NAME;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_CRON_EXPRESSION;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_JOB_NAME;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_IS_NOT_IN_PAUSED_STATUS;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_IS_NOT_SCHEDULED;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_KEY_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.MISSING_BASELINE_CONFIG;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
-import static org.quartz.CronExpression.isValidExpression;
-import static org.quartz.JobKey.jobKey;
-import static org.quartz.Trigger.TriggerState;
-import static org.quartz.Trigger.TriggerState.BLOCKED;
-import static org.quartz.Trigger.TriggerState.NORMAL;
-import static org.quartz.Trigger.TriggerState.PAUSED;
-import static org.quartz.TriggerKey.triggerKey;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.griffin.core.exception.GriffinException;
-import org.apache.griffin.core.job.entity.AbstractJob;
-import org.apache.griffin.core.job.entity.BatchJob;
-import org.apache.griffin.core.job.entity.JobDataSegment;
-import org.apache.griffin.core.job.entity.JobHealth;
-import org.apache.griffin.core.job.entity.JobInstanceBean;
-import org.apache.griffin.core.job.entity.JobState;
-import org.apache.griffin.core.job.entity.LivySessionStates;
+import org.apache.griffin.core.job.entity.*;
 import org.apache.griffin.core.job.repo.BatchJobRepo;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
 import org.apache.griffin.core.measure.entity.DataSource;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
+
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.quartz.CronExpression.isValidExpression;
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.Trigger.TriggerState;
+import static org.quartz.Trigger.TriggerState.*;
+import static org.quartz.TriggerKey.triggerKey;
 
 @Service
 public class BatchJobOperatorImpl implements JobOperator {
@@ -74,6 +52,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         .getLogger(BatchJobOperatorImpl.class);
 
     @Autowired
+    @Qualifier("schedulerFactoryBean")
     private SchedulerFactoryBean factory;
     @Autowired
     private JobInstanceRepo instanceRepo;
@@ -309,7 +288,7 @@ public class BatchJobOperatorImpl implements JobOperator {
             boolean status = pauseJobInstance(instance, deletedInstances);
             pauseStatus = pauseStatus && status;
         }
-        instanceRepo.save(deletedInstances);
+        instanceRepo.saveAll(deletedInstances);
         return pauseStatus;
     }
 
