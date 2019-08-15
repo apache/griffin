@@ -20,11 +20,11 @@ under the License.
 package org.apache.griffin.core.measure.repo;
 
 
-import java.util.List;
-
+import org.apache.griffin.core.job.repo.BaseJpaRepository;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
 
 /**
  * Interface to access measure repository
@@ -32,7 +32,7 @@ import org.springframework.data.repository.CrudRepository;
  * @param <T> Measure and its subclass
  */
 public interface MeasureRepo<T extends Measure>
-        extends CrudRepository<T, Long> {
+        extends BaseJpaRepository<T, Long> {
 
     /**
      * search repository by name and deletion state

@@ -107,11 +107,11 @@ public class MetricStoreImplTest {
         given(httpEntityMock.getContent()).willReturn(is);
 
         //when
-        MetricStoreImpl metricStore = new MetricStoreImpl("", 0, "", "", "");
+        MetricStoreImpl metricStore = new MetricStoreImpl("localhost", 0, "", "", "");
         MetricValue metric = metricStore.getMetric("application_1549876136110_0018");
 
         //then
-        PowerMockito.verifyStatic();
+        //PowerMockito.verifyStatic();
         assertEquals(expectedMetric, metric);
     }
 
