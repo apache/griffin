@@ -35,8 +35,8 @@ public class GriffinWebApplication {
             .getLogger(GriffinWebApplication.class);
 
     public static void main(String[] args) {
-        LOGGER.info("application start");
         SpringApplication.run(GriffinWebApplication.class, args);
+        LOGGER.info("application started");
     }
 
     @Bean
