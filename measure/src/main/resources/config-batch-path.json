@@ -12,7 +12,7 @@
           "type": "avro",
           "version": "1.7",
           "config": {
-            "file.name": "measure/src/test/resources/users_info_src.avro"
+            "file.path": "measure/src/test/resources/users_info_src"
           }
         }
       ]
@@ -23,7 +23,7 @@
           "type": "avro",
           "version": "1.7",
           "config": {
-            "file.name": "measure/src/test/resources/users_info_target.avro"
+            "file.path": "measure/src/test/resources/users_info_target"
           }
         }
       ]
