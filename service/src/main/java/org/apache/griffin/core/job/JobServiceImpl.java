@@ -101,7 +101,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -686,9 +685,9 @@ public class JobServiceImpl implements JobService {
         JobKey jobKey = jobKey(job.getName(), job.getGroup());
         if (scheduler.checkExists(jobKey)) {
             Trigger trigger = TriggerBuilder.newTrigger()
-                    .forJob(jobKey)
-                    .startNow()
-                    .build();
+                .forJob(jobKey)
+                .startNow()
+                .build();
             scheduler.scheduleJob(trigger);
             return trigger.getKey().toString();
         } else {

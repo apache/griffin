@@ -51,7 +51,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
-
 @RunWith(SpringRunner.class)
 public class SparkSubmitJobTest {
 
@@ -151,9 +150,9 @@ public class SparkSubmitJobTest {
         given(context.getJobDetail()).willReturn(jd);
         given(jobInstanceRepo.findByPredicateName(Matchers.anyString()))
                 .willReturn(instance);
-        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
-        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(),
-                Matchers.any())).willReturn(result);
+//        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
+//        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(),
+//                Matchers.any())).willReturn(result);
 
         sparkSubmitJob.execute(context);
 

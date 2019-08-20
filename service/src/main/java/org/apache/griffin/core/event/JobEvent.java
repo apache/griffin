@@ -32,29 +32,29 @@ public class JobEvent extends GriffinAbstractEvent<AbstractJob> {
 
     public static JobEvent yieldJobEventBeforeCreation(AbstractJob source) {
         return new JobEvent(source,
-                EventType.CREATION_EVENT,
-                EventSourceType.JOB,
-                EventPointcutType.BEFORE);
+            EventType.CREATION_EVENT,
+            EventSourceType.JOB,
+            EventPointcutType.BEFORE);
     }
 
     public static JobEvent yieldJobEventAfterCreation(AbstractJob source) {
         return new JobEvent(source,
-                EventType.CREATION_EVENT,
-                EventSourceType.JOB,
-                EventPointcutType.AFTER);
+            EventType.CREATION_EVENT,
+            EventSourceType.JOB,
+            EventPointcutType.AFTER);
     }
 
     public static JobEvent yieldJobEventBeforeRemoval(AbstractJob source) {
         return new JobEvent(source,
-                EventType.REMOVAL_EVENT,
-                EventSourceType.JOB,
-                EventPointcutType.BEFORE);
+            EventType.REMOVAL_EVENT,
+            EventSourceType.JOB,
+            EventPointcutType.BEFORE);
     }
 
     public static JobEvent yieldJobEventAfterRemoval(AbstractJob source) {
         return new JobEvent(source,
-                EventType.REMOVAL_EVENT,
-                EventSourceType.JOB,
-                EventPointcutType.AFTER);
+            EventType.REMOVAL_EVENT,
+            EventSourceType.JOB,
+            EventPointcutType.AFTER);
     }
 }

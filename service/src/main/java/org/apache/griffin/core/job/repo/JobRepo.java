@@ -28,7 +28,7 @@ import org.springframework.data.repository.CrudRepository;
 public interface JobRepo<T extends AbstractJob> extends CrudRepository<T, Long> {
 
     @Query("select count(j) from #{#entityName} j " +
-            "where j.jobName = ?1 and j.deleted = ?2")
+        "where j.jobName = ?1 and j.deleted = ?2")
     int countByJobNameAndDeleted(String jobName, Boolean deleted);
 
     List<T> findByDeleted(boolean deleted);

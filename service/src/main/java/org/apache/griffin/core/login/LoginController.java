@@ -37,7 +37,7 @@ public class LoginController {
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> login(
-            @RequestBody Map<String, String> map) {
+        @RequestBody Map<String, String> map) {
         return loginService.login(map);
     }
 }

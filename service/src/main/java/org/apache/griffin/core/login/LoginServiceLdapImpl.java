@@ -43,10 +43,10 @@ import org.springframework.http.ResponseEntity;
 
 public class LoginServiceLdapImpl implements LoginService {
     private static final Logger LOGGER = LoggerFactory.getLogger
-            (LoginServiceLdapImpl.class);
+        (LoginServiceLdapImpl.class);
 
     private static final String LDAP_FACTORY =
-            "com.sun.jndi.ldap.LdapCtxFactory";
+        "com.sun.jndi.ldap.LdapCtxFactory";
 
     private String url;
     private String email;
@@ -86,7 +86,7 @@ public class LoginServiceLdapImpl implements LoginService {
             ctx = getContextInstance(toPrincipal(bindAccount), bindPassword);
 
             NamingEnumeration<SearchResult> results = ctx.search(searchBase,
-                    searchFilter, searchControls);
+                searchFilter, searchControls);
             SearchResult userObject = getSingleUser(results);
 
             // verify password if different bind user is used
@@ -102,7 +102,7 @@ public class LoginServiceLdapImpl implements LoginService {
             return new ResponseEntity<>(message, HttpStatus.OK);
         } catch (AuthenticationException e) {
             LOGGER.warn("User {} failed to login with LDAP auth. {}", username,
-                    e.getMessage());
+                e.getMessage());
         } catch (NamingException e) {
             LOGGER.warn(String.format("User %s failed to login with LDAP auth.", username), e);
         } finally {
@@ -129,7 +129,7 @@ public class LoginServiceLdapImpl implements LoginService {
         if (results.hasMoreElements()) {
             SearchResult second = results.nextElement();
             throw new NamingException(String.format("Ambiguous search, found two users: %s, %s",
-                    result.getNameInNamespace(), second.getNameInNamespace()));
+                result.getNameInNamespace(), second.getNameInNamespace()));
         }
         return result;
     }
@@ -161,7 +161,7 @@ public class LoginServiceLdapImpl implements LoginService {
             }
         } catch (NamingException e) {
             LOGGER.warn("User {} successfully login with LDAP auth, " +
-                    "but failed to get full name.", ntAccount);
+                "but failed to get full name.", ntAccount);
             return ntAccount;
         }
     }
@@ -175,7 +175,7 @@ public class LoginServiceLdapImpl implements LoginService {
     }
 
     private LdapContext getContextInstance(String principal, String password)
-            throws NamingException {
+        throws NamingException {
         Hashtable<String, String> ht = new Hashtable<>();
         ht.put(Context.INITIAL_CONTEXT_FACTORY, LDAP_FACTORY);
         ht.put(Context.PROVIDER_URL, url);

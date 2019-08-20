@@ -44,7 +44,7 @@ public class SchedulerConfig {
     @Bean
     public JobFactory jobFactory(ApplicationContext applicationContext) {
         AutowiringSpringBeanJobFactory jobFactory =
-                new AutowiringSpringBeanJobFactory();
+            new AutowiringSpringBeanJobFactory();
         jobFactory.setApplicationContext(applicationContext);
         return jobFactory;
     }
@@ -59,6 +59,5 @@ public class SchedulerConfig {
         factory.setQuartzProperties(quartzConf);
         return factory;
     }
-
 
 }

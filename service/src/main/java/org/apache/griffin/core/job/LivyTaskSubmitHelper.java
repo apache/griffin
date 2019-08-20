@@ -19,8 +19,26 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
+import static org.apache.griffin.core.util.JsonUtil.toEntity;
+import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.quartz.JobDetail;
 import org.slf4j.Logger;
@@ -35,29 +53,13 @@ import org.springframework.security.kerberos.client.KerberosRestTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static org.apache.griffin.core.config.PropertiesConfig.livyConfMap;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_FOUND;
-import static org.apache.griffin.core.util.JsonUtil.toEntity;
-import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
-
 @Component
 public class LivyTaskSubmitHelper {
-
-    private static final Logger logger = LoggerFactory.getLogger(LivyTaskSubmitHelper.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(LivyTaskSubmitHelper.class);
     private static final String REQUEST_BY_HEADER = "X-Requested-By";
+    public static final int DEFAULT_QUEUE_SIZE = 20000;
+    private static final int SLEEP_TIME = 300;
+
     private SparkSubmitJob sparkSubmitJob;
     private ConcurrentMap<Long, Integer> taskAppIdMap = new ConcurrentHashMap<>();
     // Current number of tasks
@@ -66,15 +68,12 @@ public class LivyTaskSubmitHelper {
     private RestTemplate restTemplate = new RestTemplate();
     // queue for pub or sub
     private BlockingQueue<JobDetail> queue;
-    public static final int DEFAULT_QUEUE_SIZE = 20000;
-    private static final int SLEEP_TIME = 300;
     private String uri;
 
     @Value("${livy.task.max.concurrent.count:20}")
     private int maxConcurrentTaskCount;
     @Value("${livy.task.submit.interval.second:3}")
     private int batchIntervalSecond;
-
 
     @Autowired
     private Environment env;
@@ -86,7 +85,7 @@ public class LivyTaskSubmitHelper {
     public void init() {
         startWorker();
         uri = env.getProperty("livy.uri");
-        logger.info("Livy uri : {}", uri);
+        LOGGER.info("Livy uri : {}", uri);
     }
 
     public LivyTaskSubmitHelper() {
@@ -110,20 +109,19 @@ public class LivyTaskSubmitHelper {
      */
     public void addTaskToWaitingQueue(JobDetail jd) throws IOException {
         if (jd == null) {
-            logger.warn("task is blank, workerNamePre: {}", workerNamePre);
+            LOGGER.warn("task is blank, workerNamePre: {}", workerNamePre);
             return;
         }
 
         if (queue.remainingCapacity() <= 0) {
-            logger.warn("task is discard, workerNamePre: {}, task: {}", workerNamePre, jd);
+            LOGGER.warn("task is discard, workerNamePre: {}, task: {}", workerNamePre, jd);
             sparkSubmitJob.saveJobInstance(null, NOT_FOUND);
             return;
         }
 
         queue.add(jd);
-
-        logger.info("add_task_to_waiting_queue_success, workerNamePre: {}, task: {}",
-                workerNamePre, jd);
+        LOGGER.info("add_task_to_waiting_queue_success, workerNamePre: {}, task: {}",
+            workerNamePre, jd);
     }
 
     /**
@@ -141,7 +139,7 @@ public class LivyTaskSubmitHelper {
             while (true) {
                 try {
                     if (curConcurrentTaskNum.get() < maxConcurrentTaskCount
-                            && (System.currentTimeMillis() - insertTime) >= batchIntervalSecond * 1000) {
+                        && (System.currentTimeMillis() - insertTime) >= batchIntervalSecond * 1000) {
                         JobDetail jd = queue.take();
                         sparkSubmitJob.saveJobInstance(jd);
                         insertTime = System.currentTimeMillis();
@@ -149,7 +147,7 @@ public class LivyTaskSubmitHelper {
                         Thread.sleep(SLEEP_TIME);
                     }
                 } catch (Exception e) {
-                    logger.error("Async_worker_doTask_failed, {}", e.getMessage(), e);
+                    LOGGER.error("Async_worker_doTask_failed, {}", e.getMessage(), e);
                     es.execute(this);
                 }
             }
@@ -181,12 +179,12 @@ public class LivyTaskSubmitHelper {
     }
 
     protected Map<String, Object> retryLivyGetAppId(String result, int appIdRetryCount)
-            throws IOException {
+        throws IOException {
 
         int retryCount = appIdRetryCount;
         TypeReference<HashMap<String, Object>> type =
-                new TypeReference<HashMap<String, Object>>() {
-                };
+            new TypeReference<HashMap<String, Object>>() {
+            };
         Map<String, Object> resultMap = toEntity(result, type);
 
         if (retryCount <= 0) {
@@ -206,10 +204,10 @@ public class LivyTaskSubmitHelper {
             try {
                 Thread.sleep(SLEEP_TIME);
             } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
             resultMap = getResultByLivyId(livyBatchesId, type);
-            logger.info("retry get livy resultMap: {}, batches id : {}", resultMap, livyBatchesId);
+            LOGGER.info("retry get livy resultMap: {}, batches id : {}", resultMap, livyBatchesId);
 
             if (resultMap.get("appId") != null) {
                 break;
@@ -220,104 +218,102 @@ public class LivyTaskSubmitHelper {
     }
 
     private Map<String, Object> getResultByLivyId(Object livyBatchesId, TypeReference<HashMap<String, Object>> type)
-            throws IOException {
+        throws IOException {
         Map<String, Object> resultMap = new HashedMap();
         String livyUri = uri + "/" + livyBatchesId;
         String result = getFromLivy(livyUri);
-        logger.info(result);
+        LOGGER.info(result);
         return result == null ? resultMap : toEntity(result, type);
     }
 
     public String postToLivy(String uri) {
-        logger.info("Post To Livy URI is: " + uri);
+        LOGGER.info("Post To Livy URI is: " + uri);
         String needKerberos = env.getProperty("livy.need.kerberos");
-        logger.info("Need Kerberos:" + needKerberos);
+        LOGGER.info("Need Kerberos:" + needKerberos);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(REQUEST_BY_HEADER,"admin");
+        headers.set(REQUEST_BY_HEADER, "admin");
 
         if (needKerberos == null || needKerberos.isEmpty()) {
-            logger.error("The property \"livy.need.kerberos\" is empty");
+            LOGGER.error("The property \"livy.need.kerberos\" is empty");
             return null;
         }
 
         if (needKerberos.equalsIgnoreCase("false")) {
-            logger.info("The livy server doesn't need Kerberos Authentication");
+            LOGGER.info("The livy server doesn't need Kerberos Authentication");
             String result = null;
             try {
-
-                HttpEntity<String> springEntity = new HttpEntity<>(toJsonWithFormat(livyConfMap),headers);
-                result = restTemplate.postForObject(uri,springEntity,String.class);
-
-                logger.info(result);
+                HttpEntity<String> springEntity = new HttpEntity<>(toJsonWithFormat(livyConfMap), headers);
+                result = restTemplate.postForObject(uri, springEntity, String.class);
+                LOGGER.info(result);
             } catch (JsonProcessingException e) {
-                logger.error("Post to livy ERROR. \n {}", e.getMessage());
+                LOGGER.error("Post to livy ERROR. \n {}", e.getMessage());
             }
             return result;
         } else {
-            logger.info("The livy server needs Kerberos Authentication");
+            LOGGER.info("The livy server needs Kerberos Authentication");
             String userPrincipal = env.getProperty("livy.server.auth.kerberos.principal");
             String keyTabLocation = env.getProperty("livy.server.auth.kerberos.keytab");
-            logger.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
+            LOGGER.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
 
             KerberosRestTemplate restTemplate = new KerberosRestTemplate(keyTabLocation, userPrincipal);
             HttpEntity<String> springEntity = null;
             try {
                 springEntity = new HttpEntity<>(toJsonWithFormat(livyConfMap), headers);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                LOGGER.error("Json Parsing failed, {}", e.getMessage(), e);
             }
             String result = restTemplate.postForObject(uri, springEntity, String.class);
-            logger.info(result);
+            LOGGER.info(result);
             return result;
         }
     }
 
     public String getFromLivy(String uri) {
-        logger.info("Get From Livy URI is: " + uri);
+        LOGGER.info("Get From Livy URI is: " + uri);
         String needKerberos = env.getProperty("livy.need.kerberos");
-        logger.info("Need Kerberos:" + needKerberos);
+        LOGGER.info("Need Kerberos:" + needKerberos);
 
         if (needKerberos == null || needKerberos.isEmpty()) {
-            logger.error("The property \"livy.need.kerberos\" is empty");
+            LOGGER.error("The property \"livy.need.kerberos\" is empty");
             return null;
         }
 
         if (needKerberos.equalsIgnoreCase("false")) {
-            logger.info("The livy server doesn't need Kerberos Authentication");
+            LOGGER.info("The livy server doesn't need Kerberos Authentication");
             return restTemplate.getForObject(uri, String.class);
         } else {
-            logger.info("The livy server needs Kerberos Authentication");
+            LOGGER.info("The livy server needs Kerberos Authentication");
             String userPrincipal = env.getProperty("livy.server.auth.kerberos.principal");
             String keyTabLocation = env.getProperty("livy.server.auth.kerberos.keytab");
-            logger.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
+            LOGGER.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
 
             KerberosRestTemplate restTemplate = new KerberosRestTemplate(keyTabLocation, userPrincipal);
             String result = restTemplate.getForObject(uri, String.class);
-            logger.info(result);
+            LOGGER.info(result);
             return result;
         }
     }
 
     public void deleteByLivy(String uri) {
-        logger.info("Delete by Livy URI is: " + uri);
+        LOGGER.info("Delete by Livy URI is: " + uri);
         String needKerberos = env.getProperty("livy.need.kerberos");
-        logger.info("Need Kerberos:" + needKerberos);
+        LOGGER.info("Need Kerberos:" + needKerberos);
 
         if (needKerberos == null || needKerberos.isEmpty()) {
-            logger.error("The property \"livy.need.kerberos\" is empty");
+            LOGGER.error("The property \"livy.need.kerberos\" is empty");
             return;
         }
 
         if (needKerberos.equalsIgnoreCase("false")) {
-            logger.info("The livy server doesn't need Kerberos Authentication");
+            LOGGER.info("The livy server doesn't need Kerberos Authentication");
             new RestTemplate().delete(uri);
         } else {
-            logger.info("The livy server needs Kerberos Authentication");
+            LOGGER.info("The livy server needs Kerberos Authentication");
             String userPrincipal = env.getProperty("livy.server.auth.kerberos.principal");
             String keyTabLocation = env.getProperty("livy.server.auth.kerberos.keytab");
-            logger.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
+            LOGGER.info("principal:{}, lcoation:{}", userPrincipal, keyTabLocation);
 
             KerberosRestTemplate restTemplate = new KerberosRestTemplate(keyTabLocation, userPrincipal);
             restTemplate.delete(uri);
