@@ -40,5 +40,5 @@ install:
 # keep 30, need change according to ci logs.
 script:
   - docker-compose up -d 
-  - travis_wait 30 mvn clean verify -q
+  - travis_wait 30 mvn install
 
