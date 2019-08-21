@@ -39,8 +39,12 @@ cache:
 install:
   - npm install -g bower
 
+before_script:
+  - MAVEN_SKIP_RC=true 
+  - MAVEN_OPTS="-Xmx2g"
+  - docker-compose up -d 
+
 # keep 30, need change according to ci logs.
 script:
-  - docker-compose up -d 
-  - travis_wait 30 mvn -q install
+  - travis_wait 50 mvn clean test verify -q
 
