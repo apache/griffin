@@ -28,8 +28,10 @@ scala:
   - 2.10.6
 node_js:
   - "6"
+
 git:
   quiet: true
+
 cache:
   directories:
   - $HOME/.m2
@@ -40,5 +42,5 @@ install:
 # keep 30, need change according to ci logs.
 script:
   - docker-compose up -d 
-  - travis_wait 30 mvn install
+  - travis_wait 30 mvn -q install
 
