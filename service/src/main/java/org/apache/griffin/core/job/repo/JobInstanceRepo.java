@@ -28,8 +28,7 @@ import java.util.List;
 
 import static org.apache.griffin.core.job.entity.LivySessionStates.State;
 
-public interface JobInstanceRepo
-        extends BaseJpaRepository<JobInstanceBean, Long> {
+public interface JobInstanceRepo extends BaseJpaRepository<JobInstanceBean, Long> {
 
     JobInstanceBean findByPredicateName(String name);
 

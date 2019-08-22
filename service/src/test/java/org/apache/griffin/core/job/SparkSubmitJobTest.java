@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
-import org.powermock.reflect.Whitebox;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,9 +151,6 @@ public class SparkSubmitJobTest {
         given(context.getJobDetail()).willReturn(jd);
         given(jobInstanceRepo.findByPredicateName(Matchers.anyString()))
                 .willReturn(instance);
-        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
-        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(),
-                Matchers.any())).willReturn(result);
 
         sparkSubmitJob.execute(context);
 

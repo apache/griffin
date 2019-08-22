@@ -31,8 +31,7 @@ import java.util.List;
  *
  * @param <T> Measure and its subclass
  */
-public interface MeasureRepo<T extends Measure>
-        extends BaseJpaRepository<T, Long> {
+public interface MeasureRepo<T extends Measure> extends BaseJpaRepository<T, Long> {
 
     /**
      * search repository by name and deletion state

@@ -103,30 +103,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
-<<<<<<< HEAD
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
-
-import static java.util.TimeZone.getTimeZone;
-import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
-import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.*;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.*;
-import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.JobKey.jobKey;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
-import static org.quartz.TriggerKey.triggerKey;
-
-
-=======
->>>>>>> GRIFFIN-279 Update imports
 @Service
 public class JobServiceImpl implements JobService {
     private static final Logger LOGGER = LoggerFactory
