@@ -20,6 +20,7 @@ services:
 env:
   - COMPOSE_FILE=griffin-doc/docker/compose/docker-compose-batch.yml
 
+
 jdk:
   - oraclejdk8
 scala:
@@ -34,8 +35,14 @@ cache:
 
 install:
   - npm install -g bower
+
+before_script:
   - docker-compose up -d
 
+
 # keep 30, need change according to ci logs.
-script: travis_wait 30 mvn clean verify -q
+script:
+  - export MAVEN_SKIP_RC=true
+  - export MAVEN_OPTS="-Xms1g -Xmx2g -XX:MaxPermSize=512m"
+  - travis_wait 30 mvn clean verify -ff -T 5 -q
 
