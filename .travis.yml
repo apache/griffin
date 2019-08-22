@@ -14,6 +14,12 @@
 
 language: java scala node_js
 
+services:
+  - docker
+
+env:
+  - COMPOSE_FILE=griffin-doc/docker/compose/docker-compose-batch.yml
+
 jdk:
   - oraclejdk8
 scala:
@@ -28,6 +34,7 @@ cache:
 
 install:
   - npm install -g bower
+  - docker-compose up -d
 
 # keep 30, need change according to ci logs.
 script: travis_wait 30 mvn clean verify -q
