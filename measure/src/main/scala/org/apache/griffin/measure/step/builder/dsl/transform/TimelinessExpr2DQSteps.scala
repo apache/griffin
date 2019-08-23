@@ -104,7 +104,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
         s"SELECT *, (`${etsColName}` - `${ConstantColumns.beginTs}`) AS `${latencyColName}` " +
           s"FROM `${inTimeTableName}`"
       }
-      val latencyTransStep = SparkSqlTransformStep(latencyTableName, latencySql, emptyMap, true)
+      val latencyTransStep = SparkSqlTransformStep(latencyTableName, latencySql, emptyMap, None, true)
       latencyTransStep.parentSteps += inTimeTransStep
 
       // 3. timeliness metric
@@ -129,27 +129,26 @@ case class TimelinessExpr2DQSteps(context: DQContext,
              |GROUP BY `${ConstantColumns.tmst}`
            """.stripMargin
       }
-      val metricTransStep = SparkSqlTransformStep(metricTableName, metricSql, emptyMap)
-      metricTransStep.parentSteps += latencyTransStep
       val metricWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
         val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
         MetricWriteStep(mwName, metricTableName, flattenType)
       }
+      val metricTransStep =
+        SparkSqlTransformStep(metricTableName, metricSql, emptyMap, Some(metricWriteStep))
+      metricTransStep.parentSteps += latencyTransStep
 
       // current steps
       val transSteps1 = metricTransStep :: Nil
-      val writeSteps1 = metricWriteStep :: Nil
 
       // 4. timeliness record
-      val (transSteps2, writeSteps2) = TimeUtil.milliseconds(details.getString(_threshold, "")) match {
+      val transSteps2 = TimeUtil.milliseconds(details.getString(_threshold, "")) match {
         case Some(tsh) =>
           val recordTableName = "__lateRecords"
           val recordSql = {
             s"SELECT * FROM `${latencyTableName}` WHERE `${latencyColName}` > ${tsh}"
           }
-          val recordTransStep = SparkSqlTransformStep(recordTableName, recordSql, emptyMap)
           val recordWriteStep = {
             val rwName =
               ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
@@ -157,12 +156,16 @@ case class TimelinessExpr2DQSteps(context: DQContext,
 
             RecordWriteStep(rwName, recordTableName, None)
           }
-          (recordTransStep :: Nil, recordWriteStep :: Nil)
-        case _ => (Nil, Nil)
+          val recordTransStep =
+            SparkSqlTransformStep(recordTableName, recordSql, emptyMap, Some(recordWriteStep))
+          recordTransStep.parentSteps += latencyTransStep
+
+          recordTransStep :: Nil
+        case _ => Nil
       }
 
       // 5. ranges
-      val (transSteps3, writeSteps3) = TimeUtil.milliseconds(details.getString(_stepSize, "")) match {
+      val transSteps3 = TimeUtil.milliseconds(details.getString(_stepSize, "")) match {
         case Some(stepSize) =>
           // 5.1 range
           val rangeTableName = "__range"
@@ -174,6 +177,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
              """.stripMargin
           }
           val rangeTransStep = SparkSqlTransformStep(rangeTableName, rangeSql, emptyMap)
+          rangeTransStep.parentSteps += latencyTransStep
 
           // 5.2 range metric
           val rangeMetricTableName = "__rangeMetric"
@@ -190,20 +194,20 @@ case class TimelinessExpr2DQSteps(context: DQContext,
                  |FROM `${rangeTableName}` GROUP BY `${ConstantColumns.tmst}`, `${stepColName}`
                 """.stripMargin
           }
-          val rangeMetricTransStep =
-            SparkSqlTransformStep(rangeMetricTableName, rangeMetricSql, emptyMap)
-          rangeMetricTransStep.parentSteps += rangeTransStep
           val rangeMetricWriteStep = {
             MetricWriteStep(stepColName, rangeMetricTableName, ArrayFlattenType)
           }
+          val rangeMetricTransStep =
+            SparkSqlTransformStep(rangeMetricTableName, rangeMetricSql, emptyMap, Some(rangeMetricWriteStep))
+          rangeMetricTransStep.parentSteps += rangeTransStep
 
-          (rangeMetricTransStep :: Nil, rangeMetricWriteStep :: Nil)
-        case _ => (Nil, Nil)
+          rangeMetricTransStep :: Nil
+        case _ => Nil
       }
 
       // 6. percentiles
       val percentiles = getPercentiles(details)
-      val (transSteps4, writeSteps4) = if (percentiles.size > 0) {
+      val transSteps4 = if (percentiles.size > 0) {
         val percentileTableName = "__percentile"
         val percentileColName = details.getStringOrKey(_percentileColPrefix)
         val percentileCols = percentiles.map { pct =>
@@ -217,19 +221,18 @@ case class TimelinessExpr2DQSteps(context: DQContext,
              |FROM `${latencyTableName}`
             """.stripMargin
         }
-        val percentileTransStep =
-          SparkSqlTransformStep(percentileTableName, percentileSql, emptyMap)
-
         val percentileWriteStep = {
           MetricWriteStep(percentileTableName, percentileTableName, DefaultFlattenType)
         }
+        val percentileTransStep =
+          SparkSqlTransformStep(percentileTableName, percentileSql, emptyMap, Some(percentileWriteStep))
+        percentileTransStep.parentSteps += latencyTransStep
 
-        (percentileTransStep :: Nil, percentileWriteStep :: Nil)
-      } else (Nil, Nil)
+        percentileTransStep :: Nil
+      } else Nil
 
       // full steps
-      transSteps1 ++ transSteps2 ++ transSteps3 ++ transSteps4 ++
-        writeSteps1 ++ writeSteps2 ++ writeSteps3 ++ writeSteps4
+      transSteps1 ++ transSteps2 ++ transSteps3 ++ transSteps4
     }
   }
 

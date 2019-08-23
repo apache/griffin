@@ -29,7 +29,7 @@ case class DataFrameOpsDQStepBuilder() extends RuleParamStepBuilder {
     val name = getStepName(ruleParam.getOutDfName())
     val inputDfName = getStepName(ruleParam.getInDfName())
     val transformStep = DataFrameOpsTransformStep(
-      name, inputDfName, ruleParam.getRule, ruleParam.getDetails, ruleParam.getCache)
+      name, inputDfName, ruleParam.getRule, ruleParam.getDetails, None, ruleParam.getCache)
     transformStep +: buildDirectWriteSteps(ruleParam)
   }
 
