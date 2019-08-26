@@ -369,8 +369,9 @@ under the License.
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M3</version>
                 <configuration>
-                    <forkCount>0</forkCount>
-                    <argLine>-Xmx2024m -XX:MaxPermSize=256m</argLine>
+                    <forkCount>10</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                 </configuration>
             </plugin>
         </plugins>
