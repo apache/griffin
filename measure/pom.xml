@@ -47,7 +47,6 @@ under the License.
         <scalamock.version>3.6.0</scalamock.version>
         <spark.testing.version>0.9.0</spark.testing.version>
         <mysql.java.version>5.1.47</mysql.java.version>
-        <commons.httpclient.version>3.1</commons.httpclient.version>
         <cassandra.connector.version>2.4.1</cassandra.connector.version>
     </properties>
 
@@ -190,11 +189,6 @@ under the License.
             <groupId>com.datastax.spark</groupId>
             <artifactId>spark-cassandra-connector_2.11</artifactId>
             <version>${cassandra.connector.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>${commons.httpclient.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
