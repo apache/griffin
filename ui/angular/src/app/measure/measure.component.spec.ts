@@ -17,9 +17,12 @@ specific language governing permissions and limitations
 under the License.
 */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed, inject} from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
+import { AppModule } from '../app.module';
 import {MeasureComponent} from './measure.component';
+import { ServiceService } from '../service/service.service';
 
 describe('MeasureComponent', () => {
   let component: MeasureComponent;
@@ -27,7 +30,9 @@ describe('MeasureComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [MeasureComponent]
+      imports: [ HttpClientTestingModule, AppModule ],
+      declarations: [],
+      providers: [ ServiceService ]
     })
       .compileComponents();
   }));
@@ -38,7 +43,18 @@ describe('MeasureComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
-    expect(component).toBeTruthy();
-  });
+  it(
+    'should be created', 
+    inject(
+      [HttpTestingController, ServiceService],
+      (httpMock: HttpTestingController, serviceService: ServiceService) => {
+
+        const req = httpMock.expectOne( serviceService.config.uri.allModels );
+        expect( req.request.method ).toBe("GET");
+        req.flush( {} );
+
+        expect(component).toBeTruthy();
+      }
+    )
+  );
 });

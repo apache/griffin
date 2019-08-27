@@ -18,6 +18,7 @@ under the License.
 */
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
+import { AppModule } from '../../../app.module';
 import {RawComponent} from './raw.component';
 
 describe('RawComponent', () => {
@@ -26,7 +27,8 @@ describe('RawComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [RawComponent]
+      imports: [ AppModule ],
+      declarations: []
     })
       .compileComponents();
   }));

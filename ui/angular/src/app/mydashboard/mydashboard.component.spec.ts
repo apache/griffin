@@ -17,6 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import {MydashboardComponent} from './mydashboard.component';
 
@@ -26,7 +27,8 @@ describe('MydashboardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [MydashboardComponent]
+      imports: [ RouterTestingModule ],
+      declarations: [MydashboardComponent],
     })
       .compileComponents();
   }));

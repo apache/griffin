@@ -19,6 +19,7 @@ under the License.
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {PrConfirmModal} from './confirmModal.component';
+import { ProfilingStep1, ProfilingStep2, ProfilingStep3, ProfilingStep4 } from '../pr.component';
 
 describe('PrConfirmModalComponent', () => {
   let component: PrConfirmModal;
@@ -34,6 +35,10 @@ describe('PrConfirmModalComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PrConfirmModal);
     component = fixture.componentInstance;
+    component.step1 = new ProfilingStep1();
+    component.step2 = new ProfilingStep2();
+    component.step3 = new ProfilingStep3();
+    component.step4 = new ProfilingStep4();
     fixture.detectChanges();
   });
 
