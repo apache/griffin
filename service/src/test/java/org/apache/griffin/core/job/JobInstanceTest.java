@@ -30,6 +30,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -51,6 +52,7 @@ import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.impl.triggers.AbstractTrigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -115,6 +117,7 @@ public class JobInstanceTest {
         JobDetail jd = createJobDetail(JsonUtil.toJson(measure), "");
         BatchJob job = new BatchJob(1L, "jobName",
                 "qName", "qGroup", false);
+        job.setConfigMap(new HashMap<>());
         List<Trigger> triggers = Arrays.asList(createSimpleTrigger(2, 0));
         given(context.getJobDetail()).willReturn(jd);
         given(measureRepo.findOne(Matchers.anyLong())).willReturn(measure);
@@ -127,6 +130,9 @@ public class JobInstanceTest {
         given(jobRepo.save(Matchers.any(BatchJob.class))).willReturn(job);
         given(scheduler.checkExists(Matchers.any(JobKey.class)))
                 .willReturn(false);
+        Trigger trigger = mock(Trigger.class);
+        given(context.getTrigger()).willReturn(trigger);
+        given(trigger.getKey()).willReturn(new TriggerKey("test"));
         jobInstance.execute(context);
 
         verify(measureRepo, times(1)).findOne(Matchers.anyLong());

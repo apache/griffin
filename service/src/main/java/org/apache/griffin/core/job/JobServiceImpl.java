@@ -19,12 +19,47 @@ under the License.
 
 package org.apache.griffin.core.job;
 
+import static java.util.TimeZone.getTimeZone;
+import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
+import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INSTANCE_ID_DOES_NOT_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_MEASURE_ID;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_TYPE_DOES_NOT_SUPPORT;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_SUPPORT;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.NO_SUCH_JOB_ACTION;
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.BUSY;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.IDLE;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RECOVERING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
+import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
+import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
+import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.TriggerKey.triggerKey;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.event.GriffinEventManager;
-import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.event.JobEvent;
+import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.entity.AbstractJob;
 import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.entity.JobHealth;
@@ -66,40 +101,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
-
-import static java.util.TimeZone.getTimeZone;
-import static org.apache.griffin.core.config.EnvConfig.ENV_BATCH;
-import static org.apache.griffin.core.config.EnvConfig.ENV_STREAMING;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.INVALID_MEASURE_ID;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_ID_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_NAME_DOES_NOT_EXIST;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.JOB_TYPE_DOES_NOT_SUPPORT;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.MEASURE_TYPE_DOES_NOT_SUPPORT;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.NO_SUCH_JOB_ACTION;
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.QUARTZ_JOB_ALREADY_EXIST;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.BUSY;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.DEAD;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.IDLE;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.NOT_STARTED;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.RECOVERING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.RUNNING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.STARTING;
-import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
-import static org.apache.griffin.core.job.entity.LivySessionStates.isActive;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.BATCH;
-import static org.apache.griffin.core.measure.entity.GriffinMeasure.ProcessType.STREAMING;
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.JobKey.jobKey;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
-import static org.quartz.TriggerKey.triggerKey;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -131,11 +132,11 @@ public class JobServiceImpl implements JobService {
     private StreamingJobOperatorImpl streamingJobOp;
     @Autowired
     private GriffinEventManager eventManager;
-
-    private RestTemplate restTemplate;
+    @Autowired
+    private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
     public JobServiceImpl() {
-        restTemplate = new RestTemplate();
+
     }
 
     @Override
@@ -284,6 +285,17 @@ public class JobServiceImpl implements JobService {
         return updateState(instances);
     }
 
+    @Override
+    public JobInstanceBean findInstance(Long id) {
+        JobInstanceBean bean = instanceRepo.findByInstanceId(id);
+        if (bean == null) {
+            LOGGER.warn("Instance id {} does not exist.", id);
+            throw new GriffinException
+                .NotFoundException(INSTANCE_ID_DOES_NOT_EXIST);
+        }
+        return bean;
+    }
+
     private List<JobInstanceBean> updateState(List<JobInstanceBean> instances) {
         for (JobInstanceBean instance : instances) {
             State state = instance.getState();
@@ -292,6 +304,11 @@ public class JobServiceImpl implements JobService {
             }
         }
         return instances;
+    }
+
+    @Override
+    public List<JobInstanceBean> findInstancesByTriggerKey(String triggerKey) {
+        return instanceRepo.findByTriggerKey(triggerKey);
     }
 
     /**
@@ -518,7 +535,9 @@ public class JobServiceImpl implements JobService {
             new TypeReference<HashMap<String, Object>>() {
             };
         try {
-            String resultStr = restTemplate.getForObject(uri, String.class);
+            String resultStr = livyTaskSubmitHelper.getFromLivy(uri);
+            LOGGER.info(resultStr);
+
             HashMap<String, Object> resultMap = JsonUtil.toEntity(resultStr,
                 type);
             setJobInstanceIdAndUri(instance, resultMap);
@@ -529,6 +548,7 @@ public class JobServiceImpl implements JobService {
             LOGGER.warn("sessionId({}) appId({}) {}.", instance.getSessionId(),
                 instance.getAppId(), e.getMessage());
             setStateByYarn(instance, e);
+            livyTaskSubmitHelper.decreaseCurTaskNum(instance.getId());
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
@@ -606,6 +626,10 @@ public class JobServiceImpl implements JobService {
             instance.setAppUri(appId == null ? null : env
                 .getProperty("yarn.uri") + "/cluster/app/" + appId);
             instanceRepo.save(instance);
+            // If Livy returns to success or dead, task execution completes one,TaskNum--
+            if (SUCCESS.equals(state) || DEAD.equals(state)) {
+                livyTaskSubmitHelper.decreaseCurTaskNum(instance.getId());
+            }
         }
     }
 
@@ -650,6 +674,24 @@ public class JobServiceImpl implements JobService {
         } catch (Exception ex) {
             LOGGER.error("Fail to get Persist path from {}", jsonString, ex);
             return null;
+        }
+    }
+
+    @Override
+    public String triggerJobById(Long id) throws SchedulerException {
+        AbstractJob job = jobRepo.findByIdAndDeleted(id, false);
+        validateJobExist(job);
+        Scheduler scheduler = factory.getScheduler();
+        JobKey jobKey = jobKey(job.getName(), job.getGroup());
+        if (scheduler.checkExists(jobKey)) {
+            Trigger trigger = TriggerBuilder.newTrigger()
+                .forJob(jobKey)
+                .startNow()
+                .build();
+            scheduler.scheduleJob(trigger);
+            return trigger.getKey().toString();
+        } else {
+            throw new GriffinException.NotFoundException(JOB_ID_DOES_NOT_EXIST);
         }
     }
 }

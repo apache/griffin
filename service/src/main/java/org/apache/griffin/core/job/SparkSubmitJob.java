@@ -57,36 +57,44 @@ import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import static org.apache.griffin.core.util.JsonUtil.toJsonWithFormat;
 
+/**
+ * Simple implementation of the Quartz Job interface, submitting the
+ * griffin job to spark cluster via livy
+ *
+ * @see LivyTaskSubmitHelper#postToLivy(String)
+ * @see Job#execute(JobExecutionContext) 
+ */
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
 @Component
 public class SparkSubmitJob implements Job {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(SparkSubmitJob.class);
-    private static final String REQUEST_BY_HEADER = "X-Requested-By";
+        LoggerFactory.getLogger(SparkSubmitJob.class);
+
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
     @Autowired
     private BatchJobOperatorImpl batchJobOp;
     @Autowired
     private Environment env;
+    @Autowired
+    private LivyTaskSubmitHelper livyTaskSubmitHelper;
+
+    @Value("${livy.need.queue:false}")
+    private boolean isNeedLivyQueue;
+    @Value("${livy.task.appId.retry.count:3}")
+    private int appIdRetryCount;
 
     private GriffinMeasure measure;
     private String livyUri;
     private List<SegmentPredicate> mPredicates;
     private JobInstanceBean jobInstance;
-    private RestTemplate restTemplate = new RestTemplate();
 
     @Override
     public void execute(JobExecutionContext context) {
@@ -98,14 +106,19 @@ public class SparkSubmitJob implements Job {
                 updateJobInstanceState(context);
                 return;
             }
-            saveJobInstance(jd);
+            if (isNeedLivyQueue) {
+                //livy batch limit
+                livyTaskSubmitHelper.addTaskToWaitingQueue(jd);
+            } else {
+                saveJobInstance(jd);
+            }
         } catch (Exception e) {
             LOGGER.error("Post spark task ERROR.", e);
         }
     }
 
-    private void updateJobInstanceState(JobExecutionContext context) throws
-            IOException {
+    private void updateJobInstanceState(JobExecutionContext context)
+        throws IOException {
         SimpleTrigger simpleTrigger = (SimpleTrigger) context.getTrigger();
         int repeatCount = simpleTrigger.getRepeatCount();
         int fireCount = simpleTrigger.getTimesTriggered();
@@ -115,33 +128,17 @@ public class SparkSubmitJob implements Job {
     }
 
     private String post2Livy() {
-        String result = null;
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set(REQUEST_BY_HEADER,"admin");
-          
-            HttpEntity<String> springEntity = new HttpEntity<String>(toJsonWithFormat(livyConfMap), headers );
-            result = restTemplate.postForObject(livyUri,springEntity,String.class);
-           
-            LOGGER.info(result);
-        } catch (HttpClientErrorException e) {
-            LOGGER.error("Post to livy ERROR. \n {} {}",
-                    e.getMessage(),
-                    e.getResponseBodyAsString());
-        } catch (Exception e) {
-            LOGGER.error("Post to livy ERROR. {}", e.getMessage());
-        }
-        return result;
+        return livyTaskSubmitHelper.postToLivy(livyUri);
     }
 
     private boolean success(List<SegmentPredicate> predicates) {
         if (CollectionUtils.isEmpty(predicates)) {
             return true;
         }
+
         for (SegmentPredicate segPredicate : predicates) {
             Predicator predicator = PredicatorFactory
-                    .newPredicateInstance(segPredicate);
+                .newPredicateInstance(segPredicate);
             try {
                 if (predicator != null && !predicator.predicate()) {
                     return false;
@@ -149,7 +146,6 @@ public class SparkSubmitJob implements Job {
             } catch (Exception e) {
                 return false;
             }
-
         }
         return true;
     }
@@ -157,9 +153,9 @@ public class SparkSubmitJob implements Job {
     private void initParam(JobDetail jd) throws IOException {
         mPredicates = new ArrayList<>();
         jobInstance = jobInstanceRepo.findByPredicateName(jd.getJobDataMap()
-                .getString(PREDICATE_JOB_NAME));
+            .getString(PREDICATE_JOB_NAME));
         measure = toEntity(jd.getJobDataMap().getString(MEASURE_KEY),
-                GriffinMeasure.class);
+            GriffinMeasure.class);
         livyUri = env.getProperty("livy.uri");
         setPredicates(jd.getJobDataMap().getString(PREDICATES_KEY));
         // in order to keep metric name unique, we set job name
@@ -172,14 +168,11 @@ public class SparkSubmitJob implements Job {
         if (StringUtils.isEmpty(json)) {
             return;
         }
-        List<Map<String, Object>> maps = toEntity(json,
-                new TypeReference<List<Map>>() {
-                });
-        for (Map<String, Object> map : maps) {
-            SegmentPredicate sp = new SegmentPredicate();
-            sp.setType((String) map.get("type"));
-            sp.setConfigMap((Map<String, Object>) map.get("config"));
-            mPredicates.add(sp);
+        List<SegmentPredicate> predicates = toEntity(json,
+            new TypeReference<List<SegmentPredicate>>() {
+            });
+        if (predicates != null) {
+            mPredicates.addAll(predicates);
         }
     }
 
@@ -205,7 +198,7 @@ public class SparkSubmitJob implements Job {
         List<String> args = new ArrayList<>();
         args.add(genEnv());
         String measureJson = JsonUtil.toJsonWithFormat(measure);
-        // to fix livy bug: character ` will be ignored by livy
+        // to fix livy bug: character will be ignored by livy
         String finalMeasureJson = escapeCharacter(measureJson, "\\`");
         LOGGER.info(finalMeasureJson);
         args.add(finalMeasureJson);
@@ -213,24 +206,39 @@ public class SparkSubmitJob implements Job {
         livyConfMap.put("args", args);
     }
 
-
-    private void saveJobInstance(JobDetail jd) throws SchedulerException,
-            IOException {
+    protected void saveJobInstance(JobDetail jd) throws SchedulerException,
+        IOException {
         // If result is null, it may livy uri is wrong
         // or livy parameter is wrong.
-        String result = post2Livy();
+        Map<String, Object> resultMap = post2LivyWithRetry();
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();
         batchJobOp.deleteJob(group, name);
         LOGGER.info("Delete predicate job({},{}) SUCCESS.", group, name);
-        saveJobInstance(result, FOUND);
+        setJobInstance(resultMap, FOUND);
+        jobInstanceRepo.save(jobInstance);
     }
 
-    private void saveJobInstance(String result, State state)
-            throws IOException {
+    private Map<String, Object> post2LivyWithRetry()
+        throws IOException {
+        String result = post2Livy();
+        Map<String, Object> resultMap = null;
+        if (result != null) {
+            resultMap = livyTaskSubmitHelper.retryLivyGetAppId(result, appIdRetryCount);
+            if (resultMap != null) {
+                livyTaskSubmitHelper.increaseCurTaskNum(Long.valueOf(
+                    String.valueOf(resultMap.get("id"))).longValue());
+            }
+        }
+
+        return resultMap;
+    }
+
+    protected void saveJobInstance(String result, State state)
+        throws IOException {
         TypeReference<HashMap<String, Object>> type =
-                new TypeReference<HashMap<String, Object>>() {
-                };
+            new TypeReference<HashMap<String, Object>>() {
+            };
         Map<String, Object> resultMap = null;
         if (result != null) {
             resultMap = toEntity(result, type);
@@ -247,9 +255,9 @@ public class SparkSubmitJob implements Job {
             Object id = resultMap.get("id");
             Object appId = resultMap.get("appId");
             jobInstance.setState(status == null ? null : State.valueOf(status
-                    .toString().toUpperCase()));
+                .toString().toUpperCase()));
             jobInstance.setSessionId(id == null ? null : Long.parseLong(id
-                    .toString()));
+                .toString()));
             jobInstance.setAppId(appId == null ? null : appId.toString());
         }
     }

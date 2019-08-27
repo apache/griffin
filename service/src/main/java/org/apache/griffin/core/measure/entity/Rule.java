@@ -186,12 +186,12 @@ public class Rule extends AbstractAuditableEntity {
         if (!StringUtils.isEmpty(details)) {
             this.detailsMap = JsonUtil.toEntity(
                 details, new TypeReference<Map<String, Object>>() {
-            });
+                });
         }
         if (!StringUtils.isEmpty(out)) {
             this.outList = JsonUtil.toEntity(
                 out, new TypeReference<List<Map<String, Object>>>() {
-            });
+                });
         }
     }
 

@@ -23,7 +23,7 @@ under the License.
     <parent>
         <groupId>org.apache.griffin</groupId>
         <artifactId>griffin</artifactId>
-        <version>0.4.0-SNAPSHOT</version>
+        <version>0.6.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>service</artifactId>
@@ -32,14 +32,13 @@ under the License.
     <name>Apache Griffin :: Web Service</name>
 
     <properties>
-        <java.version>1.8</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hadoop.version>2.7.1</hadoop.version>
         <hive.version>2.2.0</hive.version>
         <scala.version>2.10</scala.version>
         <spring.boot.version>1.5.1.RELEASE</spring.boot.version>
+        <spring.security.kerberos.version>1.0.0.RELEASE</spring.security.kerberos.version>
         <confluent.version>3.2.0</confluent.version>
-        <quartz.version>2.2.1</quartz.version>
+        <quartz.version>2.2.2</quartz.version>
         <start-class>org.apache.griffin.core.GriffinWebApplication</start-class>
         <powermock.version>1.6.6</powermock.version>
         <mockito.version>1.10.19</mockito.version>
@@ -48,6 +47,9 @@ under the License.
         <eclipselink.version>2.6.0</eclipselink.version>
         <mysql.java.version>5.1.47</mysql.java.version>
         <postgresql.version>9.4.1212.jre7</postgresql.version>
+        <livy.core.version>0.3.0</livy.core.version>
+        <elasticsearch-rest-client.version>6.2.4</elasticsearch-rest-client.version>
+        <jackson-databind.version>2.6.3</jackson-databind.version>
     </properties>
 
     <repositories>
@@ -56,7 +58,6 @@ under the License.
             <url>http://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
-
 
     <dependencyManagement>
         <dependencies>
@@ -83,6 +84,10 @@ under the License.
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <exclusions>
                 <exclusion>
@@ -99,6 +104,11 @@ under the License.
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security.kerberos</groupId>
+            <artifactId>spring-security-kerberos-client</artifactId>
+            <version>${spring.security.kerberos.version}</version>
+        </dependency>
         <!--eclipse link-->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
@@ -111,9 +121,9 @@ under the License.
             <version>${postgresql.version}</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>mysql</groupId>-->
-            <!--<artifactId>mysql-connector-java</artifactId>-->
-            <!--<version>${mysql.java.version}</version>-->
+        <!--<groupId>mysql</groupId>-->
+        <!--<artifactId>mysql-connector-java</artifactId>-->
+        <!--<version>${mysql.java.version}</version>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.h2database</groupId>
@@ -127,8 +137,9 @@ under the License.
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson-databind.version}</version>
         </dependency>
+
         <!-- to access metastore from hive-->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
@@ -139,6 +150,10 @@ under the License.
                 <exclusion>
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -166,11 +181,46 @@ under the License.
             </exclusions>
         </dependency>
 
+        <!-- to access Hive using JDBC -->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>${hive.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.aggregate</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.orbit</groupId>
+                    <artifactId>javax.servlet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>servlet-api-2.5</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!-- to access confluent schema registry -->
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client</artifactId>
             <version>${confluent.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--schedule-->
@@ -181,19 +231,19 @@ under the License.
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.2.2</version>
+            <version>${quartz.version}</version>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
-            <version>2.2.2</version>
+            <version>${quartz.version}</version>
         </dependency>
 
         <!--livy-core-->
         <dependency>
             <groupId>com.cloudera.livy</groupId>
-            <artifactId>livy-core_2.10</artifactId>
-            <version>0.3.0</version>
+            <artifactId>livy-core_${scala.version}</artifactId>
+            <version>${livy.core.version}</version>
         </dependency>
 
         <!-- test -->
@@ -206,7 +256,6 @@ under the License.
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -225,18 +274,18 @@ under the License.
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
-            <version>6.2.4</version>
+            <version>${elasticsearch-rest-client.version}</version>
         </dependency>
     </dependencies>
     <profiles>
         <!--if you need mysql, please uncomment mysql-connector-java -->
         <!--<profile>-->
-            <!--<id>mysql</id>-->
-            <!--<activation>-->
-                <!--<property>-->
-                    <!--<name>mysql</name>-->
-                <!--</property>-->
-            <!--</activation>-->
+        <!--<id>mysql</id>-->
+        <!--<activation>-->
+        <!--<property>-->
+        <!--<name>mysql</name>-->
+        <!--</property>-->
+        <!--</activation>-->
         <!--</profile>-->
         <profile>
             <id>dev</id>
@@ -279,6 +328,22 @@ under the License.
                 </dependencies>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>lib</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot-maven-plugin.version}</version>
@@ -298,12 +363,6 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-
             </plugin>
         </plugins>
     </build>

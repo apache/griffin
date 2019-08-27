@@ -48,15 +48,21 @@ case class DataSource(name: String,
 
   def loadData(context: DQContext): TimeRange = {
     info(s"load data [${name}]")
-    val timestamp = context.contextId.timestamp
-    val (dfOpt, timeRange) = data(timestamp)
-    dfOpt match {
-      case Some(df) =>
-        context.runTimeTableRegister.registerTable(name, df)
-      case None =>
-        warn(s"load data source [${name}] fails")
+    try {
+      val timestamp = context.contextId.timestamp
+      val (dfOpt, timeRange) = data(timestamp)
+      dfOpt match {
+        case Some(df) =>
+          context.runTimeTableRegister.registerTable(name, df)
+        case None =>
+          warn(s"Data source [${name}] is null!")
+      }
+      timeRange
+    } catch {
+      case e =>
+        error(s"load data source [${name}] fails")
+        throw e
     }
-    timeRange
   }
 
   private def data(timestamp: Long): (Option[DataFrame], TimeRange) = {

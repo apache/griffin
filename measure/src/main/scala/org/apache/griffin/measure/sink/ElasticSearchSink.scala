@@ -25,12 +25,14 @@ import org.apache.spark.rdd.RDD
 import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 
-
 /**
   * sink metric and record through http request
   */
-case class ElasticSearchSink(config: Map[String, Any], metricName: String,
-                             timeStamp: Long, block: Boolean
+case class ElasticSearchSink(
+                              config: Map[String, Any],
+                              metricName: String,
+                              timeStamp: Long,
+                              block: Boolean
                             ) extends Sink {
 
   val Api = "api"
@@ -64,7 +66,7 @@ case class ElasticSearchSink(config: Map[String, Any], metricName: String,
 
       def func(): (Long, Future[Boolean]) = {
         import scala.concurrent.ExecutionContext.Implicits.global
-        (timeStamp, Future(HttpUtil.httpRequest(api, method, params, header, data)))
+        (timeStamp, Future(HttpUtil.doHttpRequest(api, method, params, header, data)))
       }
       if (block) SinkTaskRunner.addBlockTask(func _, retry, connectionTimeout)
       else SinkTaskRunner.addNonBlockTask(func _, retry)

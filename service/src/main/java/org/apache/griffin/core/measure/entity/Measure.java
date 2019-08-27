@@ -19,26 +19,38 @@ under the License.
 
 package org.apache.griffin.core.measure.entity;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
-import org.apache.griffin.core.util.JsonUtil;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.griffin.core.util.JsonUtil;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
-        property = "measure.type")
+    property = "measure.type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"),
-        @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
+    @JsonSubTypes.Type(value = GriffinMeasure.class, name = "griffin"),
+    @JsonSubTypes.Type(value = ExternalMeasure.class, name = "external")})
 public abstract class Measure extends AbstractAuditableEntity {
     private static final long serialVersionUID = -4748881017029815714L;
 
@@ -137,8 +149,6 @@ public abstract class Measure extends AbstractAuditableEntity {
     public void save() throws JsonProcessingException {
         if (sinksList != null) {
             this.sinks = JsonUtil.toJson(sinksList);
-        } else {
-            this.sinks = null;
         }
     }
 
@@ -147,8 +157,6 @@ public abstract class Measure extends AbstractAuditableEntity {
         if (!StringUtils.isEmpty(sinks)) {
             this.sinksList = JsonUtil.toEntity(sinks, new TypeReference<List<String>>() {
             });
-        } else {
-            this.sinksList = null;
         }
     }
 

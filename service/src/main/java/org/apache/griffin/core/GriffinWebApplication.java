@@ -18,7 +18,6 @@ under the License.
 */
 package org.apache.griffin.core;
 
-
 import org.apache.griffin.core.common.SimpleCORSFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +26,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-
 @SpringBootApplication
 @EnableScheduling
 public class GriffinWebApplication {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(GriffinWebApplication.class);
+        .getLogger(GriffinWebApplication.class);
 
     public static void main(String[] args) {
-        LOGGER.info("application start");
         SpringApplication.run(GriffinWebApplication.class, args);
+        LOGGER.info("application started");
     }
 
     @Bean

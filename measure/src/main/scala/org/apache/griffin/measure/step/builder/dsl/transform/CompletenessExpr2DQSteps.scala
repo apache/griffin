@@ -81,7 +81,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
         s"SELECT ${selClause} FROM `${sourceName}`"
       }
       val sourceAliasTransStep =
-        SparkSqlTransformStep(sourceAliasTableName, sourceAliasSql, emptyMap, true)
+        SparkSqlTransformStep(sourceAliasTableName, sourceAliasSql, emptyMap, None, true)
 
       // 2. incomplete record
       val incompleteRecordsTableName = "__incompleteRecords"
@@ -91,14 +91,17 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val incompleteRecordsSql =
         s"SELECT * FROM `${sourceAliasTableName}` WHERE ${incompleteWhereClause}"
 
-      val incompleteRecordTransStep =
-        SparkSqlTransformStep(incompleteRecordsTableName, incompleteRecordsSql, emptyMap, true)
       val incompleteRecordWriteStep = {
         val rwName =
           ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
             .getOrElse(incompleteRecordsTableName)
         RecordWriteStep(rwName, incompleteRecordsTableName)
       }
+      val incompleteRecordTransStep =
+        SparkSqlTransformStep(incompleteRecordsTableName, incompleteRecordsSql, emptyMap,
+          Some(incompleteRecordWriteStep), true)
+      incompleteRecordTransStep.parentSteps += sourceAliasTransStep
+
 
       // 3. incomplete count
       val incompleteCountTableName = "__incompleteCount"
@@ -112,6 +115,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       }
       val incompleteCountTransStep =
         SparkSqlTransformStep(incompleteCountTableName, incompleteCountSql, emptyMap)
+      incompleteCountTransStep.parentSteps += incompleteRecordTransStep
 
       // 4. total count
       val totalCountTableName = "__totalCount"
@@ -124,6 +128,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
             s"FROM `${sourceAliasTableName}` GROUP BY `${ConstantColumns.tmst}`"
       }
       val totalCountTransStep = SparkSqlTransformStep(totalCountTableName, totalCountSql, emptyMap)
+      totalCountTransStep.parentSteps += sourceAliasTransStep
 
       // 5. complete metric
       val completeTableName = ruleParam.getOutDfName()
@@ -146,25 +151,19 @@ case class CompletenessExpr2DQSteps(context: DQContext,
              |ON `${totalCountTableName}`.`${ConstantColumns.tmst}` = `${incompleteCountTableName}`.`${ConstantColumns.tmst}`
          """.stripMargin
       }
-      val completeTransStep = SparkSqlTransformStep(completeTableName, completeMetricSql, emptyMap)
       val completeWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(completeTableName)
         val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
         MetricWriteStep(mwName, completeTableName, flattenType)
       }
+      val completeTransStep =
+        SparkSqlTransformStep(completeTableName, completeMetricSql, emptyMap, Some(completeWriteStep))
+      completeTransStep.parentSteps += incompleteCountTransStep
+      completeTransStep.parentSteps += totalCountTransStep
 
-      val transSteps = {
-        sourceAliasTransStep :: incompleteRecordTransStep ::
-          incompleteCountTransStep :: totalCountTransStep ::
-          completeTransStep :: Nil
-      }
-      val writeSteps = {
-        incompleteRecordWriteStep :: completeWriteStep :: Nil
-      }
-
-      // full steps
-      transSteps ++ writeSteps
+      val transSteps = completeTransStep :: Nil
+      transSteps
     }
   }
 

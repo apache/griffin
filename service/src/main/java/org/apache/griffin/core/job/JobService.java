@@ -42,7 +42,13 @@ public interface JobService {
 
     List<JobInstanceBean> findInstancesOfJob(Long jobId, int page, int size);
 
+    List<JobInstanceBean> findInstancesByTriggerKey(String triggerKey);
+
     JobHealth getHealthInfo();
 
     String getJobHdfsSinksPath(String jobName, long timestamp);
+
+    JobInstanceBean findInstance(Long id);
+
+    String triggerJobById(Long id) throws SchedulerException;
 }

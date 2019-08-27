@@ -34,15 +34,15 @@ case class AvroBatchDataConnector(@transient sparkSession: SparkSession,
                                   timestampStorage: TimestampStorage
                                  ) extends BatchDataConnector {
 
-  val config = dcParam.getConfig
+  val config: Map[String, Any] = dcParam.getConfig
 
   val FilePath = "file.path"
   val FileName = "file.name"
 
-  val filePath = config.getString(FilePath, "")
-  val fileName = config.getString(FileName, "")
+  val filePath: String = config.getString(FilePath, "")
+  val fileName: String = config.getString(FileName, "")
 
-  val concreteFileFullPath = if (pathPrefix) s"${filePath}${fileName}" else fileName
+  val concreteFileFullPath: String = if (pathPrefix()) filePath else fileName
 
   private def pathPrefix(): Boolean = {
     filePath.nonEmpty
@@ -53,15 +53,12 @@ case class AvroBatchDataConnector(@transient sparkSession: SparkSession,
   }
 
   def data(ms: Long): (Option[DataFrame], TimeRange) = {
-    val dfOpt = try {
+    assert(fileExist(), s"Avro file $concreteFileFullPath is not exists!")
+    val dfOpt = {
       val df = sparkSession.read.format("com.databricks.spark.avro").load(concreteFileFullPath)
       val dfOpt = Some(df)
       val preDfOpt = preProcess(dfOpt, ms)
       preDfOpt
-    } catch {
-      case e: Throwable =>
-        error(s"load avro file ${concreteFileFullPath} fails", e)
-        None
     }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))

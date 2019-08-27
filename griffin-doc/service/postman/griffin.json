@@ -1406,7 +1406,7 @@
 								"health"
 							]
 						},
-						"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"healthyJobCount\": 1,\n  \"jobCount\": 2\n}\n```"
+						"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"job instance info\"\n}\n```"
 					},
 					"response": [
 						{
@@ -1430,7 +1430,7 @@
 										"health"
 									]
 								},
-								"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"healthyJobCount\": 1,\n  \"jobCount\": 2\n}\n```"
+								"description": "`GET /api/v1/jobs/health`\n\n#### Response Body Sample\n```\n{\n  \"job instance info\"\n}\n```"
 							},
 							"status": "OK",
 							"code": 200,
@@ -1588,6 +1588,119 @@
 							],
 							"cookie": [],
 							"body": "{\"id\":3,\"measure.id\":5,\"job.name\":\"job_name\",\"cron.expression\":\"0 0/4 * * * ?\",\"cron.time.zone\":\"GMT+8:00\",\"predicate.config\":{\"checkdonefile.schedule\":{\"interval\":\"1m\",\"repeat\":2}},\"data.segments\":[{\"id\":5,\"data.connector.name\":\"connector_name_source\",\"as.baseline\":true,\"segment.range\":{\"id\":5,\"begin\":\"-1h\",\"length\":\"1h\"}},{\"id\":6,\"data.connector.name\":\"connector_name_target\",\"as.baseline\":false,\"segment.range\":{\"id\":6,\"begin\":\"-1h\",\"length\":\"1h\"}}]}"
+						}
+					]
+				},
+				{
+					"name": "Trigger job by id",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"timeout\": \"0\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_PATH}}/api/v1/jobs/trigger/:id",
+							"host": [
+								"{{BASE_PATH}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"jobs",
+								"trigger",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						},
+						"description": "`POST /api/v1/jobs/trigger/{id}`\n\n#### Path Variable\n- id -`required` `Long` job id\n\n#### Response\nThe response body should be contains job instance fields if no error happens, and the HTTP status is (200, \"OK\").\n\nIt may return failed messages. For example\n```\n{\n    \"timestamp\": 1517208792108,\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"code\": 40402,\n    \"message\": \"Job id does not exist\",\n    \"path\": \"/api/v1/jobs/trigger/2\"\n}\n```\nThere will be 'status' and 'error' fields in response if error happens, which correspond to HTTP status.\n\nThere may also be 'code' and 'message' fields, which will point out the cause.\n\nIf an exception happens at server, there will be an 'exception' field, which is the name of exception."
+					},
+					"response": [
+						{
+							"name": "Trigger job by id example",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\"timeout\": \"0\"\n}"
+								},
+								"url": {
+									"raw": "{{BASE_PATH}}/api/v1/jobs/trigger/:id",
+									"host": [
+										"{{BASE_PATH}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"jobs",
+										"trigger",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								},
+								"description": "`POST /api/v1/jobs/trigger/{id}`\n\n#### Path Variable\n- id -`required` `Long` job id\n\n#### Response\nThe response body should be contains job instance fields if no error happens, and the HTTP status is (200, \"OK\").\n\nIt may return failed messages. For example\n```\n{\n    \"timestamp\": 1517208792108,\n    \"status\": 404,\n    \"error\": \"Not Found\",\n    \"code\": 40402,\n    \"message\": \"Job id does not exist\",\n    \"path\": \"/api/v1/jobs/trigger/2\"\n}\n```\nThere will be 'status' and 'error' fields in response if error happens, which correspond to HTTP status.\n\nThere may also be 'code' and 'message' fields, which will point out the cause.\n\nIf an exception happens at server, there will be an 'exception' field, which is the name of exception."
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "access-control-allow-headers",
+									"value": "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept",
+									"name": "access-control-allow-headers",
+									"description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the actual request."
+								},
+								{
+									"key": "access-control-allow-methods",
+									"value": "POST, GET, OPTIONS, DELETE,PUT",
+									"name": "access-control-allow-methods",
+									"description": "Specifies the method or methods allowed when accessing the resource. This is used in response to a preflight request."
+								},
+								{
+									"key": "access-control-allow-origin",
+									"value": "*",
+									"name": "access-control-allow-origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "access-control-max-age",
+									"value": "3600",
+									"name": "access-control-max-age",
+									"description": "Indicates how long the results of a preflight request can be cached in seconds."
+								},
+								{
+									"key": "content-type",
+									"value": "application/json;charset=UTF-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Wed, 25 Oct 2017 01:43:23 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								}
+							],
+							"cookie": [],
+							"body": "{\n        \"id\": 1,\n        \"sessionId\": null,\n        \"state\": \"success\",\n        \"appId\": null,\n        \"appUri\": null,\n        \"predicateGroup\": \"PG\",\n        \"predicateName\": \"job_name_predicate_1515399840077\",\n        \"deleted\": true,\n        \"timestamp\": 1515399840092,\n        \"expireTimestamp\": 1516004640092\n}"
 						}
 					]
 				},
@@ -1804,6 +1917,75 @@
 								}
 							],
 							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Get Job Instance by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_PATH}}/api/v1/jobs/instances/:id",
+							"host": [
+								"{{BASE_PATH}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"jobs",
+								"instances",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						},
+						"description": "`GET /api/v1/jobs/instances/{id}`\n\n#### Response Body Sample\n```\n{\n  \"job instance info\"\n}\n```"
+					},
+					"response": [
+						{
+							"name": "Get Job Instance by Id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BASE_PATH}}/api/v1/jobs/instances/:id",
+									"host": [
+										"{{BASE_PATH}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"jobs",
+										"instances",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								},
+								"description": "`GET /api/v1/jobs/instances/{id}`\n\n#### Response Body Sample\n```\n{\n  \"job instance info\"\n}\n```"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"cookie": [],
+							"body": "{\n    \"healthyJobCount\": 1,\n    \"jobCount\": 2\n}"
 						}
 					]
 				}
@@ -2048,7 +2230,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{\n\t\t\"name\" : \"metricName\",\n\t\t\"tmst\" : 1509599811123,\n\t\t\"value\" : {\n\t\t\t\"__tmst\" : 1509599811123,\n\t\t\t\"miss\" : 11,\n\t\t\t\"total\" : 125000,\n\t\t\t\"matched\" : 124989\n\t\t}\n   }\n]"
+							"raw": "[\n\t{\n\t\t\"name\" : \"metricName\",\n\t\t\"tmst\" : 1509599811123,\n\t\t\"applicationId\" : \"app_1\",\n\t\t\"value\" : {\n\t\t\t\"__tmst\" : 1509599811123,\n\t\t\t\"miss\" : 11,\n\t\t\t\"total\" : 125000,\n\t\t\t\"matched\" : 124989\n\t\t}\n   }\n]"
 						},
 						"url": {
 							"raw": "{{BASE_PATH}}/api/v1/metrics/values",
@@ -2077,7 +2259,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n\t{\n\t\t\"name\" : \"metricName\",\n\t\t\"tmst\" : 1509599811123,\n\t\t\"value\" : {\n\t\t\t\"__tmst\" : 1509599811123,\n\t\t\t\"miss\" : 11,\n\t\t\t\"total\" : 125000,\n\t\t\t\"matched\" : 124989\n\t\t}\n   }\n]"
+									"raw": "[\n\t{\n\t\t\"name\" : \"metricName\",\n\t\t\"tmst\" : 1509599811123,\n\t\t\"applicationId\" : \"app_1\",\n\t\t\"value\" : {\n\t\t\t\"__tmst\" : 1509599811123,\n\t\t\t\"miss\" : 11,\n\t\t\t\"total\" : 125000,\n\t\t\t\"matched\" : 124989\n\t\t}\n   }\n]"
 								},
 								"url": {
 									"raw": "{{BASE_PATH}}/api/v1/metrics/values",
@@ -2273,6 +2455,75 @@
 								}
 							],
 							"body": "{\"took\":363,\"timed_out\":false,\"total\":5,\"deleted\":5,\"batches\":1,\"version_conflicts\":0,\"noops\":0,\"retries\":{\"bulk\":0,\"search\":0},\"throttled_millis\":0,\"requests_per_second\":-1.0,\"throttled_until_millis\":0,\"failures\":[]}"
+						}
+					]
+				},
+				{
+					"name": "Get Metrics Value by Job Instance Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_PATH}}/api/v1/metrics/values/:jobInstanceId",
+							"host": [
+								"{{BASE_PATH}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"metrics",
+								"values",
+								":jobInstanceId"
+							],
+							"variable": [
+								{
+									"key": "jobInstanceId",
+									"value": "304"
+								}
+							]
+						},
+						"description": "`GET /api/v1/metrics/values/{jobInstanceId}`\n\n#### Response Body Sample\n```\n{\n  \"metric value\"\n}\n```"
+					},
+					"response": [
+						{
+							"name": "Get Metrics Value by Job Instance Id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BASE_PATH}}/api/v1/metrics/values/:jobInstanceId",
+									"host": [
+										"{{BASE_PATH}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"metrics",
+										"values",
+										":jobInstanceId"
+									],
+									"variable": [
+										{
+											"key": "jobInstanceId",
+											"value": "304"
+										}
+									]
+								},
+								"description": "`GET /api/v1/metrics/values/{jobInstanceId}`\n\n#### Response Body Sample\n```\n{\n  \"metric value\"\n}\n```"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"cookie": [],
+							"body": "{\n    \"name\": some_job,\n    \"tmst\": 1553526960000\n    \"applicationId\": application_1549876136110_0237\n    \"value\": {\n    \"total\": 74}}"
 						}
 					]
 				}

@@ -20,9 +20,10 @@ package org.apache.griffin.measure.launch
 
 import scala.util.Try
 
+import org.apache.spark.sql.SparkSession
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig, SinkParam}
-
 
 /**
   * dq application process
@@ -31,6 +32,8 @@ trait DQApp extends Loggable with Serializable {
 
   val envParam: EnvConfig
   val dqParam: DQConfig
+
+  implicit var sparkSession: SparkSession = _
 
   def init: Try[_]
 

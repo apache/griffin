@@ -56,12 +56,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class StreamingJobOperatorImpl implements JobOperator {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(StreamingJobOperatorImpl.class);
+        .getLogger(StreamingJobOperatorImpl.class);
     @Autowired
     private StreamingJobRepo streamingJobRepo;
     @Autowired
@@ -72,20 +71,20 @@ public class StreamingJobOperatorImpl implements JobOperator {
     private JobInstanceRepo instanceRepo;
     @Autowired
     private SchedulerFactoryBean factory;
+    @Autowired
+    private LivyTaskSubmitHelper livyTaskSubmitHelper;
 
     private String livyUri;
-    private RestTemplate restTemplate;
 
     @PostConstruct
     public void init() {
-        restTemplate = new RestTemplate();
         livyUri = env.getProperty("livy.uri");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AbstractJob add(AbstractJob job, GriffinMeasure measure) throws
-            Exception {
+        Exception {
         validateParams(job);
         String qName = jobService.getQuartzName(job);
         String qGroup = jobService.getQuartzGroup();
@@ -127,24 +126,24 @@ public class StreamingJobOperatorImpl implements JobOperator {
         /* Firstly you should check whether job is scheduled.
         If it is scheduled, triggers are empty. */
         List<? extends Trigger> triggers = jobService.getTriggers(
-                job.getName(),
-                job.getGroup());
+            job.getName(),
+            job.getGroup());
         if (!CollectionUtils.isEmpty(triggers)) {
             throw new GriffinException.BadRequestException
-                    (STREAMING_JOB_IS_RUNNING);
+                (STREAMING_JOB_IS_RUNNING);
         }
         /* Secondly you should check whether job instance is running. */
         List<JobInstanceBean> instances = instanceRepo.findByJobId(job.getId());
         instances.stream().filter(instance -> !instance.isDeleted()).forEach
-                (instance -> {
-                    State state = instance.getState();
-                    String quartzState = convert2QuartzState(state);
-                    if (!getStartStatus(quartzState)) {
-                        throw new GriffinException.BadRequestException
-                                (STREAMING_JOB_IS_RUNNING);
-                    }
-                    instance.setDeleted(true);
-                });
+            (instance -> {
+                State state = instance.getState();
+                String quartzState = convert2QuartzState(state);
+                if (!getStartStatus(quartzState)) {
+                    throw new GriffinException.BadRequestException
+                        (STREAMING_JOB_IS_RUNNING);
+                }
+                instance.setDeleted(true);
+            });
     }
 
 
@@ -175,7 +174,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
     public JobState getState(AbstractJob job, String action) {
         JobState jobState = new JobState();
         List<JobInstanceBean> instances = instanceRepo
-                .findByJobId(job.getId());
+            .findByJobId(job.getId());
         for (JobInstanceBean instance : instances) {
             State state = instance.getState();
             if (!instance.isDeleted() && state != null) {
@@ -209,7 +208,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
      * started
      */
     private boolean getStartStatus(String state) {
-        return !"NORMAL" .equals(state) && !"BLOCKED" .equals(state);
+        return !"NORMAL".equals(state) && !"BLOCKED".equals(state);
     }
 
     /**
@@ -220,30 +219,32 @@ public class StreamingJobOperatorImpl implements JobOperator {
      * stopped
      */
     private boolean getStopStatus(String state) {
-        return !"COMPLETE" .equals(state) && !"ERROR" .equals(state);
+        return !"COMPLETE".equals(state) && !"ERROR".equals(state);
     }
 
     private void deleteByLivy(JobInstanceBean instance) {
         Long sessionId = instance.getSessionId();
         if (sessionId == null) {
             LOGGER.warn("Session id of instance({},{}) is null.", instance
-                    .getPredicateGroup(), instance.getPredicateName
-                    ());
+                .getPredicateGroup(), instance.getPredicateName
+                ());
             return;
         }
         String url = livyUri + "/" + instance.getSessionId();
         try {
-            restTemplate.delete(url);
+            // Use livy helper to interact with livy
+            livyTaskSubmitHelper.deleteByLivy(url);
+
             LOGGER.info("Job instance({}) has been deleted. {}", instance
-                    .getSessionId(), url);
+                .getSessionId(), url);
         } catch (ResourceAccessException e) {
             LOGGER.error("Your url may be wrong. Please check {}.\n {}",
-                    livyUri, e.getMessage());
+                livyUri, e.getMessage());
         } catch (RestClientException e) {
             LOGGER.warn("sessionId({}) appId({}) {}.", instance.getSessionId(),
-                    instance.getAppId(), e.getMessage());
+                instance.getAppId(), e.getMessage());
             YarnNetUtil.delete(env.getProperty("yarn.uri"),
-                    instance.getAppId());
+                instance.getAppId());
         }
     }
 
@@ -254,23 +255,23 @@ public class StreamingJobOperatorImpl implements JobOperator {
      *               job
      */
     private void stop(StreamingJob job, boolean delete) throws
-            SchedulerException {
+        SchedulerException {
         pauseJob(job);
         /* to prevent situation that streaming job is submitted
         before pause or when pausing. */
         List<JobInstanceBean> instances = instanceRepo
-                .findByJobId(job.getId());
+            .findByJobId(job.getId());
         instances.stream().filter(instance -> !instance.isDeleted())
-                .forEach(instance -> {
-                    State state = instance.getState();
-                    String quartzState = convert2QuartzState(state);
-                    if (getStopStatus(quartzState)) {
-                        deleteByLivy(instance);
+            .forEach(instance -> {
+                State state = instance.getState();
+                String quartzState = convert2QuartzState(state);
+                if (getStopStatus(quartzState)) {
+                    deleteByLivy(instance);
 
-                    }
-                    instance.setState(STOPPED);
-                    instance.setDeleted(true);
-                });
+                }
+                instance.setState(STOPPED);
+                instance.setDeleted(true);
+            });
         job.setDeleted(delete);
         streamingJobRepo.save(job);
     }

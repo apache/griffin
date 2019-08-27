@@ -47,17 +47,13 @@ case class HiveBatchDataConnector(@transient sparkSession: SparkSession,
   val wheres = whereString.split(",").map(_.trim).filter(_.nonEmpty)
 
   def data(ms: Long): (Option[DataFrame], TimeRange) = {
-    val dfOpt = try {
+    val dfOpt = {
       val dtSql = dataSql
       info(dtSql)
       val df = sparkSession.sql(dtSql)
       val dfOpt = Some(df)
       val preDfOpt = preProcess(dfOpt, ms)
       preDfOpt
-    } catch {
-      case e: Throwable =>
-        error(s"load hive table ${concreteTableName} fails: ${e.getMessage}", e)
-        None
     }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))

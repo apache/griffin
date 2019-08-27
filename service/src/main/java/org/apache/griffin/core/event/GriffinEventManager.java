@@ -19,15 +19,15 @@ under the License.
 
 package org.apache.griffin.core.event;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @Component
 public class GriffinEventManager {
@@ -43,11 +43,11 @@ public class GriffinEventManager {
     void initializeListeners() {
         List<GriffinHook> eventListeners = new ArrayList<>();
         applicationContext.getBeansOfType(GriffinHook.class)
-                .forEach((beanName, listener) -> {
-                    if (enabledListeners.contains(beanName)) {
-                        eventListeners.add(listener);
-                    }
-                });
+            .forEach((beanName, listener) -> {
+                if (enabledListeners.contains(beanName)) {
+                    eventListeners.add(listener);
+                }
+            });
         this.eventListeners = eventListeners;
     }
 

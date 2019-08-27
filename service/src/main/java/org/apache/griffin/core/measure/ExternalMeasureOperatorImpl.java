@@ -55,9 +55,9 @@ public class ExternalMeasureOperatorImpl implements MeasureOperator {
         ExternalMeasure latestMeasure = (ExternalMeasure) measure;
         validateMeasure(latestMeasure);
         ExternalMeasure originMeasure = measureRepo.findOne(
-                latestMeasure.getId());
+            latestMeasure.getId());
         VirtualJob vj = genVirtualJob(latestMeasure,
-                originMeasure.getVirtualJob());
+            originMeasure.getVirtualJob());
         latestMeasure.setVirtualJob(vj);
         measure = measureRepo.save(latestMeasure);
         return measure;

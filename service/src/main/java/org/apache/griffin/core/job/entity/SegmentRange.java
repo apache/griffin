@@ -17,7 +17,6 @@ specific language governing permissions and limitations
 under the License.
 */
 
-
 package org.apache.griffin.core.job.entity;
 
 import javax.persistence.Column;
@@ -34,7 +33,6 @@ public class SegmentRange extends AbstractAuditableEntity {
     private String begin = "-1h";
 
     private String length = "1h";
-
 
     public String getBegin() {
         return begin;

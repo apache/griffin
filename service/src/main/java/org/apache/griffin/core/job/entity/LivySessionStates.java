@@ -127,7 +127,7 @@ public class LivySessionStates {
 
     public static boolean isActive(State state) {
         if (UNKNOWN.equals(state) || STOPPED.equals(state) || NOT_FOUND.equals
-                (state) || FOUND.equals(state)) {
+            (state) || FOUND.equals(state)) {
             // set UNKNOWN isActive() as false.
             return false;
         } else if (FINDING.equals(state)) {
@@ -143,8 +143,8 @@ public class LivySessionStates {
             return "COMPLETE";
         }
         if (UNKNOWN.equals(state) || NOT_FOUND.equals(state)
-                || FOUND.equals(state) || sessionState == null
-                || !sessionState.isActive()) {
+            || FOUND.equals(state) || sessionState == null
+            || !sessionState.isActive()) {
             return "ERROR";
         }
         return "NORMAL";
@@ -153,9 +153,9 @@ public class LivySessionStates {
 
     public static boolean isHealthy(State state) {
         return !(State.ERROR.equals(state) || State.DEAD.equals(state)
-                || State.SHUTTING_DOWN.equals(state)
-                || State.FINDING.equals(state)
-                || State.NOT_FOUND.equals(state)
-                || State.FOUND.equals(state));
+            || State.SHUTTING_DOWN.equals(state)
+            || State.FINDING.equals(state)
+            || State.NOT_FOUND.equals(state)
+            || State.FOUND.equals(state));
     }
 }

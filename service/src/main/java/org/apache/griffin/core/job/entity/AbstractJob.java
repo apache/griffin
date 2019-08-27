@@ -57,20 +57,20 @@ import org.slf4j.LoggerFactory;
 @Table(name = "job")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
-        property = "job.type")
+    property = "job.type")
 @JsonSubTypes({@JsonSubTypes.Type(value = BatchJob.class, name = "batch"),
-        @JsonSubTypes.Type(
-                value = StreamingJob.class,
-                name = "streaming"),
-        @JsonSubTypes.Type(
-                value = VirtualJob.class,
-                name = "virtual")})
+    @JsonSubTypes.Type(
+        value = StreamingJob.class,
+        name = "streaming"),
+    @JsonSubTypes.Type(
+        value = VirtualJob.class,
+        name = "virtual")})
 @DiscriminatorColumn(name = "type")
 public abstract class AbstractJob extends AbstractAuditableEntity {
     private static final long serialVersionUID = 7569493377868453677L;
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(AbstractJob.class);
+        .getLogger(AbstractJob.class);
 
     protected Long measureId;
 
@@ -107,7 +107,7 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
-            CascadeType.REMOVE, CascadeType.MERGE})
+        CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "job_id")
     private List<JobDataSegment> segments = new ArrayList<>();
 
@@ -236,8 +236,8 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
     public void load() throws IOException {
         if (!StringUtils.isEmpty(predicateConfig)) {
             this.configMap = JsonUtil.toEntity(predicateConfig,
-                    new TypeReference<Map<String, Object>>() {
-                    });
+                new TypeReference<Map<String, Object>>() {
+                });
         }
     }
 
@@ -264,7 +264,6 @@ public abstract class AbstractJob extends AbstractAuditableEntity {
         this.segments = segments;
         this.deleted = deleted;
     }
-
 
     AbstractJob(String jobName, Long measureId, String metricName) {
         this.jobName = jobName;

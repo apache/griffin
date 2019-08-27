@@ -26,7 +26,10 @@ import org.apache.griffin.measure.utils.ParamUtil._
 /**
   * sink metric and record to console, for debug
   */
-case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: Long) extends Sink {
+case class ConsoleSink(
+                        config: Map[String, Any],
+                        metricName: String,
+                        timeStamp: Long) extends Sink {
 
   val block: Boolean = true
 

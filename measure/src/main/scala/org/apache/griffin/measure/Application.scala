@@ -118,7 +118,7 @@ object Application extends Loggable {
     }
   }
 
-  private def readParamFile[T <: Param](file: String)(implicit m : ClassTag[T]): Try[T] = {
+  def readParamFile[T <: Param](file: String)(implicit m : ClassTag[T]): Try[T] = {
     val paramReader = ParamReaderFactory.getParamReader(file)
     paramReader.readConfig[T]
   }

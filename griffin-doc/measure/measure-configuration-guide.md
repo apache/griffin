@@ -83,7 +83,7 @@ Above lists environment parameters.
 - **griffin.checkpoint**: This field configures list of griffin checkpoint parameters, multiple cache ways are supported. It is only for streaming dq case. Details of info cache configuration [here](#griffin-checkpoint).
 
 ### <a name="sinks"></a>Sinks
-- **type**: Metrics and records sink type, "console", "hdfs", "http", "mongo". 
+- **type**: Metrics and records sink type, "console", "hdfs", "http", "mongo", "custom". 
 - **config**: Configure parameters of each sink type.
 	+ console sink (aliases: "log")
 		* max.log.lines: the max lines of log.
@@ -98,6 +98,12 @@ Above lists environment parameters.
         * url: url of mongo db.
         * database: database name.
         * collection: collection name. 
+    + custom sink
+        * class: class name for user-provided data sink implementation
+        it should be implementing org.apache.griffin.measure.sink.Sink trait and have static method with signature
+		    ```def apply(ctx: SinkContext): Sink```. 
+        User-provided data sink should be present in Spark job's class path, by providing custom jar as -jar parameter
+		    to spark-submit or by adding to "jars" list in sparkProperties.json.
 
 ### <a name="griffin-checkpoint"></a>Griffin Checkpoint
 - **type**: Griffin checkpoint type, "zk" for zookeeper checkpoint.
@@ -238,10 +244,30 @@ Above lists DQ job configure parameters.
     * num: the duplicate number name in metric, optional.
     * duplication.array: optional, if set as a non-empty string, the duplication metric will be computed, and the group metric name is this string.
     * with.accumulate: optional, default is true, if set as false, in streaming mode, the data set will not compare with old data to check distinctness.
+  + uniqueness dq type detail configuration
+    * source: name of data source to measure uniqueness.
+    * target: name of data source to compare with. It is always the same as source, or more than source.
+    * unique: the unique count name in metric, optional.
+    * total: the total count name in metric, optional.
+    * dup: the duplicate count name in metric, optional.
+    * num: the duplicate number name in metric, optional.
+    * duplication.array: optional, if set as a non-empty string, the duplication metric will be computed, and the group metric name is this string.
+  + completeness dq type detail configuration
+    * source: name of data source to measure completeness.
+    * total: name of data source to compare with. It is always the same as source, or more than source.
+    * complete: the column name in metric, optional. The number of not null values.
+    * incomplete: the column name in metric, optional. The number of null values.
   + timeliness dq type detail configuration
     * source: name of data source to measure timeliness.
     * latency: the latency column name in metric, optional.
+    * total: column name, optional.
+    * avg: column name, optional. The average latency.
+    * step: column nmae, optional. The histogram where "bin" is step=floor(latency/step.size).
+    * count: column name, optional. The number of the same latencies in the concrete step.
+    * percentile: column name, optional.
     * threshold: optional, if set as a time string like "1h", the items with latency more than 1 hour will be record.
+    * step.size: optional, used to build the histogram of latencies, in milliseconds (ex. "100").
+    * percentile.values: optional, used to compute the percentile metrics, values between 0 and 1. For instance, We can see fastest and slowest latencies if set [0.1, 0.9].
 - **cache**: Cache output dataframe. Optional, valid only for "spark-sql" and "df-ops" mode. Defaults to `false` if not specified.
 - **out**: List of output sinks for the job.
   + Metric output.

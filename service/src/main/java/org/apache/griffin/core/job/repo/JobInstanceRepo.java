@@ -30,9 +30,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface JobInstanceRepo
-        extends CrudRepository<JobInstanceBean, Long> {
+    extends CrudRepository<JobInstanceBean, Long> {
 
     JobInstanceBean findByPredicateName(String name);
+
+    @Query("select s from JobInstanceBean s where s.id = ?1")
+    JobInstanceBean findByInstanceId(Long id);
 
     @Query("select s from JobInstanceBean s where s.job.id = ?1")
     List<JobInstanceBean> findByJobId(Long jobId, Pageable pageable);
@@ -45,9 +48,11 @@ public interface JobInstanceRepo
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @Query("delete from JobInstanceBean j " +
-            "where j.expireTms <= ?1 and j.deleted = false ")
+        "where j.expireTms <= ?1 and j.deleted = false ")
     int deleteByExpireTimestamp(Long expireTms);
 
     @Query("select DISTINCT s from JobInstanceBean s where s.state in ?1")
     List<JobInstanceBean> findByActiveState(State[] states);
+
+    List<JobInstanceBean> findByTriggerKey(String triggerKey);
 }

@@ -21,9 +21,10 @@ package org.apache.griffin.measure.step.builder.dsl.transform
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
 import org.apache.griffin.measure.configuration.enums._
-import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
+import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.dsl.expr.Expr
+import org.apache.griffin.measure.step.write.{MetricWriteStep, RecordWriteStep, WriteStep}
 
 trait Expr2DQSteps extends Loggable with Serializable {
 
@@ -31,7 +32,6 @@ trait Expr2DQSteps extends Loggable with Serializable {
   protected val emptyMap = Map[String, Any]()
 
   def getDQSteps(): Seq[DQStep]
-
 }
 
 /**

@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HiveMetaStoreProxy {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(HiveMetaStoreProxy.class);
+        .getLogger(HiveMetaStoreProxy.class);
 
     @Value("${hive.metastore.uris}")
     private String uris;
@@ -60,7 +60,7 @@ public class HiveMetaStoreProxy {
         HiveConf hiveConf = new HiveConf();
         hiveConf.set("hive.metastore.local", "false");
         hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES,
-                3);
+            3);
         hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
         hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);

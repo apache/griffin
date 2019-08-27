@@ -37,4 +37,6 @@ public interface MetricService {
     ResponseEntity addMetricValues(List<MetricValue> values);
 
     ResponseEntity<?> deleteMetricValues(String metricName);
+
+    MetricValue findMetric(Long id);
 }
