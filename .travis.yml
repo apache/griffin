@@ -14,6 +14,13 @@
 
 language: java scala node_js
 
+services:
+  - docker
+
+env:
+  - COMPOSE_FILE=griffin-doc/docker/compose/docker-compose-batch.yml
+
+
 jdk:
   - oraclejdk8
 scala:
@@ -29,6 +36,13 @@ cache:
 install:
   - npm install -g bower
 
+before_script:
+  - docker-compose up -d
+
+
 # keep 30, need change according to ci logs.
-script: travis_wait 30 mvn clean verify -q
+script:
+  - export MAVEN_SKIP_RC=true
+  - export MAVEN_OPTS="-Xms500m -Xmx1g -XX:MaxPermSize=256m -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+  - mvn -B clean test -Dlogging.level.org.springframework=WARN
 
