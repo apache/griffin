@@ -62,6 +62,7 @@ import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +75,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         .getLogger(BatchJobOperatorImpl.class);
 
     @Autowired
+    @Qualifier("schedulerFactoryBean")
     private SchedulerFactoryBean factory;
     @Autowired
     private JobInstanceRepo instanceRepo;
@@ -309,7 +311,7 @@ public class BatchJobOperatorImpl implements JobOperator {
             boolean status = pauseJobInstance(instance, deletedInstances);
             pauseStatus = pauseStatus && status;
         }
-        instanceRepo.save(deletedInstances);
+        instanceRepo.saveAll(deletedInstances);
         return pauseStatus;
     }
 

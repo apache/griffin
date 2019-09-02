@@ -17,19 +17,20 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.griffin.core.measure;
+package org.apache.griffin.core.job.repo;
 
-import java.util.List;
-import java.util.Map;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-public interface MeasureOrgService {
-
-    List<String> getOrgs();
-
-    List<String> getMetricNameListByOrg(String org);
-
-    Map<String, List<String>> getMeasureNamesGroupByOrg();
-
-    Map<String, Map<String, List<Map<String, Object>>>>
-    getMeasureWithJobDetailsGroupByOrg(Map<String, List<Map<String, Object>>> jobDetailsGroupByMeasure);
+@NoRepositoryBean
+public interface BaseJpaRepository<T, ID> extends JpaRepository<T, ID> {
+    /**
+     * This method is to make findOne method from spring boot 1.5.x compatible with spring 2.x
+     *
+     * @param id id
+     * @return object of specified id, return null if cannot find the id
+     */
+    default T findOne(ID id) {
+        return (T) findById(id).orElse(null);
+    }
 }

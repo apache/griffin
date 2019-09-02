@@ -91,6 +91,7 @@ import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -113,6 +114,7 @@ public class JobServiceImpl implements JobService {
     static final String STOP = "stop";
 
     @Autowired
+    @Qualifier("schedulerFactoryBean")
     private SchedulerFactoryBean factory;
     @Autowired
     private JobInstanceRepo instanceRepo;
@@ -685,9 +687,9 @@ public class JobServiceImpl implements JobService {
         JobKey jobKey = jobKey(job.getName(), job.getGroup());
         if (scheduler.checkExists(jobKey)) {
             Trigger trigger = TriggerBuilder.newTrigger()
-                .forJob(jobKey)
-                .startNow()
-                .build();
+                    .forJob(jobKey)
+                    .startNow()
+                    .build();
             scheduler.scheduleJob(trigger);
             return trigger.getKey().toString();
         } else {

@@ -31,7 +31,7 @@ git:
   quiet: true
 cache:
   directories:
-  - $HOME/.m2
+    - $HOME/.m2
 
 install:
   - npm install -g bower

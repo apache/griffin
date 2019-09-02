@@ -49,6 +49,7 @@ import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,7 @@ public class StreamingJobOperatorImpl implements JobOperator {
     @Autowired
     private JobInstanceRepo instanceRepo;
     @Autowired
+    @Qualifier("schedulerFactoryBean")
     private SchedulerFactoryBean factory;
     @Autowired
     private LivyTaskSubmitHelper livyTaskSubmitHelper;
