@@ -16,9 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed, inject} from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
+import { AppModule } from '../../../../app.module';
 import {PrStep1Component} from './step1.component';
+import { ProfilingStep1 } from '../pr.component';
+import { ServiceService } from '../../../../service/service.service';
 
 describe('PrStep1Component', () => {
   let component: PrStep1Component;
@@ -26,7 +30,9 @@ describe('PrStep1Component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PrStep1Component]
+      imports: [ HttpClientTestingModule, AppModule ],
+      declarations: [],
+      providers: [ ServiceService ]
     })
       .compileComponents();
   }));
@@ -34,10 +40,22 @@ describe('PrStep1Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PrStep1Component);
     component = fixture.componentInstance;
+    component.step1 = new ProfilingStep1();
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
-    expect(component).toBeTruthy();
-  });
+  it(
+    'should be created', 
+    inject(
+      [HttpTestingController, ServiceService],
+      (httpMock: HttpTestingController, serviceService: ServiceService) => {
+
+        const req = httpMock.expectOne( serviceService.config.uri.dbtablenames );
+        expect( req.request.method ).toBe("GET");
+        req.flush( [] );
+
+        expect(component).toBeTruthy();
+      }
+    )
+  );
 });

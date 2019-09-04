@@ -19,6 +19,7 @@ under the License.
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
+import { AppModule } from '../../../app.module';
 import {ConfigurationComponent} from './configuration.component';
 
 describe('ConfigurationComponent', () => {
@@ -27,7 +28,8 @@ describe('ConfigurationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ConfigurationComponent]
+      imports: [ AppModule ],
+      declarations: []
     })
       .compileComponents();
   }));
@@ -35,7 +37,15 @@ describe('ConfigurationComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ConfigurationComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    component.location = "";
+    component.data = {
+      where: "",
+      timezone: "",
+      num: 1,
+      timetype: "day",
+      needpath: false,
+      path: ""
+    };
   });
 
   it('should be created', () => {

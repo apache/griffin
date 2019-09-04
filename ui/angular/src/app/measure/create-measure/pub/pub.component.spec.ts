@@ -16,17 +16,22 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed, inject} from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
+import { AppModule } from '../../../app.module';
 import {PubComponent} from './pub.component';
+import { ServiceService } from '../../../service/service.service';
 
-describe('PrComponent', () => {
+describe('PubComponent', () => {
   let component: PubComponent;
   let fixture: ComponentFixture<PubComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PubComponent]
+      imports: [ HttpClientTestingModule, AppModule ],
+      declarations: [],
+      providers: [ ServiceService ]
     })
       .compileComponents();
   }));
@@ -37,7 +42,18 @@ describe('PrComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
-    expect(component).toBeTruthy();
-  });
+  it(
+    'should be created', 
+    inject(
+      [HttpTestingController, ServiceService],
+      (httpMock: HttpTestingController, serviceService: ServiceService) => {
+
+        const req = httpMock.expectOne( serviceService.config.uri.dataassetlist );
+        expect( req.request.method ).toBe("GET");
+        req.flush( [] );
+
+        expect(component).toBeTruthy();
+      }
+    )
+  );
 });

@@ -19,11 +19,12 @@ under the License.
 import {TestBed, inject} from '@angular/core/testing';
 
 import {ServiceService} from './service.service';
+import { LoaderService } from '../loader/loader.service';
 
 describe('ServiceService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ServiceService]
+      providers: [ServiceService, LoaderService]
     });
   });
 

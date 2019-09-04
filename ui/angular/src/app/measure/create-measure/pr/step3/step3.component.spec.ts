@@ -18,7 +18,9 @@ under the License.
 */
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
+import { AppModule } from '../../../../app.module';
 import {PrStep3Component} from './step3.component';
+import { ProfilingStep1, ProfilingStep2, ProfilingStep3 } from '../pr.component';
 
 describe('PrStep3Component', () => {
   let component: PrStep3Component;
@@ -26,7 +28,8 @@ describe('PrStep3Component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PrStep3Component]
+      imports: [ AppModule ],
+      declarations: [],
     })
       .compileComponents();
   }));
@@ -34,7 +37,9 @@ describe('PrStep3Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PrStep3Component);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    component.step1 = new ProfilingStep1();
+    component.step2 = new ProfilingStep2();
+    component.step3 = new ProfilingStep3();
   });
 
   it('should be created', () => {

@@ -16,17 +16,21 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed, inject} from '@angular/core/testing';
 
+import { AppModule } from '../app.module';
 import {LoaderComponent} from './loader.component';
+import { LoaderService } from './loader.service';
 
-describe('CreateMeasureComponent', () => {
+describe('LoaderComponent', () => {
   let component: LoaderComponent;
   let fixture: ComponentFixture<LoaderComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [LoaderComponent]
+      imports: [ AppModule ],
+      declarations: [],
+      providers: [ LoaderService ]
     })
       .compileComponents();
   }));
@@ -37,7 +41,7 @@ describe('CreateMeasureComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
+  it('should be created', inject([LoaderService], () => {
     expect(component).toBeTruthy();
-  });
+  }));
 });
