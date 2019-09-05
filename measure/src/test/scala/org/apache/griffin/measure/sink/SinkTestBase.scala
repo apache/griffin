@@ -18,7 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
-import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
@@ -29,8 +28,9 @@ import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext}
+import org.apache.griffin.measure.SparkSuiteBase
 
-trait SinkTestBase extends FlatSpec with Matchers with DataFrameSuiteBase with Loggable {
+trait SinkTestBase extends FlatSpec with Matchers with SparkSuiteBase with Loggable {
 
   var sinkParams: Seq[SinkParam]
 
@@ -55,7 +55,7 @@ trait SinkTestBase extends FlatSpec with Matchers with DataFrameSuiteBase with L
     val rows = arr.map { i =>
       Row(i.toLong, s"name_$i", if (i % 2 == 0) "man" else "women", i + 15)
     }
-    val rowRdd = sqlContext.sparkContext.parallelize(rows)
-    sqlContext.createDataFrame(rowRdd, schema)
+    val rowRdd = spark.sparkContext.parallelize(rows)
+    spark.createDataFrame(rowRdd, schema)
   }
 }

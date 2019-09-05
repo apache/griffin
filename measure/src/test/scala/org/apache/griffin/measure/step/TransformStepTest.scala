@@ -18,16 +18,16 @@ under the License.
 */
 package org.apache.griffin.measure.step
 
-import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import org.scalatest._
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.enums.BatchProcessType
 import org.apache.griffin.measure.context.ContextId
 import org.apache.griffin.measure.context.DQContext
+import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.step.transform.TransformStep
 
-class TransformStepTest extends FlatSpec with Matchers with DataFrameSuiteBase with Loggable {
+class TransformStepTest extends FlatSpec with Matchers with SparkSuiteBase with Loggable {
 
   case class DualTransformStep(name: String,
                                duration: Int,
