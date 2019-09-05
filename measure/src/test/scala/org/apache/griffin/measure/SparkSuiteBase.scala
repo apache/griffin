@@ -18,6 +18,9 @@ under the License.
 */
 package org.apache.griffin.measure
 
+import java.io.File
+
+import org.apache.commons.io.FileUtils
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfterAll, FlatSpec}
@@ -32,6 +35,7 @@ trait SparkSuiteBase extends FlatSpec with BeforeAndAfterAll {
 
   override def beforeAll() {
     super.beforeAll()
+    cleanTestHiveData()
     this.spark = SparkSession.builder
       .master("local[4]")
       .appName("Griffin Job Suite")
@@ -39,9 +43,6 @@ trait SparkSuiteBase extends FlatSpec with BeforeAndAfterAll {
       .enableHiveSupport()
       .getOrCreate()
     sc = this.spark.sparkContext
-
-    val spark = this.spark
-    import spark.implicits._
   }
 
   override def afterAll() {
@@ -51,8 +52,20 @@ trait SparkSuiteBase extends FlatSpec with BeforeAndAfterAll {
         spark.stop()
       }
       spark = null
+      cleanTestHiveData()
     } finally {
       super.afterAll()
+    }
+  }
+
+  def cleanTestHiveData(): Unit = {
+    val metastoreDB = new File("metastore_db")
+    if(metastoreDB.exists) {
+      FileUtils.forceDelete(metastoreDB)
+    }
+    val sparkWarehouse = new File("spark-warehouse")
+    if(sparkWarehouse.exists) {
+      FileUtils.forceDelete(sparkWarehouse)
     }
   }
 }
