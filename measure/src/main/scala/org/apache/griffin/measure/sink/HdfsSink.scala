@@ -22,7 +22,8 @@ import java.util.Date
 
 import org.apache.spark.rdd.RDD
 
-import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
+import org.apache.griffin.measure.utils.HdfsUtil
+import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
