@@ -18,7 +18,6 @@ under the License.
 */
 package org.apache.griffin.measure.transformations
 
-import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import org.apache.spark.sql.DataFrame
 import org.scalatest._
 
@@ -27,12 +26,11 @@ import org.apache.griffin.measure.configuration.enums.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext}
 import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
+import org.apache.griffin.measure.SparkSuiteBase
 
 case class AccuracyResult(total: Long, miss: Long, matched: Long, matchedFraction: Double)
 
-class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with DataFrameSuiteBase {
-  import spark.implicits._
-
+class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with SparkSuiteBase {
   private val EMPTY_PERSON_TABLE = "empty_person"
   private val PERSON_TABLE = "person"
 
@@ -100,6 +98,8 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
       rule = "source.name = target.name"
     )
 
+    val spark = this.spark
+    import spark.implicits._
     val res = getRuleResults(dqContext, accuracyRule)
       .as[AccuracyResult]
       .collect()

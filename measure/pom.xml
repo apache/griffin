@@ -45,7 +45,6 @@ under the License.
         <log4j.version>1.2.16</log4j.version>
         <curator.version>2.10.0</curator.version>
         <scalamock.version>3.6.0</scalamock.version>
-        <spark.testing.version>0.9.0</spark.testing.version>
         <mysql.java.version>5.1.47</mysql.java.version>
         <cassandra.connector.version>2.4.1</cassandra.connector.version>
     </properties>
@@ -68,6 +67,12 @@ under the License.
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -173,13 +178,6 @@ under the License.
             <scope>test</scope>
         </dependency>
 
-        <!--spark testing-->
-        <dependency>
-            <groupId>com.holdenkarau</groupId>
-            <artifactId>spark-testing-base_${scala.binary.version}</artifactId>
-            <version>${spark.version}_${spark.testing.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

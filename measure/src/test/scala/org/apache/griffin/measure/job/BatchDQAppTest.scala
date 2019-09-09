@@ -19,21 +19,15 @@ under the License.
 package org.apache.griffin.measure.job
 
 import scala.util.{Failure, Success, Try}
-
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
-import org.scalatest.BeforeAndAfterAll
-
 import org.apache.griffin.measure.Application.readParamFile
+import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.configuration.dqdefinition.EnvConfig
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 
-class BatchDQAppTest extends DQAppTest with BeforeAndAfterAll {
+class BatchDQAppTest extends DQAppTest with SparkSuiteBase {
 
   override def beforeAll(): Unit = {
-    super.beforeAll()
-
     envParam = readParamFile[EnvConfig](getConfigFilePath("/env-batch.json")) match {
       case Success(p) => p
       case Failure(ex) =>
@@ -45,11 +39,13 @@ class BatchDQAppTest extends DQAppTest with BeforeAndAfterAll {
 
     Try {
       // build spark 2.0+ application context
-      var conf = new SparkConf().setAppName("BatchDQApp Test")
+      conf.setAppName("BatchDQApp Test")
       conf.setAll(sparkParam.getConfig)
       conf.set("spark.sql.crossJoin.enabled", "true")
 
-      sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
+      super.beforeAll()
+
+      sparkSession = spark
       val logLevel = getGriffinLogLevel()
       sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
       griffinLogger.setLevel(logLevel)
@@ -60,15 +56,13 @@ class BatchDQAppTest extends DQAppTest with BeforeAndAfterAll {
     }
   }
 
-  override def afterAll(): Unit = {
-    super.afterAll()
-    sparkSession.stop()
-  }
-
   def runAndCheckResult(metrics: Map[String, Any]): Unit = {
-    val runResult = dqApp.run
-    assert(runResult.isSuccess)
-    assert(runResult.get)
+    dqApp.run match {
+      case Success(ret) => assert(ret)
+      case Failure(ex) =>
+        error(s"process run error: ${ex.getMessage}", ex)
+        throw ex
+    }
 
     // check Result Metrics
     val dqContext = dqApp.asInstanceOf[BatchDQApp].dqContext
