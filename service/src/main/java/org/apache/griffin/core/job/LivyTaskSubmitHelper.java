@@ -51,6 +51,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.kerberos.client.KerberosRestTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -247,8 +248,14 @@ public class LivyTaskSubmitHelper {
                 HttpEntity<String> springEntity = new HttpEntity<>(toJsonWithFormat(livyConfMap), headers);
                 result = restTemplate.postForObject(uri, springEntity, String.class);
                 LOGGER.info(result);
+            } catch (HttpClientErrorException e) {
+                LOGGER.error("Post to livy ERROR. \n  response status : " + e.getMessage()
+                    + "\n  response header : " + e.getResponseHeaders()
+                    + "\n  response body : " + e.getResponseBodyAsString());
             } catch (JsonProcessingException e) {
-                LOGGER.error("Post to livy ERROR. \n {}", e.getMessage());
+                LOGGER.error("Json Parsing failed, {}", e.getMessage(), e);
+            } catch (Exception e) {
+                LOGGER.error("Post to livy ERROR. \n {}", e);
             }
             return result;
         } else {
@@ -261,8 +268,14 @@ public class LivyTaskSubmitHelper {
             HttpEntity<String> springEntity = null;
             try {
                 springEntity = new HttpEntity<>(toJsonWithFormat(livyConfMap), headers);
+            } catch (HttpClientErrorException e) {
+                LOGGER.error("Post to livy ERROR. \n  response status : " + e.getMessage()
+                    + "\n  response header : " + e.getResponseHeaders()
+                    + "\n  response body : " + e.getResponseBodyAsString());
             } catch (JsonProcessingException e) {
                 LOGGER.error("Json Parsing failed, {}", e.getMessage(), e);
+            } catch (Exception e) {
+                LOGGER.error("Post to livy ERROR. {}", e.getMessage(), e);
             }
             String result = restTemplate.postForObject(uri, springEntity, String.class);
             LOGGER.info(result);
