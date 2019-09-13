@@ -22,7 +22,8 @@ import java.util.Date
 
 import org.apache.spark.rdd.RDD
 
-import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
+import org.apache.griffin.measure.utils.HdfsUtil
+import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -99,7 +100,9 @@ case class HdfsSink(
   def log(rt: Long, msg: String): Unit = {
     try {
       val logStr = logWrap(rt, msg)
-      HdfsUtil.appendContent(LogFile, logStr)
+      HdfsUtil.withHdfsFile(LogFile) { out =>
+        out.write(logStr.getBytes("utf-8"))
+      }
     } catch {
       case e: Throwable => error(e.getMessage, e)
     }
@@ -188,8 +191,11 @@ case class HdfsSink(
 
   private def sinkRecords2Hdfs(hdfsPath: String, records: Iterable[String]): Unit = {
     try {
-      val recStr = records.mkString("\n")
-      HdfsUtil.writeContent(hdfsPath, recStr)
+      HdfsUtil.withHdfsFile(hdfsPath, false) { out =>
+        records.map { record =>
+          out.write((record + "\n").getBytes("utf-8"))
+        }
+      }
     } catch {
       case e: Throwable => error(e.getMessage, e)
     }
