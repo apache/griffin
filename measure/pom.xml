@@ -237,6 +237,9 @@ under the License.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.1.0</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -244,6 +247,11 @@ under the License.
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.apache.griffin.measure.Application</mainClass>
+                                </transformer>
+                            </transformers>
                             <relocations>
                                 <relocation>
                                     <pattern>org.apache.http</pattern>
