@@ -204,7 +204,6 @@ public class SparkSubmitJob implements Job {
         args.add(finalMeasureJson);
         args.add("raw,raw");
         livyConfMap.put("args", args);
-        livyConfMap.remove("name");
     }
 
     protected void saveJobInstance(JobDetail jd) throws SchedulerException,
