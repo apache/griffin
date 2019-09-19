@@ -183,6 +183,14 @@ under the License.
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.java.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+
+
         <dependency>
             <groupId>com.datastax.spark</groupId>
             <artifactId>spark-cassandra-connector_2.11</artifactId>
