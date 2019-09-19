@@ -145,7 +145,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
       uniqueRecordTransStep.parentSteps += groupTransStep
 
       // 7. unique metric
-      val uniqueTableName = "__uniqueMetric"
+      val uniqueTableName = ruleParam.getOutDfName()
       val uniqueColName = details.getStringOrKey(_unique)
       val uniqueSql = procType match {
         case BatchProcessType =>
