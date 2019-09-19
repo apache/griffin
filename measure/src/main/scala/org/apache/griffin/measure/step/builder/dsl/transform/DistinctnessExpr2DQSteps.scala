@@ -217,7 +217,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
       }
 
       // 8. distinct metric
-      val distTableName = "__distMetric"
+      val distTableName = ruleParam.getOutDfName()
       val distColName = details.getStringOrKey(_distinct)
       val distSql = {
         s"""
