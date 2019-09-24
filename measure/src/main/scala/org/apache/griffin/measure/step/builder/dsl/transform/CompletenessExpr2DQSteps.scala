@@ -88,11 +88,11 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val errorConfs: Seq[RuleErrorConfParam] = ruleParam.getErrorConfs
       var incompleteWhereClause: String = ""
       if (errorConfs.size == 0) {
-        // old completeness way
+        // without errorConfs
         val completeWhereClause = aliases.map(a => s"`${a}` IS NOT NULL").mkString(" AND ")
         incompleteWhereClause = s"NOT (${completeWhereClause})"
       } else {
-        // new completeness way
+        // with errorConfs
         incompleteWhereClause = this.getErrorConfCompleteWhereClause(errorConfs)
       }
 
