@@ -328,7 +328,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         } catch (SchedulerException e) {
             LOGGER.error("Failed to pause predicate job({},{}).", pGroup,
                     pName);
-            status = false;
+            return false;
         }
         return true;
     }
