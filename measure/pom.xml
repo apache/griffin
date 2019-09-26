@@ -46,6 +46,7 @@ under the License.
         <curator.version>2.10.0</curator.version>
         <scalamock.version>3.6.0</scalamock.version>
         <mysql.java.version>5.1.47</mysql.java.version>
+        <postgresql.version>42.2.8</postgresql.version>
         <cassandra.connector.version>2.4.1</cassandra.connector.version>
     </properties>
 
@@ -183,6 +184,14 @@ under the License.
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.java.version}</version>
         </dependency>
+      
+       <!--Connector for postgresql 11 42.2.8 -->
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>${postgresql.version}</version>
+</dependency>
+      
         <dependency>
             <groupId>com.datastax.spark</groupId>
             <artifactId>spark-cassandra-connector_2.11</artifactId>
