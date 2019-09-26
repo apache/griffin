@@ -228,6 +228,7 @@ case class RuleErrorConfParam( @JsonProperty("column.name") private val columnNa
   def getValues: Seq[String] = if (values != null) values else Nil
 
   def validate(): Unit = {
-    assert("regex".equals(getErrorType.get) || "enumeration".equals(getErrorType.get), "error error.conf type")
+    assert("regex".equalsIgnoreCase(getErrorType.get) ||
+      "enumeration".equalsIgnoreCase(getErrorType.get), "error error.conf type")
   }
 }
