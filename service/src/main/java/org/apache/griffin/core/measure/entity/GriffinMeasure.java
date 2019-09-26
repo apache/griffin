@@ -182,6 +182,7 @@ public class GriffinMeasure extends Measure {
     @PrePersist
     @PreUpdate
     public void save() throws JsonProcessingException {
+        super.save();
         if (ruleDescriptionMap != null) {
             this.ruleDescription = JsonUtil.toJson(ruleDescriptionMap);
         }
@@ -189,6 +190,7 @@ public class GriffinMeasure extends Measure {
 
     @PostLoad
     public void load() throws IOException {
+        super.load();
         if (!StringUtils.isEmpty(ruleDescription)) {
             this.ruleDescriptionMap = JsonUtil.toEntity(ruleDescription,
                 new TypeReference<Map<String, Object>>() {

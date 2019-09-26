@@ -75,9 +75,6 @@ under the License.
         </mailingList>
     </mailingLists>
 
-    <!--<pluginRepositories>-->
-    <!--</pluginRepositories>-->
-
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/griffin.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/griffin.git</developerConnection>
@@ -95,6 +92,16 @@ under the License.
         <module>measure</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
@@ -167,13 +174,7 @@ under the License.
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
 
-        </plugins>
     </build>
 
 </project>

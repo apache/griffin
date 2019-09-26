@@ -30,16 +30,19 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.griffin.core.exception.GriffinException;
-import org.apache.griffin.core.job.Predicator;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.apache.griffin.core.job.factory.PredicatorFactory;
-import org.apache.griffin.core.measure.entity.*;
+import org.apache.griffin.core.measure.entity.DataConnector;
+import org.apache.griffin.core.measure.entity.DataSource;
+import org.apache.griffin.core.measure.entity.ExternalMeasure;
+import org.apache.griffin.core.measure.entity.GriffinMeasure;
+import org.apache.griffin.core.measure.entity.Measure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MeasureUtil {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(MeasureUtil.class);
+        .getLogger(MeasureUtil.class);
 
     public static void validateMeasure(Measure measure) {
         if (measure instanceof GriffinMeasure) {
@@ -53,7 +56,7 @@ public class MeasureUtil {
     private static void validateGriffinMeasure(GriffinMeasure measure) {
         if (getConnectorNamesIfValid(measure) == null) {
             throw new GriffinException.BadRequestException
-                    (INVALID_CONNECTOR_NAME);
+                (INVALID_CONNECTOR_NAME);
         }
         if (!validatePredicates(measure)) {
             throw new GriffinException.BadRequestException(INVALID_MEASURE_PREDICATE);
@@ -62,7 +65,7 @@ public class MeasureUtil {
 
     private static boolean validatePredicates(GriffinMeasure measure) {
         for (DataSource dataSource : measure.getDataSources()) {
-            for (DataConnector dataConnector: dataSource.getConnectors()) {
+            for (DataConnector dataConnector : dataSource.getConnectors()) {
                 for (SegmentPredicate segmentPredicate : dataConnector.getPredicates()) {
                     try {
                         PredicatorFactory.newPredicateInstance(segmentPredicate);
@@ -78,7 +81,7 @@ public class MeasureUtil {
     private static void validateExternalMeasure(ExternalMeasure measure) {
         if (StringUtils.isBlank(measure.getMetricName())) {
             LOGGER.warn("Failed to create external measure {}. " +
-                    "Its metric name is blank.", measure.getName());
+                "Its metric name is blank.", measure.getName());
             throw new GriffinException.BadRequestException(MISSING_METRIC_NAME);
         }
     }
@@ -88,7 +91,7 @@ public class MeasureUtil {
         List<DataSource> sources = measure.getDataSources();
         for (DataSource source : sources) {
             source.getConnectors().stream().filter(dc -> dc.getName() != null)
-                    .forEach(dc -> sets.add(dc.getName()));
+                .forEach(dc -> sets.add(dc.getName()));
         }
         if (sets.size() == 0 || sets.size() < sources.size()) {
             LOGGER.warn("Connector names cannot be repeated or empty.");

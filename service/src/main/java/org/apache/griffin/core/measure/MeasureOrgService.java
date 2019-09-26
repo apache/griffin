@@ -31,7 +31,5 @@ public interface MeasureOrgService {
     Map<String, List<String>> getMeasureNamesGroupByOrg();
 
     Map<String, Map<String, List<Map<String, Object>>>>
-    getMeasureWithJobDetailsGroupByOrg(Map<String,
-            List<Map<String, Object>>>
-                                               jobDetailsGroupByMeasure);
+    getMeasureWithJobDetailsGroupByOrg(Map<String, List<Map<String, Object>>> jobDetailsGroupByMeasure);
 }

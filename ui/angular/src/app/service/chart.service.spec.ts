@@ -19,15 +19,16 @@ under the License.
 import {TestBed, inject} from '@angular/core/testing';
 
 import {ChartService} from './chart.service';
+import { LoaderService } from '../loader/loader.service';
 
 describe('ChartService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ChartService]
+      providers: [ChartService, LoaderService]
     });
   });
 
-  it('should be created', inject([ChartService], (service: ChartService) => {
+  it('should be created', inject([ChartService, LoaderService], (service: ChartService, loaderService: LoaderService) => {
     expect(service).toBeTruthy();
   }));
 });

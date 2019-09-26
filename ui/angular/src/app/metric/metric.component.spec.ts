@@ -16,9 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed, inject} from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
+import { AppModule } from '../app.module';
+import { ServiceService } from '../service/service.service';
 import {MetricComponent} from './metric.component';
+import { LoaderService } from '../loader/loader.service';
+import { ChartService } from '../service/chart.service';
 
 describe('MetricComponent', () => {
   let component: MetricComponent;
@@ -26,7 +31,9 @@ describe('MetricComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [MetricComponent]
+      imports: [ HttpClientTestingModule, AppModule ],
+      declarations: [],
+      providers: [ LoaderService, ServiceService, ChartService ]
     })
       .compileComponents();
   }));
@@ -37,7 +44,18 @@ describe('MetricComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
-    expect(component).toBeTruthy();
-  });
+  it(
+    'should be created', 
+    inject(
+      [HttpTestingController, ServiceService],
+      (httpMock: HttpTestingController, serviceService: ServiceService) => {
+
+        const req = httpMock.expectOne( serviceService.config.uri.dashboard );
+        expect( req.request.method ).toBe("GET");
+        req.flush( [] );
+
+        expect(component).toBeTruthy();
+      }
+    )
+  );
 });

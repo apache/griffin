@@ -27,10 +27,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
+/**
+ * Auto-wiring SpringBeanJobFactory is special  BeanJobFactory that adds auto-wiring support against
+ * {@link SpringBeanJobFactory} allowing you to inject properties from the scheduler context, job data map
+ * and trigger data entries into the job bean.
+ *
+ * @see SpringBeanJobFactory
+ * @see ApplicationContextAware
+ */
 public final class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
-        implements ApplicationContextAware {
+    implements ApplicationContextAware {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(AutowiringSpringBeanJobFactory.class);
+        .getLogger(AutowiringSpringBeanJobFactory.class);
 
     private transient AutowireCapableBeanFactory beanFactory;
 
@@ -41,12 +49,10 @@ public final class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
 
     @Override
     protected Object createJobInstance(final TriggerFiredBundle bundle) {
-
         try {
             final Object job = super.createJobInstance(bundle);
             beanFactory.autowireBean(job);
             return job;
-
         } catch (Exception e) {
             LOGGER.error("fail to create job instance. {}", e);
         }

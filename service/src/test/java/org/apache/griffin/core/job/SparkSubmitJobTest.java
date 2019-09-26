@@ -19,16 +19,6 @@ under the License.
 
 package org.apache.griffin.core.job;
 
-import static org.apache.griffin.core.util.EntityMocksHelper.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Properties;
-
 import org.apache.griffin.core.config.PropertiesConfig;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.SegmentPredicate;
@@ -40,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +39,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Properties;
+
+import static org.apache.griffin.core.util.EntityMocksHelper.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 
 
 @RunWith(SpringRunner.class)
@@ -151,9 +151,6 @@ public class SparkSubmitJobTest {
         given(context.getJobDetail()).willReturn(jd);
         given(jobInstanceRepo.findByPredicateName(Matchers.anyString()))
                 .willReturn(instance);
-        Whitebox.setInternalState(sparkSubmitJob, "restTemplate", restTemplate);
-        given(restTemplate.postForObject(Matchers.anyString(), Matchers.any(),
-                Matchers.any())).willReturn(result);
 
         sparkSubmitJob.execute(context);
 

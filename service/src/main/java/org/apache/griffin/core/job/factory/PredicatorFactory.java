@@ -19,6 +19,11 @@ under the License.
 
 package org.apache.griffin.core.job.factory;
 
+import static org.apache.griffin.core.exception.GriffinExceptionMessage.PREDICATE_TYPE_NOT_FOUND;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.griffin.core.exception.GriffinException;
 import org.apache.griffin.core.job.FileExistPredicator;
 import org.apache.griffin.core.job.Predicator;
@@ -26,14 +31,9 @@ import org.apache.griffin.core.job.entity.SegmentPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import static org.apache.griffin.core.exception.GriffinExceptionMessage.PREDICATE_TYPE_NOT_FOUND;
-
 public class PredicatorFactory {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(PredicatorFactory.class);
+        .getLogger(PredicatorFactory.class);
 
     public static Predicator newPredicateInstance(SegmentPredicate segPredicate) {
         Predicator predicate;
@@ -63,7 +63,7 @@ public class PredicatorFactory {
             throw new GriffinException.ServiceException(message, e);
         } catch (NoSuchMethodException e) {
             String message = "For predicate with type " + predicateClassName +
-                    " constructor with parameter of type " + SegmentPredicate.class.getName() + " not found";
+                " constructor with parameter of type " + SegmentPredicate.class.getName() + " not found";
             LOGGER.error(message, e);
             throw new GriffinException.ServiceException(message, e);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

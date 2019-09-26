@@ -19,23 +19,27 @@ under the License.
 package org.apache.griffin.measure.step.transform
 
 import org.apache.griffin.measure.context.DQContext
+import org.apache.griffin.measure.step.write.WriteStep
 
 /**
   * spark sql transform step
   */
-case class SparkSqlTransformStep(name: String,
-                                 rule: String,
-                                 details: Map[String, Any],
-                                 cache: Boolean = false
-                                ) extends TransformStep {
-
-  def execute(context: DQContext): Boolean = {
+case class SparkSqlTransformStep[T <: WriteStep](name: String,
+                                                 rule: String,
+                                                 details: Map[String, Any],
+                                                 writeStepOpt: Option[T] = None,
+                                                 cache: Boolean = false
+                                                ) extends TransformStep {
+  def doExecute(context: DQContext): Boolean = {
     val sqlContext = context.sqlContext
     try {
       val df = sqlContext.sql(rule)
       if (cache) context.dataFrameCache.cacheDataFrame(name, df)
       context.runTimeTableRegister.registerTable(name, df)
-      true
+      writeStepOpt match {
+        case Some(writeStep) => writeStep.execute(context)
+        case None => true
+      }
     } catch {
       case e: Throwable =>
         error(s"run spark sql [ ${rule} ] error: ${e.getMessage}", e)

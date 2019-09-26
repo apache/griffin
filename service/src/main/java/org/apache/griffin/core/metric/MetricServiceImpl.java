@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MetricServiceImpl implements MetricService {
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(MetricServiceImpl.class);
+        .getLogger(MetricServiceImpl.class);
 
     @Autowired
     private MeasureRepo<Measure> measureRepo;
@@ -71,9 +71,9 @@ public class MetricServiceImpl implements MetricService {
         List<AbstractJob> jobs = jobRepo.findByDeleted(false);
         List<Measure> measures = measureRepo.findByDeleted(false);
         Map<Long, Measure> measureMap = measures.stream().collect(Collectors
-                .toMap(Measure::getId, Function.identity()));
+            .toMap(Measure::getId, Function.identity()));
         Map<Long, List<AbstractJob>> jobMap = jobs.stream().collect(Collectors
-                .groupingBy(AbstractJob::getMeasureId, Collectors.toList()));
+            .groupingBy(AbstractJob::getMeasureId, Collectors.toList()));
         for (Map.Entry<Long, List<AbstractJob>> entry : jobMap.entrySet()) {
             Long measureId = entry.getKey();
             Measure measure = measureMap.get(measureId);
@@ -81,9 +81,9 @@ public class MetricServiceImpl implements MetricService {
             List<Metric> metrics = new ArrayList<>();
             for (AbstractJob job : jobList) {
                 List<MetricValue> metricValues = getMetricValues(job
-                        .getMetricName(), 0, 300, job.getCreatedDate());
+                    .getMetricName(), 0, 300, job.getCreatedDate());
                 metrics.add(new Metric(job.getMetricName(), measure.getDqType(),
-                        measure.getOwner(), metricValues));
+                    measure.getOwner(), metricValues));
             }
             metricMap.put(measure.getName(), metrics);
 
@@ -96,19 +96,19 @@ public class MetricServiceImpl implements MetricService {
                                              int size, long tmst) {
         if (offset < 0) {
             throw new GriffinException.BadRequestException
-                    (INVALID_METRIC_RECORDS_OFFSET);
+                (INVALID_METRIC_RECORDS_OFFSET);
         }
         if (size < 0) {
             throw new GriffinException.BadRequestException
-                    (INVALID_METRIC_RECORDS_SIZE);
+                (INVALID_METRIC_RECORDS_SIZE);
         }
         try {
             return metricStore.getMetricValues(metricName, offset, size, tmst);
         } catch (IOException e) {
             LOGGER.error("Failed to get metric values named {}. {}",
-                    metricName, e.getMessage());
+                metricName, e.getMessage());
             throw new GriffinException.ServiceException(
-                    "Failed to get metric values", e);
+                "Failed to get metric values", e);
         }
     }
 
@@ -123,11 +123,11 @@ public class MetricServiceImpl implements MetricService {
         } catch (JsonProcessingException e) {
             LOGGER.warn("Failed to parse metric value.", e.getMessage());
             throw new GriffinException.BadRequestException
-                    (INVALID_METRIC_VALUE_FORMAT);
+                (INVALID_METRIC_VALUE_FORMAT);
         } catch (IOException e) {
             LOGGER.error("Failed to add metric values", e);
             throw new GriffinException.ServiceException(
-                    "Failed to add metric values", e);
+                "Failed to add metric values", e);
         }
     }
 
@@ -138,19 +138,19 @@ public class MetricServiceImpl implements MetricService {
             return metricStore.deleteMetricValues(metricName);
         } catch (IOException e) {
             LOGGER.error("Failed to delete metric values named {}. {}",
-                    metricName, e.getMessage());
+                metricName, e.getMessage());
             throw new GriffinException.ServiceException(
-                    "Failed to delete metric values.", e);
+                "Failed to delete metric values.", e);
         }
     }
 
     @Override
     public MetricValue findMetric(Long id) {
         JobInstanceBean jobInstanceBean = jobInstanceRepo.findByInstanceId(id);
-        if (jobInstanceBean == null){
+        if (jobInstanceBean == null) {
             LOGGER.warn("There are no job instances with id {} ", id);
             throw new GriffinException
-                    .NotFoundException(JOB_INSTANCE_NOT_FOUND);
+                .NotFoundException(JOB_INSTANCE_NOT_FOUND);
         }
         String appId = jobInstanceBean.getAppId();
         try {
@@ -163,9 +163,9 @@ public class MetricServiceImpl implements MetricService {
 
     private void checkFormat(MetricValue value) {
         if (StringUtils.isBlank(value.getName()) || value.getTmst() == null
-                || MapUtils.isEmpty(value.getValue())) {
+            || MapUtils.isEmpty(value.getValue())) {
             throw new GriffinException.BadRequestException
-                    (INVALID_METRIC_VALUE_FORMAT);
+                (INVALID_METRIC_VALUE_FORMAT);
         }
     }
 }

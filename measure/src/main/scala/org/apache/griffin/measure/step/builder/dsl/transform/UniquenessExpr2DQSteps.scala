@@ -64,7 +64,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
       warn(s"[${timestamp}] data source ${sourceName} not exists")
       Nil
     } else if (!context.runTimeTableRegister.existsTable(targetName)) {
-      println(s"[${timestamp}] data source ${targetName} not exists")
+      warn(s"[${timestamp}] data source ${targetName} not exists")
       Nil
     } else {
       val selItemsClause = analyzer.selectionPairs.map { pair =>
@@ -104,6 +104,8 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         s"SELECT ${joinedSelClause} FROM `${targetTableName}` RIGHT JOIN `${sourceTableName}` ON ${onClause}"
       }
       val joinedTransStep = SparkSqlTransformStep(joinedTableName, joinedSql, emptyMap)
+      joinedTransStep.parentSteps += sourceTransStep
+      joinedTransStep.parentSteps += targetTransStep
 
       // 4. group
       val groupTableName = "__group"
@@ -115,7 +117,8 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         s"SELECT ${groupSelClause}, (COUNT(*) - 1) AS `${dupColName}` " +
           s"FROM `${joinedTableName}` GROUP BY ${groupSelClause}"
       }
-      val groupTransStep = SparkSqlTransformStep(groupTableName, groupSql, emptyMap, true)
+      val groupTransStep = SparkSqlTransformStep(groupTableName, groupSql, emptyMap, None, true)
+      groupTransStep.parentSteps += joinedTransStep
 
       // 5. total metric
       val totalTableName = "__totalMetric"
@@ -128,8 +131,9 @@ case class UniquenessExpr2DQSteps(context: DQContext,
              |FROM `${sourceName}` GROUP BY `${ConstantColumns.tmst}`
            """.stripMargin
       }
-      val totalTransStep = SparkSqlTransformStep(totalTableName, totalSql, emptyMap)
       val totalMetricWriteStep = MetricWriteStep(totalColName, totalTableName, EntriesFlattenType)
+      val totalTransStep =
+        SparkSqlTransformStep(totalTableName, totalSql, emptyMap, Some(totalMetricWriteStep))
 
       // 6. unique record
       val uniqueRecordTableName = "__uniqueRecord"
@@ -138,6 +142,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
       }
       val uniqueRecordTransStep =
         SparkSqlTransformStep(uniqueRecordTableName, uniqueRecordSql, emptyMap)
+      uniqueRecordTransStep.parentSteps += groupTransStep
 
       // 7. unique metric
       val uniqueTableName = "__uniqueMetric"
@@ -151,24 +156,21 @@ case class UniquenessExpr2DQSteps(context: DQContext,
              |FROM `${uniqueRecordTableName}` GROUP BY `${ConstantColumns.tmst}`
            """.stripMargin
       }
-      val uniqueTransStep = SparkSqlTransformStep(uniqueTableName, uniqueSql, emptyMap)
-
       val uniqueMetricWriteStep =
         MetricWriteStep(uniqueColName, uniqueTableName, EntriesFlattenType)
+      val uniqueTransStep =
+        SparkSqlTransformStep(uniqueTableName, uniqueSql, emptyMap, Some(uniqueMetricWriteStep))
+      uniqueTransStep.parentSteps += uniqueRecordTransStep
 
-      val transSteps1 = sourceTransStep :: targetTransStep :: joinedTransStep :: groupTransStep ::
-        totalTransStep :: uniqueRecordTransStep :: uniqueTransStep :: Nil
-      val writeSteps1 = totalMetricWriteStep :: uniqueMetricWriteStep :: Nil
+      val transSteps1 = totalTransStep :: uniqueTransStep :: Nil
 
       val duplicationArrayName = details.getString(_duplicationArray, "")
-      val (transSteps2, writeSteps2) = if (duplicationArrayName.nonEmpty) {
+      val transSteps2 = if (duplicationArrayName.nonEmpty) {
         // 8. duplicate record
         val dupRecordTableName = "__dupRecords"
         val dupRecordSql = {
           s"SELECT * FROM `${groupTableName}` WHERE `${dupColName}` > 0"
         }
-        val dupRecordTransStep =
-          SparkSqlTransformStep(dupRecordTableName, dupRecordSql, emptyMap, true)
 
         val dupRecordWriteStep = {
           val rwName =
@@ -177,6 +179,8 @@ case class UniquenessExpr2DQSteps(context: DQContext,
 
           RecordWriteStep(rwName, dupRecordTableName)
         }
+        val dupRecordTransStep =
+          SparkSqlTransformStep(dupRecordTableName, dupRecordSql, emptyMap, Some(dupRecordWriteStep), true)
 
         // 9. duplicate metric
         val dupMetricTableName = "__dupMetric"
@@ -197,17 +201,22 @@ case class UniquenessExpr2DQSteps(context: DQContext,
              |GROUP BY ${dupMetricGroupbyClause}
           """.stripMargin
         }
-        val dupMetricTransStep = SparkSqlTransformStep(dupMetricTableName, dupMetricSql, emptyMap)
         val dupMetricWriteStep = {
           MetricWriteStep(duplicationArrayName, dupMetricTableName, ArrayFlattenType)
         }
+        val dupMetricTransStep =
+          SparkSqlTransformStep(dupMetricTableName,
+            dupMetricSql,
+            emptyMap,
+            Some(dupMetricWriteStep)
+          )
+        dupMetricTransStep.parentSteps += dupRecordTransStep
 
-        (dupRecordTransStep :: dupMetricTransStep :: Nil,
-          dupRecordWriteStep :: dupMetricWriteStep :: Nil)
-      } else (Nil, Nil)
+        dupMetricTransStep :: Nil
+      } else Nil
 
       // full steps
-      transSteps1 ++ transSteps2 ++ writeSteps1 ++ writeSteps2
+      transSteps1 ++ transSteps2
     }
   }
 

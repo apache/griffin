@@ -28,6 +28,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+/**
+ * AbstractAuditableEntity is base entity class definition in Apache Griffin, all
+ * {@link javax.persistence.Entity} classes should extend it.
+ */
 @MappedSuperclass
 public abstract class AbstractAuditableEntity implements Serializable {
 

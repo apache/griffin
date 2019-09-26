@@ -66,10 +66,17 @@ object HdfsUtil extends Loggable {
     out.close
   }
 
-  def appendContent(filePath: String, message: String): Unit = {
-    val out = appendOrCreateFile(filePath)
-    out.write(message.getBytes("utf-8"))
-    out.close
+  def withHdfsFile(filePath: String, appendIfExists: Boolean = true)
+                  (f: FSDataOutputStream => Unit): Unit = {
+    val out =
+      if (appendIfExists) {
+        appendOrCreateFile(filePath)
+      } else {
+        createFile(filePath)
+      }
+
+    f(out)
+    out.close()
   }
 
   def createEmptyFile(filePath: String): Unit = {

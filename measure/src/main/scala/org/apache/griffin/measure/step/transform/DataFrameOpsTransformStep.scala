@@ -19,18 +19,20 @@ under the License.
 package org.apache.griffin.measure.step.transform
 
 import org.apache.griffin.measure.context.DQContext
+import org.apache.griffin.measure.step.write.WriteStep
 
 /**
   * data frame ops transform step
   */
-case class DataFrameOpsTransformStep(name: String,
+case class DataFrameOpsTransformStep[T <: WriteStep](name: String,
                                      inputDfName: String,
                                      rule: String,
                                      details: Map[String, Any],
+                                     writeStepOpt: Option[T] = None,
                                      cache: Boolean = false
                                     ) extends TransformStep {
 
-  def execute(context: DQContext): Boolean = {
+  def doExecute(context: DQContext): Boolean = {
     val sqlContext = context.sqlContext
     try {
       val df = rule match {
@@ -43,7 +45,10 @@ case class DataFrameOpsTransformStep(name: String,
       }
       if (cache) context.dataFrameCache.cacheDataFrame(name, df)
       context.runTimeTableRegister.registerTable(name, df)
-      true
+      writeStepOpt match {
+        case Some(writeStep) => writeStep.execute(context)
+        case None => true
+      }
     } catch {
       case e: Throwable =>
         error(s"run data frame ops [ ${rule} ] error: ${e.getMessage}", e)

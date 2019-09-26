@@ -53,7 +53,8 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
   }
 
   def data(ms: Long): (Option[DataFrame], TimeRange) = {
-    val dfOpt = try {
+    assert(dirExist(), s"Text dir ${dirPath} is not exists!")
+    val dfOpt = {
       val dataDirs = listSubDirs(dirPath :: Nil, dataDirDepth, readable)
       // touch done file for read dirs
       dataDirs.foreach(dir => touchDone(dir))
@@ -68,10 +69,6 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
       } else {
         None
       }
-    } catch {
-      case e: Throwable =>
-        error(s"load text dir ${dirPath} fails: ${e.getMessage}", e)
-        None
     }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))

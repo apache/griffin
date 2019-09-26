@@ -18,12 +18,13 @@ under the License.
 */
 package org.apache.griffin.measure.context
 
-import com.holdenkarau.spark.testing.DataFrameSuiteBase
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types._
 import org.scalatest._
 
-class DataFrameCacheTest extends FlatSpec with Matchers with DataFrameSuiteBase {
+import org.apache.griffin.measure.SparkSuiteBase
+
+class DataFrameCacheTest extends FlatSpec with Matchers with SparkSuiteBase {
 
   def createDataFrame(arr: Seq[Int]): DataFrame = {
     val schema = StructType(Array(
@@ -34,8 +35,8 @@ class DataFrameCacheTest extends FlatSpec with Matchers with DataFrameSuiteBase 
     val rows = arr.map { i =>
       Row(i.toLong, s"name_$i", i + 15)
     }
-    val rowRdd = sqlContext.sparkContext.parallelize(rows)
-    sqlContext.createDataFrame(rowRdd, schema)
+    val rowRdd = spark.sparkContext.parallelize(rows)
+    spark.createDataFrame(rowRdd, schema)
   }
 
   "data frame cache" should "be able to cache and uncache data frames" in {

@@ -48,7 +48,7 @@ public class KafkaSchemaController {
 
     @RequestMapping(value = "/versions", method = RequestMethod.GET)
     public Iterable<Integer> getSubjectVersions(
-            @RequestParam("subject") String subject) {
+        @RequestParam("subject") String subject) {
         return kafkaSchemaService.getSubjectVersions(subject);
     }
 
