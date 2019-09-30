@@ -210,6 +210,8 @@ public class SparkSubmitJob implements Job {
         IOException {
         // If result is null, it may livy uri is wrong
         // or livy parameter is wrong.
+        initParam(jd);
+        setLivyConf();
         Map<String, Object> resultMap = post2LivyWithRetry();
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();
