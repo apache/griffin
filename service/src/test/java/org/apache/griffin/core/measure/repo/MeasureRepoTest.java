@@ -27,12 +27,14 @@ import java.util.List;
 
 import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
 import org.apache.griffin.core.measure.entity.*;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -46,6 +48,9 @@ public class MeasureRepoTest {
 
     @Autowired
     private MeasureRepo measureRepo;
+
+    @MockBean
+    private IMetaStoreClient client;
 
     @Before
     public void setup() throws Exception {

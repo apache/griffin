@@ -34,12 +34,14 @@ import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.LivySessionStates;
 import org.apache.griffin.core.job.entity.VirtualJob;
 import org.apache.griffin.core.job.repo.JobInstanceRepo;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -58,6 +60,9 @@ public class JobInstanceBeanRepoTest {
 
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
+
+    @MockBean
+    private IMetaStoreClient client;
 
     @Before
     public void setUp() {

@@ -34,6 +34,7 @@ import org.apache.griffin.core.job.entity.JobDataSegment;
 import org.apache.griffin.core.measure.entity.GriffinMeasure;
 import org.apache.griffin.core.measure.entity.Measure;
 import org.apache.griffin.core.util.EntityMocksHelper;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -58,6 +60,9 @@ public class EventServiceTest {
 
     @Autowired
     private List<GriffinEvent> eventList;
+
+    @MockBean
+    private IMetaStoreClient client;
 
     @Before
     public void setup() throws Exception {
