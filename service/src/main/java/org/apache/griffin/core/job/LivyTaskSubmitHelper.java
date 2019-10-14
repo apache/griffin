@@ -61,6 +61,7 @@ public class LivyTaskSubmitHelper {
     public static final int DEFAULT_QUEUE_SIZE = 20000;
     private static final int SLEEP_TIME = 300;
 
+    @Autowired
     private SparkSubmitJob sparkSubmitJob;
     private ConcurrentMap<Long, Integer> taskAppIdMap = new ConcurrentHashMap<>();
     // Current number of tasks
