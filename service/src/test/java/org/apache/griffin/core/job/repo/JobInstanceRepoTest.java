@@ -39,12 +39,15 @@ import org.apache.griffin.core.config.EclipseLinkJpaConfigForTest;
 import org.apache.griffin.core.job.entity.BatchJob;
 import org.apache.griffin.core.job.entity.JobInstanceBean;
 import org.apache.griffin.core.job.entity.StreamingJob;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -58,6 +61,9 @@ public class JobInstanceRepoTest {
 
     @Autowired
     private JobInstanceRepo jobInstanceRepo;
+    
+    @MockBean
+    private IMetaStoreClient client;
 
     private List<Long> entityIds;
 
