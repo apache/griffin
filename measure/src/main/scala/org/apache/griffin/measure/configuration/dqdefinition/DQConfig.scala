@@ -141,6 +141,7 @@ case class EvaluateRuleParam( @JsonProperty("rules") private val rules: List[Rul
   * @param details    detail config of rule (optional)
   * @param cache      cache the result for multiple usage (optional, valid for "spark-sql" and "df-ops" mode)
   * @param outputs    output ways configuration (optional)
+  * @param errorConfs error configuration (valid for 'COMPLETENESS' mode)
   */
 @JsonInclude(Include.NON_NULL)
 case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
@@ -150,7 +151,8 @@ case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
                      @JsonProperty("rule") private val rule: String = null,
                      @JsonProperty("details") private val details: Map[String, Any] = null,
                      @JsonProperty("cache") private val cache: Boolean = false,
-                     @JsonProperty("out") private val outputs: List[RuleOutputParam] = null
+                     @JsonProperty("out") private val outputs: List[RuleOutputParam] = null,
+                     @JsonProperty("error.confs") private val errorConfs: List[RuleErrorConfParam] = null
                     ) extends Param {
   def getDslType: DslType = if (dslType != null) DslType(dslType) else DslType("")
   def getDqType: DqType = if (dqType != null) DqType(dqType) else DqType("")
@@ -163,6 +165,8 @@ case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
 
   def getOutputs: Seq[RuleOutputParam] = if (outputs != null) outputs else Nil
   def getOutputOpt(tp: OutputType): Option[RuleOutputParam] = getOutputs.filter(_.getOutputType == tp).headOption
+
+  def getErrorConfs: Seq[RuleErrorConfParam] = if (errorConfs != null) errorConfs else Nil
 
   def replaceInDfName(newName: String): RuleParam = {
     if (StringUtils.equals(newName, inDfName)) this
@@ -186,6 +190,7 @@ case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
       "unknown dq type for griffin dsl")
 
     getOutputs.foreach(_.validate)
+    getErrorConfs.foreach(_.validate)
   }
 }
 
@@ -205,4 +210,25 @@ case class RuleOutputParam( @JsonProperty("type") private val outputType: String
   def getFlatten: FlattenType = if (StringUtils.isNotBlank(flatten)) FlattenType(flatten) else FlattenType("")
 
   def validate(): Unit = {}
+}
+
+/**
+  * error configuration parameter
+  * @param columnName the name of the column
+  * @param errorType  the way to match error, regex or enumeration
+  * @param values     error value list
+  */
+@JsonInclude(Include.NON_NULL)
+case class RuleErrorConfParam( @JsonProperty("column.name") private val columnName: String,
+                               @JsonProperty("type") private val errorType: String,
+                               @JsonProperty("values") private val values: List[String]
+                             ) extends Param {
+  def getColumnName: Option[String] = if (StringUtils.isNotBlank(columnName)) Some(columnName) else None
+  def getErrorType: Option[String] = if (StringUtils.isNotBlank(errorType)) Some(errorType) else None
+  def getValues: Seq[String] = if (values != null) values else Nil
+
+  def validate(): Unit = {
+    assert("regex".equalsIgnoreCase(getErrorType.get) ||
+      "enumeration".equalsIgnoreCase(getErrorType.get), "error error.conf type")
+  }
 }

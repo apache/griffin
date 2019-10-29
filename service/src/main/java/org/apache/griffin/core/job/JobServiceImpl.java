@@ -629,8 +629,8 @@ public class JobServiceImpl implements JobService {
                 .getProperty("yarn.uri") + "/cluster/app/" + appId);
             instanceRepo.save(instance);
             // If Livy returns to success or dead, task execution completes one,TaskNum--
-            if (SUCCESS.equals(state) || DEAD.equals(state)) {
-                livyTaskSubmitHelper.decreaseCurTaskNum(instance.getId());
+            if (instance.getState().equals(SUCCESS) || instance.getState().equals(DEAD)) {
+                livyTaskSubmitHelper.decreaseCurTaskNum(instance.getSessionId());
             }
         }
     }

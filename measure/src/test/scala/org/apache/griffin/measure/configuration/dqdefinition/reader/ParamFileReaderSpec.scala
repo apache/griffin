@@ -52,4 +52,27 @@ class ParamFileReaderSpec extends FlatSpec with Matchers{
 
   }
 
+  it should "fail for an invalid completeness json file" in {
+    val reader: ParamFileReader = ParamFileReader(getClass.getResource("/invalidconfigs/invalidtype_completeness_batch_griffindal.json").getFile)
+    val params = reader.readConfig[DQConfig]
+    params match {
+      case Success(_) =>
+        fail("it is an invalid config file")
+      case Failure(e) =>
+        e.getMessage contains ("error error.conf type")
+    }
+  }
+
+  it should "be parsed from a valid errorconf completeness json file" in {
+    val reader :ParamReader = ParamFileReader(getClass.getResource("/_completeness_errorconf-batch-griffindsl.json").getFile)
+    val params = reader.readConfig[DQConfig]
+    params match {
+      case Success(v) =>
+        v.getEvaluateRule.getRules(0).getErrorConfs.length should === (2)
+        v.getEvaluateRule.getRules(0).getErrorConfs(0).getColumnName.get should === ("user")
+        v.getEvaluateRule.getRules(0).getErrorConfs(1).getColumnName.get should === ("name")
+      case Failure(_) =>
+        fail("it should not happen")
+    }
+  }
 }
