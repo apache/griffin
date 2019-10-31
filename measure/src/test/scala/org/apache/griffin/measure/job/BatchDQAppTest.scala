@@ -19,15 +19,17 @@ under the License.
 package org.apache.griffin.measure.job
 
 import scala.util.{Failure, Success, Try}
+
 import org.apache.griffin.measure.Application.readParamFile
-import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.configuration.dqdefinition.EnvConfig
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 
-class BatchDQAppTest extends DQAppTest with SparkSuiteBase {
+class BatchDQAppTest extends DQAppTest {
 
   override def beforeAll(): Unit = {
+    super.beforeAll()
+
     envParam = readParamFile[EnvConfig](getConfigFilePath("/env-batch.json")) match {
       case Success(p) => p
       case Failure(ex) =>
@@ -38,18 +40,14 @@ class BatchDQAppTest extends DQAppTest with SparkSuiteBase {
     sparkParam = envParam.getSparkParam
 
     Try {
-      // build spark 2.0+ application context
-      conf.setAppName("BatchDQApp Test")
-      conf.setAll(sparkParam.getConfig)
-      conf.set("spark.sql.crossJoin.enabled", "true")
+      sparkParam.getConfig.foreach { case (k, v) => spark.conf.set(k, v) }
+      spark.conf.set("spark.app.name", "BatchDQApp Test")
+      spark.conf.set("spark.sql.crossJoin.enabled", "true")
 
-      super.beforeAll()
-
-      sparkSession = spark
       val logLevel = getGriffinLogLevel()
-      sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
+      sc.setLogLevel(sparkParam.getLogLevel)
       griffinLogger.setLevel(logLevel)
-      val sqlContext = sparkSession.sqlContext
+      val sqlContext = spark.sqlContext
 
       // register udf
       GriffinUDFAgent.register(sqlContext)
