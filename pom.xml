@@ -115,6 +115,43 @@ under the License.
                         <target>${maven.compiler.target}</target>
                     </configuration>
                 </plugin>
+                <!-- Surefire runs all Java tests -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.0</version>
+                    <configuration>
+                        <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                        <argLine>-ea -Xmx1g -Xss4m -XX:ReservedCodeCacheSize=128m</argLine>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>test</id>
+                            <goals>
+                                <goal>test</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- Scalatest runs all Scala tests -->
+                <!-- enable scalatest -->
+                <plugin>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest-maven-plugin</artifactId>
+                    <version>1.0</version>
+                    <configuration>
+                        <argLine>-ea -Xmx1g -Xss4m -XX:ReservedCodeCacheSize=128m</argLine>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>test</id>
+                            <goals>
+                                <goal>test</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>

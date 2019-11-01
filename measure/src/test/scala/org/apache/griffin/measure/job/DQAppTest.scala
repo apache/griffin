@@ -18,24 +18,26 @@ under the License.
 */
 package org.apache.griffin.measure.job
 
-import scala.util.{Failure, Success}
+import scala.util.Failure
+import scala.util.Success
 
-import org.apache.spark.sql.SparkSession
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.FlatSpec
+import org.scalatest.Matchers
 
 import org.apache.griffin.measure.Application._
 import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
 
-class DQAppTest extends FlatSpec with Matchers with Loggable {
+class DQAppTest extends FlatSpec with SparkSuiteBase with BeforeAndAfterAll with Matchers with Loggable {
 
   var envParam: EnvConfig = _
   var sparkParam: SparkParam = _
-  var sparkSession: SparkSession = _
 
   var dqApp: DQApp = _
 
@@ -56,15 +58,14 @@ class DQAppTest extends FlatSpec with Matchers with Loggable {
     // choose process
     val procType = ProcessType(allParam.getDqConfig.getProcType)
     dqApp = procType match {
-      case BatchProcessType => new BatchDQApp(allParam)
+      case BatchProcessType => BatchDQApp(allParam)
       case StreamingProcessType => StreamingDQApp(allParam)
       case _ =>
         error(s"${procType} is unsupported process type!")
         sys.exit(-4)
     }
 
-    dqApp.sparkSession = sparkSession
+    dqApp.sparkSession = spark
     dqApp
   }
-
 }
