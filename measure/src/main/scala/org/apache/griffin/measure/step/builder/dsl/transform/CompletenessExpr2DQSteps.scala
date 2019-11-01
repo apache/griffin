@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.dsl.transform
 
+import org.apache.commons.lang.StringUtils
+
 import org.apache.griffin.measure.configuration.dqdefinition.{RuleErrorConfParam, RuleParam}
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context.DQContext
@@ -200,19 +202,29 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       return result
     } else if ("enumeration".equalsIgnoreCase(errorType.get)) {
       val values: Seq[String] = errorConf.getValues
-      // hive_none means None
-      var hasNone: Boolean = false
+      var inResult = ""
+      var nullResult = ""
       if (values.contains("hive_none")) {
-        hasNone = true
+        // hive_none means NULL
+        nullResult = s"(`${columnName}` IS NULL)"
       }
 
       val valueWithQuote: String = values.filter(value => !"hive_none".equals(value))
         .map(value => s"'${value}'").mkString(", ")
 
-      var result = s"(`${columnName}` IN (${valueWithQuote}))"
-      if (hasNone) {
-        result = s"((${result}) OR (`${columnName}` IS NULL))"
+      if (!StringUtils.isEmpty(valueWithQuote)) {
+        inResult = s"(`${columnName}` IN (${valueWithQuote}))"
       }
+
+      var result = ""
+      if (!StringUtils.isEmpty(inResult) && !StringUtils.isEmpty(nullResult)) {
+        result = s"(${inResult} OR ${nullResult})"
+      } else if (!StringUtils.isEmpty(inResult)) {
+        result = inResult
+      } else {
+        result = nullResult
+      }
+
       return result
     }
     throw new IllegalArgumentException("type in error.confs only supports regex and enumeration way")
