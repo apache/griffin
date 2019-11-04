@@ -143,7 +143,11 @@ public class JobInstance implements Job {
         List<Trigger> triggers =
             (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
         Date triggerTime = triggers.get(0).getPreviousFireTime();
-        jobStartTime = triggerTime.getTime();
+        if (triggerTime == null) {
+            jobStartTime = System.currentTimeMillis();
+        } else {
+            jobStartTime = triggerTime.getTime();
+        }
     }
 
     private void setSourcesPartitionsAndPredicates(List<DataSource> sources)
