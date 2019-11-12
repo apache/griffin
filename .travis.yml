@@ -11,8 +11,6 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 
-dist: trusty
-
 language: java scala node_js
 
 services:
@@ -21,9 +19,8 @@ services:
 env:
   - COMPOSE_FILE=griffin-doc/docker/compose/docker-compose-batch.yml
 
-
 jdk:
-  - oraclejdk8
+  - openjdk8
 scala:
   - 2.10.6
 node_js:
