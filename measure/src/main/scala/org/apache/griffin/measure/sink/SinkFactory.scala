@@ -77,9 +77,17 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam],
     val className = config.getString("class", "")
     val cls = Class.forName(className)
     if (classOf[Sink].isAssignableFrom(cls)) {
-      val ctx = SinkContext(config, metricName, timeStamp, block)
-      val method = cls.getDeclaredMethod("apply", classOf[SinkContext])
-      method.invoke(null, ctx).asInstanceOf[Sink]
+      val method = cls.getDeclaredMethod("apply",
+        classOf[Map[String, Any]],
+        classOf[String],
+        classOf[Long],
+        classOf[Boolean])
+      method.invoke(
+        null,
+        config,
+        metricName.asInstanceOf[Object],
+        timeStamp.asInstanceOf[Object],
+        block.asInstanceOf[Object]).asInstanceOf[Sink]
     } else {
       throw new ClassCastException(s"$className should extend Sink")
     }
