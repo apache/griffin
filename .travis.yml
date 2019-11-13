@@ -12,6 +12,7 @@
 # the License.
 
 language: java scala node_js
+dist: trusty
 
 services:
   - docker
@@ -20,7 +21,7 @@ env:
   - COMPOSE_FILE=griffin-doc/docker/compose/docker-compose-batch.yml
 
 jdk:
-  - openjdk8
+  - oraclejdk8
 scala:
   - 2.10.6
 node_js:
