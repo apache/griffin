@@ -143,6 +143,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       // 5. complete metric
       val completeTableName = ruleParam.getOutDfName()
       val completeColName = details.getStringOrKey(_complete)
+      // scalastyle:off
       val completeMetricSql = procType match {
         case BatchProcessType =>
           s"""
@@ -161,6 +162,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
              |ON `${totalCountTableName}`.`${ConstantColumns.tmst}` = `${incompleteCountTableName}`.`${ConstantColumns.tmst}`
          """.stripMargin
       }
+      // scalastyle:on
       val completeWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(completeTableName)
@@ -198,31 +200,30 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       // only have one regular expression
       val regexValue: String = errorConf.getValues.apply(0)
       val afterReplace: String = regexValue.replaceAll("""\\""", """\\\\""")
-      val result: String = s"`${columnName}` REGEXP '${afterReplace}'"
-      return result
+      return s"(`${columnName}` REGEXP '${afterReplace}')"
     } else if ("enumeration".equalsIgnoreCase(errorType.get)) {
       val values: Seq[String] = errorConf.getValues
       var inResult = ""
       var nullResult = ""
       if (values.contains("hive_none")) {
         // hive_none means NULL
-        nullResult = s"(`${columnName}` IS NULL)"
+        nullResult = s"`${columnName}` IS NULL"
       }
 
       val valueWithQuote: String = values.filter(value => !"hive_none".equals(value))
         .map(value => s"'${value}'").mkString(", ")
 
       if (!StringUtils.isEmpty(valueWithQuote)) {
-        inResult = s"(`${columnName}` IN (${valueWithQuote}))"
+        inResult = s"`${columnName}` IN (${valueWithQuote})"
       }
 
       var result = ""
       if (!StringUtils.isEmpty(inResult) && !StringUtils.isEmpty(nullResult)) {
         result = s"(${inResult} OR ${nullResult})"
       } else if (!StringUtils.isEmpty(inResult)) {
-        result = inResult
+        result = s"($inResult)"
       } else {
-        result = nullResult
+        result = s"($nullResult)"
       }
 
       return result
