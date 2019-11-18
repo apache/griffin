@@ -190,8 +190,34 @@ class FileBasedDataConnectorTest extends SparkSuiteBase with Matchers {
       assert(df.collect().length == 2)
       assert(df.schema == expSchema)
     })
+  }
 
+  it should "apply schema to all formats if provided" in {
+    val formats = Seq("parquet", "orc", "csv", "tsv")
+    formats.map(f => {
+      val configs = Map(
+        "format" -> f,
+        "paths" -> Seq(
+          s"file://${getClass.getResource(s"/files/person_table.$f").getPath}"
+        ),
+        "options" -> Map(
+          "header" -> "true"
+        ),
+        "schema" -> Seq(Map("name" -> "name", "type" -> "string"))
+      )
 
+      val result = FileBasedDataConnector(spark, dcParam.copy(config = configs), timestampStorage).data(1L)
+
+      assert(result._1.isDefined)
+
+      val df = result._1.get
+      val expSchema = new StructType()
+        .add("name", StringType)
+        .add(ConstantColumns.tmst, LongType, nullable = false)
+
+      assert(df.collect().length == 2)
+      assert(df.schema == expSchema)
+    })
   }
 
 }
