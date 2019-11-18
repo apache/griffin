@@ -18,9 +18,9 @@ under the License.
  */
 package org.apache.griffin.measure.datasource.connector.batch
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.StructType
 
@@ -56,12 +56,16 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
 
   val config: Map[String, Any] = dcParam.getConfig
   var options: Map[String, String] = config.getParamStringMap(Options, Map.empty)
-  var currentSchema: StructType = _
 
   var format: String = config.getString(Format, DefaultFormat).toLowerCase
   val paths: Seq[String] = config.getStringArr(Paths, Nil)
   val schemaSeq: Seq[Map[String, String]] = config.getAnyRef[Seq[Map[String, String]]](Schema, Nil)
   val skipErrorPaths: Boolean = config.getBoolean(SkipErrorPaths, defValue = false)
+
+  val currentSchema: Option[StructType] = Try(getUserDefinedSchema) match {
+    case Success(structType) if structType.fields.nonEmpty => Some(structType)
+    case _ => None
+  }
 
   assert(SupportedFormats.contains(format),
     s"Invalid format '$format' specified. Must be one of ${SupportedFormats.mkString("['", "', '", "']")}")
@@ -94,20 +98,15 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
   private def validateCSVOptions(): Unit = {
     if (options.contains(Header) && config.contains(Schema)) {
       griffinLogger.warn(s"Both $Options.$Header and $Schema were provided. Defaulting to provided $Schema")
-      options = options - Header
     }
 
     if (!options.contains(Header) && !config.contains(Schema)) {
       throw new IllegalArgumentException(s"Either '$Header' must be set in '$Options' or '$Schema' must be set.")
     }
 
-    if (config.contains(Schema)) {
-      if (schemaSeq.isEmpty) throw new IllegalStateException("Invalid Schema specified")
-      else currentSchema = Try(getUserDefinedSchema) match {
-        case Success(structType) if structType.fields.nonEmpty => structType
-        case Failure(e) => throw new IllegalStateException("Unable to create schema from specification", e)
-        case _ => throw new IllegalStateException("Unable to create schema from specification")
-      }
+    if (config.contains(Schema) && (schemaSeq.isEmpty || currentSchema.isEmpty)) {
+      throw new IllegalStateException("Unable to create schema from specification")
+
     }
   }
 
@@ -119,7 +118,7 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
         sparkSession.read
           .options(options)
           .format(format)
-          .schema(currentSchema)
+          .withSchemaIfAny(currentSchema)
           .load(validPaths: _*)
 
       )
@@ -161,6 +160,15 @@ object FileBasedDataConnector extends Loggable {
 
     assert(validPaths.nonEmpty, "No paths were given for the data source.")
     validPaths
+  }
+
+  implicit class Implicits(dfr: DataFrameReader) {
+    def withSchemaIfAny(schemaOpt: Option[StructType]): DataFrameReader = {
+      schemaOpt match {
+        case Some(structType) => dfr.schema(structType)
+        case None => dfr
+      }
+    }
   }
 
 }
