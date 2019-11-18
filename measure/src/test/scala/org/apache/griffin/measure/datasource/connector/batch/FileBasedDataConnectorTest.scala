@@ -166,7 +166,6 @@ class FileBasedDataConnectorTest extends SparkSuiteBase with Matchers {
 
     val formats = Seq("parquet", "orc", "csv", "tsv")
     formats.map(f => {
-      val delimiter = if (f.matches("csv")) "," else if (f.matches("tsv")) "\t" else ""
       val configs = Map(
         "format" -> f,
         "paths" -> Seq(
@@ -174,8 +173,7 @@ class FileBasedDataConnectorTest extends SparkSuiteBase with Matchers {
         ),
         "options" -> Map(
           "header" -> "true",
-          "inferSchema" -> "true",
-          "delimiter" -> delimiter
+          "inferSchema" -> "true"
         )
       )
 

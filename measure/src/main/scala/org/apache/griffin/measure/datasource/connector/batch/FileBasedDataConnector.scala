@@ -67,7 +67,10 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
     s"Invalid format '$format' specified. Must be one of ${SupportedFormats.mkString("['", "', '", "']")}")
 
   if (format == "csv") validateCSVOptions()
-  if (format == "tsv") format = "csv"
+  if (format == "tsv") {
+    format = "csv"
+    options = options + (Delimiter -> "\t")
+  }
 
   /**
    * Builds a [[StructType]] from the given schema string provided as `Schema` config.
@@ -135,6 +138,7 @@ object FileBasedDataConnector extends Loggable {
   private val SkipErrorPaths: String = "skipErrorPaths"
   private val Schema: String = "schema"
   private val Header: String = "header"
+  private val Delimiter: String = "delimiter"
 
   private val ColName: String = "name"
   private val ColType: String = "type"
