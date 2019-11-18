@@ -39,14 +39,19 @@ import org.apache.griffin.measure.utils.ParamUtil._
  * Currently supported formats like Parquet, ORC, AVRO, Text and Delimited types like CSV, TSV etc.
  *
  * Supported Configurations:
- *  - format : [[String]] specifying the type of file source (parquet, orc, etc.). Default: parquet
+ *  - format : [[String]] specifying the type of file source (parquet, orc, etc.).
  *  - paths : [[Seq]] specifying the paths to be read
  *  - options : [[Map]] of format specific options
  *  - skipOnError : [[Boolean]] specifying where to continue execution if one or more paths are invalid.
  *  - schema : [[Seq]] of {colName, colType and isNullable} given as key value pairs. If provided, this can
  * help skip the schema inference step for some underlying data sources.
+ *
+ * Some defaults assumed by this connector (if not set) are as follows:
+ *  - `delimiter` is \t for TSV format,
+ *  - `schema` is None,
+ *  - `header` is false,
+ *  - `format` is parquet
  */
-
 case class FileBasedDataConnector(@transient sparkSession: SparkSession,
                                   dcParam: DataConnectorParam,
                                   timestampStorage: TimestampStorage)
@@ -95,6 +100,14 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
     })
   }
 
+  /**
+   * Ensures the presence of schema either via `header` or `schema` options.
+   *
+   *  - If both are present, the preference will be given to `schema`. First row will be omitted
+   * if `header` is set to true, else will be included.
+   *  - If `schema` is defined, it must be valid.
+   *  - If neither is set, a fatal exception is thrown.
+   */
   private def validateCSVOptions(): Unit = {
     if (options.contains(Header) && config.contains(Schema)) {
       griffinLogger.warn(s"Both $Options.$Header and $Schema were provided. Defaulting to provided $Schema")
@@ -146,6 +159,14 @@ object FileBasedDataConnector extends Loggable {
   private val DefaultFormat: String = SQLConf.DEFAULT_DATA_SOURCE_NAME.defaultValueString
   private val SupportedFormats: Seq[String] = Seq("parquet", "orc", "avro", "text", "csv", "tsv")
 
+  /**
+   * Validates the existence of paths in a given sequence.
+   * Set option `skipOnError` to true to avoid fatal errors if any erroneous paths are encountered.
+   *
+   * @param paths       given sequence of paths
+   * @param skipOnError flag to skip erroneous paths if any
+   * @return
+   */
   private def getValidPaths(paths: Seq[String], skipOnError: Boolean): Seq[String] = {
     val validPaths = paths.filter(path =>
       if (HdfsUtil.existPath(path)) true
@@ -162,7 +183,19 @@ object FileBasedDataConnector extends Loggable {
     validPaths
   }
 
+  /**
+   * Adds methods implicitly to [[DataFrameReader]]
+   *
+   * @param dfr an instance of [[DataFrameReader]]
+   */
   implicit class Implicits(dfr: DataFrameReader) {
+
+    /**
+     * Applies a schema to this [[DataFrameReader]] if any.
+     *
+     * @param schemaOpt an optional Schema
+     * @return
+     */
     def withSchemaIfAny(schemaOpt: Option[StructType]): DataFrameReader = {
       schemaOpt match {
         case Some(structType) => dfr.schema(structType)
