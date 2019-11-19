@@ -18,6 +18,7 @@ under the License.
  */
 package org.apache.griffin.measure.datasource.connector.batch
 
+import scala.collection.mutable.{Map => MutableMap}
 import scala.util.{Success, Try}
 
 import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
@@ -60,7 +61,7 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
   import FileBasedDataConnector._
 
   val config: Map[String, Any] = dcParam.getConfig
-  var options: Map[String, String] = config.getParamStringMap(Options, Map.empty)
+  var options: MutableMap[String, String] = MutableMap(config.getParamStringMap(Options, Map.empty).toSeq: _*)
 
   var format: String = config.getString(Format, DefaultFormat).toLowerCase
   val paths: Seq[String] = config.getStringArr(Paths, Nil)
@@ -78,7 +79,7 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
   if (format == "csv") validateCSVOptions()
   if (format == "tsv") {
     format = "csv"
-    options = options + (Delimiter -> "\t")
+    options.getOrElseUpdate(Delimiter, TabDelimiter)
   }
 
   /**
@@ -155,6 +156,7 @@ object FileBasedDataConnector extends Loggable {
   private val ColName: String = "name"
   private val ColType: String = "type"
   private val IsNullable: String = "nullable"
+  private val TabDelimiter: String = "\t"
 
   private val DefaultFormat: String = SQLConf.DEFAULT_DATA_SOURCE_NAME.defaultValueString
   private val SupportedFormats: Seq[String] = Seq("parquet", "orc", "avro", "text", "csv", "tsv")
