@@ -89,21 +89,30 @@ object DataConnectorFactory extends Loggable {
     }
   }
 
-  private def getCustomConnector(session: SparkSession,
-                                 context: StreamingContext,
-                                 param: DataConnectorParam,
-                                 storage: TimestampStorage,
-                                 maybeClient: Option[StreamingCacheClient]): DataConnector = {
-    val className = param.getConfig("class").asInstanceOf[String]
+  private def getCustomConnector(sparkSession: SparkSession,
+                                 ssc: StreamingContext,
+                                 dcParam: DataConnectorParam,
+                                 timestampStorage: TimestampStorage,
+                                 streamingCacheClientOpt: Option[StreamingCacheClient]): DataConnector = {
+    val className = dcParam.getConfig("class").asInstanceOf[String]
     val cls = Class.forName(className)
     if (classOf[BatchDataConnector].isAssignableFrom(cls)) {
-      val ctx = BatchDataConnectorContext(session, param, storage)
-      val meth = cls.getDeclaredMethod("apply", classOf[BatchDataConnectorContext])
-      meth.invoke(null, ctx).asInstanceOf[BatchDataConnector]
+      val method = cls.getDeclaredMethod("apply",
+        classOf[SparkSession],
+        classOf[DataConnectorParam],
+        classOf[TimestampStorage]
+      )
+      method.invoke(null, sparkSession, dcParam, timestampStorage).asInstanceOf[BatchDataConnector]
     } else if (classOf[StreamingDataConnector].isAssignableFrom(cls)) {
-      val ctx = StreamingDataConnectorContext(session, context, param, storage, maybeClient)
-      val meth = cls.getDeclaredMethod("apply", classOf[StreamingDataConnectorContext])
-      meth.invoke(null, ctx).asInstanceOf[StreamingDataConnector]
+      val method = cls.getDeclaredMethod("apply",
+        classOf[SparkSession],
+        classOf[StreamingContext],
+        classOf[DataConnectorParam],
+        classOf[TimestampStorage],
+        classOf[Option[StreamingCacheClient]]
+      )
+      method.invoke(null, sparkSession, ssc, dcParam, timestampStorage, streamingCacheClientOpt)
+        .asInstanceOf[StreamingDataConnector]
     } else {
       throw new ClassCastException(s"$className should extend BatchDataConnector or StreamingDataConnector")
     }
