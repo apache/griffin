@@ -117,7 +117,7 @@ class DataConnectorFactorySpec extends FlatSpec {
     assert(res.isFailure)
     assert(res.failed.get.isInstanceOf[ClassCastException])
     assert(res.failed.get.getMessage ==
-      "org.apache.griffin.measure.configuration.dqdefinition.reader.NotDataConnector" +
+      "org.apache.griffin.measure.datasource.connector.NotDataConnector" +
         " should extend BatchDataConnector or StreamingDataConnector")
   }
 
@@ -131,7 +131,7 @@ class DataConnectorFactorySpec extends FlatSpec {
     assert(res.isFailure)
     assert(res.failed.get.isInstanceOf[NoSuchMethodException])
     assert(res.failed.get.getMessage ==
-      "org.apache.griffin.measure.configuration.dqdefinition.reader.DataConnectorWithoutApply.apply" +
+      "org.apache.griffin.measure.datasource.connector.DataConnectorWithoutApply.apply" +
         "(org.apache.spark.sql.SparkSession, " +
         "org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam, " +
         "org.apache.griffin.measure.datasource.TimestampStorage)")
