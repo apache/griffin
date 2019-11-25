@@ -18,14 +18,15 @@ under the License.
 */
 package org.apache.griffin.measure.sink
 
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
+import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.utils.ParamUtil._
 
 case class SinkFactory(sinkParamIter: Iterable[SinkParam],
-                       metricName: String) extends Serializable {
+                       metricName: String) extends Loggable with Serializable {
 
   /**
     * create sink
@@ -51,7 +52,9 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam],
     }
     sinkTry match {
       case Success(sink) if (sink.available) => Some(sink)
-      case _ => None
+      case Failure(ex) =>
+        error("Failed to get sink", ex)
+        None
     }
   }
 
@@ -77,9 +80,17 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam],
     val className = config.getString("class", "")
     val cls = Class.forName(className)
     if (classOf[Sink].isAssignableFrom(cls)) {
-      val ctx = SinkContext(config, metricName, timeStamp, block)
-      val method = cls.getDeclaredMethod("apply", classOf[SinkContext])
-      method.invoke(null, ctx).asInstanceOf[Sink]
+      val method = cls.getDeclaredMethod("apply",
+        classOf[Map[String, Any]],
+        classOf[String],
+        classOf[Long],
+        classOf[Boolean])
+      method.invoke(
+        null,
+        config,
+        metricName.asInstanceOf[Object],
+        timeStamp.asInstanceOf[Object],
+        block.asInstanceOf[Object]).asInstanceOf[Sink]
     } else {
       throw new ClassCastException(s"$className should extend Sink")
     }

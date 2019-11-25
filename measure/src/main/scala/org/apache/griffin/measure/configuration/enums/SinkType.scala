@@ -82,7 +82,7 @@ case object ElasticsearchSinkType extends SinkType {
   */
 case object MongoSinkType extends SinkType {
   val idPattern = "^(?i)mongo|mongodb$".r
-  val desc = "distinct"
+  val desc = "mongo"
 }
 
 /**

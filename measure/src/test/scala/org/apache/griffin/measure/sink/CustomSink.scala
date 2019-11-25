@@ -25,14 +25,15 @@ import org.apache.spark.rdd.RDD
 /**
   * sink records and metrics in memory for test.
   *
-  * @param sinkContext
+  * @param config sink configurations
+  * @param metricName
+  * @param timeStamp
+  * @param block
   */
-case class CustomSink(sinkContext: SinkContext) extends Sink {
-  val config: Map[String, Any] = sinkContext.config
-  val metricName: String = sinkContext.metricName
-  val timeStamp: Long = sinkContext.timeStamp
-  val block: Boolean = sinkContext.block
-
+case class CustomSink(config: Map[String, Any],
+                      metricName: String,
+                      timeStamp: Long,
+                      block: Boolean) extends Sink {
   def available(): Boolean = true
 
   def start(msg: String): Unit = {}
