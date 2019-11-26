@@ -18,10 +18,10 @@ under the License.
 */
 package org.apache.griffin.measure.step.builder.udf
 
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.SparkSession
 
 object GriffinUDFAgent {
-  def register(sqlContext: SQLContext): Unit = {
+  def register(sqlContext: SparkSession): Unit = {
     GriffinUDFs.register(sqlContext)
     GriffinUDAggFs.register(sqlContext)
   }
@@ -32,7 +32,7 @@ object GriffinUDFAgent {
   */
 object GriffinUDFs {
 
-  def register(sqlContext: SQLContext): Unit = {
+  def register(sqlContext: SparkSession): Unit = {
     sqlContext.udf.register("index_of", indexOf _)
     sqlContext.udf.register("matches", matches _)
     sqlContext.udf.register("reg_replace", regReplace _)
@@ -57,7 +57,7 @@ object GriffinUDFs {
   */
 object GriffinUDAggFs {
 
-  def register(sqlContext: SQLContext): Unit = {
+  def register(sqlContext: SparkSession): Unit = {
   }
 
 }

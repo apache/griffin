@@ -24,7 +24,7 @@ import java.util.concurrent.{Executors, ThreadPoolExecutor, TimeUnit}
 import scala.util.Try
 
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{SparkSession, SQLContext}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
 import org.apache.griffin.measure.Loggable
@@ -49,8 +49,6 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
   val metricName = dqParam.getName
   val sinkParams = getSinkParams
 
-  var sqlContext: SQLContext = _
-
   def retryable: Boolean = true
 
   def init: Try[_] = Try {
@@ -62,7 +60,6 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     val logLevel = getGriffinLogLevel()
     sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
     griffinLogger.setLevel(logLevel)
-    sqlContext = sparkSession.sqlContext
 
     // clear checkpoint directory
     clearCpDir
@@ -72,7 +69,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     OffsetCheckpointClient.init
 
     // register udf
-    GriffinUDFAgent.register(sqlContext)
+    GriffinUDFAgent.register(sparkSession)
   }
 
   def run: Try[Boolean] = Try {

@@ -25,7 +25,7 @@ import org.apache.griffin.measure.datasource.TimestampStorage
 /**
   * data source cache in parquet format
   */
-case class StreamingCacheParquetClient(sqlContext: SQLContext,
+case class StreamingCacheParquetClient(sqlContext: SparkSession,
                                        param: Map[String, Any],
                                        dsName: String,
                                        index: Int,

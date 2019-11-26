@@ -76,7 +76,7 @@ case class RecordWriteStep(name: String,
 
   private def getDataFrame(context: DQContext, name: String): Option[DataFrame] = {
     try {
-      val df = context.sqlContext.table(s"`${name}`")
+      val df = context.sparkSession.table(s"`${name}`")
       Some(df)
     } catch {
       case e: Throwable =>

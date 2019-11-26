@@ -43,7 +43,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
 trait StreamingCacheClient
   extends StreamingOffsetCacheable with WithFanIn[Long] with Loggable with Serializable {
 
-  val sqlContext: SQLContext
+  val sqlContext: SparkSession
   val param: Map[String, Any]
   val dsName: String
   val index: Int

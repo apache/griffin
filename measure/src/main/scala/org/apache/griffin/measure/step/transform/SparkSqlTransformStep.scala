@@ -31,7 +31,7 @@ case class SparkSqlTransformStep[T <: WriteStep](name: String,
                                                  cache: Boolean = false
                                                 ) extends TransformStep {
   def doExecute(context: DQContext): Boolean = {
-    val sqlContext = context.sqlContext
+    val sqlContext = context.sparkSession
     try {
       val df = sqlContext.sql(rule)
       if (cache) context.dataFrameCache.cacheDataFrame(name, df)

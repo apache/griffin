@@ -52,7 +52,7 @@ object DataSourceFactory extends Loggable {
 
     // for streaming data cache
     val streamingCacheClientOpt = StreamingCacheClientFactory.getClientOpt(
-      sparkSession.sqlContext, dataSourceParam.getCheckpointOpt, name, index, timestampStorage)
+      sparkSession, dataSourceParam.getCheckpointOpt, name, index, timestampStorage)
 
     val dataConnectors: Seq[DataConnector] = connectorParams.flatMap { connectorParam =>
       DataConnectorFactory.getDataConnector(sparkSession, ssc, connectorParam,

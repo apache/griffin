@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.cache
 
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.SparkSession
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.datasource.TimestampStorage
@@ -44,7 +44,7 @@ object StreamingCacheClientFactory extends Loggable {
     * @param tmstCache      the same tmstCache instance inside a data source
     * @return               streaming cache client option
     */
-  def getClientOpt(sqlContext: SQLContext, checkpointOpt: Option[Map[String, Any]],
+  def getClientOpt(sqlContext: SparkSession, checkpointOpt: Option[Map[String, Any]],
                    name: String, index: Int, tmstCache: TimestampStorage
                   ): Option[StreamingCacheClient] = {
     checkpointOpt.flatMap { param =>

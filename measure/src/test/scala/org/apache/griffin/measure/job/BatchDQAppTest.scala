@@ -50,7 +50,7 @@ class BatchDQAppTest extends DQAppTest {
       val sqlContext = spark.sqlContext
 
       // register udf
-      GriffinUDFAgent.register(sqlContext)
+      GriffinUDFAgent.register(spark)
     }
   }
 

@@ -33,7 +33,7 @@ case class DataFrameOpsTransformStep[T <: WriteStep](name: String,
                                     ) extends TransformStep {
 
   def doExecute(context: DQContext): Boolean = {
-    val sqlContext = context.sqlContext
+    val sqlContext = context.sparkSession
     try {
       val df = rule match {
         case DataFrameOps._fromJson => DataFrameOps.fromJson(sqlContext, inputDfName, details)
