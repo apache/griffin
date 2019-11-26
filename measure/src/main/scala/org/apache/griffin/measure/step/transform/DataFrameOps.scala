@@ -46,7 +46,7 @@ object DataFrameOps {
     val _matchedFraction = "matchedFraction"
   }
 
-  def fromJson(sqlContext: SparkSession,
+  def fromJson(sparkSession: SparkSession,
                inputDfName: String,
                details: Map[String, Any]): DataFrame = {
     val _colName = "col.name"
@@ -54,15 +54,15 @@ object DataFrameOps {
 
     implicit val encoder = Encoders.STRING
 
-    val df: DataFrame = sqlContext.table(s"`${inputDfName}`")
+    val df: DataFrame = sparkSession.table(s"`${inputDfName}`")
     val rdd = colNameOpt match {
       case Some(colName: String) => df.map(r => r.getAs[String](colName))
       case _ => df.map(_.getAs[String](0))
     }
-    sqlContext.read.json(rdd) // slow process
+    sparkSession.read.json(rdd) // slow process
   }
 
-  def accuracy(sqlContext: SparkSession,
+  def accuracy(sparkSession: SparkSession,
                inputDfName: String,
                contextId: ContextId,
                details: Map[String, Any]): DataFrame = {
@@ -83,7 +83,7 @@ object DataFrameOps {
       }
     }
 
-    val df = sqlContext.table(s"`${inputDfName}`")
+    val df = sparkSession.table(s"`${inputDfName}`")
 
     val results = df.rdd.flatMap { row =>
       try {
@@ -117,16 +117,16 @@ object DataFrameOps {
       val ar = r.result.asInstanceOf[AccuracyMetric]
       Row(r.timeStamp, ar.miss, ar.total, ar.getMatch, ar.matchFraction, !ar.initial, ar.eventual)
     }.toArray
-    val rowRdd = sqlContext.sparkContext.parallelize(rows)
-    val retDf = sqlContext.createDataFrame(rowRdd, schema)
+    val rowRdd = sparkSession.sparkContext.parallelize(rows)
+    val retDf = sparkSession.createDataFrame(rowRdd, schema)
 
     retDf
   }
 
-  def clear(sqlContext: SparkSession, inputDfName: String, details: Map[String, Any]): DataFrame = {
-    val df = sqlContext.table(s"`${inputDfName}`")
-    val emptyRdd = sqlContext.sparkContext.emptyRDD[Row]
-    sqlContext.createDataFrame(emptyRdd, df.schema)
+  def clear(sparkSession: SparkSession, inputDfName: String, details: Map[String, Any]): DataFrame = {
+    val df = sparkSession.table(s"`${inputDfName}`")
+    val emptyRdd = sparkSession.sparkContext.emptyRDD[Row]
+    sparkSession.createDataFrame(emptyRdd, df.schema)
   }
 
 }

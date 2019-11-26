@@ -47,7 +47,6 @@ class BatchDQAppTest extends DQAppTest {
       val logLevel = getGriffinLogLevel()
       sc.setLogLevel(sparkParam.getLogLevel)
       griffinLogger.setLevel(logLevel)
-      val sqlContext = spark.sqlContext
 
       // register udf
       GriffinUDFAgent.register(spark)
