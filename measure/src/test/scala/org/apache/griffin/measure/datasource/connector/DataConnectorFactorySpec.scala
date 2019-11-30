@@ -16,13 +16,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.measure.configuration.dqdefinition.reader
+package org.apache.griffin.measure.datasource.connector
 
 import scala.util.Try
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.streaming.dstream.InputDStream
+import org.apache.spark.streaming.StreamingContext
 import org.scalatest.FlatSpec
 
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
@@ -30,19 +31,23 @@ import org.apache.griffin.measure.context.TimeRange
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.datasource.connector.DataConnectorFactory
-import org.apache.griffin.measure.datasource.connector.batch.{BatchDataConnector, BatchDataConnectorContext}
-import org.apache.griffin.measure.datasource.connector.streaming.{StreamingDataConnector, StreamingDataConnectorContext}
+import org.apache.griffin.measure.datasource.connector.batch.{BatchDataConnector, MySqlDataConnector}
+import org.apache.griffin.measure.datasource.connector.streaming.{KafkaStreamingStringDataConnector, StreamingDataConnector}
 
-case class ExampleBatchDataConnector(ctx: BatchDataConnectorContext) extends BatchDataConnector {
-  override val sparkSession: SparkSession = ctx.sparkSession
-  override val dcParam: DataConnectorParam = ctx.dcParam
-  override val timestampStorage: TimestampStorage = ctx.timestampStorage
+case class ExampleBatchDataConnector(@transient sparkSession: SparkSession,
+                                     dcParam: DataConnectorParam,
+                                     timestampStorage: TimestampStorage) extends BatchDataConnector {
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = (None, TimeRange(ms))
 }
 
 
-case class ExampleStreamingDataConnector(ctx: StreamingDataConnectorContext) extends StreamingDataConnector {
+case class ExampleStreamingDataConnector(@transient sparkSession: SparkSession,
+                                         @transient ssc: StreamingContext,
+                                         dcParam: DataConnectorParam,
+                                         timestampStorage: TimestampStorage,
+                                         streamingCacheClientOpt: Option[StreamingCacheClient]
+                                        ) extends StreamingDataConnector {
   override type K = Unit
   override type V = Unit
   override type OUT = Unit
@@ -50,11 +55,6 @@ case class ExampleStreamingDataConnector(ctx: StreamingDataConnectorContext) ext
   override protected def stream(): Try[InputDStream[this.OUT]] = null
 
   override def transform(rdd: RDD[this.OUT]): Option[DataFrame] = None
-
-  override val streamingCacheClientOpt: Option[StreamingCacheClient] = ctx.streamingCacheClientOpt
-  override val sparkSession: SparkSession = ctx.sparkSession
-  override val dcParam: DataConnectorParam = ctx.dcParam
-  override val timestampStorage: TimestampStorage = ctx.timestampStorage
 
   override def init(): Unit = ()
 }
@@ -86,16 +86,25 @@ class DataConnectorFactorySpec extends FlatSpec {
     assert(res.get.data(42)._2.begin == 42)
   }
 
-  it should "be able to create custom streaming connector" in {
+  it should "be able to create MySqlDataConnector" in {
     val param = DataConnectorParam(
       "CUSTOM", null, null,
-      Map("class" -> classOf[ExampleStreamingDataConnector].getCanonicalName), Nil)
+      Map("class" -> classOf[MySqlDataConnector].getCanonicalName), Nil)
     // apparently Scalamock can not mock classes without empty-paren constructor, providing nulls
     val res = DataConnectorFactory.getDataConnector(
       null, null, param, null, None)
     assert(res.isSuccess)
-    assert(res.get.isInstanceOf[ExampleStreamingDataConnector])
-    assert(res.get.data(0)._2 == TimeRange.emptyTimeRange)
+    assert(res.get.isInstanceOf[MySqlDataConnector])
+  }
+
+  it should "be able to create KafkaStreamingStringDataConnector" in {
+    val param = DataConnectorParam(
+      "CUSTOM", null, null,
+      Map("class" -> classOf[KafkaStreamingStringDataConnector].getCanonicalName), Nil)
+    val res = DataConnectorFactory.getDataConnector(
+      null, null, param, null, None)
+    assert(res.isSuccess)
+    assert(res.get.isInstanceOf[KafkaStreamingStringDataConnector])
   }
 
   it should "fail if class is not extending DataConnectors" in {
@@ -108,7 +117,7 @@ class DataConnectorFactorySpec extends FlatSpec {
     assert(res.isFailure)
     assert(res.failed.get.isInstanceOf[ClassCastException])
     assert(res.failed.get.getMessage ==
-      "org.apache.griffin.measure.configuration.dqdefinition.reader.NotDataConnector" +
+      "org.apache.griffin.measure.datasource.connector.NotDataConnector" +
         " should extend BatchDataConnector or StreamingDataConnector")
   }
 
@@ -122,8 +131,10 @@ class DataConnectorFactorySpec extends FlatSpec {
     assert(res.isFailure)
     assert(res.failed.get.isInstanceOf[NoSuchMethodException])
     assert(res.failed.get.getMessage ==
-      "org.apache.griffin.measure.configuration.dqdefinition.reader.DataConnectorWithoutApply" +
-        ".apply(org.apache.griffin.measure.datasource.connector.batch.BatchDataConnectorContext)")
+      "org.apache.griffin.measure.datasource.connector.DataConnectorWithoutApply.apply" +
+        "(org.apache.spark.sql.SparkSession, " +
+        "org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam, " +
+        "org.apache.griffin.measure.datasource.TimestampStorage)")
   }
 
 }
