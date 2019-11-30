@@ -23,7 +23,7 @@ import java.util.Date
 import scala.util.Try
 
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{SparkSession, SQLContext}
+import org.apache.spark.sql.SparkSession
 
 import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.configuration.enums._
@@ -43,7 +43,6 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
   val metricName = dqParam.getName
   val sinkParams = getSinkParams
 
-  var sqlContext: SQLContext = _
   var dqContext: DQContext = _
 
   def retryable: Boolean = false
@@ -57,10 +56,9 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     val logLevel = getGriffinLogLevel()
     sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
     griffinLogger.setLevel(logLevel)
-    sqlContext = sparkSession.sqlContext
 
     // register udf
-    GriffinUDFAgent.register(sqlContext)
+    GriffinUDFAgent.register(sparkSession)
   }
 
   def run: Try[Boolean] = Try {

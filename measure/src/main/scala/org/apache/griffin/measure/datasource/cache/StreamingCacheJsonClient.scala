@@ -25,7 +25,7 @@ import org.apache.griffin.measure.datasource.TimestampStorage
 /**
   * data source cache in json format
   */
-case class StreamingCacheJsonClient(sqlContext: SQLContext, param: Map[String, Any],
+case class StreamingCacheJsonClient(sparkSession: SparkSession, param: Map[String, Any],
                                     dsName: String, index: Int, timestampStorage: TimestampStorage
                               ) extends StreamingCacheClient {
 

@@ -43,7 +43,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
 trait StreamingCacheClient
   extends StreamingOffsetCacheable with WithFanIn[Long] with Loggable with Serializable {
 
-  val sqlContext: SQLContext
+  val sparkSession: SparkSession
   val param: Map[String, Any]
   val dsName: String
   val index: Int
@@ -181,7 +181,7 @@ trait StreamingCacheClient
 
     // new cache data
     val newDfOpt = try {
-      val dfr = sqlContext.read
+      val dfr = sparkSession.read
       readDataFrameOpt(dfr, newFilePath).map(_.filter(filterStr))
     } catch {
       case e: Throwable =>
@@ -194,7 +194,7 @@ trait StreamingCacheClient
     val oldDfOpt = oldCacheIndexOpt.flatMap { idx =>
       val oldDfPath = s"${oldFilePath}/${idx}"
       try {
-        val dfr = sqlContext.read
+        val dfr = sparkSession.read
         readDataFrameOpt(dfr, oldDfPath).map(_.filter(filterStr))
       } catch {
         case e: Throwable =>
@@ -329,7 +329,7 @@ trait StreamingCacheClient
               val filterStr = s"`${ConstantColumns.tmst}` > ${cleanTime}"
               val updateDf = df.filter(filterStr)
 
-              val prlCount = sqlContext.sparkContext.defaultParallelism
+              val prlCount = sparkSession.sparkContext.defaultParallelism
               // repartition
               val repartitionedDf = updateDf.repartition(prlCount)
               val dfw = repartitionedDf.write.mode(SaveMode.Overwrite)

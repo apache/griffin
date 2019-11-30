@@ -61,7 +61,7 @@ case class CompileTableRegister() extends TableRegister {}
 /**
   * register table name and create temp view during calculation
   */
-case class RunTimeTableRegister(@transient sqlContext: SQLContext) extends TableRegister {
+case class RunTimeTableRegister(@transient sparkSession: SparkSession) extends TableRegister {
 
   def registerTable(name: String, df: DataFrame): Unit = {
     registerTable(name)
@@ -70,13 +70,13 @@ case class RunTimeTableRegister(@transient sqlContext: SQLContext) extends Table
 
   override def unregisterTable(name: String): Unit = {
     if (existsTable(name)) {
-      sqlContext.dropTempTable(name)
+      sparkSession.catalog.dropTempView(name)
       tables -= name
     }
   }
   override def unregisterAllTables(): Unit = {
     val uts = getTables
-    uts.foreach(t => sqlContext.dropTempTable(t))
+    uts.foreach(t => sparkSession.catalog.dropTempView(t))
     tables.clear
   }
 

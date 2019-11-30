@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.datasource.cache
 
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.SparkSession
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.datasource.TimestampStorage
@@ -37,14 +37,14 @@ object StreamingCacheClientFactory extends Loggable {
 
   /**
     * create streaming cache client
-    * @param sqlContext     sqlContext in spark environment
+    * @param sparkSession     sparkSession in spark environment
     * @param checkpointOpt  data source checkpoint/cache config option
     * @param name           data source name
     * @param index          data source index
     * @param tmstCache      the same tmstCache instance inside a data source
     * @return               streaming cache client option
     */
-  def getClientOpt(sqlContext: SQLContext, checkpointOpt: Option[Map[String, Any]],
+  def getClientOpt(sparkSession: SparkSession, checkpointOpt: Option[Map[String, Any]],
                    name: String, index: Int, tmstCache: TimestampStorage
                   ): Option[StreamingCacheClient] = {
     checkpointOpt.flatMap { param =>
@@ -52,13 +52,13 @@ object StreamingCacheClientFactory extends Loggable {
         val tp = param.getString(_type, "")
         val dsCache = tp match {
           case ParquetRegex() =>
-            StreamingCacheParquetClient(sqlContext, param, name, index, tmstCache)
+            StreamingCacheParquetClient(sparkSession, param, name, index, tmstCache)
           case JsonRegex() =>
-            StreamingCacheJsonClient(sqlContext, param, name, index, tmstCache)
+            StreamingCacheJsonClient(sparkSession, param, name, index, tmstCache)
           case OrcRegex() =>
-            StreamingCacheOrcClient(sqlContext, param, name, index, tmstCache)
+            StreamingCacheOrcClient(sparkSession, param, name, index, tmstCache)
           case _ =>
-            StreamingCacheParquetClient(sqlContext, param, name, index, tmstCache)
+            StreamingCacheParquetClient(sparkSession, param, name, index, tmstCache)
         }
         Some(dsCache)
       } catch {

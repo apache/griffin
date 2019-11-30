@@ -98,7 +98,7 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
 
 //  def metaData(): Try[Iterable[(String, String)]] = {
 //    Try {
-//      val st = sqlContext.read.format("com.databricks.spark.avro").
+//      val st = sparkSession.read.format("com.databricks.spark.avro").
   //       load(concreteFileFullPath).schema
 //      st.fields.map(f => (f.name, f.dataType.typeName))
 //    }

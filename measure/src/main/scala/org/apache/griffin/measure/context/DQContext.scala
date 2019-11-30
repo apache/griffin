@@ -18,7 +18,7 @@ under the License.
 */
 package org.apache.griffin.measure.context
 
-import org.apache.spark.sql.{Encoders, SparkSession, SQLContext}
+import org.apache.spark.sql.{Encoders, SparkSession}
 
 import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.configuration.enums._
@@ -37,10 +37,8 @@ case class DQContext(contextId: ContextId,
                      procType: ProcessType
                     )(@transient implicit val sparkSession: SparkSession) {
 
-  val sqlContext: SQLContext = sparkSession.sqlContext
-
   val compileTableRegister: CompileTableRegister = CompileTableRegister()
-  val runTimeTableRegister: RunTimeTableRegister = RunTimeTableRegister(sqlContext)
+  val runTimeTableRegister: RunTimeTableRegister = RunTimeTableRegister(sparkSession)
 
   val dataFrameCache: DataFrameCache = DataFrameCache()
 

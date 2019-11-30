@@ -33,14 +33,14 @@ case class DataFrameOpsTransformStep[T <: WriteStep](name: String,
                                     ) extends TransformStep {
 
   def doExecute(context: DQContext): Boolean = {
-    val sqlContext = context.sqlContext
+    val sparkSession = context.sparkSession
     try {
       val df = rule match {
-        case DataFrameOps._fromJson => DataFrameOps.fromJson(sqlContext, inputDfName, details)
+        case DataFrameOps._fromJson => DataFrameOps.fromJson(sparkSession, inputDfName, details)
         case DataFrameOps._accuracy =>
-          DataFrameOps.accuracy(sqlContext, inputDfName, context.contextId, details)
+          DataFrameOps.accuracy(sparkSession, inputDfName, context.contextId, details)
 
-        case DataFrameOps._clear => DataFrameOps.clear(sqlContext, inputDfName, details)
+        case DataFrameOps._clear => DataFrameOps.clear(sparkSession, inputDfName, details)
         case _ => throw new Exception(s"df opr [ ${rule} ] not supported")
       }
       if (cache) context.dataFrameCache.cacheDataFrame(name, df)

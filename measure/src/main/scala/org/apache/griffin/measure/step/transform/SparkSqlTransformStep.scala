@@ -31,9 +31,9 @@ case class SparkSqlTransformStep[T <: WriteStep](name: String,
                                                  cache: Boolean = false
                                                 ) extends TransformStep {
   def doExecute(context: DQContext): Boolean = {
-    val sqlContext = context.sqlContext
+    val sparkSession = context.sparkSession
     try {
-      val df = sqlContext.sql(rule)
+      val df = sparkSession.sql(rule)
       if (cache) context.dataFrameCache.cacheDataFrame(name, df)
       context.runTimeTableRegister.registerTable(name, df)
       writeStepOpt match {
