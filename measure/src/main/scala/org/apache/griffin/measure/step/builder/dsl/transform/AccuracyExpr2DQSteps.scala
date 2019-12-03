@@ -83,14 +83,14 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       }
 
       val missRecordsWriteSteps = procType match {
-        case BatchProcessType =>
+        case ProcessType.BatchProcessType =>
           val rwName =
-            ruleParam.getOutputOpt(RecordOutputType).
+            ruleParam.getOutputOpt(OutputType.RecordOutputType).
               flatMap(_.getNameOpt).getOrElse(missRecordsTableName)
           RecordWriteStep(rwName, missRecordsTableName)
-        case StreamingProcessType =>
+        case ProcessType.StreamingProcessType =>
           val dsName =
-            ruleParam.getOutputOpt(DscUpdateOutputType).flatMap(_.getNameOpt).getOrElse(sourceName)
+            ruleParam.getOutputOpt(OutputType.DscUpdateOutputType).flatMap(_.getNameOpt).getOrElse(sourceName)
           DataSourceUpdateWriteStep(dsName, missRecordsTableName)
       }
 
@@ -101,9 +101,9 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       val missCountTableName = "__missCount"
       val missColName = details.getStringOrKey(_miss)
       val missCountSql = procType match {
-        case BatchProcessType =>
+        case ProcessType.BatchProcessType =>
           s"SELECT COUNT(*) AS `${missColName}` FROM `${missRecordsTableName}`"
-        case StreamingProcessType =>
+        case ProcessType.StreamingProcessType =>
           s"SELECT `${ConstantColumns.tmst}`,COUNT(*) AS `${missColName}` " +
             s"FROM `${missRecordsTableName}` GROUP BY `${ConstantColumns.tmst}`"
       }
@@ -114,8 +114,8 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       val totalCountTableName = "__totalCount"
       val totalColName = details.getStringOrKey(_total)
       val totalCountSql = procType match {
-        case BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
-        case StreamingProcessType =>
+        case ProcessType.BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
+        case ProcessType.StreamingProcessType =>
           s"SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${totalColName}` " +
             s"FROM `${sourceName}` GROUP BY `${ConstantColumns.tmst}`"
       }
@@ -126,7 +126,7 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       val matchedColName = details.getStringOrKey(_matched)
       val matchedFractionColName = details.getStringOrKey(_matchedFraction)
       val accuracyMetricSql = procType match {
-        case BatchProcessType =>
+        case ProcessType.BatchProcessType =>
           s"""
              SELECT A.total AS `${totalColName}`,
                     A.miss AS `${missColName}`,
@@ -138,7 +138,7 @@ case class AccuracyExpr2DQSteps(context: DQContext,
                FROM `${totalCountTableName}` LEFT JOIN `${missCountTableName}`
              ) AS A
          """
-        case StreamingProcessType =>
+        case ProcessType.StreamingProcessType =>
           s"""
              |SELECT `${totalCountTableName}`.`${ConstantColumns.tmst}` AS `${ConstantColumns.tmst}`,
              |`${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
@@ -150,12 +150,12 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       }
 
       val accuracyMetricWriteStep = procType match {
-        case BatchProcessType =>
-          val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
+        case ProcessType.BatchProcessType =>
+          val metricOpt = ruleParam.getOutputOpt(OutputType.MetricOutputType)
           val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
-          val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+          val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.DefaultFlattenType)
           Some(MetricWriteStep(mwName, accuracyTableName, flattenType))
-        case StreamingProcessType => None
+        case ProcessType.StreamingProcessType => None
       }
 
       val accuracyTransStep =
@@ -164,9 +164,9 @@ case class AccuracyExpr2DQSteps(context: DQContext,
       accuracyTransStep.parentSteps += totalCountTransStep
 
       procType match {
-        case BatchProcessType => accuracyTransStep :: Nil
+        case ProcessType.BatchProcessType => accuracyTransStep :: Nil
         // streaming extra steps
-        case StreamingProcessType =>
+        case ProcessType.StreamingProcessType =>
           // 5. accuracy metric merge
           val accuracyMetricTableName = "__accuracy"
           val accuracyMetricRule = DataFrameOps._accuracy
@@ -176,9 +176,9 @@ case class AccuracyExpr2DQSteps(context: DQContext,
             (AccuracyOprKeys._matched -> matchedColName)
           )
           val accuracyMetricWriteStep = {
-            val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
+            val metricOpt = ruleParam.getOutputOpt(OutputType.MetricOutputType)
             val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
-            val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+            val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.DefaultFlattenType)
             MetricWriteStep(mwName, accuracyMetricTableName, flattenType)
           }
           val accuracyMetricTransStep = DataFrameOpsTransformStep(accuracyMetricTableName,
@@ -197,7 +197,7 @@ case class AccuracyExpr2DQSteps(context: DQContext,
 
           val accuracyRecordWriteStep = {
             val rwName =
-              ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
+              ruleParam.getOutputOpt(OutputType.RecordOutputType).flatMap(_.getNameOpt)
                 .getOrElse(missRecordsTableName)
 
             RecordWriteStep(rwName, missRecordsTableName, Some(accuracyRecordTableName))

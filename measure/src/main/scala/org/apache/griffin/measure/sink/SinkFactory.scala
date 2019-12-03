@@ -43,11 +43,11 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam],
     val config = sinkParam.getConfig
     val sinkType = sinkParam.getType
     val sinkTry = sinkType match {
-      case ConsoleSinkType => Try(ConsoleSink(config, metricName, timeStamp))
-      case HdfsSinkType => Try(HdfsSink(config, metricName, timeStamp))
-      case ElasticsearchSinkType => Try(ElasticSearchSink(config, metricName, timeStamp, block))
-      case MongoSinkType => Try(MongoSink(config, metricName, timeStamp, block))
-      case CustomSinkType => Try(getCustomSink(config, metricName, timeStamp, block))
+      case SinkType.Console => Try(ConsoleSink(config, metricName, timeStamp))
+      case SinkType.Hdfs => Try(HdfsSink(config, metricName, timeStamp))
+      case SinkType.Elasticsearch => Try(ElasticSearchSink(config, metricName, timeStamp, block))
+      case SinkType.MongoDB => Try(MongoSink(config, metricName, timeStamp, block))
+      case SinkType.Custom => Try(getCustomSink(config, metricName, timeStamp, block))
       case _ => throw new Exception(s"sink type ${sinkType} is not supported!")
     }
     sinkTry match {

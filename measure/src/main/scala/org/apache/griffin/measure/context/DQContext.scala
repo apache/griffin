@@ -34,7 +34,7 @@ case class DQContext(contextId: ContextId,
                      name: String,
                      dataSources: Seq[DataSource],
                      sinkParams: Seq[SinkParam],
-                     procType: ProcessType
+                     procType: ProcessType.ProcessType
                     )(@transient implicit val sparkSession: SparkSession) {
 
   val compileTableRegister: CompileTableRegister = CompileTableRegister()
@@ -87,8 +87,8 @@ case class DQContext(contextId: ContextId,
 
   private def createSink(t: Long): Sink = {
     procType match {
-      case BatchProcessType => sinkFactory.getSinks(t, true)
-      case StreamingProcessType => sinkFactory.getSinks(t, false)
+      case ProcessType.BatchProcessType => sinkFactory.getSinks(t, true)
+      case ProcessType.StreamingProcessType => sinkFactory.getSinks(t, false)
     }
   }
 

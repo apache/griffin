@@ -87,7 +87,7 @@ case class SparkParam( @JsonProperty("log.level") private val logLevel: String,
 case class SinkParam(@JsonProperty("type") private val sinkType: String,
                      @JsonProperty("config") private val config: Map[String, Any]
                     ) extends Param {
-  def getType: SinkType = SinkType(sinkType)
+  def getType: SinkType.SinkType = SinkType.withNameWithDefault(sinkType)
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
 
   def validate(): Unit = {

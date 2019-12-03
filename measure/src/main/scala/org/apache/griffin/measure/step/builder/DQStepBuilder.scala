@@ -50,11 +50,11 @@ object DQStepBuilder {
       .flatMap(_.buildDQStep(context, dsParam))
   }
 
-  private def getDataSourceParamStepBuilder(procType: ProcessType)
+  private def getDataSourceParamStepBuilder(procType: ProcessType.ProcessType)
   : Option[DataSourceParamStepBuilder] = {
     procType match {
-      case BatchProcessType => Some(BatchDataSourceStepBuilder())
-      case StreamingProcessType => Some(StreamingDataSourceStepBuilder())
+      case ProcessType.BatchProcessType => Some(BatchDataSourceStepBuilder())
+      case ProcessType.StreamingProcessType => Some(StreamingDataSourceStepBuilder())
       case _ => None
     }
   }
@@ -72,12 +72,12 @@ object DQStepBuilder {
     dqStepOpt
   }
 
-  private def getRuleParamStepBuilder(dslType: DslType, dsNames: Seq[String], funcNames: Seq[String]
+  private def getRuleParamStepBuilder(dslType: DslType.DslType, dsNames: Seq[String], funcNames: Seq[String]
                                      ): Option[RuleParamStepBuilder] = {
     dslType match {
-      case SparkSqlType => Some(SparkSqlDQStepBuilder())
-      case DataFrameOpsType => Some(DataFrameOpsDQStepBuilder())
-      case GriffinDslType => Some(GriffinDslDQStepBuilder(dsNames, funcNames))
+      case DslType.SparkSql => Some(SparkSqlDQStepBuilder())
+      case DslType.DfOperations => Some(DataFrameOpsDQStepBuilder())
+      case DslType.GriffinDsl => Some(GriffinDslDQStepBuilder(dsNames, funcNames))
       case _ => None
     }
   }

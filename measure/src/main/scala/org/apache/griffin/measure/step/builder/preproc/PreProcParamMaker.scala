@@ -47,7 +47,7 @@ object PreProcParamMaker {
     val newOutDfName = withSuffix(rule.getOutDfName(), suffix)
     val rpRule = rule.replaceInOutDfName(newInDfName, newOutDfName)
     rule.getDslType match {
-      case DataFrameOpsType => rpRule
+      case DslType.DfOperations => rpRule
       case _ =>
         val newRule = replaceDfNameSuffix(rule.getRule, rule.getInDfName(), suffix)
         rpRule.replaceRule(newRule)

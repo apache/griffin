@@ -114,7 +114,7 @@ class CustomSinkTest extends SinkTestBase {
     val metricWriteStep = {
       val metricOpt = Some(metricsDefaultOutput)
       val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse("default_metrics_name")
-      val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+      val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.DefaultFlattenType)
       MetricWriteStep(mwName, resultTable, flattenType)
     }
 

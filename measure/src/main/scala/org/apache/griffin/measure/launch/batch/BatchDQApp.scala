@@ -74,7 +74,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // create dq context
     dqContext = DQContext(
-      contextId, metricName, dataSources, sinkParams, BatchProcessType
+      contextId, metricName, dataSources, sinkParams, ProcessType.BatchProcessType
     )(sparkSession)
 
     // start id

@@ -43,15 +43,15 @@ trait RuleParamStepBuilder extends DQStepBuilder {
   protected def buildDirectWriteSteps(ruleParam: RuleParam): Seq[DQStep] = {
     val name = getStepName(ruleParam.getOutDfName())
     // metric writer
-    val metricSteps = ruleParam.getOutputOpt(MetricOutputType).map { metric =>
+    val metricSteps = ruleParam.getOutputOpt(OutputType.MetricOutputType).map { metric =>
       MetricWriteStep(metric.getNameOpt.getOrElse(name), name, metric.getFlatten)
     }.toSeq
     // record writer
-    val recordSteps = ruleParam.getOutputOpt(RecordOutputType).map { record =>
+    val recordSteps = ruleParam.getOutputOpt(OutputType.RecordOutputType).map { record =>
       RecordWriteStep(record.getNameOpt.getOrElse(name), name)
     }.toSeq
     // update writer
-    val dsCacheUpdateSteps = ruleParam.getOutputOpt(DscUpdateOutputType).map { dsCacheUpdate =>
+    val dsCacheUpdateSteps = ruleParam.getOutputOpt(OutputType.DscUpdateOutputType).map { dsCacheUpdate =>
       DataSourceUpdateWriteStep(dsCacheUpdate.getNameOpt.getOrElse(""), name)
     }.toSeq
 

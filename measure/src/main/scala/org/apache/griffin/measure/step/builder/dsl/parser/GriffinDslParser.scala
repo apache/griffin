@@ -81,14 +81,14 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
     case exprs => CompletenessClause(exprs)
   }
 
-  def parseRule(rule: String, dqType: DqType): ParseResult[Expr] = {
+  def parseRule(rule: String, dqType: DqType.DqType): ParseResult[Expr] = {
     val rootExpr = dqType match {
-      case AccuracyType => logicalExpression
-      case ProfilingType => profilingClause
-      case UniquenessType => uniquenessClause
-      case DistinctnessType => distinctnessClause
-      case TimelinessType => timelinessClause
-      case CompletenessType => completenessClause
+      case DqType.Accuracy => logicalExpression
+      case DqType.Profiling => profilingClause
+      case DqType.Uniqueness => uniquenessClause
+      case DqType.Distinct => distinctnessClause
+      case DqType.Timeliness => timelinessClause
+      case DqType.Completeness => completenessClause
       case _ => expression
     }
     parseAll(rootExpr, rule)

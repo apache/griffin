@@ -20,9 +20,8 @@ package org.apache.griffin.measure.transformations
 
 import org.apache.spark.sql.DataFrame
 import org.scalatest._
-
 import org.apache.griffin.measure.configuration.dqdefinition._
-import org.apache.griffin.measure.configuration.enums.BatchProcessType
+import org.apache.griffin.measure.configuration.enums.{ProcessType}
 import org.apache.griffin.measure.context.{ContextId, DQContext}
 import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
@@ -164,7 +163,7 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
       name,
       dataSources,
       Nil,
-      BatchProcessType
+      ProcessType.BatchProcessType
     )(spark)
   }
 

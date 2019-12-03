@@ -19,8 +19,8 @@ under the License.
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
+import org.apache.griffin.measure.configuration.enums.DslType
 import org.scalatest._
-
 
 import scala.util.{Failure, Success}
 
@@ -32,7 +32,7 @@ class ParamFileReaderSpec extends FlatSpec with Matchers{
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
-        v.getEvaluateRule.getRules(0).getDslType.desc should === ("griffin-dsl")
+        v.getEvaluateRule.getRules(0).getDslType should === (DslType.GriffinDsl)
         v.getEvaluateRule.getRules(0).getOutDfName() should === ("accu")
       case Failure(_) =>
         fail("it should not happen")

@@ -113,14 +113,14 @@ case class TimelinessExpr2DQSteps(context: DQContext,
       val avgColName = details.getStringOrKey(_avg)
       val metricSql = procType match {
 
-        case BatchProcessType =>
+        case ProcessType.BatchProcessType =>
           s"""
              |SELECT COUNT(*) AS `${totalColName}`,
              |CAST(AVG(`${latencyColName}`) AS BIGINT) AS `${avgColName}`
              |FROM `${latencyTableName}`
            """.stripMargin
 
-        case StreamingProcessType =>
+        case ProcessType.StreamingProcessType =>
           s"""
              |SELECT `${ConstantColumns.tmst}`,
              |COUNT(*) AS `${totalColName}`,
@@ -130,9 +130,9 @@ case class TimelinessExpr2DQSteps(context: DQContext,
            """.stripMargin
       }
       val metricWriteStep = {
-        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
+        val metricOpt = ruleParam.getOutputOpt(OutputType.MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
-        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.DefaultFlattenType)
         MetricWriteStep(mwName, metricTableName, flattenType)
       }
       val metricTransStep =
@@ -151,7 +151,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
           }
           val recordWriteStep = {
             val rwName =
-              ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
+              ruleParam.getOutputOpt(OutputType.RecordOutputType).flatMap(_.getNameOpt)
                 .getOrElse(recordTableName)
 
             RecordWriteStep(rwName, recordTableName, None)
@@ -183,19 +183,19 @@ case class TimelinessExpr2DQSteps(context: DQContext,
           val rangeMetricTableName = "__rangeMetric"
           val countColName = details.getStringOrKey(_count)
           val rangeMetricSql = procType match {
-            case BatchProcessType =>
+            case ProcessType.BatchProcessType =>
               s"""
                  |SELECT `${stepColName}`, COUNT(*) AS `${countColName}`
                  |FROM `${rangeTableName}` GROUP BY `${stepColName}`
                 """.stripMargin
-            case StreamingProcessType =>
+            case ProcessType.StreamingProcessType =>
               s"""
                  |SELECT `${ConstantColumns.tmst}`, `${stepColName}`, COUNT(*) AS `${countColName}`
                  |FROM `${rangeTableName}` GROUP BY `${ConstantColumns.tmst}`, `${stepColName}`
                 """.stripMargin
           }
           val rangeMetricWriteStep = {
-            MetricWriteStep(stepColName, rangeMetricTableName, ArrayFlattenType)
+            MetricWriteStep(stepColName, rangeMetricTableName, FlattenType.ArrayFlattenType)
           }
           val rangeMetricTransStep =
             SparkSqlTransformStep(rangeMetricTableName, rangeMetricSql, emptyMap, Some(rangeMetricWriteStep))
@@ -222,7 +222,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
             """.stripMargin
         }
         val percentileWriteStep = {
-          MetricWriteStep(percentileTableName, percentileTableName, DefaultFlattenType)
+          MetricWriteStep(percentileTableName, percentileTableName, FlattenType.DefaultFlattenType)
         }
         val percentileTransStep =
           SparkSqlTransformStep(percentileTableName, percentileSql, emptyMap, Some(percentileWriteStep))

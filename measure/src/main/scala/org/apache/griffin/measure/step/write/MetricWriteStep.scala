@@ -29,7 +29,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
   */
 case class MetricWriteStep(name: String,
                            inputName: String,
-                           flattenType: FlattenType,
+                           flattenType: FlattenType.FlattenType,
                            writeTimestampOpt: Option[Long] = None
                           ) extends WriteStep {
 
@@ -94,12 +94,12 @@ case class MetricWriteStep(name: String,
     }
   }
 
-  private def flattenMetric(metrics: Seq[Map[String, Any]], name: String, flattenType: FlattenType
+  private def flattenMetric(metrics: Seq[Map[String, Any]], name: String, flattenType: FlattenType.FlattenType
                              ): Map[String, Any] = {
     flattenType match {
-      case EntriesFlattenType => metrics.headOption.getOrElse(emptyMap)
-      case ArrayFlattenType => Map[String, Any]((name -> metrics))
-      case MapFlattenType =>
+      case FlattenType.EntriesFlattenType => metrics.headOption.getOrElse(emptyMap)
+      case FlattenType.ArrayFlattenType => Map[String, Any]((name -> metrics))
+      case FlattenType.MapFlattenType =>
         val v = metrics.headOption.getOrElse(emptyMap)
         Map[String, Any]((name -> v))
       case _ =>

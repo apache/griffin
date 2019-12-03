@@ -63,10 +63,10 @@ object Application extends Loggable {
     val allParam: GriffinConfig = GriffinConfig(envParam, dqParam)
 
     // choose process
-    val procType = ProcessType(allParam.getDqConfig.getProcType)
+    val procType = ProcessType.withNameWithDefault(allParam.getDqConfig.getProcType)
     val dqApp: DQApp = procType match {
-      case BatchProcessType => BatchDQApp(allParam)
-      case StreamingProcessType => StreamingDQApp(allParam)
+      case ProcessType.BatchProcessType => BatchDQApp(allParam)
+      case ProcessType.StreamingProcessType => StreamingDQApp(allParam)
       case _ =>
         error(s"${procType} is unsupported process type!")
         sys.exit(-4)
