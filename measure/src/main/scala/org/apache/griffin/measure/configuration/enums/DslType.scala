@@ -15,28 +15,36 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
-*/
+ */
 package org.apache.griffin.measure.configuration.enums
+import org.apache.griffin.measure.configuration.enums
 
 /**
- * dsl type indicates the language type of rule param
- * <li>{@link #SparkSql} - spark-sql: rule defined in "SPARK-SQL" directly</li>
- * <li>{@link #DfOps} - df-ops|df-opr|: data frame operations rule, support some pre-defined data frame ops()</li>
- * <li>{@link #GriffinDsl} - griffin dsl rule, to define dq measurements easier</li>
- */
+  * dsl type indicates the language type of rule param
+  * <li>{@link #SparkSql} - spark-sql: rule defined in "SPARK-SQL" directly</li>
+  * <li>{@link #DfOps} - df-ops|df-opr|: data frame operations rule, support some pre-defined data frame ops()</li>
+  * <li>{@link #GriffinDsl} - griffin dsl rule, to define dq measurements easier</li>
+  */
 object DslType extends GriffinEnum {
   type DslType = Value
 
   val SparkSql, DfOps, DfOpr, DfOperations, GriffinDsl, Unknown = Value
-  //todo - removed redudant variables
+
   /**
-   *
-   * @param name Dsltype from config file
-   * @return Enum value corresponding to string
-   */
+    *
+    * @param name Dsltype from config file
+    * @return Enum value corresponding to string
+    */
   def withNameWithDslType(name: String): Value =
     values
       .find(_.toString.toLowerCase == name.replace("-", "").toLowerCase())
       .getOrElse(Value)
 
+  override def withNameWithDefault(name: String): enums.DslType.Value = {
+    val dslType = withNameWithDslType(name)
+    dslType match {
+      case DfOps | DfOpr | DfOperations => DfOperations
+      case _                            => dslType
+    }
+  }
 }

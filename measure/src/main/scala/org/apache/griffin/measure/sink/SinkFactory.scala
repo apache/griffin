@@ -45,7 +45,7 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam],
     val sinkTry = sinkType match {
       case SinkType.Console => Try(ConsoleSink(config, metricName, timeStamp))
       case SinkType.Hdfs => Try(HdfsSink(config, metricName, timeStamp))
-      case SinkType.Elasticsearch => Try(ElasticSearchSink(config, metricName, timeStamp, block))
+      case SinkType.ElasticSearch => Try(ElasticSearchSink(config, metricName, timeStamp, block))
       case SinkType.MongoDB => Try(MongoSink(config, metricName, timeStamp, block))
       case SinkType.Custom => Try(getCustomSink(config, metricName, timeStamp, block))
       case _ => throw new Exception(s"sink type ${sinkType} is not supported!")

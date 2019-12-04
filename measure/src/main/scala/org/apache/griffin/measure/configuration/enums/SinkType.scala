@@ -15,39 +15,41 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
-*/
+ */
 package org.apache.griffin.measure.configuration.enums
+import org.apache.griffin.measure.configuration.enums
 
 /**
- * Supported Sink types
- *  <li>{@link #Console #Log} -  console sink, will sink metric in console (alias log)</li>
- *  <li>{@link #Hdfs} - hdfs sink, will sink metric and record in hdfs</li>
- *  <li>{@link #Es #Elasticsearch #Http} - elasticsearch sink, will sink metric in elasticsearch (alias Es and Http)</li>
- *  <li>{@link #Mongo #MongoDB} - mongo sink, will sink metric in mongo db (alias MongoDb)</li>
- *  <li>{@link #Custom} - custom sink (needs using extra jar-file-extension)</li>
- *  <li>{@link #Unknown} - </li>
- */
+  * Supported Sink types
+  *  <li>{@link #Console #Log} -  console sink, will sink metric in console (alias log)</li>
+  *  <li>{@link #Hdfs} - hdfs sink, will sink metric and record in hdfs</li>
+  *  <li>{@link #Es #Elasticsearch #Http} - elasticsearch sink, will sink metric in elasticsearch (alias Es and Http)</li>
+  *  <li>{@link #Mongo #MongoDB} - mongo sink, will sink metric in mongo db (alias MongoDb)</li>
+  *  <li>{@link #Custom} - custom sink (needs using extra jar-file-extension)</li>
+  *  <li>{@link #Unknown} - </li>
+  */
 object SinkType extends GriffinEnum {
   type SinkType = Value
 
-  val Console, Hdfs, Elasticsearch, MongoDB, Custom, Unknown = Value
+  val Console, Log, Hdfs, Es, Http, ElasticSearch, MongoDB, Mongo, Custom,
+  Unknown = Value
 
   def validSinkTypes(strs: Seq[String]): Seq[SinkType] = {
     val seq = strs
-      .map(s => SinkType.withNameSinkType(s))
+      .map(s => SinkType.withNameWithDefault(s))
       .filter(_ != SinkType.Unknown)
       .distinct
-    if (seq.size > 0) seq else Seq(SinkType.Elasticsearch)
+    if (seq.size > 0) seq else Seq(SinkType.ElasticSearch)
   }
 
-  def withNameSinkType(name: String): Value = {
-    name.trim.toLowerCase() match {
-      case "console" | "log" => Console
-      case "hdfs" => Hdfs
-      case "es" | "elasticsearch" | "http" => Elasticsearch
-      case "mongo" | "mongodb" => MongoDB
-      case "custom" => Custom
-      case _ => Unknown
+
+  override def withNameWithDefault(name: String): enums.SinkType.Value = {
+    val sinkType = super.withNameWithDefault(name)
+    sinkType match {
+      case Console | Log             => Console
+      case Es | ElasticSearch | Http => ElasticSearch
+      case MongoDB | Mongo           => MongoDB
+      case _                         => sinkType
     }
   }
 }

@@ -18,6 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.configuration.enums
 
+import org.apache.griffin.measure.configuration.enums
+
 import scala.util.matching.Regex
 
 /**
@@ -49,7 +51,16 @@ object DqType extends GriffinEnum {
 
   type DqType = Value
 
-  val Accuracy, Profiling, Uniqueness, Distinct, Timeliness, Completeness,
+  val Accuracy, Profiling, Uniqueness, Duplicate ,Distinct, Timeliness, Completeness,
   Unknown = Value
 
+  override def withNameWithDefault(
+    name: String
+  ): enums.DqType.Value = {
+      val dqType = super.withNameWithDefault(name)
+      dqType match {
+        case Uniqueness | Duplicate => Uniqueness
+        case _                      => dqType
+      }
+    }
 }

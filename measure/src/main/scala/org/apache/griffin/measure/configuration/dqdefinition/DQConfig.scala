@@ -154,7 +154,7 @@ case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
                      @JsonProperty("out") private val outputs: List[RuleOutputParam] = null,
                      @JsonProperty("error.confs") private val errorConfs: List[RuleErrorConfParam] = null
                     ) extends Param {
-  def getDslType: DslType.DslType = if (dslType != null) DslType.withNameWithDslType(dslType) else DslType.Unknown
+  def getDslType: DslType.DslType = if (dslType != null) DslType.withNameWithDefault(dslType) else DslType.Unknown
   def getDqType: DqType.DqType = if (dqType != null) DqType.withNameWithDefault(dqType) else DqType.Unknown
   def getCache: Boolean = if (cache) cache else false
 
