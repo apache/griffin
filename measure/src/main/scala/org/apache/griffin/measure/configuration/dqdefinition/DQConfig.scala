@@ -154,7 +154,7 @@ case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
                      @JsonProperty("out") private val outputs: List[RuleOutputParam] = null,
                      @JsonProperty("error.confs") private val errorConfs: List[RuleErrorConfParam] = null
                     ) extends Param {
-  def getDslType: DslType.DslType = if (dslType != null) DslType.withNameWithDefault(dslType) else DslType.Unknown
+  def getDslType: DslType.DslType = if (dslType != null) DslType.withNameWithDefault(dslType) else DslType.GriffinDsl
   def getDqType: DqType.DqType = if (dqType != null) DqType.withNameWithDefault(dqType) else DqType.Unknown
   def getCache: Boolean = if (cache) cache else false
 
@@ -205,9 +205,9 @@ case class RuleOutputParam( @JsonProperty("type") private val outputType: String
                             @JsonProperty("name") private val name: String,
                             @JsonProperty("flatten") private val flatten: String
                           ) extends Param {
-  def getOutputType: OutputType.OutputType = if (outputType != null) OutputType.withNameOutputType(outputType) else OutputType.UnknownOutputType
+  def getOutputType: OutputType.OutputType = if (outputType != null) OutputType.withNameWithDefault(outputType) else OutputType.UnknownOutputType
   def getNameOpt: Option[String] = if (StringUtils.isNotBlank(name)) Some(name) else None
-  def getFlatten: FlattenType.FlattenType = if (StringUtils.isNotBlank(flatten)) FlattenType.withNameFlattenType(flatten) else FlattenType.DefaultFlattenType
+  def getFlatten: FlattenType.FlattenType = if (StringUtils.isNotBlank(flatten)) FlattenType.withNameWithDefault(flatten) else FlattenType.DefaultFlattenType
 
   def validate(): Unit = {}
 }

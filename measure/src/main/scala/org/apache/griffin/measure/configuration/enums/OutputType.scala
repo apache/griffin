@@ -30,8 +30,15 @@ object OutputType extends GriffinEnum {
 
   val MetricOutputType, RecordOutputType, DscUpdateOutputType, UnknownOutputType = Value
 
-  def withNameOutputType(name: String): Value =
-    values
-      .find(_.toString.toLowerCase.contains(name.replace("-", "").toLowerCase()))
-      .getOrElse(Value)
+  val Metric,Record,Records,DscUpdate = Value
+
+  override def withNameWithDefault(name : String): Value = {
+    val flattenType = super.withNameWithDefault(name)
+    flattenType match {
+      case Metric  => MetricOutputType
+      case Record | Records  => RecordOutputType
+      case DscUpdate => DscUpdateOutputType
+      case _ => UnknownOutputType
+    }
+  }
 }

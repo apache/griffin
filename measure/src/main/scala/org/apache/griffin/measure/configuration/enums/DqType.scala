@@ -51,8 +51,7 @@ object DqType extends GriffinEnum {
 
   type DqType = Value
 
-  val Accuracy, Profiling, Uniqueness, Duplicate ,Distinct, Timeliness, Completeness,
-  Unknown = Value
+  val Accuracy, Profiling, Uniqueness, Duplicate ,Distinct, Timeliness, Completeness = Value
 
   override def withNameWithDefault(
     name: String

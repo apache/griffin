@@ -28,7 +28,7 @@ import org.apache.griffin.measure.configuration.enums
 object DslType extends GriffinEnum {
   type DslType = Value
 
-  val SparkSql, DfOps, DfOpr, DfOperations, GriffinDsl, Unknown = Value
+  val SparkSql, DfOps, DfOpr, DfOperations, GriffinDsl = Value
 
   /**
     *
@@ -38,7 +38,7 @@ object DslType extends GriffinEnum {
   def withNameWithDslType(name: String): Value =
     values
       .find(_.toString.toLowerCase == name.replace("-", "").toLowerCase())
-      .getOrElse(Value)
+      .getOrElse(GriffinDsl)
 
   override def withNameWithDefault(name: String): enums.DslType.Value = {
     val dslType = withNameWithDslType(name)

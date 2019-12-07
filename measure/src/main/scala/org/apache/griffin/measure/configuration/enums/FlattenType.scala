@@ -47,13 +47,18 @@ package org.apache.griffin.measure.configuration.enums
 object FlattenType extends GriffinEnum {
   type FlattenType = Value
 
-  val DefaultFlattenType, EntriesFlattenType, ArrayFlattenType, MapFlattenType =
+  val DefaultFlattenType, EntriesFlattenType, ArrayFlattenType ,MapFlattenType =
     Value
 
-  def withNameFlattenType(name: String): Value = {
-    name.trim.toLowerCase match {
-      case "array" | "list" => ArrayFlattenType
-      case _ => withNameWithDefault(name)
+  val List,Array,Entries,Map,Default = Value
+
+  override def withNameWithDefault(name : String): Value = {
+    val flattenType = super.withNameWithDefault(name)
+    flattenType match {
+      case Array | List => ArrayFlattenType
+      case Map  => MapFlattenType
+      case Entries => EntriesFlattenType
+      case _ => DefaultFlattenType
     }
   }
 }
