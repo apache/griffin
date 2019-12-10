@@ -15,30 +15,31 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
-*/
+ */
 package org.apache.griffin.measure.configuration.enums
 
 /**
- * the strategy to output metric
- *  <li>{@link #MetricOutputType} - output the rule step result as metric</li>
- *  <li>{@link #RecordOutputType} - output the rule step result as records</li>
- *  <li>{@link #DscUpdateOutputType} - output the rule step result to update data source cache</li>
- *  <li>{@link #UnknownOutputType} - will not output the result </li>
- */
+  * the strategy to output metric
+  *  <li>{@link #MetricOutputType} - output the rule step result as metric</li>
+  *  <li>{@link #RecordOutputType} - output the rule step result as records</li>
+  *  <li>{@link #DscUpdateOutputType} - output the rule step result to update data source cache</li>
+  *  <li>{@link #UnknownOutputType} - will not output the result </li>
+  */
 object OutputType extends GriffinEnum {
   type OutputType = Value
 
-  val MetricOutputType, RecordOutputType, DscUpdateOutputType, UnknownOutputType = Value
+  val MetricOutputType, RecordOutputType, DscUpdateOutputType,
+  UnknownOutputType = Value
 
-  val Metric,Record,Records,DscUpdate = Value
+  val Metric, Record, Records, DscUpdate = Value
 
-  override def withNameWithDefault(name : String): Value = {
+  override def withNameWithDefault(name: String): Value = {
     val flattenType = super.withNameWithDefault(name)
     flattenType match {
-      case Metric  => MetricOutputType
-      case Record | Records  => RecordOutputType
-      case DscUpdate => DscUpdateOutputType
-      case _ => UnknownOutputType
+      case Metric           => MetricOutputType
+      case Record | Records => RecordOutputType
+      case DscUpdate        => DscUpdateOutputType
+      case _                => UnknownOutputType
     }
   }
 }

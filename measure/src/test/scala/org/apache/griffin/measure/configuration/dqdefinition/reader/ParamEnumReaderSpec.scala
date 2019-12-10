@@ -1,6 +1,11 @@
 package org.apache.griffin.measure.configuration.dqdefinition.reader
-import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EvaluateRuleParam, RuleOutputParam, RuleParam}
-import org.apache.griffin.measure.configuration.enums.{DqType, DslType, FlattenType, OutputType, SinkType}
+import org.apache.griffin.measure.configuration.dqdefinition.{
+  DQConfig,
+  EvaluateRuleParam,
+  RuleOutputParam,
+  RuleParam
+}
+import org.apache.griffin.measure.configuration.enums._
 import org.scalatest.{FlatSpec, Matchers}
 
 class ParamEnumReaderSpec extends FlatSpec with Matchers {
@@ -43,11 +48,6 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
       val ruleParam = new RuleParam(x, "accuracy")
       ruleParam.getDslType should not be (DslType.DfOperations)
     }
-    /*val idPattern = "^(?i)spark-?sql$".r
-    idPattern.findFirstMatchIn("spark-SQL") match {
-      case Some(_) => println("ok")
-      case None  => println("not ok")
-    }*/
   }
 
   "griffindsl" should "be returned as default dsl type" in {
@@ -56,11 +56,6 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
       val ruleParam = new RuleParam(x, "accuracy")
       ruleParam.getDslType should be(DslType.GriffinDsl)
     }
-    /*val idPattern = "^(?i)spark-?sql$".r
-    idPattern.findFirstMatchIn("spark-SQL") match {
-      case Some(_) => println("ok")
-      case None  => println("not ok")
-    }*/
   }
 
   "dqtype" should "be parsed to predefined set of values" in {
@@ -101,59 +96,97 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
   }
 
   "outputtype" should "be valid" in {
-    var ruleOutputParam = new RuleOutputParam("metric","","map")
+    var ruleOutputParam = new RuleOutputParam("metric", "", "map")
     ruleOutputParam.getOutputType should be(OutputType.MetricOutputType)
-    ruleOutputParam = new RuleOutputParam("metr","","map")
+    ruleOutputParam = new RuleOutputParam("metr", "", "map")
     ruleOutputParam.getOutputType should not be (OutputType.MetricOutputType)
-    ruleOutputParam.getOutputType should be (OutputType.UnknownOutputType)
+    ruleOutputParam.getOutputType should be(OutputType.UnknownOutputType)
 
-    ruleOutputParam = new RuleOutputParam("record","","map")
+    ruleOutputParam = new RuleOutputParam("record", "", "map")
     ruleOutputParam.getOutputType should be(OutputType.RecordOutputType)
-    ruleOutputParam = new RuleOutputParam("rec","","map")
+    ruleOutputParam = new RuleOutputParam("rec", "", "map")
     ruleOutputParam.getOutputType should not be (OutputType.RecordOutputType)
-    ruleOutputParam.getOutputType should be (OutputType.UnknownOutputType)
+    ruleOutputParam.getOutputType should be(OutputType.UnknownOutputType)
 
-    ruleOutputParam = new RuleOutputParam("dscupdate","","map")
+    ruleOutputParam = new RuleOutputParam("dscupdate", "", "map")
     ruleOutputParam.getOutputType should be(OutputType.DscUpdateOutputType)
-    ruleOutputParam = new RuleOutputParam("dsc","","map")
+    ruleOutputParam = new RuleOutputParam("dsc", "", "map")
     ruleOutputParam.getOutputType should not be (OutputType.DscUpdateOutputType)
-    ruleOutputParam.getOutputType should be (OutputType.UnknownOutputType)
+    ruleOutputParam.getOutputType should be(OutputType.UnknownOutputType)
 
   }
 
   "flattentype" should "be valid" in {
-    var ruleOutputParam = new RuleOutputParam("metric","","map")
+    var ruleOutputParam = new RuleOutputParam("metric", "", "map")
     ruleOutputParam.getFlatten should be(FlattenType.MapFlattenType)
-    ruleOutputParam = new RuleOutputParam("metric","","metr")
+    ruleOutputParam = new RuleOutputParam("metric", "", "metr")
     ruleOutputParam.getFlatten should not be (FlattenType.MapFlattenType)
-    ruleOutputParam.getFlatten should be (FlattenType.DefaultFlattenType)
+    ruleOutputParam.getFlatten should be(FlattenType.DefaultFlattenType)
 
-    ruleOutputParam = new RuleOutputParam("metric","","array")
+    ruleOutputParam = new RuleOutputParam("metric", "", "array")
     ruleOutputParam.getFlatten should be(FlattenType.ArrayFlattenType)
-    ruleOutputParam = new RuleOutputParam("metric","","list")
+    ruleOutputParam = new RuleOutputParam("metric", "", "list")
     ruleOutputParam.getFlatten should be(FlattenType.ArrayFlattenType)
-    ruleOutputParam = new RuleOutputParam("metric","","arrays")
+    ruleOutputParam = new RuleOutputParam("metric", "", "arrays")
     ruleOutputParam.getFlatten should not be (FlattenType.ArrayFlattenType)
-    ruleOutputParam.getFlatten should be (FlattenType.DefaultFlattenType)
+    ruleOutputParam.getFlatten should be(FlattenType.DefaultFlattenType)
 
-    ruleOutputParam = new RuleOutputParam("metric","","entries")
+    ruleOutputParam = new RuleOutputParam("metric", "", "entries")
     ruleOutputParam.getFlatten should be(FlattenType.EntriesFlattenType)
-    ruleOutputParam = new RuleOutputParam("metric","","entry")
+    ruleOutputParam = new RuleOutputParam("metric", "", "entry")
     ruleOutputParam.getFlatten should not be (FlattenType.EntriesFlattenType)
-    ruleOutputParam.getFlatten should be (FlattenType.DefaultFlattenType)
+    ruleOutputParam.getFlatten should be(FlattenType.DefaultFlattenType)
   }
 
   "sinktype" should "be valid" in {
     import org.mockito.Mockito._
-    var dqConfig = new DQConfig("test",1234,"",Nil,mock(classOf[EvaluateRuleParam]),List("Console","Log","CONSOLE","LOG","Es","ElasticSearch","Http","MongoDB","mongo","hdfs"))
-    dqConfig.getValidSinkTypes should be (Seq(SinkType.Console,SinkType.ElasticSearch,SinkType.MongoDB,SinkType.Hdfs))
-    dqConfig = new DQConfig("test",1234,"",Nil,mock(classOf[EvaluateRuleParam]),List("Consol","Logg"))
+    var dqConfig = new DQConfig(
+      "test",
+      1234,
+      "",
+      Nil,
+      mock(classOf[EvaluateRuleParam]),
+      List(
+        "Console",
+        "Log",
+        "CONSOLE",
+        "LOG",
+        "Es",
+        "ElasticSearch",
+        "Http",
+        "MongoDB",
+        "mongo",
+        "hdfs"
+      )
+    )
+    dqConfig.getValidSinkTypes should be(
+      Seq(
+        SinkType.Console,
+        SinkType.ElasticSearch,
+        SinkType.MongoDB,
+        SinkType.Hdfs
+      )
+    )
+    dqConfig = new DQConfig(
+      "test",
+      1234,
+      "",
+      Nil,
+      mock(classOf[EvaluateRuleParam]),
+      List("Consol", "Logg")
+    )
     dqConfig.getValidSinkTypes should not be (Seq(SinkType.Console))
-    dqConfig.getValidSinkTypes should be (Seq(SinkType.ElasticSearch))
+    dqConfig.getValidSinkTypes should be(Seq(SinkType.ElasticSearch))
 
-
-    dqConfig = new DQConfig("test",1234,"",Nil,mock(classOf[EvaluateRuleParam]),List(""))
-    dqConfig.getValidSinkTypes should be (Seq(SinkType.ElasticSearch))
+    dqConfig = new DQConfig(
+      "test",
+      1234,
+      "",
+      Nil,
+      mock(classOf[EvaluateRuleParam]),
+      List("")
+    )
+    dqConfig.getValidSinkTypes should be(Seq(SinkType.ElasticSearch))
   }
 
 }

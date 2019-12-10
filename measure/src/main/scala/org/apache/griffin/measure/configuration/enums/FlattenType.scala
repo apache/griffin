@@ -15,50 +15,50 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
-*/
+ */
 package org.apache.griffin.measure.configuration.enums
 
 /**
- * the strategy to flatten metric
- *  <li>{@link #DefaultFlattenType} -  default flatten strategy
- *                                     metrics contains 1 row -> flatten metric json map
- *                                     metrics contains n > 1 rows -> flatten metric json array
- *                                     n = 0: { }
- *                                     n = 1: { "col1": "value1", "col2": "value2", ... }
- *                                     n > 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
- *                                     all rows
- *  </li>
- *  <li>{@link #EntriesFlattenType} - metrics contains n rows -> flatten metric json map
- *                                    n = 0: { }
- *                                    n >= 1: { "col1": "value1", "col2": "value2", ... }
- *                                    the first row only
- *  </li>
- *  <li>{@link #ArrayFlattenType} -   metrics contains n rows -> flatten metric json array
- *                                    n = 0: { "arr-name": [ ] }
- *                                    n >= 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
- *                                    all rows
- *  </li>
- *  <li>{@link #MapFlattenType} - metrics contains n rows -> flatten metric json wrapped map
- *                                n = 0: { "map-name": { } }
- *                                n >= 1: { "map-name": { "col1": "value1", "col2": "value2", ... } }
- *                                the first row only
- *  </li>
- */
+  * the strategy to flatten metric
+  *  <li>{@link #DefaultFlattenType} -  default flatten strategy
+  *                                     metrics contains 1 row -> flatten metric json map
+  *                                     metrics contains n > 1 rows -> flatten metric json array
+  *                                     n = 0: { }
+  *                                     n = 1: { "col1": "value1", "col2": "value2", ... }
+  *                                     n > 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
+  *                                     all rows
+  *  </li>
+  *  <li>{@link #EntriesFlattenType} - metrics contains n rows -> flatten metric json map
+  *                                    n = 0: { }
+  *                                    n >= 1: { "col1": "value1", "col2": "value2", ... }
+  *                                    the first row only
+  *  </li>
+  *  <li>{@link #ArrayFlattenType} -   metrics contains n rows -> flatten metric json array
+  *                                    n = 0: { "arr-name": [ ] }
+  *                                    n >= 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
+  *                                    all rows
+  *  </li>
+  *  <li>{@link #MapFlattenType} - metrics contains n rows -> flatten metric json wrapped map
+  *                                n = 0: { "map-name": { } }
+  *                                n >= 1: { "map-name": { "col1": "value1", "col2": "value2", ... } }
+  *                                the first row only
+  *  </li>
+  */
 object FlattenType extends GriffinEnum {
   type FlattenType = Value
 
-  val DefaultFlattenType, EntriesFlattenType, ArrayFlattenType ,MapFlattenType =
+  val DefaultFlattenType, EntriesFlattenType, ArrayFlattenType, MapFlattenType =
     Value
 
-  val List,Array,Entries,Map,Default = Value
+  val List, Array, Entries, Map, Default = Value
 
-  override def withNameWithDefault(name : String): Value = {
+  override def withNameWithDefault(name: String): Value = {
     val flattenType = super.withNameWithDefault(name)
     flattenType match {
       case Array | List => ArrayFlattenType
-      case Map  => MapFlattenType
-      case Entries => EntriesFlattenType
-      case _ => DefaultFlattenType
+      case Map          => MapFlattenType
+      case Entries      => EntriesFlattenType
+      case _            => DefaultFlattenType
     }
   }
 }

@@ -31,7 +31,8 @@ import org.apache.griffin.measure.configuration.enums
 object SinkType extends GriffinEnum {
   type SinkType = Value
 
-  val Console, Log, Hdfs, Es, Http, ElasticSearch, MongoDB, Mongo, Custom = Value
+  val Console, Log, Hdfs, Es, Http, ElasticSearch, MongoDB, Mongo, Custom =
+    Value
 
   def validSinkTypes(strs: Seq[String]): Seq[SinkType] = {
     val seq = strs
@@ -40,7 +41,6 @@ object SinkType extends GriffinEnum {
       .distinct
     if (seq.size > 0) seq else Seq(SinkType.ElasticSearch)
   }
-
 
   override def withNameWithDefault(name: String): enums.SinkType.Value = {
     val sinkType = super.withNameWithDefault(name)
