@@ -19,10 +19,10 @@ under the License.
 package org.apache.griffin.measure.step.builder
 
 import org.apache.commons.lang.StringUtils
-
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.{DataSourceParam, Param, RuleParam}
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
+import org.apache.griffin.measure.configuration.enums.DslType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step._
 
@@ -50,11 +50,11 @@ object DQStepBuilder {
       .flatMap(_.buildDQStep(context, dsParam))
   }
 
-  private def getDataSourceParamStepBuilder(procType: ProcessType.ProcessType)
+  private def getDataSourceParamStepBuilder(procType: ProcessType)
   : Option[DataSourceParamStepBuilder] = {
     procType match {
-      case ProcessType.BatchProcessType => Some(BatchDataSourceStepBuilder())
-      case ProcessType.StreamingProcessType => Some(StreamingDataSourceStepBuilder())
+      case BatchProcessType => Some(BatchDataSourceStepBuilder())
+      case StreamingProcessType => Some(StreamingDataSourceStepBuilder())
       case _ => None
     }
   }
@@ -72,12 +72,12 @@ object DQStepBuilder {
     dqStepOpt
   }
 
-  private def getRuleParamStepBuilder(dslType: DslType.DslType, dsNames: Seq[String], funcNames: Seq[String]
+  private def getRuleParamStepBuilder(dslType: DslType, dsNames: Seq[String], funcNames: Seq[String]
                                      ): Option[RuleParamStepBuilder] = {
     dslType match {
-      case DslType.SparkSql => Some(SparkSqlDQStepBuilder())
-      case DslType.DfOperations => Some(DataFrameOpsDQStepBuilder())
-      case DslType.GriffinDsl => Some(GriffinDslDQStepBuilder(dsNames, funcNames))
+      case SparkSql => Some(SparkSqlDQStepBuilder())
+      case DataFrameOpsType => Some(DataFrameOpsDQStepBuilder())
+      case GriffinDsl => Some(GriffinDslDQStepBuilder(dsNames, funcNames))
       case _ => None
     }
   }

@@ -19,7 +19,9 @@ under the License.
 package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
+import org.apache.griffin.measure.configuration.enums.OutputType._
+import org.apache.griffin.measure.configuration.enums.FlattenType.{DefaultFlattenType,ArrayFlattenType}
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -113,14 +115,14 @@ case class TimelinessExpr2DQSteps(context: DQContext,
       val avgColName = details.getStringOrKey(_avg)
       val metricSql = procType match {
 
-        case ProcessType.BatchProcessType =>
+        case BatchProcessType =>
           s"""
              |SELECT COUNT(*) AS `${totalColName}`,
              |CAST(AVG(`${latencyColName}`) AS BIGINT) AS `${avgColName}`
              |FROM `${latencyTableName}`
            """.stripMargin
 
-        case ProcessType.StreamingProcessType =>
+        case StreamingProcessType =>
           s"""
              |SELECT `${ConstantColumns.tmst}`,
              |COUNT(*) AS `${totalColName}`,
@@ -130,9 +132,9 @@ case class TimelinessExpr2DQSteps(context: DQContext,
            """.stripMargin
       }
       val metricWriteStep = {
-        val metricOpt = ruleParam.getOutputOpt(OutputType.MetricOutputType)
+        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
-        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.DefaultFlattenType)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(DefaultFlattenType)
         MetricWriteStep(mwName, metricTableName, flattenType)
       }
       val metricTransStep =
@@ -151,7 +153,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
           }
           val recordWriteStep = {
             val rwName =
-              ruleParam.getOutputOpt(OutputType.RecordOutputType).flatMap(_.getNameOpt)
+              ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
                 .getOrElse(recordTableName)
 
             RecordWriteStep(rwName, recordTableName, None)
@@ -183,19 +185,19 @@ case class TimelinessExpr2DQSteps(context: DQContext,
           val rangeMetricTableName = "__rangeMetric"
           val countColName = details.getStringOrKey(_count)
           val rangeMetricSql = procType match {
-            case ProcessType.BatchProcessType =>
+            case BatchProcessType =>
               s"""
                  |SELECT `${stepColName}`, COUNT(*) AS `${countColName}`
                  |FROM `${rangeTableName}` GROUP BY `${stepColName}`
                 """.stripMargin
-            case ProcessType.StreamingProcessType =>
+            case StreamingProcessType =>
               s"""
                  |SELECT `${ConstantColumns.tmst}`, `${stepColName}`, COUNT(*) AS `${countColName}`
                  |FROM `${rangeTableName}` GROUP BY `${ConstantColumns.tmst}`, `${stepColName}`
                 """.stripMargin
           }
           val rangeMetricWriteStep = {
-            MetricWriteStep(stepColName, rangeMetricTableName, FlattenType.ArrayFlattenType)
+            MetricWriteStep(stepColName, rangeMetricTableName, ArrayFlattenType)
           }
           val rangeMetricTransStep =
             SparkSqlTransformStep(rangeMetricTableName, rangeMetricSql, emptyMap, Some(rangeMetricWriteStep))
@@ -222,7 +224,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
             """.stripMargin
         }
         val percentileWriteStep = {
-          MetricWriteStep(percentileTableName, percentileTableName, FlattenType.DefaultFlattenType)
+          MetricWriteStep(percentileTableName, percentileTableName, DefaultFlattenType)
         }
         val percentileTransStep =
           SparkSqlTransformStep(percentileTableName, percentileSql, emptyMap, Some(percentileWriteStep))

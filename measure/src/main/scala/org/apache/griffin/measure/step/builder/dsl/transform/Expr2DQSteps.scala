@@ -20,7 +20,7 @@ package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.DqType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.dsl.expr.Expr
@@ -47,12 +47,12 @@ object Expr2DQSteps {
             ruleParam: RuleParam
            ): Expr2DQSteps = {
     ruleParam.getDqType match {
-      case DqType.Accuracy => AccuracyExpr2DQSteps(context, expr, ruleParam)
-      case DqType.Profiling => ProfilingExpr2DQSteps(context, expr, ruleParam)
-      case DqType.Uniqueness => UniquenessExpr2DQSteps(context, expr, ruleParam)
-      case DqType.Distinct => DistinctnessExpr2DQSteps(context, expr, ruleParam)
-      case DqType.Timeliness => TimelinessExpr2DQSteps(context, expr, ruleParam)
-      case DqType.Completeness => CompletenessExpr2DQSteps(context, expr, ruleParam)
+      case Accuracy => AccuracyExpr2DQSteps(context, expr, ruleParam)
+      case Profiling => ProfilingExpr2DQSteps(context, expr, ruleParam)
+      case Uniqueness => UniquenessExpr2DQSteps(context, expr, ruleParam)
+      case Distinct => DistinctnessExpr2DQSteps(context, expr, ruleParam)
+      case Timeliness => TimelinessExpr2DQSteps(context, expr, ruleParam)
+      case Completeness => CompletenessExpr2DQSteps(context, expr, ruleParam)
       case _ => emtptExpr2DQSteps
     }
   }

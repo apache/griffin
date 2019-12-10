@@ -18,7 +18,8 @@ under the License.
 */
 package org.apache.griffin.measure.step.write
 
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.{SimpleMode, TimestampMode}
+import org.apache.griffin.measure.configuration.enums.FlattenType.{FlattenType,ArrayFlattenType,DefaultFlattenType,EntriesFlattenType,MapFlattenType}
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.JsonUtil
@@ -29,7 +30,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
   */
 case class MetricWriteStep(name: String,
                            inputName: String,
-                           flattenType: FlattenType.FlattenType,
+                           flattenType: FlattenType,
                            writeTimestampOpt: Option[Long] = None
                           ) extends WriteStep {
 
@@ -94,12 +95,12 @@ case class MetricWriteStep(name: String,
     }
   }
 
-  private def flattenMetric(metrics: Seq[Map[String, Any]], name: String, flattenType: FlattenType.FlattenType
+  private def flattenMetric(metrics: Seq[Map[String, Any]], name: String, flattenType: FlattenType
                              ): Map[String, Any] = {
     flattenType match {
-      case FlattenType.EntriesFlattenType => metrics.headOption.getOrElse(emptyMap)
-      case FlattenType.ArrayFlattenType => Map[String, Any]((name -> metrics))
-      case FlattenType.MapFlattenType =>
+      case EntriesFlattenType => metrics.headOption.getOrElse(emptyMap)
+      case ArrayFlattenType => Map[String, Any]((name -> metrics))
+      case MapFlattenType =>
         val v = metrics.headOption.getOrElse(emptyMap)
         Map[String, Any]((name -> v))
       case _ =>

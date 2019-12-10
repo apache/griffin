@@ -20,7 +20,9 @@ package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.commons.lang.StringUtils
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums.{FlattenType, OutputType, ProcessType}
+import org.apache.griffin.measure.configuration.enums.ProcessType._
+import org.apache.griffin.measure.configuration.enums.OutputType._
+import org.apache.griffin.measure.configuration.enums.FlattenType.{DefaultFlattenType}
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -72,13 +74,13 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       }
       val selCondition = profilingExpr.selectClause.extraConditionOpt.map(_.desc).mkString
       val selClause = procType match {
-        case ProcessType.BatchProcessType => selExprDescs.mkString(", ")
-        case ProcessType.StreamingProcessType => (s"`${ConstantColumns.tmst}`" +: selExprDescs).mkString(", ")
+        case BatchProcessType => selExprDescs.mkString(", ")
+        case StreamingProcessType => (s"`${ConstantColumns.tmst}`" +: selExprDescs).mkString(", ")
       }
       val groupByClauseOpt = analyzer.groupbyExprOpt
       val groupbyClause = procType match {
-        case ProcessType.BatchProcessType => groupByClauseOpt.map(_.desc).getOrElse("")
-        case ProcessType.StreamingProcessType =>
+        case BatchProcessType => groupByClauseOpt.map(_.desc).getOrElse("")
+        case StreamingProcessType =>
           val tmstGroupbyClause =
             GroupbyClause(LiteralStringExpr(s"`${ConstantColumns.tmst}`") :: Nil, None)
           val mergedGroubbyClause = tmstGroupbyClause.merge(groupByClauseOpt match {
@@ -97,9 +99,9 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       }
       val profilingName = ruleParam.getOutDfName()
       val profilingMetricWriteStep = {
-        val metricOpt = ruleParam.getOutputOpt(OutputType.MetricOutputType)
+        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
-        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.DefaultFlattenType)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(DefaultFlattenType)
         MetricWriteStep(mwName, profilingName, flattenType)
       }
       val profilingTransStep =

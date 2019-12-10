@@ -5,28 +5,28 @@ import org.apache.griffin.measure.configuration.dqdefinition.{
   RuleOutputParam,
   RuleParam
 }
-import org.apache.griffin.measure.configuration.enums._
 import org.scalatest.{FlatSpec, Matchers}
 
 class ParamEnumReaderSpec extends FlatSpec with Matchers {
+  import org.apache.griffin.measure.configuration.enums.DslType._
   "dsltype" should "be parsed to predefined set of values" in {
     val validDslSparkSqlValues =
       Seq("spark-sql", "spark-SQL", "SPARK-SQL", "sparksql")
     validDslSparkSqlValues foreach { x =>
       val ruleParam = new RuleParam(x, "accuracy")
-      ruleParam.getDslType should ===(DslType.SparkSql)
+      ruleParam.getDslType should ===(SparkSql)
     }
     val invalidDslSparkSqlValues = Seq("spark", "sql", "")
     invalidDslSparkSqlValues foreach { x =>
       val ruleParam = new RuleParam(x, "accuracy")
-      ruleParam.getDslType should not be (DslType.SparkSql)
+      ruleParam.getDslType should not be (SparkSql)
     }
 
     val validDslGriffinValues =
       Seq("griffin-dsl", "griffindsl", "griFfin-dsl", "")
     validDslGriffinValues foreach { x =>
       val ruleParam = new RuleParam(x, "accuracy")
-      ruleParam.getDslType should ===(DslType.GriffinDsl)
+      ruleParam.getDslType should ===(GriffinDsl)
     }
 
     val validDslDfOpsValues = Seq(
@@ -40,106 +40,111 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
     )
     validDslDfOpsValues foreach { x =>
       val ruleParam = new RuleParam(x, "accuracy")
-      ruleParam.getDslType should ===(DslType.DfOperations)
+      ruleParam.getDslType should ===(DataFrameOpsType)
     }
 
     val invalidDslDfOpsValues = Seq("df-oprts", "-")
     invalidDslDfOpsValues foreach { x =>
       val ruleParam = new RuleParam(x, "accuracy")
-      ruleParam.getDslType should not be (DslType.DfOperations)
+      ruleParam.getDslType should not be (DataFrameOpsType)
     }
   }
 
   "griffindsl" should "be returned as default dsl type" in {
+    import org.apache.griffin.measure.configuration.enums.DslType._
     val dslGriffinDslValues = Seq("griffin", "dsl")
     dslGriffinDslValues foreach { x =>
       val ruleParam = new RuleParam(x, "accuracy")
-      ruleParam.getDslType should be(DslType.GriffinDsl)
+      ruleParam.getDslType should be(GriffinDsl)
     }
   }
 
   "dqtype" should "be parsed to predefined set of values" in {
+    import org.apache.griffin.measure.configuration.enums.DqType._
     var ruleParam = new RuleParam("griffin-dsl", "accuracy")
-    ruleParam.getDqType should be(DqType.Accuracy)
+    ruleParam.getDqType should be(Accuracy)
     ruleParam = new RuleParam("griffin-dsl", "accu")
-    ruleParam.getDqType should not be (DqType.Accuracy)
+    ruleParam.getDqType should not be (Accuracy)
 
     ruleParam = new RuleParam("griffin-dsl", "profiling")
-    ruleParam.getDqType should be(DqType.Profiling)
+    ruleParam.getDqType should be(Profiling)
     ruleParam = new RuleParam("griffin-dsl", "profilin")
-    ruleParam.getDqType should not be (DqType.Profiling)
+    ruleParam.getDqType should not be (Profiling)
 
     ruleParam = new RuleParam("griffin-dsl", "TIMELINESS")
-    ruleParam.getDqType should be(DqType.Timeliness)
+    ruleParam.getDqType should be(Timeliness)
     ruleParam = new RuleParam("griffin-dsl", "timeliness ")
-    ruleParam.getDqType should not be (DqType.Timeliness)
+    ruleParam.getDqType should not be (Timeliness)
 
     ruleParam = new RuleParam("griffin-dsl", "UNIQUENESS")
-    ruleParam.getDqType should be(DqType.Uniqueness)
+    ruleParam.getDqType should be(Uniqueness)
     ruleParam = new RuleParam("griffin-dsl", "UNIQUE")
-    ruleParam.getDqType should not be (DqType.Uniqueness)
+    ruleParam.getDqType should not be (Uniqueness)
 
     ruleParam = new RuleParam("griffin-dsl", "Duplicate")
-    ruleParam.getDqType should be(DqType.Uniqueness)
+    ruleParam.getDqType should be(Uniqueness)
     ruleParam = new RuleParam("griffin-dsl", "duplica")
-    ruleParam.getDqType should not be (DqType.Duplicate)
+    ruleParam.getDqType should not be (Duplicate)
 
     ruleParam = new RuleParam("griffin-dsl", "COMPLETENESS")
-    ruleParam.getDqType should be(DqType.Completeness)
+    ruleParam.getDqType should be(Completeness)
     ruleParam = new RuleParam("griffin-dsl", "complete")
-    ruleParam.getDqType should not be (DqType.Completeness)
+    ruleParam.getDqType should not be (Completeness)
 
     ruleParam = new RuleParam("griffin-dsl", "")
-    ruleParam.getDqType should be(DqType.Unknown)
+    ruleParam.getDqType should be(Unknown)
     ruleParam = new RuleParam("griffin-dsl", "duplicate")
-    ruleParam.getDqType should not be (DqType.Unknown)
+    ruleParam.getDqType should not be (Unknown)
   }
 
   "outputtype" should "be valid" in {
+    import org.apache.griffin.measure.configuration.enums.OutputType._
     var ruleOutputParam = new RuleOutputParam("metric", "", "map")
-    ruleOutputParam.getOutputType should be(OutputType.MetricOutputType)
+    ruleOutputParam.getOutputType should be(MetricOutputType)
     ruleOutputParam = new RuleOutputParam("metr", "", "map")
-    ruleOutputParam.getOutputType should not be (OutputType.MetricOutputType)
-    ruleOutputParam.getOutputType should be(OutputType.UnknownOutputType)
+    ruleOutputParam.getOutputType should not be (MetricOutputType)
+    ruleOutputParam.getOutputType should be(UnknownOutputType)
 
     ruleOutputParam = new RuleOutputParam("record", "", "map")
-    ruleOutputParam.getOutputType should be(OutputType.RecordOutputType)
+    ruleOutputParam.getOutputType should be(RecordOutputType)
     ruleOutputParam = new RuleOutputParam("rec", "", "map")
-    ruleOutputParam.getOutputType should not be (OutputType.RecordOutputType)
-    ruleOutputParam.getOutputType should be(OutputType.UnknownOutputType)
+    ruleOutputParam.getOutputType should not be (RecordOutputType)
+    ruleOutputParam.getOutputType should be(UnknownOutputType)
 
     ruleOutputParam = new RuleOutputParam("dscupdate", "", "map")
-    ruleOutputParam.getOutputType should be(OutputType.DscUpdateOutputType)
+    ruleOutputParam.getOutputType should be(DscUpdateOutputType)
     ruleOutputParam = new RuleOutputParam("dsc", "", "map")
-    ruleOutputParam.getOutputType should not be (OutputType.DscUpdateOutputType)
-    ruleOutputParam.getOutputType should be(OutputType.UnknownOutputType)
+    ruleOutputParam.getOutputType should not be (DscUpdateOutputType)
+    ruleOutputParam.getOutputType should be(UnknownOutputType)
 
   }
 
   "flattentype" should "be valid" in {
+    import org.apache.griffin.measure.configuration.enums.FlattenType._
     var ruleOutputParam = new RuleOutputParam("metric", "", "map")
-    ruleOutputParam.getFlatten should be(FlattenType.MapFlattenType)
+    ruleOutputParam.getFlatten should be(MapFlattenType)
     ruleOutputParam = new RuleOutputParam("metric", "", "metr")
-    ruleOutputParam.getFlatten should not be (FlattenType.MapFlattenType)
-    ruleOutputParam.getFlatten should be(FlattenType.DefaultFlattenType)
+    ruleOutputParam.getFlatten should not be (MapFlattenType)
+    ruleOutputParam.getFlatten should be(DefaultFlattenType)
 
     ruleOutputParam = new RuleOutputParam("metric", "", "array")
-    ruleOutputParam.getFlatten should be(FlattenType.ArrayFlattenType)
+    ruleOutputParam.getFlatten should be(ArrayFlattenType)
     ruleOutputParam = new RuleOutputParam("metric", "", "list")
-    ruleOutputParam.getFlatten should be(FlattenType.ArrayFlattenType)
+    ruleOutputParam.getFlatten should be(ArrayFlattenType)
     ruleOutputParam = new RuleOutputParam("metric", "", "arrays")
-    ruleOutputParam.getFlatten should not be (FlattenType.ArrayFlattenType)
-    ruleOutputParam.getFlatten should be(FlattenType.DefaultFlattenType)
+    ruleOutputParam.getFlatten should not be (ArrayFlattenType)
+    ruleOutputParam.getFlatten should be(DefaultFlattenType)
 
     ruleOutputParam = new RuleOutputParam("metric", "", "entries")
-    ruleOutputParam.getFlatten should be(FlattenType.EntriesFlattenType)
+    ruleOutputParam.getFlatten should be(EntriesFlattenType)
     ruleOutputParam = new RuleOutputParam("metric", "", "entry")
-    ruleOutputParam.getFlatten should not be (FlattenType.EntriesFlattenType)
-    ruleOutputParam.getFlatten should be(FlattenType.DefaultFlattenType)
+    ruleOutputParam.getFlatten should not be (EntriesFlattenType)
+    ruleOutputParam.getFlatten should be(DefaultFlattenType)
   }
 
   "sinktype" should "be valid" in {
     import org.mockito.Mockito._
+    import org.apache.griffin.measure.configuration.enums.SinkType._
     var dqConfig = new DQConfig(
       "test",
       1234,
@@ -161,10 +166,10 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
     )
     dqConfig.getValidSinkTypes should be(
       Seq(
-        SinkType.Console,
-        SinkType.ElasticSearch,
-        SinkType.MongoDB,
-        SinkType.Hdfs
+        Console,
+        ElasticSearch,
+        MongoDB,
+        Hdfs
       )
     )
     dqConfig = new DQConfig(
@@ -175,8 +180,8 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
       mock(classOf[EvaluateRuleParam]),
       List("Consol", "Logg")
     )
-    dqConfig.getValidSinkTypes should not be (Seq(SinkType.Console))
-    dqConfig.getValidSinkTypes should be(Seq(SinkType.ElasticSearch))
+    dqConfig.getValidSinkTypes should not be (Seq(Console))
+    dqConfig.getValidSinkTypes should be(Seq(ElasticSearch))
 
     dqConfig = new DQConfig(
       "test",
@@ -186,7 +191,7 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
       mock(classOf[EvaluateRuleParam]),
       List("")
     )
-    dqConfig.getValidSinkTypes should be(Seq(SinkType.ElasticSearch))
+    dqConfig.getValidSinkTypes should be(Seq(ElasticSearch))
   }
 
 }

@@ -26,7 +26,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
 import org.apache.griffin.measure.configuration.dqdefinition._
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
@@ -74,7 +74,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // create dq context
     dqContext = DQContext(
-      contextId, metricName, dataSources, sinkParams, ProcessType.BatchProcessType
+      contextId, metricName, dataSources, sinkParams, BatchProcessType
     )(sparkSession)
 
     // start id

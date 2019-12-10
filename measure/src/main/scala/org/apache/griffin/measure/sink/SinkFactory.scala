@@ -22,7 +22,7 @@ import scala.util.{Failure, Success, Try}
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.SinkType._
 import org.apache.griffin.measure.utils.ParamUtil._
 
 case class SinkFactory(sinkParamIter: Iterable[SinkParam],
@@ -43,11 +43,11 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam],
     val config = sinkParam.getConfig
     val sinkType = sinkParam.getType
     val sinkTry = sinkType match {
-      case SinkType.Console => Try(ConsoleSink(config, metricName, timeStamp))
-      case SinkType.Hdfs => Try(HdfsSink(config, metricName, timeStamp))
-      case SinkType.ElasticSearch => Try(ElasticSearchSink(config, metricName, timeStamp, block))
-      case SinkType.MongoDB => Try(MongoSink(config, metricName, timeStamp, block))
-      case SinkType.Custom => Try(getCustomSink(config, metricName, timeStamp, block))
+      case Console => Try(ConsoleSink(config, metricName, timeStamp))
+      case Hdfs => Try(HdfsSink(config, metricName, timeStamp))
+      case ElasticSearch => Try(ElasticSearchSink(config, metricName, timeStamp, block))
+      case MongoDB => Try(MongoSink(config, metricName, timeStamp, block))
+      case Custom => Try(getCustomSink(config, metricName, timeStamp, block))
       case _ => throw new Exception(s"sink type ${sinkType} is not supported!")
     }
     sinkTry match {

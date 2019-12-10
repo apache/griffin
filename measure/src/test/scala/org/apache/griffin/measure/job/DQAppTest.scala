@@ -20,16 +20,15 @@ package org.apache.griffin.measure.job
 
 import scala.util.Failure
 import scala.util.Success
-
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
-
 import org.apache.griffin.measure.Application._
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.configuration.dqdefinition._
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType
+import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
@@ -58,8 +57,8 @@ class DQAppTest extends FlatSpec with SparkSuiteBase with BeforeAndAfterAll with
     // choose process
     val procType = ProcessType.withNameWithDefault(allParam.getDqConfig.getProcType)
     dqApp = procType match {
-      case ProcessType.BatchProcessType => BatchDQApp(allParam)
-      case ProcessType.StreamingProcessType => StreamingDQApp(allParam)
+      case BatchProcessType => BatchDQApp(allParam)
+      case StreamingProcessType => StreamingDQApp(allParam)
       case _ =>
         error(s"${procType} is unsupported process type!")
         sys.exit(-4)

@@ -19,9 +19,10 @@ under the License.
 package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.commons.lang.StringUtils
-
 import org.apache.griffin.measure.configuration.dqdefinition.{RuleErrorConfParam, RuleParam}
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.FlattenType.{DefaultFlattenType}
+import org.apache.griffin.measure.configuration.enums.ProcessType._
+import org.apache.griffin.measure.configuration.enums.OutputType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -69,12 +70,12 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val aliases = analyzer.selectionPairs.map(_._2)
 
       val selClause = procType match {
-        case ProcessType.BatchProcessType => selItemsClause
-        case ProcessType.StreamingProcessType => s"`${ConstantColumns.tmst}`, ${selItemsClause}"
+        case BatchProcessType => selItemsClause
+        case StreamingProcessType => s"`${ConstantColumns.tmst}`, ${selItemsClause}"
       }
       val selAliases = procType match {
-        case ProcessType.BatchProcessType => aliases
-        case ProcessType.StreamingProcessType => ConstantColumns.tmst +: aliases
+        case BatchProcessType => aliases
+        case StreamingProcessType => ConstantColumns.tmst +: aliases
       }
 
       // 1. source alias
@@ -103,7 +104,7 @@ case class CompletenessExpr2DQSteps(context: DQContext,
 
       val incompleteRecordWriteStep = {
         val rwName =
-          ruleParam.getOutputOpt(OutputType.RecordOutputType).flatMap(_.getNameOpt)
+          ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
             .getOrElse(incompleteRecordsTableName)
         RecordWriteStep(rwName, incompleteRecordsTableName)
       }
@@ -117,9 +118,9 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val incompleteCountTableName = "__incompleteCount"
       val incompleteColName = details.getStringOrKey(_incomplete)
       val incompleteCountSql = procType match {
-        case ProcessType.BatchProcessType =>
+        case BatchProcessType =>
           s"SELECT COUNT(*) AS `${incompleteColName}` FROM `${incompleteRecordsTableName}`"
-        case ProcessType.StreamingProcessType =>
+        case StreamingProcessType =>
           s"SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${incompleteColName}` " +
             s"FROM `${incompleteRecordsTableName}` GROUP BY `${ConstantColumns.tmst}`"
       }
@@ -131,9 +132,9 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val totalCountTableName = "__totalCount"
       val totalColName = details.getStringOrKey(_total)
       val totalCountSql = procType match {
-        case ProcessType.BatchProcessType =>
+        case BatchProcessType =>
           s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceAliasTableName}`"
-        case ProcessType.StreamingProcessType =>
+        case StreamingProcessType =>
           s"SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${totalColName}` " +
             s"FROM `${sourceAliasTableName}` GROUP BY `${ConstantColumns.tmst}`"
       }
@@ -145,14 +146,14 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       val completeColName = details.getStringOrKey(_complete)
       // scalastyle:off
       val completeMetricSql = procType match {
-        case ProcessType.BatchProcessType =>
+        case BatchProcessType =>
           s"""
              |SELECT `${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
              |coalesce(`${incompleteCountTableName}`.`${incompleteColName}`, 0) AS `${incompleteColName}`,
              |(`${totalCountTableName}`.`${totalColName}` - coalesce(`${incompleteCountTableName}`.`${incompleteColName}`, 0)) AS `${completeColName}`
              |FROM `${totalCountTableName}` LEFT JOIN `${incompleteCountTableName}`
          """.stripMargin
-        case ProcessType.StreamingProcessType =>
+        case StreamingProcessType =>
           s"""
              |SELECT `${totalCountTableName}`.`${ConstantColumns.tmst}` AS `${ConstantColumns.tmst}`,
              |`${totalCountTableName}`.`${totalColName}` AS `${totalColName}`,
@@ -164,9 +165,9 @@ case class CompletenessExpr2DQSteps(context: DQContext,
       }
       // scalastyle:on
       val completeWriteStep = {
-        val metricOpt = ruleParam.getOutputOpt(OutputType.MetricOutputType)
+        val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(completeTableName)
-        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.DefaultFlattenType)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(DefaultFlattenType)
         MetricWriteStep(mwName, completeTableName, flattenType)
       }
       val completeTransStep =

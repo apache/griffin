@@ -19,7 +19,9 @@ under the License.
 package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
+import org.apache.griffin.measure.configuration.enums.OutputType._
+import org.apache.griffin.measure.configuration.enums.FlattenType.{ArrayFlattenType,EntriesFlattenType}
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -74,12 +76,12 @@ case class UniquenessExpr2DQSteps(context: DQContext,
       val aliases = analyzer.selectionPairs.map(_._2)
 
       val selClause = procType match {
-        case ProcessType.BatchProcessType => selItemsClause
-        case ProcessType.StreamingProcessType => s"`${ConstantColumns.tmst}`, ${selItemsClause}"
+        case BatchProcessType => selItemsClause
+        case StreamingProcessType => s"`${ConstantColumns.tmst}`, ${selItemsClause}"
       }
       val selAliases = procType match {
-        case ProcessType.BatchProcessType => aliases
-        case ProcessType.StreamingProcessType => ConstantColumns.tmst +: aliases
+        case BatchProcessType => aliases
+        case StreamingProcessType => ConstantColumns.tmst +: aliases
       }
 
       // 1. source distinct mapping
@@ -124,14 +126,14 @@ case class UniquenessExpr2DQSteps(context: DQContext,
       val totalTableName = "__totalMetric"
       val totalColName = details.getStringOrKey(_total)
       val totalSql = procType match {
-        case ProcessType.BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
-        case ProcessType.StreamingProcessType =>
+        case BatchProcessType => s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceName}`"
+        case StreamingProcessType =>
           s"""
              |SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${totalColName}`
              |FROM `${sourceName}` GROUP BY `${ConstantColumns.tmst}`
            """.stripMargin
       }
-      val totalMetricWriteStep = MetricWriteStep(totalColName, totalTableName, FlattenType.EntriesFlattenType)
+      val totalMetricWriteStep = MetricWriteStep(totalColName, totalTableName, EntriesFlattenType)
       val totalTransStep =
         SparkSqlTransformStep(totalTableName, totalSql, emptyMap, Some(totalMetricWriteStep))
 
@@ -148,16 +150,16 @@ case class UniquenessExpr2DQSteps(context: DQContext,
       val uniqueTableName = "__uniqueMetric"
       val uniqueColName = details.getStringOrKey(_unique)
       val uniqueSql = procType match {
-        case ProcessType.BatchProcessType =>
+        case BatchProcessType =>
           s"SELECT COUNT(*) AS `${uniqueColName}` FROM `${uniqueRecordTableName}`"
-        case ProcessType.StreamingProcessType =>
+        case StreamingProcessType =>
           s"""
              |SELECT `${ConstantColumns.tmst}`, COUNT(*) AS `${uniqueColName}`
              |FROM `${uniqueRecordTableName}` GROUP BY `${ConstantColumns.tmst}`
            """.stripMargin
       }
       val uniqueMetricWriteStep =
-        MetricWriteStep(uniqueColName, uniqueTableName, FlattenType.EntriesFlattenType)
+        MetricWriteStep(uniqueColName, uniqueTableName, EntriesFlattenType)
       val uniqueTransStep =
         SparkSqlTransformStep(uniqueTableName, uniqueSql, emptyMap, Some(uniqueMetricWriteStep))
       uniqueTransStep.parentSteps += uniqueRecordTransStep
@@ -174,7 +176,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
 
         val dupRecordWriteStep = {
           val rwName =
-            ruleParam.getOutputOpt(OutputType.RecordOutputType).flatMap(_.getNameOpt)
+            ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
               .getOrElse(dupRecordTableName)
 
           RecordWriteStep(rwName, dupRecordTableName)
@@ -186,14 +188,14 @@ case class UniquenessExpr2DQSteps(context: DQContext,
         val dupMetricTableName = "__dupMetric"
         val numColName = details.getStringOrKey(_num)
         val dupMetricSelClause = procType match {
-          case ProcessType.BatchProcessType => s"`${dupColName}`, COUNT(*) AS `${numColName}`"
+          case BatchProcessType => s"`${dupColName}`, COUNT(*) AS `${numColName}`"
 
-          case ProcessType.StreamingProcessType =>
+          case StreamingProcessType =>
             s"`${ConstantColumns.tmst}`, `${dupColName}`, COUNT(*) AS `${numColName}`"
         }
         val dupMetricGroupbyClause = procType match {
-          case ProcessType.BatchProcessType => s"`${dupColName}`"
-          case ProcessType.StreamingProcessType => s"`${ConstantColumns.tmst}`, `${dupColName}`"
+          case BatchProcessType => s"`${dupColName}`"
+          case StreamingProcessType => s"`${ConstantColumns.tmst}`, `${dupColName}`"
         }
         val dupMetricSql = {
           s"""
@@ -202,7 +204,7 @@ case class UniquenessExpr2DQSteps(context: DQContext,
           """.stripMargin
         }
         val dupMetricWriteStep = {
-          MetricWriteStep(duplicationArrayName, dupMetricTableName, FlattenType.ArrayFlattenType)
+          MetricWriteStep(duplicationArrayName, dupMetricTableName, ArrayFlattenType)
         }
         val dupMetricTransStep =
           SparkSqlTransformStep(dupMetricTableName,

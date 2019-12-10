@@ -19,7 +19,9 @@ under the License.
 package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
+import org.apache.griffin.measure.configuration.enums.OutputType._
+import org.apache.griffin.measure.configuration.enums.FlattenType.{ArrayFlattenType,EntriesFlattenType}
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -111,7 +113,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
         s"SELECT COUNT(*) AS `${totalColName}` FROM `${sourceAliasTableName}`"
       }
       val totalMetricWriteStep = {
-        MetricWriteStep(totalColName, totalTableName, FlattenType.EntriesFlattenType, writeTimestampOpt)
+        MetricWriteStep(totalColName, totalTableName, EntriesFlattenType, writeTimestampOpt)
       }
       val totalTransStep =
         SparkSqlTransformStep(totalTableName, totalSql, emptyMap, Some(totalMetricWriteStep))
@@ -135,7 +137,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
       val transSteps1 = totalTransStep :: selfGroupTransStep :: Nil
 
       val (transSteps2, dupCountTableName) = procType match {
-        case ProcessType.StreamingProcessType if (withOlderTable) =>
+        case StreamingProcessType if (withOlderTable) =>
           // 4.0 update old data
           val targetDsUpdateWriteStep = DataSourceUpdateWriteStep(targetName, targetName)
 
@@ -226,7 +228,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
          """.stripMargin
       }
       val distMetricWriteStep = {
-        MetricWriteStep(distColName, distTableName, FlattenType.EntriesFlattenType, writeTimestampOpt)
+        MetricWriteStep(distColName, distTableName, EntriesFlattenType, writeTimestampOpt)
       }
       val distTransStep =
         SparkSqlTransformStep(distTableName, distSql, emptyMap, Some(distMetricWriteStep))
@@ -277,7 +279,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
                """.stripMargin
           }
           val dupItemsWriteStep = {
-            val rwName = ruleParam.getOutputOpt(OutputType.RecordOutputType).flatMap(_.getNameOpt).getOrElse(dupItemsTableName)
+            val rwName = ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt).getOrElse(dupItemsTableName)
             RecordWriteStep(rwName, dupItemsTableName, None, writeTimestampOpt)
           }
           val dupItemsTransStep = {
@@ -307,7 +309,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
           val groupDupMetricWriteStep = {
             MetricWriteStep(duplicationArrayName,
               groupDupMetricTableName,
-              FlattenType.ArrayFlattenType,
+              ArrayFlattenType,
               writeTimestampOpt)
           }
           val groupDupMetricTransStep =
@@ -325,7 +327,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
           // 9. duplicate record
           val dupRecordTableName = "__dupRecords"
           val dupRecordSelClause = procType match {
-            case ProcessType.StreamingProcessType if (withOlderTable) =>
+            case StreamingProcessType if (withOlderTable) =>
               s"${distAliasesClause}, `${dupColName}`, `${accuDupColName}`"
 
             case _ => s"${distAliasesClause}, `${dupColName}`"
@@ -338,7 +340,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
           }
           val dupRecordWriteStep = {
             val rwName =
-              ruleParam.getOutputOpt(OutputType.RecordOutputType).flatMap(_.getNameOpt)
+              ruleParam.getOutputOpt(RecordOutputType).flatMap(_.getNameOpt)
                 .getOrElse(dupRecordTableName)
             RecordWriteStep(rwName, dupRecordTableName, None, writeTimestampOpt)
           }
@@ -369,7 +371,7 @@ case class DistinctnessExpr2DQSteps(context: DQContext,
             MetricWriteStep(
               duplicationArrayName,
               dupMetricTableName,
-              FlattenType.ArrayFlattenType,
+              ArrayFlattenType,
               writeTimestampOpt
             )
           }

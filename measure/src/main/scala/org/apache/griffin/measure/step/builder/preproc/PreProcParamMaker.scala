@@ -19,7 +19,7 @@ under the License.
 package org.apache.griffin.measure.step.builder.preproc
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.DslType._
 
 /**
   * generate each entity pre-proc params by template defined in pre-proc param
@@ -47,7 +47,7 @@ object PreProcParamMaker {
     val newOutDfName = withSuffix(rule.getOutDfName(), suffix)
     val rpRule = rule.replaceInOutDfName(newInDfName, newOutDfName)
     rule.getDslType match {
-      case DslType.DfOperations => rpRule
+      case DataFrameOpsType => rpRule
       case _ =>
         val newRule = replaceDfNameSuffix(rule.getRule, rule.getInDfName(), suffix)
         rpRule.replaceRule(newRule)

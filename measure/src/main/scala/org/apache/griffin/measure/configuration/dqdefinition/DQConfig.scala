@@ -21,8 +21,12 @@ package org.apache.griffin.measure.configuration.dqdefinition
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.commons.lang.StringUtils
-
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.DqType._
+import org.apache.griffin.measure.configuration.enums.DslType.{DslType, GriffinDsl}
+import org.apache.griffin.measure.configuration.enums.FlattenType.{FlattenType,DefaultFlattenType}
+import org.apache.griffin.measure.configuration.enums.OutputType.{OutputType,UnknownOutputType}
+import org.apache.griffin.measure.configuration.enums.{DqType, DslType, FlattenType, OutputType, SinkType}
+import org.apache.griffin.measure.configuration.enums.SinkType.SinkType
 
 /**
   * dq param
@@ -53,7 +57,7 @@ case class DQConfig(@JsonProperty("name") private val name: String,
     }._1
   }
   def getEvaluateRule: EvaluateRuleParam = evaluateRule
-  def getValidSinkTypes: Seq[SinkType.SinkType] = SinkType.validSinkTypes(if (sinks != null) sinks else Nil)
+  def getValidSinkTypes: Seq[SinkType] = SinkType.validSinkTypes(if (sinks != null) sinks else Nil)
 
   def validate(): Unit = {
     assert(StringUtils.isNotBlank(name), "dq config name should not be blank")
@@ -154,8 +158,8 @@ case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
                      @JsonProperty("out") private val outputs: List[RuleOutputParam] = null,
                      @JsonProperty("error.confs") private val errorConfs: List[RuleErrorConfParam] = null
                     ) extends Param {
-  def getDslType: DslType.DslType = if (dslType != null) DslType.withNameWithDefault(dslType) else DslType.GriffinDsl
-  def getDqType: DqType.DqType = if (dqType != null) DqType.withNameWithDefault(dqType) else DqType.Unknown
+  def getDslType: DslType = if (dslType != null) DslType.withNameWithDefault(dslType) else GriffinDsl
+  def getDqType: DqType = if (dqType != null) DqType.withNameWithDefault(dqType) else Unknown
   def getCache: Boolean = if (cache) cache else false
 
   def getInDfName(defName: String = ""): String = if (inDfName != null) inDfName else defName
@@ -164,7 +168,7 @@ case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
   def getDetails: Map[String, Any] = if (details != null) details else Map[String, Any]()
 
   def getOutputs: Seq[RuleOutputParam] = if (outputs != null) outputs else Nil
-  def getOutputOpt(tp: OutputType.OutputType): Option[RuleOutputParam] = getOutputs.filter(_.getOutputType == tp).headOption
+  def getOutputOpt(tp: OutputType): Option[RuleOutputParam] = getOutputs.filter(_.getOutputType == tp).headOption
 
   def getErrorConfs: Seq[RuleErrorConfParam] = if (errorConfs != null) errorConfs else Nil
 
@@ -186,7 +190,7 @@ case class RuleParam(@JsonProperty("dsl.type") private val dslType: String,
   }
 
   def validate(): Unit = {
-    assert(!(getDslType.equals(DslType.GriffinDsl) && getDqType.equals(DqType.Unknown)),
+    assert(!(getDslType.equals(GriffinDsl) && getDqType.equals(Unknown)),
       "unknown dq type for griffin dsl")
 
     getOutputs.foreach(_.validate)
@@ -205,9 +209,9 @@ case class RuleOutputParam( @JsonProperty("type") private val outputType: String
                             @JsonProperty("name") private val name: String,
                             @JsonProperty("flatten") private val flatten: String
                           ) extends Param {
-  def getOutputType: OutputType.OutputType = if (outputType != null) OutputType.withNameWithDefault(outputType) else OutputType.UnknownOutputType
+  def getOutputType: OutputType = if (outputType != null) OutputType.withNameWithDefault(outputType) else UnknownOutputType
   def getNameOpt: Option[String] = if (StringUtils.isNotBlank(name)) Some(name) else None
-  def getFlatten: FlattenType.FlattenType = if (StringUtils.isNotBlank(flatten)) FlattenType.withNameWithDefault(flatten) else FlattenType.DefaultFlattenType
+  def getFlatten: FlattenType = if (StringUtils.isNotBlank(flatten)) FlattenType.withNameWithDefault(flatten) else DefaultFlattenType
 
   def validate(): Unit = {}
 }

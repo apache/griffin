@@ -19,9 +19,9 @@ under the License.
 package org.apache.griffin.measure.context
 
 import org.apache.spark.sql.{Encoders, SparkSession}
-
 import org.apache.griffin.measure.configuration.dqdefinition._
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
+import org.apache.griffin.measure.configuration.enums.WriteMode
 import org.apache.griffin.measure.datasource._
 import org.apache.griffin.measure.sink.{Sink, SinkFactory}
 
@@ -34,7 +34,7 @@ case class DQContext(contextId: ContextId,
                      name: String,
                      dataSources: Seq[DataSource],
                      sinkParams: Seq[SinkParam],
-                     procType: ProcessType.ProcessType
+                     procType: ProcessType
                     )(@transient implicit val sparkSession: SparkSession) {
 
   val compileTableRegister: CompileTableRegister = CompileTableRegister()
@@ -87,8 +87,8 @@ case class DQContext(contextId: ContextId,
 
   private def createSink(t: Long): Sink = {
     procType match {
-      case ProcessType.BatchProcessType => sinkFactory.getSinks(t, true)
-      case ProcessType.StreamingProcessType => sinkFactory.getSinks(t, false)
+      case BatchProcessType => sinkFactory.getSinks(t, true)
+      case StreamingProcessType => sinkFactory.getSinks(t, false)
     }
   }
 
