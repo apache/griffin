@@ -17,17 +17,18 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
+import org.scalatest._
+import scala.util.{Failure, Success}
+
 import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
 import org.apache.griffin.measure.configuration.enums.DslType.GriffinDsl
-import org.scalatest._
 
-import scala.util.{Failure, Success}
 
 class ParamFileReaderSpec extends FlatSpec with Matchers{
 
 
   "params " should "be parsed from a valid file" in {
-    val reader :ParamReader = ParamFileReader(getClass.getResource("/_accuracy-batch-griffindsl.json").getFile)
+    val reader: ParamReader = ParamFileReader(getClass.getResource("/_accuracy-batch-griffindsl.json").getFile)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
@@ -40,7 +41,8 @@ class ParamFileReaderSpec extends FlatSpec with Matchers{
   }
 
   it should "fail for an invalid file" in {
-    val reader :ParamReader = ParamFileReader(getClass.getResource("/invalidconfigs/missingrule_accuracy_batch_sparksql.json").getFile)
+    val reader: ParamReader = ParamFileReader(getClass.
+      getResource("/invalidconfigs/missingrule_accuracy_batch_sparksql.json").getFile)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(_) =>
@@ -52,7 +54,8 @@ class ParamFileReaderSpec extends FlatSpec with Matchers{
   }
 
   it should "fail for an invalid completeness json file" in {
-    val reader: ParamFileReader = ParamFileReader(getClass.getResource("/invalidconfigs/invalidtype_completeness_batch_griffindal.json").getFile)
+    val reader: ParamFileReader = ParamFileReader(getClass.
+      getResource("/invalidconfigs/invalidtype_completeness_batch_griffindal.json").getFile)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(_) =>
@@ -63,7 +66,8 @@ class ParamFileReaderSpec extends FlatSpec with Matchers{
   }
 
   it should "be parsed from a valid errorconf completeness json file" in {
-    val reader :ParamReader = ParamFileReader(getClass.getResource("/_completeness_errorconf-batch-griffindsl.json").getFile)
+    val reader: ParamReader = ParamFileReader(getClass.
+      getResource("/_completeness_errorconf-batch-griffindsl.json").getFile)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>

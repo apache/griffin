@@ -20,11 +20,12 @@ package org.apache.griffin.measure.configuration.dqdefinition
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.commons.lang.StringUtils
+
+import org.apache.griffin.measure.configuration.enums.{DqType, DslType, FlattenType, OutputType, SinkType}
 import org.apache.griffin.measure.configuration.enums.DqType._
 import org.apache.griffin.measure.configuration.enums.DslType.{DslType, GriffinDsl}
-import org.apache.griffin.measure.configuration.enums.FlattenType.{FlattenType,DefaultFlattenType}
-import org.apache.griffin.measure.configuration.enums.OutputType.{OutputType,UnknownOutputType}
-import org.apache.griffin.measure.configuration.enums.{DqType, DslType, FlattenType, OutputType, SinkType}
+import org.apache.griffin.measure.configuration.enums.FlattenType.{DefaultFlattenType, FlattenType}
+import org.apache.griffin.measure.configuration.enums.OutputType.{OutputType, UnknownOutputType}
 import org.apache.griffin.measure.configuration.enums.SinkType.SinkType
 
 /**
@@ -208,9 +209,15 @@ case class RuleOutputParam( @JsonProperty("type") private val outputType: String
                             @JsonProperty("name") private val name: String,
                             @JsonProperty("flatten") private val flatten: String
                           ) extends Param {
-  def getOutputType: OutputType = if (outputType != null) OutputType.withNameWithDefault(outputType) else UnknownOutputType
+  def getOutputType: OutputType = {
+    if (outputType != null) OutputType.withNameWithDefault(outputType)
+    else UnknownOutputType
+  }
   def getNameOpt: Option[String] = if (StringUtils.isNotBlank(name)) Some(name) else None
-  def getFlatten: FlattenType = if (StringUtils.isNotBlank(flatten)) FlattenType.withNameWithDefault(flatten) else DefaultFlattenType
+  def getFlatten: FlattenType = {
+    if (StringUtils.isNotBlank(flatten)) FlattenType.withNameWithDefault(flatten)
+    else DefaultFlattenType
+  }
 
   def validate(): Unit = {}
 }

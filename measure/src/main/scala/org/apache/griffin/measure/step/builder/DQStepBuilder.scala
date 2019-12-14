@@ -18,10 +18,11 @@
 package org.apache.griffin.measure.step.builder
 
 import org.apache.commons.lang.StringUtils
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.{DataSourceParam, Param, RuleParam}
-import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.configuration.enums.DslType._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step._
 

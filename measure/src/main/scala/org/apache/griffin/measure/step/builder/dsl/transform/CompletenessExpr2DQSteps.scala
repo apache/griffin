@@ -18,10 +18,11 @@
 package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.commons.lang.StringUtils
+
 import org.apache.griffin.measure.configuration.dqdefinition.{RuleErrorConfParam, RuleParam}
-import org.apache.griffin.measure.configuration.enums.FlattenType.{DefaultFlattenType}
-import org.apache.griffin.measure.configuration.enums.ProcessType._
+import org.apache.griffin.measure.configuration.enums.FlattenType.DefaultFlattenType
 import org.apache.griffin.measure.configuration.enums.OutputType._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns

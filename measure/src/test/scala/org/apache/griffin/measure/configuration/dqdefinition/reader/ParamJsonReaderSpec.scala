@@ -17,12 +17,14 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
+import scala.io.Source
+
+import org.scalatest.{FlatSpec, Matchers}
+import scala.util.{Failure, Success}
+
 import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
 import org.apache.griffin.measure.configuration.enums.DslType.GriffinDsl
-import org.scalatest.{FlatSpec, Matchers}
 
-import scala.io.Source
-import scala.util.{Failure, Success}
 
 class ParamJsonReaderSpec extends FlatSpec with Matchers{
 
@@ -32,7 +34,7 @@ class ParamJsonReaderSpec extends FlatSpec with Matchers{
     val jsonString = bufferedSource.getLines().mkString
     bufferedSource.close
 
-    val reader :ParamReader = ParamJsonReader(jsonString)
+    val reader: ParamReader = ParamJsonReader(jsonString)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
@@ -45,11 +47,12 @@ class ParamJsonReaderSpec extends FlatSpec with Matchers{
   }
 
   it should "fail for an invalid file" in {
-    val bufferedSource = Source.fromFile(getClass.getResource("/invalidconfigs/missingrule_accuracy_batch_sparksql.json").getFile)
+    val bufferedSource = Source.fromFile(getClass.
+      getResource("/invalidconfigs/missingrule_accuracy_batch_sparksql.json").getFile)
     val jsonString = bufferedSource.getLines().mkString
     bufferedSource.close
 
-    val reader :ParamReader = ParamJsonReader(jsonString)
+    val reader: ParamReader = ParamJsonReader(jsonString)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(_) =>

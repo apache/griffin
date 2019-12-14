@@ -55,9 +55,9 @@ object FlattenType extends GriffinEnum {
     val flattenType = super.withNameWithDefault(name)
     flattenType match {
       case Array | List => ArrayFlattenType
-      case Map          => MapFlattenType
-      case Entries      => EntriesFlattenType
-      case _            => DefaultFlattenType
+      case Map => MapFlattenType
+      case Entries => EntriesFlattenType
+      case _ => DefaultFlattenType
     }
   }
 }

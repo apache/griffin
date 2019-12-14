@@ -39,7 +39,8 @@ import org.apache.griffin.measure.configuration.enums
   *                             comparing with uniqueness, distinctness is more meaningful</li>
   * <li>{@link #Timeliness} - The latency of data source with timestamp information
   *                           e.g.: (receive_time - send_time)
-  *                           timeliness can get the statistic metric of latency, like average, max, min, percentile-value,
+  *                           timeliness can get the statistic metric of latency, like average, max, min,
+  *                            percentile-value,
   *                           even more, it can record the items with latency above threshold you configured</li>
   * <li>{@link #Completeness} - The completeness of data source
   *                             the columns you measure is incomplete if it is null</li>
@@ -55,7 +56,7 @@ object DqType extends GriffinEnum {
     val dqType = super.withNameWithDefault(name)
     dqType match {
       case Uniqueness | Duplicate => Uniqueness
-      case _                      => dqType
+      case _ => dqType
     }
   }
 }

@@ -19,6 +19,7 @@ package org.apache.griffin.measure
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
+
 import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig, GriffinConfig, Param}
 import org.apache.griffin.measure.configuration.dqdefinition.reader.ParamReaderFactory
 import org.apache.griffin.measure.configuration.enums.ProcessType

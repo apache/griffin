@@ -18,6 +18,7 @@
 package org.apache.griffin.measure.context
 
 import org.apache.spark.sql.{Encoders, SparkSession}
+
 import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.configuration.enums.WriteMode

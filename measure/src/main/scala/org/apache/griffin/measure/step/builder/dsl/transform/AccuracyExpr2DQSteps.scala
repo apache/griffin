@@ -18,7 +18,7 @@
 package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums.FlattenType.{DefaultFlattenType}
+import org.apache.griffin.measure.configuration.enums.FlattenType.DefaultFlattenType
 import org.apache.griffin.measure.configuration.enums.OutputType._
 import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.context.DQContext
@@ -26,12 +26,8 @@ import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.step.builder.dsl.expr._
 import org.apache.griffin.measure.step.builder.dsl.transform.analyzer.AccuracyAnalyzer
+import org.apache.griffin.measure.step.transform.{DataFrameOps, DataFrameOpsTransformStep, SparkSqlTransformStep}
 import org.apache.griffin.measure.step.transform.DataFrameOps.AccuracyOprKeys
-import org.apache.griffin.measure.step.transform.{
-  DataFrameOps,
-  DataFrameOpsTransformStep,
-  SparkSqlTransformStep
-}
 import org.apache.griffin.measure.step.write.{
   DataSourceUpdateWriteStep,
   MetricWriteStep,

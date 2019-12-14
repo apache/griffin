@@ -16,6 +16,7 @@
  */
 
 package org.apache.griffin.measure.configuration.enums
+
 import org.apache.griffin.measure.configuration.enums
 
 /**
@@ -43,7 +44,7 @@ object DslType extends GriffinEnum {
     val dslType = withNameWithDslType(name)
     dslType match {
       case DfOps | DfOpr | DfOperations => DataFrameOpsType
-      case _                            => dslType
+      case _ => dslType
     }
   }
 }

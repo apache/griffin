@@ -35,10 +35,10 @@ object OutputType extends GriffinEnum {
   override def withNameWithDefault(name: String): Value = {
     val flattenType = super.withNameWithDefault(name)
     flattenType match {
-      case Metric           => MetricOutputType
+      case Metric => MetricOutputType
       case Record | Records => RecordOutputType
-      case DscUpdate        => DscUpdateOutputType
-      case _                => UnknownOutputType
+      case DscUpdate => DscUpdateOutputType
+      case _ => UnknownOutputType
     }
   }
 }

@@ -16,13 +16,15 @@
  */
 
 package org.apache.griffin.measure.configuration.enums
+
 import org.apache.griffin.measure.configuration.enums
 
 /**
   * Supported Sink types
   *  <li>{@link #Console #Log} -  console sink, will sink metric in console (alias log)</li>
   *  <li>{@link #Hdfs} - hdfs sink, will sink metric and record in hdfs</li>
-  *  <li>{@link #Es #Elasticsearch #Http} - elasticsearch sink, will sink metric in elasticsearch (alias Es and Http)</li>
+  *  <li>{@link #Es #Elasticsearch #Http} - elasticsearch sink, will sink metric
+  *  in elasticsearch (alias Es and Http)</li>
   *  <li>{@link #Mongo #MongoDB} - mongo sink, will sink metric in mongo db (alias MongoDb)</li>
   *  <li>{@link #Custom} - custom sink (needs using extra jar-file-extension)</li>
   *  <li>{@link #Unknown} - </li>
@@ -44,10 +46,10 @@ object SinkType extends GriffinEnum {
   override def withNameWithDefault(name: String): enums.SinkType.Value = {
     val sinkType = super.withNameWithDefault(name)
     sinkType match {
-      case Console | Log             => Console
+      case Console | Log => Console
       case Es | ElasticSearch | Http => ElasticSearch
-      case MongoDB | Mongo           => MongoDB
-      case _                         => sinkType
+      case MongoDB | Mongo => MongoDB
+      case _ => sinkType
     }
   }
 }
