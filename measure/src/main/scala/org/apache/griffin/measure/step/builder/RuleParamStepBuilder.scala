@@ -18,7 +18,7 @@
 package org.apache.griffin.measure.step.builder
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.OutputType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.{DQStep, SeqDQStep}
 import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}

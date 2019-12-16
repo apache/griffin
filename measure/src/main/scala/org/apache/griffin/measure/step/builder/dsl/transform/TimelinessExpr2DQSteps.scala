@@ -18,7 +18,9 @@
 package org.apache.griffin.measure.step.builder.dsl.transform
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.FlattenType.{ArrayFlattenType, DefaultFlattenType}
+import org.apache.griffin.measure.configuration.enums.OutputType._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -131,7 +133,7 @@ case class TimelinessExpr2DQSteps(context: DQContext,
       val metricWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
-        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(DefaultFlattenType)
         MetricWriteStep(mwName, metricTableName, flattenType)
       }
       val metricTransStep =

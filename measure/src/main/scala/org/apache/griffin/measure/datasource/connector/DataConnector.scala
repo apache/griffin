@@ -24,7 +24,7 @@ import org.apache.spark.sql.functions._
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
-import org.apache.griffin.measure.configuration.enums.BatchProcessType
+import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.job.builder.DQJobBuilder

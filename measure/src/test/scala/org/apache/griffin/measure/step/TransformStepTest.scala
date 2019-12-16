@@ -20,7 +20,7 @@ package org.apache.griffin.measure.step
 import org.scalatest._
 
 import org.apache.griffin.measure.Loggable
-import org.apache.griffin.measure.configuration.enums.BatchProcessType
+import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context.ContextId
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.SparkSuiteBase

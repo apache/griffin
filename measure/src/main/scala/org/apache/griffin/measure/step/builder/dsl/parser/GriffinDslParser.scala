@@ -17,8 +17,7 @@
 
 package org.apache.griffin.measure.step.builder.dsl.parser
 
-import org.apache.griffin.measure.configuration.enums._
-import org.apache.griffin.measure.step.builder.dsl._
+import org.apache.griffin.measure.configuration.enums.DqType._
 import org.apache.griffin.measure.step.builder.dsl.expr._
 
 /**
@@ -82,12 +81,12 @@ case class GriffinDslParser(dataSourceNames: Seq[String], functionNames: Seq[Str
 
   def parseRule(rule: String, dqType: DqType): ParseResult[Expr] = {
     val rootExpr = dqType match {
-      case AccuracyType => logicalExpression
-      case ProfilingType => profilingClause
-      case UniquenessType => uniquenessClause
-      case DistinctnessType => distinctnessClause
-      case TimelinessType => timelinessClause
-      case CompletenessType => completenessClause
+      case Accuracy => logicalExpression
+      case Profiling => profilingClause
+      case Uniqueness => uniquenessClause
+      case Distinct => distinctnessClause
+      case Timeliness => timelinessClause
+      case Completeness => completenessClause
       case _ => expression
     }
     parseAll(rootExpr, rule)

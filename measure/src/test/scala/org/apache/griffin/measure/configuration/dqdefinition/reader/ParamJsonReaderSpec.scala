@@ -17,11 +17,14 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
-import org.scalatest.{FlatSpec, Matchers}
-
 import scala.io.Source
+
+import org.scalatest.{FlatSpec, Matchers}
 import scala.util.{Failure, Success}
+
+import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
+import org.apache.griffin.measure.configuration.enums.DslType.GriffinDsl
+
 
 class ParamJsonReaderSpec extends FlatSpec with Matchers{
 
@@ -31,11 +34,11 @@ class ParamJsonReaderSpec extends FlatSpec with Matchers{
     val jsonString = bufferedSource.getLines().mkString
     bufferedSource.close
 
-    val reader :ParamReader = ParamJsonReader(jsonString)
+    val reader: ParamReader = ParamJsonReader(jsonString)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(v) =>
-        v.getEvaluateRule.getRules(0).getDslType.desc should === ("griffin-dsl")
+        v.getEvaluateRule.getRules(0).getDslType should === (GriffinDsl)
         v.getEvaluateRule.getRules(0).getOutDfName() should === ("accu")
       case Failure(_) =>
         fail("it should not happen")
@@ -44,11 +47,12 @@ class ParamJsonReaderSpec extends FlatSpec with Matchers{
   }
 
   it should "fail for an invalid file" in {
-    val bufferedSource = Source.fromFile(getClass.getResource("/invalidconfigs/missingrule_accuracy_batch_sparksql.json").getFile)
+    val bufferedSource = Source.fromFile(getClass.
+      getResource("/invalidconfigs/missingrule_accuracy_batch_sparksql.json").getFile)
     val jsonString = bufferedSource.getLines().mkString
     bufferedSource.close
 
-    val reader :ParamReader = ParamJsonReader(jsonString)
+    val reader: ParamReader = ParamJsonReader(jsonString)
     val params = reader.readConfig[DQConfig]
     params match {
       case Success(_) =>

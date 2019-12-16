@@ -17,66 +17,28 @@
 
 package org.apache.griffin.measure.configuration.enums
 
-import scala.util.matching.Regex
-
 /**
-  * the strategy to flatten metric
+  * the strategy to output metric
+  *  <li>{@link #MetricOutputType} - output the rule step result as metric</li>
+  *  <li>{@link #RecordOutputType} - output the rule step result as records</li>
+  *  <li>{@link #DscUpdateOutputType} - output the rule step result to update data source cache</li>
+  *  <li>{@link #UnknownOutputType} - will not output the result </li>
   */
-sealed trait OutputType {
-  val idPattern: Regex
-  val desc: String
-}
+object OutputType extends GriffinEnum {
+  type OutputType = Value
 
-object OutputType {
-  private val outputTypes: List[OutputType] = List(
-    MetricOutputType,
-    RecordOutputType,
-    DscUpdateOutputType,
-    UnknownOutputType
-  )
+  val MetricOutputType, RecordOutputType, DscUpdateOutputType,
+  UnknownOutputType = Value
 
-  val default = UnknownOutputType
-  def apply(ptn: String): OutputType = {
-    outputTypes.find(tp => ptn match {
-      case tp.idPattern() => true
-      case _ => false
-    }).getOrElse(default)
+  val Metric, Record, Records, DscUpdate = Value
+
+  override def withNameWithDefault(name: String): Value = {
+    val flattenType = super.withNameWithDefault(name)
+    flattenType match {
+      case Metric => MetricOutputType
+      case Record | Records => RecordOutputType
+      case DscUpdate => DscUpdateOutputType
+      case _ => UnknownOutputType
+    }
   }
-  def unapply(pt: OutputType): Option[String] = Some(pt.desc)
-}
-
-/**
-  * metric output type
-  * output the rule step result as metric
-  */
- case object MetricOutputType extends OutputType {
-  val idPattern: Regex = "^(?i)metric$".r
-  val desc: String = "metric"
-}
-
-/**
-  * record output type
-  * output the rule step result as records
-  */
- case object RecordOutputType extends OutputType {
-  val idPattern: Regex = "^(?i)record|records$".r
-  val desc: String = "record"
-}
-
-/**
-  * data source cache update output type
-  * output the rule step result to update data source cache
-  */
- case object DscUpdateOutputType extends OutputType {
-  val idPattern: Regex = "^(?i)dsc-update$".r
-  val desc: String = "dsc-update"
-}
-
-/**
-  * unknown output type
-  * will not output the result
-  */
- case object UnknownOutputType extends OutputType {
-  val idPattern: Regex = "".r
-  val desc: String = "unknown"
 }

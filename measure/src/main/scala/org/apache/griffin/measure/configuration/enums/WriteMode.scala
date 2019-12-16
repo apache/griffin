@@ -23,10 +23,10 @@ package org.apache.griffin.measure.configuration.enums
 sealed trait WriteMode {}
 
 object WriteMode {
-  def defaultMode(procType: ProcessType): WriteMode = {
+  def defaultMode(procType: ProcessType.ProcessType): WriteMode = {
     procType match {
-      case BatchProcessType => SimpleMode
-      case StreamingProcessType => TimestampMode
+      case ProcessType.BatchProcessType => SimpleMode
+      case ProcessType.StreamingProcessType => TimestampMode
     }
   }
 }

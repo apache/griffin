@@ -18,7 +18,7 @@
 package org.apache.griffin.measure.step.builder.preproc
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.DslType._
 
 /**
   * generate each entity pre-proc params by template defined in pre-proc param

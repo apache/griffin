@@ -21,7 +21,8 @@ import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.commons.lang.StringUtils
 
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.SinkType
+import org.apache.griffin.measure.configuration.enums.SinkType.SinkType
 
 /**
   * environment param
@@ -86,7 +87,7 @@ case class SparkParam( @JsonProperty("log.level") private val logLevel: String,
 case class SinkParam(@JsonProperty("type") private val sinkType: String,
                      @JsonProperty("config") private val config: Map[String, Any]
                     ) extends Param {
-  def getType: SinkType = SinkType(sinkType)
+  def getType: SinkType = SinkType.withNameWithDefault(sinkType)
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
 
   def validate(): Unit = {

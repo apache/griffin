@@ -25,7 +25,7 @@ import org.scalatest.Matchers
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
-import org.apache.griffin.measure.configuration.enums.BatchProcessType
+import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext}
 import org.apache.griffin.measure.SparkSuiteBase
 

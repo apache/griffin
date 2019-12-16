@@ -17,82 +17,39 @@
 
 package org.apache.griffin.measure.configuration.enums
 
-import scala.util.matching.Regex
+import org.apache.griffin.measure.configuration.enums
 
 /**
-  * sink type
+  * Supported Sink types
+  *  <li>{@link #Console #Log} -  console sink, will sink metric in console (alias log)</li>
+  *  <li>{@link #Hdfs} - hdfs sink, will sink metric and record in hdfs</li>
+  *  <li>{@link #Es #Elasticsearch #Http} - elasticsearch sink, will sink metric
+  *  in elasticsearch (alias Es and Http)</li>
+  *  <li>{@link #Mongo #MongoDB} - mongo sink, will sink metric in mongo db (alias MongoDb)</li>
+  *  <li>{@link #Custom} - custom sink (needs using extra jar-file-extension)</li>
+  *  <li>{@link #Unknown} - </li>
   */
-sealed trait SinkType {
-  val idPattern: Regex
-  val desc: String
-}
+object SinkType extends GriffinEnum {
+  type SinkType = Value
 
-object SinkType {
-  private val sinkTypes: List[SinkType] = List(
-    ConsoleSinkType,
-    HdfsSinkType,
-    ElasticsearchSinkType,
-    MongoSinkType,
-    CustomSinkType,
-    UnknownSinkType
-  )
-
-  def apply(ptn: String): SinkType = {
-    sinkTypes.find(tp => ptn match {
-      case tp.idPattern() => true
-      case _ => false
-    }).getOrElse(UnknownSinkType)
-  }
-
-  def unapply(pt: SinkType): Option[String] = Some(pt.desc)
+  val Console, Log, Hdfs, Es, Http, ElasticSearch, MongoDB, Mongo, Custom =
+    Value
 
   def validSinkTypes(strs: Seq[String]): Seq[SinkType] = {
-    val seq = strs.map(s => SinkType(s)).filter(_ != UnknownSinkType).distinct
-    if (seq.size > 0) seq else Seq(ElasticsearchSinkType)
+    val seq = strs
+      .map(s => SinkType.withNameWithDefault(s))
+      .filter(_ != SinkType.Unknown)
+      .distinct
+    if (seq.size > 0) seq else Seq(SinkType.ElasticSearch)
   }
-}
 
-/**
-  * console sink, will sink metric in console
-  */
-case object ConsoleSinkType extends SinkType {
-  val idPattern = "^(?i)console|log$".r
-  val desc = "console"
-}
-
-/**
-  * hdfs sink, will sink metric and record in hdfs
-  */
-case object HdfsSinkType extends SinkType {
-  val idPattern = "^(?i)hdfs$".r
-  val desc = "hdfs"
-}
-
-/**
-  * elasticsearch sink, will sink metric in elasticsearch
-  */
-case object ElasticsearchSinkType extends SinkType {
-  val idPattern = "^(?i)es|elasticsearch|http$".r
-  val desc = "elasticsearch"
-}
-
-/**
-  * mongo sink, will sink metric in mongo db
-  */
-case object MongoSinkType extends SinkType {
-  val idPattern = "^(?i)mongo|mongodb$".r
-  val desc = "mongo"
-}
-
-/**
-  * custom sink (needs using extra jar-file-extension)
-  */
-case object CustomSinkType extends SinkType {
-  val idPattern = "^(?i)custom$".r
-  val desc = "custom"
-}
-
-case object UnknownSinkType extends SinkType {
-  val idPattern = "".r
-  val desc = "unknown"
+  override def withNameWithDefault(name: String): enums.SinkType.Value = {
+    val sinkType = super.withNameWithDefault(name)
+    sinkType match {
+      case Console | Log => Console
+      case Es | ElasticSearch | Http => ElasticSearch
+      case MongoDB | Mongo => MongoDB
+      case _ => sinkType
+    }
+  }
 }

@@ -22,7 +22,8 @@ import scala.util.{Failure, Success, Try}
 
 import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig, GriffinConfig, Param}
 import org.apache.griffin.measure.configuration.dqdefinition.reader.ParamReaderFactory
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType
+import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
@@ -62,7 +63,7 @@ object Application extends Loggable {
     val allParam: GriffinConfig = GriffinConfig(envParam, dqParam)
 
     // choose process
-    val procType = ProcessType(allParam.getDqConfig.getProcType)
+    val procType = ProcessType.withNameWithDefault(allParam.getDqConfig.getProcType)
     val dqApp: DQApp = procType match {
       case BatchProcessType => BatchDQApp(allParam)
       case StreamingProcessType => StreamingDQApp(allParam)

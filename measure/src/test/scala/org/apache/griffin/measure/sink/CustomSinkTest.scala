@@ -20,7 +20,7 @@ package org.apache.griffin.measure.sink
 import scala.collection.mutable
 
 import org.apache.griffin.measure.configuration.dqdefinition.{RuleOutputParam, SinkParam}
-import org.apache.griffin.measure.configuration.enums.FlattenType
+import org.apache.griffin.measure.configuration.enums.FlattenType.DefaultFlattenType
 import org.apache.griffin.measure.step.write.{MetricFlushStep, MetricWriteStep, RecordWriteStep}
 
 class CustomSinkTest extends SinkTestBase {
@@ -113,7 +113,7 @@ class CustomSinkTest extends SinkTestBase {
     val metricWriteStep = {
       val metricOpt = Some(metricsDefaultOutput)
       val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse("default_metrics_name")
-      val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+      val flattenType = metricOpt.map(_.getFlatten).getOrElse(DefaultFlattenType)
       MetricWriteStep(mwName, resultTable, flattenType)
     }
 

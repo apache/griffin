@@ -20,7 +20,9 @@ package org.apache.griffin.measure.step.builder.dsl.transform
 import org.apache.commons.lang.StringUtils
 
 import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.configuration.enums.{BatchProcessType, FlattenType, MetricOutputType, StreamingProcessType}
+import org.apache.griffin.measure.configuration.enums.FlattenType.DefaultFlattenType
+import org.apache.griffin.measure.configuration.enums.OutputType._
+import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.ConstantColumns
@@ -99,7 +101,7 @@ case class ProfilingExpr2DQSteps(context: DQContext,
       val profilingMetricWriteStep = {
         val metricOpt = ruleParam.getOutputOpt(MetricOutputType)
         val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse(ruleParam.getOutDfName())
-        val flattenType = metricOpt.map(_.getFlatten).getOrElse(FlattenType.default)
+        val flattenType = metricOpt.map(_.getFlatten).getOrElse(DefaultFlattenType)
         MetricWriteStep(mwName, profilingName, flattenType)
       }
       val profilingTransStep =

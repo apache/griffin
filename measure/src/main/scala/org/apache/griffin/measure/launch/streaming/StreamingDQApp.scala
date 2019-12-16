@@ -28,7 +28,7 @@ import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition._
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType.StreamingProcessType
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.context.streaming.checkpoint.offset.OffsetCheckpointClient
 import org.apache.griffin.measure.context.streaming.metric.CacheResults

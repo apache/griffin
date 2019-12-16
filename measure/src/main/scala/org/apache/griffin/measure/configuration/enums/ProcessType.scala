@@ -17,43 +17,14 @@
 
 package org.apache.griffin.measure.configuration.enums
 
-import scala.util.matching.Regex
-
 /**
   * process type enum
+  *  <li>{@link #BatchProcessType} - Process in batch mode </li>
+  *  <li>{@link #StreamingProcessType} - Process in streaming mode</li>
   */
-sealed trait ProcessType {
-  val idPattern: Regex
-  val desc: String
-}
+object ProcessType extends GriffinEnum {
+  type ProcessType = Value
 
-object ProcessType {
-  private val procTypes: List[ProcessType] = List(
-    BatchProcessType,
-    StreamingProcessType
-  )
-
-  def apply(ptn: String): ProcessType = {
-    procTypes.find(tp => ptn match {
-      case tp.idPattern() => true
-      case _ => false
-    }).getOrElse(BatchProcessType)
-  }
-  def unapply(pt: ProcessType): Option[String] = Some(pt.desc)
-}
-
-/**
-  * process in batch mode
-  */
- case object BatchProcessType extends ProcessType {
-  val idPattern = """^(?i)batch$""".r
-  val desc = "batch"
-}
-
-/**
-  * process in streaming mode
-  */
- case object StreamingProcessType extends ProcessType {
-  val idPattern = """^(?i)streaming$""".r
-  val desc = "streaming"
+  val BatchProcessType = Value("Batch")
+  val StreamingProcessType = Value("Streaming")
 }

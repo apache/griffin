@@ -17,77 +17,47 @@
 
 package org.apache.griffin.measure.configuration.enums
 
-import scala.util.matching.Regex
-
 /**
   * the strategy to flatten metric
+  *  <li>{@link #DefaultFlattenType} -  default flatten strategy
+  *                                     metrics contains 1 row -> flatten metric json map
+  *                                     metrics contains n > 1 rows -> flatten metric json array
+  *                                     n = 0: { }
+  *                                     n = 1: { "col1": "value1", "col2": "value2", ... }
+  *                                     n > 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
+  *                                     all rows
+  *  </li>
+  *  <li>{@link #EntriesFlattenType} - metrics contains n rows -> flatten metric json map
+  *                                    n = 0: { }
+  *                                    n >= 1: { "col1": "value1", "col2": "value2", ... }
+  *                                    the first row only
+  *  </li>
+  *  <li>{@link #ArrayFlattenType} -   metrics contains n rows -> flatten metric json array
+  *                                    n = 0: { "arr-name": [ ] }
+  *                                    n >= 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
+  *                                    all rows
+  *  </li>
+  *  <li>{@link #MapFlattenType} - metrics contains n rows -> flatten metric json wrapped map
+  *                                n = 0: { "map-name": { } }
+  *                                n >= 1: { "map-name": { "col1": "value1", "col2": "value2", ... } }
+  *                                the first row only
+  *  </li>
   */
-sealed trait FlattenType {
-  val idPattern: Regex
-  val desc: String
-}
+object FlattenType extends GriffinEnum {
+  type FlattenType = Value
 
-object FlattenType {
-  private val flattenTypes: List[FlattenType] = List(
-    DefaultFlattenType,
-    EntriesFlattenType,
-    ArrayFlattenType,
-    MapFlattenType
-  )
+  val DefaultFlattenType, EntriesFlattenType, ArrayFlattenType, MapFlattenType =
+    Value
 
-  val default = DefaultFlattenType
-  def apply(ptn: String): FlattenType = {
-    flattenTypes.find(tp => ptn match {
-      case tp.idPattern() => true
-      case _ => false
-    }).getOrElse(default)
+  val List, Array, Entries, Map, Default = Value
+
+  override def withNameWithDefault(name: String): Value = {
+    val flattenType = super.withNameWithDefault(name)
+    flattenType match {
+      case Array | List => ArrayFlattenType
+      case Map => MapFlattenType
+      case Entries => EntriesFlattenType
+      case _ => DefaultFlattenType
+    }
   }
-  def unapply(pt: FlattenType): Option[String] = Some(pt.desc)
-}
-
-/**
-  * default flatten strategy
-  * metrics contains 1 row -> flatten metric json map
-  * metrics contains n > 1 rows -> flatten metric json array
-  * n = 0: { }
-  * n = 1: { "col1": "value1", "col2": "value2", ... }
-  * n > 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
-  * all rows
-  */
- case object DefaultFlattenType extends FlattenType {
-  val idPattern: Regex = "".r
-  val desc: String = "default"
-}
-
-/**
-  * metrics contains n rows -> flatten metric json map
-  * n = 0: { }
-  * n >= 1: { "col1": "value1", "col2": "value2", ... }
-  * the first row only
-  */
- case object EntriesFlattenType extends FlattenType {
-  val idPattern: Regex = "^(?i)entries$".r
-  val desc: String = "entries"
-}
-
-/**
-  * metrics contains n rows -> flatten metric json array
-  * n = 0: { "arr-name": [ ] }
-  * n >= 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
-  * all rows
-  */
- case object ArrayFlattenType extends FlattenType {
-  val idPattern: Regex = "^(?i)array|list$".r
-  val desc: String = "array"
-}
-
-/**
-  * metrics contains n rows -> flatten metric json wrapped map
-  * n = 0: { "map-name": { } }
-  * n >= 1: { "map-name": { "col1": "value1", "col2": "value2", ... } }
-  * the first row only
-  */
- case object MapFlattenType extends FlattenType {
-  val idPattern: Regex = "^(?i)map$".r
-  val desc: String = "map"
 }
