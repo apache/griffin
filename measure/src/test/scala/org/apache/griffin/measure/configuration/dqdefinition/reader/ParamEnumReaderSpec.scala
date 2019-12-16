@@ -80,31 +80,37 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
     ruleParam.getDqType should be(Accuracy)
     ruleParam = new RuleParam("griffin-dsl", "accu")
     ruleParam.getDqType should not be (Accuracy)
+    ruleParam.getDqType should be(Unknown)
 
     ruleParam = new RuleParam("griffin-dsl", "profiling")
     ruleParam.getDqType should be(Profiling)
     ruleParam = new RuleParam("griffin-dsl", "profilin")
     ruleParam.getDqType should not be (Profiling)
+    ruleParam.getDqType should be(Unknown)
 
     ruleParam = new RuleParam("griffin-dsl", "TIMELINESS")
     ruleParam.getDqType should be(Timeliness)
     ruleParam = new RuleParam("griffin-dsl", "timeliness ")
     ruleParam.getDqType should not be (Timeliness)
+    ruleParam.getDqType should be(Unknown)
 
     ruleParam = new RuleParam("griffin-dsl", "UNIQUENESS")
     ruleParam.getDqType should be(Uniqueness)
     ruleParam = new RuleParam("griffin-dsl", "UNIQUE")
     ruleParam.getDqType should not be (Uniqueness)
+    ruleParam.getDqType should be(Unknown)
 
     ruleParam = new RuleParam("griffin-dsl", "Duplicate")
     ruleParam.getDqType should be(Uniqueness)
     ruleParam = new RuleParam("griffin-dsl", "duplica")
     ruleParam.getDqType should not be (Duplicate)
+    ruleParam.getDqType should be(Unknown)
 
     ruleParam = new RuleParam("griffin-dsl", "COMPLETENESS")
     ruleParam.getDqType should be(Completeness)
     ruleParam = new RuleParam("griffin-dsl", "complete")
     ruleParam.getDqType should not be (Completeness)
+    ruleParam.getDqType should be(Unknown)
 
     ruleParam = new RuleParam("griffin-dsl", "")
     ruleParam.getDqType should be(Unknown)
