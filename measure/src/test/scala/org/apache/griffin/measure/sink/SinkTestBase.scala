@@ -17,40 +17,30 @@
 
 package org.apache.griffin.measure.sink
 
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types._
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
+import org.scalatest.{FlatSpec, Matchers}
 
-import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.{Loggable, SparkSuiteBase}
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext}
-import org.apache.griffin.measure.SparkSuiteBase
 
 trait SinkTestBase extends FlatSpec with Matchers with SparkSuiteBase with Loggable {
 
   var sinkParams: Seq[SinkParam]
 
   def getDqContext(name: String = "test-context"): DQContext = {
-    DQContext(
-      ContextId(System.currentTimeMillis),
-      name,
-      Nil,
-      sinkParams,
-      BatchProcessType
-    )(spark)
+    DQContext(ContextId(System.currentTimeMillis), name, Nil, sinkParams, BatchProcessType)(spark)
   }
 
-
   def createDataFrame(arr: Seq[Int]): DataFrame = {
-    val schema = StructType(Array(
-      StructField("id", LongType),
-      StructField("name", StringType),
-      StructField("sex", StringType),
-      StructField("age", IntegerType)
-    ))
+    val schema = StructType(
+      Array(
+        StructField("id", LongType),
+        StructField("name", StringType),
+        StructField("sex", StringType),
+        StructField("age", IntegerType)))
     val rows = arr.map { i =>
       Row(i.toLong, s"name_$i", if (i % 2 == 0) "man" else "women", i + 15)
     }

@@ -27,26 +27,28 @@ import org.apache.griffin.measure.datasource.connector.DataConnector
 import org.apache.griffin.measure.utils.DataFrameUtil._
 
 /**
-  * data source
-  * @param name     name of data source
-  * @param dsParam  param of this data source
-  * @param dataConnectors       list of data connectors
-  * @param streamingCacheClientOpt   streaming data cache client option
-  */
-case class DataSource(name: String,
-                      dsParam: DataSourceParam,
-                      dataConnectors: Seq[DataConnector],
-                      streamingCacheClientOpt: Option[StreamingCacheClient]
-                     ) extends Loggable with Serializable {
+ * data source
+ * @param name     name of data source
+ * @param dsParam  param of this data source
+ * @param dataConnectors       list of data connectors
+ * @param streamingCacheClientOpt   streaming data cache client option
+ */
+case class DataSource(
+    name: String,
+    dsParam: DataSourceParam,
+    dataConnectors: Seq[DataConnector],
+    streamingCacheClientOpt: Option[StreamingCacheClient])
+    extends Loggable
+    with Serializable {
 
   val isBaseline: Boolean = dsParam.isBaseline
 
   def init(): Unit = {
-    dataConnectors.foreach(_.init)
+    dataConnectors.foreach(_.init())
   }
 
   def loadData(context: DQContext): TimeRange = {
-    info(s"load data [${name}]")
+    info(s"load data [$name]")
     try {
       val timestamp = context.contextId.timestamp
       val (dfOpt, timeRange) = data(timestamp)
@@ -54,12 +56,12 @@ case class DataSource(name: String,
         case Some(df) =>
           context.runTimeTableRegister.registerTable(name, df)
         case None =>
-          warn(s"Data source [${name}] is null!")
+          warn(s"Data source [$name] is null!")
       }
       timeRange
     } catch {
-      case e =>
-        error(s"load data source [${name}] fails")
+      case e: Throwable =>
+        error(s"load data source [$name] fails")
         throw e
     }
   }
@@ -68,7 +70,7 @@ case class DataSource(name: String,
     val batches = dataConnectors.flatMap { dc =>
       val (dfOpt, timeRange) = dc.data(timestamp)
       dfOpt match {
-        case Some(df) => Some((dfOpt, timeRange))
+        case Some(_) => Some((dfOpt, timeRange))
         case _ => None
       }
     }
@@ -78,7 +80,7 @@ case class DataSource(name: String,
     }
     val pairs = batches ++ caches
 
-    if (pairs.size > 0) {
+    if (pairs.nonEmpty) {
       pairs.reduce { (a, b) =>
         (unionDfOpts(a._1, b._1), a._2.merge(b._2))
       }
@@ -92,11 +94,11 @@ case class DataSource(name: String,
   }
 
   def cleanOldData(): Unit = {
-    streamingCacheClientOpt.foreach(_.cleanOutTimeData)
+    streamingCacheClientOpt.foreach(_.cleanOutTimeData())
   }
 
   def processFinish(): Unit = {
-    streamingCacheClientOpt.foreach(_.processFinish)
+    streamingCacheClientOpt.foreach(_.processFinish())
   }
 
 }

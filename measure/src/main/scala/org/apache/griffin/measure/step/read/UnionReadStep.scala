@@ -22,9 +22,7 @@ import org.apache.spark.sql._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.utils.DataFrameUtil._
 
-case class UnionReadStep(name: String,
-                         readSteps: Seq[ReadStep]
-                        ) extends ReadStep {
+case class UnionReadStep(name: String, readSteps: Seq[ReadStep]) extends ReadStep {
 
   val config: Map[String, Any] = Map()
   val cache: Boolean = false
@@ -33,7 +31,7 @@ case class UnionReadStep(name: String,
     val dfOpts = readSteps.map { readStep =>
       readStep.read(context)
     }
-    if (dfOpts.size > 0) {
+    if (dfOpts.nonEmpty) {
       dfOpts.reduce((a, b) => unionDfOpts(a, b))
     } else None
   }

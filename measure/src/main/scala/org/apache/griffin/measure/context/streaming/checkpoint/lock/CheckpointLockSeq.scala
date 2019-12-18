@@ -22,11 +22,11 @@ import java.util.concurrent.TimeUnit
 case class CheckpointLockSeq(locks: Seq[CheckpointLock]) extends CheckpointLock {
 
   def lock(outtime: Long, unit: TimeUnit): Boolean = {
-    locks.headOption.map(_.lock(outtime, unit)).getOrElse(true)
+    locks.headOption.forall(_.lock(outtime, unit))
   }
 
   def unlock(): Unit = {
-    locks.headOption.foreach(_.unlock)
+    locks.headOption.foreach(_.unlock())
   }
 
 }

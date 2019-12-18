@@ -18,15 +18,15 @@
 package org.apache.griffin.measure.context.streaming.metric
 
 /**
-  * accuracy metric
-  * @param miss     miss count
-  * @param total    total count
-  */
+ * accuracy metric
+ * @param miss     miss count
+ * @param total    total count
+ */
 case class AccuracyMetric(miss: Long, total: Long) extends Metric {
 
   type T = AccuracyMetric
 
-  override def isLegal(): Boolean = getTotal > 0
+  override def isLegal: Boolean = getTotal > 0
 
   def update(delta: T): T = {
     if (delta.miss < miss) AccuracyMetric(delta.miss, total) else this

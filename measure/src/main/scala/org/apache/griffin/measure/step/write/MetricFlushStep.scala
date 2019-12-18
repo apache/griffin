@@ -20,8 +20,8 @@ package org.apache.griffin.measure.step.write
 import org.apache.griffin.measure.context.DQContext
 
 /**
-  * flush final metric map in context and write
-  */
+ * flush final metric map in context and write
+ */
 case class MetricFlushStep() extends WriteStep {
 
   val name: String = ""

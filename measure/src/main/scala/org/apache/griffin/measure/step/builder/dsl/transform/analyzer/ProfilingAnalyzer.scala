@@ -19,10 +19,9 @@ package org.apache.griffin.measure.step.builder.dsl.transform.analyzer
 
 import org.apache.griffin.measure.step.builder.dsl.expr._
 
-
 case class ProfilingAnalyzer(expr: ProfilingClause, sourceName: String) extends BasicAnalyzer {
 
-  val dataSourceNames =
+  val dataSourceNames: Set[String] =
     expr.preOrderTraverseDepthFirst(Set[String]())(seqDataSourceNames, combDataSourceNames)
 
   val selectionExprs: Seq[Expr] = {
@@ -35,8 +34,8 @@ case class ProfilingAnalyzer(expr: ProfilingClause, sourceName: String) extends 
     }
   }
 
-  val groupbyExprOpt = expr.groupbyClauseOpt
-  val preGroupbyExprs = expr.preGroupbyClauses.map(_.extractSelf)
-  val postGroupbyExprs = expr.postGroupbyClauses.map(_.extractSelf)
+  val groupbyExprOpt: Option[GroupbyClause] = expr.groupbyClauseOpt
+  val preGroupbyExprs: Seq[Expr] = expr.preGroupbyClauses.map(_.extractSelf)
+  val postGroupbyExprs: Seq[Expr] = expr.postGroupbyClauses.map(_.extractSelf)
 
 }

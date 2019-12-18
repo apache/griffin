@@ -18,31 +18,31 @@
 package org.apache.griffin.measure.configuration.enums
 
 /**
-  * the strategy to flatten metric
-  *  <li>{@link #DefaultFlattenType} -  default flatten strategy
-  *                                     metrics contains 1 row -> flatten metric json map
-  *                                     metrics contains n > 1 rows -> flatten metric json array
-  *                                     n = 0: { }
-  *                                     n = 1: { "col1": "value1", "col2": "value2", ... }
-  *                                     n > 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
-  *                                     all rows
-  *  </li>
-  *  <li>{@link #EntriesFlattenType} - metrics contains n rows -> flatten metric json map
-  *                                    n = 0: { }
-  *                                    n >= 1: { "col1": "value1", "col2": "value2", ... }
-  *                                    the first row only
-  *  </li>
-  *  <li>{@link #ArrayFlattenType} -   metrics contains n rows -> flatten metric json array
-  *                                    n = 0: { "arr-name": [ ] }
-  *                                    n >= 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
-  *                                    all rows
-  *  </li>
-  *  <li>{@link #MapFlattenType} - metrics contains n rows -> flatten metric json wrapped map
-  *                                n = 0: { "map-name": { } }
-  *                                n >= 1: { "map-name": { "col1": "value1", "col2": "value2", ... } }
-  *                                the first row only
-  *  </li>
-  */
+ * the strategy to flatten metric
+ *  <li> -  default flatten strategy
+ *                                     metrics contains 1 row -> flatten metric json map
+ *                                     metrics contains n > 1 rows -> flatten metric json array
+ *                                     n = 0: { }
+ *                                     n = 1: { "col1": "value1", "col2": "value2", ... }
+ *                                     n > 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
+ *                                     all rows
+ *  </li>
+ *  <li> - metrics contains n rows -> flatten metric json map
+ *                                    n = 0: { }
+ *                                    n >= 1: { "col1": "value1", "col2": "value2", ... }
+ *                                    the first row only
+ *  </li>
+ *  <li> -   metrics contains n rows -> flatten metric json array
+ *                                    n = 0: { "arr-name": [ ] }
+ *                                    n >= 1: { "arr-name": [ { "col1": "value1", "col2": "value2", ... }, ... ] }
+ *                                    all rows
+ *  </li>
+ *  <li> - metrics contains n rows -> flatten metric json wrapped map
+ *                                n = 0: { "map-name": { } }
+ *                                n >= 1: { "map-name": { "col1": "value1", "col2": "value2", ... } }
+ *                                the first row only
+ *  </li>
+ */
 object FlattenType extends GriffinEnum {
   type FlattenType = Value
 

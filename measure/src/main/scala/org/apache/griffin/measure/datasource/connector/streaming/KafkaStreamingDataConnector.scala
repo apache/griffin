@@ -25,27 +25,27 @@ import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
-  * streaming data connector for kafka
-  */
+ * streaming data connector for kafka
+ */
 trait KafkaStreamingDataConnector extends StreamingDataConnector {
 
   type KD <: Decoder[K]
   type VD <: Decoder[V]
   type OUT = (K, V)
 
-  val config = dcParam.getConfig
+  val config: Map[String, Any] = dcParam.getConfig
 
   val KafkaConfig = "kafka.config"
   val Topics = "topics"
 
-  val kafkaConfig = config.getAnyRef(KafkaConfig, Map[String, String]())
-  val topics = config.getString(Topics, "")
+  val kafkaConfig: Map[String, String] = config.getAnyRef(KafkaConfig, Map[String, String]())
+  val topics: String = config.getString(Topics, "")
 
   def init(): Unit = {
     // register fan in
-    streamingCacheClientOpt.foreach(_.registerFanIn)
+    streamingCacheClientOpt.foreach(_.registerFanIn())
 
-    val ds = stream match {
+    val ds = stream() match {
       case Success(dstream) => dstream
       case Failure(ex) => throw ex
     }

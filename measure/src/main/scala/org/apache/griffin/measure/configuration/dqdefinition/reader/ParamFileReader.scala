@@ -23,22 +23,20 @@ import scala.util.Try
 import org.apache.griffin.measure.configuration.dqdefinition.Param
 import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 
-
-
 /**
-  * read params from config file path
+ * read params from config file path
  *
-  * @param filePath:  hdfs path ("hdfs://cluster-name/path")
-  *                   local file path ("file:///path")
-  *                   relative file path ("relative/path")
-  */
+ * @param filePath:  hdfs path ("hdfs://cluster-name/path")
+ *                   local file path ("file:///path")
+ *                   relative file path ("relative/path")
+ */
 case class ParamFileReader(filePath: String) extends ParamReader {
 
-  def readConfig[T <: Param](implicit m : ClassTag[T]): Try[T] = {
+  def readConfig[T <: Param](implicit m: ClassTag[T]): Try[T] = {
     Try {
       val source = HdfsUtil.openFile(filePath)
       val param = JsonUtil.fromJson[T](source)
-      source.close
+      source.close()
       validate(param)
     }
   }

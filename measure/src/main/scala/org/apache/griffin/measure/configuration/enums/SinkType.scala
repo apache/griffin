@@ -20,15 +20,15 @@ package org.apache.griffin.measure.configuration.enums
 import org.apache.griffin.measure.configuration.enums
 
 /**
-  * Supported Sink types
-  *  <li>{@link #Console #Log} -  console sink, will sink metric in console (alias log)</li>
-  *  <li>{@link #Hdfs} - hdfs sink, will sink metric and record in hdfs</li>
-  *  <li>{@link #Es #Elasticsearch #Http} - elasticsearch sink, will sink metric
-  *  in elasticsearch (alias Es and Http)</li>
-  *  <li>{@link #Mongo #MongoDB} - mongo sink, will sink metric in mongo db (alias MongoDb)</li>
-  *  <li>{@link #Custom} - custom sink (needs using extra jar-file-extension)</li>
-  *  <li>{@link #Unknown} - </li>
-  */
+ * Supported Sink types
+ *  <li>{@link #Console #Log} -  console sink, will sink metric in console (alias log)</li>
+ *  <li>{@link #Hdfs} - hdfs sink, will sink metric and record in hdfs</li>
+ *  <li>{@link #Es #Elasticsearch #Http} - elasticsearch sink, will sink metric
+ *  in elasticsearch (alias Es and Http)</li>
+ *  <li>{@link #Mongo #MongoDB} - mongo sink, will sink metric in mongo db (alias MongoDb)</li>
+ *  <li>{@link #Custom} - custom sink (needs using extra jar-file-extension)</li>
+ *  <li>{@link #Unknown} - </li>
+ */
 object SinkType extends GriffinEnum {
   type SinkType = Value
 
@@ -40,7 +40,7 @@ object SinkType extends GriffinEnum {
       .map(s => SinkType.withNameWithDefault(s))
       .filter(_ != SinkType.Unknown)
       .distinct
-    if (seq.size > 0) seq else Seq(SinkType.ElasticSearch)
+    if (seq.nonEmpty) seq else Seq(SinkType.ElasticSearch)
   }
 
   override def withNameWithDefault(name: String): enums.SinkType.Value = {

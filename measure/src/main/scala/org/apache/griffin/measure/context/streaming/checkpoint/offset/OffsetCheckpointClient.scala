@@ -18,19 +18,22 @@
 package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
 import org.apache.griffin.measure.configuration.dqdefinition.CheckpointParam
-import org.apache.griffin.measure.context.streaming.checkpoint.lock.{CheckpointLock, CheckpointLockSeq}
+import org.apache.griffin.measure.context.streaming.checkpoint.lock.{
+  CheckpointLock,
+  CheckpointLockSeq
+}
 
 object OffsetCheckpointClient extends OffsetCheckpoint with OffsetOps {
   var offsetCheckpoints: Seq[OffsetCheckpoint] = Nil
 
-  def initClient(checkpointParams: Iterable[CheckpointParam], metricName: String) : Unit = {
+  def initClient(checkpointParams: Iterable[CheckpointParam], metricName: String): Unit = {
     val fac = OffsetCheckpointFactory(checkpointParams, metricName)
     offsetCheckpoints = checkpointParams.flatMap(param => fac.getOffsetCheckpoint(param)).toList
   }
 
-  def init(): Unit = offsetCheckpoints.foreach(_.init)
+  def init(): Unit = offsetCheckpoints.foreach(_.init())
   def available(): Boolean = offsetCheckpoints.foldLeft(false)(_ || _.available)
-  def close(): Unit = offsetCheckpoints.foreach(_.close)
+  def close(): Unit = offsetCheckpoints.foreach(_.close())
 
   def cache(kvs: Map[String, String]): Unit = {
     offsetCheckpoints.foreach(_.cache(kvs))
@@ -40,11 +43,11 @@ object OffsetCheckpointClient extends OffsetCheckpoint with OffsetOps {
     maps.fold(Map[String, String]())(_ ++ _)
   }
   def delete(keys: Iterable[String]): Unit = offsetCheckpoints.foreach(_.delete(keys))
-  def clear(): Unit = offsetCheckpoints.foreach(_.clear)
+  def clear(): Unit = offsetCheckpoints.foreach(_.clear())
 
   def listKeys(path: String): List[String] = {
     offsetCheckpoints.foldLeft(Nil: List[String]) { (res, offsetCheckpoint) =>
-      if (res.size > 0) res else offsetCheckpoint.listKeys(path)
+      if (res.nonEmpty) res else offsetCheckpoint.listKeys(path)
     }
   }
 

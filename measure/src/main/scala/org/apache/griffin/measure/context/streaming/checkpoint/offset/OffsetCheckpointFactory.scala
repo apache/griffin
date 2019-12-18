@@ -18,14 +18,16 @@
 package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
 import scala.util.Try
+import scala.util.matching.Regex
 
 import org.apache.griffin.measure.configuration.dqdefinition.CheckpointParam
 
+case class OffsetCheckpointFactory(
+    checkpointParams: Iterable[CheckpointParam],
+    metricName: String)
+    extends Serializable {
 
-case class OffsetCheckpointFactory(checkpointParams: Iterable[CheckpointParam], metricName: String
-                                  ) extends Serializable {
-
-  val ZK_REGEX = """^(?i)zk|zookeeper$""".r
+  val ZK_REGEX: Regex = """^(?i)zk|zookeeper$""".r
 
   def getOffsetCheckpoint(checkpointParam: CheckpointParam): Option[OffsetCheckpoint] = {
     val config = checkpointParam.getConfig

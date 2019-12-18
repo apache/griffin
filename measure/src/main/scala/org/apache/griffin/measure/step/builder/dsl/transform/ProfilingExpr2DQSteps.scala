@@ -33,19 +33,17 @@ import org.apache.griffin.measure.step.write.MetricWriteStep
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
-  * generate profiling dq steps
-  */
-case class ProfilingExpr2DQSteps(context: DQContext,
-                                 expr: Expr,
-                                 ruleParam: RuleParam
-                                ) extends Expr2DQSteps {
+ * generate profiling dq steps
+ */
+case class ProfilingExpr2DQSteps(context: DQContext, expr: Expr, ruleParam: RuleParam)
+    extends Expr2DQSteps {
 
   private object ProfilingKeys {
     val _source = "source"
   }
   import ProfilingKeys._
 
-  def getDQSteps(): Seq[DQStep] = {
+  def getDQSteps: Seq[DQStep] = {
     val details = ruleParam.getDetails
     val profilingExpr = expr.asInstanceOf[ProfilingClause]
 
@@ -59,18 +57,18 @@ case class ProfilingExpr2DQSteps(context: DQContext,
     val timestamp = context.contextId.timestamp
 
     if (!context.runTimeTableRegister.existsTable(sourceName)) {
-      warn(s"[${timestamp}] data source ${sourceName} not exists")
+      warn(s"[$timestamp] data source $sourceName not exists")
       Nil
     } else {
       val analyzer = ProfilingAnalyzer(profilingExpr, sourceName)
       val selExprDescs = analyzer.selectionExprs.map { sel =>
         val alias = sel match {
           case s: AliasableExpr =>
-            s.alias.filter(StringUtils.isNotEmpty).map(a => s" AS `${a}`").getOrElse("")
+            s.alias.filter(StringUtils.isNotEmpty).map(a => s" AS `$a`").getOrElse("")
 
           case _ => ""
         }
-        s"${sel.desc}${alias}"
+        s"${sel.desc}$alias"
       }
       val selCondition = profilingExpr.selectClause.extraConditionOpt.map(_.desc).mkString
       val selClause = procType match {
@@ -94,8 +92,8 @@ case class ProfilingExpr2DQSteps(context: DQContext,
 
       // 1. select statement
       val profilingSql = {
-        s"SELECT ${selCondition} ${selClause} " +
-          s"${fromClause} ${preGroupbyClause} ${groupbyClause} ${postGroupbyClause}"
+        s"SELECT $selCondition $selClause " +
+          s"$fromClause $preGroupbyClause $groupbyClause $postGroupbyClause"
       }
       val profilingName = ruleParam.getOutDfName()
       val profilingMetricWriteStep = {
@@ -105,7 +103,11 @@ case class ProfilingExpr2DQSteps(context: DQContext,
         MetricWriteStep(mwName, profilingName, flattenType)
       }
       val profilingTransStep =
-        SparkSqlTransformStep(profilingName, profilingSql, details, Some(profilingMetricWriteStep))
+        SparkSqlTransformStep(
+          profilingName,
+          profilingSql,
+          details,
+          Some(profilingMetricWriteStep))
       profilingTransStep :: Nil
     }
   }

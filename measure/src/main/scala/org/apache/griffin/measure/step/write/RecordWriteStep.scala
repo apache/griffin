@@ -26,13 +26,14 @@ import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.JsonUtil
 
 /**
-  * write records needs to be sink
-  */
-case class RecordWriteStep(name: String,
-                           inputName: String,
-                           filterTableNameOpt: Option[String] = None,
-                           writeTimestampOpt: Option[Long] = None
-                          ) extends WriteStep {
+ * write records needs to be sink
+ */
+case class RecordWriteStep(
+    name: String,
+    inputName: String,
+    filterTableNameOpt: Option[String] = None,
+    writeTimestampOpt: Option[Long] = None)
+    extends WriteStep {
 
   def execute(context: DQContext): Boolean = {
     val timestamp = writeTimestampOpt.getOrElse(context.contextId.timestamp)
@@ -75,36 +76,36 @@ case class RecordWriteStep(name: String,
 
   private def getDataFrame(context: DQContext, name: String): Option[DataFrame] = {
     try {
-      val df = context.sparkSession.table(s"`${name}`")
+      val df = context.sparkSession.table(s"`$name`")
       Some(df)
     } catch {
       case e: Throwable =>
-        error(s"get data frame ${name} fails", e)
+        error(s"get data frame $name fails", e)
         None
     }
   }
 
-  private def getRecordDataFrame(context: DQContext): Option[DataFrame]
-    = getDataFrame(context, inputName)
+  private def getRecordDataFrame(context: DQContext): Option[DataFrame] =
+    getDataFrame(context, inputName)
 
-  private def getFilterTableDataFrame(context: DQContext): Option[DataFrame]
-    = filterTableNameOpt.flatMap(getDataFrame(context, _))
+  private def getFilterTableDataFrame(context: DQContext): Option[DataFrame] =
+    filterTableNameOpt.flatMap(getDataFrame(context, _))
 
   private def getBatchRecords(context: DQContext): Option[RDD[String]] = {
-    getRecordDataFrame(context).map(_.toJSON.rdd);
+    getRecordDataFrame(context).map(_.toJSON.rdd)
   }
 
-  private def getStreamingRecords(context: DQContext)
-    : (Option[RDD[(Long, Iterable[String])]], Set[Long])
-    = {
-    implicit val encoder = Encoders.tuple(Encoders.scalaLong, Encoders.STRING)
+  private def getStreamingRecords(
+      context: DQContext): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
+    implicit val encoder: Encoder[(Long, String)] =
+      Encoders.tuple(Encoders.scalaLong, Encoders.STRING)
     val defTimestamp = context.contextId.timestamp
     getRecordDataFrame(context) match {
       case Some(df) =>
         val (filterFuncOpt, emptyTimestamps) = getFilterTableDataFrame(context) match {
           case Some(filterDf) =>
             // timestamps with empty flag
-            val tmsts: Array[(Long, Boolean)] = (filterDf.collect.flatMap { row =>
+            val tmsts: Array[(Long, Boolean)] = filterDf.collect.flatMap { row =>
               try {
                 val tmst = getTmst(row, defTimestamp)
                 val empty = row.getAs[Boolean](ConstantColumns.empty)
@@ -112,15 +113,15 @@ case class RecordWriteStep(name: String,
               } catch {
                 case _: Throwable => None
               }
-            })
+            }
             val emptyTmsts = tmsts.filter(_._2).map(_._1).toSet
             val recordTmsts = tmsts.filter(!_._2).map(_._1).toSet
-            val filterFuncOpt: Option[(Long) => Boolean] = if (recordTmsts.size > 0) {
+            val filterFuncOpt: Option[Long => Boolean] = if (recordTmsts.nonEmpty) {
               Some((t: Long) => recordTmsts.contains(t))
             } else None
 
             (filterFuncOpt, emptyTmsts)
-          case _ => (Some((t: Long) => true), Set[Long]())
+          case _ => (Some((_: Long) => true), Set[Long]())
         }
 
         // filter timestamps need to record
@@ -134,7 +135,7 @@ case class RecordWriteStep(name: String,
                   val str = JsonUtil.toJson(map)
                   Some((tmst, str))
                 } catch {
-                  case e: Throwable => None
+                  case _: Throwable => None
                 }
               } else None
             }

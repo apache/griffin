@@ -40,7 +40,7 @@ case class CheckpointLockInZK(@transient mutex: InterProcessMutex) extends Check
 
   def unlock(): Unit = {
     try {
-      if (mutex.isAcquiredInThisProcess) mutex.release
+      if (mutex.isAcquiredInThisProcess) mutex.release()
     } catch {
       case e: Throwable =>
         error(s"unlock error: ${e.getMessage}")

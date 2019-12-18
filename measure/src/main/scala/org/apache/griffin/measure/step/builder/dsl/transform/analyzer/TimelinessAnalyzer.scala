@@ -19,7 +19,6 @@ package org.apache.griffin.measure.step.builder.dsl.transform.analyzer
 
 import org.apache.griffin.measure.step.builder.dsl.expr._
 
-
 case class TimelinessAnalyzer(expr: TimelinessClause, sourceName: String) extends BasicAnalyzer {
 
 //  val tsExpr = expr.desc
@@ -51,7 +50,6 @@ case class TimelinessAnalyzer(expr: TimelinessClause, sourceName: String) extend
 //    val alias = aliasOpt.getOrElse(defAlias)
 //    (pr.desc, alias)
 //  }
-
 
   private val exprs = expr.exprs.map(_.desc).toList
 

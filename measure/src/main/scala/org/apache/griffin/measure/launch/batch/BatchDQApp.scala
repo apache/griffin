@@ -32,15 +32,14 @@ import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 
-
 case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
   val envParam: EnvConfig = allParam.getEnvConfig
   val dqParam: DQConfig = allParam.getDqConfig
 
-  val sparkParam = envParam.getSparkParam
-  val metricName = dqParam.getName
-  val sinkParams = getSinkParams
+  val sparkParam: SparkParam = envParam.getSparkParam
+  val metricName: String = dqParam.getName
+  val sinkParams: Seq[SinkParam] = getSinkParams
 
   var dqContext: DQContext = _
 
@@ -52,7 +51,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     conf.setAll(sparkParam.getConfig)
     conf.set("spark.sql.crossJoin.enabled", "true")
     sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
-    val logLevel = getGriffinLogLevel()
+    val logLevel = getGriffinLogLevel
     sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
     griffinLogger.setLevel(logLevel)
 
@@ -69,16 +68,15 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // get data sources
     val dataSources = DataSourceFactory.getDataSources(sparkSession, null, dqParam.getDataSources)
-    dataSources.foreach(_.init)
+    dataSources.foreach(_.init())
 
     // create dq context
-    dqContext = DQContext(
-      contextId, metricName, dataSources, sinkParams, BatchProcessType
-    )(sparkSession)
+    dqContext =
+      DQContext(contextId, metricName, dataSources, sinkParams, BatchProcessType)(sparkSession)
 
     // start id
     val applicationId = sparkSession.sparkContext.applicationId
-    dqContext.getSink().start(applicationId)
+    dqContext.getSink.start(applicationId)
 
     // build job
     val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
@@ -88,13 +86,13 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // end time
     val endTime = new Date().getTime
-    dqContext.getSink().log(endTime, s"process using time: ${endTime - startTime} ms")
+    dqContext.getSink.log(endTime, s"process using time: ${endTime - startTime} ms")
 
     // clean context
     dqContext.clean()
 
     // finish
-    dqContext.getSink().finish()
+    dqContext.getSink.finish()
 
     result
   }

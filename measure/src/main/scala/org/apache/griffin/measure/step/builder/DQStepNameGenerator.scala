@@ -24,7 +24,7 @@ object DQStepNameGenerator {
   private val head: String = "step"
 
   def genName: String = {
-    s"${head}${increment}"
+    s"$head$increment"
   }
 
   private def increment: Long = {

@@ -21,15 +21,16 @@ import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.write.WriteStep
 
 /**
-  * data frame ops transform step
-  */
-case class DataFrameOpsTransformStep[T <: WriteStep](name: String,
-                                     inputDfName: String,
-                                     rule: String,
-                                     details: Map[String, Any],
-                                     writeStepOpt: Option[T] = None,
-                                     cache: Boolean = false
-                                    ) extends TransformStep {
+ * data frame ops transform step
+ */
+case class DataFrameOpsTransformStep[T <: WriteStep](
+    name: String,
+    inputDfName: String,
+    rule: String,
+    details: Map[String, Any],
+    writeStepOpt: Option[T] = None,
+    cache: Boolean = false)
+    extends TransformStep {
 
   def doExecute(context: DQContext): Boolean = {
     val sparkSession = context.sparkSession
@@ -40,7 +41,7 @@ case class DataFrameOpsTransformStep[T <: WriteStep](name: String,
           DataFrameOps.accuracy(sparkSession, inputDfName, context.contextId, details)
 
         case DataFrameOps._clear => DataFrameOps.clear(sparkSession, inputDfName, details)
-        case _ => throw new Exception(s"df opr [ ${rule} ] not supported")
+        case _ => throw new Exception(s"df opr [ $rule ] not supported")
       }
       if (cache) context.dataFrameCache.cacheDataFrame(name, df)
       context.runTimeTableRegister.registerTable(name, df)
@@ -50,7 +51,7 @@ case class DataFrameOpsTransformStep[T <: WriteStep](name: String,
       }
     } catch {
       case e: Throwable =>
-        error(s"run data frame ops [ ${rule} ] error: ${e.getMessage}", e)
+        error(s"run data frame ops [ $rule ] error: ${e.getMessage}", e)
         false
     }
   }

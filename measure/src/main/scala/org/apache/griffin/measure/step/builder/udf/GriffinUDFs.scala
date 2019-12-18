@@ -27,8 +27,8 @@ object GriffinUDFAgent {
 }
 
 /**
-  * user defined functions extension
-  */
+ * user defined functions extension
+ */
 object GriffinUDFs {
 
   def register(sparkSession: SparkSession): Unit = {
@@ -52,11 +52,10 @@ object GriffinUDFs {
 }
 
 /**
-  * aggregation functions extension
-  */
+ * aggregation functions extension
+ */
 object GriffinUDAggFs {
 
-  def register(sparkSession: SparkSession): Unit = {
-  }
+  def register(sparkSession: SparkSession): Unit = {}
 
 }

@@ -17,13 +17,14 @@
 
 package org.apache.griffin.measure.step.transform
 
+import scala.collection.mutable
 import scala.collection.mutable.HashSet
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 
 import org.apache.griffin.measure.context.DQContext
-import org.apache.griffin.measure.step.DQStep
+import org.apache.griffin.measure.step.{DQStep, DQStepStatus}
 import org.apache.griffin.measure.step.DQStepStatus._
 import org.apache.griffin.measure.utils.ThreadUtils
 
@@ -35,9 +36,9 @@ trait TransformStep extends DQStep {
 
   val cache: Boolean
 
-  var status = PENDING
+  var status: DQStepStatus.Value = PENDING
 
-  val parentSteps = new HashSet[TransformStep]
+  val parentSteps = new mutable.HashSet[TransformStep]
 
   def doExecute(context: DQContext): Boolean
 
@@ -61,12 +62,12 @@ trait TransformStep extends DQStep {
       Future.sequence(parentStepFutures)(implicitly, TransformStep.transformStepContext),
       Duration.Inf)
 
-    parentSteps.map(step => {
+    parentSteps.foreach(step => {
       while (step.status == RUNNING) {
         Thread.sleep(1000L)
       }
     })
-    val prepared = parentSteps.foldLeft(true)((ret, step) => ret && step.status == COMPLETE)
+    val prepared = parentSteps.forall(step => step.status == COMPLETE)
     if (prepared) {
       val res = doExecute(context)
       info(threadName + " end transform step : \n" + debugString())
@@ -91,7 +92,7 @@ trait TransformStep extends DQStep {
   def debugString(level: Int = 0): String = {
     val stringBuffer = new StringBuilder
     if (level > 0) {
-      for (i <- 0 to level - 1) {
+      for (_ <- 0 until level) {
         stringBuffer.append("|   ")
       }
       stringBuffer.append("|---")
@@ -103,7 +104,6 @@ trait TransformStep extends DQStep {
 }
 
 object TransformStep {
-  private[transform] val transformStepContext = ExecutionContext.fromExecutorService(
-    ThreadUtils.newDaemonCachedThreadPool("transform-step"))
+  private[transform] val transformStepContext =
+    ExecutionContext.fromExecutorService(ThreadUtils.newDaemonCachedThreadPool("transform-step"))
 }
-

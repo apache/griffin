@@ -27,8 +27,8 @@ import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step._
 
 /**
-  * build dq step by param
-  */
+ * build dq step by param
+ */
 trait DQStepBuilder extends Loggable with Serializable {
 
   type ParamType <: Param
@@ -44,14 +44,15 @@ trait DQStepBuilder extends Loggable with Serializable {
 
 object DQStepBuilder {
 
-  def buildStepOptByDataSourceParam(context: DQContext, dsParam: DataSourceParam
-                                   ): Option[DQStep] = {
+  def buildStepOptByDataSourceParam(
+      context: DQContext,
+      dsParam: DataSourceParam): Option[DQStep] = {
     getDataSourceParamStepBuilder(context.procType)
       .flatMap(_.buildDQStep(context, dsParam))
   }
 
-  private def getDataSourceParamStepBuilder(procType: ProcessType)
-  : Option[DataSourceParamStepBuilder] = {
+  private def getDataSourceParamStepBuilder(
+      procType: ProcessType): Option[DataSourceParamStepBuilder] = {
     procType match {
       case BatchProcessType => Some(BatchDataSourceStepBuilder())
       case StreamingProcessType => Some(StreamingDataSourceStepBuilder())
@@ -59,21 +60,22 @@ object DQStepBuilder {
     }
   }
 
-  def buildStepOptByRuleParam(context: DQContext, ruleParam: RuleParam
-                             ): Option[DQStep] = {
+  def buildStepOptByRuleParam(context: DQContext, ruleParam: RuleParam): Option[DQStep] = {
     val dslType = ruleParam.getDslType
     val dsNames = context.dataSourceNames
     val funcNames = context.functionNames
     val dqStepOpt = getRuleParamStepBuilder(dslType, dsNames, funcNames)
       .flatMap(_.buildDQStep(context, ruleParam))
-    dqStepOpt.toSeq.flatMap(_.getNames).foreach(name =>
-      context.compileTableRegister.registerTable(name)
-    )
+    dqStepOpt.toSeq
+      .flatMap(_.getNames)
+      .foreach(name => context.compileTableRegister.registerTable(name))
     dqStepOpt
   }
 
-  private def getRuleParamStepBuilder(dslType: DslType, dsNames: Seq[String], funcNames: Seq[String]
-                                     ): Option[RuleParamStepBuilder] = {
+  private def getRuleParamStepBuilder(
+      dslType: DslType,
+      dsNames: Seq[String],
+      funcNames: Seq[String]): Option[RuleParamStepBuilder] = {
     dslType match {
       case SparkSql => Some(SparkSqlDQStepBuilder())
       case DataFrameOpsType => Some(DataFrameOpsDQStepBuilder())

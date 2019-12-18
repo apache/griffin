@@ -22,10 +22,9 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
 
-
 /**
-  * spark row formatter
-  */
+ * spark row formatter
+ */
 object SparkRowFormatter {
 
   def formatRow(row: Row): Map[String, Any] = {
@@ -41,13 +40,14 @@ object SparkRowFormatter {
     paired.foldLeft(Map[String, Any]())((s, p) => s ++ formatItem(p))
   }
 
-  private def formatItem(p: Tuple2[StructField, Any]): Map[String, Any] = {
+  private def formatItem(p: (StructField, Any)): Map[String, Any] = {
     p match {
       case (sf, a) =>
         sf.dataType match {
           case ArrayType(et, _) =>
-            Map(sf.name ->
-              (if (a == null) a else formatArray(et, a.asInstanceOf[ArrayBuffer[Any]])))
+            Map(
+              sf.name ->
+                (if (a == null) a else formatArray(et, a.asInstanceOf[ArrayBuffer[Any]])))
           case StructType(s) =>
             Map(sf.name -> (if (a == null) a else formatStruct(s, a.asInstanceOf[Row])))
           case _ => Map(sf.name -> a)

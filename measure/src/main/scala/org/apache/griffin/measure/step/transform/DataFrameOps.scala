@@ -29,8 +29,8 @@ import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
-  * pre-defined data frame operations
-  */
+ * pre-defined data frame operations
+ */
 object DataFrameOps {
 
   final val _fromJson = "from_json"
@@ -45,15 +45,16 @@ object DataFrameOps {
     val _matchedFraction = "matchedFraction"
   }
 
-  def fromJson(sparkSession: SparkSession,
-               inputDfName: String,
-               details: Map[String, Any]): DataFrame = {
+  def fromJson(
+      sparkSession: SparkSession,
+      inputDfName: String,
+      details: Map[String, Any]): DataFrame = {
     val _colName = "col.name"
     val colNameOpt = details.get(_colName).map(_.toString)
 
-    implicit val encoder = Encoders.STRING
+    implicit val encoder: Encoder[String] = Encoders.STRING
 
-    val df: DataFrame = sparkSession.table(s"`${inputDfName}`")
+    val df: DataFrame = sparkSession.table(s"`$inputDfName`")
     val rdd = colNameOpt match {
       case Some(colName: String) => df.map(r => r.getAs[String](colName))
       case _ => df.map(_.getAs[String](0))
@@ -61,10 +62,11 @@ object DataFrameOps {
     sparkSession.read.json(rdd) // slow process
   }
 
-  def accuracy(sparkSession: SparkSession,
-               inputDfName: String,
-               contextId: ContextId,
-               details: Map[String, Any]): DataFrame = {
+  def accuracy(
+      sparkSession: SparkSession,
+      inputDfName: String,
+      contextId: ContextId,
+      details: Map[String, Any]): DataFrame = {
     import AccuracyOprKeys._
 
     val miss = details.getStringOrKey(_miss)
@@ -78,11 +80,11 @@ object DataFrameOps {
       try {
         Some(r.getAs[Long](k))
       } catch {
-        case e: Throwable => None
+        case _: Throwable => None
       }
     }
 
-    val df = sparkSession.table(s"`${inputDfName}`")
+    val df = sparkSession.table(s"`$inputDfName`")
 
     val results = df.rdd.flatMap { row =>
       try {
@@ -92,29 +94,36 @@ object DataFrameOps {
         val ar = AccuracyMetric(missCount, totalCount)
         if (ar.isLegal) Some((tmst, ar)) else None
       } catch {
-        case e: Throwable => None
+        case _: Throwable => None
       }
     }.collect
 
     // cache and update results
-    val updatedResults = CacheResults.update(results.map{ pair =>
+    val updatedResults = CacheResults.update(results.map { pair =>
       val (t, r) = pair
       CacheResult(t, updateTime, r)
     })
 
     // generate metrics
-    val schema = StructType(Array(
-      StructField(ConstantColumns.tmst, LongType),
-      StructField(miss, LongType),
-      StructField(total, LongType),
-      StructField(matched, LongType),
-      StructField(matchedFraction, DoubleType),
-      StructField(ConstantColumns.record, BooleanType),
-      StructField(ConstantColumns.empty, BooleanType)
-    ))
+    val schema = StructType(
+      Array(
+        StructField(ConstantColumns.tmst, LongType),
+        StructField(miss, LongType),
+        StructField(total, LongType),
+        StructField(matched, LongType),
+        StructField(matchedFraction, DoubleType),
+        StructField(ConstantColumns.record, BooleanType),
+        StructField(ConstantColumns.empty, BooleanType)))
     val rows = updatedResults.map { r =>
       val ar = r.result.asInstanceOf[AccuracyMetric]
-      Row(r.timeStamp, ar.miss, ar.total, ar.getMatch, ar.matchFraction, !ar.initial, ar.eventual)
+      Row(
+        r.timeStamp,
+        ar.miss,
+        ar.total,
+        ar.getMatch,
+        ar.matchFraction,
+        !ar.initial,
+        ar.eventual())
     }.toArray
     val rowRdd = sparkSession.sparkContext.parallelize(rows)
     val retDf = sparkSession.createDataFrame(rowRdd, schema)
@@ -122,8 +131,11 @@ object DataFrameOps {
     retDf
   }
 
-  def clear(sparkSession: SparkSession, inputDfName: String, details: Map[String, Any]): DataFrame = {
-    val df = sparkSession.table(s"`${inputDfName}`")
+  def clear(
+      sparkSession: SparkSession,
+      inputDfName: String,
+      details: Map[String, Any]): DataFrame = {
+    val df = sparkSession.table(s"`$inputDfName`")
     val emptyRdd = sparkSession.sparkContext.emptyRDD[Row]
     sparkSession.createDataFrame(emptyRdd, df.schema)
   }

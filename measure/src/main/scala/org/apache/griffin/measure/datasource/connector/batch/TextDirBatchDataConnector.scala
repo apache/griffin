@@ -26,24 +26,25 @@ import org.apache.griffin.measure.utils.HdfsUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
-  * batch data connector for directory with text format data in the nth depth sub-directories
-  */
-case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
-                                     dcParam: DataConnectorParam,
-                                     timestampStorage: TimestampStorage
-                                    ) extends BatchDataConnector {
+ * batch data connector for directory with text format data in the nth depth sub-directories
+ */
+case class TextDirBatchDataConnector(
+    @transient sparkSession: SparkSession,
+    dcParam: DataConnectorParam,
+    timestampStorage: TimestampStorage)
+    extends BatchDataConnector {
 
-  val config = dcParam.getConfig
+  val config: Map[String, Any] = dcParam.getConfig
 
   val DirPath = "dir.path"
   val DataDirDepth = "data.dir.depth"
   val SuccessFile = "success.file"
   val DoneFile = "done.file"
 
-  val dirPath = config.getString(DirPath, "")
-  val dataDirDepth = config.getInt(DataDirDepth, 0)
-  val successFile = config.getString(SuccessFile, "_SUCCESS")
-  val doneFile = config.getString(DoneFile, "_DONE")
+  val dirPath: String = config.getString(DirPath, "")
+  val dataDirDepth: Int = config.getInt(DataDirDepth, 0)
+  val successFile: String = config.getString(SuccessFile, "_SUCCESS")
+  val doneFile: String = config.getString(DoneFile, "_DONE")
 
   val ignoreFilePrefix = "_"
 
@@ -52,7 +53,7 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
   }
 
   def data(ms: Long): (Option[DataFrame], TimeRange) = {
-    assert(dirExist(), s"Text dir ${dirPath} is not exists!")
+    assert(dirExist(), s"Text dir $dirPath is not exists!")
     val dfOpt = {
       val dataDirs = listSubDirs(dirPath :: Nil, dataDirDepth, readable)
       // touch done file for read dirs
@@ -73,10 +74,14 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
     (dfOpt, TimeRange(ms, tmsts))
   }
 
-  private def listSubDirs(paths: Seq[String],
-                          depth: Int,
-                          filteFunc: (String) => Boolean): Seq[String] = {
-    val subDirs = paths.flatMap { path => HdfsUtil.listSubPathsByType(path, "dir", true) }
+  @scala.annotation.tailrec
+  private def listSubDirs(
+      paths: Seq[String],
+      depth: Int,
+      filteFunc: String => Boolean): Seq[String] = {
+    val subDirs = paths.flatMap { path =>
+      HdfsUtil.listSubPathsByType(path, "dir", fullPath = true)
+    }
     if (depth <= 0) {
       subDirs.filter(filteFunc)
     } else {
@@ -92,7 +97,7 @@ case class TextDirBatchDataConnector(@transient sparkSession: SparkSession,
     HdfsUtil.createEmptyFile(HdfsUtil.getHdfsFilePath(dir, doneFile))
 
   private def emptyDir(dir: String): Boolean = {
-    HdfsUtil.listSubPathsByType(dir, "file").filter(!_.startsWith(ignoreFilePrefix)).size == 0
+    HdfsUtil.listSubPathsByType(dir, "file").forall(_.startsWith(ignoreFilePrefix))
   }
 
 //  def metaData(): Try[Iterable[(String, String)]] = {

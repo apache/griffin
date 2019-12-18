@@ -22,14 +22,18 @@ import org.apache.spark.sql._
 import org.apache.griffin.measure.datasource.TimestampStorage
 
 /**
-  * data source cache in orc format
-  */
-case class StreamingCacheOrcClient(sparkSession: SparkSession, param: Map[String, Any],
-                                   dsName: String, index: Int, timestampStorage: TimestampStorage
-                             ) extends StreamingCacheClient {
+ * data source cache in orc format
+ */
+case class StreamingCacheOrcClient(
+    sparkSession: SparkSession,
+    param: Map[String, Any],
+    dsName: String,
+    index: Int,
+    timestampStorage: TimestampStorage)
+    extends StreamingCacheClient {
 
   protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit = {
-    info(s"write path: ${path}")
+    info(s"write path: $path")
     dfw.orc(path)
   }
 

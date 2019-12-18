@@ -24,16 +24,17 @@ import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums.SinkType._
 import org.apache.griffin.measure.utils.ParamUtil._
 
-case class SinkFactory(sinkParamIter: Iterable[SinkParam],
-                       metricName: String) extends Loggable with Serializable {
+case class SinkFactory(sinkParamIter: Iterable[SinkParam], metricName: String)
+    extends Loggable
+    with Serializable {
 
   /**
-    * create sink
-    *
-    * @param timeStamp the timestamp of sink
-    * @param block     sink write metric in block or non-block way
-    * @return sink
-    */
+   * create sink
+   *
+   * @param timeStamp the timestamp of sink
+   * @param block     sink write metric in block or non-block way
+   * @return sink
+   */
   def getSinks(timeStamp: Long, block: Boolean): MultiSinks = {
     MultiSinks(sinkParamIter.flatMap(param => getSink(timeStamp, param, block)))
   }
@@ -47,10 +48,10 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam],
       case ElasticSearch => Try(ElasticSearchSink(config, metricName, timeStamp, block))
       case MongoDB => Try(MongoSink(config, metricName, timeStamp, block))
       case Custom => Try(getCustomSink(config, metricName, timeStamp, block))
-      case _ => throw new Exception(s"sink type ${sinkType} is not supported!")
+      case _ => throw new Exception(s"sink type $sinkType is not supported!")
     }
     sinkTry match {
-      case Success(sink) if (sink.available) => Some(sink)
+      case Success(sink) if sink.available() => Some(sink)
       case Failure(ex) =>
         error("Failed to get sink", ex)
         None
@@ -58,38 +59,42 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam],
   }
 
   /**
-    * Using custom sink
-    *
-    * how it might look in env.json:
-    *
-    * "sinks": [
-    * {
-    * "type": "CUSTOM",
-    * "config": {
-    * "class": "com.yourcompany.griffin.sinks.MySuperSink",
-    * "path": "/Users/Shared"
-    * }
-    * },
-    *
-    */
-  private def getCustomSink(config: Map[String, Any],
-                            metricName: String,
-                            timeStamp: Long,
-                            block: Boolean): Sink = {
+   * Using custom sink
+   *
+   * how it might look in env.json:
+   *
+   * "sinks": [
+   * {
+   * "type": "CUSTOM",
+   * "config": {
+   * "class": "com.yourcompany.griffin.sinks.MySuperSink",
+   * "path": "/Users/Shared"
+   * }
+   * },
+   *
+   */
+  private def getCustomSink(
+      config: Map[String, Any],
+      metricName: String,
+      timeStamp: Long,
+      block: Boolean): Sink = {
     val className = config.getString("class", "")
     val cls = Class.forName(className)
     if (classOf[Sink].isAssignableFrom(cls)) {
-      val method = cls.getDeclaredMethod("apply",
+      val method = cls.getDeclaredMethod(
+        "apply",
         classOf[Map[String, Any]],
         classOf[String],
         classOf[Long],
         classOf[Boolean])
-      method.invoke(
-        null,
-        config,
-        metricName.asInstanceOf[Object],
-        timeStamp.asInstanceOf[Object],
-        block.asInstanceOf[Object]).asInstanceOf[Sink]
+      method
+        .invoke(
+          null,
+          config,
+          metricName.asInstanceOf[Object],
+          timeStamp.asInstanceOf[Object],
+          block.asInstanceOf[Object])
+        .asInstanceOf[Sink]
     } else {
       throw new ClassCastException(s"$className should extend Sink")
     }

@@ -27,7 +27,11 @@ case class SparkSqlDQStepBuilder() extends RuleParamStepBuilder {
   def buildSteps(context: DQContext, ruleParam: RuleParam): Seq[DQStep] = {
     val name = getStepName(ruleParam.getOutDfName())
     val transformStep = SparkSqlTransformStep(
-      name, ruleParam.getRule, ruleParam.getDetails, None, ruleParam.getCache)
+      name,
+      ruleParam.getRule,
+      ruleParam.getDetails,
+      None,
+      ruleParam.getCache)
     transformStep +: buildDirectWriteSteps(ruleParam)
   }
 

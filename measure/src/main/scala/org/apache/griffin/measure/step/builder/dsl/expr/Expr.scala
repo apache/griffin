@@ -18,8 +18,8 @@
 package org.apache.griffin.measure.step.builder.dsl.expr
 
 /**
-  * expr parsed by griffin dsl
-  */
+ * expr parsed by griffin dsl
+ */
 trait Expr extends TreeNode with ExprTag with Serializable {
 
   def desc: String
@@ -29,6 +29,6 @@ trait Expr extends TreeNode with ExprTag with Serializable {
   def extractSelf: Expr = this
 
   // execution
-  def map(func: (Expr) => Expr): Expr = func(this)
+  def map(func: Expr => Expr): Expr = func(this)
 
 }

@@ -25,8 +25,8 @@ import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig, SinkParam}
 
 /**
-  * dq application process
-  */
+ * dq application process
+ */
 trait DQApp extends Loggable with Serializable {
 
   val envParam: EnvConfig
@@ -37,22 +37,22 @@ trait DQApp extends Loggable with Serializable {
   def init: Try[_]
 
   /**
-    * @return execution success
-    */
+   * @return execution success
+   */
   def run: Try[Boolean]
 
   def close: Try[_]
 
   /**
-    * application will exit if it fails in run phase.
-    * if retryable is true, the exception will be threw to spark env,
-    * and enable retry strategy of spark application
-    */
+   * application will exit if it fails in run phase.
+   * if retryable is true, the exception will be threw to spark env,
+   * and enable retry strategy of spark application
+   */
   def retryable: Boolean
 
   /**
-    * timestamp as a key for metrics
-    */
+   * timestamp as a key for metrics
+   */
   protected def getMeasureTime: Long = {
     dqParam.getTimestampOpt match {
       case Some(t) if t > 0 => t

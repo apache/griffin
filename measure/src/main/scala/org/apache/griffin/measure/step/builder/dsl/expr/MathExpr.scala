@@ -17,11 +17,11 @@
 
 package org.apache.griffin.measure.step.builder.dsl.expr
 
-trait MathExpr extends Expr {
-}
+trait MathExpr extends Expr {}
 
-case class MathFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Option[String]
-                         ) extends MathExpr with AliasableExpr {
+case class MathFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Option[String])
+    extends MathExpr
+    with AliasableExpr {
 
   addChild(factor)
 
@@ -33,7 +33,7 @@ case class MathFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Option[S
     else factor.extractSelf
   }
 
-  override def map(func: (Expr) => Expr): MathFactorExpr = {
+  override def map(func: Expr => Expr): MathFactorExpr = {
     MathFactorExpr(func(factor), withBracket, aliasOpt)
   }
 }
@@ -44,12 +44,12 @@ case class UnaryMathExpr(oprs: Seq[String], factor: MathExpr) extends MathExpr {
 
   def desc: String = {
     oprs.foldRight(factor.desc) { (opr, fac) =>
-      s"(${opr}${fac})"
+      s"($opr$fac)"
     }
   }
   def coalesceDesc: String = {
     oprs.foldRight(factor.coalesceDesc) { (opr, fac) =>
-      s"(${opr}${fac})"
+      s"($opr$fac)"
     }
   }
   override def extractSelf: Expr = {
@@ -57,7 +57,7 @@ case class UnaryMathExpr(oprs: Seq[String], factor: MathExpr) extends MathExpr {
     else factor.extractSelf
   }
 
-  override def map(func: (Expr) => Expr): UnaryMathExpr = {
+  override def map(func: Expr => Expr): UnaryMathExpr = {
     UnaryMathExpr(oprs, func(factor).asInstanceOf[MathExpr])
   }
 }
@@ -69,24 +69,24 @@ case class BinaryMathExpr(factor: MathExpr, tails: Seq[(String, MathExpr)]) exte
   def desc: String = {
     val res = tails.foldLeft(factor.desc) { (fac, tail) =>
       val (opr, expr) = tail
-      s"${fac} ${opr} ${expr.desc}"
+      s"$fac $opr ${expr.desc}"
     }
-    if (tails.size <= 0) res else s"${res}"
+    if (tails.size <= 0) res else s"$res"
   }
   def coalesceDesc: String = {
     val res = tails.foldLeft(factor.coalesceDesc) { (fac, tail) =>
       val (opr, expr) = tail
-      s"${fac} ${opr} ${expr.coalesceDesc}"
+      s"$fac $opr ${expr.coalesceDesc}"
     }
-    if (tails.size <= 0) res else s"${res}"
+    if (tails.size <= 0) res else s"$res"
   }
   override def extractSelf: Expr = {
     if (tails.nonEmpty) this
     else factor.extractSelf
   }
 
-  override def map(func: (Expr) => Expr): BinaryMathExpr = {
-    BinaryMathExpr(func(factor).asInstanceOf[MathExpr], tails.map{ pair =>
+  override def map(func: Expr => Expr): BinaryMathExpr = {
+    BinaryMathExpr(func(factor).asInstanceOf[MathExpr], tails.map { pair =>
       (pair._1, func(pair._2).asInstanceOf[MathExpr])
     })
   }

@@ -25,74 +25,80 @@ trait OffsetOps extends Serializable { this: OffsetCheckpoint =>
   val CleanTime = "clean.time"
   val OldCacheIndex = "old.cache.index"
 
-  def cacheTime(path: String): String = s"${path}/${CacheTime}"
-  def lastProcTime(path: String): String = s"${path}/${LastProcTime}"
-  def readyTime(path: String): String = s"${path}/${ReadyTime}"
-  def cleanTime(path: String): String = s"${path}/${CleanTime}"
-  def oldCacheIndex(path: String): String = s"${path}/${OldCacheIndex}"
+  def cacheTime(path: String): String = s"$path/$CacheTime"
+  def lastProcTime(path: String): String = s"$path/$LastProcTime"
+  def readyTime(path: String): String = s"$path/$ReadyTime"
+  def cleanTime(path: String): String = s"$path/$CleanTime"
+  def oldCacheIndex(path: String): String = s"$path/$OldCacheIndex"
 
   val infoPath = "info"
 
   val finalCacheInfoPath = "info.final"
-  val finalReadyTime = s"${finalCacheInfoPath}/${ReadyTime}"
-  val finalLastProcTime = s"${finalCacheInfoPath}/${LastProcTime}"
-  val finalCleanTime = s"${finalCacheInfoPath}/${CleanTime}"
+  val finalReadyTime = s"$finalCacheInfoPath/$ReadyTime"
+  val finalLastProcTime = s"$finalCacheInfoPath/$LastProcTime"
+  val finalCleanTime = s"$finalCacheInfoPath/$CleanTime"
 
   def startOffsetCheckpoint(): Unit = {
-    genFinalReadyTime
+    genFinalReadyTime()
   }
 
-  def getTimeRange(): (Long, Long) = {
-    readTimeRange
+  def getTimeRange: (Long, Long) = {
+    readTimeRange()
   }
 
-  def getCleanTime(): Long = {
-    readCleanTime
+  def getCleanTime: Long = {
+    readCleanTime()
   }
 
-  def endOffsetCheckpoint: Unit = {
-    genFinalLastProcTime
-    genFinalCleanTime
+  def endOffsetCheckpoint(): Unit = {
+    genFinalLastProcTime()
+    genFinalCleanTime()
   }
 
   private def genFinalReadyTime(): Unit = {
     val subPath = listKeys(infoPath)
-    val keys = subPath.map { p => s"${infoPath}/${p}/${ReadyTime}" }
+    val keys = subPath.map { p =>
+      s"$infoPath/$p/$ReadyTime"
+    }
     val result = read(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
-      val map = Map[String, String]((finalReadyTime -> time.toString))
+      val map = Map[String, String](finalReadyTime -> time.toString)
       cache(map)
     }
   }
 
   private def genFinalLastProcTime(): Unit = {
     val subPath = listKeys(infoPath)
-    val keys = subPath.map { p => s"${infoPath}/${p}/${LastProcTime}" }
+    val keys = subPath.map { p =>
+      s"$infoPath/$p/$LastProcTime"
+    }
     val result = read(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
-      val map = Map[String, String]((finalLastProcTime -> time.toString))
+      val map = Map[String, String](finalLastProcTime -> time.toString)
       cache(map)
     }
   }
 
   private def genFinalCleanTime(): Unit = {
     val subPath = listKeys(infoPath)
-    val keys = subPath.map { p => s"${infoPath}/${p}/${CleanTime}" }
+    val keys = subPath.map { p =>
+      s"$infoPath/$p/$CleanTime"
+    }
     val result = read(keys)
     val times = keys.flatMap { k =>
       getLongOpt(result, k)
     }
     if (times.nonEmpty) {
       val time = times.min
-      val map = Map[String, String]((finalCleanTime -> time.toString))
+      val map = Map[String, String](finalCleanTime -> time.toString)
       cache(map)
     }
   }
@@ -114,7 +120,7 @@ trait OffsetOps extends Serializable { this: OffsetCheckpoint =>
     try {
       map.get(key).map(_.toLong)
     } catch {
-      case e: Throwable => None
+      case _: Throwable => None
     }
   }
   private def getLong(map: Map[String, String], key: String) = {

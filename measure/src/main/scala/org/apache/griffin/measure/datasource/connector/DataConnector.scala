@@ -19,6 +19,8 @@ package org.apache.griffin.measure.datasource.connector
 
 import java.util.concurrent.atomic.AtomicLong
 
+import scala.collection.mutable
+
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 
@@ -40,8 +42,8 @@ trait DataConnector extends Loggable with Serializable {
   val id: String = DataConnectorIdGenerator.genId
 
   val timestampStorage: TimestampStorage
-  protected def saveTmst(t: Long) = timestampStorage.insert(t)
-  protected def readTmst(t: Long) = timestampStorage.fromUntil(t, t + 1)
+  protected def saveTmst(t: Long): mutable.SortedSet[Long] = timestampStorage.insert(t)
+  protected def readTmst(t: Long): Set[Long] = timestampStorage.fromUntil(t, t + 1)
 
   def init(): Unit
 
@@ -61,7 +63,7 @@ trait DataConnector extends Loggable with Serializable {
     val dcDfName = dcParam.getDataFrameName("this")
 
     try {
-      saveTmst(timestamp)    // save timestamp
+      saveTmst(timestamp) // save timestamp
 
       dfOpt.flatMap { df =>
         val (preProcRules, thisTable) =
@@ -78,7 +80,7 @@ trait DataConnector extends Loggable with Serializable {
         preprocJob.execute(context)
 
         // out data
-        val outDf = context.sparkSession.table(s"`${thisTable}`")
+        val outDf = context.sparkSession.table(s"`$thisTable`")
 
         // add tmst column
         val withTmstDf = outDf.withColumn(ConstantColumns.tmst, lit(timestamp))
@@ -91,7 +93,7 @@ trait DataConnector extends Loggable with Serializable {
 
     } catch {
       case e: Throwable =>
-        error(s"pre-process of data connector [${id}] error: ${e.getMessage}", e)
+        error(s"pre-process of data connector [$id] error: ${e.getMessage}", e)
         None
     }
   }
@@ -102,7 +104,7 @@ object DataConnectorIdGenerator {
   private val head: String = "dc"
 
   def genId: String = {
-    s"${head}${increment}"
+    s"$head$increment"
   }
 
   private def increment: Long = {

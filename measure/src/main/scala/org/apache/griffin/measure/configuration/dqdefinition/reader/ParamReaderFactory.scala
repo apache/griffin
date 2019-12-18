@@ -25,10 +25,10 @@ object ParamReaderFactory {
   val file = "file"
 
   /**
-    * parse string content to get param reader
-    * @param pathOrJson
-    * @return
-    */
+   * parse string content to get param reader
+   * @param pathOrJson
+   * @return
+   */
   def getParamReader(pathOrJson: String): ParamReader = {
     val strType = paramStrType(pathOrJson)
     if (json.equals(strType)) ParamJsonReader(pathOrJson)
@@ -40,7 +40,7 @@ object ParamReaderFactory {
       JsonUtil.toAnyMap(str)
       json
     } catch {
-      case e: Throwable => file
+      case _: Throwable => file
     }
   }
 

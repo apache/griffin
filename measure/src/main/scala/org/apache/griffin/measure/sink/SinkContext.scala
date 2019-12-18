@@ -17,4 +17,8 @@
 
 package org.apache.griffin.measure.sink
 
-case class SinkContext(config: Map[String, Any], metricName: String, timeStamp: Long, block: Boolean)
+case class SinkContext(
+    config: Map[String, Any],
+    metricName: String,
+    timeStamp: Long,
+    block: Boolean)

@@ -29,10 +29,10 @@ object HdfsUtil extends Loggable {
 
   def existPath(filePath: String): Boolean = {
     try {
-      implicit val path = new Path(filePath)
+      implicit val path: Path = new Path(filePath)
       getFS.exists(path)
     } catch {
-      case e: Throwable => false
+      case _: Throwable => false
     }
   }
 
@@ -42,31 +42,31 @@ object HdfsUtil extends Loggable {
   }
 
   def createFile(filePath: String): FSDataOutputStream = {
-    implicit val path = new Path(filePath)
+    implicit val path: Path = new Path(filePath)
     if (getFS.exists(path)) getFS.delete(path, true)
-    return getFS.create(path)
+    getFS.create(path)
   }
 
   def appendOrCreateFile(filePath: String): FSDataOutputStream = {
-    implicit val path = new Path(filePath)
+    implicit val path: Path = new Path(filePath)
     if (getFS.getConf.getBoolean("dfs.support.append", false) && getFS.exists(path)) {
       getFS.append(path)
     } else createFile(filePath)
   }
 
   def openFile(filePath: String): FSDataInputStream = {
-    implicit val path = new Path(filePath)
+    implicit val path: Path = new Path(filePath)
     getFS.open(path)
   }
 
   def writeContent(filePath: String, message: String): Unit = {
     val out = createFile(filePath)
     out.write(message.getBytes("utf-8"))
-    out.close
+    out.close()
   }
 
-  def withHdfsFile(filePath: String, appendIfExists: Boolean = true)
-                  (f: FSDataOutputStream => Unit): Unit = {
+  def withHdfsFile(filePath: String, appendIfExists: Boolean = true)(
+      f: FSDataOutputStream => Unit): Unit = {
     val out =
       if (appendIfExists) {
         appendOrCreateFile(filePath)
@@ -80,7 +80,7 @@ object HdfsUtil extends Loggable {
 
   def createEmptyFile(filePath: String): Unit = {
     val out = createFile(filePath)
-    out.close
+    out.close()
   }
 
   def getHdfsFilePath(parentPath: String, fileName: String): String = {
@@ -89,43 +89,45 @@ object HdfsUtil extends Loggable {
 
   def deleteHdfsPath(dirPath: String): Unit = {
     try {
-      implicit val path = new Path(dirPath)
+      implicit val path: Path = new Path(dirPath)
       if (getFS.exists(path)) getFS.delete(path, true)
     } catch {
-      case e: Throwable => error(s"delete path [${dirPath}] error: ${e.getMessage}", e)
+      case e: Throwable => error(s"delete path [$dirPath] error: ${e.getMessage}", e)
     }
   }
 
   def listSubPathsByType(
-                          dirPath: String,
-                          subType: String,
-                          fullPath: Boolean = false) : Iterable[String] = {
+      dirPath: String,
+      subType: String,
+      fullPath: Boolean = false): Iterable[String] = {
     if (existPath(dirPath)) {
       try {
-        implicit val path = new Path(dirPath)
+        implicit val path: Path = new Path(dirPath)
         val fileStatusArray = getFS.listStatus(path)
-        fileStatusArray.filter { fileStatus =>
-          subType match {
-            case "dir" => fileStatus.isDirectory
-            case "file" => fileStatus.isFile
-            case _ => true
+        fileStatusArray
+          .filter { fileStatus =>
+            subType match {
+              case "dir" => fileStatus.isDirectory
+              case "file" => fileStatus.isFile
+              case _ => true
+            }
           }
-        }.map { fileStatus =>
-          val fname = fileStatus.getPath.getName
-          if (fullPath) getHdfsFilePath(dirPath, fname) else fname
-        }
+          .map { fileStatus =>
+            val fname = fileStatus.getPath.getName
+            if (fullPath) getHdfsFilePath(dirPath, fname) else fname
+          }
       } catch {
         case e: Throwable =>
-          warn(s"list path [${dirPath}] warn: ${e.getMessage}", e)
+          warn(s"list path [$dirPath] warn: ${e.getMessage}", e)
           Nil
       }
     } else Nil
   }
 
   def listSubPathsByTypes(
-                           dirPath: String,
-                           subTypes: Iterable[String],
-                           fullPath: Boolean = false) : Iterable[String] = {
+      dirPath: String,
+      subTypes: Iterable[String],
+      fullPath: Boolean = false): Iterable[String] = {
     subTypes.flatMap { subType =>
       listSubPathsByType(dirPath, subType, fullPath)
     }
