@@ -32,7 +32,7 @@ object CacheResults extends Loggable {
     def update[A <: result.T: Manifest](ut: Long, r: Metric): Option[Metric] = {
       r match {
         case m: A if olderThan(ut) =>
-          val ur = result.update(m.asInstanceOf[result.T])
+          val ur = result.update(m)
           Some(ur).filter(result.differsFrom)
         case _ => None
       }
