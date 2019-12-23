@@ -278,7 +278,7 @@ under the License.
             </plugin>
             <plugin>
                 <groupId>org.antipathy</groupId>
-                <artifactId>mvn-scalafmt_2.11</artifactId>
+                <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
                 <version>0.12_1.5.1</version>
                 <configuration>
                     <parameters>${scalafmt.parameters}</parameters>
