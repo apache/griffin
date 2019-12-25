@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit
 import org.apache.griffin.measure.Loggable
 
 /**
-  * lock for checkpoint
-  */
+ * lock for checkpoint
+ */
 trait CheckpointLock extends Loggable with Serializable {
 
   def lock(outtime: Long, unit: TimeUnit): Boolean

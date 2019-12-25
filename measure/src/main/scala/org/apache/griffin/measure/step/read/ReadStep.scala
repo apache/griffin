@@ -29,14 +29,14 @@ trait ReadStep extends DQStep {
   val cache: Boolean
 
   def execute(context: DQContext): Boolean = {
-    info(s"read data source [${name}]")
+    info(s"read data source [$name]")
     read(context) match {
       case Some(df) =>
 //        if (needCache) context.dataFrameCache.cacheDataFrame(name, df)
         context.runTimeTableRegister.registerTable(name, df)
         true
       case _ =>
-        warn(s"read data source [${name}] fails")
+        warn(s"read data source [$name] fails")
         false
     }
   }

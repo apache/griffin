@@ -24,9 +24,11 @@ import org.apache.griffin.measure.context.TimeRange
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.ParamUtil._
 
-case class CassandraDataConnector(@transient sparkSession: SparkSession,
-                                  dcParam: DataConnectorParam,
-                                  timestampStorage: TimestampStorage) extends BatchDataConnector {
+case class CassandraDataConnector(
+    @transient sparkSession: SparkSession,
+    dcParam: DataConnectorParam,
+    timestampStorage: TimestampStorage)
+    extends BatchDataConnector {
 
   val config: Map[String, Any] = dcParam.getConfig
 
@@ -55,7 +57,6 @@ case class CassandraDataConnector(@transient sparkSession: SparkSession,
       sparkSession.conf.set("spark.cassandra.connection.port", port)
       sparkSession.conf.set("spark.cassandra.auth.username", user)
       sparkSession.conf.set("spark.cassandra.auth.password", password)
-
 
       val tableDef: DataFrameReader = sparkSession.read
         .format("org.apache.spark.sql.cassandra")

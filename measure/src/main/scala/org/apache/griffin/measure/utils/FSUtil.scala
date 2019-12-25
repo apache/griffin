@@ -52,7 +52,7 @@ object FSUtil extends Loggable {
     }
   }
 
-  private def getConfiguration(): Configuration = {
+  private def getConfiguration: Configuration = {
     val conf = new Configuration()
     conf.setBoolean("dfs.support.append", true)
 //    conf.set("fs.defaultFS", "hdfs://localhost")    // debug in hdfs localhost env
@@ -63,14 +63,14 @@ object FSUtil extends Loggable {
     val uriOpt = try {
       Some(new URI(path))
     } catch {
-      case e: Throwable => None
+      case _: Throwable => None
     }
     uriOpt.flatMap { uri =>
       if (uri.getScheme == null) {
         try {
           Some(new File(path).toURI)
         } catch {
-          case e: Throwable => None
+          case _: Throwable => None
         }
       } else Some(uri)
     }

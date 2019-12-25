@@ -30,14 +30,15 @@ import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 
 /**
-  * streaming data connector for kafka with string format key and value
-  */
-case class KafkaStreamingStringDataConnector(@transient sparkSession: SparkSession,
-                                             @transient ssc: StreamingContext,
-                                             dcParam: DataConnectorParam,
-                                             timestampStorage: TimestampStorage,
-                                             streamingCacheClientOpt: Option[StreamingCacheClient]
-                                            ) extends KafkaStreamingDataConnector {
+ * streaming data connector for kafka with string format key and value
+ */
+case class KafkaStreamingStringDataConnector(
+    @transient sparkSession: SparkSession,
+    @transient ssc: StreamingContext,
+    dcParam: DataConnectorParam,
+    timestampStorage: TimestampStorage,
+    streamingCacheClientOpt: Option[StreamingCacheClient])
+    extends KafkaStreamingDataConnector {
 
   type K = String
   type KD = StringDecoder
@@ -45,22 +46,21 @@ case class KafkaStreamingStringDataConnector(@transient sparkSession: SparkSessi
   type VD = StringDecoder
 
   val valueColName = "value"
-  val schema = StructType(Array(
-    StructField(valueColName, StringType)
-  ))
+  val schema: StructType = StructType(Array(StructField(valueColName, StringType)))
 
   def createDStream(topicSet: Set[String]): InputDStream[OUT] = {
     KafkaUtils.createDirectStream[K, V, KD, VD](ssc, kafkaConfig, topicSet)
   }
 
   def transform(rdd: RDD[OUT]): Option[DataFrame] = {
-    if (rdd.isEmpty) None else {
+    if (rdd.isEmpty) None
+    else {
       try {
         val rowRdd = rdd.map(d => Row(d._2))
         val df = sparkSession.createDataFrame(rowRdd, schema)
         Some(df)
       } catch {
-        case e: Throwable =>
+        case _: Throwable =>
           error("streaming data transform fails")
           None
       }

@@ -26,12 +26,9 @@ import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
-  * sink metric and record to hdfs
-  */
-case class HdfsSink(
-                     config: Map[String, Any],
-                     metricName: String,
-                     timeStamp: Long) extends Sink {
+ * sink metric and record to hdfs
+ */
+case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Long) extends Sink {
 
   val block: Boolean = true
 
@@ -39,15 +36,15 @@ case class HdfsSink(
   val MaxPersistLines = "max.persist.lines"
   val MaxLinesPerFile = "max.lines.per.file"
 
-  val parentPath = config.getOrElse(PathKey, "").toString
-  val maxPersistLines = config.getInt(MaxPersistLines, -1)
-  val maxLinesPerFile = math.min(config.getInt(MaxLinesPerFile, 10000), 1000000)
+  val parentPath: String = config.getOrElse(PathKey, "").toString
+  val maxPersistLines: Int = config.getInt(MaxPersistLines, -1)
+  val maxLinesPerFile: Int = math.min(config.getInt(MaxLinesPerFile, 10000), 1000000)
 
-  val StartFile = filePath("_START")
-  val FinishFile = filePath("_FINISH")
-  val MetricsFile = filePath("_METRICS")
+  val StartFile: String = filePath("_START")
+  val FinishFile: String = filePath("_FINISH")
+  val MetricsFile: String = filePath("_METRICS")
 
-  val LogFile = filePath("_LOG")
+  val LogFile: String = filePath("_LOG")
 
   var _init = true
 
@@ -59,25 +56,25 @@ case class HdfsSink(
     if (_init) {
       _init = false
       val dt = new Date(timeStamp)
-      s"================ log of ${dt} ================\n"
+      s"================ log of $dt ================\n"
     } else ""
   }
 
   private def timeHead(rt: Long): String = {
     val dt = new Date(rt)
-    s"--- ${dt} ---\n"
+    s"--- $dt ---\n"
   }
 
   private def logWrap(rt: Long, msg: String): String = {
-    logHead + timeHead(rt) + s"${msg}\n\n"
+    logHead + timeHead(rt) + s"$msg\n\n"
   }
 
   protected def filePath(file: String): String = {
-    HdfsUtil.getHdfsFilePath(parentPath, s"${metricName}/${timeStamp}/${file}")
+    HdfsUtil.getHdfsFilePath(parentPath, s"$metricName/$timeStamp/$file")
   }
 
   protected def withSuffix(path: String, suffix: String): String = {
-    s"${path}.${suffix}"
+    s"$path.$suffix"
   }
 
   def start(msg: String): Unit = {
@@ -108,11 +105,7 @@ case class HdfsSink(
   }
 
   private def getHdfsPath(path: String, groupId: Int): String = {
-    HdfsUtil.getHdfsFilePath(path, s"${groupId}")
-  }
-
-  private def getHdfsPath(path: String, ptnId: Int, groupId: Int): String = {
-    HdfsUtil.getHdfsFilePath(path, s"${ptnId}.${groupId}")
+    HdfsUtil.getHdfsFilePath(path, s"$groupId")
   }
 
   private def clearOldRecords(path: String): Unit = {
@@ -135,10 +128,12 @@ case class HdfsSink(
           sinkRecords2Hdfs(path, recs)
         } else {
           val groupedRecords: RDD[(Long, Iterable[String])] =
-            records.zipWithIndex.flatMap { r =>
-              val gid = r._2 / maxLinesPerFile
-              if (gid < groupCount) Some((gid, r._1)) else None
-            }.groupByKey()
+            records.zipWithIndex
+              .flatMap { r =>
+                val gid = r._2 / maxLinesPerFile
+                if (gid < groupCount) Some((gid, r._1)) else None
+              }
+              .groupByKey()
           groupedRecords.foreach { group =>
             val (gid, recs) = group
             val hdfsPath = if (gid == 0) path else withSuffix(path, gid.toString)
@@ -190,7 +185,7 @@ case class HdfsSink(
 
   private def sinkRecords2Hdfs(hdfsPath: String, records: Iterable[String]): Unit = {
     try {
-      HdfsUtil.withHdfsFile(hdfsPath, false) { out =>
+      HdfsUtil.withHdfsFile(hdfsPath, appendIfExists = false) { out =>
         records.map { record =>
           out.write((record + "\n").getBytes("utf-8"))
         }

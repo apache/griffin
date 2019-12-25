@@ -23,15 +23,13 @@ import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.dsl.parser.GriffinDslParser
 import org.apache.griffin.measure.step.builder.dsl.transform.Expr2DQSteps
 
+case class GriffinDslDQStepBuilder(dataSourceNames: Seq[String], functionNames: Seq[String])
+    extends RuleParamStepBuilder {
 
-case class GriffinDslDQStepBuilder(dataSourceNames: Seq[String],
-                                   functionNames: Seq[String]
-                                  ) extends RuleParamStepBuilder {
-
-  val filteredFunctionNames = functionNames.filter { fn =>
+  val filteredFunctionNames: Seq[String] = functionNames.filter { fn =>
     fn.matches("""^[a-zA-Z_]\w*$""")
   }
-  val parser = GriffinDslParser(dataSourceNames, filteredFunctionNames)
+  val parser: GriffinDslParser = GriffinDslParser(dataSourceNames, filteredFunctionNames)
 
   def buildSteps(context: DQContext, ruleParam: RuleParam): Seq[DQStep] = {
     val name = getStepName(ruleParam.getOutDfName())
@@ -42,14 +40,14 @@ case class GriffinDslDQStepBuilder(dataSourceNames: Seq[String],
       if (result.successful) {
         val expr = result.get
         val expr2DQSteps = Expr2DQSteps(context, expr, ruleParam.replaceOutDfName(name))
-        expr2DQSteps.getDQSteps()
+        expr2DQSteps.getDQSteps
       } else {
-        warn(s"parse rule [ ${rule} ] fails: \n${result}")
+        warn(s"parse rule [ $rule ] fails: \n$result")
         Nil
       }
     } catch {
       case e: Throwable =>
-        error(s"generate rule plan ${name} fails: ${e.getMessage}", e)
+        error(s"generate rule plan $name fails: ${e.getMessage}", e)
         Nil
     }
   }

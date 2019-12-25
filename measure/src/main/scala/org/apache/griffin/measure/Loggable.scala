@@ -24,9 +24,9 @@ trait Loggable {
 
   @transient private lazy val logger = Logger.getLogger(getClass)
 
-  @transient protected lazy val griffinLogger = Logger.getLogger("org.apache.griffin")
+  @transient protected lazy val griffinLogger: Logger = Logger.getLogger("org.apache.griffin")
 
-  def getGriffinLogLevel(): Level = {
+  def getGriffinLogLevel: Level = {
     var logger = griffinLogger
     while (logger != null && logger.getLevel == null) {
       logger = logger.getParent.asInstanceOf[Logger]

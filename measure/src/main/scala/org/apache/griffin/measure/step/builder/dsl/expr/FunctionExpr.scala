@@ -17,17 +17,20 @@
 
 package org.apache.griffin.measure.step.builder.dsl.expr
 
-case class FunctionExpr(functionName: String, args: Seq[Expr],
-                        extraConditionOpt: Option[ExtraConditionExpr],
-                        aliasOpt: Option[String]
-                       ) extends Expr with AliasableExpr {
+case class FunctionExpr(
+    functionName: String,
+    args: Seq[Expr],
+    extraConditionOpt: Option[ExtraConditionExpr],
+    aliasOpt: Option[String])
+    extends Expr
+    with AliasableExpr {
 
   addChildren(args)
 
   def desc: String = {
     extraConditionOpt match {
-      case Some(cdtn) => s"${functionName}(${cdtn.desc} ${args.map(_.desc).mkString(", ")})"
-      case _ => s"${functionName}(${args.map(_.desc).mkString(", ")})"
+      case Some(cdtn) => s"$functionName(${cdtn.desc} ${args.map(_.desc).mkString(", ")})"
+      case _ => s"$functionName(${args.map(_.desc).mkString(", ")})"
     }
   }
   def coalesceDesc: String = desc
@@ -37,8 +40,11 @@ case class FunctionExpr(functionName: String, args: Seq[Expr],
     } else aliasOpt
   }
 
-  override def map(func: (Expr) => Expr): FunctionExpr = {
-    FunctionExpr(functionName, args.map(func(_)),
-      extraConditionOpt.map(func(_).asInstanceOf[ExtraConditionExpr]), aliasOpt)
+  override def map(func: Expr => Expr): FunctionExpr = {
+    FunctionExpr(
+      functionName,
+      args.map(func(_)),
+      extraConditionOpt.map(func(_).asInstanceOf[ExtraConditionExpr]),
+      aliasOpt)
   }
 }

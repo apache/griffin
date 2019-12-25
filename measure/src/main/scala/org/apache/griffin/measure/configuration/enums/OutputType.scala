@@ -18,17 +18,16 @@
 package org.apache.griffin.measure.configuration.enums
 
 /**
-  * the strategy to output metric
-  *  <li>{@link #MetricOutputType} - output the rule step result as metric</li>
-  *  <li>{@link #RecordOutputType} - output the rule step result as records</li>
-  *  <li>{@link #DscUpdateOutputType} - output the rule step result to update data source cache</li>
-  *  <li>{@link #UnknownOutputType} - will not output the result </li>
-  */
+ * the strategy to output metric
+ *  <li> - output the rule step result as metric</li>
+ *  <li> - output the rule step result as records</li>
+ *  <li> - output the rule step result to update data source cache</li>
+ *  <li> - will not output the result </li>
+ */
 object OutputType extends GriffinEnum {
   type OutputType = Value
 
-  val MetricOutputType, RecordOutputType, DscUpdateOutputType,
-  UnknownOutputType = Value
+  val MetricOutputType, RecordOutputType, DscUpdateOutputType, UnknownOutputType = Value
 
   val Metric, Record, Records, DscUpdate = Value
 

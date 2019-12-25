@@ -25,6 +25,6 @@ trait WriteStep extends DQStep {
 
   val writeTimestampOpt: Option[Long]
 
-  override def getNames(): Seq[String] = Nil
+  override def getNames: Seq[String] = Nil
 
 }

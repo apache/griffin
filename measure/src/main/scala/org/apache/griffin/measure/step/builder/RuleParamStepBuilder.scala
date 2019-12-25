@@ -21,11 +21,15 @@ import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
 import org.apache.griffin.measure.configuration.enums.OutputType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.{DQStep, SeqDQStep}
-import org.apache.griffin.measure.step.write.{DataSourceUpdateWriteStep, MetricWriteStep, RecordWriteStep}
+import org.apache.griffin.measure.step.write.{
+  DataSourceUpdateWriteStep,
+  MetricWriteStep,
+  RecordWriteStep
+}
 
 /**
-  * build dq step by rule param
-  */
+ * build dq step by rule param
+ */
 trait RuleParamStepBuilder extends DQStepBuilder {
 
   type ParamType = RuleParam
@@ -42,17 +46,26 @@ trait RuleParamStepBuilder extends DQStepBuilder {
   protected def buildDirectWriteSteps(ruleParam: RuleParam): Seq[DQStep] = {
     val name = getStepName(ruleParam.getOutDfName())
     // metric writer
-    val metricSteps = ruleParam.getOutputOpt(MetricOutputType).map { metric =>
-      MetricWriteStep(metric.getNameOpt.getOrElse(name), name, metric.getFlatten)
-    }.toSeq
+    val metricSteps = ruleParam
+      .getOutputOpt(MetricOutputType)
+      .map { metric =>
+        MetricWriteStep(metric.getNameOpt.getOrElse(name), name, metric.getFlatten)
+      }
+      .toSeq
     // record writer
-    val recordSteps = ruleParam.getOutputOpt(RecordOutputType).map { record =>
-      RecordWriteStep(record.getNameOpt.getOrElse(name), name)
-    }.toSeq
+    val recordSteps = ruleParam
+      .getOutputOpt(RecordOutputType)
+      .map { record =>
+        RecordWriteStep(record.getNameOpt.getOrElse(name), name)
+      }
+      .toSeq
     // update writer
-    val dsCacheUpdateSteps = ruleParam.getOutputOpt(DscUpdateOutputType).map { dsCacheUpdate =>
-      DataSourceUpdateWriteStep(dsCacheUpdate.getNameOpt.getOrElse(""), name)
-    }.toSeq
+    val dsCacheUpdateSteps = ruleParam
+      .getOutputOpt(DscUpdateOutputType)
+      .map { dsCacheUpdate =>
+        DataSourceUpdateWriteStep(dsCacheUpdate.getNameOpt.getOrElse(""), name)
+      }
+      .toSeq
 
     metricSteps ++ recordSteps ++ dsCacheUpdateSteps
   }

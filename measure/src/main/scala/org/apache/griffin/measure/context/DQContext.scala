@@ -17,7 +17,7 @@
 
 package org.apache.griffin.measure.context
 
-import org.apache.spark.sql.{Encoders, SparkSession}
+import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 
 import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.configuration.enums.ProcessType._
@@ -26,16 +26,16 @@ import org.apache.griffin.measure.datasource._
 import org.apache.griffin.measure.sink.{Sink, SinkFactory}
 
 /**
-  * dq context: the context of each calculation
-  * unique context id in each calculation
-  * access the same spark session this app created
-  */
-case class DQContext(contextId: ContextId,
-                     name: String,
-                     dataSources: Seq[DataSource],
-                     sinkParams: Seq[SinkParam],
-                     procType: ProcessType
-                    )(@transient implicit val sparkSession: SparkSession) {
+ * dq context: the context of each calculation
+ * unique context id in each calculation
+ * access the same spark session this app created
+ */
+case class DQContext(
+    contextId: ContextId,
+    name: String,
+    dataSources: Seq[DataSource],
+    sinkParams: Seq[SinkParam],
+    procType: ProcessType)(@transient implicit val sparkSession: SparkSession) {
 
   val compileTableRegister: CompileTableRegister = CompileTableRegister()
   val runTimeTableRegister: RunTimeTableRegister = RunTimeTableRegister(sparkSession)
@@ -43,13 +43,14 @@ case class DQContext(contextId: ContextId,
   val dataFrameCache: DataFrameCache = DataFrameCache()
 
   val metricWrapper: MetricWrapper = MetricWrapper(name, sparkSession.sparkContext.applicationId)
-  val writeMode = WriteMode.defaultMode(procType)
+  val writeMode: WriteMode = WriteMode.defaultMode(procType)
 
   val dataSourceNames: Seq[String] = {
     // sort data source names, put baseline data source name to the head
-    val (blOpt, others) = dataSources.foldLeft((None: Option[String], Nil: Seq[String])) { (ret, ds) =>
-      val (opt, seq) = ret
-      if (opt.isEmpty && ds.isBaseline) (Some(ds.name), seq) else (opt, seq :+ ds.name)
+    val (blOpt, others) = dataSources.foldLeft((None: Option[String], Nil: Seq[String])) {
+      (ret, ds) =>
+        val (opt, seq) = ret
+        if (opt.isEmpty && ds.isBaseline) (Some(ds.name), seq) else (opt, seq :+ ds.name)
     }
     blOpt match {
       case Some(bl) => bl +: others
@@ -62,10 +63,10 @@ case class DQContext(contextId: ContextId,
     if (dataSourceNames.size > index) dataSourceNames(index) else ""
   }
 
-  implicit val encoder = Encoders.STRING
+  implicit val encoder: Encoder[String] = Encoders.STRING
   val functionNames: Seq[String] = sparkSession.catalog.listFunctions.map(_.name).collect.toSeq
 
-  val dataSourceTimeRanges = loadDataSources()
+  val dataSourceTimeRanges: Map[String, TimeRange] = loadDataSources()
 
   def loadDataSources(): Map[String, TimeRange] = {
     dataSources.map { ds =>
@@ -73,22 +74,22 @@ case class DQContext(contextId: ContextId,
     }.toMap
   }
 
-  printTimeRanges
+  printTimeRanges()
 
   private val sinkFactory = SinkFactory(sinkParams, name)
   private val defaultSink: Sink = createSink(contextId.timestamp)
 
   def getSink(timestamp: Long): Sink = {
-    if (timestamp == contextId.timestamp) getSink()
+    if (timestamp == contextId.timestamp) getSink
     else createSink(timestamp)
   }
 
-  def getSink(): Sink = defaultSink
+  def getSink: Sink = defaultSink
 
   private def createSink(t: Long): Sink = {
     procType match {
-      case BatchProcessType => sinkFactory.getSinks(t, true)
-      case StreamingProcessType => sinkFactory.getSinks(t, false)
+      case BatchProcessType => sinkFactory.getSinks(t, block = true)
+      case StreamingProcessType => sinkFactory.getSinks(t, block = false)
     }
   }
 
@@ -106,11 +107,13 @@ case class DQContext(contextId: ContextId,
 
   private def printTimeRanges(): Unit = {
     if (dataSourceTimeRanges.nonEmpty) {
-      val timeRangesStr = dataSourceTimeRanges.map { pair =>
-        val (name, timeRange) = pair
-        s"${name} -> (${timeRange.begin}, ${timeRange.end}]"
-      }.mkString(", ")
-      println(s"data source timeRanges: ${timeRangesStr}")
+      val timeRangesStr = dataSourceTimeRanges
+        .map { pair =>
+          val (name, timeRange) = pair
+          s"$name -> (${timeRange.begin}, ${timeRange.end}]"
+        }
+        .mkString(", ")
+      println(s"data source timeRanges: $timeRangesStr")
     }
   }
 

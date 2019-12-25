@@ -23,30 +23,28 @@ import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
-  * sink metric and record to console, for debug
-  */
-case class ConsoleSink(
-                        config: Map[String, Any],
-                        metricName: String,
-                        timeStamp: Long) extends Sink {
+ * sink metric and record to console, for debug
+ */
+case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: Long)
+    extends Sink {
 
   val block: Boolean = true
 
   val MaxLogLines = "max.log.lines"
 
-  val maxLogLines = config.getInt(MaxLogLines, 100)
+  val maxLogLines: Int = config.getInt(MaxLogLines, 100)
 
   def available(): Boolean = true
 
   def start(msg: String): Unit = {
-    println(s"[${timeStamp}] ${metricName} start: ${msg}")
+    println(s"[$timeStamp] $metricName start: $msg")
   }
   def finish(): Unit = {
-    println(s"[${timeStamp}] ${metricName} finish")
+    println(s"[$timeStamp] $metricName finish")
   }
 
   def log(rt: Long, msg: String): Unit = {
-    println(s"[${timeStamp}] ${rt}: ${msg}")
+    println(s"[$timeStamp] $rt: $msg")
   }
 
   def sinkRecords(records: RDD[String], name: String): Unit = {
@@ -78,10 +76,9 @@ case class ConsoleSink(
   }
 
   def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    println(s"${metricName} [${timeStamp}] metrics: ")
+    println(s"$metricName [$timeStamp] metrics: ")
     val json = JsonUtil.toJson(metrics)
     println(json)
   }
-
 
 }

@@ -44,7 +44,7 @@ case class LiteralNumberExpr(str: String) extends LiteralExpr {
         str.toLong.toString
       }
     } catch {
-      case e: Throwable => throw new Exception(s"${str} is invalid number")
+      case _: Throwable => throw new Exception(s"$str is invalid number")
     }
   }
 }
@@ -53,7 +53,7 @@ case class LiteralTimeExpr(str: String) extends LiteralExpr {
   def desc: String = {
     TimeUtil.milliseconds(str) match {
       case Some(t) => t.toString
-      case _ => throw new Exception(s"${str} is invalid time")
+      case _ => throw new Exception(s"$str is invalid time")
     }
   }
 }
@@ -65,7 +65,7 @@ case class LiteralBooleanExpr(str: String) extends LiteralExpr {
     str match {
       case TrueRegex() => true.toString
       case FalseRegex() => false.toString
-      case _ => throw new Exception(s"${str} is invalid boolean")
+      case _ => throw new Exception(s"$str is invalid boolean")
     }
   }
 }

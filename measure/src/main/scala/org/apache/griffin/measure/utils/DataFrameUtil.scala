@@ -22,12 +22,11 @@ import org.apache.spark.sql.functions._
 
 object DataFrameUtil {
 
-  def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]
-                 ): Option[DataFrame] = {
+  def unionDfOpts(dfOpt1: Option[DataFrame], dfOpt2: Option[DataFrame]): Option[DataFrame] = {
     (dfOpt1, dfOpt2) match {
       case (Some(df1), Some(df2)) => Some(unionByName(df1, df2))
-      case (Some(df1), _) => dfOpt1
-      case (_, Some(df2)) => dfOpt2
+      case (Some(_), _) => dfOpt1
+      case (_, Some(_)) => dfOpt2
       case _ => None
     }
   }

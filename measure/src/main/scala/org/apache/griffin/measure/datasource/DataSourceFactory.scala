@@ -27,38 +27,45 @@ import org.apache.griffin.measure.configuration.dqdefinition.DataSourceParam
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClientFactory
 import org.apache.griffin.measure.datasource.connector.{DataConnector, DataConnectorFactory}
 
-
 object DataSourceFactory extends Loggable {
 
-  def getDataSources(sparkSession: SparkSession,
-                     ssc: StreamingContext,
-                     dataSources: Seq[DataSourceParam]
-                    ): Seq[DataSource] = {
+  def getDataSources(
+      sparkSession: SparkSession,
+      ssc: StreamingContext,
+      dataSources: Seq[DataSourceParam]): Seq[DataSource] = {
     dataSources.zipWithIndex.flatMap { pair =>
       val (param, index) = pair
       getDataSource(sparkSession, ssc, param, index)
     }
   }
 
-  private def getDataSource(sparkSession: SparkSession,
-                            ssc: StreamingContext,
-                            dataSourceParam: DataSourceParam,
-                            index: Int
-                           ): Option[DataSource] = {
+  private def getDataSource(
+      sparkSession: SparkSession,
+      ssc: StreamingContext,
+      dataSourceParam: DataSourceParam,
+      index: Int): Option[DataSource] = {
     val name = dataSourceParam.getName
     val connectorParams = dataSourceParam.getConnectors
     val timestampStorage = TimestampStorage()
 
     // for streaming data cache
     val streamingCacheClientOpt = StreamingCacheClientFactory.getClientOpt(
-      sparkSession, dataSourceParam.getCheckpointOpt, name, index, timestampStorage)
+      sparkSession,
+      dataSourceParam.getCheckpointOpt,
+      name,
+      index,
+      timestampStorage)
 
     val dataConnectors: Seq[DataConnector] = connectorParams.flatMap { connectorParam =>
-      DataConnectorFactory.getDataConnector(sparkSession, ssc, connectorParam,
-        timestampStorage, streamingCacheClientOpt) match {
-          case Success(connector) => Some(connector)
-          case _ => None
-        }
+      DataConnectorFactory.getDataConnector(
+        sparkSession,
+        ssc,
+        connectorParam,
+        timestampStorage,
+        streamingCacheClientOpt) match {
+        case Success(connector) => Some(connector)
+        case _ => None
+      }
     }
 
     Some(DataSource(name, dataSourceParam, dataConnectors, streamingCacheClientOpt))

@@ -18,8 +18,8 @@
 package org.apache.griffin.measure.step.builder
 
 /**
-  * for griffin dsl rules, the constant columns might be used during calculation,
-  */
+ * for griffin dsl rules, the constant columns might be used during calculation,
+ */
 object ConstantColumns {
   val tmst = "__tmst"
   val metric = "__metric"
@@ -33,5 +33,6 @@ object ConstantColumns {
 
   val rowNumber = "__rn"
 
-  val columns = List[String](tmst, metric, record, empty, beginTs, endTs, distinct, rowNumber)
+  val columns: List[String] =
+    List[String](tmst, metric, record, empty, beginTs, endTs, distinct, rowNumber)
 }

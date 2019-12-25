@@ -21,7 +21,7 @@ trait Metric extends Serializable {
 
   type T <: Metric
 
-  def isLegal(): Boolean = true
+  def isLegal: Boolean = true
 
   def update(delta: T): T
 

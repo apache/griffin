@@ -18,9 +18,13 @@ under the License.
 -->
 
 # Apache Griffin Development Code Style Config Guide
-Griffin product consists of three main parts, they are developed and built on Angular 2/Java/Scala technique.
-So it's necessary to define a bunch of code style rules, all codes need to follow those rules and
-keep any codes submitted by various committers consistent.
+Apache Griffin consists of three main modules - Measure, Services and UI. These are developed using Scala, Java and Angular 2 respectively.
+
+Quoting the Databricks-Apache Spark Code Style Guide at [link](https://github.com/databricks/scala-style-guide) :
+> Code is written once by its author, but read and modified multiple times by lots of other engineers. As most bugs actually come from future modification of the code, we need to optimize our codebase for long-term, global readability and maintainability. The best way to achieve this is to write simple code.
+
+So it's necessary to define a bunch of code style rules, which are to be followed by all contributors and committers so as ot keep the code base consistent.
+
 
 ## Config Java Code Style
 We suggest developers use automatic tools to check code violation like [CheckStyle](https://github.com/checkstyle/checkstyle).<br>
@@ -309,8 +313,59 @@ We suggest developers use automatic tools to check code violation like [CheckSty
         ![idea check-run](../img/devguide/check-run-idea.png)
 
 
-## Config Scala Code Style
-to do
+## Scala Code Style Guide
+
+Since only Measure module is written in Scala, this guide applies to only the measure module. 
+For Scala code, Apache Griffin follows the official [Scala style guide](https://docs.scala-lang.org/style/) 
+and [Apache Spark Scala guide](https://github.com/databricks/scala-style-guide).
+
+#### Guide Update History
+| Version | Date       | Changes |
+|:-------:|:-----------|:--------|
+| 1       | 2019-12-24 | Initial version: Added Scala Code Style Guide |
+
+#### Configuration
+For code style checks Apache Griffin uses [Scalastyle](http://www.scalastyle.org/) and formatting is handled 
+by [Scalafmt](https://scalameta.org/scalafmt/).
+
+Configurations for both Scalastyle and Scalafmt are present in the root of Apache Griffin repository.
+ - Scalastyle Config: `scalastyle-config.xml`
+ - Scalafmt Config: `.scalafmt.conf`
+ 
+####  Formatting and Style Check
+ 
+Although automatic formatting and checks are built into the build steps of Apache Griffin, 
+to manually format Scala code and check for possible style violations, run the following commands.
+
+```
+## assuming current working directory is griffin root
+
+cd measure
+mvn clean verify -DskipTests
+```
+
+####  IntelliJ IDEA Setup
+
+Navigate to _Settings > Editor > Code Style > Scala_ and follow the screenshots below to ensure coding standards
+ in the IntelliJ IDEA.
+![scala_code_style_1](../img/devguide/scala-intellij-idea/1.png)
+![scala_code_style_2](../img/devguide/scala-intellij-idea/2.png)
+![scala_code_style_3](../img/devguide/scala-intellij-idea/3.png)
+![scala_code_style_4](../img/devguide/scala-intellij-idea/4.png)
+![scala_code_style_5](../img/devguide/scala-intellij-idea/5.png)
+![scala_code_style_6](../img/devguide/scala-intellij-idea/6.png)
+
+
+#### Important Notes
+1. [Guide Update History](#guide-update-history) section must be updated each time any section of 
+Scala Code Style Guide is edited.
+2. Formatting and code style checks must be ensured each time before submitting or updating a pull request as 
+violations will cause build failures.
+3. If you’re not sure about the right style for something, try to follow the style of the existing codebase. 
+Look at whether there are other examples in the code that use your feature. 
+
+In case of any queries or dilemmas feel free to reach out to the other contributors and committers 
+on the [dev@griffin.apache.org](mailto:dev@griffin.apache.org) list.
 
 ## Config Angular 2 Code Style
 to do

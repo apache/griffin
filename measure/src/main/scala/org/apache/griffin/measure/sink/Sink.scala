@@ -22,8 +22,8 @@ import org.apache.spark.rdd.RDD
 import org.apache.griffin.measure.Loggable
 
 /**
-  * sink metric and record
-  */
+ * sink metric and record
+ */
 trait Sink extends Loggable with Serializable {
   val metricName: String
   val timeStamp: Long

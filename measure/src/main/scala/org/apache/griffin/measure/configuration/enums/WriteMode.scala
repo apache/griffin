@@ -18,8 +18,8 @@
 package org.apache.griffin.measure.configuration.enums
 
 /**
-  * write mode when write metrics and records
-  */
+ * write mode when write metrics and records
+ */
 sealed trait WriteMode {}
 
 object WriteMode {
@@ -32,11 +32,11 @@ object WriteMode {
 }
 
 /**
-  * simple mode: write metrics and records directly
-  */
- case object SimpleMode extends WriteMode {}
+ * simple mode: write metrics and records directly
+ */
+case object SimpleMode extends WriteMode {}
 
 /**
-  * timestamp mode: write metrics and records with timestamp information
-  */
- case object TimestampMode extends WriteMode {}
+ * timestamp mode: write metrics and records with timestamp information
+ */
+case object TimestampMode extends WriteMode {}

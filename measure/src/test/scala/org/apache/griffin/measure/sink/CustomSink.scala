@@ -18,21 +18,24 @@
 package org.apache.griffin.measure.sink
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 import org.apache.spark.rdd.RDD
 
 /**
-  * sink records and metrics in memory for test.
-  *
-  * @param config sink configurations
-  * @param metricName
-  * @param timeStamp
-  * @param block
-  */
-case class CustomSink(config: Map[String, Any],
-                      metricName: String,
-                      timeStamp: Long,
-                      block: Boolean) extends Sink {
+ * sink records and metrics in memory for test.
+ *
+ * @param config sink configurations
+ * @param metricName
+ * @param timeStamp
+ * @param block
+ */
+case class CustomSink(
+    config: Map[String, Any],
+    metricName: String,
+    timeStamp: Long,
+    block: Boolean)
+    extends Sink {
   def available(): Boolean = true
 
   def start(msg: String): Unit = {}
@@ -41,7 +44,7 @@ case class CustomSink(config: Map[String, Any],
 
   def log(rt: Long, msg: String): Unit = {}
 
-  val allRecords = mutable.ListBuffer[String]()
+  val allRecords: ListBuffer[String] = mutable.ListBuffer[String]()
 
   def sinkRecords(records: RDD[String], name: String): Unit = {
     allRecords ++= records.collect()
@@ -51,7 +54,7 @@ case class CustomSink(config: Map[String, Any],
     allRecords ++= records
   }
 
-  val allMetrics = mutable.Map[String, Any]()
+  val allMetrics: mutable.Map[String, Any] = mutable.Map[String, Any]()
 
   def sinkMetrics(metrics: Map[String, Any]): Unit = {
     allMetrics ++= metrics

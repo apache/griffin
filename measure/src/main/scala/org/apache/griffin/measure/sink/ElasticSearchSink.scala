@@ -25,27 +25,27 @@ import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
-  * sink metric and record through http request
-  */
+ * sink metric and record through http request
+ */
 case class ElasticSearchSink(
-                              config: Map[String, Any],
-                              metricName: String,
-                              timeStamp: Long,
-                              block: Boolean
-                            ) extends Sink {
+    config: Map[String, Any],
+    metricName: String,
+    timeStamp: Long,
+    block: Boolean)
+    extends Sink {
 
   val Api = "api"
   val Method = "method"
   val ConnectionTimeout = "connection.timeout"
   val Retry = "retry"
 
-  val api = config.getString(Api, "")
-  val method = config.getString(Method, "post")
+  val api: String = config.getString(Api, "")
+  val method: String = config.getString(Method, "post")
 
-  val connectionTimeout =
+  val connectionTimeout: Long =
     TimeUtil.milliseconds(config.getString(ConnectionTimeout, "")).getOrElse(-1L)
 
-  val retry = config.getInt(Retry, 10)
+  val retry: Int = config.getInt(Retry, 10)
 
   val _Value = "value"
 
@@ -56,7 +56,7 @@ case class ElasticSearchSink(
   def start(msg: String): Unit = {}
   def finish(): Unit = {}
 
-  private def httpResult(dataMap: Map[String, Any]) = {
+  private def httpResult(dataMap: Map[String, Any]): Unit = {
     try {
       val data = JsonUtil.toJson(dataMap)
       // http request

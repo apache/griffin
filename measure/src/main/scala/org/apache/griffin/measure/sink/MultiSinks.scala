@@ -20,8 +20,8 @@ package org.apache.griffin.measure.sink
 import org.apache.spark.rdd.RDD
 
 /**
-  * sink metric and record in multiple ways
-  */
+ * sink metric and record in multiple ways
+ */
 case class MultiSinks(sinkIter: Iterable[Sink]) extends Sink {
 
   val block: Boolean = false

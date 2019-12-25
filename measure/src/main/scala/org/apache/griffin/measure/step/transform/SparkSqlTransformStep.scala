@@ -21,14 +21,15 @@ import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.write.WriteStep
 
 /**
-  * spark sql transform step
-  */
-case class SparkSqlTransformStep[T <: WriteStep](name: String,
-                                                 rule: String,
-                                                 details: Map[String, Any],
-                                                 writeStepOpt: Option[T] = None,
-                                                 cache: Boolean = false
-                                                ) extends TransformStep {
+ * spark sql transform step
+ */
+case class SparkSqlTransformStep[T <: WriteStep](
+    name: String,
+    rule: String,
+    details: Map[String, Any],
+    writeStepOpt: Option[T] = None,
+    cache: Boolean = false)
+    extends TransformStep {
   def doExecute(context: DQContext): Boolean = {
     val sparkSession = context.sparkSession
     try {
@@ -41,7 +42,7 @@ case class SparkSqlTransformStep[T <: WriteStep](name: String,
       }
     } catch {
       case e: Throwable =>
-        error(s"run spark sql [ ${rule} ] error: ${e.getMessage}", e)
+        error(s"run spark sql [ $rule ] error: ${e.getMessage}", e)
         false
     }
   }

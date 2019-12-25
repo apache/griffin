@@ -20,8 +20,8 @@ package org.apache.griffin.measure.context
 import scala.collection.mutable.{Map => MutableMap}
 
 /**
-  * wrap metrics into one, each calculation produces one metric map
-  */
+ * wrap metrics into one, each calculation produces one metric map
+ */
 case class MetricWrapper(name: String, applicationId: String) extends Serializable {
 
   val _Name = "name"
@@ -42,12 +42,13 @@ case class MetricWrapper(name: String, applicationId: String) extends Serializab
   def flush: Map[Long, Map[String, Any]] = {
     metrics.toMap.map { pair =>
       val (timestamp, value) = pair
-      (timestamp, Map[String, Any](
-        (_Name -> name),
-        (_Timestamp -> timestamp),
-        (_Value -> value),
-        (_Metadata -> Map("applicationId" -> applicationId))
-      ))
+      (
+        timestamp,
+        Map[String, Any](
+          _Name -> name,
+          _Timestamp -> timestamp,
+          _Value -> value,
+          _Metadata -> Map("applicationId" -> applicationId)))
     }
   }
 

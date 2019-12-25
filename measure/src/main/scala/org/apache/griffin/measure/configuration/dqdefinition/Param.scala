@@ -20,8 +20,8 @@ package org.apache.griffin.measure.configuration.dqdefinition
 trait Param extends Serializable {
 
   /**
-    * validate param internally
-    */
+   * validate param internally
+   */
   def validate(): Unit
 
 }

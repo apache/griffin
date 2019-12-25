@@ -65,11 +65,11 @@ trait SparkSuiteBase extends FlatSpec with BeforeAndAfterAll {
 
   def cleanTestHiveData(): Unit = {
     val metastoreDB = new File("metastore_db")
-    if(metastoreDB.exists) {
+    if (metastoreDB.exists) {
       FileUtils.forceDelete(metastoreDB)
     }
     val sparkWarehouse = new File("spark-warehouse")
-    if(sparkWarehouse.exists) {
+    if (sparkWarehouse.exists) {
       FileUtils.forceDelete(sparkWarehouse)
     }
   }

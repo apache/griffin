@@ -19,21 +19,20 @@ package org.apache.griffin.measure.step
 
 import org.scalatest._
 
-import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.{Loggable, SparkSuiteBase}
 import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
-import org.apache.griffin.measure.context.ContextId
-import org.apache.griffin.measure.context.DQContext
-import org.apache.griffin.measure.SparkSuiteBase
+import org.apache.griffin.measure.context.{ContextId, DQContext}
 import org.apache.griffin.measure.step.transform.TransformStep
 
 class TransformStepTest extends FlatSpec with Matchers with SparkSuiteBase with Loggable {
 
-  case class DualTransformStep(name: String,
-                               duration: Int,
-                               rule: String = "",
-                               details: Map[String, Any] = Map(),
-                               cache: Boolean = false
-                              ) extends TransformStep {
+  case class DualTransformStep(
+      name: String,
+      duration: Int,
+      rule: String = "",
+      details: Map[String, Any] = Map(),
+      cache: Boolean = false)
+      extends TransformStep {
 
     def doExecute(context: DQContext): Boolean = {
       val threadName = Thread.currentThread().getName
@@ -45,32 +44,26 @@ class TransformStepTest extends FlatSpec with Matchers with SparkSuiteBase with 
   }
 
   private def getDqContext(name: String = "test-context"): DQContext = {
-    DQContext(
-      ContextId(System.currentTimeMillis),
-      name,
-      Nil,
-      Nil,
-      BatchProcessType
-    )(spark)
+    DQContext(ContextId(System.currentTimeMillis), name, Nil, Nil, BatchProcessType)(spark)
   }
 
   /**
-    * Run transform steps in parallel. Here are the dependencies of transform steps
-    *
-    * step5
-    * |   |---step2
-    * |   |   |---step1
-    * |   |---step3
-    * |   |   |---step1
-    * |   |---step4
-    *
-    * step1 : -->
-    * step2 :    --->
-    * step3 :    ---->
-    * step4 : ->
-    * step5 :         -->
-    *
-    */
+   * Run transform steps in parallel. Here are the dependencies of transform steps
+   *
+   * step5
+   * |   |---step2
+   * |   |   |---step1
+   * |   |---step3
+   * |   |   |---step1
+   * |   |---step4
+   *
+   * step1 : -->
+   * step2 :    --->
+   * step3 :    ---->
+   * step4 : ->
+   * step5 :         -->
+   *
+   */
   "transform step " should "be run steps in parallel" in {
     val step1 = DualTransformStep("step1", 3)
     val step2 = DualTransformStep("step2", 4)
@@ -84,6 +77,6 @@ class TransformStepTest extends FlatSpec with Matchers with SparkSuiteBase with 
     step5.parentSteps += step4
 
     val context = getDqContext()
-    step5.execute(context) should be (true)
+    step5.execute(context) should be(true)
   }
 }

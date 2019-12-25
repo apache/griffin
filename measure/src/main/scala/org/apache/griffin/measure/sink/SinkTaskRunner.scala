@@ -26,10 +26,9 @@ import scala.util.{Failure, Success}
 
 import org.apache.griffin.measure.Loggable
 
-
 /**
-  * sink task runner, to sink metrics in block or non-block mode
-  */
+ * sink task runner, to sink metrics in block or non-block mode
+ */
 object SinkTaskRunner extends Loggable {
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -54,38 +53,41 @@ object SinkTaskRunner extends Loggable {
     res.onComplete {
       case Success(value) =>
         val et = new Date().getTime
-        info(s"task ${t} success with (${value}) [ using time ${et - st} ms ]")
+        info(s"task $t success with ($value) [ using time ${et - st} ms ]")
 
       case Failure(e) =>
         val et = new Date().getTime
-        warn(s"task ${t} fails [ using time ${et - st} ms ] : ${e.getMessage}")
+        warn(s"task $t fails [ using time ${et - st} ms ] : ${e.getMessage}")
         if (nextRetry >= 0) {
-          info(s"task ${t} retry [ rest retry count: ${nextRetry} ]")
+          info(s"task $t retry [ rest retry count: $nextRetry ]")
           nonBlockExecute(func, nextRetry)
         } else {
-          error(s"task fails: task ${t} retry ends but fails", e)
+          error(s"task fails: task $t retry ends but fails", e)
         }
     }
   }
 
-  private def blockExecute(func: () => (Long, Future[_]),
-                           retry: Int, waitDuration: Duration): Unit = {
+  @scala.annotation.tailrec
+  private def blockExecute(
+      func: () => (Long, Future[_]),
+      retry: Int,
+      waitDuration: Duration): Unit = {
     val nextRetry = nextRetryCount(retry)
     val st = new Date().getTime
     val (t, res) = func()
     try {
       val value = Await.result(res, waitDuration)
       val et = new Date().getTime
-      info(s"task ${t} success with (${value}) [ using time ${et - st} ms ]")
+      info(s"task $t success with ($value) [ using time ${et - st} ms ]")
     } catch {
       case e: Throwable =>
         val et = new Date().getTime
-        warn(s"task ${t} fails [ using time ${et - st} ms ] : ${e.getMessage}")
+        warn(s"task $t fails [ using time ${et - st} ms ] : ${e.getMessage}")
         if (nextRetry >= 0) {
-          info(s"task ${t} retry [ rest retry count: ${nextRetry} ]")
+          info(s"task $t retry [ rest retry count: $nextRetry ]")
           blockExecute(func, nextRetry, waitDuration)
         } else {
-          error(s"task fails: task ${t} retry ends but fails", e)
+          error(s"task fails: task $t retry ends but fails", e)
         }
     }
   }

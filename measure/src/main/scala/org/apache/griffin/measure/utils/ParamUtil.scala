@@ -193,16 +193,18 @@ object ParamUtil {
       params.get(key).flatMap(toBoolean).getOrElse(defValue)
     }
 
-    def getParamAnyMap(key: String, defValue: Map[String, Any]
-      = Map[String, Any]()): Map[String, Any] = {
+    def getParamAnyMap(
+        key: String,
+        defValue: Map[String, Any] = Map[String, Any]()): Map[String, Any] = {
       params.get(key) match {
         case Some(v: Map[_, _]) => v.map(pair => (pair._1.toString, pair._2))
         case _ => defValue
       }
     }
 
-    def getParamStringMap(key: String, defValue: Map[String, String]
-    = Map[String, String]()): Map[String, String] = {
+    def getParamStringMap(
+        key: String,
+        defValue: Map[String, String] = Map[String, String]()): Map[String, String] = {
       params.get(key) match {
         case Some(v: Map[_, _]) => v.map(pair => (pair._1.toString, pair._2.toString))
         case _ => defValue
@@ -236,4 +238,3 @@ object ParamUtil {
   }
 
 }
-

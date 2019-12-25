@@ -26,18 +26,19 @@ object TimeUtil extends Loggable {
 
   private object Units {
     case class TimeUnit(name: String, shortName: String, ut: Long, regex: Regex) {
-      def toMs(t: Long) : Long = t * ut
-      def fromMs(ms: Long) : Long = ms / ut
-      def fitUnit(ms: Long) : Boolean = (ms % ut == 0)
+      def toMs(t: Long): Long = t * ut
+      def fromMs(ms: Long): Long = ms / ut
+      def fitUnit(ms: Long): Boolean = ms % ut == 0
     }
 
-    val dayUnit = TimeUnit("day", "d", 24 * 60 * 60 * 1000, """^(?i)d(?:ay)?$""".r)
-    val hourUnit = TimeUnit("hour", "h", 60 * 60 * 1000, """^(?i)h(?:our|r)?$""".r)
-    val minUnit = TimeUnit("minute", "m", 60 * 1000, """^(?i)m(?:in(?:ute)?)?$""".r)
-    val secUnit = TimeUnit("second", "s", 1000, """^(?i)s(?:ec(?:ond)?)?$""".r)
-    val msUnit = TimeUnit("millisecond", "ms", 1, """^(?i)m(?:illi)?s(?:ec(?:ond)?)?$""".r)
+    val dayUnit: TimeUnit = TimeUnit("day", "d", 24 * 60 * 60 * 1000, """^(?i)d(?:ay)?$""".r)
+    val hourUnit: TimeUnit = TimeUnit("hour", "h", 60 * 60 * 1000, """^(?i)h(?:our|r)?$""".r)
+    val minUnit: TimeUnit = TimeUnit("minute", "m", 60 * 1000, """^(?i)m(?:in(?:ute)?)?$""".r)
+    val secUnit: TimeUnit = TimeUnit("second", "s", 1000, """^(?i)s(?:ec(?:ond)?)?$""".r)
+    val msUnit: TimeUnit =
+      TimeUnit("millisecond", "ms", 1, """^(?i)m(?:illi)?s(?:ec(?:ond)?)?$""".r)
 
-    val timeUnits = dayUnit :: hourUnit :: minUnit :: secUnit :: msUnit :: Nil
+    val timeUnits: List[TimeUnit] = dayUnit :: hourUnit :: minUnit :: secUnit :: msUnit :: Nil
   }
   import Units._
 
@@ -57,16 +58,16 @@ object TimeUtil extends Loggable {
               case minUnit.regex() => minUnit.toMs(t)
               case secUnit.regex() => secUnit.toMs(t)
               case msUnit.regex() => msUnit.toMs(t)
-              case _ => throw new Exception(s"${timeString} is invalid time format")
+              case _ => throw new Exception(s"$timeString is invalid time format")
             }
           case PureTimeRegex(time) =>
             val t = time.toLong
             msUnit.toMs(t)
-          case _ => throw new Exception(s"${timeString} is invalid time format")
+          case _ => throw new Exception(s"$timeString is invalid time format")
         }
       } match {
         case Success(v) => Some(v)
-        case Failure(ex) => None
+        case Failure(_) => None
       }
     }
     value
@@ -101,7 +102,7 @@ object TimeUtil extends Loggable {
     val unit = matchedUnitOpt.getOrElse(msUnit)
     val unitTime = unit.fromMs(t)
     val unitStr = unit.shortName
-    s"${unitTime}${unitStr}"
+    s"$unitTime$unitStr"
   }
 
 }

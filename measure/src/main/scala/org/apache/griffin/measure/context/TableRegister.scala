@@ -23,10 +23,9 @@ import org.apache.spark.sql._
 
 import org.apache.griffin.measure.Loggable
 
-
 /**
-  * register table name
-  */
+ * register table name
+ */
 trait TableRegister extends Loggable with Serializable {
 
   protected val tables: MutableSet[String] = MutableSet()
@@ -46,20 +45,20 @@ trait TableRegister extends Loggable with Serializable {
     tables.clear
   }
 
-  def getTables(): Set[String] = {
+  def getTables: Set[String] = {
     tables.toSet
   }
 
 }
 
 /**
-  * register table name when building dq job
-  */
+ * register table name when building dq job
+ */
 case class CompileTableRegister() extends TableRegister {}
 
 /**
-  * register table name and create temp view during calculation
-  */
+ * register table name and create temp view during calculation
+ */
 case class RunTimeTableRegister(@transient sparkSession: SparkSession) extends TableRegister {
 
   def registerTable(name: String, df: DataFrame): Unit = {

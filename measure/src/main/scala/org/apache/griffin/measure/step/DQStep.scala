@@ -25,19 +25,17 @@ trait DQStep extends Loggable {
   val name: String
 
   /**
-    * @return execution success
-    */
+   * @return execution success
+   */
   def execute(context: DQContext): Boolean
 
-  def getNames(): Seq[String] = name :: Nil
+  def getNames: Seq[String] = name :: Nil
 
 }
 
 object DQStepStatus extends Enumeration {
-  val PENDING = Value
-  val RUNNING = Value
-  val COMPLETE = Value
-  val FAILED = Value
+  val PENDING: DQStepStatus.Value = Value
+  val RUNNING: DQStepStatus.Value = Value
+  val COMPLETE: DQStepStatus.Value = Value
+  val FAILED: DQStepStatus.Value = Value
 }
-
-

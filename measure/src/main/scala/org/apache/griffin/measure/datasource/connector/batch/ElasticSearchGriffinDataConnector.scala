@@ -37,10 +37,11 @@ import org.apache.griffin.measure.context.TimeRange
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.ParamUtil._
 
-
-case class ElasticSearchGriffinDataConnector(@transient sparkSession: SparkSession,
-                                             dcParam: DataConnectorParam,
-                                             timestampStorage: TimestampStorage) extends BatchDataConnector {
+case class ElasticSearchGriffinDataConnector(
+    @transient sparkSession: SparkSession,
+    dcParam: DataConnectorParam,
+    timestampStorage: TimestampStorage)
+    extends BatchDataConnector {
 
   lazy val getBaseUrl = s"http://$host:$port"
   val config: scala.Predef.Map[scala.Predef.String, scala.Any] = dcParam.getConfig
@@ -71,7 +72,8 @@ case class ElasticSearchGriffinDataConnector(@transient sparkSession: SparkSessi
       val data = ArrayBuffer[Map[String, Number]]()
 
       if (answer._1) {
-        val arrayAnswers: util.Iterator[JsonNode] = parseString(answer._2).get("hits").get("hits").elements()
+        val arrayAnswers: util.Iterator[JsonNode] =
+          parseString(answer._2).get("hits").get("hits").elements()
 
         while (arrayAnswers.hasNext) {
           val answer = arrayAnswers.next()
@@ -90,8 +92,7 @@ case class ElasticSearchGriffinDataConnector(@transient sparkSession: SparkSessi
       val defaultNumber: Number = 0.0
       val rdd: RDD[Row] = rdd1
         .map { x: Map[String, Number] =>
-          Row(
-            columns.map(c => x.getOrElse(c, defaultNumber).doubleValue()): _*)
+          Row(columns.map(c => x.getOrElse(c, defaultNumber).doubleValue()): _*)
         }
       val schema = dfSchema(columns.toList)
       val df: DataFrame = sparkSession.createDataFrame(rdd, schema).limit(size)
@@ -126,15 +127,15 @@ case class ElasticSearchGriffinDataConnector(@transient sparkSession: SparkSessi
   def parseString(data: String): JsonNode = {
     val mapper = new ObjectMapper()
     mapper.registerModule(DefaultScalaModule)
-    val reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data.getBytes)))
+    val reader = new BufferedReader(
+      new InputStreamReader(new ByteArrayInputStream(data.getBytes)))
     mapper.readTree(reader)
   }
 
   def dfSchema(columnNames: List[String]): StructType = {
     val a: Seq[StructField] = columnNames
-      .map(x => StructField(name = x,
-        dataType = org.apache.spark.sql.types.DoubleType,
-        nullable = false))
+      .map(x =>
+        StructField(name = x, dataType = org.apache.spark.sql.types.DoubleType, nullable = false))
     StructType(a)
   }
 

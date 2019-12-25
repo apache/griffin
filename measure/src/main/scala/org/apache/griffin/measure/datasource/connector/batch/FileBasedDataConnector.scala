@@ -52,19 +52,22 @@ import org.apache.griffin.measure.utils.ParamUtil._
  *  - `header` is false,
  *  - `format` is parquet
  */
-case class FileBasedDataConnector(@transient sparkSession: SparkSession,
-                                  dcParam: DataConnectorParam,
-                                  timestampStorage: TimestampStorage)
-  extends BatchDataConnector {
+case class FileBasedDataConnector(
+    @transient sparkSession: SparkSession,
+    dcParam: DataConnectorParam,
+    timestampStorage: TimestampStorage)
+    extends BatchDataConnector {
 
   import FileBasedDataConnector._
 
   val config: Map[String, Any] = dcParam.getConfig
-  var options: MutableMap[String, String] = MutableMap(config.getParamStringMap(Options, Map.empty).toSeq: _*)
+  val options: MutableMap[String, String] = MutableMap(
+    config.getParamStringMap(Options, Map.empty).toSeq: _*)
 
   var format: String = config.getString(Format, DefaultFormat).toLowerCase
   val paths: Seq[String] = config.getStringArr(Paths, Nil)
-  val schemaSeq: Seq[Map[String, String]] = config.getAnyRef[Seq[Map[String, String]]](Schema, Nil)
+  val schemaSeq: Seq[Map[String, String]] =
+    config.getAnyRef[Seq[Map[String, String]]](Schema, Nil)
   val skipErrorPaths: Boolean = config.getBoolean(SkipErrorPaths, defValue = false)
 
   val currentSchema: Option[StructType] = Try(getUserDefinedSchema) match {
@@ -72,7 +75,8 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
     case _ => None
   }
 
-  assert(SupportedFormats.contains(format),
+  assert(
+    SupportedFormats.contains(format),
     s"Invalid format '$format' specified. Must be one of ${SupportedFormats.mkString("['", "', '", "']")}")
 
   if (format == "csv") validateCSVOptions()
@@ -110,11 +114,13 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
    */
   private def validateCSVOptions(): Unit = {
     if (options.contains(Header) && config.contains(Schema)) {
-      griffinLogger.warn(s"Both $Options.$Header and $Schema were provided. Defaulting to provided $Schema")
+      griffinLogger.warn(
+        s"Both $Options.$Header and $Schema were provided. Defaulting to provided $Schema")
     }
 
     if (!options.contains(Header) && !config.contains(Schema)) {
-      throw new IllegalArgumentException(s"Either '$Header' must be set in '$Options' or '$Schema' must be set.")
+      throw new IllegalArgumentException(
+        s"Either '$Header' must be set in '$Options' or '$Schema' must be set.")
     }
 
     if (config.contains(Schema) && (schemaSeq.isEmpty || currentSchema.isEmpty)) {
@@ -132,9 +138,7 @@ case class FileBasedDataConnector(@transient sparkSession: SparkSession,
           .options(options)
           .format(format)
           .withSchemaIfAny(currentSchema)
-          .load(validPaths: _*)
-
-      )
+          .load(validPaths: _*))
       val preDfOpt = preProcess(dfOpt, ms)
       preDfOpt
     }
@@ -169,16 +173,16 @@ object FileBasedDataConnector extends Loggable {
    * @return
    */
   private def getValidPaths(paths: Seq[String], skipOnError: Boolean): Seq[String] = {
-    val validPaths = paths.filter(path =>
-      if (HdfsUtil.existPath(path)) true
-      else {
-        val msg = s"Path '$path' does not exist!"
-        if (skipOnError) griffinLogger.error(msg)
-        else throw new IllegalArgumentException(msg)
+    val validPaths = paths.filter(
+      path =>
+        if (HdfsUtil.existPath(path)) true
+        else {
+          val msg = s"Path '$path' does not exist!"
+          if (skipOnError) griffinLogger.error(msg)
+          else throw new IllegalArgumentException(msg)
 
-        false
-      }
-    )
+          false
+      })
 
     assert(validPaths.nonEmpty, "No paths were given for the data source.")
     validPaths

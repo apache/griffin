@@ -23,23 +23,22 @@ import scala.util.Try
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.Param
 
-
 trait ParamReader extends Loggable with Serializable {
 
   /**
-    * read config param
- *
-    * @tparam T     param type expected
-    * @return       parsed param
-    */
-  def readConfig[T <: Param](implicit m : ClassTag[T]): Try[T]
+   * read config param
+   *
+   * @tparam T     param type expected
+   * @return       parsed param
+   */
+  def readConfig[T <: Param](implicit m: ClassTag[T]): Try[T]
 
   /**
-    * validate config param
- *
-    * @param param  param to be validated
-    * @return       param itself
-    */
+   * validate config param
+   *
+   * @param param  param to be validated
+   * @return       param itself
+   */
   protected def validate[T <: Param](param: T): T = {
     param.validate()
     param

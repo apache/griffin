@@ -24,27 +24,27 @@ import org.apache.griffin.measure.step.builder.DQStepBuilder
 import org.apache.griffin.measure.step.write.MetricFlushStep
 
 /**
-  * build dq job based on configuration
-  */
+ * build dq job based on configuration
+ */
 object DQJobBuilder {
 
   /**
-    * build dq job with rule param
-    * @param context              dq context
-    * @param evaluateRuleParam    evaluate rule param
-    * @return       dq job
-    */
+   * build dq job with rule param
+   * @param context              dq context
+   * @param evaluateRuleParam    evaluate rule param
+   * @return       dq job
+   */
   def buildDQJob(context: DQContext, evaluateRuleParam: EvaluateRuleParam): DQJob = {
     val ruleParams = evaluateRuleParam.getRules
     buildDQJob(context, ruleParams)
   }
 
   /**
-    * build dq job with rules in evaluate rule param or pre-proc param
-    * @param context          dq context
-    * @param ruleParams       rule params
-    * @return       dq job
-    */
+   * build dq job with rules in evaluate rule param or pre-proc param
+   * @param context          dq context
+   * @param ruleParams       rule params
+   * @return       dq job
+   */
   def buildDQJob(context: DQContext, ruleParams: Seq[RuleParam]): DQJob = {
     // build steps by datasources
     val dsSteps = context.dataSources.flatMap { dataSource =>

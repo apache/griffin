@@ -27,7 +27,6 @@ import org.apache.griffin.measure.context.TimeRange
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClient
 import org.apache.griffin.measure.datasource.connector.DataConnector
 
-
 trait StreamingDataConnector extends DataConnector {
 
   type K

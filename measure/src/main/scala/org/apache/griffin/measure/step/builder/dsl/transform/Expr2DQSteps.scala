@@ -27,24 +27,21 @@ import org.apache.griffin.measure.step.write.{MetricWriteStep, RecordWriteStep, 
 
 trait Expr2DQSteps extends Loggable with Serializable {
 
-  protected val emtptDQSteps = Seq[DQStep]()
-  protected val emptyMap = Map[String, Any]()
+  protected val emtptDQSteps: Seq[DQStep] = Seq[DQStep]()
+  protected val emptyMap: Map[String, Any] = Map[String, Any]()
 
-  def getDQSteps(): Seq[DQStep]
+  def getDQSteps: Seq[DQStep]
 }
 
 /**
-  * get dq steps generator for griffin dsl rule
-  */
+ * get dq steps generator for griffin dsl rule
+ */
 object Expr2DQSteps {
-  private val emtptExpr2DQSteps = new Expr2DQSteps {
-    def getDQSteps(): Seq[DQStep] = emtptDQSteps
+  private val emtptExpr2DQSteps: Expr2DQSteps = new Expr2DQSteps {
+    def getDQSteps: Seq[DQStep] = emtptDQSteps
   }
 
-  def apply(context: DQContext,
-            expr: Expr,
-            ruleParam: RuleParam
-           ): Expr2DQSteps = {
+  def apply(context: DQContext, expr: Expr, ruleParam: RuleParam): Expr2DQSteps = {
     ruleParam.getDqType match {
       case Accuracy => AccuracyExpr2DQSteps(context, expr, ruleParam)
       case Profiling => ProfilingExpr2DQSteps(context, expr, ruleParam)

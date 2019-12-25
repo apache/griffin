@@ -22,19 +22,20 @@ import org.apache.spark.sql._
 import org.apache.griffin.measure.datasource.TimestampStorage
 
 /**
-  * data source cache in parquet format
-  */
-case class StreamingCacheParquetClient(sparkSession: SparkSession,
-                                       param: Map[String, Any],
-                                       dsName: String,
-                                       index: Int,
-                                       timestampStorage: TimestampStorage
-                                 ) extends StreamingCacheClient {
+ * data source cache in parquet format
+ */
+case class StreamingCacheParquetClient(
+    sparkSession: SparkSession,
+    param: Map[String, Any],
+    dsName: String,
+    index: Int,
+    timestampStorage: TimestampStorage)
+    extends StreamingCacheClient {
 
   sparkSession.sparkContext.hadoopConfiguration.set("parquet.enable.summary-metadata", "false")
 
   protected def writeDataFrame(dfw: DataFrameWriter[Row], path: String): Unit = {
-    info(s"write path: ${path}")
+    info(s"write path: $path")
     dfw.parquet(path)
   }
 

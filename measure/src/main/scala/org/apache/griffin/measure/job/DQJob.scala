@@ -23,12 +23,10 @@ import org.apache.griffin.measure.step.DQStep
 case class DQJob(dqSteps: Seq[DQStep]) extends Serializable {
 
   /**
-    * @return execution success
-    */
+   * @return execution success
+   */
   def execute(context: DQContext): Boolean = {
-    dqSteps.foldLeft(true) { (ret, dqStep) =>
-      ret && dqStep.execute(context)
-    }
+    dqSteps.forall(dqStep => dqStep.execute(context))
   }
 
 }
