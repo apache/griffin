@@ -88,18 +88,18 @@ case class JDBCBasedDataConnector(
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))
   }
-  private def createSqlStmt(): String = {
 
-    val wheres = whereString.split(",").map(_.trim).filter(_.nonEmpty)
+  /**
+   * @return Return SQL statement with where condition if provided
+   */
+  private def createSqlStmt(): String = {
     val tableClause = s"SELECT * FROM $fullTableName"
-    if (wheres.length > 0) {
-      val clauses = wheres.map { w =>
-        s"$tableClause WHERE $w"
-      }
-      clauses.mkString(" UNION ALL ")
+    if (whereString.length > 0) {
+      s"$tableClause WHERE $whereString"
     } else tableClause
   }
 }
+
 object JDBCBasedDataConnector extends Loggable {
   private val Database: String = "database"
   private val TableName: String = "tablename"
@@ -113,6 +113,10 @@ object JDBCBasedDataConnector extends Loggable {
   private val DefaultDatabase = "default"
   private val EmptyString = ""
 
+  /**
+   * @param driver JDBC driver class name
+   * @return True if JDBC driver present in classpath
+   */
   private def isJDBCDriverLoaded(driver: String): Boolean = {
     try {
       Class.forName(driver, false, this.getClass.getClassLoader)
@@ -121,9 +125,6 @@ object JDBCBasedDataConnector extends Loggable {
       case x: ClassNotFoundException =>
         griffinLogger.error("JDBC driver provided is not found in class path")
         false
-      case _ =>
-        griffinLogger.info("JDBC driver provided present in class path")
-        true
     }
   }
 }
