@@ -79,7 +79,7 @@ case class JDBCBasedDataConnector(
       preDfOpt
     } catch {
       case e: Throwable =>
-        error(s"load mysql table $fullTableName fails: ${e.getMessage}", e)
+        error(s"loading table $fullTableName fails: ${e.getMessage}", e)
         None
     }
     val tmsts = readTmst(ms)
@@ -120,7 +120,7 @@ object JDBCBasedDataConnector extends Loggable {
       true
     } catch {
       case x: ClassNotFoundException =>
-        griffinLogger.error("JDBC driver provided is not found in class path")
+        griffinLogger.error(s"JDBC driver ${driver} provided is not found in class path")
         false
     }
   }

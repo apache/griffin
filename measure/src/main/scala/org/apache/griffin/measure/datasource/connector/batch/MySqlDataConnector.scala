@@ -24,6 +24,9 @@ import org.apache.griffin.measure.context.TimeRange
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.ParamUtil._
 
+@deprecated(
+  "This class is deprecated. Use 'org.apache.griffin.measure.datasource.connector.batch.JDBCBasedDataConnector'",
+  "0.6.0")
 case class MySqlDataConnector(
     @transient sparkSession: SparkSession,
     dcParam: DataConnectorParam,
