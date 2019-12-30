@@ -18,6 +18,7 @@
 package org.apache.griffin.measure.step.read
 
 import org.apache.spark.sql._
+import scala.util.Try
 
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
@@ -28,7 +29,7 @@ trait ReadStep extends DQStep {
 
   val cache: Boolean
 
-  def execute(context: DQContext): Boolean = {
+  def execute(context: DQContext): Try[Boolean] = Try {
     info(s"read data source [$name]")
     read(context) match {
       case Some(df) =>

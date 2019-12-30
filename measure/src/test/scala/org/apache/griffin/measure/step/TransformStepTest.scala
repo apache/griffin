@@ -18,6 +18,7 @@
 package org.apache.griffin.measure.step
 
 import org.scalatest._
+import scala.util.Try
 
 import org.apache.griffin.measure.{Loggable, SparkSuiteBase}
 import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
@@ -34,7 +35,7 @@ class TransformStepTest extends FlatSpec with Matchers with SparkSuiteBase with 
       cache: Boolean = false)
       extends TransformStep {
 
-    def doExecute(context: DQContext): Boolean = {
+    def doExecute(context: DQContext): Try[Boolean] = Try {
       val threadName = Thread.currentThread().getName
       info(s"Step $name started with $threadName")
       Thread.sleep(duration * 1000L)
@@ -77,6 +78,6 @@ class TransformStepTest extends FlatSpec with Matchers with SparkSuiteBase with 
     step5.parentSteps += step4
 
     val context = getDqContext()
-    step5.execute(context) should be(true)
+    step5.execute(context).get should be(true)
   }
 }

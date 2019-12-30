@@ -43,7 +43,12 @@ class DQAppTest
   var dqApp: DQApp = _
 
   def getConfigFilePath(fileName: String): String = {
-    getClass.getResource(fileName).getFile
+    try {
+      getClass.getResource(fileName).getFile
+    } catch {
+      case _: NullPointerException => throw new Exception(s"resource [$fileName] not found")
+      case ex: Throwable => throw ex
+    }
   }
 
   def initApp(dqParamFile: String): DQApp = {

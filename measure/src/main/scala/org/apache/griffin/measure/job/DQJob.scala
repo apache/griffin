@@ -17,6 +17,8 @@
 
 package org.apache.griffin.measure.job
 
+import scala.util.{Failure, Success, Try}
+
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 
@@ -25,8 +27,16 @@ case class DQJob(dqSteps: Seq[DQStep]) extends Serializable {
   /**
    * @return execution success
    */
-  def execute(context: DQContext): Boolean = {
-    dqSteps.forall(dqStep => dqStep.execute(context))
+  def execute(context: DQContext): Try[Boolean] = {
+    val tmp = dqSteps.map(dqStep => dqStep.execute(context))
+    tmp
+      .foldLeft(Try(true)) {
+        (ret, stepResult) =>
+          (ret, stepResult) match {
+            case (Success(_), nextResult) => nextResult
+            case (Failure(ex), _) => Failure(ex)
+          }
+      }
   }
 
 }

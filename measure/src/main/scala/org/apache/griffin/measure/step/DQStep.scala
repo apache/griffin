@@ -17,6 +17,8 @@
 
 package org.apache.griffin.measure.step
 
+import scala.util.Try
+
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.context.DQContext
 
@@ -27,7 +29,7 @@ trait DQStep extends Loggable {
   /**
    * @return execution success
    */
-  def execute(context: DQContext): Boolean
+  def execute(context: DQContext): Try[Boolean]
 
   def getNames: Seq[String] = name :: Nil
 

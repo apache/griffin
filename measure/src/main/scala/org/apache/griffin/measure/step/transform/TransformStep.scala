@@ -18,10 +18,10 @@
 package org.apache.griffin.measure.step.transform
 
 import scala.collection.mutable
-import scala.collection.mutable.HashSet
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success, Try}
 
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.{DQStep, DQStepStatus}
@@ -40,9 +40,9 @@ trait TransformStep extends DQStep {
 
   val parentSteps = new mutable.HashSet[TransformStep]
 
-  def doExecute(context: DQContext): Boolean
+  def doExecute(context: DQContext): Try[Boolean]
 
-  def execute(context: DQContext): Boolean = {
+  def execute(context: DQContext): Try[Boolean] = {
     val threadName = Thread.currentThread().getName
     info(threadName + " begin transform step : \n" + debugString())
     // Submit parents Steps
@@ -50,10 +50,9 @@ trait TransformStep extends DQStep {
       Future {
         val result = parentStep.execute(context)
         parentStep.synchronized {
-          if (result) {
-            parentStep.status = COMPLETE
-          } else {
-            parentStep.status = FAILED
+          result match {
+            case Success(_) => parentStep.status = COMPLETE
+            case Failure(_) => parentStep.status = FAILED
           }
         }
       }(TransformStep.transformStepContext)
@@ -67,15 +66,8 @@ trait TransformStep extends DQStep {
         Thread.sleep(1000L)
       }
     })
-    val prepared = parentSteps.forall(step => step.status == COMPLETE)
-    if (prepared) {
-      val res = doExecute(context)
-      info(threadName + " end transform step : \n" + debugString())
-      res
-    } else {
-      error("Parent transform step failed!")
-      false
-    }
+    val prepared = parentSteps.foldLeft(true)((ret, step) => ret && step.status == COMPLETE)
+    doExecute(context)
   }
 
   def checkAndUpdateStatus(step: TransformStep): Boolean = {

@@ -17,6 +17,8 @@
 
 package org.apache.griffin.measure.step
 
+import scala.util.{Failure, Success, Try}
+
 import org.apache.griffin.measure.context.DQContext
 
 /**
@@ -31,8 +33,15 @@ case class SeqDQStep(dqSteps: Seq[DQStep]) extends DQStep {
   /**
    * @return execution success
    */
-  def execute(context: DQContext): Boolean = {
-    dqSteps.forall(dqStep => dqStep.execute(context))
+  def execute(context: DQContext): Try[Boolean] = {
+    dqSteps
+      .map(_.execute(context))
+      .foldLeft(Try(true))((ret, stepResult) => {
+        (ret, stepResult) match {
+          case (Success(_), nextResult) => nextResult
+          case (Failure(ex), _) => Failure(ex)
+        }
+      })
   }
 
   override def getNames: Seq[String] = {

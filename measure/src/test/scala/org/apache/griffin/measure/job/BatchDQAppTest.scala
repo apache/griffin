@@ -17,6 +17,8 @@
 
 package org.apache.griffin.measure.job
 
+import org.apache.spark.sql.AnalysisException
+import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 import org.apache.griffin.measure.Application.readParamFile
@@ -67,6 +69,14 @@ class BatchDQAppTest extends DQAppTest {
       Map(timestamp -> metrics)
 
     dqContext.metricWrapper.metrics should equal(expectedMetrics)
+  }
+
+  def runAndCheckException[T <: AnyRef](implicit classTag: ClassTag[T]): Unit = {
+    dqApp.run match {
+      case Success(_) =>
+        fail(s"job ${dqApp.dqParam.getName} should not succeed, a ${classTag.toString} exception is expected.")
+      case Failure(ex) => assertThrows[T](throw ex)
+    }
   }
 
   "accuracy batch job" should "work" in {
@@ -138,5 +148,11 @@ class BatchDQAppTest extends DQAppTest {
     val expectedMetrics = Map("total" -> 50, "unique" -> 48)
 
     runAndCheckResult(expectedMetrics)
+  }
+
+  "batch job" should "fail with exception caught due to invalid rules" in {
+    dqApp = initApp("/_profiling-batch-griffindsl_malformed.json")
+
+    runAndCheckException[AnalysisException]
   }
 }
