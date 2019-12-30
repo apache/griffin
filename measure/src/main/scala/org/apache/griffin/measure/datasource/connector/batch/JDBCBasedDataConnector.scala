@@ -26,9 +26,8 @@ import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
- * A batch data connector for file based sources which allows support various
- * file based data sources like Parquet, CSV, TSV, ORC etc.
- * Local files can also be read by prepending `file://` namespace.
+ * A batch data connector for JDBC based source which allows support for various
+ * JDBC based data sources like Oracle. Postgres etc.
  *
  * Currently supported formats like Parquet, ORC, AVRO, Text and Delimited types like CSV, TSV etc.
  *
