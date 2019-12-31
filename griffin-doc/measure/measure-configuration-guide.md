@@ -253,14 +253,14 @@ List of supported data connectors:
  - Currently supported formats like Parquet, ORC, AVRO, Text and Delimited types like CSV, TSV etc.
  - Local files can also be read by prepending `file://` namespace.
  - **config** object supports the following keys,
-      + 
-         | Name       | Type     | Description                            | Supported Values | Default Values |
-         |:-----------|:---------|:---------------------------------------|:-----------------|:-------------- |
-         | format     | `String` | type of file source| parquet, avro, orc, csv, tsv, text | parquet |
-         | paths      | `List`   | path(s) to be read | | `Empty` |
-         | options    | `Object` | format specific options | | `Empty` |
-         | skipOnError| `Boolean`| whether to continue execution if one or more paths are invalid | true, false | false |
-         | schema     | `List`   | given as list of key value pairs | See example below | `null` |
+        
+ | Name       | Type     | Description                            | Supported Values | Default Values |
+ |:-----------|:---------|:---------------------------------------|:-----------------|:-------------- |
+ | format     | `String` | type of file source| parquet, avro, orc, csv, tsv, text | parquet |
+ | paths      | `List`   | path(s) to be read | | `Empty` |
+ | options    | `Object` | format specific options | | `Empty` |
+ | skipOnError| `Boolean`| whether to continue execution if one or more paths are invalid | true, false | false |
+ | schema     | `List`   | given as list of key value pairs | See example below | `null` |
 
  - Example:
       ```
@@ -293,16 +293,16 @@ List of supported data connectors:
         
  ##### For JDBC based Data Connectors:
 - **config** object supports the following keys,
-    +
-        | Name       | Type     | Description                            | Default Values |
-        |:-----------|:---------|:---------------------------------------|:-------------- |
-        | database   | `String` | database name                          | default |
-        | tablename  | `String` | table name to be read                  | `Empty` |
-        | url        | `String` | the connection string URL to database  | `Empty` |
-        | user       | `String` | user for connection to database        | `Empty` |
-        | password   | `String` | password for connection to database    | `null`  |
-        | driver     | `String` | driver class for JDBC connection to database | com.mysql.jdbc.Driver |
-        | where      | `String` | condition for reading data from table  | `Empty` |
+
+| Name       | Type     | Description                            | Default Values |
+|:-----------|:---------|:---------------------------------------|:-------------- |
+| database   | `String` | database name                          | default |
+| tablename  | `String` | table name to be read                  | `Empty` |
+| url        | `String` | the connection string URL to database  | `Empty` |
+| user       | `String` | user for connection to database        | `Empty` |
+| password   | `String` | password for connection to database    | `null`  |
+| driver     | `String` | driver class for JDBC connection to database | com.mysql.jdbc.Driver |
+| where      | `String` | condition for reading data from table  | `Empty` |
 
 - Example:
    ```
