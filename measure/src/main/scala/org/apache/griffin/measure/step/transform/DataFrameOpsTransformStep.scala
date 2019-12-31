@@ -34,22 +34,22 @@ case class DataFrameOpsTransformStep[T <: WriteStep](
     cache: Boolean = false)
     extends TransformStep {
 
-  def doExecute(context: DQContext): Try[Boolean] = Try {
-    val sparkSession = context.sparkSession
-    val df = rule match {
-      case DataFrameOps._fromJson => DataFrameOps.fromJson(sparkSession, inputDfName, details)
-      case DataFrameOps._accuracy =>
-        DataFrameOps.accuracy(sparkSession, inputDfName, context.contextId, details)
-
-      case DataFrameOps._clear => DataFrameOps.clear(sparkSession, inputDfName, details)
-      case _ => throw new Exception(s"df opr [ $rule ] not supported")
-    }
-    if (cache) context.dataFrameCache.cacheDataFrame(name, df)
-    context.runTimeTableRegister.registerTable(name, df)
-    writeStepOpt match {
-      case Some(writeStep) => writeStep.execute(context)
-      case None => Try(true)
-    }
-  }.flatten
+  def doExecute(context: DQContext): Try[Boolean] =
+    Try {
+      val sparkSession = context.sparkSession
+      val df = rule match {
+        case DataFrameOps._fromJson => DataFrameOps.fromJson(sparkSession, inputDfName, details)
+        case DataFrameOps._accuracy =>
+          DataFrameOps.accuracy(sparkSession, inputDfName, context.contextId, details)
+        case DataFrameOps._clear => DataFrameOps.clear(sparkSession, inputDfName, details)
+        case _ => throw new Exception(s"df opr [ $rule ] not supported")
+      }
+      if (cache) context.dataFrameCache.cacheDataFrame(name, df)
+      context.runTimeTableRegister.registerTable(name, df)
+      writeStepOpt match {
+        case Some(writeStep) => writeStep.execute(context)
+        case None => Try(true)
+      }
+    }.flatten
 
 }

@@ -74,7 +74,8 @@ class BatchDQAppTest extends DQAppTest {
   def runAndCheckException[T <: AnyRef](implicit classTag: ClassTag[T]): Unit = {
     dqApp.run match {
       case Success(_) =>
-        fail(s"job ${dqApp.dqParam.getName} should not succeed, a ${classTag.toString} exception is expected.")
+        fail(
+          s"job ${dqApp.dqParam.getName} should not succeed, a ${classTag.toString} exception is expected.")
       case Failure(ex) => assertThrows[T](throw ex)
     }
   }
