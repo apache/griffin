@@ -82,7 +82,7 @@ Above lists environment parameters.
 - **sinks**: This field configures list of metrics sink parameters, multiple sink ways are supported. Details of sink configuration [here](#sinks).
 - **griffin.checkpoint**: This field configures list of griffin checkpoint parameters, multiple cache ways are supported. It is only for streaming dq case. Details of info cache configuration [here](#griffin-checkpoint).
 
-### <a name="sinks"></a>Sinks
+### Sinks
 - **type**: Metrics and records sink type, "console", "hdfs", "http", "mongo", "custom". 
 - **config**: Configure parameters of each sink type.
 	+ console sink (aliases: "log")
@@ -105,7 +105,7 @@ Above lists environment parameters.
         User-provided data sink should be present in Spark job's class path, by providing custom jar as -jar parameter
 		    to spark-submit or by adding to "jars" list in sparkProperties.json.
 
-### <a name="griffin-checkpoint"></a>Griffin Checkpoint
+### Griffin Checkpoint
 - **type**: Griffin checkpoint type, "zk" for zookeeper checkpoint.
 - **config**: Configure parameters of griffin checkpoint type.
 	+ zookeeper checkpoint
@@ -193,7 +193,7 @@ Above lists DQ job configure parameters.
 	+ rules: List of rules, to define every rule step. Details of rule configuration [here](#rule).
 - **sinks**: Whitelisted sink types for this job. Note: no sinks will be used, if empty or omitted. 
 
-### <a name="data-connector"></a>Data Connector
+### Data Connector
 
 Data Connectors help connector to external sources on which DQ checks can be applied.
 
@@ -324,7 +324,7 @@ List of supported data connectors:
 **Note:** Jar containing driver class should be present in Spark job's class path, by either providing custom jar with 
 `--jars` parameter to spark-submit or by adding setting `spark.jars` in `spark -> config` section of environment config.  
 
-### <a name="rule"></a>Rule
+### Rule
 - **dsl.type**: Rule dsl type, "spark-sql", "df-ops" and "griffin-dsl".
 - **dq.type**: DQ type of this rule, only for "griffin-dsl" type. Supported types: "ACCURACY", "PROFILING", "TIMELINESS", "UNIQUENESS", "COMPLETENESS".
 - **out.dataframe.name** (step information): Output table name of this rule, could be used in the following rules.
