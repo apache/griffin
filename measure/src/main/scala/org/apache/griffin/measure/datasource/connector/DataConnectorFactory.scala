@@ -40,6 +40,7 @@ object DataConnectorFactory extends Loggable {
   val KafkaRegex: Regex = """^(?i)kafka$""".r
 
   val CustomRegex: Regex = """^(?i)custom$""".r
+  val JDBCRegex: Regex = """^(?i)jdbc$""".r
 
   /**
    * create data connector
@@ -72,6 +73,7 @@ object DataConnectorFactory extends Loggable {
             dcParam,
             tmstCache,
             streamingCacheClientOpt)
+        case JDBCRegex() => JDBCBasedDataConnector(sparkSession, dcParam, tmstCache)
         case _ => throw new Exception("connector creation error!")
       }
     }
