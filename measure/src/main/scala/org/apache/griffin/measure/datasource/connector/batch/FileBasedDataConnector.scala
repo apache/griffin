@@ -42,7 +42,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
  *  - format : [[String]] specifying the type of file source (parquet, orc, etc.).
  *  - paths : [[Seq]] specifying the paths to be read
  *  - options : [[Map]] of format specific options
- *  - skipOnError : [[Boolean]] specifying where to continue execution if one or more paths are invalid.
+ *  - skipOnError : [[Boolean]] specifying whether to continue execution if one or more paths are invalid.
  *  - schema : [[Seq]] of {colName, colType and isNullable} given as key value pairs. If provided, this can
  * help skip the schema inference step for some underlying data sources.
  *
