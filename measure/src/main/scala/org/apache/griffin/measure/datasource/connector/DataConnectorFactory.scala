@@ -32,15 +32,14 @@ import org.apache.griffin.measure.datasource.connector.streaming._
 
 object DataConnectorFactory extends Loggable {
 
+  @deprecated val AvroRegex: Regex = """^(?i)avro$""".r
+  @deprecated val TextDirRegex: Regex = """^(?i)text-dir$""".r
+
   val HiveRegex: Regex = """^(?i)hive$""".r
-  val AvroRegex: Regex = """^(?i)avro$""".r
   val FileRegex: Regex = """^(?i)file$""".r
-  val TextDirRegex: Regex = """^(?i)text-dir$""".r
-
   val KafkaRegex: Regex = """^(?i)kafka$""".r
-
-  val CustomRegex: Regex = """^(?i)custom$""".r
   val JDBCRegex: Regex = """^(?i)jdbc$""".r
+  val CustomRegex: Regex = """^(?i)custom$""".r
 
   /**
    * create data connector
