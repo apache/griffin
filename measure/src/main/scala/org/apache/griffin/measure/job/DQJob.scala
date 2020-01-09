@@ -30,7 +30,7 @@ case class DQJob(dqSteps: Seq[DQStep]) extends Serializable {
       .foldLeft(Try(true)) { (ret, stepResult) =>
         (ret, stepResult) match {
           case (Success(_), nextResult) => nextResult
-          case (Failure(ex), _) => Failure(ex)
+          case (Failure(_), _) => ret
         }
       }
   }

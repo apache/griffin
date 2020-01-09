@@ -39,7 +39,7 @@ case class SeqDQStep(dqSteps: Seq[DQStep]) extends DQStep {
       .foldLeft(Try(true))((ret, stepResult) => {
         (ret, stepResult) match {
           case (Success(_), nextResult) => nextResult
-          case (Failure(ex), _) => Failure(ex)
+          case (Failure(_), _) => ret
         }
       })
   }

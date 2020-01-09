@@ -43,8 +43,10 @@ trait TransformStep extends DQStep {
   def doExecute(context: DQContext): Try[Boolean]
 
   def execute(context: DQContext): Try[Boolean] = {
+
     val threadName = Thread.currentThread().getName
     info(threadName + " begin transform step : \n" + debugString())
+
     // Submit parents Steps
     val parentStepFutures = parentSteps.filter(checkAndUpdateStatus).map { parentStep =>
       Future {
@@ -55,19 +57,35 @@ trait TransformStep extends DQStep {
             case Failure(_) => parentStep.status = FAILED
           }
         }
+        result
       }(TransformStep.transformStepContext)
     }
-    ThreadUtils.awaitResult(
+
+    val parentsResultSet = ThreadUtils.awaitResult(
       Future.sequence(parentStepFutures)(implicitly, TransformStep.transformStepContext),
       Duration.Inf)
+
+    val parentsResult = parentsResultSet.foldLeft(Try(true)) { (ret, step) =>
+      (ret, step) match {
+        case (Success(_), nextResult) => nextResult
+        case (Failure(_), _) => ret
+      }
+    }
 
     parentSteps.foreach(step => {
       while (step.status == RUNNING) {
         Thread.sleep(1000L)
       }
     })
-    val prepared = parentSteps.foldLeft(true)((ret, step) => ret && step.status == COMPLETE)
-    doExecute(context)
+
+    parentsResult match {
+      case Success(_) =>
+        info(threadName + " end transform step : \n" + debugString())
+        doExecute(context)
+      case Failure(_) =>
+        error("Parent transform step failed!")
+        parentsResult
+    }
   }
 
   def checkAndUpdateStatus(step: TransformStep): Boolean = {
