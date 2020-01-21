@@ -30,7 +30,7 @@ import org.apache.http.client.methods.{CloseableHttpResponse, HttpGet, HttpPost,
 import org.apache.http.entity.{ContentType, StringEntity}
 import org.apache.http.impl.client.{BasicResponseHandler, HttpClientBuilder}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, DataFrameReader, Row, SparkSession}
 import org.apache.spark.sql.types.{StructField, StructType}
 
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
@@ -55,6 +55,7 @@ case class ElasticSearchGriffinDataConnector(
   val Size = "size"
   val MetricName = "metric.name"
   val Sql = "sql"
+  val SqlMode = "sql.mode"
   val index: String = config.getString(Index, "default")
   val dataType: String = config.getString(Type, "accuracy")
   val metricName: String = config.getString(MetricName, "*")
@@ -63,10 +64,11 @@ case class ElasticSearchGriffinDataConnector(
   val port: String = config.getString(Port, "")
   val fields: Seq[String] = config.getStringArr(Fields, Seq[String]())
   val sql: String = config.getString(Sql, "")
+  val sqlMode: Boolean = config.getBoolean(SqlMode, false)
   val size: Int = config.getInt(Size, 100)
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = {
-     if (sql == "") dataBySearch(ms) else dataBySql(ms)
+    if (sqlMode) dataBySql(ms) else dataBySearch(ms)
   }
 
   def dataBySql(ms: Long): (Option[DataFrame], TimeRange) = {
@@ -77,7 +79,9 @@ case class ElasticSearchGriffinDataConnector(
       if (answer._1) {
         import sparkSession.implicits._
         val rdd: RDD[String] = sparkSession.sparkContext.parallelize(answer._2.lines.toList)
-        val df: DataFrame = sparkSession.read.option("header", true).option("inferSchema", true).csv(rdd.toDS())
+        val reader: DataFrameReader = sparkSession.read
+        reader.option("header", true).option("inferSchema", true)
+        val df: DataFrame = reader.csv(rdd.toDS())
         df.show(20)
         val dfOpt = Some(df)
         val preDfOpt = preProcess(dfOpt, ms)
