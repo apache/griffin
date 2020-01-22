@@ -248,6 +248,62 @@ List of supported data connectors:
  **Note:** User-provided data connector should be present in Spark job's class path, by either providing custom jar with 
 `--jars` parameter to spark-submit or by adding setting `spark.jars` in `spark -> config` section of environment config.  
 
+ ##### For ElasticSearch Custom Data Connectors:
+  - Currently supported SQL mode (for ElasticSearch with sql plugin) and NORMAL mode.
+  - For NORMAL mode, config object supports the following keys,
+  
+ | Name       | Type     | Description                            | Default Values |
+ |:-----------|:---------|:---------------------------------------|:-------------- |
+ | index      | `String` | ElasticSearch index name| default |
+ | type       | `String` | ElasticSearch data type | accuracy |
+ | host       | `String` | ElasticSearch url host | `Empty` |
+ | port       | `String` | ElasticSearch url port | `Empty` |
+ | fields     | `List`   | list of columns | `Empty` |
+ | size       | `Integer`| data size (lines) to load | 100 |
+ | metric.name| `String` | metric name to load | * |
+
+ - Example:
+      ```
+     "connectors": [
+       { 
+         "type": "custom",
+         "config": {
+           "class": "org.apache.griffin.measure.datasource.connector.batch.ElasticSearchGriffinDataConnector",
+           "index": "test-index-v1",
+           "type": "metric",
+           "host": "test.es-xxx.org",
+           "port": "80",
+           "fields": ["col_a", "col_b", "col_c"],
+           "size": 20
+         }
+       }
+     ]
+      ```
+  - For SQL mode, config object supports the following keys,
+  
+ | Name       | Type     | Description                            | Default Values |
+ |:-----------|:---------|:---------------------------------------|:-------------- |
+ | host       | `String` | ElasticSearch url host | `Empty` |
+ | port       | `String` | ElasticSearch url port | `Empty` |
+ | sql.mode   | `Boolean`| use sql mode | false |
+ | sql        | `String` | ElasticSearch SQL | `Empty` |
+
+ - Example:
+      ```
+     "connectors": [
+       { 
+         "type": "custom",
+         "config": {
+           "class": "org.apache.griffin.measure.datasource.connector.batch.ElasticSearchGriffinDataConnector",
+           "host": "test.es-xxx.org",
+           "port": "80",
+           "sql.mode": true,
+           "sql": "select col_a, col_b, col_c from test-index-v1 limit 20"
+         }
+       }
+     ]
+      ```
+ 
  ##### For File based Data Connectors:
 
  - Currently supported formats like Parquet, ORC, AVRO, Text and Delimited types like CSV, TSV etc.
