@@ -31,11 +31,14 @@ trait DataSourceParamStepBuilder extends DQStepBuilder {
 
   def buildDQStep(context: DQContext, param: ParamType): Option[DQStep] = {
     val name = getStepName(param.getName)
-    val steps = param.getConnectors.flatMap { dc =>
-      buildReadSteps(context, dc)
+
+    param.getConnector match {
+      case Some(dc) =>
+        val steps = buildReadSteps(context, dc)
+        if (steps.isDefined) Some(UnionReadStep(name, Seq(steps.get)))
+        else None
+      case _ => None
     }
-    if (steps.nonEmpty) Some(UnionReadStep(name, steps))
-    else None
   }
 
   protected def buildReadSteps(context: DQContext, dcParam: DataConnectorParam): Option[ReadStep]

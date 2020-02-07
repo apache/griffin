@@ -55,7 +55,7 @@ class FileBasedDataConnectorTest extends SparkSuiteBase with Matchers {
   }
 
   private final val dcParam =
-    DataConnectorParam("file", "1", "test_df", Map.empty[String, String], Nil)
+    DataConnectorParam("file", "test_df", Map.empty[String, String], Nil)
   private final val timestampStorage = TimestampStorage()
 
   // Regarding Local FileSystem

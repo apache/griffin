@@ -30,13 +30,13 @@ import org.apache.griffin.measure.utils.DataFrameUtil._
  * data source
  * @param name     name of data source
  * @param dsParam  param of this data source
- * @param dataConnectors       list of data connectors
+ * @param dataConnector       list of data connectors
  * @param streamingCacheClientOpt   streaming data cache client option
  */
 case class DataSource(
     name: String,
     dsParam: DataSourceParam,
-    dataConnectors: Seq[DataConnector],
+    dataConnector: Option[DataConnector],
     streamingCacheClientOpt: Option[StreamingCacheClient])
     extends Loggable
     with Serializable {
@@ -44,7 +44,7 @@ case class DataSource(
   val isBaseline: Boolean = dsParam.isBaseline
 
   def init(): Unit = {
-    dataConnectors.foreach(_.init())
+    dataConnector.foreach(_.init())
   }
 
   def loadData(context: DQContext): TimeRange = {
@@ -67,7 +67,7 @@ case class DataSource(
   }
 
   private def data(timestamp: Long): (Option[DataFrame], TimeRange) = {
-    val batches = dataConnectors.flatMap { dc =>
+    val batches = dataConnector.flatMap { dc =>
       val (dfOpt, timeRange) = dc.data(timestamp)
       dfOpt match {
         case Some(_) => Some((dfOpt, timeRange))
