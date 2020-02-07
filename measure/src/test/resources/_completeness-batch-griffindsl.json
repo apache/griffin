@@ -1,25 +1,19 @@
 {
   "name": "comp_batch",
-
   "process.type": "batch",
-
   "timestamp": 123456,
-
   "data.sources": [
     {
       "name": "source",
-      "connectors": [
-        {
-          "type": "avro",
-          "version": "1.7",
-          "config": {
-            "file.name": "src/test/resources/users_info_src.avro"
-          }
+      "connector": {
+        "type": "avro",
+        "version": "1.7",
+        "config": {
+          "file.name": "src/test/resources/users_info_src.avro"
         }
-      ]
+      }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -27,7 +21,7 @@
         "dq.type": "completeness",
         "out.dataframe.name": "comp",
         "rule": "email, post_code, first_name",
-        "out":[
+        "out": [
           {
             "type": "metric",
             "name": "comp"
@@ -36,6 +30,8 @@
       }
     ]
   },
-
-  "sinks": ["CONSOLE","ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }
