@@ -120,37 +120,31 @@ Above lists environment parameters.
 ```
 {
   "name": "accu_batch",
-
   "process.type": "BATCH",
-
   "data.sources": [
     {
       "name": "src",
-      "connectors": [
-        {
-          "type": "AVRO",
-          "version": "1.7",
-          "config": {
-          	"file.path": "<path>/<to>",
-            "file.name": "<source-file>.avro"
-          }
+      "connector": {
+        "type": "AVRO",
+        "version": "1.7",
+        "config": {
+          "file.path": "<path>/<to>",
+          "file.name": "<source-file>.avro"
         }
-      ]
-    }, {
+      }
+    },
+    {
       "name": "tgt",
-      "connectors": [
-        {
-          "type": "AVRO",
-          "version": "1.7",
-          "config": {
-          	"file.path": "<path>/<to>",
-            "file.name": "<target-file>.avro"
-          }
+      "connector": {
+        "type": "AVRO",
+        "version": "1.7",
+        "config": {
+          "file.path": "<path>/<to>",
+          "file.name": "<target-file>.avro"
         }
-      ]
+      }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -164,7 +158,7 @@ Above lists environment parameters.
           "miss": "miss_count",
           "total": "total_count",
           "matched": "matched_count"
-        },        
+        },
         "out": [
           {
             "type": "metric",
@@ -172,13 +166,16 @@ Above lists environment parameters.
           },
           {
             "type": "record"
-          }        
+          }
         ]
       }
     ]
   },
-  
-  "sinks": ["CONSOLE", "HTTP", "HDFS"]
+  "sinks": [
+    "CONSOLE",
+    "HTTP",
+    "HDFS"
+  ]
 }
 ```
 Above lists DQ job configure parameters.  
@@ -187,7 +184,7 @@ Above lists DQ job configure parameters.
 - **process.type**: Process type of DQ job, "BATCH" or "STREAMING".
 - **data.sources**: List of data sources in this DQ job.
 	+ name: Name of this data source, it should be different from other data sources.
-	+ connectors: List of data connectors combined as the same data source. Details of data connector configuration [here](#data-connector).
+	+ connector: Data connector for this data source. Details of data connector configuration [here](#data-connector).
 - **evaluate.rule**: Evaluate rule parameters of this DQ job.
 	+ dsl.type: Default dsl type of all the rules.
 	+ rules: List of rules, to define every rule step. Details of rule configuration [here](#rule).
@@ -195,7 +192,7 @@ Above lists DQ job configure parameters.
 
 ### Data Connector
 
-Data Connectors help connector to external sources on which DQ checks can be applied.
+Data Connector help connect to external sources on which DQ checks can be applied.
 
 List of supported data connectors:
  - Hive
@@ -208,8 +205,7 @@ List of supported data connectors:
  A sample data connector configuration is as following,
  
  ```
-"connectors": [
-  {
+"connector": {
     "type": "file",
     "version": "1.7",
     "config": {
@@ -217,7 +213,6 @@ List of supported data connectors:
       "key2": "value2"
     }
   }
-]
  ```
 
  ##### Key Parameters:
@@ -234,15 +229,13 @@ List of supported data connectors:
     + For **Streaming** it should implement StreamingDataConnector trait.
  - Example:
       ```
-     "connectors": [
-       {
+     "connector": {
          "type": "custom",
          "config": {
            "class": "org.apache.griffin.measure.datasource.connector.batch.CassandraDataConnector",
            ...
          }
        }
-     ]
       ```
  
  **Note:** User-provided data connector should be present in Spark job's class path, by either providing custom jar with 
@@ -264,20 +257,32 @@ List of supported data connectors:
 
  - Example:
       ```
-     "connectors": [
-       {
+     "connector": {
          "type": "file",
          "config": {
            "format": "csv",
-           "paths": ["/path/to/csv/dir/*", "/path/to/dir/test.csv"],
+           "paths": [
+             "/path/to/csv/dir/*",
+             "/path/to/dir/test.csv"
+           ],
            "options": {
-                "header": "true"
-            },
+             "header": "true"
+           },
            "skipOnError": "false",
-           "schema":[{"name":"user_id","type":"string","nullable":"true"},{"name":"age","type":"int","nullable":"false"}]
+           "schema": [
+             {
+               "name": "user_id",
+               "type": "string",
+               "nullable": "true"
+             },
+             {
+               "name": "age",
+               "type": "int",
+               "nullable": "false"
+             }
+           ]
          }
        }
-     ]
    
  **Note:** Additional examples of schema:
 - "schema":[{"name":"user_id","type":"string","nullable":"true"},{"name":"age","type":"int","nullable":"false"}]
@@ -306,8 +311,7 @@ List of supported data connectors:
 
 - Example:
    ```
-  "connectors": [
-    {
+  "connector": {
       "type": "jdbc",
       "config": {
         "database": "default",
@@ -318,8 +322,7 @@ List of supported data connectors:
         "driver": "com.mysql.jdbc.Driver",
         "where": ""
       }
-    }
-  ]   
+    } 
   
 **Note:** Jar containing driver class should be present in Spark job's class path, by either providing custom jar with 
 `--jars` parameter to spark-submit or by adding setting `spark.jars` in `spark -> config` section of environment config.  

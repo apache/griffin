@@ -30,7 +30,7 @@ import org.apache.griffin.measure.utils.DataFrameUtil._
  * data source
  * @param name     name of data source
  * @param dsParam  param of this data source
- * @param dataConnector       list of data connectors
+ * @param dataConnector       data connector
  * @param streamingCacheClientOpt   streaming data cache client option
  */
 case class DataSource(

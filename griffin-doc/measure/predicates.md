@@ -31,7 +31,7 @@ For configuring predicates need add property to measure json:
     ...
      "data.sources": [
         ...
-         "connectors": [
+         "connector": {
                    "predicates": [
                        {
                          "type": "file.exist",
@@ -42,8 +42,7 @@ For configuring predicates need add property to measure json:
                        }
                    ],
          ...
-         
-     ]
+         }
 }
 ```
 
