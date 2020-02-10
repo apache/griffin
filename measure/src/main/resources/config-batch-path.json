@@ -1,35 +1,29 @@
 {
   "name": "accu_batch",
-
   "process.type": "batch",
-
   "data.sources": [
     {
       "name": "source",
       "baseline": true,
-      "connectors": [
-        {
-          "type": "avro",
-          "version": "1.7",
-          "config": {
-            "file.path": "measure/src/test/resources/users_info_src"
-          }
+      "connector": {
+        "type": "avro",
+        "version": "1.7",
+        "config": {
+          "file.path": "measure/src/test/resources/users_info_src"
         }
-      ]
-    }, {
+      }
+    },
+    {
       "name": "target",
-      "connectors": [
-        {
-          "type": "avro",
-          "version": "1.7",
-          "config": {
-            "file.path": "measure/src/test/resources/users_info_target"
-          }
+      "connector": {
+        "type": "avro",
+        "version": "1.7",
+        "config": {
+          "file.path": "measure/src/test/resources/users_info_target"
         }
-      ]
+      }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -40,5 +34,8 @@
       }
     ]
   },
-  "sinks": ["CONSOLE","ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }

@@ -1,17 +1,15 @@
 {
   "data.sources": [
     {
-      "connectors": [
-        {
-          "dataframe.name": "prof_table",
-          "config": {
-            "table.name": "efg",
-            "database": "abc",
-            "where": "`date`=\"20190825\""
-          },
-          "type": "hive"
-        }
-      ],
+      "connector": {
+        "dataframe.name": "prof_table",
+        "config": {
+          "table.name": "efg",
+          "database": "abc",
+          "where": "`date`=\"20190825\""
+        },
+        "type": "hive"
+      },
       "name": "source"
     }
   ],
@@ -26,16 +24,23 @@
         "out.dataframe.name": "prof",
         "dsl.type": "griffin-dsl",
         "dq.type": "completeness",
-        "error.confs":[
+        "error.confs": [
           {
             "column.name": "user",
             "type": "enumeration",
-            "values":["1", "2", "hive_none", ""]
+            "values": [
+              "1",
+              "2",
+              "hive_none",
+              ""
+            ]
           },
           {
             "column.name": "name",
             "type": "regex",
-            "values":["^zhanglei.natur\\w{1}$"]
+            "values": [
+              "^zhanglei.natur\\w{1}$"
+            ]
           }
         ],
         "out": [

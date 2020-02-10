@@ -28,7 +28,7 @@ import org.apache.griffin.measure.datasource.TimestampStorage
 class JDBCBasedDataConnectorTest extends SparkSuiteBase with Matchers {
 
   val url = "jdbc:h2:mem:test"
-  var conn: java.sql.Connection = null
+  var conn: java.sql.Connection = _
   val properties = new Properties()
   properties.setProperty("user", "user")
   properties.setProperty("password", "password")
@@ -51,7 +51,7 @@ class JDBCBasedDataConnectorTest extends SparkSuiteBase with Matchers {
   }
 
   private final val dcParam =
-    DataConnectorParam("jdbc", "1", "test_df", Map.empty[String, String], Nil)
+    DataConnectorParam("jdbc", "test_df", Map.empty[String, String], Nil)
   private final val timestampStorage = TimestampStorage()
 
   "JDBC based data connector" should "be able to read data from relational database" in {
