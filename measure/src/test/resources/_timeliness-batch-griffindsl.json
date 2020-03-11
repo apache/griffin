@@ -1,23 +1,18 @@
 {
   "name": "timeliness_batch",
-
   "process.type": "batch",
-
   "data.sources": [
     {
       "name": "source",
-      "connectors": [
-        {
-          "type": "avro",
-          "version": "1.7",
-          "config": {
-            "file.name": "src/test/resources/timeliness_data.avro"
-          }
+      "connector": {
+        "type": "avro",
+        "version": "1.7",
+        "config": {
+          "file.name": "src/test/resources/timeliness_data.avro"
         }
-      ]
+      }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -35,9 +30,11 @@
           "count": "cnt",
           "step.size": "2m",
           "percentile": "percentile",
-          "percentile.values": [0.95]
+          "percentile.values": [
+            0.95
+          ]
         },
-        "out":[
+        "out": [
           {
             "type": "metric",
             "name": "timeliness"
@@ -50,6 +47,8 @@
       }
     ]
   },
-
-  "sinks": ["CONSOLE","ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }

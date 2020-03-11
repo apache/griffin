@@ -1,96 +1,96 @@
 {
   "name": "accu_streaming",
-
   "process.type": "streaming",
-
   "data.sources": [
     {
       "name": "source",
       "baseline": true,
-      "connectors": [
-        {
-          "type": "kafka",
-          "version": "0.8",
-          "dataframe.name": "this",
-          "config": {
-            "kafka.config": {
-              "bootstrap.servers": "10.147.177.107:9092",
-              "group.id": "group1",
-              "auto.offset.reset": "smallest",
-              "auto.commit.enable": "false"
-            },
-            "topics": "sss",
-            "key.type": "java.lang.String",
-            "value.type": "java.lang.String"
+      "connector": {
+        "type": "kafka",
+        "version": "0.8",
+        "dataframe.name": "this",
+        "config": {
+          "kafka.config": {
+            "bootstrap.servers": "10.147.177.107:9092",
+            "group.id": "group1",
+            "auto.offset.reset": "smallest",
+            "auto.commit.enable": "false"
           },
-          "pre.proc": [
-            {
-              "dsl.type": "df-ops",
-              "in.dataframe.name": "this",
-              "out.dataframe.name": "s1",
-              "rule": "from_json"
-            },
-            {
-              "dsl.type": "spark-sql",
-              "out.dataframe.name": "this",
-              "rule": "select name, age from s1"
-            }
-          ]
-        }
-      ],
+          "topics": "sss",
+          "key.type": "java.lang.String",
+          "value.type": "java.lang.String"
+        },
+        "pre.proc": [
+          {
+            "dsl.type": "df-ops",
+            "in.dataframe.name": "this",
+            "out.dataframe.name": "s1",
+            "rule": "from_json"
+          },
+          {
+            "dsl.type": "spark-sql",
+            "out.dataframe.name": "this",
+            "rule": "select name, age from s1"
+          }
+        ]
+      },
       "checkpoint": {
         "type": "parquet",
         "file.path": "hdfs://localhost/griffin/streaming/dump/source",
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"],
+        "time.range": [
+          "-2m",
+          "0"
+        ],
         "updatable": true
       }
-    }, {
+    },
+    {
       "name": "target",
-      "connectors": [
-        {
-          "type": "kafka",
-          "version": "0.8",
-          "dataframe.name": "this",
-          "config": {
-            "kafka.config": {
-              "bootstrap.servers": "10.147.177.107:9092",
-              "group.id": "group1",
-              "auto.offset.reset": "smallest",
-              "auto.commit.enable": "false"
-            },
-            "topics": "ttt",
-            "key.type": "java.lang.String",
-            "value.type": "java.lang.String"
+      "connector": {
+        "type": "kafka",
+        "version": "0.8",
+        "dataframe.name": "this",
+        "config": {
+          "kafka.config": {
+            "bootstrap.servers": "10.147.177.107:9092",
+            "group.id": "group1",
+            "auto.offset.reset": "smallest",
+            "auto.commit.enable": "false"
           },
-          "pre.proc": [
-            {
-              "dsl.type": "df-ops",
-              "in.dataframe.name": "this",
-              "out.dataframe.name": "t1",
-              "rule": "from_json"
-            },
-            {
-              "dsl.type": "spark-sql",
-              "out.dataframe.name": "this",
-              "rule": "select name, age from t1"
-            }
-          ]
-        }
-      ],
+          "topics": "ttt",
+          "key.type": "java.lang.String",
+          "value.type": "java.lang.String"
+        },
+        "pre.proc": [
+          {
+            "dsl.type": "df-ops",
+            "in.dataframe.name": "this",
+            "out.dataframe.name": "t1",
+            "rule": "from_json"
+          },
+          {
+            "dsl.type": "spark-sql",
+            "out.dataframe.name": "this",
+            "rule": "select name, age from t1"
+          }
+        ]
+      },
       "checkpoint": {
         "type": "parquet",
         "file.path": "hdfs://localhost/griffin/streaming/dump/target",
         "info.path": "target",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"]
+        "time.range": [
+          "-2m",
+          "0"
+        ]
       }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -105,19 +105,21 @@
           "total": "total_count",
           "matched": "matched_count"
         },
-        "out":[
+        "out": [
           {
-            "type":"metric",
+            "type": "metric",
             "name": "accu"
           },
           {
-            "type":"record",
+            "type": "record",
             "name": "missRecords"
           }
         ]
       }
     ]
   },
-
-  "sinks": ["CONSOLE","ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }

@@ -81,7 +81,6 @@ class DataConnectorFactorySpec extends FlatSpec {
     val param = DataConnectorParam(
       "CUSTOM",
       null,
-      null,
       Map("class" -> classOf[ExampleBatchDataConnector].getCanonicalName),
       Nil)
     // apparently Scalamock can not mock classes without empty-paren constructor, providing nulls
@@ -96,7 +95,6 @@ class DataConnectorFactorySpec extends FlatSpec {
     val param = DataConnectorParam(
       "CUSTOM",
       null,
-      null,
       Map("class" -> classOf[MySqlDataConnector].getCanonicalName),
       Nil)
     // apparently Scalamock can not mock classes without empty-paren constructor, providing nulls
@@ -109,7 +107,6 @@ class DataConnectorFactorySpec extends FlatSpec {
     val param = DataConnectorParam(
       "CUSTOM",
       null,
-      null,
       Map("class" -> classOf[KafkaStreamingStringDataConnector].getCanonicalName),
       Nil)
     val res = DataConnectorFactory.getDataConnector(null, null, param, null, None)
@@ -120,7 +117,6 @@ class DataConnectorFactorySpec extends FlatSpec {
   it should "fail if class is not extending DataConnectors" in {
     val param = DataConnectorParam(
       "CUSTOM",
-      null,
       null,
       Map("class" -> classOf[NotDataConnector].getCanonicalName),
       Nil)
@@ -137,7 +133,6 @@ class DataConnectorFactorySpec extends FlatSpec {
   it should "fail if class does not have apply() method" in {
     val param = DataConnectorParam(
       "CUSTOM",
-      null,
       null,
       Map("class" -> classOf[DataConnectorWithoutApply].getCanonicalName),
       Nil)

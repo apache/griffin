@@ -21,13 +21,7 @@ import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import org.apache.commons.lang.StringUtils
 
-import org.apache.griffin.measure.configuration.enums.{
-  DqType,
-  DslType,
-  FlattenType,
-  OutputType,
-  SinkType
-}
+import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.configuration.enums.DqType._
 import org.apache.griffin.measure.configuration.enums.DslType.{DslType, GriffinDsl}
 import org.apache.griffin.measure.configuration.enums.FlattenType.{
@@ -86,31 +80,31 @@ case class DQConfig(
  * data source param
  * @param name         data source name (must)
  * @param baseline     data source is baseline or not, false by default (optional)
- * @param connectors   data connectors (optional)
+ * @param connector   data connector (optional)
  * @param checkpoint   data source checkpoint configuration (must in streaming mode with streaming connectors)
  */
 @JsonInclude(Include.NON_NULL)
 case class DataSourceParam(
     @JsonProperty("name") private val name: String,
-    @JsonProperty("connectors") private val connectors: List[DataConnectorParam],
+    @JsonProperty("connector") private val connector: DataConnectorParam,
     @JsonProperty("baseline") private val baseline: Boolean = false,
     @JsonProperty("checkpoint") private val checkpoint: Map[String, Any] = null)
     extends Param {
   def getName: String = name
   def isBaseline: Boolean = if (Option(baseline).isDefined) baseline else false
-  def getConnectors: Seq[DataConnectorParam] = if (connectors != null) connectors else Nil
+  def getConnector: Option[DataConnectorParam] = Option(connector)
   def getCheckpointOpt: Option[Map[String, Any]] = Option(checkpoint)
 
   def validate(): Unit = {
     assert(StringUtils.isNotBlank(name), "data source name should not be empty")
-    getConnectors.foreach(_.validate())
+    assert(getConnector.isDefined, "Connector is undefined or invalid")
+    getConnector.foreach(_.validate())
   }
 }
 
 /**
  * data connector param
  * @param conType    data connector type, e.g.: hive, avro, kafka (must)
- * @param version    data connector type version (optional)
  * @param dataFrameName    data connector dataframe name, for pre-process input usage (optional)
  * @param config     detail configuration of data connector (must)
  * @param preProc    pre-process rules after load data (optional)
@@ -118,13 +112,11 @@ case class DataSourceParam(
 @JsonInclude(Include.NON_NULL)
 case class DataConnectorParam(
     @JsonProperty("type") private val conType: String,
-    @JsonProperty("version") private val version: String,
     @JsonProperty("dataframe.name") private val dataFrameName: String,
     @JsonProperty("config") private val config: Map[String, Any],
     @JsonProperty("pre.proc") private val preProc: List[RuleParam])
     extends Param {
   def getType: String = conType
-  def getVersion: String = if (version != null) version else ""
   def getDataFrameName(defName: String): String =
     if (dataFrameName != null) dataFrameName else defName
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()

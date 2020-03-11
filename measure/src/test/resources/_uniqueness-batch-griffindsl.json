@@ -1,36 +1,29 @@
 {
   "name": "unique_batch",
-
   "process.type": "batch",
-
   "data.sources": [
     {
       "name": "source",
       "baseline": true,
-      "connectors": [
-        {
-          "type": "avro",
-          "version": "1.7",
-          "config": {
-            "file.name": "src/test/resources/users_info_src.avro"
-          }
+      "connector": {
+        "type": "avro",
+        "version": "1.7",
+        "config": {
+          "file.name": "src/test/resources/users_info_src.avro"
         }
-      ]
+      }
     },
     {
       "name": "target",
-      "connectors": [
-        {
-          "type": "avro",
-          "version": "1.7",
-          "config": {
-            "file.name": "src/test/resources/users_info_src.avro"
-          }
+      "connector": {
+        "type": "avro",
+        "version": "1.7",
+        "config": {
+          "file.name": "src/test/resources/users_info_src.avro"
         }
-      ]
+      }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -46,7 +39,7 @@
           "dup": "dup",
           "num": "num"
         },
-        "out":[
+        "out": [
           {
             "type": "metric",
             "name": "unique"
@@ -59,6 +52,8 @@
       }
     ]
   },
-
-  "sinks": ["CONSOLE","ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }

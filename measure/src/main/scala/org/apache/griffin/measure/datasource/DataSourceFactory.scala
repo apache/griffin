@@ -25,7 +25,7 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.DataSourceParam
 import org.apache.griffin.measure.datasource.cache.StreamingCacheClientFactory
-import org.apache.griffin.measure.datasource.connector.{DataConnector, DataConnectorFactory}
+import org.apache.griffin.measure.datasource.connector.DataConnectorFactory
 
 object DataSourceFactory extends Loggable {
 
@@ -45,7 +45,6 @@ object DataSourceFactory extends Loggable {
       dataSourceParam: DataSourceParam,
       index: Int): Option[DataSource] = {
     val name = dataSourceParam.getName
-    val connectorParams = dataSourceParam.getConnectors
     val timestampStorage = TimestampStorage()
 
     // for streaming data cache
@@ -56,19 +55,23 @@ object DataSourceFactory extends Loggable {
       index,
       timestampStorage)
 
-    val dataConnectors: Seq[DataConnector] = connectorParams.flatMap { connectorParam =>
-      DataConnectorFactory.getDataConnector(
-        sparkSession,
-        ssc,
-        connectorParam,
-        timestampStorage,
-        streamingCacheClientOpt) match {
-        case Success(connector) => Some(connector)
-        case _ => None
-      }
-    }
+    val connectorParamsOpt = dataSourceParam.getConnector
 
-    Some(DataSource(name, dataSourceParam, dataConnectors, streamingCacheClientOpt))
+    connectorParamsOpt match {
+      case Some(connectorParam) =>
+        val dataConnectors = DataConnectorFactory.getDataConnector(
+          sparkSession,
+          ssc,
+          connectorParam,
+          timestampStorage,
+          streamingCacheClientOpt) match {
+          case Success(connector) => Some(connector)
+          case _ => None
+        }
+
+        Some(DataSource(name, dataSourceParam, dataConnectors, streamingCacheClientOpt))
+      case None => None
+    }
   }
 
 }

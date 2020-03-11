@@ -163,137 +163,131 @@ Here is an example to define measure of profiling:
 curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
 -X POST http://127.0.0.1:8080/api/v1/measures \
 -d '{
-    "name":"profiling_measure",
-    "measure.type":"griffin",
-    "dq.type":"PROFILING",
-    "rule.description":{
-        "details":[
-            {
-                "name":"age",
-                "infos":"Total Count,Average"
-            }
+      "name": "profiling_measure",
+      "measure.type": "griffin",
+      "dq.type": "PROFILING",
+      "rule.description": {
+        "details": [
+          {
+            "name": "age",
+            "infos": "Total Count,Average"
+          }
         ]
-    },
-    "process.type":"BATCH",
-    "owner":"test",
-    "description":"measure description",
-    "data.sources":[
+      },
+      "process.type": "BATCH",
+      "owner": "test",
+      "description": "measure description",
+      "data.sources": [
         {
-            "name":"source",
-            "connectors":[
-                {
-                    "name":"connector_name",
-                    "type":"HIVE",
-                    "version":"1.2",
-                    "data.unit":"1hour",
-                    "data.time.zone":"UTC(WET,GMT)",
-                    "config":{
-                        "database":"default",
-                        "table.name":"demo_src",
-                        "where":"dt=#YYYYMMdd# AND hour=#HH#"
-                    },
-                    "predicates":[
-                        {
-                            "type":"file.exist",
-                            "config":{
-                                "root.path":"hdfs:///griffin/demo_src",
-                                "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                            }
-                        }
-                    ]
+          "name": "source",
+          "connector": {
+            "name": "connector_name",
+            "type": "HIVE",
+            "version": "1.2",
+            "data.unit": "1hour",
+            "data.time.zone": "UTC(WET,GMT)",
+            "config": {
+              "database": "default",
+              "table.name": "demo_src",
+              "where": "dt=#YYYYMMdd# AND hour=#HH#"
+            },
+            "predicates": [
+              {
+                "type": "file.exist",
+                "config": {
+                  "root.path": "hdfs:///griffin/demo_src",
+                  "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
                 }
+              }
             ]
+          }
         }
-    ],
-    "evaluate.rule":{
-        "rules":[
-            {
-                "dsl.type":"griffin-dsl",
-                "dq.type":"PROFILING",
-                "rule":"count(source.`age`) AS `age-count`,avg(source.`age`) AS `age-average`",
-                "name":"profiling",
-                "details":{}
-            }
+      ],
+      "evaluate.rule": {
+        "rules": [
+          {
+            "dsl.type": "griffin-dsl",
+            "dq.type": "PROFILING",
+            "rule": "count(source.`age`) AS `age-count`,avg(source.`age`) AS `age-average`",
+            "name": "profiling",
+            "details": {}
+          }
         ]
-    }
-}'
+      }
+    }'
 ```
 Here is an example to define measure of accuracy:
 ```
 curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
 -X POST http://127.0.0.1:8080/api/v1/measures \
 -d '{
-    "name":"accuracy_measure",
-    "measure.type":"griffin",
-    "dq.type":"ACCURACY",
-    "process.type":"BATCH",
-    "owner":"test",
-    "description":"measure description",
-    "data.sources":[
+      "name": "accuracy_measure",
+      "measure.type": "griffin",
+      "dq.type": "ACCURACY",
+      "process.type": "BATCH",
+      "owner": "test",
+      "description": "measure description",
+      "data.sources": [
         {
-            "name":"source",
-            "connectors":[
-                {
-                    "name":"connector_name_source",
-                    "type":"HIVE",
-                    "version":"1.2",
-                    "data.unit":"1hour",
-                    "data.time.zone":"UTC(WET,GMT)",
-                    "config":{
-                        "database":"default",
-                        "table.name":"demo_src",
-                        "where":"dt=#YYYYMMdd# AND hour=#HH#"
-                    },
-                    "predicates":[
-                        {
-                            "type":"file.exist",
-                            "config":{
-                                "root.path":"hdfs:///griffin/demo_src",
-                                "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                            }
-                        }
-                    ]
+          "name": "source",
+          "connector": {
+            "name": "connector_name_source",
+            "type": "HIVE",
+            "version": "1.2",
+            "data.unit": "1hour",
+            "data.time.zone": "UTC(WET,GMT)",
+            "config": {
+              "database": "default",
+              "table.name": "demo_src",
+              "where": "dt=#YYYYMMdd# AND hour=#HH#"
+            },
+            "predicates": [
+              {
+                "type": "file.exist",
+                "config": {
+                  "root.path": "hdfs:///griffin/demo_src",
+                  "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
                 }
+              }
             ]
+          }
         },
         {
-            "name":"target",
-            "connectors":[
-                {
-                    "name":"connector_name_target",
-                    "type":"HIVE",
-                    "version":"1.2",
-                    "data.unit":"1hour",
-                    "data.time.zone":"UTC(WET,GMT)",
-                    "config":{
-                        "database":"default",
-                        "table.name":"demo_tgt",
-                        "where":"dt=#YYYYMMdd# AND hour=#HH#"
-                    },
-                    "predicates":[
-                        {
-                            "type":"file.exist",
-                            "config":{
-                                "root.path":"hdfs:///griffin/demo_src",
-                                "path":"/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                            }
-                        }
-                    ]
+          "name": "target",
+          "connector": {
+            "name": "connector_name_target",
+            "type": "HIVE",
+            "version": "1.2",
+            "data.unit": "1hour",
+            "data.time.zone": "UTC(WET,GMT)",
+            "config": {
+              "database": "default",
+              "table.name": "demo_tgt",
+              "where": "dt=#YYYYMMdd# AND hour=#HH#"
+            },
+            "predicates": [
+              {
+                "type": "file.exist",
+                "config": {
+                  "root.path": "hdfs:///griffin/demo_src",
+                  "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
                 }
+              }
             ]
+          }
         }
-    ],
-    "evaluate.rule":{
-        "rules":[
-            {
-                "dsl.type":"griffin-dsl",
-                "dq.type":"ACCURACY",
-                "name":"accuracy",
-                "rule":"source.desc=target.desc"
-            }
+      ],
+      "evaluate.rule": {
+        "rules": [
+          {
+            "dsl.type": "griffin-dsl",
+            "dq.type": "ACCURACY",
+            "name": "accuracy",
+            "rule": "source.desc=target.desc"
+          }
         ]
-    }
-}'
+      }
+    }'
 ```
 Here is an example to define external measure:
 ```
@@ -319,84 +313,90 @@ curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
 #### API Example
 ```bash
 curl -k -H "Accept: application/json" -X GET http://127.0.0.1:8080/api/v1/measures
-[{
-        "measure.type": "griffin",
-        "id": 1,
-        "name": "accuracy_measure",
-        "owner": "test",
-        "description": "measure description",
-        "deleted": false,
-        "dq.type": "ACCURACY",
-        "sinks": ["ELASTICSEARCH", "HDFS"],
-        "process.type": "BATCH",
-        "data.sources": [{
-                "id": 4,
-                "name": "source",
-                "connectors": [{
-                        "id": 5,
-                        "name": "connector_name_source",
-                        "type": "HIVE",
-                        "version": "1.2",
-                        "predicates": [{
-                                "id": 6,
-                                "type": "file.exist",
-                                "config": {
-                                    "root.path": "hdfs:///127.0.0.1/demo_src",
-                                    "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                                }
-                            }
-                        ],
-                        "data.unit": "1hour",
-                        "data.time.zone": "UTC(WET,GMT)",
-                        "config": {
-                            "database": "default",
-                            "table.name": "demo_src",
-                            "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                        }
-                    }
-                ],
-                "baseline": false
-            }, {
-                "id": 7,
-                "name": "target",
-                "connectors": [{
-                        "id": 8,
-                        "name": "connector_name_target",
-                        "type": "HIVE",
-                        "version": "1.2",
-                        "predicates": [{
-                                "id": 9,
-                                "type": "file.exist",
-                                "config": {
-                                    "root.path": "hdfs:///127.0.0.1/demo_src",
-                                    "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                                }
-                            }
-                        ],
-                        "data.unit": "1hour",
-                        "data.time.zone": "UTC(WET,GMT)",
-                        "config": {
-                            "database": "default",
-                            "table.name": "demo_tgt",
-                            "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                        }
-                    }
-                ],
-                "baseline": false
+[
+  {
+    "measure.type": "griffin",
+    "id": 1,
+    "name": "accuracy_measure",
+    "owner": "test",
+    "description": "measure description",
+    "deleted": false,
+    "dq.type": "ACCURACY",
+    "sinks": [
+      "ELASTICSEARCH",
+      "HDFS"
+    ],
+    "process.type": "BATCH",
+    "data.sources": [
+      {
+        "id": 4,
+        "name": "source",
+        "connector": {
+          "id": 5,
+          "name": "connector_name_source",
+          "type": "HIVE",
+          "version": "1.2",
+          "predicates": [
+            {
+              "id": 6,
+              "type": "file.exist",
+              "config": {
+                "root.path": "hdfs:///127.0.0.1/demo_src",
+                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+              }
             }
-        ],
-        "evaluate.rule": {
-            "id": 2,
-            "rules": [{
-                    "id": 3,
-                    "rule": "source.desc=target.desc",
-                    "dsl.type": "griffin-dsl",
-                    "dq.type": "ACCURACY"
-                }
-            ]
+          ],
+          "data.unit": "1hour",
+          "data.time.zone": "UTC(WET,GMT)",
+          "config": {
+            "database": "default",
+            "table.name": "demo_src",
+            "where": "dt=#YYYYMMdd# AND hour=#HH#"
+          }
         },
-        "measure.type": "griffin"
+        "baseline": false
+      },
+      {
+        "id": 7,
+        "name": "target",
+        "connector": {
+          "id": 8,
+          "name": "connector_name_target",
+          "type": "HIVE",
+          "version": "1.2",
+          "predicates": [
+            {
+              "id": 9,
+              "type": "file.exist",
+              "config": {
+                "root.path": "hdfs:///127.0.0.1/demo_src",
+                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
+              }
+            }
+          ],
+          "data.unit": "1hour",
+          "data.time.zone": "UTC(WET,GMT)",
+          "config": {
+            "database": "default",
+            "table.name": "demo_tgt",
+            "where": "dt=#YYYYMMdd# AND hour=#HH#"
+          }
+        },
+        "baseline": false
+      }
+    ],
+    "evaluate.rule": {
+      "id": 2,
+      "rules": [
+        {
+          "id": 3,
+          "rule": "source.desc=target.desc",
+          "dsl.type": "griffin-dsl",
+          "dq.type": "ACCURACY"
+        }
+      ]
     }
+  }
 ]
 ```
 
@@ -422,64 +422,69 @@ Here is an example to update measure:
 curl -k -H "Content-Type: application/json" -H "Accept: application/json" \
 -X PUT http://127.0.0.1:8080/api/v1/measures \
 -d '{
-    "measure.type": "griffin",
-    "id": 19,
-    "name": "profiling_measure_edited",
-    "owner": "test",
-    "description": "measure description",
-    "deleted": false,
-    "dq.type": "PROFILING",
-    "sinks": ["ELASTICSEARCH", "HDFS"],
-    "process.type": "BATCH",
-    "rule.description": {
-        "details": [{
-                "name": "age",
-                "infos": "Total Count,Average"
-            }
+      "measure.type": "griffin",
+      "id": 19,
+      "name": "profiling_measure_edited",
+      "owner": "test",
+      "description": "measure description",
+      "deleted": false,
+      "dq.type": "PROFILING",
+      "sinks": [
+        "ELASTICSEARCH",
+        "HDFS"
+      ],
+      "process.type": "BATCH",
+      "rule.description": {
+        "details": [
+          {
+            "name": "age",
+            "infos": "Total Count,Average"
+          }
         ]
-    },
-    "data.sources": [{
-            "id": 22,
-            "name": "source",
-            "connectors": [{
-                    "id": 23,
-                    "name": "connector_name",
-                    "type": "HIVE",
-                    "version": "1.2",
-                    "predicates": [{
-                            "id": 24,
-                            "type": "file.exist",
-                            "config": {
-                                "root.path": "hdfs:///griffin/demo_src",
-                                "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
-                            }
-                        }
-                    ],
-                    "data.unit": "1hour",
-                    "data.time.zone": "UTC(WET,GMT)",
-                    "config": {
-                        "database": "default",
-                        "table.name": "demo_src",
-                        "where": "dt=#YYYYMMdd# AND hour=#HH#"
-                    }
+      },
+      "data.sources": [
+        {
+          "id": 22,
+          "name": "source",
+          "connector": {
+            "id": 23,
+            "name": "connector_name",
+            "type": "HIVE",
+            "version": "1.2",
+            "predicates": [
+              {
+                "id": 24,
+                "type": "file.exist",
+                "config": {
+                  "root.path": "hdfs:///griffin/demo_src",
+                  "path": "/dt=#YYYYMMdd#/hour=#HH#/_DONE"
                 }
+              }
             ],
-            "baseline": false
-        }
-    ],
-    "evaluate.rule": {
-        "id": 20,
-        "rules": [{
-                "id": 21,
-                "rule": "count(source.`age`) AS `age-count`,avg(source.`age`) AS `age-average`",
-                "dsl.type": "griffin-dsl",
-                "dq.type": "PROFILING",
-                "details": {}
+            "data.unit": "1hour",
+            "data.time.zone": "UTC(WET,GMT)",
+            "config": {
+              "database": "default",
+              "table.name": "demo_src",
+              "where": "dt=#YYYYMMdd# AND hour=#HH#"
             }
+          },
+          "baseline": false
+        }
+      ],
+      "evaluate.rule": {
+        "id": 20,
+        "rules": [
+          {
+            "id": 21,
+            "rule": "count(source.`age`) AS `age-count`,avg(source.`age`) AS `age-average`",
+            "dsl.type": "griffin-dsl",
+            "dq.type": "PROFILING",
+            "details": {}
+          }
         ]
-    },
-    "measure.type": "griffin"
-}'
+      }
+    }'
 ```
 Here is an example to update external measure:
 ```

@@ -24,36 +24,30 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
 ```
 {
   "name": "accu_batch",
-
   "process.type": "BATCH",
-
   "data.sources": [
     {
       "name": "source",
       "baseline": true,
-      "connectors": [
-        {
-          "type": "AVRO",
-          "version": "1.7",
-          "config": {
-            "file.name": "src/test/resources/users_info_src.avro"
-          }
+      "connector": {
+        "type": "AVRO",
+        "version": "1.7",
+        "config": {
+          "file.name": "src/test/resources/users_info_src.avro"
         }
-      ]
-    }, {
+      }
+    },
+    {
       "name": "target",
-      "connectors": [
-        {
-          "type": "AVRO",
-          "version": "1.7",
-          "config": {
-            "file.name": "src/test/resources/users_info_target.avro"
-          }
+      "connector": {
+        "type": "AVRO",
+        "version": "1.7",
+        "config": {
+          "file.name": "src/test/resources/users_info_target.avro"
         }
-      ]
+      }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -76,13 +70,15 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
           {
             "type": "record",
             "name": "missRecords"
-          }        
-        ]        
+          }
+        ]
       }
     ]
   },
-  
-  "sinks": ["CONSOLE", "ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }
 ```
 Above is the configure file of batch accuracy job.  
@@ -99,25 +95,20 @@ The miss records of source will be persisted as record.
 ```
 {
   "name": "prof_batch",
-
   "process.type": "BATCH",
-
   "data.sources": [
     {
       "name": "source",
-      "connectors": [
-        {
-          "type": "HIVE",
-          "version": "1.2",
-          "config": {
-            "database": "default",
-            "table.name": "src"
-          }
+      "connector": {
+        "type": "HIVE",
+        "version": "1.2",
+        "config": {
+          "database": "default",
+          "table.name": "src"
         }
-      ]
+      }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -129,8 +120,8 @@ The miss records of source will be persisted as record.
           {
             "type": "metric",
             "name": "prof"
-          }        
-        ]        
+          }
+        ]
       },
       {
         "dsl.type": "griffin-dsl",
@@ -142,13 +133,15 @@ The miss records of source will be persisted as record.
             "type": "metric",
             "name": "name_grp",
             "flatten": "array"
-          }        
+          }
         ]
       }
     ]
   },
-   
-  "sinks": ["CONSOLE", "ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }
 ```
 Above is the configure file of batch profiling job.  

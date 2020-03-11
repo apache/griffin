@@ -82,12 +82,8 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
       expectedResult: AccuracyResult) = {
     val dqContext: DQContext = getDqContext(
       dataSourcesParam = List(
-        DataSourceParam(
-          name = "source",
-          connectors = List(dataConnectorParam(tableName = sourceName))),
-        DataSourceParam(
-          name = "target",
-          connectors = List(dataConnectorParam(tableName = targetName)))))
+        DataSourceParam(name = "source", connector = dataConnectorParam(tableName = sourceName)),
+        DataSourceParam(name = "target", connector = dataConnectorParam(tableName = targetName))))
 
     val accuracyRule = RuleParam(
       dslType = "griffin-dsl",
@@ -161,7 +157,6 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
   private def dataConnectorParam(tableName: String) = {
     DataConnectorParam(
       conType = "HIVE",
-      version = null,
       dataFrameName = null,
       config = Map("table.name" -> tableName),
       preProc = null)

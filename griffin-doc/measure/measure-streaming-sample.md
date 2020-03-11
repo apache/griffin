@@ -24,93 +24,93 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
 ```
 {
   "name": "accu_streaming",
-
   "process.type": "STREAMING",
-
   "data.sources": [
     {
       "name": "source",
       "baseline": true,
-      "connectors": [
-        {
-          "type": "KAFKA",
-          "version": "0.8",
-          "config": {
-            "kafka.config": {
-              "bootstrap.servers": "10.149.247.156:9092",
-              "group.id": "src_group",
-              "auto.offset.reset": "largest",
-              "auto.commit.enable": "false"
-            },
-            "topics": "sss",
-            "key.type": "java.lang.String",
-            "value.type": "java.lang.String"
+      "connector": {
+        "type": "KAFKA",
+        "version": "0.8",
+        "config": {
+          "kafka.config": {
+            "bootstrap.servers": "10.149.247.156:9092",
+            "group.id": "src_group",
+            "auto.offset.reset": "largest",
+            "auto.commit.enable": "false"
           },
-          "pre.proc": [
-            {
-              "dsl.type": "df-ops",
-              "in.dataframe.name": "this",
-              "out.dataframe.name": "s1",
-              "rule": "from_json"
-            },
-            {
-              "dsl.type": "spark-sql",
-              "out.dataframe.name": "this",
-              "rule": "select name, age from s1"
-            }
-          ]
-        }
-      ],
+          "topics": "sss",
+          "key.type": "java.lang.String",
+          "value.type": "java.lang.String"
+        },
+        "pre.proc": [
+          {
+            "dsl.type": "df-ops",
+            "in.dataframe.name": "this",
+            "out.dataframe.name": "s1",
+            "rule": "from_json"
+          },
+          {
+            "dsl.type": "spark-sql",
+            "out.dataframe.name": "this",
+            "rule": "select name, age from s1"
+          }
+        ]
+      },
       "cache": {
         "file.path": "hdfs://localhost/griffin/streaming/dump/source",
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"],
+        "time.range": [
+          "-2m",
+          "0"
+        ],
         "updatable": true
       }
-    }, {
+    },
+    {
       "name": "target",
-      "connectors": [
-        {
-          "type": "KAFKA",
-          "version": "0.8",
-          "config": {
-            "kafka.config": {
-              "bootstrap.servers": "10.149.247.156:9092",
-              "group.id": "tgt_group",
-              "auto.offset.reset": "largest",
-              "auto.commit.enable": "false"
-            },
-            "topics": "ttt",
-            "key.type": "java.lang.String",
-            "value.type": "java.lang.String"
+      "connector": {
+        "type": "KAFKA",
+        "version": "0.8",
+        "config": {
+          "kafka.config": {
+            "bootstrap.servers": "10.149.247.156:9092",
+            "group.id": "tgt_group",
+            "auto.offset.reset": "largest",
+            "auto.commit.enable": "false"
           },
-          "pre.proc": [
-            {
-              "dsl.type": "df-ops",
-              "in.dataframe.name": "this",
-              "out.dataframe.name": "t1",
-              "rule": "from_json"
-            },
-            {
-              "dsl.type": "spark-sql",
-              "out.dataframe.name": "this",
-              "rule": "select name, age from t1"
-            }
-          ]
-        }
-      ],
+          "topics": "ttt",
+          "key.type": "java.lang.String",
+          "value.type": "java.lang.String"
+        },
+        "pre.proc": [
+          {
+            "dsl.type": "df-ops",
+            "in.dataframe.name": "this",
+            "out.dataframe.name": "t1",
+            "rule": "from_json"
+          },
+          {
+            "dsl.type": "spark-sql",
+            "out.dataframe.name": "this",
+            "rule": "select name, age from t1"
+          }
+        ]
+      },
       "cache": {
         "file.path": "hdfs://localhost/griffin/streaming/dump/target",
         "info.path": "target",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["-2m", "0"]
+        "time.range": [
+          "-2m",
+          "0"
+        ]
       }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -132,14 +132,16 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
           },
           {
             "type": "record",
-            "name": "missRecords",
-          }        
+            "name": "missRecords"
+          }
         ]
       }
     ]
   },
-   
-  "sinks": ["CONSOLE","ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }
 ```
 Above is the configure file of streaming accuracy job.  
@@ -175,52 +177,50 @@ The miss records of source will be persisted as record.
 ```
 {
   "name": "prof_streaming",
-
   "process.type": "STREAMING",
-
   "data.sources": [
     {
       "name": "source",
-      "connectors": [
-        {
-          "type": "KAFKA",
-          "version": "0.8",
-          "config": {
-            "kafka.config": {
-              "bootstrap.servers": "10.149.247.156:9092",
-              "group.id": "group1",
-              "auto.offset.reset": "smallest",
-              "auto.commit.enable": "false"
-            },
-            "topics": "sss",
-            "key.type": "java.lang.String",
-            "value.type": "java.lang.String"
+      "connector": {
+        "type": "KAFKA",
+        "version": "0.8",
+        "config": {
+          "kafka.config": {
+            "bootstrap.servers": "10.149.247.156:9092",
+            "group.id": "group1",
+            "auto.offset.reset": "smallest",
+            "auto.commit.enable": "false"
           },
-          "pre.proc": [
-            {
-              "dsl.type": "df-ops",
-              "in.dataframe.name": "this",
-              "out.dataframe.name": "s1",
-              "rule": "from_json"
-            },
-            {
-              "dsl.type": "spark-sql",
-              "out.dataframe.name": "this",
-              "rule": "select name, age from s1"
-            }
-          ]
-        }
-      ],
+          "topics": "sss",
+          "key.type": "java.lang.String",
+          "value.type": "java.lang.String"
+        },
+        "pre.proc": [
+          {
+            "dsl.type": "df-ops",
+            "in.dataframe.name": "this",
+            "out.dataframe.name": "s1",
+            "rule": "from_json"
+          },
+          {
+            "dsl.type": "spark-sql",
+            "out.dataframe.name": "this",
+            "rule": "select name, age from s1"
+          }
+        ]
+      },
       "cache": {
         "file.path": "hdfs://localhost/griffin/streaming/dump/source",
         "info.path": "source",
         "ready.time.interval": "10s",
         "ready.time.delay": "0",
-        "time.range": ["0", "0"]
+        "time.range": [
+          "0",
+          "0"
+        ]
       }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -232,8 +232,8 @@ The miss records of source will be persisted as record.
           {
             "type": "metric",
             "name": "prof"
-          }        
-        ]        
+          }
+        ]
       },
       {
         "dsl.type": "griffin-dsl",
@@ -245,13 +245,15 @@ The miss records of source will be persisted as record.
             "type": "metric",
             "name": "name_group",
             "flatten": "array"
-          }        
-        ]        
+          }
+        ]
       }
     ]
   },
-      
-  "sinks": ["CONSOLE","ELASTICSEARCH"]
+  "sinks": [
+    "CONSOLE",
+    "ELASTICSEARCH"
+  ]
 }
 ```
 Above is the configure file of streaming profiling job.  

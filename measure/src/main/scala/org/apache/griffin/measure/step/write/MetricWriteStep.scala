@@ -84,16 +84,10 @@ case class MetricWriteStep(
   private def getMetricMaps(context: DQContext): Seq[Map[String, Any]] = {
     try {
       val pdf = context.sparkSession.table(s"`$inputName`")
-      val records = pdf.toJSON.collect()
-      if (records.length > 0) {
-        records.flatMap { rec =>
-          try {
-            val value = JsonUtil.toAnyMap(rec)
-            Some(value)
-          } catch {
-            case _: Throwable => None
-          }
-        }.toSeq
+      val rows = pdf.collect()
+      val columns = pdf.columns
+      if (rows.size > 0) {
+        rows.map(_.getValuesMap(columns))
       } else Nil
     } catch {
       case e: Throwable =>

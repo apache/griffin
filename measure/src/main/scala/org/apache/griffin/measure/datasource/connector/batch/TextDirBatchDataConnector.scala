@@ -28,6 +28,9 @@ import org.apache.griffin.measure.utils.ParamUtil._
 /**
  * batch data connector for directory with text format data in the nth depth sub-directories
  */
+@deprecated(
+  s"This class is deprecated. Use '${classOf[FileBasedDataConnector].getCanonicalName}'.",
+  "0.6.0")
 case class TextDirBatchDataConnector(
     @transient sparkSession: SparkSession,
     dcParam: DataConnectorParam,
