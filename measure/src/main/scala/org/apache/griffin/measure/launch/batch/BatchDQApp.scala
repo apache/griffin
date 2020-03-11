@@ -59,7 +59,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
     GriffinUDFAgent.register(sparkSession)
   }
 
-  def run: Try[Boolean] = Try {
+  def run: Try[Boolean] = {
     // start time
     val startTime = new Date().getTime
 

@@ -19,6 +19,7 @@ package org.apache.griffin.measure.step.write
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
+import scala.util.Try
 
 import org.apache.griffin.measure.configuration.enums._
 import org.apache.griffin.measure.context.DQContext
@@ -35,7 +36,7 @@ case class RecordWriteStep(
     writeTimestampOpt: Option[Long] = None)
     extends WriteStep {
 
-  def execute(context: DQContext): Boolean = {
+  def execute(context: DQContext): Try[Boolean] = Try {
     val timestamp = writeTimestampOpt.getOrElse(context.contextId.timestamp)
 
     val writeMode = writeTimestampOpt.map(_ => SimpleMode).getOrElse(context.writeMode)

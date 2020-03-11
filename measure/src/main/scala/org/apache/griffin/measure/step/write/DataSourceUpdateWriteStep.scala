@@ -19,6 +19,7 @@ package org.apache.griffin.measure.step.write
 
 import org.apache.commons.lang.StringUtils
 import org.apache.spark.sql.DataFrame
+import scala.util.Try
 
 import org.apache.griffin.measure.context.DQContext
 
@@ -30,7 +31,7 @@ case class DataSourceUpdateWriteStep(dsName: String, inputName: String) extends 
   val name: String = ""
   val writeTimestampOpt: Option[Long] = None
 
-  def execute(context: DQContext): Boolean = {
+  def execute(context: DQContext): Try[Boolean] = Try {
     getDataSourceCacheUpdateDf(context) match {
       case Some(df) =>
         context.dataSources

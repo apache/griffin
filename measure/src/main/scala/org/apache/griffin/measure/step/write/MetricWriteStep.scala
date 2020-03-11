@@ -17,6 +17,8 @@
 
 package org.apache.griffin.measure.step.write
 
+import scala.util.Try
+
 import org.apache.griffin.measure.configuration.enums.{SimpleMode, TimestampMode}
 import org.apache.griffin.measure.configuration.enums.FlattenType.{
   ArrayFlattenType,
@@ -42,7 +44,7 @@ case class MetricWriteStep(
   val emptyMetricMap: Map[Long, Map[String, Any]] = Map[Long, Map[String, Any]]()
   val emptyMap: Map[String, Any] = Map[String, Any]()
 
-  def execute(context: DQContext): Boolean = {
+  def execute(context: DQContext): Try[Boolean] = Try {
     val timestamp = writeTimestampOpt.getOrElse(context.contextId.timestamp)
 
     // get metric list from data frame
