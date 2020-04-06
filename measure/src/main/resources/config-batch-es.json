@@ -8,17 +8,18 @@
       "connector": {
         "type": "elasticsearch",
         "config": {
-          "fields": [
+          "selectionExprs": [
             "account_number",
             "city",
-            "gender"
+            "gender",
+            "age > 18"
           ],
-          "queryExprs": [
+          "filterExprs": [
+            "account_number < 10"
           ],
           "paths": [
             "bank",
-            "customer",
-            "subbank"
+            "customer"
           ],
           "options": {
             "es.nodes": "localhost",

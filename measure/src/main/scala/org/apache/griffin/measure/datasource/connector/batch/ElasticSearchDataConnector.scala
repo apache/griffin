@@ -4,20 +4,47 @@ import scala.collection.mutable.{Map => MutableMap}
 import scala.util.Try
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.elasticsearch.hadoop.cfg.ConfigurationOptions
 
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.context.TimeRange
 import org.apache.griffin.measure.datasource.TimestampStorage
 import org.apache.griffin.measure.utils.ParamUtil._
 
+/**
+ * A batch data connector for ElasticSearch source with read support for multiple indices.
+ *
+ * Supported Configurations:
+ *  - filterExprs : [[Seq]] of string expressions that act as where conditions (row filters)
+ *  - selectionExprs : [[Seq]] of string expressions that act as selection conditions (column filters)
+ *  - options : [[Map]] of elasticsearch options. Refer to [[ConfigurationOptions]] for options
+ *  - paths : [[Seq]] of elasticsearch paths (indexes) to read from
+ *
+ * Some defaults assumed by this connector (if not set) are as follows:
+ *  - `es.nodes` in options is 'localhost',
+ *  - `es.port` in options is 9200
+ *  - filterExprs is empty list
+ *  - selectionExprs is empty list
+ *
+ * Note:
+ *  - When reading from multiple indices, the schemas are merged.
+ *  - Selection expressions are applied first, then the filter expressions.
+ *  - filterExprs/ selectionExprs may be left empty if no filters are to be applied.
+ */
 case class ElasticSearchDataConnector(
     @transient sparkSession: SparkSession,
     dcParam: DataConnectorParam,
     timestampStorage: TimestampStorage)
     extends BatchDataConnector {
-  val config: Map[String, Any] = dcParam.getConfig
 
-  import ElasticSearchDataConnector._
+  final val ElasticSearchFormat: String = "es"
+  final val Options: String = "options"
+
+  final val Paths: String = "paths"
+  final val FilterExprs: String = "filterExprs"
+  final val SelectionExprs: String = "selectionExprs"
+
+  val config: Map[String, Any] = dcParam.getConfig
 
   final val filterExprs: Seq[String] = config.getStringArr(FilterExprs)
   final val selectionExprs: Seq[String] = config.getStringArr(SelectionExprs)
@@ -52,13 +79,4 @@ case class ElasticSearchDataConnector(
 
     (dfOpt, TimeRange(ms, readTmst(ms)))
   }
-}
-
-object ElasticSearchDataConnector {
-  final val ElasticSearchFormat: String = "es"
-  final val Paths: String = "paths"
-  final val Fields: String = "fields"
-  final val Options: String = "options"
-  final val FilterExprs: String = "filterExprs"
-  final val SelectionExprs: String = "selectionExprs"
 }
