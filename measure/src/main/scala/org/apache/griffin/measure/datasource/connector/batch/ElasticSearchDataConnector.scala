@@ -19,17 +19,16 @@ case class ElasticSearchDataConnector(
 
   import ElasticSearchDataConnector._
 
-  final val fields: Seq[String] = config.getStringArr(Fields).map(_.trim)
+  final val filterExprs: Seq[String] = config.getStringArr(FilterExprs)
+  final val selectionExprs: Seq[String] = config.getStringArr(SelectionExprs)
+  final val options: MutableMap[String, String] =
+    MutableMap(config.getParamStringMap(Options, Map.empty).toSeq: _*)
   final val paths: String = config.getStringArr(Paths).map(_.trim).mkString(",") match {
     case s: String if s.isEmpty =>
       griffinLogger.error(s"Mandatory configuration '$Paths' is either empty or not defined.")
       throw new IllegalArgumentException()
     case s: String => s
   }
-  val options: MutableMap[String, String] = MutableMap(
-    config.getParamStringMap(Options, Map.empty).toSeq: _*)
-
-  val queryExprs: Seq[String] = config.getStringArr(QueryExprs)
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = {
     val dfOpt = {
@@ -39,10 +38,12 @@ case class ElasticSearchDataConnector(
           .format(ElasticSearchFormat)
           .load(paths)
 
-        val df =
-          if (fields.nonEmpty) indexesDF.select(fields.head, fields.tail: _*) else indexesDF
+        val df = {
+          if (selectionExprs.nonEmpty) indexesDF.selectExpr(selectionExprs: _*)
+          else indexesDF
+        }
 
-        queryExprs.foldLeft(df)((currentDf, expr) => currentDf.where(expr))
+        filterExprs.foldLeft(df)((currentDf, expr) => currentDf.where(expr))
       }.toOption
 
       val preDfOpt = preProcess(dfOpt, ms)
@@ -58,5 +59,6 @@ object ElasticSearchDataConnector {
   final val Paths: String = "paths"
   final val Fields: String = "fields"
   final val Options: String = "options"
-  final val QueryExprs: String = "queryExprs"
+  final val FilterExprs: String = "filterExprs"
+  final val SelectionExprs: String = "selectionExprs"
 }
