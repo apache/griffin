@@ -34,7 +34,7 @@ case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: 
 
   val maxLogLines: Int = config.getInt(MaxLogLines, 100)
 
-  def available(): Boolean = true
+  def validate(): Boolean = true
 
   def start(msg: String): Unit = {
     println(s"[$timeStamp] $metricName start: $msg")

@@ -49,7 +49,7 @@ case class ElasticSearchSink(
 
   val _Value = "value"
 
-  def available(): Boolean = {
+  def validate(): Boolean = {
     api.nonEmpty
   }
 

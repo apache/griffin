@@ -36,7 +36,7 @@ case class CustomSink(
     timeStamp: Long,
     block: Boolean)
     extends Sink {
-  def available(): Boolean = true
+  def validate(): Boolean = true
 
   def start(msg: String): Unit = {}
 

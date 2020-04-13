@@ -35,8 +35,8 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam], metricName: String)
    * @param block     sink write metric in block or non-block way
    * @return sink
    */
-  def getSinks(timeStamp: Long, block: Boolean): MultiSinks = {
-    MultiSinks(sinkParamIter.flatMap(param => getSink(timeStamp, param, block)))
+  def getSinks(timeStamp: Long, block: Boolean): Iterable[Sink] = {
+    sinkParamIter.flatMap(param => getSink(timeStamp, param, block))
   }
 
   private def getSink(timeStamp: Long, sinkParam: SinkParam, block: Boolean): Option[Sink] = {
@@ -51,7 +51,7 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam], metricName: String)
       case _ => throw new Exception(s"sink type $sinkType is not supported!")
     }
     sinkTry match {
-      case Success(sink) if sink.available() => Some(sink)
+      case Success(sink) if sink.validate() => Some(sink)
       case Failure(ex) =>
         error("Failed to get sink", ex)
         None

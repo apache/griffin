@@ -32,7 +32,7 @@ trait Sink extends Loggable with Serializable {
 
   val block: Boolean
 
-  def available(): Boolean
+  def validate(): Boolean
 
   def start(msg: String): Unit
   def finish(): Unit

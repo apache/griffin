@@ -76,7 +76,7 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // start id
     val applicationId = sparkSession.sparkContext.applicationId
-    dqContext.getSink.start(applicationId)
+    dqContext.getSinks.foreach(_.start(applicationId))
 
     // build job
     val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
@@ -86,13 +86,19 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
     // end time
     val endTime = new Date().getTime
-    dqContext.getSink.log(endTime, s"process using time: ${endTime - startTime} ms")
+    dqContext.getSinks.foreach { sink =>
+      try {
+        sink.log(endTime, s"process using time: ${endTime - startTime} ms")
+      } catch {
+        case e: Throwable => error(s"log error: ${e.getMessage}", e)
+      }
+    }
 
     // clean context
     dqContext.clean()
 
     // finish
-    dqContext.getSink.finish()
+    dqContext.getSinks.foreach(_.finish())
 
     result
   }

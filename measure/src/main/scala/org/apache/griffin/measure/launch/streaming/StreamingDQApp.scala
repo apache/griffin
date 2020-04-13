@@ -101,7 +101,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
     // start id
     val applicationId = sparkSession.sparkContext.applicationId
-    globalContext.getSink.start(applicationId)
+    globalContext.getSinks.foreach(_.start(applicationId))
 
     // process thread
     val dqCalculator = StreamingDQCalculator(globalContext, dqParam.getEvaluateRule)
@@ -121,7 +121,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     globalContext.clean()
 
     // finish
-    globalContext.getSink.finish()
+    globalContext.getSinks.foreach(_.finish())
 
     true
   }
@@ -160,7 +160,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
       with Loggable {
 
     val lock: CheckpointLock = OffsetCheckpointClient.genLock("process")
-    val appSink: Sink = globalContext.getSink
+    val appSink: Iterable[Sink] = globalContext.getSinks
 
     var dqContext: DQContext = _
     var dqJob: DQJob = _
@@ -176,7 +176,13 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
           OffsetCheckpointClient.startOffsetCheckpoint()
 
           val startTime = new Date().getTime
-          appSink.log(startTime, "starting process ...")
+          appSink.foreach { sink =>
+            try {
+              sink.log(startTime, "starting process ...")
+            } catch {
+              case e: Throwable => error(s"log error: ${e.getMessage}", e)
+            }
+          }
           val contextId = ContextId(startTime)
 
           // create dq context
@@ -193,7 +199,13 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
           // end time
           val endTime = new Date().getTime
-          appSink.log(endTime, s"process using time: ${endTime - startTime} ms")
+          appSink.foreach { sink =>
+            try {
+              sink.log(endTime, s"process using time: ${endTime - startTime} ms")
+            } catch {
+              case e: Throwable => error(s"log error: ${e.getMessage}", e)
+            }
+          }
 
           OffsetCheckpointClient.endOffsetCheckpoint()
 

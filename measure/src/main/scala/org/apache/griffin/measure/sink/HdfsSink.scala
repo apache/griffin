@@ -48,7 +48,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
 
   var _init = true
 
-  def available(): Boolean = {
+  def validate(): Boolean = {
     parentPath.nonEmpty
   }
 

@@ -49,7 +49,7 @@ case class MongoSink(
   val _Timestamp = "timestamp"
   val _Value = "value"
 
-  def available(): Boolean = MongoConnection.dataConf.available
+  def validate(): Boolean = MongoConnection.dataConf.available
 
   def start(msg: String): Unit = {}
   def finish(): Unit = {}
