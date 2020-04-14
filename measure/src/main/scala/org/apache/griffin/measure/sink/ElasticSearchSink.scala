@@ -20,6 +20,7 @@ package org.apache.griffin.measure.sink
 import scala.concurrent.Future
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Dataset
 
 import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -84,4 +85,5 @@ case class ElasticSearchSink(
     httpResult(metrics)
   }
 
+  override def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit = {}
 }

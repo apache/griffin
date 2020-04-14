@@ -18,6 +18,7 @@
 package org.apache.griffin.measure.sink
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Dataset
 
 import org.apache.griffin.measure.Loggable
 
@@ -44,4 +45,5 @@ trait Sink extends Loggable with Serializable {
 
   def sinkMetrics(metrics: Map[String, Any]): Unit
 
+  def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit
 }

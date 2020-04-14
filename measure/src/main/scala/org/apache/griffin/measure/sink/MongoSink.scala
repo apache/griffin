@@ -20,6 +20,7 @@ package org.apache.griffin.measure.sink
 import scala.concurrent.Future
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Dataset
 import org.mongodb.scala._
 import org.mongodb.scala.model.{Filters, UpdateOptions, Updates}
 import org.mongodb.scala.result.UpdateResult
@@ -83,6 +84,7 @@ case class MongoSink(
     }
   }
 
+  override def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit = {}
 }
 
 object MongoConnection {

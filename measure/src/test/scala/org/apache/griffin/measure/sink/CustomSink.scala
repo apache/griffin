@@ -21,6 +21,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Dataset
 
 /**
  * sink records and metrics in memory for test.
@@ -58,5 +59,9 @@ case class CustomSink(
 
   def sinkMetrics(metrics: Map[String, Any]): Unit = {
     allMetrics ++= metrics
+  }
+
+  override def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit = {
+    allRecords ++= dataset.toJSON.rdd.collect()
   }
 }

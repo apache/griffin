@@ -18,6 +18,7 @@
 package org.apache.griffin.measure.sink
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Dataset
 
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -80,5 +81,7 @@ case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: 
     val json = JsonUtil.toJson(metrics)
     println(json)
   }
+
+  override def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit = {}
 
 }

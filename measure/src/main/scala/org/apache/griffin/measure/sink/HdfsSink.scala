@@ -20,9 +20,9 @@ package org.apache.griffin.measure.sink
 import java.util.Date
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Dataset
 
-import org.apache.griffin.measure.utils.HdfsUtil
-import org.apache.griffin.measure.utils.JsonUtil
+import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -195,4 +195,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     }
   }
 
+  override def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit = {
+    sinkRecords(dataset.toJSON.rdd, key.getOrElse(""))
+  }
 }

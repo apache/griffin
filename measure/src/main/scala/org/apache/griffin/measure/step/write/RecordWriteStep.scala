@@ -50,7 +50,7 @@ case class RecordWriteStep(
           case Some(records) =>
             context.getSinks(timestamp).foreach { sink =>
               try {
-                sink.sinkRecords(records, name)
+                sink.sinkBatchRecords(records, Option(name))
               } catch {
                 case e: Throwable => error(s"sink records error: ${e.getMessage}", e)
               }
@@ -108,8 +108,8 @@ case class RecordWriteStep(
   private def getFilterTableDataFrame(context: DQContext): Option[DataFrame] =
     filterTableNameOpt.flatMap(getDataFrame(context, _))
 
-  private def getBatchRecords(context: DQContext): Option[RDD[String]] = {
-    getDataFrame(context, inputName).map(_.toJSON.rdd)
+  private def getBatchRecords(context: DQContext): Option[DataFrame] = {
+    getDataFrame(context, inputName)
   }
 
   private def getStreamingRecords(
