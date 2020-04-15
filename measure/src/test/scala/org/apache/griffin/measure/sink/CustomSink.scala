@@ -21,27 +21,23 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.Dataset
+import org.apache.spark.sql.DataFrame
 
 /**
  * sink records and metrics in memory for test.
  *
  * @param config sink configurations
- * @param metricName
+ * @param jobName
  * @param timeStamp
  * @param block
  */
-case class CustomSink(
-    config: Map[String, Any],
-    metricName: String,
-    timeStamp: Long,
-    block: Boolean)
+case class CustomSink(config: Map[String, Any], jobName: String, timeStamp: Long, block: Boolean)
     extends Sink {
   def validate(): Boolean = true
 
-  def start(msg: String): Unit = {}
+  def open(msg: String): Unit = {}
 
-  def finish(): Unit = {}
+  def close(): Unit = {}
 
   def log(rt: Long, msg: String): Unit = {}
 
@@ -61,7 +57,7 @@ case class CustomSink(
     allMetrics ++= metrics
   }
 
-  override def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit = {
+  override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {
     allRecords ++= dataset.toJSON.rdd.collect()
   }
 }

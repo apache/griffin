@@ -101,7 +101,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
     // start id
     val applicationId = sparkSession.sparkContext.applicationId
-    globalContext.getSinks.foreach(_.start(applicationId))
+    globalContext.getSinks.foreach(_.open(applicationId))
 
     // process thread
     val dqCalculator = StreamingDQCalculator(globalContext, dqParam.getEvaluateRule)
@@ -121,7 +121,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     globalContext.clean()
 
     // finish
-    globalContext.getSinks.foreach(_.finish())
+    globalContext.getSinks.foreach(_.close())
 
     true
   }
@@ -172,40 +172,30 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
       val locked = lock.lock(5, TimeUnit.SECONDS)
       if (locked) {
         try {
+          import org.apache.griffin.measure.utils.CommonUtils
 
           OffsetCheckpointClient.startOffsetCheckpoint()
 
-          val startTime = new Date().getTime
-          appSink.foreach { sink =>
-            try {
-              sink.log(startTime, "starting process ...")
-            } catch {
-              case e: Throwable => error(s"log error: ${e.getMessage}", e)
-            }
-          }
-          val contextId = ContextId(startTime)
+          CommonUtils.timeThis({
+            // start time
+            val startTime = new Date().getTime
 
-          // create dq context
-          dqContext = globalContext.cloneDQContext(contextId)
+            val contextId = ContextId(startTime)
 
-          // build job
-          dqJob = DQJobBuilder.buildDQJob(dqContext, evaluateRuleParam)
+            // create dq context
+            dqContext = globalContext.cloneDQContext(contextId)
 
-          // dq job execute
-          dqJob.execute(dqContext)
+            // build job
+            dqJob = DQJobBuilder.buildDQJob(dqContext, evaluateRuleParam)
 
-          // finish calculation
-          finishCalculation(dqContext)
+            // dq job execute
+            dqJob.execute(dqContext)
 
-          // end time
-          val endTime = new Date().getTime
-          appSink.foreach { sink =>
-            try {
-              sink.log(endTime, s"process using time: ${endTime - startTime} ms")
-            } catch {
-              case e: Throwable => error(s"log error: ${e.getMessage}", e)
-            }
-          }
+            // finish calculation
+            finishCalculation(dqContext)
+
+            // end time
+          }, TimeUnit.MILLISECONDS)
 
           OffsetCheckpointClient.endOffsetCheckpoint()
 

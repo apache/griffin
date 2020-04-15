@@ -18,7 +18,7 @@
 package org.apache.griffin.measure.sink
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.Dataset
+import org.apache.spark.sql.DataFrame
 
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -26,8 +26,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
 /**
  * sink metric and record to console, for debug
  */
-case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: Long)
-    extends Sink {
+case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Long) extends Sink {
 
   val block: Boolean = true
 
@@ -37,15 +36,11 @@ case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: 
 
   def validate(): Boolean = true
 
-  def start(msg: String): Unit = {
-    println(s"[$timeStamp] $metricName start: $msg")
+  def open(msg: String): Unit = {
+    println(s"[$timeStamp] $jobName start: $msg")
   }
-  def finish(): Unit = {
-    println(s"[$timeStamp] $metricName finish")
-  }
-
-  def log(rt: Long, msg: String): Unit = {
-    println(s"[$timeStamp] $rt: $msg")
+  def close(): Unit = {
+    println(s"[$timeStamp] $jobName finish")
   }
 
   def sinkRecords(records: RDD[String], name: String): Unit = {
@@ -77,11 +72,11 @@ case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: 
   }
 
   def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    println(s"$metricName [$timeStamp] metrics: ")
+    println(s"$jobName [$timeStamp] metrics: ")
     val json = JsonUtil.toJson(metrics)
     println(json)
   }
 
-  override def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit = {}
+  override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {}
 
 }

@@ -15,33 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.griffin.measure.sink
+package org.apache.griffin.measure.utils
 
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.DataFrame
+import java.util.concurrent.TimeUnit
 
 import org.apache.griffin.measure.Loggable
 
-/**
- * sink metric and record
- */
-trait Sink extends Loggable with Serializable {
-  val jobName: String
-  val timeStamp: Long
+object CommonUtils extends Loggable {
 
-  val config: Map[String, Any]
+  def timeThis[T](f: => T, timeUnit: TimeUnit = TimeUnit.SECONDS): T = {
+    val startNanos = System.nanoTime()
+    val result = f
+    val endNanos = System.nanoTime()
 
-  val block: Boolean
+    griffinLogger.info(s"Time taken: ${timeUnit
+      .convert(endNanos - startNanos, TimeUnit.NANOSECONDS)} ${timeUnit.name().toLowerCase}")
 
-  def validate(): Boolean
-
-  def open(msg: String): Unit
-  def close(): Unit
-
-  def sinkRecords(records: RDD[String], name: String): Unit
-  def sinkRecords(records: Iterable[String], name: String): Unit
-
-  def sinkMetrics(metrics: Map[String, Any]): Unit
-
-  def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit
+    result
+  }
 }

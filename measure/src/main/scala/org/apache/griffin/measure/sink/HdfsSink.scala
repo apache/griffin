@@ -17,10 +17,8 @@
 
 package org.apache.griffin.measure.sink
 
-import java.util.Date
-
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.Dataset
+import org.apache.spark.sql.DataFrame
 
 import org.apache.griffin.measure.utils.{HdfsUtil, JsonUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -28,7 +26,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
 /**
  * sink metric and record to hdfs
  */
-case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Long) extends Sink {
+case class HdfsSink(config: Map[String, Any], jobName: String, timeStamp: Long) extends Sink {
 
   val block: Boolean = true
 
@@ -52,32 +50,32 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     parentPath.nonEmpty
   }
 
-  private def logHead: String = {
-    if (_init) {
-      _init = false
-      val dt = new Date(timeStamp)
-      s"================ log of $dt ================\n"
-    } else ""
-  }
-
-  private def timeHead(rt: Long): String = {
-    val dt = new Date(rt)
-    s"--- $dt ---\n"
-  }
-
-  private def logWrap(rt: Long, msg: String): String = {
-    logHead + timeHead(rt) + s"$msg\n\n"
-  }
+//  private def logHead: String = {
+//    if (_init) {
+//      _init = false
+//      val dt = new Date(timeStamp)
+//      s"================ log of $dt ================\n"
+//    } else ""
+//  }
+//
+//  private def timeHead(rt: Long): String = {
+//    val dt = new Date(rt)
+//    s"--- $dt ---\n"
+//  }
+//
+//  private def logWrap(rt: Long, msg: String): String = {
+//    logHead + timeHead(rt) + s"$msg\n\n"
+//  }
 
   protected def filePath(file: String): String = {
-    HdfsUtil.getHdfsFilePath(parentPath, s"$metricName/$timeStamp/$file")
+    HdfsUtil.getHdfsFilePath(parentPath, s"$jobName/$timeStamp/$file")
   }
 
   protected def withSuffix(path: String, suffix: String): String = {
     s"$path.$suffix"
   }
 
-  def start(msg: String): Unit = {
+  def open(msg: String): Unit = {
     try {
       HdfsUtil.writeContent(StartFile, msg)
     } catch {
@@ -85,7 +83,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     }
   }
 
-  def finish(): Unit = {
+  def close(): Unit = {
     try {
       HdfsUtil.createEmptyFile(FinishFile)
     } catch {
@@ -93,16 +91,16 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     }
   }
 
-  def log(rt: Long, msg: String): Unit = {
-    try {
-      val logStr = logWrap(rt, msg)
-      HdfsUtil.withHdfsFile(LogFile) { out =>
-        out.write(logStr.getBytes("utf-8"))
-      }
-    } catch {
-      case e: Throwable => error(e.getMessage, e)
-    }
-  }
+//  def log(rt: Long, msg: String): Unit = {
+//    try {
+//      val logStr = logWrap(rt, msg)
+//      HdfsUtil.withHdfsFile(LogFile) { out =>
+//        out.write(logStr.getBytes("utf-8"))
+//      }
+//    } catch {
+//      case e: Throwable => error(e.getMessage, e)
+//    }
+//  }
 
   private def getHdfsPath(path: String, groupId: Int): String = {
     HdfsUtil.getHdfsFilePath(path, s"$groupId")
@@ -195,7 +193,7 @@ case class HdfsSink(config: Map[String, Any], metricName: String, timeStamp: Lon
     }
   }
 
-  override def sinkBatchRecords[T](dataset: Dataset[T], key: Option[String] = None): Unit = {
+  override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {
     sinkRecords(dataset.toJSON.rdd, key.getOrElse(""))
   }
 }

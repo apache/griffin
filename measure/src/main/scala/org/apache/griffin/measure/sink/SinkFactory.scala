@@ -24,7 +24,7 @@ import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums.SinkType._
 import org.apache.griffin.measure.utils.ParamUtil._
 
-case class SinkFactory(sinkParamIter: Iterable[SinkParam], metricName: String)
+case class SinkFactory(sinkParamIter: Seq[SinkParam], jobName: String)
     extends Loggable
     with Serializable {
 
@@ -35,7 +35,7 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam], metricName: String)
    * @param block     sink write metric in block or non-block way
    * @return sink
    */
-  def getSinks(timeStamp: Long, block: Boolean): Iterable[Sink] = {
+  def getSinks(timeStamp: Long, block: Boolean): Seq[Sink] = {
     sinkParamIter.flatMap(param => getSink(timeStamp, param, block))
   }
 
@@ -43,11 +43,11 @@ case class SinkFactory(sinkParamIter: Iterable[SinkParam], metricName: String)
     val config = sinkParam.getConfig
     val sinkType = sinkParam.getType
     val sinkTry = sinkType match {
-      case Console => Try(ConsoleSink(config, metricName, timeStamp))
-      case Hdfs => Try(HdfsSink(config, metricName, timeStamp))
-      case ElasticSearch => Try(ElasticSearchSink(config, metricName, timeStamp, block))
-      case MongoDB => Try(MongoSink(config, metricName, timeStamp, block))
-      case Custom => Try(getCustomSink(config, metricName, timeStamp, block))
+      case Console => Try(ConsoleSink(config, jobName, timeStamp))
+      case Hdfs => Try(HdfsSink(config, jobName, timeStamp))
+      case ElasticSearch => Try(ElasticSearchSink(config, jobName, timeStamp, block))
+      case MongoDB => Try(MongoSink(config, jobName, timeStamp, block))
+      case Custom => Try(getCustomSink(config, jobName, timeStamp, block))
       case _ => throw new Exception(s"sink type $sinkType is not supported!")
     }
     sinkTry match {
