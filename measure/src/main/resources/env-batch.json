@@ -5,15 +5,16 @@
       "spark.master": "local[*]"
     }
   },
-
   "sinks": [
     {
+      "name": "consoleSink",
       "type": "CONSOLE",
       "config": {
         "max.log.lines": 10
       }
     },
     {
+      "name": "hdfsSink",
       "type": "HDFS",
       "config": {
         "path": "hdfs://localhost/griffin/batch/persist",
@@ -22,6 +23,7 @@
       }
     },
     {
+      "name": "elasticSink",
       "type": "ELASTICSEARCH",
       "config": {
         "method": "post",
@@ -31,6 +33,5 @@
       }
     }
   ],
-
   "griffin.checkpoint": []
 }

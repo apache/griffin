@@ -162,6 +162,7 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
 
   "sinktype" should "be valid" in {
     import org.mockito.Mockito._
+
     import org.apache.griffin.measure.configuration.enums.SinkType._
     var dqConfig = DQConfig(
       "test",
@@ -184,10 +185,10 @@ class ParamEnumReaderSpec extends FlatSpec with Matchers {
     dqConfig =
       DQConfig("test", 1234, "", Nil, mock(classOf[EvaluateRuleParam]), List("Consol", "Logg"))
     dqConfig.getValidSinkTypes should not be Seq(Console)
-    dqConfig.getValidSinkTypes should be(Seq(ElasticSearch))
+    dqConfig.getValidSinkTypes should be(Seq())
 
     dqConfig = DQConfig("test", 1234, "", Nil, mock(classOf[EvaluateRuleParam]), List(""))
-    dqConfig.getValidSinkTypes should be(Seq(ElasticSearch))
+    dqConfig.getValidSinkTypes should be(Nil)
   }
 
 }

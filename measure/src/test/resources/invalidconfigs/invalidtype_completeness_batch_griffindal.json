@@ -16,7 +16,7 @@
     }
   ],
   "sinks": [
-    "CONSOLE"
+    "CONSOLESink"
   ],
   "name": "test_griffin_complete",
   "evaluate.rule": {

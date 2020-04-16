@@ -26,7 +26,10 @@ import org.apache.griffin.measure.step.write.{MetricFlushStep, MetricWriteStep, 
 class CustomSinkTest extends SinkTestBase {
 
   val sinkParam: SinkParam =
-    SinkParam("custom", Map("class" -> "org.apache.griffin.measure.sink.CustomSink"))
+    SinkParam(
+      "customSink",
+      "custom",
+      Map("class" -> "org.apache.griffin.measure.sink.CustomSink"))
   override var sinkParams = Seq(sinkParam)
 
   def withCustomSink[A](func: Iterable[Sink] => A): A = {

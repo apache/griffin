@@ -45,6 +45,15 @@ case class EnvConfig(
     assert(sparkParam != null, "spark param should not be null")
     sparkParam.validate()
     getSinkParams.foreach(_.validate())
+    val repeatedSinks = sinkParams
+      .map(_.getName)
+      .groupBy(x => x)
+      .mapValues(_.size)
+      .filter(_._2 > 1)
+      .keys
+    assert(
+      repeatedSinks.isEmpty,
+      s"sink names must be unique. duplicate sink names ['${repeatedSinks.mkString("', '")}'] were found.")
     getCheckpointParams.foreach(_.validate())
   }
 }
@@ -88,13 +97,16 @@ case class SparkParam(
  */
 @JsonInclude(Include.NON_NULL)
 case class SinkParam(
+    @JsonProperty("name") private val name: String,
     @JsonProperty("type") private val sinkType: String,
-    @JsonProperty("config") private val config: Map[String, Any])
+    @JsonProperty("config") private val config: Map[String, Any] = Map.empty)
     extends Param {
+  def getName: String = name
   def getType: SinkType = SinkType.withNameWithDefault(sinkType)
-  def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
+  def getConfig: Map[String, Any] = config
 
   def validate(): Unit = {
+    assert(name != null, "sink name should must be defined")
     assert(StringUtils.isNotBlank(sinkType), "sink type should not be empty")
   }
 }

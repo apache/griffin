@@ -61,10 +61,19 @@ trait DQApp extends Loggable with Serializable {
   }
 
   protected def getSinkParams: Seq[SinkParam] = {
-    val validSinkTypes = dqParam.getValidSinkTypes
-    envParam.getSinkParams.flatMap { sinkParam =>
-      if (validSinkTypes.contains(sinkParam.getType)) Some(sinkParam) else None
-    }
+    val sinkParams = dqParam.getSinkNames
+      .map(_.toLowerCase())
+      .map { sinkName =>
+        (sinkName, envParam.getSinkParams.find(_.getName.toLowerCase().matches(sinkName)))
+      }
+
+    val missingSinks = sinkParams.filter(_._2.isEmpty).map(_._1)
+
+    assert(
+      missingSinks.isEmpty,
+      s"Sink(s) ['${missingSinks.mkString("', '")}'] not defined in env config.")
+
+    sinkParams.flatMap(_._2)
   }
 
 }

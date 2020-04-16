@@ -75,7 +75,7 @@
     ]
   },
   "sinks": [
-    "CONSOLE",
-    "ELASTICSEARCH"
+    "CONSOLESink",
+    "ELASTICSEARCHSink"
   ]
 }

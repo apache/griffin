@@ -20,13 +20,14 @@
 
   "sinks": [
     {
+      "name": "consoleSink",
       "type": "console",
       "config": {
         "max.log.lines": 100
       }
     },
     {
-      "type": "mongo",
+      "type": "mongoSink",
       "config": {
         "url": "10.149.247.156",
         "database": "test",
