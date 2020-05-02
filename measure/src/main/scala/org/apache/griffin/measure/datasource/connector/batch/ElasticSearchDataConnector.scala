@@ -46,7 +46,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
  * Note:
  *  - When reading from multiple indices, the schemas are merged.
  *  - Selection expressions are applied first, then the filter expressions.
- *  - filterExprs/ selectionExprs may be left empty if no filters are to be applied.
+ *  - filterExprs/selectionExprs may be left empty if no filters are to be applied.
  */
 case class ElasticSearchDataConnector(
     @transient sparkSession: SparkSession,
