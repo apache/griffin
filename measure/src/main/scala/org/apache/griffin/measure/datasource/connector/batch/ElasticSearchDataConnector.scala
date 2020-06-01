@@ -18,7 +18,7 @@
 package org.apache.griffin.measure.datasource.connector.batch
 
 import scala.collection.mutable.{Map => MutableMap}
-import scala.util.Try
+import scala.util._
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.elasticsearch.hadoop.cfg.ConfigurationOptions
@@ -88,9 +88,15 @@ case class ElasticSearchDataConnector(
         }
 
         filterExprs.foldLeft(df)((currentDf, expr) => currentDf.where(expr))
-      }.toOption
+      }
 
-      val preDfOpt = preProcess(dfOpt, ms)
+      dfOpt match {
+        case Success(_) =>
+        case Failure(exception) =>
+          griffinLogger.error("Error occurred while reading data set.", exception)
+      }
+
+      val preDfOpt = preProcess(dfOpt.toOption, ms)
       preDfOpt
     }
 
