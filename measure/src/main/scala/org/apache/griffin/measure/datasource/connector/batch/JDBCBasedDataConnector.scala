@@ -17,6 +17,8 @@
 
 package org.apache.griffin.measure.datasource.connector.batch
 
+import scala.util._
+
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import org.apache.griffin.measure.Loggable
@@ -64,7 +66,7 @@ case class JDBCBasedDataConnector(
   require(user.nonEmpty, "JDBC connection: user name is mandatory")
   require(password.nonEmpty, "JDBC connection: password is mandatory")
   require(tableName.nonEmpty, "JDBC connection: table is mandatory")
-  assert(isJDBCDriverLoaded(driver), s"JDBC driver ${driver} not present in classpath")
+  assert(isJDBCDriverLoaded(driver), s"JDBC driver $driver not present in classpath")
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = {
     val dfOpt = try {
@@ -73,9 +75,15 @@ case class JDBCBasedDataConnector(
       prop.setProperty("user", user)
       prop.setProperty("password", password)
       prop.setProperty("driver", driver)
-      val df: DataFrame = sparkSession.read.jdbc(url, s"($dtSql) as t", prop)
-      val dfOpt = Some(df)
-      val preDfOpt = preProcess(dfOpt, ms)
+      val dfOpt = Try(sparkSession.read.jdbc(url, s"($dtSql) as t", prop))
+
+      dfOpt match {
+        case Success(_) =>
+        case Failure(exception) =>
+          griffinLogger.error("Error occurred while reading data set.", exception)
+      }
+
+      val preDfOpt = preProcess(dfOpt.toOption, ms)
       preDfOpt
     } catch {
       case e: Throwable =>
@@ -119,8 +127,8 @@ object JDBCBasedDataConnector extends Loggable {
       Class.forName(driver, false, this.getClass.getClassLoader)
       true
     } catch {
-      case x: ClassNotFoundException =>
-        griffinLogger.error(s"JDBC driver ${driver} provided is not found in class path")
+      case e: ClassNotFoundException =>
+        griffinLogger.error(s"JDBC driver $driver provided is not found in class path", e)
         false
     }
   }

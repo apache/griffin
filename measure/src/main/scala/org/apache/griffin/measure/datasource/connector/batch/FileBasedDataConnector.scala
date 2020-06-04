@@ -18,7 +18,7 @@
 package org.apache.griffin.measure.datasource.connector.batch
 
 import scala.collection.mutable.{Map => MutableMap}
-import scala.util.{Success, Try}
+import scala.util._
 
 import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
 import org.apache.spark.sql.internal.SQLConf
@@ -133,13 +133,20 @@ case class FileBasedDataConnector(
     val validPaths = getValidPaths(paths, skipErrorPaths)
 
     val dfOpt = {
-      val dfOpt = Some(
+      val dfOpt = Try(
         sparkSession.read
           .options(options)
           .format(format)
           .withSchemaIfAny(currentSchema)
           .load(validPaths: _*))
-      val preDfOpt = preProcess(dfOpt, ms)
+
+      dfOpt match {
+        case Success(_) =>
+        case Failure(exception) =>
+          griffinLogger.error("Error occurred while reading data set.", exception)
+      }
+
+      val preDfOpt = preProcess(dfOpt.toOption, ms)
       preDfOpt
     }
 

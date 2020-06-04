@@ -17,7 +17,6 @@
 
 package org.apache.griffin.measure.datasource.connector.batch
 
-import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.types.{IntegerType, LongType, StringType, StructType}
 import org.scalatest._
 
@@ -28,37 +27,9 @@ import org.apache.griffin.measure.step.builder.ConstantColumns
 
 class FileBasedDataConnectorTest extends SparkSuiteBase with Matchers {
 
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-
-    createDataSets(s"file://${getClass.getResource("/").getPath}")
-  }
-
-  private def createDataSets(basePath: String): Unit = {
-    val formats = Seq("parquet", "orc", "csv", "tsv")
-    val schema = new StructType().add("name", StringType).add("age", IntegerType, nullable = true)
-
-    val df = spark.read.schema(schema).csv(s"${basePath}hive/person_table.csv")
-
-    df.cache()
-    formats.foreach(f => {
-      val delimiter = if (f.matches("csv")) "," else if (f.matches("tsv")) "\t" else ""
-      df.write
-        .mode(SaveMode.Overwrite)
-        .option("delimiter", delimiter)
-        .option("header", "true")
-        .format(if (f.matches("tsv")) "csv" else f)
-        .save(s"${basePath}files/person_table.$f")
-    })
-
-    df.unpersist()
-  }
-
   private final val dcParam =
     DataConnectorParam("file", "test_df", Map.empty[String, String], Nil)
   private final val timestampStorage = TimestampStorage()
-
-  // Regarding Local FileSystem
 
   "file based data connector" should "be able to read from local filesystem" in {
     val configs = Map(
@@ -190,7 +161,8 @@ class FileBasedDataConnectorTest extends SparkSuiteBase with Matchers {
     formats.map(f => {
       val configs = Map(
         "format" -> f,
-        "paths" -> Seq(s"file://${getClass.getResource(s"/files/person_table.$f").getPath}"),
+        "paths" -> Seq(
+          s"file://${ClassLoader.getSystemResource(s"files/person_table.$f").getPath}"),
         "options" -> Map("header" -> "true"),
         "schema" -> Seq(Map("name" -> "name", "type" -> "string")))
 

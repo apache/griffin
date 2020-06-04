@@ -44,7 +44,7 @@
     "@angular/language-service": "4.4.4",
     "@types/jasmine": "~2.5.53",
     "@types/jasminewd2": "~2.0.2",
-    "@types/jquery": "^3.2.12",
+    "@types/jquery": "3.3.31",
     "@types/node": "~6.0.60",
     "@types/js-yaml": "~3.11.2",
     "angular-tree-component": "^4.1.0",
@@ -53,7 +53,7 @@
     "fontawesome": "^4.7.2",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",
-    "jquery": "^3.2.1",
+    "jquery": "3.3.1",
     "karma": "~1.7.0",
     "karma-chrome-launcher": "~2.1.1",
     "karma-cli": "~1.0.1",
@@ -64,7 +64,7 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "~5.3.2",
-    "typescript": "~2.3.3",
+    "typescript": "~2.7",
     "typings": "^2.1.1",
     "webpack": "^3.5.4"
   }
