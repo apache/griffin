@@ -36,6 +36,7 @@ class JDBCBasedDataConnectorTest extends SparkSuiteBase with Matchers {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
+    DriverManager.registerDriver(new org.h2.Driver)
     Class.forName("org.h2.Driver", false, this.getClass.getClassLoader)
     conn = DriverManager.getConnection(url, properties)
     conn.prepareStatement("create schema griffin").executeUpdate()

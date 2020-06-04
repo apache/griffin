@@ -196,10 +196,11 @@ Data Connector help connect to external sources on which DQ checks can be applie
 
 List of supported data connectors:
  - Hive
- - Kafka (Steaming only) 
+ - Kafka (Steaming only)
+ - ElasticSearch (Batch only) 
  - **File based:** Parquet, Avro, ORC, CSV, TSV, Text.
  - **JDBC based:** MySQL, PostgreSQL etc.
- - **Custom:** Cassandra, ElasticSearch
+ - **Custom:** Cassandra
  
  #### Configuration
  A sample data connector configuration is as following,
@@ -241,7 +242,7 @@ List of supported data connectors:
  **Note:** User-provided data connector should be present in Spark job's class path, by either providing custom jar with 
 `--jars` parameter to spark-submit or by adding setting `spark.jars` in `spark -> config` section of environment config.  
 
- ##### For ElasticSearch Custom Data Connectors:
+ ##### [Deprecated] ~~For ElasticSearch Custom Data Connectors:~~ 
   - Currently supported SQL mode (for ElasticSearch with sql plugin) and NORMAL mode.
   - For NORMAL mode, config object supports the following keys,
   
@@ -299,7 +300,7 @@ List of supported data connectors:
  
  ##### For File based Data Connectors:
 
- - Currently supported formats like Parquet, ORC, AVRO, Text and Delimited types like CSV, TSV etc.
+ - Currently supports formats like Parquet, ORC, AVRO, Text and Delimited types like CSV, TSV etc.
  - Local files can also be read by prepending `file://` namespace.
  - **config** object supports the following keys,
         
@@ -344,6 +345,43 @@ List of supported data connectors:
 - "schema":[{"name":"user_id","type":"string","nullable":"true"},{"name":"age","type":"int","nullable":"false"}]
 - "schema":[{"name":"user_id","type":"decimal(5,2)","nullable":"true"}]
 - "schema":[{"name":"my_struct","type":"struct<f1:int,f2:string>","nullable":"true"}]
+
+
+##### For ElasticSearch Data Connectors:
+  - Elasticsearch Data Connector, supports the following configurations
+  
+ | Name           | Type     | Description                            | Default Values |
+ |:---------------|:---------|:---------------------------------------|:-------------- |
+ | paths          | `List`   | Elasticsearch indices (Required)                  |  |
+ | filterExprs    | `List`   | List of string expressions that act as where conditions (row filters)| `Empty` |
+ | selectionExprs | `List`   | List of string expressions that act as selection conditions (column filters) | `Empty` |
+ | options        | `Object` | Additional elasticsearch options. Refer to [ConfigurationOptions](https://github.com/elastic/elasticsearch-hadoop/blob/v7.6.1/mr/src/main/java/org/elasticsearch/hadoop/cfg/ConfigurationOptions.java) for options | `Empty` |
+ 
+ - Example:
+      ```
+     "connector": {
+             "type": "elasticsearch",
+             "config": {
+               "selectionExprs": [
+                 "account_number",
+                 "city",
+                 "gender",
+                 "age > 18"
+               ],
+               "filterExprs": [
+                 "account_number < 10"
+               ],
+               "paths": [
+                 "bank",
+                 "customer"
+               ],
+               "options": {
+                 "es.nodes": "localhost",
+                 "es.port": 9200
+               }
+             }
+           }
+      ```
 
  ##### For Hive Data Connectors:
  - **config** object supports the following keys,

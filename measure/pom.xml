@@ -51,6 +51,7 @@ under the License.
         <scalastyle.version>1.0.0</scalastyle.version>
         <scalafmt.parameters>--diff --test</scalafmt.parameters>
         <scalafmt.skip>false</scalafmt.skip>
+        <elasticsearch.version>6.4.1</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -205,6 +206,17 @@ under the License.
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.200</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch-spark-20_2.11</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>1.14.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

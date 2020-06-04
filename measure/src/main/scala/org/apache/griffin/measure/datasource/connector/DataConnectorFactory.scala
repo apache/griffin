@@ -40,6 +40,7 @@ object DataConnectorFactory extends Loggable {
   val KafkaRegex: Regex = """^(?i)kafka$""".r
   val JDBCRegex: Regex = """^(?i)jdbc$""".r
   val CustomRegex: Regex = """^(?i)custom$""".r
+  val ElasticSearchRegex: Regex = """^(?i)elasticsearch$""".r
 
   /**
    * create data connector
@@ -63,6 +64,7 @@ object DataConnectorFactory extends Loggable {
         case AvroRegex() => AvroBatchDataConnector(sparkSession, dcParam, tmstCache)
         case FileRegex() => FileBasedDataConnector(sparkSession, dcParam, tmstCache)
         case TextDirRegex() => TextDirBatchDataConnector(sparkSession, dcParam, tmstCache)
+        case ElasticSearchRegex() => ElasticSearchDataConnector(sparkSession, dcParam, tmstCache)
         case CustomRegex() =>
           getCustomConnector(sparkSession, ssc, dcParam, tmstCache, streamingCacheClientOpt)
         case KafkaRegex() =>
