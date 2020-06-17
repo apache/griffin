@@ -30,53 +30,35 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
 
   val block: Boolean = true
 
-  val MaxLogLines = "max.log.lines"
+  val Truncate: String = "truncate"
+  val truncateRecords: Boolean = config.getBoolean(Truncate, defValue = true)
 
-  val maxLogLines: Int = config.getInt(MaxLogLines, 100)
+  val NumberOfRows: String = "numRows"
+  val numRows: Int = config.getInt(NumberOfRows, 10)
 
   def validate(): Boolean = true
 
-  def open(msg: String): Unit = {
-    println(s"[$timeStamp] $jobName start: $msg")
-  }
-  def close(): Unit = {
-    println(s"[$timeStamp] $jobName finish")
-  }
-
-  def sinkRecords(records: RDD[String], name: String): Unit = {
-//    println(s"${metricName} [${timeStamp}] records: ")
-//    try {
-//      val recordCount = records.count
-//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-//      val maxCount = count.toInt
-//      if (maxCount > 0) {
-//        val recordsArray = records.take(maxCount)
-//        recordsArray.foreach(println)
-//      }
-//    } catch {
-//      case e: Throwable => error(e.getMessage)
-//    }
+  override def open(msg: String): Unit = {
+    griffinLogger.info(
+      s"Opened ConsoleSink for job with name '$jobName', " +
+        s"timestamp '$timeStamp' and applicationId '$msg'")
   }
 
-  def sinkRecords(records: Iterable[String], name: String): Unit = {
-//    println(s"${metricName} [${timeStamp}] records: ")
-//    try {
-//      val recordCount = records.size
-//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-//      if (count > 0) {
-//        records.foreach(println)
-//      }
-//    } catch {
-//      case e: Throwable => error(e.getMessage)
-//    }
+  override def close(): Unit = {
+    griffinLogger.info(
+      s"Closed ConsoleSink for job with name '$jobName' and timestamp '$timeStamp'")
   }
+
+  def sinkRecords(records: RDD[String], name: String): Unit = {}
+
+  def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
   def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    println(s"$jobName [$timeStamp] metrics: ")
-    val json = JsonUtil.toJson(metrics)
-    println(json)
+    griffinLogger.info(s"$jobName [$timeStamp] metrics:\n${JsonUtil.toJson(metrics)}")
   }
 
-  override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {}
+  override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {
+    dataset.show(numRows, truncateRecords)
+  }
 
 }
