@@ -54,7 +54,7 @@ case class ElasticSearchSink(
     api.nonEmpty
   }
 
-  def open(msg: String): Unit = {}
+  def open(applicationId: String): Unit = {}
   def close(): Unit = {}
 
   private def httpResult(dataMap: Map[String, Any]): Unit = {

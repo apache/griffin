@@ -25,10 +25,11 @@ import org.apache.griffin.measure.configuration.enums.SinkType
 import org.apache.griffin.measure.configuration.enums.SinkType.SinkType
 
 /**
- * environment param
- * @param sparkParam         config of spark environment (must)
- * @param sinkParams         config of sink ways (optional)
- * @param checkpointParams   config of checkpoint locations (required in streaming mode)
+ * Model for Environment Config.
+ *
+ * @param sparkParam Job specific Spark Configs to override the Defaults set on the cluster
+ * @param sinkParams A [[Seq]] of sink definitions where records and metrics can be persisted
+ * @param checkpointParams Config of checkpoint locations (required in streaming mode)
  */
 @JsonInclude(Include.NON_NULL)
 case class EnvConfig(

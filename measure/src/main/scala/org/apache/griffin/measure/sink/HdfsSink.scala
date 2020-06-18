@@ -75,9 +75,9 @@ case class HdfsSink(config: Map[String, Any], jobName: String, timeStamp: Long) 
     s"$path.$suffix"
   }
 
-  def open(msg: String): Unit = {
+  def open(applicationId: String): Unit = {
     try {
-      HdfsUtil.writeContent(StartFile, msg)
+      HdfsUtil.writeContent(StartFile, applicationId)
     } catch {
       case e: Throwable => error(e.getMessage, e)
     }

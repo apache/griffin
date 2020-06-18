@@ -24,7 +24,13 @@ import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
- * sink metric and record to console, for debug
+ * Console Sink for Records and Metrics.
+ * Records are shown in a tabular structure and Metrics are logged as JSON string.
+ *
+ * Supported Configurations:
+ *  - truncate : [[Boolean]] Whether truncate long strings. If true, strings more than 20 characters
+ *  will be truncated and all cells will be aligned right. Default is true.
+ *  - numRows : [[Int]] Number of rows to show. Default is 20.
  */
 case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Long) extends Sink {
 
@@ -34,14 +40,14 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
   val truncateRecords: Boolean = config.getBoolean(Truncate, defValue = true)
 
   val NumberOfRows: String = "numRows"
-  val numRows: Int = config.getInt(NumberOfRows, 10)
+  val numRows: Int = config.getInt(NumberOfRows, 20)
 
   def validate(): Boolean = true
 
-  override def open(msg: String): Unit = {
+  override def open(applicationId: String): Unit = {
     griffinLogger.info(
       s"Opened ConsoleSink for job with name '$jobName', " +
-        s"timestamp '$timeStamp' and applicationId '$msg'")
+        s"timestamp '$timeStamp' and applicationId '$applicationId'")
   }
 
   override def close(): Unit = {

@@ -35,7 +35,7 @@ case class CustomSink(config: Map[String, Any], jobName: String, timeStamp: Long
     extends Sink {
   def validate(): Boolean = true
 
-  def open(msg: String): Unit = {}
+  def open(applicationId: String): Unit = {}
 
   def close(): Unit = {}
 

@@ -48,7 +48,7 @@ case class MongoSink(config: Map[String, Any], jobName: String, timeStamp: Long,
 
   def validate(): Boolean = MongoConnection.dataConf.available
 
-  def open(msg: String): Unit = {}
+  def open(applicationId: String): Unit = {}
   def close(): Unit = {}
 
   def sinkRecords(records: RDD[String], name: String): Unit = {}

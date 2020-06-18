@@ -19,6 +19,7 @@ package org.apache.griffin.measure.launch
 
 import scala.util.Try
 
+import org.apache.spark.metrics.sink.Sink
 import org.apache.spark.sql.SparkSession
 
 import org.apache.griffin.measure.Loggable
@@ -60,6 +61,12 @@ trait DQApp extends Loggable with Serializable {
     }
   }
 
+  /**
+   * Gets a valid [[Sink]] definition from the Env Config for each [[Sink]] defined in Job Config.
+   *
+   * @throws AssertionError if Env Config does not contain definition for a sink defined in Job Config
+   * @return [[Seq]] of [[Sink]] definitions
+   */
   protected def getSinkParams: Seq[SinkParam] = {
     val sinkParams = dqParam.getSinkNames
       .map(_.toLowerCase())
