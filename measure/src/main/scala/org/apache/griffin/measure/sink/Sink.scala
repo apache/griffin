@@ -45,30 +45,30 @@ trait Sink extends Loggable with Serializable {
    *
    * @param applicationId Spark Application ID
    */
-  def open(applicationId: String): Unit
+  def open(applicationId: String): Unit = {}
 
   /**
    * Allows clean up for the sink (if required).
    */
-  def close(): Unit
+  def close(): Unit = {}
 
   /**
    * Implementation of persisting records for streaming pipelines.
    */
-  def sinkRecords(records: RDD[String], name: String): Unit
+  def sinkRecords(records: RDD[String], name: String): Unit = {}
 
   /**
    * Implementation of persisting records for streaming pipelines.
    */
-  def sinkRecords(records: Iterable[String], name: String): Unit
+  def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
   /**
    * Implementation of persisting metrics.
    */
-  def sinkMetrics(metrics: Map[String, Any]): Unit
+  def sinkMetrics(metrics: Map[String, Any]): Unit = {}
 
   /**
    * Implementation of persisting records for batch pipelines.
    */
-  def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit
+  def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {}
 }
