@@ -75,7 +75,7 @@ case class HdfsSink(config: Map[String, Any], jobName: String, timeStamp: Long) 
     s"$path.$suffix"
   }
 
-  def open(applicationId: String): Unit = {
+  override def open(applicationId: String): Unit = {
     try {
       HdfsUtil.writeContent(StartFile, applicationId)
     } catch {
@@ -83,7 +83,7 @@ case class HdfsSink(config: Map[String, Any], jobName: String, timeStamp: Long) 
     }
   }
 
-  def close(): Unit = {
+  override def close(): Unit = {
     try {
       HdfsUtil.createEmptyFile(FinishFile)
     } catch {
@@ -110,7 +110,7 @@ case class HdfsSink(config: Map[String, Any], jobName: String, timeStamp: Long) 
     HdfsUtil.deleteHdfsPath(path)
   }
 
-  def sinkRecords(records: RDD[String], name: String): Unit = {
+  override def sinkRecords(records: RDD[String], name: String): Unit = {
     val path = filePath(name)
     clearOldRecords(path)
     try {
@@ -144,7 +144,7 @@ case class HdfsSink(config: Map[String, Any], jobName: String, timeStamp: Long) 
     }
   }
 
-  def sinkRecords(records: Iterable[String], name: String): Unit = {
+  override def sinkRecords(records: Iterable[String], name: String): Unit = {
     val path = filePath(name)
     clearOldRecords(path)
     try {
@@ -172,7 +172,7 @@ case class HdfsSink(config: Map[String, Any], jobName: String, timeStamp: Long) 
     }
   }
 
-  def sinkMetrics(metrics: Map[String, Any]): Unit = {
+  override def sinkMetrics(metrics: Map[String, Any]): Unit = {
     try {
       val json = JsonUtil.toJson(metrics)
       sinkRecords2Hdfs(MetricsFile, json :: Nil)

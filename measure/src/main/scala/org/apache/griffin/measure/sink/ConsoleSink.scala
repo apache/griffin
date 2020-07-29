@@ -55,11 +55,11 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
       s"Closed ConsoleSink for job with name '$jobName' and timestamp '$timeStamp'")
   }
 
-  def sinkRecords(records: RDD[String], name: String): Unit = {}
+  override def sinkRecords(records: RDD[String], name: String): Unit = {}
 
-  def sinkRecords(records: Iterable[String], name: String): Unit = {}
+  override def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
-  def sinkMetrics(metrics: Map[String, Any]): Unit = {
+  override def sinkMetrics(metrics: Map[String, Any]): Unit = {
     griffinLogger.info(s"$jobName [$timeStamp] metrics:\n${JsonUtil.toJson(metrics)}")
   }
 

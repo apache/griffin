@@ -48,13 +48,10 @@ case class MongoSink(config: Map[String, Any], jobName: String, timeStamp: Long,
 
   def validate(): Boolean = MongoConnection.dataConf.available
 
-  def open(applicationId: String): Unit = {}
-  def close(): Unit = {}
+  override def sinkRecords(records: RDD[String], name: String): Unit = {}
+  override def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
-  def sinkRecords(records: RDD[String], name: String): Unit = {}
-  def sinkRecords(records: Iterable[String], name: String): Unit = {}
-
-  def sinkMetrics(metrics: Map[String, Any]): Unit = {
+  override def sinkMetrics(metrics: Map[String, Any]): Unit = {
     mongoInsert(metrics)
   }
 

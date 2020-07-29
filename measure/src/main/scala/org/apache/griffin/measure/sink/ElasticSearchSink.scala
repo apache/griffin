@@ -54,9 +54,6 @@ case class ElasticSearchSink(
     api.nonEmpty
   }
 
-  def open(applicationId: String): Unit = {}
-  def close(): Unit = {}
-
   private def httpResult(dataMap: Map[String, Any]): Unit = {
     try {
       val data = JsonUtil.toJson(dataMap)
@@ -76,10 +73,7 @@ case class ElasticSearchSink(
 
   }
 
-  def sinkRecords(records: RDD[String], name: String): Unit = {}
-  def sinkRecords(records: Iterable[String], name: String): Unit = {}
-
-  def sinkMetrics(metrics: Map[String, Any]): Unit = {
+  override def sinkMetrics(metrics: Map[String, Any]): Unit = {
     httpResult(metrics)
   }
 

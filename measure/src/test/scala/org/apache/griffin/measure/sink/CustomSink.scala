@@ -35,25 +35,21 @@ case class CustomSink(config: Map[String, Any], jobName: String, timeStamp: Long
     extends Sink {
   def validate(): Boolean = true
 
-  def open(applicationId: String): Unit = {}
-
-  def close(): Unit = {}
-
   def log(rt: Long, msg: String): Unit = {}
 
   val allRecords: ListBuffer[String] = mutable.ListBuffer[String]()
 
-  def sinkRecords(records: RDD[String], name: String): Unit = {
+  override def sinkRecords(records: RDD[String], name: String): Unit = {
     allRecords ++= records.collect()
   }
 
-  def sinkRecords(records: Iterable[String], name: String): Unit = {
+  override def sinkRecords(records: Iterable[String], name: String): Unit = {
     allRecords ++= records
   }
 
   val allMetrics: mutable.Map[String, Any] = mutable.Map[String, Any]()
 
-  def sinkMetrics(metrics: Map[String, Any]): Unit = {
+  override def sinkMetrics(metrics: Map[String, Any]): Unit = {
     allMetrics ++= metrics
   }
 
