@@ -35,12 +35,11 @@ object SinkType extends GriffinEnum {
   val Console, Log, Hdfs, Es, Http, ElasticSearch, MongoDB, Mongo, Custom =
     Value
 
-  def validSinkTypes(strs: Seq[String]): Seq[SinkType] = {
-    val seq = strs
+  def validSinkTypes(sinkTypeSeq: Seq[String]): Seq[SinkType] = {
+    sinkTypeSeq
       .map(s => SinkType.withNameWithDefault(s))
       .filter(_ != SinkType.Unknown)
       .distinct
-    if (seq.nonEmpty) seq else Seq(SinkType.ElasticSearch)
   }
 
   override def withNameWithDefault(name: String): enums.SinkType.Value = {

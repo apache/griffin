@@ -5,15 +5,14 @@
       "spark.master": "local[*]"
     }
   },
-
   "sinks": [
     {
+      "name": "consoleSink",
       "type": "console",
       "config": {
         "max.log.lines": 10
       }
     }
   ],
-
   "griffin.checkpoint": []
 }

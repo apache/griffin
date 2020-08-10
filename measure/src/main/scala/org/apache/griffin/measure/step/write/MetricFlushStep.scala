@@ -34,7 +34,13 @@ case class MetricFlushStep() extends WriteStep {
     context.metricWrapper.flush.foldLeft(true) { (ret, pair) =>
       val (t, metric) = pair
       val pr = try {
-        context.getSink(t).sinkMetrics(metric)
+        context.getSinks(t).foreach { sink =>
+          try {
+            sink.sinkMetrics(metric)
+          } catch {
+            case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
+          }
+        }
         true
       } catch {
         case e: Throwable =>

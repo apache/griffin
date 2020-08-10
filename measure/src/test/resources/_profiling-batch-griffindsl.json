@@ -52,6 +52,6 @@
     ]
   },
   "sinks": [
-    "CONSOLE"
+    "CONSOLESink"
   ]
 }

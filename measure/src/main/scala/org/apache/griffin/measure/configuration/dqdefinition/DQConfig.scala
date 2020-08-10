@@ -47,7 +47,7 @@ case class DQConfig(
     @JsonProperty("process.type") private val procType: String,
     @JsonProperty("data.sources") private val dataSources: List[DataSourceParam],
     @JsonProperty("evaluate.rule") private val evaluateRule: EvaluateRuleParam,
-    @JsonProperty("sinks") private val sinks: List[String])
+    @JsonProperty("sinks") private val sinks: List[String] = Nil)
     extends Param {
   def getName: String = name
   def getTimestampOpt: Option[Long] = if (timestamp != 0) Some(timestamp) else None
@@ -63,8 +63,8 @@ case class DQConfig(
       ._1
   }
   def getEvaluateRule: EvaluateRuleParam = evaluateRule
-  def getValidSinkTypes: Seq[SinkType] =
-    SinkType.validSinkTypes(if (sinks != null) sinks else Nil)
+  def getSinkNames: Seq[String] = sinks
+  def getValidSinkTypes: Seq[SinkType] = SinkType.validSinkTypes(sinks)
 
   def validate(): Unit = {
     assert(StringUtils.isNotBlank(name), "dq config name should not be blank")

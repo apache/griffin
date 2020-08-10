@@ -77,16 +77,16 @@ case class DQContext(
   printTimeRanges()
 
   private val sinkFactory = SinkFactory(sinkParams, name)
-  private val defaultSink: Sink = createSink(contextId.timestamp)
+  private val defaultSinks: Seq[Sink] = createSinks(contextId.timestamp)
 
-  def getSink(timestamp: Long): Sink = {
-    if (timestamp == contextId.timestamp) getSink
-    else createSink(timestamp)
+  def getSinks(timestamp: Long): Seq[Sink] = {
+    if (timestamp == contextId.timestamp) getSinks
+    else createSinks(timestamp)
   }
 
-  def getSink: Sink = defaultSink
+  def getSinks: Seq[Sink] = defaultSinks
 
-  private def createSink(t: Long): Sink = {
+  private def createSinks(t: Long): Seq[Sink] = {
     procType match {
       case BatchProcessType => sinkFactory.getSinks(t, block = true)
       case StreamingProcessType => sinkFactory.getSinks(t, block = false)

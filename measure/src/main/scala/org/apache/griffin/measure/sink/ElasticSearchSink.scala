@@ -20,6 +20,7 @@ package org.apache.griffin.measure.sink
 import scala.concurrent.Future
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}
 import org.apache.griffin.measure.utils.ParamUtil._
@@ -29,7 +30,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
  */
 case class ElasticSearchSink(
     config: Map[String, Any],
-    metricName: String,
+    jobName: String,
     timeStamp: Long,
     block: Boolean)
     extends Sink {
@@ -49,12 +50,9 @@ case class ElasticSearchSink(
 
   val _Value = "value"
 
-  def available(): Boolean = {
+  def validate(): Boolean = {
     api.nonEmpty
   }
-
-  def start(msg: String): Unit = {}
-  def finish(): Unit = {}
 
   private def httpResult(dataMap: Map[String, Any]): Unit = {
     try {
@@ -75,13 +73,9 @@ case class ElasticSearchSink(
 
   }
 
-  def log(rt: Long, msg: String): Unit = {}
-
-  def sinkRecords(records: RDD[String], name: String): Unit = {}
-  def sinkRecords(records: Iterable[String], name: String): Unit = {}
-
-  def sinkMetrics(metrics: Map[String, Any]): Unit = {
+  override def sinkMetrics(metrics: Map[String, Any]): Unit = {
     httpResult(metrics)
   }
 
+  override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {}
 }

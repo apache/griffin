@@ -139,8 +139,8 @@ Apache Griffin measures consist of batch measure and streaming measure, this doc
     ]
   },
   "sinks": [
-    "CONSOLE",
-    "ELASTICSEARCH"
+    "CONSOLESink",
+    "ELASTICSEARCHSink"
   ]
 }
 ```
@@ -251,8 +251,8 @@ The miss records of source will be persisted as record.
     ]
   },
   "sinks": [
-    "CONSOLE",
-    "ELASTICSEARCH"
+    "CONSOLESink",
+    "ELASTICSEARCHSink"
   ]
 }
 ```

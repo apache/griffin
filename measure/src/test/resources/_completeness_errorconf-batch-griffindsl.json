@@ -14,7 +14,7 @@
     }
   ],
   "sinks": [
-    "CONSOLE"
+    "CONSOLESink"
   ],
   "name": "test_griffin_complete_lizhao.bd",
   "evaluate.rule": {

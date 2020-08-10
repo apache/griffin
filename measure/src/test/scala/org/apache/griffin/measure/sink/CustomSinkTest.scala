@@ -26,10 +26,13 @@ import org.apache.griffin.measure.step.write.{MetricFlushStep, MetricWriteStep, 
 class CustomSinkTest extends SinkTestBase {
 
   val sinkParam: SinkParam =
-    SinkParam("custom", Map("class" -> "org.apache.griffin.measure.sink.CustomSink"))
+    SinkParam(
+      "customSink",
+      "custom",
+      Map("class" -> "org.apache.griffin.measure.sink.CustomSink"))
   override var sinkParams = Seq(sinkParam)
 
-  def withCustomSink[A](func: MultiSinks => A): A = {
+  def withCustomSink[A](func: Iterable[Sink] => A): A = {
     val sinkFactory = SinkFactory(sinkParams, "Test Sink Factory")
     val timestamp = System.currentTimeMillis
     val sinks = sinkFactory.getSinks(timestamp, block = true)
@@ -38,9 +41,21 @@ class CustomSinkTest extends SinkTestBase {
 
   "custom sink" can "sink metrics" in {
     val actualMetrics = withCustomSink(sinks => {
-      sinks.sinkMetrics(Map("sum" -> 10))
-      sinks.sinkMetrics(Map("count" -> 5))
-      sinks.headSinkOpt match {
+      sinks.foreach { sink =>
+        try {
+          sink.sinkMetrics(Map("sum" -> 10))
+        } catch {
+          case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
+        }
+      }
+      sinks.foreach { sink =>
+        try {
+          sink.sinkMetrics(Map("count" -> 5))
+        } catch {
+          case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
+        }
+      }
+      sinks.headOption match {
         case Some(sink: CustomSink) => sink.allMetrics
         case _ => mutable.ListBuffer[String]()
       }
@@ -53,10 +68,22 @@ class CustomSinkTest extends SinkTestBase {
   "custom sink" can "sink records" in {
     val actualRecords = withCustomSink(sinks => {
       val rdd1 = createDataFrame(1 to 2)
-      sinks.sinkRecords(rdd1.toJSON.rdd, "test records")
+      sinks.foreach { sink =>
+        try {
+          sink.sinkRecords(rdd1.toJSON.rdd, "test records")
+        } catch {
+          case e: Throwable => error(s"sink records error: ${e.getMessage}", e)
+        }
+      }
       val rdd2 = createDataFrame(2 to 4)
-      sinks.sinkRecords(rdd2.toJSON.rdd, "test records")
-      sinks.headSinkOpt match {
+      sinks.foreach { sink =>
+        try {
+          sink.sinkRecords(rdd2.toJSON.rdd, "test records")
+        } catch {
+          case e: Throwable => error(s"sink records error: ${e.getMessage}", e)
+        }
+      }
+      sinks.headOption match {
         case Some(sink: CustomSink) => sink.allRecords
         case _ =>
       }
@@ -84,7 +111,7 @@ class CustomSinkTest extends SinkTestBase {
     val dQContext = getDqContext()
     RecordWriteStep(rwName, resultTable).execute(dQContext)
 
-    val actualRecords = dQContext.getSink.asInstanceOf[MultiSinks].headSinkOpt match {
+    val actualRecords = dQContext.getSinks.headOption match {
       case Some(sink: CustomSink) => sink.allRecords
       case _ => mutable.ListBuffer[String]()
     }
@@ -122,7 +149,7 @@ class CustomSinkTest extends SinkTestBase {
 
     metricWriteStep.execute(dQContext)
     MetricFlushStep().execute(dQContext)
-    val actualMetrics = dQContext.getSink.asInstanceOf[MultiSinks].headSinkOpt match {
+    val actualMetrics = dQContext.getSinks.headOption match {
       case Some(sink: CustomSink) => sink.allMetrics
       case _ => mutable.Map[String, Any]()
     }

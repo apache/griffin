@@ -17,15 +17,16 @@
       "spark.hadoop.fs.hdfs.impl.disable.cache": true
     }
   },
-
   "sinks": [
     {
+      "name": "consoleSink",
       "type": "CONSOLE",
       "config": {
         "max.log.lines": 100
       }
     },
     {
+      "name": "hdfsSink",
       "type": "HDFS",
       "config": {
         "path": "hdfs://localhost/griffin/streaming/persist",
@@ -34,6 +35,7 @@
       }
     },
     {
+      "name": "elasticSink",
       "type": "ELASTICSEARCH",
       "config": {
         "method": "post",
@@ -41,7 +43,6 @@
       }
     }
   ],
-
   "griffin.checkpoint": [
     {
       "type": "zk",

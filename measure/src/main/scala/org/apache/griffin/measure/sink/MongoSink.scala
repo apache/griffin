@@ -20,6 +20,7 @@ package org.apache.griffin.measure.sink
 import scala.concurrent.Future
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 import org.mongodb.scala._
 import org.mongodb.scala.model.{Filters, UpdateOptions, Updates}
 import org.mongodb.scala.result.UpdateResult
@@ -30,11 +31,7 @@ import org.apache.griffin.measure.utils.TimeUtil
 /**
  * sink metric and record to mongo
  */
-case class MongoSink(
-    config: Map[String, Any],
-    metricName: String,
-    timeStamp: Long,
-    block: Boolean)
+case class MongoSink(config: Map[String, Any], jobName: String, timeStamp: Long, block: Boolean)
     extends Sink {
 
   MongoConnection.init(config)
@@ -49,22 +46,17 @@ case class MongoSink(
   val _Timestamp = "timestamp"
   val _Value = "value"
 
-  def available(): Boolean = MongoConnection.dataConf.available
+  def validate(): Boolean = MongoConnection.dataConf.available
 
-  def start(msg: String): Unit = {}
-  def finish(): Unit = {}
+  override def sinkRecords(records: RDD[String], name: String): Unit = {}
+  override def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
-  def log(rt: Long, msg: String): Unit = {}
-
-  def sinkRecords(records: RDD[String], name: String): Unit = {}
-  def sinkRecords(records: Iterable[String], name: String): Unit = {}
-
-  def sinkMetrics(metrics: Map[String, Any]): Unit = {
+  override def sinkMetrics(metrics: Map[String, Any]): Unit = {
     mongoInsert(metrics)
   }
 
   private val filter =
-    Filters.and(Filters.eq(_MetricName, metricName), Filters.eq(_Timestamp, timeStamp))
+    Filters.and(Filters.eq(_MetricName, jobName), Filters.eq(_Timestamp, timeStamp))
 
   private def mongoInsert(dataMap: Map[String, Any]): Unit = {
     try {
@@ -83,6 +75,7 @@ case class MongoSink(
     }
   }
 
+  override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {}
 }
 
 object MongoConnection {

@@ -18,67 +18,53 @@
 package org.apache.griffin.measure.sink
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
- * sink metric and record to console, for debug
+ * Console Sink for Records and Metrics.
+ * Records are shown in a tabular structure and Metrics are logged as JSON string.
+ *
+ * Supported Configurations:
+ *  - truncate : [[Boolean]] Whether truncate long strings. If true, strings more than 20 characters
+ *  will be truncated and all cells will be aligned right. Default is true.
+ *  - numRows : [[Int]] Number of rows to show. Default is 20.
  */
-case class ConsoleSink(config: Map[String, Any], metricName: String, timeStamp: Long)
-    extends Sink {
+case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Long) extends Sink {
 
   val block: Boolean = true
 
-  val MaxLogLines = "max.log.lines"
+  val Truncate: String = "truncate"
+  val truncateRecords: Boolean = config.getBoolean(Truncate, defValue = true)
 
-  val maxLogLines: Int = config.getInt(MaxLogLines, 100)
+  val NumberOfRows: String = "numRows"
+  val numRows: Int = config.getInt(NumberOfRows, 20)
 
-  def available(): Boolean = true
+  def validate(): Boolean = true
 
-  def start(msg: String): Unit = {
-    println(s"[$timeStamp] $metricName start: $msg")
-  }
-  def finish(): Unit = {
-    println(s"[$timeStamp] $metricName finish")
-  }
-
-  def log(rt: Long, msg: String): Unit = {
-    println(s"[$timeStamp] $rt: $msg")
+  override def open(applicationId: String): Unit = {
+    griffinLogger.info(
+      s"Opened ConsoleSink for job with name '$jobName', " +
+        s"timestamp '$timeStamp' and applicationId '$applicationId'")
   }
 
-  def sinkRecords(records: RDD[String], name: String): Unit = {
-//    println(s"${metricName} [${timeStamp}] records: ")
-//    try {
-//      val recordCount = records.count
-//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-//      val maxCount = count.toInt
-//      if (maxCount > 0) {
-//        val recordsArray = records.take(maxCount)
-//        recordsArray.foreach(println)
-//      }
-//    } catch {
-//      case e: Throwable => error(e.getMessage)
-//    }
+  override def close(): Unit = {
+    griffinLogger.info(
+      s"Closed ConsoleSink for job with name '$jobName' and timestamp '$timeStamp'")
   }
 
-  def sinkRecords(records: Iterable[String], name: String): Unit = {
-//    println(s"${metricName} [${timeStamp}] records: ")
-//    try {
-//      val recordCount = records.size
-//      val count = if (maxLogLines < 0) recordCount else scala.math.min(maxLogLines, recordCount)
-//      if (count > 0) {
-//        records.foreach(println)
-//      }
-//    } catch {
-//      case e: Throwable => error(e.getMessage)
-//    }
+  override def sinkRecords(records: RDD[String], name: String): Unit = {}
+
+  override def sinkRecords(records: Iterable[String], name: String): Unit = {}
+
+  override def sinkMetrics(metrics: Map[String, Any]): Unit = {
+    griffinLogger.info(s"$jobName [$timeStamp] metrics:\n${JsonUtil.toJson(metrics)}")
   }
 
-  def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    println(s"$metricName [$timeStamp] metrics: ")
-    val json = JsonUtil.toJson(metrics)
-    println(json)
+  override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {
+    dataset.show(numRows, truncateRecords)
   }
 
 }

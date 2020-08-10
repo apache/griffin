@@ -17,7 +17,7 @@
 
 package org.apache.griffin.measure.launch.batch
 
-import java.util.Date
+import java.util.concurrent.TimeUnit
 
 import scala.util.Try
 
@@ -31,6 +31,7 @@ import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
+import org.apache.griffin.measure.utils.CommonUtils
 
 case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
@@ -60,45 +61,40 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
   }
 
   def run: Try[Boolean] = {
-    // start time
-    val startTime = new Date().getTime
+    val result = CommonUtils.timeThis({
+      val measureTime = getMeasureTime
+      val contextId = ContextId(measureTime)
 
-    val measureTime = getMeasureTime
-    val contextId = ContextId(measureTime)
+      // get data sources
+      val dataSources =
+        DataSourceFactory.getDataSources(sparkSession, null, dqParam.getDataSources)
+      dataSources.foreach(_.init())
 
-    // get data sources
-    val dataSources = DataSourceFactory.getDataSources(sparkSession, null, dqParam.getDataSources)
-    dataSources.foreach(_.init())
+      // create dq context
+      dqContext =
+        DQContext(contextId, metricName, dataSources, sinkParams, BatchProcessType)(sparkSession)
 
-    // create dq context
-    dqContext =
-      DQContext(contextId, metricName, dataSources, sinkParams, BatchProcessType)(sparkSession)
+      // start id
+      val applicationId = sparkSession.sparkContext.applicationId
+      dqContext.getSinks.foreach(_.open(applicationId))
 
-    // start id
-    val applicationId = sparkSession.sparkContext.applicationId
-    dqContext.getSink.start(applicationId)
+      // build job
+      val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
 
-    // build job
-    val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
-
-    // dq job execute
-    val result = dqJob.execute(dqContext)
-
-    // end time
-    val endTime = new Date().getTime
-    dqContext.getSink.log(endTime, s"process using time: ${endTime - startTime} ms")
+      // dq job execute
+      dqJob.execute(dqContext)
+    }, TimeUnit.MILLISECONDS)
 
     // clean context
     dqContext.clean()
 
     // finish
-    dqContext.getSink.finish()
+    dqContext.getSinks.foreach(_.close())
 
     result
   }
 
   def close: Try[_] = Try {
-    sparkSession.close()
     sparkSession.stop()
   }
 
