@@ -17,16 +17,16 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# Apache Griffin Shell Guide
+# Apache Griffin Tool Guide
 
-With Griffin shell, user can run dq jobs in command line. 
+With Griffin tool, user can run dq jobs in command line. 
 This is helpful for user to debug and run user dq jobs.
 
 # Install
 
 * Compile Griffin using maven.
 * Decompress Griffin tool file `measure-x.x.x-package.tar.gz` in the target directory of measure module.
-* Go to the decompress directory, and run Griffin tool with user defined env file and dq file. eg: `./bin/griffin-shell.sh ENV_FILE DQ_FILE`
+* Go to the decompress directory, and run Griffin tool with user defined env file and dq file. eg: `./bin/griffin-tool.sh ENV_FILE DQ_FILE`
 
 # ENV_FILE demo
 
