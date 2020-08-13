@@ -344,14 +344,9 @@ under the License.
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
-                        <descriptor>assembly-fat-jar.xml</descriptor>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.apache.griffin.measure.Application</mainClass>
-                        </manifest>
-                    </archive>
+                    <finalName>${artifactId}-${project.version}</finalName>
                 </configuration>
                 <executions>
                     <execution>

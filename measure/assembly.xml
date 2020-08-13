@@ -31,8 +31,8 @@
         <include>/**</include>
       </includes>
       <lineEnding>unix</lineEnding>
-      <fileMode>0777</fileMode> <!-- 所有文件文件权限为777 -->
-      <directoryMode>0755</directoryMode> <!-- 所有目录权限为777  -->
+      <fileMode>0777</fileMode>
+      <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
       <directory>${project.basedir}/src/main/resources</directory>
@@ -41,12 +41,14 @@
         <include>/**</include>
       </includes>
     </fileSet>
-    <fileSet>
-      <directory>${project.basedir}/target</directory>
-      <outputDirectory>/lib</outputDirectory>
-      <includes>
-        <include>/*-with-dependencies.jar</include>
-      </includes>
-    </fileSet>
   </fileSets>
+
+  <dependencySets>
+    <dependencySet>
+      <useProjectArtifact>true</useProjectArtifact>
+      <outputDirectory>/lib</outputDirectory>
+      <unpack>false</unpack>
+      <scope>provided</scope>
+    </dependencySet>
+  </dependencySets>
 </assembly>

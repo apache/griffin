@@ -17,42 +17,40 @@
 # limitations under the License.
 #
 
+# Logging functions
+function log_info() {
+  echo "[INFO] | $(date -u +"%D %T") UTC | $1"
+}
+
+function log_error() {
+  echo "[ERROR] | $(date -u +"%D %T") UTC | $1"
+}
+
 BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
-CONFDIR="${BASEDIR}/conf"
 
 . "${BASEDIR}/bin/griffin-env.sh"
 
-if [ ! $# -ge 2 ]; then
-  echo "env file and dq file must be provided!"
+if [ ! $# -eq 2 ]; then
+  log_error "env file and dq file must be provided!"
   exit 1
 fi
 
 envFile=$1
 if [ ! -f ${envFile} ];then
-  envFile="${CONFDIR}/${envFile}"
-  if [ ! -f ${envFile} ];then
-    echo "Not found env file: $1"
-    exit
-  fi
+  log_error "Not found env file: $1"
+  exit
 fi
 shift
 
 dqFile=$1
 if [ ! -f ${dqFile} ];then
-  dqFile="${CONFDIR}/${dqFile}"
-  if [ ! -f ${dqFile} ];then
-    echo "Not found dq file: $2"
-    exit
-  fi
+  log_error "Not found dq file: $2"
+  exit
 fi
 shift
 
 cd ${BASEDIR}
 
-# export CLASSPATH and JAVA_OPTS
-export CLASSPATH=$(echo ${SPARK_HOME}/jars/*.jar | tr ' ' ':'):${CLASSPATH}
 export CLASSPATH=$(echo ${BASEDIR}/lib/*.jar | tr ' ' ':'):${CLASSPATH}
-export CLASSPATH=${BASEDIR}/conf:${CLASSPATH}
-
 
 exec "${JAVA_HOME}"/bin/java org.apache.griffin.measure.Application ${envFile} ${dqFile}
