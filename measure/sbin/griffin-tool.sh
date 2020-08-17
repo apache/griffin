@@ -28,31 +28,31 @@ function log_error() {
 
 BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
-. "${BASEDIR}/bin/griffin-env.sh"
-
 if [ ! $# -eq 2 ]; then
   log_error "env file and dq file must be provided!"
   exit 1
 fi
 
-envFile=$1
-if [ ! -f ${envFile} ];then
-  log_error "Not found env file: $1"
+env_file=$1
+if [ ! -f "${env_file}" ];then
+  log_error "Not found env file: ${env_file}"
   exit
 fi
 shift
 
-dqFile=$1
-if [ ! -f ${dqFile} ];then
-  log_error "Not found dq file: $2"
+dq_file=$1
+if [ ! -f "${dq_file}" ];then
+  log_error "Not found dq file: ${dq_file}"
   exit
 fi
 shift
 
 cd ${BASEDIR}
 
+export JAVA_OPTS="-Xmx2048m -Xms256m -server -XX:+UseG1GC"
+
 LIB_JARS=$(echo ${BASEDIR}/lib/*.jar | tr ' ' ',')
 APP_CLASS="org.apache.griffin.measure.Application"
-APP_JAR=`ls ${BASEDIR}/lib/measure-*.jar`
+APP_JAR=$(ls ${BASEDIR}/lib/measure-*.jar)
 
-exec "${SPARK_HOME}"/bin/spark-submit --class ${APP_CLASS} --jars ${LIB_JARS} ${APP_JAR} ${envFile} ${dqFile}
+exec `which spark-submit` --class ${APP_CLASS} --jars ${LIB_JARS} ${APP_JAR} ${env_file} ${dq_file}

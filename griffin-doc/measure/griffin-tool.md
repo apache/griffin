@@ -26,7 +26,7 @@ This is helpful for user to debug and run user dq jobs.
 
 * Compile Griffin using maven.
 * Decompress Griffin tool file `measure-x.x.x-package.tar.gz` in the target directory of measure module.
-* Set `HADOOP_CONF_DIR`, `HIVE_CONF_DIR`, `SPARK_CONF_DIR` environment variables in `measure-x.x.x/bin/griffin-env.sh`
+* Install and configure spark.
 * Run Griffin tool with user defined env file and dq file. eg: `measure-x.x.x/bin/griffin-tool.sh ENV_FILE DQ_FILE`
 
 # ENV_FILE demo
