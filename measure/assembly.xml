@@ -49,6 +49,16 @@
       <outputDirectory>/lib</outputDirectory>
       <unpack>false</unpack>
       <scope>provided</scope>
+      <excludes>
+        <exclude>com.twitter:parquet-hadoop-bundle</exclude>
+        <exclude>io.dropwizard.metrics:*</exclude>
+        <exclude>org.glassfish.jersey.core:*</exclude>
+        <exclude>org.glassfish.jersey.containers:*</exclude>
+        <exclude>org.apache.thrift:*</exclude>
+        <exclude>org.apache.parquet:*</exclude>
+        <exclude>org.apache.hadoop:*</exclude>
+        <exclude>org.apache.spark:*</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>

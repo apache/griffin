@@ -51,6 +51,8 @@ shift
 
 cd ${BASEDIR}
 
-export CLASSPATH=$(echo ${BASEDIR}/lib/*.jar | tr ' ' ':'):${CLASSPATH}
+LIB_JARS=$(echo ${BASEDIR}/lib/*.jar | tr ' ' ',')
+APP_CLASS="org.apache.griffin.measure.Application"
+APP_JAR=`ls ${BASEDIR}/lib/measure-*.jar`
 
-exec "${JAVA_HOME}"/bin/java org.apache.griffin.measure.Application ${envFile} ${dqFile}
+exec "${SPARK_HOME}"/bin/spark-submit --class ${APP_CLASS} --jars ${LIB_JARS} ${APP_JAR} ${envFile} ${dqFile}

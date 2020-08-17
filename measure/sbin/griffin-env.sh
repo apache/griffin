@@ -22,7 +22,5 @@
 # export JAVA_HOME=/usr/java/latest
 export JAVA_OPTS="-Xmx2048m -Xms256m -server -XX:+UseG1GC"
 
-#export HADOOP_CONF_DIR=
-#export HIVE_CONF_DIR=
+export SPARK_HOME=
 #export SPARK_CONF_DIR=
-
