@@ -533,21 +533,27 @@ Similar changes are required in `env_streaming.json`.
 }
 ```
 
-It's easy to build Griffin, just run maven command `mvn clean install`. Successfully building, you can get two jars `service-0.4.0.jar`,`measure-0.4.0.jar` from target folder in service and measure module.
+It's easy to build Griffin, just run maven command `mvn clean install`. Successfully building, you can get `service-${version}.tar.gz` and `measure-${version}.jar` from target folder in service and measure module.
 
 Upload measure's jar to hadoop folder.
 ```
 # change jar name
 mv measure-0.4.0.jar griffin-measure.jar
-mv service-0.4.0.jar griffin-service.jar
 # upload measure jar file
 hdfs dfs -put griffin-measure.jar /griffin/
 ```
 
-Startup service.jar，run Griffin management service.
+Startup service，run Griffin management service.
 ```
-cd $GRIFFIN_HOME
-nohup java -jar griffin-service.jar>service.out 2>&1 &
+cd $GRIFFIN_INSTALL_DIR
+tar -zxvf service-${version}.tar.gz
+cd service-${version}
+# start service
+./bin/griffin.sh start  
+# or use ./bin/start.sh
+# stop service
+./bin/griffin.sh stop
+# or use ./bin/stop.sh
 ```
 
 After a few seconds, we can visit our default UI of Apache Griffin (by default the port of spring boot is 8080).
