@@ -43,3 +43,4 @@ measure/src/test/test_scala/*
 
 environment.local.ts
 logs/
+venv
