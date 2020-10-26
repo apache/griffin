@@ -196,6 +196,7 @@ under the License.
                             <exclude>**/src/main/resources/public/**</exclude>
                             <exclude>**/pom.xml.releaseBackup</exclude>
                             <exclude>**/pom.xml.tag</exclude>
+                            <exclude>**/_SUCCESS</exclude>
                         </excludes>
                     </configuration>
                     <executions>
