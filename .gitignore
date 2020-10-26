@@ -2,6 +2,7 @@
 *.iml
 .idea/
 .DS_Store
+.java-version
 target/**
 
 # Mobile Tools for Java (J2ME)
