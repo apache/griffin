@@ -30,7 +30,7 @@ under the License.
 
     <groupId>org.apache.griffin</groupId>
     <artifactId>griffin</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
     <url>http://griffin.apache.org</url>
@@ -79,7 +79,7 @@ under the License.
         <connection>scm:git:https://gitbox.apache.org/repos/asf/griffin.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/griffin.git</developerConnection>
         <url>https://gitbox.apache.org/repos/asf?p=griffin.git;a=summary</url>
-        <tag>griffin-0.7.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
