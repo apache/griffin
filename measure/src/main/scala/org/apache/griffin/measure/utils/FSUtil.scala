@@ -1,21 +1,20 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 package org.apache.griffin.measure.utils
 
 import java.io.File
@@ -53,7 +52,7 @@ object FSUtil extends Loggable {
     }
   }
 
-  private def getConfiguration(): Configuration = {
+  private def getConfiguration: Configuration = {
     val conf = new Configuration()
     conf.setBoolean("dfs.support.append", true)
 //    conf.set("fs.defaultFS", "hdfs://localhost")    // debug in hdfs localhost env
@@ -64,14 +63,14 @@ object FSUtil extends Loggable {
     val uriOpt = try {
       Some(new URI(path))
     } catch {
-      case e: Throwable => None
+      case _: Throwable => None
     }
     uriOpt.flatMap { uri =>
       if (uri.getScheme == null) {
         try {
           Some(new File(path).toURI)
         } catch {
-          case e: Throwable => None
+          case _: Throwable => None
         }
       } else Some(uri)
     }

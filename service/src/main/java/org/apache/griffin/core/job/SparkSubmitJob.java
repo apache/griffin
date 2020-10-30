@@ -100,12 +100,6 @@ public class SparkSubmitJob implements Job {
     public void execute(JobExecutionContext context) {
         JobDetail jd = context.getJobDetail();
         try {
-            initParam(jd);
-            setLivyConf();
-            if (!success(mPredicates)) {
-                updateJobInstanceState(context);
-                return;
-            }
             if (isNeedLivyQueue) {
                 //livy batch limit
                 livyTaskSubmitHelper.addTaskToWaitingQueue(jd);
@@ -210,6 +204,12 @@ public class SparkSubmitJob implements Job {
         IOException {
         // If result is null, it may livy uri is wrong
         // or livy parameter is wrong.
+        initParam(jd);
+        setLivyConf();
+        if (!success(mPredicates)) {
+            updateJobInstanceState((JobExecutionContext) jd);
+            return;
+        }
         Map<String, Object> resultMap = post2LivyWithRetry();
         String group = jd.getKey().getGroup();
         String name = jd.getKey().getName();

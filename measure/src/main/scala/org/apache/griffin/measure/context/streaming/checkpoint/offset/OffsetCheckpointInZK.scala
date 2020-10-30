@@ -1,21 +1,20 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
@@ -25,17 +24,18 @@ import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.utils.ZKPaths
 import org.apache.zookeeper.CreateMode
 import scala.collection.JavaConverters._
+import scala.util.matching.Regex
 
 import org.apache.griffin.measure.context.streaming.checkpoint.lock.CheckpointLockInZK
 
-
 /**
-  * leverage zookeeper for info cache
-  * @param config
-  * @param metricName
-  */
+ * leverage zookeeper for info cache
+ * @param config
+ * @param metricName
+ */
 case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
-  extends OffsetCheckpoint with OffsetOps {
+    extends OffsetCheckpoint
+    with OffsetOps {
 
   val Hosts = "hosts"
   val Namespace = "namespace"
@@ -44,35 +44,37 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
   val CloseClear = "close.clear"
   val LockPath = "lock.path"
 
-  val PersistentRegex = """^(?i)persist(ent)?$""".r
-  val EphemeralRegex = """^(?i)ephemeral$""".r
+  val PersistentRegex: Regex = """^(?i)persist(ent)?$""".r
+  val EphemeralRegex: Regex = """^(?i)ephemeral$""".r
 
   final val separator = ZKPaths.PATH_SEPARATOR
 
-  val hosts = config.getOrElse(Hosts, "").toString
-  val namespace = config.getOrElse(Namespace, "").toString
+  val hosts: String = config.getOrElse(Hosts, "").toString
+  val namespace: String = config.getOrElse(Namespace, "").toString
   val mode: CreateMode = config.get(Mode) match {
-    case Some(s: String) => s match {
-      case PersistentRegex() => CreateMode.PERSISTENT
-      case EphemeralRegex() => CreateMode.EPHEMERAL
-      case _ => CreateMode.PERSISTENT
-    }
+    case Some(s: String) =>
+      s match {
+        case PersistentRegex() => CreateMode.PERSISTENT
+        case EphemeralRegex() => CreateMode.EPHEMERAL
+        case _ => CreateMode.PERSISTENT
+      }
     case _ => CreateMode.PERSISTENT
   }
-  val initClear = config.get(InitClear) match {
+  val initClear: Boolean = config.get(InitClear) match {
     case Some(b: Boolean) => b
     case _ => true
   }
-  val closeClear = config.get(CloseClear) match {
+  val closeClear: Boolean = config.get(CloseClear) match {
     case Some(b: Boolean) => b
     case _ => false
   }
-  val lockPath = config.getOrElse(LockPath, "lock").toString
+  val lockPath: String = config.getOrElse(LockPath, "lock").toString
 
   private val cacheNamespace: String =
     if (namespace.isEmpty) metricName else namespace + separator + metricName
 
-  private val builder = CuratorFrameworkFactory.builder()
+  private val builder = CuratorFrameworkFactory
+    .builder()
     .connectString(hosts)
     .retryPolicy(new ExponentialBackoffRetry(1000, 3))
     .namespace(cacheNamespace)
@@ -82,10 +84,10 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
     client.start()
     info("start zk info cache")
     client.usingNamespace(cacheNamespace)
-    info(s"init with namespace: ${cacheNamespace}")
+    info(s"init with namespace: $cacheNamespace")
     delete(lockPath :: Nil)
     if (initClear) {
-      clear
+      clear()
     }
   }
 
@@ -98,7 +100,7 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
 
   def close(): Unit = {
     if (closeClear) {
-      clear
+      clear()
     }
     info("close zk info cache")
     client.close()
@@ -118,7 +120,9 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
   }
 
   def delete(keys: Iterable[String]): Unit = {
-    keys.foreach { key => delete(path(key)) }
+    keys.foreach { key =>
+      delete(path(key))
+    }
   }
 
   def clear(): Unit = {
@@ -143,10 +147,10 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
 
   private def children(path: String): List[String] = {
     try {
-      client.getChildren().forPath(path).asScala.toList
+      client.getChildren.forPath(path).asScala.toList
     } catch {
       case e: Throwable =>
-        warn(s"list ${path} warn: ${e.getMessage}")
+        warn(s"list $path warn: ${e.getMessage}")
         Nil
     }
   }
@@ -161,12 +165,15 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
 
   private def create(path: String, content: String): Boolean = {
     try {
-      client.create().creatingParentsIfNeeded().withMode(mode)
+      client
+        .create()
+        .creatingParentsIfNeeded()
+        .withMode(mode)
         .forPath(path, content.getBytes("utf-8"))
       true
     } catch {
       case e: Throwable =>
-        error(s"create ( ${path} -> ${content} ) error: ${e.getMessage}")
+        error(s"create ( $path -> $content ) error: ${e.getMessage}")
         false
     }
   }
@@ -177,17 +184,17 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
       true
     } catch {
       case e: Throwable =>
-        error(s"update ( ${path} -> ${content} ) error: ${e.getMessage}")
+        error(s"update ( $path -> $content ) error: ${e.getMessage}")
         false
     }
   }
 
   private def read(path: String): Option[String] = {
     try {
-      Some(new String(client.getData().forPath(path), "utf-8"))
+      Some(new String(client.getData.forPath(path), "utf-8"))
     } catch {
       case e: Throwable =>
-        warn(s"read ${path} warn: ${e.getMessage}")
+        warn(s"read $path warn: ${e.getMessage}")
         None
     }
   }
@@ -196,7 +203,7 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
     try {
       client.delete().guaranteed().deletingChildrenIfNeeded().forPath(path)
     } catch {
-      case e: Throwable => error(s"delete ${path} error: ${e.getMessage}")
+      case e: Throwable => error(s"delete $path error: ${e.getMessage}")
     }
   }
 
@@ -205,7 +212,7 @@ case class OffsetCheckpointInZK(config: Map[String, Any], metricName: String)
       client.checkExists().forPath(path) != null
     } catch {
       case e: Throwable =>
-        warn(s"check exists ${path} warn: ${e.getMessage}")
+        warn(s"check exists $path warn: ${e.getMessage}")
         false
     }
   }

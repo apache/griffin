@@ -43,11 +43,13 @@ Apache Griffin measure module needs two configuration files to define the parame
 
   "sinks": [
     {
+      "name": "ConsoleSink",
       "type": "console",
       "config": {
         "max.log.lines": 100
       }
     }, {
+      "name": "HdfsSink",
       "type": "hdfs",
       "config": {
         "path": "hdfs:///griffin/streaming/persist",
@@ -79,33 +81,182 @@ Above lists environment parameters.
 	+ batch.interval: Interval of dumping streaming data, for streaming mode.
 	+ process.interval: Interval of processing dumped streaming data, for streaming mode.
 	+ config: Configuration of spark parameters.
-- **sinks**: This field configures list of metrics sink parameters, multiple sink ways are supported. Details of sink configuration [here](#sinks).
+- **sinks**: This field configures list of sink definitions to persist both records and metrics. Details of sink configuration are available [here](#sinks).
 - **griffin.checkpoint**: This field configures list of griffin checkpoint parameters, multiple cache ways are supported. It is only for streaming dq case. Details of info cache configuration [here](#griffin-checkpoint).
 
-### <a name="sinks"></a>Sinks
-- **type**: Metrics and records sink type, "console", "hdfs", "http", "mongo", "custom". 
-- **config**: Configure parameters of each sink type.
-	+ console sink (aliases: "log")
-		* max.log.lines: the max lines of log.
-	+ hdfs sink
-		* path: hdfs path to sink metrics
-		* max.persist.lines: the max lines of total sink data.
-		* max.lines.per.file: the max lines of each sink file.
-	+ http sink (aliases: "es", "elasticsearch")
-		* api: api to submit sink metrics.
-		* method: http method, "post" default.
-    + mongo sink
-        * url: url of mongo db.
-        * database: database name.
-        * collection: collection name. 
-    + custom sink
-        * class: class name for user-provided data sink implementation
-        it should be implementing org.apache.griffin.measure.sink.Sink trait and have static method with signature
-		    ```def apply(ctx: SinkContext): Sink```. 
-        User-provided data sink should be present in Spark job's class path, by providing custom jar as -jar parameter
-		    to spark-submit or by adding to "jars" list in sparkProperties.json.
+### Sinks
+Sinks allow persistence of job metrics and bad data (source records that violated the defined rules) to external 
+storage systems. 
+Sinks have to be defined in the Env Config, and their `name` are mentioned in the Job Config. 
 
-### <a name="griffin-checkpoint"></a>Griffin Checkpoint
+List of supported sinks:
+ - Console
+ - HDFS
+ - MongoDB
+ - ElasticSearch 
+ - Custom Implementations
+ 
+ #### Configuration
+  A sample sink configuration is as following,
+  
+  ```
+...
+
+ "sinks": [
+     {
+       "name": "ConsoleSink",
+       "type": "CONSOLE",
+       "config": {
+         "numRows": 10,
+         "truncate": false
+       }
+     }
+   ]
+
+...
+  ```
+ 
+  ##### Key Parameters:
+  | Name    | Type     | Description                             | Supported Values                                 |
+  |:--------|:---------|:----------------------------------------|:-------------------------------------------------|
+  | name    | `String` | User defined unique name for Sink       |                                                  |
+  | type    | `String` | Type of Sink (Value is case insensitive)| console, hdfs, elasticsearch, mongodb, custom    |
+  | config  | `Object` | Configuration params of the sink        | Depends on sink type (see below)                 |
+ 
+  ##### For Custom Sinks:
+  - **config** object must contain the key **class** whose value specifies class name for user-provided sink 
+  implementation. This class should implement  `org.apache.griffin.measure.sink.Sink` trait
+  - Example:
+       ```
+    ...
+    
+     "sinks": [
+         {
+           "name": "MyCustomSink",
+           "type": "CUSTOM",
+           "config": {
+             "class": "my.package.sink.MyCustomSinkImpl",
+             ...
+           }
+         }
+       ]
+    
+    ...
+       ```
+  
+  **Note:** User-provided sink should be present in Spark job's class path, by either providing custom jar with 
+ `--jars` parameter to spark-submit or by adding setting `spark.jars` in `spark -> config` section of environment config.  
+
+##### For Console Sink:
+  - Console Sink, supports the following configurations. Other alias' like 'Log' as value for `type`.
+  
+     | Name           | Type     | Description                            | Default Values |
+     |:---------------|:---------|:---------------------------------------|:-------------- |
+     | numRows        | `Integer`| Number of records to log               | 20             |
+     | truncate       | `Boolean`| If true, strings more than 20 characters will be truncated and all cells will be aligned right| `true` |
+     
+ - Example:
+      ```
+     ...
+     
+      "sinks": [
+          {
+            "name": "ConsoleSink",
+            "type": "CONSOLE",
+            "config": {
+              "numRows": 10,
+              "truncate": false
+            }
+          }
+        ]
+     
+     ...
+      ```
+
+ ##### For HDFS Sink:
+   - HDFS Sink, supports the following configurations
+   
+      | Name               | Type     | Description                            | Default Values |
+      |:-------------------|:---------|:---------------------------------------|:-------------- |
+      | path               | `String` | HDFS base path to sink metrics         |                |
+      | max.persist.lines  | `Integer`| the max lines of total sink data       | -1             |
+      | max.lines.per.file | `Integer`| the max lines of each sink file        | 1000000        |
+      
+  - Example:
+       ```
+      ...
+      
+       "sinks": [
+           {
+             "name": "hdfsSink",
+             "type": "HDFS",
+             "config": {
+               "path": "hdfs://localhost/griffin/batch/persist",
+               "max.persist.lines": 10000,
+               "max.lines.per.file": 10000
+             }
+           }
+         ]
+      
+      ...
+       ```
+ 
+  ##### For MongoDB Sink:
+  - MongoDB Sink, supports the following configurations. Other alias' like 'Mongo' as value for `type`.
+  
+     | Name       | Type     | Description       | Default Values |
+     |:-----------|:---------|:------------------|:-------------- |
+     | url        | `String` | URL of MongoDB    |                |
+     | database   | `String` | Database name     |                |
+     | collection | `String` | Collection name   |                |
+     | over.time  | `Long`   | Wait Duration     | -1             |
+     | retry      | `Int`    | Number of retries | 10             |
+     
+ - Example:
+      ```
+     ...
+     
+      "sinks": [
+          {
+            "name": "MongoDBSink",
+            "type": "MongoDB",
+            "config": {
+              ...
+            }
+          }
+        ]
+     
+     ...
+      ```
+
+ ##### For Elasticsearch Sink:
+ - Elasticsearch Sink, supports the following configurations. Other alias' like 'ES' and 'HTTP' as value for `type`.
+   
+      | Name               | Type     | Description                   | Default Values |
+      |:-------------------|:---------|:------------------------------|:-------------- |
+      | api                | `String` | api to submit sink metrics    |                |
+      | method             | `String` | http method, "post" default   |                |
+      | connection.timeout | `Long`   | Wait Duration                 | -1             |
+      | retry              | `Integer`| Number of retries             | 10             |
+      
+  - Example:
+       ```
+      ...
+      
+       "sinks": [
+           {
+             "name": "ElasticsearchSink",
+             "type": "Elasticsearch",
+             "config": {
+               ...
+             }
+           }
+         ]
+      
+      ...
+       ```
+
+### Griffin Checkpoint
 - **type**: Griffin checkpoint type, "zk" for zookeeper checkpoint.
 - **config**: Configure parameters of griffin checkpoint type.
 	+ zookeeper checkpoint
@@ -120,37 +271,29 @@ Above lists environment parameters.
 ```
 {
   "name": "accu_batch",
-
   "process.type": "BATCH",
-
   "data.sources": [
     {
       "name": "src",
-      "connectors": [
-        {
-          "type": "AVRO",
-          "version": "1.7",
-          "config": {
-          	"file.path": "<path>/<to>",
-            "file.name": "<source-file>.avro"
-          }
+      "connector": {
+        "type": "AVRO",
+        "config": {
+          "file.path": "<path>/<to>",
+          "file.name": "<source-file>.avro"
         }
-      ]
-    }, {
+      }
+    },
+    {
       "name": "tgt",
-      "connectors": [
-        {
-          "type": "AVRO",
-          "version": "1.7",
-          "config": {
-          	"file.path": "<path>/<to>",
-            "file.name": "<target-file>.avro"
-          }
+      "connector": {
+        "type": "AVRO",
+        "config": {
+          "file.path": "<path>/<to>",
+          "file.name": "<target-file>.avro"
         }
-      ]
+      }
     }
   ],
-
   "evaluate.rule": {
     "rules": [
       {
@@ -164,7 +307,7 @@ Above lists environment parameters.
           "miss": "miss_count",
           "total": "total_count",
           "matched": "matched_count"
-        },        
+        },
         "out": [
           {
             "type": "metric",
@@ -172,13 +315,16 @@ Above lists environment parameters.
           },
           {
             "type": "record"
-          }        
+          }
         ]
       }
     ]
   },
-  
-  "sinks": ["CONSOLE", "HTTP", "HDFS"]
+  "sinks": [
+    "CONSOLESink",
+    "HTTPSink",
+    "HDFSSink"
+  ]
 }
 ```
 Above lists DQ job configure parameters.  
@@ -187,39 +333,246 @@ Above lists DQ job configure parameters.
 - **process.type**: Process type of DQ job, "BATCH" or "STREAMING".
 - **data.sources**: List of data sources in this DQ job.
 	+ name: Name of this data source, it should be different from other data sources.
-	+ connectors: List of data connectors combined as the same data source. Details of data connector configuration [here](#data-connector).
+	+ connector: Data connector for this data source. Details of data connector configuration [here](#data-connector).
 - **evaluate.rule**: Evaluate rule parameters of this DQ job.
 	+ dsl.type: Default dsl type of all the rules.
 	+ rules: List of rules, to define every rule step. Details of rule configuration [here](#rule).
 - **sinks**: Whitelisted sink types for this job. Note: no sinks will be used, if empty or omitted. 
 
-### <a name="data-connector"></a>Data Connector
-- **type**: Data connector type: "AVRO", "HIVE", "TEXT-DIR", "CUSTOM" for batch mode; "KAFKA", "CUSTOM" for streaming mode.
-- **version**: Version string of data connector type.
-- **config**: Configure parameters of each data connector type.
-	+ avro data connector
-		* file.path: avro file path, optional, "" as default.
-		* file.name: avro file name.
-	+ hive data connector
-		* database: data base name, optional, "default" as default.
-		* table.name: table name.
-		* where: where conditions string, split by ",", optional.
-			e.g. `dt=20170410 AND hour=15, dt=20170411 AND hour=15, dt=20170412 AND hour=15`
-	+ text dir data connector
-		* dir.path: parent directory path.
-		* data.dir.depth: integer, depth of data directories, 0 as default.
-		* success.file: success file name, 
-		* done.file: 
-	+ custom connector
-	    * class: class name for user-provided data connector implementation. For Batch
-	    it should be implementing BatchDataConnector trait and have static method with signature
-	    ```def apply(ctx: BatchDataConnectorContext): BatchDataConnector```. 
-	    For Streaming, it should be implementing StreamingDataConnector and have static method
-	    ```def apply(ctx: StreamingDataConnectorContext): StreamingDataConnector```. User-provided
-	    data connector should be present in Spark job's class path, by providing custom jar as -jar parameter
-	    to spark-submit or by adding to "jars" list in sparkProperties.json.  
+### Data Connector
 
-### <a name="rule"></a>Rule
+Data Connector help connect to external sources on which DQ checks can be applied.
+
+List of supported data connectors:
+ - Hive
+ - Kafka (Steaming only)
+ - ElasticSearch (Batch only) 
+ - **File based:** Parquet, Avro, ORC, CSV, TSV, Text.
+ - **JDBC based:** MySQL, PostgreSQL etc.
+ - **Custom:** Cassandra
+ 
+ #### Configuration
+ A sample data connector configuration is as following,
+ 
+ ```
+...
+
+"connector": {
+    "type": "file",
+    "config": {
+      "key1": "value1",
+      "key2": "value2"
+    }
+  }
+
+...
+ ```
+
+ ##### Key Parameters:
+ | Name    | Type     | Description                            | Supported Values                                 |
+ |:--------|:---------|:---------------------------------------|:-------------------------------------------------|
+ | type    | `String` | Type of the Connector                  | file, hive, kafka (streaming only), jdbc, custom |
+ | config  | `Object` | Configuration params of the connector  | Depends on connector type (see below)            |
+
+ ##### For Custom Data Connectors:
+ - **config** object must contain the key **class** whose value specifies class name for user-provided data connector 
+ implementation. 
+    + For **Batch** it should implement BatchDataConnector trait.
+    + For **Streaming** it should implement StreamingDataConnector trait.
+ - Example:
+      ```
+     "connector": {
+         "type": "custom",
+         "config": {
+           "class": "org.apache.griffin.measure.datasource.connector.batch.CassandraDataConnector",
+           ...
+         }
+       }
+      ```
+ 
+ **Note:** User-provided data connector should be present in Spark job's class path, by either providing custom jar with 
+`--jars` parameter to spark-submit or by adding setting `spark.jars` in `spark -> config` section of environment config.  
+
+ ##### [Deprecated] ~~For ElasticSearch Custom Data Connectors:~~ 
+  - Currently supported SQL mode (for ElasticSearch with sql plugin) and NORMAL mode.
+  - For NORMAL mode, config object supports the following keys,
+  
+ | Name       | Type     | Description                            | Default Values |
+ |:-----------|:---------|:---------------------------------------|:-------------- |
+ | index      | `String` | ElasticSearch index name| default |
+ | type       | `String` | ElasticSearch data type | accuracy |
+ | host       | `String` | ElasticSearch url host | `Empty` |
+ | port       | `String` | ElasticSearch url port | `Empty` |
+ | fields     | `List`   | list of columns | `Empty` |
+ | size       | `Integer`| data size (lines) to load | 100 |
+ | metric.name| `String` | metric name to load | * |
+
+ - Example:
+      ```
+     "connectors": [
+       { 
+         "type": "custom",
+         "config": {
+           "class": "org.apache.griffin.measure.datasource.connector.batch.ElasticSearchGriffinDataConnector",
+           "index": "test-index-v1",
+           "type": "metric",
+           "host": "test.es-xxx.org",
+           "port": "80",
+           "fields": ["col_a", "col_b", "col_c"],
+           "size": 20
+         }
+       }
+     ]
+      ```
+  - For SQL mode, config object supports the following keys,
+  
+ | Name       | Type     | Description                            | Default Values |
+ |:-----------|:---------|:---------------------------------------|:-------------- |
+ | host       | `String` | ElasticSearch url host | `Empty` |
+ | port       | `String` | ElasticSearch url port | `Empty` |
+ | sql.mode   | `Boolean`| use sql mode | false |
+ | sql        | `String` | ElasticSearch SQL | `Empty` |
+
+ - Example:
+      ```
+     "connectors": [
+       { 
+         "type": "custom",
+         "config": {
+           "class": "org.apache.griffin.measure.datasource.connector.batch.ElasticSearchGriffinDataConnector",
+           "host": "test.es-xxx.org",
+           "port": "80",
+           "sql.mode": true,
+           "sql": "select col_a, col_b, col_c from test-index-v1 limit 20"
+         }
+       }
+     ]
+      ```
+ 
+ ##### For File based Data Connectors:
+
+ - Currently supports formats like Parquet, ORC, AVRO, Text and Delimited types like CSV, TSV etc.
+ - Local files can also be read by prepending `file://` namespace.
+ - **config** object supports the following keys,
+        
+ | Name       | Type     | Description                            | Supported Values | Default Values |
+ |:-----------|:---------|:---------------------------------------|:-----------------|:-------------- |
+ | format     | `String` | type of file source| parquet, avro, orc, csv, tsv, text | parquet |
+ | paths      | `List`   | path(s) to be read | | `Empty` |
+ | options    | `Object` | format specific options | | `Empty` |
+ | skipOnError| `Boolean`| whether to continue execution if one or more paths are invalid | true, false | false |
+ | schema     | `List`   | given as list of key value pairs | See example below | `null` |
+
+ - Example:
+      ```
+     "connector": {
+         "type": "file",
+         "config": {
+           "format": "csv",
+           "paths": [
+             "/path/to/csv/dir/*",
+             "/path/to/dir/test.csv"
+           ],
+           "options": {
+             "header": "true"
+           },
+           "skipOnError": "false",
+           "schema": [
+             {
+               "name": "user_id",
+               "type": "string",
+               "nullable": "true"
+             },
+             {
+               "name": "age",
+               "type": "int",
+               "nullable": "false"
+             }
+           ]
+         }
+       }
+   
+ **Note:** Additional examples of schema:
+- "schema":[{"name":"user_id","type":"string","nullable":"true"},{"name":"age","type":"int","nullable":"false"}]
+- "schema":[{"name":"user_id","type":"decimal(5,2)","nullable":"true"}]
+- "schema":[{"name":"my_struct","type":"struct<f1:int,f2:string>","nullable":"true"}]
+
+
+##### For ElasticSearch Data Connectors:
+  - Elasticsearch Data Connector, supports the following configurations
+  
+ | Name           | Type     | Description                            | Default Values |
+ |:---------------|:---------|:---------------------------------------|:-------------- |
+ | paths          | `List`   | Elasticsearch indices (Required)                  |  |
+ | filterExprs    | `List`   | List of string expressions that act as where conditions (row filters)| `Empty` |
+ | selectionExprs | `List`   | List of string expressions that act as selection conditions (column filters) | `Empty` |
+ | options        | `Object` | Additional elasticsearch options. Refer to [ConfigurationOptions](https://github.com/elastic/elasticsearch-hadoop/blob/v7.6.1/mr/src/main/java/org/elasticsearch/hadoop/cfg/ConfigurationOptions.java) for options | `Empty` |
+ 
+ - Example:
+      ```
+     "connector": {
+             "type": "elasticsearch",
+             "config": {
+               "selectionExprs": [
+                 "account_number",
+                 "city",
+                 "gender",
+                 "age > 18"
+               ],
+               "filterExprs": [
+                 "account_number < 10"
+               ],
+               "paths": [
+                 "bank",
+                 "customer"
+               ],
+               "options": {
+                 "es.nodes": "localhost",
+                 "es.port": 9200
+               }
+             }
+           }
+      ```
+
+ ##### For Hive Data Connectors:
+ - **config** object supports the following keys,
+    * database: data base name, optional, "default" as default.
+    * table.name: table name.
+    * where: where conditions string, split by ",", optional.
+        e.g. `dt=20170410 AND hour=15, dt=20170411 AND hour=15, dt=20170412 AND hour=15`
+        
+ ##### For JDBC based Data Connectors:
+- **config** object supports the following keys,
+
+| Name       | Type     | Description                            | Default Values |
+|:-----------|:---------|:---------------------------------------|:-------------- |
+| database   | `String` | database name                          | default |
+| tablename  | `String` | table name to be read                  | `Empty` |
+| url        | `String` | the connection string URL to database  | `Empty` |
+| user       | `String` | user for connection to database        | `Empty` |
+| password   | `String` | password for connection to database    | `null`  |
+| driver     | `String` | driver class for JDBC connection to database | com.mysql.jdbc.Driver |
+| where      | `String` | condition for reading data from table  | `Empty` |
+
+- Example:
+   ```
+  "connector": {
+      "type": "jdbc",
+      "config": {
+        "database": "default",
+        "tablename": "test",
+        "url": "jdbc:mysql://localhost:3306/default",
+        "user": "test_u",
+        "password": "test_p",
+        "driver": "com.mysql.jdbc.Driver",
+        "where": ""
+      }
+    } 
+  
+**Note:** Jar containing driver class should be present in Spark job's class path, by either providing custom jar with 
+`--jars` parameter to spark-submit or by adding setting `spark.jars` in `spark -> config` section of environment config.  
+
+### Rule
 - **dsl.type**: Rule dsl type, "spark-sql", "df-ops" and "griffin-dsl".
 - **dq.type**: DQ type of this rule, only for "griffin-dsl" type. Supported types: "ACCURACY", "PROFILING", "TIMELINESS", "UNIQUENESS", "COMPLETENESS".
 - **out.dataframe.name** (step information): Output table name of this rule, could be used in the following rules.

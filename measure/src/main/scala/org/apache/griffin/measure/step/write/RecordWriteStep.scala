@@ -1,22 +1,23 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 package org.apache.griffin.measure.step.write
+
+import scala.util.Try
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
@@ -27,15 +28,16 @@ import org.apache.griffin.measure.step.builder.ConstantColumns
 import org.apache.griffin.measure.utils.JsonUtil
 
 /**
-  * write records needs to be sink
-  */
-case class RecordWriteStep(name: String,
-                           inputName: String,
-                           filterTableNameOpt: Option[String] = None,
-                           writeTimestampOpt: Option[Long] = None
-                          ) extends WriteStep {
+ * write records needs to be sink
+ */
+case class RecordWriteStep(
+    name: String,
+    inputName: String,
+    filterTableNameOpt: Option[String] = None,
+    writeTimestampOpt: Option[Long] = None)
+    extends WriteStep {
 
-  def execute(context: DQContext): Boolean = {
+  def execute(context: DQContext): Try[Boolean] = Try {
     val timestamp = writeTimestampOpt.getOrElse(context.contextId.timestamp)
 
     val writeMode = writeTimestampOpt.map(_ => SimpleMode).getOrElse(context.writeMode)
@@ -46,7 +48,13 @@ case class RecordWriteStep(name: String,
         // write records
         recordsOpt match {
           case Some(records) =>
-            context.getSink(timestamp).sinkRecords(records, name)
+            context.getSinks(timestamp).foreach { sink =>
+              try {
+                sink.sinkBatchRecords(records, Option(name))
+              } catch {
+                case e: Throwable => error(s"sink records error: ${e.getMessage}", e)
+              }
+            }
           case _ =>
         }
       case TimestampMode =>
@@ -55,12 +63,24 @@ case class RecordWriteStep(name: String,
         // write records
         recordsOpt.foreach { records =>
           records.foreach { pair =>
-            val (t, strs) = pair
-            context.getSink(t).sinkRecords(strs, name)
+            val (t, strRecords) = pair
+            context.getSinks(t).foreach { sink =>
+              try {
+                sink.sinkRecords(strRecords, name)
+              } catch {
+                case e: Throwable => error(s"sink records error: ${e.getMessage}", e)
+              }
+            }
           }
         }
         emptyTimestamps.foreach { t =>
-          context.getSink(t).sinkRecords(Nil, name)
+          context.getSinks(t).foreach { sink =>
+            try {
+              sink.sinkRecords(Nil, name)
+            } catch {
+              case e: Throwable => error(s"sink records error: ${e.getMessage}", e)
+            }
+          }
         }
     }
     true
@@ -76,36 +96,33 @@ case class RecordWriteStep(name: String,
 
   private def getDataFrame(context: DQContext, name: String): Option[DataFrame] = {
     try {
-      val df = context.sqlContext.table(s"`${name}`")
+      val df = context.sparkSession.table(s"`$name`")
       Some(df)
     } catch {
       case e: Throwable =>
-        error(s"get data frame ${name} fails", e)
+        error(s"get data frame $name fails", e)
         None
     }
   }
 
-  private def getRecordDataFrame(context: DQContext): Option[DataFrame]
-    = getDataFrame(context, inputName)
+  private def getFilterTableDataFrame(context: DQContext): Option[DataFrame] =
+    filterTableNameOpt.flatMap(getDataFrame(context, _))
 
-  private def getFilterTableDataFrame(context: DQContext): Option[DataFrame]
-    = filterTableNameOpt.flatMap(getDataFrame(context, _))
-
-  private def getBatchRecords(context: DQContext): Option[RDD[String]] = {
-    getRecordDataFrame(context).map(_.toJSON.rdd);
+  private def getBatchRecords(context: DQContext): Option[DataFrame] = {
+    getDataFrame(context, inputName)
   }
 
-  private def getStreamingRecords(context: DQContext)
-    : (Option[RDD[(Long, Iterable[String])]], Set[Long])
-    = {
-    implicit val encoder = Encoders.tuple(Encoders.scalaLong, Encoders.STRING)
+  private def getStreamingRecords(
+      context: DQContext): (Option[RDD[(Long, Iterable[String])]], Set[Long]) = {
+    implicit val encoder: Encoder[(Long, String)] =
+      Encoders.tuple(Encoders.scalaLong, Encoders.STRING)
     val defTimestamp = context.contextId.timestamp
-    getRecordDataFrame(context) match {
+    getDataFrame(context, inputName) match {
       case Some(df) =>
         val (filterFuncOpt, emptyTimestamps) = getFilterTableDataFrame(context) match {
           case Some(filterDf) =>
             // timestamps with empty flag
-            val tmsts: Array[(Long, Boolean)] = (filterDf.collect.flatMap { row =>
+            val tmsts: Array[(Long, Boolean)] = filterDf.collect.flatMap { row =>
               try {
                 val tmst = getTmst(row, defTimestamp)
                 val empty = row.getAs[Boolean](ConstantColumns.empty)
@@ -113,15 +130,15 @@ case class RecordWriteStep(name: String,
               } catch {
                 case _: Throwable => None
               }
-            })
+            }
             val emptyTmsts = tmsts.filter(_._2).map(_._1).toSet
             val recordTmsts = tmsts.filter(!_._2).map(_._1).toSet
-            val filterFuncOpt: Option[(Long) => Boolean] = if (recordTmsts.size > 0) {
+            val filterFuncOpt: Option[Long => Boolean] = if (recordTmsts.nonEmpty) {
               Some((t: Long) => recordTmsts.contains(t))
             } else None
 
             (filterFuncOpt, emptyTmsts)
-          case _ => (Some((t: Long) => true), Set[Long]())
+          case _ => (Some((_: Long) => true), Set[Long]())
         }
 
         // filter timestamps need to record
@@ -135,7 +152,7 @@ case class RecordWriteStep(name: String,
                   val str = JsonUtil.toJson(map)
                   Some((tmst, str))
                 } catch {
-                  case e: Throwable => None
+                  case _: Throwable => None
                 }
               } else None
             }

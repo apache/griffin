@@ -17,7 +17,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -44,9 +45,14 @@ under the License.
         <slf4j.version>1.7.21</slf4j.version>
         <log4j.version>1.2.16</log4j.version>
         <curator.version>2.10.0</curator.version>
-        <scalamock.version>3.6.0</scalamock.version>
+        <mockito.version>1.10.19</mockito.version>
         <mysql.java.version>5.1.47</mysql.java.version>
         <cassandra.connector.version>2.4.1</cassandra.connector.version>
+        <scalastyle.version>1.0.0</scalastyle.version>
+        <scalafmt.parameters>--diff --test</scalafmt.parameters>
+        <scalafmt.skip>false</scalafmt.skip>
+        <elasticsearch.version>6.4.1</elasticsearch.version>
+        <spark.scope>provided</spark.scope>
     </properties>
 
     <dependencies>
@@ -62,25 +68,25 @@ under the License.
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
+            <scope>${spark.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
+            <scope>${spark.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
+            <scope>${spark.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
+            <scope>${spark.scope}</scope>
             <exclusions>
                 <exclusion>
                     <groupId>commons-httpclient</groupId>
@@ -169,12 +175,16 @@ under the License.
             <version>${scalatest.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!--scala mock-->
         <dependency>
-            <groupId>org.scalamock</groupId>
-            <artifactId>scalamock-scalatest-support_${scala.binary.version}</artifactId>
-            <version>${scalamock.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -193,9 +203,28 @@ under the License.
             <artifactId>httpclient</artifactId>
             <version>4.5.9</version>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch-spark-20_2.11</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>1.14.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
@@ -213,25 +242,20 @@ under the License.
                 </executions>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
+                    <args>
+                        <arg>-deprecation</arg>
+                        <arg>-feature</arg>
+                        <arg>-unchecked</arg>
+                    </args>
                 </configuration>
-            </plugin>
-            <!-- enable scalatest -->
-            <plugin>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <id>test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -248,7 +272,8 @@ under the License.
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.apache.griffin.measure.Application</mainClass>
                                 </transformer>
                             </transformers>
@@ -267,6 +292,70 @@ under the License.
                                 </filter>
                             </filters>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.antipathy</groupId>
+                <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
+                <version>0.12_1.5.1</version>
+                <configuration>
+                    <parameters>${scalafmt.parameters}</parameters>
+                    <skip>${scalafmt.skip}</skip>
+                    <skipSources>${scalafmt.skip}</skipSources>
+                    <skipTestSources>${scalafmt.skip}</skipTestSources>
+                    <configLocation>${project.parent.basedir}/.scalafmt.conf</configLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.scalastyle</groupId>
+                <artifactId>scalastyle-maven-plugin</artifactId>
+                <version>${scalastyle.version}</version>
+                <configuration>
+                    <verbose>false</verbose>
+                    <failOnViolation>true</failOnViolation>
+                    <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                    <failOnWarning>false</failOnWarning>
+                    <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                    <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+                    <configLocation>${project.parent.basedir}/scalastyle-config.xml</configLocation>
+                    <outputFile>${basedir}/target/scalastyle-output.xml</outputFile>
+                    <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
+                    <outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <finalName>${artifactId}-${project.version}</finalName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

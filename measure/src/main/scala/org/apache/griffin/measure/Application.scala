@@ -1,37 +1,41 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 package org.apache.griffin.measure
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
-import org.apache.griffin.measure.configuration.dqdefinition.{DQConfig, EnvConfig, GriffinConfig, Param}
+import org.apache.griffin.measure.configuration.dqdefinition.{
+  DQConfig,
+  EnvConfig,
+  GriffinConfig,
+  Param
+}
 import org.apache.griffin.measure.configuration.dqdefinition.reader.ParamReaderFactory
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType
+import org.apache.griffin.measure.configuration.enums.ProcessType._
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
 
-
 /**
-  * application entrance
-  */
+ * application entrance
+ */
 object Application extends Loggable {
 
   def main(args: Array[String]): Unit = {
@@ -63,16 +67,16 @@ object Application extends Loggable {
     val allParam: GriffinConfig = GriffinConfig(envParam, dqParam)
 
     // choose process
-    val procType = ProcessType(allParam.getDqConfig.getProcType)
+    val procType = ProcessType.withNameWithDefault(allParam.getDqConfig.getProcType)
     val dqApp: DQApp = procType match {
       case BatchProcessType => BatchDQApp(allParam)
       case StreamingProcessType => StreamingDQApp(allParam)
       case _ =>
-        error(s"${procType} is unsupported process type!")
+        error(s"$procType is unsupported process type!")
         sys.exit(-4)
     }
 
-    startup
+    startup()
 
     // dq app init
     dqApp.init match {
@@ -80,7 +84,7 @@ object Application extends Loggable {
         info("process init success")
       case Failure(ex) =>
         error(s"process init error: ${ex.getMessage}", ex)
-        shutdown
+        shutdown()
         sys.exit(-5)
     }
 
@@ -96,7 +100,7 @@ object Application extends Loggable {
         if (dqApp.retryable) {
           throw ex
         } else {
-          shutdown
+          shutdown()
           sys.exit(-5)
         }
     }
@@ -107,26 +111,24 @@ object Application extends Loggable {
         info("process end success")
       case Failure(ex) =>
         error(s"process end error: ${ex.getMessage}", ex)
-        shutdown
+        shutdown()
         sys.exit(-5)
     }
 
-    shutdown
+    shutdown()
 
     if (!success) {
       sys.exit(-5)
     }
   }
 
-  def readParamFile[T <: Param](file: String)(implicit m : ClassTag[T]): Try[T] = {
+  def readParamFile[T <: Param](file: String)(implicit m: ClassTag[T]): Try[T] = {
     val paramReader = ParamReaderFactory.getParamReader(file)
     paramReader.readConfig[T]
   }
 
-  private def startup(): Unit = {
-  }
+  private def startup(): Unit = {}
 
-  private def shutdown(): Unit = {
-  }
+  private def shutdown(): Unit = {}
 
 }

@@ -1,21 +1,20 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 package org.apache.griffin.measure.utils
 
 import scala.util.{Failure, Success, Try}
@@ -27,18 +26,19 @@ object TimeUtil extends Loggable {
 
   private object Units {
     case class TimeUnit(name: String, shortName: String, ut: Long, regex: Regex) {
-      def toMs(t: Long) : Long = t * ut
-      def fromMs(ms: Long) : Long = ms / ut
-      def fitUnit(ms: Long) : Boolean = (ms % ut == 0)
+      def toMs(t: Long): Long = t * ut
+      def fromMs(ms: Long): Long = ms / ut
+      def fitUnit(ms: Long): Boolean = ms % ut == 0
     }
 
-    val dayUnit = TimeUnit("day", "d", 24 * 60 * 60 * 1000, """^(?i)d(?:ay)?$""".r)
-    val hourUnit = TimeUnit("hour", "h", 60 * 60 * 1000, """^(?i)h(?:our|r)?$""".r)
-    val minUnit = TimeUnit("minute", "m", 60 * 1000, """^(?i)m(?:in(?:ute)?)?$""".r)
-    val secUnit = TimeUnit("second", "s", 1000, """^(?i)s(?:ec(?:ond)?)?$""".r)
-    val msUnit = TimeUnit("millisecond", "ms", 1, """^(?i)m(?:illi)?s(?:ec(?:ond)?)?$""".r)
+    val dayUnit: TimeUnit = TimeUnit("day", "d", 24 * 60 * 60 * 1000, """^(?i)d(?:ay)?$""".r)
+    val hourUnit: TimeUnit = TimeUnit("hour", "h", 60 * 60 * 1000, """^(?i)h(?:our|r)?$""".r)
+    val minUnit: TimeUnit = TimeUnit("minute", "m", 60 * 1000, """^(?i)m(?:in(?:ute)?)?$""".r)
+    val secUnit: TimeUnit = TimeUnit("second", "s", 1000, """^(?i)s(?:ec(?:ond)?)?$""".r)
+    val msUnit: TimeUnit =
+      TimeUnit("millisecond", "ms", 1, """^(?i)m(?:illi)?s(?:ec(?:ond)?)?$""".r)
 
-    val timeUnits = dayUnit :: hourUnit :: minUnit :: secUnit :: msUnit :: Nil
+    val timeUnits: List[TimeUnit] = dayUnit :: hourUnit :: minUnit :: secUnit :: msUnit :: Nil
   }
   import Units._
 
@@ -58,16 +58,16 @@ object TimeUtil extends Loggable {
               case minUnit.regex() => minUnit.toMs(t)
               case secUnit.regex() => secUnit.toMs(t)
               case msUnit.regex() => msUnit.toMs(t)
-              case _ => throw new Exception(s"${timeString} is invalid time format")
+              case _ => throw new Exception(s"$timeString is invalid time format")
             }
           case PureTimeRegex(time) =>
             val t = time.toLong
             msUnit.toMs(t)
-          case _ => throw new Exception(s"${timeString} is invalid time format")
+          case _ => throw new Exception(s"$timeString is invalid time format")
         }
       } match {
         case Success(v) => Some(v)
-        case Failure(ex) => None
+        case Failure(_) => None
       }
     }
     value
@@ -102,7 +102,7 @@ object TimeUtil extends Loggable {
     val unit = matchedUnitOpt.getOrElse(msUnit)
     val unitTime = unit.fromMs(t)
     val unitStr = unit.shortName
-    s"${unitTime}${unitStr}"
+    s"$unitTime$unitStr"
   }
 
 }

@@ -1,25 +1,23 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 package org.apache.griffin.measure.step.builder.dsl.expr
 
-trait LogicalExpr extends Expr {
-}
+trait LogicalExpr extends Expr {}
 
 case class InExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends LogicalExpr {
 
@@ -27,14 +25,14 @@ case class InExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends LogicalExpr
 
   def desc: String = {
     val notStr = if (is) "" else " NOT"
-    s"${head.desc}${notStr} IN (${range.map(_.desc).mkString(", ")})"
+    s"${head.desc}$notStr IN (${range.map(_.desc).mkString(", ")})"
   }
   def coalesceDesc: String = {
     val notStr = if (is) "" else " NOT"
-    s"${head.coalesceDesc}${notStr} IN (${range.map(_.coalesceDesc).mkString(", ")})"
+    s"${head.coalesceDesc}$notStr IN (${range.map(_.coalesceDesc).mkString(", ")})"
   }
 
-  override def map(func: (Expr) => Expr): InExpr = {
+  override def map(func: Expr => Expr): InExpr = {
     InExpr(func(head), is, range.map(func(_)))
   }
 }
@@ -52,7 +50,7 @@ case class BetweenExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends Logica
       case first :: second :: _ => s"${first.desc} AND ${second.desc}"
       case _ => throw new Exception("between expression exception: range less than 2")
     }
-    s"${head.desc}${notStr} BETWEEN ${rangeStr}"
+    s"${head.desc}$notStr BETWEEN $rangeStr"
   }
   def coalesceDesc: String = {
     val notStr = if (is) "" else " NOT"
@@ -60,10 +58,10 @@ case class BetweenExpr(head: Expr, is: Boolean, range: Seq[Expr]) extends Logica
       case first :: second :: _ => s"${first.coalesceDesc} AND ${second.coalesceDesc}"
       case _ => throw new Exception("between expression exception: range less than 2")
     }
-    s"${head.coalesceDesc}${notStr} BETWEEN ${rangeStr}"
+    s"${head.coalesceDesc}$notStr BETWEEN $rangeStr"
   }
 
-  override def map(func: (Expr) => Expr): BetweenExpr = {
+  override def map(func: Expr => Expr): BetweenExpr = {
     BetweenExpr(func(head), is, range.map(func(_)))
   }
 }
@@ -74,14 +72,14 @@ case class LikeExpr(head: Expr, is: Boolean, value: Expr) extends LogicalExpr {
 
   def desc: String = {
     val notStr = if (is) "" else " NOT"
-    s"${head.desc}${notStr} LIKE ${value.desc}"
+    s"${head.desc}$notStr LIKE ${value.desc}"
   }
   def coalesceDesc: String = {
     val notStr = if (is) "" else " NOT"
-    s"${head.coalesceDesc}${notStr} LIKE ${value.coalesceDesc}"
+    s"${head.coalesceDesc}$notStr LIKE ${value.coalesceDesc}"
   }
 
-  override def map(func: (Expr) => Expr): LikeExpr = {
+  override def map(func: Expr => Expr): LikeExpr = {
     LikeExpr(func(head), is, func(value))
   }
 }
@@ -92,18 +90,17 @@ case class RLikeExpr(head: Expr, is: Boolean, value: Expr) extends LogicalExpr {
 
   def desc: String = {
     val notStr = if (is) "" else " NOT"
-    s"${head.desc}${notStr} RLIKE ${value.desc}"
+    s"${head.desc}$notStr RLIKE ${value.desc}"
   }
   def coalesceDesc: String = {
     val notStr = if (is) "" else " NOT"
-    s"${head.coalesceDesc}${notStr} RLIKE ${value.coalesceDesc}"
+    s"${head.coalesceDesc}$notStr RLIKE ${value.coalesceDesc}"
   }
 
-  override def map(func: (Expr) => Expr): RLikeExpr = {
+  override def map(func: Expr => Expr): RLikeExpr = {
     RLikeExpr(func(head), is, func(value))
   }
 }
-
 
 case class IsNullExpr(head: Expr, is: Boolean) extends LogicalExpr {
 
@@ -111,11 +108,11 @@ case class IsNullExpr(head: Expr, is: Boolean) extends LogicalExpr {
 
   def desc: String = {
     val notStr = if (is) "" else " NOT"
-    s"${head.desc} IS${notStr} NULL"
+    s"${head.desc} IS$notStr NULL"
   }
   def coalesceDesc: String = desc
 
-  override def map(func: (Expr) => Expr): IsNullExpr = {
+  override def map(func: Expr => Expr): IsNullExpr = {
     IsNullExpr(func(head), is)
   }
 }
@@ -130,15 +127,16 @@ case class IsNanExpr(head: Expr, is: Boolean) extends LogicalExpr {
   }
   def coalesceDesc: String = desc
 
-  override def map(func: (Expr) => Expr): IsNanExpr = {
+  override def map(func: Expr => Expr): IsNanExpr = {
     IsNanExpr(func(head), is)
   }
 }
 
 // -----------
 
-case class LogicalFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Option[String]
-                            ) extends LogicalExpr with AliasableExpr {
+case class LogicalFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Option[String])
+    extends LogicalExpr
+    with AliasableExpr {
 
   addChild(factor)
 
@@ -150,7 +148,7 @@ case class LogicalFactorExpr(factor: Expr, withBracket: Boolean, aliasOpt: Optio
     else factor.extractSelf
   }
 
-  override def map(func: (Expr) => Expr): LogicalFactorExpr = {
+  override def map(func: Expr => Expr): LogicalFactorExpr = {
     LogicalFactorExpr(func(factor), withBracket, aliasOpt)
   }
 }
@@ -161,12 +159,12 @@ case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends Logi
 
   def desc: String = {
     oprs.foldRight(factor.desc) { (opr, fac) =>
-      s"(${trans(opr)} ${fac})"
+      s"(${trans(opr)} $fac)"
     }
   }
   def coalesceDesc: String = {
     oprs.foldRight(factor.coalesceDesc) { (opr, fac) =>
-      s"(${trans(opr)} ${fac})"
+      s"(${trans(opr)} $fac)"
     }
   }
   private def trans(s: String): String = {
@@ -180,29 +178,29 @@ case class UnaryLogicalExpr(oprs: Seq[String], factor: LogicalExpr) extends Logi
     else factor.extractSelf
   }
 
-  override def map(func: (Expr) => Expr): UnaryLogicalExpr = {
+  override def map(func: Expr => Expr): UnaryLogicalExpr = {
     UnaryLogicalExpr(oprs, func(factor).asInstanceOf[LogicalExpr])
   }
 }
 
 case class BinaryLogicalExpr(factor: LogicalExpr, tails: Seq[(String, LogicalExpr)])
-  extends LogicalExpr {
+    extends LogicalExpr {
 
   addChildren(factor +: tails.map(_._2))
 
   def desc: String = {
     val res = tails.foldLeft(factor.desc) { (fac, tail) =>
       val (opr, expr) = tail
-      s"${fac} ${trans(opr)} ${expr.desc}"
+      s"$fac ${trans(opr)} ${expr.desc}"
     }
-    if (tails.size <= 0) res else s"${res}"
+    if (tails.size <= 0) res else s"$res"
   }
   def coalesceDesc: String = {
     val res = tails.foldLeft(factor.coalesceDesc) { (fac, tail) =>
       val (opr, expr) = tail
-      s"${fac} ${trans(opr)} ${expr.coalesceDesc}"
+      s"$fac ${trans(opr)} ${expr.coalesceDesc}"
     }
-    if (tails.size <= 0) res else s"${res}"
+    if (tails.size <= 0) res else s"$res"
   }
   private def trans(s: String): String = {
     s match {
@@ -216,8 +214,8 @@ case class BinaryLogicalExpr(factor: LogicalExpr, tails: Seq[(String, LogicalExp
     else factor.extractSelf
   }
 
-  override def map(func: (Expr) => Expr): BinaryLogicalExpr = {
-    BinaryLogicalExpr(func(factor).asInstanceOf[LogicalExpr], tails.map{ pair =>
+  override def map(func: Expr => Expr): BinaryLogicalExpr = {
+    BinaryLogicalExpr(func(factor).asInstanceOf[LogicalExpr], tails.map { pair =>
       (pair._1, func(pair._2).asInstanceOf[LogicalExpr])
     })
   }

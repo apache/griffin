@@ -1,21 +1,20 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 package org.apache.griffin.measure.launch.streaming
 
 import java.util.{Date, Timer, TimerTask}
@@ -24,19 +23,21 @@ import java.util.concurrent.{Executors, ThreadPoolExecutor, TimeUnit}
 import scala.util.Try
 
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{SparkSession, SQLContext}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition._
-import org.apache.griffin.measure.configuration.enums._
+import org.apache.griffin.measure.configuration.enums.ProcessType.StreamingProcessType
 import org.apache.griffin.measure.context._
+import org.apache.griffin.measure.context.streaming.checkpoint.lock.CheckpointLock
 import org.apache.griffin.measure.context.streaming.checkpoint.offset.OffsetCheckpointClient
 import org.apache.griffin.measure.context.streaming.metric.CacheResults
 import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.job.DQJob
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
+import org.apache.griffin.measure.sink.Sink
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 import org.apache.griffin.measure.utils.{HdfsUtil, TimeUtil}
 
@@ -45,11 +46,9 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
   val envParam: EnvConfig = allParam.getEnvConfig
   val dqParam: DQConfig = allParam.getDqConfig
 
-  val sparkParam = envParam.getSparkParam
-  val metricName = dqParam.getName
-  val sinkParams = getSinkParams
-
-  var sqlContext: SQLContext = _
+  val sparkParam: SparkParam = envParam.getSparkParam
+  val metricName: String = dqParam.getName
+  val sinkParams: Seq[SinkParam] = getSinkParams
 
   def retryable: Boolean = true
 
@@ -59,20 +58,19 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     conf.setAll(sparkParam.getConfig)
     conf.set("spark.sql.crossJoin.enabled", "true")
     sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
-    val logLevel = getGriffinLogLevel()
+    val logLevel = getGriffinLogLevel
     sparkSession.sparkContext.setLogLevel(sparkParam.getLogLevel)
     griffinLogger.setLevel(logLevel)
-    sqlContext = sparkSession.sqlContext
 
     // clear checkpoint directory
-    clearCpDir
+    clearCpDir()
 
     // init info cache instance
     OffsetCheckpointClient.initClient(envParam.getCheckpointParams, metricName)
-    OffsetCheckpointClient.init
+    OffsetCheckpointClient.init()
 
     // register udf
-    GriffinUDFAgent.register(sqlContext)
+    GriffinUDFAgent.register(sparkSession)
   }
 
   def run: Try[Boolean] = Try {
@@ -94,16 +92,16 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
     // generate data sources
     val dataSources = DataSourceFactory.getDataSources(sparkSession, ssc, dqParam.getDataSources)
-    dataSources.foreach(_.init)
+    dataSources.foreach(_.init())
 
     // create dq context
-    val globalContext: DQContext = DQContext(
-      contextId, metricName, dataSources, sinkParams, StreamingProcessType
-    )(sparkSession)
+    val globalContext: DQContext =
+      DQContext(contextId, metricName, dataSources, sinkParams, StreamingProcessType)(
+        sparkSession)
 
     // start id
     val applicationId = sparkSession.sparkContext.applicationId
-    globalContext.getSink().start(applicationId)
+    globalContext.getSinks.foreach(_.open(applicationId))
 
     // process thread
     val dqCalculator = StreamingDQCalculator(globalContext, dqParam.getEvaluateRule)
@@ -123,7 +121,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     globalContext.clean()
 
     // finish
-    globalContext.getSink().finish()
+    globalContext.getSinks.foreach(_.close())
 
     true
   }
@@ -132,7 +130,6 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     sparkSession.close()
     sparkSession.stop()
   }
-
 
   def createStreamingContext: StreamingContext = {
     val batchInterval = TimeUtil.milliseconds(sparkParam.getBatchInterval) match {
@@ -145,26 +142,25 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     ssc
   }
 
-  private def clearCpDir: Unit = {
+  private def clearCpDir(): Unit = {
     if (sparkParam.needInitClear) {
       val cpDir = sparkParam.getCpDir
-      info(s"clear checkpoint directory ${cpDir}")
+      info(s"clear checkpoint directory $cpDir")
       HdfsUtil.deleteHdfsPath(cpDir)
     }
   }
 
-
   /**
-    *
-    * @param globalContext
-    * @param evaluateRuleParam
-    */
-  case class StreamingDQCalculator(globalContext: DQContext,
-                                   evaluateRuleParam: EvaluateRuleParam
-                                  ) extends Runnable with Loggable {
+   *
+   * @param globalContext
+   * @param evaluateRuleParam
+   */
+  case class StreamingDQCalculator(globalContext: DQContext, evaluateRuleParam: EvaluateRuleParam)
+      extends Runnable
+      with Loggable {
 
-    val lock = OffsetCheckpointClient.genLock("process")
-    val appSink = globalContext.getSink()
+    val lock: CheckpointLock = OffsetCheckpointClient.genLock("process")
+    val appSink: Iterable[Sink] = globalContext.getSinks
 
     var dqContext: DQContext = _
     var dqJob: DQJob = _
@@ -172,34 +168,36 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     def run(): Unit = {
       val updateTimeDate = new Date()
       val updateTime = updateTimeDate.getTime
-      println(s"===== [${updateTimeDate}] process begins =====")
+      println(s"===== [$updateTimeDate] process begins =====")
       val locked = lock.lock(5, TimeUnit.SECONDS)
       if (locked) {
         try {
+          import org.apache.griffin.measure.utils.CommonUtils
 
-          OffsetCheckpointClient.startOffsetCheckpoint
+          OffsetCheckpointClient.startOffsetCheckpoint()
 
-          val startTime = new Date().getTime
-          appSink.log(startTime, "starting process ...")
-          val contextId = ContextId(startTime)
+          CommonUtils.timeThis({
+            // start time
+            val startTime = new Date().getTime
 
-          // create dq context
-          dqContext = globalContext.cloneDQContext(contextId)
+            val contextId = ContextId(startTime)
 
-          // build job
-          dqJob = DQJobBuilder.buildDQJob(dqContext, evaluateRuleParam)
+            // create dq context
+            dqContext = globalContext.cloneDQContext(contextId)
 
-          // dq job execute
-          dqJob.execute(dqContext)
+            // build job
+            dqJob = DQJobBuilder.buildDQJob(dqContext, evaluateRuleParam)
 
-          // finish calculation
-          finishCalculation(dqContext)
+            // dq job execute
+            dqJob.execute(dqContext)
 
-          // end time
-          val endTime = new Date().getTime
-          appSink.log(endTime, s"process using time: ${endTime - startTime} ms")
+            // finish calculation
+            finishCalculation(dqContext)
 
-          OffsetCheckpointClient.endOffsetCheckpoint
+            // end time
+          }, TimeUnit.MILLISECONDS)
+
+          OffsetCheckpointClient.endOffsetCheckpoint()
 
           // clean old data
           cleanData(dqContext)
@@ -210,21 +208,21 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
           lock.unlock()
         }
       } else {
-        println(s"===== [${updateTimeDate}] process ignores =====")
+        println(s"===== [$updateTimeDate] process ignores =====")
       }
       val endTime = new Date().getTime
-      println(s"===== [${updateTimeDate}] process ends, using ${endTime - updateTime} ms =====")
+      println(s"===== [$updateTimeDate] process ends, using ${endTime - updateTime} ms =====")
     }
 
     // finish calculation for this round
     private def finishCalculation(context: DQContext): Unit = {
-      context.dataSources.foreach(_.processFinish)
+      context.dataSources.foreach(_.processFinish())
     }
 
     // clean old data and old result cache
     private def cleanData(context: DQContext): Unit = {
       try {
-        context.dataSources.foreach(_.cleanOldData)
+        context.dataSources.foreach(_.cleanOldData())
 
         context.clean()
 
@@ -237,19 +235,19 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
 
   }
 
-
   /**
-    *
-    * @param interval
-    * @param runnable
-    */
+   *
+   * @param interval
+   * @param runnable
+   */
   case class Scheduler(interval: Long, runnable: Runnable) {
 
-    val pool: ThreadPoolExecutor = Executors.newFixedThreadPool(5).asInstanceOf[ThreadPoolExecutor]
+    val pool: ThreadPoolExecutor =
+      Executors.newFixedThreadPool(5).asInstanceOf[ThreadPoolExecutor]
 
     val timer = new Timer("process", true)
 
-    val timerTask = new TimerTask() {
+    val timerTask: TimerTask = new TimerTask() {
       override def run(): Unit = {
         pool.submit(runnable)
       }

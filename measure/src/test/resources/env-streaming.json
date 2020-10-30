@@ -20,7 +20,7 @@
 
   "sinks": [
     {
-      "type": "console",
+      "type": "consoleSink",
       "config": {
         "max.log.lines": 100
       }

@@ -1,21 +1,20 @@
 /*
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-*/
 package org.apache.griffin.measure.datasource
 
 import org.apache.spark.sql._
@@ -28,26 +27,28 @@ import org.apache.griffin.measure.datasource.connector.DataConnector
 import org.apache.griffin.measure.utils.DataFrameUtil._
 
 /**
-  * data source
-  * @param name     name of data source
-  * @param dsParam  param of this data source
-  * @param dataConnectors       list of data connectors
-  * @param streamingCacheClientOpt   streaming data cache client option
-  */
-case class DataSource(name: String,
-                      dsParam: DataSourceParam,
-                      dataConnectors: Seq[DataConnector],
-                      streamingCacheClientOpt: Option[StreamingCacheClient]
-                     ) extends Loggable with Serializable {
+ * data source
+ * @param name     name of data source
+ * @param dsParam  param of this data source
+ * @param dataConnector       data connector
+ * @param streamingCacheClientOpt   streaming data cache client option
+ */
+case class DataSource(
+    name: String,
+    dsParam: DataSourceParam,
+    dataConnector: Option[DataConnector],
+    streamingCacheClientOpt: Option[StreamingCacheClient])
+    extends Loggable
+    with Serializable {
 
   val isBaseline: Boolean = dsParam.isBaseline
 
   def init(): Unit = {
-    dataConnectors.foreach(_.init)
+    dataConnector.foreach(_.init())
   }
 
   def loadData(context: DQContext): TimeRange = {
-    info(s"load data [${name}]")
+    info(s"load data [$name]")
     try {
       val timestamp = context.contextId.timestamp
       val (dfOpt, timeRange) = data(timestamp)
@@ -55,21 +56,21 @@ case class DataSource(name: String,
         case Some(df) =>
           context.runTimeTableRegister.registerTable(name, df)
         case None =>
-          warn(s"Data source [${name}] is null!")
+          warn(s"Data source [$name] is null!")
       }
       timeRange
     } catch {
-      case e =>
-        error(s"load data source [${name}] fails")
+      case e: Throwable =>
+        error(s"load data source [$name] fails")
         throw e
     }
   }
 
   private def data(timestamp: Long): (Option[DataFrame], TimeRange) = {
-    val batches = dataConnectors.flatMap { dc =>
+    val batches = dataConnector.flatMap { dc =>
       val (dfOpt, timeRange) = dc.data(timestamp)
       dfOpt match {
-        case Some(df) => Some((dfOpt, timeRange))
+        case Some(_) => Some((dfOpt, timeRange))
         case _ => None
       }
     }
@@ -79,7 +80,7 @@ case class DataSource(name: String,
     }
     val pairs = batches ++ caches
 
-    if (pairs.size > 0) {
+    if (pairs.nonEmpty) {
       pairs.reduce { (a, b) =>
         (unionDfOpts(a._1, b._1), a._2.merge(b._2))
       }
@@ -93,11 +94,11 @@ case class DataSource(name: String,
   }
 
   def cleanOldData(): Unit = {
-    streamingCacheClientOpt.foreach(_.cleanOutTimeData)
+    streamingCacheClientOpt.foreach(_.cleanOutTimeData())
   }
 
   def processFinish(): Unit = {
-    streamingCacheClientOpt.foreach(_.processFinish)
+    streamingCacheClientOpt.foreach(_.processFinish())
   }
 
 }
