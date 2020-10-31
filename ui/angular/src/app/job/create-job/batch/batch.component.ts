@@ -268,23 +268,21 @@ export class BatchComponent implements OnInit, AfterViewChecked {
       if (measure == map.name) {
         var source = map["data.sources"];
         for (let i = 0; i < source.length; i++) {
-          var details = source[i].connectors;
-          for (let j = 0; j < details.length; j++) {
-            if (details[j]["data.unit"] != undefined) {
-              var table =
-                details[j].config.database +
-                "." +
-                details[j].config["table.name"];
-              var size = details[j]["data.unit"];
-              var connectorname = details[j]["name"];
-              var detail = {
-                id: i + 1,
-                name: table,
-                size: size,
-                connectorname: connectorname
-              };
-              this.dropdownList.push(detail);
-            }
+          var connector = source[i].connector;
+          if (connector["data.unit"] != undefined) {
+            var table =
+              connector.config.database +
+              "." +
+              connector.config["table.name"];
+            var size = connector["data.unit"];
+            var connectorname = connector["name"];
+            var detail = {
+              id: i + 1,
+              name: table,
+              size: size,
+              connectorname: connectorname
+            };
+            this.dropdownList.push(detail);
           }
         }
       }

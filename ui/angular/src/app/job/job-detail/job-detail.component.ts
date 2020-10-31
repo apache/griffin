@@ -57,7 +57,7 @@ export class JobDetailComponent implements OnInit {
         this.measureType = this.measureData["dq.type"].toLowerCase();
         this.processType = this.measureData["process.type"].toLowerCase();
         for (let item of this.measureData["data.sources"]) {
-          let config = item.connectors[0].config;
+          let config = item.connector.config;
           let tableName = config.database + "." + config["table.name"];
           this.tableInfo.push(tableName);
         }
