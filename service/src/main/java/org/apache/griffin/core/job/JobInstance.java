@@ -146,8 +146,7 @@ public class JobInstance implements Job {
         jobStartTime = triggerTime.getTime();
     }
 
-    private void setSourcesPartitionsAndPredicates(List<DataSource> sources)
-        throws Exception {
+    private void setSourcesPartitionsAndPredicates(List<DataSource> sources) {
         boolean isFirstBaseline = true;
         for (JobDataSegment jds : job.getSegments()) {
             if (jds.isAsTsBaseline() && isFirstBaseline) {
@@ -157,22 +156,14 @@ public class JobInstance implements Job {
                 isFirstBaseline = false;
             }
             for (DataSource ds : sources) {
-                setDataSourcePartitions(jds, ds);
+                setDataConnectorPartitions(jds, ds.getConnector());
             }
-        }
-    }
-
-    private void setDataSourcePartitions(JobDataSegment jds, DataSource ds)
-        throws Exception {
-        List<DataConnector> connectors = ds.getConnectors();
-        for (DataConnector dc : connectors) {
-            setDataConnectorPartitions(jds, dc);
         }
     }
 
     private void setDataConnectorPartitions(
         JobDataSegment jds,
-        DataConnector dc) throws Exception {
+        DataConnector dc) {
         String dcName = jds.getDataConnectorName();
         if (dcName.equals(dc.getName())) {
             Long[] sampleTs = genSampleTs(jds.getSegmentRange(), dc);

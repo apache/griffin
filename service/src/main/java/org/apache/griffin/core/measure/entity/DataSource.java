@@ -28,21 +28,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.apache.griffin.core.util.JsonUtil;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 @Entity
@@ -51,10 +40,10 @@ public class DataSource extends AbstractAuditableEntity {
 
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
         CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "data_source_id")
-    private List<DataConnector> connectors = new ArrayList<>();
+    private DataConnector connector = new DataConnector();
 
     private boolean baseline = false;
 
@@ -75,15 +64,12 @@ public class DataSource extends AbstractAuditableEntity {
         this.name = name;
     }
 
-    public List<DataConnector> getConnectors() {
-        return connectors;
+    public DataConnector getConnector() {
+        return connector;
     }
 
-    public void setConnectors(List<DataConnector> connectors) {
-        if (CollectionUtils.isEmpty(connectors)) {
-            throw new NullPointerException("Data connector can not be empty.");
-        }
-        this.connectors = connectors;
+    public void setConnector(DataConnector connector) {
+        this.connector = connector;
     }
 
     public boolean isBaseline() {
@@ -132,18 +118,18 @@ public class DataSource extends AbstractAuditableEntity {
     public DataSource() {
     }
 
-    public DataSource(String name, List<DataConnector> connectors) {
+    public DataSource(String name, DataConnector connector) {
         this.name = name;
-        this.connectors = connectors;
+        this.connector = connector;
     }
 
     public DataSource(String name, boolean baseline,
                       Map<String, Object> checkpointMap,
-                      List<DataConnector> connectors) {
+                      DataConnector connector) {
         this.name = name;
         this.baseline = baseline;
         this.checkpointMap = checkpointMap;
-        this.connectors = connectors;
+        this.connector = connector;
 
     }
 }

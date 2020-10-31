@@ -403,7 +403,7 @@ public class BatchJobOperatorImpl implements JobOperator {
         Set<String> sets = new HashSet<>();
         List<DataSource> sources = measure.getDataSources();
         for (DataSource source : sources) {
-            source.getConnectors().forEach(dc -> sets.add(dc.getName()));
+            sets.add(source.getConnector().getName());
         }
         if (sets.size() < sources.size()) {
             LOGGER.warn("Connector names cannot be repeated.");
