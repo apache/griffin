@@ -88,7 +88,9 @@ public class MeasureUtil {
         Set<String> sets = new HashSet<>();
         List<DataSource> sources = measure.getDataSources();
         for (DataSource source : sources) {
-            sets.add(source.getConnector().getName());
+            if(source.getConnector() != null && source.getConnector().getName() != null){
+                sets.add(source.getConnector().getName());
+            }
         }
         if (sets.size() == 0 || sets.size() < sources.size()) {
             LOGGER.warn("Connector names cannot be repeated or empty.");
