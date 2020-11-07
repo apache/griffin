@@ -4,12 +4,14 @@
   },
   "sinks": [
     {
+      "name": "console",
       "type": "CONSOLE",
       "config": {
         "max.log.lines": 10
       }
     },
     {
+      "name": "hdfs",
       "type": "HDFS",
       "config": {
         "path": "hdfs:///griffin/persist",
@@ -18,10 +20,11 @@
       }
     },
     {
+      "name": "elasticsearch",
       "type": "ELASTICSEARCH",
       "config": {
         "method": "post",
-        "api": "http://es:9200/griffin/accuracy",
+        "api": "http://10.148.217.217:9200/griffin/accuracy",
         "connection.timeout": "1m",
         "retry": 10
       }
