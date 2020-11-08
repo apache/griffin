@@ -72,11 +72,11 @@ export class MeasureComponent implements OnInit {
     this.deletedRow = row;
     $("#save").removeAttr("disabled");
     if (this.deletedRow["measure.type"] !== "external") {
-      var sourcedata = this.deletedRow["data.sources"][0].connectors[0].config;
+      var sourcedata = this.deletedRow["data.sources"][0].connector.config;
       this.sourceTable = sourcedata["table.name"];
     }
     if (this.deletedRow["dq.type"] === "accuracy") {
-      var targetdata = this.deletedRow["data.sources"][1].connectors[0].config;
+      var targetdata = this.deletedRow["data.sources"][1].connector.config;
       this.targetTable = targetdata["table.name"];
     } else {
       this.targetTable = "";

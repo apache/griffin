@@ -148,7 +148,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
     "data.sources": [
       {
         name: "source",
-        connectors: [
+        connector:
           {
             name: "",
             type: "HIVE",
@@ -170,11 +170,10 @@ export class AcComponent implements OnInit, AfterViewChecked {
               }
             ]
           }
-        ]
       },
       {
         name: "target",
-        connectors: [
+        connector:
           {
             name: "",
             type: "HIVE",
@@ -196,7 +195,6 @@ export class AcComponent implements OnInit, AfterViewChecked {
               }
             ]
           }
-        ]
       }
     ],
 
@@ -393,7 +391,7 @@ export class AcComponent implements OnInit, AfterViewChecked {
       "data.sources": [
         {
           name: "source",
-          connectors: [
+          connector:
             {
               name: this.src_name,
               type: "HIVE",
@@ -415,11 +413,10 @@ export class AcComponent implements OnInit, AfterViewChecked {
                 }
               ]
             }
-          ]
         },
         {
           name: "target",
-          connectors: [
+          connector:
             {
               name: this.tgt_name,
               type: "HIVE",
@@ -441,7 +438,6 @@ export class AcComponent implements OnInit, AfterViewChecked {
                 }
               ]
             }
-          ]
         }
       ],
       "evaluate.rule": {
@@ -499,11 +495,11 @@ export class AcComponent implements OnInit, AfterViewChecked {
   }
 
   deleteUnit(index) {
-    delete this.newMeasure["data.sources"][index]["connectors"][0]["data.unit"];
+    delete this.newMeasure["data.sources"][index]["connector"]["data.unit"];
   }
 
   deletePredicates(index) {
-    delete this.newMeasure["data.sources"][index]["connectors"][0]["predicates"];
+    delete this.newMeasure["data.sources"][index]["connector"]["predicates"];
   }
 
   save() {

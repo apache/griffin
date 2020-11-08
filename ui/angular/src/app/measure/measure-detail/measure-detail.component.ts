@@ -64,7 +64,7 @@ export class MeasureDetailComponent implements OnInit {
   currentrule: string;
 
   fetchData(value, index) {
-    var data = this.ruleData["data.sources"][index].connectors[0];
+    var data = this.ruleData["data.sources"][index].connector;
     var size = value + "size";
     var zone = value + "zone";
     var where = value + "where";

@@ -43,7 +43,7 @@ describe('MeasureDetailComponent', () => {
   });
 
   it(
-    'should be created', 
+    'should be created',
     inject(
       [HttpTestingController, ServiceService],
       (httpMock: HttpTestingController, serviceService: ServiceService) => {
@@ -54,13 +54,13 @@ describe('MeasureDetailComponent', () => {
           "dq.type": "",
           "evaluate.rule": "",
           "data.sources": [{
-            "connectors": [{
+            "connector": {
               "data.unit": "",
               config: {
                 where: ""
               },
               predicates: []
-            }]
+            }
           }]
         });
 

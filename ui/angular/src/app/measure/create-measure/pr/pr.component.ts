@@ -360,7 +360,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
       "data.sources": [
         {
           name: "source",
-          connectors: [
+          connector:
             {
               name: this.step1.srcname,
               type: "HIVE",
@@ -382,7 +382,6 @@ export class PrComponent implements AfterViewChecked, OnInit {
                 }
               ]
             }
-          ]
         }
       ],
       "evaluate.rule": {
@@ -393,10 +392,10 @@ export class PrComponent implements AfterViewChecked, OnInit {
 
     this.getGrouprule();
     if (this.step3.size.indexOf("0") == 0) {
-      delete this.newMeasure["data.sources"][0]["connectors"][0]["data.unit"];
+      delete this.newMeasure["data.sources"][0]["connector"]["data.unit"];
     }
     if (!this.step3.needpath || this.step3.path == "") {
-      delete this.newMeasure["data.sources"][0]["connectors"][0]["predicates"];
+      delete this.newMeasure["data.sources"][0]["connector"]["predicates"];
     }
     this.visible = true;
     setTimeout(() => (this.visibleAnimate = true), 100);
