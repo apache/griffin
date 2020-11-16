@@ -21,7 +21,7 @@ import scala.util.matching.Regex
 
 import org.apache.http.client.methods.{HttpGet, HttpPost}
 import org.apache.http.entity.{ContentType, StringEntity}
-import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.impl.client.{BasicResponseHandler, HttpClientBuilder}
 import scalaj.http._
 
 object HttpUtil {
@@ -43,6 +43,17 @@ object HttpUtil {
       .asString
 
     response.isSuccess
+  }
+
+  def getData(
+      url: String,
+      headers: Map[String, Object]): String = {
+    val client = HttpClientBuilder.create.build
+    val get = new HttpGet(url)
+    convertObjMap2StrMap(headers) foreach (header => get.addHeader(header._1, header._2))
+    val response = client.execute(get)
+    val handler = new BasicResponseHandler()
+    handler.handleResponse(response).trim
   }
 
   def doHttpRequest(
