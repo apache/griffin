@@ -33,7 +33,7 @@ case class ParamHttpReader(httpUrl: String) extends ParamReader {
   def readConfig[T <: Param](implicit m: ClassTag[T]): Try[T] = {
     Try {
       val header = Map[String, Object](("Content-Type", "application/json"))
-      val jsonString = HttpUtil.getData(httpUrl, header);
+      val jsonString = HttpUtil.getData(httpUrl, header)
       val param = JsonUtil.fromJson[T](jsonString)
       validate(param)
     }
