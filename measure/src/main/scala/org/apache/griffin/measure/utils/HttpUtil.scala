@@ -45,9 +45,7 @@ object HttpUtil {
     response.isSuccess
   }
 
-  def getData(
-      url: String,
-      headers: Map[String, Object]): String = {
+  def getData(url: String, headers: Map[String, Object]): String = {
     val client = HttpClientBuilder.create.build
     val get = new HttpGet(url)
     convertObjMap2StrMap(headers) foreach (header => get.addHeader(header._1, header._2))
