@@ -17,14 +17,13 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-#About predicates
+# About predicates
 
-##Overview
+## Overview
 The purpose of predicates is obligate Griffin to check certain conditions before starting SparkSubmitJob. 
 Depending on these conditions Griffin need to start or not start the measurement.
 
-##Configure predicates
-
+## Configure predicates
 For configuring predicates need add property to measure json:
 ```
 {
@@ -74,10 +73,10 @@ It important to notice that predicate class must satisfy follow conditions:
 - implement interface **org.apache.griffin.core.job.Predicator**
 - have constructor with argument of type **org.apache.griffin.core.job.entity.SegmentPredicate**
 
-##Deployment custom predicates
+## Deployment custom predicates
 For the creating custom predicate you need 
 1. Build the Griffin service using command
-As a result, two artifacts will be built  
+As a result, two artifacts will be built,  
 - **service-VERSION.jar** - executable Spring-Boot application
 - **service-VERSION-lib.jar** - jar, which we can use as a dependency
 This step is necessary because we can't use executable Spring-Boot application as a dependency in our plugin. 
