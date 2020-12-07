@@ -17,36 +17,26 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.apache.griffin.measure.utils.JsonUtil
+import scala.reflect.ClassTag
+import scala.util.Try
 
-object ParamReaderFactory {
+import org.apache.griffin.measure.configuration.dqdefinition.Param
+import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil}
 
-  val json = "json"
-  val file = "file"
-  val httpRegex = "^http[s]?://.*"
+/**
+ * read params by http url
+ *
+ * @param httpUrl
+ */
+case class ParamHttpReader(httpUrl: String) extends ParamReader {
 
-  /**
-   * parse string content to get param reader
-   * @param pathOrJson
-   * @return
-   */
-  def getParamReader(pathOrJson: String): ParamReader = {
-    if (pathOrJson.matches(httpRegex)) {
-      ParamHttpReader(pathOrJson)
-    } else {
-      val strType = paramStrType(pathOrJson)
-      if (json.equals(strType)) ParamJsonReader(pathOrJson)
-      else ParamFileReader(pathOrJson)
+  def readConfig[T <: Param](implicit m: ClassTag[T]): Try[T] = {
+    Try {
+      val params = Map[String, Object]()
+      val headers = Map[String, Object](("Content-Type", "application/json"))
+      val jsonString = HttpUtil.doHttpRequest(httpUrl, "get", params, headers, null)._2
+      val param = JsonUtil.fromJson[T](jsonString)
+      validate(param)
     }
   }
-
-  private def paramStrType(str: String): String = {
-    try {
-      JsonUtil.toAnyMap(str)
-      json
-    } catch {
-      case _: Throwable => file
-    }
-  }
-
 }

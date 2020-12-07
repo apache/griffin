@@ -63,7 +63,8 @@ case class ElasticSearchSink(
 
       def func(): (Long, Future[Boolean]) = {
         import scala.concurrent.ExecutionContext.Implicits.global
-        (timeStamp, Future(HttpUtil.doHttpRequest(api, method, params, header, data)))
+        val code = HttpUtil.doHttpRequest(api, method, params, header, data)._1
+        (timeStamp, Future(code >= 200 && code < 300))
       }
       if (block) SinkTaskRunner.addBlockTask(func _, retry, connectionTimeout)
       else SinkTaskRunner.addNonBlockTask(func _, retry)
