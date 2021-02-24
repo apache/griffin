@@ -65,13 +65,12 @@ class FileBasedDataConnectorTest extends SparkSuiteBase with Matchers {
     // valid schema
     val result1 = FileBasedDataConnector(
       spark,
-      dcParam.copy(
-        config = configs + (
-          (
-            "schema",
-            Seq(
-              Map("name" -> "name", "type" -> "string"),
-              Map("name" -> "age", "type" -> "int", "nullable" -> "true"))))),
+      dcParam.copy(config = configs + (
+        (
+          "schema",
+          Seq(
+            Map("name" -> "name", "type" -> "string"),
+            Map("name" -> "age", "type" -> "int", "nullable" -> "true"))))),
       timestampStorage)
       .data(1L)
 

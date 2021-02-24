@@ -77,23 +77,24 @@ case class ElasticSearchGriffinDataConnector(
   def dataBySql(ms: Long): (Option[DataFrame], TimeRange) = {
     val path: String = s"/_sql?format=csv"
     info(s"ElasticSearchGriffinDataConnector data : sql: $sql")
-    val dfOpt = try {
-      val answer = httpPost(path, sql)
-      if (answer._1) {
-        import sparkSession.implicits._
-        val rdd: RDD[String] = sparkSession.sparkContext.parallelize(answer._2.lines.toList)
-        val reader: DataFrameReader = sparkSession.read
-        reader.option("header", true).option("inferSchema", true)
-        val df: DataFrame = reader.csv(rdd.toDS())
-        val dfOpt = Some(df)
-        val preDfOpt = preProcess(dfOpt, ms)
-        preDfOpt
-      } else None
-    } catch {
-      case e: Throwable =>
-        error(s"load ES by sql $host:$port $sql  fails: ${e.getMessage}", e)
-        None
-    }
+    val dfOpt =
+      try {
+        val answer = httpPost(path, sql)
+        if (answer._1) {
+          import sparkSession.implicits._
+          val rdd: RDD[String] = sparkSession.sparkContext.parallelize(answer._2.lines.toList)
+          val reader: DataFrameReader = sparkSession.read
+          reader.option("header", true).option("inferSchema", true)
+          val df: DataFrame = reader.csv(rdd.toDS())
+          val dfOpt = Some(df)
+          val preDfOpt = preProcess(dfOpt, ms)
+          preDfOpt
+        } else None
+      } catch {
+        case e: Throwable =>
+          error(s"load ES by sql $host:$port $sql  fails: ${e.getMessage}", e)
+          None
+      }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))
   }
@@ -102,44 +103,44 @@ case class ElasticSearchGriffinDataConnector(
     val path: String = s"/$index/$dataType/_search?sort=tmst:desc&q=name:$metricName&size=$size"
     info(s"ElasticSearchGriffinDataConnector data : host: $host port: $port path:$path")
 
-    val dfOpt = try {
-      val answer = httpGet(path)
-      val data = ArrayBuffer[Map[String, Number]]()
+    val dfOpt =
+      try {
+        val answer = httpGet(path)
+        val data = ArrayBuffer[Map[String, Number]]()
 
-      if (answer._1) {
-        val arrayAnswers: util.Iterator[JsonNode] =
-          parseString(answer._2).get("hits").get("hits").elements()
+        if (answer._1) {
+          val arrayAnswers: util.Iterator[JsonNode] =
+            parseString(answer._2).get("hits").get("hits").elements()
 
-        while (arrayAnswers.hasNext) {
-          val answer = arrayAnswers.next()
-          val values = answer.get("_source").get("value")
-          val fields: util.Iterator[util.Map.Entry[String, JsonNode]] = values.fields()
-          val fieldsMap = mutable.Map[String, Number]()
-          while (fields.hasNext) {
-            val fld: util.Map.Entry[String, JsonNode] = fields.next()
-            fieldsMap.put(fld.getKey, fld.getValue.numberValue())
+          while (arrayAnswers.hasNext) {
+            val answer = arrayAnswers.next()
+            val values = answer.get("_source").get("value")
+            val fields: util.Iterator[util.Map.Entry[String, JsonNode]] = values.fields()
+            val fieldsMap = mutable.Map[String, Number]()
+            while (fields.hasNext) {
+              val fld: util.Map.Entry[String, JsonNode] = fields.next()
+              fieldsMap.put(fld.getKey, fld.getValue.numberValue())
+            }
+            data += fieldsMap.toMap
           }
-          data += fieldsMap.toMap
         }
+        val rdd1: RDD[Map[String, Number]] = sparkSession.sparkContext.parallelize(data)
+        val columns: Array[String] = fields.toArray
+        val defaultNumber: Number = 0.0
+        val rdd: RDD[Row] = rdd1
+          .map { x: Map[String, Number] =>
+            Row(columns.map(c => x.getOrElse(c, defaultNumber).doubleValue()): _*)
+          }
+        val schema = dfSchema(columns.toList)
+        val df: DataFrame = sparkSession.createDataFrame(rdd, schema).limit(size)
+        val dfOpt = Some(df)
+        val preDfOpt = preProcess(dfOpt, ms)
+        preDfOpt
+      } catch {
+        case e: Throwable =>
+          error(s"load ES table $host:$port $index/$dataType  fails: ${e.getMessage}", e)
+          None
       }
-      val rdd1: RDD[Map[String, Number]] = sparkSession.sparkContext.parallelize(data)
-      val columns: Array[String] = fields.toArray
-      val defaultNumber: Number = 0.0
-      val rdd: RDD[Row] = rdd1
-        .map { x: Map[String, Number] =>
-          Row(columns.map(c => x.getOrElse(c, defaultNumber).doubleValue()): _*)
-        }
-      val schema = dfSchema(columns.toList)
-      val df: DataFrame = sparkSession.createDataFrame(rdd, schema).limit(size)
-      df.show(20)
-      val dfOpt = Some(df)
-      val preDfOpt = preProcess(dfOpt, ms)
-      preDfOpt
-    } catch {
-      case e: Throwable =>
-        error(s"load ES table $host:$port $index/$dataType  fails: ${e.getMessage}", e)
-        None
-    }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))
   }

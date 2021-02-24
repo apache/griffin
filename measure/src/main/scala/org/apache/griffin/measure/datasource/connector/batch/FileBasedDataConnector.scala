@@ -79,7 +79,14 @@ case class FileBasedDataConnector(
     SupportedFormats.contains(format),
     s"Invalid format '$format' specified. Must be one of ${SupportedFormats.mkString("['", "', '", "']")}")
 
-  if (format == "csv") validateCSVOptions()
+  if (format.equalsIgnoreCase("avro") && sparkSession.version < "2.3.0") {
+    format = "com.databricks.spark.avro"
+  }
+
+  if (format == "csv") {
+    validateCSVOptions()
+  }
+
   if (format == "tsv") {
     format = "csv"
     options.getOrElseUpdate(Delimiter, TabDelimiter)
@@ -169,7 +176,8 @@ object FileBasedDataConnector extends Loggable {
   private val TabDelimiter: String = "\t"
 
   private val DefaultFormat: String = SQLConf.DEFAULT_DATA_SOURCE_NAME.defaultValueString
-  private val SupportedFormats: Seq[String] = Seq("parquet", "orc", "avro", "text", "csv", "tsv")
+  private val SupportedFormats: Seq[String] =
+    Seq("parquet", "orc", "avro", "text", "csv", "tsv", "com.databricks.spark.avro")
 
   /**
    * Validates the existence of paths in a given sequence.
@@ -189,7 +197,7 @@ object FileBasedDataConnector extends Loggable {
           else throw new IllegalArgumentException(msg)
 
           false
-      })
+        })
 
     assert(validPaths.nonEmpty, "No paths were given for the data source.")
     validPaths

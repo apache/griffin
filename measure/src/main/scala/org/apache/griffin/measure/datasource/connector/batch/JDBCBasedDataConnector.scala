@@ -69,27 +69,28 @@ case class JDBCBasedDataConnector(
   assert(isJDBCDriverLoaded(driver), s"JDBC driver $driver not present in classpath")
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = {
-    val dfOpt = try {
-      val dtSql = createSqlStmt()
-      val prop = new java.util.Properties
-      prop.setProperty("user", user)
-      prop.setProperty("password", password)
-      prop.setProperty("driver", driver)
-      val dfOpt = Try(sparkSession.read.jdbc(url, s"($dtSql) as t", prop))
+    val dfOpt =
+      try {
+        val dtSql = createSqlStmt()
+        val prop = new java.util.Properties
+        prop.setProperty("user", user)
+        prop.setProperty("password", password)
+        prop.setProperty("driver", driver)
+        val dfOpt = Try(sparkSession.read.jdbc(url, s"($dtSql) as t", prop))
 
-      dfOpt match {
-        case Success(_) =>
-        case Failure(exception) =>
-          griffinLogger.error("Error occurred while reading data set.", exception)
+        dfOpt match {
+          case Success(_) =>
+          case Failure(exception) =>
+            griffinLogger.error("Error occurred while reading data set.", exception)
+        }
+
+        val preDfOpt = preProcess(dfOpt.toOption, ms)
+        preDfOpt
+      } catch {
+        case e: Throwable =>
+          error(s"loading table $fullTableName fails: ${e.getMessage}", e)
+          None
       }
-
-      val preDfOpt = preProcess(dfOpt.toOption, ms)
-      preDfOpt
-    } catch {
-      case e: Throwable =>
-        error(s"loading table $fullTableName fails: ${e.getMessage}", e)
-        None
-    }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))
   }
@@ -99,7 +100,7 @@ case class JDBCBasedDataConnector(
    */
   private def createSqlStmt(): String = {
     val tableClause = s"SELECT * FROM $fullTableName"
-    if (whereString.length > 0) {
+    if (whereString.nonEmpty) {
       s"$tableClause WHERE $whereString"
     } else tableClause
   }
