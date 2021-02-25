@@ -17,9 +17,10 @@
 
 package org.apache.griffin.measure.context
 
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
-class TimeRangeTest extends FlatSpec with Matchers {
+class TimeRangeTest extends AnyFlatSpec with Matchers {
 
   "time range" should "be able to merge another time range" in {
     val tr1 = TimeRange(1, 10, Set(2, 5, 8))

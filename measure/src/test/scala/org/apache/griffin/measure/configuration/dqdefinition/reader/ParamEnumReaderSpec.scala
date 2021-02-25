@@ -17,7 +17,9 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest._
+import flatspec.AnyFlatSpec
+import matchers.should._
 
 import org.apache.griffin.measure.configuration.dqdefinition.{
   DQConfig,
@@ -26,7 +28,7 @@ import org.apache.griffin.measure.configuration.dqdefinition.{
   RuleParam
 }
 
-class ParamEnumReaderSpec extends FlatSpec with Matchers {
+class ParamEnumReaderSpec extends AnyFlatSpec with Matchers {
   import org.apache.griffin.measure.configuration.enums.DslType._
   "dsltype" should "be parsed to predefined set of values" in {
     val validDslSparkSqlValues =

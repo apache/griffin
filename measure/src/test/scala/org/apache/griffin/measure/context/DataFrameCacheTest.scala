@@ -19,11 +19,12 @@ package org.apache.griffin.measure.context
 
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types._
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.SparkSuiteBase
 
-class DataFrameCacheTest extends FlatSpec with Matchers with SparkSuiteBase {
+class DataFrameCacheTest extends AnyFlatSpec with Matchers with SparkSuiteBase {
 
   def createDataFrame(arr: Seq[Int]): DataFrame = {
     val schema = StructType(

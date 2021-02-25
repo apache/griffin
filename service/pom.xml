@@ -34,7 +34,6 @@ under the License.
     <properties>
         <hadoop.version>2.7.1</hadoop.version>
         <hive.version>2.2.0</hive.version>
-        <scala.version>2.10</scala.version>
         <spring.boot.version>2.1.7.RELEASE</spring.boot.version>
         <spring.security.kerberos.version>1.0.1.RELEASE</spring.security.kerberos.version>
         <confluent.version>3.2.0</confluent.version>
@@ -258,7 +257,7 @@ under the License.
         <!--livy-core-->
         <dependency>
             <groupId>com.cloudera.livy</groupId>
-            <artifactId>livy-core_${scala.version}</artifactId>
+            <artifactId>livy-core_2.10</artifactId>
             <version>${livy.core.version}</version>
         </dependency>
 

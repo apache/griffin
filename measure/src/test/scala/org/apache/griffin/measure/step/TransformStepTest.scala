@@ -17,15 +17,17 @@
 
 package org.apache.griffin.measure.step
 
-import org.scalatest._
 import scala.util.Try
+
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.{Loggable, SparkSuiteBase}
 import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext}
 import org.apache.griffin.measure.step.transform.TransformStep
 
-class TransformStepTest extends FlatSpec with Matchers with SparkSuiteBase with Loggable {
+class TransformStepTest extends AnyFlatSpec with Matchers with SparkSuiteBase with Loggable {
 
   case class DualTransformStep(
       name: String,

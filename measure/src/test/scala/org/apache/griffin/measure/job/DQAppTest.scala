@@ -19,7 +19,7 @@ package org.apache.griffin.measure.job
 
 import scala.util.{Failure, Success}
 
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.{Loggable, SparkSuiteBase}
 import org.apache.griffin.measure.Application._
@@ -30,12 +30,7 @@ import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.launch.batch.BatchDQApp
 import org.apache.griffin.measure.launch.streaming.StreamingDQApp
 
-class DQAppTest
-    extends FlatSpec
-    with SparkSuiteBase
-    with BeforeAndAfterAll
-    with Matchers
-    with Loggable {
+class DQAppTest extends SparkSuiteBase with Matchers with Loggable {
 
   var envParam: EnvConfig = _
   var sparkParam: SparkParam = _
