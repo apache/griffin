@@ -18,7 +18,7 @@
 package org.apache.griffin.measure.datasource.connector.batch
 
 import org.apache.spark.sql.types.StructType
-import org.scalatest.Matchers
+import org.scalatest.matchers.should._
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 
 import org.apache.griffin.measure.SparkSuiteBase

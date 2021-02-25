@@ -17,9 +17,10 @@
 
 package org.apache.griffin.measure.datasource
 
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
-class TimestampStorageTest extends FlatSpec with Matchers {
+class TimestampStorageTest extends AnyFlatSpec with Matchers {
 
   "timestamp storage" should "be able to insert a timestamp" in {
     val timestampStorage = TimestampStorage()

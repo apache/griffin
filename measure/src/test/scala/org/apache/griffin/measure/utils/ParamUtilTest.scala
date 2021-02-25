@@ -17,11 +17,13 @@
 
 package org.apache.griffin.measure.utils
 
-import org.scalatest._
+import org.scalatest.BeforeAndAfter
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.utils.ParamUtil._
 
-class ParamUtilTest extends FlatSpec with Matchers with BeforeAndAfter {
+class ParamUtilTest extends AnyFlatSpec with Matchers with BeforeAndAfter {
 
   val fruits: Map[String, Any] =
     Map[String, Any]("A" -> "apple", "B" -> "banana", "O" -> "orange")

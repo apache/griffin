@@ -17,7 +17,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -29,237 +30,266 @@ under the License.
     <artifactId>measure</artifactId>
     <packaging>jar</packaging>
 
-    <name>Apache Griffin :: Measures</name>
-    <url>http://maven.apache.org</url>
+    <name>Apache Griffin :: Measure</name>
+    <url>http://griffin.apache.org</url>
 
     <properties>
-        <scala.version>2.11.8</scala.version>
-        <spark.version>2.2.1</spark.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <avro.version>1.7.7</avro.version>
-        <jackson.version>2.8.7</jackson.version>
+
+        <!-- Spark -->
+        <spark.major.version>2.4</spark.major.version>
+        <spark.version>${spark.major.version}.4</spark.version>
+        <spark.scope>${provided.scope}</spark.scope>
+
+        <!-- Code Standardization -->
+        <scalastyle.version>1.0.0</scalastyle.version>
+        <scalafmt.version>1.0.3</scalafmt.version>
+
+        <!-- Data Connectors -->
+        <mysql.java.version>5.1.47</mysql.java.version>
+        <mariadb.version>2.7.0</mariadb.version>
+        <cassandra.connector.version>2.5.1</cassandra.connector.version>
+        <elasticsearch.version>6.4.1</elasticsearch.version>
         <scalaj.version>2.3.0</scalaj.version>
         <mongo.version>2.1.0</mongo.version>
-        <scalatest.version>3.0.0</scalatest.version>
-        <slf4j.version>1.7.21</slf4j.version>
-        <log4j.version>1.2.16</log4j.version>
         <curator.version>2.10.0</curator.version>
-        <mockito.version>1.10.19</mockito.version>
-        <mysql.java.version>5.1.47</mysql.java.version>
-        <cassandra.connector.version>2.4.1</cassandra.connector.version>
-        <scalastyle.version>1.0.0</scalastyle.version>
-        <scalafmt.parameters>--diff --test</scalafmt.parameters>
-        <scalafmt.skip>false</scalafmt.skip>
-        <elasticsearch.version>6.4.1</elasticsearch.version>
-        <spark.scope>provided</spark.scope>
+
+        <!-- Testing -->
+        <scoverage.plugin.version>1.4.0</scoverage.plugin.version>
+        <mockito.version>3.2.2.0</mockito.version>
+        <scalatest.version>3.2.3</scalatest.version>
     </properties>
 
     <dependencies>
-        <!--scala-->
+
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
         </dependency>
 
-        <!--spark, spark streaming, spark hive-->
+        <!-- Spark Dependencies -->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <scope>${spark.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>${spark.scope}</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <scope>${spark.scope}</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>${spark.scope}</scope>
+        </dependency>
+
+        <!-- Data Connectors -->
+
+        <!-- Spark Hive-->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <scope>${spark.scope}</scope>
+        </dependency>
+
+        <!-- Spark Kafka-->
+        <!-- TODO
+        Spark Streaming Kafka 08 is not cross compiled with scala 2.12.
+        Thus, this dependency has been temporary un-banned in the enforcer plugin.
+        This will be removed with structured streaming implementation
+        -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka-0-8_${scala211.binary.version}</artifactId>
+            <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>commons-httpclient</groupId>
-                    <artifactId>commons-httpclient</artifactId>
+                    <groupId>org.scala-lang.modules</groupId>
+                    <artifactId>scala-xml_2.11</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
+                    <groupId>org.scala-lang.modules</groupId>
+                    <artifactId>scala-parser-combinators_2.11</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-tags_2.11</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming-kafka-0-8_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
-        </dependency>
 
-        <!--jackson-->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
-        <!--scalaj for http request-->
-        <dependency>
-            <groupId>org.scalaj</groupId>
-            <artifactId>scalaj-http_${scala.binary.version}</artifactId>
-            <version>${scalaj.version}</version>
-        </dependency>
-
-        <!--mongo request-->
+        <!-- MongoDB-->
         <dependency>
             <groupId>org.mongodb.scala</groupId>
-            <artifactId>mongo-scala-driver_2.11</artifactId>
+            <artifactId>mongo-scala-driver_${scala.binary.version}</artifactId>
             <version>${mongo.version}</version>
         </dependency>
 
-        <!--avro-->
+        <!-- MySql -->
         <dependency>
-            <groupId>com.databricks</groupId>
-            <artifactId>spark-avro_${scala.binary.version}</artifactId>
-            <version>4.0.0</version>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.java.version}</version>
         </dependency>
 
-        <!--log4j-->
+        <!-- MariaDB -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${mariadb.version}</version>
         </dependency>
 
+        <!-- Spark Cassandra-->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>com.datastax.spark</groupId>
+            <artifactId>spark-cassandra-connector_${scala.binary.version}</artifactId>
+            <version>${cassandra.connector.version}</version>
         </dependency>
 
-        <!--curator-->
+        <!-- Spark Elasticsearch-->
+        <!-- TODO
+        Elasticsearch Spark has recently added support for scala 2.12 but it is not published in the Maven Central yet.
+        Thus, this dependency has been temporary un-banned in the enforcer plugin.
+        See https://github.com/elastic/elasticsearch-hadoop/pull/1589#issuecomment-776920189
+        -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch-spark-20_${scala211.binary.version}</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+
+        <!-- Miscellaneous-->
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
             <version>${curator.version}</version>
         </dependency>
 
-        <!--junit-->
+        <dependency>
+            <groupId>org.scalaj</groupId>
+            <artifactId>scalaj-http_${scala.binary.version}</artifactId>
+            <version>${scalaj.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.9</version>
+        </dependency>
+
+        <!-- Test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
 
-        <!--scala test-->
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.binary.version}</artifactId>
             <version>${scalatest.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <groupId>org.scalatestplus</groupId>
+            <artifactId>mockito-3-4_${scala.binary.version}</artifactId>
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.datastax.spark</groupId>
-            <artifactId>spark-cassandra-connector_2.11</artifactId>
-            <version>${cassandra.connector.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.9</version>
-        </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.200</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch-spark-20_2.11</artifactId>
-            <version>${elasticsearch.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>1.14.3</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
         <sourceDirectory>src/main/scala</sourceDirectory>
         <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
+
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>4.3.0</version>
                 <executions>
                     <execution>
-                        <id>compile</id>
                         <goals>
                             <goal>compile</goal>
                             <goal>testCompile</goal>
                         </goals>
-                        <phase>compile</phase>
                     </execution>
                 </executions>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
+                    <checkMultipleScalaVersions>true</checkMultipleScalaVersions>
+                    <failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
+                    <recompileMode>incremental</recompileMode>
                     <args>
+                        <arg>-unchecked</arg>
                         <arg>-deprecation</arg>
                         <arg>-feature</arg>
-                        <arg>-unchecked</arg>
+                        <arg>-explaintypes</arg>
                     </args>
+                    <jvmArgs>
+                        <jvmArg>-Xms64m</jvmArg>
+                        <jvmArg>-Xmx1024m</jvmArg>
+                    </jvmArgs>
+                    <javacArgs>
+                        <javacArg>-source</javacArg>
+                        <javacArg>-target</javacArg>
+                        <javacArg>${java.version}</javacArg>
+                        <javacArg>-Xlint:all,-serial,-path,-try</javacArg>
+                    </javacArgs>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
+
             <plugin>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest-maven-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <testFailureIgnore>false</testFailureIgnore>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <junitxml>.</junitxml>
+                    <filereports>TestSuiteReport.txt</filereports>
+                    <stderr/>
+                    <systemProperties>
+                        <java.io.tmpdir>${project.build.directory}/tmp</java.io.tmpdir>
+                    </systemProperties>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.4</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                 </configuration>
@@ -271,7 +301,8 @@ under the License.
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.apache.griffin.measure.Application</mainClass>
                                 </transformer>
                             </transformers>
@@ -293,26 +324,28 @@ under the License.
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.antipathy</groupId>
                 <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
-                <version>0.12_1.5.1</version>
+                <version>${scalafmt.version}</version>
                 <configuration>
-                    <parameters>${scalafmt.parameters}</parameters>
-                    <skip>${scalafmt.skip}</skip>
-                    <skipSources>${scalafmt.skip}</skipSources>
-                    <skipTestSources>${scalafmt.skip}</skipTestSources>
                     <configLocation>${project.parent.basedir}/.scalafmt.conf</configLocation>
+                    <skipTestSources>false</skipTestSources>
+                    <skipSources>false</skipSources>
+                    <respectVersion>false</respectVersion>
+                    <validateOnly>false</validateOnly>
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>validate</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>format</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.scalastyle</groupId>
                 <artifactId>scalastyle-maven-plugin</artifactId>
@@ -331,21 +364,68 @@ under the License.
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>validate</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.2</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.scoverage</groupId>
+                <artifactId>scoverage-maven-plugin</artifactId>
+                <version>${scoverage.plugin.version}</version>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                    <aggregate>true</aggregate>
+                    <highlighting>true</highlighting>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <finalName>
+                        ${project.artifactId}-${project.version}_${spark.major.version}_${scala.binary.version}
+                    </finalName>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
-                    <finalName>${artifactId}-${project.version}</finalName>
+                    <finalName>
+                        ${project.artifactId}-${project.version}_${spark.major.version}_${scala.binary.version}
+                    </finalName>
                 </configuration>
                 <executions>
                     <execution>
@@ -357,6 +437,139 @@ under the License.
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M2</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>${java.version}</version>
+                                </requireJavaVersion>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>*:*_2.10</exclude>
+                                        <exclude>*:*_2.12</exclude>
+                                        <exclude>*:*_2.13</exclude>
+                                    </excludes>
+                                    <searchTransitive>true</searchTransitive>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-no-duplicate-dependencies</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <banDuplicatePomDependencyVersions/>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Scala 2.12 -->
+        <profile>
+            <id>scala-2.12</id>
+            <properties>
+                <scala.binary.version>2.12</scala.binary.version>
+                <scala.version>${scala.binary.version}.12</scala.version>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-versions</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireJavaVersion>
+                                            <version>${java.version}</version>
+                                        </requireJavaVersion>
+                                        <bannedDependencies>
+                                            <!-- TODO Temporary Fix: These will be removed in a future iteration. -->
+                                            <includes>
+                                                <include>org.elasticsearch:elasticsearch-spark-20_2.11:*</include>
+                                                <include>org.apache.spark:spark-streaming-kafka-0-8_2.11:*</include>
+                                                <include>org.apache.kafka:kafka_2.11:*</include>
+                                            </includes>
+                                            <excludes>
+                                                <exclude>*:*_2.10</exclude>
+                                                <exclude>*:*_2.11</exclude>
+                                                <exclude>*:*_2.13</exclude>
+                                            </excludes>
+                                            <searchTransitive>true</searchTransitive>
+                                        </bannedDependencies>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>enforce-no-duplicate-dependencies</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <banDuplicatePomDependencyVersions/>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Spark 2.3.x -->
+        <profile>
+            <id>spark-2.3</id>
+            <properties>
+                <spark.major.version>2.3</spark.major.version>
+                <spark.version>${spark.major.version}.4</spark.version>
+            </properties>
+
+            <dependencies>
+                <!-- Old Spark Avro-->
+                <dependency>
+                    <groupId>com.databricks</groupId>
+                    <artifactId>spark-avro_${scala211.binary.version}</artifactId>
+                    <version>4.0.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- Spark 2.3.x -->
+        <profile>
+            <id>new-avro</id>
+
+            <dependencies>
+                <!-- New Spark Avro-->
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-avro_${scala.binary.version}</artifactId>
+                    <version>${spark.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+    </profiles>
 </project>
