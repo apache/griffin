@@ -12,6 +12,7 @@ target/**
 *.jar
 *.war
 *.ear
+*.cfg
 target
 service/src/main/resources/public/
 ui/.tmp/
@@ -21,7 +22,7 @@ ui/.tmp/
 .settings/
 .classpath
 bin
-
+**/site-packages/**
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 # don't need binary 
