@@ -484,6 +484,12 @@ under the License.
         <!-- Scala 2.12 -->
         <profile>
             <id>scala-2.12</id>
+            <activation>
+                <property>
+                    <name>scala-2.12</name>
+                </property>
+            </activation>
+
             <properties>
                 <scala.binary.version>2.12</scala.binary.version>
                 <scala.version>${scala.binary.version}.12</scala.version>
@@ -542,6 +548,12 @@ under the License.
         <!-- Spark 2.3.x -->
         <profile>
             <id>spark-2.3</id>
+            <activation>
+                <property>
+                    <name>spark-2.3</name>
+                </property>
+            </activation>
+
             <properties>
                 <spark.major.version>2.3</spark.major.version>
                 <spark.version>${spark.major.version}.4</spark.version>
@@ -557,9 +569,14 @@ under the License.
             </dependencies>
         </profile>
 
-        <!-- Spark 2.3.x -->
+        <!-- Spark 2.4+ Avro -->
         <profile>
-            <id>new-avro</id>
+            <id>spark-avro-2.4</id>
+            <activation>
+                <property>
+                    <name>!spark-2.3</name>
+                </property>
+            </activation>
 
             <dependencies>
                 <!-- New Spark Avro-->
