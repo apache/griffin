@@ -39,6 +39,7 @@ under the License.
         <spark.major.version>2.4</spark.major.version>
         <spark.version>${spark.major.version}.4</spark.version>
         <spark.scope>${provided.scope}</spark.scope>
+        <spark-streaming-kafka.verion>${spark.version}</spark-streaming-kafka.verion>
 
         <!-- Code Standardization -->
         <scalastyle.version>1.0.0</scalastyle.version>
@@ -108,7 +109,7 @@ under the License.
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming-kafka-0-8_${scala211.binary.version}</artifactId>
-            <version>${spark.version}</version>
+            <version>${spark-streaming-kafka.verion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.scala-lang.modules</groupId>
@@ -567,6 +568,22 @@ under the License.
                     <version>4.0.0</version>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <!-- Spark 3.0.x -->
+        <profile>
+            <id>spark-3.0</id>
+            <activation>
+                <property>
+                    <name>spark-3.0</name>
+                </property>
+            </activation>
+
+            <properties>
+                <spark.major.version>3.0</spark.major.version>
+                <spark.version>${spark.major.version}.2</spark.version>
+                <spark-streaming-kafka.verion>2.4.7</spark-streaming-kafka.verion>
+            </properties>
         </profile>
 
         <!-- Spark 2.4+ Avro -->

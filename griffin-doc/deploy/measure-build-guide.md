@@ -27,10 +27,10 @@ requires Maven version 3.5+ and Java 8.
 Starting from Apache Griffin 0.7, the `measure` module will be (scala-spark) cross version compatible. Since both Scala
 and Spark are dependencies for Apache Griffin, details of Spark-Scala cross version compatibility is mentioned below,
 
-|           | Spark 2.3.x | Spark 2.4.x |
-| --------- |:-----------:|:-----------:|
-| Scala 2.11| ✓           | ✓           |
-| Scala 2.12| x           | ✓           |
+|           | Spark 2.3.x | Spark 2.4.x | Spark 3.0.x |
+| --------- |:-----------:|:-----------:|:-----------:|
+| Scala 2.11| ✓           | ✓           | x           |
+| Scala 2.12| x           | ✓           | ✓           |
 
 ## Building a Distribution
 
@@ -55,8 +55,16 @@ mvn clean package -Dscala-2.12
 mvn clean package -Dspark-2.3
 ```
 
-Note: Using `-Dscala-2.12` and `-Dspark-2.3` option together will cause build failure due to missing dependencies as it
+```
+# For measure module with Scala 2.12 and Spark 3.0.x
+mvn clean package -Dscala-2.12 -Dspark-3.0 
+```
+
+Note: 
+ - Using `-Dscala-2.12` and `-Dspark-2.3` option together will cause build failure due to missing dependencies as it
 is not cross compiled, see details [here](#version-compatibility)
+ - Using `-Dspark-3.0` option without `-Dscala-2.12` option will cause build failure due to missing dependencies as it
+   is not cross compiled, see details [here](#version-compatibility)
 
 ### AVRO Source Support
 
