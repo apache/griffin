@@ -291,39 +291,24 @@ under the License.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.4</version>
-                <configuration>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.apache.griffin.measure.Application</mainClass>
-                                </transformer>
-                            </transformers>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.apache.http</pattern>
-                                    <shadedPattern>griffin.org.apache.http</shadedPattern>
-                                </relocation>
-                            </relocations>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/maven/**</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <minimizeJar>true</minimizeJar>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.apache.http</pattern>
+                            <shadedPattern>griffin.org.apache.http</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -409,11 +394,18 @@ under the License.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.2.0</version>
-                <configuration>
-                    <finalName>
-                        ${project.artifactId}-${project.version}_${spark.major.version}_${scala.binary.version}
-                    </finalName>
-                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${project.artifactId}-${project.version}</finalName>
+                            <classifier>spark-${spark.major.version}_scala-${scala.binary.version}</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -421,12 +413,18 @@ under the License.
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
+                    <tarLongFileMode>posix</tarLongFileMode>
                     <finalName>
-                        ${project.artifactId}-${project.version}_${spark.major.version}_${scala.binary.version}
+                        ${project.artifactId}-${project.version}-spark-${spark.major.version}_scala-${scala.binary.version}
                     </finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.apache.griffin.measure.Application</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
                 <executions>
                     <execution>
