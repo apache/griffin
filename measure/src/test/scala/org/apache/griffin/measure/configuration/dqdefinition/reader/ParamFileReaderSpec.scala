@@ -22,8 +22,10 @@ import scala.util.{Failure, Success}
 
 import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
 import org.apache.griffin.measure.configuration.enums.DslType.GriffinDsl
-
-class ParamFileReaderSpec extends FlatSpec with Matchers {
+import org.scalatest._
+import flatspec.AnyFlatSpec
+import matchers.should._
+class ParamFileReaderSpec extends AnyFlatSpec with Matchers {
 
   "params " should "be parsed from a valid file" in {
     val reader: ParamReader =

@@ -38,13 +38,14 @@ object FSUtil extends Loggable {
         fsMap.get(uri.getScheme) match {
           case Some(fs) => fs
           case _ =>
-            val fs = try {
-              FileSystem.get(uri, getConfiguration)
-            } catch {
-              case e: Throwable =>
-                error(s"get file system error: ${e.getMessage}", e)
-                throw e
-            }
+            val fs =
+              try {
+                FileSystem.get(uri, getConfiguration)
+              } catch {
+                case e: Throwable =>
+                  error(s"get file system error: ${e.getMessage}", e)
+                  throw e
+              }
             fsMap += (uri.getScheme -> fs)
             fs
         }
@@ -60,11 +61,12 @@ object FSUtil extends Loggable {
   }
 
   private def getUriOpt(path: String): Option[URI] = {
-    val uriOpt = try {
-      Some(new URI(path))
-    } catch {
-      case _: Throwable => None
-    }
+    val uriOpt =
+      try {
+        Some(new URI(path))
+      } catch {
+        case _: Throwable => None
+      }
     uriOpt.flatMap { uri =>
       if (uri.getScheme == null) {
         try {

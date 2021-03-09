@@ -19,7 +19,7 @@ package org.apache.griffin.measure.datasource.connector.batch
 import java.sql.DriverManager
 import java.util.Properties
 
-import org.scalatest.Matchers
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam

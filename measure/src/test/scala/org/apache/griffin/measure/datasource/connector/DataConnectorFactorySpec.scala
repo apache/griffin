@@ -23,7 +23,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.context.TimeRange
@@ -75,7 +75,7 @@ class DataConnectorWithoutApply extends BatchDataConnector {
   override def data(ms: Long): (Option[DataFrame], TimeRange) = null
 }
 
-class DataConnectorFactorySpec extends FlatSpec {
+class DataConnectorFactorySpec extends AnyFlatSpec {
 
   "DataConnectorFactory" should "be able to create custom batch connector" in {
     val param = DataConnectorParam(

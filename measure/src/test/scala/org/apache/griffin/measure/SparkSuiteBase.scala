@@ -22,9 +22,10 @@ import java.io.File
 import org.apache.commons.io.FileUtils
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
-import org.scalatest.{BeforeAndAfterAll, FlatSpec}
+import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 
-trait SparkSuiteBase extends FlatSpec with BeforeAndAfterAll {
+trait SparkSuiteBase extends AnyFlatSpec with BeforeAndAfterAll {
 
   @transient var spark: SparkSession = _
   @transient var sc: SparkContext = _

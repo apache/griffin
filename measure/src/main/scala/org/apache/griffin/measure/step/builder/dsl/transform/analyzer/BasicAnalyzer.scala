@@ -43,7 +43,7 @@ trait BasicAnalyzer extends Serializable {
             v :+ se
           case _ => v
         }
-    }
+      }
   val combSelectionExprs: (Seq[SelectionExpr], Seq[SelectionExpr]) => Seq[SelectionExpr] =
     (a: Seq[SelectionExpr], b: Seq[SelectionExpr]) => a ++ b
 

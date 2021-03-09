@@ -184,14 +184,15 @@ trait StreamingCacheClient
     }
 
     // new cache data
-    val newDfOpt = try {
-      val dfr = sparkSession.read
-      readDataFrameOpt(dfr, newFilePath).map(_.filter(filterStr))
-    } catch {
-      case e: Throwable =>
-        warn(s"read data source cache warn: ${e.getMessage}")
-        None
-    }
+    val newDfOpt =
+      try {
+        val dfr = sparkSession.read
+        readDataFrameOpt(dfr, newFilePath).map(_.filter(filterStr))
+      } catch {
+        case e: Throwable =>
+          warn(s"read data source cache warn: ${e.getMessage}")
+          None
+      }
 
     // old cache data
     val oldCacheIndexOpt = if (updatable) readOldCacheIndex() else None

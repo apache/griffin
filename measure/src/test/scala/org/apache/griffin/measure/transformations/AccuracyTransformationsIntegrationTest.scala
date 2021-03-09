@@ -18,7 +18,8 @@
 package org.apache.griffin.measure.transformations
 
 import org.apache.spark.sql.DataFrame
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.configuration.dqdefinition._
@@ -29,7 +30,10 @@ import org.apache.griffin.measure.job.builder.DQJobBuilder
 
 case class AccuracyResult(total: Long, miss: Long, matched: Long, matchedFraction: Double)
 
-class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with SparkSuiteBase {
+class AccuracyTransformationsIntegrationTest
+    extends AnyFlatSpec
+    with Matchers
+    with SparkSuiteBase {
   private val EMPTY_PERSON_TABLE = "empty_person"
   private val PERSON_TABLE = "person"
 
@@ -80,10 +84,9 @@ class AccuracyTransformationsIntegrationTest extends FlatSpec with Matchers with
       sourceName: String,
       targetName: String,
       expectedResult: AccuracyResult) = {
-    val dqContext: DQContext = getDqContext(
-      dataSourcesParam = List(
-        DataSourceParam(name = "source", connector = dataConnectorParam(tableName = sourceName)),
-        DataSourceParam(name = "target", connector = dataConnectorParam(tableName = targetName))))
+    val dqContext: DQContext = getDqContext(dataSourcesParam = List(
+      DataSourceParam(name = "source", connector = dataConnectorParam(tableName = sourceName)),
+      DataSourceParam(name = "target", connector = dataConnectorParam(tableName = targetName))))
 
     val accuracyRule = RuleParam(
       dslType = "griffin-dsl",

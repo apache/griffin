@@ -19,14 +19,15 @@ package org.apache.griffin.measure.sink
 
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types._
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.{Loggable, SparkSuiteBase}
 import org.apache.griffin.measure.configuration.dqdefinition.SinkParam
 import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext}
 
-trait SinkTestBase extends FlatSpec with Matchers with SparkSuiteBase with Loggable {
+trait SinkTestBase extends AnyFlatSpec with Matchers with SparkSuiteBase with Loggable {
 
   var sinkParams: Seq[SinkParam]
 
