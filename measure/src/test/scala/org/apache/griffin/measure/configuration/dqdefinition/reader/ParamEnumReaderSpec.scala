@@ -17,9 +17,8 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.scalatest._
-import flatspec.AnyFlatSpec
-import matchers.should._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.configuration.dqdefinition.{
   DQConfig,
@@ -50,18 +49,6 @@ class ParamEnumReaderSpec extends AnyFlatSpec with Matchers {
       ruleParam.getDslType should ===(GriffinDsl)
     }
 
-    val validDslDfOpsValues =
-      Seq("df-ops", "dfops", "DFOPS", "df-opr", "dfopr", "df-operations", "dfoperations")
-    validDslDfOpsValues foreach { x =>
-      val ruleParam = RuleParam(x, "accuracy")
-      ruleParam.getDslType should ===(DataFrameOpsType)
-    }
-
-    val invalidDslDfOpsValues = Seq("df-oprts", "-")
-    invalidDslDfOpsValues foreach { x =>
-      val ruleParam = RuleParam(x, "accuracy")
-      ruleParam.getDslType should not be DataFrameOpsType
-    }
   }
 
   "griffindsl" should "be returned as default dsl type" in {

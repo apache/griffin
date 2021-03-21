@@ -23,7 +23,6 @@ import org.apache.griffin.measure.configuration.enums.DqType._
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep
 import org.apache.griffin.measure.step.builder.dsl.expr.Expr
-import org.apache.griffin.measure.step.write.{MetricWriteStep, RecordWriteStep, WriteStep}
 
 trait Expr2DQSteps extends Loggable with Serializable {
 

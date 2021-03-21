@@ -20,6 +20,7 @@ package org.apache.griffin.measure.datasource.connector
 import java.util.concurrent.atomic.AtomicLong
 
 import scala.collection.mutable
+import scala.util._
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
@@ -29,9 +30,7 @@ import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context.{ContextId, DQContext, TimeRange}
 import org.apache.griffin.measure.datasource.TimestampStorage
-import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.step.builder.ConstantColumns
-import org.apache.griffin.measure.step.builder.preproc.PreProcParamMaker
 
 trait DataConnector extends Loggable with Serializable {
 
@@ -59,38 +58,33 @@ trait DataConnector extends Loggable with Serializable {
     val context = createContext(ms)
 
     val timestamp = context.contextId.timestamp
-    val suffix = context.contextId.id
-    val dcDfName = dcParam.getDataFrameName("this")
-
+    val thisTable = dcParam.getDataFrameName("this")
     try {
       saveTmst(timestamp) // save timestamp
 
-      dfOpt.flatMap { df =>
-        val (preProcRules, thisTable) =
-          PreProcParamMaker.makePreProcRules(dcParam.getPreProcRules, suffix, dcDfName)
+      val processedDf = dfOpt match {
+        case Some(df) =>
+          context.compileTableRegister.registerTable(thisTable)
 
-        // init data
-        context.compileTableRegister.registerTable(thisTable)
-        context.runTimeTableRegister.registerTable(thisTable, df)
+          dcParam.getPreProcRules.foldLeft(df)((dataFrame, rule) => {
+            Try {
+              context.runTimeTableRegister.registerTable(thisTable, dataFrame)
 
-        // build job
-        val preprocJob = DQJobBuilder.buildDQJob(context, preProcRules)
-
-        // job execute
-        preprocJob.execute(context)
-
-        // out data
-        val outDf = context.sparkSession.table(s"`$thisTable`")
-
-        // add tmst column
-        val withTmstDf = outDf.withColumn(ConstantColumns.tmst, lit(timestamp))
-
-        // clean context
-        context.clean()
-
-        Some(withTmstDf)
+              sparkSession.sql(rule)
+            } match {
+              case Success(value) => value
+              case Failure(exception) =>
+                val errorMsg =
+                  s"Exception occurred while preprocessing dataset with name '$thisTable'"
+                error(errorMsg, exception)
+                throw exception
+            }
+          })
+        case None => null
       }
 
+      Option(processedDf)
+        .map(_.withColumn(ConstantColumns.tmst, lit(timestamp)))
     } catch {
       case e: Throwable =>
         error(s"pre-process of data connector [$id] error: ${e.getMessage}", e)

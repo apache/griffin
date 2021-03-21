@@ -17,7 +17,7 @@
 
 package org.apache.griffin.measure.datasource
 
-import scala.util.Success
+import scala.util._
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.StreamingContext
@@ -66,7 +66,8 @@ object DataSourceFactory extends Loggable {
           timestampStorage,
           streamingCacheClientOpt) match {
           case Success(connector) => Some(connector)
-          case _ => None
+          case Failure(exception) =>
+            throw exception
         }
 
         Some(DataSource(name, dataSourceParam, dataConnectors, streamingCacheClientOpt))

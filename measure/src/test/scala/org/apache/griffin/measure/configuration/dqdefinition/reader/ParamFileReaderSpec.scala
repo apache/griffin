@@ -35,8 +35,8 @@ class ParamFileReaderSpec extends AnyFlatSpec with Matchers {
       case Success(v) =>
         v.getEvaluateRule.getRules.head.getDslType should ===(GriffinDsl)
         v.getEvaluateRule.getRules.head.getOutDfName() should ===("accu")
-      case Failure(_) =>
-        fail("it should not happen")
+      case Failure(e) =>
+        fail("it should not happen", e)
     }
 
   }
@@ -77,8 +77,8 @@ class ParamFileReaderSpec extends AnyFlatSpec with Matchers {
         v.getEvaluateRule.getRules.head.getErrorConfs.length should ===(2)
         v.getEvaluateRule.getRules.head.getErrorConfs.head.getColumnName.get should ===("user")
         v.getEvaluateRule.getRules.head.getErrorConfs(1).getColumnName.get should ===("name")
-      case Failure(_) =>
-        fail("it should not happen")
+      case Failure(e) =>
+        fail("it should not happen", e)
     }
   }
 }

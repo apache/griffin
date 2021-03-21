@@ -1,0 +1,43 @@
+{
+  "name": "accu_batch",
+  "process.type": "batch",
+  "data.sources": [
+    {
+      "name": "source",
+      "baseline": true,
+      "connector": {
+        "type": "file",
+        "config": {
+          "format": "text",
+          "paths": [
+            "measure/src/test/resources/users_info_src.csv"
+          ]
+        },
+        "pre.proc": [
+          "select split(value, ',') as part from this",
+          "select part[0] as user_id, part[1] as first_name, part[2] as last_name, part[3] as address, part[4] as email, part[5] as phone, part[6] as post_code from this"
+        ]
+      }
+    }
+  ],
+  "evaluate.rule": {
+    "rules": [
+      {
+        "dsl.type": "griffin-dsl",
+        "dq.type": "completeness",
+        "out.dataframe.name": "comp_df",
+        "rule": "post_code",
+        "out": [
+          {
+            "type": "metric",
+            "name": "comp_metric",
+            "flatten": "map"
+          }
+        ]
+      }
+    ]
+  },
+  "sinks": [
+    "consoleSink"
+  ]
+}
