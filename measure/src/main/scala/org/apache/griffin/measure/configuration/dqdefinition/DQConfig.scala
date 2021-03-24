@@ -50,6 +50,7 @@ case class DQConfig(
     @JsonProperty("process.type") private val procType: String,
     @JsonProperty("data.sources") private val dataSources: List[DataSourceParam],
     @JsonProperty("evaluate.rule") private val evaluateRule: EvaluateRuleParam,
+    @JsonProperty("measures") private val measures: Seq[MeasureParam],
     @JsonProperty("sinks") private val sinks: List[String] = Nil)
     extends Param {
   def getName: String = name
@@ -66,6 +67,7 @@ case class DQConfig(
       ._1
   }
   def getEvaluateRule: EvaluateRuleParam = evaluateRule
+  def getMeasures: Seq[MeasureParam] = measures
   def getSinkNames: Seq[String] = sinks
   def getValidSinkTypes: Seq[SinkType] = SinkType.validSinkTypes(sinks)
 
@@ -73,9 +75,75 @@ case class DQConfig(
     assert(StringUtils.isNotBlank(name), "dq config name should not be blank")
     assert(StringUtils.isNotBlank(procType), "process.type should not be blank")
     assert(dataSources != null, "data.sources should not be null")
-    assert(evaluateRule != null, "evaluate.rule should not be null")
     getDataSources.foreach(_.validate())
-    evaluateRule.validate()
+
+    assert(measures != null, "measures should not be null")
+    measures.foreach(_.validate())
+    assert(measures.nonEmpty, "No measures were defined")
+
+    val repeatedMeasures = getMeasures
+      .map(_.getName)
+      .groupBy(x => x)
+      .mapValues(_.size)
+      .filter(_._2 > 1)
+      .keys
+    assert(
+      repeatedMeasures.isEmpty,
+      s"Measure names must be unique. " +
+        s"Duplicate Measures names ['${repeatedMeasures.mkString("', '")}'] were found.")
+
+    val invalidMeasureSources = getMeasures
+      .map(_.getDataSource)
+      .map(dataSource => (dataSource, getDataSources.exists(_.getName.matches(dataSource))))
+      .filterNot(_._2)
+      .map(_._1)
+
+    assert(
+      invalidMeasureSources.isEmpty,
+      s"Measure source(s) undefined." +
+        s" Unknown source(s) ['${invalidMeasureSources.mkString("', '")}'] were found.")
+  }
+}
+
+trait ConfigParam extends Param {
+  @JsonProperty("name")
+  private val name: String = StringUtils.EMPTY
+
+  @JsonProperty("type")
+  private val configType: String = StringUtils.EMPTY
+
+  @JsonProperty("config")
+  private val config: Map[String, Any] = Map.empty
+
+  def getName: String = name
+  def getType: String = configType
+  def getConfig: Map[String, Any] = config
+}
+
+case class MeasureParam(
+    @JsonProperty("name") private val name: String,
+    @JsonProperty("type") private val measureType: String,
+    @JsonProperty("data.source") private val dataSource: String,
+    @JsonProperty("config") private val config: Map[String, Any] = Map.empty,
+    @JsonProperty("out") private val outputs: List[RuleOutputParam] = Nil)
+    extends Param {
+
+  def getName: String = name
+
+  def getType: MeasureTypes.MeasureType = MeasureTypes.withNameWithDefault(measureType)
+
+  def getConfig: Map[String, Any] = config
+
+  def getDataSource: String = dataSource
+
+  def getOutputs: Seq[RuleOutputParam] = if (outputs != null) outputs else Nil
+
+  def getOutputOpt(tp: OutputType): Option[RuleOutputParam] =
+    getOutputs.find(_.getOutputType == tp)
+
+  override def validate(): Unit = {
+    assert(!StringUtil.isNullOrEmpty(dataSource), "data.source should not be empty or null")
+    assert(!getType.equals(MeasureTypes.Unknown), s"Unknown measure type '$measureType' provided")
   }
 }
 

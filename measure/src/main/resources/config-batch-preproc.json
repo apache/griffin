@@ -20,23 +20,23 @@
       }
     }
   ],
-  "evaluate.rule": {
-    "rules": [
-      {
-        "dsl.type": "griffin-dsl",
-        "dq.type": "completeness",
-        "out.dataframe.name": "comp_df",
-        "rule": "post_code",
-        "out": [
-          {
-            "type": "metric",
-            "name": "comp_metric",
-            "flatten": "map"
-          }
-        ]
-      }
-    ]
-  },
+  "measures": [
+    {
+      "name": "completeness_measure",
+      "type": "completeness",
+      "data.source": "source",
+      "config": {
+        "expr": "post_code is null OR address RLIKE '\\\\d+$'"
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "comp_metric",
+          "flatten": "map"
+        }
+      ]
+    }
+  ],
   "sinks": [
     "consoleSink"
   ]
