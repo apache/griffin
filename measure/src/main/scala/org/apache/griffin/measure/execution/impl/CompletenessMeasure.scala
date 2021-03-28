@@ -49,19 +49,16 @@ case class CompletenessMeasure(measureParam: MeasureParam) extends Measure {
     }
 
     val selectCols = Seq(Total, Complete, InComplete).flatMap(e => Seq(lit(e), col(e)))
-    val metricColumn: Column = map(selectCols: _*).as(measureViolationsColName)
+    val metricColumn: Column = map(selectCols: _*).as(valueColumn)
 
     val input = sparkSession.read.table(measureParam.getDataSource)
-    val resultDf = input.withColumn(measureViolationsColName, column)
+    val badRecordsDf = input.withColumn(valueColumn, column)
 
-    val metricDf = preProcessMetrics(
-      resultDf
-        .withColumn(Total, lit(1))
-        .agg(sum(Total).as(Total), sum(measureViolationsColName).as(InComplete))
-        .withColumn(Complete, col(Total) - col(InComplete))
-        .select(metricColumn))
-
-    val badRecordsDf = preProcessRecords(resultDf)
+    val metricDf = badRecordsDf
+      .withColumn(Total, lit(1))
+      .agg(sum(Total).as(Total), sum(valueColumn).as(InComplete))
+      .withColumn(Complete, col(Total) - col(InComplete))
+      .select(metricColumn)
 
     (badRecordsDf, metricDf)
   }

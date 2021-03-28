@@ -45,13 +45,13 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
   def validate(): Boolean = true
 
   override def open(applicationId: String): Unit = {
-    griffinLogger.info(
+    info(
       s"Opened ConsoleSink for job with name '$jobName', " +
         s"timestamp '$timeStamp' and applicationId '$applicationId'")
   }
 
   override def close(): Unit = {
-    griffinLogger.info(
+    info(
       s"Closed ConsoleSink for job with name '$jobName' and timestamp '$timeStamp'")
   }
 
@@ -60,7 +60,7 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
   override def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
   override def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    griffinLogger.info(s"$jobName [$timeStamp] metrics:\n${JsonUtil.toJson(metrics)}")
+    info(s"$jobName [$timeStamp] metrics:\n${JsonUtil.toJson(metrics)}")
   }
 
   override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {

@@ -52,4 +52,6 @@ case class MetricWrapper(name: String, applicationId: String) extends Serializab
     }
   }
 
+  def clear(): Unit = metrics.clear()
+
 }

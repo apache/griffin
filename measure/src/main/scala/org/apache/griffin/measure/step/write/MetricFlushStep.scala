@@ -31,7 +31,7 @@ case class MetricFlushStep() extends WriteStep {
   val writeTimestampOpt: Option[Long] = None
 
   def execute(context: DQContext): Try[Boolean] = Try {
-    context.metricWrapper.flush.foldLeft(true) { (ret, pair) =>
+    val res = context.metricWrapper.flush.foldLeft(true) { (ret, pair) =>
       val (t, metric) = pair
       val pr =
         try {
@@ -50,6 +50,9 @@ case class MetricFlushStep() extends WriteStep {
         }
       ret && pr
     }
+
+    context.metricWrapper.clear()
+    res
   }
 
 }

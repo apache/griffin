@@ -37,27 +37,31 @@ trait Measure extends Loggable {
   val supportsRecordWrite: Boolean
   val supportsMetricWrite: Boolean
 
-  final val measureViolationsColName = s"${MeasureColPrefix}_${measureParam.getName}"
+  final val valueColumn = s"${MeasureColPrefix}_${measureParam.getName}"
 
   def getFromConfig[T: ClassTag](key: String, defValue: T): T = {
     measureParam.getConfig.getAnyRef[T](key, defValue)
   }
 
   def preProcessMetrics(input: DataFrame): DataFrame = {
-    val measureType = measureParam.getType.toString.toLowerCase(Locale.ROOT)
+    if (supportsMetricWrite) {
+      val measureType = measureParam.getType.toString.toLowerCase(Locale.ROOT)
 
-    input
-      .withColumn(MeasureName, typedLit[String](measureParam.getName))
-      .withColumn(MeasureType, typedLit[String](measureType))
-      .withColumn("value", col(measureViolationsColName))
-      .withColumn("data_source", typedLit[String](measureParam.getDataSource))
-      .select(MeasureName, MeasureType, "data_source", "value")
+      input
+        .withColumn(MeasureName, typedLit[String](measureParam.getName))
+        .withColumn(MeasureType, typedLit[String](measureType))
+        .withColumn("value", col(valueColumn))
+        .withColumn("data_source", typedLit[String](measureParam.getDataSource))
+        .select(MeasureName, MeasureType, "data_source", "value")
+    } else input
   }
 
   def preProcessRecords(input: DataFrame): DataFrame = {
-    input
-      .withColumn(Status, when(col(measureViolationsColName) === 0, "good").otherwise("bad"))
-      .drop(measureViolationsColName)
+    if (supportsRecordWrite) {
+      input
+        .withColumn(Status, when(col(valueColumn) === 0, "good").otherwise("bad"))
+        .drop(valueColumn)
+    } else input
   }
 
   def impl(sparkSession: SparkSession): (DataFrame, DataFrame)
@@ -65,13 +69,16 @@ trait Measure extends Loggable {
   def execute(sparkSession: SparkSession, batchId: Option[Long]): (DataFrame, DataFrame) = {
     val (badRecordsDf, metricDf) = impl(sparkSession)
 
+    val processedRecordDf = preProcessRecords(badRecordsDf)
+    val processedMetricDf = preProcessMetrics(metricDf)
+
     var batchDetailsOpt = StringUtils.EMPTY
     val res = batchId match {
       case Some(batchId) =>
         implicit val bId: Long = batchId
         batchDetailsOpt = s"for batch id $bId"
-        (appendBatchIdIfAvailable(badRecordsDf), appendBatchIdIfAvailable(metricDf))
-      case None => (badRecordsDf, metricDf)
+        (appendBatchIdIfAvailable(processedRecordDf), appendBatchIdIfAvailable(processedMetricDf))
+      case None => (processedRecordDf, processedMetricDf)
     }
 
     info(

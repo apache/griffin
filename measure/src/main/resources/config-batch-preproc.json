@@ -15,7 +15,7 @@
         },
         "pre.proc": [
           "select split(value, ',') as part from this",
-          "select part[0] as user_id, part[1] as first_name, part[2] as last_name, part[3] as address, part[4] as email, part[5] as phone, part[6] as post_code from this"
+          "select cast(part[0] as long) as user_id, part[1] as first_name, part[2] as last_name, part[3] as address, part[4] as email, part[5] as phone, part[6] as post_code from this"
         ]
       }
     }
@@ -33,6 +33,26 @@
           "type": "metric",
           "name": "comp_metric",
           "flatten": "map"
+        }
+      ]
+    },
+    {
+      "name": "profiling_measure",
+      "type": "profiling",
+      "data.source": "source",
+      "config": {
+        "expr": [
+          "user_id",
+          "post_code"
+        ],
+        "approx.distinct.count": true,
+        "round.scale": 2
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "prof_metric",
+          "flatten": "default"
         }
       ]
     }
