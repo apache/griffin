@@ -81,6 +81,7 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
     measureParam.getType match {
       case MeasureTypes.Completeness => CompletenessMeasure(measureParam)
       case MeasureTypes.Profiling => ProfilingMeasure(measureParam)
+      case MeasureTypes.SparkSQL => SparkSQLMeasure(measureParam)
       case _ =>
         val errorMsg = s"Measure type '${measureParam.getType}' is not supported."
         val exception = new NotImplementedError(errorMsg)

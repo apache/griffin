@@ -1,5 +1,5 @@
 {
-  "name": "accu_batch",
+  "name": "Batch-Preprocessing-Example",
   "process.type": "batch",
   "data.sources": [
     {
@@ -33,6 +33,10 @@
           "type": "metric",
           "name": "comp_metric",
           "flatten": "map"
+        },
+        {
+          "type": "record",
+          "name": "comp_records"
         }
       ]
     },
@@ -41,10 +45,7 @@
       "type": "profiling",
       "data.source": "source",
       "config": {
-        "expr": [
-          "user_id",
-          "post_code"
-        ],
+        "expr": "user_id, post_code",
         "approx.distinct.count": true,
         "round.scale": 2
       },
@@ -53,6 +54,26 @@
           "type": "metric",
           "name": "prof_metric",
           "flatten": "default"
+        }
+      ]
+    },
+    {
+      "name": "query_measure",
+      "type": "sparkSQL",
+      "data.source": "source",
+      "config": {
+        "expr": "select * from source",
+        "bad.record.definition": "post_code is null"
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "sql_metric",
+          "flatten": "default"
+        },
+        {
+          "type": "record",
+          "name": "sql_records"
         }
       ]
     }

@@ -10,7 +10,7 @@
       "name": "consoleSink",
       "type": "CONSOLE",
       "config": {
-        "max.log.lines": 10
+        "numRows": 40
       }
     },
     {

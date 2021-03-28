@@ -25,18 +25,18 @@ case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
 
   override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
     val input = sparkSession.read.table(measureParam.getDataSource)
-    val profilingColNames =
-      getFromConfig[Seq[String]](Expression, input.columns)
-        .map(_.trim.toLowerCase(Locale.ROOT))
-        .toSet
-
-    assert(
-      profilingColNames.nonEmpty,
-      s"Invalid columns [${profilingColNames.mkString(", ")}] were provided for profiling")
+    val profilingColNames = getFromConfig[String](Expression, input.columns.mkString(","))
+      .split(",")
+      .map(_.trim.toLowerCase(Locale.ROOT))
+      .toSet
 
     val profilingCols =
       input.schema.fields.filter(f =>
         profilingColNames.contains(f.name) && !f.name.equalsIgnoreCase(ConstantColumns.tmst))
+
+    assert(
+      profilingCols.nonEmpty,
+      s"Invalid columns [${profilingCols.map(_.name).mkString(", ")}] were provided for profiling.")
 
     val profilingExprs = profilingCols.foldLeft(Array.empty[Column])((exprList, field) => {
       val colName = field.name
