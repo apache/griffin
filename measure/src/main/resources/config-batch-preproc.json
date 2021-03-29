@@ -3,7 +3,7 @@
   "process.type": "batch",
   "data.sources": [
     {
-      "name": "source",
+      "name": "source_1",
       "baseline": true,
       "connector": {
         "type": "file",
@@ -41,7 +41,7 @@
     {
       "name": "completeness_measure",
       "type": "completeness",
-      "data.source": "source",
+      "data.source": "source_1",
       "config": {
         "expr": "post_code is null OR address RLIKE '\\\\d+$'"
       },
@@ -60,7 +60,7 @@
     {
       "name": "profiling_measure",
       "type": "profiling",
-      "data.source": "source",
+      "data.source": "source_1",
       "config": {
         "expr": "user_id, post_code",
         "approx.distinct.count": true,
@@ -70,23 +70,23 @@
         {
           "type": "metric",
           "name": "prof_metric",
-          "flatten": "default"
+          "flatten": "map"
         }
       ]
     },
     {
       "name": "query_measure",
       "type": "sparkSQL",
-      "data.source": "source",
+      "data.source": "source_1",
       "config": {
-        "expr": "select * from source",
+        "expr": "select * from source_1",
         "bad.record.definition": "post_code is null"
       },
       "out": [
         {
           "type": "metric",
           "name": "sql_metric",
-          "flatten": "default"
+          "flatten": "map"
         },
         {
           "type": "record",
@@ -106,7 +106,7 @@
         {
           "type": "metric",
           "name": "duplication_metric",
-          "flatten": "default"
+          "flatten": "map"
         },
         {
           "type": "record",

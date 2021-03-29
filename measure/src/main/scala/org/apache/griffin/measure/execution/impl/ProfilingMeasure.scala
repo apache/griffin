@@ -42,9 +42,7 @@ case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
       val colName = field.name
       val profilingExprs = getProfilingExprs(field, roundScale, approxDistinctCount)
 
-      exprList.:+(
-        map(lit(colName).as(ColName), struct(profilingExprs: _*))
-          .as(s"$DetailsPrefix$colName"))
+      exprList.:+(map(profilingExprs: _*).as(s"$DetailsPrefix$colName"))
     })
 
     val aggregateDf = profilingCols
@@ -60,12 +58,15 @@ case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
       })
       .agg(count(lit(1L)).as(TotalCount), profilingExprs: _*)
 
-    val detailCols = aggregateDf.columns.filter(_.startsWith(DetailsPrefix)).map(col)
+    val detailCols =
+      aggregateDf.columns
+        .filter(_.startsWith(DetailsPrefix))
+        .flatMap(c => Seq(lit(c.stripPrefix(DetailsPrefix)), col(c)))
 
     val metricDf = aggregateDf
-      .withColumn(ColumnDetails, array(detailCols: _*))
+      .withColumn(ColumnDetails, map(detailCols: _*))
       .select(TotalCount, ColumnDetails)
-      .select(to_json(struct(AllColumns)).as(valueColumn))
+      .select(map(lit(ColumnDetails), col(ColumnDetails)).as(valueColumn))
 
     (sparkSession.emptyDataFrame, metricDf)
   }
@@ -131,22 +132,28 @@ object ProfilingMeasure {
     val column = col(colName)
     val lengthColExpr = col(lengthColFn(colName))
     val nullColExpr = col(nullsInColFn(colName))
-    val distinctCountExpr =
-      if (approxDistinctCount) approx_count_distinct(column).as(s"$ApproxPrefix$DistinctCount")
-      else countDistinct(column).as(DistinctCount)
+    val (distinctCountName, distinctCountExpr) =
+      if (approxDistinctCount)
+        (
+          lit(s"$ApproxPrefix$DistinctCount"),
+          approx_count_distinct(column).as(s"$ApproxPrefix$DistinctCount"))
+      else (lit(DistinctCount), countDistinct(column).as(DistinctCount))
 
     Seq(
-      lit(colType.catalogString).as(DataTypeStr),
-      min(lengthColExpr).as(MinColLength),
-      max(lengthColExpr).as(MaxColLength),
-      forNumericFn(colType, avg(lengthColExpr), AvgColLength),
-      forNumericFn(colType, min(column), Min),
-      forNumericFn(colType, max(column), Max),
-      forNumericFn(colType, bround(avg(column), roundScale), Avg),
-      forNumericFn(colType, bround(stddev(column), roundScale), StdDeviation),
-      forNumericFn(colType, bround(variance(column), roundScale), Variance),
-      forNumericFn(colType, bround(kurtosis(column), roundScale), Kurtosis),
-      distinctCountExpr,
-      sum(nullColExpr).as(NullCount))
+      Seq(lit(DataTypeStr), lit(colType.catalogString).as(DataTypeStr)),
+      Seq(lit(TotalCount), sum(lit(1)).as(TotalCount)),
+      Seq(lit(MinColLength), min(lengthColExpr).as(MinColLength)),
+      Seq(lit(MaxColLength), max(lengthColExpr).as(MaxColLength)),
+      Seq(lit(AvgColLength), forNumericFn(colType, avg(lengthColExpr), AvgColLength)),
+      Seq(lit(Min), forNumericFn(colType, min(column), Min)),
+      Seq(lit(Max), forNumericFn(colType, max(column), Max)),
+      Seq(lit(Avg), forNumericFn(colType, bround(avg(column), roundScale), Avg)),
+      Seq(
+        lit(StdDeviation),
+        forNumericFn(colType, bround(stddev(column), roundScale), StdDeviation)),
+      Seq(lit(Variance), forNumericFn(colType, bround(variance(column), roundScale), Variance)),
+      Seq(lit(Kurtosis), forNumericFn(colType, bround(kurtosis(column), roundScale), Kurtosis)),
+      Seq(lit(distinctCountName), distinctCountExpr),
+      Seq(lit(NullCount), sum(nullColExpr).as(NullCount))).flatten
   }
 }

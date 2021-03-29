@@ -75,6 +75,8 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
       persistRecords(measure, badRecordsDf)
       persistMetrics(measure, metricsDf)
     })
+
+    MetricFlushStep().execute(context)
   }
 
   private def createMeasure(measureParam: MeasureParam): Measure = {
@@ -113,7 +115,6 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
           metricsDf.createOrReplaceTempView("metricsDf")
           MetricWriteStep(measureParam.getName, "metricsDf", o.getFlatten)
             .execute(context)
-          MetricFlushStep().execute(context)
         } else warn(s"Measure with name '${measureParam.getName}' doesn't support metric write")
       case None =>
     }
