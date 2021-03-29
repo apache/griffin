@@ -42,8 +42,8 @@ case class CompletenessMeasure(measureParam: MeasureParam) extends Measure {
       case Some(exprStr) => when(expr(exprStr), 1.0).otherwise(0.0)
       case None =>
         error(
-          s"$Expression was not defined for completeness measures",
-          new IllegalArgumentException(s"$Expression was not defined for completeness measures"))
+          s"$Expression was not defined for completeness measure.",
+          new IllegalArgumentException(s"$Expression was not defined for completeness measure."))
         throw new IllegalArgumentException(
           s"$Expression was not defined for completeness measures")
     }

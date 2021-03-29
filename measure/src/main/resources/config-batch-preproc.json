@@ -18,6 +18,23 @@
           "select cast(part[0] as long) as user_id, part[1] as first_name, part[2] as last_name, part[3] as address, part[4] as email, part[5] as phone, part[6] as post_code from this"
         ]
       }
+    },
+    {
+      "name": "source_2",
+      "baseline": true,
+      "connector": {
+        "type": "file",
+        "config": {
+          "format": "text",
+          "paths": [
+            "measure/src/test/resources/duplicates_users_info_src.csv"
+          ]
+        },
+        "pre.proc": [
+          "select split(value, ',') as part from this",
+          "select cast(part[0] as int) as id, part[1] as name, part[2] as gender from this"
+        ]
+      }
     }
   ],
   "measures": [
@@ -74,6 +91,26 @@
         {
           "type": "record",
           "name": "sql_records"
+        }
+      ]
+    },
+    {
+      "name": "duplication_measure",
+      "type": "duplication",
+      "data.source": "source_2",
+      "config": {
+        "expr": "name",
+        "bad.record.definition": "duplicate"
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "duplication_metric",
+          "flatten": "default"
+        },
+        {
+          "type": "record",
+          "name": "duplication_records"
         }
       ]
     }

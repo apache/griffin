@@ -10,7 +10,7 @@
       "name": "consoleSink",
       "type": "CONSOLE",
       "config": {
-        "numRows": 40
+        "numRows": 20
       }
     },
     {

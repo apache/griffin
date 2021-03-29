@@ -80,6 +80,7 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
   private def createMeasure(measureParam: MeasureParam): Measure = {
     measureParam.getType match {
       case MeasureTypes.Completeness => CompletenessMeasure(measureParam)
+      case MeasureTypes.Duplication => DuplicationMeasure(measureParam)
       case MeasureTypes.Profiling => ProfilingMeasure(measureParam)
       case MeasureTypes.SparkSQL => SparkSQLMeasure(measureParam)
       case _ =>
