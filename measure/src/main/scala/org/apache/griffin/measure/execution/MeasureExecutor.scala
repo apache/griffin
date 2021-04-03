@@ -70,9 +70,9 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
       batchId: Option[Long] = None): Unit = {
     measureParams.foreach(measureParam => {
       val measure = createMeasure(measureParam)
-      val (badRecordsDf, metricsDf) = measure.execute(context.sparkSession, batchId)
+      val (recordsDf, metricsDf) = measure.execute(context.sparkSession, batchId)
 
-      persistRecords(measure, badRecordsDf)
+      persistRecords(measure, recordsDf)
       persistMetrics(measure, metricsDf)
     })
 
@@ -84,6 +84,7 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
       case MeasureTypes.Completeness => CompletenessMeasure(measureParam)
       case MeasureTypes.Duplication => DuplicationMeasure(measureParam)
       case MeasureTypes.Profiling => ProfilingMeasure(measureParam)
+      case MeasureTypes.Accuracy => AccuracyMeasure(measureParam)
       case MeasureTypes.SparkSQL => SparkSQLMeasure(measureParam)
       case _ =>
         val errorMsg = s"Measure type '${measureParam.getType}' is not supported."
@@ -99,8 +100,8 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
     measureParam.getOutputOpt(OutputType.RecordOutputType) match {
       case Some(_) =>
         if (measure.supportsRecordWrite) {
-          recordsDf.createOrReplaceTempView("badRecordsDf")
-          RecordWriteStep(measureParam.getName, "badRecordsDf").execute(context)
+          recordsDf.createOrReplaceTempView("recordsDf")
+          RecordWriteStep(measureParam.getName, "recordsDf").execute(context)
         } else warn(s"Measure with name '${measureParam.getName}' doesn't support record write")
       case None =>
     }

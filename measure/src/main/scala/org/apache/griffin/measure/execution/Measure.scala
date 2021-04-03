@@ -68,9 +68,9 @@ trait Measure extends Loggable {
   def impl(sparkSession: SparkSession): (DataFrame, DataFrame)
 
   def execute(sparkSession: SparkSession, batchId: Option[Long]): (DataFrame, DataFrame) = {
-    val (badRecordsDf, metricDf) = impl(sparkSession)
+    val (recordsDf, metricDf) = impl(sparkSession)
 
-    val processedRecordDf = preProcessRecords(badRecordsDf)
+    val processedRecordDf = preProcessRecords(recordsDf)
     val processedMetricDf = preProcessMetrics(metricDf)
 
     var batchDetailsOpt = StringUtils.EMPTY

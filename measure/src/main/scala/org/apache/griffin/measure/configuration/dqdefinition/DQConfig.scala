@@ -78,8 +78,8 @@ case class DQConfig(
     getDataSources.foreach(_.validate())
 
     assert(measures != null, "measures should not be null")
-    measures.foreach(_.validate())
     assert(measures.nonEmpty, "No measures were defined")
+    measures.foreach(_.validate())
 
     val repeatedMeasures = getMeasures
       .map(_.getName)

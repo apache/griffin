@@ -54,7 +54,7 @@ case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
         val nullColName = nullsInColFn(colName)
 
         df.withColumn(lengthColName, length(column))
-          .withColumn(nullColName, when(isnull(column).or(isnan(column)), 1L).otherwise(0L))
+          .withColumn(nullColName, when(isnull(column), 1L).otherwise(0L))
       })
       .agg(count(lit(1L)).as(TotalCount), profilingExprs: _*)
 

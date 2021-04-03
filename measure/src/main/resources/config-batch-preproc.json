@@ -3,37 +3,37 @@
   "process.type": "batch",
   "data.sources": [
     {
-      "name": "source_1",
+      "name": "crime_report_source",
       "baseline": true,
       "connector": {
         "type": "file",
         "config": {
           "format": "text",
           "paths": [
-            "measure/src/test/resources/users_info_src.csv"
+            "measure/src/main/resources/crime_report.csv"
           ]
         },
         "pre.proc": [
           "select split(value, ',') as part from this",
-          "select cast(part[0] as long) as user_id, part[1] as first_name, part[2] as last_name, part[3] as address, part[4] as email, part[5] as phone, part[6] as post_code from this"
+          "select part[0] as date_time, part[1] as incident, part[2] as address, part[3] as city, part[4] as zipcode from this",
+          "select cast(date_time as timestamp) as date_time, incident, address, city, cast(zipcode as int) as zipcode from this"
         ]
       }
     },
     {
-      "name": "source_2",
+      "name": "crime_report_truth",
       "baseline": true,
       "connector": {
         "type": "file",
         "config": {
-          "format": "text",
+          "format": "csv",
+          "options": {
+            "header": "true"
+          },
           "paths": [
-            "measure/src/test/resources/duplicates_users_info_src.csv"
+            "measure/src/main/resources/crime_report_truth.csv"
           ]
-        },
-        "pre.proc": [
-          "select split(value, ',') as part from this",
-          "select cast(part[0] as int) as id, part[1] as name, part[2] as gender from this"
-        ]
+        }
       }
     }
   ],
@@ -41,9 +41,9 @@
     {
       "name": "completeness_measure",
       "type": "completeness",
-      "data.source": "source_1",
+      "data.source": "crime_report_source",
       "config": {
-        "expr": "post_code is null OR address RLIKE '\\\\d+$'"
+        "expr": "zipcode is null OR city is null"
       },
       "out": [
         {
@@ -60,9 +60,8 @@
     {
       "name": "profiling_measure",
       "type": "profiling",
-      "data.source": "source_1",
+      "data.source": "crime_report_source",
       "config": {
-        "expr": "user_id, post_code",
         "approx.distinct.count": true,
         "round.scale": 2
       },
@@ -77,10 +76,10 @@
     {
       "name": "query_measure",
       "type": "sparkSQL",
-      "data.source": "source_1",
+      "data.source": "crime_report_source",
       "config": {
-        "expr": "select * from source_1",
-        "bad.record.definition": "post_code is null"
+        "expr": "select * from crime_report_source",
+        "bad.record.definition": "zipcode is null and city is null"
       },
       "out": [
         {
@@ -97,9 +96,8 @@
     {
       "name": "duplication_measure",
       "type": "duplication",
-      "data.source": "source_2",
+      "data.source": "crime_report_source",
       "config": {
-        "expr": "name",
         "bad.record.definition": "duplicate"
       },
       "out": [
@@ -111,6 +109,31 @@
         {
           "type": "record",
           "name": "duplication_records"
+        }
+      ]
+    },
+    {
+      "name": "accuracy_measure",
+      "type": "accuracy",
+      "data.source": "crime_report_source",
+      "config": {
+        "target.source": "crime_report_truth",
+        "expr": [
+          {
+            "source.col": "city",
+            "target.col": "city_name"
+          }
+        ]
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "accuracy_metric",
+          "flatten": "map"
+        },
+        {
+          "type": "record",
+          "name": "accuracy_records"
         }
       ]
     }

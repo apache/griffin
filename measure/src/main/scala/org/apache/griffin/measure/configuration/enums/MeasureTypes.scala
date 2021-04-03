@@ -25,7 +25,7 @@ object MeasureTypes extends GriffinEnum {
 
   type MeasureType = Value
 
-  val Completeness, Duplication, Profiling, SparkSQL = Value
+  val Completeness, Duplication, Profiling, Accuracy, SparkSQL = Value
 
   override def withNameWithDefault(name: String): MeasureType = {
     super.withNameWithDefault(name)
