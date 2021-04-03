@@ -13,7 +13,6 @@ case class SparkSQLMeasure(measureParam: MeasureParam) extends Measure {
 
   import Measure._
 
-  private final val Total: String = "total"
   private final val Complete: String = "complete"
   private final val InComplete: String = "incomplete"
 
@@ -21,7 +20,6 @@ case class SparkSQLMeasure(measureParam: MeasureParam) extends Measure {
 
   override val supportsMetricWrite: Boolean = true
 
-  private final val BadRecordDefinition = "bad.record.definition"
   private val badnessExpr = getFromConfig[String](BadRecordDefinition, StringUtils.EMPTY)
 
   override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {

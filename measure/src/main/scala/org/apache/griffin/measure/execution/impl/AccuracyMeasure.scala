@@ -20,7 +20,7 @@ package org.apache.griffin.measure.execution.impl
 import java.util.Locale
 
 import io.netty.util.internal.StringUtil
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
@@ -36,7 +36,6 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
   private final val SourceColStr: String = "source.col"
   private final val TargetColStr: String = "target.col"
 
-  private final val Total: String = "total"
   private final val AccurateStr: String = "accurate"
   private final val InAccurateStr: String = "inaccurate"
 
@@ -59,14 +58,13 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
 
     exprOpt match {
       case Some(accuracyExpr) =>
-        import org.apache.spark.sql.Column
         val joinExpr =
           accuracyExpr.map(e => col(e.sourceCol) === col(e.targetCol)).reduce(_ and _)
 
         val indicatorExpr =
           accuracyExpr
             .map(e =>
-              coalesce(col(e.sourceCol), lit("")) notEqual coalesce(col(e.targetCol), lit("")))
+              coalesce(col(e.sourceCol), emptyCol) notEqual coalesce(col(e.targetCol), emptyCol))
             .reduce(_ or _)
 
         val recordsDf = targetDataSource

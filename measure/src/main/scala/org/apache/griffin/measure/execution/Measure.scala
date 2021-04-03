@@ -22,7 +22,7 @@ import java.util.Locale
 import scala.reflect.ClassTag
 
 import org.apache.commons.lang3.StringUtils
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
@@ -52,15 +52,15 @@ trait Measure extends Loggable {
         .withColumn(MeasureName, typedLit[String](measureParam.getName))
         .withColumn(MeasureType, typedLit[String](measureType))
         .withColumn(Metrics, col(valueColumn))
-        .withColumn("data_source", typedLit[String](measureParam.getDataSource))
-        .select(MeasureName, MeasureType, "data_source", Metrics)
+        .withColumn(DataSource, typedLit[String](measureParam.getDataSource))
+        .select(MeasureName, MeasureType, DataSource, Metrics)
     } else input
   }
 
   def preProcessRecords(input: DataFrame): DataFrame = {
     if (supportsRecordWrite) {
       input
-        .withColumn(Status, when(col(valueColumn) === 0, "good").otherwise("bad"))
+        .withColumn(Status, when(col(valueColumn) === 0, Good).otherwise(Bad))
         .drop(valueColumn)
     } else input
   }
@@ -96,6 +96,8 @@ trait Measure extends Loggable {
 }
 
 object Measure {
+
+  final val DataSource = "data_source"
   final val Expression = "expr"
   final val MeasureColPrefix = "__measure"
   final val Status = "__status"
@@ -103,4 +105,13 @@ object Measure {
   final val MeasureName = "measure_name"
   final val MeasureType = "measure_type"
   final val Metrics = "metrics"
+  final val Good = "good"
+  final val Bad = "bad"
+
+  final val Total: String = "total"
+  final val BadRecordDefinition = "bad.record.definition"
+  final val AllColumns: String = "*"
+
+  final val emptyCol: Column = lit(StringUtils.EMPTY)
+
 }

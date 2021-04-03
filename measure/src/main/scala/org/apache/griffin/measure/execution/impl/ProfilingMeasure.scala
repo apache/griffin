@@ -8,11 +8,11 @@ import org.apache.spark.sql.types._
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
+import org.apache.griffin.measure.execution.Measure._
 import org.apache.griffin.measure.step.builder.ConstantColumns
 
 case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
 
-  import Measure._
   import ProfilingMeasure._
 
   override val supportsRecordWrite: Boolean = false
@@ -56,7 +56,7 @@ case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
         df.withColumn(lengthColName, length(column))
           .withColumn(nullColName, when(isnull(column), 1L).otherwise(0L))
       })
-      .agg(count(lit(1L)).as(TotalCount), profilingExprs: _*)
+      .agg(count(lit(1L)).as(Total), profilingExprs: _*)
 
     val detailCols =
       aggregateDf.columns
@@ -65,7 +65,7 @@ case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
 
     val metricDf = aggregateDf
       .withColumn(ColumnDetails, map(detailCols: _*))
-      .select(TotalCount, ColumnDetails)
+      .select(Total, ColumnDetails)
       .select(map(lit(ColumnDetails), col(ColumnDetails)).as(valueColumn))
 
     (sparkSession.emptyDataFrame, metricDf)
@@ -85,9 +85,7 @@ object ProfilingMeasure {
    * Structure Keys
    */
   private final val ColumnDetails: String = "column_details"
-  private final val ColName: String = "col_name"
   private final val DataTypeStr: String = "data_type"
-  private final val TotalCount: String = "total_count"
 
   /**
    * Prefix Keys
@@ -111,8 +109,6 @@ object ProfilingMeasure {
   private final val MinColLength: String = s"${Min}_$ColumnLengthPrefix"
   private final val MaxColLength: String = s"${Max}_$ColumnLengthPrefix"
   private final val AvgColLength: String = s"${Avg}_$ColumnLengthPrefix"
-
-  private final val AllColumns: String = "*"
 
   private def lengthColFn(colName: String): String = s"${ColumnLengthPrefix}_$colName"
 
@@ -141,7 +137,7 @@ object ProfilingMeasure {
 
     Seq(
       Seq(lit(DataTypeStr), lit(colType.catalogString).as(DataTypeStr)),
-      Seq(lit(TotalCount), sum(lit(1)).as(TotalCount)),
+      Seq(lit(Total), sum(lit(1)).as(Total)),
       Seq(lit(MinColLength), min(lengthColExpr).as(MinColLength)),
       Seq(lit(MaxColLength), max(lengthColExpr).as(MaxColLength)),
       Seq(lit(AvgColLength), forNumericFn(colType, avg(lengthColExpr), AvgColLength)),

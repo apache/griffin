@@ -42,8 +42,6 @@ case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
 
   import Measure._
 
-  private final val BadRecordDefinition = "bad.record.definition"
-
   private final val Duplicate: String = "duplicate"
   private final val Unique: String = "unique"
   private final val NonUnique: String = "non_unique"

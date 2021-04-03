@@ -27,7 +27,6 @@ case class CompletenessMeasure(measureParam: MeasureParam) extends Measure {
 
   import Measure._
 
-  private final val Total: String = "total"
   private final val Complete: String = "complete"
   private final val InComplete: String = "incomplete"
 
