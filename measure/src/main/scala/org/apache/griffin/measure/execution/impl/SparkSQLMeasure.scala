@@ -13,31 +13,27 @@ case class SparkSQLMeasure(measureParam: MeasureParam) extends Measure {
 
   import Measure._
 
-  private final val Complete: String = "complete"
-  private final val InComplete: String = "incomplete"
+  final val Complete: String = "complete"
+  final val InComplete: String = "incomplete"
 
   override val supportsRecordWrite: Boolean = true
 
   override val supportsMetricWrite: Boolean = true
 
+  private val expr = getFromConfig[String](Expression, StringUtils.EMPTY)
   private val badnessExpr = getFromConfig[String](BadRecordDefinition, StringUtils.EMPTY)
 
+  validate()
+
   override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
-
-    val expr = getFromConfig[String](Expression, StringUtils.EMPTY)
-
-    assert(!StringUtil.isNullOrEmpty(expr), "Invalid query provided as expr.")
-    assert(
-      !StringUtil.isNullOrEmpty(badnessExpr),
-      "Invalid condition provided as bad.record.definition.")
-
     val df = sparkSession.sql(expr).withColumn(valueColumn, sparkExpr(badnessExpr))
 
     assert(
       df.schema.exists(f => f.name.matches(valueColumn) && f.dataType.isInstanceOf[BooleanType]),
       s"Invalid condition provided as $BadRecordDefinition. Does not yield a boolean result.")
 
-    val selectCols = Seq(Total, Complete, InComplete).flatMap(e => Seq(lit(e), col(e)))
+    val selectCols =
+      Seq(Total, Complete, InComplete).flatMap(e => Seq(lit(e), col(e).cast("string")))
     val metricColumn: Column = map(selectCols: _*).as(valueColumn)
 
     val badRecordsDf = df.withColumn(valueColumn, when(col(valueColumn), 1).otherwise(0))
@@ -48,5 +44,14 @@ case class SparkSQLMeasure(measureParam: MeasureParam) extends Measure {
       .select(metricColumn)
 
     (badRecordsDf, metricDf)
+  }
+
+  private def validate(): Unit = {
+    assert(
+      !StringUtil.isNullOrEmpty(expr),
+      "Invalid query provided as expr. Must not be null, empty or of invalid type.")
+    assert(
+      !StringUtil.isNullOrEmpty(badnessExpr),
+      "Invalid condition provided as bad.record.definition.")
   }
 }

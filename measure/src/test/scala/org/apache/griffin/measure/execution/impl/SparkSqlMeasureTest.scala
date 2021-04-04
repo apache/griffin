@@ -19,74 +19,85 @@ package org.apache.griffin.measure.execution.impl
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.AnalysisException
-import org.apache.spark.sql.catalyst.parser.ParseException
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure._
 
-class CompletenessMeasureTest extends MeasureTest {
+class SparkSqlMeasureTest extends MeasureTest {
   var param: MeasureParam = _
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    param = MeasureParam("param", "Completeness", "source", Map(Expression -> "name is null"))
+    param = MeasureParam(
+      "param",
+      "SparkSql",
+      "source",
+      Map(
+        Expression -> "select * from source",
+        BadRecordDefinition -> "name is null or gender is null"))
   }
 
-  "CompletenessMeasure" should "validate expression config" in {
+  "SparkSqlMeasure" should "validate expression config" in {
+
+    // Validations for Expression
+
+    // Empty
     assertThrows[AssertionError] {
-      CompletenessMeasure(param.copy(config = Map.empty[String, String]))
+      SparkSQLMeasure(param.copy(config = Map.empty[String, String]))
     }
 
+    // Empty
     assertThrows[AssertionError] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> StringUtils.EMPTY)))
+      SparkSQLMeasure(param.copy(config = Map(Expression -> StringUtils.EMPTY)))
     }
 
+    // Null
     assertThrows[AssertionError] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> null)))
+      SparkSQLMeasure(param.copy(config = Map(Expression -> null)))
     }
 
+    // Incorrect Type
     assertThrows[AssertionError] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> 22)))
+      SparkSQLMeasure(param.copy(config = Map(Expression -> 943)))
     }
+
+    // Validations for BadRecordDefinition
+
+    // Empty
+    assertThrows[AssertionError] {
+      SparkSQLMeasure(
+        param.copy(
+          config = Map(Expression -> "select 1", BadRecordDefinition -> StringUtils.EMPTY)))
+    }
+
+    // Incorrect Type
+    assertThrows[AssertionError] {
+      SparkSQLMeasure(
+        param.copy(config = Map(Expression -> "select 1", BadRecordDefinition -> 2344)))
+    }
+
+    // Null
+    assertThrows[AssertionError] {
+      SparkSQLMeasure(
+        param.copy(config = Map(Expression -> "select 1", BadRecordDefinition -> null)))
+    }
+
   }
 
   it should "support metric writing" in {
-    val measure = CompletenessMeasure(param)
+    val measure = SparkSQLMeasure(param)
     assertResult(true)(measure.supportsMetricWrite)
   }
 
   it should "support record writing" in {
-    val measure = CompletenessMeasure(param)
+    val measure = SparkSQLMeasure(param)
     assertResult(true)(measure.supportsRecordWrite)
   }
 
   it should "execute defined measure expr" in {
-    val measure = CompletenessMeasure(param)
+    val measure = SparkSQLMeasure(param)
     val (recordsDf, metricsDf) = measure.execute(context, None)
 
-    assertResult(recordsDf.schema)(recordDfSchema)
-    assertResult(metricsDf.schema)(metricDfSchema)
-
-    assertResult(recordsDf.count())(source.count())
-    assertResult(metricsDf.count())(1L)
-
-    val row = metricsDf.head()
-    assertResult(param.getDataSource)(row.getAs[String](DataSource))
-    assertResult(param.getName)(row.getAs[String](MeasureName))
-    assertResult(param.getType.toString)(row.getAs[String](MeasureType))
-
-    val metricMap = row.getAs[Map[String, String]](Metrics)
-    assertResult(metricMap(Total))("5")
-    assertResult(metricMap(measure.Complete))("4")
-    assertResult(metricMap(measure.InComplete))("1")
-  }
-
-  it should "supported complex measure expr" in {
-    val measure = CompletenessMeasure(
-      param.copy(config = Map(Expression -> "name is null or gender is null")))
-    val (recordsDf, metricsDf) = measure.execute(context, None)
-
-    assertResult(recordsDf.schema)(recordDfSchema)
     assertResult(metricsDf.schema)(metricDfSchema)
 
     assertResult(recordsDf.count())(source.count())
@@ -104,13 +115,17 @@ class CompletenessMeasureTest extends MeasureTest {
   }
 
   it should "throw runtime error for invalid expr" in {
-    assertThrows[AnalysisException] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> "xyz is null")))
+    assertThrows[AssertionError] {
+      SparkSQLMeasure(
+        param.copy(
+          config = Map(Expression -> "select * from source", BadRecordDefinition -> "name")))
         .execute(context)
     }
 
-    assertThrows[ParseException] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> "select 1")))
+    assertThrows[AnalysisException] {
+      SparkSQLMeasure(
+        param.copy(config =
+          Map(Expression -> "select 1 as my_value", BadRecordDefinition -> "name is null")))
         .execute(context)
     }
   }
