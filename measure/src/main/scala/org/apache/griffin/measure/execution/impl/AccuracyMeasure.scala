@@ -25,75 +25,84 @@ import org.apache.spark.sql.functions._
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
+import org.apache.griffin.measure.step.builder.ConstantColumns
 
 case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
 
   case class AccuracyExpr(sourceCol: String, targetCol: String)
 
+  import AccuracyMeasure._
   import Measure._
-
-  private final val TargetSourceStr: String = "target.source"
-  private final val SourceColStr: String = "source.col"
-  private final val TargetColStr: String = "target.col"
-
-  private final val AccurateStr: String = "accurate"
-  private final val InAccurateStr: String = "inaccurate"
 
   override val supportsRecordWrite: Boolean = true
 
   override val supportsMetricWrite: Boolean = true
 
   val targetSource: String = getFromConfig[String](TargetSourceStr, null)
-  val exprOpt: Option[Seq[AccuracyExpr]] =
-    Option(getFromConfig[Seq[Map[String, String]]](Expression, null).map(toAccuracyExpr).distinct)
+  val exprOpt: Option[Seq[Map[String, String]]] =
+    Option(getFromConfig[Seq[Map[String, String]]](Expression, null))
 
   validate()
 
   override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
-    import org.apache.griffin.measure.step.builder.ConstantColumns
-    datasetValidations(sparkSession)
+    val originalSource = sparkSession.read.table(measureParam.getDataSource)
+    val originalCols = originalSource.columns
 
-    val dataSource = sparkSession.read.table(measureParam.getDataSource)
-    val targetDataSource = sparkSession.read.table(targetSource).drop(ConstantColumns.tmst)
+    val dataSource = addColumnPrefix(originalSource, SourcePrefixStr)
 
-    exprOpt match {
-      case Some(accuracyExpr) =>
-        val joinExpr =
-          accuracyExpr.map(e => col(e.sourceCol) === col(e.targetCol)).reduce(_ and _)
+    val targetDataSource =
+      addColumnPrefix(
+        sparkSession.read.table(targetSource).drop(ConstantColumns.tmst),
+        TargetPrefixStr)
 
-        val indicatorExpr =
-          accuracyExpr
-            .map(e =>
-              coalesce(col(e.sourceCol), emptyCol) notEqual coalesce(col(e.targetCol), emptyCol))
-            .reduce(_ or _)
+    val accuracyExprs = exprOpt.get
+      .map(toAccuracyExpr)
+      .distinct
+      .map(x =>
+        AccuracyExpr(s"$SourcePrefixStr${x.sourceCol}", s"$TargetPrefixStr${x.targetCol}"))
 
-        val recordsDf = targetDataSource
-          .join(dataSource, joinExpr, "outer")
-          .withColumn(valueColumn, when(indicatorExpr, 1).otherwise(0))
-          .selectExpr(s"${measureParam.getDataSource}.*", valueColumn)
+    val joinExpr =
+      accuracyExprs
+        .map(e => col(e.sourceCol) === col(e.targetCol))
+        .reduce(_ and _)
 
-        val selectCols = Seq(Total, AccurateStr, InAccurateStr).flatMap(e => Seq(lit(e), col(e)))
-        val metricColumn: Column = map(selectCols: _*).as(valueColumn)
+    val indicatorExpr =
+      accuracyExprs
+        .map(e =>
+          coalesce(col(e.sourceCol), emptyCol) notEqual coalesce(col(e.targetCol), emptyCol))
+        .reduce(_ or _)
 
-        val metricDf = recordsDf
-          .withColumn(Total, lit(1))
-          .agg(sum(Total).as(Total), sum(valueColumn).as(InAccurateStr))
-          .withColumn(AccurateStr, col(Total) - col(InAccurateStr))
-          .select(metricColumn)
+    val nullExpr = accuracyExprs.map(e => col(e.sourceCol).isNull).reduce(_ or _)
 
-        (recordsDf, metricDf)
-      case None =>
-        throw new IllegalArgumentException(s"'$Expression' must be defined.")
-    }
+    val recordsDf = removeColumnPrefix(
+      targetDataSource
+        .join(dataSource, joinExpr, "outer")
+        .withColumn(valueColumn, when(indicatorExpr or nullExpr, 1).otherwise(0)),
+      SourcePrefixStr)
+      .select((originalCols :+ valueColumn).map(col): _*)
+
+    val selectCols =
+      Seq(Total, AccurateStr, InAccurateStr).flatMap(e => Seq(lit(e), col(e).cast("string")))
+    val metricColumn: Column = map(selectCols: _*).as(valueColumn)
+
+    val metricDf = recordsDf
+      .withColumn(Total, lit(1))
+      .agg(sum(Total).as(Total), sum(valueColumn).as(InAccurateStr))
+      .withColumn(AccurateStr, col(Total) - col(InAccurateStr))
+      .select(metricColumn)
+
+    (recordsDf, metricDf)
   }
 
   private def validate(): Unit = {
     assert(exprOpt.isDefined, s"'$Expression' must be defined.")
-    assert(exprOpt.nonEmpty, s"'$Expression' must not be empty.")
+    assert(exprOpt.get.flatten.nonEmpty, s"'$Expression' must not be empty or of invalid type.")
 
     assert(
       !StringUtil.isNullOrEmpty(targetSource),
-      s"'$TargetSourceStr' must not be null or empty.")
+      s"'$TargetSourceStr' must not be null, empty or of invalid type.")
+
+    datasetValidations()
   }
 
   private def toAccuracyExpr(map: Map[String, String]): AccuracyExpr = {
@@ -103,7 +112,9 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
     AccuracyExpr(map(SourceColStr), map(TargetColStr))
   }
 
-  private def datasetValidations(sparkSession: SparkSession): Unit = {
+  private def datasetValidations(): Unit = {
+    val sparkSession = SparkSession.getDefaultSession.get
+
     assert(
       sparkSession.catalog.tableExists(targetSource),
       s"Target source with name '$targetSource' does not exist.")
@@ -115,7 +126,7 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
     val targetDataSourceCols =
       sparkSession.read.table(targetSource).columns.map(_.toLowerCase(Locale.ROOT)).toSet
 
-    val accuracyExpr = exprOpt.get
+    val accuracyExpr = exprOpt.get.map(toAccuracyExpr).distinct
     val (forDataSource, forTarget) =
       accuracyExpr
         .map(
@@ -138,4 +149,26 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
       s"Column(s) [${invalidColsTarget.map(_._1).mkString(", ")}] " +
         s"do not exist in target data set with name '$targetSource'")
   }
+
+  private def addColumnPrefix(dataFrame: DataFrame, prefix: String): DataFrame = {
+    val columns = dataFrame.columns
+    columns.foldLeft(dataFrame)((df, c) => df.withColumnRenamed(c, s"$prefix$c"))
+  }
+
+  private def removeColumnPrefix(dataFrame: DataFrame, prefix: String): DataFrame = {
+    val columns = dataFrame.columns
+    columns.foldLeft(dataFrame)((df, c) => df.withColumnRenamed(c, c.stripPrefix(prefix)))
+  }
+}
+
+object AccuracyMeasure{
+  final val SourcePrefixStr: String = "__source_"
+  final val TargetPrefixStr: String = "__target_"
+
+  final val TargetSourceStr: String = "target.source"
+  final val SourceColStr: String = "source.col"
+  final val TargetColStr: String = "target.col"
+
+  final val AccurateStr: String = "accurate"
+  final val InAccurateStr: String = "inaccurate"
 }

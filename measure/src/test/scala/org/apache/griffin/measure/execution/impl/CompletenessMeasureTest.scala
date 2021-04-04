@@ -43,6 +43,10 @@ class CompletenessMeasureTest extends MeasureTest {
     assertThrows[AssertionError] {
       CompletenessMeasure(param.copy(config = Map(Expression -> null)))
     }
+
+    assertThrows[AssertionError] {
+      CompletenessMeasure(param.copy(config = Map(Expression -> 22)))
+    }
   }
 
   it should "support metric writing" in {
@@ -62,7 +66,7 @@ class CompletenessMeasureTest extends MeasureTest {
     assertResult(recordsDf.schema)(recordDfSchema)
     assertResult(metricsDf.schema)(metricDfSchema)
 
-    assertResult(recordsDf.count())(dataSet.count())
+    assertResult(recordsDf.count())(source.count())
     assertResult(metricsDf.count())(1L)
 
     val row = metricsDf.head()
@@ -84,7 +88,7 @@ class CompletenessMeasureTest extends MeasureTest {
     assertResult(recordsDf.schema)(recordDfSchema)
     assertResult(metricsDf.schema)(metricDfSchema)
 
-    assertResult(recordsDf.count())(dataSet.count())
+    assertResult(recordsDf.count())(source.count())
     assertResult(metricsDf.count())(1L)
 
     val row = metricsDf.head()

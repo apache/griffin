@@ -30,11 +30,13 @@ import org.apache.griffin.measure.context.{ContextId, DQContext}
 trait MeasureTest extends SparkSuiteBase with Matchers {
 
   var sourceSchema: StructType = _
+  var targetSchema: StructType = _
   var recordDfSchema: StructType = _
   var metricDfSchema: StructType = _
   var context: DQContext = _
 
-  var dataSet: DataFrame = _
+  var source: DataFrame = _
+  var target: DataFrame = _
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -46,6 +48,8 @@ trait MeasureTest extends SparkSuiteBase with Matchers {
     sourceSchema =
       new StructType().add("id", "integer").add("name", "string").add("gender", "string")
 
+    targetSchema = new StructType().add("gender", "string")
+
     recordDfSchema = sourceSchema.add(Status, "string", nullable = false)
     metricDfSchema = new StructType()
       .add(MeasureName, "string", nullable = false)
@@ -53,7 +57,7 @@ trait MeasureTest extends SparkSuiteBase with Matchers {
       .add(DataSource, "string", nullable = false)
       .add(Metrics, MapType(StringType, StringType), nullable = false)
 
-    dataSet = spark
+    source = spark
       .createDataset(
         Seq(
           Row(1, "John Smith", "Male"),
@@ -63,7 +67,10 @@ trait MeasureTest extends SparkSuiteBase with Matchers {
           Row(5, null, null)))(RowEncoder(sourceSchema))
       .cache()
 
-    dataSet.createOrReplaceTempView("source")
+    target = spark.createDataset(Seq(Row("Male")))(RowEncoder(targetSchema)).cache()
+
+    source.createOrReplaceTempView("source")
+    target.createOrReplaceTempView("target")
   }
 
 }
