@@ -17,8 +17,6 @@
 
 package org.apache.griffin.measure.execution
 
-import java.util.Locale
-
 import scala.reflect.ClassTag
 
 import org.apache.commons.lang3.StringUtils
@@ -28,6 +26,7 @@ import org.apache.spark.sql.functions._
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.context.DQContext
 
 trait Measure extends Loggable {
   import Measure._
@@ -46,11 +45,9 @@ trait Measure extends Loggable {
   // todo add status col to persist blank metrics if the measure fails
   def preProcessMetrics(input: DataFrame): DataFrame = {
     if (supportsMetricWrite) {
-      val measureType = measureParam.getType.toString.toLowerCase(Locale.ROOT)
-
       input
         .withColumn(MeasureName, typedLit[String](measureParam.getName))
-        .withColumn(MeasureType, typedLit[String](measureType))
+        .withColumn(MeasureType, typedLit[String](measureParam.getType.toString))
         .withColumn(Metrics, col(valueColumn))
         .withColumn(DataSource, typedLit[String](measureParam.getDataSource))
         .select(MeasureName, MeasureType, DataSource, Metrics)
@@ -67,8 +64,8 @@ trait Measure extends Loggable {
 
   def impl(sparkSession: SparkSession): (DataFrame, DataFrame)
 
-  def execute(sparkSession: SparkSession, batchId: Option[Long]): (DataFrame, DataFrame) = {
-    val (recordsDf, metricDf) = impl(sparkSession)
+  def execute(context: DQContext, batchId: Option[Long] = None): (DataFrame, DataFrame) = {
+    val (recordsDf, metricDf) = impl(context.sparkSession)
 
     val processedRecordDf = preProcessRecords(recordsDf)
     val processedMetricDf = preProcessMetrics(metricDf)

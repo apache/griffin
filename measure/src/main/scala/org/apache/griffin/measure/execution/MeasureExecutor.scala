@@ -70,7 +70,7 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
       batchId: Option[Long] = None): Unit = {
     measureParams.foreach(measureParam => {
       val measure = createMeasure(measureParam)
-      val (recordsDf, metricsDf) = measure.execute(context.sparkSession, batchId)
+      val (recordsDf, metricsDf) = measure.execute(context, batchId)
 
       persistRecords(measure, recordsDf)
       persistMetrics(measure, metricsDf)

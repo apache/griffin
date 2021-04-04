@@ -17,6 +17,7 @@
 
 package org.apache.griffin.measure.execution.impl
 
+import io.netty.util.internal.StringUtil
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 
@@ -27,31 +28,26 @@ case class CompletenessMeasure(measureParam: MeasureParam) extends Measure {
 
   import Measure._
 
-  private final val Complete: String = "complete"
-  private final val InComplete: String = "incomplete"
+  final val Complete: String = "complete"
+  final val InComplete: String = "incomplete"
 
   override val supportsRecordWrite: Boolean = true
 
   override val supportsMetricWrite: Boolean = true
 
+  val exprOpt: Option[String] = Option(getFromConfig[String](Expression, null))
+
+  validate()
+
   override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
-    val exprOpt = Option(getFromConfig[String](Expression, null))
+    val exprStr = exprOpt.get
 
-    val column = exprOpt match {
-      case Some(exprStr) => when(expr(exprStr), 1.0).otherwise(0.0)
-      case None =>
-        error(
-          s"$Expression was not defined for completeness measure.",
-          new IllegalArgumentException(s"$Expression was not defined for completeness measure."))
-        throw new IllegalArgumentException(
-          s"$Expression was not defined for completeness measures")
-    }
-
-    val selectCols = Seq(Total, Complete, InComplete).flatMap(e => Seq(lit(e), col(e)))
+    val selectCols =
+      Seq(Total, Complete, InComplete).flatMap(e => Seq(lit(e), col(e).cast("string")))
     val metricColumn: Column = map(selectCols: _*).as(valueColumn)
 
     val input = sparkSession.read.table(measureParam.getDataSource)
-    val badRecordsDf = input.withColumn(valueColumn, column)
+    val badRecordsDf = input.withColumn(valueColumn, when(expr(exprStr), 1).otherwise(0))
 
     val metricDf = badRecordsDf
       .withColumn(Total, lit(1))
@@ -60,5 +56,12 @@ case class CompletenessMeasure(measureParam: MeasureParam) extends Measure {
       .select(metricColumn)
 
     (badRecordsDf, metricDf)
+  }
+
+  private def validate(): Unit = {
+    assert(exprOpt.isDefined, s"'$Expression' must be defined.")
+    assert(exprOpt.nonEmpty, s"'$Expression' must not be empty.")
+
+    assert(!StringUtil.isNullOrEmpty(exprOpt.get), s"'$Expression' must not be null or empty.")
   }
 }
