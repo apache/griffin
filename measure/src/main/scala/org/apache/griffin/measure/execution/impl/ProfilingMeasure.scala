@@ -19,8 +19,8 @@ case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
 
   override val supportsMetricWrite: Boolean = true
 
-  private val roundScale: Int = getFromConfig[java.lang.Integer](RoundScaleStr, 3)
-  private val approxDistinctCount: Boolean =
+  val roundScale: Int = getFromConfig[java.lang.Integer](RoundScaleStr, 3)
+  val approxDistinctCount: Boolean =
     getFromConfig[java.lang.Boolean](ApproxDistinctCountStr, true)
 
   override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
@@ -78,13 +78,13 @@ object ProfilingMeasure {
   /**
    * Options Keys
    */
-  private final val RoundScaleStr: String = "round.scale"
-  private final val ApproxDistinctCountStr: String = "approx.distinct.count"
+   final val RoundScaleStr: String = "round.scale"
+   final val ApproxDistinctCountStr: String = "approx.distinct.count"
 
   /**
    * Structure Keys
    */
-  private final val ColumnDetails: String = "column_details"
+   final val ColumnDetails: String = "column_details"
   private final val DataTypeStr: String = "data_type"
 
   /**
