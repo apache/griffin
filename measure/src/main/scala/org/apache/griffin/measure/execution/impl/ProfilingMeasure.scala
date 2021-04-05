@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.griffin.measure.execution.impl
 
 import java.util.Locale
@@ -78,13 +95,13 @@ object ProfilingMeasure {
   /**
    * Options Keys
    */
-   final val RoundScaleStr: String = "round.scale"
-   final val ApproxDistinctCountStr: String = "approx.distinct.count"
+  final val RoundScaleStr: String = "round.scale"
+  final val ApproxDistinctCountStr: String = "approx.distinct.count"
 
   /**
    * Structure Keys
    */
-   final val ColumnDetails: String = "column_details"
+  final val ColumnDetails: String = "column_details"
   private final val DataTypeStr: String = "data_type"
 
   /**
@@ -129,11 +146,13 @@ object ProfilingMeasure {
     val lengthColExpr = col(lengthColFn(colName))
     val nullColExpr = col(nullsInColFn(colName))
     val (distinctCountName, distinctCountExpr) =
-      if (approxDistinctCount)
+      if (approxDistinctCount) {
         (
           lit(s"$ApproxPrefix$DistinctCount"),
           approx_count_distinct(column).as(s"$ApproxPrefix$DistinctCount"))
-      else (lit(DistinctCount), countDistinct(column).as(DistinctCount))
+      } else {
+        (lit(DistinctCount), countDistinct(column).as(DistinctCount))
+      }
 
     Seq(
       Seq(lit(DataTypeStr), lit(colType.catalogString).as(DataTypeStr)),

@@ -67,17 +67,20 @@ class DuplicationMeasureTest extends MeasureTest {
 
     // Empty
     assertThrows[AssertionError] {
-      DuplicationMeasure(param.copy(config = Map(Expression -> "name", BadRecordDefinition -> "")))
+      DuplicationMeasure(
+        param.copy(config = Map(Expression -> "name", BadRecordDefinition -> "")))
     }
 
     // Null
     assertThrows[AssertionError] {
-      DuplicationMeasure(param.copy(config = Map(Expression -> "name", BadRecordDefinition -> null)))
+      DuplicationMeasure(
+        param.copy(config = Map(Expression -> "name", BadRecordDefinition -> null)))
     }
 
     // Incorrect Type
     assertThrows[AssertionError] {
-      DuplicationMeasure(param.copy(config = Map(Expression -> "name", BadRecordDefinition -> 435)))
+      DuplicationMeasure(
+        param.copy(config = Map(Expression -> "name", BadRecordDefinition -> 435)))
     }
 
     // Incorrect Value
@@ -113,7 +116,6 @@ class DuplicationMeasureTest extends MeasureTest {
     assertResult(param.getType.toString)(row.getAs[String](MeasureType))
 
     val metricMap = row.getAs[Map[String, String]](Metrics)
-    println(metricMap)
     assertResult(metricMap(Duplicate))("0")
     assertResult(metricMap(Unique))("5")
     assertResult(metricMap(NonUnique))("0")

@@ -19,8 +19,8 @@ package org.apache.griffin.measure.execution
 
 import org.apache.spark.sql.DataFrame
 
-import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.configuration.enums.{MeasureTypes, OutputType}
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.execution.impl._

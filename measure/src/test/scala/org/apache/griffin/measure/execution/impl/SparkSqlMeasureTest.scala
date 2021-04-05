@@ -66,8 +66,8 @@ class SparkSqlMeasureTest extends MeasureTest {
     // Empty
     assertThrows[AssertionError] {
       SparkSQLMeasure(
-        param.copy(
-          config = Map(Expression -> "select 1", BadRecordDefinition -> StringUtils.EMPTY)))
+        param.copy(config =
+          Map(Expression -> "select 1", BadRecordDefinition -> StringUtils.EMPTY)))
     }
 
     // Incorrect Type
@@ -117,8 +117,8 @@ class SparkSqlMeasureTest extends MeasureTest {
   it should "throw runtime error for invalid expr" in {
     assertThrows[AssertionError] {
       SparkSQLMeasure(
-        param.copy(
-          config = Map(Expression -> "select * from source", BadRecordDefinition -> "name")))
+        param.copy(config =
+          Map(Expression -> "select * from source", BadRecordDefinition -> "name")))
         .execute(context)
     }
 

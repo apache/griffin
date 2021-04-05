@@ -75,33 +75,15 @@ class AccuracyMeasureTest extends MeasureTest {
     // Invalid Expr as target.col is missing
     assertThrows[AssertionError] {
       AccuracyMeasure(
-        param.copy(
-          config = Map(Expression -> Seq(Map(SourceColStr -> "b")), TargetSourceStr -> "target")))
+        param.copy(config =
+          Map(Expression -> Seq(Map(SourceColStr -> "b")), TargetSourceStr -> "target")))
     }
 
     // Invalid Expr as source.col is missing
     assertThrows[AssertionError] {
       AccuracyMeasure(
-        param.copy(
-          config = Map(Expression -> Seq(Map(TargetColStr -> "b")), TargetSourceStr -> "target")))
-    }
-
-    // Invalid Expr as provided source.col is invalid
-    assertThrows[AssertionError] {
-      AccuracyMeasure(
-        param.copy(
-          config = Map(
-            Expression -> Seq(Map(SourceColStr -> "b", TargetColStr -> "b")),
-            TargetSourceStr -> "target")))
-    }
-
-    // Invalid Expr as provided target.col is invalid
-    assertThrows[AssertionError] {
-      AccuracyMeasure(
-        param.copy(
-          config = Map(
-            Expression -> Seq(Map(SourceColStr -> "gender", TargetColStr -> "b")),
-            TargetSourceStr -> "target")))
+        param.copy(config =
+          Map(Expression -> Seq(Map(TargetColStr -> "b")), TargetSourceStr -> "target")))
     }
 
     // Validations for Target source
@@ -109,8 +91,8 @@ class AccuracyMeasureTest extends MeasureTest {
     // Empty
     assertThrows[AssertionError] {
       AccuracyMeasure(
-        param.copy(
-          config = Map(Expression -> Seq(Map("a" -> "b")), TargetSourceStr -> StringUtils.EMPTY)))
+        param.copy(config =
+          Map(Expression -> Seq(Map("a" -> "b")), TargetSourceStr -> StringUtils.EMPTY)))
     }
 
     // Incorrect Type

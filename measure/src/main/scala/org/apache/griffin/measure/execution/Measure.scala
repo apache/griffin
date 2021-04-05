@@ -23,10 +23,10 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 
-import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
-import org.apache.griffin.measure.utils.ParamUtil._
 import org.apache.griffin.measure.Loggable
+import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.context.DQContext
+import org.apache.griffin.measure.utils.ParamUtil._
 
 trait Measure extends Loggable {
   import Measure._
@@ -34,6 +34,7 @@ trait Measure extends Loggable {
   val measureParam: MeasureParam
 
   val supportsRecordWrite: Boolean
+
   val supportsMetricWrite: Boolean
 
   final val valueColumn = s"${MeasureColPrefix}_${measureParam.getName}"
