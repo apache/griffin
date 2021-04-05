@@ -25,7 +25,6 @@ import org.apache.spark.sql.functions._
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
-import org.apache.griffin.measure.step.builder.ConstantColumns
 
 /**
  * Duplication Measure
@@ -40,13 +39,8 @@ import org.apache.griffin.measure.step.builder.ConstantColumns
  */
 case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
 
+  import DuplicationMeasure._
   import Measure._
-
-  private final val Duplicate: String = "duplicate"
-  private final val Unique: String = "unique"
-  private final val NonUnique: String = "non_unique"
-  private final val Distinct: String = "distinct"
-  private final val __Temp: String = "__temp"
 
   private final val duplicationMeasures = Seq(Duplicate, Unique, NonUnique, Distinct)
 
@@ -68,18 +62,11 @@ case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
     val nonUniqueCol =
       when(col(Unique) =!= 1 and (col(__Temp) - col(NonUnique) === 0), 1).otherwise(0)
 
-    val keyCols = {
-      if (StringUtil.isNullOrEmpty(exprs)) input.columns
-      else exprs.split(",").map(_.trim)
-    }.distinct
-
-    keyCols.foreach(c =>
-      assert(input.columns.contains(c), s"Provided column '$c' does not exist in the dataset."))
-
-    val window = Window.partitionBy(keyCols.map(col): _*).orderBy(ConstantColumns.tmst)
+    val cols = keyCols(input).map(col)
+    val window = Window.partitionBy(cols: _*).orderBy(cols: _*)
 
     val aggDf = input
-      .select(col("*"), row_number().over(window).as(__Temp))
+      .select(col(AllColumns), row_number().over(window).as(__Temp))
       .withColumn(Duplicate, duplicateCol)
       .withColumn(Unique, count(lit(1)).over(window))
       .withColumn(Unique, uniqueCol)
@@ -90,7 +77,7 @@ case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
       .drop(__Temp)
 
     val metricAggCols = duplicationMeasures.map(m => sum(m).as(m))
-    val selectCols = duplicationMeasures.flatMap(e => Seq(lit(e), col(e)))
+    val selectCols = duplicationMeasures.flatMap(e => Seq(lit(e), col(e).cast("string")))
     val metricColumn = map(selectCols: _*).as(valueColumn)
     val metricDf = aggDf
       .agg(metricAggCols.head, metricAggCols.tail: _*)
@@ -102,6 +89,13 @@ case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
   }
 
   private def validate(): Unit = {
+    val input = SparkSession.getDefaultSession.get.read.table(measureParam.getDataSource)
+    val kc = keyCols(input)
+
+    assert(kc.nonEmpty, s"Columns defined in '$Expression' is empty.")
+    kc.foreach(c =>
+      assert(input.columns.contains(c), s"Provided column '$c' does not exist in the dataset."))
+
     assert(
       !StringUtil.isNullOrEmpty(badnessExpr),
       s"Invalid value '$badnessExpr' provided for $BadRecordDefinition")
@@ -111,4 +105,18 @@ case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
       case _ => false
     }, s"Invalid value '$badnessExpr' was provided for $BadRecordDefinition")
   }
+
+  private def keyCols(input: DataFrame): Array[String] = {
+    if (StringUtil.isNullOrEmpty(exprs)) input.columns
+    else exprs.split(",").map(_.trim)
+  }.distinct
+
+}
+
+object DuplicationMeasure {
+  final val Duplicate: String = "duplicate"
+  final val Unique: String = "unique"
+  final val NonUnique: String = "non_unique"
+  final val Distinct: String = "distinct"
+  final val __Temp: String = "__temp"
 }
