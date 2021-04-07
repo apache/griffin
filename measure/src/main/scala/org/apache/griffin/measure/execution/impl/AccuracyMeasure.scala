@@ -75,8 +75,8 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
     val nullExpr = accuracyExprs.map(e => col(e.sourceCol).isNull).reduce(_ or _)
 
     val recordsDf = removeColumnPrefix(
-      targetDataSource
-        .join(dataSource, joinExpr, "outer")
+      dataSource
+        .join(targetDataSource, joinExpr, "left")
         .withColumn(valueColumn, when(indicatorExpr or nullExpr, 1).otherwise(0)),
       SourcePrefixStr)
       .select((originalCols :+ valueColumn).map(col): _*)
@@ -161,7 +161,7 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
   }
 }
 
-object AccuracyMeasure{
+object AccuracyMeasure {
   final val SourcePrefixStr: String = "__source_"
   final val TargetPrefixStr: String = "__target_"
 

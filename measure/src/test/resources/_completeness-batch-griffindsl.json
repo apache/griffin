@@ -1,36 +1,39 @@
 {
   "name": "comp_batch",
   "process.type": "batch",
-  "timestamp": 123456,
   "data.sources": [
     {
       "name": "source",
       "connector": {
-        "type": "avro",
-        "version": "1.7",
+        "type": "file",
         "config": {
-          "file.name": "src/test/resources/users_info_src.avro"
+          "format": "avro",
+          "paths": [
+            "src/test/resources/users_info_src.avro"
+          ]
         }
       }
     }
   ],
-  "evaluate.rule": {
-    "rules": [
-      {
-        "dsl.type": "griffin-dsl",
-        "dq.type": "completeness",
-        "out.dataframe.name": "comp",
-        "rule": "email, post_code, first_name",
-        "out": [
-          {
-            "type": "metric",
-            "name": "comp"
-          }
-        ]
-      }
-    ]
-  },
+  "measures": [
+    {
+      "name": "completeness_measure",
+      "type": "completeness",
+      "data.source": "source",
+      "config": {
+        "expr": "email is null or post_code is null or first_name is null"
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "comp_metric",
+          "flatten": "map"
+        }
+      ]
+    }
+  ],
   "sinks": [
-    "CONSOLESINK"
+    "CONSOLESINK",
+    "customSink"
   ]
 }

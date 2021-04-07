@@ -20,18 +20,33 @@
   ],
   "measures": [
     {
-      "name": "profiling_measure",
-      "type": "profiling",
+      "name": "query_measure1",
+      "type": "sparkSQL",
       "data.source": "source",
       "config": {
-        "expr": "first_name, user_id",
-        "approx.distinct.count": true,
-        "round.scale": 2
+        "expr": "select user_id, count(*) as cnt from source group by user_id",
+        "bad.record.definition": "cnt > 1"
       },
       "out": [
         {
           "type": "metric",
-          "name": "prof_metric",
+          "name": "sql_metric",
+          "flatten": "map"
+        }
+      ]
+    },
+    {
+      "name": "query_measure2",
+      "type": "sparkSQL",
+      "data.source": "source",
+      "config": {
+        "expr": "select post_code, count(*) as cnt from source group by post_code order by cnt desc",
+        "bad.record.definition": "cnt > 1"
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "sql_metric",
           "flatten": "map"
         }
       ]

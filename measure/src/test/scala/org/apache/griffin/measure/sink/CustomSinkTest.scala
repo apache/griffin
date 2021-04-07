@@ -19,8 +19,10 @@ package org.apache.griffin.measure.sink
 
 import scala.collection.mutable
 
+import org.apache.spark.sql.functions._
+
 import org.apache.griffin.measure.configuration.dqdefinition.{RuleOutputParam, SinkParam}
-import org.apache.griffin.measure.configuration.enums.FlattenType.DefaultFlattenType
+import org.apache.griffin.measure.configuration.enums.FlattenType.MapFlattenType
 import org.apache.griffin.measure.step.write.{MetricFlushStep, MetricWriteStep, RecordWriteStep}
 
 class CustomSinkTest extends SinkTestBase {
@@ -40,29 +42,30 @@ class CustomSinkTest extends SinkTestBase {
   }
 
   "custom sink" can "sink metrics" in {
-    val actualMetrics = withCustomSink(sinks => {
+    val measureName = "test_measure"
+    withCustomSink(sinks => {
       sinks.foreach { sink =>
         try {
-          sink.sinkMetrics(Map("sum" -> 10))
+          sink.sinkMetrics(Map("value" -> Map(measureName -> Map("sum" -> 10))))
         } catch {
           case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
         }
       }
+
       sinks.foreach { sink =>
         try {
-          sink.sinkMetrics(Map("count" -> 5))
+          sink.sinkMetrics(Map("value" -> Map(measureName -> Map("count" -> 5))))
         } catch {
           case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
         }
-      }
-      sinks.headOption match {
-        case Some(sink: CustomSink) => sink.allMetrics
-        case _ => Map.empty
       }
     })
 
+    val actualMetricsOpt = CustomSinkResultRegister.getMetrics(measureName)
+    assert(actualMetricsOpt.isDefined)
+
     val expected = Map("sum" -> 10, "count" -> 5)
-    actualMetrics should be(expected)
+    actualMetricsOpt.get should contain theSameElementsAs expected
   }
 
   "custom sink" can "sink records" in {
@@ -134,33 +137,44 @@ class CustomSinkTest extends SinkTestBase {
   "MetricWriteStep" should "output default metrics with custom sink" in {
     val resultTable = "result_table"
     val df = createDataFrame(1 to 5)
-    df.groupBy("sex")
-      .agg("age" -> "max", "age" -> "avg")
-      .createOrReplaceTempView(resultTable)
+    val metricCols = Seq("sex", "max_age", "avg_age").flatMap(c => Seq(lit(c), col(c)))
+
+    val metricDf = df
+      .groupBy("sex")
+      .agg(max("age").as("max_age"), avg("age").as("avg_age"))
+      .select(map(metricCols: _*).as("metrics"))
+      .withColumn("mark", lit(1))
+      .groupBy("mark")
+      .agg(collect_list("metrics") as "metrics")
+      .select("metrics")
+
+    metricDf.createOrReplaceTempView(resultTable)
 
     val dQContext = getDqContext()
 
     val metricWriteStep = {
-      val metricOpt = Some(metricsDefaultOutput)
+      val metricOpt = Some(metricsMapOutput)
       val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse("default_metrics_name")
-      val flattenType = metricOpt.map(_.getFlatten).getOrElse(DefaultFlattenType)
+      val flattenType = metricOpt.map(_.getFlatten).getOrElse(MapFlattenType)
+
       MetricWriteStep(mwName, resultTable, flattenType)
     }
 
     metricWriteStep.execute(dQContext)
     MetricFlushStep().execute(dQContext)
-    val actualMetrics = dQContext.getSinks.headOption match {
-      case Some(sink: CustomSink) => sink.allMetrics
-      case _ => mutable.Map[String, Any]()
-    }
 
-    val metricsValue = Seq(
-      Map("sex" -> "man", "max(age)" -> 19, "avg(age)" -> 18.0),
-      Map("sex" -> "women", "max(age)" -> 20, "avg(age)" -> 18.0))
+    val expectedMetrics = Array(
+      Map("sex" -> "women", "max_age" -> "20", "avg_age" -> "18.0"),
+      Map("sex" -> "man", "max_age" -> "19", "avg_age" -> "18.0"))
 
-    val expected = Map("default_output" -> metricsValue)
+    val actualMetricsOpt = CustomSinkResultRegister.getMetrics(metricWriteStep.name)
+    assert(actualMetricsOpt.isDefined)
 
-    actualMetrics("value") should be(expected)
+    val actualMetricsMap: Map[String, Any] = actualMetricsOpt.get
+    assert(actualMetricsMap.contains("metrics"))
+
+    val actualMetrics = actualMetricsMap("metrics").asInstanceOf[Seq[Map[String, String]]]
+    actualMetrics should contain theSameElementsAs expectedMetrics
   }
 
 }

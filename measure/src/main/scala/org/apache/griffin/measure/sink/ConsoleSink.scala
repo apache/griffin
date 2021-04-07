@@ -51,8 +51,7 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
   }
 
   override def close(): Unit = {
-    info(
-      s"Closed ConsoleSink for job with name '$jobName' and timestamp '$timeStamp'")
+    info(s"Closed ConsoleSink for job with name '$jobName' and timestamp '$timeStamp'")
   }
 
   override def sinkRecords(records: RDD[String], name: String): Unit = {}
@@ -60,7 +59,7 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
   override def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
   override def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    info(s"$jobName [$timeStamp] metrics:\n${JsonUtil.toJson(metrics)}")
+    griffinLogger.info(s"$jobName [$timeStamp] metrics:\n${JsonUtil.toJson(metrics)}")
   }
 
   override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {

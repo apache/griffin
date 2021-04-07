@@ -98,10 +98,9 @@ class SparkSqlMeasureTest extends MeasureTest {
     val measure = SparkSQLMeasure(param)
     val (recordsDf, metricsDf) = measure.execute(context, None)
 
-    assertResult(metricsDf.schema)(metricDfSchema)
-
-    assertResult(recordsDf.count())(source.count())
-    assertResult(metricsDf.count())(1L)
+    assertResult(metricDfSchema)(metricsDf.schema)
+    assertResult(source.count())(recordsDf.count())
+    assertResult(1L)(metricsDf.count())
 
     val row = metricsDf.head()
     assertResult(param.getDataSource)(row.getAs[String](DataSource))

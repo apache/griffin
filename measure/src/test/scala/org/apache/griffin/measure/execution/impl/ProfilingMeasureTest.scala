@@ -70,7 +70,7 @@ class ProfilingMeasureTest extends MeasureTest {
 
     val (_, metricsDf) = measure.execute(context, None)
 
-    assertResult(metricsDf.count())(1L)
+    assertResult(1L)(metricsDf.count())
 
     val row = metricsDf.head()
     assertResult(param.getDataSource)(row.getAs[String](DataSource))
@@ -94,7 +94,7 @@ class ProfilingMeasureTest extends MeasureTest {
 
     val (_, metricsDf) = measure.execute(context, None)
 
-    assertResult(metricsDf.count())(1L)
+    assertResult(1L)(metricsDf.count())
 
     val row = metricsDf.head()
     assertResult(param.getDataSource)(row.getAs[String](DataSource))

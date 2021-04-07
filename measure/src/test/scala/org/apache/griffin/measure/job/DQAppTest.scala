@@ -46,12 +46,11 @@ class DQAppTest extends SparkSuiteBase with Matchers with Loggable {
     }
   }
 
-  def initApp(dqParamFile: String): DQApp = {
+  def runApp(dqParamFile: String): DQApp = {
     val dqParam = readParamFile[DQConfig](getConfigFilePath(dqParamFile)) match {
       case Success(p) => p
       case Failure(ex) =>
-        error(ex.getMessage, ex)
-        sys.exit(-2)
+        throw ex
     }
 
     val allParam: GriffinConfig = GriffinConfig(envParam, dqParam)
@@ -67,6 +66,14 @@ class DQAppTest extends SparkSuiteBase with Matchers with Loggable {
     }
 
     dqApp.sparkSession = spark
+
+    dqApp.run match {
+      case Success(ret) => assert(ret)
+      case Failure(ex) =>
+        error(s"process run error: ${ex.getMessage}", ex)
+        throw ex
+    }
+
     dqApp
   }
 }

@@ -4,48 +4,78 @@
   "data.sources": [
     {
       "name": "source",
-      "baseline": true,
       "connector": {
-        "type": "avro",
+        "type": "file",
         "config": {
-          "file.name": "src/test/resources/users_info_src.avro"
+          "format": "avro",
+          "paths": [
+            "src/test/resources/users_info_src.avro"
+          ]
         }
       }
     },
     {
       "name": "target",
       "connector": {
-        "type": "avro",
+        "type": "file",
         "config": {
-          "file.name": "src/test/resources/users_info_target.avro"
+          "format": "avro",
+          "paths": [
+            "src/test/resources/users_info_target.avro"
+          ]
         }
       }
     }
   ],
-  "evaluate.rule": {
-    "rules": [
-      {
-        "dsl.type": "griffin-dsl",
-        "dq.type": "accuracy",
-        "out.dataframe.name": "accu",
-        "rule": "source.user_id = target.user_id AND upper(source.first_name) = upper(target.first_name) AND source.last_name = target.last_name AND source.address = target.address AND source.email = target.email AND source.phone = target.phone AND source.post_code = target.post_code",
-        "details": {
-          "source": "source",
-          "target": "target",
-          "miss": "miss_count",
-          "total": "total_count",
-          "matched": "matched_count"
-        },
-        "out": [
+  "measures": [
+    {
+      "name": "accuracy_measure",
+      "type": "accuracy",
+      "data.source": "target",
+      "config": {
+        "target.source": "source",
+        "expr": [
           {
-            "type": "record",
-            "name": "missRecords"
+            "source.col": "user_id",
+            "target.col": "user_id"
+          },
+          {
+            "source.col": "first_name",
+            "target.col": "first_name"
+          },
+          {
+            "source.col": "last_name",
+            "target.col": "last_name"
+          },
+          {
+            "source.col": "address",
+            "target.col": "address"
+          },
+          {
+            "source.col": "email",
+            "target.col": "email"
+          },
+          {
+            "source.col": "phone",
+            "target.col": "phone"
+          },
+          {
+            "source.col": "post_code",
+            "target.col": "post_code"
           }
         ]
-      }
-    ]
-  },
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "accuracy_metric",
+          "flatten": "map"
+        }
+      ]
+    }
+  ],
   "sinks": [
-    "consoleSink"
+    "consoleSink",
+    "customSink"
   ]
 }

@@ -74,9 +74,9 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
 
       persistRecords(measure, recordsDf)
       persistMetrics(measure, metricsDf)
-    })
 
-    MetricFlushStep().execute(context)
+      MetricFlushStep().execute(context)
+    })
   }
 
   private def createMeasure(measureParam: MeasureParam): Measure = {

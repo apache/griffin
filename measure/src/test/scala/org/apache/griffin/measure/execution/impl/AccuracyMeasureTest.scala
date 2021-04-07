@@ -128,11 +128,11 @@ class AccuracyMeasureTest extends MeasureTest {
     val measure = AccuracyMeasure(param)
     val (recordsDf, metricsDf) = measure.execute(context, None)
 
-    assertResult(recordsDf.schema)(recordDfSchema)
-    assertResult(metricsDf.schema)(metricDfSchema)
+    assertResult(recordDfSchema)(recordsDf.schema)
+    assertResult(metricDfSchema)(metricsDf.schema)
 
-    assertResult(recordsDf.count())(source.count())
-    assertResult(metricsDf.count())(1L)
+    assertResult(source.count())(recordsDf.count())
+    assertResult(1L)(metricsDf.count())
 
     val row = metricsDf.head()
     assertResult(param.getDataSource)(row.getAs[String](DataSource))

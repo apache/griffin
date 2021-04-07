@@ -4,53 +4,37 @@
   "data.sources": [
     {
       "name": "source",
-      "baseline": true,
       "connector": {
-        "type": "avro",
-        "version": "1.7",
+        "type": "file",
         "config": {
-          "file.name": "src/test/resources/users_info_src.avro"
-        }
-      }
-    },
-    {
-      "name": "target",
-      "baseline": true,
-      "connector": {
-        "type": "avro",
-        "version": "1.7",
-        "config": {
-          "file.name": "src/test/resources/users_info_src.avro"
+          "format": "avro",
+          "paths": [
+            "src/test/resources/users_info_src.avro"
+          ]
         }
       }
     }
   ],
-  "evaluate.rule": {
-    "rules": [
-      {
-        "dsl.type": "griffin-dsl",
-        "dq.type": "distinct",
-        "out.dataframe.name": "dist",
-        "rule": "user_id",
-        "details": {
-          "source": "source",
-          "target": "target",
-          "total": "total",
-          "distinct": "distinct",
-          "dup": "dup",
-          "num": "num",
-          "duplication.array": "dup"
-        },
-        "out": [
-          {
-            "type": "metric",
-            "name": "distinct"
-          }
-        ]
-      }
-    ]
-  },
+  "measures": [
+    {
+      "name": "duplication_measure",
+      "type": "duplication",
+      "data.source": "source",
+      "config": {
+        "expr": "user_id",
+        "bad.record.definition": "distinct"
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "duplication_metric",
+          "flatten": "map"
+        }
+      ]
+    }
+  ],
   "sinks": [
-    "CONSOLESink"
+    "CONSOLESink",
+    "customSink"
   ]
 }

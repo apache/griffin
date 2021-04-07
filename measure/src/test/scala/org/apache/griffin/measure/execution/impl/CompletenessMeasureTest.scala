@@ -64,11 +64,11 @@ class CompletenessMeasureTest extends MeasureTest {
     val measure = CompletenessMeasure(param)
     val (recordsDf, metricsDf) = measure.execute(context, None)
 
-    assertResult(recordsDf.schema)(recordDfSchema)
-    assertResult(metricsDf.schema)(metricDfSchema)
+    assertResult(recordDfSchema)(recordsDf.schema)
+    assertResult(metricDfSchema)(metricsDf.schema)
 
-    assertResult(recordsDf.count())(source.count())
-    assertResult(metricsDf.count())(1L)
+    assertResult(source.count())(recordsDf.count())
+    assertResult(1L)(metricsDf.count())
 
     val row = metricsDf.head()
     assertResult(param.getDataSource)(row.getAs[String](DataSource))
@@ -86,11 +86,11 @@ class CompletenessMeasureTest extends MeasureTest {
       param.copy(config = Map(Expression -> "name is null or gender is null")))
     val (recordsDf, metricsDf) = measure.execute(context, None)
 
-    assertResult(recordsDf.schema)(recordDfSchema)
-    assertResult(metricsDf.schema)(metricDfSchema)
+    assertResult(recordDfSchema)(recordsDf.schema)
+    assertResult(metricDfSchema)(metricsDf.schema)
 
-    assertResult(recordsDf.count())(source.count())
-    assertResult(metricsDf.count())(1L)
+    assertResult(source.count())(recordsDf.count())
+    assertResult(1L)(metricsDf.count())
 
     val row = metricsDf.head()
     assertResult(param.getDataSource)(row.getAs[String](DataSource))
