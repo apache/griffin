@@ -33,20 +33,21 @@ case class MetricFlushStep() extends WriteStep {
   def execute(context: DQContext): Try[Boolean] = Try {
     context.metricWrapper.flush.foldLeft(true) { (ret, pair) =>
       val (t, metric) = pair
-      val pr = try {
-        context.getSinks(t).foreach { sink =>
-          try {
-            sink.sinkMetrics(metric)
-          } catch {
-            case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
+      val pr =
+        try {
+          context.getSinks(t).foreach { sink =>
+            try {
+              sink.sinkMetrics(metric)
+            } catch {
+              case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
+            }
           }
+          true
+        } catch {
+          case e: Throwable =>
+            error(s"flush metrics error: ${e.getMessage}", e)
+            false
         }
-        true
-      } catch {
-        case e: Throwable =>
-          error(s"flush metrics error: ${e.getMessage}", e)
-          false
-      }
       ret && pr
     }
   }

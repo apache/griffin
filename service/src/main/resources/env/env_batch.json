@@ -4,20 +4,23 @@
   },
   "sinks": [
     {
+      "name": "console",
       "type": "CONSOLE",
       "config": {
         "max.log.lines": 10
       }
     },
     {
+      "name": "hdfs",
       "type": "HDFS",
       "config": {
-        "path": "hdfs:///griffin/persist",
+        "path": "hdfs://localhost/griffin/persist",
         "max.persist.lines": 10000,
         "max.lines.per.file": 10000
       }
     },
     {
+      "name": "elasticsearch",
       "type": "ELASTICSEARCH",
       "config": {
         "method": "post",

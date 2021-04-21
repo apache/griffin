@@ -19,10 +19,10 @@ package org.apache.griffin.measure.utils
 
 import scala.util.matching.Regex
 
-import org.apache.http.client.methods.{HttpGet, HttpPost}
+import org.apache.http.client.methods.{HttpDelete, HttpGet, HttpPost, HttpPut}
+import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.{ContentType, StringEntity}
-import org.apache.http.impl.client.HttpClientBuilder
-import scalaj.http._
+import org.apache.http.impl.client.{BasicResponseHandler, HttpClientBuilder}
 
 object HttpUtil {
 
@@ -31,65 +31,34 @@ object HttpUtil {
   val PUT_REGEX: Regex = """^(?i)put$""".r
   val DELETE_REGEX: Regex = """^(?i)delete$""".r
 
-  def postData(
-      url: String,
-      params: Map[String, Object],
-      headers: Map[String, Object],
-      data: String): Boolean = {
-    val response = Http(url)
-      .params(convertObjMap2StrMap(params))
-      .headers(convertObjMap2StrMap(headers))
-      .postData(data)
-      .asString
-
-    response.isSuccess
-  }
-
   def doHttpRequest(
       url: String,
       method: String,
       params: Map[String, Object],
       headers: Map[String, Object],
-      data: String): Boolean = {
+      data: String): (Integer, String) = {
     val client = HttpClientBuilder.create.build
-    method match {
+    val uriBuilder = new URIBuilder(url)
+    convertObjMap2StrMap(params) foreach (param => uriBuilder.setParameter(param._1, param._2))
+    val handler = new BasicResponseHandler()
+    val request = method match {
       case POST_REGEX() =>
-        val post = new HttpPost(url)
-        convertObjMap2StrMap(headers) foreach (header => post.addHeader(header._1, header._2))
+        val post = new HttpPost(uriBuilder.build())
         post.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON))
-
-        // send the post request
-        val response = client.execute(post)
-        val code = response.getStatusLine.getStatusCode
-        code >= 200 && code < 300
+        post
       case PUT_REGEX() =>
-        val get = new HttpGet(url)
-        convertObjMap2StrMap(headers) foreach (header => get.addHeader(header._1, header._2))
-        val response = client.execute(get)
-        val code = response.getStatusLine.getStatusCode
-        code >= 200 && code < 300
-      case _ => false
+        val put = new HttpPut(uriBuilder.build())
+        put.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON))
+        put
+      case GET_REGEX() =>
+        new HttpGet(uriBuilder.build())
+      case DELETE_REGEX() =>
+        new HttpDelete(uriBuilder.build())
+      case _ => throw new UnsupportedOperationException("Unsupported http method error!")
     }
-  }
-
-  def httpRequest(
-      url: String,
-      method: String,
-      params: Map[String, Object],
-      headers: Map[String, Object],
-      data: String): Boolean = {
-    val httpReq = Http(url)
-      .params(convertObjMap2StrMap(params))
-      .headers(convertObjMap2StrMap(headers))
-    method match {
-      case POST_REGEX() =>
-        val res = httpReq.postData(data).asString
-        res.isSuccess
-      case PUT_REGEX() =>
-        val res = httpReq.put(data).asString
-        res.isSuccess
-      case _ => false
-    }
+    convertObjMap2StrMap(headers) foreach (header => request.addHeader(header._1, header._2))
+    val response = client.execute(request)
+    (response.getStatusLine.getStatusCode, handler.handleResponse(response).trim)
   }
 
   private def convertObjMap2StrMap(map: Map[String, Object]): Map[String, String] = {

@@ -23,6 +23,7 @@ object ParamReaderFactory {
 
   val json = "json"
   val file = "file"
+  val httpRegex = "^http[s]?://.*"
 
   /**
    * parse string content to get param reader
@@ -30,9 +31,13 @@ object ParamReaderFactory {
    * @return
    */
   def getParamReader(pathOrJson: String): ParamReader = {
-    val strType = paramStrType(pathOrJson)
-    if (json.equals(strType)) ParamJsonReader(pathOrJson)
-    else ParamFileReader(pathOrJson)
+    if (pathOrJson.matches(httpRegex)) {
+      ParamHttpReader(pathOrJson)
+    } else {
+      val strType = paramStrType(pathOrJson)
+      if (json.equals(strType)) ParamJsonReader(pathOrJson)
+      else ParamFileReader(pathOrJson)
+    }
   }
 
   private def paramStrType(str: String): String = {

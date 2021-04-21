@@ -66,7 +66,7 @@ public class MeasureRepoTest {
         GriffinMeasure m = (GriffinMeasure) measures.get(0);
 
         List<DataSource> sources = m.getDataSources();
-        DataConnector connector = sources.get(0).getConnectors().get(0);
+        DataConnector connector = sources.get(0).getConnector();
         Rule rule = m.getEvaluateRule().getRules().get(0);
         assertEquals(m.getSinksList().size(), 2);
         assertEquals(sources.get(0).isBaseline(), true);

@@ -32,8 +32,15 @@ import org.apache.griffin.measure.datasource.connector.streaming._
 
 object DataConnectorFactory extends Loggable {
 
-  @deprecated val AvroRegex: Regex = """^(?i)avro$""".r
-  @deprecated val TextDirRegex: Regex = """^(?i)text-dir$""".r
+  @deprecated(
+    s"This class is deprecated. Use '${classOf[FileBasedDataConnector].getCanonicalName}' with correct format.",
+    "0.6.0")
+  val AvroRegex: Regex = """^(?i)avro$""".r
+
+  @deprecated(
+    s"This class is deprecated. Use '${classOf[FileBasedDataConnector].getCanonicalName}' with correct format.",
+    "0.6.0")
+  val TextDirRegex: Regex = """^(?i)text-dir$""".r
 
   val HiveRegex: Regex = """^(?i)hive$""".r
   val FileRegex: Regex = """^(?i)file$""".r

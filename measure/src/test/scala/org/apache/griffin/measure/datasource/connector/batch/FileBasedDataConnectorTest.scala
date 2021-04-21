@@ -18,7 +18,7 @@
 package org.apache.griffin.measure.datasource.connector.batch
 
 import org.apache.spark.sql.types.{IntegerType, LongType, StringType, StructType}
-import org.scalatest._
+import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
@@ -65,13 +65,12 @@ class FileBasedDataConnectorTest extends SparkSuiteBase with Matchers {
     // valid schema
     val result1 = FileBasedDataConnector(
       spark,
-      dcParam.copy(
-        config = configs + (
-          (
-            "schema",
-            Seq(
-              Map("name" -> "name", "type" -> "string"),
-              Map("name" -> "age", "type" -> "int", "nullable" -> "true"))))),
+      dcParam.copy(config = configs + (
+        (
+          "schema",
+          Seq(
+            Map("name" -> "name", "type" -> "string"),
+            Map("name" -> "age", "type" -> "int", "nullable" -> "true"))))),
       timestampStorage)
       .data(1L)
 

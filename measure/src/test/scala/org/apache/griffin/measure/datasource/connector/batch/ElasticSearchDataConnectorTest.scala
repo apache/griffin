@@ -18,13 +18,15 @@
 package org.apache.griffin.measure.datasource.connector.batch
 
 import org.apache.spark.sql.types.StructType
-import org.scalatest.Matchers
+import org.scalatest.matchers.should._
+import org.scalatest.Ignore
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 
 import org.apache.griffin.measure.SparkSuiteBase
 import org.apache.griffin.measure.configuration.dqdefinition.DataConnectorParam
 import org.apache.griffin.measure.datasource.TimestampStorage
 
+@Ignore
 class ElasticSearchDataConnectorTest extends SparkSuiteBase with Matchers {
 
   // ignorance flag that could skip cases

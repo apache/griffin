@@ -15,27 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.griffin.measure.context
+package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should._
+import scala.reflect.ClassTag
+import scala.util.Try
 
-class TimeRangeTest extends AnyFlatSpec with Matchers {
+import org.apache.griffin.measure.configuration.dqdefinition.Param
+import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil}
 
-  "time range" should "be able to merge another time range" in {
-    val tr1 = TimeRange(1, 10, Set(2, 5, 8))
-    val tr2 = TimeRange(4, 15, Set(5, 6, 13, 7))
-    tr1.merge(tr2) should be(TimeRange(1, 15, Set(2, 5, 6, 7, 8, 13)))
+/**
+ * read params by http url
+ *
+ * @param httpUrl
+ */
+case class ParamHttpReader(httpUrl: String) extends ParamReader {
+
+  def readConfig[T <: Param](implicit m: ClassTag[T]): Try[T] = {
+    Try {
+      val params = Map[String, Object]()
+      val headers = Map[String, Object](("Content-Type", "application/json"))
+      val jsonString = HttpUtil.doHttpRequest(httpUrl, "get", params, headers, null)._2
+      val param = JsonUtil.fromJson[T](jsonString)
+      validate(param)
+    }
   }
-
-  it should "get minimum timestamp in not-empty timestamp set" in {
-    val tr = TimeRange(1, 10, Set(2, 5, 8))
-    tr.minTmstOpt should be(Some(2))
-  }
-
-  it should "not get minimum timestamp in empty timestamp set" in {
-    val tr = TimeRange(1, 10, Set[Long]())
-    tr.minTmstOpt should be(None)
-  }
-
 }

@@ -7,14 +7,14 @@
   },
   "sinks": [
     {
-      "name": "consoleSink",
+      "name": "console",
       "type": "CONSOLE",
       "config": {
         "max.log.lines": 10
       }
     },
     {
-      "name": "hdfsSink",
+      "name": "hdfs",
       "type": "HDFS",
       "config": {
         "path": "hdfs://localhost/griffin/batch/persist",
@@ -23,7 +23,7 @@
       }
     },
     {
-      "name": "elasticSink",
+      "name": "elasticsearch",
       "type": "ELASTICSEARCH",
       "config": {
         "method": "post",

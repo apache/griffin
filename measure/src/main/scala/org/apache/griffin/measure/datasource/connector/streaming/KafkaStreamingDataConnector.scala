@@ -51,23 +51,24 @@ trait KafkaStreamingDataConnector extends StreamingDataConnector {
     }
     ds.foreachRDD((rdd, time) => {
       val ms = time.milliseconds
-      val saveDfOpt = try {
-        // coalesce partition number
-        val prlCount = rdd.sparkContext.defaultParallelism
-        val ptnCount = rdd.getNumPartitions
-        val repartitionedRdd = if (prlCount < ptnCount) {
-          rdd.coalesce(prlCount)
-        } else rdd
+      val saveDfOpt =
+        try {
+          // coalesce partition number
+          val prlCount = rdd.sparkContext.defaultParallelism
+          val ptnCount = rdd.getNumPartitions
+          val repartitionedRdd = if (prlCount < ptnCount) {
+            rdd.coalesce(prlCount)
+          } else rdd
 
-        val dfOpt = transform(repartitionedRdd)
+          val dfOpt = transform(repartitionedRdd)
 
-        // pre-process
-        preProcess(dfOpt, ms)
-      } catch {
-        case e: Throwable =>
-          error(s"streaming data connector error: ${e.getMessage}")
-          None
-      }
+          // pre-process
+          preProcess(dfOpt, ms)
+        } catch {
+          case e: Throwable =>
+            error(s"streaming data connector error: ${e.getMessage}")
+            None
+        }
 
       // save data frame
       streamingCacheClientOpt.foreach(_.saveData(saveDfOpt, ms))

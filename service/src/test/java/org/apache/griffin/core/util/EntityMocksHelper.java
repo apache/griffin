@@ -82,9 +82,9 @@ public class EntityMocksHelper {
         DataConnector dcTarget)
         throws Exception {
         DataSource dataSource = new DataSource(
-            "source", true, createCheckpointMap(), Arrays.asList(dcSource));
+            "source", true, createCheckpointMap(), dcSource);
         DataSource targetSource = new DataSource(
-            "target", false, createCheckpointMap(), Arrays.asList(dcTarget));
+            "target", false, createCheckpointMap(), dcTarget);
         List<DataSource> dataSources = new ArrayList<>();
         dataSources.add(dataSource);
         dataSources.add(targetSource);

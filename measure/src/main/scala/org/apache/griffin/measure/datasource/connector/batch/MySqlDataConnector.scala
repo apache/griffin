@@ -52,21 +52,22 @@ case class MySqlDataConnector(
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = {
 
-    val dfOpt = try {
-      val dtSql = dataSql()
-      val prop = new java.util.Properties
-      prop.setProperty("user", user)
-      prop.setProperty("password", password)
-      prop.setProperty("driver", driver)
-      val df: DataFrame = sparkSession.read.jdbc(url, s"($dtSql) as t", prop)
-      val dfOpt = Some(df)
-      val preDfOpt = preProcess(dfOpt, ms)
-      preDfOpt
-    } catch {
-      case e: Throwable =>
-        error(s"load mysql table $fullTableName fails: ${e.getMessage}", e)
-        None
-    }
+    val dfOpt =
+      try {
+        val dtSql = dataSql()
+        val prop = new java.util.Properties
+        prop.setProperty("user", user)
+        prop.setProperty("password", password)
+        prop.setProperty("driver", driver)
+        val df: DataFrame = sparkSession.read.jdbc(url, s"($dtSql) as t", prop)
+        val dfOpt = Some(df)
+        val preDfOpt = preProcess(dfOpt, ms)
+        preDfOpt
+      } catch {
+        case e: Throwable =>
+          error(s"load mysql table $fullTableName fails: ${e.getMessage}", e)
+          None
+      }
     val tmsts = readTmst(ms)
     (dfOpt, TimeRange(ms, tmsts))
   }

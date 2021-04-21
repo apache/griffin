@@ -49,7 +49,7 @@ public class HiveMetaStoreServiceImpl implements HiveMetaStoreService {
     private static final Logger LOGGER = LoggerFactory
         .getLogger(HiveMetaStoreService.class);
 
-    @Autowired
+    @Autowired(required = false)
     private IMetaStoreClient client = null;
 
     @Value("${hive.metastore.dbname}")
