@@ -7,26 +7,22 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v3
+      - name: Check stale PRs
+        uses: actions/stale@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          stale-issue-message: >
-            Automated Message: We're closing this Issue because it hasn't been updated in a while.
-            This isn't a judgement on the merit of the Issue in any way. It's just
-            a way of keeping the Issue queue manageable.
-
-            If you'd like to revive this Issue, please reopen it and ask a
-            committer to remove the Stale tag!
           stale-pr-message: >
+            Automated Message: This PR is being labelled as stale and will be closed in
+            next 15 days due to lack of activity. To avoid this push new commits or
+            ask the committers for a review/ resolution.
+          close-pr-message: >
             Automated Message: We're closing this PR because it hasn't been updated in a while.
             This isn't a judgement on the merit of the PR in any way. It's just
             a way of keeping the PR queue manageable.
 
             If you'd like to revive this PR, please reopen it and ask a
-            committer to remove the Stale tag!
+            committer to remove the 'no-pr-activity' tag!
           days-before-stale: 30
           days-before-close: 15
-          stale-issue-label: 'no-issue-activity'
           stale-pr-label: 'no-pr-activity'
-          exempt-issue-labels: 'awaiting-approval,work-in-progress'
-          exempt-pr-labels: 'awaiting-approval,work-in-progress'
+          exempt-pr-labels: 'awaiting-approval,work-in-progress,wip'
