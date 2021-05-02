@@ -140,9 +140,9 @@ class DuplicationMeasureTest extends MeasureTest {
 
     val metricMap = row.getAs[Map[String, String]](Metrics)
     assertResult(metricMap(Duplicate))("1")
-    assertResult(metricMap(Unique))("3")
+    assertResult(metricMap(Unique))("2")
     assertResult(metricMap(NonUnique))("1")
-    assertResult(metricMap(Distinct))("4")
+    assertResult(metricMap(Distinct))("3")
   }
 
 }
