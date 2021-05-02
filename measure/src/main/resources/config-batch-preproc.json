@@ -74,22 +74,22 @@
       ]
     },
     {
-      "name": "query_measure",
+      "name": "spark_sql_measure",
       "type": "sparkSQL",
       "data.source": "crime_report_source",
       "config": {
-        "expr": "select * from crime_report_source",
-        "bad.record.definition": "zipcode is null and city is null"
+        "expr": "SELECT t.*, sq.zip IS NULL AS __measure_spark_sql_measure FROM crime_report_source AS t LEFT OUTER JOIN (SELECT zipcode as zip, COUNT(DISTINCT city) AS city_count FROM crime_report_source GROUP BY zipcode having city_count = 1) as sq ON sq.zip=t.zipcode",
+        "bad.record.definition": "__measure_spark_sql_measure"
       },
       "out": [
         {
           "type": "metric",
-          "name": "sql_metric",
+          "name": "spark_sql_metric",
           "flatten": "map"
         },
         {
           "type": "record",
-          "name": "sql_records"
+          "name": "spark_sql_records"
         }
       ]
     },

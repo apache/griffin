@@ -86,12 +86,12 @@ Duplication measure in Apache Griffin computes all of these metrics for a user-d
 
 ## SparkSQL
 
-In some cases, the above-mentioned quality dimensions/ measures may not be able to model a complete data quality
-definition. For such cases, Apache Griffin allows the definition of complex custom user-defined checks as SparkSQL
-queries.
+In some cases, the above-mentioned dimensions/ measures may not enough to model a complete data quality definition. For
+such cases, Apache Griffin allows the definition of complex custom user-defined checks as SparkSQL queries.
 
-SparkSQL measure is like a pro mode and allows advanced users to put complex custom checks that are not covered by other
-measures. These SparkSQL queries may contain clauses like select/ from/ where/ group-by/ order-by/ limit, etc.
+SparkSQL measure is like a pro mode that allows advanced users to configure complex custom checks that are not covered
+by other measures. These SparkSQL queries may contain clauses like `select`, `from`, `where`, `group-by`, `order-by`
+, `limit`, etc.
 
 ## Profiling
 
