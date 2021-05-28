@@ -42,7 +42,7 @@ dimension/ measures,
 
 ## Accuracy
 
-Data accuracy refers to the degree to which the values of a said attribute agree with an identified reference truth
+Data accuracy refers to the degree to which the values of a said attribute agrees with an identified reference truth
 data (source of correct information). In-accurate data may come from different sources like,
 
 - Dynamically computed values,
@@ -53,7 +53,7 @@ Accuracy measure quantifies the extent to which data sets contains are correct, 
 free of error. Higher accuracy values signify that the said data set represents the “real-life” values/ objects that it
 intends to model.
 
-A detailed measure configuration guide is avaiable [here](measure-configuration-guide/accuracy.md).
+A detailed measure configuration guide is available [here](measure-configuration-guide/accuracy.md).
 
 ## Completeness
 
@@ -70,7 +70,7 @@ columns `name`, `email` and `age`, some examples of such completeness definition
 - `name is NULL and age is NULL`
 - `email NOT RLIKE '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$'`
 
-A detailed measure configuration guide is avaiable [here](measure-configuration-guide/completeness.md).
+A detailed measure configuration guide is available [here](measure-configuration-guide/completeness.md).
 
 ## Duplication
 
@@ -88,7 +88,7 @@ Redundancies in a dataset can be measured in terms of the following metrics,
 
 Duplication measure in Apache Griffin computes all of these metrics for a user-defined data asset.
 
-A detailed measure configuration guide is avaiable [here](measure-configuration-guide/duplication.md).
+A detailed measure configuration guide is available [here](measure-configuration-guide/duplication.md).
 
 ## SparkSQL
 
@@ -99,7 +99,7 @@ SparkSQL measure is like a pro mode that allows advanced users to configure comp
 by other measures. These SparkSQL queries may contain clauses like `select`, `from`, `where`, `group-by`, `order-by`
 , `limit`, etc.
 
-A detailed measure configuration guide is avaiable [here](measure-configuration-guide/sparksql.md).
+A detailed measure configuration guide is available [here](measure-configuration-guide/sparksql.md).
 
 ## Profiling
 
@@ -121,4 +121,4 @@ assessment in a later step. Data profiling can help us to,
 Data Profiling helps us create a huge amount of insight into the quality levels of our data and helps to find data
 quality rules and requirements that will support a more thorough data quality assessment in a later step.
 
-A detailed measure configuration guide is avaiable [here](measure-configuration-guide/profiling.md).
+A detailed measure configuration guide is available [here](measure-configuration-guide/profiling.md).
