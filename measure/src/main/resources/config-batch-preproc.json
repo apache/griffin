@@ -117,11 +117,11 @@
       "type": "accuracy",
       "data.source": "crime_report_source",
       "config": {
-        "target.source": "crime_report_truth",
+        "ref.source": "crime_report_truth",
         "expr": [
           {
             "source.col": "city",
-            "target.col": "city_name"
+            "ref.col": "city_name"
           }
         ]
       },

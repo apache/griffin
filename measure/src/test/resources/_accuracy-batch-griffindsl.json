@@ -33,35 +33,35 @@
       "type": "accuracy",
       "data.source": "target",
       "config": {
-        "target.source": "source",
+        "ref.source": "source",
         "expr": [
           {
             "source.col": "user_id",
-            "target.col": "user_id"
+            "ref.col": "user_id"
           },
           {
             "source.col": "first_name",
-            "target.col": "first_name"
+            "ref.col": "first_name"
           },
           {
             "source.col": "last_name",
-            "target.col": "last_name"
+            "ref.col": "last_name"
           },
           {
             "source.col": "address",
-            "target.col": "address"
+            "ref.col": "address"
           },
           {
             "source.col": "email",
-            "target.col": "email"
+            "ref.col": "email"
           },
           {
             "source.col": "phone",
-            "target.col": "phone"
+            "ref.col": "phone"
           },
           {
             "source.col": "post_code",
-            "target.col": "post_code"
+            "ref.col": "post_code"
           }
         ]
       },

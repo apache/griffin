@@ -33,8 +33,8 @@ class AccuracyMeasureTest extends MeasureTest {
       "Accuracy",
       "source",
       Map(
-        Expression -> Seq(Map(SourceColStr -> "gender", TargetColStr -> "gender")),
-        TargetSourceStr -> "target"))
+        Expression -> Seq(Map(SourceColStr -> "gender", ReferenceColStr -> "gender")),
+        ReferenceSourceStr -> "reference"))
   }
 
   "AccuracyMeasure" should "validate expression config" in {
@@ -69,48 +69,49 @@ class AccuracyMeasureTest extends MeasureTest {
     // Invalid Expr
     assertThrows[AssertionError] {
       AccuracyMeasure(
-        param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), TargetSourceStr -> "target")))
+        param.copy(config =
+          Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> "reference")))
     }
 
-    // Invalid Expr as target.col is missing
+    // Invalid Expr as ref.col is missing
     assertThrows[AssertionError] {
       AccuracyMeasure(
         param.copy(config =
-          Map(Expression -> Seq(Map(SourceColStr -> "b")), TargetSourceStr -> "target")))
+          Map(Expression -> Seq(Map(SourceColStr -> "b")), ReferenceSourceStr -> "reference")))
     }
 
     // Invalid Expr as source.col is missing
     assertThrows[AssertionError] {
       AccuracyMeasure(
         param.copy(config =
-          Map(Expression -> Seq(Map(TargetColStr -> "b")), TargetSourceStr -> "target")))
+          Map(Expression -> Seq(Map(ReferenceColStr -> "b")), ReferenceSourceStr -> "reference")))
     }
 
-    // Validations for Target source
+    // Validations for Reference source
 
     // Empty
     assertThrows[AssertionError] {
       AccuracyMeasure(
         param.copy(config =
-          Map(Expression -> Seq(Map("a" -> "b")), TargetSourceStr -> StringUtils.EMPTY)))
+          Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> StringUtils.EMPTY)))
     }
 
     // Incorrect Type
     assertThrows[AssertionError] {
       AccuracyMeasure(
-        param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), TargetSourceStr -> 2331)))
+        param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> 2331)))
     }
 
     // Null
     assertThrows[AssertionError] {
       AccuracyMeasure(
-        param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), TargetSourceStr -> null)))
+        param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> null)))
     }
 
-    // Invalid target
+    // Invalid Reference
     assertThrows[AssertionError] {
       AccuracyMeasure(
-        param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), TargetSourceStr -> "jj")))
+        param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> "jj")))
     }
   }
 
