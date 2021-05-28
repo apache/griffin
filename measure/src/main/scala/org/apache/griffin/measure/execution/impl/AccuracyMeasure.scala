@@ -51,15 +51,12 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
     val dataSource = addColumnPrefix(originalSource, SourcePrefixStr)
 
     val refDataSource =
-      addColumnPrefix(
-        sparkSession.read.table(refSource).drop(ConstantColumns.tmst),
-        refPrefixStr)
+      addColumnPrefix(sparkSession.read.table(refSource).drop(ConstantColumns.tmst), refPrefixStr)
 
     val accuracyExprs = exprOpt.get
       .map(toAccuracyExpr)
       .distinct
-      .map(x =>
-        AccuracyExpr(s"$SourcePrefixStr${x.sourceCol}", s"$refPrefixStr${x.refCol}"))
+      .map(x => AccuracyExpr(s"$SourcePrefixStr${x.sourceCol}", s"$refPrefixStr${x.refCol}"))
 
     val joinExpr =
       accuracyExprs
@@ -68,8 +65,7 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
 
     val indicatorExpr =
       accuracyExprs
-        .map(e =>
-          coalesce(col(e.sourceCol), emptyCol) notEqual coalesce(col(e.refCol), emptyCol))
+        .map(e => coalesce(col(e.sourceCol), emptyCol) notEqual coalesce(col(e.refCol), emptyCol))
         .reduce(_ or _)
 
     val nullExpr = accuracyExprs.map(e => col(e.sourceCol).isNull).reduce(_ or _)

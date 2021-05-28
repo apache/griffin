@@ -169,10 +169,14 @@ class BatchDQAppTest extends DQAppTest {
   }
 
   "batch job" should "fail with exception caught due to invalid rules" in {
-    assertThrows[java.lang.AssertionError] {
+    assertThrows[org.apache.spark.sql.AnalysisException] {
       runApp("/_profiling-batch-griffindsl_malformed.json")
     }
+  }
 
-    assertThrows[NullPointerException](runAndCheckException)
+  "batch job" should "fail with exception when no measures or rules are defined" in {
+    assertThrows[AssertionError] {
+      runApp("/_no_measure_or_rules_malformed.json")
+    }
   }
 }

@@ -29,6 +29,7 @@ import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessTy
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.datasource.DataSourceFactory
 import org.apache.griffin.measure.execution.MeasureExecutor
+import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 import org.apache.griffin.measure.utils.CommonUtils
@@ -80,16 +81,24 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
           val applicationId = sparkSession.sparkContext.applicationId
           dqContext.getSinks.foreach(_.open(applicationId))
 
-          Try {
-            val t = Try(MeasureExecutor(dqContext).execute(dqParam.getMeasures))
+          if (dqParam.getMeasures != null && dqParam.getMeasures.nonEmpty) {
+            Try {
+              val t = Try(MeasureExecutor(dqContext).execute(dqParam.getMeasures))
 
-            t match {
-              case Success(_) =>
-              case Failure(exception) =>
-                error("Exception", exception)
+              t match {
+                case Success(_) =>
+                case Failure(exception) =>
+                  error("Exception", exception)
+              }
+
+              t.isSuccess
             }
+          } else {
+            // build job
+            val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
 
-            t.isSuccess
+            // dq job execute
+            dqJob.execute(dqContext)
           }
         },
         TimeUnit.MILLISECONDS)

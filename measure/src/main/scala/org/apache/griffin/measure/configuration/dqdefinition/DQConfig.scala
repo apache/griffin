@@ -77,31 +77,38 @@ case class DQConfig(
     assert(dataSources != null, "data.sources should not be null")
     getDataSources.foreach(_.validate())
 
-    assert(measures != null, "measures should not be null")
-    assert(measures.nonEmpty, "No measures were defined")
-    measures.foreach(_.validate())
+    if (measures != null && measures.nonEmpty) {
+      measures.foreach(_.validate())
 
-    val repeatedMeasures = getMeasures
-      .map(_.getName)
-      .groupBy(x => x)
-      .mapValues(_.size)
-      .filter(_._2 > 1)
-      .keys
-    assert(
-      repeatedMeasures.isEmpty,
-      s"Measure names must be unique. " +
-        s"Duplicate Measures names ['${repeatedMeasures.mkString("', '")}'] were found.")
+      val repeatedMeasures = measures
+        .map(_.getName)
+        .groupBy(x => x)
+        .mapValues(_.size)
+        .filter(_._2 > 1)
+        .keys
 
-    val invalidMeasureSources = getMeasures
-      .map(_.getDataSource)
-      .map(dataSource => (dataSource, getDataSources.exists(_.getName.matches(dataSource))))
-      .filterNot(_._2)
-      .map(_._1)
+      assert(
+        repeatedMeasures.isEmpty,
+        s"Measure names must be unique. " +
+          s"Duplicate Measures names ['${repeatedMeasures.mkString("', '")}'] were found.")
 
-    assert(
-      invalidMeasureSources.isEmpty,
-      s"Measure source(s) undefined." +
-        s" Unknown source(s) ['${invalidMeasureSources.mkString("', '")}'] were found.")
+      val invalidMeasureSources = measures
+        .map(_.getDataSource)
+        .map(dataSource => (dataSource, getDataSources.exists(_.getName.matches(dataSource))))
+        .filterNot(_._2)
+        .map(_._1)
+
+      assert(
+        invalidMeasureSources.isEmpty,
+        s"Measure source(s) undefined." +
+          s" Unknown source(s) ['${invalidMeasureSources.mkString("', '")}'] were found.")
+    } else if (evaluateRule != null) {
+      evaluateRule.validate()
+    } else {
+      assert(
+        assertion = false,
+        "Either 'measure' or 'evaluate.rule' must be defined in the Application Config.")
+    }
   }
 }
 
