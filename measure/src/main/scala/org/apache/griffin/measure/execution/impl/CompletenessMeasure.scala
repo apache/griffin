@@ -24,7 +24,8 @@ import org.apache.spark.sql.functions._
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
 
-case class CompletenessMeasure(measureParam: MeasureParam) extends Measure {
+case class CompletenessMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
+    extends Measure {
 
   import Measure._
 
@@ -39,7 +40,7 @@ case class CompletenessMeasure(measureParam: MeasureParam) extends Measure {
 
   validate()
 
-  override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
+  override def impl(): (DataFrame, DataFrame) = {
     val exprStr = exprOpt.get
 
     val selectCols =
@@ -58,7 +59,7 @@ case class CompletenessMeasure(measureParam: MeasureParam) extends Measure {
     (badRecordsDf, metricDf)
   }
 
-  private def validate(): Unit = {
+  override def validate(): Unit = {
     assert(exprOpt.isDefined, s"'$Expression' must be defined.")
     assert(exprOpt.nonEmpty, s"'$Expression' must not be empty.")
 

@@ -34,35 +34,35 @@ class CompletenessMeasureTest extends MeasureTest {
 
   "CompletenessMeasure" should "validate expression config" in {
     assertThrows[AssertionError] {
-      CompletenessMeasure(param.copy(config = Map.empty[String, String]))
+      CompletenessMeasure(spark, param.copy(config = Map.empty[String, String]))
     }
 
     assertThrows[AssertionError] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> StringUtils.EMPTY)))
+      CompletenessMeasure(spark, param.copy(config = Map(Expression -> StringUtils.EMPTY)))
     }
 
     assertThrows[AssertionError] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> null)))
+      CompletenessMeasure(spark, param.copy(config = Map(Expression -> null)))
     }
 
     assertThrows[AssertionError] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> 22)))
+      CompletenessMeasure(spark, param.copy(config = Map(Expression -> 22)))
     }
   }
 
   it should "support metric writing" in {
-    val measure = CompletenessMeasure(param)
+    val measure = CompletenessMeasure(spark, param)
     assertResult(true)(measure.supportsMetricWrite)
   }
 
   it should "support record writing" in {
-    val measure = CompletenessMeasure(param)
+    val measure = CompletenessMeasure(spark, param)
     assertResult(true)(measure.supportsRecordWrite)
   }
 
   it should "execute defined measure expr" in {
-    val measure = CompletenessMeasure(param)
-    val (recordsDf, metricsDf) = measure.execute(context, None)
+    val measure = CompletenessMeasure(spark, param)
+    val (recordsDf, metricsDf) = measure.execute(None)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
@@ -83,8 +83,9 @@ class CompletenessMeasureTest extends MeasureTest {
 
   it should "supported complex measure expr" in {
     val measure = CompletenessMeasure(
+      spark,
       param.copy(config = Map(Expression -> "name is null or gender is null")))
-    val (recordsDf, metricsDf) = measure.execute(context, None)
+    val (recordsDf, metricsDf) = measure.execute(None)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
@@ -105,13 +106,13 @@ class CompletenessMeasureTest extends MeasureTest {
 
   it should "throw runtime error for invalid expr" in {
     assertThrows[AnalysisException] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> "xyz is null")))
-        .execute(context)
+      CompletenessMeasure(spark, param.copy(config = Map(Expression -> "xyz is null")))
+        .execute()
     }
 
     assertThrows[ParseException] {
-      CompletenessMeasure(param.copy(config = Map(Expression -> "select 1")))
-        .execute(context)
+      CompletenessMeasure(spark, param.copy(config = Map(Expression -> "select 1")))
+        .execute()
     }
   }
 

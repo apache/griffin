@@ -27,7 +27,8 @@ import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
 import org.apache.griffin.measure.step.builder.ConstantColumns
 
-case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
+case class AccuracyMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
+    extends Measure {
 
   case class AccuracyExpr(sourceCol: String, refCol: String)
 
@@ -44,7 +45,7 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
 
   validate()
 
-  override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
+  override def impl(): (DataFrame, DataFrame) = {
     val originalSource = sparkSession.read.table(measureParam.getDataSource)
     val originalCols = originalSource.columns
 
@@ -90,7 +91,7 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
     (recordsDf, metricDf)
   }
 
-  private def validate(): Unit = {
+  override def validate(): Unit = {
     assert(exprOpt.isDefined, s"'$Expression' must be defined.")
     assert(exprOpt.get.flatten.nonEmpty, s"'$Expression' must not be empty or of invalid type.")
 
@@ -109,8 +110,6 @@ case class AccuracyMeasure(measureParam: MeasureParam) extends Measure {
   }
 
   private def datasetValidations(): Unit = {
-    val sparkSession = SparkSession.getDefaultSession.get
-
     assert(
       sparkSession.catalog.tableExists(refSource),
       s"Reference source with name '$refSource' does not exist.")

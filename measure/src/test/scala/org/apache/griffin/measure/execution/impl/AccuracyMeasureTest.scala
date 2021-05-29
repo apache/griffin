@@ -43,32 +43,35 @@ class AccuracyMeasureTest extends MeasureTest {
 
     // Empty
     assertThrows[AssertionError] {
-      AccuracyMeasure(param.copy(config = Map.empty[String, String]))
+      AccuracyMeasure(spark, param.copy(config = Map.empty[String, String]))
     }
 
     // Incorrect Type and Empty
     assertThrows[AssertionError] {
-      AccuracyMeasure(param.copy(config = Map(Expression -> StringUtils.EMPTY)))
+      AccuracyMeasure(spark, param.copy(config = Map(Expression -> StringUtils.EMPTY)))
     }
 
     // Null
     assertThrows[AssertionError] {
-      AccuracyMeasure(param.copy(config = Map(Expression -> null)))
+      AccuracyMeasure(spark, param.copy(config = Map(Expression -> null)))
     }
 
     // Incorrect Type
     assertThrows[AssertionError] {
-      AccuracyMeasure(param.copy(config = Map(Expression -> "gender")))
+      AccuracyMeasure(spark, param.copy(config = Map(Expression -> "gender")))
     }
 
     // Correct Type and Empty
     assertThrows[AssertionError] {
-      AccuracyMeasure(param.copy(config = Map(Expression -> Seq.empty[Map[String, String]])))
+      AccuracyMeasure(
+        spark,
+        param.copy(config = Map(Expression -> Seq.empty[Map[String, String]])))
     }
 
     // Invalid Expr
     assertThrows[AssertionError] {
       AccuracyMeasure(
+        spark,
         param.copy(config =
           Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> "reference")))
     }
@@ -76,6 +79,7 @@ class AccuracyMeasureTest extends MeasureTest {
     // Invalid Expr as ref.col is missing
     assertThrows[AssertionError] {
       AccuracyMeasure(
+        spark,
         param.copy(config =
           Map(Expression -> Seq(Map(SourceColStr -> "b")), ReferenceSourceStr -> "reference")))
     }
@@ -83,6 +87,7 @@ class AccuracyMeasureTest extends MeasureTest {
     // Invalid Expr as source.col is missing
     assertThrows[AssertionError] {
       AccuracyMeasure(
+        spark,
         param.copy(config =
           Map(Expression -> Seq(Map(ReferenceColStr -> "b")), ReferenceSourceStr -> "reference")))
     }
@@ -92,6 +97,7 @@ class AccuracyMeasureTest extends MeasureTest {
     // Empty
     assertThrows[AssertionError] {
       AccuracyMeasure(
+        spark,
         param.copy(config =
           Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> StringUtils.EMPTY)))
     }
@@ -99,35 +105,38 @@ class AccuracyMeasureTest extends MeasureTest {
     // Incorrect Type
     assertThrows[AssertionError] {
       AccuracyMeasure(
+        spark,
         param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> 2331)))
     }
 
     // Null
     assertThrows[AssertionError] {
       AccuracyMeasure(
+        spark,
         param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> null)))
     }
 
     // Invalid Reference
     assertThrows[AssertionError] {
       AccuracyMeasure(
+        spark,
         param.copy(config = Map(Expression -> Seq(Map("a" -> "b")), ReferenceSourceStr -> "jj")))
     }
   }
 
   it should "support metric writing" in {
-    val measure = AccuracyMeasure(param)
+    val measure = AccuracyMeasure(spark, param)
     assertResult(true)(measure.supportsMetricWrite)
   }
 
   it should "support record writing" in {
-    val measure = AccuracyMeasure(param)
+    val measure = AccuracyMeasure(spark, param)
     assertResult(true)(measure.supportsRecordWrite)
   }
 
   it should "execute defined measure expr" in {
-    val measure = AccuracyMeasure(param)
-    val (recordsDf, metricsDf) = measure.execute(context, None)
+    val measure = AccuracyMeasure(spark, param)
+    val (recordsDf, metricsDf) = measure.execute(None)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)

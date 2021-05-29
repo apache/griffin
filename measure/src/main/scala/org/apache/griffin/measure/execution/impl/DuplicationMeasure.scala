@@ -37,7 +37,8 @@ import org.apache.griffin.measure.execution.Measure
  *
  * @param measureParam Measure Param
  */
-case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
+case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
+    extends Measure {
 
   import DuplicationMeasure._
   import Measure._
@@ -53,7 +54,7 @@ case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
 
   override val supportsMetricWrite: Boolean = true
 
-  override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
+  override def impl(): (DataFrame, DataFrame) = {
     val input = sparkSession.read.table(measureParam.getDataSource)
     val cols = keyCols(input).map(col)
 
@@ -92,8 +93,8 @@ case class DuplicationMeasure(measureParam: MeasureParam) extends Measure {
     (badRecordsDf, metricDf)
   }
 
-  private def validate(): Unit = {
-    val input = SparkSession.getDefaultSession.get.read.table(measureParam.getDataSource)
+  override def validate(): Unit = {
+    val input = sparkSession.read.table(measureParam.getDataSource)
     val kc = keyCols(input)
 
     assert(kc.nonEmpty, s"Columns defined in '$Expression' is empty.")

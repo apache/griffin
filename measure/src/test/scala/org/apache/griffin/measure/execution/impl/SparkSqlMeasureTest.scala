@@ -43,22 +43,22 @@ class SparkSqlMeasureTest extends MeasureTest {
 
     // Empty
     assertThrows[AssertionError] {
-      SparkSQLMeasure(param.copy(config = Map.empty[String, String]))
+      SparkSQLMeasure(spark, param.copy(config = Map.empty[String, String]))
     }
 
     // Empty
     assertThrows[AssertionError] {
-      SparkSQLMeasure(param.copy(config = Map(Expression -> StringUtils.EMPTY)))
+      SparkSQLMeasure(spark, param.copy(config = Map(Expression -> StringUtils.EMPTY)))
     }
 
     // Null
     assertThrows[AssertionError] {
-      SparkSQLMeasure(param.copy(config = Map(Expression -> null)))
+      SparkSQLMeasure(spark, param.copy(config = Map(Expression -> null)))
     }
 
     // Incorrect Type
     assertThrows[AssertionError] {
-      SparkSQLMeasure(param.copy(config = Map(Expression -> 943)))
+      SparkSQLMeasure(spark, param.copy(config = Map(Expression -> 943)))
     }
 
     // Validations for BadRecordDefinition
@@ -66,6 +66,7 @@ class SparkSqlMeasureTest extends MeasureTest {
     // Empty
     assertThrows[AssertionError] {
       SparkSQLMeasure(
+        spark,
         param.copy(config =
           Map(Expression -> "select 1", BadRecordDefinition -> StringUtils.EMPTY)))
     }
@@ -73,30 +74,32 @@ class SparkSqlMeasureTest extends MeasureTest {
     // Incorrect Type
     assertThrows[AssertionError] {
       SparkSQLMeasure(
+        spark,
         param.copy(config = Map(Expression -> "select 1", BadRecordDefinition -> 2344)))
     }
 
     // Null
     assertThrows[AssertionError] {
       SparkSQLMeasure(
+        spark,
         param.copy(config = Map(Expression -> "select 1", BadRecordDefinition -> null)))
     }
 
   }
 
   it should "support metric writing" in {
-    val measure = SparkSQLMeasure(param)
+    val measure = SparkSQLMeasure(spark, param)
     assertResult(true)(measure.supportsMetricWrite)
   }
 
   it should "support record writing" in {
-    val measure = SparkSQLMeasure(param)
+    val measure = SparkSQLMeasure(spark, param)
     assertResult(true)(measure.supportsRecordWrite)
   }
 
   it should "execute defined measure expr" in {
-    val measure = SparkSQLMeasure(param)
-    val (recordsDf, metricsDf) = measure.execute(context, None)
+    val measure = SparkSQLMeasure(spark, param)
+    val (recordsDf, metricsDf) = measure.execute(None)
 
     assertResult(metricDfSchema)(metricsDf.schema)
     assertResult(source.count())(recordsDf.count())
@@ -116,16 +119,18 @@ class SparkSqlMeasureTest extends MeasureTest {
   it should "throw runtime error for invalid expr" in {
     assertThrows[AssertionError] {
       SparkSQLMeasure(
+        spark,
         param.copy(config =
           Map(Expression -> "select * from source", BadRecordDefinition -> "name")))
-        .execute(context)
+        .execute()
     }
 
     assertThrows[AnalysisException] {
       SparkSQLMeasure(
+        spark,
         param.copy(config =
           Map(Expression -> "select 1 as my_value", BadRecordDefinition -> "name is null")))
-        .execute(context)
+        .execute()
     }
   }
 

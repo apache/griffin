@@ -32,13 +32,14 @@ class ProfilingMeasureTest extends MeasureTest {
   "ProfilingMeasure" should "validate expression config" in {
 
     // Default values
-    val defaultProfilingMeasure = ProfilingMeasure(param)
+    val defaultProfilingMeasure = ProfilingMeasure(spark, param)
 
     assertResult(3)(defaultProfilingMeasure.roundScale)
     assertResult(true)(defaultProfilingMeasure.approxDistinctCount)
 
     // Incorrect Type
     val invalidMeasure = ProfilingMeasure(
+      spark,
       param.copy(config = Map(ApproxDistinctCountStr -> "false", RoundScaleStr -> "1")))
 
     assertResult(3)(invalidMeasure.roundScale)
@@ -46,6 +47,7 @@ class ProfilingMeasureTest extends MeasureTest {
 
     // Correct Type
     val validMeasure = ProfilingMeasure(
+      spark,
       param.copy(config = Map(ApproxDistinctCountStr -> false, RoundScaleStr -> 5)))
 
     assertResult(5)(validMeasure.roundScale)
@@ -53,22 +55,22 @@ class ProfilingMeasureTest extends MeasureTest {
   }
 
   it should "support metric writing" in {
-    val measure = ProfilingMeasure(param)
+    val measure = ProfilingMeasure(spark, param)
     assertResult(true)(measure.supportsMetricWrite)
   }
 
   it should "not support record writing" in {
-    val measure = ProfilingMeasure(param)
+    val measure = ProfilingMeasure(spark, param)
     assertResult(false)(measure.supportsRecordWrite)
   }
 
   it should "profile all columns when no expression is provided" in {
-    val measure = ProfilingMeasure(param)
+    val measure = ProfilingMeasure(spark, param)
 
     assertResult(3)(measure.roundScale)
     assertResult(true)(measure.approxDistinctCount)
 
-    val (_, metricsDf) = measure.execute(context, None)
+    val (_, metricsDf) = measure.execute(None)
 
     assertResult(1L)(metricsDf.count())
 
@@ -87,12 +89,13 @@ class ProfilingMeasureTest extends MeasureTest {
 
   it should "profile only selected columns if expression is provided" in {
     val measure = ProfilingMeasure(
+      spark,
       param.copy(config = Map(Expression -> "name, gender", ApproxDistinctCountStr -> false)))
 
     assertResult(3)(measure.roundScale)
     assertResult(false)(measure.approxDistinctCount)
 
-    val (_, metricsDf) = measure.execute(context, None)
+    val (_, metricsDf) = measure.execute(None)
 
     assertResult(1L)(metricsDf.count())
 
@@ -111,8 +114,8 @@ class ProfilingMeasureTest extends MeasureTest {
 
   it should "throw runtime error for invalid expr" in {
     assertThrows[AssertionError] {
-      ProfilingMeasure(param.copy(config = Map(Expression -> "xyz")))
-        .execute(context)
+      ProfilingMeasure(spark, param.copy(config = Map(Expression -> "xyz")))
+        .execute()
     }
   }
 

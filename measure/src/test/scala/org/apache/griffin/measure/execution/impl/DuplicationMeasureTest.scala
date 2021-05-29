@@ -40,69 +40,74 @@ class DuplicationMeasureTest extends MeasureTest {
 
     // Empty
     assertThrows[AssertionError] {
-      DuplicationMeasure(param.copy(config = Map.empty[String, String]))
+      DuplicationMeasure(spark, param.copy(config = Map.empty[String, String]))
     }
 
     // Empty
     assertThrows[AssertionError] {
-      DuplicationMeasure(param.copy(config = Map(Expression -> StringUtils.EMPTY)))
+      DuplicationMeasure(spark, param.copy(config = Map(Expression -> StringUtils.EMPTY)))
     }
 
     // Null
     assertThrows[AssertionError] {
-      DuplicationMeasure(param.copy(config = Map(Expression -> null)))
+      DuplicationMeasure(spark, param.copy(config = Map(Expression -> null)))
     }
 
     // Incorrect Type
     assertThrows[AssertionError] {
-      DuplicationMeasure(param.copy(config = Map(Expression -> 1234)))
+      DuplicationMeasure(spark, param.copy(config = Map(Expression -> 1234)))
     }
 
     // Validations for BadRecordDefinition
 
     // Empty
     assertThrows[AssertionError] {
-      DuplicationMeasure(param.copy(config = Map(Expression -> "name")))
+      DuplicationMeasure(spark, param.copy(config = Map(Expression -> "name")))
     }
 
     // Empty
     assertThrows[AssertionError] {
       DuplicationMeasure(
+        spark,
         param.copy(config = Map(Expression -> "name", BadRecordDefinition -> "")))
     }
 
     // Null
     assertThrows[AssertionError] {
       DuplicationMeasure(
+        spark,
         param.copy(config = Map(Expression -> "name", BadRecordDefinition -> null)))
     }
 
     // Incorrect Type
     assertThrows[AssertionError] {
       DuplicationMeasure(
+        spark,
         param.copy(config = Map(Expression -> "name", BadRecordDefinition -> 435)))
     }
 
     // Incorrect Value
     assertThrows[AssertionError] {
       DuplicationMeasure(
+        spark,
         param.copy(config = Map(Expression -> "name", BadRecordDefinition -> "xyz")))
     }
   }
 
   it should "support metric writing" in {
-    val measure = DuplicationMeasure(param)
+    val measure = DuplicationMeasure(spark, param)
     assertResult(true)(measure.supportsMetricWrite)
   }
 
   it should "support record writing" in {
-    val measure = DuplicationMeasure(param)
+    val measure = DuplicationMeasure(spark, param)
     assertResult(true)(measure.supportsRecordWrite)
   }
 
   it should "execute defined measure expr" in {
-    val measure = DuplicationMeasure(param.copy(config = Map(BadRecordDefinition -> "duplicate")))
-    val (recordsDf, metricsDf) = measure.execute(context, None)
+    val measure =
+      DuplicationMeasure(spark, param.copy(config = Map(BadRecordDefinition -> "duplicate")))
+    val (recordsDf, metricsDf) = measure.execute(None)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
@@ -124,8 +129,9 @@ class DuplicationMeasureTest extends MeasureTest {
 
   it should "supported complex measure expr" in {
     val measure = DuplicationMeasure(
+      spark,
       param.copy(config = Map(Expression -> "name", BadRecordDefinition -> "duplicate")))
-    val (recordsDf, metricsDf) = measure.execute(context, None)
+    val (recordsDf, metricsDf) = measure.execute(None)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)

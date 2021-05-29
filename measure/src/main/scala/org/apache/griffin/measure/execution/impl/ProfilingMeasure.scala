@@ -28,7 +28,8 @@ import org.apache.griffin.measure.execution.Measure
 import org.apache.griffin.measure.execution.Measure._
 import org.apache.griffin.measure.step.builder.ConstantColumns
 
-case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
+case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
+    extends Measure {
 
   import ProfilingMeasure._
 
@@ -40,7 +41,7 @@ case class ProfilingMeasure(measureParam: MeasureParam) extends Measure {
   val approxDistinctCount: Boolean =
     getFromConfig[java.lang.Boolean](ApproxDistinctCountStr, true)
 
-  override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
+  override def impl(): (DataFrame, DataFrame) = {
     val input = sparkSession.read.table(measureParam.getDataSource)
     val profilingColNames = getFromConfig[String](Expression, input.columns.mkString(","))
       .split(",")

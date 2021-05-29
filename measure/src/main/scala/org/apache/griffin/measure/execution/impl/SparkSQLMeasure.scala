@@ -26,7 +26,8 @@ import org.apache.spark.sql.types.BooleanType
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
 
-case class SparkSQLMeasure(measureParam: MeasureParam) extends Measure {
+case class SparkSQLMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
+    extends Measure {
 
   import Measure._
 
@@ -42,7 +43,7 @@ case class SparkSQLMeasure(measureParam: MeasureParam) extends Measure {
 
   validate()
 
-  override def impl(sparkSession: SparkSession): (DataFrame, DataFrame) = {
+  override def impl(): (DataFrame, DataFrame) = {
     val df = sparkSession.sql(expr).withColumn(valueColumn, sparkExpr(badnessExpr))
 
     assert(
@@ -63,10 +64,11 @@ case class SparkSQLMeasure(measureParam: MeasureParam) extends Measure {
     (badRecordsDf, metricDf)
   }
 
-  private def validate(): Unit = {
+  override def validate(): Unit = {
     assert(
       !StringUtil.isNullOrEmpty(expr),
       "Invalid query provided as expr. Must not be null, empty or of invalid type.")
+
     assert(
       !StringUtil.isNullOrEmpty(badnessExpr),
       "Invalid condition provided as bad.record.definition.")

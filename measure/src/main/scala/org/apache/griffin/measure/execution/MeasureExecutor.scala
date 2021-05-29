@@ -70,7 +70,7 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
       batchId: Option[Long] = None): Unit = {
     measureParams.foreach(measureParam => {
       val measure = createMeasure(measureParam)
-      val (recordsDf, metricsDf) = measure.execute(context, batchId)
+      val (recordsDf, metricsDf) = measure.execute(batchId)
 
       persistRecords(measure, recordsDf)
       persistMetrics(measure, metricsDf)
@@ -80,12 +80,13 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
   }
 
   private def createMeasure(measureParam: MeasureParam): Measure = {
+    val sparkSession = context.sparkSession
     measureParam.getType match {
-      case MeasureTypes.Completeness => CompletenessMeasure(measureParam)
-      case MeasureTypes.Duplication => DuplicationMeasure(measureParam)
-      case MeasureTypes.Profiling => ProfilingMeasure(measureParam)
-      case MeasureTypes.Accuracy => AccuracyMeasure(measureParam)
-      case MeasureTypes.SparkSQL => SparkSQLMeasure(measureParam)
+      case MeasureTypes.Completeness => CompletenessMeasure(sparkSession, measureParam)
+      case MeasureTypes.Duplication => DuplicationMeasure(sparkSession, measureParam)
+      case MeasureTypes.Profiling => ProfilingMeasure(sparkSession, measureParam)
+      case MeasureTypes.Accuracy => AccuracyMeasure(sparkSession, measureParam)
+      case MeasureTypes.SparkSQL => SparkSQLMeasure(sparkSession, measureParam)
       case _ =>
         val errorMsg = s"Measure type '${measureParam.getType}' is not supported."
         val exception = new NotImplementedError(errorMsg)

@@ -25,11 +25,12 @@ import org.apache.spark.sql.functions._
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
-import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.utils.ParamUtil._
 
 trait Measure extends Loggable {
   import Measure._
+
+  val sparkSession: SparkSession
 
   val measureParam: MeasureParam
 
@@ -63,10 +64,12 @@ trait Measure extends Loggable {
     } else input
   }
 
-  def impl(sparkSession: SparkSession): (DataFrame, DataFrame)
+  def impl(): (DataFrame, DataFrame)
 
-  def execute(context: DQContext, batchId: Option[Long] = None): (DataFrame, DataFrame) = {
-    val (recordsDf, metricDf) = impl(context.sparkSession)
+  def validate(): Unit = {}
+
+  def execute(batchId: Option[Long] = None): (DataFrame, DataFrame) = {
+    val (recordsDf, metricDf) = impl()
 
     val processedRecordDf = preProcessRecords(recordsDf)
     val processedMetricDf = preProcessMetrics(metricDf)
