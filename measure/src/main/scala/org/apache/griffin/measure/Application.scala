@@ -119,6 +119,8 @@ object Application extends Loggable {
 
     if (!success) {
       sys.exit(-5)
+    } else {
+      sys.exit(0)
     }
   }
 

@@ -66,15 +66,15 @@ case class DQContext(
   implicit val encoder: Encoder[String] = Encoders.STRING
   val functionNames: Seq[String] = sparkSession.catalog.listFunctions.map(_.name).collect.toSeq
 
-  val dataSourceTimeRanges: Map[String, TimeRange] = loadDataSources()
+  var dataSourceTimeRanges: Map[String, TimeRange] = _
 
   def loadDataSources(): Map[String, TimeRange] = {
-    dataSources.map { ds =>
+    dataSourceTimeRanges = dataSources.map { ds =>
       (ds.name, ds.loadData(this))
     }.toMap
-  }
 
-  printTimeRanges()
+    dataSourceTimeRanges
+  }
 
   private val sinkFactory = SinkFactory(sinkParams, name)
   private val defaultSinks: Seq[Sink] = createSinks(contextId.timestamp)
@@ -103,18 +103,6 @@ case class DQContext(
 
     dataFrameCache.uncacheAllDataFrames()
     dataFrameCache.clearAllTrashDataFrames()
-  }
-
-  private def printTimeRanges(): Unit = {
-    if (dataSourceTimeRanges.nonEmpty) {
-      val timeRangesStr = dataSourceTimeRanges
-        .map { pair =>
-          val (name, timeRange) = pair
-          s"$name -> (${timeRange.begin}, ${timeRange.end}]"
-        }
-        .mkString(", ")
-      println(s"data source timeRanges: $timeRangesStr")
-    }
   }
 
 }

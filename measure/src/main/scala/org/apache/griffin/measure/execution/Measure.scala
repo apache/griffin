@@ -27,23 +27,54 @@ import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.utils.ParamUtil._
 
+/**
+ * Measure
+ *
+ * An abstraction for a data quality measure implementation.
+ */
 trait Measure extends Loggable {
   import Measure._
 
+  /**
+   * SparkSession for this Griffin Application.
+   */
   val sparkSession: SparkSession
 
+  /**
+   * Object representation of user defined measure.
+   */
   val measureParam: MeasureParam
 
+  /**
+   * If this measure supports record writing.
+   */
   val supportsRecordWrite: Boolean
 
+  /**
+   * If this measure supports metric writing.
+   */
   val supportsMetricWrite: Boolean
 
+  /**
+   * Metric values column.
+   */
   final val valueColumn = s"${MeasureColPrefix}_${measureParam.getName}"
 
+  /**
+   * Helper method to get a typed value from measure configuration based on given key.
+   *
+   * @param key given key for which the value needs to be fetched.
+   * @param defValue default value in case of no value.
+   * @tparam T type of value to get.
+   * @return value for given key
+   */
   def getFromConfig[T: ClassTag](key: String, defValue: T): T = {
     measureParam.getConfig.getAnyRef[T](key, defValue)
   }
 
+  /**
+   * Enriches metrics dataframe with some additional keys.
+   */
   // todo add status col to persist blank metrics if the measure fails
   def preProcessMetrics(input: DataFrame): DataFrame = {
     if (supportsMetricWrite) {
@@ -56,6 +87,9 @@ trait Measure extends Loggable {
     } else input
   }
 
+  /**
+   * Enriches records dataframe with a status column marking rows as good or bad based on values.
+   */
   def preProcessRecords(input: DataFrame): DataFrame = {
     if (supportsRecordWrite) {
       input
@@ -64,38 +98,59 @@ trait Measure extends Loggable {
     } else input
   }
 
+  /**
+   * Implementation of this measure.
+   *
+   * @return tuple of records dataframe and metric dataframe
+   */
   def impl(): (DataFrame, DataFrame)
 
+  /**
+   * Implementation should define validtion checks in this method (if required).
+   * This method needs to be called explicitly call this method (preferably during measure creation).
+   *
+   * Defaults to no-op.
+   */
   def validate(): Unit = {}
 
+  /**
+   * Executes this measure specific transformation on input data source.
+   *
+   * @param batchId batch id to append in case of streaming source.
+   * @return enriched tuple of records dataframe and metric dataframe
+   */
   def execute(batchId: Option[Long] = None): (DataFrame, DataFrame) = {
     val (recordsDf, metricDf) = impl()
 
     val processedRecordDf = preProcessRecords(recordsDf)
     val processedMetricDf = preProcessMetrics(metricDf)
 
-    var batchDetailsOpt = StringUtils.EMPTY
     val res = batchId match {
       case Some(batchId) =>
         implicit val bId: Long = batchId
-        batchDetailsOpt = s"for batch id $bId"
         (appendBatchIdIfAvailable(processedRecordDf), appendBatchIdIfAvailable(processedMetricDf))
       case None => (processedRecordDf, processedMetricDf)
     }
 
-    info(
-      s"Execution of '${measureParam.getType}' measure " +
-        s"with name '${measureParam.getName}' is complete $batchDetailsOpt")
-
     res
   }
 
+  /**
+   * Appends batch id to metrics in case of streaming sources.
+   *
+   * @param input metric dataframe
+   * @param batchId batch id to append
+   * @return updated metric dataframe
+   */
   private def appendBatchIdIfAvailable(input: DataFrame)(implicit batchId: Long): DataFrame = {
     input.withColumn(BatchId, typedLit[Long](batchId))
   }
 
 }
 
+/**
+ * Measure Constants.
+ */
 object Measure {
 
   final val DataSource = "data_source"

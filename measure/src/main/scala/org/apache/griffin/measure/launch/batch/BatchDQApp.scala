@@ -77,6 +77,8 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
           dqContext = DQContext(contextId, metricName, dataSources, sinkParams, BatchProcessType)(
             sparkSession)
 
+          dqContext.loadDataSources()
+
           // start id
           val applicationId = sparkSession.sparkContext.applicationId
           dqContext.getSinks.foreach(_.open(applicationId))
