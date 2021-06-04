@@ -27,15 +27,23 @@ import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
 
 /**
- * Duplication Measure
+ * Duplication Measure.
  *
- * Definition of duplication measures used:
+ * Asserting the measure of duplication of the entities within a data set implies that
+ * no entity exists more than once within the data set and that there is a key that can be used
+ * to uniquely access each entity.
+ *
+ * For example, in a master product table, each product must appear once and be assigned a unique
+ * identifier that represents that product within a system or across multiple applications/ systems.
+ *
+ * Duplication measures the redundancies in a dataset in terms of the following metrics,
  *  - Duplicate: the number of values that are the same as other values in the list
  *  - Distinct: the number of non-null values that are different from each other (Non-unique + Unique)
  *  - Non Unique: the number of values that have at least one duplicate in the list
  *  - Unique: the number of values that have no duplicates
  *
- * @param measureParam Measure Param
+ * @param sparkSession SparkSession for this Griffin Application.
+ * @param measureParam Object representation of this measure and its configuration.
  */
 case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
     extends Measure {
@@ -43,17 +51,49 @@ case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureP
   import DuplicationMeasure._
   import Measure._
 
-  private final val duplicationMeasures = Seq(Duplicate, Unique, NonUnique, Distinct)
+  /**
+   * Metrics of redundancies
+   */
+  private final val duplicationMeasures = Seq(Total, Duplicate, Unique, NonUnique, Distinct)
 
+  /**
+   * The value for `expr` is a comma separated string of columns in the data asset on which the
+   * duplication measure is to be executed. `expr` is an optional key for Duplication measure, i.e.,
+   * if it is not defined, the entire row will be checked by duplication measure.
+   */
   val exprs: String = getFromConfig[String](Expression, null)
+
+  /**
+   * Its value defines what exactly would be considered as a bad record after this measure
+   * computes redundancies on the data asset. Since the redundancies are calculated as `duplicate`,
+   * `unique`, `non_unique`, and  `distinct`, the value of this key must also be one of these values.
+   * This key is mandatory and must be defined with appropriate value.
+   */
   private val badnessExpr = getFromConfig[String](BadRecordDefinition, StringUtils.EMPTY)
 
   validate()
 
+  /**
+   * Duplication measure supports record and metric write
+   */
   override val supportsRecordWrite: Boolean = true
 
   override val supportsMetricWrite: Boolean = true
 
+  /**
+   * The Duplication measure calculates the all metrics of redundancies for the input dataset.
+   * Users can choose which of these metrics defines a "bad record" for them by defining `BadRecordDefinition`
+   * with a supported value.
+   *
+   * Duplication produces the following 5 metrics as result,
+   *  - Total records
+   *  - Duplicate records
+   *  - Unique records
+   *  - NonUnique records
+   *  - Distinct records
+   *
+   *  @return tuple of records dataframe and metric dataframe
+   */
   override def impl(): (DataFrame, DataFrame) = {
     val input = sparkSession.read.table(measureParam.getDataSource)
     val cols = keyCols(input).map(col)
@@ -78,12 +118,14 @@ case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureP
       .withColumn(NonUnique, min(__Temp).over(window))
       .withColumn(NonUnique, nonUniqueCol)
       .withColumn(Distinct, distinctCol)
+      .withColumn(Total, lit(1))
       .withColumn(valueColumn, col(badnessExpr))
       .drop(__Temp, IsNull)
 
     val metricAggCols = duplicationMeasures.map(m => sum(m).as(m))
     val selectCols = duplicationMeasures.flatMap(e => Seq(lit(e), col(e).cast("string")))
     val metricColumn = map(selectCols: _*).as(valueColumn)
+
     val metricDf = aggDf
       .agg(metricAggCols.head, metricAggCols.tail: _*)
       .select(metricColumn)
@@ -93,6 +135,10 @@ case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureP
     (badRecordsDf, metricDf)
   }
 
+  /**
+   * Since `expr` is a comma separated string of columns, these provided columns must exist in the dataset.
+   * `BadRecordDefinition` must be defined with one of the supported values.
+   */
   override def validate(): Unit = {
     val input = sparkSession.read.table(measureParam.getDataSource)
     val kc = keyCols(input)
@@ -118,6 +164,9 @@ case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureP
 
 }
 
+/**
+ * Duplication measure constants
+ */
 object DuplicationMeasure {
   final val IsNull: String = "is_null"
   final val Duplicate: String = "duplicate"

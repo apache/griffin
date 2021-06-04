@@ -115,7 +115,12 @@ class BatchDQAppTest extends DQAppTest {
   "duplication batch job" should "work" in {
     dqApp = runApp("/_distinctness-batch-griffindsl.json")
     val expectedMetrics =
-      Map("duplicate" -> "1", "unique" -> "48", "non_unique" -> "1", "distinct" -> "49")
+      Map(
+        "duplicate" -> "1",
+        "unique" -> "48",
+        "non_unique" -> "1",
+        "distinct" -> "49",
+        "total" -> "50")
 
     runAndCheckResult(Map("duplication_measure" -> expectedMetrics))
   }

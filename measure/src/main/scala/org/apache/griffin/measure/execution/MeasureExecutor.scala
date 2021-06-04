@@ -122,11 +122,10 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
    * @param dataSourceName name of data source
    * @param f function to perform
    * @param measureCountByDataSource number of measures for each data source
-   * @tparam T return type of function `f`
    * @return
    */
-  private def withCacheIfNecessary[T](dataSourceName: String, f: => T)(
-      implicit measureCountByDataSource: Map[String, Int]): T = {
+  private def withCacheIfNecessary(dataSourceName: String, f: => Unit)(
+      implicit measureCountByDataSource: Map[String, Int]): Unit = {
     val numMeasures = measureCountByDataSource(dataSourceName)
     var isCached = false
     if (cacheDataSources && numMeasures > 1) {
@@ -185,7 +184,7 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
           info(s"Successfully executed measure with name '${task._1}' $batchDetailsOpt")
         case Failure(e) =>
           error(s"Error executing measure with name '${task._1}' $batchDetailsOpt", e)
-    })
+      })
 
     while (!tasks.forall(_._2.isCompleted)) {
       info(

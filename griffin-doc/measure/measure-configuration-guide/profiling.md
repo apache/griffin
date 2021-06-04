@@ -49,7 +49,7 @@ Quality Assessment due to the interchangeable use of these 2 terms.
 Data Profiling helps us create a huge amount of insight into the quality levels of our data and helps to find data
 quality rules and requirements that will support a more thorough data quality assessment in a later step. For example,
 data profiling can help us to discover value frequencies, formats and patterns for each attribute in the data asset.
-Using data profiling alone we can find some perceived defects and outliers in the data asset and we end up with a whole
+Using data profiling alone we can find some perceived defects and outliers in the data asset, and we end up with a whole
 range of clues based on which correct Quality assessment measures can be defined like completeness/ distinctness etc.
 
 ### Configuration

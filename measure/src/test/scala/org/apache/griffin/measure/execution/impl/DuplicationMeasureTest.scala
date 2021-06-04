@@ -125,6 +125,7 @@ class DuplicationMeasureTest extends MeasureTest {
     assertResult(metricMap(Unique))("5")
     assertResult(metricMap(NonUnique))("0")
     assertResult(metricMap(Distinct))("5")
+    assertResult(metricMap(Total))("5")
   }
 
   it should "supported complex measure expr" in {
@@ -149,6 +150,7 @@ class DuplicationMeasureTest extends MeasureTest {
     assertResult(metricMap(Unique))("2")
     assertResult(metricMap(NonUnique))("1")
     assertResult(metricMap(Distinct))("3")
+    assertResult(metricMap(Total))("5")
   }
 
 }

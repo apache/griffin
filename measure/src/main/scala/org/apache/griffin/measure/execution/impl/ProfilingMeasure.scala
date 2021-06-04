@@ -28,22 +28,90 @@ import org.apache.griffin.measure.execution.Measure
 import org.apache.griffin.measure.execution.Measure._
 import org.apache.griffin.measure.step.builder.ConstantColumns
 
+/**
+ * Profiling measure.
+ *
+ * Data processing and its analysis can't truly be complete without data profiling -
+ * reviewing source data for content and quality. Data profiling helps to find data quality rules and
+ * requirements that will support a more thorough data quality assessment in a later step.
+ *
+ * The process of Data profiling involves:
+ *   - Collecting descriptive statistics like min, max, count and sum
+ *   - Collecting data types, length and recurring patterns
+ *   - Discovering metadata and assessing its accuracy, etc.
+ *
+ * A common problem in data management circles is the confusion around what is meant by
+ * Data profiling as opposed to Data Quality Assessment due to the interchangeable use of these 2 terms.
+ *
+ * Data Profiling helps us create a huge amount of insight into the quality levels of our
+ * data and helps to find data quality rules and requirements that will support a more thorough
+ * data quality assessment in a later step. For example, data profiling can help us to discover value
+ * frequencies, formats and patterns for each attribute in the data asset. Using data profiling alone
+ * we can find some perceived defects and outliers in the data asset, and we end up with a whole
+ * range of clues based on which correct Quality assessment measures can be defined like
+ * completeness/ distinctness etc.
+ *
+ * @param sparkSession SparkSession for this Griffin Application.
+ * @param measureParam Object representation of this measure and its configuration.
+ */
 case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
     extends Measure {
 
   import ProfilingMeasure._
 
+  /**
+   * Profiling measure supports only metric write
+   */
   override val supportsRecordWrite: Boolean = false
 
   override val supportsMetricWrite: Boolean = true
 
+  /**
+   * The value for `expr` is a comma separated string of columns in the data asset on which the
+   * profiling measure is to be executed. `expr` is an optional key for Profiling measure,
+   * i.e., if it is not defined, all columns in the data set will be profiled.
+   */
+  val exprOpt: Option[String] = Option(getFromConfig[String](Expression, null))
+
+  /**
+   * The value for this key is boolean. If this is `true`, the distinct counts will be approximated
+   * to allow up to 5% error. Approximate counts are usually faster by are less accurate. If this is set
+   * to `false`, then the counts will be 100% accurate.
+   */
   val roundScale: Int = getFromConfig[java.lang.Integer](RoundScaleStr, 3)
+
+  /**
+   * Several resultant metrics of profiling measure are floating-point numbers. This key controls to extent
+   * to which these floating-point numbers are rounded. For example, if `round.scale = 2` then all
+   * floating-point metric values will be rounded to 2 decimal places.
+   */
   val approxDistinctCount: Boolean =
     getFromConfig[java.lang.Boolean](ApproxDistinctCountStr, true)
 
+  /**
+   * Various metrics are calculated for columns of the data set. If expr is correctly defined,
+   * then metrics are generated for only the given subset of columns else, its generated for all columns.
+   *
+   * List of profiling metrics that are generated,
+   *  - avg_col_len
+   *  - max_col_len
+   *  - min_col_len
+   *  - avg
+   *  - max
+   *  - min
+   *  - approx_distinct_count OR distinct_count
+   *  - variance
+   *  - kurtosis
+   *  - std_dev
+   *  - total
+   *  - data_type
+   *
+   *  @return tuple of records dataframe and metric dataframe
+   */
   override def impl(): (DataFrame, DataFrame) = {
     val input = sparkSession.read.table(measureParam.getDataSource)
-    val profilingColNames = getFromConfig[String](Expression, input.columns.mkString(","))
+    val profilingColNames = exprOpt
+      .getOrElse(input.columns.mkString(","))
       .split(",")
       .map(_.trim.toLowerCase(Locale.ROOT))
       .toSet
@@ -91,6 +159,9 @@ case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasurePar
 
 }
 
+/**
+ * Profiling measure constants
+ */
 object ProfilingMeasure {
 
   /**
@@ -136,6 +207,14 @@ object ProfilingMeasure {
     (if (t.isInstanceOf[NumericType]) value else lit(null)).as(alias)
   }
 
+  /**
+   * Calculates profiling metrics for a column.
+   *
+   * @param field column
+   * @param roundScale round off places.
+   * @param approxDistinctCount to approximate distinct or not.
+   * @return
+   */
   private def getProfilingExprs(
       field: StructField,
       roundScale: Int,

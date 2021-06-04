@@ -180,6 +180,7 @@ This will generate the metrics like below,
       "data_source": "crime_report_source",
       "metrics": {
         "duplicate": "4363",
+        "total": "4617",
         "unique": "58",
         "non_unique": "196",
         "distinct": "254"
