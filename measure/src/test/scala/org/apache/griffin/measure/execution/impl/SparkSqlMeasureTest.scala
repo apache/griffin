@@ -105,12 +105,12 @@ class SparkSqlMeasureTest extends MeasureTest {
     assertResult(source.count())(recordsDf.count())
     assertResult(1L)(metricsDf.count())
 
-    val row = metricsDf.head()
-    assertResult(param.getDataSource)(row.getAs[String](DataSource))
-    assertResult(param.getName)(row.getAs[String](MeasureName))
-    assertResult(param.getType.toString)(row.getAs[String](MeasureType))
+    val metricMap = metricsDf
+      .head()
+      .getAs[Seq[Map[String, String]]](Metrics)
+      .map(x => x(MetricName) -> x(MetricValue))
+      .toMap
 
-    val metricMap = row.getAs[Map[String, String]](Metrics)
     assertResult(metricMap(Total))("5")
     assertResult(metricMap(measure.Complete))("3")
     assertResult(metricMap(measure.InComplete))("2")

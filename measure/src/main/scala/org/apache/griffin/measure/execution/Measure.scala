@@ -78,12 +78,7 @@ trait Measure extends Loggable {
   // todo add status col to persist blank metrics if the measure fails
   def preProcessMetrics(input: DataFrame): DataFrame = {
     if (supportsMetricWrite) {
-      input
-        .withColumn(MeasureName, typedLit[String](measureParam.getName))
-        .withColumn(MeasureType, typedLit[String](measureParam.getType.toString))
-        .withColumn(Metrics, col(valueColumn))
-        .withColumn(DataSource, typedLit[String](measureParam.getDataSource))
-        .select(MeasureName, MeasureType, DataSource, Metrics)
+      input.withColumn(Metrics, col(valueColumn)).select(Metrics)
     } else input
   }
 
@@ -160,6 +155,8 @@ object Measure {
   final val BatchId = "__batch_id"
   final val MeasureName = "measure_name"
   final val MeasureType = "measure_type"
+  final val MetricName = "metric_name"
+  final val MetricValue = "metric_value"
   final val Metrics = "metrics"
   final val Good = "good"
   final val Bad = "bad"

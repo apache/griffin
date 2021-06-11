@@ -22,6 +22,7 @@ import java.util.Locale
 import io.netty.util.internal.StringUtil
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.StringType
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
@@ -133,8 +134,9 @@ case class AccuracyMeasure(sparkSession: SparkSession, measureParam: MeasurePara
       .select((originalCols :+ valueColumn).map(col): _*)
 
     val selectCols =
-      Seq(Total, AccurateStr, InAccurateStr).flatMap(e => Seq(lit(e), col(e).cast("string")))
-    val metricColumn: Column = map(selectCols: _*).as(valueColumn)
+      Seq(Total, AccurateStr, InAccurateStr).map(e =>
+        map(lit(MetricName), lit(e), lit(MetricValue), col(e).cast(StringType)))
+    val metricColumn: Column = array(selectCols: _*).as(valueColumn)
 
     val metricDf = recordsDf
       .withColumn(Total, lit(1))

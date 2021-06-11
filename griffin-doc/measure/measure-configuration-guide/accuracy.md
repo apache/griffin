@@ -84,7 +84,7 @@ The accuracy measure can be configured as below,
 | Name    | Type     | Description                            | Supported Values                                          |
 |:--------|:---------|:---------------------------------------|:----------------------------------------------------------|
 | name    | `String` | User-defined name of this measure      | -                                                         |
-| type    | `String` | Type of Measure                        | completeness, duplication, profiling, accuracy, sparksql  |
+| type    | `String` | Type of Measure                        | completeness, duplication, profiling, accuracy, sparksql, schemaConformance  |
 | data.source | `String` | Name of data source on which this measure is applied  | -                                      |
 | config  | `Object` | Configuration params of the measure    | Depends on measure type ([see below](#example-config-object))                       |
 | out     | `List  ` | Define output(s) of measure execution  | [See below](#outputs)                                               |
@@ -155,8 +155,7 @@ To write metrics for accuracy measure, configure the measure with output section
   "out": [
     {
       "type": "metric",
-      "name": "accuracy_metric",
-      "flatten": "map"
+      "name": "accuracy_metric"
     }
   ]
 
@@ -168,22 +167,26 @@ This will generate the metrics like below,
 
 ```json
 {
-  ...
-
-  "value" : {
-    "accuracy_measure" : {
-      "measure_name" : "accuracy_measure",
-      "measure_type" : "Accuracy",
-      "data_source" : "crime_report_source",
-      "metrics" : {
-        "total" : "4617",
-        "accurate" : "4511",
-        "inaccurate" : "106"
-      }
+  "applicationId": "local-1623451540444",
+  "job_name": "Batch-All-Measures-Example",
+  "tmst": 1623451547986,
+  "measure_name": "accuracy_measure",
+  "metrics": [
+    {
+      "metric_name": "total",
+      "metric_value": "4617"
+    },
+    {
+      "metric_name": "accurate",
+      "metric_value": "4511"
+    },
+    {
+      "metric_name": "inaccurate",
+      "metric_value": "106"
     }
-  }
-
-  ...
+  ],
+  "measure_type": "Accuracy",
+  "data_source": "crime_report_source"
 }
 ```
 

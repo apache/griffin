@@ -115,12 +115,12 @@ class DuplicationMeasureTest extends MeasureTest {
     assertResult(source.count())(recordsDf.count())
     assertResult(1L)(metricsDf.count())
 
-    val row = metricsDf.head()
-    assertResult(param.getDataSource)(row.getAs[String](DataSource))
-    assertResult(param.getName)(row.getAs[String](MeasureName))
-    assertResult(param.getType.toString)(row.getAs[String](MeasureType))
+    val metricMap = metricsDf
+      .head()
+      .getAs[Seq[Map[String, String]]](Metrics)
+      .map(x => x(MetricName) -> x(MetricValue))
+      .toMap
 
-    val metricMap = row.getAs[Map[String, String]](Metrics)
     assertResult(metricMap(Duplicate))("0")
     assertResult(metricMap(Unique))("5")
     assertResult(metricMap(NonUnique))("0")
@@ -140,12 +140,12 @@ class DuplicationMeasureTest extends MeasureTest {
     assertResult(source.count())(recordsDf.count())
     assertResult(1L)(metricsDf.count())
 
-    val row = metricsDf.head()
-    assertResult(param.getDataSource)(row.getAs[String](DataSource))
-    assertResult(param.getName)(row.getAs[String](MeasureName))
-    assertResult(param.getType.toString)(row.getAs[String](MeasureType))
+    val metricMap = metricsDf
+      .head()
+      .getAs[Seq[Map[String, String]]](Metrics)
+      .map(x => x(MetricName) -> x(MetricValue))
+      .toMap
 
-    val metricMap = row.getAs[Map[String, String]](Metrics)
     assertResult(metricMap(Duplicate))("1")
     assertResult(metricMap(Unique))("2")
     assertResult(metricMap(NonUnique))("1")

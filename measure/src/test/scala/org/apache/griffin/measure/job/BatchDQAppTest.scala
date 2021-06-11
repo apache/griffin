@@ -20,7 +20,6 @@ package org.apache.griffin.measure.job
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
-import org.apache.griffin.measure.execution.Measure._
 import org.apache.griffin.measure.Application.readParamFile
 import org.apache.griffin.measure.configuration.dqdefinition.EnvConfig
 import org.apache.griffin.measure.sink.CustomSinkResultRegister
@@ -66,9 +65,8 @@ class BatchDQAppTest extends DQAppTest {
     CustomSinkResultRegister.clear()
   }
 
+  // check Result Metrics
   def runAndCheckResult(expectedMetrics: Map[String, Map[String, Any]]): Unit = {
-    // check Result Metrics
-
     val measureNames = dqApp.dqParam.getMeasures
     assert(measureNames.nonEmpty)
 
@@ -78,14 +76,8 @@ class BatchDQAppTest extends DQAppTest {
 
       val actualMetricsMap = actualMetricsOpt.get
 
-      assertResult(param.getName)(actualMetricsMap.get(MeasureName).orNull)
-      assertResult(param.getType.toString)(actualMetricsMap.get(MeasureType).orNull)
-      assertResult(param.getDataSource)(actualMetricsMap.get(DataSource).orNull)
-
-      val actualMetrics = actualMetricsMap.getOrElse(Metrics, null).asInstanceOf[Map[String, Any]]
-
       assert(expectedMetrics.contains(param.getName))
-      actualMetrics should contain theSameElementsAs expectedMetrics(param.getName)
+      actualMetricsMap should contain theSameElementsAs expectedMetrics(param.getName)
     })
   }
 
@@ -140,35 +132,34 @@ class BatchDQAppTest extends DQAppTest {
     dqApp = runApp("/_profiling-batch-griffindsl.json")
 
     val expectedMetrics = Map(
-      "column_details" -> Map(
-        "user_id" -> Map(
-          "avg_col_len" -> "5.0",
-          "max_col_len" -> "5",
-          "variance" -> "15.17",
-          "kurtosis" -> "-1.21",
-          "avg" -> "10007.0",
-          "min" -> "10001",
-          "null_count" -> "0",
-          "approx_distinct_count" -> "13",
-          "total" -> "13",
-          "std_dev" -> "3.89",
-          "data_type" -> "bigint",
-          "max" -> "10013",
-          "min_col_len" -> "5"),
-        "first_name" -> Map(
-          "avg_col_len" -> null,
-          "max_col_len" -> "6",
-          "variance" -> null,
-          "kurtosis" -> null,
-          "avg" -> null,
-          "min" -> null,
-          "null_count" -> "0",
-          "approx_distinct_count" -> "13",
-          "total" -> "13",
-          "std_dev" -> null,
-          "data_type" -> "string",
-          "max" -> null,
-          "min_col_len" -> "6")))
+      "user_id" -> Map(
+        "avg_col_len" -> "5.0",
+        "max_col_len" -> "5",
+        "variance" -> "15.17",
+        "kurtosis" -> "-1.21",
+        "avg" -> "10007.0",
+        "min" -> "10001",
+        "null_count" -> "0",
+        "approx_distinct_count" -> "13",
+        "total" -> "13",
+        "std_dev" -> "3.89",
+        "data_type" -> "bigint",
+        "max" -> "10013",
+        "min_col_len" -> "5"),
+      "first_name" -> Map(
+        "avg_col_len" -> null,
+        "max_col_len" -> "6",
+        "variance" -> null,
+        "kurtosis" -> null,
+        "avg" -> null,
+        "min" -> null,
+        "null_count" -> "0",
+        "approx_distinct_count" -> "13",
+        "total" -> "13",
+        "std_dev" -> null,
+        "data_type" -> "string",
+        "max" -> null,
+        "min_col_len" -> "6"))
 
     runAndCheckResult(Map("profiling_measure" -> expectedMetrics))
   }

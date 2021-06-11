@@ -19,7 +19,7 @@ package org.apache.griffin.measure.execution.impl
 
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.types.{MapType, StringType, StructType}
+import org.apache.spark.sql.types.{ArrayType, MapType, StringType, StructType}
 import org.scalatest.matchers.should._
 
 import org.apache.griffin.measure.execution.Measure._
@@ -52,10 +52,10 @@ trait MeasureTest extends SparkSuiteBase with Matchers {
 
     recordDfSchema = sourceSchema.add(Status, "string", nullable = false)
     metricDfSchema = new StructType()
-      .add(MeasureName, "string", nullable = false)
-      .add(MeasureType, "string", nullable = false)
-      .add(DataSource, "string", nullable = false)
-      .add(Metrics, MapType(StringType, StringType), nullable = false)
+      .add(
+        Metrics,
+        ArrayType(MapType(StringType, StringType), containsNull = false),
+        nullable = false)
 
     source = spark
       .createDataset(

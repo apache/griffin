@@ -158,12 +158,9 @@ case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasurePar
     val detailCols =
       aggregateDf.columns
         .filter(_.startsWith(DetailsPrefix))
-        .flatMap(c => Seq(lit(c.stripPrefix(DetailsPrefix)), col(c)))
+        .flatMap(c => Seq(map(lit(c.stripPrefix(DetailsPrefix)), col(c))))
 
-    val metricDf = aggregateDf
-      .withColumn(ColumnDetails, map(detailCols: _*))
-      .select(Total, ColumnDetails)
-      .select(map(lit(ColumnDetails), col(ColumnDetails)).as(valueColumn))
+    val metricDf = aggregateDf.select(array(detailCols: _*).as(valueColumn))
 
     (sparkSession.emptyDataFrame, metricDf)
   }

@@ -21,7 +21,7 @@ import java.util.Date
 import java.util.concurrent.Executors
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future}
-import scala.util.{Failure, Success}
+import scala.util._
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -29,6 +29,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.configuration.enums.{MeasureTypes, OutputType}
+import org.apache.griffin.measure.configuration.enums.FlattenType.DefaultFlattenType
 import org.apache.griffin.measure.context.{ContextId, DQContext}
 import org.apache.griffin.measure.execution.impl._
 import org.apache.griffin.measure.step.write.{MetricFlushStep, MetricWriteStep, RecordWriteStep}
@@ -171,10 +172,10 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
           val measure = createMeasure(measureParam)
           val (recordsDf, metricsDf) = measure.execute(batchId)
 
-          persistRecords(currentContext, measure, recordsDf)
           persistMetrics(currentContext, measure, metricsDf)
+          persistRecords(currentContext, measure, recordsDf)
 
-          MetricFlushStep().execute(currentContext)
+          MetricFlushStep(Some(measureParam)).execute(currentContext)
         })
       }).toMap
 
@@ -185,6 +186,8 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
         case Failure(e) =>
           error(s"Error executing measure with name '${task._1}' $batchDetailsOpt", e)
       })
+
+    Thread.sleep(1000)
 
     while (!tasks.forall(_._2.isCompleted)) {
       info(
@@ -210,6 +213,7 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
       case MeasureTypes.Profiling => ProfilingMeasure(sparkSession, measureParam)
       case MeasureTypes.Accuracy => AccuracyMeasure(sparkSession, measureParam)
       case MeasureTypes.SparkSQL => SparkSQLMeasure(sparkSession, measureParam)
+      case MeasureTypes.SchemaConformance => SchemaConformanceMeasure(sparkSession, measureParam)
       case _ =>
         val errorMsg = s"Measure type '${measureParam.getType}' is not supported."
         val exception = new NotImplementedError(errorMsg)
@@ -249,11 +253,11 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
     val measureParam: MeasureParam = measure.measureParam
 
     measureParam.getOutputOpt(OutputType.MetricOutputType) match {
-      case Some(o) =>
+      case Some(_) =>
         if (measure.supportsMetricWrite) {
-          metricsDf.createOrReplaceTempView("metricsDf")
-          MetricWriteStep(measureParam.getName, "metricsDf", o.getFlatten)
-            .execute(context)
+          val metricDfName = s"${measureParam.getName}_metricsDf"
+          metricsDf.createOrReplaceTempView(metricDfName)
+          MetricWriteStep(measureParam.getName, metricDfName, DefaultFlattenType).execute(context)
         } else warn(s"Measure with name '${measureParam.getName}' doesn't support metric write")
       case None =>
     }

@@ -23,6 +23,9 @@ import scala.collection.mutable.ListBuffer
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
+import org.apache.griffin.measure.configuration.enums.MeasureTypes
+import org.apache.griffin.measure.execution.Measure._
+
 /**
  * A dummy batch sink for testing.
  *
@@ -50,11 +53,21 @@ case class CustomSink(config: Map[String, Any], jobName: String, timeStamp: Long
   val allMetrics: mutable.Map[String, Any] = mutable.Map[String, Any]()
 
   override def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    val (metricName: String, value: Map[String, Any]) = metrics("value")
-      .asInstanceOf[Map[String, Any]]
-      .head
+    val measureName = metrics(MeasureName).toString
+    val measureType =
+      MeasureTypes.withNameWithDefault(metrics.getOrElse(MeasureType, "unknown").toString)
 
-    CustomSinkResultRegister.setMetrics(metricName, value)
+    val value = metrics(Metrics)
+      .asInstanceOf[Seq[Map[String, Any]]]
+      .map(x => {
+        if (measureType == MeasureTypes.Profiling)
+          x.head
+        else
+          x(MetricName).toString -> x(MetricValue)
+      })
+      .toMap
+
+    CustomSinkResultRegister.setMetrics(measureName, value)
 
     allMetrics ++= metrics
   }
@@ -70,7 +83,7 @@ case class CustomSink(config: Map[String, Any], jobName: String, timeStamp: Long
  */
 object CustomSinkResultRegister {
 
-  private val _metricsSink: mutable.Map[String, Map[String, Any]] = mutable.HashMap.empty
+  val _metricsSink: mutable.Map[String, Map[String, Any]] = mutable.HashMap.empty
   private val _batchSink: mutable.Map[String, Array[String]] = mutable.HashMap.empty
 
   def setMetrics(key: String, metrics: Map[String, Any]): Unit = {

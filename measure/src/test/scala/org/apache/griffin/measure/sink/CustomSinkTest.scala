@@ -21,10 +21,11 @@ import scala.collection.mutable
 
 import org.apache.spark.sql.functions._
 
-import org.apache.griffin.measure.configuration.dqdefinition.{RuleOutputParam, SinkParam}
-import org.apache.griffin.measure.configuration.enums.FlattenType.MapFlattenType
+import org.apache.griffin.measure.configuration.dqdefinition._
+import org.apache.griffin.measure.configuration.enums.FlattenType.DefaultFlattenType
+import org.apache.griffin.measure.configuration.enums.MeasureTypes
+import org.apache.griffin.measure.execution.Measure._
 import org.apache.griffin.measure.step.write.{MetricFlushStep, MetricWriteStep, RecordWriteStep}
-
 class CustomSinkTest extends SinkTestBase {
 
   val sinkParam: SinkParam =
@@ -46,7 +47,10 @@ class CustomSinkTest extends SinkTestBase {
     withCustomSink(sinks => {
       sinks.foreach { sink =>
         try {
-          sink.sinkMetrics(Map("value" -> Map(measureName -> Map("sum" -> 10))))
+          sink.sinkMetrics(
+            Map(
+              MeasureName -> measureName,
+              Metrics -> Seq(Map(MetricName -> "sum", MetricValue -> "10"))))
         } catch {
           case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
         }
@@ -54,7 +58,10 @@ class CustomSinkTest extends SinkTestBase {
 
       sinks.foreach { sink =>
         try {
-          sink.sinkMetrics(Map("value" -> Map(measureName -> Map("count" -> 5))))
+          sink.sinkMetrics(
+            Map(
+              MeasureName -> measureName,
+              Metrics -> Seq(Map(MetricName -> "count", MetricValue -> "5"))))
         } catch {
           case e: Throwable => error(s"sink metrics error: ${e.getMessage}", e)
         }
@@ -64,7 +71,7 @@ class CustomSinkTest extends SinkTestBase {
     val actualMetricsOpt = CustomSinkResultRegister.getMetrics(measureName)
     assert(actualMetricsOpt.isDefined)
 
-    val expected = Map("sum" -> 10, "count" -> 5)
+    val expected = Map("sum" -> "10", "count" -> "5")
     actualMetricsOpt.get should contain theSameElementsAs expected
   }
 
@@ -137,35 +144,35 @@ class CustomSinkTest extends SinkTestBase {
   "MetricWriteStep" should "output default metrics with custom sink" in {
     val resultTable = "result_table"
     val df = createDataFrame(1 to 5)
-    val metricCols = Seq("sex", "max_age", "avg_age").flatMap(c => Seq(lit(c), col(c)))
+
+    val metricCols =
+      Seq("sex", "max_age", "avg_age").map(c =>
+        map(lit(MetricName), lit(c), lit(MetricValue), col(c)))
 
     val metricDf = df
       .groupBy("sex")
       .agg(max("age").as("max_age"), avg("age").as("avg_age"))
-      .select(map(metricCols: _*).as("metrics"))
-      .withColumn("mark", lit(1))
-      .groupBy("mark")
-      .agg(collect_list("metrics") as "metrics")
+      .select(array(metricCols: _*).as("metrics"))
       .select("metrics")
 
     metricDf.createOrReplaceTempView(resultTable)
 
     val dQContext = getDqContext()
 
-    val metricWriteStep = {
-      val metricOpt = Some(metricsMapOutput)
-      val mwName = metricOpt.flatMap(_.getNameOpt).getOrElse("default_metrics_name")
-      val flattenType = metricOpt.map(_.getFlatten).getOrElse(MapFlattenType)
+    val metricWriteStep = MetricWriteStep("metrics", resultTable, DefaultFlattenType)
 
-      MetricWriteStep(mwName, resultTable, flattenType)
-    }
+    val mp = MeasureParam(
+      metricWriteStep.name,
+      MeasureTypes.Profiling.toString,
+      metricWriteStep.inputName)
 
     metricWriteStep.execute(dQContext)
-    MetricFlushStep().execute(dQContext)
+    MetricFlushStep(Some(mp)).execute(dQContext)
 
     val expectedMetrics = Array(
-      Map("sex" -> "women", "max_age" -> "20", "avg_age" -> "18.0"),
-      Map("sex" -> "man", "max_age" -> "19", "avg_age" -> "18.0"))
+      Map("metric_name" -> "sex", "metric_value" -> "man"),
+      Map("metric_name" -> "max_age", "metric_value" -> "19"),
+      Map("metric_name" -> "avg_age", "metric_value" -> "18.0"))
 
     val actualMetricsOpt = CustomSinkResultRegister.getMetrics(metricWriteStep.name)
     assert(actualMetricsOpt.isDefined)

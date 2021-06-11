@@ -63,7 +63,7 @@
       "config": {
         "approx.distinct.count": true,
         "round.scale": 2,
-        "dataset.sample": 0.45
+        "dataset.sample": 1.0
       },
       "out": [
         {
@@ -96,6 +96,7 @@
       "type": "duplication",
       "data.source": "crime_report_source",
       "config": {
+        "expr": "incident",
         "bad.record.definition": "duplicate"
       },
       "out": [

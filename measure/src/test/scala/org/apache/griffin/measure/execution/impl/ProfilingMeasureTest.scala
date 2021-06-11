@@ -74,17 +74,8 @@ class ProfilingMeasureTest extends MeasureTest {
 
     assertResult(1L)(metricsDf.count())
 
-    val row = metricsDf.head()
-    assertResult(param.getDataSource)(row.getAs[String](DataSource))
-    assertResult(param.getName)(row.getAs[String](MeasureName))
-    assertResult(param.getType.toString)(row.getAs[String](MeasureType))
-
-    val metricMap = row.getAs[Map[String, Any]](Metrics)
-    assert(metricMap.contains(ColumnDetails))
-    assert(metricMap(ColumnDetails).isInstanceOf[Map[String, Any]])
-
-    val columnDetailsMap = metricMap(ColumnDetails).asInstanceOf[Map[String, Any]]
-    assert(columnDetailsMap.size == sourceSchema.size)
+    val metricMap = metricsDf.head().getAs[Seq[Map[String, String]]](Metrics)
+    assert(metricMap.size == sourceSchema.size)
   }
 
   it should "profile only selected columns if expression is provided" in {
@@ -99,17 +90,8 @@ class ProfilingMeasureTest extends MeasureTest {
 
     assertResult(1L)(metricsDf.count())
 
-    val row = metricsDf.head()
-    assertResult(param.getDataSource)(row.getAs[String](DataSource))
-    assertResult(param.getName)(row.getAs[String](MeasureName))
-    assertResult(param.getType.toString)(row.getAs[String](MeasureType))
-
-    val metricMap = row.getAs[Map[String, Any]](Metrics)
-    assert(metricMap.contains(ColumnDetails))
-    assert(metricMap(ColumnDetails).isInstanceOf[Map[String, Any]])
-
-    val columnDetailsMap = metricMap(ColumnDetails).asInstanceOf[Map[String, Any]]
-    assert(columnDetailsMap.size == 2)
+    val metricMap = metricsDf.head().getAs[Seq[Map[String, String]]](Metrics)
+    assert(metricMap.size == 2)
   }
 
   it should "throw runtime error for invalid expr" in {

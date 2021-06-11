@@ -20,6 +20,7 @@ package org.apache.griffin.measure.sink
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
+import org.apache.griffin.measure.execution.Measure
 import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
@@ -42,6 +43,8 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
   val NumberOfRows: String = "numRows"
   val numRows: Int = config.getInt(NumberOfRows, 20)
 
+  val Unknown: String = "UNKNOWN"
+
   def validate(): Boolean = true
 
   override def open(applicationId: String): Unit = {
@@ -59,11 +62,14 @@ case class ConsoleSink(config: Map[String, Any], jobName: String, timeStamp: Lon
   override def sinkRecords(records: Iterable[String], name: String): Unit = {}
 
   override def sinkMetrics(metrics: Map[String, Any]): Unit = {
-    griffinLogger.info(s"$jobName [$timeStamp] metrics:\n${JsonUtil.toJson(metrics)}")
+    val measureName = metrics.getOrElse(Measure.MeasureName, Unknown)
+    griffinLogger.info(
+      s"Metrics for measure with name '$measureName':\n${JsonUtil.toJson(metrics)}")
   }
 
   override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {
     dataset.show(numRows, truncateRecords)
+    griffinLogger.info(s"Records written for measure with name '${key.getOrElse(Unknown)}'.")
   }
 
 }

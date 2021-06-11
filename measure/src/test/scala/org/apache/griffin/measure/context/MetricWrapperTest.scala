@@ -24,7 +24,7 @@ class MetricWrapperTest extends AnyFlatSpec with Matchers {
 
   "metric wrapper" should "flush empty if no metric inserted" in {
     val metricWrapper = MetricWrapper("name", "appId")
-    metricWrapper.flush should be(Map[Long, Map[String, Any]]())
+    metricWrapper.flush() should be(Map[Long, Map[String, Any]]())
   }
 
   it should "flush all metrics inserted" in {
@@ -33,18 +33,18 @@ class MetricWrapperTest extends AnyFlatSpec with Matchers {
     metricWrapper.insertMetric(1, Map("match" -> 8))
     metricWrapper.insertMetric(2, Map("total" -> 20))
     metricWrapper.insertMetric(2, Map("miss" -> 4))
-    metricWrapper.flush should be(
+    metricWrapper.flush() should be(
       Map(
         1L -> Map(
-          "name" -> "test",
+          "job_name" -> "test",
           "tmst" -> 1,
-          "value" -> Map("total" -> 10, "miss" -> 2, "match" -> 8),
-          "metadata" -> Map("applicationId" -> "appId")),
+          "metrics" -> Map("total" -> 10, "miss" -> 2, "match" -> 8),
+          "applicationId" -> "appId"),
         2L -> Map(
-          "name" -> "test",
+          "job_name" -> "test",
           "tmst" -> 2,
-          "value" -> Map("total" -> 20, "miss" -> 4),
-          "metadata" -> Map("applicationId" -> "appId"))))
+          "metrics" -> Map("total" -> 20, "miss" -> 4),
+          "applicationId" -> "appId")))
   }
 
 }

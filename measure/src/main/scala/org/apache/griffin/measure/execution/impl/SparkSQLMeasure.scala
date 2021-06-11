@@ -21,7 +21,7 @@ import io.netty.util.internal.StringUtil
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{expr => sparkExpr, _}
-import org.apache.spark.sql.types.BooleanType
+import org.apache.spark.sql.types.{BooleanType, StringType}
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
@@ -95,8 +95,9 @@ case class SparkSQLMeasure(sparkSession: SparkSession, measureParam: MeasurePara
       s"Invalid condition provided as $BadRecordDefinition. Does not yield a boolean result.")
 
     val selectCols =
-      Seq(Total, Complete, InComplete).flatMap(e => Seq(lit(e), col(e).cast("string")))
-    val metricColumn: Column = map(selectCols: _*).as(valueColumn)
+      Seq(Total, Complete, InComplete).map(e =>
+        map(lit(MetricName), lit(e), lit(MetricValue), col(e).cast(StringType)))
+    val metricColumn: Column = array(selectCols: _*).as(valueColumn)
 
     val badRecordsDf = df.withColumn(valueColumn, when(col(valueColumn), 1).otherwise(0))
     val metricDf = badRecordsDf

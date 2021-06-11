@@ -20,6 +20,7 @@ package org.apache.griffin.measure.execution.impl
 import io.netty.util.internal.StringUtil
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.StringType
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
@@ -69,8 +70,6 @@ case class CompletenessMeasure(sparkSession: SparkSession, measureParam: Measure
   validate()
 
   /**
-   * Completeness Measure.
-   *
    * Completeness evaluates the user provided `expr` for each row of the input dataset.
    * Each row that fails this expression is tagged as incomplete record(s), all other record(s) are complete.
    *
@@ -85,8 +84,9 @@ case class CompletenessMeasure(sparkSession: SparkSession, measureParam: Measure
     val exprStr = exprOpt.get
 
     val selectCols =
-      Seq(Total, Complete, InComplete).flatMap(e => Seq(lit(e), col(e).cast("string")))
-    val metricColumn: Column = map(selectCols: _*).as(valueColumn)
+      Seq(Total, Complete, InComplete).map(e =>
+        map(lit(MetricName), lit(e), lit(MetricValue), col(e).cast(StringType)))
+    val metricColumn: Column = array(selectCols: _*).as(valueColumn)
 
     val input = sparkSession.read.table(measureParam.getDataSource)
     val badRecordsDf = input.withColumn(valueColumn, when(expr(exprStr), 1).otherwise(0))

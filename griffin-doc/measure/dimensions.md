@@ -101,6 +101,17 @@ by other measures. These SparkSQL queries may contain clauses like `select`, `fr
 
 A detailed measure configuration guide is available [here](measure-configuration-guide/sparksql.md).
 
+## Schema Conformance
+
+Schema Conformance ensures that the attributes of a given dataset follow a set of standard definitions in terms of data
+type. Most binary file formats (orc, avro, etc.) and tabular sources (Hive, RDBMS, etc.) already impose type constraints
+on the data they represent. However, text based formats like csv, json, xml, etc. do not retain schema information. Such
+formats must be explicitly validated for attribute type conformance.
+
+For example, date of birth of customer should be a date, age should be an integer.
+
+A detailed measure configuration guide is available [here](measure-configuration-guide/schema_conformance.md).
+
 ## Profiling
 
 Data processing and its analysis can't truly be complete without data profiling - reviewing source data for content and

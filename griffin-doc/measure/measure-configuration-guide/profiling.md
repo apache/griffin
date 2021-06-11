@@ -68,7 +68,8 @@ The Profiling measure can be configured as below,
       "config": {
         "expr": "city,zipcode",
         "approx.distinct.count": true,
-        "round.scale": 2
+        "round.scale": 2,
+        "dataset.sample": 1.0
       },
       "out": [
         {
@@ -89,7 +90,7 @@ The Profiling measure can be configured as below,
 | Name    | Type     | Description                            | Supported Values                                          |
 |:--------|:---------|:---------------------------------------|:----------------------------------------------------------|
 | name    | `String` | User-defined name of this measure      | -                                                         |
-| type    | `String` | Type of Measure                        | completeness, duplication, profiling, accuracy, sparksql  |
+| type    | `String` | Type of Measure                        | completeness, duplication, profiling, accuracy, sparksql, schemaConformance  |
 | data.source | `String` | Name of data source on which this measure is applied  | -                                      |
 | config  | `Object` | Configuration params of the measure    | Depends on measure type ([see below](#example-config-object))                       |
 | out     | `List  ` | Define output(s) of measure execution  | [See below](#outputs)                                               |
@@ -148,8 +149,7 @@ To write Profiling metrics, configure the measure with output section as below,
   "out": [
     {
       "name": "prof_metric",
-      "type": "metric",
-      "flatten": "map"
+      "type": "metric"
     }
   ]
 
@@ -161,51 +161,48 @@ This will generate the metrics like below,
 
 ```json
 {
-  ...
-
-  "value": {
-    "profiling_measure": {
-      "measure_name": "profiling_measure",
-      "measure_type": "Profiling",
-      "data_source": "crime_report_source",
-      "metrics": {
-        "column_details": {
-          "city": {
-            "avg_col_len": null,
-            "max_col_len": "25",
-            "variance": null,
-            "kurtosis": null,
-            "avg": null,
-            "min": null,
-            "null_count": "0",
-            "approx_distinct_count": "6",
-            "total": "4617",
-            "std_dev": null,
-            "data_type": "string",
-            "max": null,
-            "min_col_len": "2"
-          },
-          "zipcode": {
-            "avg_col_len": "5.0",
-            "max_col_len": "5",
-            "variance": "4.57",
-            "kurtosis": "-1.57",
-            "avg": "94303.11",
-            "min": "94301",
-            "null_count": "158",
-            "approx_distinct_count": "4",
-            "total": "4617",
-            "std_dev": "2.14",
-            "data_type": "int",
-            "max": "94306",
-            "min_col_len": "5"
-          }
-        }
+  "applicationId": "local-1623451540444",
+  "job_name": "Batch-All-Measures-Example",
+  "tmst": 1623451547985,
+  "measure_name": "profiling_measure",
+  "metrics": [
+    {
+      "city": {
+        "avg_col_len": null,
+        "max_col_len": "25",
+        "variance": null,
+        "kurtosis": null,
+        "avg": null,
+        "min": null,
+        "null_count": "0",
+        "approx_distinct_count": "6",
+        "total": "4617",
+        "std_dev": null,
+        "data_type": "string",
+        "max": null,
+        "min_col_len": "2"
+      }
+    },
+    {
+      "zipcode": {
+        "avg_col_len": "5.0",
+        "max_col_len": "5",
+        "variance": "4.57",
+        "kurtosis": "-1.57",
+        "avg": "94303.11",
+        "min": "94301",
+        "null_count": "158",
+        "approx_distinct_count": "4",
+        "total": "4617",
+        "std_dev": "2.14",
+        "data_type": "int",
+        "max": "94306",
+        "min_col_len": "5"
       }
     }
-  }
-
-  ...
+  ],
+  "measure_type": "Profiling",
+  "data_source": "crime_report_source"
 }
 ```
 
