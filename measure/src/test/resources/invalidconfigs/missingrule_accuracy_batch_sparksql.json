@@ -1,8 +1,6 @@
 {
   "name": "accu_batch",
-
   "process.type": "batch",
-
   "data.sources": [
     {
       "name": "source",
@@ -16,7 +14,8 @@
           }
         }
       ]
-    }, {
+    },
+    {
       "name": "target",
       "connectors": [
         {

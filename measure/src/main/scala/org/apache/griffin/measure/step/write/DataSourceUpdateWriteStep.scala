@@ -17,9 +17,10 @@
 
 package org.apache.griffin.measure.step.write
 
+import scala.util.Try
+
 import org.apache.commons.lang.StringUtils
 import org.apache.spark.sql.DataFrame
-import scala.util.Try
 
 import org.apache.griffin.measure.context.DQContext
 

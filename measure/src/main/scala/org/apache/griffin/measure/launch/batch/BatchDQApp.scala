@@ -19,7 +19,7 @@ package org.apache.griffin.measure.launch.batch
 
 import java.util.concurrent.TimeUnit
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -85,15 +85,8 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
           if (dqParam.getMeasures != null && dqParam.getMeasures.nonEmpty) {
             Try {
-              val t = Try(MeasureExecutor(dqContext).execute(dqParam.getMeasures))
-
-              t match {
-                case Success(_) =>
-                case Failure(exception) =>
-                  error("Exception", exception)
-              }
-
-              t.isSuccess
+              MeasureExecutor(dqContext).execute(dqParam.getMeasures)
+              true
             }
           } else {
             // build job

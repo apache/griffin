@@ -18,7 +18,6 @@
 package org.apache.griffin.measure.utils
 
 import scala.reflect.ClassTag
-import scala.util.Try
 
 object ParamUtil {
 

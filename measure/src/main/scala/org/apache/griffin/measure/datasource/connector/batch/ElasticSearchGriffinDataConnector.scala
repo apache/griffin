@@ -19,13 +19,13 @@ package org.apache.griffin.measure.datasource.connector.batch
 
 import java.io.{BufferedReader, ByteArrayInputStream, InputStreamReader}
 import java.net.URI
-import java.util
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import java.util
 import org.apache.http.client.methods.{CloseableHttpResponse, HttpGet, HttpPost, HttpRequestBase}
 import org.apache.http.entity.{ContentType, StringEntity}
 import org.apache.http.impl.client.{BasicResponseHandler, HttpClientBuilder}
@@ -67,7 +67,7 @@ case class ElasticSearchGriffinDataConnector(
   val port: String = config.getString(Port, "")
   val fields: Seq[String] = config.getStringArr(Fields, Seq[String]())
   val sql: String = config.getString(Sql, "")
-  val sqlMode: Boolean = config.getBoolean(SqlMode, false)
+  val sqlMode: Boolean = config.getBoolean(SqlMode, defValue = false)
   val size: Int = config.getInt(Size, 100)
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = {
@@ -84,7 +84,7 @@ case class ElasticSearchGriffinDataConnector(
           import sparkSession.implicits._
           val rdd: RDD[String] = sparkSession.sparkContext.parallelize(answer._2.lines.toList)
           val reader: DataFrameReader = sparkSession.read
-          reader.option("header", true).option("inferSchema", true)
+          reader.option("header", value = true).option("inferSchema", value = true)
           val df: DataFrame = reader.csv(rdd.toDS())
           val dfOpt = Some(df)
           val preDfOpt = preProcess(dfOpt, ms)

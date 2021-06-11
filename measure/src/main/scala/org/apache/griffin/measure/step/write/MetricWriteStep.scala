@@ -28,7 +28,6 @@ import org.apache.griffin.measure.configuration.enums.FlattenType.{
 }
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.builder.ConstantColumns
-import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**

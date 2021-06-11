@@ -18,8 +18,7 @@
 package org.apache.griffin.measure.step.transform
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
@@ -82,8 +81,8 @@ trait TransformStep extends DQStep {
       case Success(_) =>
         info(threadName + " end transform step : \n" + debugString())
         doExecute(context)
-      case Failure(_) =>
-        error("Parent transform step failed!")
+      case Failure(e) =>
+        error("Parent transform step failed: \n" + debugString(), e)
         parentsResult
     }
   }

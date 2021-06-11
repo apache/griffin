@@ -17,8 +17,9 @@
 
 package org.apache.griffin.measure.step.read
 
-import org.apache.spark.sql._
 import scala.util.Try
+
+import org.apache.spark.sql._
 
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.DQStep

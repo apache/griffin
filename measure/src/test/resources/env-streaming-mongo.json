@@ -17,7 +17,6 @@
       "spark.hadoop.fs.hdfs.impl.disable.cache": true
     }
   },
-
   "sinks": [
     {
       "name": "consoleSink",
@@ -35,7 +34,6 @@
       }
     }
   ],
-
   "griffin.checkpoint": [
     {
       "type": "zk",

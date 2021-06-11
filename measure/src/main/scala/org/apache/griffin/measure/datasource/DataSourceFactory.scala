@@ -67,11 +67,14 @@ object DataSourceFactory extends Loggable {
           streamingCacheClientOpt) match {
           case Success(connector) => Some(connector)
           case Failure(exception) =>
+            error("Error initializing data source with name '$name'.", exception)
             throw exception
         }
 
         Some(DataSource(name, dataSourceParam, dataConnectors, streamingCacheClientOpt))
-      case None => None
+      case None =>
+        error(s"Connector for data source with name '$name' is invalid.")
+        throw new IllegalStateException()
     }
   }
 
