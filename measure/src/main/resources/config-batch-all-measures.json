@@ -15,8 +15,8 @@
         },
         "pre.proc": [
           "select split(value, ',') as part from this",
-          "select part[0] as date_time, part[1] as incident, part[2] as address, part[3] as city, part[4] as zipcode from this",
-          "select cast(date_time as timestamp) as date_time, incident, address, city, cast(zipcode as int) as zipcode from this"
+          "select part[0] as date_time, part[1] as incident, part[2] as address, part[3] as city, part[4] as zipcode_str from this",
+          "select cast(date_time as timestamp) as date_time, incident, address, city, zipcode_str, cast(zipcode_str as int) as zipcode from this"
         ]
       }
     },
@@ -48,8 +48,7 @@
       "out": [
         {
           "type": "metric",
-          "name": "comp_metric",
-          "flatten": "map"
+          "name": "comp_metric"
         },
         {
           "type": "record",
@@ -69,8 +68,7 @@
       "out": [
         {
           "type": "metric",
-          "name": "prof_metric",
-          "flatten": "map"
+          "name": "prof_metric"
         }
       ]
     },
@@ -85,8 +83,7 @@
       "out": [
         {
           "type": "metric",
-          "name": "spark_sql_metric",
-          "flatten": "map"
+          "name": "spark_sql_metric"
         },
         {
           "type": "record",
@@ -104,8 +101,7 @@
       "out": [
         {
           "type": "metric",
-          "name": "duplication_metric",
-          "flatten": "map"
+          "name": "duplication_metric"
         },
         {
           "type": "record",
@@ -129,12 +125,34 @@
       "out": [
         {
           "type": "metric",
-          "name": "accuracy_metric",
-          "flatten": "map"
+          "name": "accuracy_metric"
         },
         {
           "type": "record",
           "name": "accuracy_records"
+        }
+      ]
+    },
+    {
+      "name": "schema_conformance_measure",
+      "type": "schemaConformance",
+      "data.source": "crime_report_source",
+      "config": {
+        "expr": [
+          {
+            "source.col": "zipcode_str",
+            "type": "int"
+          }
+        ]
+      },
+      "out": [
+        {
+          "type": "metric",
+          "name": "schema_conformance_metric"
+        },
+        {
+          "type": "record",
+          "name": "schema_conformance_records"
         }
       ]
     }
