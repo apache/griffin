@@ -94,13 +94,7 @@ case class SchemaConformanceMeasure(sparkSession: SparkSession, measureParam: Me
     val givenExprs = exprOpt.get.map(toSchemaConformanceExpr).distinct
 
     val incompleteExpr = givenExprs
-      .map(
-        e =>
-          when(
-            col(e.sourceCol).isNull or
-              col(e.sourceCol).cast(e.dataType).isNull,
-            true)
-            .otherwise(false))
+      .map(e => when(col(e.sourceCol).cast(e.dataType).isNull, true).otherwise(false))
       .reduce(_ or _)
 
     val selectCols =
