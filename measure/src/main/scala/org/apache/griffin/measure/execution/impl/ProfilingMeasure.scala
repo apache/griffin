@@ -81,6 +81,16 @@ case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasurePar
   val roundScale: Int = getFromConfig[java.lang.Integer](RoundScaleStr, 3)
 
   /**
+   * The value of this key determines what percentage of data is to be profiled. The decimal value
+   * belongs to range [0.0, 1.0], where 0.0 means the whole dataset will be skipped, 1.0 means the whole
+   * dataset will be profiled. An intermediate value, say 0.5 will approximately take random 50% of
+   * the dataset rows (without replacement) and perform profiling on it.
+   *
+   * This option can be used when the dataset to be profiled is large, and an approximate profile is needed.
+   */
+  val dataSetSample: Double = getFromConfig[java.lang.Double](DataSetSampleStr, 1.0)
+
+  /**
    * Several resultant metrics of profiling measure are floating-point numbers. This key controls to extent
    * to which these floating-point numbers are rounded. For example, if `round.scale = 2` then all
    * floating-point metric values will be rounded to 2 decimal places.
@@ -109,7 +119,8 @@ case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasurePar
    *  @return tuple of records dataframe and metric dataframe
    */
   override def impl(): (DataFrame, DataFrame) = {
-    val input = sparkSession.read.table(measureParam.getDataSource)
+    info(s"Selecting random ${dataSetSample * 100}% of the rows for profiling.")
+    val input = sparkSession.read.table(measureParam.getDataSource).sample(dataSetSample)
     val profilingColNames = exprOpt
       .getOrElse(input.columns.mkString(","))
       .split(",")
@@ -167,6 +178,7 @@ object ProfilingMeasure {
   /**
    * Options Keys
    */
+  final val DataSetSampleStr: String = "dataset.sample"
   final val RoundScaleStr: String = "round.scale"
   final val ApproxDistinctCountStr: String = "approx.distinct.count"
 

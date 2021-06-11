@@ -63,7 +63,8 @@
       "data.source": "crime_report_source",
       "config": {
         "approx.distinct.count": true,
-        "round.scale": 2
+        "round.scale": 2,
+        "dataset.sample": 0.45
       },
       "out": [
         {

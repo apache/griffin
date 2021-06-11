@@ -103,12 +103,18 @@ The Profiling measure can be configured as below,
   data set will be profiled.
 
 - `approx.distinct.count`: The value for this key is boolean. If this is `true`, the distinct counts will be
-  approximated to allow up to 5% error. Approximate counts are usually faster by are less accurate. If this is set
+  approximated to allow up to 5% error. Approximate counts are usually faster but are less accurate. If this is set
   to `false`, then the counts will be 100% accurate.
 
 - `round.scale`: Several resultant metrics of profiling measure are floating-point numbers. This key controls to extent
   to which these floating-point numbers are rounded. For example, if `round.scale = 2` then all floating-point metric
   values will be rounded to 2 decimal places.
+
+- `dataset.sample`: The value of this key determines what percentage of data is to be profiled. The decimal value
+  belongs to range [0.0, 1.0], where 0.0 means the whole dataset will be skipped, 1.0 means the whole dataset will be
+  profiled. An intermediate value, say 0.5 will approximately take random 50% of the dataset rows (without replacement)
+  and perform profiling on it. This option can be used when the dataset to be profiled is large, and an approximate
+  profile is needed.
 
 ### Outputs
 
