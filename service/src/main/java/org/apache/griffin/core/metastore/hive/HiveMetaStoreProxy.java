@@ -69,11 +69,11 @@ public class HiveMetaStoreProxy {
     private String keytabUser;
 
     @Value("${hive.need.kerberos}")
-    private Boolean needKerberos;
+    private String needKerberos;
 
     @PostConstruct
     public void init() throws IOException {
-        if (needKerberos && hiveKrb5confPath != null) {
+        if ( needKerberos != null && "true".equalsIgnoreCase(needKerberos) && hiveKrb5confPath != null) {
             System.setProperty("java.security.krb5.conf", hiveKrb5confPath);
             UserGroupInformation.loginUserFromKeytab(keytabUser, keytabPath);
         }else {
