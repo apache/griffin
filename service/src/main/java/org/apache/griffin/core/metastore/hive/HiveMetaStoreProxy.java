@@ -59,8 +59,8 @@ public class HiveMetaStoreProxy {
 
     private IMetaStoreClient client = null;
 
-    @Value("${hive.krb5conf.path}")
-    private String hiveKrb5confPath;
+    @Value("${krb5conf.path}")
+    private String krb5confPath;
 
     @Value("${hive.keytab.path}")
     private String keytabPath;
@@ -73,8 +73,8 @@ public class HiveMetaStoreProxy {
 
     @PostConstruct
     public void init() throws IOException {
-        if ( needKerberos != null && "true".equalsIgnoreCase(needKerberos) && hiveKrb5confPath != null) {
-            System.setProperty("java.security.krb5.conf", hiveKrb5confPath);
+        if ( needKerberos != null && "true".equalsIgnoreCase(needKerberos) && krb5confPath != null) {
+            System.setProperty("java.security.krb5.conf", krb5confPath);
             UserGroupInformation.loginUserFromKeytab(keytabUser, keytabPath);
         }else {
             LOGGER.warn("Property:java.security.krb5.conf is not set! please check out your configuration");
