@@ -19,13 +19,13 @@ package org.apache.griffin.measure.datasource.connector.batch
 
 import java.io.{BufferedReader, ByteArrayInputStream, InputStreamReader}
 import java.net.URI
+import java.util.{Iterator => JavaIterator, Map => JavaMap}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import java.util
 import org.apache.http.client.methods.{CloseableHttpResponse, HttpGet, HttpPost, HttpRequestBase}
 import org.apache.http.entity.{ContentType, StringEntity}
 import org.apache.http.impl.client.{BasicResponseHandler, HttpClientBuilder}
@@ -109,16 +109,16 @@ case class ElasticSearchGriffinDataConnector(
         val data = ArrayBuffer[Map[String, Number]]()
 
         if (answer._1) {
-          val arrayAnswers: util.Iterator[JsonNode] =
+          val arrayAnswers: JavaIterator[JsonNode] =
             parseString(answer._2).get("hits").get("hits").elements()
 
           while (arrayAnswers.hasNext) {
             val answer = arrayAnswers.next()
             val values = answer.get("_source").get("value")
-            val fields: util.Iterator[util.Map.Entry[String, JsonNode]] = values.fields()
+            val fields: JavaIterator[JavaMap.Entry[String, JsonNode]] = values.fields()
             val fieldsMap = mutable.Map[String, Number]()
             while (fields.hasNext) {
-              val fld: util.Map.Entry[String, JsonNode] = fields.next()
+              val fld: JavaMap.Entry[String, JsonNode] = fields.next()
               fieldsMap.put(fld.getKey, fld.getValue.numberValue())
             }
             data += fieldsMap.toMap
