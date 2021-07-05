@@ -19,7 +19,7 @@ package org.apache.griffin.measure.datasource.connector.batch
 
 import java.io.{BufferedReader, ByteArrayInputStream, InputStreamReader}
 import java.net.URI
-import java.util
+import java.util.{Iterator => JavaIterator, Map => JavaMap}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -67,7 +67,7 @@ case class ElasticSearchGriffinDataConnector(
   val port: String = config.getString(Port, "")
   val fields: Seq[String] = config.getStringArr(Fields, Seq[String]())
   val sql: String = config.getString(Sql, "")
-  val sqlMode: Boolean = config.getBoolean(SqlMode, false)
+  val sqlMode: Boolean = config.getBoolean(SqlMode, defValue = false)
   val size: Int = config.getInt(Size, 100)
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = {
@@ -84,7 +84,7 @@ case class ElasticSearchGriffinDataConnector(
           import sparkSession.implicits._
           val rdd: RDD[String] = sparkSession.sparkContext.parallelize(answer._2.lines.toList)
           val reader: DataFrameReader = sparkSession.read
-          reader.option("header", true).option("inferSchema", true)
+          reader.option("header", value = true).option("inferSchema", value = true)
           val df: DataFrame = reader.csv(rdd.toDS())
           val dfOpt = Some(df)
           val preDfOpt = preProcess(dfOpt, ms)
@@ -109,16 +109,16 @@ case class ElasticSearchGriffinDataConnector(
         val data = ArrayBuffer[Map[String, Number]]()
 
         if (answer._1) {
-          val arrayAnswers: util.Iterator[JsonNode] =
+          val arrayAnswers: JavaIterator[JsonNode] =
             parseString(answer._2).get("hits").get("hits").elements()
 
           while (arrayAnswers.hasNext) {
             val answer = arrayAnswers.next()
             val values = answer.get("_source").get("value")
-            val fields: util.Iterator[util.Map.Entry[String, JsonNode]] = values.fields()
+            val fields: JavaIterator[JavaMap.Entry[String, JsonNode]] = values.fields()
             val fieldsMap = mutable.Map[String, Number]()
             while (fields.hasNext) {
-              val fld: util.Map.Entry[String, JsonNode] = fields.next()
+              val fld: JavaMap.Entry[String, JsonNode] = fields.next()
               fieldsMap.put(fld.getKey, fld.getValue.numberValue())
             }
             data += fieldsMap.toMap

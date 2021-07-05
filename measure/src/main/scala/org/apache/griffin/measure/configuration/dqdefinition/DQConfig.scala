@@ -17,8 +17,11 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition
 
+import scala.util.Try
+
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import io.netty.util.internal.StringUtil
 import org.apache.commons.lang.StringUtils
 
 import org.apache.griffin.measure.configuration.enums._
@@ -47,6 +50,7 @@ case class DQConfig(
     @JsonProperty("process.type") private val procType: String,
     @JsonProperty("data.sources") private val dataSources: List[DataSourceParam],
     @JsonProperty("evaluate.rule") private val evaluateRule: EvaluateRuleParam,
+    @JsonProperty("measures") private val measures: Seq[MeasureParam],
     @JsonProperty("sinks") private val sinks: List[String] = Nil)
     extends Param {
   def getName: String = name
@@ -63,6 +67,7 @@ case class DQConfig(
       ._1
   }
   def getEvaluateRule: EvaluateRuleParam = evaluateRule
+  def getMeasures: Seq[MeasureParam] = measures
   def getSinkNames: Seq[String] = sinks
   def getValidSinkTypes: Seq[SinkType] = SinkType.validSinkTypes(sinks)
 
@@ -70,9 +75,82 @@ case class DQConfig(
     assert(StringUtils.isNotBlank(name), "dq config name should not be blank")
     assert(StringUtils.isNotBlank(procType), "process.type should not be blank")
     assert(dataSources != null, "data.sources should not be null")
-    assert(evaluateRule != null, "evaluate.rule should not be null")
     getDataSources.foreach(_.validate())
-    evaluateRule.validate()
+
+    if (measures != null && measures.nonEmpty) {
+      measures.foreach(_.validate())
+
+      val repeatedMeasures = measures
+        .map(_.getName)
+        .groupBy(x => x)
+        .mapValues(_.size)
+        .filter(_._2 > 1)
+        .keys
+
+      assert(
+        repeatedMeasures.isEmpty,
+        s"Measure names must be unique. " +
+          s"Duplicate Measures names ['${repeatedMeasures.mkString("', '")}'] were found.")
+
+      val invalidMeasureSources = measures
+        .map(_.getDataSource)
+        .map(dataSource => (dataSource, getDataSources.exists(_.getName.matches(dataSource))))
+        .filterNot(_._2)
+        .map(_._1)
+
+      assert(
+        invalidMeasureSources.isEmpty,
+        s"Measure source(s) undefined." +
+          s" Unknown source(s) ['${invalidMeasureSources.mkString("', '")}'] were found.")
+    } else if (evaluateRule != null) {
+      evaluateRule.validate()
+    } else {
+      assert(
+        assertion = false,
+        "Either 'measure' or 'evaluate.rule' must be defined in the Application Config.")
+    }
+  }
+}
+
+trait ConfigParam extends Param {
+  @JsonProperty("name")
+  private val name: String = StringUtils.EMPTY
+
+  @JsonProperty("type")
+  private val configType: String = StringUtils.EMPTY
+
+  @JsonProperty("config")
+  private val config: Map[String, Any] = Map.empty
+
+  def getName: String = name
+  def getType: String = configType
+  def getConfig: Map[String, Any] = config
+}
+
+case class MeasureParam(
+    @JsonProperty("name") private val name: String,
+    @JsonProperty("type") private val measureType: String,
+    @JsonProperty("data.source") private val dataSource: String,
+    @JsonProperty("config") private val config: Map[String, Any] = Map.empty,
+    @JsonProperty("out") private val outputs: List[RuleOutputParam] = Nil)
+    extends Param {
+
+  def getName: String = name
+
+  def getType: MeasureTypes.MeasureType = MeasureTypes.withNameWithDefault(measureType)
+
+  def getConfig: Map[String, Any] = config
+
+  def getDataSource: String = dataSource
+
+  def getOutputs: Seq[RuleOutputParam] = if (outputs != null) outputs else Nil
+
+  def getOutputOpt(tp: OutputType): Option[RuleOutputParam] =
+    getOutputs.find(_.getOutputType == tp)
+
+  override def validate(): Unit = {
+    assert(!StringUtil.isNullOrEmpty(dataSource), "data.source should not be empty or null")
+    assert(!getType.equals(MeasureTypes.Unknown), s"Unknown measure type '$measureType' provided")
   }
 }
 
@@ -114,17 +192,17 @@ case class DataConnectorParam(
     @JsonProperty("type") private val conType: String,
     @JsonProperty("dataframe.name") private val dataFrameName: String,
     @JsonProperty("config") private val config: Map[String, Any],
-    @JsonProperty("pre.proc") private val preProc: List[RuleParam])
+    @JsonProperty("pre.proc") private val preProc: List[String])
     extends Param {
   def getType: String = conType
   def getDataFrameName(defName: String): String =
     if (dataFrameName != null) dataFrameName else defName
   def getConfig: Map[String, Any] = if (config != null) config else Map[String, Any]()
-  def getPreProcRules: Seq[RuleParam] = if (preProc != null) preProc else Nil
+  def getPreProcRules: Seq[String] = if (preProc != null) preProc else Nil
 
   def validate(): Unit = {
     assert(StringUtils.isNotBlank(conType), "data connector type should not be empty")
-    getPreProcRules.foreach(_.validate())
+    getPreProcRules.forall(rule => !StringUtil.isNullOrEmpty(rule))
   }
 }
 
@@ -183,27 +261,9 @@ case class RuleParam(
 
   def getErrorConfs: Seq[RuleErrorConfParam] = if (errorConfs != null) errorConfs else Nil
 
-  def replaceInDfName(newName: String): RuleParam = {
-    if (StringUtils.equals(newName, inDfName)) this
-    else RuleParam(dslType, dqType, newName, outDfName, rule, details, cache, outputs)
-  }
-  def replaceOutDfName(newName: String): RuleParam = {
-    if (StringUtils.equals(newName, outDfName)) this
-    else RuleParam(dslType, dqType, inDfName, newName, rule, details, cache, outputs)
-  }
-  def replaceInOutDfName(in: String, out: String): RuleParam = {
-    if (StringUtils.equals(inDfName, in) && StringUtils.equals(outDfName, out)) this
-    else RuleParam(dslType, dqType, in, out, rule, details, cache, outputs)
-  }
-  def replaceRule(newRule: String): RuleParam = {
-    if (StringUtils.equals(newRule, rule)) this
-    else RuleParam(dslType, dqType, inDfName, outDfName, newRule, details, cache, outputs)
-  }
-
   def validate(): Unit = {
-    assert(
-      !(getDslType.equals(GriffinDsl) && getDqType.equals(Unknown)),
-      "unknown dq type for griffin dsl")
+    assert(!StringUtil.isNullOrEmpty(dqType), "DQ type cannot be null.")
+    assert(Try(getDqType).isSuccess, s"Undefined measure type '$dqType' encountered.")
 
     getOutputs.foreach(_.validate())
     getErrorConfs.foreach(_.validate())

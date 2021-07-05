@@ -17,28 +17,21 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.scalatest._
 import scala.util.{Failure, Success}
 
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
+
 import org.apache.griffin.measure.configuration.dqdefinition.DQConfig
-import org.apache.griffin.measure.configuration.enums.DslType.GriffinDsl
-import org.scalatest._
-import flatspec.AnyFlatSpec
-import matchers.should._
+import org.apache.griffin.measure.configuration.enums.MeasureTypes
+
 class ParamFileReaderSpec extends AnyFlatSpec with Matchers {
 
   "params " should "be parsed from a valid file" in {
     val reader: ParamReader =
       ParamFileReader(getClass.getResource("/_accuracy-batch-griffindsl.json").getFile)
     val params = reader.readConfig[DQConfig]
-    params match {
-      case Success(v) =>
-        v.getEvaluateRule.getRules.head.getDslType should ===(GriffinDsl)
-        v.getEvaluateRule.getRules.head.getOutDfName() should ===("accu")
-      case Failure(_) =>
-        fail("it should not happen")
-    }
-
+    assert(params.isSuccess)
   }
 
   it should "fail for an invalid file" in {
@@ -69,16 +62,10 @@ class ParamFileReaderSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "be parsed from a valid errorconf completeness json file" in {
-    val reader: ParamReader = ParamFileReader(
-      getClass.getResource("/_completeness_errorconf-batch-griffindsl.json").getFile)
+    val reader: ParamReader =
+      ParamFileReader(getClass.getResource("/_completeness-batch-griffindsl.json").getFile)
     val params = reader.readConfig[DQConfig]
-    params match {
-      case Success(v) =>
-        v.getEvaluateRule.getRules.head.getErrorConfs.length should ===(2)
-        v.getEvaluateRule.getRules.head.getErrorConfs.head.getColumnName.get should ===("user")
-        v.getEvaluateRule.getRules.head.getErrorConfs(1).getColumnName.get should ===("name")
-      case Failure(_) =>
-        fail("it should not happen")
-    }
+    assert(params.isSuccess)
+    assert(params.get.getMeasures.forall(_.getType == MeasureTypes.Completeness))
   }
 }

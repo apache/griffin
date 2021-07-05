@@ -28,6 +28,7 @@ import org.apache.griffin.measure.configuration.dqdefinition._
 import org.apache.griffin.measure.configuration.enums.ProcessType.BatchProcessType
 import org.apache.griffin.measure.context._
 import org.apache.griffin.measure.datasource.DataSourceFactory
+import org.apache.griffin.measure.execution.MeasureExecutor
 import org.apache.griffin.measure.job.builder.DQJobBuilder
 import org.apache.griffin.measure.launch.DQApp
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
@@ -61,29 +62,41 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
   }
 
   def run: Try[Boolean] = {
-    val result = CommonUtils.timeThis({
-      val measureTime = getMeasureTime
-      val contextId = ContextId(measureTime)
+    val result =
+      CommonUtils.timeThis(
+        {
+          val measureTime = getMeasureTime
+          val contextId = ContextId(measureTime)
 
-      // get data sources
-      val dataSources =
-        DataSourceFactory.getDataSources(sparkSession, null, dqParam.getDataSources)
-      dataSources.foreach(_.init())
+          // get data sources
+          val dataSources =
+            DataSourceFactory.getDataSources(sparkSession, null, dqParam.getDataSources)
+          dataSources.foreach(_.init())
 
-      // create dq context
-      dqContext =
-        DQContext(contextId, metricName, dataSources, sinkParams, BatchProcessType)(sparkSession)
+          // create dq context
+          dqContext = DQContext(contextId, metricName, dataSources, sinkParams, BatchProcessType)(
+            sparkSession)
 
-      // start id
-      val applicationId = sparkSession.sparkContext.applicationId
-      dqContext.getSinks.foreach(_.open(applicationId))
+          dqContext.loadDataSources()
 
-      // build job
-      val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
+          // start id
+          val applicationId = sparkSession.sparkContext.applicationId
+          dqContext.getSinks.foreach(_.open(applicationId))
 
-      // dq job execute
-      dqJob.execute(dqContext)
-    }, TimeUnit.MILLISECONDS)
+          if (dqParam.getMeasures != null && dqParam.getMeasures.nonEmpty) {
+            Try {
+              MeasureExecutor(dqContext).execute(dqParam.getMeasures)
+              true
+            }
+          } else {
+            // build job
+            val dqJob = DQJobBuilder.buildDQJob(dqContext, dqParam.getEvaluateRule)
+
+            // dq job execute
+            dqJob.execute(dqContext)
+          }
+        },
+        TimeUnit.MILLISECONDS)
 
     // clean context
     dqContext.clean()

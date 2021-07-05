@@ -17,16 +17,10 @@
 
 package org.apache.griffin.measure.configuration.dqdefinition.reader
 
-import org.scalatest._
-import flatspec.AnyFlatSpec
-import matchers.should._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
-import org.apache.griffin.measure.configuration.dqdefinition.{
-  DQConfig,
-  EvaluateRuleParam,
-  RuleOutputParam,
-  RuleParam
-}
+import org.apache.griffin.measure.configuration.dqdefinition._
 
 class ParamEnumReaderSpec extends AnyFlatSpec with Matchers {
   import org.apache.griffin.measure.configuration.enums.DslType._
@@ -50,18 +44,6 @@ class ParamEnumReaderSpec extends AnyFlatSpec with Matchers {
       ruleParam.getDslType should ===(GriffinDsl)
     }
 
-    val validDslDfOpsValues =
-      Seq("df-ops", "dfops", "DFOPS", "df-opr", "dfopr", "df-operations", "dfoperations")
-    validDslDfOpsValues foreach { x =>
-      val ruleParam = RuleParam(x, "accuracy")
-      ruleParam.getDslType should ===(DataFrameOpsType)
-    }
-
-    val invalidDslDfOpsValues = Seq("df-oprts", "-")
-    invalidDslDfOpsValues foreach { x =>
-      val ruleParam = RuleParam(x, "accuracy")
-      ruleParam.getDslType should not be DataFrameOpsType
-    }
   }
 
   "griffindsl" should "be returned as default dsl type" in {
@@ -172,6 +154,7 @@ class ParamEnumReaderSpec extends AnyFlatSpec with Matchers {
       "",
       Nil,
       mock(classOf[EvaluateRuleParam]),
+      Nil,
       List(
         "Console",
         "Log",
@@ -184,12 +167,18 @@ class ParamEnumReaderSpec extends AnyFlatSpec with Matchers {
         "mongo",
         "hdfs"))
     dqConfig.getValidSinkTypes should be(Seq(Console, ElasticSearch, MongoDB, Hdfs))
-    dqConfig =
-      DQConfig("test", 1234, "", Nil, mock(classOf[EvaluateRuleParam]), List("Consol", "Logg"))
+    dqConfig = DQConfig(
+      "test",
+      1234,
+      "",
+      Nil,
+      mock(classOf[EvaluateRuleParam]),
+      Nil,
+      List("Consol", "Logg"))
     dqConfig.getValidSinkTypes should not be Seq(Console)
     dqConfig.getValidSinkTypes should be(Seq())
 
-    dqConfig = DQConfig("test", 1234, "", Nil, mock(classOf[EvaluateRuleParam]), List(""))
+    dqConfig = DQConfig("test", 1234, "", Nil, mock(classOf[EvaluateRuleParam]), Nil, List(""))
     dqConfig.getValidSinkTypes should be(Nil)
   }
 

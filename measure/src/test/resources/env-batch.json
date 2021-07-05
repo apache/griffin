@@ -12,6 +12,13 @@
       "config": {
         "max.log.lines": 10
       }
+    },
+    {
+      "name": "customSink",
+      "type": "custom",
+      "config": {
+        "class": "org.apache.griffin.measure.sink.CustomSink"
+      }
     }
   ],
   "griffin.checkpoint": []

@@ -23,13 +23,16 @@ import scala.collection.mutable.ListBuffer
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
+import org.apache.griffin.measure.configuration.enums.MeasureTypes
+import org.apache.griffin.measure.execution.Measure._
+
 /**
- * sink records and metrics in memory for test.
+ * A dummy batch sink for testing.
  *
  * @param config sink configurations
- * @param jobName
- * @param timeStamp
- * @param block
+ * @param jobName Griffin Job Name
+ * @param timeStamp timestamp for job
+ * @param block is blocking or not
  */
 case class CustomSink(config: Map[String, Any], jobName: String, timeStamp: Long, block: Boolean)
     extends Sink {
@@ -50,10 +53,56 @@ case class CustomSink(config: Map[String, Any], jobName: String, timeStamp: Long
   val allMetrics: mutable.Map[String, Any] = mutable.Map[String, Any]()
 
   override def sinkMetrics(metrics: Map[String, Any]): Unit = {
+    val measureName = metrics(MeasureName).toString
+    val measureType =
+      MeasureTypes.withNameWithDefault(metrics.getOrElse(MeasureType, "unknown").toString)
+
+    val value = metrics(Metrics)
+      .asInstanceOf[Seq[Map[String, Any]]]
+      .map(x => {
+        if (measureType == MeasureTypes.Profiling)
+          x.head
+        else
+          x(MetricName).toString -> x(MetricValue)
+      })
+      .toMap
+
+    CustomSinkResultRegister.setMetrics(measureName, value)
+
     allMetrics ++= metrics
   }
 
   override def sinkBatchRecords(dataset: DataFrame, key: Option[String] = None): Unit = {
+    CustomSinkResultRegister.setBatch(key.get, dataset.toJSON.collect())
     allRecords ++= dataset.toJSON.rdd.collect()
   }
+}
+
+/**
+ * Register for storing test sink results in memory
+ */
+object CustomSinkResultRegister {
+
+  val _metricsSink: mutable.Map[String, Map[String, Any]] = mutable.HashMap.empty
+  private val _batchSink: mutable.Map[String, Array[String]] = mutable.HashMap.empty
+
+  def setMetrics(key: String, metrics: Map[String, Any]): Unit = {
+    val updatedMetrics = _metricsSink.getOrElse(key, Map.empty) ++ metrics
+    _metricsSink.put(key, updatedMetrics)
+  }
+
+  def getMetrics(key: String): Option[Map[String, Any]] = _metricsSink.get(key)
+
+  def setBatch(key: String, batch: Array[String]): Unit = {
+    val updatedBatch = _batchSink.getOrElse(key, Array.empty) ++ batch
+    _batchSink.put(key, updatedBatch)
+  }
+
+  def getBatch(key: String): Option[Array[String]] = _batchSink.get(key)
+
+  def clear(): Unit = {
+    _metricsSink.clear()
+    _batchSink.clear()
+  }
+
 }

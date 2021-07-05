@@ -22,10 +22,11 @@ import java.io.File
 import org.apache.commons.io.FileUtils
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.internal.SQLConf
 import org.scalatest._
 import org.scalatest.flatspec.AnyFlatSpec
 
-trait SparkSuiteBase extends AnyFlatSpec with BeforeAndAfterAll {
+trait SparkSuiteBase extends AnyFlatSpec with BeforeAndAfterAll with BeforeAndAfterEach {
 
   @transient var spark: SparkSession = _
   @transient var sc: SparkContext = _
@@ -38,6 +39,9 @@ trait SparkSuiteBase extends AnyFlatSpec with BeforeAndAfterAll {
     spark = SparkSession.builder
       .master("local[4]")
       .appName("Griffin Job Suite")
+      .config(SQLConf.SHUFFLE_PARTITIONS.key, "4")
+      .config("spark.default.parallelism", "4")
+      .config("spark.sql.crossJoin.enabled", "true")
       .config(conf)
       .enableHiveSupport()
       .getOrCreate()

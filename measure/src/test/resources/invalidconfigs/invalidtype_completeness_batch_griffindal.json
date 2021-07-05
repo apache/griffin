@@ -26,11 +26,16 @@
         "out.dataframe.name": "prof",
         "dsl.type": "griffin-dsl",
         "dq.type": "completeness",
-        "error.confs":[
+        "error.confs": [
           {
             "column.name": "user",
             "type": "abc",
-            "values":["1", "2", "hive_none", ""]
+            "values": [
+              "1",
+              "2",
+              "hive_none",
+              ""
+            ]
           }
         ],
         "out": [

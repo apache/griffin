@@ -19,15 +19,17 @@ package org.apache.griffin.measure.context
 
 import scala.collection.mutable.{Map => MutableMap}
 
+import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
+import org.apache.griffin.measure.execution.Measure._
+
 /**
  * wrap metrics into one, each calculation produces one metric map
  */
 case class MetricWrapper(name: String, applicationId: String) extends Serializable {
 
-  val _Name = "name"
-  val _Timestamp = "tmst"
-  val _Value = "value"
-  val _Metadata = "metadata"
+  val JobName = "job_name"
+  val Timestamp = "tmst"
+  val ApplicationID = "applicationId"
 
   val metrics: MutableMap[Long, Map[String, Any]] = MutableMap()
 
@@ -39,17 +41,32 @@ case class MetricWrapper(name: String, applicationId: String) extends Serializab
     metrics += (timestamp -> newValue)
   }
 
-  def flush: Map[Long, Map[String, Any]] = {
+  def flush(measureParamOpt: Option[MeasureParam] = None): Map[Long, Map[String, Any]] = {
     metrics.toMap.map { pair =>
-      val (timestamp, value) = pair
-      (
-        timestamp,
-        Map[String, Any](
-          _Name -> name,
-          _Timestamp -> timestamp,
-          _Value -> value,
-          _Metadata -> Map("applicationId" -> applicationId)))
+      {
+        val (timestamp, value) = pair
+        val metrics = if (value.contains(Metrics)) value(Metrics) else value
+        val jobDetails =
+          Map(
+            JobName -> name,
+            Timestamp -> timestamp,
+            ApplicationID -> applicationId,
+            Metrics -> metrics)
+
+        val measureDetails = measureParamOpt
+          .map(
+            mp =>
+              Map(
+                MeasureName -> mp.getName,
+                MeasureType -> mp.getType.toString,
+                DataSource -> mp.getDataSource))
+          .getOrElse(Map.empty)
+
+        (timestamp, jobDetails ++ measureDetails)
+      }
     }
   }
+
+  def clear(): Unit = metrics.clear()
 
 }

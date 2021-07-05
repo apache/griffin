@@ -19,19 +19,20 @@ package org.apache.griffin.measure.step.write
 
 import scala.util.Try
 
+import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.context.DQContext
 
 /**
  * flush final metric map in context and write
  */
-case class MetricFlushStep() extends WriteStep {
+case class MetricFlushStep(measureParamOpt: Option[MeasureParam] = None) extends WriteStep {
 
   val name: String = ""
   val inputName: String = ""
   val writeTimestampOpt: Option[Long] = None
 
   def execute(context: DQContext): Try[Boolean] = Try {
-    context.metricWrapper.flush.foldLeft(true) { (ret, pair) =>
+    val res = context.metricWrapper.flush(measureParamOpt).foldLeft(true) { (ret, pair) =>
       val (t, metric) = pair
       val pr =
         try {
@@ -50,6 +51,9 @@ case class MetricFlushStep() extends WriteStep {
         }
       ret && pr
     }
+
+    context.metricWrapper.clear()
+    res
   }
 
 }

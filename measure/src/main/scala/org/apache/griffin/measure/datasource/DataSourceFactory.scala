@@ -17,7 +17,7 @@
 
 package org.apache.griffin.measure.datasource
 
-import scala.util.Success
+import scala.util._
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.StreamingContext
@@ -66,11 +66,15 @@ object DataSourceFactory extends Loggable {
           timestampStorage,
           streamingCacheClientOpt) match {
           case Success(connector) => Some(connector)
-          case _ => None
+          case Failure(exception) =>
+            error("Error initializing data source with name '$name'.", exception)
+            throw exception
         }
 
         Some(DataSource(name, dataSourceParam, dataConnectors, streamingCacheClientOpt))
-      case None => None
+      case None =>
+        error(s"Connector for data source with name '$name' is invalid.")
+        throw new IllegalStateException()
     }
   }
 

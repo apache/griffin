@@ -98,6 +98,7 @@ case class StreamingDQApp(allParam: GriffinConfig) extends DQApp {
     val globalContext: DQContext =
       DQContext(contextId, metricName, dataSources, sinkParams, StreamingProcessType)(
         sparkSession)
+    globalContext.loadDataSources()
 
     // start id
     val applicationId = sparkSession.sparkContext.applicationId

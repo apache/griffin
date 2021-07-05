@@ -17,13 +17,12 @@
 
 package org.apache.griffin.measure.job
 
-import org.apache.spark.sql.AnalysisException
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 import org.apache.griffin.measure.Application.readParamFile
 import org.apache.griffin.measure.configuration.dqdefinition.EnvConfig
-import org.apache.griffin.measure.launch.batch.BatchDQApp
+import org.apache.griffin.measure.sink.CustomSinkResultRegister
 import org.apache.griffin.measure.step.builder.udf.GriffinUDFAgent
 
 class BatchDQAppTest extends DQAppTest {
@@ -42,8 +41,6 @@ class BatchDQAppTest extends DQAppTest {
 
     Try {
       sparkParam.getConfig.foreach { case (k, v) => spark.conf.set(k, v) }
-      spark.conf.set("spark.app.name", "BatchDQApp Test")
-      spark.conf.set("spark.sql.crossJoin.enabled", "true")
 
       val logLevel = getGriffinLogLevel
       sc.setLogLevel(sparkParam.getLogLevel)
@@ -54,21 +51,34 @@ class BatchDQAppTest extends DQAppTest {
     }
   }
 
-  def runAndCheckResult(metrics: Map[String, Any]): Unit = {
-    dqApp.run match {
-      case Success(ret) => assert(ret)
-      case Failure(ex) =>
-        error(s"process run error: ${ex.getMessage}", ex)
-        throw ex
-    }
+  override def beforeEach(): Unit = {
+    super.beforeEach()
 
-    // check Result Metrics
-    val dqContext = dqApp.asInstanceOf[BatchDQApp].dqContext
-    val timestamp = dqContext.contextId.timestamp
-    val expectedMetrics =
-      Map(timestamp -> metrics)
+    dqApp = null
+    CustomSinkResultRegister.clear()
+  }
 
-    dqContext.metricWrapper.metrics should equal(expectedMetrics)
+  override def afterEach(): Unit = {
+    super.afterEach()
+
+    dqApp = null
+    CustomSinkResultRegister.clear()
+  }
+
+  // check Result Metrics
+  def runAndCheckResult(expectedMetrics: Map[String, Map[String, Any]]): Unit = {
+    val measureNames = dqApp.dqParam.getMeasures
+    assert(measureNames.nonEmpty)
+
+    measureNames.foreach(param => {
+      val actualMetricsOpt = CustomSinkResultRegister.getMetrics(param.getName)
+      assert(actualMetricsOpt.isDefined)
+
+      val actualMetricsMap = actualMetricsOpt.get
+
+      assert(expectedMetrics.contains(param.getName))
+      actualMetricsMap should contain theSameElementsAs expectedMetrics(param.getName)
+    })
   }
 
   def runAndCheckException[T <: AnyRef](implicit classTag: ClassTag[T]): Unit = {
@@ -81,79 +91,88 @@ class BatchDQAppTest extends DQAppTest {
   }
 
   "accuracy batch job" should "work" in {
-    dqApp = initApp("/_accuracy-batch-griffindsl.json")
-    val expectedMetrics = Map(
-      "total_count" -> 50,
-      "miss_count" -> 4,
-      "matched_count" -> 46,
-      "matchedFraction" -> 0.92)
+    dqApp = runApp("/_accuracy-batch-griffindsl.json")
+    val expectedMetrics = Map("total" -> "50", "accurate" -> "45", "inaccurate" -> "5")
 
-    runAndCheckResult(expectedMetrics)
+    runAndCheckResult(Map("accuracy_measure" -> expectedMetrics))
   }
 
   "completeness batch job" should "work" in {
-    dqApp = initApp("/_completeness-batch-griffindsl.json")
-    val expectedMetrics = Map("total" -> 50, "incomplete" -> 1, "complete" -> 49)
+    dqApp = runApp("/_completeness-batch-griffindsl.json")
+    val expectedMetrics = Map("total" -> "50", "incomplete" -> "1", "complete" -> "49")
 
-    runAndCheckResult(expectedMetrics)
+    runAndCheckResult(Map("completeness_measure" -> expectedMetrics))
   }
 
-  "distinctness batch job" should "work" in {
-    dqApp = initApp("/_distinctness-batch-griffindsl.json")
+  "duplication batch job" should "work" in {
+    dqApp = runApp("/_distinctness-batch-griffindsl.json")
+    val expectedMetrics =
+      Map(
+        "duplicate" -> "1",
+        "unique" -> "48",
+        "non_unique" -> "1",
+        "distinct" -> "49",
+        "total" -> "50")
+
+    runAndCheckResult(Map("duplication_measure" -> expectedMetrics))
+  }
+
+  "spark sql batch job" should "work" in {
+    dqApp = runApp("/_sparksql-batch-griffindsl.json")
 
     val expectedMetrics =
-      Map("total" -> 50, "distinct" -> 49, "dup" -> Seq(Map("dup" -> 1, "num" -> 1)))
+      Map(
+        "query_measure1" -> Map("total" -> "13", "complete" -> "13", "incomplete" -> "0"),
+        "query_measure2" -> Map("total" -> "1", "complete" -> "0", "incomplete" -> "1"))
 
     runAndCheckResult(expectedMetrics)
   }
 
   "profiling batch job" should "work" in {
-    dqApp = initApp("/_profiling-batch-griffindsl.json")
+    dqApp = runApp("/_profiling-batch-griffindsl.json")
+
     val expectedMetrics = Map(
-      "prof" -> Seq(
-        Map("user_id" -> 10004, "cnt" -> 1),
-        Map("user_id" -> 10011, "cnt" -> 1),
-        Map("user_id" -> 10010, "cnt" -> 1),
-        Map("user_id" -> 10002, "cnt" -> 1),
-        Map("user_id" -> 10006, "cnt" -> 1),
-        Map("user_id" -> 10001, "cnt" -> 1),
-        Map("user_id" -> 10005, "cnt" -> 1),
-        Map("user_id" -> 10008, "cnt" -> 1),
-        Map("user_id" -> 10013, "cnt" -> 1),
-        Map("user_id" -> 10003, "cnt" -> 1),
-        Map("user_id" -> 10007, "cnt" -> 1),
-        Map("user_id" -> 10012, "cnt" -> 1),
-        Map("user_id" -> 10009, "cnt" -> 1)),
-      "post_group" -> Seq(Map("post_code" -> "94022", "cnt" -> 13)))
+      "user_id" -> Map(
+        "avg_col_len" -> "5.0",
+        "max_col_len" -> "5",
+        "variance" -> "15.17",
+        "kurtosis" -> "-1.21",
+        "avg" -> "10007.0",
+        "min" -> "10001",
+        "null_count" -> "0",
+        "approx_distinct_count" -> "13",
+        "total" -> "13",
+        "std_dev" -> "3.89",
+        "data_type" -> "bigint",
+        "max" -> "10013",
+        "min_col_len" -> "5"),
+      "first_name" -> Map(
+        "avg_col_len" -> null,
+        "max_col_len" -> "6",
+        "variance" -> null,
+        "kurtosis" -> null,
+        "avg" -> null,
+        "min" -> null,
+        "null_count" -> "0",
+        "approx_distinct_count" -> "13",
+        "total" -> "13",
+        "std_dev" -> null,
+        "data_type" -> "string",
+        "max" -> null,
+        "min_col_len" -> "6"))
 
-    runAndCheckResult(expectedMetrics)
-  }
-
-  "timeliness batch job" should "work" in {
-    dqApp = initApp("/_timeliness-batch-griffindsl.json")
-    val expectedMetrics = Map(
-      "total" -> 10,
-      "avg" -> 276000,
-      "percentile_95" -> 660000,
-      "step" -> Seq(
-        Map("step" -> 0, "cnt" -> 6),
-        Map("step" -> 5, "cnt" -> 2),
-        Map("step" -> 3, "cnt" -> 1),
-        Map("step" -> 4, "cnt" -> 1)))
-
-    runAndCheckResult(expectedMetrics)
-  }
-
-  "uniqueness batch job" should "work" in {
-    dqApp = initApp("/_uniqueness-batch-griffindsl.json")
-    val expectedMetrics = Map("total" -> 50, "unique" -> 48)
-
-    runAndCheckResult(expectedMetrics)
+    runAndCheckResult(Map("profiling_measure" -> expectedMetrics))
   }
 
   "batch job" should "fail with exception caught due to invalid rules" in {
-    dqApp = initApp("/_profiling-batch-griffindsl_malformed.json")
+    assertThrows[org.apache.spark.sql.AnalysisException] {
+      runApp("/_profiling-batch-griffindsl_malformed.json")
+    }
+  }
 
-    runAndCheckException[AnalysisException]
+  "batch job" should "fail with exception when no measures or rules are defined" in {
+    assertThrows[AssertionError] {
+      runApp("/_no_measure_or_rules_malformed.json")
+    }
   }
 }

@@ -13,10 +13,7 @@
           "file.name": "src/test/resources/users_info_src.avro"
         },
         "pre.proc": [
-          {
-            "dsl.type": "spark-sql",
-            "rule": "select * from this_table where user_id < 10014"
-          }
+          "select * from this_table where user_id < 10014"
         ]
       }
     }
@@ -28,7 +25,7 @@
         "dq.type": "profiling",
         "out.dataframe.name": "prof",
         "rule": "abc",
-        "out":[
+        "out": [
           {
             "type": "metric",
             "name": "prof",
@@ -38,6 +35,7 @@
       }
     ]
   },
-
-  "sinks": ["CONSOLESink"]
+  "sinks": [
+    "CONSOLESink"
+  ]
 }

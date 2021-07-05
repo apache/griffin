@@ -78,7 +78,6 @@ object DQStepBuilder {
       funcNames: Seq[String]): Option[RuleParamStepBuilder] = {
     dslType match {
       case SparkSql => Some(SparkSqlDQStepBuilder())
-      case DataFrameOpsType => Some(DataFrameOpsDQStepBuilder())
       case GriffinDsl => Some(GriffinDslDQStepBuilder(dsNames, funcNames))
       case _ => None
     }

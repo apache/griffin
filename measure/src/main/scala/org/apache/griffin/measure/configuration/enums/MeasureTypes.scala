@@ -15,26 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.griffin.measure.step.builder
+package org.apache.griffin.measure.configuration.enums
 
-import org.apache.griffin.measure.configuration.dqdefinition.RuleParam
-import org.apache.griffin.measure.context.DQContext
-import org.apache.griffin.measure.step.DQStep
-import org.apache.griffin.measure.step.transform.DataFrameOpsTransformStep
+/**
+ * Types of Griffin measures.
+ * <li> - The completeness of data source based on user defined expressions</li>
+ */
+object MeasureTypes extends GriffinEnum {
 
-case class DataFrameOpsDQStepBuilder() extends RuleParamStepBuilder {
+  type MeasureType = Value
 
-  def buildSteps(context: DQContext, ruleParam: RuleParam): Seq[DQStep] = {
-    val name = getStepName(ruleParam.getOutDfName())
-    val inputDfName = getStepName(ruleParam.getInDfName())
-    val transformStep = DataFrameOpsTransformStep(
-      name,
-      inputDfName,
-      ruleParam.getRule,
-      ruleParam.getDetails,
-      None,
-      ruleParam.getCache)
-    transformStep +: buildDirectWriteSteps(ruleParam)
+  val Completeness, Duplication, Profiling, Accuracy, SparkSQL, SchemaConformance = Value
+
+  override def withNameWithDefault(name: String): MeasureType = {
+    super.withNameWithDefault(name)
   }
-
 }

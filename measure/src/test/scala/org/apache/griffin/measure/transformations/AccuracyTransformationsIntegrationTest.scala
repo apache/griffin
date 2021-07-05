@@ -87,6 +87,7 @@ class AccuracyTransformationsIntegrationTest
     val dqContext: DQContext = getDqContext(dataSourcesParam = List(
       DataSourceParam(name = "source", connector = dataConnectorParam(tableName = sourceName)),
       DataSourceParam(name = "target", connector = dataConnectorParam(tableName = targetName))))
+    dqContext.loadDataSources()
 
     val accuracyRule = RuleParam(
       dslType = "griffin-dsl",

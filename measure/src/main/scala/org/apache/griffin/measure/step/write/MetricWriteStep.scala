@@ -19,16 +19,9 @@ package org.apache.griffin.measure.step.write
 
 import scala.util.Try
 
-import org.apache.griffin.measure.configuration.enums.{SimpleMode, TimestampMode}
-import org.apache.griffin.measure.configuration.enums.FlattenType.{
-  ArrayFlattenType,
-  EntriesFlattenType,
-  FlattenType,
-  MapFlattenType
-}
+import org.apache.griffin.measure.configuration.enums.{FlattenType, SimpleMode, TimestampMode}
 import org.apache.griffin.measure.context.DQContext
 import org.apache.griffin.measure.step.builder.ConstantColumns
-import org.apache.griffin.measure.utils.JsonUtil
 import org.apache.griffin.measure.utils.ParamUtil._
 
 /**
@@ -37,7 +30,7 @@ import org.apache.griffin.measure.utils.ParamUtil._
 case class MetricWriteStep(
     name: String,
     inputName: String,
-    flattenType: FlattenType,
+    flattenType: FlattenType.FlattenType,
     writeTimestampOpt: Option[Long] = None)
     extends WriteStep {
 
@@ -86,7 +79,7 @@ case class MetricWriteStep(
       val pdf = context.sparkSession.table(s"`$inputName`")
       val rows = pdf.collect()
       val columns = pdf.columns
-      if (rows.size > 0) {
+      if (rows.length > 0) {
         rows.map(_.getValuesMap(columns))
       } else Nil
     } catch {
@@ -99,11 +92,11 @@ case class MetricWriteStep(
   private def flattenMetric(
       metrics: Seq[Map[String, Any]],
       name: String,
-      flattenType: FlattenType): Map[String, Any] = {
+      flattenType: FlattenType.FlattenType): Map[String, Any] = {
     flattenType match {
-      case EntriesFlattenType => metrics.headOption.getOrElse(emptyMap)
-      case ArrayFlattenType => Map[String, Any](name -> metrics)
-      case MapFlattenType =>
+      case FlattenType.EntriesFlattenType => metrics.headOption.getOrElse(emptyMap)
+      case FlattenType.ArrayFlattenType => Map[String, Any](name -> metrics)
+      case FlattenType.MapFlattenType =>
         val v = metrics.headOption.getOrElse(emptyMap)
         Map[String, Any](name -> v)
       case _ =>

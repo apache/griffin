@@ -19,7 +19,6 @@ package org.apache.griffin.measure.sink
 
 import scala.concurrent.Future
 
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 import org.apache.griffin.measure.utils.{HttpUtil, JsonUtil, TimeUtil}

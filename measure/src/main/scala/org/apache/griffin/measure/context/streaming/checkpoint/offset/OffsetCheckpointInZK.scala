@@ -17,14 +17,15 @@
 
 package org.apache.griffin.measure.context.streaming.checkpoint.offset
 
+import scala.collection.JavaConverters._
+import scala.util.matching.Regex
+
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.utils.ZKPaths
 import org.apache.zookeeper.CreateMode
-import scala.collection.JavaConverters._
-import scala.util.matching.Regex
 
 import org.apache.griffin.measure.context.streaming.checkpoint.lock.CheckpointLockInZK
 

@@ -28,7 +28,7 @@ import org.apache.griffin.measure.configuration.enums
 object DslType extends GriffinEnum {
   type DslType = Value
 
-  val SparkSql, DfOps, DfOpr, DfOperations, GriffinDsl, DataFrameOpsType = Value
+  val SparkSql, GriffinDsl = Value
 
   /**
    *
@@ -41,10 +41,6 @@ object DslType extends GriffinEnum {
       .getOrElse(GriffinDsl)
 
   override def withNameWithDefault(name: String): enums.DslType.Value = {
-    val dslType = withNameWithDslType(name)
-    dslType match {
-      case DfOps | DfOpr | DfOperations => DataFrameOpsType
-      case _ => dslType
-    }
+    withNameWithDslType(name)
   }
 }
