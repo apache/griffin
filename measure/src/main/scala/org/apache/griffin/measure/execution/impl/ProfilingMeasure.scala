@@ -17,8 +17,7 @@
 
 package org.apache.griffin.measure.execution.impl
 
-import java.util.Locale
-
+import io.netty.util.internal.StringUtil
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -26,7 +25,6 @@ import org.apache.spark.sql.types._
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
 import org.apache.griffin.measure.execution.Measure._
-import org.apache.griffin.measure.step.builder.ConstantColumns
 
 /**
  * Profiling measure.
@@ -71,12 +69,12 @@ case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasurePar
    * profiling measure is to be executed. `expr` is an optional key for Profiling measure,
    * i.e., if it is not defined, all columns in the data set will be profiled.
    */
-  val exprOpt: Option[String] = Option(getFromConfig[String](Expression, null))
+  val exprs: String = getFromConfig[String](Expression, null)
 
   /**
-   * The value for this key is boolean. If this is `true`, the distinct counts will be approximated
-   * to allow up to 5% error. Approximate counts are usually faster by are less accurate. If this is set
-   * to `false`, then the counts will be 100% accurate.
+   * Several resultant metrics of profiling measure are floating-point numbers. This key controls to extent
+   * to which these floating-point numbers are rounded. For example, if `round.scale = 2` then all
+   * floating-point metric values will be rounded to 2 decimal places.
    */
   val roundScale: Int = getFromConfig[java.lang.Integer](RoundScaleStr, 3)
 
@@ -91,12 +89,14 @@ case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasurePar
   val dataSetSample: Double = getFromConfig[java.lang.Double](DataSetSampleStr, 1.0)
 
   /**
-   * Several resultant metrics of profiling measure are floating-point numbers. This key controls to extent
-   * to which these floating-point numbers are rounded. For example, if `round.scale = 2` then all
-   * floating-point metric values will be rounded to 2 decimal places.
+   * The value for this key is boolean. If this is `true`, the distinct counts will be approximated
+   * to allow up to 5% error. Approximate counts are usually faster by are less accurate. If this is set
+   * to `false`, then the counts will be 100% accurate.
    */
   val approxDistinctCount: Boolean =
     getFromConfig[java.lang.Boolean](ApproxDistinctCountStr, true)
+
+  validate()
 
   /**
    * Various metrics are calculated for columns of the data set. If expr is correctly defined,
@@ -118,26 +118,17 @@ case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasurePar
    *
    *  @return tuple of records dataframe and metric dataframe
    */
-  override def impl(): (DataFrame, DataFrame) = {
+  override def impl(dataSource: DataFrame): (DataFrame, DataFrame) = {
     info(s"Selecting random ${dataSetSample * 100}% of the rows for profiling.")
-    val input = sparkSession.read.table(measureParam.getDataSource).sample(dataSetSample)
-    val profilingColNames = exprOpt
-      .getOrElse(input.columns.mkString(","))
-      .split(",")
-      .map(_.trim.toLowerCase(Locale.ROOT))
-      .toSet
+    val input = dataSource.sample(dataSetSample)
+    val profilingColNames = keyCols(input)
 
-    val profilingCols =
-      input.schema.fields.filter(f =>
-        profilingColNames.contains(f.name) && !f.name.equalsIgnoreCase(ConstantColumns.tmst))
-
-    assert(
-      profilingCols.nonEmpty,
-      s"Invalid columns [${profilingCols.map(_.name).mkString(", ")}] were provided for profiling.")
+    val profilingCols = input.schema.fields.filter(f => profilingColNames.contains(f.name))
 
     val profilingExprs = profilingCols.foldLeft(Array.empty[Column])((exprList, field) => {
       val colName = field.name
-      val profilingExprs = getProfilingExprs(field, roundScale, approxDistinctCount)
+      val profilingExprs =
+        getProfilingExprs(field, roundScale, approxDistinctCount, dataSetSample).map(nullToZero)
 
       exprList.:+(map(profilingExprs: _*).as(s"$DetailsPrefix$colName"))
     })
@@ -164,6 +155,24 @@ case class ProfilingMeasure(sparkSession: SparkSession, measureParam: MeasurePar
 
     (sparkSession.emptyDataFrame, metricDf)
   }
+
+  override def validate(): Unit = {
+    val input = sparkSession.read.table(measureParam.getDataSource)
+    val kc = keyCols(input)
+
+    assert(kc.nonEmpty, s"Columns defined in '$Expression' is empty.")
+    kc.foreach(c =>
+      assert(input.columns.contains(c), s"Provided column '$c' does not exist in the dataset."))
+
+    assert(
+      dataSetSample > 0.0d && dataSetSample <= 1.0d,
+      "Sample fraction of rows must be in range [0.0, 1.0].")
+  }
+
+  private def keyCols(input: DataFrame): Array[String] = {
+    if (StringUtil.isNullOrEmpty(exprs)) input.columns
+    else exprs.split(",").map(_.trim)
+  }.distinct
 
 }
 
@@ -227,7 +236,8 @@ object ProfilingMeasure {
   private def getProfilingExprs(
       field: StructField,
       roundScale: Int,
-      approxDistinctCount: Boolean): Seq[Column] = {
+      approxDistinctCount: Boolean,
+      dataSetSample: Double): Seq[Column] = {
     val colName = field.name
     val colType = field.dataType
 
@@ -243,12 +253,16 @@ object ProfilingMeasure {
         (lit(DistinctCount), countDistinct(column).as(DistinctCount))
       }
 
+    val distinctExpr = if (dataSetSample == 1) {
+      Seq(lit(distinctCountName), distinctCountExpr)
+    } else Nil
+
     Seq(
       Seq(lit(DataTypeStr), lit(colType.catalogString).as(DataTypeStr)),
       Seq(lit(Total), sum(lit(1)).as(Total)),
       Seq(lit(MinColLength), min(lengthColExpr).as(MinColLength)),
       Seq(lit(MaxColLength), max(lengthColExpr).as(MaxColLength)),
-      Seq(lit(AvgColLength), forNumericFn(colType, avg(lengthColExpr), AvgColLength)),
+      Seq(lit(AvgColLength), avg(lengthColExpr).as(AvgColLength)),
       Seq(lit(Min), forNumericFn(colType, min(column), Min)),
       Seq(lit(Max), forNumericFn(colType, max(column), Max)),
       Seq(lit(Avg), forNumericFn(colType, bround(avg(column), roundScale), Avg)),
@@ -257,7 +271,7 @@ object ProfilingMeasure {
         forNumericFn(colType, bround(stddev(column), roundScale), StdDeviation)),
       Seq(lit(Variance), forNumericFn(colType, bround(variance(column), roundScale), Variance)),
       Seq(lit(Kurtosis), forNumericFn(colType, bround(kurtosis(column), roundScale), Kurtosis)),
-      Seq(lit(distinctCountName), distinctCountExpr),
+      distinctExpr,
       Seq(lit(NullCount), sum(nullColExpr).as(NullCount))).flatten
   }
 }
