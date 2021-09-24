@@ -150,7 +150,6 @@ This will generate the metrics like below,
     }
   ],
   "measure_type": "SparkSQL",
-  "batch_id": -1,
   "data_source": "crime_report_source"
 }
 ```
