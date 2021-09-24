@@ -136,12 +136,35 @@ class AccuracyMeasureTest extends MeasureTest {
 
   it should "execute defined measure expr" in {
     val measure = AccuracyMeasure(spark, param)
-    val (recordsDf, metricsDf) = measure.execute(None)
+    val (recordsDf, metricsDf) = measure.execute(source)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
 
     assertResult(source.count())(recordsDf.count())
+    assertResult(1L)(metricsDf.count())
+
+    val metricMap = metricsDf
+      .head()
+      .getAs[Seq[Map[String, String]]](Metrics)
+      .map(x => x(MetricName) -> x(MetricValue))
+      .toMap
+
+    assertResult(metricMap(Total))("5")
+    assertResult(metricMap(AccurateStr))("2")
+    assertResult(metricMap(InAccurateStr))("3")
+  }
+
+  it should "support space in column name" in {
+    val newSource = source.withColumnRenamed("name", "first name")
+    newSource.createOrReplaceTempView("newSource")
+    val measure = AccuracyMeasure(spark, param)
+    val (recordsDf, metricsDf) = measure.execute(newSource)
+
+    assertResult(newSource.schema.add(Status, "string", nullable = false))(recordsDf.schema)
+    assertResult(metricDfSchema)(metricsDf.schema)
+
+    assertResult(newSource.count())(recordsDf.count())
     assertResult(1L)(metricsDf.count())
 
     val metricMap = metricsDf

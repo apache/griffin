@@ -23,6 +23,7 @@ import org.apache.spark.sql.catalyst.parser.ParseException
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure._
+import org.apache.griffin.measure.execution.impl.CompletenessMeasure._
 
 class CompletenessMeasureTest extends MeasureTest {
   var param: MeasureParam = _
@@ -61,8 +62,8 @@ class CompletenessMeasureTest extends MeasureTest {
   }
 
   it should "execute defined measure expr" in {
-    val measure = CompletenessMeasure(spark, param)
-    val (recordsDf, metricsDf) = measure.execute(None)
+    val measure = new CompletenessMeasure(spark, param)
+    val (recordsDf, metricsDf) = measure.execute(source)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
@@ -77,15 +78,15 @@ class CompletenessMeasureTest extends MeasureTest {
       .toMap
 
     assertResult(metricMap(Total))("5")
-    assertResult(metricMap(measure.Complete))("4")
-    assertResult(metricMap(measure.InComplete))("1")
+    assertResult(metricMap(Complete))("4")
+    assertResult(metricMap(InComplete))("1")
   }
 
   it should "supported complex measure expr" in {
-    val measure = CompletenessMeasure(
+    val measure = new CompletenessMeasure(
       spark,
-      param.copy(config = Map(Expression -> "name is null or gender is null")))
-    val (recordsDf, metricsDf) = measure.execute(None)
+      param.copy(config = Map(Expression -> "name is not null and gender is not null")))
+    val (recordsDf, metricsDf) = measure.execute(source)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
@@ -100,19 +101,19 @@ class CompletenessMeasureTest extends MeasureTest {
       .toMap
 
     assertResult(metricMap(Total))("5")
-    assertResult(metricMap(measure.Complete))("3")
-    assertResult(metricMap(measure.InComplete))("2")
+    assertResult(metricMap(Complete))("3")
+    assertResult(metricMap(InComplete))("2")
   }
 
   it should "throw runtime error for invalid expr" in {
     assertThrows[AnalysisException] {
-      CompletenessMeasure(spark, param.copy(config = Map(Expression -> "xyz is null")))
-        .execute()
+      new CompletenessMeasure(spark, param.copy(config = Map(Expression -> "xyz is null")))
+        .execute(source)
     }
 
     assertThrows[ParseException] {
-      CompletenessMeasure(spark, param.copy(config = Map(Expression -> "select 1")))
-        .execute()
+      new CompletenessMeasure(spark, param.copy(config = Map(Expression -> "select 1")))
+        .execute(source)
     }
   }
 

@@ -107,7 +107,7 @@ class DuplicationMeasureTest extends MeasureTest {
   it should "execute defined measure expr" in {
     val measure =
       DuplicationMeasure(spark, param.copy(config = Map(BadRecordDefinition -> "duplicate")))
-    val (recordsDf, metricsDf) = measure.execute(None)
+    val (recordsDf, metricsDf) = measure.execute(source)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
@@ -128,16 +128,46 @@ class DuplicationMeasureTest extends MeasureTest {
     assertResult(metricMap(Total))("5")
   }
 
-  it should "supported complex measure expr" in {
+  it should "support complex measure expr" in {
     val measure = DuplicationMeasure(
       spark,
       param.copy(config = Map(Expression -> "name", BadRecordDefinition -> "duplicate")))
-    val (recordsDf, metricsDf) = measure.execute(None)
+    val (recordsDf, metricsDf) = measure.execute(source)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
 
     assertResult(source.count())(recordsDf.count())
+    assertResult(1L)(metricsDf.count())
+
+    val metricMap = metricsDf
+      .head()
+      .getAs[Seq[Map[String, String]]](Metrics)
+      .map(x => x(MetricName) -> x(MetricValue))
+      .toMap
+
+    assertResult(metricMap(Duplicate))("1")
+    assertResult(metricMap(Unique))("2")
+    assertResult(metricMap(NonUnique))("1")
+    assertResult(metricMap(Distinct))("3")
+    assertResult(metricMap(Total))("5")
+  }
+
+  it should "support columns with space in their names" in {
+    val newSource = source.withColumnRenamed("name", "full name")
+    newSource.createOrReplaceTempView("newSource")
+    val measure = DuplicationMeasure(
+      spark,
+      param.copy(
+        dataSource = "newSource",
+        config = Map(Expression -> "full name", BadRecordDefinition -> "duplicate")))
+
+    val (recordsDf, metricsDf) = measure.execute(newSource)
+
+    assertResult(newSource.schema.add(Status, "string", nullable = false))(recordsDf.schema)
+    assertResult(metricDfSchema)(metricsDf.schema)
+
+    assertResult(newSource.count())(recordsDf.count())
     assertResult(1L)(metricsDf.count())
 
     val metricMap = metricsDf

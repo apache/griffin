@@ -70,7 +70,7 @@ class ProfilingMeasureTest extends MeasureTest {
     assertResult(3)(measure.roundScale)
     assertResult(true)(measure.approxDistinctCount)
 
-    val (_, metricsDf) = measure.execute(None)
+    val (_, metricsDf) = measure.execute(source)
 
     assertResult(1L)(metricsDf.count())
 
@@ -86,7 +86,7 @@ class ProfilingMeasureTest extends MeasureTest {
     assertResult(3)(measure.roundScale)
     assertResult(false)(measure.approxDistinctCount)
 
-    val (_, metricsDf) = measure.execute(None)
+    val (_, metricsDf) = measure.execute(source)
 
     assertResult(1L)(metricsDf.count())
 
@@ -97,7 +97,7 @@ class ProfilingMeasureTest extends MeasureTest {
   it should "throw runtime error for invalid expr" in {
     assertThrows[AssertionError] {
       ProfilingMeasure(spark, param.copy(config = Map(Expression -> "xyz")))
-        .execute()
+        .execute(source)
     }
   }
 
