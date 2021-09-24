@@ -49,7 +49,7 @@ under the License.
         <mysql.java.version>5.1.47</mysql.java.version>
         <mariadb.version>2.7.0</mariadb.version>
         <cassandra.connector.version>2.5.1</cassandra.connector.version>
-        <elasticsearch.version>6.4.1</elasticsearch.version>
+        <elasticsearch.version>7.14.0</elasticsearch.version>
         <scalaj.version>2.3.0</scalaj.version>
         <mongo.version>2.1.0</mongo.version>
         <curator.version>2.10.0</curator.version>
@@ -163,18 +163,6 @@ under the License.
             <groupId>com.datastax.spark</groupId>
             <artifactId>spark-cassandra-connector_${scala.binary.version}</artifactId>
             <version>${cassandra.connector.version}</version>
-        </dependency>
-
-        <!-- Spark Elasticsearch-->
-        <!-- TODO
-        Elasticsearch Spark has recently added support for scala 2.12 but it is not published in the Maven Central yet.
-        Thus, this dependency has been temporary un-banned in the enforcer plugin.
-        See https://github.com/elastic/elasticsearch-hadoop/pull/1589#issuecomment-776920189
-        -->
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch-spark-20_${scala211.binary.version}</artifactId>
-            <version>${elasticsearch.version}</version>
         </dependency>
 
         <!-- Miscellaneous-->
@@ -493,7 +481,6 @@ under the License.
                                         <bannedDependencies>
                                             <!-- TODO Temporary Fix: These will be removed in a future iteration. -->
                                             <includes>
-                                                <include>org.elasticsearch:elasticsearch-spark-20_2.11:*</include>
                                                 <include>org.apache.spark:spark-streaming-kafka-0-8_2.11:*</include>
                                                 <include>org.apache.kafka:kafka_2.11:*</include>
                                             </includes>
@@ -545,6 +532,14 @@ under the License.
                     <artifactId>spark-avro_${scala211.binary.version}</artifactId>
                     <version>4.0.0</version>
                 </dependency>
+
+                <!-- Spark Elasticsearch-->
+                <dependency>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch-spark-20_${scala211.binary.version}</artifactId>
+                    <version>${elasticsearch.version}</version>
+                    <scope>provided</scope>
+                </dependency>
             </dependencies>
         </profile>
 
@@ -562,6 +557,16 @@ under the License.
                 <spark.version>${spark.major.version}.2</spark.version>
                 <spark-streaming-kafka.version>2.4.7</spark-streaming-kafka.version>
             </properties>
+
+            <dependencies>
+                <!-- Spark Elasticsearch-->
+                <dependency>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch-spark-30_2.12</artifactId>
+                    <version>${elasticsearch.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
         </profile>
 
         <!-- Spark 2.4+ Avro -->
@@ -579,6 +584,14 @@ under the License.
                     <groupId>org.apache.spark</groupId>
                     <artifactId>spark-avro_${scala.binary.version}</artifactId>
                     <version>${spark.version}</version>
+                </dependency>
+
+                <!-- Spark Elasticsearch-->
+                <dependency>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch-spark-20_${scala.binary.version}</artifactId>
+                    <version>${elasticsearch.version}</version>
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
         </profile>
