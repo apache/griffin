@@ -192,7 +192,7 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
     while (!tasks.forall(_._2.isCompleted)) {
       info(
         s"Measures with name ${tasks.filterNot(_._2.isCompleted).keys.mkString("['", "', '", "']")} " +
-          s"are still executing.")
+          "are still executing.")
       Thread.sleep(1000)
     }
 

@@ -17,7 +17,7 @@
 
 package org.apache.griffin.measure.job
 
-import scala.util.{Failure, Success}
+import scala.util._
 
 import org.scalatest.matchers.should._
 
@@ -38,11 +38,9 @@ class DQAppTest extends SparkSuiteBase with Matchers with Loggable {
   var dqApp: DQApp = _
 
   def getConfigFilePath(fileName: String): String = {
-    try {
-      getClass.getResource(fileName).getFile
-    } catch {
-      case _: NullPointerException => throw new Exception(s"resource [$fileName] not found")
-      case ex: Throwable => throw ex
+    Try(getClass.getResource(fileName).getFile).toOption match {
+      case Some(n) => n
+      case None => throw new Exception(s"resource [$fileName] not found")
     }
   }
 
