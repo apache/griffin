@@ -159,7 +159,6 @@ This will generate the metrics like below,
     }
   ],
   "measure_type": "SchemaConformance",
-  "batch_id": -1,
   "data_source": "crime_report_source"
 }
 ```
