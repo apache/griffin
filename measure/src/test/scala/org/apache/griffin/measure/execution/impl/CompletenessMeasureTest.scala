@@ -30,7 +30,7 @@ class CompletenessMeasureTest extends MeasureTest {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    param = MeasureParam("param", "Completeness", "source", Map(Expression -> "name is null"))
+    param = MeasureParam("param", "Completeness", "source", Map(Expression -> "name is not null"))
   }
 
   "CompletenessMeasure" should "validate expression config" in {

@@ -31,9 +31,9 @@ The definition of Completeness and its scope itself may change from one user to 
 users to define SQL-like expressions which describe their definition of completeness. For a tabular data set with
 columns `name`, `email` and `age`, some examples of such completeness definitions are mentioned below,
 
-- `name is NULL`
-- `name is NULL and age is NULL`
-- `email NOT RLIKE '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$'`
+- `name is NOT NULL`
+- `name is NOT NULL and age is NOT NULL`
+- `email RLIKE '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$'`
 
 ### Configuration
 
@@ -49,7 +49,7 @@ The completeness measure can be configured as below,
       "type": "completeness",
       "data.source": "crime_report_source",
       "config": {
-        "expr": "zipcode is null OR city is null"
+        "expr": "zipcode is not null and city is not null"
       },
       "out": [
         {
@@ -84,8 +84,8 @@ The completeness measure can be configured as below,
 `config` object for completeness measure contains only one key `expr`. The value for `expr` is a SQL-like expression
 string which definition this completeness. For more complex definitions, expressions can be clubbed with `AND` and `OR`.
 
-_Note:_ This expression describes the bad or incomplete records. This means that for `"expr": "zipcode is NULL"` the
-records which contain `null` in zipcode column are considered as incomplete.
+_Note:_ This expression describes the good or complete records. This means that for `"expr": "zipcode is NOT NULL"` the
+records which contain `null` in zipcode column are incomplete.
 
 It can be defined as mentioned below,
 
@@ -94,7 +94,7 @@ It can be defined as mentioned below,
   ...
 
   "config": {
-    "expr": "zipcode is null OR city is null"
+    "expr": "zipcode is NOT null AND city is NOT null"
   }
 
   ...
@@ -136,7 +136,6 @@ This will generate the metrics like below,
 {
   "applicationId": "local-1623452412322",
   "job_name": "Batch-All-Measures-Example",
-  "tmst": 1623452423891,
   "measure_name": "completeness_measure",
   "metrics": [
     {
@@ -209,4 +208,4 @@ only showing top 20 rows
 A new column `__status` has been added to the original data set on which this measure was executed. The value of this
 column can be either `bad` or `good` which can be used to calculate the metrics/ separate data based on quality etc.
 
-_Note:_ This output is for `ConsoleSink`. 
+_Note:_ These outputs are for `ConsoleSink`. 

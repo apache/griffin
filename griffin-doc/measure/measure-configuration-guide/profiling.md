@@ -208,3 +208,5 @@ This will generate the metrics like below,
 
 _Note:_ Some mathematical metrics are bound to the type of attribute under consideration, for example standard deviation
 cannot be calculated for a column name of string type, thus, the value for these metrics are null for such columns.
+
+_Note:_ This output is for `ConsoleSink`. 

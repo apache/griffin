@@ -254,4 +254,4 @@ A new column `__status` has been added to the original data set on which this me
 column can be either `bad` or `good` which can be used to calculate the metrics/ separate data based on quality etc.
 These values for `__status` column are based on the value of user-defined key `bad.record.definition`.
 
-_Note:_ This output is for `ConsoleSink`. 
+_Note:_ These outputs are for `ConsoleSink`. 

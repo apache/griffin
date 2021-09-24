@@ -147,18 +147,18 @@ class BatchDQAppTest extends DQAppTest {
         "max" -> "10013",
         "min_col_len" -> "5"),
       "first_name" -> Map(
-        "avg_col_len" -> null,
+        "avg_col_len" -> "6.0",
         "max_col_len" -> "6",
-        "variance" -> null,
-        "kurtosis" -> null,
-        "avg" -> null,
-        "min" -> null,
+        "variance" -> "0",
+        "kurtosis" -> "0",
+        "avg" -> "0",
+        "min" -> "0",
         "null_count" -> "0",
         "approx_distinct_count" -> "13",
         "total" -> "13",
-        "std_dev" -> null,
+        "std_dev" -> "0",
         "data_type" -> "string",
-        "max" -> null,
+        "max" -> "0",
         "min_col_len" -> "6"))
 
     runAndCheckResult(Map("profiling_measure" -> expectedMetrics))
