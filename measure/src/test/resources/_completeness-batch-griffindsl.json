@@ -21,7 +21,7 @@
       "type": "completeness",
       "data.source": "source",
       "config": {
-        "expr": "email is null or post_code is null or first_name is null"
+        "expr": "email is not null and post_code is not null and first_name is not null"
       },
       "out": [
         {

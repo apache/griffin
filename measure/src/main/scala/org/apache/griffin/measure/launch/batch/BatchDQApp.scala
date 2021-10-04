@@ -17,8 +17,9 @@
 
 package org.apache.griffin.measure.launch.batch
 
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{Executors, TimeUnit}
 
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 import scala.util.Try
 
 import org.apache.spark.SparkConf
@@ -85,7 +86,18 @@ case class BatchDQApp(allParam: GriffinConfig) extends DQApp {
 
           if (dqParam.getMeasures != null && dqParam.getMeasures.nonEmpty) {
             Try {
-              MeasureExecutor(dqContext).execute(dqParam.getMeasures)
+              // Size of thread pool for parallel measure execution.
+              // Defaults to number of processors available to the spark driver JVM.
+              val numThreads: Int = sparkSession.sparkContext.getConf
+                .getInt(
+                  "spark.griffin.measure.parallelism",
+                  Runtime.getRuntime.availableProcessors())
+
+              // Service to handle threaded execution of tasks (measures).
+              val ec: ExecutionContextExecutorService =
+                ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(numThreads))
+
+              MeasureExecutor(dqContext, ec).execute(dqParam.getMeasures)
               true
             }
           } else {

@@ -18,13 +18,11 @@
 package org.apache.griffin.measure.execution
 
 import java.util.Date
-import java.util.concurrent.Executors
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future}
+import scala.concurrent.{ExecutionContextExecutorService, Future}
 import scala.util._
 
-import org.apache.commons.lang3.StringUtils
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 import org.apache.griffin.measure.Loggable
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
@@ -55,7 +53,8 @@ import org.apache.griffin.measure.step.write.{MetricFlushStep, MetricWriteStep, 
  *
  * @param context Instance of `DQContext`
  */
-case class MeasureExecutor(context: DQContext) extends Loggable {
+case class MeasureExecutor(context: DQContext, ec: ExecutionContextExecutorService)
+    extends Loggable {
 
   /**
    * SparkSession for this Griffin Application.
@@ -67,19 +66,6 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
    */
   private val cacheDataSources: Boolean = sparkSession.sparkContext.getConf
     .getBoolean("spark.griffin.measure.cacheDataSources", defaultValue = true)
-
-  /**
-   * Size of thread pool for parallel measure execution.
-   * Defaults to number of processors available to the spark driver JVM.
-   */
-  private val numThreads: Int = sparkSession.sparkContext.getConf
-    .getInt("spark.griffin.measure.parallelism", Runtime.getRuntime.availableProcessors())
-
-  /**
-   * Service to handle threaded execution of tasks (measures).
-   */
-  private implicit val ec: ExecutionContextExecutorService =
-    ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(numThreads))
 
   /**
    * Starting point of measure execution.
@@ -98,20 +84,18 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
         val dataSourceName = measuresForSource._1
         val measureParams = measuresForSource._2
 
-        withCacheIfNecessary(dataSourceName, {
-          val dataSource = sparkSession.read.table(dataSourceName)
+        val dataSource = sparkSession.read.table(dataSourceName)
 
-          if (dataSource.isStreaming) {
-            // TODO this is a no op as streaming queries need to be registered.
+        if (dataSource.isStreaming) {
+          // TODO this is a no op as streaming queries need to be registered.
 
-            dataSource.writeStream
-              .foreachBatch((_, batchId) => {
-                executeMeasures(measureParams, Some(batchId))
-              })
-          } else {
-            executeMeasures(measureParams)
-          }
-        })
+          dataSource.writeStream
+            .foreachBatch((batchDf: Dataset[Row], batchId: Long) => {
+              executeMeasures(batchDf, dataSourceName, measureParams, batchId)
+            })
+        } else {
+          executeMeasures(dataSource, dataSourceName, measureParams)
+        }
       })
   }
 
@@ -121,25 +105,31 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
    * After the function is complete, the data source is uncached.
    *
    * @param dataSourceName name of data source
+   * @param numMeasures number of measures for each data source
    * @param f function to perform
-   * @param measureCountByDataSource number of measures for each data source
    * @return
    */
-  private def withCacheIfNecessary(dataSourceName: String, f: => Unit)(
-      implicit measureCountByDataSource: Map[String, Int]): Unit = {
-    val numMeasures = measureCountByDataSource(dataSourceName)
+  private def withCacheIfNecessary(
+      dataSourceName: String,
+      numMeasures: Int,
+      dataSource: DataFrame,
+      f: => Unit): Unit = {
     var isCached = false
     if (cacheDataSources && numMeasures > 1) {
-      info(
-        s"Caching data source with name '$dataSourceName' as $numMeasures measures are applied on it.")
-      sparkSession.catalog.cacheTable(dataSourceName)
-      isCached = true
+      if (!dataSource.isStreaming) {
+        info(
+          s"Caching data source with name '$dataSourceName' as $numMeasures measures are applied on it.")
+        dataSource.persist()
+        isCached = true
+      }
     }
 
     f
 
     if (isCached) {
-      sparkSession.catalog.uncacheTable(dataSourceName)
+      info(
+        s"Un-Caching data source with name '$dataSourceName' as measure execution is complete for it.")
+      dataSource.unpersist(true)
     }
   }
 
@@ -155,49 +145,74 @@ case class MeasureExecutor(context: DQContext) extends Loggable {
    * @param batchId Option batch Id in case of streaming sources to identify micro batches.
    */
   private def executeMeasures(
+      input: DataFrame,
+      dataSourceName: String,
       measureParams: Seq[MeasureParam],
-      batchId: Option[Long] = None): Unit = {
-    val batchDetailsOpt = batchId.map(bId => s"for batch id $bId").getOrElse(StringUtils.EMPTY)
+      batchId: Long = -1L): Unit = {
+    val numMeasures: Int = measureParams.length
 
-    // define the tasks
-    val tasks: Map[String, Future[_]] = (for (i <- measureParams.indices)
-      yield {
-        val measureParam = measureParams(i)
-        val measureName = measureParam.getName
+    withCacheIfNecessary(
+      dataSourceName,
+      numMeasures,
+      input, {
+        import java.util.concurrent.TimeUnit
 
-        (measureName, Future {
-          val currentContext = context.cloneDQContext(ContextId(new Date().getTime))
-          info(s"Started execution of measure with name '$measureName'")
+        import scala.concurrent.duration.Duration
 
-          val measure = createMeasure(measureParam)
-          val (recordsDf, metricsDf) = measure.execute(batchId)
+        // define the tasks
+        val tasks = (for (i <- measureParams.indices)
+          yield {
+            val measureParam = measureParams(i)
+            val measure = createMeasure(measureParam)
+            val measureName = measureParam.getName
 
-          persistMetrics(currentContext, measure, metricsDf)
-          persistRecords(currentContext, measure, recordsDf)
+            (measure, Future {
+              info(s"Started execution of measure with name '$measureName'")
 
-          MetricFlushStep(Some(measureParam)).execute(currentContext)
+              val (recordsDf, metricsDf) = measure.execute(input)
+              val currentContext = context.cloneDQContext(ContextId(new Date().getTime))
+
+              persistMetrics(currentContext, measure, metricsDf)
+              persistRecords(currentContext, measure, recordsDf)
+
+              MetricFlushStep(Some(measureParam)).execute(currentContext)
+            }(ec))
+          }).toMap
+
+        tasks.foreach(task => {
+          val measureName = task._1.measureParam.getName
+
+          task._2.onComplete {
+            case Success(_) =>
+              info(
+                s"Successfully executed measure with name '$measureName' on data source with name " +
+                  s"'$dataSourceName")
+            case Failure(exception) =>
+              error(
+                s"Error occurred while executing measure with name '$measureName' on data source with name " +
+                  s"'$dataSourceName'",
+                exception)
+          }(ec)
         })
-      }).toMap
 
-    tasks.foreach(task =>
-      task._2.onComplete {
-        case Success(_) =>
-          info(s"Successfully executed measure with name '${task._1}' $batchDetailsOpt")
-        case Failure(e) =>
-          error(s"Error executing measure with name '${task._1}' $batchDetailsOpt", e)
+        var deadline = Duration(10, TimeUnit.SECONDS).fromNow
+
+        while (!tasks.forall(_._2.isCompleted)) {
+          if (deadline.isOverdue()) {
+            val unfinishedMeasureNames = tasks
+              .filterNot(_._2.isCompleted)
+              .map(_._1.measureParam.getName)
+              .mkString("['", "', '", "']")
+
+            info(s"Measures with name $unfinishedMeasureNames are still executing.")
+            deadline = Duration(10, TimeUnit.SECONDS).fromNow
+          }
+        }
+
+        info(
+          "Completed execution of all measures for data source with " +
+            s"name '${measureParams.head.getDataSource}'.")
       })
-
-    Thread.sleep(1000)
-
-    while (!tasks.forall(_._2.isCompleted)) {
-      info(
-        s"Measures with name ${tasks.filterNot(_._2.isCompleted).keys.mkString("['", "', '", "']")} " +
-          s"are still executing.")
-      Thread.sleep(1000)
-    }
-
-    info(
-      s"Completed execution of all measures for data source with name '${measureParams.head.getDataSource}'.")
   }
 
   /**

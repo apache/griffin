@@ -98,10 +98,10 @@ trait Measure extends Loggable {
    *
    * @return tuple of records dataframe and metric dataframe
    */
-  def impl(): (DataFrame, DataFrame)
+  def impl(dataSource: DataFrame): (DataFrame, DataFrame)
 
   /**
-   * Implementation should define validtion checks in this method (if required).
+   * Implementation should define validation checks in this method (if required).
    * This method needs to be called explicitly call this method (preferably during measure creation).
    *
    * Defaults to no-op.
@@ -111,35 +111,18 @@ trait Measure extends Loggable {
   /**
    * Executes this measure specific transformation on input data source.
    *
-   * @param batchId batch id to append in case of streaming source.
    * @return enriched tuple of records dataframe and metric dataframe
    */
-  def execute(batchId: Option[Long] = None): (DataFrame, DataFrame) = {
-    val (recordsDf, metricDf) = impl()
+  def execute(dataSource: DataFrame): (DataFrame, DataFrame) = {
+    val (recordsDf, metricDf) = impl(dataSource)
 
     val processedRecordDf = preProcessRecords(recordsDf)
     val processedMetricDf = preProcessMetrics(metricDf)
 
-    val res = batchId match {
-      case Some(batchId) =>
-        implicit val bId: Long = batchId
-        (appendBatchIdIfAvailable(processedRecordDf), appendBatchIdIfAvailable(processedMetricDf))
-      case None => (processedRecordDf, processedMetricDf)
-    }
-
-    res
+    (processedRecordDf, processedMetricDf)
   }
 
-  /**
-   * Appends batch id to metrics in case of streaming sources.
-   *
-   * @param input metric dataframe
-   * @param batchId batch id to append
-   * @return updated metric dataframe
-   */
-  private def appendBatchIdIfAvailable(input: DataFrame)(implicit batchId: Long): DataFrame = {
-    input.withColumn(BatchId, typedLit[Long](batchId))
-  }
+  protected def nullToZero(column: Column): Column = when(column.isNull, 0).otherwise(column)
 
 }
 
@@ -152,7 +135,8 @@ object Measure {
   final val Expression = "expr"
   final val MeasureColPrefix = "__measure"
   final val Status = "__status"
-  final val BatchId = "__batch_id"
+  final val BatchId = "batch_id"
+
   final val MeasureName = "measure_name"
   final val MeasureType = "measure_type"
   final val MetricName = "metric_name"
@@ -164,6 +148,7 @@ object Measure {
   final val Total: String = "total"
   final val BadRecordDefinition = "bad.record.definition"
   final val AllColumns: String = "*"
+  final val RowNumber: String = "__row_number"
 
   final val emptyCol: Column = lit(StringUtils.EMPTY)
 

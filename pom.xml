@@ -47,7 +47,7 @@ under the License.
         <java.version>1.8</java.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala211.binary.version>2.11</scala211.binary.version>
-        <scala.version>${scala.binary.version}.0</scala.version>
+        <scala.version>${scala.binary.version}.12</scala.version>
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>

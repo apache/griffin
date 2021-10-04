@@ -43,13 +43,8 @@ import org.apache.griffin.measure.execution.Measure
 case class SparkSQLMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
     extends Measure {
 
+  import CompletenessMeasure._
   import Measure._
-
-  /**
-   * SparkSQL measure constants
-   */
-  final val Complete: String = "complete"
-  final val InComplete: String = "incomplete"
 
   /**
    * SparkSQL measure supports record and metric write
@@ -87,8 +82,8 @@ case class SparkSQLMeasure(sparkSession: SparkSession, measureParam: MeasurePara
    *
    *  @return tuple of records dataframe and metric dataframe
    */
-  override def impl(): (DataFrame, DataFrame) = {
-    val df = sparkSession.sql(expr).withColumn(valueColumn, sparkExpr(badnessExpr))
+  override def impl(dataSource: DataFrame): (DataFrame, DataFrame) = {
+    val df = dataSource.sparkSession.sql(expr).withColumn(valueColumn, sparkExpr(badnessExpr))
 
     assert(
       df.schema.exists(f => f.name.matches(valueColumn) && f.dataType.isInstanceOf[BooleanType]),
@@ -96,7 +91,7 @@ case class SparkSQLMeasure(sparkSession: SparkSession, measureParam: MeasurePara
 
     val selectCols =
       Seq(Total, Complete, InComplete).map(e =>
-        map(lit(MetricName), lit(e), lit(MetricValue), col(e).cast(StringType)))
+        map(lit(MetricName), lit(e), lit(MetricValue), nullToZero(col(e).cast(StringType))))
     val metricColumn: Column = array(selectCols: _*).as(valueColumn)
 
     val badRecordsDf = df.withColumn(valueColumn, when(col(valueColumn), 1).otherwise(0))

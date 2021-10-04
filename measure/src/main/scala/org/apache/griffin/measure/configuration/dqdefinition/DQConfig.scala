@@ -89,7 +89,7 @@ case class DQConfig(
 
       assert(
         repeatedMeasures.isEmpty,
-        s"Measure names must be unique. " +
+        "Measure names must be unique. " +
           s"Duplicate Measures names ['${repeatedMeasures.mkString("', '")}'] were found.")
 
       val invalidMeasureSources = measures
@@ -100,7 +100,7 @@ case class DQConfig(
 
       assert(
         invalidMeasureSources.isEmpty,
-        s"Measure source(s) undefined." +
+        "Measure source(s) undefined." +
           s" Unknown source(s) ['${invalidMeasureSources.mkString("', '")}'] were found.")
     } else if (evaluateRule != null) {
       evaluateRule.validate()

@@ -17,14 +17,13 @@
 
 package org.apache.griffin.measure.execution.impl
 
-import java.util.Locale
-
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DataType, StringType}
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
+import org.apache.griffin.measure.utils.CommonUtils.safeReduce
 
 /**
  * SchemaConformance Measure.
@@ -43,6 +42,7 @@ import org.apache.griffin.measure.execution.Measure
 case class SchemaConformanceMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
     extends Measure {
 
+  import CompletenessMeasure._
   import Measure._
 
   /**
@@ -51,15 +51,13 @@ case class SchemaConformanceMeasure(sparkSession: SparkSession, measureParam: Me
    * @param sourceCol name of source column
    * @param dataType name of reference column
    */
-  case class SchemaConformanceExpr(sourceCol: String, dataType: DataType)
+  final case class SchemaConformanceExpr(sourceCol: String, dataType: DataType)
 
   /**
    * SchemaConformance Constants
    */
   final val SourceColStr: String = "source.col"
   final val DataTypeStr: String = "type"
-  final val Complete: String = "complete"
-  final val InComplete: String = "incomplete"
 
   /**
    * SchemaConformance measure supports record and metric write
@@ -90,19 +88,21 @@ case class SchemaConformanceMeasure(sparkSession: SparkSession, measureParam: Me
    *
    *  @return tuple of records dataframe and metric dataframe
    */
-  override def impl(): (DataFrame, DataFrame) = {
-    val givenExprs = exprOpt.get.map(toSchemaConformanceExpr).distinct
+  override def impl(input: DataFrame): (DataFrame, DataFrame) = {
+    val expr = exprOpt.getOrElse(throw new AssertionError(s"'$Expression' must be defined."))
+    val givenExprs = expr.map(toSchemaConformanceExpr).distinct
 
-    val incompleteExpr = givenExprs
-      .map(e => when(col(e.sourceCol).cast(e.dataType).isNull, true).otherwise(false))
-      .reduce(_ or _)
+    val incompleteExpr = safeReduce(
+      givenExprs
+        .map(e =>
+          when(col(e.sourceCol).cast(StringType).cast(e.dataType).isNull, true)
+            .otherwise(false)))(_ or _)
 
     val selectCols =
       Seq(Total, Complete, InComplete).map(e =>
-        map(lit(MetricName), lit(e), lit(MetricValue), col(e).cast(StringType)))
+        map(lit(MetricName), lit(e), lit(MetricValue), nullToZero(col(e).cast(StringType))))
     val metricColumn: Column = array(selectCols: _*).as(valueColumn)
 
-    val input = sparkSession.read.table(measureParam.getDataSource)
     val badRecordsDf = input.withColumn(valueColumn, when(incompleteExpr, 1).otherwise(0))
 
     val metricDf = badRecordsDf
@@ -132,14 +132,13 @@ case class SchemaConformanceMeasure(sparkSession: SparkSession, measureParam: Me
    * Validates if the expression is not null and non empty along with some dataset specific validations.
    */
   override def validate(): Unit = {
-    assert(exprOpt.isDefined, s"'$Expression' must be defined.")
-    assert(exprOpt.get.flatten.nonEmpty, s"'$Expression' must not be empty or of invalid type.")
+    val expr = exprOpt.getOrElse(throw new AssertionError(s"'$Expression' must be defined."))
+    assert(expr.flatten.nonEmpty, s"'$Expression' must not be empty or of invalid type.")
 
     val datasourceName = measureParam.getDataSource
 
-    val dataSourceCols =
-      sparkSession.read.table(datasourceName).columns.map(_.toLowerCase(Locale.ROOT)).toSet
-    val schemaConformanceExprExpr = exprOpt.get.map(toSchemaConformanceExpr).distinct
+    val dataSourceCols = sparkSession.read.table(datasourceName).columns.toSet
+    val schemaConformanceExprExpr = expr.map(toSchemaConformanceExpr).distinct
 
     val forDataSource =
       schemaConformanceExprExpr.map(e => (e.sourceCol, dataSourceCols.contains(e.sourceCol)))

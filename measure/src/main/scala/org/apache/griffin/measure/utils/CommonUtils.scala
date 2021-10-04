@@ -41,4 +41,17 @@ object CommonUtils extends Loggable {
 
     result
   }
+
+  /**
+   *
+   * @param t `Traversable`
+   * @param op operation
+   * @tparam T1 any type
+   * @return instance of `T1`
+   */
+  def safeReduce[T1](t: Iterable[T1])(op: (T1, T1) => T1): T1 = {
+    val head :: tail = t.toList
+    tail.fold(head)(op)
+  }
+
 }

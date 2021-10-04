@@ -26,6 +26,7 @@ import org.apache.spark.sql.types.StringType
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
+import org.apache.griffin.measure.utils.CommonUtils.safeReduce
 
 /**
  * Duplication Measure.
@@ -95,38 +96,33 @@ case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureP
    *
    *  @return tuple of records dataframe and metric dataframe
    */
-  override def impl(): (DataFrame, DataFrame) = {
-    val input = sparkSession.read.table(measureParam.getDataSource)
+  override def impl(input: DataFrame): (DataFrame, DataFrame) = {
     val cols = keyCols(input).map(col)
 
-    val isNullCol = cols.map(x => x.isNull).reduce(_ and _)
-    val duplicateCol = when(col(__Temp) > 1, 1).otherwise(0)
-    val uniqueCol = when(not(isNullCol) and col(Unique) === 1, 1).otherwise(0)
-    val distinctCol =
-      when(not(isNullCol) and (col(Unique) === 1 or col(NonUnique) === 1), 1).otherwise(0)
-    val nonUniqueCol =
-      when(not(isNullCol) and col(Unique) =!= 1 and (col(__Temp) - col(NonUnique) === 0), 1)
-        .otherwise(0)
+    val isNullCol = safeReduce(cols.map(x => x.isNull))(_ and _)
+    val uniqueCol = condition(col(Count) === 1)
+    val nonUniqueCol = condition(col(Count) > 1 and col(RowNumber) === 1)
+    val duplicateCol = condition(col(Count) > 1 and col(RowNumber) > 1)
+    val distinctCol = condition(col(Unique) === 1 or col(NonUnique) === 1)
 
     val window = Window.partitionBy(cols: _*).orderBy(cols: _*)
 
     val aggDf = input
-      .select(col(AllColumns), row_number().over(window).as(__Temp))
-      .withColumn(IsNull, isNullCol)
-      .withColumn(Duplicate, duplicateCol)
-      .withColumn(Unique, count(lit(1)).over(window))
+      .withColumn(IsNotNull, not(isNullCol))
+      .withColumn(RowNumber, row_number().over(window))
+      .withColumn(Count, count(lit(1)).over(window))
       .withColumn(Unique, uniqueCol)
-      .withColumn(NonUnique, min(__Temp).over(window))
       .withColumn(NonUnique, nonUniqueCol)
+      .withColumn(Duplicate, duplicateCol)
       .withColumn(Distinct, distinctCol)
       .withColumn(Total, lit(1))
       .withColumn(valueColumn, col(badnessExpr))
-      .drop(__Temp, IsNull)
+      .drop(IsNotNull, RowNumber, Count)
 
     val metricAggCols = duplicationMeasures.map(m => sum(m).as(m))
 
     val selectCols = duplicationMeasures.map(e =>
-      map(lit(MetricName), lit(e), lit(MetricValue), col(e).cast(StringType)))
+      map(lit(MetricName), lit(e), lit(MetricValue), nullToZero(col(e).cast(StringType))))
     val metricColumn: Column = array(selectCols: _*).as(valueColumn)
 
     val metricDf = aggDf
@@ -160,6 +156,11 @@ case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureP
     }, s"Invalid value '$badnessExpr' was provided for $BadRecordDefinition")
   }
 
+  private def condition(c: Column, checkNotNull: Boolean = true): Column = {
+    val notNullExpr = if (checkNotNull) col(IsNotNull) else lit(true)
+    when(notNullExpr and c, 1).otherwise(0)
+  }
+
   private def keyCols(input: DataFrame): Array[String] = {
     if (StringUtil.isNullOrEmpty(exprs)) input.columns
     else exprs.split(",").map(_.trim)
@@ -171,10 +172,11 @@ case class DuplicationMeasure(sparkSession: SparkSession, measureParam: MeasureP
  * Duplication measure constants
  */
 object DuplicationMeasure {
-  final val IsNull: String = "is_null"
   final val Duplicate: String = "duplicate"
   final val Unique: String = "unique"
   final val NonUnique: String = "non_unique"
   final val Distinct: String = "distinct"
-  final val __Temp: String = "__temp"
+
+  final val IsNotNull: String = "is_not_null"
+  final val Count: String = "count"
 }

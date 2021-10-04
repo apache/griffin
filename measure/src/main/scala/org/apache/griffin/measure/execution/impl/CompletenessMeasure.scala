@@ -39,13 +39,8 @@ import org.apache.griffin.measure.execution.Measure
 case class CompletenessMeasure(sparkSession: SparkSession, measureParam: MeasureParam)
     extends Measure {
 
+  import CompletenessMeasure._
   import Measure._
-
-  /**
-   * Completeness Constants
-   */
-  final val Complete: String = "complete"
-  final val InComplete: String = "incomplete"
 
   /**
    * Completeness measure supports record and metric write
@@ -80,16 +75,15 @@ case class CompletenessMeasure(sparkSession: SparkSession, measureParam: Measure
    *
    *  @return tuple of records dataframe and metric dataframe
    */
-  override def impl(): (DataFrame, DataFrame) = {
-    val exprStr = exprOpt.get
+  override def impl(input: DataFrame): (DataFrame, DataFrame) = {
+    val exprStr = exprOpt.getOrElse(throw new AssertionError(s"'$Expression' must be defined."))
 
     val selectCols =
       Seq(Total, Complete, InComplete).map(e =>
-        map(lit(MetricName), lit(e), lit(MetricValue), col(e).cast(StringType)))
+        map(lit(MetricName), lit(e), lit(MetricValue), nullToZero(col(e).cast(StringType))))
     val metricColumn: Column = array(selectCols: _*).as(valueColumn)
 
-    val input = sparkSession.read.table(measureParam.getDataSource)
-    val badRecordsDf = input.withColumn(valueColumn, when(expr(exprStr), 1).otherwise(0))
+    val badRecordsDf = input.withColumn(valueColumn, when(expr(exprStr), 0).otherwise(1))
 
     val metricDf = badRecordsDf
       .withColumn(Total, lit(1))
@@ -104,9 +98,16 @@ case class CompletenessMeasure(sparkSession: SparkSession, measureParam: Measure
    * Validates if expression is defined and is non empty.
    */
   override def validate(): Unit = {
-    assert(exprOpt.isDefined, s"'$Expression' must be defined.")
-    assert(exprOpt.nonEmpty, s"'$Expression' must not be empty.")
-
-    assert(!StringUtil.isNullOrEmpty(exprOpt.get), s"'$Expression' must not be null or empty.")
+    val expr = exprOpt.getOrElse(throw new AssertionError(s"'$Expression' must be defined."))
+    assert(!StringUtil.isNullOrEmpty(expr), s"'$Expression' must not be null or empty.")
   }
+}
+
+object CompletenessMeasure {
+
+  /**
+   * Completeness Constants
+   */
+  final val Complete: String = "complete"
+  final val InComplete: String = "incomplete"
 }

@@ -22,6 +22,7 @@ import org.apache.spark.sql.AnalysisException
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure._
+import org.apache.griffin.measure.execution.impl.CompletenessMeasure._
 
 class SparkSqlMeasureTest extends MeasureTest {
   var param: MeasureParam = _
@@ -99,7 +100,7 @@ class SparkSqlMeasureTest extends MeasureTest {
 
   it should "execute defined measure expr" in {
     val measure = SparkSQLMeasure(spark, param)
-    val (recordsDf, metricsDf) = measure.execute(None)
+    val (recordsDf, metricsDf) = measure.execute(source)
 
     assertResult(metricDfSchema)(metricsDf.schema)
     assertResult(source.count())(recordsDf.count())
@@ -112,8 +113,8 @@ class SparkSqlMeasureTest extends MeasureTest {
       .toMap
 
     assertResult(metricMap(Total))("5")
-    assertResult(metricMap(measure.Complete))("3")
-    assertResult(metricMap(measure.InComplete))("2")
+    assertResult(metricMap(Complete))("3")
+    assertResult(metricMap(InComplete))("2")
   }
 
   it should "throw runtime error for invalid expr" in {
@@ -122,7 +123,7 @@ class SparkSqlMeasureTest extends MeasureTest {
         spark,
         param.copy(config =
           Map(Expression -> "select * from source", BadRecordDefinition -> "name")))
-        .execute()
+        .execute(source)
     }
 
     assertThrows[AnalysisException] {
@@ -130,7 +131,7 @@ class SparkSqlMeasureTest extends MeasureTest {
         spark,
         param.copy(config =
           Map(Expression -> "select 1 as my_value", BadRecordDefinition -> "name is null")))
-        .execute()
+        .execute(source)
     }
   }
 

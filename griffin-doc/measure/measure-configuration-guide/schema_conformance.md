@@ -215,4 +215,4 @@ only showing top 20 rows
 A new column `__status` has been added to the source data set that acted as input to this measure. The value of this
 column can be either `bad` or `good` which can be used to calculate the metrics/ separate data based on quality etc.
 
-_Note:_ This output is for `ConsoleSink`. 
+_Note:_ These outputs are for `ConsoleSink`. 

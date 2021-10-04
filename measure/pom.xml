@@ -58,6 +58,10 @@ under the License.
         <scoverage.plugin.version>1.4.0</scoverage.plugin.version>
         <mockito.version>3.2.2.0</mockito.version>
         <scalatest.version>3.2.3</scalatest.version>
+        <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
+        <scoverage.plugin.version>1.4.0</scoverage.plugin.version>
+        <scalatest.maven.plugin.version>2.0.2</scalatest.maven.plugin.version>
+        <scapegoat.version>1.4.8</scapegoat.version>
     </properties>
 
     <dependencies>
@@ -66,6 +70,13 @@ under the License.
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sksamuel.scapegoat</groupId>
+            <artifactId>scalac-scapegoat-plugin_${scala.version}</artifactId>
+            <version>${scapegoat.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Spark Dependencies -->
@@ -249,9 +260,13 @@ under the License.
                         <arg>-deprecation</arg>
                         <arg>-feature</arg>
                         <arg>-explaintypes</arg>
+                        <arg>-P:scapegoat:dataDir:${project.build.directory}</arg>
+                        <arg>-P:scapegoat:reports:scalastyle</arg>
+                        <arg>
+                            -P:scapegoat:overrideLevels:UnsafeTraversableMethods=Warning:OptionGet=Warning:TryGet=Warning
+                        </arg>
                     </args>
                     <jvmArgs>
-                        <jvmArg>-Xms64m</jvmArg>
                         <jvmArg>-Xmx1024m</jvmArg>
                     </jvmArgs>
                     <javacArgs>
@@ -260,19 +275,41 @@ under the License.
                         <javacArg>${java.version}</javacArg>
                         <javacArg>-Xlint:all,-serial,-path,-try</javacArg>
                     </javacArgs>
+                    <compilerPlugins>
+                        <compilerPlugin>
+                            <groupId>com.sksamuel.scapegoat</groupId>
+                            <artifactId>scalac-scapegoat-plugin_${scala.version}</artifactId>
+                            <version>${scapegoat.version}</version>
+                        </compilerPlugin>
+                    </compilerPlugins>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <skipTests>true</skipTests>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest-maven-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>${scalatest.maven.plugin.version}</version>
                 <configuration>
                     <testFailureIgnore>false</testFailureIgnore>
                     <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                     <junitxml>.</junitxml>
                     <filereports>TestSuiteReport.txt</filereports>
+                    <parallel>false</parallel>
+                    <forkMode>once</forkMode>
                     <stderr/>
+                    <argLine>
+                        -ea -Xmx4g -Xss4m -XX:ReservedCodeCacheSize=1g -Dio.netty.tryReflectionSetAccessible=true
+                        -Dfile.encoding=${project.build.sourceEncoding}
+                    </argLine>
                     <systemProperties>
                         <java.io.tmpdir>${project.build.directory}/tmp</java.io.tmpdir>
                     </systemProperties>
@@ -297,18 +334,29 @@ under the License.
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.http</pattern>
+                                    <shadedPattern>griffin.org.apache.http</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.zaxxer</pattern>
+                                    <shadedPattern>griffin.com.zaxxer</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <finalName>${project.build.finalName}-with-dependencies</finalName>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.apache.griffin.measure.Application</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <minimizeJar>true</minimizeJar>
-                    <relocations>
-                        <relocation>
-                            <pattern>org.apache.http</pattern>
-                            <shadedPattern>griffin.org.apache.http</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -324,7 +372,7 @@ under the License.
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <phase>validate</phase>
                         <goals>
                             <goal>format</goal>
                         </goals>
@@ -350,30 +398,9 @@ under the License.
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <phase>validate</phase>
                         <goals>
                             <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.2</version>
-                <executions>
-                    <execution>
-                        <id>default-prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -385,56 +412,9 @@ under the License.
                 <version>${scoverage.plugin.version}</version>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
-                    <aggregate>true</aggregate>
+                    <aggregateOnly>true</aggregateOnly>
                     <highlighting>true</highlighting>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>${project.artifactId}-${project.version}</finalName>
-                            <classifier>spark-${spark.major.version}_scala-${scala.binary.version}</classifier>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <tarLongFileMode>posix</tarLongFileMode>
-                    <finalName>
-                        ${project.artifactId}-${project.version}-spark-${spark.major.version}_scala-${scala.binary.version}
-                    </finalName>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.apache.griffin.measure.Application</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>

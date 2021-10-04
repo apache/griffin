@@ -75,7 +75,7 @@ case class ElasticSearchGriffinDataConnector(
   }
 
   def dataBySql(ms: Long): (Option[DataFrame], TimeRange) = {
-    val path: String = s"/_sql?format=csv"
+    val path: String = "/_sql?format=csv"
     info(s"ElasticSearchGriffinDataConnector data : sql: $sql")
     val dfOpt =
       try {

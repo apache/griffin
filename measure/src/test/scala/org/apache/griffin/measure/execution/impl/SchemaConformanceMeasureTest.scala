@@ -18,9 +18,11 @@
 package org.apache.griffin.measure.execution.impl
 
 import org.apache.commons.lang3.StringUtils
+import org.apache.spark.sql.functions.lit
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure._
+import org.apache.griffin.measure.execution.impl.CompletenessMeasure._
 
 class SchemaConformanceMeasureTest extends MeasureTest {
   var param: MeasureParam = _
@@ -102,7 +104,7 @@ class SchemaConformanceMeasureTest extends MeasureTest {
 
   it should "execute defined measure expr" in {
     val measure = SchemaConformanceMeasure(spark, param)
-    val (recordsDf, metricsDf) = measure.execute(None)
+    val (recordsDf, metricsDf) = measure.execute(source)
 
     assertResult(recordDfSchema)(recordsDf.schema)
     assertResult(metricDfSchema)(metricsDf.schema)
@@ -117,8 +119,65 @@ class SchemaConformanceMeasureTest extends MeasureTest {
       .toMap
 
     assertResult(metricMap(Total))("5")
-    assertResult(metricMap(measure.Complete))("5")
-    assertResult(metricMap(measure.InComplete))("0")
+    assertResult(metricMap(Complete))("5")
+    assertResult(metricMap(InComplete))("0")
+  }
+
+  it should "be able to check for date column" in {
+    val newSource = source.withColumn("Test_date", lit("2009-07-30"))
+    newSource.createOrReplaceTempView("newSource")
+    val measure = SchemaConformanceMeasure(
+      spark,
+      param.copy(
+        dataSource = "newSource",
+        config = Map(Expression -> Seq(Map(SourceColStr -> "Test_date", DataTypeStr -> "date")))))
+    val (recordsDf, metricsDf) = measure.execute(newSource)
+
+    val newRecordDfSchema = newSource.schema.add(Status, "string", nullable = false)
+    assertResult(newRecordDfSchema)(recordsDf.schema)
+    assertResult(metricDfSchema)(metricsDf.schema)
+
+    assertResult(newSource.count())(recordsDf.count())
+    assertResult(1L)(metricsDf.count())
+
+    val metricMap = metricsDf
+      .head()
+      .getAs[Seq[Map[String, String]]](Metrics)
+      .map(x => x(MetricName) -> x(MetricValue))
+      .toMap
+
+    assertResult(metricMap(Total))("5")
+    assertResult(metricMap(Complete))("5")
+    assertResult(metricMap(InComplete))("0")
+  }
+
+  it should "be able to check for timestamp column and support space in column name" in {
+    val newSource = source.withColumn("Test date", lit("2009-07-30"))
+    newSource.createOrReplaceTempView("newSource")
+    val measure = SchemaConformanceMeasure(
+      spark,
+      param.copy(
+        dataSource = "newSource",
+        config =
+          Map(Expression -> Seq(Map(SourceColStr -> "Test date", DataTypeStr -> "timestamp")))))
+    val (recordsDf, metricsDf) = measure.execute(newSource)
+
+    val newRecordDfSchema = newSource.schema.add(Status, "string", nullable = false)
+    assertResult(newRecordDfSchema)(recordsDf.schema)
+    assertResult(metricDfSchema)(metricsDf.schema)
+
+    assertResult(newSource.count())(recordsDf.count())
+    assertResult(1L)(metricsDf.count())
+
+    val metricMap = metricsDf
+      .head()
+      .getAs[Seq[Map[String, String]]](Metrics)
+      .map(x => x(MetricName) -> x(MetricValue))
+      .toMap
+
+    assertResult(metricMap(Total))("5")
+    assertResult(metricMap(Complete))("5")
+    assertResult(metricMap(InComplete))("0")
   }
 
 }

@@ -17,16 +17,15 @@
 
 package org.apache.griffin.measure.execution.impl
 
-import java.util.Locale
-
 import io.netty.util.internal.StringUtil
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 
 import org.apache.griffin.measure.configuration.dqdefinition.MeasureParam
 import org.apache.griffin.measure.execution.Measure
-import org.apache.griffin.measure.step.builder.ConstantColumns
+import org.apache.griffin.measure.utils.CommonUtils.safeReduce
 
 /**
  * Accuracy Measure.
@@ -60,7 +59,7 @@ case class AccuracyMeasure(sparkSession: SparkSession, measureParam: MeasurePara
    * @param sourceCol name of source column
    * @param refCol name of reference column
    */
-  case class AccuracyExpr(sourceCol: String, refCol: String)
+  final case class AccuracyExpr(sourceCol: String, refCol: String)
 
   import AccuracyMeasure._
   import Measure._
@@ -100,42 +99,47 @@ case class AccuracyMeasure(sparkSession: SparkSession, measureParam: MeasurePara
    *
    *  @return tuple of records dataframe and metric dataframe
    */
-  override def impl(): (DataFrame, DataFrame) = {
-    val originalSource = sparkSession.read.table(measureParam.getDataSource)
-    val originalCols = originalSource.columns
+  override def impl(input: DataFrame): (DataFrame, DataFrame) = {
+    val originalCols = input.columns
 
-    val dataSource = addColumnPrefix(originalSource, SourcePrefixStr)
+    val dataSource = addColumnPrefix(input, SourcePrefixStr)
 
     val refDataSource =
-      addColumnPrefix(sparkSession.read.table(refSource).drop(ConstantColumns.tmst), refPrefixStr)
+      addColumnPrefix(sparkSession.read.table(refSource), refPrefixStr)
 
-    val accuracyExprs = exprOpt.get
+    val expr = exprOpt.getOrElse(throw new AssertionError(s"'$Expression' must be defined."))
+    val accuracyExprs = expr
       .map(toAccuracyExpr)
       .distinct
       .map(x => AccuracyExpr(s"$SourcePrefixStr${x.sourceCol}", s"$refPrefixStr${x.refCol}"))
 
-    val joinExpr =
+    val joinExpr = safeReduce(
       accuracyExprs
-        .map(e => col(e.sourceCol) === col(e.refCol))
-        .reduce(_ and _)
+        .map(e => col(e.sourceCol) === col(e.refCol)))(_ and _)
 
     val indicatorExpr =
-      accuracyExprs
-        .map(e => coalesce(col(e.sourceCol), emptyCol) notEqual coalesce(col(e.refCol), emptyCol))
-        .reduce(_ or _)
+      safeReduce(
+        accuracyExprs
+          .map(e =>
+            coalesce(col(e.sourceCol), emptyCol) notEqual coalesce(col(e.refCol), emptyCol)))(
+        _ or _)
 
-    val nullExpr = accuracyExprs.map(e => col(e.sourceCol).isNull).reduce(_ or _)
+    val nullExpr = safeReduce(accuracyExprs.map(e => col(e.sourceCol).isNull))(_ or _)
+
+    val cols = accuracyExprs.map(_.refCol).map(col)
+    val window = Window.partitionBy(cols: _*).orderBy(cols: _*)
 
     val recordsDf = removeColumnPrefix(
       dataSource
-        .join(refDataSource, joinExpr, "left")
+        .join(refDataSource.withColumn(RowNumber, row_number().over(window)), joinExpr, "left")
+        .where(col(RowNumber) === 1 or col(RowNumber).isNull)
         .withColumn(valueColumn, when(indicatorExpr or nullExpr, 1).otherwise(0)),
       SourcePrefixStr)
       .select((originalCols :+ valueColumn).map(col): _*)
 
     val selectCols =
       Seq(Total, AccurateStr, InAccurateStr).map(e =>
-        map(lit(MetricName), lit(e), lit(MetricValue), col(e).cast(StringType)))
+        map(lit(MetricName), lit(e), lit(MetricValue), nullToZero(col(e).cast(StringType))))
     val metricColumn: Column = array(selectCols: _*).as(valueColumn)
 
     val metricDf = recordsDf
@@ -165,8 +169,8 @@ case class AccuracyMeasure(sparkSession: SparkSession, measureParam: MeasurePara
    * Validates if the expression is not null and non empty along with some dataset specific validations.
    */
   override def validate(): Unit = {
-    assert(exprOpt.isDefined, s"'$Expression' must be defined.")
-    assert(exprOpt.get.flatten.nonEmpty, s"'$Expression' must not be empty or of invalid type.")
+    val expr = exprOpt.getOrElse(throw new AssertionError(s"'$Expression' must be defined."))
+    assert(expr.flatten.nonEmpty, s"'$Expression' must not be empty or of invalid type.")
 
     assert(
       !StringUtil.isNullOrEmpty(refSource),
@@ -178,12 +182,10 @@ case class AccuracyMeasure(sparkSession: SparkSession, measureParam: MeasurePara
 
     val datasourceName = measureParam.getDataSource
 
-    val dataSourceCols =
-      sparkSession.read.table(datasourceName).columns.map(_.toLowerCase(Locale.ROOT)).toSet
-    val refDataSourceCols =
-      sparkSession.read.table(refSource).columns.map(_.toLowerCase(Locale.ROOT)).toSet
+    val dataSourceCols = sparkSession.read.table(datasourceName).columns.toSet
+    val refDataSourceCols = sparkSession.read.table(refSource).columns.toSet
 
-    val accuracyExpr = exprOpt.get.map(toAccuracyExpr).distinct
+    val accuracyExpr = expr.map(toAccuracyExpr).distinct
     val (forDataSource, forRefDataSource) =
       accuracyExpr
         .map(
