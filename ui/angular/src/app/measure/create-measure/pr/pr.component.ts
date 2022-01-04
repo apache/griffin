@@ -309,7 +309,7 @@ export class PrComponent implements AfterViewChecked, OnInit {
         );
       case "Regular Expression Detection Count":
         return (
-          `count(source.${col.name}) AS \`${col.name}_regexcount\` WHERE source.${col.name} RLIKE '^[0-9]{4}$'`
+          `count(source.${col.name}) AS \`${col.name}_regexcount\` WHERE source.${col.name} RLIKE ${col.regex}`
         );
       case "Enum Detection Top5 Count":
         return (

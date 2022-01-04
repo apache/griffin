@@ -14,7 +14,7 @@
       "name": "hdfs",
       "type": "HDFS",
       "config": {
-        "path": "hdfs://localhost/griffin/persist",
+        "path": "hdfs:///griffin/persist",
         "max.persist.lines": 10000,
         "max.lines.per.file": 10000
       }
@@ -24,7 +24,7 @@
       "type": "ELASTICSEARCH",
       "config": {
         "method": "post",
-        "api": "http://es:9200/griffin/accuracy",
+        "api": "http://master01:9200/griffin/accuracy",
         "connection.timeout": "1m",
         "retry": 10
       }

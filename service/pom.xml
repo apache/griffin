@@ -32,8 +32,8 @@ under the License.
     <name>Apache Griffin :: Web Service</name>
 
     <properties>
-        <hadoop.version>2.7.1</hadoop.version>
-        <hive.version>2.2.0</hive.version>
+        <hadoop.version>3.0.0-cdh6.3.2</hadoop.version>
+        <hive.version>2.1.1-cdh6.3.2</hive.version>
         <spring.boot.version>2.1.7.RELEASE</spring.boot.version>
         <spring.security.kerberos.version>1.0.1.RELEASE</spring.security.kerberos.version>
         <confluent.version>3.2.0</confluent.version>
@@ -45,7 +45,7 @@ under the License.
         <eclipselink.version>2.6.0</eclipselink.version>
         <mysql.java.version>5.1.47</mysql.java.version>
         <postgresql.version>9.4.1212.jre7</postgresql.version>
-        <livy.core.version>0.3.0</livy.core.version>
+        <livy.core.version>0.7.1-incubating</livy.core.version>
         <elasticsearch-rest-client.version>6.2.4</elasticsearch-rest-client.version>
         <jackson-databind.version>2.9.9.3</jackson-databind.version>
     </properties>
@@ -54,6 +54,18 @@ under the License.
         <repository>
             <id>confluent</id>
             <url>http://packages.confluent.io/maven/</url>
+        </repository>
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        </repository>
+        <repository>
+            <id>Hortonworks</id>
+            <url>https://repo.hortonworks.com/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>mvn</id>
+            <url>https://repo1.maven.org/maven2/</url>
         </repository>
     </repositories>
 
@@ -70,6 +82,12 @@ under the License.
     </dependencyManagement>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.geronimo.components/geronimo-jaspi -->
+        <dependency>
+            <groupId>org.apache.geronimo.components</groupId>
+            <artifactId>geronimo-jaspi</artifactId>
+            <version>2.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -203,6 +221,10 @@ under the License.
             <version>${hive.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-runner</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.eclipse.jetty.aggregate</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
@@ -254,10 +276,10 @@ under the License.
             <version>${quartz.version}</version>
         </dependency>
 
-        <!--livy-core-->
+        <!-- https://mvnrepository.com/artifact/org.apache.livy/livy-core -->
         <dependency>
-            <groupId>com.cloudera.livy</groupId>
-            <artifactId>livy-core_2.10</artifactId>
+            <groupId>org.apache.livy</groupId>
+            <artifactId>livy-core_2.11</artifactId>
             <version>${livy.core.version}</version>
         </dependency>
 

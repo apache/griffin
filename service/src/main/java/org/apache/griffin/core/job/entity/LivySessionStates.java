@@ -31,9 +31,10 @@ import static org.apache.griffin.core.job.entity.LivySessionStates.State.STOPPED
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.SUCCESS;
 import static org.apache.griffin.core.job.entity.LivySessionStates.State.UNKNOWN;
 
-import com.cloudera.livy.sessions.SessionState;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.livy.sessions.SessionState;
 
 public class LivySessionStates {
 
@@ -65,19 +66,19 @@ public class LivySessionStates {
         }
         switch (state) {
             case NOT_STARTED:
-                return new SessionState.NotStarted();
+                return new SessionState.NotStarted$();
             case STARTING:
-                return new SessionState.Starting();
+                return new SessionState.Starting$();
             case RECOVERING:
-                return new SessionState.Recovering();
+                return new SessionState.Recovering$();
             case IDLE:
-                return new SessionState.Idle();
+                return new SessionState.Idle$();
             case RUNNING:
-                return new SessionState.Running();
+                return new SessionState.Running$();
             case BUSY:
-                return new SessionState.Busy();
+                return new SessionState.Busy$();
             case SHUTTING_DOWN:
-                return new SessionState.ShuttingDown();
+                return new SessionState.ShuttingDown$();
             case ERROR:
                 return new SessionState.Error(System.nanoTime());
             case DEAD:
