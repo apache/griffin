@@ -64,7 +64,8 @@ public class DataConnector extends AbstractAuditableEntity {
         HIVE,
         KAFKA,
         AVRO,
-        CUSTOM
+        CUSTOM,
+        JDBC
     }
 
     @NotNull
