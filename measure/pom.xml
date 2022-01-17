@@ -53,6 +53,8 @@ under the License.
         <scalaj.version>2.3.0</scalaj.version>
         <mongo.version>2.1.0</mongo.version>
         <curator.version>2.10.0</curator.version>
+        <postgresql.version>9.4.1212.jre7</postgresql.version>
+        <ojdbc8.version>21.4.0.0.1</ojdbc8.version>
 
         <!-- Testing -->
         <scoverage.plugin.version>1.4.0</scoverage.plugin.version>
@@ -149,6 +151,20 @@ under the License.
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.java.version}</version>
+        </dependency>
+
+        <!-- PostgreSQL -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+
+        <!-- Oracle -->
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>${ojdbc8.version}</version>
         </dependency>
 
         <!-- MariaDB -->
