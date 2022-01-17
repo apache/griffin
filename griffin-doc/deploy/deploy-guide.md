@@ -220,84 +220,66 @@ Here you can access http://127.0.0.1:8088/cluster/nodes to check hadoop nodes, y
 * **update configuration**
 Copy hive/conf/hive-site.xml.template to hive/conf/hive-site.xml and update some fields.
 ```xml
-+++ hive/conf/hive-site.xml	2018-12-16 11:17:51.000000000 +0800
-@@ -72,12 +72,12 @@
-   </property>
+<configuration>
    <property>
      <name>hive.exec.local.scratchdir</name>
--    <value>${system:java.io.tmpdir}/${system:user.name}</value>
-+    <value>/apache/tmp/hive</value>
+     <value>/apache/tmp/hive</value>
      <description>Local scratch space for Hive jobs</description>
    </property>
    <property>
      <name>hive.downloaded.resources.dir</name>
--    <value>${system:java.io.tmpdir}/${hive.session.id}_resources</value>
-+    <value>/apache/tmp/hive/${hive.session.id}_resources</value>
+     <value>/apache/tmp/hive/${hive.session.id}_resources</value>
      <description>Temporary local directory for added resources in the remote file system.</description>
    </property>
    <property>
-@@ -368,7 +368,7 @@
    </property>
    <property>
      <name>hive.metastore.uris</name>
--    <value/>
-+    <value>thrift://127.0.0.1:9083</value>
+     <value>thrift://127.0.0.1:9083</value>
      <description>Thrift URI for the remote metastore.</description>
    </property>
    <property>
-@@ -527,7 +527,7 @@
    </property>
    <property>
      <name>javax.jdo.option.ConnectionPassword</name>
--    <value>mine</value>
-+    <value>secret</value>
+     <value>secret</value>
      <description>password to use against metastore database</description>
    </property>
    <property>
-@@ -542,7 +542,7 @@
    </property>
    <property>
      <name>javax.jdo.option.ConnectionURL</name>
--    <value>jdbc:derby:;databaseName=metastore_db;create=true</value>
-+    <value>jdbc:postgresql://127.0.0.1/myDB?ssl=false</value>
+     <value>jdbc:postgresql://127.0.0.1/myDB?ssl=false</value>
      <description>
        JDBC connect string for a JDBC metastore.
        To use SSL to encrypt/authenticate the connection, provide database-specific SSL flag in the connection URL.
-@@ -1017,7 +1017,7 @@
    </property>
    <property>
      <name>javax.jdo.option.ConnectionDriverName</name>
--    <value>org.apache.derby.jdbc.EmbeddedDriver</value>
-+    <value>org.postgresql.Driver</value>
+     <value>org.postgresql.Driver</value>
      <description>Driver class name for a JDBC metastore</description>
    </property>
    <property>
-@@ -1042,7 +1042,7 @@
    </property>
    <property>
      <name>javax.jdo.option.ConnectionUserName</name>
--    <value>APP</value>
-+    <value>king</value>
+     <value>king</value>
      <description>Username to use against metastore database</description>
    </property>
    <property>
-@@ -1682,7 +1682,7 @@
    </property>
    <property>
      <name>hive.querylog.location</name>
--    <value>${system:java.io.tmpdir}/${system:user.name}</value>
-+    <value>/apache/tmp/hive</value>
+     <value>/apache/tmp/hive</value>
      <description>Location of Hive run time structured log file</description>
    </property>
    <property>
-@@ -3973,7 +3973,7 @@
    </property>
    <property>
      <name>hive.server2.logging.operation.log.location</name>
--    <value>${system:java.io.tmpdir}/${system:user.name}/operation_logs</value>
-+    <value>/apache/tmp/hive/operation_logs</value>
+     <value>/apache/tmp/hive/operation_logs</value>
    </property>
-   <property>
+</configuration>
 ```
 
 * **start up hive metastore service**
