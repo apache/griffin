@@ -79,7 +79,8 @@ case class FileBasedDataConnector(
     SupportedFormats.contains(format),
     s"Invalid format '$format' specified. Must be one of ${SupportedFormats.mkString("['", "', '", "']")}")
 
-  if (format.equalsIgnoreCase("avro") && sparkSession.version < "2.3.0") {
+  // built-in AVRO data source implementation is released in spark 2.4.0
+  if (format.equalsIgnoreCase("avro") && sparkSession.version < "2.4.0") {
     format = "com.databricks.spark.avro"
   }
 
