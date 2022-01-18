@@ -385,6 +385,7 @@ under the License.
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
                     <skipAssembly>false</skipAssembly>
+                    <outputDirectory>../target</outputDirectory>
                     <descriptors>
                         <descriptor>src/main/resources/assembly/assembly.xml</descriptor>
                     </descriptors>

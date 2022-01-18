@@ -515,7 +515,7 @@ Similar changes are required in `env_streaming.json`.
 }
 ```
 
-It's easy to build Griffin, just run maven command `mvn clean install`. Successfully building, you can get `service-${version}.tar.gz` and `measure-${version}.jar` from target folder in service and measure module.
+It's easy to build Griffin, just run maven command `mvn clean install`. Successfully building, you can get `service-${version}.tar.gz` in root target folder and `measure-${version}.jar` in measure module target folder.
 
 Upload measure's jar to hadoop folder.
 ```
@@ -528,7 +528,7 @@ hdfs dfs -put griffin-measure.jar /griffin/
 Startup service，run Griffin management service.
 ```
 cd $GRIFFIN_INSTALL_DIR
-tar -zxvf service-${version}.tar.gz
+tar -zxvf target/service-${version}.tar.gz
 cd service-${version}
 # start service
 ./bin/griffin.sh start  
