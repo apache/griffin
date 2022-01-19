@@ -132,7 +132,7 @@ class JDBCBasedDataConnectorTest extends SparkSuiteBase with Matchers {
     } should have message "requirement failed: JDBC connection: password is mandatory"
   }
 
-  "JDBC data connector" should "have driver provided in config in classpath" in {
+  "JDBC data connector" should "have valid driver provided in config in classpath" in {
     the[AssertionError] thrownBy {
       val configs = Map(
         "database" -> "griffin",
@@ -140,7 +140,7 @@ class JDBCBasedDataConnectorTest extends SparkSuiteBase with Matchers {
         "tablename" -> "employee",
         "user" -> "user",
         "password" -> "password",
-        "driver" -> "org.postgresql.Driver")
+        "driver" -> "org.postgresql.InvalidDriver")
       JDBCBasedDataConnector(spark, dcParam.copy(config = configs), timestampStorage)
     }
   }
