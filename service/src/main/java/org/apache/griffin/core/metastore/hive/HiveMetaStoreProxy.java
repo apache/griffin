@@ -22,6 +22,7 @@ package org.apache.griffin.core.metastore.hive;
 import javax.annotation.PreDestroy;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.slf4j.Logger;
@@ -53,6 +54,15 @@ public class HiveMetaStoreProxy {
     @Value("${hive.hmshandler.retry.interval}")
     private String interval;
 
+    @Value("${hive.need.kerberos}")
+    private String needKerberos;
+
+    @Value("${hive.keytab.user}")
+    private String keytabUser;
+
+    @Value("${hive.keytab.path}")
+    private String keytabPath;
+
     private IMetaStoreClient client = null;
 
     @Bean
@@ -64,6 +74,12 @@ public class HiveMetaStoreProxy {
         hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, uris);
         hiveConf.setIntVar(HiveConf.ConfVars.HMSHANDLERATTEMPTS, attempts);
         hiveConf.setVar(HiveConf.ConfVars.HMSHANDLERINTERVAL, interval);
+        if("true".equalsIgnoreCase(needKerberos)) {
+            LOGGER.info("Hive need Kerberos Auth.");
+            hiveConf.setVar(ConfVars.METASTORE_USE_THRIFT_SASL,"true");
+            hiveConf.setVar(ConfVars.METASTORE_KERBEROS_PRINCIPAL, keytabUser);
+            hiveConf.setVar(ConfVars.METASTORE_KERBEROS_KEYTAB_FILE, keytabPath);
+        }
         try {
             client = HiveMetaStoreClient.newSynchronizedClient(new HiveMetaStoreClient(hiveConf));
         } catch (Exception e) {
