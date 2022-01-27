@@ -794,6 +794,8 @@ drwxr-xr-x   - king supergroup          0 2019-02-26 16:14 /griffin/data/batch/d
 ```
 
 You need to create Elasticsearch index in advance, in order to set number of shards, replicas, and other settings to desired values:
+for latest es: curl -k -H "Content-Type: application/json" -X PUT http://127.0.0.1:9200/griffin?include_type_name=true
+
 ```
 curl -k -H "Content-Type: application/json" -X PUT http://127.0.0.1:9200/griffin \
  -d '{

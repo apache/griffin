@@ -10,5 +10,8 @@
     "spark.yarn.dist.files": "hdfs:///home/spark_conf/hive-site.xml"
   },
   "files": [
+  ],
+  "jars": [
+    "hdfs:///jdbc/clickhouse-native-jdbc-2.5.4.jar"
   ]
 }
