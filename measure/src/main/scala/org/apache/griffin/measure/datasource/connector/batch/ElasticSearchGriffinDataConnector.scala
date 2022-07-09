@@ -21,7 +21,7 @@ import java.io.{BufferedReader, ByteArrayInputStream, InputStreamReader}
 import java.net.URI
 import java.util.{Iterator => JavaIterator, Map => JavaMap}
 
-import scala.collection.JavaConverters
+import scala.collection.JavaConversions
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -83,8 +83,10 @@ case class ElasticSearchGriffinDataConnector(
         val answer = httpPost(path, sql)
         if (answer._1) {
           import sparkSession.implicits._
-          val rdd: RDD[String] = sparkSession.sparkContext.parallelize(Seq(JavaConverters.asScalaIteratorConverter(
-            answer._2.lines.toList.iterator()).asScala.toString()))
+          val rdd: RDD[String] = sparkSession.sparkContext.parallelize(
+            Seq(
+              JavaConversions
+                .asJavaIterable(answer._2.lines.toList)))
           val reader: DataFrameReader = sparkSession.read
           reader.option("header", value = true).option("inferSchema", value = true)
           val df: DataFrame = reader.csv(rdd.toDS())
