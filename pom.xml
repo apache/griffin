@@ -30,7 +30,7 @@ under the License.
 
     <groupId>org.apache.griffin</groupId>
     <artifactId>griffin</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
     <url>http://griffin.apache.org</url>
@@ -97,9 +97,10 @@ under the License.
 
 
     <modules>
-        <module>ui</module>
-        <module>service</module>
-        <module>measure</module>
+        <module>core</module>
+        <module>dispatcher</module>
+        <module>scheduler</module>
+        <module>anomalydetection</module>
     </modules>
 
     <dependencyManagement>
