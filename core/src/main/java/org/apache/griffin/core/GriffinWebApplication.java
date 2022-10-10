@@ -33,7 +33,7 @@ public class GriffinWebApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(GriffinWebApplication.class, args);
-        LOGGER.info("application started test");
+        LOGGER.info("application started");
     }
 
 
