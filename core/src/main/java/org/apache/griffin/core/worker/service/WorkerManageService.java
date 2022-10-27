@@ -18,4 +18,9 @@ public class WorkerManageService {
 
     }
 
+    // 上报心跳
+    public void nodeHeartBeat() {
+
+    }
+
 }

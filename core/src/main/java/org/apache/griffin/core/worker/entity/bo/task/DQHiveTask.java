@@ -1,6 +1,10 @@
-package org.apache.griffin.core.worker.entity.task;
+package org.apache.griffin.core.worker.entity.bo.task;
 
+/**
+ * 表维度
+ */
 public class DQHiveTask extends DQBaseTask {
+
     @Override
     public void doRecord() {
 

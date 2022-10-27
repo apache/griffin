@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.entity.task;
+package org.apache.griffin.core.worker.entity.bo.task;
 
 public class DQKafkaTask extends DQBaseTask {
     @Override
