@@ -16,21 +16,53 @@ import java.util.Queue;
 @Component
 public class WorkerContext {
 
-    public static final Queue<DQInstance> waittingTaskIdQueue = Queues.newPriorityQueue();
+    private final Queue<DQInstance> WAITTING_TASK_QUEUE;
 //    public static final List<DQBaseTask> runningTaskIdQueue = Lists.newCopyOnWriteArrayList();
     // runningTaskIdList = RECORDING_TASK_LIST + EVALUATING_TASK_LIST + ALERTING_TASK_LIST
-    public static final Queue<DQInstance> RECORDING_TASK_QUEUE = Queues.newPriorityQueue();
-    public static final Queue<DQInstance> EVALUATING_TASK_QUEUE = Queues.newPriorityQueue();
-    public static final Queue<DQInstance> ALERTING_TASK_QUEUE = Queues.newPriorityQueue();
+    private final Queue<DQInstance> RECORDING_TASK_QUEUE;
+    private final Queue<DQInstance> EVALUATING_TASK_QUEUE;
+    private final Queue<DQInstance> ALERTING_TASK_QUEUE;
 
     // success和failed队列数据老化问题？
-    public static final List<DQInstance> successTaskIdList = Lists.newArrayList();
-    public static final List<DQInstance> failedTaskIdList = Lists.newArrayList();
+    public final List<DQInstance> successTaskIdList;
+    public final List<DQInstance> failedTaskIdList;
+    
+    public WorkerContext() {
+        // 设置队列长度
+        WAITTING_TASK_QUEUE = Queues.newPriorityQueue();
+        RECORDING_TASK_QUEUE = Queues.newPriorityQueue();
+        EVALUATING_TASK_QUEUE = Queues.newPriorityQueue();
+        ALERTING_TASK_QUEUE = Queues.newPriorityQueue();
+        successTaskIdList = Lists.newArrayList();
+        failedTaskIdList = Lists.newArrayList();
+    }
+    
+    @PostConstruct
+    public void init() {
+        initQueueInfo();
+        resetTaskStatusWhenStartUp();
+    }
+
+    private void initQueueInfo() {
+        
+    }
+
+    public DQInstance getWaittingTask() {
+        return null;
+    }
+
+    public DQInstance getRecordingTask() {
+        return null;
+    }
+
+    public void offerToRecordingTaskQueue(DQInstance dqInstance) {
+    }
+    public void offerToAlertingTaskQueue(DQInstance dqInstance) {
+    }
 
     /**
      * 启动时，加载让分配在该节点的任务信息到
      */
-    @PostConstruct
     public void resetTaskStatusWhenStartUp() {
 
     }
@@ -40,4 +72,11 @@ public class WorkerContext {
 
     }
 
+    public boolean canSubmitToDispatcher() {
+        return false;
+    }
+
+
+    public void offerToEvaluatingTaskQueue(DQInstance dqInstance) {
+    }
 }
