@@ -1,18 +1,22 @@
 package org.apache.griffin.core.worker.entity.bo.task;
 
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
+
 public class DQKafkaTask extends DQBaseTask {
     @Override
-    public void doRecord() {
-
+    public List<Pair<Long, String>> doRecord() {
+        return null;
     }
 
     @Override
-    public void doEvaluate() {
-
+    public boolean doEvaluate() {
+        return false;
     }
 
     @Override
-    public void doAlert() {
-
+    public boolean doAlert() {
+        return false;
     }
 }

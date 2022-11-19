@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class JobStatusRequest {
+public class MetricRequest {
     String jobId;
 }
