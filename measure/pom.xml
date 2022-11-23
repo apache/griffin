@@ -53,7 +53,7 @@ under the License.
         <scalaj.version>2.3.0</scalaj.version>
         <mongo.version>2.1.0</mongo.version>
         <curator.version>2.10.0</curator.version>
-        <postgresql.version>42.4.1</postgresql.version>
+        <postgresql.version>42.4.3</postgresql.version>
         <ojdbc8.version>21.4.0.0.1</ojdbc8.version>
 
         <!-- Testing -->
