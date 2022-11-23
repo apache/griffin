@@ -18,7 +18,6 @@ public enum DQEngineEnum {
     }
 
     /**
-     * 获取降级引擎
      * @return DQEngineEnum
      */
     public DQEngineEnum getBackEngine() {

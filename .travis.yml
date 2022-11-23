@@ -11,31 +11,32 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 
-language: java scala node_js
+#language: java scala node_js
+language: java scala
 
-services:
-  - docker
+#services:
+#  - docker
 
-env:
-  - COMPOSE_FILE=griffin-doc/docker/compose/docker-compose-batch.yml
+#env:
+#  - COMPOSE_FILE=griffin-doc/docker/compose/docker-compose-batch.yml
 
 jdk:
   - openjdk8
 scala:
   - 2.10.6
-node_js:
-  - "6"
+#node_js:
+#  - "6"
 git:
   quiet: true
 cache:
   directories:
     - $HOME/.m2
 
-install:
-  - npm install -g bower
-
-before_script:
-  - docker-compose up -d
+#install:
+#  - npm install -g bower
+#
+#before_script:
+#  - docker-compose up -d
 
 
 # keep 30, need change according to ci logs.

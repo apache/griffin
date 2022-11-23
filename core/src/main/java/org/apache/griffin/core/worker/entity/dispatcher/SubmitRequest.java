@@ -8,7 +8,6 @@ public class SubmitRequest {
     private String recordSql;
     private DQEngineEnum engine;  // Spark,Hive,Presto,etc.
     private String owner;
-    // Ä¬ÈÏÖØÊÔ3´Î
     private Integer maxRetryCount = 3;
 
     public SubmitRequest() {
