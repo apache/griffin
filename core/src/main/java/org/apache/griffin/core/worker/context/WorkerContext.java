@@ -19,8 +19,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class WorkerContext {
 
     private final List<DQInstance> WAITTING_TASK_QUEUE;
-//    public static final List<DQBaseTask> runningTaskIdQueue = Lists.newCopyOnWriteArrayList();
-    // runningTaskIdList = RECORDING_TASK_LIST + EVALUATING_TASK_LIST + ALERTING_TASK_LIST
     private final List<DQInstance> RECORDING_TASK_QUEUE;
     private final LinkedBlockingQueue<DQInstance> EVALUATING_TASK_QUEUE;
     private final LinkedBlockingQueue<DQInstance> ALERTING_TASK_QUEUE;

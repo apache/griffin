@@ -28,42 +28,43 @@ public class DQTaskService {
     @Autowired
     private DispatcherClient dispatcherClient;
 
-    public boolean updateTaskStatus(DQBaseTask task, DQTaskStatus status) {
+    public void updateTaskStatus(DQBaseTask task, DQTaskStatus status) {
         try {
-            dqTaskDao.updateDQTaskListStatus(task, status.getCode());
+            dqTaskDao.updateDQTaskStatus(task, status.getCode());
             task.setStatus(status);
-            return true;
         } catch (Exception e) {
             log.error("task {} {} => {} failed, ex", task.getId(), task.getStatus(), status, e);
         }
-        return false;
     }
 
-    public boolean updateTaskStatus(List<DQBaseTask> tasks, DQTaskStatus status) {
-        if (CollectionUtils.isEmpty(tasks)) return false;
+    public void updateTaskStatus(List<DQBaseTask> tasks, DQTaskStatus status) {
+        if (CollectionUtils.isEmpty(tasks)) return;
         DQBaseTask sampleTask = tasks.get(0);
         List<Long> taskIdList = tasks.stream().map(DQBaseTask::getId).collect(Collectors.toList());
         try {
             dqTaskDao.updateDQTaskListStatus(tasks, status.getCode());
             tasks.forEach(x -> x.setStatus(status));
-            return true;
         } catch (Exception e) {
             log.error("task {} {} => {} failed, ex", taskIdList, sampleTask.getStatus(), status, e);
         }
-        return false;
     }
 
     public boolean doSubmitRecordingTask(DQBaseTask task) {
-        // 一个task对应多个dispatcher任务 分别获取所有的任务对应的请求
-        List<Pair<Long, SubmitRequest>> requestList = getSubmitRequest(task);
-        // 提交任务 获取任务对应的job信息
-        List<JobStatus> jobStatusList = requestList.stream()
-                .map(reqPair -> Pair.of(reqPair.getLeft(), dispatcherClient.submitSql(reqPair.getRight())))
-                .map(respPair -> dispatcherClient.wrapperSubmitResponse(respPair))
-                .collect(Collectors.toList());
-        // 设置job信息
-        task.setJobStatusList(jobStatusList);
-        return true;
+        try {
+            // 一个task对应多个dispatcher任务 分别获取所有的任务对应的请求
+            List<Pair<Long, SubmitRequest>> requestList = getSubmitRequest(task);
+            // 提交任务 获取任务对应的job信息
+            List<JobStatus> jobStatusList = requestList.stream()
+                    .map(reqPair -> Pair.of(reqPair.getLeft(), dispatcherClient.submitSql(reqPair.getRight())))
+                    .map(respPair -> dispatcherClient.wrapperSubmitResponse(respPair))
+                    .collect(Collectors.toList());
+            // 设置job信息
+            task.setJobStatusList(jobStatusList);
+            return true;
+        } catch (Exception e) {
+            log.error("ex: ", e);
+        }
+        return false;
     }
 
     public boolean checkJobStatus(DQBaseTask task) {

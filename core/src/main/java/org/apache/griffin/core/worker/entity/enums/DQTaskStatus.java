@@ -6,8 +6,8 @@ public enum DQTaskStatus {
     RECORDED(1),
     EVALUATING(2),
     EVALUATED(2),
-    ALERTING(3),
-    ALERTED(3),
+//    ALERTING(3),
+//    ALERTED(3),
     SUCCESS(4),
     FAILED(5);
 

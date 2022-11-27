@@ -18,9 +18,9 @@ public abstract class TemplateDriver {
     /**
      * 拼出的SQL 返回值 必须是 <ruleId, Partition, Metric>  这样可以做SQL合并
      */
-    public abstract List<String> getRecordSql(DQRecordTemplate template, Map<String, String> params);
+    public abstract String getRecordSql(DQRecordTemplate template, Map<String, String> params);
 
-    public List<String> getRecordSql(DQEngineEnum engine, DQRecordTemplate template, Map<String, String> params) {
+    public String getRecordSql(DQEngineEnum engine, DQRecordTemplate template, Map<String, String> params) {
         TemplateDriver templateDriver = templateDriverFactory.getTemplateDrvier(engine);
         return templateDriver.getRecordSql(template, params);
     }

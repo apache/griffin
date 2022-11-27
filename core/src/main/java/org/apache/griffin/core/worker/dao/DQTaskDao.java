@@ -11,6 +11,6 @@ import java.util.List;
 public interface DQTaskDao {
 
     void updateDQTaskListStatus(List<DQBaseTask> tasks, int status);
-    void updateDQTaskListStatus(DQBaseTask task, int status);
+    void updateDQTaskStatus(DQBaseTask task, int status);
 
 }
