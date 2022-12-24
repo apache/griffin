@@ -18,6 +18,9 @@ import java.util.List;
 @Data
 public class DQInstance {
     private Long id;
+
+    private Long dqcId;
+
     // 实例状态
     private DQInstanceStatus status;
     // 记录状态年龄  状态更新是重置

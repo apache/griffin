@@ -1,5 +1,7 @@
 package org.apache.griffin.core.worker.service;
 
+import org.apache.griffin.core.api.entity.GriffinDQContentInstanceMap;
+import org.apache.griffin.core.worker.dao.DQContentInstanceMapDao;
 import org.apache.griffin.core.worker.dao.DQInstanceDao;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
 import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;
@@ -14,12 +16,14 @@ public class DQInstanceService {
 
     @Autowired
     private DQInstanceDao dqInstanceDao;
+    @Autowired
+    private DQContentInstanceMapDao dqContentInstanceMapDao;
 
     /**
      * 数据库和内存需要保持同步
-     * @param instance
-     * @param status
-     * @return
+     * @param instance obj
+     * @param status stat
+     * @return true or false
      */
     public boolean updateStatus(DQInstance instance, DQInstanceStatus status) {
         try {
@@ -33,7 +37,33 @@ public class DQInstanceService {
         return false;
     }
 
-    public DQInstance getById(long id) {
+    /**
+     * construct instance
+     * @param id master assign id
+     * @return DQInstance
+     */
+    public DQInstance getById(Long id) {
+        if (id == null) {
+            log.error("Unknown instance id: null");
+        }
+        DQInstance ins = dqInstanceDao.getById(id);
+        if (ins == null) {
+            // the ins id has no task info
+            return constructInstance(id);
+        }
+        return recoveryInstance(ins);
+    }
+
+    private DQInstance constructInstance(Long id) {
+        log.info("constructInstance id: {}", id);
+        GriffinDQContentInstanceMap contentInstanceMap = dqContentInstanceMapDao.getContentInstanceMapByInstanceId(id);
+        Long instanceId = contentInstanceMap.getInstanceId();
+        Long dqcId = contentInstanceMap.getDqcId();
+
+        return null;
+    }
+
+    private DQInstance recoveryInstance(DQInstance instance) {
         return null;
     }
 }
