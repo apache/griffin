@@ -1,10 +1,11 @@
 package org.apache.griffin.core.worker.service;
 
 import org.apache.griffin.core.api.entity.GriffinDQContentInstanceMap;
-import org.apache.griffin.core.worker.dao.DQContentInstanceMapDao;
+import org.apache.griffin.core.api.dao.DQContentInstanceMapDao;
 import org.apache.griffin.core.worker.dao.DQInstanceDao;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
 import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;
+import org.apache.griffin.core.worker.factory.DQInstanceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ public class DQInstanceService {
     private DQInstanceDao dqInstanceDao;
     @Autowired
     private DQContentInstanceMapDao dqContentInstanceMapDao;
+    @Autowired
+    private DQInstanceFactory dqInstanceFactory;
 
     /**
      * 数据库和内存需要保持同步
@@ -59,11 +62,10 @@ public class DQInstanceService {
         GriffinDQContentInstanceMap contentInstanceMap = dqContentInstanceMapDao.getContentInstanceMapByInstanceId(id);
         Long instanceId = contentInstanceMap.getInstanceId();
         Long dqcId = contentInstanceMap.getDqcId();
-
-        return null;
+        return dqInstanceFactory.constructInstance(instanceId, dqcId);
     }
 
     private DQInstance recoveryInstance(DQInstance instance) {
-        return null;
+        return dqInstanceFactory.recoveryInstance(instance);
     }
 }

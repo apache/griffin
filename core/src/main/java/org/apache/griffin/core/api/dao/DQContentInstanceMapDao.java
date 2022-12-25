@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.dao;
+package org.apache.griffin.core.api.dao;
 
 import org.apache.griffin.core.api.entity.GriffinDQContentInstanceMap;
 import org.springframework.stereotype.Component;

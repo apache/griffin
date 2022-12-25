@@ -16,4 +16,5 @@ public class GriffinDQContent {
     private Long resourceId;
     // tableName
     private String tableName;
+    private DQResoueceEnum resoueceEnum;
 }

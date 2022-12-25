@@ -17,6 +17,10 @@ public abstract class DQAbstractStage implements DQStage {
 
     protected List<DQBaseTask> subTaskList;
 
+    public DQAbstractStage() {
+        this.status = DQStageStatus.INIT;
+    }
+
     public DQInstance getInstance() {
         return instance;
     }
