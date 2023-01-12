@@ -1,6 +1,6 @@
 package org.apache.griffin.core.worker.service;
 
-import org.apache.griffin.core.worker.context.WorkerContext;
+import org.apache.griffin.core.api.context.WorkerContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

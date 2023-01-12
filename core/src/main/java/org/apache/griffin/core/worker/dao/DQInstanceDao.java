@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 @Component
 public interface DQInstanceDao {
 
+    DQInstance getById(Long id);
+
     void updateDQInstanceStatus(DQInstance instance, int status);
 
+    void insert(DQInstance instance);
 }

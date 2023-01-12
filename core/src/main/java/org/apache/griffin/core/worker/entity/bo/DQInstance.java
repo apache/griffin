@@ -5,6 +5,9 @@ import org.apache.griffin.core.worker.entity.dispatcher.JobStatus;
 import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;
 import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
 import org.apache.griffin.core.worker.entity.enums.DQTaskStatus;
+import org.apache.griffin.core.worker.entity.pojo.rule.DQAlertRule;
+import org.apache.griffin.core.worker.stage.DQAbstractStage;
+import org.apache.griffin.core.worker.stage.DQStage;
 
 import java.util.List;
 
@@ -15,6 +18,9 @@ import java.util.List;
 @Data
 public class DQInstance {
     private Long id;
+
+    private Long dqcId;
+
     // 实例状态
     private DQInstanceStatus status;
     // 记录状态年龄  状态更新是重置
@@ -23,6 +29,12 @@ public class DQInstance {
     private List<DQBaseTask> subTaskList;
     //
     private long scanTimeStamp = 0L;
+
+    protected DQAlertRule dqAlertRule;
+
+    private DQAbstractStage recordingStage;
+    private DQAbstractStage evaluatingStage;
+    private DQAbstractStage alertingStage;
 
 
 
@@ -44,16 +56,7 @@ public class DQInstance {
         return statusAge > 5;
     }
 
-    public boolean hasTaskToSubmit() {
-        boolean hasTaskToSubmit = false;
-        for (DQBaseTask dqBaseTask : subTaskList) {
-            if (dqBaseTask.getStatus() == DQTaskStatus.WAITTING) {
-                hasTaskToSubmit = true;
-                break;
-            }
-        }
-        return hasTaskToSubmit;
-    }
+
 
     public boolean isFinishRecord() {
         boolean isFinishRecord = true;
@@ -64,14 +67,5 @@ public class DQInstance {
             }
         }
         return isFinishRecord;
-    }
-
-    public void doEvaluteTask() {
-        subTaskList.forEach(DQBaseTask::evaluate);
-
-    }
-
-    public void doAlertTask() {
-        // 收敛告警信息 进行告警
     }
 }

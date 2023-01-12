@@ -1,26 +1,23 @@
-package org.apache.griffin.core.worker.context;
+package org.apache.griffin.core.api.context;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
-import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * 上下文信息  全局唯一
+ * Worker Runtime Env
+ * Scope: Singleton
  */
 @Component
 public class WorkerContext {
 
     private final List<DQInstance> WAITTING_TASK_QUEUE;
-//    public static final List<DQBaseTask> runningTaskIdQueue = Lists.newCopyOnWriteArrayList();
-    // runningTaskIdList = RECORDING_TASK_LIST + EVALUATING_TASK_LIST + ALERTING_TASK_LIST
     private final List<DQInstance> RECORDING_TASK_QUEUE;
     private final LinkedBlockingQueue<DQInstance> EVALUATING_TASK_QUEUE;
     private final LinkedBlockingQueue<DQInstance> ALERTING_TASK_QUEUE;

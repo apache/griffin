@@ -3,6 +3,7 @@ package org.apache.griffin.core.worker.client;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
 import org.apache.griffin.core.worker.entity.dispatcher.*;
+import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
 import org.apache.griffin.core.worker.entity.enums.DQErrorCode;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,11 @@ public class DispatcherClient {
         return null;
     }
 
+
+    public boolean canSubmitToSpecEngine(DQEngineEnum engine) {
+        // todo
+        return true;
+    }
 
     public JobStatusResponse getJobStatus(JobStatusRequest jobStatusRequest) {
         // todo parse job status

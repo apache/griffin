@@ -1,6 +1,7 @@
 package org.apache.griffin.core.worker.entity.bo.task;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.griffin.core.worker.entity.pojo.rule.DQRecordRule;
 
 import java.util.List;
 
@@ -10,17 +11,8 @@ import java.util.List;
 public class DQHiveTask extends DQBaseTask {
 
     @Override
-    public List<Pair<Long, String>> doRecord() {
-        return null;
+    public List<Pair<Long, String>> getRecordInfo() {
+        return recordRule.getPartitionAndRuleIdList(businessTime, engine);
     }
 
-    @Override
-    public boolean doEvaluate() {
-        return false;
-    }
-
-    @Override
-    public boolean doAlert() {
-        return false;
-    }
 }

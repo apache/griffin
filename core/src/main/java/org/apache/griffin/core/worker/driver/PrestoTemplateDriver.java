@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class PrestoTemplateDriver extends TemplateDriver{
     @Override
-    public List<String> getRecordSql(DQRecordTemplate template, Map<String, String> params) {
+    public String getRecordSql(DQRecordTemplate template, Map<String, String> params) {
         return null;
     }
 }

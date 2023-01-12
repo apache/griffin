@@ -3,13 +3,11 @@ package org.apache.griffin.core.worker.entity.bo.task;
 import com.beust.jcommander.internal.Lists;
 import lombok.Data;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.griffin.core.worker.context.WorkerContext;
+import org.apache.griffin.core.api.context.WorkerContext;
 import org.apache.griffin.core.worker.entity.dispatcher.JobStatus;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
-import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;
 import org.apache.griffin.core.worker.entity.enums.DQTaskStatus;
 import org.apache.griffin.core.worker.entity.pojo.Metric;
-import org.apache.griffin.core.worker.entity.pojo.rule.DQAlertRule;
 import org.apache.griffin.core.worker.entity.pojo.rule.DQEvaluateRule;
 import org.apache.griffin.core.worker.entity.pojo.rule.DQRecordRule;
 
@@ -20,42 +18,50 @@ import java.util.List;
  *   一个完整的任务包含
  *      record
  *      evaluate
- *      alert
  */
 @Data
 public abstract class DQBaseTask {
 
-    private long id;
-    private String owner;
-    private WorkerContext wc;
-    private DQEngineEnum engine;
-    private DQRecordRule recordRule;
-    private DQEvaluateRule dqEvaluateRule;
-    private DQAlertRule dqAlertRule;
-    private DQTaskStatus status;
-    private List<JobStatus> jobStatusList;
-    private List<Metric> metricList = Lists.newArrayList();
+    protected long id;
+    protected String owner;
+    protected WorkerContext wc;
+    protected DQEngineEnum engine;
+    protected DQRecordRule recordRule;
+    protected DQEvaluateRule dqEvaluateRule;
+    protected DQTaskStatus status;
+    protected List<JobStatus> jobStatusList;
+    protected List<Metric> metricList = Lists.newArrayList();
+    protected boolean needAlert = false;
+    protected Long businessTime;
     // 记录状态年龄  状态更新是重置
     private int statusAge;
     // 生成recordsql和 模板 + 参数 有关系
     // 生成SQL部分希望交给模板来做
     public List<Pair<Long, String>> record() {
         // before
-        List<Pair<Long, String>> partitionTimeAndSqlList = doRecord();
+        List<Pair<Long, String>> partitionTimeAndSqlList = getRecordInfo();
         // after
         return partitionTimeAndSqlList;
     }
+
     public void evaluate() {
-        doEvaluate();
+        needAlert = doEvaluate();
     }
-    public void alert() {
-        doAlert();
+
+    public String alert() {
+        return getAlertMsg();
     }
 
     // partitionTime And sql
-    public abstract List<Pair<Long, String>> doRecord();
-    public abstract boolean doEvaluate();
-    public abstract boolean doAlert();
+    public abstract List<Pair<Long, String>> getRecordInfo();
+
+    public boolean doEvaluate() {
+        return dqEvaluateRule.execute(metricList);
+    }
+
+    public String getAlertMsg() {
+        return "xxx is error";
+    }
 
     public void setStatus(DQTaskStatus status) {
         if (this.status != status) resetStatusAge();

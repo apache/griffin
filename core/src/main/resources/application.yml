@@ -1,0 +1,4 @@
+task:
+  assign:
+    strategy:
+      org.apache.griffin.core.master.strategy.LooperAssignStrategy
