@@ -1,6 +1,6 @@
 package org.apache.griffin.core.worker.factory;
 
-import org.apache.griffin.core.api.entity.DQResoueceEnum;
+import org.apache.griffin.core.api.entity.DQResoueceEnums;
 import org.apache.griffin.core.api.entity.GriffinDQBusinessRule;
 import org.apache.griffin.core.worker.dao.DQTaskDao;
 import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
@@ -20,7 +20,7 @@ public class DQTaskFactory {
     @Autowired
     private DQTaskDao dqTaskDao;
 
-    public List<DQBaseTask> constructTasks(DQResoueceEnum resoueceEnum,
+    public List<DQBaseTask> constructTasks(DQResoueceEnums resoueceEnum,
                                            List<GriffinDQBusinessRule> businessRuleList) {
         switch (resoueceEnum) {
             // construct hive

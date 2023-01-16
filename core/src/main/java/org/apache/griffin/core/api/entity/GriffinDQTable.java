@@ -9,5 +9,5 @@ import lombok.Data;
 public class GriffinDQTable {
     private Long id;
     private String tableName;
-    private DQResoueceEnum resoueceEnum;
+    private DQResoueceEnums resoueceEnum;
 }
