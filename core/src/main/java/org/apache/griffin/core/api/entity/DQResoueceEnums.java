@@ -1,5 +1,5 @@
 package org.apache.griffin.core.api.entity;
 
-public enum DQResoueceEnum {
+public enum DQResoueceEnums {
     HIVE, KAFKA;
 }
