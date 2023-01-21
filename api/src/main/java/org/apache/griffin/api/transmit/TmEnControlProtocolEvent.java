@@ -1,4 +1,4 @@
-package org.apache.griffin.core.api.transmit;
+package org.apache.griffin.api.transmit;
 
 /**
  * the Protocol for TaskManager to control ExecuteNode

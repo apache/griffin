@@ -1,4 +1,4 @@
-package org.apache.griffin.core.api.context;
+package org.apache.griffin.core.common.utils.context;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;

@@ -48,6 +48,10 @@ under the License.
         <livy.core.version>0.3.0</livy.core.version>
         <elasticsearch-rest-client.version>6.2.4</elasticsearch-rest-client.version>
         <jackson-databind.version>2.9.9.3</jackson-databind.version>
+        <!-- grpc -->
+<!--        <protobuf.version>3.19.1</protobuf.version>-->
+<!--        <protobuf-plugin.version>0.6.1</protobuf-plugin.version>-->
+<!--        <grpc.version>1.42.1</grpc.version>-->
     </properties>
 
     <repositories>
@@ -224,20 +228,6 @@ under the License.
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- to access confluent schema registry -->
-<!--        <dependency>-->
-<!--            <groupId>io.confluent</groupId>-->
-<!--            <artifactId>kafka-schema-registry-client</artifactId>-->
-<!--            <version>${confluent.version}</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.slf4j</groupId>-->
-<!--                    <artifactId>slf4j-log4j12</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
         <!--schedule-->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -298,12 +288,28 @@ under the License.
             <version>${elasticsearch-rest-client.version}</version>
         </dependency>
 
-        <!--   新增依赖     -->
+        <!--   new dependencies     -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- grpc server dependency-->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-server-spring-boot-starter</artifactId>
+            <version>2.14.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.griffin</groupId>
+            <artifactId>api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <profiles>
@@ -335,7 +341,33 @@ under the License.
         </profile>
     </profiles>
     <build>
+<!--        <extensions>-->
+<!--            <extension>-->
+<!--                <groupId>kr.motd.maven</groupId>-->
+<!--                <artifactId>os-maven-plugin</artifactId>-->
+<!--                <version>1.7.0</version>-->
+<!--            </extension>-->
+<!--        </extensions>-->
+
         <plugins>
+<!--            <plugin>-->
+<!--                <groupId>org.xolstice.maven.plugins</groupId>-->
+<!--                <artifactId>protobuf-maven-plugin</artifactId>-->
+<!--                <version>${protobuf-plugin.version}</version>-->
+<!--                <configuration>-->
+<!--                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>-->
+<!--                    <pluginId>grpc-java</pluginId>-->
+<!--                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>compile</goal>-->
+<!--                            <goal>compile-custom</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>com.ethlo.persistence.tools</groupId>
                 <artifactId>eclipselink-maven-plugin</artifactId>

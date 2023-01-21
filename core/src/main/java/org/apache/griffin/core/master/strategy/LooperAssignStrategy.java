@@ -1,6 +1,7 @@
 package org.apache.griffin.core.master.strategy;
 
-import org.apache.griffin.core.api.context.DQCApplicationContext;
+
+import org.apache.griffin.api.context.DQCApplicationContext;
 
 public class LooperAssignStrategy extends AbstractAssignStrategy {
 

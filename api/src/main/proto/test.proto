@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package org.apache.griffin.api.proto.protocol;
+
+option java_multiple_files = true;
+option java_package = "org.apache.griffin.api.proto.protocol";
+option java_outer_classname = "TmEnprotocol";
+
+
+service EnToTmHeartbeat{
+  // send heartbeat
+  rpc heartbeat(EnToTmHeartbeatRequest) returns (CommonReply) {
+
+  }
+
+}
+
+
+// The request message containing the user's name.
+message EnToTmHeartbeatRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message CommonReply {
+  string message = 1;
+}

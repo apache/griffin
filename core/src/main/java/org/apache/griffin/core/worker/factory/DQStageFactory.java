@@ -1,6 +1,6 @@
 package org.apache.griffin.core.worker.factory;
 
-import org.apache.griffin.core.api.utils.SpringUtils;
+import org.apache.griffin.core.common.utils.SpringUtils;
 import org.apache.griffin.core.worker.dao.DQStageDao;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
 import org.apache.griffin.core.worker.entity.enums.DQStageTypeEnum;

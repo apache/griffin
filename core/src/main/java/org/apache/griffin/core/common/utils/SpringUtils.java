@@ -1,4 +1,4 @@
-package org.apache.griffin.core.api.utils;
+package org.apache.griffin.core.common.utils;
 
 
 import org.springframework.beans.BeansException;

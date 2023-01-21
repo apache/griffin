@@ -1,4 +1,4 @@
-package org.apache.griffin.core.api.transmit;
+package org.apache.griffin.api.transmit;
 
 public interface GriffinProtocolEvent {
 

@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@ComponentScan({"org.apache.griffin.core.master", "org.apache.griffin.core.api"})
+@ComponentScan({"org.apache.griffin.core.master", "org.apache.griffin.core.common"})
 @SpringBootApplication
 @EnableScheduling
 public class GriffinMasterMain {

@@ -1,6 +1,6 @@
-package org.apache.griffin.core.api.dao;
+package org.apache.griffin.core.common.dao;
 
-import org.apache.griffin.core.api.entity.GriffinDQContentInstanceMap;
+import org.apache.griffin.core.common.entity.GriffinDQContentInstanceMap;
 import org.springframework.stereotype.Component;
 
 @Component

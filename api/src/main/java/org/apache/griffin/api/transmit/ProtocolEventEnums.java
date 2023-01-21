@@ -1,4 +1,4 @@
-package org.apache.griffin.core.api.transmit;
+package org.apache.griffin.api.transmit;
 
 public enum ProtocolEventEnums {
     TASK_ASSIGN_REQUEST(1, "the request for tm to assign task to en"),
