@@ -1,6 +1,6 @@
 package org.apache.griffin.core.worker.entity.bo.task;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import lombok.Data;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.griffin.core.common.utils.context.WorkerContext;

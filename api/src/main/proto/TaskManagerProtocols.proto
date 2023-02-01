@@ -8,8 +8,9 @@ option java_outer_classname = "TaskManagerProtocol";
 option java_generic_services = true;
 option java_generate_equals_and_hash = true;
 
-service RegistDQWorkerNode {
+service TaskManagerService {
   rpc registDQWorkerNode(RegistDQWorkerNodeRequest) returns (RegistDQWorkerNodeResponse) {}
+  rpc reportDQWorkNodeStatus(ReportDQWorkNodeStatusRequest) returns (ReportDQWorkNodeStatusResponse) {}
 }
 
 message RegistDQWorkerNodeRequest {
@@ -20,10 +21,6 @@ message RegistDQWorkerNodeRequest {
 message RegistDQWorkerNodeResponse {
   int32 code = 1;
   optional int32 status = 2;
-}
-
-service ReportDQWorkNodeStatus {
-  rpc reportDQWorkNodeStatus(ReportDQWorkNodeStatusRequest) returns (ReportDQWorkNodeStatusResponse) {}
 }
 
 message ReportDQWorkNodeStatusRequest {

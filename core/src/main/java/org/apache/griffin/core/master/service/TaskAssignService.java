@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
 import javax.annotation.PostConstruct;
 
 
-@Component
+//@Component
 public class TaskAssignService {
 
     @Value("${task.assign.strategy}")
