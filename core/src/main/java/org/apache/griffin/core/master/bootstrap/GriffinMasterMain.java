@@ -8,8 +8,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-//@ComponentScan({"org.apache.griffin.core.master", "org.apache.griffin.core.common"})
-@ComponentScan({"org.apache.griffin.core.master.service"})
+@ComponentScan({"org.apache.griffin.core.master", "org.apache.griffin.core.common"})
+//@ComponentScan({"org.apache.griffin.core.master.service"})
 @SpringBootApplication
 @EnableScheduling
 public class GriffinMasterMain {

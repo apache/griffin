@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package org.apache.griffin.api.proto.protocol;
+
+option java_multiple_files = true;
+option java_package = "org.apache.griffin.api.proto.protocol";
+option java_outer_classname = "CommonProtocol";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+
+message SayHelloRequest {
+}
+
+message SayHelloResponse {
+  int32 code = 1;
+}

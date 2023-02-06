@@ -6,10 +6,12 @@ import org.apache.griffin.api.proto.protocol.TaskManagerServiceGrpc;
 
 public class TaskManagerClient {
 
+    // todo connect to master?
     @GrpcClient("taskManagerService")
     private TaskManagerServiceGrpc.TaskManagerServiceBlockingStub client;
 
     public void test() {
-        client.registDQWorkerNode(null);
+
+//        TaskManagerServiceGrpc.newBlockingStub()
     }
 }

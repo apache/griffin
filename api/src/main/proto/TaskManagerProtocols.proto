@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "common.proto";
+
 package org.apache.griffin.api.proto.protocol;
 
 option java_multiple_files = true;
@@ -11,6 +13,7 @@ option java_generate_equals_and_hash = true;
 service TaskManagerService {
   rpc registDQWorkerNode(RegistDQWorkerNodeRequest) returns (RegistDQWorkerNodeResponse) {}
   rpc reportDQWorkNodeStatus(ReportDQWorkNodeStatusRequest) returns (ReportDQWorkNodeStatusResponse) {}
+  rpc sayHello(SayHelloRequest) returns (SayHelloResponse) {}
 }
 
 message RegistDQWorkerNodeRequest {

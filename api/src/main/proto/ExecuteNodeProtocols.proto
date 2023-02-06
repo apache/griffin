@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "common.proto";
+
 package org.apache.griffin.api.proto.protocol;
 
 option java_multiple_files = true;
@@ -15,6 +17,7 @@ service ExecuteNodeService {
   rpc stopDQTask(StopDQTaskRequest) returns (StopDQTaskResponse) {}
   // Ask ExecuteNode to stop one task
   rpc querySingleDQTask(SQuerySingleDQTaskRequest) returns (QuerySingleDQTaskResponse) {}
+  rpc sayHello(SayHelloRequest) returns (SayHelloResponse) {}
 }
 
 message SubmitDQTaskRequest {
@@ -43,3 +46,5 @@ message QuerySingleDQTaskResponse {
   int32 code = 1;
   optional int32 status = 2;
 }
+
+
