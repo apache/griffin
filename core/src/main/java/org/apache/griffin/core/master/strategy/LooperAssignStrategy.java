@@ -1,16 +1,14 @@
 package org.apache.griffin.core.master.strategy;
 
 
-import org.apache.griffin.api.context.DQCApplicationContext;
+import org.apache.griffin.core.master.transport.DQCConnection;
+
+import java.util.List;
 
 public class LooperAssignStrategy extends AbstractAssignStrategy {
 
-    public LooperAssignStrategy(DQCApplicationContext dqcApplicationContext) {
-        super(dqcApplicationContext);
-    }
-
     @Override
-    public String assignTask(long instanceId) {
+    public DQCConnection assignTask(List<DQCConnection> clientList) {
         return null;
     }
 }

@@ -9,31 +9,23 @@ import org.apache.griffin.api.common.GRPCCode;
 import org.apache.griffin.api.proto.protocol.ExecuteNodeServiceGrpc;
 import org.apache.griffin.api.proto.protocol.SayHelloRequest;
 import org.apache.griffin.api.proto.protocol.SayHelloResponse;
+import org.apache.griffin.core.master.transport.DQCConnection;
+import org.apache.griffin.core.master.transport.DQCConnectionManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.UnknownHostException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @Component
 @Slf4j
 public class TaskManager {
 
-    public ConcurrentMap<String, ExecuteNodeServiceGrpc.ExecuteNodeServiceBlockingStub> clientMap = Maps.newConcurrentMap();
+    @Autowired
+    private DQCConnectionManager dqcConnectionManager;
 
     public void registerWorker(String hostName, int port) throws UnknownHostException {
-
         try {
-            ManagedChannel channel = ManagedChannelBuilder.forAddress(hostName, port)
-                    .usePlaintext()
-                    .build();
-            ExecuteNodeServiceGrpc.ExecuteNodeServiceBlockingStub clientStub = ExecuteNodeServiceGrpc.newBlockingStub(channel);
-            SayHelloResponse sayHelloResponse = clientStub.sayHello(SayHelloRequest.newBuilder().build());
-            if (sayHelloResponse.getCode() == GRPCCode.SUCCESS.getCode()) {
-                clientMap.put(hostName + "_" + port, clientStub);
-            } else  {
-                throw new UnknownHostException(hostName + ":" + port);
-            }
+            dqcConnectionManager.registerWorker(hostName, port);
         } catch (UnknownHostException uhe) {
             throw uhe;
         } catch (Exception e) {
@@ -41,7 +33,13 @@ public class TaskManager {
         }
     }
 
-    // todo check client health
+    public void submitDQTask(Long instanceId) {
+        DQCConnection aliveClient = dqcConnectionManager.getAliveClient();
+        if (aliveClient == null) {
 
-    // todo reconnect
+        }
+        if (aliveClient.submitDQTask(instanceId)) {
+            // todo add task and client info to cache
+        }
+    }
 }

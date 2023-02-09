@@ -24,7 +24,7 @@ public class TaskAssignService {
     }
 
 
-    public String assignTask(long instanceId) {
-        return strategy.assignTask(instanceId);
-    }
+//    public String assignTask(long instanceId) {
+//        return strategy.assignTask(instanceId);
+//    }
 }

@@ -1,27 +1,47 @@
 package org.apache.griffin.core.master.transport;
 
+import com.google.protobuf.RpcCallback;
+import com.google.protobuf.RpcController;
+import io.grpc.stub.StreamObserver;
+import lombok.Builder;
+import lombok.Data;
+import org.apache.griffin.api.common.GRPCCode;
+import org.apache.griffin.api.proto.protocol.*;
+
+import java.net.UnknownHostException;
 import java.nio.channels.ServerSocketChannel;
 import java.util.concurrent.Future;
 
 /**
  * the obj has a socketChannel to worker node
  */
+@Data
+@Builder
 public class DQCConnection {
     // worker hostName
     private String hostName;
-    // worker hostIP
-    private String hostIP;
     // worker hostPort
     private int hostPort;
-    // todo
-    private ServerSocketChannel channel;
+    // client
+    private ExecuteNodeServiceGrpc.ExecuteNodeServiceBlockingStub client;
 
-    /**
-     * Send msg async
-     * @param msg message
-     * @return Future
-     */
-    public Future send(byte[] msg) {
-        return null;
+    private boolean isAlive;
+
+    public boolean sayHello() throws UnknownHostException {
+        SayHelloResponse sayHelloResponse = client.sayHello(SayHelloRequest.newBuilder().build());
+        if (sayHelloResponse.getCode() == GRPCCode.SUCCESS.getCode()) {
+            return true;
+        } else  {
+            throw new UnknownHostException(hostName + ":" + hostPort);
+        }
     }
+
+    public boolean submitDQTask(Long instanceId) {
+        SubmitDQTaskRequest submitDQTaskRequest = SubmitDQTaskRequest.newBuilder()
+                .setInstanceId(instanceId)
+                .build();
+        SubmitDQTaskResponse submitDQTaskResponse = client.submitDQTask(submitDQTaskRequest);
+        return submitDQTaskResponse.getCode() == GRPCCode.SUCCESS.getCode();
+    }
+
 }
