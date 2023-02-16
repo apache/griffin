@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package org.apache.griffin.api.proto.protocol;
+
+option java_multiple_files = true;
+option java_package = "org.apache.griffin.api.proto.protocol";
+option java_outer_classname = "TaskManagerProtocol";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+
+service TaskManagerService {
+  rpc registDQWorkerNode(RegistDQWorkerNodeRequest) returns (RegistDQWorkerNodeResponse) {}
+  rpc reportDQWorkNodeStatus(ReportDQWorkNodeStatusRequest) returns (ReportDQWorkNodeStatusResponse) {}
+  rpc sayHello(SayHelloRequest) returns (SayHelloResponse) {}
+}
+
+message RegistDQWorkerNodeRequest {
+  string hostName = 1;
+  int32 port = 2;
+}
+
+message RegistDQWorkerNodeResponse {
+  int32 code = 1;
+  optional int32 status = 2;
+}
+
+message ReportDQWorkNodeStatusRequest {
+  int64 instanceId = 1;
+}
+
+message ReportDQWorkNodeStatusResponse {
+  int32 code = 1;
+  optional int32 status = 2;
+}

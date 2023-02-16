@@ -3,7 +3,7 @@ package org.apache.griffin.core.worker.schedule;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.griffin.core.api.context.WorkerContext;
+import org.apache.griffin.core.common.utils.context.WorkerContext;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
 import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;
 import org.apache.griffin.core.worker.entity.enums.DQStageStatus;

@@ -101,6 +101,7 @@ under the License.
         <module>dispatcher</module>
         <module>scheduler</module>
         <module>anomalydetection</module>
+        <module>api</module>
     </modules>
 
     <dependencyManagement>

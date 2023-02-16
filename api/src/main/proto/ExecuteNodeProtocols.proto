@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package org.apache.griffin.api.proto.protocol;
+
+option java_multiple_files = true;
+option java_package = "org.apache.griffin.api.proto.protocol";
+option java_outer_classname = "ExecuteNodeProtocol";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+
+service ExecuteNodeService {
+  // Submit Task to ExecuteNode
+  rpc submitDQTask(SubmitDQTaskRequest) returns (SubmitDQTaskResponse) {}
+  // Ask ExecuteNode to stop one task
+  rpc stopDQTask(StopDQTaskRequest) returns (StopDQTaskResponse) {}
+  // Ask ExecuteNode to stop one task
+  rpc querySingleDQTask(SQuerySingleDQTaskRequest) returns (QuerySingleDQTaskResponse) {}
+  rpc sayHello(SayHelloRequest) returns (SayHelloResponse) {}
+}
+
+message SubmitDQTaskRequest {
+  int64 instanceId = 1;
+}
+
+message SubmitDQTaskResponse {
+  int32 code = 1;
+  optional int32 status = 2;
+}
+
+message StopDQTaskRequest {
+  int64 instanceId = 1;
+}
+
+message StopDQTaskResponse {
+  int32 code = 1;
+  optional int32 status = 2;
+}
+
+message SQuerySingleDQTaskRequest {
+  int64 instanceId = 1;
+}
+
+message QuerySingleDQTaskResponse {
+  int32 code = 1;
+  optional int32 status = 2;
+}
+
+

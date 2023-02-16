@@ -1,14 +1,11 @@
 package org.apache.griffin.core.master.strategy;
 
-import org.apache.griffin.core.api.context.DQCApplicationContext;
+
+import org.apache.griffin.core.master.transport.DQCConnection;
+
+import java.util.List;
 
 public abstract class AbstractAssignStrategy {
 
-    protected DQCApplicationContext dqcApplicationContext;
-
-    public AbstractAssignStrategy(DQCApplicationContext dqcApplicationContext) {
-        this.dqcApplicationContext = dqcApplicationContext;
-    }
-
-    public abstract String assignTask(long instanceId);
+    public abstract DQCConnection assignTask(List<DQCConnection> clientList);
 }

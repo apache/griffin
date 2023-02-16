@@ -1,7 +1,7 @@
 package org.apache.griffin.core.worker.service;
 
-import org.apache.griffin.core.api.entity.GriffinDQContentInstanceMap;
-import org.apache.griffin.core.api.dao.DQContentInstanceMapDao;
+import org.apache.griffin.core.common.entity.GriffinDQContentInstanceMap;
+import org.apache.griffin.core.common.dao.DQContentInstanceMapDao;
 import org.apache.griffin.core.worker.dao.DQInstanceDao;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
 import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;

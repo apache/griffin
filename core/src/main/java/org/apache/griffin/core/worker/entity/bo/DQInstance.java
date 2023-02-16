@@ -16,7 +16,7 @@ import java.util.List;
  *      一个实例包含多个子任务
  */
 @Data
-public class DQInstance {
+public class DQInstance implements Comparable<DQInstance> {
     private Long id;
 
     private Long dqcId;
@@ -67,5 +67,10 @@ public class DQInstance {
             }
         }
         return isFinishRecord;
+    }
+
+    @Override
+    public int compareTo(DQInstance o) {
+        return 0;
     }
 }
