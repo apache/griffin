@@ -547,6 +547,7 @@ List of supported data connectors:
 | Name       | Type     | Description                            | Default Values |
 |:-----------|:---------|:---------------------------------------|:-------------- |
 | database   | `String` | database name                          | default |
+| sql        | `String` | query sql                              | `Empty` |
 | tablename  | `String` | table name to be read                  | `Empty` |
 | url        | `String` | the connection string URL to database  | `Empty` |
 | user       | `String` | user for connection to database        | `Empty` |
@@ -554,6 +555,7 @@ List of supported data connectors:
 | driver     | `String` | driver class for JDBC connection to database | com.mysql.jdbc.Driver |
 | where      | `String` | condition for reading data from table  | `Empty` |
 
+- The config `sql` and `tablename` cannot be all empty. If sql is not empty, connector will extract the result of sql.
 - Example:
    ```
   "connector": {
