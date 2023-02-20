@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.entity.enums;
+package org.apache.griffin.api.entity.enums;
 
 public enum DQInstanceStatus {
     ACCEPTED(0),
@@ -21,5 +21,13 @@ public enum DQInstanceStatus {
 
     public int getCode() {
         return code;
+    }
+
+    public static DQInstanceStatus findByCode(int statusCode) throws Exception {
+        DQInstanceStatus[] values = DQInstanceStatus.values();
+        for (DQInstanceStatus value : values) {
+            if (value.code == statusCode) return value;
+        }
+        throw new Exception("Unknown DQInstanceStatus Code: " + statusCode);
     }
 }

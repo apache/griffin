@@ -1,13 +1,11 @@
 package org.apache.griffin.core.worker.entity.bo;
 
 import lombok.Data;
-import org.apache.griffin.core.worker.entity.dispatcher.JobStatus;
-import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;
+import org.apache.griffin.api.entity.enums.DQInstanceStatus;
 import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
 import org.apache.griffin.core.worker.entity.enums.DQTaskStatus;
 import org.apache.griffin.core.worker.entity.pojo.rule.DQAlertRule;
 import org.apache.griffin.core.worker.stage.DQAbstractStage;
-import org.apache.griffin.core.worker.stage.DQStage;
 
 import java.util.List;
 

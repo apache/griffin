@@ -1,16 +1,12 @@
 package org.apache.griffin.core.master.transport;
 
-import com.google.protobuf.RpcCallback;
-import com.google.protobuf.RpcController;
-import io.grpc.stub.StreamObserver;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.griffin.api.common.GRPCCode;
+import org.apache.griffin.api.entity.enums.DQInstanceStatus;
 import org.apache.griffin.api.proto.protocol.*;
 
 import java.net.UnknownHostException;
-import java.nio.channels.ServerSocketChannel;
-import java.util.concurrent.Future;
 
 /**
  * the obj has a socketChannel to worker node
@@ -44,4 +40,24 @@ public class DQCConnection {
         return submitDQTaskResponse.getCode() == GRPCCode.SUCCESS.getCode();
     }
 
+    public DQInstanceStatus querySingleDQTask(Long instanceId) throws Exception {
+        QuerySingleDQTaskRequest querySingleDQTaskRequest = QuerySingleDQTaskRequest.newBuilder()
+                .setInstanceId(instanceId)
+                .build();
+        QuerySingleDQTaskResponse querySingleDQTaskResponse = client.querySingleDQTask(querySingleDQTaskRequest);
+        if (querySingleDQTaskResponse.getCode() == GRPCCode.SUCCESS.getCode()) {
+            int status = querySingleDQTaskResponse.getStatus();
+            DQInstanceStatus dqInstanceStatus = DQInstanceStatus.findByCode(status);
+            return dqInstanceStatus;
+        }
+        return null;
+    }
+
+    public boolean stopDQTask(Long instanceId) {
+        StopDQTaskRequest stopDQTaskRequest = StopDQTaskRequest.newBuilder()
+                .setInstanceId(instanceId)
+                .build();
+        StopDQTaskResponse stopDQTaskResponse = client.stopDQTask(stopDQTaskRequest);
+        return stopDQTaskResponse.getCode() == GRPCCode.SUCCESS.getCode();
+    }
 }

@@ -16,7 +16,7 @@ service ExecuteNodeService {
   // Ask ExecuteNode to stop one task
   rpc stopDQTask(StopDQTaskRequest) returns (StopDQTaskResponse) {}
   // Ask ExecuteNode to stop one task
-  rpc querySingleDQTask(SQuerySingleDQTaskRequest) returns (QuerySingleDQTaskResponse) {}
+  rpc querySingleDQTask(QuerySingleDQTaskRequest) returns (QuerySingleDQTaskResponse) {}
   rpc sayHello(SayHelloRequest) returns (SayHelloResponse) {}
 }
 
@@ -38,7 +38,7 @@ message StopDQTaskResponse {
   optional int32 status = 2;
 }
 
-message SQuerySingleDQTaskRequest {
+message QuerySingleDQTaskRequest {
   int64 instanceId = 1;
 }
 

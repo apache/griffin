@@ -1,10 +1,10 @@
 package org.apache.griffin.core.worker.service;
 
+import org.apache.griffin.api.entity.enums.DQInstanceStatus;
 import org.apache.griffin.core.common.entity.GriffinDQContentInstanceMap;
 import org.apache.griffin.core.common.dao.DQContentInstanceMapDao;
 import org.apache.griffin.core.worker.dao.DQInstanceDao;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
-import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;
 import org.apache.griffin.core.worker.factory.DQInstanceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
