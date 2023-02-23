@@ -5,11 +5,11 @@ import com.google.common.collect.Queues;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.griffin.api.entity.enums.DQInstanceStatus;
 import org.apache.griffin.core.common.utils.context.WorkerContext;
-import org.apache.griffin.core.worker.entity.bo.DQInstance;
+import org.apache.griffin.core.worker.entity.bo.DQInstanceBO;
 import org.apache.griffin.core.worker.entity.enums.DQStageStatus;
 import org.apache.griffin.core.worker.exception.StageSubmitException;
-import org.apache.griffin.core.worker.service.DQInstanceService;
 import org.apache.griffin.core.worker.service.DQStageService;
+import org.apache.griffin.core.worker.service.DQWorkerInstanceService;
 import org.apache.griffin.core.worker.stage.DQAbstractStage;
 import org.apache.griffin.core.worker.stage.DQStage;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class TaskDispatcherScheduler {
     private static final Logger log = LoggerFactory.getLogger(TaskDispatcherScheduler.class);
 
     private WorkerContext wc;
-    private DQInstanceService dqInstanceService;
+    private DQWorkerInstanceService dqWorkerInstanceService;
     private DQStageService dqStageService;
 
     @Autowired
@@ -41,8 +41,8 @@ public class TaskDispatcherScheduler {
         this.wc = wc;
     }
     @Autowired
-    public void setDqInstanceService(DQInstanceService dqInstanceService) {
-        this.dqInstanceService = dqInstanceService;
+    public void setDqWorkerInstanceService(DQWorkerInstanceService dqWorkerInstanceService) {
+        this.dqWorkerInstanceService = dqWorkerInstanceService;
     }
     @Autowired
     public void setDqStageService(DQStageService dqStageService) {
@@ -63,23 +63,23 @@ public class TaskDispatcherScheduler {
     @Scheduled(fixedDelay = 5 * 1000L)
     public void doTaskDispatcherScheduler() {
         log.info("doTaskDispatcherScheduler start.");
-        List<DQInstance> waittingToRemoveFromWaitingList = Lists.newArrayList();
-        Queue<DQInstance> waitingToRecordingDQInstanceQueue = Queues.newPriorityBlockingQueue(wc.getWAITTING_TASK_QUEUE());
+        List<DQInstanceBO> waittingToRemoveFromWaitingList = Lists.newArrayList();
+        Queue<DQInstanceBO> waitingToRecordingDQInstanceQueue = Queues.newPriorityBlockingQueue(wc.getWAITTING_TASK_QUEUE());
 
         try {
             while (true) {
                 try {
-                    DQInstance dqInstance = waitingToRecordingDQInstanceQueue.poll();
+                    DQInstanceBO dqInstance = waitingToRecordingDQInstanceQueue.poll();
                     // queue is empty, quit
                     if (dqInstance == null) break;
                     if (DQInstanceStatus.ACCEPTED != dqInstance.getStatus()) {
                         // State is not init, sync from database and reassign it
-                        dqInstance = dqInstanceService.getById(dqInstance.getId());
+                        dqInstance = dqWorkerInstanceService.getById(dqInstance.getId());
                         // assign task by status
                         waittingToRemoveFromWaitingList.add(dqInstance);
                     } else {
                         // normal, update status and remove from queue, then put it to the queue of recording task
-                        if (dqInstanceService.updateStatus(dqInstance, DQInstanceStatus.WAITTING)) {
+                        if (dqWorkerInstanceService.updateStatus(dqInstance, DQInstanceStatus.WAITTING)) {
                             waittingToRemoveFromWaitingList.add(dqInstance);
                         }
                     }
@@ -100,7 +100,7 @@ public class TaskDispatcherScheduler {
         log.info("doTaskDispatcherScheduler end.");
     }
 
-    private void offerToSpecQueueByStatus(DQInstance instance) {
+    private void offerToSpecQueueByStatus(DQInstanceBO instance) {
         DQInstanceStatus status = instance.getStatus();
         switch (status) {
             case WAITTING:
@@ -132,12 +132,12 @@ public class TaskDispatcherScheduler {
 
     @Scheduled(fixedDelay = 5 * 1000L)
     public void scanRecordingTask() {
-        List<DQInstance> waittingToRemoveFromRecordingList = Lists.newArrayList();
-        Queue<DQInstance> waitingToSubmitDQInstanceQueue = Queues.newPriorityBlockingQueue(wc.getRECORDING_TASK_QUEUE());
+        List<DQInstanceBO> waittingToRemoveFromRecordingList = Lists.newArrayList();
+        Queue<DQInstanceBO> waitingToSubmitDQInstanceQueue = Queues.newPriorityBlockingQueue(wc.getRECORDING_TASK_QUEUE());
         try {
             while (CollectionUtils.isNotEmpty(waitingToSubmitDQInstanceQueue)) {
                 try {
-                    DQInstance dqInstance = waitingToSubmitDQInstanceQueue.poll();
+                    DQInstanceBO dqInstance = waitingToSubmitDQInstanceQueue.poll();
                     if (dqInstance == null) break;
                     processRecordingInstance(dqInstance, waittingToRemoveFromRecordingList);
                 } catch (Exception e) {
@@ -156,7 +156,7 @@ public class TaskDispatcherScheduler {
         }
     }
 
-    private void processRecordingInstance(DQInstance dqInstance, List<DQInstance> waittingToRemoveFromRecordingList) {
+    private void processRecordingInstance(DQInstanceBO dqInstance, List<DQInstanceBO> waittingToRemoveFromRecordingList) {
         try {
             DQAbstractStage recordingStage = dqInstance.getRecordingStage();
             DQStageStatus stageStatus = recordingStage.getStatus();
@@ -164,13 +164,13 @@ public class TaskDispatcherScheduler {
                 if (!dqStageService.submitStage(recordingStage)) {
                     throw new StageSubmitException("Submit stage failed!, instance id: " + dqInstance.getId());
                 } else {
-                    dqInstanceService.updateStatus(dqInstance, DQInstanceStatus.RECORDING);
+                    dqWorkerInstanceService.updateStatus(dqInstance, DQInstanceStatus.RECORDING);
                 }
             } else if (stageStatus == DQStageStatus.FINISH) {
                 // if there is one task success, the instance should be EVALUATING;
                 // if all tasks are failed, the instance should be FAILED_ALERTING;
                 DQInstanceStatus instanceStatus = recordingStage.hasSuccess()? DQInstanceStatus.EVALUATING: DQInstanceStatus.FAILED_ALERTING;
-                dqInstanceService.updateStatus(dqInstance, instanceStatus);
+                dqWorkerInstanceService.updateStatus(dqInstance, instanceStatus);
                 waittingToRemoveFromRecordingList.add(dqInstance);
             }
         } catch (Exception e) {
@@ -181,9 +181,9 @@ public class TaskDispatcherScheduler {
 
     public void scanEvaluatingTask() {
         Executors.newCachedThreadPool().execute(() -> {
-            LinkedBlockingQueue<DQInstance> evaluating_task_queue = wc.getEVALUATING_TASK_QUEUE();
+            LinkedBlockingQueue<DQInstanceBO> evaluating_task_queue = wc.getEVALUATING_TASK_QUEUE();
             while (true) {
-                DQInstance dqInstance = null;
+                DQInstanceBO dqInstance = null;
                 try {
                     dqInstance = evaluating_task_queue.poll(5, TimeUnit.SECONDS);
                     if (dqInstance == null) continue;
@@ -192,13 +192,13 @@ public class TaskDispatcherScheduler {
                     if (dqInstance.getStatus() == DQInstanceStatus.EVALUATING) {
                         dqStageService.executeStage(evaluatingStage);
                         DQInstanceStatus dqInstanceStatus = evaluatingStage.hasSuccess() ? DQInstanceStatus.ALERTING : DQInstanceStatus.FAILED_ALERTING;
-                        dqInstanceService.updateStatus(dqInstance, dqInstanceStatus);
+                        dqWorkerInstanceService.updateStatus(dqInstance, dqInstanceStatus);
                     }
                     offerToSpecQueueByStatus(dqInstance);
                 } catch (Exception e) {
                     if (dqInstance != null) {
                         log.error("scanEvaluatingTask doEvalute failed, id : {}， instance : {}, ex:", dqInstance.getId(), dqInstance, e);
-                        dqInstanceService.updateStatus(dqInstance, DQInstanceStatus.FAILED_ALERTING);
+                        dqWorkerInstanceService.updateStatus(dqInstance, DQInstanceStatus.FAILED_ALERTING);
                         offerToSpecQueueByStatus(dqInstance);
                     } else {
                         log.error("scanEvaluatingTask poll instance failed. ex:", e);
@@ -210,9 +210,9 @@ public class TaskDispatcherScheduler {
 
     public void scanAlertingTask() {
         Executors.newCachedThreadPool().execute(() -> {
-            LinkedBlockingQueue<DQInstance> alerting_task_queue = wc.getALERTING_TASK_QUEUE();
+            LinkedBlockingQueue<DQInstanceBO> alerting_task_queue = wc.getALERTING_TASK_QUEUE();
             while (true) {
-                DQInstance dqInstance = null;
+                DQInstanceBO dqInstance = null;
                 try {
                     dqInstance = alerting_task_queue.poll(1, TimeUnit.SECONDS);
                     if (dqInstance == null) continue;
@@ -221,7 +221,7 @@ public class TaskDispatcherScheduler {
                         DQStage alertingStage = dqInstance.getAlertingStage();
                         dqStageService.executeStage(alertingStage);
                         DQInstanceStatus dqInstanceStatus = alertingStage.hasSuccess()? DQInstanceStatus.SUCCESS : DQInstanceStatus.FAILED;
-                        dqInstanceService.updateStatus(dqInstance, dqInstanceStatus);
+                        dqWorkerInstanceService.updateStatus(dqInstance, dqInstanceStatus);
                     }
                     offerToSpecQueueByStatus(dqInstance);
                 } catch (Exception e) {
@@ -229,7 +229,7 @@ public class TaskDispatcherScheduler {
                         log.error("scanAlertingTask doAlert failed, id : {}， instance : {}, ex:", dqInstance.getId(), dqInstance, e);
                         if (dqInstance.isFailed()) {
                             // retry 5 times, set failed
-                            dqInstanceService.updateStatus(dqInstance, DQInstanceStatus.FAILED);
+                            dqWorkerInstanceService.updateStatus(dqInstance, DQInstanceStatus.FAILED);
                             // retry times less than 5, do not modify status and put task back
                         }
                         // put task back

@@ -1,11 +1,12 @@
 package org.apache.griffin.core.worker.factory;
 
-import org.apache.griffin.core.common.dao.DQBusinessRuleDao;
-import org.apache.griffin.core.common.dao.DQContentDao;
-import org.apache.griffin.core.common.entity.GriffinDQBusinessRule;
-import org.apache.griffin.core.common.entity.GriffinDQContent;
-import org.apache.griffin.core.worker.dao.DQInstanceDao;
-import org.apache.griffin.core.worker.entity.bo.DQInstance;
+import org.apache.griffin.api.dao.DQBusinessRuleDao;
+import org.apache.griffin.api.dao.DQContentDao;
+import org.apache.griffin.api.entity.GriffinDQBusinessRule;
+import org.apache.griffin.api.entity.GriffinDQContent;
+import org.apache.griffin.api.dao.DQInstanceDao;
+import org.apache.griffin.api.entity.pojo.DQInstanceEntity;
+import org.apache.griffin.core.worker.entity.bo.DQInstanceBO;
 import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
 import org.apache.griffin.core.worker.entity.enums.DQStageTypeEnum;
 import org.apache.griffin.core.worker.stage.DQAbstractStage;
@@ -28,8 +29,8 @@ public class DQInstanceFactory {
     @Autowired
     private DQTaskFactory dqTaskFactory;
 
-    public DQInstance constructInstance(Long id, Long dqcId) {
-        DQInstance instance = new DQInstance();
+    public DQInstanceBO constructInstance(Long id, Long dqcId) {
+        DQInstanceBO instance = new DQInstanceBO();
         instance.setId(id);
         instance.setDqcId(dqcId);
         GriffinDQContent griffinDQContent = dqContentDao.getById(dqcId);
@@ -46,11 +47,10 @@ public class DQInstanceFactory {
         // construct alert stage
         DQAbstractStage alertStage = dqStageFactory.constructStage(DQStageTypeEnum.ALERT, instance);
         instance.setAlertingStage(alertStage);
-        dqInstanceDao.insert(instance);
         return instance;
     }
 
-    public DQInstance recoveryInstance(DQInstance instance) {
+    public DQInstanceBO recoveryInstance(DQInstanceEntity instance) {
         return null;
     }
 }

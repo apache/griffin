@@ -1,7 +1,7 @@
 package org.apache.griffin.core.worker.factory;
 
-import org.apache.griffin.core.common.entity.DQResoueceEnums;
-import org.apache.griffin.core.common.entity.GriffinDQBusinessRule;
+import org.apache.griffin.api.entity.DQResoueceEnums;
+import org.apache.griffin.api.entity.GriffinDQBusinessRule;
 import org.apache.griffin.core.worker.dao.DQTaskDao;
 import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
 import org.slf4j.Logger;

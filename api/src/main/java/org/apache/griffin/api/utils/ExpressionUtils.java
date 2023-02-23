@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.utils;
+package org.apache.griffin.api.utils;
 
 public class ExpressionUtils {
     public static boolean evaluate(String expression, double metricValue) {

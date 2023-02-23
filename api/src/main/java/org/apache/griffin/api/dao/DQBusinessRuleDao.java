@@ -1,9 +1,10 @@
-package org.apache.griffin.core.common.dao;
+package org.apache.griffin.api.dao;
 
-import org.apache.griffin.core.common.entity.GriffinDQBusinessRule;
+import org.apache.griffin.api.entity.GriffinDQBusinessRule;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
 
 @Component
 public interface DQBusinessRuleDao {

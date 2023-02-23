@@ -15,4 +15,7 @@ public class TaskManagerContext {
         submitTaskContainer.put(instanceId, client);
     }
 
+    public void clearTask(Long instanceId) {
+        submitTaskContainer.remove(instanceId);
+    }
 }

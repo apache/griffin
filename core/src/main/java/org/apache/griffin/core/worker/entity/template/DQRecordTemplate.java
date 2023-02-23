@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.entity.pojo.template;
+package org.apache.griffin.core.worker.entity.template;
 
 import org.apache.griffin.core.worker.driver.TemplateDriver;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;

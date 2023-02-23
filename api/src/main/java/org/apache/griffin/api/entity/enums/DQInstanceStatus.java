@@ -11,7 +11,8 @@ public enum DQInstanceStatus {
 //    EVALUATE_ALERTING(6), // Metric 需要告警
     FAILED_ALERTING(7),   // 任务执行失败需要告警
     SUCCESS(8),
-    FAILED(9);
+    FAILED(9),
+    STOPPED(10);
 
     private final int code;
 

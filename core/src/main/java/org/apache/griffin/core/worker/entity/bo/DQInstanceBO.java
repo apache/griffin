@@ -2,9 +2,9 @@ package org.apache.griffin.core.worker.entity.bo;
 
 import lombok.Data;
 import org.apache.griffin.api.entity.enums.DQInstanceStatus;
+import org.apache.griffin.api.entity.pojo.rule.DQAlertRule;
 import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
 import org.apache.griffin.core.worker.entity.enums.DQTaskStatus;
-import org.apache.griffin.core.worker.entity.pojo.rule.DQAlertRule;
 import org.apache.griffin.core.worker.stage.DQAbstractStage;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  *      一个实例包含多个子任务
  */
 @Data
-public class DQInstance implements Comparable<DQInstance> {
+public class DQInstanceBO implements Comparable<DQInstanceBO> {
     private Long id;
 
     private Long dqcId;
@@ -68,7 +68,7 @@ public class DQInstance implements Comparable<DQInstance> {
     }
 
     @Override
-    public int compareTo(DQInstance o) {
+    public int compareTo(DQInstanceBO o) {
         return 0;
     }
 }

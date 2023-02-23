@@ -1,13 +1,13 @@
-package org.apache.griffin.core.worker.entity.pojo.rule;
+package org.apache.griffin.api.entity.pojo.rule;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.Data;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
-import org.apache.griffin.core.worker.entity.pojo.DQTable;
-import org.apache.griffin.core.worker.entity.pojo.template.DQRecordBaseTemplate;
-import org.apache.griffin.core.worker.entity.pojo.template.DQRecordTemplate;
+import org.apache.griffin.api.entity.pojo.DQTable;
+import org.apache.griffin.core.worker.entity.template.DQRecordBaseTemplate;
+import org.apache.griffin.core.worker.entity.template.DQRecordTemplate;
 import org.apache.griffin.core.worker.utils.DQDateUtils;
 
 import java.util.List;

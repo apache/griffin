@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.entity.pojo.template;
+package org.apache.griffin.core.worker.entity.template;
 
 public class DQRecordBaseTemplate extends DQRecordTemplate {
 }

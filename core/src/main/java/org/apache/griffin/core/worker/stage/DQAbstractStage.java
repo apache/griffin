@@ -1,6 +1,6 @@
 package org.apache.griffin.core.worker.stage;
 
-import org.apache.griffin.core.worker.entity.bo.DQInstance;
+import org.apache.griffin.core.worker.entity.bo.DQInstanceBO;
 import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
 import org.apache.griffin.core.worker.entity.enums.DQStageStatus;
 import org.apache.griffin.core.worker.service.DQStageService;
@@ -13,7 +13,7 @@ public abstract class DQAbstractStage implements DQStage {
     protected DQStageService dqStageService;
 
     protected DQStageStatus status;
-    protected DQInstance instance;
+    protected DQInstanceBO instance;
 
     protected List<DQBaseTask> subTaskList;
 
@@ -21,11 +21,11 @@ public abstract class DQAbstractStage implements DQStage {
         this.status = DQStageStatus.INIT;
     }
 
-    public DQInstance getInstance() {
+    public DQInstanceBO getInstance() {
         return instance;
     }
 
-    public void setInstance(DQInstance instance) {
+    public void setInstance(DQInstanceBO instance) {
         this.instance = instance;
     }
 

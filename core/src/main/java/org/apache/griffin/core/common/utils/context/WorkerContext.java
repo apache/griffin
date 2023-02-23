@@ -2,7 +2,7 @@ package org.apache.griffin.core.common.utils.context;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import org.apache.griffin.core.worker.entity.bo.DQInstance;
+import org.apache.griffin.core.worker.entity.bo.DQInstanceBO;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +17,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Component
 public class WorkerContext {
 
-    private final List<DQInstance> WAITTING_TASK_QUEUE;
-    private final List<DQInstance> RECORDING_TASK_QUEUE;
-    private final LinkedBlockingQueue<DQInstance> EVALUATING_TASK_QUEUE;
-    private final LinkedBlockingQueue<DQInstance> ALERTING_TASK_QUEUE;
+    private final List<DQInstanceBO> WAITTING_TASK_QUEUE;
+    private final List<DQInstanceBO> RECORDING_TASK_QUEUE;
+    private final LinkedBlockingQueue<DQInstanceBO> EVALUATING_TASK_QUEUE;
+    private final LinkedBlockingQueue<DQInstanceBO> ALERTING_TASK_QUEUE;
 
     // success和failed队列数据老化问题？
-    public final List<DQInstance> successTaskIdList;
-    public final List<DQInstance> failedTaskIdList;
+    public final List<DQInstanceBO> successTaskIdList;
+    public final List<DQInstanceBO> failedTaskIdList;
     
     public WorkerContext() {
         // 设置队列长度
@@ -37,27 +37,27 @@ public class WorkerContext {
         failedTaskIdList = Lists.newArrayList();
     }
 
-    public List<DQInstance> getWAITTING_TASK_QUEUE() {
+    public List<DQInstanceBO> getWAITTING_TASK_QUEUE() {
         return WAITTING_TASK_QUEUE;
     }
 
-    public List<DQInstance> getRECORDING_TASK_QUEUE() {
+    public List<DQInstanceBO> getRECORDING_TASK_QUEUE() {
         return RECORDING_TASK_QUEUE;
     }
 
-    public LinkedBlockingQueue<DQInstance> getEVALUATING_TASK_QUEUE() {
+    public LinkedBlockingQueue<DQInstanceBO> getEVALUATING_TASK_QUEUE() {
         return EVALUATING_TASK_QUEUE;
     }
 
-    public LinkedBlockingQueue<DQInstance> getALERTING_TASK_QUEUE() {
+    public LinkedBlockingQueue<DQInstanceBO> getALERTING_TASK_QUEUE() {
         return ALERTING_TASK_QUEUE;
     }
 
-    public List<DQInstance> getSuccessTaskIdList() {
+    public List<DQInstanceBO> getSuccessTaskIdList() {
         return successTaskIdList;
     }
 
-    public List<DQInstance> getFailedTaskIdList() {
+    public List<DQInstanceBO> getFailedTaskIdList() {
         return failedTaskIdList;
     }
 
@@ -66,18 +66,18 @@ public class WorkerContext {
         resetTaskStatusWhenStartUp();
     }
 
-    public DQInstance getWaittingTask() {
+    public DQInstanceBO getWaittingTask() {
         return null;
     }
 
-    public DQInstance getRecordingTask() {
+    public DQInstanceBO getRecordingTask() {
         return null;
     }
 
-    public boolean offerToRecordingTaskQueue(DQInstance dqInstance) {
+    public boolean offerToRecordingTaskQueue(DQInstanceBO dqInstance) {
         return false;
     }
-    public void offerToAlertingTaskQueue(DQInstance dqInstance) {
+    public void offerToAlertingTaskQueue(DQInstanceBO dqInstance) {
     }
 
     /**
@@ -97,18 +97,18 @@ public class WorkerContext {
     }
 
 
-    public void offerToEvaluatingTaskQueue(DQInstance dqInstance) {
+    public void offerToEvaluatingTaskQueue(DQInstanceBO dqInstance) {
     }
 
-    public void removeAll(List<DQInstance> targetList, List<DQInstance> waittingToRemoveFromRecordingList) {
+    public void removeAll(List<DQInstanceBO> targetList, List<DQInstanceBO> waittingToRemoveFromRecordingList) {
         targetList.removeAll(waittingToRemoveFromRecordingList);
     }
 
-    public void addFailedDQInstanceInfo(DQInstance instance) {
+    public void addFailedDQInstanceInfo(DQInstanceBO instance) {
 
     }
 
-    public void addSuccessDQInstanceInfo(DQInstance instance) {
+    public void addSuccessDQInstanceInfo(DQInstanceBO instance) {
 
     }
 }
