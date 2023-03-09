@@ -63,6 +63,7 @@ case class SinkFactory(sinkParamIter: Seq[SinkParam], jobName: String)
       case Hdfs => Try(HdfsSink(config, jobName, timeStamp))
       case ElasticSearch => Try(ElasticSearchSink(config, jobName, timeStamp, block))
       case MongoDB => Try(MongoSink(config, jobName, timeStamp, block))
+      case MySql => Try(MysqlSink(config, jobName, timeStamp, block))
       case Custom => Try(getCustomSink(config, timeStamp, block))
       case _ => throw new Exception(s"sink type $sinkType is not supported!")
     }

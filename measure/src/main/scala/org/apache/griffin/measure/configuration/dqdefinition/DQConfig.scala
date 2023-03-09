@@ -42,6 +42,7 @@ import org.apache.griffin.measure.configuration.enums.SinkType.SinkType
  * @param dataSources    data sources (must)
  * @param evaluateRule   dq measurement (must)
  * @param sinks          sink types (optional, by default will be elasticsearch)
+ * Optional: change to mysql sink default
  */
 @JsonInclude(Include.NON_NULL)
 case class DQConfig(

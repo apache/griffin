@@ -48,6 +48,11 @@ under the License.
         <livy.core.version>0.3.0</livy.core.version>
         <elasticsearch-rest-client.version>6.2.4</elasticsearch-rest-client.version>
         <jackson-databind.version>2.9.9.3</jackson-databind.version>
+        <mybatis-plus-annotation.version>3.5.1</mybatis-plus-annotation.version>
+        <druid.version>1.2.8</druid.version>
+        <fastjson.version>1.2.78</fastjson.version>
+        <lombok.version>1.18.22</lombok.version>
+        <mybatis-spring-boot-starter.vesion>2.1.1</mybatis-spring-boot-starter.vesion>
     </properties>
 
     <repositories>
@@ -297,9 +302,35 @@ under the License.
             <artifactId>elasticsearch-rest-client</artifactId>
             <version>${elasticsearch-rest-client.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${mybatis-spring-boot-starter.vesion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-annotation</artifactId>
+            <version>${mybatis-plus-annotation.version}</version>
+        </dependency>
     </dependencies>
     <profiles>
-        <!--if you need mysql, please uncomment mysql-connector-java -->
+        <!--if you need mysql, please uncomment mysql-connector-java-->
         <!--<profile>-->
         <!--<id>mysql</id>-->
         <!--<activation>-->

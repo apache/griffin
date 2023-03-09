@@ -19,6 +19,10 @@ under the License.
 
 package org.apache.griffin.core.metric.model;
 
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.annotation.TableField;
+import org.apache.griffin.core.util.MysqlSinkUtil;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +36,15 @@ public class MetricValue {
     private Map<String, Object> metadata;
 
     private Map<String, Object> value;
+
+    @TableField(value = "metadata",
+            typeHandler = MysqlSinkUtil.class)
+    private JSONObject metadataJson;
+
+    @TableField(value = "value",
+            typeHandler = MysqlSinkUtil.class)
+    private JSONObject valueJson;
+
 
     public MetricValue() {
     }

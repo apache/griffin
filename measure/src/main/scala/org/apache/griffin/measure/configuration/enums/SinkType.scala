@@ -26,13 +26,14 @@ import org.apache.griffin.measure.configuration.enums
  *  <li>{@link #Es #Elasticsearch #Http} - elasticsearch sink, will sink metric
  *  in elasticsearch (alias Es and Http)</li>
  *  <li>{@link #Mongo #MongoDB} - mongo sink, will sink metric in mongo db (alias MongoDb)</li>
+ *  <li>{@link #MySql} - MySql sink, alias=MySql</li>
  *  <li>{@link #Custom} - custom sink (needs using extra jar-file-extension)</li>
  *  <li>{@link #Unknown} - </li>
  */
 object SinkType extends GriffinEnum {
   type SinkType = Value
 
-  val Console, Log, Hdfs, Es, Http, ElasticSearch, MongoDB, Mongo, Custom =
+  val Console, Log, Hdfs, Es, Http, ElasticSearch, MongoDB, Mongo, MySql, Custom =
     Value
 
   def validSinkTypes(sinkTypeSeq: Seq[String]): Seq[SinkType] = {
@@ -48,6 +49,7 @@ object SinkType extends GriffinEnum {
       case Console | Log => Console
       case Es | ElasticSearch | Http => ElasticSearch
       case MongoDB | Mongo => MongoDB
+      case MySql => MySql
       case _ => sinkType
     }
   }
