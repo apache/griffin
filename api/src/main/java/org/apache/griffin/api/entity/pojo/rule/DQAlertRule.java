@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.entity.pojo.rule;
+package org.apache.griffin.api.entity.pojo.rule;
 
 import java.util.List;
 

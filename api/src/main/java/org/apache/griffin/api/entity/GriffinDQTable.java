@@ -1,4 +1,4 @@
-package org.apache.griffin.core.common.entity;
+package org.apache.griffin.api.entity;
 
 import lombok.Data;
 

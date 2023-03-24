@@ -16,7 +16,7 @@ public class ExecuteNodeServiceImpl extends ExecuteNodeServiceGrpc.ExecuteNodeSe
     }
 
     @Override
-    public void querySingleDQTask(SQuerySingleDQTaskRequest request, StreamObserver<QuerySingleDQTaskResponse> responseObserver) {
+    public void querySingleDQTask(QuerySingleDQTaskRequest request, StreamObserver<QuerySingleDQTaskResponse> responseObserver) {
         super.querySingleDQTask(request, responseObserver);
     }
 }

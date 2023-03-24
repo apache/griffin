@@ -22,8 +22,10 @@ import java.util.stream.Collectors;
 public class DQCConnectionManager {
 
     private List<DQCConnection> clientList = Lists.newCopyOnWriteArrayList();
-    private String assignStrategyClassName = "org.apache.griffin.core.master.strategy.LooperAssignStrategy";
+    // todo read from conf
+    private final String assignStrategyClassName = "org.apache.griffin.core.master.strategy.LooperAssignStrategy";
     private AbstractAssignStrategy strategy;
+
     @PostConstruct
     public void init() {
         strategy = AssignStrategyFactory.getStrategy(assignStrategyClassName);

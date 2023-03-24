@@ -1,14 +1,9 @@
 package org.apache.griffin.core.master.server;
 
 
-import com.google.common.collect.Maps;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.griffin.api.common.GRPCCode;
-import org.apache.griffin.api.proto.protocol.ExecuteNodeServiceGrpc;
-import org.apache.griffin.api.proto.protocol.SayHelloRequest;
-import org.apache.griffin.api.proto.protocol.SayHelloResponse;
+import org.apache.griffin.api.entity.enums.DQInstanceStatus;
+import org.apache.griffin.core.master.context.TaskManagerContext;
 import org.apache.griffin.core.master.transport.DQCConnection;
 import org.apache.griffin.core.master.transport.DQCConnectionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +17,8 @@ public class TaskManager {
 
     @Autowired
     private DQCConnectionManager dqcConnectionManager;
+    @Autowired
+    private TaskManagerContext taskManagerContext;
 
     public void registerWorker(String hostName, int port) throws UnknownHostException {
         try {
@@ -36,10 +33,35 @@ public class TaskManager {
     public void submitDQTask(Long instanceId) {
         DQCConnection aliveClient = dqcConnectionManager.getAliveClient();
         if (aliveClient == null) {
-
+            log.error("getAliveClient Failed, Please check");
+            return;
         }
         if (aliveClient.submitDQTask(instanceId)) {
-            // todo add task and client info to cache
+            taskManagerContext.addTask(instanceId, aliveClient);
+            // todo flush to db
         }
+    }
+
+    public DQInstanceStatus querySingleDQTask(Long instanceId) throws Exception {
+        DQCConnection aliveClient = dqcConnectionManager.getAliveClient();
+        if (aliveClient == null) {
+            log.error("getAliveClient Failed, Please check");
+            return null;
+        }
+        DQInstanceStatus dqInstanceStatus = aliveClient.querySingleDQTask(instanceId);
+        return dqInstanceStatus;
+    }
+
+    public boolean stopDQTask(Long instanceId) {
+        DQCConnection aliveClient = dqcConnectionManager.getAliveClient();
+        if (aliveClient == null) {
+            log.error("getAliveClient Failed, Please check");
+            return false;
+        }
+        if (aliveClient.stopDQTask(instanceId)) {
+            taskManagerContext.clearTask(instanceId);
+            return true;
+        }
+        return false;
     }
 }

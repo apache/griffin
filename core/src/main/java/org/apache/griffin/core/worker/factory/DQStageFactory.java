@@ -2,7 +2,8 @@ package org.apache.griffin.core.worker.factory;
 
 import org.apache.griffin.core.common.utils.SpringUtils;
 import org.apache.griffin.core.worker.dao.DQStageDao;
-import org.apache.griffin.core.worker.entity.bo.DQInstance;
+import org.apache.griffin.api.entity.pojo.DQInstanceEntity;
+import org.apache.griffin.core.worker.entity.bo.DQInstanceBO;
 import org.apache.griffin.core.worker.entity.enums.DQStageTypeEnum;
 import org.apache.griffin.core.worker.service.DQStageService;
 import org.apache.griffin.core.worker.service.DQTaskService;
@@ -23,7 +24,7 @@ public class DQStageFactory {
     @Autowired
     private DQStageDao dqStageDao;
 
-    public DQAbstractStage constructStage(DQStageTypeEnum stageTypeEnum, DQInstance instance) {
+    public DQAbstractStage constructStage(DQStageTypeEnum stageTypeEnum, DQInstanceBO instance) {
         DQAbstractStage stage = null;
         switch (stageTypeEnum) {
             case RECORD:

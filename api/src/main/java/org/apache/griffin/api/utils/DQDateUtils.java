@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.utils;
+package org.apache.griffin.api.utils;
 
 import java.util.concurrent.TimeUnit;
 

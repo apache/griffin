@@ -1,4 +1,4 @@
-package org.apache.griffin.core.worker.entity.pojo;
+package org.apache.griffin.api.entity.pojo;
 
 import lombok.Data;
 

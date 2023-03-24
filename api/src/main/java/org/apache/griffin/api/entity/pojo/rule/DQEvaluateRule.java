@@ -1,7 +1,7 @@
-package org.apache.griffin.core.worker.entity.pojo.rule;
+package org.apache.griffin.api.entity.pojo.rule;
 
-import org.apache.griffin.core.worker.entity.pojo.Metric;
-import org.apache.griffin.core.worker.utils.ExpressionUtils;
+import org.apache.griffin.api.entity.pojo.Metric;
+import org.apache.griffin.api.utils.ExpressionUtils;
 
 import java.util.List;
 

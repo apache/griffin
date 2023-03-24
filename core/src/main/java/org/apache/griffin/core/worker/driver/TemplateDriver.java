@@ -1,12 +1,11 @@
 package org.apache.griffin.core.worker.driver;
 
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
-import org.apache.griffin.core.worker.entity.pojo.template.DQRecordTemplate;
+import org.apache.griffin.core.worker.entity.template.DQRecordTemplate;
 import org.apache.griffin.core.worker.factory.TemplateDriverFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service

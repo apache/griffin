@@ -7,9 +7,9 @@ import org.apache.griffin.core.common.utils.context.WorkerContext;
 import org.apache.griffin.core.worker.entity.dispatcher.JobStatus;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
 import org.apache.griffin.core.worker.entity.enums.DQTaskStatus;
-import org.apache.griffin.core.worker.entity.pojo.Metric;
-import org.apache.griffin.core.worker.entity.pojo.rule.DQEvaluateRule;
-import org.apache.griffin.core.worker.entity.pojo.rule.DQRecordRule;
+import org.apache.griffin.api.entity.pojo.Metric;
+import org.apache.griffin.api.entity.pojo.rule.DQEvaluateRule;
+import org.apache.griffin.api.entity.pojo.rule.DQRecordRule;
 
 import java.util.List;
 

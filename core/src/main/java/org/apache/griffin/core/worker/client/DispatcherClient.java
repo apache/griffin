@@ -1,7 +1,7 @@
 package org.apache.griffin.core.worker.client;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.griffin.core.worker.entity.bo.DQInstance;
+import org.apache.griffin.api.entity.pojo.DQInstanceEntity;
 import org.apache.griffin.core.worker.entity.dispatcher.*;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
 import org.apache.griffin.core.worker.entity.enums.DQErrorCode;
@@ -32,7 +32,7 @@ public class DispatcherClient {
         return null;
     }
 
-    public SubmitRequest wrapperDQTask(DQInstance waittingTask) {
+    public SubmitRequest wrapperDQTask(DQInstanceEntity waittingTask) {
         return null;
     }
 
