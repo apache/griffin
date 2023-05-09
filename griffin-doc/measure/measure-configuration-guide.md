@@ -553,8 +553,10 @@ List of supported data connectors:
 | password   | `String` | password for connection to database    | `null`  |
 | driver     | `String` | driver class for JDBC connection to database | com.mysql.jdbc.Driver |
 | where      | `String` | condition for reading data from table  | `Empty` |
+| sql        | `String` | query sql                              | `Empty` |
 
-- Example:
+
+- Example (without `sql` provided):
    ```
   "connector": {
       "type": "jdbc",
@@ -566,6 +568,20 @@ List of supported data connectors:
         "password": "test_p",
         "driver": "com.mysql.jdbc.Driver",
         "where": ""
+      }
+    } 
+
+- If the config `sql` was provided, `database`, `tablename` and `where` can all be ignored, connector will extract the result of sql.
+- Example (with `sql` provided):
+   ```
+  "connector": {
+      "type": "jdbc",
+      "config": {
+        "sql": "select col_a, col_b from griffin.griffin where id > 100 limit 100",
+        "url": "jdbc:mysql://localhost:3306/default",
+        "user": "test_u",
+        "password": "test_p",
+        "driver": "com.mysql.jdbc.Driver",
       }
     } 
   

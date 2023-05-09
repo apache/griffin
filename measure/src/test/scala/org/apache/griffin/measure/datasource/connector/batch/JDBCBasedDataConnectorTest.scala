@@ -105,7 +105,19 @@ class JDBCBasedDataConnectorTest extends SparkSuiteBase with Matchers {
         "password" -> "password",
         "driver" -> "org.h2.Driver")
       JDBCBasedDataConnector(spark, dcParam.copy(config = configs), timestampStorage)
-    } should have message "requirement failed: JDBC connection: table is mandatory"
+    } should have message "requirement failed: JDBC connection: sql or table is mandatory"
+  }
+
+  "JDBC data connector" should "have user name field in config" in {
+    the[java.lang.IllegalArgumentException] thrownBy {
+      val configs = Map(
+        "database" -> "griffin",
+        "url" -> url,
+        "sql" -> "select col_a, col_b, col_c from griffin.griffin limit 10000",
+        "password" -> "password",
+        "driver" -> "org.h2.Driver")
+      JDBCBasedDataConnector(spark, dcParam.copy(config = configs), timestampStorage)
+    } should have message "requirement failed: JDBC connection: user name is mandatory"
   }
 
   "JDBC data connector" should "have user name field in config" in {
