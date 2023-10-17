@@ -1,0 +1,41 @@
+{
+  "name":"prof_batch",
+  "process.type":"BATCH",
+  "data.sources":[
+    {
+      "name":"src",
+      "baseline": true,
+      "connector":{
+        "type":"jdbc",
+        "config":{
+          "database":"test1",
+          "tablename":"student",
+          "url":"jdbc:mysql://localhost:3306/test",
+          "user":"test",
+          "password":"123456",
+          "driver":"com.mysql.jdbc.Driver",
+          "where":""
+        }
+      }
+    }
+  ],
+  "evaluate.rule":{
+    "rules":[
+      {
+        "dsl.type":"griffin-dsl",
+        "dq.type":"PROFILING",
+        "out.dataframe.name":"prof",
+        "rule":"src.id where src.age > 20",
+        "out":[
+          {
+            "type":"metric",
+            "name":"prof"
+          }
+        ]
+      }
+    ]
+  },
+  "sinks":[
+    "CONSOLESink"
+  ]
+}
