@@ -80,7 +80,7 @@ case class JDBCBasedDataConnector(
       dfOpt match {
         case Success(_) =>
         case Failure(exception) =>
-          griffinLogger.error("Error occurred while reading data set.", exception)
+          error("Error occurred while reading data set.", exception)
       }
 
       val preDfOpt = preProcess(dfOpt.toOption, ms)
