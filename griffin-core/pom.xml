@@ -26,10 +26,10 @@ under the License.
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>anomalydetection</artifactId>
+    <artifactId>griffin-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>Apache Griffin :: Anomaly Detection</name>
+    <name>Apache Griffin :: Core</name>
 
     <properties>
         <hadoop.version>2.7.1</hadoop.version>
@@ -225,19 +225,6 @@ under the License.
             </exclusions>
         </dependency>
 
-        <!-- to access confluent schema registry -->
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>kafka-schema-registry-client</artifactId>
-            <version>${confluent.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!--schedule-->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -296,6 +283,12 @@ under the License.
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
             <version>${elasticsearch-rest-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <profiles>

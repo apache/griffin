@@ -97,10 +97,11 @@ under the License.
 
 
     <modules>
-        <module>core</module>
-        <module>dispatcher</module>
-        <module>scheduler</module>
-        <module>anomalydetection</module>
+        <module>griffin-bom</module>
+        <module>griffin-common</module>
+        <module>griffin-core</module>
+        <module>griffin-scheduler</module>
+        <module>griffin-anomalydetection</module>
     </modules>
 
     <dependencyManagement>
