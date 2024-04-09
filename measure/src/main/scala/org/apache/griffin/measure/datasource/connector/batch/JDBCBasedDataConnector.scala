@@ -55,6 +55,7 @@ case class JDBCBasedDataConnector(
   val config: Map[String, Any] = dcParam.getConfig
   val database: String = config.getString(Database, DefaultDatabase)
   val tableName: String = config.getString(TableName, EmptyString)
+  val sql: String = config.getString(Sql, EmptyString)
   val fullTableName: String = s"$database.$tableName"
   val whereString: String = config.getString(Where, EmptyString)
   val url: String = config.getString(Url, EmptyString)
@@ -65,7 +66,7 @@ case class JDBCBasedDataConnector(
   require(url.nonEmpty, "JDBC connection: connection url is mandatory")
   require(user.nonEmpty, "JDBC connection: user name is mandatory")
   require(password.nonEmpty, "JDBC connection: password is mandatory")
-  require(tableName.nonEmpty, "JDBC connection: table is mandatory")
+  require(sql.nonEmpty || tableName.nonEmpty, "JDBC connection: sql or table is mandatory")
   assert(isJDBCDriverLoaded(driver), s"JDBC driver $driver not present in classpath")
 
   override def data(ms: Long): (Option[DataFrame], TimeRange) = {
@@ -99,6 +100,9 @@ case class JDBCBasedDataConnector(
    * @return Return SQL statement with where condition if provided
    */
   private def createSqlStmt(): String = {
+    if (sql.nonEmpty) {
+      return sql
+    }
     val tableClause = s"SELECT * FROM $fullTableName"
     if (whereString.nonEmpty) {
       s"$tableClause WHERE $whereString"
@@ -109,6 +113,7 @@ case class JDBCBasedDataConnector(
 object JDBCBasedDataConnector extends Loggable {
   private val Database: String = "database"
   private val TableName: String = "tablename"
+  private val Sql: String = "sql"
   private val Where: String = "where"
   private val Url: String = "url"
   private val User: String = "user"
