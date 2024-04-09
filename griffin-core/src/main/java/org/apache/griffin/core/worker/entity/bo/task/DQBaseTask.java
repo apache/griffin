@@ -1,23 +1,21 @@
 package org.apache.griffin.core.worker.entity.bo.task;
 
-import com.beust.jcommander.internal.Lists;
 import lombok.Data;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.griffin.core.worker.context.WorkerContext;
 import org.apache.griffin.core.worker.entity.dispatcher.JobStatus;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
-import org.apache.griffin.core.worker.entity.enums.DQInstanceStatus;
+
 import org.apache.griffin.core.worker.entity.enums.DQTaskStatus;
 import org.apache.griffin.core.worker.entity.pojo.Metric;
 import org.apache.griffin.core.worker.entity.pojo.rule.DQAlertRule;
 import org.apache.griffin.core.worker.entity.pojo.rule.DQEvaluateRule;
 import org.apache.griffin.core.worker.entity.pojo.rule.DQRecordRule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 任务基础类
- *   一个完整的任务包含
  *      record
  *      evaluate
  *      alert
@@ -34,7 +32,7 @@ public abstract class DQBaseTask {
     private DQAlertRule dqAlertRule;
     private DQTaskStatus status;
     private List<JobStatus> jobStatusList;
-    private List<Metric> metricList = Lists.newArrayList();
+    private List<Metric> metricList = new ArrayList<>();
     // 记录状态年龄  状态更新是重置
     private int statusAge;
     // 生成recordsql和 模板 + 参数 有关系

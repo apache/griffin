@@ -3,17 +3,15 @@ package org.apache.griffin.core.worker.context;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
-import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;
 import org.apache.griffin.core.worker.entity.enums.DQEngineEnum;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * 上下文信息  全局唯一
+ *
  */
 @Component
 public class WorkerContext {

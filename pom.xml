@@ -24,39 +24,54 @@ under the License.
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>17</version>
-        <relativePath />
+        <version>25</version>
     </parent>
 
     <groupId>org.apache.griffin</groupId>
-    <artifactId>griffin</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>griffin-parent</artifactId>
+    <version>${revision}</version>
     <packaging>pom</packaging>
-    <name>Apache Griffin ${project.version}</name>
+    <name>Apache Griffin ${revision}</name>
     <url>http://griffin.apache.org</url>
 
-    <prerequisites>
-        <maven>3.2.5</maven>
-    </prerequisites>
 
     <properties>
-        <encoding>UTF-8</encoding>
-        <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+        <revision>1.0.0-SNAPSHOT</revision>
 
+        <file.encoding>UTF-8</file.encoding>
         <java.version>1.8</java.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <scala211.binary.version>2.11</scala211.binary.version>
-        <scala.version>${scala.binary.version}.12</scala.version>
-
+        <project.build.sourceEncoding>${file.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${file.encoding}</project.reporting.outputEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
+
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <guava.version>33.1.0-jre</guava.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-io.version>2.15.1</commons-io.version>
+        <mybatis-spring-boot-starter.version>2.3.2</mybatis-spring-boot-starter.version>
+
+        <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
+        <testcontainers.version>1.19.7</testcontainers.version>
+
+        <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
+        <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+
+        <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+        <maven-gpg-plugin.version>3.2.1</maven-gpg-plugin.version>
 
         <maven-apache-rat.version>0.11</maven-apache-rat.version>
         <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 
-        <compile.scope>compile</compile.scope>
-        <provided.scope>provided</provided.scope>
     </properties>
 
     <licenses>
@@ -107,13 +122,50 @@ under the License.
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
-                <scope>test</scope>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.junit.platform</groupId>-->
+<!--            <artifactId>junit-platform-suite</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+    </dependencies>
 
     <build>
         <pluginManagement>

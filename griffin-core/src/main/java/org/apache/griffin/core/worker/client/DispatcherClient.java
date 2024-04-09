@@ -7,7 +7,7 @@ import org.apache.griffin.core.worker.entity.enums.DQErrorCode;
 import org.springframework.stereotype.Service;
 
 /**
- * Dispatcher客户端 负责与dispatcher交互
+ *
  */
 @Service
 public class DispatcherClient {

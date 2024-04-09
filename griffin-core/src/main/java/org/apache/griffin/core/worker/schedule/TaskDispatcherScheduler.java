@@ -2,7 +2,7 @@ package org.apache.griffin.core.worker.schedule;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.griffin.core.worker.context.WorkerContext;
 import org.apache.griffin.core.worker.entity.bo.DQInstance;
 import org.apache.griffin.core.worker.entity.bo.task.DQBaseTask;

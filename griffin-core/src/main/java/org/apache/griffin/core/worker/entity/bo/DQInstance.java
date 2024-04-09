@@ -13,7 +13,7 @@ import java.util.List;
  *      一个实例包含多个子任务
  */
 @Data
-public class DQInstance {
+public class DQInstance implements Comparable{
     private Long id;
     // 实例状态
     private DQInstanceStatus status;
@@ -74,4 +74,14 @@ public class DQInstance {
     public void doAlertTask() {
         // 收敛告警信息 进行告警
     }
+
+    @Override
+    public int compareTo(Object o) {
+        if (o == null || !(o instanceof DQInstance)) {
+            throw new IllegalArgumentException("Object must be of type DQInstance");
+        }
+        DQInstance otherInstance = (DQInstance) o;
+        return Long.compare(this.id, otherInstance.getId());
+    }
+
 }
