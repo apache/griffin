@@ -16,8 +16,8 @@ public abstract class BaseEntity implements java.io.Serializable {
 
     private Long id;
 
-    private Date updatedAt;
+    protected Date updatedAt;
 
-    private Date createdAt;
+    protected Date createdAt;
 
 }
