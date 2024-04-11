@@ -27,8 +27,8 @@ under the License.
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>griffin-anomalydetection</artifactId>
-    <name>${project.artifactId}</name>
+    <artifactId>griffin-detection</artifactId>
+    <name>Anomaly detection</name>
 
     <dependencies>
         <!-- Test dependencies -->

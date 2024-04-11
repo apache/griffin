@@ -116,7 +116,7 @@ under the License.
         <module>griffin-common</module>
         <module>griffin-core</module>
         <module>griffin-scheduler</module>
-        <module>griffin-anomalydetection</module>
+        <module>griffin-detection</module>
     </modules>
 
     <dependencyManagement>

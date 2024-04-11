@@ -23,7 +23,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 任务执行调度期 和 dispatcher交互
  */
 @Component
 public class TaskDispatcherScheduler {
@@ -48,35 +47,28 @@ public class TaskDispatcherScheduler {
 
     @PostConstruct
     public void startEvaluetingAndAlertThread() {
-        // todo 用线程池运行
         scanAlertingTask();
         scanEvaluatingTask();
     }
 
     /**
-     * 进行任务调度
      */
     @Scheduled(fixedDelay = 5 * 1000L)
     public void doTaskDispatcherScheduler() {
         log.info("doTaskDispatcherScheduler start.");
         List<DQInstance> waittingToRemoveFromWaitingList = Lists.newArrayList();
         Queue<DQInstance> waitingToRecordingDQInstanceQueue = Queues.newPriorityBlockingQueue(wc.getWAITTING_TASK_QUEUE());
-        // 从waitting队列获取任务
+        // FETCH TASKS FROM WAITING QUEUE
         try {
             while (true) {
                 try {
                     DQInstance dqInstance = waitingToRecordingDQInstanceQueue.poll();
-                    // 队列中无元素 结束循环
                     if (dqInstance == null) break;
                     if (DQInstanceStatus.ACCEPTED != dqInstance.getStatus()) {
-                        // 非初始状态
-                        // 同步数据库状态 缓存中的实例状态可能不是最新的 从数据库构建最新的实例 替换缓存中的实例
                         dqInstance = dqInstanceService.getById(dqInstance.getId());
-                        // 根据状态放到对应队列
                         waittingToRemoveFromWaitingList.add(dqInstance);
                     } else {
-                        // 提交到recording队列
-                        // 开始提交任务 放到recording队列中
+                        // submit to recording queue
                         if (dqInstanceService.updateStatus(dqInstance, DQInstanceStatus.WAITTING)) {
                             waittingToRemoveFromWaitingList.add(dqInstance);
                         }
@@ -90,9 +82,7 @@ public class TaskDispatcherScheduler {
             // todo
             log.error("scanRecordingTask failed, ex:", e);
         } finally {
-            // 根据状态分发到指定队列
             waittingToRemoveFromWaitingList.forEach(this::offerToSpecQueueByStatus);
-            // 从 原队列移除 队列移除
             if (CollectionUtils.isNotEmpty(waittingToRemoveFromWaitingList)) wc.removeAll(wc.getWAITTING_TASK_QUEUE(), waittingToRemoveFromWaitingList);
         }
         log.info("doTaskDispatcherScheduler end.");
@@ -121,7 +111,6 @@ public class TaskDispatcherScheduler {
                 wc.addSuccessDQInstanceInfo(instance);
                 break;
             default:
-                // todo 未知状态 丢弃任务
                 log.warn("Unknown status, id : {}, status : {}, instance: {}", instance.getId(), status, instance);
                 break;
         }
@@ -146,15 +135,12 @@ public class TaskDispatcherScheduler {
             // todo
             log.error("scanRecordingTask failed, ex:", e);
         } finally {
-            // 根据状态分发到指定队列
             waittingToRemoveFromRecordingList.forEach(this::offerToSpecQueueByStatus);
-            // 从 record 队列移除
             if (CollectionUtils.isNotEmpty(waittingToRemoveFromRecordingList)) wc.removeAll(wc.getRECORDING_TASK_QUEUE(), waittingToRemoveFromRecordingList);
         }
     }
 
     private void processRecordingInstance(DQInstance dqInstance, List<DQInstance> waittingToRemoveFromRecordingList) {
-        // 检查当前环境是否有可以提交任务到dispatcher（并发度限制  需要根据提交的引擎计算）
         DQInstanceStatus instanceStatus = dqInstance.getStatus();
         List<DQBaseTask> subTaskList = dqInstance.getSubTaskList();
         switch (instanceStatus) {
@@ -168,16 +154,13 @@ public class TaskDispatcherScheduler {
                 break;
             case SUBMITTING:
                 submitTaskToDispatcher(subTaskList);
-                // 检查是否所有任务都已经提交
                 if (!dqInstance.hasTaskToSubmit()) {
                     dqInstanceService.updateStatus(dqInstance, DQInstanceStatus.RUNNING);
                 }
                 break;
             case RUNNING:
-                // 检查并更新任务状态
                 checkJobStatus(subTaskList);
                 if (dqInstance.isFinishRecord()) {
-                    // record 任务都完成了  准备移除
                     waittingToRemoveFromRecordingList.add(dqInstance);
                 }
                 break;
@@ -191,41 +174,32 @@ public class TaskDispatcherScheduler {
     }
 
     private void submitTaskToDispatcher(List<DQBaseTask> subTaskList) {
-        // 遍历 recording tasks 检查状态进行更新
         subTaskList.forEach(task -> {
             DQTaskStatus taskStatus = task.getStatus();
             switch (taskStatus) {
                 case WAITTING:
-                    // 提交任务
                     doSubmitTaskToDispatcher(task);
                     if (task.isFailed()) {
-                        // 提交一直失败
                         dqTaskService.updateTaskStatus(task, DQTaskStatus.FAILED);
                     }
                     break;
                 case RECORDING:
-                    // 查询结果
                     boolean isFinished = dqTaskService.checkJobStatus(task);
                     if (isFinished) {
-                        // 任务结束， 设置任务状态为record结束
                         dqTaskService.updateTaskStatus(task, DQTaskStatus.RECORDED);
                     }
                     break;
                 default:
-                    // 其余状态不处理
                     break;
             }
         });
     }
 
     private void doSubmitTaskToDispatcher(DQBaseTask task) {
-        // 并发度检查
         if (!wc.canSubmitToSpecEngine(task.getEngine())) return;
         if (dqTaskService.doSubmitRecordingTask(task)) {
-            // 任务提交成功  更新状态为recording
             dqTaskService.updateTaskStatus(task, DQTaskStatus.RECORDING);
         } else {
-            // 提交失败 记录一次失败
             task.incrStatusAge();
         }
     }
@@ -235,11 +209,9 @@ public class TaskDispatcherScheduler {
         while (true) {
             DQInstance dqInstance = null;
             try {
-                // Evaluating 来一个处理一个
+                // Evaluating
                 dqInstance = evaluating_task_queue.poll(5, TimeUnit.SECONDS);
                 if (dqInstance == null) continue;
-                // 根据状态打回任务
-                // 执行evaluating
                 if (dqInstance.getStatus() == DQInstanceStatus.EVALUATING) {
                     dqInstance.doEvaluteTask();
                 } else {
@@ -262,11 +234,8 @@ public class TaskDispatcherScheduler {
         while (true) {
             DQInstance dqInstance = null;
             try {
-                // Evaluating 来一个处理一个
                 dqInstance = alerting_task_queue.poll(1, TimeUnit.SECONDS);
                 if (dqInstance == null) continue;
-                // 根据状态打回任务
-                // 执行evaluating
                 if (dqInstance.getStatus() == DQInstanceStatus.FAILED_ALERTING || dqInstance.getStatus() == DQInstanceStatus.EVALUATE_ALERTING) {
                     dqInstance.doAlertTask();
                 } else {
@@ -276,11 +245,8 @@ public class TaskDispatcherScheduler {
                 if (dqInstance != null) {
                     log.error("scanAlertingTask doAlert failed, id : {}， instance : {}, ex:", dqInstance.getId(), dqInstance, e);
                     if (dqInstance.isFailed()) {
-                        // 重试很多次了 直接设置为失败
                         dqInstanceService.updateStatus(dqInstance, DQInstanceStatus.FAILED);
-                        // 没有失败很多次的话，状态不修改 放回队列重试
                     }
-                    // 放回队列准备重试
                     offerToSpecQueueByStatus(dqInstance);
                 } else {
                     log.error("scanAlertingTask poll instance failed. ex:", e);
