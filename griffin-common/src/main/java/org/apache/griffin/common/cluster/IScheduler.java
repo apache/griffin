@@ -1,5 +1,6 @@
 package org.apache.griffin.common.cluster;
 
+import org.apache.griffin.common.cluster.plan.ITriggerStrategy;
 import org.apache.griffin.common.model.IJob;
 import org.apache.griffin.common.model.IJobInstance;
 import org.apache.griffin.common.model.ITask;
@@ -12,7 +13,7 @@ public interface IScheduler {
      * @param job
      * @return
      */
-    List<IJobInstance> trigger(IJob job);
+    List<IJobInstance> trigger(IJob job, ITriggerStrategy triggerStrategy);
 
     List<ITask> plan(IJobInstance jobInstance);
 
