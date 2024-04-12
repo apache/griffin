@@ -44,7 +44,7 @@ under the License.
         <derby.version>10.14.1.0</derby.version>
         <eclipselink.version>2.6.0</eclipselink.version>
         <mysql.java.version>5.1.47</mysql.java.version>
-        <postgresql.version>42.4.1</postgresql.version>
+        <postgresql.version>42.4.4</postgresql.version>
         <livy.core.version>0.3.0</livy.core.version>
         <elasticsearch-rest-client.version>6.2.4</elasticsearch-rest-client.version>
         <jackson-databind.version>2.9.9.3</jackson-databind.version>
