@@ -24,18 +24,40 @@ This tool abstracts common data quality problems and integrates seamlessly with 
 
 ## Our new Architecture
 
-Our new architecture is comprised of two layers: data quality layer and integration layer
+Our new architecture consists of two primary layers: the Data Quality Layer and the Integration Layer.
 
-In data quality layer, we abstract the concepts in data quality lifecycle, including
- - what is a specific data quality by (metric, anomaly_detection, action)
- - how to measure data quality by different connectors such as (sql, http, cmd)
- - how to organize these data quality jobs in a generic topological DAG
+### Data Quality Layer
 
-In integration layer, we develop a generic enough framework
-to allow our users to bridge griffin data quality pipelines with their business pipelines
- - how to seamlessly integration with a typical scheduler
- - how to integration with apache dolphinscheduler without efforts in java ecosystem
- - how to integration with apache airflow in ai ecosystem
+This layer abstracts the core concepts of the data quality lifecycle, focusing on:
+
+- **Defining Specific Data Quality**:
+  - **Metrics**: Establishing specific data quality metrics.
+  - **Anomaly Detection**: Implementing methods for detecting anomalies.
+  - **Actions**: Defining actions to be taken based on the data quality assessments.
+
+- **Measuring Data Quality**:
+  - Utilizing various connectors such as SQL, HTTP, and CMD to measure data quality across different systems.
+
+- **Unifying Data Quality Results**:
+  - Creating a standardized view of data quality results across different dimensions to ensure a consistent understanding.
+
+- **Flexible Data Quality Jobs**:
+  - Designing data quality jobs within a generic, topological Directed Acyclic Graph (DAG) framework to facilitate easy plug-and-play functionality.
+
+### Integration Layer
+
+This layer provides a robust framework to enable users to integrate Griffin data quality pipelines seamlessly with their business processes. It includes:
+
+- **Scheduler Integration**:
+  - Ensuring seamless integration with typical schedulers for efficient pipeline execution.
+
+- **Apache DolphinScheduler Integration**:
+  - Facilitating effortless integration within the Java ecosystem to leverage Apache DolphinScheduler.
+
+- **Apache Airflow Integration**:
+  - Enabling smooth integration within the AI ecosystem using Apache Airflow.
+
+This architecture aims to provide a comprehensive and flexible approach to managing data quality and integrating it into various business workflows.
 
 ### Data Quality Layer
 
