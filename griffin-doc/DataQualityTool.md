@@ -1,0 +1,128 @@
+# Data Quality Tool
+
+## Introduction
+
+In the evolving landscape of data architecture, ensuring data quality remains a critical success factor for all companies.
+Data architectures have progressed significantly over recent years, transitioning from relational databases and data
+warehouses to data lakes, hybrid data lake and warehouse combinations, and modern lakehouses.
+
+Despite these advancements, data quality issues persist and have become increasingly vital, especially in the era of AI
+and data integration. Improving data quality is essential for all organizations, and maintaining it across various
+environments requires a combination of people, processes, and technology.
+
+To address these challenges, we have developed a data quality tool designed to be easily adopted by any data organization.
+This tool abstracts common data quality problems and integrates seamlessly with diverse data architectures.
+
+## Data Quality Dimensions
+
+1. **Accuracy** – Data should be error-free by business needs.
+2. **Consistency** – Data should not conflict with other values across data sets.
+3. **Completeness** – Data should not be missing.
+4. **Timeliness** – Data should be up to date in a limited time frame
+5. **Uniqueness** – Data should have no duplicates.
+6. **Validity** – Data should conform to a specified format.
+
+## Our new Architecture
+
+Our new architecture is comprised of two layers: data quality layer and integration layer
+
+In data quality layer, we abstract the concepts in data quality lifecycle, including
+ - what is a specific data quality by (metric, anomaly_detection, action)
+ - how to measure data quality by different connectors such as (sql, http, cmd)
+ - how to organize these data quality jobs in a generic topological DAG
+
+In integration layer, we develop a generic enough framework
+to allow our users to bridge griffin data quality pipelines with their business pipelines
+ - how to seamlessly integration with a typical scheduler
+ - how to integration with apache dolphinscheduler without efforts in java ecosystem
+ - how to integration with apache airflow in ai ecosystem
+
+### Data Quality Layer
+
+#### Data Quality Definition
+
+This concept has been thoroughly discussed in the original Apache Griffin design documents. Essentially, we aim to quantify
+the data quality of a dataset based on the aforementioned dimensions. For example, to measure the count of records in a user
+table, our data quality definition could be:
+
+**Simple Version:**
+
+- **Metric**
+  - Name: count_of_users
+  - Target: user_table
+  - Dimension: count
+- **Anomaly Condition:** $metric <= 0
+- **Post Action:** send alert
+
+**Advanced Version:**
+
+- **Metric**
+  - Name: count_of_users
+  - Target: user_table
+  - Filters: city = 'shanghai' and event_date = '20240601'
+  - Dimension: count
+- **Anomaly Condition:** $metric <= 0
+- **Post Action:** send alert
+
+#### Data Quality Pipelines(DAG)
+
+We support several typical data quality pipelines:
+
+**One Dataset Profiling Pipeline:**
+
+```plaintext
+recording_target_table_metric_job -> anomaly_condition_job -> post_action_job
+```
+
+**Dataset Diff Pipeline:**
+
+```plaintext
+recording_target_table1_metric_job  ->
+                                       \
+                                        -> anomaly_condition_job  -> post_action_job
+                                       /
+recording_target_table2_metric_job  ->
+```
+#### Data Quality Result
+
+- **Meet Expectations**
+- **Anomaly**
+  - Violations samples
+   + we can sample some violation cases to our users
+  - Anomaly profiling: for anomaly cases, we also can deep it dive to find the root cause in SQL.
+    - Function error
+    - Group by error
+  - Possible root cause analysis
+
+#### Connector
+
+The executor measures the data quality of the target dataset by recording the metrics. It supports many predefined protocols,
+and customers can extend the executor protocol if they want to add their own business logic.
+
+**Predefined Protocols:**
+
+- MySQL: `jdbc:mysql://hostname:port/database_name?user=username&password=password`
+- Presto: `jdbc:presto://hostname:port/catalog/schema`
+- Trino: `jdbc:trino://hostname:port/catalog/schema`
+- HTTP: `http://hostname:port/api/v1/query?query=<prometheus_query>`
+- Docker
+
+### Integration layer
+
+Every data team has its own existing scheduler.
+While we provide a default scheduler, for greater adoption, we will refactor
+our Apache Griffin scheduler capabilities to leverage our customers' schedulers.
+This involves redesigning our scheduler to either ingest job instances into our customers' schedulers
+or bridge our DQ pipelines to their DAGs.
+
+ - integration with a generic scheduler
+
+ - integration with apache dolphinscheduler
+
+ - integration with apache airflow
+
+
+
+
+
+
