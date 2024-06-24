@@ -10,7 +10,7 @@ Despite these advancements, data quality issues persist and have become increasi
 and data integration. Improving data quality is essential for all organizations, and maintaining it across various
 environments requires a combination of people, processes, and technology.
 
-To address these challenges, we have developed a data quality tool designed to be easily adopted by any data organization.
+To address these challenges, we will upgrade data quality tool designed to be easily adopted by any data organization.
 This tool abstracts common data quality problems and integrates seamlessly with diverse data architectures.
 
 ## Data Quality Dimensions
@@ -39,7 +39,7 @@ This layer abstracts the core concepts of the data quality lifecycle, focusing o
   - Utilizing various connectors such as SQL, HTTP, and CMD to measure data quality across different systems.
 
 - **Unifying Data Quality Results**:
-  - Creating a standardized view of data quality results across different dimensions to ensure a consistent understanding.
+  - Creating a standardized and structured view of data quality results across different dimensions to ensure a consistent understanding.
 
 - **Flexible Data Quality Jobs**:
   - Designing data quality jobs within a generic, topological Directed Acyclic Graph (DAG) framework to facilitate easy plug-and-play functionality.
@@ -58,6 +58,8 @@ This layer provides a robust framework to enable users to integrate Griffin data
   - Enabling smooth integration within the AI ecosystem using Apache Airflow.
 
 This architecture aims to provide a comprehensive and flexible approach to managing data quality and integrating it into various business workflows.
+So that enterprise job scheduling system will launch data quality check pipelines
+and maybe based on data quality result, do some actions such as retry or stop the downstream scheduling like circuit breaker.
 
 ### Data Quality Layer
 
