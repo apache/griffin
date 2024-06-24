@@ -57,9 +57,11 @@ This layer provides a robust framework to enable users to integrate Griffin data
 - **Apache Airflow Integration**:
   - Enabling smooth integration within the AI ecosystem using Apache Airflow.
 
-This architecture aims to provide a comprehensive and flexible approach to managing data quality and integrating it into various business workflows.
-So that enterprise job scheduling system will launch data quality check pipelines
-and maybe based on data quality result, do some actions such as retry or stop the downstream scheduling like circuit breaker.
+This architecture aims to provide a comprehensive and flexible approach to managing data quality
+and integrating it into various existing business workflows in data team.
+
+So that enterprise job scheduling system will launch optional data quality check pipelines after usual data jobs are finished.
+And maybe based on data quality result, schedule some actions such as retry or stop the downstream scheduling like circuit breaker.
 
 ### Data Quality Layer
 
