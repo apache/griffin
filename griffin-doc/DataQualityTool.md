@@ -139,6 +139,17 @@ our Apache Griffin scheduler capabilities to leverage our customers' schedulers.
 This involves redesigning our scheduler to either ingest job instances into our customers' schedulers
 or bridge our DQ pipelines to their DAGs.
 
+```plaintext
+  biz_etl_phase  ||     data_quality_phase
+                 ||
+business_etl_job -> recording_target_table1_metric_job  - ->
+                 ||                                         \
+                 ||                                           -> anomaly_condition_job  -> post_action_job
+                 ||                                         /
+business_etl_job -> recording_target_table2_metric_job  - ->
+                 ||
+```
+
  - integration with a generic scheduler
 
  - integration with apache dolphinscheduler
