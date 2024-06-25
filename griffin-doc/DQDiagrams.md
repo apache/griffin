@@ -38,6 +38,10 @@
     - **DQFileDiffMetric**
       > A specific diff metric that compares files to identify differences.
 
+- **MetricStorageService**
+  > A data quality metric storage and fetch service
+
+
 - **DQJob**
   > Abstract Data Quality related Jobs.
     - **MetricCollectingJob**
