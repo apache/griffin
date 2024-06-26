@@ -10,6 +10,8 @@
 
     - **DQCOUNTMetric**
       > A specific completeness metric that counts the number of non-missing values in a dataset.
+    - **DQNULLPERCENTAGEMetric**
+      > A specific completeness metric that counts the percentage of null values in a dataset.
 
 - **DQAccuracyMetric**
   > Measures the accuracy of data, ensuring that data values are correct and conform to a known standard.
@@ -17,10 +19,32 @@
     - **DQNULLMetric**
       > An accuracy metric that counts the number of NULL values in a dataset.
 
+- **DQPROFILEMetric**
+  > Measures the profile of data, such as max, min, median, avg, stddev
+
+    - **DQMAXMetric**
+      > A profile metric that max of values in a dataset.
+
+    - **DQMINMetric**
+      > A profile metric that min of values in a dataset.
+
+    - **DQMEDIANMetric**
+      > A profile metric that median of values in a dataset.
+
+    - **DQAVGMetric**
+      > A profile metric that average of values in a dataset.
+
+    - **DQSTDDEVMetric**
+      > A profile metric that standard deviation of values in a dataset.
+
+    - **DQTOPKMetric**
+      > A profile metric that list top k frequent items of values in a dataset.
+
+
 - **DQUniquenessMetric**
   > Measures the uniqueness of data, ensuring that there are no duplicate records.
 
-    - **DQUNIQUEMetric**
+    - **DQDISTINCTCOUNTMetric**
       > A specific uniqueness metric that identifies and counts unique records in a dataset.
 
 - **DQFreshnessMetric**

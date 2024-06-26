@@ -18,7 +18,7 @@ This tool abstracts common data quality problems and integrates seamlessly with 
 1. **Accuracy** – Data should be error-free by business needs.
 2. **Consistency** – Data should not conflict with other values across data sets.
 3. **Completeness** – Data should not be missing.
-4. **Timeliness** – Data should be up to date in a limited time frame
+4. **Timeliness** – Data should be up-to-date in a limited time frame
 5. **Uniqueness** – Data should have no duplicates.
 6. **Validity** – Data should conform to a specified format.
 
