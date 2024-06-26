@@ -57,10 +57,12 @@
       > A directed acyclic graph that defines the dependencies and execution order of various data quality jobs.
 
 - **Scheduler**
-  > A system that schedules and manages the execution of data quality jobs.
+  > A system that schedules and manages the execution of data quality jobs. 
+  > This is the default scheduler, it will launch data quality jobs periodically.
 
     - **DolphinSchdulerAdapter**
-      > connect our planed data quality jobs with apache dolphinscheduler.
-      >
+      > Connects our planed data quality jobs with Apache Dolphinscheduler,
+      > allowing data quality jobs to be triggered upon the completion of dependent previous jobs.
     - **AirflowSchdulerAdapter**
-      > connect our planed data quality jobs with apache airflow.
+      > Connects our planed data quality jobs with apache airflow,
+      > so that data quality jobs can be triggered upon the completion of dependent previous jobs.
