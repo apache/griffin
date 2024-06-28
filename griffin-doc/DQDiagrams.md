@@ -1,4 +1,6 @@
 # DQ Diagrams
+## Arch
+![img.png](arch2.png)
 
 ## Entities
 
@@ -90,3 +92,10 @@
     - **AirflowSchdulerAdapter**
       > Connects our planed data quality jobs with apache airflow,
       > so that data quality jobs can be triggered upon the completion of dependent previous jobs.
+      >
+
+- **Worker**
+  > should we need another worker layer, since most work are done on big data side
+  > 
+> 
+
