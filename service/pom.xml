@@ -47,7 +47,7 @@ under the License.
         <postgresql.version>42.4.1</postgresql.version>
         <livy.core.version>0.3.0</livy.core.version>
         <elasticsearch-rest-client.version>6.2.4</elasticsearch-rest-client.version>
-        <jackson-databind.version>2.9.9.3</jackson-databind.version>
+        <jackson-databind.version>2.12.7.1</jackson-databind.version>
     </properties>
 
     <repositories>
