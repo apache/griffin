@@ -109,6 +109,16 @@ recording_target_table1_metric_job  ->
                                        /
 recording_target_table2_metric_job  ->
 ```
+
+**Compute Platform Migration Pipeline:**
+
+```plaintext
+run_job_on_platform_v1 -> recording_target_table1_metric_job  ->
+                                                                 \
+                                                                  -> anomaly_condition_job  -> post_action_job
+                                                                 /
+run_job_on_platform_v1 -> recording_target_table2_metric_job  ->
+```
 #### Data Quality Result
 
 - **Meet Expectations**
