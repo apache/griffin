@@ -26,11 +26,11 @@ This tool abstracts common data quality problems and integrates seamlessly with 
 
 Our new architecture consists of two primary layers: the Data Quality Layer and the Integration Layer.
 
-### Data Quality Layer
+### Data Quality Constraints Layer
 
-This layer abstracts the core concepts of the data quality lifecycle, focusing on:
+This constraints layer abstracts the core concepts of the data quality lifecycle, focusing on:
 
-- **Defining Specific Data Quality**:
+- **Defining Specific Data Quality Constraints**:
   - **Metrics**: Establishing specific data quality metrics.
   - **Anomaly Detection**: Implementing methods for detecting anomalies.
   - **Actions**: Defining actions to be taken based on the data quality assessments.
@@ -65,11 +65,11 @@ And maybe based on data quality result, schedule some actions such as retry or s
 
 ### Data Quality Layer
 
-#### Data Quality Definition
+#### Data Quality Constraints Definition
 
 This concept has been thoroughly discussed in the original Apache Griffin design documents. Essentially, we aim to quantify
 the data quality of a dataset based on the aforementioned dimensions. For example, to measure the count of records in a user
-table, our data quality definition could be:
+table, our data quality constraint definition could be:
 
 **Simple Version:**
 
@@ -119,18 +119,20 @@ run_job_on_platform_v1 -> recording_target_table_metric_job_on_v1  ->
                                                                        /
 run_job_on_platform_v2 -> recording_target_table_metric_job_on_v2  ->
 ```
-#### Data Quality Result
+#### Data Quality Report
 
 - **Meet Expectations**
-- **Anomaly**
-  - Violations samples
-   + we can sample some violation cases to our users
-  - Anomaly profiling: for anomaly cases, we also can deep it dive to find the root cause in SQL.
-    - Function error
-    - Group by error
-  - Possible root cause analysis
+  + Data Quality Constrain 1: Passed
+  + Data Quality Constrain 2: Passed
+- **Does Not Meet Expectations**
+  + Data Quality Constrain 3: Failed
+    - Violation details
+    - Possible root cause 
+  + Data Quality Constrain 4: Failed
+    - Violation details
+    - Possible root cause
 
-#### Connector
+#### Connectors
 
 The executor measures the data quality of the target dataset by recording the metrics. It supports many predefined protocols,
 and customers can extend the executor protocol if they want to add their own business logic.
