@@ -8,7 +8,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+  https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -17,16 +17,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>17</version>
-        <relativePath />
+        <version>33</version>
+        <relativePath/>
     </parent>
 
     <groupId>org.apache.griffin</groupId>
@@ -34,11 +34,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Griffin ${project.version}</name>
-    <url>http://griffin.apache.org</url>
-
-    <prerequisites>
-        <maven>3.2.5</maven>
-    </prerequisites>
+    <url>https://griffin.apache.org</url>
 
     <properties>
         <encoding>UTF-8</encoding>
@@ -53,7 +49,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <maven-apache-rat.version>0.11</maven-apache-rat.version>
+        <maven-apache-rat.version>${version.apache-rat-plugin}</maven-apache-rat.version>
         <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 
         <compile.scope>compile</compile.scope>
@@ -63,13 +59,13 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
 
     <organization>
         <name>Apache Software Foundation</name>
-        <url>http://www.apache.org</url>
+        <url>https://www.apache.org</url>
     </organization>
 
     <issueManagement>
@@ -121,7 +117,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                     <configuration>
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
@@ -131,11 +127,21 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.1.2</version>
                     <configuration>
                         <testFailureIgnore>false</testFailureIgnore>
                         <useSystemClassLoader>true</useSystemClassLoader>
-                        <forkMode>once</forkMode>
+                        <!--
+                        1.forkCount=1/reuseForks=true, which means that maven-surefire-plugin creates one
+                        new JVM process to execute all tests in one Maven module.
+
+                        2.forkCount=1/reuseForks=false executes each test class in its own JVM process, one after
+                        another. It creates the highest level of separation for the test execution, but it would
+                        probably also give you the longest execution time of all the available options.
+                        Consider it as a last resort.
+                        -->
+                        <forkCount>1</forkCount>
+                        <reuseForks>true</reuseForks>
                         <failIfNoTests>false</failIfNoTests>
                         <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                         <systemProperties>
