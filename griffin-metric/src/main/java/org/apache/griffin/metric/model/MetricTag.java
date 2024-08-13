@@ -23,31 +23,29 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
- * A metric value entity represents fundamental information.
+ * A metric tag entity represents fundamental information.
  */
-@Data
-@ToString
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class MetricV extends BaseEntity {
+public class MetricTag extends BaseEntity {
 
     /**
-     * An unique identity for a metric.
+     * An unique identity for a metric tag.
      */
-    private long metricId;
+    private long id;
 
     /**
-     * A double number to store metric value.
+     * Key name
      */
-    private double value;
+    private String tagKey;
 
     /**
-     * The tag property assigned.
+     * The value corresponding to a key
      */
-    private Tags tags;
+    private String tagValue;
 }

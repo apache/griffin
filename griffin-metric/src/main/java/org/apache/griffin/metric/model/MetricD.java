@@ -18,10 +18,15 @@ under the License.
 */
 package org.apache.griffin.metric.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.util.Map;
-
+/**
+ * A metric definition entity represents fundamental metadata.
+ */
 @Builder
 @Data
 @NoArgsConstructor
@@ -29,13 +34,23 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public class MetricD extends BaseEntity {
 
+    /**
+     * An unique identity for a metric.
+     */
     private long metricId;
 
+    /**
+     * The name of a metric entity.
+     */
     private String metricName;
 
+    /**
+     * The owner of a metric entity.
+     */
     private String owner;
 
+    /**
+     * The details of a metric entity.
+     */
     private String description;
-
-    private Map<String, String> tags;
 }

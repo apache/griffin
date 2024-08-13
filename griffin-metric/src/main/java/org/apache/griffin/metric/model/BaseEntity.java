@@ -18,12 +18,13 @@ under the License.
 */
 package org.apache.griffin.metric.model;
 
-import java.util.Date;
-
 import lombok.Data;
 
+import java.util.Date;
 
-
+/**
+ * A base class in metric function in griffin, which contains timestamp properties of entity creation/update.
+ */
 @Data
 public abstract class BaseEntity implements java.io.Serializable {
 
