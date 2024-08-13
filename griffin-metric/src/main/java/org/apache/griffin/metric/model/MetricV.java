@@ -34,6 +34,6 @@ public class MetricV extends BaseEntity {
 
     private double value;
 
+    //todo: move this tags to a separate table
     private Map<String, String> tags;
-
 }

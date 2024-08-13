@@ -20,23 +20,14 @@ package org.apache.griffin.metric.model;
 
 import lombok.*;
 
-import java.util.Map;
-
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class MetricD extends BaseEntity {
-
+public class MetricTags {
+    private long id;
     private long metricId;
-
-    private String metricName;
-
-    private String owner;
-
-    private String description;
-
-    //todo: move this tags to a separate table
-    private Map<String, String> tags;
+    private String tagKey;
+    private String tagValue;
 }
