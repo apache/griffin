@@ -30,7 +30,7 @@ under the License.
 
     <artifactId>griffin-metric</artifactId>
     <name>${project.artifactId}</name>
-    <url>https://griffin.apache.org</url>
+    <packaging>jar</packaging>
 
 
 </project>
