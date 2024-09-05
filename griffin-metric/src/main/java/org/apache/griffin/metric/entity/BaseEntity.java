@@ -16,41 +16,45 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.metric.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+package org.apache.griffin.metric.entity;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
- * A metric definition entity represents fundamental metadata.
+ * A base class in metric function in griffin, which contains timestamp properties of entity creation/update.
  */
-@Builder
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class MetricD extends BaseEntity {
+public abstract class BaseEntity implements java.io.Serializable {
+
+    private static final long serialVersionUID = 2110740953277261851L;
 
     /**
-     * An unique identity for a metric.
+     * creation time
      */
-    private long metricId;
+    @TableField(value = "ctime")
+    protected Date ctime;
 
     /**
-     * The name of a metric entity.
+     * update time
      */
-    private String metricName;
+    @TableField(value = "mtime")
+    protected Date mtime;
 
-    /**
-     * The owner of a metric entity.
-     */
-    private String owner;
+    public void prePersist() {
+        Date date = new Date();
+        if (ctime == null) {
+            ctime = date;
+        }
+        if (mtime == null) {
+            mtime = date;
+        }
+    }
 
-    /**
-     * The details of a metric entity.
-     */
-    private String description;
+    public void preUpdate() {
+        mtime = new Date();
+    }
 }

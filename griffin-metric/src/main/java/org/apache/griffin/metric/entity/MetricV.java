@@ -16,14 +16,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.metric.model;
 
+package org.apache.griffin.metric.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * A metric value entity represents fundamental information.
@@ -34,16 +40,19 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@TableName("t_metric_v")
 public class MetricV extends BaseEntity {
 
     /**
      * An unique identity for a metric.
      */
+    @TableId(value="mid", type = IdType.AUTO)
     private long metricId;
 
     /**
      * A double number to store metric value.
      */
+    @TableField(value = "val")
     private double value;
 
     /**
