@@ -16,41 +16,37 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.metric.model;
 
+package org.apache.griffin.metric.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
- * A base class in metric function in griffin, which contains timestamp properties of entity creation/update.
+ * A metric tag entity represents fundamental information.
  */
+@Builder
 @Data
-public abstract class BaseEntity implements java.io.Serializable {
-
-    private static final long serialVersionUID = 2110740953277261851L;
-
-    /**
-     * creation time
-     */
-    protected Date ctime;
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class MetricTag extends BaseEntity {
 
     /**
-     * update time
+     * An unique identity for a metric tag.
      */
-    protected Date mtime;
+    private long id;
 
-    public void prePersist() {
-        Date date = new Date();
-        if (ctime == null) {
-            ctime = date;
-        }
-        if (mtime == null) {
-            mtime = date;
-        }
-    }
+    /**
+     * Key name
+     */
+    private String tagKey;
 
-    public void preUpdate() {
-        mtime = new Date();
-    }
+    /**
+     * The value corresponding to a key
+     */
+    private String tagValue;
 }

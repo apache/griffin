@@ -16,7 +16,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 */
-package org.apache.griffin.metric.model;
+
+package org.apache.griffin.metric.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,28 +25,43 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
 /**
- * A metric tag entity represents fundamental information.
+ * A metric definition entity represents fundamental metadata.
  */
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class MetricTag extends BaseEntity {
+@TableName("t_metric_d")
+public class MetricD extends BaseEntity {
 
     /**
-     * An unique identity for a metric tag.
+     * An unique identity for a metric.
      */
-    private long id;
+    @TableId(value="mid", type = IdType.AUTO)
+    private Long metricId;
 
     /**
-     * Key name
+     * The name of a metric entity.
      */
-    private String tagKey;
+    @TableField(value = "name")
+    private String metricName;
 
     /**
-     * The value corresponding to a key
+     * The owner of a metric entity.
      */
-    private String tagValue;
+    @TableField(value = "owner")
+    private String owner;
+
+    /**
+     * The details of a metric entity.
+     */
+    @TableField(value = "description")
+    private String description;
 }
