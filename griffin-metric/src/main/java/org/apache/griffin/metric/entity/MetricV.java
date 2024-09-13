@@ -47,7 +47,7 @@ public class MetricV extends BaseEntity {
      * An unique identity for a metric.
      */
     @TableId(value="mid", type = IdType.AUTO)
-    private long metricId;
+    private Long metricId;
 
     /**
      * A double number to store metric value.

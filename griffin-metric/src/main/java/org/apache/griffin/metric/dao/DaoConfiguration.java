@@ -21,12 +21,10 @@
 package org.apache.griffin.metric.dao;
 
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-
 
 @Configuration
 @ComponentScan("org.apache.griffin.metric")
@@ -34,7 +32,9 @@ import org.springframework.context.annotation.Configuration;
 @MapperScan(basePackages = "org.apache.griffin.metric.dao.mapper", sqlSessionFactoryRef = "sqlSessionFactory")
 public class DaoConfiguration {
 
-    @Autowired(required = false)
-    public DataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer;
+    public final DataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer;
 
+    public DaoConfiguration(DataSourceScriptDatabaseInitializer dsScriptDatabaseInitializer) {
+        this.dataSourceScriptDatabaseInitializer = dsScriptDatabaseInitializer;
+    }
 }

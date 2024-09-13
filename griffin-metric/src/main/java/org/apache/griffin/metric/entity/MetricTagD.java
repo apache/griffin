@@ -19,6 +19,10 @@ under the License.
 
 package org.apache.griffin.metric.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,20 +37,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class MetricTag extends BaseEntity {
+@TableName("t_tag_d")
+public class MetricTagD extends BaseEntity {
 
     /**
      * An unique identity for a metric tag.
      */
-    private long id;
+    @TableId(value="mid", type = IdType.ASSIGN_ID)
+    private Long id;
 
     /**
      * Key name
      */
+    @TableField(value = "name")
     private String tagKey;
 
     /**
      * The value corresponding to a key
      */
+    @TableField(value = "val")
     private String tagValue;
 }
