@@ -14,23 +14,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#server:
-#  port: 8888
+server:
+  port: 8888
 
 spring:
   application:
     name: persist-service
+#  sql:
+#    init:
+#      schema-locations: classpath:sql/create_mysql.sql
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://127.0.0.1:3306/griffin
+#    username: root
+#    password: ""
+#    hikari:
+#      maximum-pool-size: 5
   sql:
     init:
-      schema-locations: classpath:sql/create_mysql.sql
+      schema-locations: classpath:sql/create_h2.sql
+      continue-on-error: false
+      mode: embedded
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/griffin
-    username: root
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:griffin
+    username: sa
     password: ""
     hikari:
       maximum-pool-size: 5
 
+  h2:
+    console:
+      path: /h2-console
+      enabled: on
+      settings:
+        web-allow-others: true
+        trace: true
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*Mapper.xml

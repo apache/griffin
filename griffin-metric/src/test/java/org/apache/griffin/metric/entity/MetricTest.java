@@ -31,7 +31,7 @@ public class MetricTest {
     private MetricD metricD;
     private MetricV metricV1;
     private MetricV metricV2;
-    private Tags tags;
+    private TagAttachment tagAttachment;
 
     @BeforeEach
     public void setUp() {
@@ -47,7 +47,7 @@ public class MetricTest {
         metricV1 = MetricV.builder()
                 .metricId(1L)
                 .value(100.5)
-                .tags(Tags.builder()
+                .tags(TagAttachment.builder()
                         .metricId(1L)
                         .metricTags(createSampleTags())
                         .build())
@@ -56,14 +56,14 @@ public class MetricTest {
         metricV2 = MetricV.builder()
                 .metricId(1L)
                 .value(200.75)
-                .tags(Tags.builder()
+                .tags(TagAttachment.builder()
                         .metricId(1L)
                         .metricTags(createSampleTags())
                         .build())
                 .build();
 
         // Initialize Tags
-        tags = Tags.builder()
+        tagAttachment = TagAttachment.builder()
                 .metricId(1L)
                 .metricTags(createSampleTags())
                 .build();
@@ -93,20 +93,20 @@ public class MetricTest {
     public void testFetchMetricDWithTags() {
         // Mock fetch logic here. This would typically involve querying a database or service.
         MetricD fetchedMetricD = metricD;  // Simulate fetching
-        Tags fetchedTags = tags;  // Simulate fetching tags
+        TagAttachment fetchedTagAttachment = tagAttachment;  // Simulate fetching tags
 
         assertNotNull(fetchedMetricD);
         assertEquals(1L, fetchedMetricD.getMetricId());
 
-        assertNotNull(fetchedTags);
-        assertEquals(1L, fetchedTags.getMetricId());
-        assertEquals(2, fetchedTags.getMetricTags().size());
+        assertNotNull(fetchedTagAttachment);
+        assertEquals(1L, fetchedTagAttachment.getMetricId());
+        assertEquals(2, fetchedTagAttachment.getMetricTags().size());
     }
 
-    private List<MetricTag> createSampleTags() {
-        List<MetricTag> tags = new ArrayList<>();
-        tags.add(new MetricTag(1L, "key1", "value1"));
-        tags.add(new MetricTag(2L, "key2", "value2"));
+    private List<MetricTagD> createSampleTags() {
+        List<MetricTagD> tags = new ArrayList<>();
+        tags.add(new MetricTagD(1L, "key1", "value1"));
+        tags.add(new MetricTagD(2L, "key2", "value2"));
         return tags;
     }
 }

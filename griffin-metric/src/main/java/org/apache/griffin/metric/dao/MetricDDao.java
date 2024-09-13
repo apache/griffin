@@ -20,23 +20,36 @@ package org.apache.griffin.metric.dao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.griffin.metric.dao.mapper.MetricDMapper;
 import org.apache.griffin.metric.entity.MetricD;
+import org.apache.griffin.metric.exception.GriffinException;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @Slf4j
 public class MetricDDao extends BaseDao<MetricD, MetricDMapper> {
 
+    public static final String NOT_BE_NULL = "The metricD argument is illegal.\n" +
+            "Either metricD entity or metric name attribute must not be null.";
+
     public MetricDDao(MetricDMapper metricDMapper) {
         super(metricDMapper);
     }
 
     public int addMetricD(MetricD metricD) {
-        if (null == metricD || null == metricD.getMetricName()) {
-            log.warn("metricD is invalid");
-            return 0;
+        validateEntity(metricD);
+        int count = 0;
+        try {
+            count = mybatisMapper.insert(metricD);
+        } catch (Exception e) {
+            throw new GriffinException(e);
         }
-        int count = mybatisMapper.insert(metricD);
         log.info("add metricD: {}, count: {}", metricD, count);
         return count;
+    }
+
+    private void validateEntity(MetricD metricD) {
+        if (null == metricD || null == metricD.getMetricName()) {
+            log.error(NOT_BE_NULL);
+            throw new GriffinException(NOT_BE_NULL);
+        }
     }
 }

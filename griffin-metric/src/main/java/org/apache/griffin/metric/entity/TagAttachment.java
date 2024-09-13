@@ -17,13 +17,15 @@
 
 package org.apache.griffin.metric.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * A common tag entity represents the relationships among metric entities and metric tag entities.
@@ -33,15 +35,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Tags extends BaseEntity {
+@TableName("t_metric_tag")
+public class TagAttachment extends BaseEntity {
 
     /**
      * Metric entity's identity.
      */
-    private long metricId;
+    @TableId(value="mid", type = IdType.INPUT)
+    private Long metricId;
 
     /**
-     * All tag properties assigning to a metric entity.
+     * Metric tag's identity.
      */
-    private List<MetricTag> metricTags;
+    @TableField(value="tid")
+    private Long tagId;
 }
