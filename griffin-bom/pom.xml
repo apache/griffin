@@ -26,7 +26,6 @@ under the License.
         <groupId>org.apache.griffin</groupId>
         <artifactId>griffin</artifactId>
         <version>2.0.0-SNAPSHOT</version>
-        <relativePath/>
     </parent>
 
     <groupId>org.apache.griffin</groupId>
