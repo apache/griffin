@@ -103,10 +103,10 @@ public class MetricTest {
         assertEquals(2, fetchedTags.getMetricTags().size());
     }
 
-    private List<MetricTag> createSampleTags() {
-        List<MetricTag> tags = new ArrayList<>();
-        tags.add(new MetricTag(1L, "key1", "value1"));
-        tags.add(new MetricTag(2L, "key2", "value2"));
+    private List<MetricTagD> createSampleTags() {
+        List<MetricTagD> tags = new ArrayList<>();
+        tags.add(new MetricTagD(1L, "key1", "value1"));
+        tags.add(new MetricTagD(2L, "key2", "value2"));
         return tags;
     }
 }

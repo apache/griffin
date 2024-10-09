@@ -17,6 +17,9 @@
 
 package org.apache.griffin.metric.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,15 +36,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@TableName("t_metric_tag")
 public class Tags extends BaseEntity {
 
     /**
      * Metric entity's identity.
      */
-    private long metricId;
+    @TableId(value="mid", type = IdType.AUTO)
+    private Long metricId;
 
     /**
      * All tag properties assigning to a metric entity.
      */
-    private List<MetricTag> metricTags;
+    private List<MetricTagD> metricTags;
 }

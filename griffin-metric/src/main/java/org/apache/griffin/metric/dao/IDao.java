@@ -28,9 +28,16 @@ public interface IDao<E> {
 
     /**
      * Query by the primary key.
+     * @param id Unique identity of E
+     * @return E if exist
      */
     E queryById(@NonNull Serializable id);
 
+    /**
+     * Query by the primary key.
+     * @param id Unique identity of E
+     * @return {@code Optional}
+     */
     Optional<E> queryOptionalById(@NonNull Serializable id);
 
     List<E> queryByIds(Collection<? extends Serializable> ids);
