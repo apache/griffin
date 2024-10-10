@@ -20,6 +20,7 @@ package org.apache.griffin.metric.dao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.griffin.metric.dao.mapper.MetricDMapper;
 import org.apache.griffin.metric.entity.MetricD;
+import org.apache.griffin.metric.exception.GriffinErr;
 import org.apache.griffin.metric.exception.GriffinException;
 import org.springframework.stereotype.Repository;
 
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class MetricDDao extends BaseDao<MetricD, MetricDMapper> {
 
-    public static final String NOT_BE_NULL = "The metricD argument is illegal.\n" +
+    public static final String NOT_BE_NULL = "The metricD argument is illegal." +
             "Either metricD entity or metric name attribute must not be null.";
 
     public MetricDDao(MetricDMapper metricDMapper) {
@@ -49,7 +50,7 @@ public class MetricDDao extends BaseDao<MetricD, MetricDMapper> {
     private void validateEntity(MetricD metricD) {
         if (null == metricD || null == metricD.getMetricName()) {
             log.error(NOT_BE_NULL);
-            throw new GriffinException(NOT_BE_NULL);
+            throw new GriffinException(NOT_BE_NULL, GriffinErr.validationError);
         }
     }
 }

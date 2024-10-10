@@ -20,6 +20,8 @@ under the License.
 package org.apache.griffin.metric.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -28,6 +30,7 @@ import java.util.Date;
  * A base class in metric function in griffin, which contains timestamp properties of entity creation/update.
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class BaseEntity implements java.io.Serializable {
 
     private static final long serialVersionUID = 2110740953277261851L;
@@ -35,12 +38,14 @@ public abstract class BaseEntity implements java.io.Serializable {
     /**
      * creation time
      */
+    @JsonProperty(value = "creation_time")
     @TableField(value = "ctime")
     protected Date ctime;
 
     /**
      * update time
      */
+    @JsonProperty(value = "update_time")
     @TableField(value = "mtime")
     protected Date mtime;
 
