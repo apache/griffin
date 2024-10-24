@@ -43,7 +43,7 @@ public class MetricTagD extends BaseEntity {
     /**
      * An unique identity for a metric tag.
      */
-    @TableId(value="mid", type = IdType.ASSIGN_ID)
+    @TableId(value="tid", type = IdType.AUTO)
     private Long id;
 
     /**

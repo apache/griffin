@@ -54,9 +54,4 @@ public class MetricV extends BaseEntity {
      */
     @TableField(value = "val")
     private double value;
-
-    /**
-     * The tag property assigned.
-     */
-    private Tags tags;
 }
