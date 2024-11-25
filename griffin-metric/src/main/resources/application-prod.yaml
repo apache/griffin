@@ -14,6 +14,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+server:
+  port: 8080
+
 spring:
-  profiles:
-    active: dev
+  application:
+    name: persist-service
+  sql:
+    init:
+      schema-locations: classpath:sql/create_mysql.sql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/griffin
+    username: root
+    password: ""
+    hikari:
+      maximum-pool-size: 5
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: org.apache.griffin.metric.dao.entity
+  configuration:
+    cache-enabled: false
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
+  global-config:
+    db-config:
+      id-type: auto
+    banner: false
+
+
+logging:
+  level:
+    root: info
