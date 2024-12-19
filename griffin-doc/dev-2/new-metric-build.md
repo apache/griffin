@@ -98,6 +98,7 @@ T_TAG_D
       
         Response:
         {
+           "id": 2,
            "metricId": 1,
            "value": 5.0
         }

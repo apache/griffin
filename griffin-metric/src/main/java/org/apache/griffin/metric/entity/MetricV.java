@@ -31,6 +31,8 @@ import lombok.ToString;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import java.util.List;
+
 /**
  * A metric value entity represents fundamental information.
  */
@@ -44,9 +46,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
 public class MetricV extends BaseEntity {
 
     /**
-     * An unique identity for a metric.
+     * An incremental identity in metric value table.
      */
-    @TableId(value="mid", type = IdType.AUTO)
+    @TableId(value="vid", type = IdType.AUTO)
+    private Long id;
+
+    /**
+     * metric identity in metric definition table.
+     */
+    @TableField(value="mid")
     private Long metricId;
 
     /**
@@ -54,4 +62,6 @@ public class MetricV extends BaseEntity {
      */
     @TableField(value = "val")
     private double value;
+
+    private List<MetricTagD> tags;
 }
