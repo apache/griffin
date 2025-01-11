@@ -1,0 +1,56 @@
+griffin_recording:
+  count:
+    parameters:
+      - table_name: "table_name"
+        required: true
+      - filter_expression: "filter_expression"
+        required: false
+    metric: |
+      SELECT 
+          COUNT(1) AS count
+      FROM {{table_name}}
+      WHERE {{filter_expression}};
+
+  count_distinct:
+    parameters:
+      - table_name: "table_name"
+        required: true
+      - table_name: "pk_columns"
+        required: true
+      - filter_expression: "filter_expression"
+        required: false
+    metric: |
+      SELECT
+      COUNT(DISTINCT {{pk_columns}}) AS count
+      FROM {{table_name}}
+      WHERE {{filter_expression}};     
+
+  group_count:
+    parameters:
+      - table_name: "table_name"
+        required: true
+      - table_name: "group_columns"
+        required: true
+      - filter_expression: "filter_expression"
+        required: false
+    metric: |
+      SELECT
+      {{group_columns}},
+      COUNT(1) AS count
+      FROM {{table_name}}
+      WHERE {{filter_expression}}
+      GROUP BY {{group_columns}};
+
+griffin_check_alerts:
+  simple:
+    operator: {{operator}}
+    threshold: {{threshold}}
+    alerts:
+      email: {{email}}
+      webhook: {{webhook}}
+  cross:
+    operator: {{operator}}
+    threshold: {{target_metric}}
+    alerts:
+      email: {{email}}
+      webhook: {{webhook}}
