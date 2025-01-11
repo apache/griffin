@@ -15,7 +15,7 @@ griffin_recording:
     parameters:
       - table_name: "table_name"
         required: true
-      - table_name: "pk_columns"
+      - pk_columns: "pk_columns"
         required: true
       - filter_expression: "filter_expression"
         required: false
@@ -29,7 +29,7 @@ griffin_recording:
     parameters:
       - table_name: "table_name"
         required: true
-      - table_name: "group_columns"
+      - group_columns: "group_columns"
         required: true
       - filter_expression: "filter_expression"
         required: false
