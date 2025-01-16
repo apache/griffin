@@ -28,54 +28,52 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MetricTest {
 
+    public static final long METRIC_A_ID = 100L;
+    public static final long VALUE_ID_1 = 1001L;
+    public static final long VALUE_ID_2 = 1002L;
+    public static final String METRIC_A_NAME = "Metric A";
+    public static final String OWNER_A = "Owner A";
+    public static final String DESCRIPTION_A = "Description A";
     private MetricD metricD;
+    public static final long PERFMETRIC_TAGD_ID = 5000L;
+    public static final long CAPACITYMETRIC_TAGD_ID = 5001L;
+    private MetricTagD perfMetricTagD, capacityMetricTagD;
     private MetricV metricV1;
     private MetricV metricV2;
-    private TagAttachment tagAttachment;
 
     @BeforeEach
     public void setUp() {
         // Initialize MetricD
         metricD = MetricD.builder()
-                .metricId(1L)
-                .metricName("Metric A")
-                .owner("Owner A")
-                .description("Description A")
+                .metricId(METRIC_A_ID)
+                .metricName(METRIC_A_NAME)
+                .owner(OWNER_A)
+                .description(DESCRIPTION_A)
                 .build();
 
         // Initialize MetricV
         metricV1 = MetricV.builder()
-                .metricId(1L)
+                .id(VALUE_ID_1)
+                .metricId(METRIC_A_ID)
                 .value(100.5)
-                .tags(TagAttachment.builder()
-                        .metricId(1L)
-                        .metricTags(createSampleTags())
-                        .build())
+                .tags(createSampleTags())
                 .build();
 
         metricV2 = MetricV.builder()
-                .metricId(1L)
+                .id(VALUE_ID_2)
+                .metricId(METRIC_A_ID)
                 .value(200.75)
-                .tags(TagAttachment.builder()
-                        .metricId(1L)
-                        .metricTags(createSampleTags())
-                        .build())
-                .build();
-
-        // Initialize Tags
-        tagAttachment = TagAttachment.builder()
-                .metricId(1L)
-                .metricTags(createSampleTags())
+                .tags(createSampleTags())
                 .build();
     }
 
     @Test
     public void testCreateMetricD() {
         assertNotNull(metricD);
-        assertEquals(1L, metricD.getMetricId());
-        assertEquals("Metric A", metricD.getMetricName());
-        assertEquals("Owner A", metricD.getOwner());
-        assertEquals("Description A", metricD.getDescription());
+        assertEquals(METRIC_A_ID, metricD.getMetricId());
+        assertEquals(METRIC_A_NAME, metricD.getMetricName());
+        assertEquals(OWNER_A, metricD.getOwner());
+        assertEquals(DESCRIPTION_A, metricD.getDescription());
     }
 
     @Test
@@ -87,26 +85,41 @@ public class MetricTest {
         assertEquals(2, metricVs.size());
         assertTrue(metricVs.contains(metricV1));
         assertTrue(metricVs.contains(metricV2));
+        assertEquals(metricV1.getMetricId(), metricV2.getMetricId());
+        assertEquals(metricD.getMetricId(), metricV1.getMetricId());
+        assertEquals(metricD.getMetricId(), metricV2.getMetricId());
     }
 
     @Test
     public void testFetchMetricDWithTags() {
         // Mock fetch logic here. This would typically involve querying a database or service.
         MetricD fetchedMetricD = metricD;  // Simulate fetching
-        TagAttachment fetchedTagAttachment = tagAttachment;  // Simulate fetching tags
+        List<MetricTagD> fetchedTagAttachment = metricV1.getTags();
 
         assertNotNull(fetchedMetricD);
-        assertEquals(1L, fetchedMetricD.getMetricId());
+        assertEquals(METRIC_A_ID, fetchedMetricD.getMetricId());
 
         assertNotNull(fetchedTagAttachment);
-        assertEquals(1L, fetchedTagAttachment.getMetricId());
-        assertEquals(2, fetchedTagAttachment.getMetricTags().size());
+        assertEquals(2, fetchedTagAttachment.size());
     }
 
     private List<MetricTagD> createSampleTags() {
         List<MetricTagD> tags = new ArrayList<>();
-        tags.add(new MetricTagD(1L, "key1", "value1"));
-        tags.add(new MetricTagD(2L, "key2", "value2"));
+
+        // Initialize MetricTagD
+        perfMetricTagD = MetricTagD.builder()
+                .id(PERFMETRIC_TAGD_ID)
+                .tagKey("perf")
+                .tagValue("baseline")
+                .build();
+        capacityMetricTagD = MetricTagD.builder()
+                .id(CAPACITYMETRIC_TAGD_ID)
+                .tagKey("capacity")
+                .tagValue("overall")
+                .build();
+
+        tags.add(perfMetricTagD);
+        tags.add(capacityMetricTagD);
         return tags;
     }
 }
